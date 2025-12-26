@@ -241,6 +241,237 @@ export default function AdminDashboard() {
     setBulkDialog(true);
   };
 
+  // ========== CSV IMPORT ==========
+  
+  // Grade mapping from Spanish names to IDs
+  const gradeMapping = {
+    'preescolar': 'preescolar',
+    'pre-escolar': 'preescolar',
+    'pre escolar': 'preescolar',
+    '1': '1', '1er grado': '1', '1er': '1', 'primer grado': '1', 'primero': '1',
+    '2': '2', '2do grado': '2', '2do': '2', 'segundo grado': '2', 'segundo': '2',
+    '3': '3', '3er grado': '3', '3er': '3', 'tercer grado': '3', 'tercero': '3',
+    '4': '4', '4to grado': '4', '4to': '4', 'cuarto grado': '4', 'cuarto': '4',
+    '5': '5', '5to grado': '5', '5to': '5', 'quinto grado': '5', 'quinto': '5',
+    '6': '6', '6to grado': '6', '6to': '6', 'sexto grado': '6', 'sexto': '6',
+    '7': '7', '7mo grado': '7', '7mo': '7', 'séptimo grado': '7', 'septimo': '7',
+    '8': '8', '8vo grado': '8', '8vo': '8', 'octavo grado': '8', 'octavo': '8',
+    '9': '9', '9no grado': '9', '9no': '9', 'noveno grado': '9', 'noveno': '9',
+    '10': '10', '10mo grado': '10', '10mo': '10', 'décimo grado': '10', 'decimo': '10',
+    '11': '11', '11vo grado': '11', '11vo': '11', 'undécimo grado': '11', 'undecimo': '11',
+    '12': '12', '12vo grado': '12', '12vo': '12', 'duodécimo grado': '12', 'duodecimo': '12'
+  };
+
+  // Subject mapping from Spanish names to IDs
+  const subjectMapping = {
+    'matematicas': 'matematicas', 'matemáticas': 'matematicas', 'math': 'matematicas', 'mate': 'matematicas',
+    'espanol': 'espanol', 'español': 'espanol', 'spanish': 'espanol', 'lengua': 'espanol',
+    'ciencias': 'ciencias', 'ciencia': 'ciencias', 'science': 'ciencias',
+    'sociales': 'sociales', 'estudios sociales': 'sociales', 'social': 'sociales', 'historia': 'sociales',
+    'ingles': 'ingles', 'inglés': 'ingles', 'english': 'ingles',
+    'arte': 'arte', 'artes': 'arte', 'art': 'arte',
+    'musica': 'musica', 'música': 'musica', 'music': 'musica',
+    'educacion fisica': 'educacion_fisica', 'educación física': 'educacion_fisica', 'ed. fisica': 'educacion_fisica', 'deportes': 'educacion_fisica',
+    'tecnologia': 'tecnologia', 'tecnología': 'tecnologia', 'tech': 'tecnologia', 'informatica': 'tecnologia',
+    'religion': 'religion', 'religión': 'religion'
+  };
+
+  const normalizeGrade = (value) => {
+    if (!value) return null;
+    const normalized = value.toString().toLowerCase().trim();
+    return gradeMapping[normalized] || null;
+  };
+
+  const normalizeSubject = (value) => {
+    if (!value) return null;
+    const normalized = value.toString().toLowerCase().trim();
+    return subjectMapping[normalized] || null;
+  };
+
+  const parseCSV = (text) => {
+    const lines = text.split(/\r?\n/).filter(line => line.trim());
+    if (lines.length < 2) return { data: [], errors: ['El archivo CSV debe tener al menos una fila de encabezados y una fila de datos'] };
+
+    // Parse header
+    const headerLine = lines[0];
+    const headers = headerLine.split(/[,;]/).map(h => h.trim().toLowerCase().replace(/["']/g, ''));
+    
+    // Expected columns mapping
+    const columnMapping = {
+      'nombre': ['nombre', 'name', 'titulo', 'título', 'libro', 'product', 'producto'],
+      'grado': ['grado', 'grade', 'nivel', 'level', 'año', 'year'],
+      'materia': ['materia', 'subject', 'asignatura', 'curso', 'course'],
+      'precio': ['precio', 'price', 'costo', 'cost', 'valor'],
+      'cantidad_inventario': ['cantidad', 'stock', 'inventario', 'qty', 'quantity', 'cantidad_inventario', 'unidades'],
+      'descripcion': ['descripcion', 'descripción', 'description', 'desc', 'detalle'],
+      'isbn': ['isbn', 'codigo', 'código', 'code'],
+      'editorial': ['editorial', 'publisher', 'publicador', 'editor']
+    };
+
+    // Find column indices
+    const columnIndices = {};
+    for (const [field, aliases] of Object.entries(columnMapping)) {
+      const index = headers.findIndex(h => aliases.includes(h));
+      if (index !== -1) columnIndices[field] = index;
+    }
+
+    // Check required columns
+    const requiredColumns = ['nombre', 'grado', 'materia', 'precio', 'cantidad_inventario'];
+    const missingColumns = requiredColumns.filter(col => columnIndices[col] === undefined);
+    
+    if (missingColumns.length > 0) {
+      return { 
+        data: [], 
+        errors: [`Columnas requeridas no encontradas: ${missingColumns.join(', ')}. Columnas detectadas: ${headers.join(', ')}`] 
+      };
+    }
+
+    // Parse data rows
+    const data = [];
+    const errors = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.trim()) continue;
+
+      // Split by comma or semicolon, handling quoted values
+      const values = line.match(/("([^"]|"")*"|[^,;]+)/g)?.map(v => v.trim().replace(/^["']|["']$/g, '').replace(/""/g, '"')) || [];
+      
+      const row = {
+        rowNumber: i + 1,
+        nombre: values[columnIndices.nombre] || '',
+        grado: normalizeGrade(values[columnIndices.grado]),
+        materia: normalizeSubject(values[columnIndices.materia]),
+        precio: values[columnIndices.precio] || '',
+        cantidad_inventario: values[columnIndices.cantidad_inventario] || '',
+        descripcion: columnIndices.descripcion !== undefined ? values[columnIndices.descripcion] || '' : '',
+        isbn: columnIndices.isbn !== undefined ? values[columnIndices.isbn] || '' : '',
+        editorial: columnIndices.editorial !== undefined ? values[columnIndices.editorial] || '' : '',
+        valid: true,
+        error: null
+      };
+
+      // Validate row
+      const rowErrors = [];
+      if (!row.nombre) rowErrors.push('Nombre vacío');
+      if (!row.grado) rowErrors.push(`Grado inválido: "${values[columnIndices.grado]}"`);
+      if (!row.materia) rowErrors.push(`Materia inválida: "${values[columnIndices.materia]}"`);
+      if (!row.precio || isNaN(parseFloat(row.precio))) rowErrors.push('Precio inválido');
+      if (!row.cantidad_inventario || isNaN(parseInt(row.cantidad_inventario))) rowErrors.push('Cantidad inválida');
+
+      if (rowErrors.length > 0) {
+        row.valid = false;
+        row.error = rowErrors.join(', ');
+        errors.push(`Fila ${row.rowNumber}: ${row.error}`);
+      }
+
+      data.push(row);
+    }
+
+    return { data, errors };
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Reset file input
+    event.target.value = '';
+
+    // Check file type
+    if (!file.name.endsWith('.csv') && !file.type.includes('csv')) {
+      toast.error('Por favor seleccione un archivo CSV');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text === 'string') {
+        const { data, errors } = parseCSV(text);
+        setCsvData(data);
+        setCsvErrors(errors);
+        setCsvDialog(true);
+      }
+    };
+    reader.onerror = () => {
+      toast.error('Error al leer el archivo');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleCsvImport = async () => {
+    const validProducts = csvData.filter(row => row.valid);
+    
+    if (validProducts.length === 0) {
+      toast.error('No hay productos válidos para importar');
+      return;
+    }
+
+    setImportingCsv(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const product of validProducts) {
+      try {
+        const data = {
+          nombre: product.nombre,
+          grado: product.grado,
+          materia: product.materia,
+          precio: parseFloat(product.precio),
+          cantidad_inventario: parseInt(product.cantidad_inventario),
+          descripcion: product.descripcion || '',
+          isbn: product.isbn || '',
+          editorial: product.editorial || '',
+          activo: true
+        };
+
+        await api.post('/admin/libros', data);
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        console.error('Error importing product:', error);
+      }
+    }
+
+    setImportingCsv(false);
+
+    if (successCount > 0) {
+      toast.success(`${successCount} producto(s) importado(s) exitosamente`);
+      setCsvDialog(false);
+      setCsvData([]);
+      setCsvErrors([]);
+      fetchData();
+    }
+
+    if (errorCount > 0) {
+      toast.error(`${errorCount} producto(s) fallaron al importar`);
+    }
+  };
+
+  const downloadCsvTemplate = () => {
+    const headers = ['nombre', 'grado', 'materia', 'precio', 'cantidad', 'descripcion', 'isbn', 'editorial'];
+    const exampleRows = [
+      ['Matemáticas 1', '1', 'matematicas', '25.00', '50', 'Libro de matemáticas primer grado', '978-1-234-56789-0', 'Editorial Santillana'],
+      ['Español 2', '2', 'espanol', '26.50', '40', 'Libro de español segundo grado', '978-1-234-56789-1', 'Editorial Norma'],
+      ['Ciencias 3', '3', 'ciencias', '28.00', '35', '', '', '']
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...exampleRows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'plantilla_productos.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    
+    toast.success('Plantilla descargada');
+  };
+
   // ========== INVENTORY & ORDERS ==========
   const handleUpdateStock = async (libroId, cantidad) => {
     try {
