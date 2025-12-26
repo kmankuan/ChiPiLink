@@ -95,10 +95,10 @@ export default function Landing() {
               <GraduationCap className="h-6 w-6 text-primary" />
             </div>
             <h3 className="font-serif text-xl md:text-2xl font-bold mb-2">
-              12 {t('catalog.allGrades')}
+              12 {t('landing.allGrades')}
             </h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Desde preescolar hasta bachillerato
+              {t('landing.fromPreschool')}
             </p>
           </div>
           
@@ -120,14 +120,14 @@ export default function Landing() {
           data-testid="benefits-card"
         >
           <h3 className="font-serif text-lg md:text-xl font-bold mb-4">
-            ¿Por qué elegirnos?
+            {t('landing.whyUs')}
           </h3>
           <ul className="space-y-3">
             {[
-              'Precios competitivos',
-              'Libros originales',
-              'Envío a todo el país',
-              'Atención personalizada'
+              t('landing.benefits.prices'),
+              t('landing.benefits.original'),
+              t('landing.benefits.shipping'),
+              t('landing.benefits.support')
             ].map((benefit, i) => (
               <li key={i} className="flex items-center gap-2 text-sm">
                 <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
@@ -142,10 +142,10 @@ export default function Landing() {
       <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            Comprar nunca fue tan fácil
+            {t('landing.buyEasy')}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Simplificamos el proceso de compra de libros escolares para que pueda enfocarse en lo importante: la educación de sus hijos.
+            {t('landing.buyEasyDesc')}
           </p>
         </div>
         
@@ -178,11 +178,10 @@ export default function Landing() {
         >
           <div className="relative z-10 max-w-2xl">
             <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-              ¿Listo para ordenar?
+              {t('landing.readyToOrder')}
             </h2>
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              Cree su cuenta hoy y obtenga acceso a todos los libros de texto organizados por grado. 
-              Agregue sus estudiantes y ordene en minutos.
+              {t('landing.readyToOrderDesc')}
             </p>
             <div className="flex flex-wrap gap-4">
               <Button 
@@ -200,7 +199,7 @@ export default function Landing() {
                 onClick={() => navigate('/catalogo')}
                 className="rounded-full px-8 py-6 text-lg"
               >
-                Ver Catálogo
+                {t('landing.viewCatalog')}
               </Button>
             </div>
           </div>
