@@ -44,7 +44,8 @@ logger = logging.getLogger(__name__)
 class LibroBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    grado: str  # Grade level
+    grado: str  # Grade level (primary grade)
+    grados: Optional[List[str]] = None  # Additional grades that use this book
     materia: str  # Subject
     precio: float
     cantidad_inventario: int = 0
