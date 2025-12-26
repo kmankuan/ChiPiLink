@@ -41,8 +41,21 @@ import {
   X,
   Printer,
   Loader2,
-  Search
+  Search,
+  Save
 } from 'lucide-react';
+
+// Empty product row template
+const emptyProductRow = {
+  nombre: '',
+  grado: '',
+  materia: '',
+  precio: '',
+  cantidad_inventario: '',
+  descripcion: '',
+  isbn: '',
+  editorial: ''
+};
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -56,19 +69,15 @@ export default function AdminDashboard() {
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   
-  const [productDialog, setProductDialog] = useState(false);
+  // Single product edit dialog
+  const [editDialog, setEditDialog] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [productForm, setProductForm] = useState({
-    nombre: '',
-    descripcion: '',
-    grado: '',
-    materia: '',
-    precio: '',
-    cantidad_inventario: '',
-    isbn: '',
-    editorial: '',
-    imagen_url: ''
-  });
+  const [editForm, setEditForm] = useState({...emptyProductRow});
+  
+  // Bulk add products dialog
+  const [bulkDialog, setBulkDialog] = useState(false);
+  const [bulkProducts, setBulkProducts] = useState([{...emptyProductRow}]);
+  const [savingBulk, setSavingBulk] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [orderFilter, setOrderFilter] = useState('all');
@@ -105,35 +114,31 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleProductSubmit = async (e) => {
+  // ========== SINGLE PRODUCT EDIT ==========
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
     
     try {
       const data = {
-        ...productForm,
-        precio: parseFloat(productForm.precio),
-        cantidad_inventario: parseInt(productForm.cantidad_inventario)
+        ...editForm,
+        precio: parseFloat(editForm.precio),
+        cantidad_inventario: parseInt(editForm.cantidad_inventario)
       };
       
-      if (editingProduct) {
-        await api.put(`/admin/libros/${editingProduct.libro_id}`, data);
-        toast.success('Producto actualizado');
-      } else {
-        await api.post('/admin/libros', data);
-        toast.success('Producto creado');
-      }
+      await api.put(`/admin/libros/${editingProduct.libro_id}`, data);
+      toast.success('Producto actualizado');
       
-      setProductDialog(false);
-      resetProductForm();
+      setEditDialog(false);
+      setEditingProduct(null);
       fetchData();
     } catch (error) {
-      toast.error('Error al guardar producto');
+      toast.error('Error al actualizar producto');
     }
   };
 
   const handleEditProduct = (libro) => {
     setEditingProduct(libro);
-    setProductForm({
+    setEditForm({
       nombre: libro.nombre,
       descripcion: libro.descripcion || '',
       grado: libro.grado,
@@ -141,10 +146,9 @@ export default function AdminDashboard() {
       precio: libro.precio.toString(),
       cantidad_inventario: libro.cantidad_inventario.toString(),
       isbn: libro.isbn || '',
-      editorial: libro.editorial || '',
-      imagen_url: libro.imagen_url || ''
+      editorial: libro.editorial || ''
     });
-    setProductDialog(true);
+    setEditDialog(true);
   };
 
   const handleDeleteProduct = async (libroId) => {
@@ -159,6 +163,74 @@ export default function AdminDashboard() {
     }
   };
 
+  // ========== BULK ADD PRODUCTS ==========
+  const addBulkRow = () => {
+    setBulkProducts([...bulkProducts, {...emptyProductRow}]);
+  };
+
+  const removeBulkRow = (index) => {
+    if (bulkProducts.length === 1) return;
+    setBulkProducts(bulkProducts.filter((_, i) => i !== index));
+  };
+
+  const updateBulkRow = (index, field, value) => {
+    const updated = [...bulkProducts];
+    updated[index] = { ...updated[index], [field]: value };
+    setBulkProducts(updated);
+  };
+
+  const handleBulkSubmit = async () => {
+    // Validate all rows
+    const validProducts = bulkProducts.filter(p => 
+      p.nombre && p.grado && p.materia && p.precio && p.cantidad_inventario
+    );
+    
+    if (validProducts.length === 0) {
+      toast.error('Complete al menos un producto con los campos requeridos');
+      return;
+    }
+    
+    setSavingBulk(true);
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const product of validProducts) {
+      try {
+        const data = {
+          ...product,
+          precio: parseFloat(product.precio),
+          cantidad_inventario: parseInt(product.cantidad_inventario),
+          activo: true
+        };
+        
+        await api.post('/admin/libros', data);
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        console.error('Error creating product:', error);
+      }
+    }
+    
+    setSavingBulk(false);
+    
+    if (successCount > 0) {
+      toast.success(`${successCount} producto(s) creado(s) exitosamente`);
+      setBulkDialog(false);
+      setBulkProducts([{...emptyProductRow}]);
+      fetchData();
+    }
+    
+    if (errorCount > 0) {
+      toast.error(`${errorCount} producto(s) fallaron al crear`);
+    }
+  };
+
+  const openBulkDialog = () => {
+    setBulkProducts([{...emptyProductRow}]);
+    setBulkDialog(true);
+  };
+
+  // ========== INVENTORY & ORDERS ==========
   const handleUpdateStock = async (libroId, cantidad) => {
     try {
       await api.put(`/admin/inventario/${libroId}`, null, {
@@ -191,26 +263,6 @@ export default function AdminDashboard() {
     } catch (error) {
       toast.error('Error al confirmar pago');
     }
-  };
-
-  const resetProductForm = () => {
-    setEditingProduct(null);
-    setProductForm({
-      nombre: '',
-      descripcion: '',
-      grado: '',
-      materia: '',
-      precio: '',
-      cantidad_inventario: '',
-      isbn: '',
-      editorial: '',
-      imagen_url: ''
-    });
-  };
-
-  const openNewProductDialog = () => {
-    resetProductForm();
-    setProductDialog(true);
   };
 
   const filteredProducts = inventario.libros.filter(libro =>
@@ -390,135 +442,286 @@ export default function AdminDashboard() {
                 className="pl-10"
               />
             </div>
-            <Dialog open={productDialog} onOpenChange={setProductDialog}>
+            
+            {/* Bulk Add Products Button */}
+            <Dialog open={bulkDialog} onOpenChange={setBulkDialog}>
               <DialogTrigger asChild>
-                <Button onClick={openNewProductDialog} className="rounded-full" data-testid="add-product-button">
+                <Button onClick={openBulkDialog} className="rounded-full" data-testid="add-product-button">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('admin.addProduct')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-[95vw] w-[1200px] max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                   <DialogTitle className="font-serif">
-                    {editingProduct ? t('admin.editProduct') : t('admin.addProduct')}
+                    Agregar Productos en Lote
                   </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleProductSubmit} className="space-y-4 mt-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2 space-y-2">
-                      <Label>Nombre *</Label>
-                      <Input
-                        value={productForm.nombre}
-                        onChange={(e) => setProductForm({...productForm, nombre: e.target.value})}
-                        required
-                        data-testid="product-name-input"
-                      />
+                
+                <div className="flex-1 overflow-auto mt-4">
+                  {/* Table Header */}
+                  <div className="min-w-[1000px]">
+                    <div className="grid grid-cols-[1fr_120px_120px_80px_80px_1fr_100px_100px_50px] gap-2 pb-2 border-b border-border sticky top-0 bg-background z-10">
+                      <div className="text-xs font-medium text-muted-foreground">Nombre *</div>
+                      <div className="text-xs font-medium text-muted-foreground">Grado *</div>
+                      <div className="text-xs font-medium text-muted-foreground">Materia *</div>
+                      <div className="text-xs font-medium text-muted-foreground">Precio *</div>
+                      <div className="text-xs font-medium text-muted-foreground">Stock *</div>
+                      <div className="text-xs font-medium text-muted-foreground">Descripción</div>
+                      <div className="text-xs font-medium text-muted-foreground">ISBN</div>
+                      <div className="text-xs font-medium text-muted-foreground">Editorial</div>
+                      <div></div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label>Grado *</Label>
-                      <Select 
-                        value={productForm.grado} 
-                        onValueChange={(v) => setProductForm({...productForm, grado: v})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {grados.map((g) => (
-                            <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Materia *</Label>
-                      <Select 
-                        value={productForm.materia} 
-                        onValueChange={(v) => setProductForm({...productForm, materia: v})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {materias.map((m) => (
-                            <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Precio ($) *</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={productForm.precio}
-                        onChange={(e) => setProductForm({...productForm, precio: e.target.value})}
-                        required
-                        data-testid="product-price-input"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Stock *</Label>
-                      <Input
-                        type="number"
-                        value={productForm.cantidad_inventario}
-                        onChange={(e) => setProductForm({...productForm, cantidad_inventario: e.target.value})}
-                        required
-                        data-testid="product-stock-input"
-                      />
-                    </div>
-                    
-                    <div className="col-span-2 space-y-2">
-                      <Label>Descripción</Label>
-                      <Input
-                        value={productForm.descripcion}
-                        onChange={(e) => setProductForm({...productForm, descripcion: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>ISBN</Label>
-                      <Input
-                        value={productForm.isbn}
-                        onChange={(e) => setProductForm({...productForm, isbn: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Editorial</Label>
-                      <Input
-                        value={productForm.editorial}
-                        onChange={(e) => setProductForm({...productForm, editorial: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="col-span-2 space-y-2">
-                      <Label>URL de Imagen</Label>
-                      <Input
-                        value={productForm.imagen_url}
-                        onChange={(e) => setProductForm({...productForm, imagen_url: e.target.value})}
-                        placeholder="https://..."
-                      />
+                    {/* Product Rows */}
+                    <div className="space-y-2 mt-2">
+                      {bulkProducts.map((product, index) => (
+                        <div 
+                          key={index}
+                          className="grid grid-cols-[1fr_120px_120px_80px_80px_1fr_100px_100px_50px] gap-2 items-center"
+                          data-testid={`bulk-row-${index}`}
+                        >
+                          <Input
+                            value={product.nombre}
+                            onChange={(e) => updateBulkRow(index, 'nombre', e.target.value)}
+                            placeholder="Nombre del libro"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Select 
+                            value={product.grado} 
+                            onValueChange={(v) => updateBulkRow(index, 'grado', v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue placeholder="Grado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {grados.map((g) => (
+                                <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <Select 
+                            value={product.materia} 
+                            onValueChange={(v) => updateBulkRow(index, 'materia', v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue placeholder="Materia" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {materias.map((m) => (
+                                <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={product.precio}
+                            onChange={(e) => updateBulkRow(index, 'precio', e.target.value)}
+                            placeholder="$"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Input
+                            type="number"
+                            value={product.cantidad_inventario}
+                            onChange={(e) => updateBulkRow(index, 'cantidad_inventario', e.target.value)}
+                            placeholder="Qty"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Input
+                            value={product.descripcion}
+                            onChange={(e) => updateBulkRow(index, 'descripcion', e.target.value)}
+                            placeholder="Descripción"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Input
+                            value={product.isbn}
+                            onChange={(e) => updateBulkRow(index, 'isbn', e.target.value)}
+                            placeholder="ISBN"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Input
+                            value={product.editorial}
+                            onChange={(e) => updateBulkRow(index, 'editorial', e.target.value)}
+                            placeholder="Editorial"
+                            className="h-9 text-sm"
+                          />
+                          
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-destructive hover:text-destructive"
+                            onClick={() => removeBulkRow(index)}
+                            disabled={bulkProducts.length === 1}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   </div>
+                </div>
+                
+                {/* Actions */}
+                <div className="flex justify-between items-center pt-4 border-t border-border mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addBulkRow}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Agregar Fila
+                  </Button>
                   
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setProductDialog(false)}>
-                      {t('common.cancel')}
+                  <div className="flex gap-3">
+                    <Button type="button" variant="outline" onClick={() => setBulkDialog(false)}>
+                      Cancelar
                     </Button>
-                    <Button type="submit" data-testid="save-product-button">
-                      {t('common.save')}
+                    <Button 
+                      onClick={handleBulkSubmit}
+                      disabled={savingBulk}
+                      className="gap-2"
+                      data-testid="save-bulk-products"
+                    >
+                      {savingBulk ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Guardando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4" />
+                          Guardar Todos ({bulkProducts.filter(p => p.nombre && p.grado && p.materia && p.precio && p.cantidad_inventario).length})
+                        </>
+                      )}
                     </Button>
                   </div>
-                </form>
+                </div>
               </DialogContent>
             </Dialog>
           </div>
 
+          {/* Edit Single Product Dialog */}
+          <Dialog open={editDialog} onOpenChange={setEditDialog}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-serif">
+                  {t('admin.editProduct')}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleEditSubmit} className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2 space-y-2">
+                    <Label>Nombre *</Label>
+                    <Input
+                      value={editForm.nombre}
+                      onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Grado *</Label>
+                    <Select 
+                      value={editForm.grado} 
+                      onValueChange={(v) => setEditForm({...editForm, grado: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {grados.map((g) => (
+                          <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Materia *</Label>
+                    <Select 
+                      value={editForm.materia} 
+                      onValueChange={(v) => setEditForm({...editForm, materia: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {materias.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Precio ($) *</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={editForm.precio}
+                      onChange={(e) => setEditForm({...editForm, precio: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Stock *</Label>
+                    <Input
+                      type="number"
+                      value={editForm.cantidad_inventario}
+                      onChange={(e) => setEditForm({...editForm, cantidad_inventario: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="col-span-2 space-y-2">
+                    <Label>Descripción</Label>
+                    <Input
+                      value={editForm.descripcion}
+                      onChange={(e) => setEditForm({...editForm, descripcion: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>ISBN</Label>
+                    <Input
+                      value={editForm.isbn}
+                      onChange={(e) => setEditForm({...editForm, isbn: e.target.value})}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Editorial</Label>
+                    <Input
+                      value={editForm.editorial}
+                      onChange={(e) => setEditForm({...editForm, editorial: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setEditDialog(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit">
+                    Guardar Cambios
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          {/* Products Table */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
