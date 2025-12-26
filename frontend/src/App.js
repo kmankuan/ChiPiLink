@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Layout
 import { Header } from '@/components/layout/Header';
+import { NotificationBar } from '@/components/layout/NotificationBar';
 
 // Pages
 import Landing from '@/pages/Landing';
@@ -26,6 +27,17 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import EmbedOrderForm from '@/pages/EmbedOrderForm';
 
 import '@/App.css';
+
+// Admin Layout with Notification Bar
+function AdminLayout({ children }) {
+  return (
+    <>
+      <Header />
+      <NotificationBar />
+      {children}
+    </>
+  );
+}
 
 // Protected Route Component
 function ProtectedRoute({ children, adminOnly = false }) {
