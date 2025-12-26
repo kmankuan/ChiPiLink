@@ -1,116 +1,102 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
-import axios from 'axios';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+// Icons
 import { 
+  User, 
+  Phone, 
+  Mail, 
+  GraduationCap, 
+  School, 
+  Book, 
   ShoppingCart, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  CreditCard, 
-  Building2,
+  Building2, 
+  CreditCard,
   Loader2,
-  CheckCircle2,
-  Book,
-  User,
-  Mail,
-  Phone,
-  GraduationCap,
-  School,
-  Globe
+  Plus,
+  Minus,
+  Trash2,
+  CheckCircle,
+  BookOpen,
+  Users
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Embeddable Order Form - Works independently without authentication
 export default function EmbedOrderForm() {
   const { t, i18n } = useTranslation();
-  const [searchParams] = useSearchParams();
-  const lang = searchParams.get('lang');
-  const themeParam = searchParams.get('theme');
-
-  const [formConfig, setFormConfig] = useState(null);
-  const [libros, setLibros] = useState([]);
-  const [grados, setGrados] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(null);
-
-  const [formData, setFormData] = useState({
-    nombre_cliente: '',
-    email_cliente: '',
-    telefono_cliente: '',
-    nombre_estudiante: '',
-    grado_estudiante: '',
-    escuela_estudiante: ''
+  
+  // Form state - Section Acudiente (Guardian)
+  const [acudiente, setAcudiente] = useState({
+    nombre_completo: '',
+    telefono: '',
+    email: ''
   });
+  
+  // Form state - Section Estudiante (Student)
+  const [estudiante, setEstudiante] = useState({
+    nombre: '',
+    apellido: '',
+    grado: '',
+    email: '',
+    telefono: ''
+  });
+  
+  // Form config and data
+  const [formConfig, setFormConfig] = useState(null);
+  const [grados, setGrados] = useState([]);
+  const [libros, setLibros] = useState([]);
   const [cart, setCart] = useState([]);
   const [metodoPago, setMetodoPago] = useState('transferencia_bancaria');
   const [notas, setNotas] = useState('');
-
-  // Handle language from URL param
+  
+  // UI state
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [orderResult, setOrderResult] = useState(null);
+  
+  // Fetch initial data
   useEffect(() => {
-    if (lang && ['es', 'zh'].includes(lang)) {
-      i18n.changeLanguage(lang);
-    }
-  }, [lang, i18n]);
-
-  // Handle theme from URL param
-  useEffect(() => {
-    if (themeParam === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (themeParam === 'light') {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [themeParam]);
-
-  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [configRes, gradosRes] = await Promise.all([
+          axios.get(`${API_URL}/api/public/config-formulario`),
+          axios.get(`${API_URL}/api/grados`)
+        ]);
+        
+        setFormConfig(configRes.data);
+        setGrados(gradosRes.data.grados);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading form data:', error);
+        toast.error('Error cargando formulario');
+        setLoading(false);
+      }
+    };
+    
     fetchData();
   }, []);
-
-  const fetchData = async () => {
-    try {
-      const [configRes, gradosRes] = await Promise.all([
-        axios.get(`${API_URL}/api/public/config-formulario`),
-        axios.get(`${API_URL}/api/grados`)
-      ]);
-      
-      setFormConfig(configRes.data);
-      setGrados(gradosRes.data.grados);
-      
-      // Set default payment method from config
-      if (configRes.data.metodos_pago?.length > 0) {
-        setMetodoPago(configRes.data.metodos_pago[0]);
-      }
-    } catch (error) {
-      console.error('Error fetching config:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   // Fetch books when grade changes
-  useEffect(() => {
-    if (formData.grado_estudiante) {
-      fetchLibros(formData.grado_estudiante);
+  const fetchLibrosPorGrado = useCallback(async (grado) => {
+    if (!grado) {
+      setLibros([]);
+      return;
     }
-  }, [formData.grado_estudiante]);
-
-  const fetchLibros = async (grado) => {
+    
     try {
       const response = await axios.get(`${API_URL}/api/public/libros`, {
         params: { grado }
@@ -118,59 +104,70 @@ export default function EmbedOrderForm() {
       setLibros(response.data);
     } catch (error) {
       console.error('Error fetching books:', error);
-      toast.error('Error al cargar libros');
+      toast.error('Error cargando libros');
     }
+  }, []);
+  
+  // Handle grade change
+  const handleGradoChange = (grado) => {
+    setEstudiante(prev => ({ ...prev, grado }));
+    setCart([]); // Clear cart when grade changes
+    fetchLibrosPorGrado(grado);
   };
-
+  
+  // Cart functions
   const addToCart = (libro) => {
     const existing = cart.find(item => item.libro_id === libro.libro_id);
     if (existing) {
-      if (existing.cantidad < libro.cantidad_inventario) {
-        setCart(cart.map(item => 
-          item.libro_id === libro.libro_id 
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item
-        ));
-      } else {
-        toast.error('Stock insuficiente');
-      }
+      updateQuantity(libro.libro_id, 1);
     } else {
       setCart([...cart, {
         libro_id: libro.libro_id,
         nombre_libro: libro.nombre,
         cantidad: 1,
-        precio_unitario: libro.precio,
-        max_stock: libro.cantidad_inventario
+        precio_unitario: libro.precio
       }]);
     }
   };
-
+  
   const updateQuantity = (libroId, delta) => {
     setCart(cart.map(item => {
       if (item.libro_id === libroId) {
-        const newQty = item.cantidad + delta;
-        if (newQty <= 0) return null;
-        if (newQty > item.max_stock) {
-          toast.error('Stock insuficiente');
-          return item;
-        }
+        const libro = libros.find(l => l.libro_id === libroId);
+        const maxQty = libro?.cantidad_inventario || 99;
+        const newQty = Math.max(1, Math.min(maxQty, item.cantidad + delta));
         return { ...item, cantidad: newQty };
       }
       return item;
-    }).filter(Boolean));
+    }));
   };
-
+  
   const removeFromCart = (libroId) => {
     setCart(cart.filter(item => item.libro_id !== libroId));
   };
-
+  
+  // Calculate total
   const total = cart.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
-
+  
+  // Form validation
+  const isFormValid = () => {
+    return (
+      acudiente.nombre_completo.trim() !== '' &&
+      acudiente.telefono.trim() !== '' &&
+      acudiente.email.trim() !== '' &&
+      estudiante.nombre.trim() !== '' &&
+      estudiante.apellido.trim() !== '' &&
+      estudiante.grado !== '' &&
+      cart.length > 0
+    );
+  };
+  
+  // Submit order
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (cart.length === 0) {
-      toast.error('Agregue al menos un libro');
+    if (!isFormValid()) {
+      toast.error('Por favor complete todos los campos requeridos');
       return;
     }
     
@@ -178,217 +175,240 @@ export default function EmbedOrderForm() {
     
     try {
       const orderData = {
-        nombre_cliente: formData.nombre_cliente,
-        email_cliente: formData.email_cliente,
-        telefono_cliente: formData.telefono_cliente || null,
-        nombre_estudiante: formData.nombre_estudiante,
-        grado_estudiante: formData.grado_estudiante,
-        escuela_estudiante: formData.escuela_estudiante || null,
-        items: cart.map(item => ({
-          libro_id: item.libro_id,
-          nombre_libro: item.nombre_libro,
-          cantidad: item.cantidad,
-          precio_unitario: item.precio_unitario
-        })),
+        // Acudiente
+        nombre_acudiente: acudiente.nombre_completo,
+        telefono_acudiente: acudiente.telefono,
+        email_acudiente: acudiente.email,
+        // Estudiante
+        nombre_estudiante: estudiante.nombre,
+        apellido_estudiante: estudiante.apellido,
+        grado_estudiante: estudiante.grado,
+        email_estudiante: estudiante.email || null,
+        telefono_estudiante: estudiante.telefono || null,
+        // Order
+        items: cart,
         metodo_pago: metodoPago,
         notas: notas || null
       };
       
       const response = await axios.post(`${API_URL}/api/public/pedido`, orderData);
-      setOrderSuccess(response.data);
-      toast.success(formConfig?.mensaje_exito || '¡Pedido enviado exitosamente!');
       
+      setOrderResult(response.data);
+      setSubmitted(true);
+      toast.success('¡Pedido enviado exitosamente!');
     } catch (error) {
-      const message = error.response?.data?.detail || 'Error al enviar pedido';
-      toast.error(message);
+      console.error('Error submitting order:', error);
+      const errorMsg = error.response?.data?.detail || 'Error al enviar el pedido';
+      toast.error(errorMsg);
     } finally {
       setSubmitting(false);
     }
   };
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language?.substring(0, 2) === 'zh' ? 'es' : 'zh';
-    i18n.changeLanguage(newLang);
-  };
-
+  
+  // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-muted-foreground">Cargando formulario...</p>
+        </div>
       </div>
     );
   }
-
-  // Success Screen
-  if (orderSuccess) {
+  
+  // Success state
+  if (submitted && orderResult) {
     return (
-      <div className="min-h-screen bg-background p-4 md:p-6">
-        <div className="max-w-md mx-auto text-center bg-card rounded-2xl border border-border p-8">
-          <div className="p-4 rounded-full bg-green-100 dark:bg-green-900/30 w-fit mx-auto mb-6">
-            <CheckCircle2 className="h-12 w-12 text-green-600 dark:text-green-400" />
-          </div>
-          
-          <h1 className="font-serif text-2xl font-bold mb-4">
-            {formConfig?.mensaje_exito || '¡Gracias por su pedido!'}
-          </h1>
-          
-          <p className="text-muted-foreground mb-4">
-            {t('order.orderNumber')}: <span className="font-mono font-bold">{orderSuccess.pedido_id}</span>
-          </p>
-          
-          <div className="bg-muted rounded-xl p-4 mb-6">
-            <p className="text-lg font-bold">
-              Total: ${orderSuccess.total?.toFixed(2)}
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="pt-6 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-green-800 dark:text-green-400 mb-2">
+              ¡Pedido Recibido!
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              {formConfig?.mensaje_exito || 'Gracias por su pedido. Nos comunicaremos con usted pronto.'}
             </p>
-          </div>
-
-          {metodoPago === 'transferencia_bancaria' && (
-            <div className="bg-secondary rounded-xl p-6 text-left mb-6">
-              <h3 className="font-bold mb-4">{t('payment.bankInfo')}</h3>
-              <div className="space-y-2 text-sm">
-                <p><span className="text-muted-foreground">Banco:</span> Banco General</p>
-                <p><span className="text-muted-foreground">Tipo:</span> Cuenta Corriente</p>
-                <p><span className="text-muted-foreground">Número:</span> XXXX-XXXX-XXXX</p>
-                <p><span className="text-muted-foreground">Titular:</span> Librería Escolar S.A.</p>
-              </div>
-              <Separator className="my-4" />
-              <p className="text-sm text-muted-foreground">
-                {t('payment.instructionsText')}
+            
+            <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left">
+              <p className="text-sm mb-2">
+                <span className="font-medium">Número de Pedido:</span>{' '}
+                <span className="font-mono">{orderResult.pedido_id}</span>
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Total:</span>{' '}
+                <span className="text-green-600 font-bold">${orderResult.total.toFixed(2)}</span>
               </p>
             </div>
-          )}
-          
-          <Button onClick={() => window.location.reload()} className="rounded-full">
-            Hacer Otro Pedido
-          </Button>
-        </div>
+            
+            <Button 
+              onClick={() => {
+                setSubmitted(false);
+                setOrderResult(null);
+                setCart([]);
+                setAcudiente({ nombre_completo: '', telefono: '', email: '' });
+                setEstudiante({ nombre: '', apellido: '', grado: '', email: '', telefono: '' });
+                setNotas('');
+                setLibros([]);
+              }}
+              className="w-full"
+            >
+              Realizar Otro Pedido
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
-
+  
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6" data-testid="embed-order-form">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            {formConfig?.logo_url ? (
-              <img src={formConfig.logo_url} alt="Logo" className="h-10 w-auto" />
-            ) : (
-              <div className="p-2 rounded-xl bg-primary text-primary-foreground">
-                <Book className="h-6 w-6" />
-              </div>
-            )}
-            <div>
-              <h1 className="font-serif text-xl md:text-2xl font-bold">
-                {formConfig?.titulo || 'Formulario de Pedido'}
-              </h1>
-              {formConfig?.descripcion && (
-                <p className="text-sm text-muted-foreground hidden sm:block">
-                  {formConfig.descripcion}
-                </p>
-              )}
-            </div>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-2xl mb-4">
+            <BookOpen className="h-8 w-8 text-white" />
           </div>
-          
-          {/* Language Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleLanguage}
-            className="gap-2"
-          >
-            <Globe className="h-4 w-4" />
-            {i18n.language?.substring(0, 2) === 'zh' ? '中文' : 'ES'}
-          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {formConfig?.titulo || 'Formulario de Pedido de Libros'}
+          </h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            {formConfig?.descripcion || 'Complete el formulario para ordenar los libros de texto'}
+          </p>
         </div>
-
+        
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left - Form Fields */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left Column - Form Sections */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Contact Info */}
-              <div className="bg-card rounded-xl border border-border p-6">
-                <h2 className="font-bold mb-4 flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Información de Contacto
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Section 1: Acudiente (Guardian) */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                      <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    Datos del Acudiente
+                  </CardTitle>
+                  <CardDescription>
+                    Información del padre, madre o tutor responsable
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label>{t('auth.name')} *</Label>
+                    <Label htmlFor="acudiente-nombre" className="flex items-center gap-1">
+                      Nombre Completo <span className="text-destructive">*</span>
+                    </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        value={formData.nombre_cliente}
-                        onChange={(e) => setFormData({...formData, nombre_cliente: e.target.value})}
+                        id="acudiente-nombre"
+                        value={acudiente.nombre_completo}
+                        onChange={(e) => setAcudiente({ ...acudiente, nombre_completo: e.target.value })}
                         className="pl-10"
-                        placeholder="Nombre completo"
+                        placeholder="Nombre y apellido del acudiente"
                         required
-                        data-testid="client-name-input"
+                        data-testid="guardian-name-input"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label>{t('auth.email')} *</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="acudiente-telefono" className="flex items-center gap-1">
+                        Número de Celular <span className="text-destructive">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="acudiente-telefono"
+                          type="tel"
+                          value={acudiente.telefono}
+                          onChange={(e) => setAcudiente({ ...acudiente, telefono: e.target.value })}
+                          className="pl-10"
+                          placeholder="+507 6XXX-XXXX"
+                          required
+                          data-testid="guardian-phone-input"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="acudiente-email" className="flex items-center gap-1">
+                        Dirección de Email <span className="text-destructive">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="acudiente-email"
+                          type="email"
+                          value={acudiente.email}
+                          onChange={(e) => setAcudiente({ ...acudiente, email: e.target.value })}
+                          className="pl-10"
+                          placeholder="correo@ejemplo.com"
+                          required
+                          data-testid="guardian-email-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Section 2: Estudiante (Student) */}
+              <Card>
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                      <GraduationCap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    Datos del Estudiante
+                  </CardTitle>
+                  <CardDescription>
+                    Información del estudiante que usará los libros
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="estudiante-nombre" className="flex items-center gap-1">
+                        Nombre <span className="text-destructive">*</span>
+                      </Label>
                       <Input
-                        type="email"
-                        value={formData.email_cliente}
-                        onChange={(e) => setFormData({...formData, email_cliente: e.target.value})}
-                        className="pl-10"
-                        placeholder="correo@ejemplo.com"
+                        id="estudiante-nombre"
+                        value={estudiante.nombre}
+                        onChange={(e) => setEstudiante({ ...estudiante, nombre: e.target.value })}
+                        placeholder="Nombre del estudiante"
                         required
-                        data-testid="client-email-input"
+                        data-testid="student-first-name-input"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>{t('auth.phone')}</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="estudiante-apellido" className="flex items-center gap-1">
+                        Apellido <span className="text-destructive">*</span>
+                      </Label>
                       <Input
-                        value={formData.telefono_cliente}
-                        onChange={(e) => setFormData({...formData, telefono_cliente: e.target.value})}
-                        className="pl-10"
-                        placeholder="+507 6000-0000"
-                        data-testid="client-phone-input"
+                        id="estudiante-apellido"
+                        value={estudiante.apellido}
+                        onChange={(e) => setEstudiante({ ...estudiante, apellido: e.target.value })}
+                        placeholder="Apellido del estudiante"
+                        required
+                        data-testid="student-last-name-input"
                       />
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Student Info */}
-              <div className="bg-card rounded-xl border border-border p-6">
-                <h2 className="font-bold mb-4 flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-primary" />
-                  Información del Estudiante
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{t('student.name')} *</Label>
-                    <Input
-                      value={formData.nombre_estudiante}
-                      onChange={(e) => setFormData({...formData, nombre_estudiante: e.target.value})}
-                      placeholder="Nombre del estudiante"
-                      required
-                      data-testid="student-name-input"
-                    />
-                  </div>
                   
                   <div className="space-y-2">
-                    <Label>{t('student.grade')} *</Label>
-                    <Select 
-                      value={formData.grado_estudiante} 
-                      onValueChange={(v) => {
-                        setFormData({...formData, grado_estudiante: v});
-                        setCart([]); // Clear cart when grade changes
-                      }}
+                    <Label className="flex items-center gap-1">
+                      Grado a Estudiar <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={estudiante.grado}
+                      onValueChange={handleGradoChange}
                       required
                     >
                       <SelectTrigger data-testid="student-grade-select">
@@ -402,226 +422,287 @@ export default function EmbedOrderForm() {
                     </Select>
                   </div>
                   
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>{t('student.school')}</Label>
-                    <div className="relative">
-                      <School className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        value={formData.escuela_estudiante}
-                        onChange={(e) => setFormData({...formData, escuela_estudiante: e.target.value})}
-                        className="pl-10"
-                        placeholder="Nombre de la escuela"
-                        data-testid="student-school-input"
-                      />
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="estudiante-email">
+                        Email del Estudiante <span className="text-muted-foreground text-xs">(Opcional)</span>
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="estudiante-email"
+                          type="email"
+                          value={estudiante.email}
+                          onChange={(e) => setEstudiante({ ...estudiante, email: e.target.value })}
+                          className="pl-10"
+                          placeholder="correo@ejemplo.com"
+                          data-testid="student-email-input"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="estudiante-telefono">
+                        Celular del Estudiante <span className="text-muted-foreground text-xs">(Opcional)</span>
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="estudiante-telefono"
+                          type="tel"
+                          value={estudiante.telefono}
+                          onChange={(e) => setEstudiante({ ...estudiante, telefono: e.target.value })}
+                          className="pl-10"
+                          placeholder="+507 6XXX-XXXX"
+                          data-testid="student-phone-input"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Book Selection */}
-              {formData.grado_estudiante && (
-                <div className="bg-card rounded-xl border border-border p-6">
-                  <h2 className="font-bold mb-4 flex items-center gap-2">
-                    <Book className="h-5 w-5 text-primary" />
-                    {t('order.booksForGrade')} {t(`grades.${formData.grado_estudiante}`)}
-                  </h2>
-                  
-                  {libros.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">
-                      No hay libros disponibles para este grado
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {libros.map((libro) => {
-                        const inCart = cart.find(item => item.libro_id === libro.libro_id);
-                        
-                        return (
-                          <div 
-                            key={libro.libro_id}
-                            className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                              inCart ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
-                            }`}
-                            data-testid={`book-item-${libro.libro_id}`}
-                          >
-                            <div className="flex-1">
-                              <p className="font-medium">{libro.nombre}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {t(`subjects.${libro.materia}`)}
-                                {formConfig?.mostrar_precios !== false && (
-                                  <> • <span className="font-medium text-primary">${libro.precio.toFixed(2)}</span></>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Disponibles: {libro.cantidad_inventario}
-                              </p>
-                            </div>
-                            
-                            {inCart ? (
-                              <div className="flex items-center gap-2">
+                </CardContent>
+              </Card>
+              
+              {/* Section 3: Book Selection */}
+              {estudiante.grado && (
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                        <Book className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      Selección de Libros
+                    </CardTitle>
+                    <CardDescription>
+                      Libros disponibles para {grados.find(g => g.id === estudiante.grado)?.nombre || estudiante.grado}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {libros.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Book className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                        <p>No hay libros disponibles para este grado</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {libros.map((libro) => {
+                          const inCart = cart.find(item => item.libro_id === libro.libro_id);
+                          
+                          return (
+                            <div 
+                              key={libro.libro_id}
+                              className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
+                                inCart 
+                                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+                                  : 'border-border hover:border-green-300 hover:bg-muted/50'
+                              }`}
+                              data-testid={`book-item-${libro.libro_id}`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{libro.nombre}</p>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                                    {libro.materia}
+                                  </span>
+                                  {formConfig?.mostrar_precios !== false && (
+                                    <span className="text-sm font-semibold text-green-600">
+                                      ${libro.precio.toFixed(2)}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {libro.cantidad_inventario} disponibles
+                                </p>
+                              </div>
+                              
+                              {inCart ? (
+                                <div className="flex items-center gap-2 ml-4">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      if (inCart.cantidad === 1) {
+                                        removeFromCart(libro.libro_id);
+                                      } else {
+                                        updateQuantity(libro.libro_id, -1);
+                                      }
+                                    }}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="w-8 text-center font-bold">
+                                    {inCart.cantidad}
+                                  </span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => updateQuantity(libro.libro_id, 1)}
+                                    disabled={inCart.cantidad >= libro.cantidad_inventario}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ) : (
                                 <Button
                                   type="button"
                                   variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => updateQuantity(libro.libro_id, -1)}
+                                  size="sm"
+                                  className="ml-4 shrink-0"
+                                  onClick={() => addToCart(libro)}
+                                  data-testid={`add-book-${libro.libro_id}`}
                                 >
-                                  <Minus className="h-4 w-4" />
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Agregar
                                 </Button>
-                                <span className="w-8 text-center font-medium">
-                                  {inCart.cantidad}
-                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Payment & Notes Section */}
+              {cart.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                        <CreditCard className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      Método de Pago y Notas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <RadioGroup value={metodoPago} onValueChange={setMetodoPago} className="space-y-3">
+                      {(formConfig?.metodos_pago || ['transferencia_bancaria', 'yappy']).includes('transferencia_bancaria') && (
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                          <RadioGroupItem value="transferencia_bancaria" id="embed-bank" />
+                          <Label htmlFor="embed-bank" className="flex items-center gap-3 cursor-pointer flex-1">
+                            <Building2 className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">Transferencia Bancaria</p>
+                              <p className="text-sm text-muted-foreground">Banco General / Banistmo</p>
+                            </div>
+                          </Label>
+                        </div>
+                      )}
+                      
+                      {(formConfig?.metodos_pago || ['transferencia_bancaria', 'yappy']).includes('yappy') && (
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                          <RadioGroupItem value="yappy" id="embed-yappy" />
+                          <Label htmlFor="embed-yappy" className="flex items-center gap-3 cursor-pointer flex-1">
+                            <CreditCard className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">Yappy</p>
+                              <p className="text-sm text-muted-foreground">Pago instantáneo móvil</p>
+                            </div>
+                          </Label>
+                        </div>
+                      )}
+                    </RadioGroup>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="order-notes">Notas adicionales</Label>
+                      <Textarea
+                        id="order-notes"
+                        value={notas}
+                        onChange={(e) => setNotas(e.target.value)}
+                        placeholder="Instrucciones especiales, comentarios o consultas..."
+                        className="min-h-[80px]"
+                        data-testid="order-notes"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            
+            {/* Right Column - Cart Summary (Sticky) */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-4">
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ShoppingCart className="h-5 w-5" />
+                      Resumen del Pedido
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {cart.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">Seleccione el grado del estudiante para ver los libros disponibles</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                          {cart.map((item) => (
+                            <div key={item.libro_id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm truncate">{item.nombre_libro}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {item.cantidad} × ${item.precio_unitario.toFixed(2)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <p className="font-medium text-sm">
+                                  ${(item.cantidad * item.precio_unitario).toFixed(2)}
+                                </p>
                                 <Button
                                   type="button"
-                                  variant="outline"
+                                  variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => updateQuantity(libro.libro_id, 1)}
+                                  className="h-6 w-6 text-destructive hover:text-destructive"
+                                  onClick={() => removeFromCart(item.libro_id)}
                                 >
-                                  <Plus className="h-4 w-4" />
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
-                            ) : (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addToCart(libro)}
-                                data-testid={`add-book-${libro.libro_id}`}
-                              >
-                                <Plus className="h-4 w-4 mr-1" />
-                                Agregar
-                              </Button>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Payment Method */}
-              {(formConfig?.metodos_pago?.length > 0) && (
-                <div className="bg-card rounded-xl border border-border p-6">
-                  <h2 className="font-bold mb-4">{t('order.paymentMethod')}</h2>
-                  
-                  <RadioGroup value={metodoPago} onValueChange={setMetodoPago} className="space-y-3">
-                    {formConfig.metodos_pago.includes('transferencia_bancaria') && (
-                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                        <RadioGroupItem value="transferencia_bancaria" id="embed-bank" />
-                        <Label htmlFor="embed-bank" className="flex items-center gap-3 cursor-pointer flex-1">
-                          <Building2 className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <p className="font-medium">{t('order.bankTransfer')}</p>
-                            <p className="text-sm text-muted-foreground">Banco General</p>
-                          </div>
-                        </Label>
-                      </div>
-                    )}
-                    
-                    {formConfig.metodos_pago.includes('yappy') && (
-                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                        <RadioGroupItem value="yappy" id="embed-yappy" />
-                        <Label htmlFor="embed-yappy" className="flex items-center gap-3 cursor-pointer flex-1">
-                          <CreditCard className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <p className="font-medium">{t('order.yappy')}</p>
-                            <p className="text-sm text-muted-foreground">Pago instantáneo</p>
-                          </div>
-                        </Label>
-                      </div>
-                    )}
-                  </RadioGroup>
-                </div>
-              )}
-
-              {/* Notes */}
-              <div className="bg-card rounded-xl border border-border p-6">
-                <Label className="font-bold mb-4 block">{t('order.notes')}</Label>
-                <Textarea
-                  value={notas}
-                  onChange={(e) => setNotas(e.target.value)}
-                  placeholder="Instrucciones especiales, comentarios..."
-                  className="min-h-[80px]"
-                  data-testid="order-notes"
-                />
-              </div>
-            </div>
-
-            {/* Right - Cart Summary */}
-            <div>
-              <div className="bg-card rounded-xl border border-border p-6 sticky top-4">
-                <h2 className="font-bold mb-4 flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Resumen del Pedido
-                </h2>
-                
-                {cart.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    Seleccione los libros que desea ordenar
-                  </p>
-                ) : (
-                  <>
-                    <div className="space-y-3 mb-4">
-                      {cart.map((item) => (
-                        <div key={item.libro_id} className="flex items-start justify-between gap-2 py-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{item.nombre_libro}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {item.cantidad} x ${item.precio_unitario.toFixed(2)}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium text-sm">
-                              ${(item.cantidad * item.precio_unitario).toFixed(2)}
-                            </p>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 text-destructive hover:text-destructive"
-                              onClick={() => removeFromCart(item.libro_id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                        
+                        <Separator className="my-4" />
+                        
+                        <div className="flex items-center justify-between mb-6">
+                          <p className="font-bold text-lg">Total</p>
+                          <p className="font-bold text-2xl text-green-600" data-testid="cart-total">
+                            ${total.toFixed(2)}
+                          </p>
+                        </div>
+                      </>
+                    )}
                     
-                    <Separator className="my-4" />
+                    <Button
+                      type="submit"
+                      className="w-full h-12 text-base font-semibold bg-green-600 hover:bg-green-700"
+                      disabled={submitting || !isFormValid()}
+                      data-testid="submit-order-button"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Enviando Pedido...
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCart className="mr-2 h-5 w-5" />
+                          Enviar Pedido
+                        </>
+                      )}
+                    </Button>
                     
-                    <div className="flex items-center justify-between mb-6">
-                      <p className="font-bold text-lg">{t('order.total')}</p>
-                      <p className="font-bold text-2xl text-primary" data-testid="cart-total">
-                        ${total.toFixed(2)}
-                      </p>
-                    </div>
-                  </>
-                )}
-                
-                <Button
-                  type="submit"
-                  className="w-full h-12 rounded-full text-base font-medium"
-                  disabled={submitting || cart.length === 0 || !formData.nombre_cliente || !formData.email_cliente || !formData.nombre_estudiante || !formData.grado_estudiante}
-                  data-testid="submit-order-button"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="mr-2 h-4 w-4" />
-                      {t('order.placeOrder')}
-                    </>
-                  )}
-                </Button>
-                
-                <p className="text-xs text-muted-foreground text-center mt-4">
-                  Al enviar acepta nuestros términos y condiciones
-                </p>
+                    <p className="text-xs text-muted-foreground text-center mt-4">
+                      Al enviar, acepta nuestros términos y condiciones
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
