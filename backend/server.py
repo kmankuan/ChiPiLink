@@ -771,6 +771,265 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     
     return {"message": f"Se agregaron {len(sample_libros)} libros de muestra"}
 
+# ============== PUBLIC ORDER ROUTES (NO AUTH) ==============
+
+async def create_notification(tipo: str, titulo: str, mensaje: str, datos: dict = None):
+    """Helper to create notifications"""
+    notificacion = Notificacion(
+        tipo=tipo,
+        titulo=titulo,
+        mensaje=mensaje,
+        datos=datos
+    )
+    doc = notificacion.model_dump()
+    doc["fecha_creacion"] = doc["fecha_creacion"].isoformat()
+    await db.notificaciones.insert_one(doc)
+    return notificacion
+
+@api_router.get("/public/libros")
+async def get_public_libros(grado: Optional[str] = None):
+    """Get books for public form - no auth required"""
+    query = {"activo": True}
+    if grado:
+        query["grado"] = grado
+    
+    libros = await db.libros.find(query, {"_id": 0}).to_list(500)
+    # Filter only books with stock > 0
+    libros_disponibles = [l for l in libros if l.get("cantidad_inventario", 0) > 0]
+    return libros_disponibles
+
+@api_router.get("/public/config-formulario")
+async def get_form_config():
+    """Get form configuration for embed"""
+    config = await db.config_formulario.find_one({}, {"_id": 0})
+    if not config:
+        # Return default config
+        default = ConfiguracionFormulario()
+        return default.model_dump()
+    return config
+
+@api_router.post("/public/pedido")
+async def create_public_order(pedido: PedidoPublicoCreate):
+    """Create order from public form - no auth required"""
+    
+    # Validate and calculate total
+    total = 0
+    items_validados = []
+    
+    for item in pedido.items:
+        libro = await db.libros.find_one({"libro_id": item.libro_id, "activo": True}, {"_id": 0})
+        if not libro:
+            raise HTTPException(status_code=404, detail=f"Libro {item.libro_id} no encontrado")
+        if libro.get("cantidad_inventario", 0) < item.cantidad:
+            raise HTTPException(status_code=400, detail=f"Stock insuficiente para {libro['nombre']}")
+        
+        total += item.cantidad * item.precio_unitario
+        items_validados.append(item.model_dump())
+    
+    # Create order
+    pedido_id = f"ped_{uuid.uuid4().hex[:12]}"
+    pedido_doc = {
+        "pedido_id": pedido_id,
+        "tipo": "publico",  # Mark as public order
+        "cliente_id": None,
+        "nombre_cliente": pedido.nombre_cliente,
+        "email_cliente": pedido.email_cliente,
+        "telefono_cliente": pedido.telefono_cliente,
+        "estudiante_id": None,
+        "estudiante_nombre": pedido.nombre_estudiante,
+        "grado_estudiante": pedido.grado_estudiante,
+        "escuela_estudiante": pedido.escuela_estudiante,
+        "items": items_validados,
+        "total": total,
+        "metodo_pago": pedido.metodo_pago,
+        "estado": "pendiente",
+        "pago_confirmado": False,
+        "notas": pedido.notas,
+        "fecha_creacion": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Update inventory
+    for item in pedido.items:
+        await db.libros.update_one(
+            {"libro_id": item.libro_id},
+            {"$inc": {"cantidad_inventario": -item.cantidad}}
+        )
+    
+    await db.pedidos.insert_one(pedido_doc)
+    
+    # Create Monday.com item
+    monday_id = await create_monday_item(pedido_doc)
+    if monday_id:
+        await db.pedidos.update_one(
+            {"pedido_id": pedido_id},
+            {"$set": {"monday_item_id": monday_id}}
+        )
+    
+    # Create notification
+    await create_notification(
+        tipo="pedido_nuevo",
+        titulo="Nuevo Pedido Recibido",
+        mensaje=f"Pedido {pedido_id} de {pedido.nombre_cliente} - ${total:.2f}",
+        datos={"pedido_id": pedido_id, "total": total, "cliente": pedido.nombre_cliente}
+    )
+    
+    # Check low stock and create notifications
+    for item in pedido.items:
+        libro = await db.libros.find_one({"libro_id": item.libro_id}, {"_id": 0})
+        if libro and libro.get("cantidad_inventario", 0) < 10:
+            await create_notification(
+                tipo="bajo_stock",
+                titulo="Alerta de Stock Bajo",
+                mensaje=f"{libro['nombre']} tiene solo {libro['cantidad_inventario']} unidades",
+                datos={"libro_id": item.libro_id, "stock": libro['cantidad_inventario'], "nombre": libro['nombre']}
+            )
+    
+    return {
+        "success": True,
+        "pedido_id": pedido_id,
+        "total": total,
+        "mensaje": "Pedido creado exitosamente"
+    }
+
+# ============== NOTIFICATIONS ROUTES ==============
+
+@api_router.get("/admin/notificaciones")
+async def get_notificaciones(
+    limite: int = 50,
+    solo_no_leidas: bool = False,
+    tipos: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get notifications for admin"""
+    query = {}
+    if solo_no_leidas:
+        query["leida"] = False
+    if tipos:
+        tipo_list = tipos.split(",")
+        query["tipo"] = {"$in": tipo_list}
+    
+    notificaciones = await db.notificaciones.find(query, {"_id": 0}).sort("fecha_creacion", -1).to_list(limite)
+    
+    # Count by type
+    pipeline = [
+        {"$match": {"leida": False}},
+        {"$group": {"_id": "$tipo", "count": {"$sum": 1}}}
+    ]
+    counts = await db.notificaciones.aggregate(pipeline).to_list(10)
+    conteo_por_tipo = {item["_id"]: item["count"] for item in counts}
+    
+    return {
+        "notificaciones": notificaciones,
+        "total_no_leidas": sum(conteo_por_tipo.values()),
+        "conteo_por_tipo": conteo_por_tipo
+    }
+
+@api_router.put("/admin/notificaciones/{notificacion_id}/leer")
+async def mark_notification_read(notificacion_id: str, admin: dict = Depends(get_admin_user)):
+    """Mark notification as read"""
+    await db.notificaciones.update_one(
+        {"notificacion_id": notificacion_id},
+        {"$set": {"leida": True}}
+    )
+    return {"success": True}
+
+@api_router.put("/admin/notificaciones/leer-todas")
+async def mark_all_notifications_read(
+    tipos: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Mark all notifications as read"""
+    query = {}
+    if tipos:
+        query["tipo"] = {"$in": tipos.split(",")}
+    
+    await db.notificaciones.update_many(query, {"$set": {"leida": True}})
+    return {"success": True}
+
+@api_router.delete("/admin/notificaciones/limpiar")
+async def clear_old_notifications(dias: int = 30, admin: dict = Depends(get_admin_user)):
+    """Delete notifications older than X days"""
+    fecha_limite = datetime.now(timezone.utc) - timedelta(days=dias)
+    result = await db.notificaciones.delete_many({
+        "fecha_creacion": {"$lt": fecha_limite.isoformat()}
+    })
+    return {"success": True, "eliminadas": result.deleted_count}
+
+# ============== NOTIFICATION CONFIG ROUTES ==============
+
+@api_router.get("/admin/config-notificaciones")
+async def get_notification_config(admin: dict = Depends(get_admin_user)):
+    """Get notification display preferences"""
+    config = await db.config_notificaciones.find_one({"admin_id": admin["cliente_id"]}, {"_id": 0})
+    if not config:
+        default = ConfiguracionNotificaciones()
+        return default.model_dump()
+    return config
+
+@api_router.put("/admin/config-notificaciones")
+async def update_notification_config(
+    config: ConfiguracionNotificaciones,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update notification display preferences"""
+    await db.config_notificaciones.update_one(
+        {"admin_id": admin["cliente_id"]},
+        {"$set": {**config.model_dump(), "admin_id": admin["cliente_id"]}},
+        upsert=True
+    )
+    return {"success": True}
+
+# ============== FORM CONFIGURATION ROUTES ==============
+
+@api_router.get("/admin/config-formulario")
+async def get_admin_form_config(admin: dict = Depends(get_admin_user)):
+    """Get form configuration"""
+    config = await db.config_formulario.find_one({}, {"_id": 0})
+    if not config:
+        default = ConfiguracionFormulario()
+        return default.model_dump()
+    return config
+
+@api_router.put("/admin/config-formulario")
+async def update_form_config(config: dict, admin: dict = Depends(get_admin_user)):
+    """Update form configuration"""
+    await db.config_formulario.update_one(
+        {},
+        {"$set": config},
+        upsert=True
+    )
+    return {"success": True}
+
+# ============== EMBED CODE GENERATOR ==============
+
+@api_router.get("/admin/embed-code")
+async def get_embed_code(admin: dict = Depends(get_admin_user)):
+    """Generate embed code for the form"""
+    base_url = os.environ.get('FRONTEND_URL', 'https://your-domain.com')
+    
+    iframe_code = f'''<iframe 
+  src="{base_url}/embed/orden" 
+  width="100%" 
+  height="800" 
+  frameborder="0" 
+  style="border: none; max-width: 1200px; margin: 0 auto; display: block;">
+</iframe>'''
+    
+    script_code = f'''<div id="libreria-form-container"></div>
+<script src="{base_url}/embed.js"></script>
+<script>
+  LibreriaForm.init({{
+    container: '#libreria-form-container',
+    theme: 'auto'
+  }});
+</script>'''
+    
+    return {
+        "iframe_code": iframe_code,
+        "script_code": script_code,
+        "direct_url": f"{base_url}/embed/orden"
+    }
+
 # Include router
 app.include_router(api_router)
 
