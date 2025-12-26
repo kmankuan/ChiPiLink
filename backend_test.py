@@ -349,6 +349,186 @@ class TextbookStoreAPITester:
         
         return False
 
+    def test_public_books_api(self):
+        """Test public books API (no auth required)"""
+        print("\n📚 Testing Public Books API...")
+        
+        # Test public books endpoint without auth
+        old_token = self.token
+        self.token = None  # Remove auth for public endpoint
+        
+        # Get all public books
+        all_books = self.run_test(
+            "Get All Public Books",
+            "GET",
+            "public/libros",
+            200
+        )
+        
+        # Test filtering by grade
+        grade_books = self.run_test(
+            "Get Public Books by Grade",
+            "GET",
+            "public/libros?grado=1",
+            200
+        )
+        
+        # Restore token
+        self.token = old_token
+        
+        return all([all_books, grade_books])
+
+    def test_public_order_api(self):
+        """Test public order API (embeddable form)"""
+        print("\n🛒 Testing Public Order API...")
+        
+        # First get available books
+        old_token = self.token
+        self.token = None  # Remove auth for public endpoint
+        
+        books = self.run_test(
+            "Get Books for Public Order",
+            "GET",
+            "public/libros?grado=1",
+            200
+        )
+        
+        if not books or len(books) == 0:
+            print("❌ No books available for public order testing")
+            self.token = old_token
+            return False
+        
+        # Create public order with realistic data
+        book = books[0]
+        order_data = {
+            # Guardian (Acudiente) info
+            "nombre_acudiente": "María García López",
+            "telefono_acudiente": "+507 6123-4567",
+            "email_acudiente": "maria.garcia@test.com",
+            
+            # Student info
+            "nombre_estudiante": "Carlos",
+            "apellido_estudiante": "García Rodríguez",
+            "grado_estudiante": "1",
+            "email_estudiante": "carlos.garcia@test.com",
+            "telefono_estudiante": "+507 6234-5678",
+            "escuela_estudiante": "Escuela Primaria Test",
+            
+            # Order details
+            "items": [
+                {
+                    "libro_id": book['libro_id'],
+                    "nombre_libro": book['nombre'],
+                    "cantidad": 2,
+                    "precio_unitario": book['precio']
+                }
+            ],
+            "metodo_pago": "transferencia_bancaria",
+            "notas": "Pedido de prueba desde formulario embebible"
+        }
+        
+        public_order = self.run_test(
+            "Create Public Order",
+            "POST",
+            "public/pedido",
+            200,
+            order_data
+        )
+        
+        # Restore token
+        self.token = old_token
+        
+        if public_order and 'pedido_id' in public_order:
+            self.created_resources['orders'].append(public_order['pedido_id'])
+            return True
+        
+        return False
+
+    def test_notifications_api(self):
+        """Test notifications API"""
+        print("\n🔔 Testing Notifications API...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Get notifications
+        notifications = self.run_test(
+            "Get Admin Notifications",
+            "GET",
+            "admin/notificaciones",
+            200
+        )
+        
+        # Get unread notifications only
+        unread_notifications = self.run_test(
+            "Get Unread Notifications",
+            "GET",
+            "admin/notificaciones?solo_no_leidas=true",
+            200
+        )
+        
+        # Get notifications by type
+        order_notifications = self.run_test(
+            "Get Order Notifications",
+            "GET",
+            "admin/notificaciones?tipos=pedido_nuevo",
+            200
+        )
+        
+        success = all([notifications, unread_notifications, order_notifications])
+        
+        # Test marking notification as read if we have notifications
+        if notifications and notifications.get('notificaciones') and len(notifications['notificaciones']) > 0:
+            notification_id = notifications['notificaciones'][0]['notificacion_id']
+            
+            mark_read = self.run_test(
+                "Mark Notification as Read",
+                "PUT",
+                f"admin/notificaciones/{notification_id}/leer",
+                200
+            )
+            
+            # Test mark all as read
+            mark_all_read = self.run_test(
+                "Mark All Notifications as Read",
+                "PUT",
+                "admin/notificaciones/leer-todas",
+                200
+            )
+            
+            success = success and all([mark_read, mark_all_read])
+        
+        # Test notification config
+        config = self.run_test(
+            "Get Notification Config",
+            "GET",
+            "admin/config-notificaciones",
+            200
+        )
+        
+        # Update notification config
+        config_data = {
+            "mostrar_pedidos_nuevos": True,
+            "mostrar_bajo_stock": True,
+            "mostrar_pagos_confirmados": True,
+            "mostrar_pedidos_enviados": True
+        }
+        
+        update_config = self.run_test(
+            "Update Notification Config",
+            "PUT",
+            "admin/config-notificaciones",
+            200,
+            config_data
+        )
+        
+        success = success and all([config, update_config])
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_admin_functionality(self):
         """Test admin functionality"""
         print("\n👑 Testing Admin Functionality...")
