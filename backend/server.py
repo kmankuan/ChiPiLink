@@ -266,14 +266,18 @@ async def get_admin_user(current_user: dict = Depends(get_current_user)) -> dict
 
 async def create_monday_item(pedido: dict) -> Optional[str]:
     if not MONDAY_API_KEY or not MONDAY_BOARD_ID:
-        logger.warning("Monday.com not configured")
+        logger.warning("Monday.com not configured - missing API key or Board ID")
         return None
     
     try:
         import json
+        # Use appropriate fields based on order type
+        cliente_info = pedido.get("nombre_acudiente") or pedido.get("cliente_id", "")
+        estudiante_nombre = pedido.get("estudiante_nombre", "")
+        
         column_values = json.dumps({
-            "text": pedido.get("cliente_id", ""),
-            "text4": pedido.get("estudiante_nombre", ""),
+            "text": cliente_info,
+            "text4": estudiante_nombre,
             "numbers": str(pedido.get("total", 0)),
             "status": {"label": pedido.get("estado", "pendiente")},
             "text0": pedido.get("metodo_pago", "")
