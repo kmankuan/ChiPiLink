@@ -32,7 +32,21 @@ const resources = {
           fastDesc: "Reciba sus libros en tiempo para el inicio de clases",
           support: "Soporte",
           supportDesc: "Atención personalizada para todas sus consultas"
-        }
+        },
+        whyUs: "¿Por qué elegirnos?",
+        benefits: {
+          prices: "Precios competitivos",
+          original: "Libros originales",
+          shipping: "Envío a todo el país",
+          support: "Atención personalizada"
+        },
+        allGrades: "Todos los Grados",
+        fromPreschool: "Desde preescolar hasta bachillerato",
+        buyEasy: "Comprar nunca fue tan fácil",
+        buyEasyDesc: "Simplificamos el proceso de compra de libros escolares para que pueda enfocarse en lo importante: la educación de sus hijos.",
+        readyToOrder: "¿Listo para ordenar?",
+        readyToOrderDesc: "Cree su cuenta hoy y obtenga acceso a todos los libros de texto organizados por grado. Agregue sus estudiantes y ordene en minutos.",
+        viewCatalog: "Ver Catálogo"
       },
       // Auth
       auth: {
@@ -223,7 +237,21 @@ const resources = {
           fastDesc: "确保在开学前收到您的教科书",
           support: "客户支持",
           supportDesc: "为您的所有问题提供个性化服务"
-        }
+        },
+        whyUs: "为什么选择我们？",
+        benefits: {
+          prices: "价格实惠",
+          original: "正版书籍",
+          shipping: "全国配送",
+          support: "个性化服务"
+        },
+        allGrades: "所有年级",
+        fromPreschool: "从学前班到高中",
+        buyEasy: "购买从未如此简单",
+        buyEasyDesc: "我们简化了购买学校书籍的流程，让您可以专注于最重要的事情：孩子的教育。",
+        readyToOrder: "准备好订购了吗？",
+        readyToOrderDesc: "立即创建账户，获取按年级分类的所有教科书。添加您的学生，几分钟内完成订购。",
+        viewCatalog: "查看目录"
       },
       // Auth
       auth: {
