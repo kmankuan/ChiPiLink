@@ -28,17 +28,22 @@ import {
   Book,
   User,
   Mail,
-  Phone
+  Phone,
+  GraduationCap,
+  School,
+  Globe
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Embeddable Order Form Component - Can be used as iframe
+// Embeddable Order Form - Works independently without authentication
 export default function EmbedOrderForm() {
   const { t, i18n } = useTranslation();
   const [searchParams] = useSearchParams();
-  const lang = searchParams.get('lang') || 'es';
+  const lang = searchParams.get('lang');
+  const themeParam = searchParams.get('theme');
 
+  const [formConfig, setFormConfig] = useState(null);
   const [libros, setLibros] = useState([]);
   const [grados, setGrados] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,40 +52,75 @@ export default function EmbedOrderForm() {
 
   const [formData, setFormData] = useState({
     nombre_cliente: '',
-    email: '',
-    telefono: '',
+    email_cliente: '',
+    telefono_cliente: '',
     nombre_estudiante: '',
-    grado: ''
+    grado_estudiante: '',
+    escuela_estudiante: ''
   });
   const [cart, setCart] = useState([]);
   const [metodoPago, setMetodoPago] = useState('transferencia_bancaria');
   const [notas, setNotas] = useState('');
 
+  // Handle language from URL param
   useEffect(() => {
-    i18n.changeLanguage(lang);
+    if (lang && ['es', 'zh'].includes(lang)) {
+      i18n.changeLanguage(lang);
+    }
+  }, [lang, i18n]);
+
+  // Handle theme from URL param
+  useEffect(() => {
+    if (themeParam === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (themeParam === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [themeParam]);
+
+  useEffect(() => {
     fetchData();
-  }, [lang]);
+  }, []);
 
   const fetchData = async () => {
     try {
-      const [librosRes, gradosRes] = await Promise.all([
-        axios.get(`${API_URL}/api/libros`),
+      const [configRes, gradosRes] = await Promise.all([
+        axios.get(`${API_URL}/api/public/config-formulario`),
         axios.get(`${API_URL}/api/grados`)
       ]);
       
-      setLibros(librosRes.data);
+      setFormConfig(configRes.data);
       setGrados(gradosRes.data.grados);
+      
+      // Set default payment method from config
+      if (configRes.data.metodos_pago?.length > 0) {
+        setMetodoPago(configRes.data.metodos_pago[0]);
+      }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Error al cargar datos');
+      console.error('Error fetching config:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredLibros = libros.filter(libro => 
-    formData.grado ? libro.grado === formData.grado : false
-  );
+  // Fetch books when grade changes
+  useEffect(() => {
+    if (formData.grado_estudiante) {
+      fetchLibros(formData.grado_estudiante);
+    }
+  }, [formData.grado_estudiante]);
+
+  const fetchLibros = async (grado) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/public/libros`, {
+        params: { grado }
+      });
+      setLibros(response.data);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      toast.error('Error al cargar libros');
+    }
+  };
 
   const addToCart = (libro) => {
     const existing = cart.find(item => item.libro_id === libro.libro_id);
@@ -91,6 +131,8 @@ export default function EmbedOrderForm() {
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         ));
+      } else {
+        toast.error('Stock insuficiente');
       }
     } else {
       setCart([...cart, {
@@ -108,7 +150,10 @@ export default function EmbedOrderForm() {
       if (item.libro_id === libroId) {
         const newQty = item.cantidad + delta;
         if (newQty <= 0) return null;
-        if (newQty > item.max_stock) return item;
+        if (newQty > item.max_stock) {
+          toast.error('Stock insuficiente');
+          return item;
+        }
         return { ...item, cantidad: newQty };
       }
       return item;
@@ -132,54 +177,13 @@ export default function EmbedOrderForm() {
     setSubmitting(true);
     
     try {
-      // For embed form, we create a guest order
-      // First register or get existing user
-      const registerResponse = await axios.post(`${API_URL}/api/auth/registro`, {
-        nombre: formData.nombre_cliente,
-        email: formData.email,
-        telefono: formData.telefono,
-        contrasena: `temp_${Date.now()}` // Temporary password
-      }).catch(() => null);
-
-      // Login to get token
-      const loginResponse = await axios.post(`${API_URL}/api/auth/login`, {
-        email: formData.email,
-        contrasena: `temp_${Date.now()}`
-      }).catch(() => null);
-
-      // If login fails, user might already exist - for embed form we'll use a simplified approach
-      // In production, you'd want a proper guest checkout endpoint
-
-      // Create student first
-      const token = loginResponse?.data?.token || registerResponse?.data?.token;
-      
-      if (!token) {
-        // Fallback: show success anyway with order info (demo mode)
-        setOrderSuccess({
-          pedido_id: `EMBED-${Date.now()}`,
-          total: total,
-          demo: true
-        });
-        toast.success(t('order.orderSuccess'));
-        return;
-      }
-
-      const api = axios.create({
-        baseURL: `${API_URL}/api`,
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      // Add student
-      const studentRes = await api.post('/estudiantes', {
-        nombre: formData.nombre_estudiante,
-        grado: formData.grado,
-        escuela: '',
-        notas: ''
-      });
-
-      // Create order
       const orderData = {
-        estudiante_id: studentRes.data.estudiante_id,
+        nombre_cliente: formData.nombre_cliente,
+        email_cliente: formData.email_cliente,
+        telefono_cliente: formData.telefono_cliente || null,
+        nombre_estudiante: formData.nombre_estudiante,
+        grado_estudiante: formData.grado_estudiante,
+        escuela_estudiante: formData.escuela_estudiante || null,
         items: cart.map(item => ({
           libro_id: item.libro_id,
           nombre_libro: item.nombre_libro,
@@ -190,22 +194,21 @@ export default function EmbedOrderForm() {
         notas: notas || null
       };
       
-      const response = await api.post('/pedidos', orderData);
+      const response = await axios.post(`${API_URL}/api/public/pedido`, orderData);
       setOrderSuccess(response.data);
-      toast.success(t('order.orderSuccess'));
+      toast.success(formConfig?.mensaje_exito || '¡Pedido enviado exitosamente!');
       
     } catch (error) {
-      console.error('Order error:', error);
-      // For demo purposes, show success anyway
-      setOrderSuccess({
-        pedido_id: `EMBED-${Date.now()}`,
-        total: total,
-        demo: true
-      });
-      toast.success(t('order.orderSuccess'));
+      const message = error.response?.data?.detail || 'Error al enviar pedido';
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language?.substring(0, 2) === 'zh' ? 'es' : 'zh';
+    i18n.changeLanguage(newLang);
   };
 
   if (loading) {
@@ -219,14 +222,14 @@ export default function EmbedOrderForm() {
   // Success Screen
   if (orderSuccess) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-background p-4 md:p-6">
         <div className="max-w-md mx-auto text-center bg-card rounded-2xl border border-border p-8">
           <div className="p-4 rounded-full bg-green-100 dark:bg-green-900/30 w-fit mx-auto mb-6">
             <CheckCircle2 className="h-12 w-12 text-green-600 dark:text-green-400" />
           </div>
           
           <h1 className="font-serif text-2xl font-bold mb-4">
-            {t('order.orderSuccess')}
+            {formConfig?.mensaje_exito || '¡Gracias por su pedido!'}
           </h1>
           
           <p className="text-muted-foreground mb-4">
@@ -246,7 +249,12 @@ export default function EmbedOrderForm() {
                 <p><span className="text-muted-foreground">Banco:</span> Banco General</p>
                 <p><span className="text-muted-foreground">Tipo:</span> Cuenta Corriente</p>
                 <p><span className="text-muted-foreground">Número:</span> XXXX-XXXX-XXXX</p>
+                <p><span className="text-muted-foreground">Titular:</span> Librería Escolar S.A.</p>
               </div>
+              <Separator className="my-4" />
+              <p className="text-sm text-muted-foreground">
+                {t('payment.instructionsText')}
+              </p>
             </div>
           )}
           
@@ -262,25 +270,49 @@ export default function EmbedOrderForm() {
     <div className="min-h-screen bg-background p-4 md:p-6" data-testid="embed-order-form">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-2 rounded-xl bg-primary text-primary-foreground">
-              <Book className="h-6 w-6" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            {formConfig?.logo_url ? (
+              <img src={formConfig.logo_url} alt="Logo" className="h-10 w-auto" />
+            ) : (
+              <div className="p-2 rounded-xl bg-primary text-primary-foreground">
+                <Book className="h-6 w-6" />
+              </div>
+            )}
+            <div>
+              <h1 className="font-serif text-xl md:text-2xl font-bold">
+                {formConfig?.titulo || 'Formulario de Pedido'}
+              </h1>
+              {formConfig?.descripcion && (
+                <p className="text-sm text-muted-foreground hidden sm:block">
+                  {formConfig.descripcion}
+                </p>
+              )}
             </div>
-            <h1 className="font-serif text-2xl font-bold">Librería Escolar</h1>
           </div>
-          <p className="text-muted-foreground">
-            {t('order.title')}
-          </p>
+          
+          {/* Language Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="gap-2"
+          >
+            <Globe className="h-4 w-4" />
+            {i18n.language?.substring(0, 2) === 'zh' ? '中文' : 'ES'}
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left - Form Fields */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Customer Info */}
+              {/* Contact Info */}
               <div className="bg-card rounded-xl border border-border p-6">
-                <h2 className="font-bold mb-4">Información de Contacto</h2>
+                <h2 className="font-bold mb-4 flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  Información de Contacto
+                </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -291,7 +323,9 @@ export default function EmbedOrderForm() {
                         value={formData.nombre_cliente}
                         onChange={(e) => setFormData({...formData, nombre_cliente: e.target.value})}
                         className="pl-10"
+                        placeholder="Nombre completo"
                         required
+                        data-testid="client-name-input"
                       />
                     </div>
                   </div>
@@ -302,22 +336,26 @@ export default function EmbedOrderForm() {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        value={formData.email_cliente}
+                        onChange={(e) => setFormData({...formData, email_cliente: e.target.value})}
                         className="pl-10"
+                        placeholder="correo@ejemplo.com"
                         required
+                        data-testid="client-email-input"
                       />
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label>{t('auth.phone')}</Label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        value={formData.telefono}
-                        onChange={(e) => setFormData({...formData, telefono: e.target.value})}
+                        value={formData.telefono_cliente}
+                        onChange={(e) => setFormData({...formData, telefono_cliente: e.target.value})}
                         className="pl-10"
+                        placeholder="+507 6000-0000"
+                        data-testid="client-phone-input"
                       />
                     </div>
                   </div>
@@ -326,7 +364,10 @@ export default function EmbedOrderForm() {
 
               {/* Student Info */}
               <div className="bg-card rounded-xl border border-border p-6">
-                <h2 className="font-bold mb-4">Información del Estudiante</h2>
+                <h2 className="font-bold mb-4 flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                  Información del Estudiante
+                </h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -334,17 +375,23 @@ export default function EmbedOrderForm() {
                     <Input
                       value={formData.nombre_estudiante}
                       onChange={(e) => setFormData({...formData, nombre_estudiante: e.target.value})}
+                      placeholder="Nombre del estudiante"
                       required
+                      data-testid="student-name-input"
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <Label>{t('student.grade')} *</Label>
                     <Select 
-                      value={formData.grado} 
-                      onValueChange={(v) => setFormData({...formData, grado: v})}
+                      value={formData.grado_estudiante} 
+                      onValueChange={(v) => {
+                        setFormData({...formData, grado_estudiante: v});
+                        setCart([]); // Clear cart when grade changes
+                      }}
+                      required
                     >
-                      <SelectTrigger>
+                      <SelectTrigger data-testid="student-grade-select">
                         <SelectValue placeholder="Seleccionar grado" />
                       </SelectTrigger>
                       <SelectContent>
@@ -354,110 +401,139 @@ export default function EmbedOrderForm() {
                       </SelectContent>
                     </Select>
                   </div>
+                  
+                  <div className="space-y-2 md:col-span-2">
+                    <Label>{t('student.school')}</Label>
+                    <div className="relative">
+                      <School className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        value={formData.escuela_estudiante}
+                        onChange={(e) => setFormData({...formData, escuela_estudiante: e.target.value})}
+                        className="pl-10"
+                        placeholder="Nombre de la escuela"
+                        data-testid="student-school-input"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Book Selection */}
-              {formData.grado && (
+              {formData.grado_estudiante && (
                 <div className="bg-card rounded-xl border border-border p-6">
-                  <h2 className="font-bold mb-4">
-                    {t('order.booksForGrade')} {t(`grades.${formData.grado}`)}
+                  <h2 className="font-bold mb-4 flex items-center gap-2">
+                    <Book className="h-5 w-5 text-primary" />
+                    {t('order.booksForGrade')} {t(`grades.${formData.grado_estudiante}`)}
                   </h2>
                   
-                  <div className="space-y-3">
-                    {filteredLibros.map((libro) => {
-                      const inCart = cart.find(item => item.libro_id === libro.libro_id);
-                      const isOutOfStock = libro.cantidad_inventario <= 0;
-                      
-                      return (
-                        <div 
-                          key={libro.libro_id}
-                          className={`flex items-center justify-between p-4 rounded-lg border ${
-                            inCart ? 'border-primary bg-primary/5' : 'border-border'
-                          } ${isOutOfStock ? 'opacity-50' : ''}`}
-                        >
-                          <div className="flex-1">
-                            <p className="font-medium">{libro.nombre}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {t(`subjects.${libro.materia}`)} • ${libro.precio.toFixed(2)}
-                            </p>
-                          </div>
-                          
-                          {inCart ? (
-                            <div className="flex items-center gap-2">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => updateQuantity(libro.libro_id, -1)}
-                              >
-                                <Minus className="h-4 w-4" />
-                              </Button>
-                              <span className="w-8 text-center font-medium">
-                                {inCart.cantidad}
-                              </span>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => updateQuantity(libro.libro_id, 1)}
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
+                  {libros.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      No hay libros disponibles para este grado
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {libros.map((libro) => {
+                        const inCart = cart.find(item => item.libro_id === libro.libro_id);
+                        
+                        return (
+                          <div 
+                            key={libro.libro_id}
+                            className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+                              inCart ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                            }`}
+                            data-testid={`book-item-${libro.libro_id}`}
+                          >
+                            <div className="flex-1">
+                              <p className="font-medium">{libro.nombre}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {t(`subjects.${libro.materia}`)}
+                                {formConfig?.mostrar_precios !== false && (
+                                  <> • <span className="font-medium text-primary">${libro.precio.toFixed(2)}</span></>
+                                )}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Disponibles: {libro.cantidad_inventario}
+                              </p>
                             </div>
-                          ) : (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => addToCart(libro)}
-                              disabled={isOutOfStock}
-                            >
-                              <Plus className="h-4 w-4 mr-1" />
-                              Agregar
-                            </Button>
-                          )}
-                        </div>
-                      );
-                    })}
-                    
-                    {filteredLibros.length === 0 && (
-                      <p className="text-center text-muted-foreground py-8">
-                        No hay libros disponibles para este grado
-                      </p>
-                    )}
-                  </div>
+                            
+                            {inCart ? (
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => updateQuantity(libro.libro_id, -1)}
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                                <span className="w-8 text-center font-medium">
+                                  {inCart.cantidad}
+                                </span>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => updateQuantity(libro.libro_id, 1)}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addToCart(libro)}
+                                data-testid={`add-book-${libro.libro_id}`}
+                              >
+                                <Plus className="h-4 w-4 mr-1" />
+                                Agregar
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Payment Method */}
-              <div className="bg-card rounded-xl border border-border p-6">
-                <h2 className="font-bold mb-4">{t('order.paymentMethod')}</h2>
-                
-                <RadioGroup value={metodoPago} onValueChange={setMetodoPago} className="space-y-3">
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border">
-                    <RadioGroupItem value="transferencia_bancaria" id="embed-bank" />
-                    <Label htmlFor="embed-bank" className="flex items-center gap-3 cursor-pointer flex-1">
-                      <Building2 className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{t('order.bankTransfer')}</p>
-                      </div>
-                    </Label>
-                  </div>
+              {(formConfig?.metodos_pago?.length > 0) && (
+                <div className="bg-card rounded-xl border border-border p-6">
+                  <h2 className="font-bold mb-4">{t('order.paymentMethod')}</h2>
                   
-                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border">
-                    <RadioGroupItem value="yappy" id="embed-yappy" />
-                    <Label htmlFor="embed-yappy" className="flex items-center gap-3 cursor-pointer flex-1">
-                      <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{t('order.yappy')}</p>
+                  <RadioGroup value={metodoPago} onValueChange={setMetodoPago} className="space-y-3">
+                    {formConfig.metodos_pago.includes('transferencia_bancaria') && (
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                        <RadioGroupItem value="transferencia_bancaria" id="embed-bank" />
+                        <Label htmlFor="embed-bank" className="flex items-center gap-3 cursor-pointer flex-1">
+                          <Building2 className="h-5 w-5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">{t('order.bankTransfer')}</p>
+                            <p className="text-sm text-muted-foreground">Banco General</p>
+                          </div>
+                        </Label>
                       </div>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                    )}
+                    
+                    {formConfig.metodos_pago.includes('yappy') && (
+                      <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors">
+                        <RadioGroupItem value="yappy" id="embed-yappy" />
+                        <Label htmlFor="embed-yappy" className="flex items-center gap-3 cursor-pointer flex-1">
+                          <CreditCard className="h-5 w-5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">{t('order.yappy')}</p>
+                            <p className="text-sm text-muted-foreground">Pago instantáneo</p>
+                          </div>
+                        </Label>
+                      </div>
+                    )}
+                  </RadioGroup>
+                </div>
+              )}
 
               {/* Notes */}
               <div className="bg-card rounded-xl border border-border p-6">
@@ -465,8 +541,9 @@ export default function EmbedOrderForm() {
                 <Textarea
                   value={notas}
                   onChange={(e) => setNotas(e.target.value)}
-                  placeholder="Instrucciones especiales..."
+                  placeholder="Instrucciones especiales, comentarios..."
                   className="min-h-[80px]"
+                  data-testid="order-notes"
                 />
               </div>
             </div>
@@ -476,12 +553,12 @@ export default function EmbedOrderForm() {
               <div className="bg-card rounded-xl border border-border p-6 sticky top-4">
                 <h2 className="font-bold mb-4 flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5" />
-                  Resumen
+                  Resumen del Pedido
                 </h2>
                 
                 {cart.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">
-                    Carrito vacío
+                    Seleccione los libros que desea ordenar
                   </p>
                 ) : (
                   <>
@@ -502,7 +579,7 @@ export default function EmbedOrderForm() {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 text-destructive"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
                               onClick={() => removeFromCart(item.libro_id)}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -516,7 +593,7 @@ export default function EmbedOrderForm() {
                     
                     <div className="flex items-center justify-between mb-6">
                       <p className="font-bold text-lg">{t('order.total')}</p>
-                      <p className="font-bold text-2xl text-primary">
+                      <p className="font-bold text-2xl text-primary" data-testid="cart-total">
                         ${total.toFixed(2)}
                       </p>
                     </div>
@@ -526,12 +603,13 @@ export default function EmbedOrderForm() {
                 <Button
                   type="submit"
                   className="w-full h-12 rounded-full text-base font-medium"
-                  disabled={submitting || cart.length === 0 || !formData.nombre_cliente || !formData.email || !formData.nombre_estudiante || !formData.grado}
+                  disabled={submitting || cart.length === 0 || !formData.nombre_cliente || !formData.email_cliente || !formData.nombre_estudiante || !formData.grado_estudiante}
+                  data-testid="submit-order-button"
                 >
                   {submitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Procesando...
+                      Enviando...
                     </>
                   ) : (
                     <>
@@ -540,6 +618,10 @@ export default function EmbedOrderForm() {
                     </>
                   )}
                 </Button>
+                
+                <p className="text-xs text-muted-foreground text-center mt-4">
+                  Al enviar acepta nuestros términos y condiciones
+                </p>
               </div>
             </div>
           </div>
