@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -42,7 +42,11 @@ import {
   Printer,
   Loader2,
   Search,
-  Save
+  Save,
+  Upload,
+  FileSpreadsheet,
+  Download,
+  AlertCircle
 } from 'lucide-react';
 
 // Empty product row template
