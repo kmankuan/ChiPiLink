@@ -730,7 +730,7 @@ export default function AdminDashboard() {
               />
             </div>
             
-            {/* CSV Import Section */}
+            {/* CSV Import/Export Section */}
             <div className="flex gap-2">
               {/* Hidden file input */}
               <input
@@ -741,6 +741,17 @@ export default function AdminDashboard() {
                 className="hidden"
               />
               
+              {/* Export Products Button */}
+              <Button 
+                variant="outline" 
+                onClick={exportProductsToCsv}
+                className="rounded-full gap-2"
+                data-testid="export-csv-button"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Exportar CSV</span>
+              </Button>
+              
               {/* Download Template Button */}
               <Button 
                 variant="outline" 
@@ -748,8 +759,8 @@ export default function AdminDashboard() {
                 className="rounded-full gap-2"
                 data-testid="download-csv-template"
               >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Plantilla CSV</span>
+                <FileSpreadsheet className="h-4 w-4" />
+                <span className="hidden sm:inline">Plantilla</span>
               </Button>
               
               {/* Upload CSV Button */}
