@@ -472,6 +472,51 @@ export default function AdminDashboard() {
     toast.success('Plantilla descargada');
   };
 
+  const exportProductsToCsv = () => {
+    if (inventario.libros.length === 0) {
+      toast.error('No hay productos para exportar');
+      return;
+    }
+
+    const headers = ['nombre', 'grado', 'materia', 'precio', 'cantidad', 'descripcion', 'isbn', 'editorial', 'libro_id'];
+    
+    const rows = inventario.libros.map(libro => [
+      libro.nombre || '',
+      libro.grado || '',
+      libro.materia || '',
+      libro.precio?.toString() || '0',
+      libro.cantidad_inventario?.toString() || '0',
+      libro.descripcion || '',
+      libro.isbn || '',
+      libro.editorial || '',
+      libro.libro_id || ''
+    ]);
+
+    // Escape CSV values properly
+    const escapeCSV = (value) => {
+      const str = value.toString();
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(escapeCSV).join(','))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel compatibility
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    const date = new Date().toISOString().split('T')[0];
+    link.download = `productos_libreria_${date}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    
+    toast.success(`${inventario.libros.length} productos exportados`);
+  };
+
   // ========== INVENTORY & ORDERS ==========
   const handleUpdateStock = async (libroId, cantidad) => {
     try {
