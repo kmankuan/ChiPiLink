@@ -137,8 +137,9 @@ function AppRouter() {
         path="/admin" 
         element={
           <ProtectedRoute adminOnly>
-            <Header />
-            <AdminDashboard />
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
           </ProtectedRoute>
         } 
       />
