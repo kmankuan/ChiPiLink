@@ -101,3 +101,160 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Full-stack textbook store application with:
+  1. Embeddable order form (public, no auth required)
+  2. Admin notification system
+  3. CSV import/export for products
+  4. Multi-grade book support
+  5. Monday.com integration
+
+backend:
+  - task: "Public Order API (Embeddable Form)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/public/pedido with new fields: nombre_acudiente, telefono_acudiente, email_acudiente, nombre_estudiante, apellido_estudiante, grado_estudiante, email_estudiante (optional), telefono_estudiante (optional). Creates notifications on new order and low stock."
+
+  - task: "Public Books API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/public/libros with multi-grade support. Books can be tagged with multiple grades (grado + grados array) and the endpoint searches both fields."
+
+  - task: "Notifications API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented GET /api/admin/notificaciones, PUT /api/admin/notificaciones/{id}/leer, PUT /api/admin/notificaciones/leer-todas. Notifications are auto-created for new orders and low stock."
+
+  - task: "Admin Login API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Tested via curl - admin login works. Credentials: admin@libreria.com / adminpassword"
+
+frontend:
+  - task: "Embeddable Order Form"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EmbedOrderForm.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Rebuilt entire form with 3 sections: 1) Acudiente (guardian) - nombre, telefono, email. 2) Estudiante - nombre, apellido, grado, email/telefono (optional). 3) Book selection based on student grade. Cart summary sticky on right. Form validation and submission to /api/public/pedido."
+
+  - task: "Admin Notification Bar"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/layout/NotificationBar.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Component exists and shows in admin dashboard. Displays notification counts by type, settings dropdown, and notification list popover."
+
+  - task: "CSV Import"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminDashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Installed papaparse dependency (was missing). UI exists in AdminDashboard. Needs testing to verify full functionality."
+
+  - task: "Admin Login Flow"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Login.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Fixed CORS issue - removed withCredentials from AuthContext. Login now redirects to /admin for admin users."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Public Order API (Embeddable Form)"
+    - "Embeddable Order Form"
+    - "Notifications API"
+    - "Admin Notification Bar"
+    - "CSV Import"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Testing Agent - Please test the following features:
+      
+      1. EMBEDDABLE ORDER FORM (http://localhost:3000/embed/orden):
+         - Fill guardian section: nombre completo, telefono, email (all required)
+         - Fill student section: nombre, apellido, grado (required), email/telefono (optional)
+         - Select a grade to load books
+         - Add books to cart
+         - Verify total calculation
+         - Submit order and verify success message
+         
+      2. ADMIN NOTIFICATION BAR:
+         - Login as admin: admin@libreria.com / adminpassword
+         - Go to /admin
+         - Verify notification bar shows at top
+         - After submitting a public order, refresh admin page
+         - Verify new order notification appears
+         
+      3. CSV IMPORT (Admin Dashboard):
+         - Go to Productos tab
+         - Click "Importar CSV" button
+         - Verify papaparse library loads (no console errors)
+         
+      4. PUBLIC BOOKS API:
+         - Test: GET /api/public/libros
+         - Test: GET /api/public/libros?grado=1
+         - Should return books filtered by grade
+         
+      5. NOTIFICATIONS API:
+         - Test: GET /api/admin/notificaciones (with auth)
+         - Should return notifications array with counts
