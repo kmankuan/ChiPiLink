@@ -83,6 +83,13 @@ export default function AdminDashboard() {
   const [bulkProducts, setBulkProducts] = useState([{...emptyProductRow}]);
   const [savingBulk, setSavingBulk] = useState(false);
   
+  // CSV Import
+  const [csvDialog, setCsvDialog] = useState(false);
+  const [csvData, setCsvData] = useState([]);
+  const [csvErrors, setCsvErrors] = useState([]);
+  const [importingCsv, setImportingCsv] = useState(false);
+  const fileInputRef = useRef(null);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [orderFilter, setOrderFilter] = useState('all');
 
