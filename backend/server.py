@@ -135,14 +135,19 @@ class TokenResponse(BaseModel):
 
 class PedidoPublicoCreate(BaseModel):
     """Pedido sin autenticación - para formulario embebible"""
-    # Cliente info
-    nombre_cliente: str
-    email_cliente: EmailStr
-    telefono_cliente: Optional[str] = None
-    # Estudiante info
+    # Sección Acudiente (Guardian)
+    nombre_acudiente: str
+    telefono_acudiente: str
+    email_acudiente: EmailStr
+    
+    # Sección Estudiante
     nombre_estudiante: str
+    apellido_estudiante: str
     grado_estudiante: str
+    email_estudiante: Optional[EmailStr] = None  # Optional
+    telefono_estudiante: Optional[str] = None  # Optional
     escuela_estudiante: Optional[str] = None
+    
     # Order info
     items: List[ItemPedido]
     metodo_pago: str
