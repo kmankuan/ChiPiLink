@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -10,32 +10,48 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
 
-  const api = axios.create({
-    baseURL: `${API_URL}/api`,
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
-  });
+  // Create API instance with dynamic token using interceptors
+  const api = useMemo(() => {
+    const instance = axios.create({
+      baseURL: `${API_URL}/api`,
+      withCredentials: true
+    });
+
+    // Add request interceptor to always use the latest token
+    instance.interceptors.request.use((config) => {
+      const currentToken = localStorage.getItem('auth_token');
+      if (currentToken) {
+        config.headers.Authorization = `Bearer ${currentToken}`;
+      }
+      return config;
+    });
+
+    return instance;
+  }, []);
 
   const checkAuth = useCallback(async () => {
+    const currentToken = localStorage.getItem('auth_token');
+    if (!currentToken) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const response = await api.get('/auth/me');
       setUser(response.data);
     } catch (error) {
+      console.error('Auth check error:', error);
       setUser(null);
       localStorage.removeItem('auth_token');
       setToken(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api]);
 
   useEffect(() => {
-    if (token) {
-      checkAuth();
-    } else {
-      setLoading(false);
-    }
-  }, [token, checkAuth]);
+    checkAuth();
+  }, [checkAuth]);
 
   const login = async (email, contrasena) => {
     const response = await api.post('/auth/login', { email, contrasena });
