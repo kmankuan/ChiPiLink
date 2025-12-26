@@ -885,6 +885,124 @@ export default function AdminDashboard() {
             </Dialog>
           </div>
 
+          {/* CSV Import Dialog */}
+          <Dialog open={csvDialog} onOpenChange={setCsvDialog}>
+            <DialogContent className="max-w-[95vw] w-[1200px] max-h-[90vh] overflow-hidden flex flex-col">
+              <DialogHeader>
+                <DialogTitle className="font-serif flex items-center gap-2">
+                  <FileSpreadsheet className="h-5 w-5" />
+                  Importar Productos desde CSV
+                </DialogTitle>
+              </DialogHeader>
+              
+              {/* Summary */}
+              <div className="flex items-center gap-4 p-4 bg-muted rounded-lg mt-4">
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span className="text-sm">
+                    <strong>{csvData.filter(r => r.valid).length}</strong> válidos
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                  <span className="text-sm">
+                    <strong>{csvData.filter(r => !r.valid).length}</strong> con errores
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Total: {csvData.length} filas
+                </div>
+              </div>
+
+              {/* Errors */}
+              {csvErrors.length > 0 && (
+                <div className="p-4 bg-destructive/10 rounded-lg mt-4 max-h-32 overflow-auto">
+                  <p className="font-medium text-destructive mb-2">Errores encontrados:</p>
+                  <ul className="text-sm text-destructive/80 space-y-1">
+                    {csvErrors.slice(0, 10).map((error, i) => (
+                      <li key={i}>• {error}</li>
+                    ))}
+                    {csvErrors.length > 10 && (
+                      <li className="text-muted-foreground">... y {csvErrors.length - 10} errores más</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {/* Preview Table */}
+              <div className="flex-1 overflow-auto mt-4 border border-border rounded-lg">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted sticky top-0">
+                    <tr>
+                      <th className="text-left p-3 font-medium">Estado</th>
+                      <th className="text-left p-3 font-medium">Nombre</th>
+                      <th className="text-left p-3 font-medium">Grado</th>
+                      <th className="text-left p-3 font-medium">Materia</th>
+                      <th className="text-right p-3 font-medium">Precio</th>
+                      <th className="text-right p-3 font-medium">Stock</th>
+                      <th className="text-left p-3 font-medium">Editorial</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {csvData.map((row, index) => (
+                      <tr 
+                        key={index} 
+                        className={`border-t border-border ${!row.valid ? 'bg-destructive/5' : ''}`}
+                      >
+                        <td className="p-3">
+                          {row.valid ? (
+                            <Check className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <span className="text-xs text-destructive" title={row.error}>
+                              <AlertCircle className="h-4 w-4" />
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-3 font-medium">{row.nombre || '-'}</td>
+                        <td className="p-3">{row.grado ? t(`grades.${row.grado}`) : <span className="text-destructive">-</span>}</td>
+                        <td className="p-3">{row.materia ? t(`subjects.${row.materia}`) : <span className="text-destructive">-</span>}</td>
+                        <td className="p-3 text-right">{row.precio ? `$${parseFloat(row.precio).toFixed(2)}` : '-'}</td>
+                        <td className="p-3 text-right">{row.cantidad_inventario || '-'}</td>
+                        <td className="p-3">{row.editorial || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-between items-center pt-4 border-t border-border mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Solo se importarán los {csvData.filter(r => r.valid).length} productos válidos
+                </p>
+                
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setCsvDialog(false)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleCsvImport}
+                    disabled={importingCsv || csvData.filter(r => r.valid).length === 0}
+                    className="gap-2"
+                    data-testid="confirm-csv-import"
+                  >
+                    {importingCsv ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Importando...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4" />
+                        Importar {csvData.filter(r => r.valid).length} Productos
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           {/* Edit Single Product Dialog */}
           <Dialog open={editDialog} onOpenChange={setEditDialog}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
