@@ -685,14 +685,47 @@ export default function AdminDashboard() {
               />
             </div>
             
-            {/* Bulk Add Products Button */}
-            <Dialog open={bulkDialog} onOpenChange={setBulkDialog}>
-              <DialogTrigger asChild>
-                <Button onClick={openBulkDialog} className="rounded-full" data-testid="add-product-button">
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('admin.addProduct')}
-                </Button>
-              </DialogTrigger>
+            {/* CSV Import Section */}
+            <div className="flex gap-2">
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept=".csv"
+                className="hidden"
+              />
+              
+              {/* Download Template Button */}
+              <Button 
+                variant="outline" 
+                onClick={downloadCsvTemplate}
+                className="rounded-full gap-2"
+                data-testid="download-csv-template"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Plantilla CSV</span>
+              </Button>
+              
+              {/* Upload CSV Button */}
+              <Button 
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="rounded-full gap-2"
+                data-testid="import-csv-button"
+              >
+                <Upload className="h-4 w-4" />
+                <span className="hidden sm:inline">Importar CSV</span>
+              </Button>
+              
+              {/* Bulk Add Products Button */}
+              <Dialog open={bulkDialog} onOpenChange={setBulkDialog}>
+                <DialogTrigger asChild>
+                  <Button onClick={openBulkDialog} className="rounded-full" data-testid="add-product-button">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('admin.addProduct')}
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-[95vw] w-[1200px] max-h-[90vh] overflow-hidden flex flex-col">
                 <DialogHeader>
                   <DialogTitle className="font-serif">
