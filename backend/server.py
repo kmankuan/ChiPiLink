@@ -130,6 +130,70 @@ class TokenResponse(BaseModel):
     token: str
     cliente: dict
 
+# ============== PUBLIC ORDER MODELS ==============
+
+class PedidoPublicoCreate(BaseModel):
+    """Pedido sin autenticación - para formulario embebible"""
+    # Cliente info
+    nombre_cliente: str
+    email_cliente: EmailStr
+    telefono_cliente: Optional[str] = None
+    # Estudiante info
+    nombre_estudiante: str
+    grado_estudiante: str
+    escuela_estudiante: Optional[str] = None
+    # Order info
+    items: List[ItemPedido]
+    metodo_pago: str
+    notas: Optional[str] = None
+
+# ============== NOTIFICATION MODELS ==============
+
+class NotificacionCreate(BaseModel):
+    tipo: str  # "pedido_nuevo", "bajo_stock", "pago_confirmado", "pedido_enviado"
+    titulo: str
+    mensaje: str
+    datos: Optional[dict] = None
+
+class Notificacion(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    notificacion_id: str = Field(default_factory=lambda: f"not_{uuid.uuid4().hex[:12]}")
+    tipo: str
+    titulo: str
+    mensaje: str
+    datos: Optional[dict] = None
+    leida: bool = False
+    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ConfiguracionNotificaciones(BaseModel):
+    mostrar_pedidos_nuevos: bool = True
+    mostrar_bajo_stock: bool = True
+    mostrar_pagos_confirmados: bool = True
+    mostrar_pedidos_enviados: bool = True
+
+# ============== FORM CONFIG MODEL ==============
+
+class CampoFormulario(BaseModel):
+    campo_id: str
+    nombre: str
+    tipo: str  # "text", "email", "tel", "select", "textarea"
+    requerido: bool = True
+    placeholder: Optional[str] = None
+    opciones: Optional[List[str]] = None  # For select fields
+    orden: int = 0
+    activo: bool = True
+
+class ConfiguracionFormulario(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    titulo: str = "Formulario de Pedido de Libros"
+    descripcion: Optional[str] = "Complete el formulario para ordenar los libros de texto"
+    campos_personalizados: List[CampoFormulario] = []
+    mostrar_precios: bool = True
+    metodos_pago: List[str] = ["transferencia_bancaria", "yappy"]
+    mensaje_exito: str = "¡Gracias! Su pedido ha sido recibido."
+    color_primario: str = "#166534"
+    logo_url: Optional[str] = None
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
