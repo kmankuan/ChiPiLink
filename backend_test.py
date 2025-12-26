@@ -77,7 +77,7 @@ class TextbookStoreAPITester:
         print("\n🔧 Testing Admin Setup...")
         
         # Try to create admin user with query parameters
-        url = f"{self.base_url}/api/admin/setup?email=admin@libreria.com&contrasena=admin123"
+        url = f"{self.base_url}/api/admin/setup?email=admin@libreria.com&contrasena=adminpassword"
         
         try:
             response = requests.post(url, headers={'Content-Type': 'application/json'}, timeout=10)
@@ -104,7 +104,7 @@ class TextbookStoreAPITester:
         
         login_data = {
             "email": "admin@libreria.com",
-            "contrasena": "admin123"
+            "contrasena": "adminpassword"
         }
         
         result = self.run_test(
