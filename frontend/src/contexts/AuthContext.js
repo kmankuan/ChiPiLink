@@ -13,8 +13,7 @@ export function AuthProvider({ children }) {
   // Create API instance with dynamic token using interceptors
   const api = useMemo(() => {
     const instance = axios.create({
-      baseURL: `${API_URL}/api`,
-      withCredentials: true
+      baseURL: `${API_URL}/api`
     });
 
     // Add request interceptor to always use the latest token
