@@ -1113,6 +1113,7 @@ export default function AdminDashboard() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
 
           {/* Products Table */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
