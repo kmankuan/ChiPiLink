@@ -136,7 +136,14 @@ const resources = {
         preparing: "Preparando",
         shipped: "Enviado",
         delivered: "Entregado",
-        cancelled: "Cancelado"
+        cancelled: "Cancelado",
+        // Spanish backend status keys
+        pendiente: "Pendiente",
+        confirmado: "Confirmado",
+        preparando: "Preparando",
+        enviado: "Enviado",
+        entregado: "Entregado",
+        cancelado: "Cancelado"
       },
       // Common
       common: {
@@ -320,7 +327,14 @@ const resources = {
         preparing: "准备中",
         shipped: "已发货",
         delivered: "已送达",
-        cancelled: "已取消"
+        cancelled: "已取消",
+        // Spanish backend status keys
+        pendiente: "待处理",
+        confirmado: "已确认",
+        preparando: "准备中",
+        enviado: "已发货",
+        entregado: "已送达",
+        cancelado: "已取消"
       },
       // Common
       common: {
