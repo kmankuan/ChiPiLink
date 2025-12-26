@@ -840,19 +840,29 @@ async def create_public_order(pedido: PedidoPublicoCreate):
         total += item.cantidad * item.precio_unitario
         items_validados.append(item.model_dump())
     
+    # Create full student name from separate fields
+    nombre_completo_estudiante = f"{pedido.nombre_estudiante} {pedido.apellido_estudiante}"
+    
     # Create order
     pedido_id = f"ped_{uuid.uuid4().hex[:12]}"
     pedido_doc = {
         "pedido_id": pedido_id,
         "tipo": "publico",  # Mark as public order
         "cliente_id": None,
-        "nombre_cliente": pedido.nombre_cliente,
-        "email_cliente": pedido.email_cliente,
-        "telefono_cliente": pedido.telefono_cliente,
+        # Acudiente (Guardian) info
+        "nombre_acudiente": pedido.nombre_acudiente,
+        "telefono_acudiente": pedido.telefono_acudiente,
+        "email_acudiente": pedido.email_acudiente,
+        # Estudiante info
         "estudiante_id": None,
-        "estudiante_nombre": pedido.nombre_estudiante,
+        "estudiante_nombre": nombre_completo_estudiante,
+        "estudiante_primer_nombre": pedido.nombre_estudiante,
+        "estudiante_apellido": pedido.apellido_estudiante,
         "grado_estudiante": pedido.grado_estudiante,
+        "email_estudiante": pedido.email_estudiante,
+        "telefono_estudiante": pedido.telefono_estudiante,
         "escuela_estudiante": pedido.escuela_estudiante,
+        # Order details
         "items": items_validados,
         "total": total,
         "metodo_pago": pedido.metodo_pago,
@@ -883,8 +893,8 @@ async def create_public_order(pedido: PedidoPublicoCreate):
     await create_notification(
         tipo="pedido_nuevo",
         titulo="Nuevo Pedido Recibido",
-        mensaje=f"Pedido {pedido_id} de {pedido.nombre_cliente} - ${total:.2f}",
-        datos={"pedido_id": pedido_id, "total": total, "cliente": pedido.nombre_cliente}
+        mensaje=f"Pedido {pedido_id} de {pedido.nombre_acudiente} - ${total:.2f}",
+        datos={"pedido_id": pedido_id, "total": total, "acudiente": pedido.nombre_acudiente}
     )
     
     # Check low stock and create notifications
