@@ -426,8 +426,9 @@ i18n
       escapeValue: false
     },
     detection: {
-      order: ['navigator', 'localStorage', 'htmlTag'],
-      caches: ['localStorage']
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng'
     }
   });
 
