@@ -451,7 +451,11 @@ async def logout(request: Request, response: Response):
 async def get_libros(grado: Optional[str] = None, materia: Optional[str] = None):
     query = {"activo": True}
     if grado:
-        query["grado"] = grado
+        # Search in both 'grado' (primary) and 'grados' (additional grades)
+        query["$or"] = [
+            {"grado": grado},
+            {"grados": grado}
+        ]
     if materia:
         query["materia"] = materia
     
