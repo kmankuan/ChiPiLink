@@ -1,0 +1,238 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { Book, Search, Filter, ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+export default function Catalog() {
+  const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  
+  const [libros, setLibros] = useState([]);
+  const [grados, setGrados] = useState([]);
+  const [materias, setMaterias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGrado, setSelectedGrado] = useState('all');
+  const [selectedMateria, setSelectedMateria] = useState('all');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [librosRes, gradosRes, materiasRes] = await Promise.all([
+        axios.get(`${API_URL}/api/libros`),
+        axios.get(`${API_URL}/api/grados`),
+        axios.get(`${API_URL}/api/materias`)
+      ]);
+      
+      setLibros(librosRes.data);
+      setGrados(gradosRes.data.grados);
+      setMaterias(materiasRes.data.materias);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Error al cargar catálogo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredLibros = libros.filter(libro => {
+    const matchesSearch = libro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         libro.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGrado = selectedGrado === 'all' || libro.grado === selectedGrado;
+    const matchesMateria = selectedMateria === 'all' || libro.materia === selectedMateria;
+    
+    return matchesSearch && matchesGrado && matchesMateria;
+  });
+
+  const getStockStatus = (cantidad) => {
+    if (cantidad <= 0) return { label: t('catalog.outOfStock'), color: 'destructive' };
+    if (cantidad < 10) return { label: t('catalog.lowStock'), color: 'warning' };
+    return { label: t('catalog.inStock'), color: 'success' };
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 md:px-8 py-8 max-w-7xl" data-testid="catalog-page">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">
+          {t('catalog.title')}
+        </h1>
+        <p className="text-muted-foreground">
+          Encuentre todos los libros de texto organizados por grado y materia
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t('common.search')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-12 rounded-lg"
+            data-testid="catalog-search"
+          />
+        </div>
+        
+        <div className="flex gap-4">
+          <Select value={selectedGrado} onValueChange={setSelectedGrado}>
+            <SelectTrigger className="w-[180px] h-12" data-testid="grade-filter">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder={t('catalog.filterByGrade')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('catalog.allGrades')}</SelectItem>
+              {grados.map((grado) => (
+                <SelectItem key={grado.id} value={grado.id}>
+                  {grado.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={selectedMateria} onValueChange={setSelectedMateria}>
+            <SelectTrigger className="w-[180px] h-12" data-testid="subject-filter">
+              <SelectValue placeholder={t('catalog.filterBySubject')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('catalog.allSubjects')}</SelectItem>
+              {materias.map((materia) => (
+                <SelectItem key={materia.id} value={materia.id}>
+                  {materia.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Results Count */}
+      <p className="text-sm text-muted-foreground mb-6">
+        {filteredLibros.length} libros encontrados
+      </p>
+
+      {/* Books Grid */}
+      {filteredLibros.length === 0 ? (
+        <div className="text-center py-16 bg-card rounded-xl border border-border">
+          <Book className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">{t('common.noResults')}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredLibros.map((libro) => {
+            const stockStatus = getStockStatus(libro.cantidad_inventario);
+            
+            return (
+              <div
+                key={libro.libro_id}
+                className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-colors duration-300"
+                data-testid={`book-card-${libro.libro_id}`}
+              >
+                {/* Book Image/Placeholder */}
+                <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
+                  {libro.imagen_url ? (
+                    <img 
+                      src={libro.imagen_url} 
+                      alt={libro.nombre}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <Book className="h-16 w-16 text-muted-foreground/50" />
+                  )}
+                </div>
+                
+                {/* Content */}
+                <div className="p-5">
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Badge variant="secondary" className="text-xs">
+                      {t(`grades.${libro.grado}`)}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {t(`subjects.${libro.materia}`)}
+                    </Badge>
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="font-serif font-bold text-lg mb-2 line-clamp-2">
+                    {libro.nombre}
+                  </h3>
+                  
+                  {/* Description */}
+                  {libro.descripcion && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {libro.descripcion}
+                    </p>
+                  )}
+                  
+                  {/* Publisher */}
+                  {libro.editorial && (
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {libro.editorial}
+                    </p>
+                  )}
+                  
+                  {/* Price & Stock */}
+                  <div className="flex items-center justify-between pt-3 border-t border-border">
+                    <div>
+                      <p className="text-xl font-bold text-primary">
+                        ${libro.precio.toFixed(2)}
+                      </p>
+                      <div className={`flex items-center gap-1 text-xs ${
+                        stockStatus.color === 'success' ? 'text-green-600 dark:text-green-400' :
+                        stockStatus.color === 'warning' ? 'text-yellow-600 dark:text-yellow-400' :
+                        'text-red-600 dark:text-red-400'
+                      }`}>
+                        {stockStatus.color !== 'success' && (
+                          <AlertCircle className="h-3 w-3" />
+                        )}
+                        {stockStatus.label} ({libro.cantidad_inventario})
+                      </div>
+                    </div>
+                    
+                    {isAuthenticated && libro.cantidad_inventario > 0 && (
+                      <Button 
+                        size="sm" 
+                        className="rounded-full"
+                        onClick={() => toast.info('Agregue este libro desde el formulario de orden')}
+                        data-testid={`add-to-cart-${libro.libro_id}`}
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
