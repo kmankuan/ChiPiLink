@@ -34,9 +34,14 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'es' ? 'zh' : 'es';
+    // Handle language codes like "es-ES", "zh-CN" by checking the prefix
+    const currentLang = i18n.language?.substring(0, 2) || 'es';
+    const newLang = currentLang === 'zh' ? 'es' : 'zh';
     i18n.changeLanguage(newLang);
+    localStorage.setItem('i18nextLng', newLang);
   };
+
+  const currentLangCode = i18n.language?.substring(0, 2) || 'es';
 
   const handleLogout = async () => {
     await logout();
