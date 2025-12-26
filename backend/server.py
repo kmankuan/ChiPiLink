@@ -792,7 +792,11 @@ async def get_public_libros(grado: Optional[str] = None):
     """Get books for public form - no auth required"""
     query = {"activo": True}
     if grado:
-        query["grado"] = grado
+        # Search in both 'grado' (primary) and 'grados' (additional grades)
+        query["$or"] = [
+            {"grado": grado},
+            {"grados": grado}
+        ]
     
     libros = await db.libros.find(query, {"_id": 0}).to_list(500)
     # Filter only books with stock > 0
