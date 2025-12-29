@@ -1463,6 +1463,287 @@ export default function AdminDashboard() {
             </div>
           </div>
         </TabsContent>
+        
+        {/* Form Configuration Tab */}
+        <TabsContent value="form-config">
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left Column - Configuration */}
+            <div className="space-y-6">
+              {/* Basic Settings */}
+              <div className="bg-card rounded-xl border border-border p-6">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Configuración Básica
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="form-titulo">Título del Formulario</Label>
+                    <Input
+                      id="form-titulo"
+                      value={formConfig.titulo || ''}
+                      onChange={(e) => setFormConfig(prev => ({ ...prev, titulo: e.target.value }))}
+                      placeholder="Formulario de Pedido de Libros"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="form-descripcion">Descripción</Label>
+                    <Textarea
+                      id="form-descripcion"
+                      value={formConfig.descripcion || ''}
+                      onChange={(e) => setFormConfig(prev => ({ ...prev, descripcion: e.target.value }))}
+                      placeholder="Complete el formulario para ordenar los libros de texto"
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="form-mensaje">Mensaje de Éxito</Label>
+                    <Textarea
+                      id="form-mensaje"
+                      value={formConfig.mensaje_exito || ''}
+                      onChange={(e) => setFormConfig(prev => ({ ...prev, mensaje_exito: e.target.value }))}
+                      placeholder="¡Gracias! Su pedido ha sido recibido."
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Display Options */}
+              <div className="bg-card rounded-xl border border-border p-6">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Opciones de Visualización
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Mostrar Precios</Label>
+                      <p className="text-sm text-muted-foreground">Muestra los precios de los libros en el formulario</p>
+                    </div>
+                    <Switch
+                      checked={formConfig.mostrar_precios !== false}
+                      onCheckedChange={(checked) => setFormConfig(prev => ({ ...prev, mostrar_precios: checked }))}
+                    />
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Palette className="h-4 w-4" />
+                      Color Primario
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={formConfig.color_primario || '#166534'}
+                        onChange={(e) => setFormConfig(prev => ({ ...prev, color_primario: e.target.value }))}
+                        className="h-10 w-14 rounded cursor-pointer border border-border"
+                      />
+                      <Input
+                        value={formConfig.color_primario || '#166534'}
+                        onChange={(e) => setFormConfig(prev => ({ ...prev, color_primario: e.target.value }))}
+                        placeholder="#166534"
+                        className="w-28 font-mono"
+                      />
+                      <div 
+                        className="h-10 flex-1 rounded flex items-center justify-center text-white text-sm font-medium"
+                        style={{ backgroundColor: formConfig.color_primario || '#166534' }}
+                      >
+                        Vista Previa
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Methods */}
+              <div className="bg-card rounded-xl border border-border p-6">
+                <h3 className="font-semibold text-lg mb-4">Métodos de Pago</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                        <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium">Transferencia Bancaria</p>
+                        <p className="text-sm text-muted-foreground">Banco General / Banistmo</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={(formConfig.metodos_pago || []).includes('transferencia_bancaria')}
+                      onCheckedChange={() => togglePaymentMethod('transferencia_bancaria')}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                        <svg className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium">Yappy</p>
+                        <p className="text-sm text-muted-foreground">Pago móvil instantáneo</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={(formConfig.metodos_pago || []).includes('yappy')}
+                      onCheckedChange={() => togglePaymentMethod('yappy')}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Save Button */}
+              <Button 
+                onClick={handleSaveFormConfig} 
+                className="w-full h-12"
+                disabled={savingConfig}
+              >
+                {savingConfig ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Guardar Configuración
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {/* Right Column - Embed Info & Preview */}
+            <div className="space-y-6">
+              {/* Embed URL */}
+              <div className="bg-card rounded-xl border border-border p-6">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <ExternalLink className="h-5 w-5" />
+                  Enlace del Formulario
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>URL Directa</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={`${window.location.origin}/embed/orden`}
+                        readOnly
+                        className="font-mono text-sm"
+                      />
+                      <Button variant="outline" size="icon" onClick={copyEmbedUrl}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Comparta este enlace directamente con sus clientes
+                    </p>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    <Label>Código para Embeber (iframe)</Label>
+                    <div className="relative">
+                      <pre className="p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+{`<iframe 
+  src="${window.location.origin}/embed/orden"
+  width="100%" 
+  height="800" 
+  frameborder="0"
+></iframe>`}
+                      </pre>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="absolute top-2 right-2"
+                        onClick={copyIframeCode}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copiar
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Pegue este código en su sitio web para mostrar el formulario
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => window.open('/embed/orden', '_blank')}
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Ver Formulario en Nueva Pestaña
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Preview */}
+              <div className="bg-card rounded-xl border border-border p-6">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Vista Previa
+                </h3>
+                
+                <div className="border border-border rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-800 dark:to-gray-700 p-6">
+                  <div className="text-center mb-4">
+                    <div 
+                      className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3"
+                      style={{ backgroundColor: formConfig.color_primario || '#166534' }}
+                    >
+                      <Book className="h-6 w-6 text-white" />
+                    </div>
+                    <h4 className="font-bold text-lg">{formConfig.titulo || 'Formulario de Pedido'}</h4>
+                    <p className="text-sm text-muted-foreground">{formConfig.descripcion || 'Complete el formulario'}</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-1">Sección: Datos del Acudiente</p>
+                      <div className="h-2 bg-muted rounded w-3/4"></div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-1">Sección: Datos del Estudiante</p>
+                      <div className="h-2 bg-muted rounded w-2/3"></div>
+                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-1">Sección: Selección de Libros</p>
+                      <div className="flex gap-2 mt-2">
+                        <div className="h-8 bg-muted rounded flex-1"></div>
+                        {formConfig.mostrar_precios !== false && (
+                          <div className="h-8 w-16 bg-green-100 dark:bg-green-900/30 rounded flex items-center justify-center text-xs font-medium text-green-600">$XX.XX</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    className="w-full mt-4" 
+                    style={{ backgroundColor: formConfig.color_primario || '#166534' }}
+                  >
+                    Enviar Pedido
+                  </Button>
+                </div>
+                
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  Esta es una vista previa simplificada. El formulario real incluye todos los campos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
