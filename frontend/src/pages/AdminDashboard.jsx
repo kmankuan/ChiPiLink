@@ -46,8 +46,15 @@ import {
   Upload,
   FileSpreadsheet,
   Download,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  Eye,
+  Copy,
+  ExternalLink,
+  Palette
 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 
 // Empty product row template
 const emptyProductRow = {
