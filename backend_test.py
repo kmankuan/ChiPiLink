@@ -939,6 +939,8 @@ class TextbookStoreAPITester:
             return user_result is not None
         
         return False
+
+    def test_admin_functionality(self):
         """Test admin functionality"""
         print("\n👑 Testing Admin Functionality...")
         
