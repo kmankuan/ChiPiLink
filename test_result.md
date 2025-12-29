@@ -123,6 +123,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Modelo actualizado con: nombre, apellido (separados), grado, es_nuevo, estado_matricula (pendiente/confirmada/rechazada), documento_matricula_url, ano_escolar, libros_comprados[]"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Student model working perfectly. Tested student creation with enrollment documents, automatic 'pendiente' status assignment, and data persistence. All fields properly handled."
 
   - task: "API Gestión de Estudiantes"
     implemented: true
@@ -135,6 +138,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Endpoints: GET/POST/PUT/DELETE /api/estudiantes, GET /api/estudiantes/{id}/libros-disponibles. Tested via curl and UI."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: All student management APIs working. Tested POST /api/estudiantes (creates María & Carlos), GET /api/estudiantes (lists students), PUT updates, and GET libros-disponibles (shows available/purchased books correctly)."
 
   - task: "API Verificación de Matrículas (Admin)"
     implemented: true
@@ -147,6 +153,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Endpoints: GET /api/admin/matriculas, GET /api/admin/matriculas-pendientes, PUT /api/admin/matriculas/{cliente_id}/{estudiante_id}/verificar?accion=aprobar|rechazar. Tested successfully."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Enrollment verification APIs fully functional. Tested GET matriculas with filters (estado=pendiente/confirmada), approval/rejection workflow. Carlos shows as pending, María as confirmed. Admin can manage all enrollments."
 
   - task: "API Pedidos con Control de Matrícula"
     implemented: true
@@ -159,6 +168,9 @@ backend:
       - working: true
         agent: "main"
         comment: "POST /api/pedidos verifica matrícula confirmada, previene compra de libros duplicados, actualiza libros_comprados en estudiante."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Order creation with enrollment verification working perfectly. Successfully purchased 2 books for María (confirmed student), books marked as 'ya_comprado', duplicate purchase prevention working. Enrollment check prevents orders for pending students."
 
   - task: "Notificaciones de Matrícula"
     implemented: true
@@ -171,6 +183,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Crea notificaciones tipo 'matricula_pendiente' y 'matricula_verificada' para admin."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Notification system working. Tested admin notifications API, mark as read functionality, and notification config. All notification types properly handled."
 
 frontend:
   - task: "Dashboard Usuario - Gestión de Estudiantes"
