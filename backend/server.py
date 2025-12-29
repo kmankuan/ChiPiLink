@@ -772,6 +772,17 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
+    # Verify enrollment is confirmed
+    if estudiante.get("estado_matricula") != "confirmada":
+        raise HTTPException(status_code=403, detail="La matrícula del estudiante debe estar confirmada para realizar compras")
+    
+    # Check for already purchased books
+    libros_comprados = estudiante.get("libros_comprados", [])
+    for item in pedido.items:
+        if item.libro_id in libros_comprados:
+            libro = await db.libros.find_one({"libro_id": item.libro_id}, {"_id": 0})
+            raise HTTPException(status_code=400, detail=f"El libro '{libro['nombre']}' ya fue comprado para este estudiante")
+    
     # Calculate total and verify inventory
     total = 0
     for item in pedido.items:
@@ -785,7 +796,7 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
     pedido_obj = Pedido(
         cliente_id=current_user["cliente_id"],
         estudiante_id=pedido.estudiante_id,
-        estudiante_nombre=estudiante["nombre"],
+        estudiante_nombre=f"{estudiante['nombre']} {estudiante.get('apellido', '')}",
         items=[item.model_dump() for item in pedido.items],
         total=total,
         metodo_pago=pedido.metodo_pago,
@@ -794,6 +805,7 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
     
     doc = pedido_obj.model_dump()
     doc["fecha_creacion"] = doc["fecha_creacion"].isoformat()
+    doc["ano_escolar"] = estudiante.get("ano_escolar", get_current_school_year())
     
     # Update inventory
     for item in pedido.items:
@@ -804,6 +816,13 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
     
     await db.pedidos.insert_one(doc)
     
+    # Update student's purchased books list
+    libro_ids = [item.libro_id for item in pedido.items]
+    await db.clientes.update_one(
+        {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": pedido.estudiante_id},
+        {"$push": {"estudiantes.$.libros_comprados": {"$each": libro_ids}}}
+    )
+    
     # Create Monday.com item
     monday_id = await create_monday_item(doc)
     if monday_id:
@@ -812,6 +831,14 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
             {"$set": {"monday_item_id": monday_id}}
         )
         doc["monday_item_id"] = monday_id
+    
+    # Create notification for admin
+    await create_notification(
+        tipo="pedido_nuevo",
+        titulo="Nuevo Pedido de Libros",
+        mensaje=f"Pedido {doc['pedido_id']} - {estudiante['nombre']} {estudiante.get('apellido', '')} - ${total:.2f}",
+        datos={"pedido_id": doc["pedido_id"], "total": total, "estudiante": f"{estudiante['nombre']} {estudiante.get('apellido', '')}"}
+    )
     
     return {k: v for k, v in doc.items() if k != "_id"}
 
