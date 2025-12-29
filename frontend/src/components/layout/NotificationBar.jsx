@@ -25,14 +25,17 @@ import {
   Check,
   Settings,
   X,
-  ChevronRight
+  ChevronRight,
+  GraduationCap
 } from 'lucide-react';
 
 const NOTIFICATION_TYPES = {
   pedido_nuevo: { icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Pedidos Nuevos' },
   bajo_stock: { icon: AlertTriangle, color: 'text-orange-500', bg: 'bg-orange-500/10', label: 'Bajo Stock' },
   pago_confirmado: { icon: CreditCard, color: 'text-green-500', bg: 'bg-green-500/10', label: 'Pagos Confirmados' },
-  pedido_enviado: { icon: Truck, color: 'text-purple-500', bg: 'bg-purple-500/10', label: 'Pedidos Enviados' }
+  pedido_enviado: { icon: Truck, color: 'text-purple-500', bg: 'bg-purple-500/10', label: 'Pedidos Enviados' },
+  matricula_pendiente: { icon: GraduationCap, color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'Matrículas Pendientes' },
+  matricula_verificada: { icon: GraduationCap, color: 'text-emerald-500', bg: 'bg-emerald-500/10', label: 'Matrículas Verificadas' }
 };
 
 export function NotificationBar() {
