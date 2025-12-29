@@ -1532,6 +1532,288 @@ export default function AdminDashboard() {
           </div>
         </TabsContent>
         
+        {/* Matriculas Tab */}
+        <TabsContent value="matriculas">
+          <div className="bg-card rounded-xl border border-border">
+            <div className="p-6 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-lg">Verificación de Matrículas</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Revise y apruebe las matrículas de estudiantes
+                  </p>
+                </div>
+                
+                <Select value={matriculaFilter} onValueChange={setMatriculaFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filtrar por estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="pendiente">Pendientes</SelectItem>
+                    <SelectItem value="confirmada">Confirmadas</SelectItem>
+                    <SelectItem value="rechazada">Rechazadas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              {loadingMatriculas ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : matriculas.length === 0 ? (
+                <div className="text-center py-12">
+                  <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground">No hay matrículas {matriculaFilter !== 'all' ? matriculaFilter + 's' : ''}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {matriculas.map((matricula) => (
+                    <div
+                      key={`${matricula.cliente_id}-${matricula.estudiante_id}`}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors gap-4"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-xl ${
+                          matricula.estado_matricula === 'pendiente' ? 'bg-amber-100' :
+                          matricula.estado_matricula === 'confirmada' ? 'bg-green-100' : 'bg-red-100'
+                        }`}>
+                          <GraduationCap className={`h-6 w-6 ${
+                            matricula.estado_matricula === 'pendiente' ? 'text-amber-600' :
+                            matricula.estado_matricula === 'confirmada' ? 'text-green-600' : 'text-red-600'
+                          }`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold">{matricula.nombre} {matricula.apellido}</h4>
+                            <Badge 
+                              variant="outline" 
+                              className={
+                                matricula.estado_matricula === 'pendiente' ? 'border-amber-500 text-amber-600' :
+                                matricula.estado_matricula === 'confirmada' ? 'border-green-500 text-green-600' : 
+                                'border-red-500 text-red-600'
+                              }
+                            >
+                              {matricula.estado_matricula === 'pendiente' && <Clock className="h-3 w-3 mr-1" />}
+                              {matricula.estado_matricula === 'confirmada' && <CheckCircle className="h-3 w-3 mr-1" />}
+                              {matricula.estado_matricula === 'rechazada' && <XCircle className="h-3 w-3 mr-1" />}
+                              {matricula.estado_matricula}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Grado: {grados.find(g => g.id === matricula.grado)?.nombre || matricula.grado}
+                            {matricula.escuela && ` • ${matricula.escuela}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              {matricula.cliente_nombre}
+                            </span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {matricula.es_nuevo ? '🆕 Estudiante Nuevo' : '📚 Del Año Anterior'}
+                            • {matricula.ano_escolar || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {matricula.documento_matricula_url && (
+                          <Badge variant="outline" className="gap-1">
+                            <FileImage className="h-3 w-3" />
+                            Doc
+                          </Badge>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openMatriculaDetail(matricula)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Ver Detalles
+                        </Button>
+                        {matricula.estado_matricula === 'pendiente' && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-green-500 text-green-600 hover:bg-green-50"
+                              onClick={() => {
+                                setSelectedMatricula(matricula);
+                                handleVerifyMatricula('aprobar');
+                              }}
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              Aprobar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-500 text-red-600 hover:bg-red-50"
+                              onClick={() => {
+                                setSelectedMatricula(matricula);
+                                handleVerifyMatricula('rechazar');
+                              }}
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              Rechazar
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Matricula Detail Dialog */}
+          <Dialog open={matriculaDialog} onOpenChange={setMatriculaDialog}>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5" />
+                  Detalles de Matrícula
+                </DialogTitle>
+              </DialogHeader>
+              
+              {selectedMatricula && (
+                <div className="space-y-4">
+                  {/* Student Info */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-lg">
+                        {selectedMatricula.nombre} {selectedMatricula.apellido}
+                      </h4>
+                      <Badge 
+                        variant="outline" 
+                        className={
+                          selectedMatricula.estado_matricula === 'pendiente' ? 'border-amber-500 text-amber-600' :
+                          selectedMatricula.estado_matricula === 'confirmada' ? 'border-green-500 text-green-600' : 
+                          'border-red-500 text-red-600'
+                        }
+                      >
+                        {selectedMatricula.estado_matricula}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Grado</p>
+                        <p className="font-medium">{grados.find(g => g.id === selectedMatricula.grado)?.nombre || selectedMatricula.grado}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Tipo</p>
+                        <p className="font-medium">{selectedMatricula.es_nuevo ? 'Estudiante Nuevo' : 'Del Año Anterior'}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Escuela</p>
+                        <p className="font-medium">{selectedMatricula.escuela || 'No especificada'}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Año Escolar</p>
+                        <p className="font-medium">{selectedMatricula.ano_escolar || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Parent/Guardian Info */}
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Datos del Acudiente</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedMatricula.cliente_nombre}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <span>{selectedMatricula.cliente_email}</span>
+                      </div>
+                      {selectedMatricula.cliente_telefono && (
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          <span>{selectedMatricula.cliente_telefono}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Document */}
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Documento de Matrícula</h4>
+                    {selectedMatricula.documento_matricula_url ? (
+                      <div className="border border-border rounded-lg overflow-hidden">
+                        <img 
+                          src={selectedMatricula.documento_matricula_url} 
+                          alt="Documento de matrícula"
+                          className="w-full max-h-[300px] object-contain bg-muted"
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 bg-muted/50 rounded-lg">
+                        <FileImage className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">No se adjuntó documento</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Notes */}
+                  {selectedMatricula.notas && (
+                    <>
+                      <Separator />
+                      <div className="space-y-2">
+                        <h4 className="font-medium">Notas</h4>
+                        <p className="text-sm text-muted-foreground">{selectedMatricula.notas}</p>
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Actions */}
+                  {selectedMatricula.estado_matricula === 'pendiente' && (
+                    <>
+                      <Separator />
+                      <div className="flex gap-3">
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleVerifyMatricula('aprobar')}
+                          disabled={verifyingMatricula}
+                        >
+                          {verifyingMatricula ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          ) : (
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                          )}
+                          Aprobar Matrícula
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1"
+                          onClick={() => handleVerifyMatricula('rechazar')}
+                          disabled={verifyingMatricula}
+                        >
+                          {verifyingMatricula ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          ) : (
+                            <XCircle className="h-4 w-4 mr-2" />
+                          )}
+                          Rechazar
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+        
         {/* Form Configuration Tab */}
         <TabsContent value="form-config">
           <div className="grid lg:grid-cols-2 gap-8">
