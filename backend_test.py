@@ -231,16 +231,18 @@ class TextbookStoreAPITester:
         """Test student management"""
         print("\n🎓 Testing Student Management...")
         
-        # Add a student
+        # Add a student with enrollment document
         student_data = {
-            "nombre": "Test Student",
-            "grado": "1",
-            "escuela": "Test School",
-            "notas": "Test notes"
+            "nombre": "María",
+            "apellido": "Pérez García",
+            "grado": "4",
+            "escuela": "Escuela Primaria Central",
+            "es_nuevo": False,
+            "documento_matricula": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA=="
         }
         
         student = self.run_test(
-            "Add Student",
+            "Add Student with Enrollment Document",
             "POST",
             "estudiantes",
             200,
@@ -250,6 +252,13 @@ class TextbookStoreAPITester:
         if student and 'estudiante_id' in student:
             student_id = student['estudiante_id']
             self.created_resources['students'].append(student_id)
+            
+            # Verify student has pending enrollment status
+            if student.get('estado_matricula') != 'pendiente':
+                self.log_test("Student Enrollment Status", False, f"Expected 'pendiente', got '{student.get('estado_matricula')}'")
+                return False
+            else:
+                self.log_test("Student Enrollment Status", True)
             
             # Get students
             students = self.run_test(
@@ -261,10 +270,12 @@ class TextbookStoreAPITester:
             
             # Update student
             updated_data = {
-                "nombre": "Updated Student",
-                "grado": "2",
-                "escuela": "Updated School",
-                "notas": "Updated notes"
+                "nombre": "María",
+                "apellido": "Pérez García",
+                "grado": "4",
+                "escuela": "Escuela Primaria Central Actualizada",
+                "es_nuevo": False,
+                "notas": "Estudiante actualizada"
             }
             
             update_result = self.run_test(
