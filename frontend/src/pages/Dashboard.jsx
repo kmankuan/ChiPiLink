@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -19,6 +24,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { 
   Users, 
@@ -29,8 +47,37 @@ import {
   Package,
   GraduationCap,
   Loader2,
-  ArrowRight
+  ArrowRight,
+  Upload,
+  FileImage,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  BookOpen,
+  CreditCard,
+  Building2,
+  History,
+  Eye
 } from 'lucide-react';
+
+// Status badge component
+const StatusBadge = ({ status }) => {
+  const config = {
+    pendiente: { label: 'Pendiente', variant: 'outline', icon: Clock, className: 'border-amber-500 text-amber-600 bg-amber-50' },
+    confirmada: { label: 'Confirmada', variant: 'outline', icon: CheckCircle, className: 'border-green-500 text-green-600 bg-green-50' },
+    rechazada: { label: 'Rechazada', variant: 'outline', icon: XCircle, className: 'border-red-500 text-red-600 bg-red-50' }
+  };
+  
+  const { label, icon: Icon, className } = config[status] || config.pendiente;
+  
+  return (
+    <Badge variant="outline" className={className}>
+      <Icon className="h-3 w-3 mr-1" />
+      {label}
+    </Badge>
+  );
+};
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -40,14 +87,36 @@ export default function Dashboard() {
   const [pedidos, setPedidos] = useState([]);
   const [grados, setGrados] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Student dialog
+  const [studentDialog, setStudentDialog] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
+    apellido: '',
     grado: '',
     escuela: '',
-    notas: ''
+    es_nuevo: true,
+    notas: '',
+    documento_matricula: null
   });
+  const [savingStudent, setSavingStudent] = useState(false);
+  const [documentPreview, setDocumentPreview] = useState(null);
+  const fileInputRef = useRef(null);
+  
+  // Purchase dialog
+  const [purchaseDialog, setPurchaseDialog] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [availableBooks, setAvailableBooks] = useState([]);
+  const [selectedBooks, setSelectedBooks] = useState([]);
+  const [loadingBooks, setLoadingBooks] = useState(false);
+  const [submittingOrder, setSubmittingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('transferencia_bancaria');
+  const [orderNotes, setOrderNotes] = useState('');
+  
+  // View history dialog
+  const [historyDialog, setHistoryDialog] = useState(false);
+  const [historyStudent, setHistoryStudent] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -72,43 +141,88 @@ export default function Dashboard() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      if (editingStudent) {
-        await api.put(`/estudiantes/${editingStudent.estudiante_id}`, formData);
-        toast.success('Estudiante actualizado');
-      } else {
-        await api.post('/estudiantes', formData);
-        toast.success('Estudiante agregado');
+  // Handle file upload
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('El archivo no debe exceder 5MB');
+        return;
       }
       
-      setDialogOpen(false);
-      setEditingStudent(null);
-      setFormData({ nombre: '', grado: '', escuela: '', notas: '' });
-      fetchData();
-    } catch (error) {
-      toast.error('Error al guardar estudiante');
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, documento_matricula: reader.result }));
+        setDocumentPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleEdit = (estudiante) => {
-    setEditingStudent(estudiante);
+  // Open add student dialog
+  const openAddDialog = () => {
+    setEditingStudent(null);
     setFormData({
-      nombre: estudiante.nombre,
-      grado: estudiante.grado,
-      escuela: estudiante.escuela || '',
-      notas: estudiante.notas || ''
+      nombre: '',
+      apellido: '',
+      grado: '',
+      escuela: '',
+      es_nuevo: true,
+      notas: '',
+      documento_matricula: null
     });
-    setDialogOpen(true);
+    setDocumentPreview(null);
+    setStudentDialog(true);
   };
 
-  const handleDelete = async (estudianteId) => {
-    if (!confirm(t('student.confirmDelete'))) return;
+  // Open edit student dialog
+  const openEditDialog = (student) => {
+    setEditingStudent(student);
+    setFormData({
+      nombre: student.nombre || '',
+      apellido: student.apellido || '',
+      grado: student.grado || '',
+      escuela: student.escuela || '',
+      es_nuevo: student.es_nuevo ?? true,
+      notas: student.notas || '',
+      documento_matricula: null
+    });
+    setDocumentPreview(student.documento_matricula_url || null);
+    setStudentDialog(true);
+  };
+
+  // Submit student form
+  const handleStudentSubmit = async (e) => {
+    e.preventDefault();
+    setSavingStudent(true);
     
     try {
-      await api.delete(`/estudiantes/${estudianteId}`);
+      const data = { ...formData };
+      
+      if (editingStudent) {
+        await api.put(`/estudiantes/${editingStudent.estudiante_id}`, data);
+        toast.success('Estudiante actualizado');
+      } else {
+        await api.post('/estudiantes', data);
+        toast.success('Estudiante agregado. El administrador verificará la matrícula.');
+      }
+      
+      setStudentDialog(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error saving student:', error);
+      toast.error(error.response?.data?.detail || 'Error al guardar estudiante');
+    } finally {
+      setSavingStudent(false);
+    }
+  };
+
+  // Delete student
+  const handleDeleteStudent = async (studentId) => {
+    if (!confirm('¿Está seguro de eliminar este estudiante?')) return;
+    
+    try {
+      await api.delete(`/estudiantes/${studentId}`);
       toast.success('Estudiante eliminado');
       fetchData();
     } catch (error) {
@@ -116,272 +230,723 @@ export default function Dashboard() {
     }
   };
 
-  const openNewStudentDialog = () => {
-    setEditingStudent(null);
-    setFormData({ nombre: '', grado: '', escuela: '', notas: '' });
-    setDialogOpen(true);
+  // Open purchase dialog
+  const openPurchaseDialog = async (student) => {
+    if (student.estado_matricula !== 'confirmada') {
+      toast.error('La matrícula debe estar confirmada para comprar libros');
+      return;
+    }
+    
+    setSelectedStudent(student);
+    setSelectedBooks([]);
+    setPaymentMethod('transferencia_bancaria');
+    setOrderNotes('');
+    setLoadingBooks(true);
+    setPurchaseDialog(true);
+    
+    try {
+      const response = await api.get(`/estudiantes/${student.estudiante_id}/libros-disponibles`);
+      setAvailableBooks(response.data.libros);
+    } catch (error) {
+      console.error('Error loading books:', error);
+      toast.error('Error al cargar libros disponibles');
+    } finally {
+      setLoadingBooks(false);
+    }
+  };
+
+  // Toggle book selection
+  const toggleBookSelection = (book) => {
+    if (book.ya_comprado || !book.disponible) return;
+    
+    setSelectedBooks(prev => {
+      const exists = prev.find(b => b.libro_id === book.libro_id);
+      if (exists) {
+        return prev.filter(b => b.libro_id !== book.libro_id);
+      }
+      return [...prev, book];
+    });
+  };
+
+  // Calculate total
+  const calculateTotal = () => {
+    return selectedBooks.reduce((sum, book) => sum + book.precio, 0);
+  };
+
+  // Submit order
+  const handleSubmitOrder = async () => {
+    if (selectedBooks.length === 0) {
+      toast.error('Seleccione al menos un libro');
+      return;
+    }
+    
+    setSubmittingOrder(true);
+    
+    try {
+      const orderData = {
+        estudiante_id: selectedStudent.estudiante_id,
+        items: selectedBooks.map(book => ({
+          libro_id: book.libro_id,
+          nombre_libro: book.nombre,
+          cantidad: 1,
+          precio_unitario: book.precio
+        })),
+        metodo_pago: paymentMethod,
+        notas: orderNotes || null
+      };
+      
+      await api.post('/pedidos', orderData);
+      toast.success('¡Pedido realizado exitosamente!');
+      setPurchaseDialog(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      toast.error(error.response?.data?.detail || 'Error al realizar el pedido');
+    } finally {
+      setSubmittingOrder(false);
+    }
+  };
+
+  // View purchase history for student
+  const viewHistory = (student) => {
+    setHistoryStudent(student);
+    setHistoryDialog(true);
+  };
+
+  // Get orders for a specific student
+  const getStudentOrders = (studentId) => {
+    return pedidos.filter(p => p.estudiante_id === studentId);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-8 py-8 max-w-7xl" data-testid="parent-dashboard">
-      {/* Welcome Header */}
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl md:text-4xl font-bold mb-2">
-          {t('dashboard.welcome')}, {user?.nombre?.split(' ')[0]}
-        </h1>
-        <p className="text-muted-foreground">
-          Administre sus estudiantes y realice pedidos de libros
-        </p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 md:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+            Bienvenido, {user?.nombre || 'Usuario'}
+          </h1>
+          <p className="text-muted-foreground">
+            Gestione los estudiantes y realice pedidos de libros
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-card rounded-xl border border-border p-6 soft-shadow" data-testid="students-stat-card">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-primary/10">
-              <Users className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{estudiantes.length}</p>
-              <p className="text-sm text-muted-foreground">{t('dashboard.myStudents')}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-card rounded-xl border border-border p-6 soft-shadow" data-testid="orders-stat-card">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-accent/10">
-              <Package className="h-6 w-6 text-accent" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{pedidos.length}</p>
-              <p className="text-sm text-muted-foreground">{t('dashboard.myOrders')}</p>
-            </div>
-          </div>
-        </div>
-        
-        <Link to="/orden" className="block" data-testid="order-cta-card">
-          <div className="bg-primary text-primary-foreground rounded-xl p-6 soft-shadow h-full flex items-center justify-between group cursor-pointer hover:bg-primary/90 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-white/20">
-                <ShoppingCart className="h-6 w-6" />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                  <GraduationCap className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{estudiantes.length}</p>
+                  <p className="text-sm text-muted-foreground">Estudiantes</p>
+                </div>
               </div>
-              <p className="font-medium">{t('dashboard.orderTextbooks')}</p>
-            </div>
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </Link>
-      </div>
-
-      {/* Students Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-2xl font-bold">{t('dashboard.myStudents')}</h2>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openNewStudentDialog} className="rounded-full" data-testid="add-student-button">
-                <Plus className="h-4 w-4 mr-2" />
-                {t('dashboard.addStudent')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="font-serif">
-                  {editingStudent ? t('student.editStudent') : t('student.addStudent')}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nombre">{t('student.name')} *</Label>
-                  <Input
-                    id="nombre"
-                    value={formData.nombre}
-                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    placeholder="Nombre del estudiante"
-                    required
-                    data-testid="student-name-input"
-                  />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="grado">{t('student.grade')} *</Label>
-                  <Select 
-                    value={formData.grado} 
-                    onValueChange={(value) => setFormData({ ...formData, grado: value })}
-                    required
-                  >
-                    <SelectTrigger data-testid="student-grade-select">
-                      <SelectValue placeholder="Seleccione un grado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {grados.map((grado) => (
-                        <SelectItem key={grado.id} value={grado.id}>
-                          {grado.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="escuela">{t('student.school')}</Label>
-                  <Input
-                    id="escuela"
-                    value={formData.escuela}
-                    onChange={(e) => setFormData({ ...formData, escuela: e.target.value })}
-                    placeholder="Nombre de la escuela"
-                    data-testid="student-school-input"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="notas">{t('student.notes')}</Label>
-                  <Input
-                    id="notas"
-                    value={formData.notas}
-                    onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                    placeholder="Notas adicionales"
-                    data-testid="student-notes-input"
-                  />
-                </div>
-                
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                    {t('common.cancel')}
-                  </Button>
-                  <Button type="submit" data-testid="save-student-button">
-                    {t('common.save')}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {estudiantes.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-xl border border-border" data-testid="no-students-message">
-            <GraduationCap className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground mb-4">{t('dashboard.noStudents')}</p>
-            <Button onClick={openNewStudentDialog} variant="outline" className="rounded-full">
-              <Plus className="h-4 w-4 mr-2" />
-              {t('dashboard.addStudent')}
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {estudiantes.map((estudiante) => (
-              <div 
-                key={estudiante.estudiante_id}
-                className="bg-card rounded-xl border border-border p-6 soft-shadow group"
-                data-testid={`student-card-${estudiante.estudiante_id}`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <GraduationCap className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{estudiante.nombre}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {t(`grades.${estudiante.grado}`)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handleEdit(estudiante)}
-                      data-testid={`edit-student-${estudiante.estudiante_id}`}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(estudiante.estudiante_id)}
-                      data-testid={`delete-student-${estudiante.estudiante_id}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {estudiante.escuela && (
-                  <p className="text-sm text-muted-foreground mb-2">
-                    📍 {estudiante.escuela}
+                <div>
+                  <p className="text-2xl font-bold">
+                    {estudiantes.filter(e => e.estado_matricula === 'confirmada').length}
                   </p>
-                )}
-                
-                <Link to={`/orden?estudiante=${estudiante.estudiante_id}`}>
-                  <Button variant="outline" size="sm" className="w-full mt-2 rounded-full" data-testid={`order-for-${estudiante.estudiante_id}`}>
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Ordenar libros
-                  </Button>
-                </Link>
+                  <p className="text-sm text-muted-foreground">Matrículas Confirmadas</p>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Recent Orders Section */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-2xl font-bold">{t('dashboard.recentOrders')}</h2>
-          <Link to="/pedidos">
-            <Button variant="ghost" className="rounded-full">
-              Ver todos
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </Link>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                  <ShoppingCart className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{pedidos.length}</p>
+                  <p className="text-sm text-muted-foreground">Pedidos Realizados</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {pedidos.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-xl border border-border" data-testid="no-orders-message">
-            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">{t('dashboard.noOrders')}</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {pedidos.slice(0, 5).map((pedido) => (
-              <div 
-                key={pedido.pedido_id}
-                className="bg-card rounded-xl border border-border p-4 flex items-center justify-between"
-                data-testid={`order-row-${pedido.pedido_id}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    pedido.estado === 'entregado' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                    pedido.estado === 'confirmado' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                    pedido.estado === 'cancelado' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                  }`}>
-                    {t(`status.${pedido.estado}`)}
+        {/* Main Content */}
+        <Tabs defaultValue="estudiantes" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="estudiantes" className="gap-2">
+              <Users className="h-4 w-4" />
+              Mis Estudiantes
+            </TabsTrigger>
+            <TabsTrigger value="pedidos" className="gap-2">
+              <Package className="h-4 w-4" />
+              Mis Pedidos
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Estudiantes Tab */}
+          <TabsContent value="estudiantes">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Estudiantes Registrados</CardTitle>
+                  <CardDescription>
+                    Agregue y gestione los estudiantes para ordenar sus libros
+                  </CardDescription>
+                </div>
+                <Button onClick={openAddDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar Estudiante
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {estudiantes.length === 0 ? (
+                  <div className="text-center py-12">
+                    <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="font-medium mb-2">No hay estudiantes registrados</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Agregue un estudiante para comenzar a ordenar libros
+                    </p>
+                    <Button onClick={openAddDialog}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Agregar Primer Estudiante
+                    </Button>
                   </div>
-                  <div>
-                    <p className="font-medium">{pedido.pedido_id}</p>
+                ) : (
+                  <div className="space-y-4">
+                    {estudiantes.map((student) => (
+                      <div
+                        key={student.estudiante_id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors gap-4"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-primary/10 rounded-xl">
+                            <GraduationCap className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">
+                                {student.nombre} {student.apellido}
+                              </h3>
+                              <StatusBadge status={student.estado_matricula} />
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {grados.find(g => g.id === student.grado)?.nombre || student.grado}
+                              {student.escuela && ` • ${student.escuela}`}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {student.es_nuevo ? '🆕 Estudiante Nuevo' : '📚 Estudiante del Año Anterior'}
+                              {student.libros_comprados?.length > 0 && (
+                                <span className="ml-2">• {student.libros_comprados.length} libros comprados</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 ml-auto sm:ml-0">
+                          {student.estado_matricula === 'confirmada' ? (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => viewHistory(student)}
+                              >
+                                <History className="h-4 w-4 mr-1" />
+                                Historial
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => openPurchaseDialog(student)}
+                              >
+                                <ShoppingCart className="h-4 w-4 mr-1" />
+                                Comprar Libros
+                              </Button>
+                            </>
+                          ) : student.estado_matricula === 'pendiente' ? (
+                            <Badge variant="outline" className="border-amber-500 text-amber-600">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Esperando Verificación
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="border-red-500 text-red-600">
+                              <XCircle className="h-3 w-3 mr-1" />
+                              Matrícula Rechazada
+                            </Badge>
+                          )}
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditDialog(student)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteStudent(student.estudiante_id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Pedidos Tab */}
+          <TabsContent value="pedidos">
+            <Card>
+              <CardHeader>
+                <CardTitle>Historial de Pedidos</CardTitle>
+                <CardDescription>
+                  Todos los pedidos de libros realizados
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pedidos.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="font-medium mb-2">No hay pedidos</h3>
                     <p className="text-sm text-muted-foreground">
-                      {pedido.estudiante_nombre} • {pedido.items?.length || 0} libros
+                      Los pedidos aparecerán aquí después de realizar una compra
                     </p>
                   </div>
-                </div>
-                <p className="font-bold text-lg">${pedido.total?.toFixed(2)}</p>
+                ) : (
+                  <div className="space-y-4">
+                    {pedidos.map((pedido) => (
+                      <div
+                        key={pedido.pedido_id}
+                        className="p-4 rounded-xl border border-border"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                          <div>
+                            <p className="font-mono text-sm text-muted-foreground">
+                              {pedido.pedido_id}
+                            </p>
+                            <p className="font-medium">{pedido.estudiante_nombre}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={pedido.estado === 'entregado' ? 'default' : 'outline'}>
+                              {pedido.estado}
+                            </Badge>
+                            <p className="font-bold text-lg text-primary">
+                              ${pedido.total.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {pedido.items.length} libro(s) • {pedido.metodo_pago === 'transferencia_bancaria' ? 'Transferencia' : 'Yappy'}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {pedido.items.map((item, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs">
+                              {item.nombre_libro}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Add/Edit Student Dialog */}
+      <Dialog open={studentDialog} onOpenChange={setStudentDialog}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingStudent ? 'Editar Estudiante' : 'Agregar Nuevo Estudiante'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingStudent 
+                ? 'Actualice la información del estudiante'
+                : 'Complete los datos del estudiante y suba el documento de matrícula'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleStudentSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nombre">Nombre *</Label>
+                <Input
+                  id="nombre"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
+                  placeholder="Nombre"
+                  required
+                />
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="apellido">Apellido *</Label>
+                <Input
+                  id="apellido"
+                  value={formData.apellido}
+                  onChange={(e) => setFormData(prev => ({ ...prev, apellido: e.target.value }))}
+                  placeholder="Apellido"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Grado a Estudiar *</Label>
+              <Select
+                value={formData.grado}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, grado: v }))}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar grado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {grados.map((g) => (
+                    <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="escuela">Escuela</Label>
+              <Input
+                id="escuela"
+                value={formData.escuela}
+                onChange={(e) => setFormData(prev => ({ ...prev, escuela: e.target.value }))}
+                placeholder="Nombre de la escuela"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Tipo de Estudiante</Label>
+              <RadioGroup
+                value={formData.es_nuevo ? 'nuevo' : 'anterior'}
+                onValueChange={(v) => setFormData(prev => ({ ...prev, es_nuevo: v === 'nuevo' }))}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="nuevo" id="nuevo" />
+                  <Label htmlFor="nuevo" className="cursor-pointer">Estudiante Nuevo</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="anterior" id="anterior" />
+                  <Label htmlFor="anterior" className="cursor-pointer">Del Año Anterior</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Documento de Matrícula *</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Suba una foto o imagen del documento de matrícula o nota de la escuela
+              </p>
+              
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              
+              {documentPreview ? (
+                <div className="relative">
+                  <img
+                    src={documentPreview}
+                    alt="Documento"
+                    className="w-full h-48 object-cover rounded-lg border border-border"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="absolute bottom-2 right-2"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Cambiar
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    Click para subir imagen
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    JPG, PNG hasta 5MB
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="notas">Notas Adicionales</Label>
+              <Textarea
+                id="notas"
+                value={formData.notas}
+                onChange={(e) => setFormData(prev => ({ ...prev, notas: e.target.value }))}
+                placeholder="Información adicional..."
+                rows={2}
+              />
+            </div>
+            
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStudentDialog(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={savingStudent || !formData.nombre || !formData.apellido || !formData.grado}
+                className="flex-1"
+              >
+                {savingStudent ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : editingStudent ? 'Actualizar' : 'Agregar Estudiante'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Purchase Books Dialog */}
+      <Dialog open={purchaseDialog} onOpenChange={setPurchaseDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Comprar Libros para {selectedStudent?.nombre} {selectedStudent?.apellido}
+            </DialogTitle>
+            <DialogDescription>
+              {grados.find(g => g.id === selectedStudent?.grado)?.nombre} • Seleccione los libros que desea comprar
+            </DialogDescription>
+          </DialogHeader>
+          
+          {loadingBooks ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Book List */}
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                {availableBooks.map((book) => (
+                  <div
+                    key={book.libro_id}
+                    onClick={() => toggleBookSelection(book)}
+                    className={`flex items-center gap-4 p-4 rounded-lg border transition-colors cursor-pointer ${
+                      book.ya_comprado
+                        ? 'bg-muted/50 border-border opacity-60 cursor-not-allowed'
+                        : selectedBooks.find(b => b.libro_id === book.libro_id)
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Checkbox
+                      checked={book.ya_comprado || selectedBooks.some(b => b.libro_id === book.libro_id)}
+                      disabled={book.ya_comprado || !book.disponible}
+                      className={book.ya_comprado ? 'opacity-50' : ''}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium truncate">{book.nombre}</p>
+                        {book.ya_comprado && (
+                          <Badge variant="secondary" className="text-xs">Ya Comprado</Badge>
+                        )}
+                        {!book.disponible && !book.ya_comprado && (
+                          <Badge variant="destructive" className="text-xs">Sin Stock</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{book.materia}</p>
+                    </div>
+                    <p className={`font-bold ${book.ya_comprado ? 'text-muted-foreground' : 'text-primary'}`}>
+                      ${book.precio.toFixed(2)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              
+              {selectedBooks.length > 0 && (
+                <>
+                  <Separator />
+                  
+                  {/* Payment Method */}
+                  <div className="space-y-3">
+                    <Label>Método de Pago</Label>
+                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-2">
+                      <div className="flex items-center space-x-3 p-3 rounded-lg border border-border">
+                        <RadioGroupItem value="transferencia_bancaria" id="bank" />
+                        <Label htmlFor="bank" className="flex items-center gap-2 cursor-pointer flex-1">
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                          Transferencia Bancaria
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg border border-border">
+                        <RadioGroupItem value="yappy" id="yappy" />
+                        <Label htmlFor="yappy" className="flex items-center gap-2 cursor-pointer flex-1">
+                          <CreditCard className="h-4 w-4 text-muted-foreground" />
+                          Yappy
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <Label>Notas (opcional)</Label>
+                    <Textarea
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      placeholder="Instrucciones especiales..."
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Summary */}
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-muted-foreground">Libros seleccionados:</span>
+                      <span className="font-medium">{selectedBooks.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-lg">
+                      <span className="font-bold">Total:</span>
+                      <span className="font-bold text-primary text-2xl">
+                        ${calculateTotal().toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+              
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setPurchaseDialog(false)}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSubmitOrder}
+                  disabled={submittingOrder || selectedBooks.length === 0}
+                  className="flex-1"
+                >
+                  {submittingOrder ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Confirmar Pedido
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={historyDialog} onOpenChange={setHistoryDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              Historial de {historyStudent?.nombre} {historyStudent?.apellido}
+            </DialogTitle>
+            <DialogDescription>
+              Libros comprados y pedidos realizados
+            </DialogDescription>
+          </DialogHeader>
+          
+          {historyStudent && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Libros Comprados ({historyStudent.libros_comprados?.length || 0})
+                </h4>
+                {historyStudent.libros_comprados?.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {historyStudent.libros_comprados.map((libroId, idx) => (
+                      <Badge key={idx} variant="secondary">{libroId}</Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Aún no ha comprado libros</p>
+                )}
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  Pedidos
+                </h4>
+                {getStudentOrders(historyStudent.estudiante_id).length > 0 ? (
+                  <div className="space-y-2">
+                    {getStudentOrders(historyStudent.estudiante_id).map((pedido) => (
+                      <div key={pedido.pedido_id} className="p-3 rounded-lg border border-border text-sm">
+                        <div className="flex justify-between mb-1">
+                          <span className="font-mono text-xs">{pedido.pedido_id}</span>
+                          <Badge variant="outline" className="text-xs">{pedido.estado}</Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>{pedido.items.length} libro(s)</span>
+                          <span className="font-bold">${pedido.total.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No hay pedidos</p>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
