@@ -125,23 +125,67 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [invRes, pedidosRes, gradosRes, materiasRes] = await Promise.all([
+      const [invRes, pedidosRes, gradosRes, materiasRes, configRes] = await Promise.all([
         api.get('/admin/inventario'),
         api.get('/admin/pedidos'),
         api.get('/grados'),
-        api.get('/materias')
+        api.get('/materias'),
+        api.get('/admin/config-formulario')
       ]);
       
       setInventario(invRes.data);
       setPedidos(pedidosRes.data);
       setGrados(gradosRes.data.grados);
       setMaterias(materiasRes.data.materias);
+      setFormConfig(configRes.data);
+      setConfigLoaded(true);
     } catch (error) {
       console.error('Error fetching admin data:', error);
       toast.error('Error al cargar datos');
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Save form configuration
+  const handleSaveFormConfig = async () => {
+    setSavingConfig(true);
+    try {
+      await api.put('/admin/config-formulario', formConfig);
+      toast.success('Configuración guardada exitosamente');
+    } catch (error) {
+      console.error('Error saving config:', error);
+      toast.error('Error al guardar configuración');
+    } finally {
+      setSavingConfig(false);
+    }
+  };
+  
+  // Copy embed URL to clipboard
+  const copyEmbedUrl = () => {
+    const url = `${window.location.origin}/embed/orden`;
+    navigator.clipboard.writeText(url);
+    toast.success('URL copiada al portapapeles');
+  };
+  
+  // Copy iframe code to clipboard
+  const copyIframeCode = () => {
+    const url = `${window.location.origin}/embed/orden`;
+    const code = `<iframe src="${url}" width="100%" height="800" frameborder="0" style="border: none;"></iframe>`;
+    navigator.clipboard.writeText(code);
+    toast.success('Código iframe copiado al portapapeles');
+  };
+  
+  // Toggle payment method
+  const togglePaymentMethod = (method) => {
+    setFormConfig(prev => {
+      const methods = prev.metodos_pago || [];
+      if (methods.includes(method)) {
+        return { ...prev, metodos_pago: methods.filter(m => m !== method) };
+      } else {
+        return { ...prev, metodos_pago: [...methods, method] };
+      }
+    });
   };
 
   // ========== SINGLE PRODUCT EDIT ==========
