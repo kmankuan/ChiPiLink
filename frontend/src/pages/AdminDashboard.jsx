@@ -663,6 +663,10 @@ export default function AdminDashboard() {
             <Package className="h-4 w-4" />
             {t('admin.inventory')}
           </TabsTrigger>
+          <TabsTrigger value="matriculas" className="gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Matrículas
+          </TabsTrigger>
           <TabsTrigger value="form-config" className="gap-2">
             <Settings className="h-4 w-4" />
             Formulario
