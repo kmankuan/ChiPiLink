@@ -556,27 +556,64 @@ async def get_estudiantes(current_user: dict = Depends(get_current_user)):
     user = await db.clientes.find_one({"cliente_id": current_user["cliente_id"]}, {"_id": 0})
     return user.get("estudiantes", [])
 
+@api_router.get("/estudiantes/{estudiante_id}")
+async def get_estudiante(estudiante_id: str, current_user: dict = Depends(get_current_user)):
+    user = await db.clientes.find_one({"cliente_id": current_user["cliente_id"]}, {"_id": 0})
+    estudiante = next((e for e in user.get("estudiantes", []) if e["estudiante_id"] == estudiante_id), None)
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    return estudiante
+
 @api_router.post("/estudiantes")
 async def add_estudiante(estudiante: EstudianteCreate, current_user: dict = Depends(get_current_user)):
-    estudiante_obj = Estudiante(**estudiante.model_dump())
+    estudiante_data = estudiante.model_dump(exclude={"documento_matricula"})
+    estudiante_obj = Estudiante(**estudiante_data)
+    estudiante_dict = estudiante_obj.model_dump()
+    estudiante_dict["fecha_registro"] = estudiante_dict["fecha_registro"].isoformat()
+    
+    # Handle document upload if provided
+    if estudiante.documento_matricula:
+        # Store as base64 or URL directly
+        estudiante_dict["documento_matricula_url"] = estudiante.documento_matricula
     
     await db.clientes.update_one(
         {"cliente_id": current_user["cliente_id"]},
-        {"$push": {"estudiantes": estudiante_obj.model_dump()}}
+        {"$push": {"estudiantes": estudiante_dict}}
     )
     
-    return estudiante_obj.model_dump()
+    # Create notification for admin
+    await create_notification(
+        tipo="matricula_pendiente",
+        titulo="Nueva Solicitud de Matrícula",
+        mensaje=f"Estudiante {estudiante.nombre} {estudiante.apellido} - Grado {estudiante.grado}",
+        datos={
+            "estudiante_id": estudiante_dict["estudiante_id"],
+            "cliente_id": current_user["cliente_id"],
+            "nombre": f"{estudiante.nombre} {estudiante.apellido}",
+            "grado": estudiante.grado
+        }
+    )
+    
+    return estudiante_dict
 
 @api_router.put("/estudiantes/{estudiante_id}")
 async def update_estudiante(estudiante_id: str, estudiante: EstudianteCreate, current_user: dict = Depends(get_current_user)):
+    update_data = {
+        "estudiantes.$.nombre": estudiante.nombre,
+        "estudiantes.$.apellido": estudiante.apellido,
+        "estudiantes.$.grado": estudiante.grado,
+        "estudiantes.$.escuela": estudiante.escuela,
+        "estudiantes.$.es_nuevo": estudiante.es_nuevo,
+        "estudiantes.$.notas": estudiante.notas
+    }
+    
+    # Handle document update if provided
+    if estudiante.documento_matricula:
+        update_data["estudiantes.$.documento_matricula_url"] = estudiante.documento_matricula
+    
     result = await db.clientes.update_one(
         {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
-        {"$set": {
-            "estudiantes.$.nombre": estudiante.nombre,
-            "estudiantes.$.grado": estudiante.grado,
-            "estudiantes.$.escuela": estudiante.escuela,
-            "estudiantes.$.notas": estudiante.notas
-        }}
+        {"$set": update_data}
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
@@ -588,6 +625,140 @@ async def delete_estudiante(estudiante_id: str, current_user: dict = Depends(get
         {"cliente_id": current_user["cliente_id"]},
         {"$pull": {"estudiantes": {"estudiante_id": estudiante_id}}}
     )
+    return {"success": True}
+
+@api_router.get("/estudiantes/{estudiante_id}/libros-disponibles")
+async def get_libros_disponibles(estudiante_id: str, current_user: dict = Depends(get_current_user)):
+    """Get available books for a student (excludes already purchased)"""
+    user = await db.clientes.find_one({"cliente_id": current_user["cliente_id"]}, {"_id": 0})
+    estudiante = next((e for e in user.get("estudiantes", []) if e["estudiante_id"] == estudiante_id), None)
+    
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    
+    if estudiante.get("estado_matricula") != "confirmada":
+        raise HTTPException(status_code=403, detail="La matrícula debe estar confirmada para ver libros")
+    
+    grado = estudiante["grado"]
+    libros_comprados = estudiante.get("libros_comprados", [])
+    
+    # Get all books for this grade
+    query = {
+        "activo": True,
+        "$or": [{"grado": grado}, {"grados": grado}]
+    }
+    libros = await db.libros.find(query, {"_id": 0}).to_list(500)
+    
+    # Mark books as purchased or available
+    for libro in libros:
+        libro["ya_comprado"] = libro["libro_id"] in libros_comprados
+        libro["disponible"] = libro.get("cantidad_inventario", 0) > 0 and not libro["ya_comprado"]
+    
+    return {
+        "estudiante": estudiante,
+        "libros": libros,
+        "libros_comprados_count": len(libros_comprados)
+    }
+
+# ============== ADMIN MATRICULA VERIFICATION ==============
+
+@api_router.get("/admin/matriculas-pendientes")
+async def get_matriculas_pendientes(admin: dict = Depends(get_admin_user)):
+    """Get all students with pending enrollment verification"""
+    # Get all clients with students that have pending status
+    clientes = await db.clientes.find(
+        {"estudiantes.estado_matricula": "pendiente"},
+        {"_id": 0, "contrasena_hash": 0}
+    ).to_list(500)
+    
+    pendientes = []
+    for cliente in clientes:
+        for est in cliente.get("estudiantes", []):
+            if est.get("estado_matricula") == "pendiente":
+                pendientes.append({
+                    "cliente_id": cliente["cliente_id"],
+                    "cliente_nombre": cliente.get("nombre", ""),
+                    "cliente_email": cliente.get("email", ""),
+                    "cliente_telefono": cliente.get("telefono", ""),
+                    **est
+                })
+    
+    # Sort by date, most recent first
+    pendientes.sort(key=lambda x: x.get("fecha_registro", ""), reverse=True)
+    
+    return pendientes
+
+@api_router.get("/admin/matriculas")
+async def get_all_matriculas(
+    estado: Optional[str] = None,
+    ano_escolar: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all student enrollments with optional filters"""
+    clientes = await db.clientes.find(
+        {},
+        {"_id": 0, "contrasena_hash": 0}
+    ).to_list(500)
+    
+    matriculas = []
+    for cliente in clientes:
+        for est in cliente.get("estudiantes", []):
+            # Apply filters
+            if estado and est.get("estado_matricula") != estado:
+                continue
+            if ano_escolar and est.get("ano_escolar") != ano_escolar:
+                continue
+                
+            matriculas.append({
+                "cliente_id": cliente["cliente_id"],
+                "cliente_nombre": cliente.get("nombre", ""),
+                "cliente_email": cliente.get("email", ""),
+                "cliente_telefono": cliente.get("telefono", ""),
+                **est
+            })
+    
+    return matriculas
+
+@api_router.put("/admin/matriculas/{cliente_id}/{estudiante_id}/verificar")
+async def verificar_matricula(
+    cliente_id: str,
+    estudiante_id: str,
+    accion: str,  # "aprobar" or "rechazar"
+    motivo: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Approve or reject a student enrollment"""
+    if accion not in ["aprobar", "rechazar"]:
+        raise HTTPException(status_code=400, detail="Acción debe ser 'aprobar' o 'rechazar'")
+    
+    nuevo_estado = "confirmada" if accion == "aprobar" else "rechazada"
+    
+    result = await db.clientes.update_one(
+        {"cliente_id": cliente_id, "estudiantes.estudiante_id": estudiante_id},
+        {"$set": {"estudiantes.$.estado_matricula": nuevo_estado}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    
+    # Get student info for notification
+    cliente = await db.clientes.find_one({"cliente_id": cliente_id}, {"_id": 0})
+    estudiante = next((e for e in cliente.get("estudiantes", []) if e["estudiante_id"] == estudiante_id), None)
+    
+    # Create notification about the status change
+    await create_notification(
+        tipo="matricula_verificada",
+        titulo=f"Matrícula {nuevo_estado.title()}",
+        mensaje=f"Estudiante {estudiante['nombre']} {estudiante['apellido']} - {nuevo_estado}",
+        datos={
+            "estudiante_id": estudiante_id,
+            "cliente_id": cliente_id,
+            "estado": nuevo_estado,
+            "motivo": motivo
+        }
+    )
+    
+    return {"success": True, "nuevo_estado": nuevo_estado}
     return {"success": True}
 
 # ============== PEDIDOS (ORDERS) ROUTES ==============
