@@ -62,18 +62,33 @@ class Libro(LibroBase):
     libro_id: str = Field(default_factory=lambda: f"libro_{uuid.uuid4().hex[:12]}")
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# Current school year helper
+def get_current_school_year() -> str:
+    now = datetime.now()
+    # School year starts in February/March typically
+    if now.month >= 2:
+        return f"{now.year}-{now.year + 1}"
+    return f"{now.year - 1}-{now.year}"
+
 class EstudianteBase(BaseModel):
-    nombre: str
+    nombre: str  # First name
+    apellido: str  # Last name
     grado: str
     escuela: Optional[str] = None
+    es_nuevo: bool = True  # True = estudiante nuevo, False = cursado del año pasado
     notas: Optional[str] = None
 
 class EstudianteCreate(EstudianteBase):
-    pass
+    documento_matricula: Optional[str] = None  # Base64 encoded image or URL
 
 class Estudiante(EstudianteBase):
     model_config = ConfigDict(extra="ignore")
     estudiante_id: str = Field(default_factory=lambda: f"est_{uuid.uuid4().hex[:12]}")
+    estado_matricula: str = "pendiente"  # pendiente, confirmada, rechazada
+    documento_matricula_url: Optional[str] = None
+    ano_escolar: str = Field(default_factory=get_current_school_year)
+    fecha_registro: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    libros_comprados: List[str] = []  # List of libro_ids already purchased this year
 
 class ClienteBase(BaseModel):
     email: EmailStr
