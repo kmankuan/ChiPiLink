@@ -122,6 +122,10 @@ export function NotificationBar() {
   if (config.mostrar_bajo_stock) visibleTypes.push('bajo_stock');
   if (config.mostrar_pagos_confirmados) visibleTypes.push('pago_confirmado');
   if (config.mostrar_pedidos_enviados) visibleTypes.push('pedido_enviado');
+  if (config.mostrar_matriculas) {
+    visibleTypes.push('matricula_pendiente');
+    visibleTypes.push('matricula_verificada');
+  }
 
   const filteredNotifications = notifications.filter(n => visibleTypes.includes(n.tipo));
   const visibleCount = filteredNotifications.length;
