@@ -120,6 +120,14 @@ export default function AdminDashboard() {
   });
   const [savingConfig, setSavingConfig] = useState(false);
   const [configLoaded, setConfigLoaded] = useState(false);
+  
+  // Matriculas state
+  const [matriculas, setMatriculas] = useState([]);
+  const [matriculaFilter, setMatriculaFilter] = useState('pendiente');
+  const [loadingMatriculas, setLoadingMatriculas] = useState(false);
+  const [selectedMatricula, setSelectedMatricula] = useState(null);
+  const [matriculaDialog, setMatriculaDialog] = useState(false);
+  const [verifyingMatricula, setVerifyingMatricula] = useState(false);
 
   // Get active tab from URL or default
   const activeTab = location.hash.replace('#', '') || 'overview';
