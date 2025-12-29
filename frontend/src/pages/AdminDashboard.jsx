@@ -51,10 +51,19 @@ import {
   Eye,
   Copy,
   ExternalLink,
-  Palette
+  Palette,
+  GraduationCap,
+  Clock,
+  CheckCircle,
+  XCircle,
+  FileImage,
+  User,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Empty product row template
 const emptyProductRow = {
