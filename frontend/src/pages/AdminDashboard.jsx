@@ -205,6 +205,53 @@ export default function AdminDashboard() {
     });
   };
 
+  // ========== MATRICULAS FUNCTIONS ==========
+  const fetchMatriculas = async (estado = matriculaFilter) => {
+    setLoadingMatriculas(true);
+    try {
+      const params = estado !== 'all' ? { estado } : {};
+      const response = await api.get('/admin/matriculas', { params });
+      setMatriculas(response.data);
+    } catch (error) {
+      console.error('Error fetching matriculas:', error);
+      toast.error('Error al cargar matrículas');
+    } finally {
+      setLoadingMatriculas(false);
+    }
+  };
+
+  const handleVerifyMatricula = async (accion) => {
+    if (!selectedMatricula) return;
+    
+    setVerifyingMatricula(true);
+    try {
+      await api.put(
+        `/admin/matriculas/${selectedMatricula.cliente_id}/${selectedMatricula.estudiante_id}/verificar?accion=${accion}`
+      );
+      toast.success(`Matrícula ${accion === 'aprobar' ? 'aprobada' : 'rechazada'} exitosamente`);
+      setMatriculaDialog(false);
+      setSelectedMatricula(null);
+      fetchMatriculas();
+    } catch (error) {
+      console.error('Error verifying matricula:', error);
+      toast.error('Error al verificar matrícula');
+    } finally {
+      setVerifyingMatricula(false);
+    }
+  };
+
+  const openMatriculaDetail = (matricula) => {
+    setSelectedMatricula(matricula);
+    setMatriculaDialog(true);
+  };
+
+  // Load matriculas when tab changes
+  useEffect(() => {
+    if (activeTab === 'matriculas') {
+      fetchMatriculas();
+    }
+  }, [activeTab, matriculaFilter]);
+
   // ========== SINGLE PRODUCT EDIT ==========
   const handleEditSubmit = async (e) => {
     e.preventDefault();
