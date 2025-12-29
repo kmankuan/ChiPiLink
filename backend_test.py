@@ -135,6 +135,78 @@ class TextbookStoreAPITester:
             200
         )
         
+        # Create test user and student data as mentioned in the review
+        self.token = old_token
+        
+        # Create test user juan.perez@test.com
+        test_user_data = {
+            "email": "juan.perez@test.com",
+            "contrasena": "password123",
+            "nombre": "Juan Pérez",
+            "telefono": "507-1234-5678",
+            "direccion": "Ciudad de Panamá, Panamá"
+        }
+        
+        test_user_result = self.run_test(
+            "Create Test User (juan.perez@test.com)",
+            "POST",
+            "auth/registro",
+            200,
+            test_user_data
+        )
+        
+        if test_user_result and 'token' in test_user_result:
+            # Use the test user token to create María Pérez García
+            test_token = test_user_result['token']
+            old_token = self.token
+            self.token = test_token
+            
+            # Create María Pérez García student with confirmed enrollment
+            maria_data = {
+                "nombre": "María",
+                "apellido": "Pérez García", 
+                "grado": "4",
+                "escuela": "Escuela Primaria Central",
+                "es_nuevo": False,
+                "documento_matricula": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/wA=="
+            }
+            
+            maria_result = self.run_test(
+                "Create María Pérez García Student",
+                "POST",
+                "estudiantes",
+                200,
+                maria_data
+            )
+            
+            if maria_result and 'estudiante_id' in maria_result:
+                # Get user info to approve María's enrollment
+                user_info = self.run_test(
+                    "Get Test User Info",
+                    "GET", 
+                    "auth/me",
+                    200
+                )
+                
+                if user_info and 'cliente_id' in user_info:
+                    cliente_id = user_info['cliente_id']
+                    estudiante_id = maria_result['estudiante_id']
+                    
+                    # Switch to admin token to approve María's enrollment
+                    self.token = self.admin_token
+                    
+                    approval_result = self.run_test(
+                        "Approve María's Enrollment",
+                        "PUT",
+                        f"admin/matriculas/{cliente_id}/{estudiante_id}/verificar?accion=aprobar",
+                        200
+                    )
+                    
+                    self.token = old_token
+                    return all([result, test_user_result, maria_result, approval_result])
+            
+            self.token = old_token
+        
         self.token = old_token
         return result is not None
 
