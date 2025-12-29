@@ -108,7 +108,6 @@ export default function AdminDashboard() {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [orderFilter, setOrderFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('overview');
   
   // Form configuration state
   const [formConfig, setFormConfig] = useState({
