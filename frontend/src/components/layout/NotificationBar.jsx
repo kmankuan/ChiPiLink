@@ -47,7 +47,8 @@ export function NotificationBar() {
     mostrar_pedidos_nuevos: true,
     mostrar_bajo_stock: true,
     mostrar_pagos_confirmados: true,
-    mostrar_pedidos_enviados: true
+    mostrar_pedidos_enviados: true,
+    mostrar_matriculas: true
   });
   const [popoverOpen, setPopoverOpen] = useState(false);
 
