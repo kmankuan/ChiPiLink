@@ -540,7 +540,333 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
-    def test_admin_functionality(self):
+    def test_enrollment_verification_flow(self):
+        """Test the complete enrollment verification flow"""
+        print("\n📋 Testing Enrollment Verification Flow...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Get pending enrollments
+        pending_enrollments = self.run_test(
+            "Get Pending Enrollments",
+            "GET",
+            "admin/matriculas-pendientes",
+            200
+        )
+        
+        # Get all enrollments
+        all_enrollments = self.run_test(
+            "Get All Enrollments",
+            "GET",
+            "admin/matriculas",
+            200
+        )
+        
+        # Filter by confirmed status
+        confirmed_enrollments = self.run_test(
+            "Get Confirmed Enrollments",
+            "GET",
+            "admin/matriculas?estado=confirmada",
+            200
+        )
+        
+        # Filter by pending status
+        pending_filtered = self.run_test(
+            "Get Pending Enrollments (Filtered)",
+            "GET",
+            "admin/matriculas?estado=pendiente",
+            200
+        )
+        
+        success = all([pending_enrollments, all_enrollments, confirmed_enrollments, pending_filtered])
+        
+        # If we have pending enrollments, test approval/rejection
+        if pending_enrollments and len(pending_enrollments) > 0:
+            enrollment = pending_enrollments[0]
+            cliente_id = enrollment.get('cliente_id')
+            estudiante_id = enrollment.get('estudiante_id')
+            
+            if cliente_id and estudiante_id:
+                # Test approval
+                approval_result = self.run_test(
+                    "Approve Enrollment",
+                    "PUT",
+                    f"admin/matriculas/{cliente_id}/{estudiante_id}/verificar?accion=aprobar",
+                    200
+                )
+                
+                success = success and approval_result is not None
+                
+                # Verify the enrollment is now confirmed
+                confirmed_check = self.run_test(
+                    "Verify Enrollment Confirmed",
+                    "GET",
+                    "admin/matriculas?estado=confirmada",
+                    200
+                )
+                
+                success = success and confirmed_check is not None
+        
+        # Restore token
+        self.token = old_token
+        return success
+
+    def test_book_purchase_flow(self):
+        """Test the complete book purchase flow for enrolled students"""
+        print("\n📚 Testing Book Purchase Flow...")
+        
+        if not self.created_resources['students']:
+            print("❌ No students available for purchase testing")
+            return False
+        
+        student_id = self.created_resources['students'][0]
+        
+        # First, we need to confirm the student's enrollment as admin
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Get the student's client info
+        user_info = None
+        self.token = old_token  # Switch back to user token to get user info
+        
+        user_data = self.run_test(
+            "Get Current User Info",
+            "GET",
+            "auth/me",
+            200
+        )
+        
+        if user_data and 'cliente_id' in user_data:
+            cliente_id = user_data['cliente_id']
+            
+            # Switch to admin token to approve enrollment
+            self.token = self.admin_token
+            
+            approval_result = self.run_test(
+                "Approve Student Enrollment for Purchase",
+                "PUT",
+                f"admin/matriculas/{cliente_id}/{student_id}/verificar?accion=aprobar",
+                200
+            )
+            
+            # Switch back to user token
+            self.token = old_token
+            
+            if approval_result:
+                # Test getting available books for the student
+                available_books = self.run_test(
+                    "Get Available Books for Student",
+                    "GET",
+                    f"estudiantes/{student_id}/libros-disponibles",
+                    200
+                )
+                
+                if available_books and available_books.get('libros') and len(available_books['libros']) > 0:
+                    # Select books for purchase
+                    books = available_books['libros']
+                    available_books_list = [book for book in books if book.get('disponible', False)]
+                    
+                    if len(available_books_list) >= 2:
+                        # Create order with 2 books
+                        book1 = available_books_list[0]
+                        book2 = available_books_list[1]
+                        
+                        order_data = {
+                            "estudiante_id": student_id,
+                            "items": [
+                                {
+                                    "libro_id": book1['libro_id'],
+                                    "nombre_libro": book1['nombre'],
+                                    "cantidad": 1,
+                                    "precio_unitario": book1['precio']
+                                },
+                                {
+                                    "libro_id": book2['libro_id'],
+                                    "nombre_libro": book2['nombre'],
+                                    "cantidad": 1,
+                                    "precio_unitario": book2['precio']
+                                }
+                            ],
+                            "metodo_pago": "transferencia_bancaria",
+                            "notas": "Compra de libros de 4to grado"
+                        }
+                        
+                        order = self.run_test(
+                            "Create Book Order for Enrolled Student",
+                            "POST",
+                            "pedidos",
+                            200,
+                            order_data
+                        )
+                        
+                        if order and 'pedido_id' in order:
+                            order_id = order['pedido_id']
+                            self.created_resources['orders'].append(order_id)
+                            
+                            # Verify books are now marked as purchased
+                            updated_books = self.run_test(
+                                "Verify Books Marked as Purchased",
+                                "GET",
+                                f"estudiantes/{student_id}/libros-disponibles",
+                                200
+                            )
+                            
+                            if updated_books and updated_books.get('libros'):
+                                purchased_books = [book for book in updated_books['libros'] if book.get('ya_comprado', False)]
+                                if len(purchased_books) >= 2:
+                                    self.log_test("Books Marked as Purchased", True)
+                                    return True
+                                else:
+                                    self.log_test("Books Marked as Purchased", False, f"Expected 2+ purchased books, found {len(purchased_books)}")
+                            
+                            return order is not None
+                        
+                        return False
+                    else:
+                        print("❌ Not enough available books for purchase testing")
+                        return False
+                else:
+                    print("❌ No available books for enrolled student")
+                    return False
+            else:
+                print("❌ Failed to approve student enrollment")
+                return False
+        else:
+            print("❌ Could not get user info for enrollment approval")
+            return False
+
+    def test_duplicate_purchase_prevention(self):
+        """Test prevention of duplicate book purchases"""
+        print("\n🚫 Testing Duplicate Purchase Prevention...")
+        
+        if not self.created_resources['students'] or not self.created_resources['orders']:
+            print("❌ No students or orders available for duplicate purchase testing")
+            return False
+        
+        student_id = self.created_resources['students'][0]
+        
+        # Get the student's available books (should show already purchased books)
+        available_books = self.run_test(
+            "Get Books After Purchase",
+            "GET",
+            f"estudiantes/{student_id}/libros-disponibles",
+            200
+        )
+        
+        if available_books and available_books.get('libros'):
+            purchased_books = [book for book in available_books['libros'] if book.get('ya_comprado', False)]
+            
+            if len(purchased_books) > 0:
+                # Try to purchase the same book again
+                purchased_book = purchased_books[0]
+                
+                duplicate_order_data = {
+                    "estudiante_id": student_id,
+                    "items": [
+                        {
+                            "libro_id": purchased_book['libro_id'],
+                            "nombre_libro": purchased_book['nombre'],
+                            "cantidad": 1,
+                            "precio_unitario": purchased_book['precio']
+                        }
+                    ],
+                    "metodo_pago": "transferencia_bancaria",
+                    "notas": "Intento de compra duplicada"
+                }
+                
+                # This should fail with 400 status
+                duplicate_result = self.run_test(
+                    "Attempt Duplicate Purchase (Should Fail)",
+                    "POST",
+                    "pedidos",
+                    400,  # Expecting failure
+                    duplicate_order_data
+                )
+                
+                # If we get here and the test passed, it means the duplicate was properly prevented
+                return duplicate_result is None  # None means the test "passed" (got expected 400)
+            else:
+                print("❌ No purchased books found to test duplicate prevention")
+                return False
+        else:
+            print("❌ Could not get student's book list")
+            return False
+
+    def test_user_login_with_test_credentials(self):
+        """Test login with the specific test credentials mentioned in the review"""
+        print("\n🔐 Testing Login with Test Credentials...")
+        
+        # Test user login
+        user_login_data = {
+            "email": "juan.perez@test.com",
+            "contrasena": "password123"
+        }
+        
+        user_result = self.run_test(
+            "Login Test User (juan.perez@test.com)",
+            "POST",
+            "auth/login",
+            200,
+            user_login_data
+        )
+        
+        if user_result and 'token' in user_result:
+            # Store the test user token
+            test_user_token = user_result['token']
+            
+            # Test admin login
+            admin_login_data = {
+                "email": "admin@libreria.com",
+                "contrasena": "adminpassword"
+            }
+            
+            admin_result = self.run_test(
+                "Login Admin (admin@libreria.com)",
+                "POST",
+                "auth/login",
+                200,
+                admin_login_data
+            )
+            
+            if admin_result and 'token' in admin_result:
+                # Verify we can access user data with test user token
+                old_token = self.token
+                self.token = test_user_token
+                
+                user_students = self.run_test(
+                    "Get Test User Students",
+                    "GET",
+                    "estudiantes",
+                    200
+                )
+                
+                # Check if María Pérez García exists and is confirmed
+                if user_students and len(user_students) > 0:
+                    maria_student = None
+                    for student in user_students:
+                        if (student.get('nombre') == 'María' and 
+                            student.get('apellido') == 'Pérez García' and
+                            student.get('grado') == '4'):
+                            maria_student = student
+                            break
+                    
+                    if maria_student:
+                        if maria_student.get('estado_matricula') == 'confirmada':
+                            self.log_test("María Pérez García Enrollment Confirmed", True)
+                        else:
+                            self.log_test("María Pérez García Enrollment Confirmed", False, 
+                                        f"Expected 'confirmada', got '{maria_student.get('estado_matricula')}'")
+                    else:
+                        self.log_test("María Pérez García Found", False, "Student not found")
+                
+                self.token = old_token
+                return all([user_result, admin_result, user_students])
+            
+            return user_result is not None
+        
+        return False
         """Test admin functionality"""
         print("\n👑 Testing Admin Functionality...")
         
