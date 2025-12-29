@@ -99,6 +99,18 @@ export default function AdminDashboard() {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [orderFilter, setOrderFilter] = useState('all');
+  
+  // Form configuration state
+  const [formConfig, setFormConfig] = useState({
+    titulo: 'Formulario de Pedido de Libros',
+    descripcion: 'Complete el formulario para ordenar los libros de texto',
+    mostrar_precios: true,
+    metodos_pago: ['transferencia_bancaria', 'yappy'],
+    mensaje_exito: '¡Gracias! Su pedido ha sido recibido.',
+    color_primario: '#166534'
+  });
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   // Get active tab from URL or default
   const activeTab = location.hash.replace('#', '') || 'overview';
