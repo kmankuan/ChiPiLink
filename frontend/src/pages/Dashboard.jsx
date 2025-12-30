@@ -702,51 +702,17 @@ export default function Dashboard() {
               </RadioGroup>
             </div>
             
-            <div className="space-y-2">
-              <Label>Documento de Matrícula *</Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Suba una foto o imagen del documento de matrícula o nota de la escuela
-              </p>
-              
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-              
-              {documentPreview ? (
-                <div className="relative">
-                  <img
-                    src={documentPreview}
-                    alt="Documento"
-                    className="w-full h-48 object-cover rounded-lg border border-border"
-                  />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="absolute bottom-2 right-2"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    Cambiar
-                  </Button>
-                </div>
-              ) : (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                >
-                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Click para subir imagen
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    JPG, PNG hasta 5MB
+            {/* Info box about auto-verification */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex gap-3">
+                <Search className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-800 dark:text-blue-200">Verificación Automática</p>
+                  <p className="text-blue-700 dark:text-blue-300">
+                    Al guardar, el sistema buscará automáticamente si el estudiante está en la lista oficial de matrículas.
                   </p>
                 </div>
-              )}
+              </div>
             </div>
             
             <div className="space-y-2">
