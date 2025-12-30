@@ -1820,6 +1820,11 @@ export default function AdminDashboard() {
           </Dialog>
         </TabsContent>
         
+        {/* Google Sheets Sync Tab */}
+        <TabsContent value="sheets">
+          <GoogleSheetsSync />
+        </TabsContent>
+        
         {/* Form Configuration Tab */}
         <TabsContent value="form-config">
           <div className="grid lg:grid-cols-2 gap-8">
