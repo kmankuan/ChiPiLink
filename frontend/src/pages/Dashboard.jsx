@@ -386,9 +386,9 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">
-                    {estudiantes.filter(e => e.estado_matricula === 'confirmada').length}
+                    {estudiantes.filter(e => e.estado_matricula === 'encontrado' || e.estado_matricula === 'confirmada').length}
                   </p>
-                  <p className="text-sm text-muted-foreground">Matrículas Confirmadas</p>
+                  <p className="text-sm text-muted-foreground">Encontrados en Matrículas</p>
                 </div>
               </div>
             </CardContent>
@@ -429,7 +429,7 @@ export default function Dashboard() {
                 <div>
                   <CardTitle>Estudiantes Registrados</CardTitle>
                   <CardDescription>
-                    Agregue y gestione los estudiantes para ordenar sus libros
+                    Agregue estudiantes y el sistema verificará automáticamente si están en la lista de matrículas
                   </CardDescription>
                 </div>
                 <Button onClick={openAddDialog}>
