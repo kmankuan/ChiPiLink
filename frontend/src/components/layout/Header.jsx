@@ -68,13 +68,16 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <Link 
-              to="/catalogo" 
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="catalog-nav-link"
-            >
-              {t('nav.catalog')}
-            </Link>
+            {/* Catalog only visible for admins */}
+            {isAdmin && (
+              <Link 
+                to="/catalogo" 
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="catalog-nav-link"
+              >
+                {t('nav.catalog')}
+              </Link>
+            )}
             
             {isAuthenticated && (
               <>
