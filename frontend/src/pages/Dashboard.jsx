@@ -222,8 +222,12 @@ export default function Dashboard() {
         await api.put(`/estudiantes/${editingStudent.estudiante_id}`, data);
         toast.success('Estudiante actualizado');
       } else {
-        await api.post('/estudiantes', data);
-        toast.success('Estudiante agregado. El administrador verificará la matrícula.');
+        const response = await api.post('/estudiantes', data);
+        if (response.data.estado_matricula === 'encontrado') {
+          toast.success(`¡Estudiante encontrado en matrículas! (${response.data.similitud_matricula}% similitud)`);
+        } else {
+          toast.warning('Estudiante agregado, pero NO se encontró en la lista de matrículas');
+        }
       }
       
       setStudentDialog(false);
