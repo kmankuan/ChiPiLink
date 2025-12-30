@@ -91,12 +91,15 @@ const StatusBadge = ({ status, similitud }) => {
     }
   };
   
-  const { label, icon: Icon, className } = config[status] || config.pendiente;
+  const { label, icon: Icon, className } = config[status] || config.no_encontrado;
   
   return (
     <Badge variant="outline" className={className}>
       <Icon className="h-3 w-3 mr-1" />
       {label}
+      {similitud && status === 'encontrado' && (
+        <span className="ml-1 text-xs opacity-75">({similitud}%)</span>
+      )}
     </Badge>
   );
 };
