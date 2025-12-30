@@ -458,20 +458,33 @@ export default function Dashboard() {
                         className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors gap-4"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="p-3 bg-primary/10 rounded-xl">
-                            <GraduationCap className="h-6 w-6 text-primary" />
+                          <div className={`p-3 rounded-xl ${
+                            student.estado_matricula === 'encontrado' || student.estado_matricula === 'confirmada'
+                              ? 'bg-green-100 dark:bg-green-900/30'
+                              : 'bg-red-100 dark:bg-red-900/30'
+                          }`}>
+                            <GraduationCap className={`h-6 w-6 ${
+                              student.estado_matricula === 'encontrado' || student.estado_matricula === 'confirmada'
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            }`} />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold">
                                 {student.nombre} {student.apellido}
                               </h3>
-                              <StatusBadge status={student.estado_matricula} />
+                              <StatusBadge status={student.estado_matricula} similitud={student.similitud_matricula} />
                             </div>
                             <p className="text-sm text-muted-foreground">
                               {grados.find(g => g.id === student.grado)?.nombre || student.grado}
                               {student.escuela && ` • ${student.escuela}`}
                             </p>
+                            {student.nombre_matricula && student.estado_matricula === 'encontrado' && (
+                              <p className="text-xs text-green-600 mt-1">
+                                ✓ Coincide con: {student.nombre_matricula}
+                              </p>
+                            )}
                             <p className="text-xs text-muted-foreground mt-1">
                               {student.es_nuevo ? '🆕 Estudiante Nuevo' : '📚 Estudiante del Año Anterior'}
                               {student.libros_comprados?.length > 0 && (
@@ -482,7 +495,7 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                          {student.estado_matricula === 'confirmada' ? (
+                          {(student.estado_matricula === 'encontrado' || student.estado_matricula === 'confirmada') ? (
                             <>
                               <Button
                                 variant="outline"
@@ -500,16 +513,21 @@ export default function Dashboard() {
                                 Comprar Libros
                               </Button>
                             </>
-                          ) : student.estado_matricula === 'pendiente' ? (
-                            <Badge variant="outline" className="border-amber-500 text-amber-600">
-                              <Clock className="h-3 w-3 mr-1" />
-                              Esperando Verificación
-                            </Badge>
                           ) : (
-                            <Badge variant="outline" className="border-red-500 text-red-600">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Matrícula Rechazada
-                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleVerifyStudent(student.estudiante_id)}
+                              disabled={verifyingStudent === student.estudiante_id}
+                              className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                            >
+                              {verifyingStudent === student.estudiante_id ? (
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-4 w-4 mr-1" />
+                              )}
+                              Re-verificar
+                            </Button>
                           )}
                           
                           <Button
