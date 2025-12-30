@@ -890,7 +890,7 @@ async def get_libros_disponibles(estudiante_id: str, current_user: dict = Depend
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
     if estudiante.get("estado_matricula") != "encontrado":
-        raise HTTPException(status_code=403, detail="La matrícula debe estar confirmada para ver libros")
+        raise HTTPException(status_code=403, detail="El estudiante debe estar en la lista de matrículas para ver libros")
     
     grado = estudiante["grado"]
     libros_comprados = estudiante.get("libros_comprados", [])
