@@ -65,6 +65,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import GoogleSheetsSync from '@/components/admin/GoogleSheetsSync';
 
 // Empty product row template
 const emptyProductRow = {
