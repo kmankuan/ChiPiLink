@@ -164,21 +164,21 @@ export default function Dashboard() {
     }
   };
 
-  // Handle file upload
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('El archivo no debe exceder 5MB');
-        return;
+  // Re-verify student enrollment
+  const handleVerifyStudent = async (studentId) => {
+    setVerifyingStudent(studentId);
+    try {
+      const response = await api.post(`/estudiantes/${studentId}/verificar-matricula`);
+      if (response.data.estado === 'encontrado') {
+        toast.success(`¡Estudiante encontrado! Similitud: ${response.data.similitud}%`);
+      } else {
+        toast.error('Estudiante no encontrado en la lista de matrículas');
       }
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, documento_matricula: reader.result }));
-        setDocumentPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      fetchData();
+    } catch (error) {
+      toast.error('Error al verificar matrícula');
+    } finally {
+      setVerifyingStudent(null);
     }
   };
 
@@ -191,10 +191,8 @@ export default function Dashboard() {
       grado: '',
       escuela: '',
       es_nuevo: true,
-      notas: '',
-      documento_matricula: null
+      notas: ''
     });
-    setDocumentPreview(null);
     setStudentDialog(true);
   };
 
@@ -207,10 +205,8 @@ export default function Dashboard() {
       grado: student.grado || '',
       escuela: student.escuela || '',
       es_nuevo: student.es_nuevo ?? true,
-      notas: student.notas || '',
-      documento_matricula: null
+      notas: student.notas || ''
     });
-    setDocumentPreview(student.documento_matricula_url || null);
     setStudentDialog(true);
   };
 
