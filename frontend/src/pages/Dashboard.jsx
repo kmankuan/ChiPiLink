@@ -122,12 +122,10 @@ export default function Dashboard() {
     grado: '',
     escuela: '',
     es_nuevo: true,
-    notas: '',
-    documento_matricula: null
+    notas: ''
   });
   const [savingStudent, setSavingStudent] = useState(false);
-  const [documentPreview, setDocumentPreview] = useState(null);
-  const fileInputRef = useRef(null);
+  const [verifyingStudent, setVerifyingStudent] = useState(null);
   
   // Purchase dialog
   const [purchaseDialog, setPurchaseDialog] = useState(false);
