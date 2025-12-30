@@ -726,38 +726,100 @@ async def get_estudiante(estudiante_id: str, current_user: dict = Depends(get_cu
 
 @api_router.post("/estudiantes")
 async def add_estudiante(estudiante: EstudianteCreate, current_user: dict = Depends(get_current_user)):
-    estudiante_data = estudiante.model_dump(exclude={"documento_matricula"})
+    estudiante_data = estudiante.model_dump()
     estudiante_obj = Estudiante(**estudiante_data)
     estudiante_dict = estudiante_obj.model_dump()
     estudiante_dict["fecha_registro"] = estudiante_dict["fecha_registro"].isoformat()
     
-    # Handle document upload if provided
-    if estudiante.documento_matricula:
-        # Store as base64 or URL directly
-        estudiante_dict["documento_matricula_url"] = estudiante.documento_matricula
+    # Auto-search in enrollment database
+    estudiantes_sync = await db.estudiantes_sincronizados.find(
+        {"estado": "activo"},
+        {"_id": 0}
+    ).to_list(2000)
+    
+    coincidencia = buscar_estudiante_en_matriculas(
+        estudiante.nombre,
+        estudiante.apellido,
+        estudiante.grado,
+        estudiantes_sync
+    )
+    
+    if coincidencia:
+        # Found a match!
+        estudiante_dict["estado_matricula"] = "encontrado"
+        estudiante_dict["matricula_sync_id"] = coincidencia["sync_id"]
+        estudiante_dict["similitud_matricula"] = coincidencia["similitud"]
+        estudiante_dict["nombre_matricula"] = coincidencia["nombre_encontrado"]
+    else:
+        estudiante_dict["estado_matricula"] = "no_encontrado"
+        estudiante_dict["matricula_sync_id"] = None
+        estudiante_dict["similitud_matricula"] = None
+        estudiante_dict["nombre_matricula"] = None
     
     await db.clientes.update_one(
         {"cliente_id": current_user["cliente_id"]},
         {"$push": {"estudiantes": estudiante_dict}}
     )
     
-    # Create notification for admin
-    await create_notification(
-        tipo="matricula_pendiente",
-        titulo="Nueva Solicitud de Matrícula",
-        mensaje=f"Estudiante {estudiante.nombre} {estudiante.apellido} - Grado {estudiante.grado}",
-        datos={
-            "estudiante_id": estudiante_dict["estudiante_id"],
-            "cliente_id": current_user["cliente_id"],
-            "nombre": f"{estudiante.nombre} {estudiante.apellido}",
-            "grado": estudiante.grado
-        }
+    return estudiante_dict
+
+@api_router.post("/estudiantes/{estudiante_id}/verificar-matricula")
+async def verificar_matricula_estudiante(estudiante_id: str, current_user: dict = Depends(get_current_user)):
+    """Re-verify student enrollment against the synced database"""
+    user = await db.clientes.find_one({"cliente_id": current_user["cliente_id"]}, {"_id": 0})
+    estudiante = next((e for e in user.get("estudiantes", []) if e["estudiante_id"] == estudiante_id), None)
+    
+    if not estudiante:
+        raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    
+    # Search in enrollment database
+    estudiantes_sync = await db.estudiantes_sincronizados.find(
+        {"estado": "activo"},
+        {"_id": 0}
+    ).to_list(2000)
+    
+    coincidencia = buscar_estudiante_en_matriculas(
+        estudiante["nombre"],
+        estudiante["apellido"],
+        estudiante["grado"],
+        estudiantes_sync
     )
     
-    return estudiante_dict
+    if coincidencia:
+        await db.clientes.update_one(
+            {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
+            {"$set": {
+                "estudiantes.$.estado_matricula": "encontrado",
+                "estudiantes.$.matricula_sync_id": coincidencia["sync_id"],
+                "estudiantes.$.similitud_matricula": coincidencia["similitud"],
+                "estudiantes.$.nombre_matricula": coincidencia["nombre_encontrado"]
+            }}
+        )
+        return {
+            "success": True,
+            "estado": "encontrado",
+            "similitud": coincidencia["similitud"],
+            "nombre_encontrado": coincidencia["nombre_encontrado"]
+        }
+    else:
+        await db.clientes.update_one(
+            {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
+            {"$set": {
+                "estudiantes.$.estado_matricula": "no_encontrado",
+                "estudiantes.$.matricula_sync_id": None,
+                "estudiantes.$.similitud_matricula": None,
+                "estudiantes.$.nombre_matricula": None
+            }}
+        )
+        return {
+            "success": True,
+            "estado": "no_encontrado",
+            "mensaje": "No se encontró coincidencia en la base de datos de matrículas"
+        }
 
 @api_router.put("/estudiantes/{estudiante_id}")
 async def update_estudiante(estudiante_id: str, estudiante: EstudianteCreate, current_user: dict = Depends(get_current_user)):
+    # First update the basic data
     update_data = {
         "estudiantes.$.nombre": estudiante.nombre,
         "estudiantes.$.apellido": estudiante.apellido,
@@ -767,16 +829,47 @@ async def update_estudiante(estudiante_id: str, estudiante: EstudianteCreate, cu
         "estudiantes.$.notas": estudiante.notas
     }
     
-    # Handle document update if provided
-    if estudiante.documento_matricula:
-        update_data["estudiantes.$.documento_matricula_url"] = estudiante.documento_matricula
-    
     result = await db.clientes.update_one(
         {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
         {"$set": update_data}
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
+    
+    # Re-verify enrollment after update
+    estudiantes_sync = await db.estudiantes_sincronizados.find(
+        {"estado": "activo"},
+        {"_id": 0}
+    ).to_list(2000)
+    
+    coincidencia = buscar_estudiante_en_matriculas(
+        estudiante.nombre,
+        estudiante.apellido,
+        estudiante.grado,
+        estudiantes_sync
+    )
+    
+    if coincidencia:
+        await db.clientes.update_one(
+            {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
+            {"$set": {
+                "estudiantes.$.estado_matricula": "encontrado",
+                "estudiantes.$.matricula_sync_id": coincidencia["sync_id"],
+                "estudiantes.$.similitud_matricula": coincidencia["similitud"],
+                "estudiantes.$.nombre_matricula": coincidencia["nombre_encontrado"]
+            }}
+        )
+    else:
+        await db.clientes.update_one(
+            {"cliente_id": current_user["cliente_id"], "estudiantes.estudiante_id": estudiante_id},
+            {"$set": {
+                "estudiantes.$.estado_matricula": "no_encontrado",
+                "estudiantes.$.matricula_sync_id": None,
+                "estudiantes.$.similitud_matricula": None,
+                "estudiantes.$.nombre_matricula": None
+            }}
+        )
+    
     return {"success": True}
 
 @api_router.delete("/estudiantes/{estudiante_id}")
