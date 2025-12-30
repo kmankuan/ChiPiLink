@@ -80,7 +80,17 @@ function AppRouter() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/catalogo" element={<><Header /><Catalog /></>} />
+      
+      {/* Catalog - Admin only */}
+      <Route 
+        path="/catalogo" 
+        element={
+          <ProtectedRoute adminOnly>
+            <Header />
+            <Catalog />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Embed Route - No header */}
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
