@@ -889,7 +889,7 @@ async def get_libros_disponibles(estudiante_id: str, current_user: dict = Depend
     if not estudiante:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
-    if estudiante.get("estado_matricula") != "confirmada":
+    if estudiante.get("estado_matricula") != "encontrado":
         raise HTTPException(status_code=403, detail="La matrícula debe estar confirmada para ver libros")
     
     grado = estudiante["grado"]
@@ -1026,7 +1026,7 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
     # Verify enrollment is confirmed
-    if estudiante.get("estado_matricula") != "confirmada":
+    if estudiante.get("estado_matricula") != "encontrado":
         raise HTTPException(status_code=403, detail="La matrícula del estudiante debe estar confirmada para realizar compras")
     
     # Check for already purchased books
