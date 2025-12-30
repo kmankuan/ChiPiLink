@@ -48,6 +48,7 @@ import {
   Download,
   AlertCircle,
   Settings,
+  Sheet,
   Eye,
   Copy,
   ExternalLink,
