@@ -236,14 +236,17 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border/50">
             <div className="flex flex-col gap-2">
-              <Link 
-                to="/catalogo"
-                className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-                data-testid="mobile-catalog-link"
-              >
-                {t('nav.catalog')}
-              </Link>
+              {/* Catalog only for admins */}
+              {isAdmin && (
+                <Link 
+                  to="/catalogo"
+                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                  data-testid="mobile-catalog-link"
+                >
+                  {t('nav.catalog')}
+                </Link>
+              )}
               
               {isAuthenticated && (
                 <>
