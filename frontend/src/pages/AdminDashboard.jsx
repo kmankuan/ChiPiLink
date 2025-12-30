@@ -733,6 +733,10 @@ export default function AdminDashboard() {
             <GraduationCap className="h-4 w-4" />
             Matrículas
           </TabsTrigger>
+          <TabsTrigger value="sheets" className="gap-2">
+            <Sheet className="h-4 w-4" />
+            Google Sheets
+          </TabsTrigger>
           <TabsTrigger value="form-config" className="gap-2">
             <Settings className="h-4 w-4" />
             Formulario
