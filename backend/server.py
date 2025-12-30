@@ -1027,7 +1027,7 @@ async def create_pedido(pedido: PedidoCreate, current_user: dict = Depends(get_c
     
     # Verify enrollment is confirmed
     if estudiante.get("estado_matricula") != "encontrado":
-        raise HTTPException(status_code=403, detail="La matrícula del estudiante debe estar confirmada para realizar compras")
+        raise HTTPException(status_code=403, detail="El estudiante debe estar en la lista de matrículas para realizar compras")
     
     # Check for already purchased books
     libros_comprados = estudiante.get("libros_comprados", [])
