@@ -215,6 +215,57 @@ class ConfiguracionFormulario(BaseModel):
     color_primario: str = "#166534"
     logo_url: Optional[str] = None
 
+# ============== GOOGLE SHEETS SYNC MODELS ==============
+
+class ColumnaSheet(BaseModel):
+    """Represents a column from Google Sheet"""
+    columna_id: str = Field(default_factory=lambda: f"col_{uuid.uuid4().hex[:8]}")
+    nombre_original: str  # Original column name from sheet
+    nombre_display: str  # Display name in our system
+    indice: int  # Column index (0-based)
+    tipo_dato: str = "texto"  # texto, numero, fecha, email, etc.
+    fijada: bool = False  # If true, won't auto-update from sheet changes
+    mapeo_campo: Optional[str] = None  # Maps to student field (nombre, apellido, grado, etc.)
+    activa: bool = True
+
+class CambioRegistro(BaseModel):
+    """Records a change detected in the sheet"""
+    cambio_id: str = Field(default_factory=lambda: f"chg_{uuid.uuid4().hex[:8]}")
+    tipo: str  # "nuevo", "modificado", "eliminado", "columna_nueva", "columna_eliminada"
+    fila_id: Optional[str] = None
+    datos_anteriores: Optional[dict] = None
+    datos_nuevos: Optional[dict] = None
+    columna_afectada: Optional[str] = None
+    fecha_deteccion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    aplicado: bool = False
+    fecha_aplicado: Optional[datetime] = None
+
+class ConfiguracionSheetSync(BaseModel):
+    """Configuration for Google Sheet synchronization"""
+    config_id: str = Field(default_factory=lambda: f"cfg_{uuid.uuid4().hex[:8]}")
+    nombre: str  # Friendly name for this sync config
+    spreadsheet_id: str  # Google Sheet ID
+    spreadsheet_url: Optional[str] = None
+    hoja_nombre: Optional[str] = None  # Specific sheet tab name (default: first sheet)
+    columnas: List[ColumnaSheet] = []
+    ultima_sincronizacion: Optional[datetime] = None
+    activo: bool = True
+    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EstudianteSincronizado(BaseModel):
+    """Student record synced from Google Sheet"""
+    sync_id: str = Field(default_factory=lambda: f"sync_{uuid.uuid4().hex[:8]}")
+    config_id: str  # Reference to sync config
+    fila_sheet: int  # Row number in sheet (for tracking)
+    datos: dict  # All data from the sheet row
+    hash_datos: str  # Hash of data for change detection
+    estudiante_id: Optional[str] = None  # Link to actual student if created
+    cliente_id: Optional[str] = None  # Link to parent/guardian
+    estado: str = "activo"  # activo, eliminado_pendiente
+    version: int = 1
+    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    fecha_actualizacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
