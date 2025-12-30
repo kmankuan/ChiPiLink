@@ -48,9 +48,6 @@ import {
   GraduationCap,
   Loader2,
   ArrowRight,
-  Upload,
-  FileImage,
-  Clock,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -58,15 +55,40 @@ import {
   CreditCard,
   Building2,
   History,
-  Eye
+  Eye,
+  RefreshCw,
+  Search
 } from 'lucide-react';
 
-// Status badge component
-const StatusBadge = ({ status }) => {
+// Status badge component - Updated for auto-verification system
+const StatusBadge = ({ status, similitud }) => {
   const config = {
-    pendiente: { label: 'Pendiente', variant: 'outline', icon: Clock, className: 'border-amber-500 text-amber-600 bg-amber-50' },
-    confirmada: { label: 'Confirmada', variant: 'outline', icon: CheckCircle, className: 'border-green-500 text-green-600 bg-green-50' },
-    rechazada: { label: 'Rechazada', variant: 'outline', icon: XCircle, className: 'border-red-500 text-red-600 bg-red-50' }
+    encontrado: { 
+      label: 'Encontrado', 
+      icon: CheckCircle, 
+      className: 'border-green-500 text-green-600 bg-green-50 dark:bg-green-900/30' 
+    },
+    no_encontrado: { 
+      label: 'No Encontrado', 
+      icon: XCircle, 
+      className: 'border-red-500 text-red-600 bg-red-50 dark:bg-red-900/30' 
+    },
+    // Legacy support
+    pendiente: { 
+      label: 'Pendiente', 
+      icon: AlertCircle, 
+      className: 'border-amber-500 text-amber-600 bg-amber-50' 
+    },
+    confirmada: { 
+      label: 'Encontrado', 
+      icon: CheckCircle, 
+      className: 'border-green-500 text-green-600 bg-green-50' 
+    },
+    rechazada: { 
+      label: 'No Encontrado', 
+      icon: XCircle, 
+      className: 'border-red-500 text-red-600 bg-red-50' 
+    }
   };
   
   const { label, icon: Icon, className } = config[status] || config.pendiente;
