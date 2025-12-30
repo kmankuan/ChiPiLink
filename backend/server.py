@@ -989,6 +989,449 @@ async def get_materias():
         ]
     }
 
+# ============== GOOGLE SHEETS SYNC ==============
+
+import hashlib
+import csv
+import io
+import re
+
+def extract_sheet_id(url_or_id: str) -> str:
+    """Extract Google Sheet ID from URL or return as-is if already an ID"""
+    # Pattern for Google Sheets URL
+    match = re.search(r'/spreadsheets/d/([a-zA-Z0-9-_]+)', url_or_id)
+    if match:
+        return match.group(1)
+    # Assume it's already an ID
+    return url_or_id
+
+def hash_row_data(data: dict) -> str:
+    """Create a hash of row data for change detection"""
+    sorted_str = str(sorted(data.items()))
+    return hashlib.md5(sorted_str.encode()).hexdigest()
+
+async def fetch_public_sheet(spreadsheet_id: str, sheet_name: Optional[str] = None) -> tuple:
+    """
+    Fetch data from a public Google Sheet using CSV export.
+    Returns (headers, rows) tuple.
+    """
+    # Build export URL
+    gid = 0  # Default to first sheet
+    export_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid={gid}"
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(export_url, follow_redirects=True, timeout=30.0)
+        
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"No se pudo acceder a la hoja. Asegúrese de que esté compartida públicamente. Status: {response.status_code}"
+            )
+        
+        content = response.text
+        
+        # Parse CSV
+        reader = csv.reader(io.StringIO(content))
+        rows = list(reader)
+        
+        if not rows:
+            return [], []
+        
+        headers = rows[0]
+        data_rows = rows[1:]
+        
+        return headers, data_rows
+
+@api_router.post("/admin/sheets/conectar")
+async def conectar_sheet(
+    url_o_id: str,
+    nombre: str = "Estudiantes",
+    admin: dict = Depends(get_admin_user)
+):
+    """Connect to a public Google Sheet and detect columns"""
+    spreadsheet_id = extract_sheet_id(url_o_id)
+    
+    # Check if already connected
+    existing = await db.sheet_configs.find_one({"spreadsheet_id": spreadsheet_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Esta hoja ya está conectada")
+    
+    # Fetch sheet data
+    try:
+        headers, rows = await fetch_public_sheet(spreadsheet_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al acceder a la hoja: {str(e)}")
+    
+    if not headers:
+        raise HTTPException(status_code=400, detail="La hoja no tiene columnas")
+    
+    # Create column configurations
+    columnas = []
+    for idx, header in enumerate(headers):
+        # Try to auto-detect field mapping
+        mapeo = None
+        header_lower = header.lower().strip()
+        if "nombre" in header_lower and "apellido" not in header_lower:
+            mapeo = "nombre"
+        elif "apellido" in header_lower:
+            mapeo = "apellido"
+        elif "grado" in header_lower:
+            mapeo = "grado"
+        elif "email" in header_lower or "correo" in header_lower:
+            mapeo = "email_acudiente"
+        elif "teléfono" in header_lower or "telefono" in header_lower or "celular" in header_lower:
+            mapeo = "telefono_acudiente"
+        elif "cédula" in header_lower or "cedula" in header_lower:
+            mapeo = "cedula"
+        elif "escuela" in header_lower or "colegio" in header_lower:
+            mapeo = "escuela"
+        elif "acudiente" in header_lower or "padre" in header_lower or "madre" in header_lower or "tutor" in header_lower:
+            mapeo = "nombre_acudiente"
+        
+        columnas.append(ColumnaSheet(
+            nombre_original=header,
+            nombre_display=header,
+            indice=idx,
+            mapeo_campo=mapeo
+        ).model_dump())
+    
+    # Create config
+    config = ConfiguracionSheetSync(
+        nombre=nombre,
+        spreadsheet_id=spreadsheet_id,
+        spreadsheet_url=f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}",
+        columnas=columnas
+    )
+    
+    config_dict = config.model_dump()
+    config_dict["fecha_creacion"] = config_dict["fecha_creacion"].isoformat()
+    
+    await db.sheet_configs.insert_one(config_dict)
+    
+    # Import initial data
+    estudiantes_importados = 0
+    for row_idx, row in enumerate(rows):
+        if not any(row):  # Skip empty rows
+            continue
+            
+        datos = {}
+        for col_idx, valor in enumerate(row):
+            if col_idx < len(headers):
+                datos[headers[col_idx]] = valor
+        
+        sync_record = EstudianteSincronizado(
+            config_id=config.config_id,
+            fila_sheet=row_idx + 2,  # +2 because row 1 is header, and 0-indexed
+            datos=datos,
+            hash_datos=hash_row_data(datos)
+        )
+        
+        sync_dict = sync_record.model_dump()
+        sync_dict["fecha_creacion"] = sync_dict["fecha_creacion"].isoformat()
+        sync_dict["fecha_actualizacion"] = sync_dict["fecha_actualizacion"].isoformat()
+        
+        await db.estudiantes_sincronizados.insert_one(sync_dict)
+        estudiantes_importados += 1
+    
+    return {
+        "success": True,
+        "config_id": config.config_id,
+        "columnas_detectadas": len(columnas),
+        "estudiantes_importados": estudiantes_importados,
+        "spreadsheet_id": spreadsheet_id
+    }
+
+@api_router.get("/admin/sheets/configs")
+async def get_sheet_configs(admin: dict = Depends(get_admin_user)):
+    """Get all sheet sync configurations"""
+    configs = await db.sheet_configs.find({"activo": True}, {"_id": 0}).to_list(100)
+    return configs
+
+@api_router.get("/admin/sheets/{config_id}")
+async def get_sheet_config(config_id: str, admin: dict = Depends(get_admin_user)):
+    """Get a specific sheet config with its data"""
+    config = await db.sheet_configs.find_one({"config_id": config_id}, {"_id": 0})
+    if not config:
+        raise HTTPException(status_code=404, detail="Configuración no encontrada")
+    
+    estudiantes = await db.estudiantes_sincronizados.find(
+        {"config_id": config_id, "estado": "activo"},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    return {
+        "config": config,
+        "estudiantes": estudiantes,
+        "total": len(estudiantes)
+    }
+
+@api_router.post("/admin/sheets/{config_id}/sincronizar")
+async def sincronizar_sheet(config_id: str, admin: dict = Depends(get_admin_user)):
+    """
+    Synchronize with Google Sheet and detect changes.
+    - New rows: Auto-imported
+    - Modified rows: Marked as pending change
+    - Deleted rows: Marked as pending deletion
+    - Column changes: Detected and reported
+    """
+    config = await db.sheet_configs.find_one({"config_id": config_id})
+    if not config:
+        raise HTTPException(status_code=404, detail="Configuración no encontrada")
+    
+    # Fetch current data from sheet
+    try:
+        headers, rows = await fetch_public_sheet(config["spreadsheet_id"])
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al acceder a la hoja: {str(e)}")
+    
+    cambios = []
+    nuevos = 0
+    modificados = 0
+    eliminados = 0
+    
+    # Check for column changes
+    columnas_actuales = {c["nombre_original"]: c for c in config["columnas"]}
+    columnas_nuevas = set(headers) - set(columnas_actuales.keys())
+    columnas_eliminadas = set(columnas_actuales.keys()) - set(headers)
+    
+    # Record column changes
+    for col_name in columnas_nuevas:
+        cambio = CambioRegistro(
+            tipo="columna_nueva",
+            columna_afectada=col_name,
+            datos_nuevos={"nombre": col_name, "indice": headers.index(col_name)}
+        )
+        cambio_dict = cambio.model_dump()
+        cambio_dict["fecha_deteccion"] = cambio_dict["fecha_deteccion"].isoformat()
+        await db.cambios_sheet.insert_one({"config_id": config_id, **cambio_dict})
+        cambios.append({"tipo": "columna_nueva", "columna": col_name})
+    
+    for col_name in columnas_eliminadas:
+        if not columnas_actuales[col_name].get("fijada", False):
+            cambio = CambioRegistro(
+                tipo="columna_eliminada",
+                columna_afectada=col_name
+            )
+            cambio_dict = cambio.model_dump()
+            cambio_dict["fecha_deteccion"] = cambio_dict["fecha_deteccion"].isoformat()
+            await db.cambios_sheet.insert_one({"config_id": config_id, **cambio_dict})
+            cambios.append({"tipo": "columna_eliminada", "columna": col_name})
+    
+    # Get existing synced students
+    existentes = await db.estudiantes_sincronizados.find(
+        {"config_id": config_id, "estado": "activo"},
+        {"_id": 0}
+    ).to_list(2000)
+    existentes_por_fila = {e["fila_sheet"]: e for e in existentes}
+    filas_procesadas = set()
+    
+    # Process each row
+    for row_idx, row in enumerate(rows):
+        fila_num = row_idx + 2  # +2 for header and 0-index
+        filas_procesadas.add(fila_num)
+        
+        if not any(row):  # Skip empty rows
+            continue
+        
+        datos = {}
+        for col_idx, valor in enumerate(row):
+            if col_idx < len(headers):
+                datos[headers[col_idx]] = valor
+        
+        nuevo_hash = hash_row_data(datos)
+        
+        if fila_num in existentes_por_fila:
+            # Existing row - check for modifications
+            existente = existentes_por_fila[fila_num]
+            if existente["hash_datos"] != nuevo_hash:
+                # Row was modified - create pending change
+                cambio = CambioRegistro(
+                    tipo="modificado",
+                    fila_id=existente["sync_id"],
+                    datos_anteriores=existente["datos"],
+                    datos_nuevos=datos
+                )
+                cambio_dict = cambio.model_dump()
+                cambio_dict["fecha_deteccion"] = cambio_dict["fecha_deteccion"].isoformat()
+                await db.cambios_sheet.insert_one({"config_id": config_id, **cambio_dict})
+                modificados += 1
+                cambios.append({"tipo": "modificado", "fila": fila_num, "sync_id": existente["sync_id"]})
+        else:
+            # New row - auto-import
+            sync_record = EstudianteSincronizado(
+                config_id=config_id,
+                fila_sheet=fila_num,
+                datos=datos,
+                hash_datos=nuevo_hash
+            )
+            sync_dict = sync_record.model_dump()
+            sync_dict["fecha_creacion"] = sync_dict["fecha_creacion"].isoformat()
+            sync_dict["fecha_actualizacion"] = sync_dict["fecha_actualizacion"].isoformat()
+            await db.estudiantes_sincronizados.insert_one(sync_dict)
+            nuevos += 1
+    
+    # Check for deleted rows
+    for fila_num, existente in existentes_por_fila.items():
+        if fila_num not in filas_procesadas:
+            # Row was deleted - create pending change
+            cambio = CambioRegistro(
+                tipo="eliminado",
+                fila_id=existente["sync_id"],
+                datos_anteriores=existente["datos"]
+            )
+            cambio_dict = cambio.model_dump()
+            cambio_dict["fecha_deteccion"] = cambio_dict["fecha_deteccion"].isoformat()
+            await db.cambios_sheet.insert_one({"config_id": config_id, **cambio_dict})
+            eliminados += 1
+            cambios.append({"tipo": "eliminado", "fila": fila_num, "sync_id": existente["sync_id"]})
+    
+    # Update last sync time
+    await db.sheet_configs.update_one(
+        {"config_id": config_id},
+        {"$set": {"ultima_sincronizacion": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "success": True,
+        "resumen": {
+            "nuevos_importados": nuevos,
+            "modificaciones_pendientes": modificados,
+            "eliminaciones_pendientes": eliminados,
+            "cambios_columnas": len(columnas_nuevas) + len(columnas_eliminadas)
+        },
+        "cambios": cambios
+    }
+
+@api_router.get("/admin/sheets/{config_id}/cambios-pendientes")
+async def get_cambios_pendientes(config_id: str, admin: dict = Depends(get_admin_user)):
+    """Get pending changes that need manual approval"""
+    cambios = await db.cambios_sheet.find(
+        {"config_id": config_id, "aplicado": False},
+        {"_id": 0}
+    ).to_list(500)
+    return cambios
+
+@api_router.post("/admin/sheets/{config_id}/aplicar-cambio/{cambio_id}")
+async def aplicar_cambio(
+    config_id: str,
+    cambio_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Apply a pending change"""
+    cambio = await db.cambios_sheet.find_one({"cambio_id": cambio_id, "config_id": config_id})
+    if not cambio:
+        raise HTTPException(status_code=404, detail="Cambio no encontrado")
+    
+    if cambio["aplicado"]:
+        raise HTTPException(status_code=400, detail="Este cambio ya fue aplicado")
+    
+    if cambio["tipo"] == "modificado":
+        # Apply modification
+        await db.estudiantes_sincronizados.update_one(
+            {"sync_id": cambio["fila_id"]},
+            {
+                "$set": {
+                    "datos": cambio["datos_nuevos"],
+                    "hash_datos": hash_row_data(cambio["datos_nuevos"]),
+                    "fecha_actualizacion": datetime.now(timezone.utc).isoformat(),
+                    "version": {"$inc": 1}
+                }
+            }
+        )
+    elif cambio["tipo"] == "eliminado":
+        # Mark as deleted
+        await db.estudiantes_sincronizados.update_one(
+            {"sync_id": cambio["fila_id"]},
+            {"$set": {"estado": "eliminado", "fecha_actualizacion": datetime.now(timezone.utc).isoformat()}}
+        )
+    elif cambio["tipo"] == "columna_nueva":
+        # Add new column to config
+        config = await db.sheet_configs.find_one({"config_id": config_id})
+        nueva_columna = ColumnaSheet(
+            nombre_original=cambio["columna_afectada"],
+            nombre_display=cambio["columna_afectada"],
+            indice=cambio["datos_nuevos"]["indice"]
+        ).model_dump()
+        await db.sheet_configs.update_one(
+            {"config_id": config_id},
+            {"$push": {"columnas": nueva_columna}}
+        )
+    elif cambio["tipo"] == "columna_eliminada":
+        # Remove column from config
+        await db.sheet_configs.update_one(
+            {"config_id": config_id},
+            {"$pull": {"columnas": {"nombre_original": cambio["columna_afectada"]}}}
+        )
+    
+    # Mark change as applied
+    await db.cambios_sheet.update_one(
+        {"cambio_id": cambio_id},
+        {"$set": {"aplicado": True, "fecha_aplicado": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True, "mensaje": f"Cambio '{cambio['tipo']}' aplicado correctamente"}
+
+@api_router.post("/admin/sheets/{config_id}/ignorar-cambio/{cambio_id}")
+async def ignorar_cambio(config_id: str, cambio_id: str, admin: dict = Depends(get_admin_user)):
+    """Ignore/dismiss a pending change"""
+    result = await db.cambios_sheet.delete_one({"cambio_id": cambio_id, "config_id": config_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Cambio no encontrado")
+    return {"success": True, "mensaje": "Cambio ignorado"}
+
+@api_router.put("/admin/sheets/{config_id}/columnas/{columna_id}/fijar")
+async def toggle_fijar_columna(
+    config_id: str,
+    columna_id: str,
+    fijada: bool,
+    admin: dict = Depends(get_admin_user)
+):
+    """Toggle column lock status"""
+    result = await db.sheet_configs.update_one(
+        {"config_id": config_id, "columnas.columna_id": columna_id},
+        {"$set": {"columnas.$.fijada": fijada}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Columna no encontrada")
+    return {"success": True, "fijada": fijada}
+
+@api_router.put("/admin/sheets/{config_id}/columnas/{columna_id}/mapeo")
+async def actualizar_mapeo_columna(
+    config_id: str,
+    columna_id: str,
+    mapeo_campo: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update column field mapping"""
+    result = await db.sheet_configs.update_one(
+        {"config_id": config_id, "columnas.columna_id": columna_id},
+        {"$set": {"columnas.$.mapeo_campo": mapeo_campo}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Columna no encontrada")
+    return {"success": True}
+
+@api_router.get("/admin/sheets/{config_id}/historial")
+async def get_historial_cambios(
+    config_id: str,
+    limite: int = 50,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get change history"""
+    cambios = await db.cambios_sheet.find(
+        {"config_id": config_id, "aplicado": True},
+        {"_id": 0}
+    ).sort("fecha_aplicado", -1).limit(limite).to_list(limite)
+    return cambios
+
+@api_router.delete("/admin/sheets/{config_id}")
+async def eliminar_config_sheet(config_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a sheet sync configuration"""
+    await db.sheet_configs.delete_one({"config_id": config_id})
+    await db.estudiantes_sincronizados.delete_many({"config_id": config_id})
+    await db.cambios_sheet.delete_many({"config_id": config_id})
+    return {"success": True, "mensaje": "Configuración eliminada"}
+
 # ============== ADMIN SETUP ==============
 
 @api_router.post("/admin/setup")
