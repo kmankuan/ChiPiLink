@@ -2111,6 +2111,11 @@ export default function AdminDashboard() {
             </div>
           </div>
         </TabsContent>
+
+        {/* Landing Page Editor Tab */}
+        <TabsContent value="landing-editor">
+          <LandingPageEditor />
+        </TabsContent>
       </Tabs>
     </div>
   );
