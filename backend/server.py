@@ -378,6 +378,10 @@ BLOCK_TEMPLATES = {
     }
 }
 
+class BlockOrderItem(BaseModel):
+    bloque_id: str
+    orden: int
+
 class ItemPedido(BaseModel):
     libro_id: str
     nombre_libro: str
