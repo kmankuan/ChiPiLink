@@ -443,7 +443,7 @@ export default function Landing() {
 }
 
 // Block Wrapper Component - needs to be outside render
-function BlockWrapper({ children, isEditMode, onSave }) {
+function BlockWrapper({ children, isEditMode, onSave, onDelete }) {
   if (!isEditMode) return children;
   
   return (
@@ -453,13 +453,16 @@ function BlockWrapper({ children, isEditMode, onSave }) {
         <Button size="sm" variant="secondary" className="shadow-lg" onClick={onSave}>
           <Save className="h-4 w-4" />
         </Button>
+        <Button size="sm" variant="destructive" className="shadow-lg" onClick={onDelete}>
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
 }
 
 // Block Renderer Component
-function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
+function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) {
   const navigate = useNavigate();
   const { isEditMode } = useEditMode();
   const config = block.config || {};
