@@ -391,6 +391,22 @@ export default function Landing() {
   );
 }
 
+// Block Wrapper Component - needs to be outside render
+function BlockWrapper({ children, isEditMode, onSave }) {
+  if (!isEditMode) return children;
+  
+  return (
+    <div className="relative group">
+      {children}
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 z-20">
+        <Button size="sm" variant="secondary" className="shadow-lg" onClick={onSave}>
+          <Save className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // Block Renderer Component
 function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
   const navigate = useNavigate();
@@ -417,26 +433,10 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
     onUpdateConfig({ items });
   };
 
-  // Edit Mode Wrapper for blocks
-  const BlockWrapper = ({ children }) => {
-    if (!isEditMode) return children;
-    
-    return (
-      <div className="relative group">
-        {children}
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-          <Button size="sm" variant="secondary" className="shadow-lg" onClick={onSave}>
-            <Save className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
   switch (block.tipo) {
     case 'hero':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section 
             className="relative overflow-hidden"
             style={{ minHeight: config.altura || '500px' }}
