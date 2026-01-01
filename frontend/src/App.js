@@ -9,6 +9,7 @@ import '@/i18n';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { SiteConfigProvider } from '@/contexts/SiteConfigContext';
+import { InlineTranslationProvider } from '@/contexts/InlineTranslationContext';
 
 // Layout
 import { Header } from '@/components/layout/Header';
