@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ import { Book, Mail, Lock, User, Phone, MapPin, Loader2 } from 'lucide-react';
 export default function Register() {
   const { t } = useTranslation();
   const { register, loginWithGoogle } = useAuth();
+  const { siteConfig } = useSiteConfig();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
