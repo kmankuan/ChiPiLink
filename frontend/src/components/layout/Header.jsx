@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useSiteConfig } from '@/contexts/SiteConfigContext';
+import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +27,8 @@ import {
   ShoppingCart,
   Users,
   LayoutDashboard,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Store
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
@@ -35,8 +38,12 @@ export function Header() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { siteConfig } = useSiteConfig();
+  const { itemCount, openCart } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isUnatiendaPage = location.pathname.startsWith('/unatienda');
 
   const handleLogout = async () => {
     await logout();
@@ -63,6 +70,20 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
+            {/* Unatienda - Public store link */}
+            <Link 
+              to="/unatienda" 
+              className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                isUnatiendaPage 
+                  ? 'text-primary' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              data-testid="unatienda-nav-link"
+            >
+              <Store className="h-4 w-4" />
+              Tienda
+            </Link>
+
             {/* Catalog only visible for admins */}
             {isAdmin && (
               <Link 
@@ -106,6 +127,26 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
+            {/* Cart Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={openCart}
+              className="h-9 w-9 rounded-full relative"
+              data-testid="cart-button"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {itemCount > 0 && (
+                <Badge 
+                  variant="default" 
+                  className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                >
+                  {itemCount > 9 ? '9+' : itemCount}
+                </Badge>
+              )}
+              <span className="sr-only">Carrito</span>
+            </Button>
+
             {/* Inline Edit Toggle (Admin only) */}
             <InlineEditToggle />
 
@@ -223,6 +264,19 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border/50">
             <div className="flex flex-col gap-2">
+              {/* Unatienda */}
+              <Link 
+                to="/unatienda"
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                  isUnatiendaPage ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+                data-testid="mobile-unatienda-link"
+              >
+                <Store className="h-4 w-4" />
+                Tienda
+              </Link>
+
               {/* Catalog only for admins */}
               {isAdmin && (
                 <Link 
