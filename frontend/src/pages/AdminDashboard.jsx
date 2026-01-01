@@ -2120,7 +2120,241 @@ export default function AdminDashboard() {
         <TabsContent value="landing-editor">
           <LandingPageEditor />
         </TabsContent>
+
+        {/* Monday.com Integration Tab */}
+        <TabsContent value="monday">
+          <MondayIntegration />
+        </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// Monday.com Integration Component
+function MondayIntegration() {
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [testing, setTesting] = useState(false);
+
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
+  const fetchStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${BACKEND_URL}/api/admin/monday/status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStatus(response.data);
+    } catch (error) {
+      toast.error('Error cargando estado de Monday.com');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testIntegration = async () => {
+    if (!status?.board_id_configured) {
+      toast.error('Configure el MONDAY_BOARD_ID en las variables de entorno primero');
+      return;
+    }
+
+    try {
+      setTesting(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${BACKEND_URL}/api/admin/monday/test`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error probando integración');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-serif font-bold">Integración Monday.com</h2>
+        <p className="text-muted-foreground">
+          Los pedidos se envían automáticamente a tu tablero de Monday.com
+        </p>
+      </div>
+
+      {/* Status Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              API Key
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              {status?.api_key_configured ? (
+                <>
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-green-600">Configurada</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-red-600">No configurada</span>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Board ID
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              {status?.board_id_configured ? (
+                <>
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-green-600">Configurado</span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-5 w-5 text-yellow-500" />
+                  <span className="font-medium text-yellow-600">Pendiente</span>
+                </>
+              )}
+            </div>
+            {status?.board_id && (
+              <p className="text-xs text-muted-foreground mt-1 font-mono">
+                {status.board_id}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Conexión
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              {status?.connected ? (
+                <>
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-green-600">Conectado</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-red-600">Desconectado</span>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Board Selection */}
+      {status?.connected && status?.boards?.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Tableros Disponibles</CardTitle>
+            <CardDescription>
+              {status?.board_id_configured 
+                ? `Board ID actual: ${status.board_id}`
+                : 'Selecciona un tablero y configura el MONDAY_BOARD_ID en las variables de entorno'
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+              {status.boards.map((board) => (
+                <div 
+                  key={board.id}
+                  className={`p-3 border rounded-lg ${
+                    status.board_id === board.id 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-primary/50'
+                  } cursor-pointer transition-colors`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(board.id);
+                    toast.success(`Board ID copiado: ${board.id}`);
+                  }}
+                >
+                  <p className="font-medium text-sm truncate">{board.name}</p>
+                  <p className="text-xs text-muted-foreground font-mono mt-1">
+                    ID: {board.id}
+                  </p>
+                  {status.board_id === board.id && (
+                    <Badge variant="default" className="mt-2">Seleccionado</Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">
+              💡 Haz clic en un tablero para copiar su ID. Luego configura la variable de entorno MONDAY_BOARD_ID con ese valor.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Test Button */}
+      <div className="flex gap-4">
+        <Button 
+          onClick={testIntegration}
+          disabled={testing || !status?.board_id_configured}
+          className="gap-2"
+        >
+          {testing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+          Probar Integración
+        </Button>
+        <Button variant="outline" onClick={fetchStatus} className="gap-2">
+          <RefreshCw className="h-4 w-4" />
+          Actualizar Estado
+        </Button>
+      </div>
+
+      {/* Instructions */}
+      {!status?.board_id_configured && (
+        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+          <CardHeader>
+            <CardTitle className="text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Configuración Pendiente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-yellow-700 dark:text-yellow-300">
+            <p className="mb-3">
+              Para completar la integración, configura la variable de entorno <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">MONDAY_BOARD_ID</code> con el ID del tablero donde deseas recibir los pedidos.
+            </p>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Haz clic en un tablero de la lista arriba para copiar su ID</li>
+              <li>Agrega <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">MONDAY_BOARD_ID=ID_COPIADO</code> a las variables de entorno</li>
+              <li>Reinicia el servidor backend</li>
+              <li>Haz clic en "Probar Integración" para verificar</li>
+            </ol>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
