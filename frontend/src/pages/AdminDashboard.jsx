@@ -641,7 +641,7 @@ export default function AdminDashboard() {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     const date = new Date().toISOString().split('T')[0];
-    link.download = `productos_libreria_${date}.csv`;
+    link.download = `productos_export_${date}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
     
