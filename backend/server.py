@@ -53,15 +53,17 @@ logger = logging.getLogger(__name__)
 class LibroBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    grado: str  # Grade level (primary grade)
+    categoria: Optional[str] = "libros"  # Category (libros, snacks, bebidas, preparados, uniformes, servicios)
+    grado: Optional[str] = None  # Grade level (only for books)
     grados: Optional[List[str]] = None  # Additional grades that use this book
-    materia: str  # Subject
+    materia: Optional[str] = None  # Subject (only for books)
     precio: float
     cantidad_inventario: int = 0
     isbn: Optional[str] = None
     editorial: Optional[str] = None  # Publisher
     imagen_url: Optional[str] = None
     activo: bool = True
+    requiere_preparacion: bool = False  # For prepared items (hotdogs, coffee, etc.)
 
 class LibroCreate(LibroBase):
     pass
