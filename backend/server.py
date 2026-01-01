@@ -2091,10 +2091,12 @@ async def update_monday_config(config: dict, admin: dict = Depends(get_admin_use
 @api_router.post("/admin/monday/test")
 async def test_monday_integration(admin: dict = Depends(get_admin_user)):
     """Test Monday.com integration by creating a test item"""
-    if not MONDAY_API_KEY or not MONDAY_BOARD_ID:
+    board_id = await get_monday_board_id()
+    
+    if not MONDAY_API_KEY or not board_id:
         raise HTTPException(
             status_code=400, 
-            detail="Monday.com no está configurado. Configure MONDAY_API_KEY y MONDAY_BOARD_ID en las variables de entorno."
+            detail="Monday.com no está configurado. Configura el Board ID desde el panel de administración."
         )
     
     try:
@@ -2112,7 +2114,7 @@ async def test_monday_integration(admin: dict = Depends(get_admin_user)):
         mutation = f'''
         mutation {{
             create_item (
-                board_id: {MONDAY_BOARD_ID},
+                board_id: {board_id},
                 item_name: "{test_item_name}",
                 column_values: {json.dumps(column_values)}
             ) {{
