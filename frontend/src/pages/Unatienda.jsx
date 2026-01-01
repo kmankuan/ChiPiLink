@@ -18,14 +18,23 @@ import {
   Search,
   ShoppingCart,
   Loader2,
-  AlertCircle,
   Store,
-  Filter,
   Plus,
-  Check
+  Check,
+  Clock
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// Default category icons mapping
+const categoryIcons = {
+  'libros': '📚',
+  'snacks': '🍫',
+  'bebidas': '🥤',
+  'preparados': '🌭',
+  'uniformes': '👕',
+  'servicios': '🔧'
+};
 
 export default function Unatienda() {
   const { t } = useTranslation();
@@ -33,12 +42,13 @@ export default function Unatienda() {
   
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
+  const [categorias, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategoria, setSelectedCategoria] = useState('all');
   const [selectedGrado, setSelectedGrado] = useState('all');
-  const [selectedMateria, setSelectedMateria] = useState('all');
   const [addedItems, setAddedItems] = useState({});
 
   useEffect(() => {
@@ -47,15 +57,17 @@ export default function Unatienda() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, storeRes, gradosRes, materiasRes] = await Promise.all([
+      const [productsRes, storeRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
         axios.get(`${API_URL}/api/platform-store/products`),
         axios.get(`${API_URL}/api/platform-store`),
+        axios.get(`${API_URL}/api/categorias`),
         axios.get(`${API_URL}/api/grados`),
         axios.get(`${API_URL}/api/materias`)
       ]);
       
       setProducts(productsRes.data.products || []);
       setStoreInfo(storeRes.data);
+      setCategorias(categoriasRes.data || []);
       setGrados(gradosRes.data.grados || []);
       setMaterias(materiasRes.data.materias || []);
     } catch (error) {
@@ -70,10 +82,11 @@ export default function Unatienda() {
     const matchesSearch = 
       product.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGrado = selectedGrado === 'all' || product.grado === selectedGrado;
-    const matchesMateria = selectedMateria === 'all' || product.materia === selectedMateria;
+    const matchesCategoria = selectedCategoria === 'all' || product.categoria === selectedCategoria;
+    const matchesGrado = selectedGrado === 'all' || 
+      (selectedCategoria === 'libros' && (product.grado === selectedGrado || product.grados?.includes(selectedGrado)));
     
-    return matchesSearch && matchesGrado && matchesMateria;
+    return matchesSearch && matchesCategoria && (selectedCategoria !== 'libros' || matchesGrado);
   });
 
   const handleAddToCart = (product) => {
@@ -82,7 +95,6 @@ export default function Unatienda() {
       return;
     }
     addItem(product, 1);
-    // Show visual feedback
     setAddedItems(prev => ({ ...prev, [product.libro_id]: true }));
     setTimeout(() => {
       setAddedItems(prev => ({ ...prev, [product.libro_id]: false }));
@@ -99,6 +111,11 @@ export default function Unatienda() {
     if (cantidad <= 0) return { label: 'Agotado', color: 'destructive', canBuy: false };
     if (cantidad < 10) return { label: `Solo ${cantidad}`, color: 'warning', canBuy: true };
     return { label: 'Disponible', color: 'success', canBuy: true };
+  };
+
+  const getCategoryInfo = (categoriaId) => {
+    const cat = categorias.find(c => c.categoria_id === categoriaId);
+    return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
   };
 
   if (loading) {
@@ -123,7 +140,7 @@ export default function Unatienda() {
                 {storeInfo?.nombre || 'Unatienda'}
               </h1>
               <p className="text-muted-foreground">
-                {storeInfo?.descripcion || 'Tu tienda de libros de texto'}
+                {storeInfo?.descripcion || 'Tu tienda de confianza'}
               </p>
             </div>
           </div>
@@ -144,36 +161,66 @@ export default function Unatienda() {
             />
           </div>
           
-          <div className="flex gap-3">
-            <Select value={selectedGrado} onValueChange={setSelectedGrado}>
-              <SelectTrigger className="w-[160px] h-11">
-                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                <SelectValue placeholder="Grado" />
+          <div className="flex gap-3 flex-wrap">
+            {/* Category Filter */}
+            <Select value={selectedCategoria} onValueChange={(v) => { setSelectedCategoria(v); setSelectedGrado('all'); }}>
+              <SelectTrigger className="w-[180px] h-11">
+                <SelectValue placeholder="Categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los grados</SelectItem>
-                {grados.map((grado) => (
-                  <SelectItem key={grado.id} value={grado.id}>
-                    {grado.nombre}
+                <SelectItem value="all">Todas las categorías</SelectItem>
+                {categorias.map((cat) => (
+                  <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                    <span className="flex items-center gap-2">
+                      <span>{cat.icono}</span>
+                      {cat.nombre}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             
-            <Select value={selectedMateria} onValueChange={setSelectedMateria}>
-              <SelectTrigger className="w-[160px] h-11">
-                <SelectValue placeholder="Materia" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las materias</SelectItem>
-                {materias.map((materia) => (
-                  <SelectItem key={materia.id} value={materia.id}>
-                    {materia.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Grade Filter - Only show for Books */}
+            {selectedCategoria === 'libros' && (
+              <Select value={selectedGrado} onValueChange={setSelectedGrado}>
+                <SelectTrigger className="w-[160px] h-11">
+                  <SelectValue placeholder="Grado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los grados</SelectItem>
+                  {grados.map((grado) => (
+                    <SelectItem key={grado.id} value={grado.id}>
+                      {grado.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex gap-2 flex-wrap mb-6">
+          <Button
+            variant={selectedCategoria === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => { setSelectedCategoria('all'); setSelectedGrado('all'); }}
+            className="rounded-full"
+          >
+            Todos
+          </Button>
+          {categorias.map((cat) => (
+            <Button
+              key={cat.categoria_id}
+              variant={selectedCategoria === cat.categoria_id ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setSelectedCategoria(cat.categoria_id); setSelectedGrado('all'); }}
+              className="rounded-full"
+            >
+              <span className="mr-1.5">{cat.icono}</span>
+              {cat.nombre}
+            </Button>
+          ))}
         </div>
 
         {/* Results Count */}
@@ -184,7 +231,7 @@ export default function Unatienda() {
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
-            <Book className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <Store className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">No se encontraron productos</p>
           </div>
         ) : (
@@ -194,6 +241,7 @@ export default function Unatienda() {
               const inCart = isInCart(product.libro_id);
               const cartQty = getCartQuantity(product.libro_id);
               const justAdded = addedItems[product.libro_id];
+              const catInfo = getCategoryInfo(product.categoria);
               
               return (
                 <div
@@ -209,7 +257,7 @@ export default function Unatienda() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <Book className="h-16 w-16 text-muted-foreground/30" />
+                      <span className="text-5xl">{catInfo.icono}</span>
                     )}
                     
                     {/* Quick Add Button (overlay) */}
@@ -250,19 +298,28 @@ export default function Unatienda() {
                       </Badge>
                     </div>
                   )}
+
+                  {/* Requires Preparation Badge */}
+                  {product.requiere_preparacion && (
+                    <div className="absolute top-12 right-3">
+                      <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Preparación
+                      </Badge>
+                    </div>
+                  )}
                   
                   {/* Content */}
                   <div className="p-5">
-                    {/* Category Badges */}
+                    {/* Category & Grade Badges */}
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {product.grado && (
-                        <Badge variant="outline" className="text-xs">
-                          {grados.find(g => g.id === product.grado)?.nombre || product.grado}
-                        </Badge>
-                      )}
-                      {product.materia && (
+                      <Badge variant="outline" className="text-xs">
+                        <span className="mr-1">{catInfo.icono}</span>
+                        {catInfo.nombre}
+                      </Badge>
+                      {product.categoria === 'libros' && product.grado && (
                         <Badge variant="secondary" className="text-xs">
-                          {materias.find(m => m.id === product.materia)?.nombre || product.materia}
+                          {grados.find(g => g.id === product.grado)?.nombre || product.grado}
                         </Badge>
                       )}
                     </div>
