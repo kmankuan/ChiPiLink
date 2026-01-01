@@ -385,7 +385,7 @@ function BlockRenderer({ block, siteConfig }) {
               >
                 <Quote className="h-8 w-8 text-primary/30 mb-4" />
                 <p className="text-muted-foreground mb-6 italic">
-                  "{item.texto}"
+                  &ldquo;{item.texto}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
                   {item.avatar_url ? (
