@@ -1957,22 +1957,6 @@ async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
     
     return {"success": True}
 
-@api_router.put("/admin/landing-page/blocks/reorder")
-async def reorder_blocks(request: ReorderBlocksRequest, admin: dict = Depends(get_admin_user)):
-    """Reorder blocks - expects {orders: [{bloque_id, orden}]}"""
-    for item in request.orders:
-        await db.paginas.update_one(
-            {"pagina_id": "landing", "bloques.bloque_id": item.bloque_id},
-            {"$set": {"bloques.$.orden": item.orden}}
-        )
-    
-    await db.paginas.update_one(
-        {"pagina_id": "landing"},
-        {"$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}}
-    )
-    
-    return {"success": True}
-
 @api_router.put("/admin/landing-page/publish")
 async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admin_user)):
     """Toggle landing page published status"""
