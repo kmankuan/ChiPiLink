@@ -275,6 +275,10 @@ export default function StoreModule() {
             <Package className="h-4 w-4" />
             Productos
           </TabsTrigger>
+          <TabsTrigger value="categories" className="gap-2">
+            <Tags className="h-4 w-4" />
+            Categorías
+          </TabsTrigger>
           <TabsTrigger value="inventory" className="gap-2">
             <Box className="h-4 w-4" />
             Inventario
@@ -284,14 +288,31 @@ export default function StoreModule() {
         {/* Products Tab */}
         <TabsContent value="products" className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-2 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar productos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={filterCategoria} onValueChange={setFilterCategoria}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  {categorias.map(cat => (
+                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                      <span className="flex items-center gap-2">
+                        <span>{cat.icono}</span> {cat.nombre}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => openEditDialog()} className="gap-2">
@@ -306,30 +327,93 @@ export default function StoreModule() {
           </div>
 
           <div className="grid gap-4">
-            {filteredProducts.map((libro) => (
-              <Card key={libro.libro_id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{libro.nombre}</h3>
-                      <div className="flex gap-2 mt-1">
-                        <Badge variant="outline">{libro.grado}</Badge>
-                        <Badge variant="secondary">{libro.materia}</Badge>
+            {filteredProducts.map((libro) => {
+              const cat = categorias.find(c => c.categoria_id === libro.categoria);
+              return (
+                <Card key={libro.libro_id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">{libro.nombre}</h3>
+                          {libro.requiere_preparacion && (
+                            <Badge variant="outline" className="text-orange-600 border-orange-300">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Preparación
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-2 mt-1 flex-wrap">
+                          {cat && (
+                            <Badge variant="default" className="text-xs">
+                              {cat.icono} {cat.nombre}
+                            </Badge>
+                          )}
+                          {libro.categoria === 'libros' && libro.grado && (
+                            <Badge variant="outline">{libro.grado}</Badge>
+                          )}
+                          {libro.categoria === 'libros' && libro.materia && (
+                            <Badge variant="secondary">{libro.materia}</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg">${libro.precio?.toFixed(2)}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Stock: {libro.cantidad_inventario}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button size="icon" variant="ghost" onClick={() => openEditDialog(libro)}>
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(libro.libro_id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg">${libro.precio?.toFixed(2)}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Stock: {libro.cantidad_inventario}
-                      </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        {/* Categories Tab */}
+        <TabsContent value="categories" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold">Categorías de Productos</h3>
+              <p className="text-sm text-muted-foreground">Administra las categorías disponibles en tu tienda</p>
+            </div>
+            <Button onClick={() => openCategoryDialog()} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Nueva Categoría
+            </Button>
+          </div>
+
+          <div className="grid gap-3">
+            {categorias.map((cat) => (
+              <Card key={cat.categoria_id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">{cat.icono}</div>
+                      <div>
+                        <h4 className="font-semibold">{cat.nombre}</h4>
+                        <p className="text-sm text-muted-foreground">ID: {cat.categoria_id}</p>
+                      </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
-                      <Button size="icon" variant="ghost" onClick={() => openEditDialog(libro)}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(libro.libro_id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                    <div className="flex items-center gap-4">
+                      <Badge variant="outline">Orden: {cat.orden}</Badge>
+                      <div className="flex gap-2">
+                        <Button size="icon" variant="ghost" onClick={() => openCategoryDialog(cat)}>
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteCategory(cat.categoria_id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
