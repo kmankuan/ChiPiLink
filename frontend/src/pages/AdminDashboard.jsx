@@ -2362,7 +2362,7 @@ function MondayIntegration() {
               <li>Haz clic en un tablero de la lista arriba para copiar su ID</li>
               <li>Agrega <code className="bg-yellow-100 dark:bg-yellow-900 px-1 rounded">MONDAY_BOARD_ID=ID_COPIADO</code> a las variables de entorno</li>
               <li>Reinicia el servidor backend</li>
-              <li>Haz clic en "Probar Integración" para verificar</li>
+              <li>Haz clic en &quot;Probar Integración&quot; para verificar</li>
             </ol>
           </CardContent>
         </Card>
