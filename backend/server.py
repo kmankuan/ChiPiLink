@@ -1997,10 +1997,12 @@ async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admi
 @api_router.get("/admin/monday/status")
 async def get_monday_status(admin: dict = Depends(get_admin_user)):
     """Check Monday.com integration status"""
+    board_id = await get_monday_board_id()
+    
     status = {
         "api_key_configured": bool(MONDAY_API_KEY),
-        "board_id_configured": bool(MONDAY_BOARD_ID),
-        "board_id": MONDAY_BOARD_ID if MONDAY_BOARD_ID else None,
+        "board_id_configured": bool(board_id),
+        "board_id": board_id if board_id else None,
         "connected": False,
         "boards": []
     }
@@ -2033,6 +2035,56 @@ async def get_monday_status(admin: dict = Depends(get_admin_user)):
                         status["boards"] = result["data"]["boards"]
         except Exception as e:
             logger.error(f"Error checking Monday.com status: {e}")
+    
+    return status
+
+@api_router.put("/admin/monday/config")
+async def update_monday_config(config: dict, admin: dict = Depends(get_admin_user)):
+    """Update Monday.com configuration (Board ID)"""
+    board_id = config.get("board_id", "").strip()
+    
+    if not board_id:
+        raise HTTPException(status_code=400, detail="Board ID es requerido")
+    
+    # Verify board exists
+    if MONDAY_API_KEY:
+        try:
+            query = f'''
+            query {{
+                boards (ids: [{board_id}]) {{
+                    id
+                    name
+                }}
+            }}
+            '''
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://api.monday.com/v2",
+                    json={"query": query},
+                    headers={
+                        "Authorization": MONDAY_API_KEY,
+                        "Content-Type": "application/json"
+                    },
+                    timeout=10.0
+                )
+                
+                result = response.json()
+                if response.status_code != 200 or not result.get("data", {}).get("boards"):
+                    raise HTTPException(status_code=400, detail="Board ID no válido o no encontrado")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error verifying board: {e}")
+            raise HTTPException(status_code=500, detail="Error verificando el board")
+    
+    # Save to database
+    await db.app_config.update_one(
+        {"config_key": "monday_board_id"},
+        {"$set": {"config_key": "monday_board_id", "value": board_id, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True
+    )
+    
+    return {"success": True, "board_id": board_id}
     
     return status
 
