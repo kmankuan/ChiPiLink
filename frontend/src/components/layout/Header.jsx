@@ -105,19 +105,8 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
-            {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className="h-9 px-3 rounded-full gap-2"
-              data-testid="language-toggle"
-            >
-              <Globe className="h-4 w-4" />
-              <span className="text-xs font-medium uppercase">
-                {currentLangCode === 'zh' ? '中文' : 'ES'}
-              </span>
-            </Button>
+            {/* Language Selector */}
+            <LanguageSelector />
 
             {/* Theme Toggle */}
             <Button
