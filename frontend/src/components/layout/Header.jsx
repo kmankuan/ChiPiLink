@@ -52,11 +52,11 @@ export function Header() {
             className="flex items-center gap-3 group"
             data-testid="logo-link"
           >
-            <div className="p-2 rounded-xl bg-primary text-primary-foreground group-hover:scale-105 transition-transform">
-              <Book className="h-5 w-5" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-red-500 to-yellow-500 text-white group-hover:scale-105 transition-transform">
+              <LinkIcon className="h-5 w-5" />
             </div>
-            <span className="font-serif text-xl font-bold tracking-tight hidden sm:inline">
-              {siteConfig?.nombre_sitio || 'Mi Tienda'}
+            <span className="font-serif text-xl font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-red-600 to-yellow-600 bg-clip-text text-transparent">
+              ChiPi Link
             </span>
           </Link>
 
