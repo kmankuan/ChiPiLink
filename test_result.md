@@ -354,6 +354,7 @@ test_plan:
   completed_testing:
     - "Unatienda/Platform Store Integration"
     - "Yappy Payment Gateway Integration"
+    - "Yappy Checkout Flow Implementation"
     - "Modular Admin Dashboard Structure"
     - "Dashboard Module Stats and Alerts"
     - "Store Module Products and Inventory"
