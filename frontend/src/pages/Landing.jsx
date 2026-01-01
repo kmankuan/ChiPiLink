@@ -393,6 +393,35 @@ export default function Landing() {
           </div>
         )}
 
+        {/* Floating Add Block Button */}
+        {isEditMode && (
+          <FloatingAddBlockButton onClick={() => setAddBlockDialogOpen(true)} />
+        )}
+
+        {/* Add Block Dialog */}
+        <AddBlockDialog 
+          open={addBlockDialogOpen} 
+          onOpenChange={setAddBlockDialogOpen}
+          onBlockAdded={handleBlockAdded}
+        />
+
+        {/* Empty State for Edit Mode */}
+        {isEditMode && blocks.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-24 px-4">
+            <div className="p-4 rounded-full bg-primary/10 mb-4">
+              <Plus className="h-12 w-12 text-primary" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold mb-2">Página vacía</h2>
+            <p className="text-muted-foreground mb-6 text-center max-w-md">
+              Comienza a crear tu página agregando bloques. Haz clic en el botón verde para empezar.
+            </p>
+            <Button onClick={() => setAddBlockDialogOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Agregar Primer Bloque
+            </Button>
+          </div>
+        )}
+
         {blocks.map((block) => (
           <BlockRenderer 
             key={block.bloque_id} 
@@ -400,6 +429,7 @@ export default function Landing() {
             siteConfig={siteConfig}
             onUpdateConfig={(newConfig) => updateBlockConfig(block.bloque_id, newConfig)}
             onSave={() => saveBlock(block.bloque_id)}
+            onDelete={() => handleDeleteBlock(block.bloque_id)}
           />
         ))}
         
