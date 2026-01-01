@@ -499,7 +499,7 @@ export default function StoreModule() {
 
       {/* Edit Product Dialog */}
       <Dialog open={editDialog} onOpenChange={setEditDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingProduct ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
           </DialogHeader>
@@ -511,26 +511,48 @@ export default function StoreModule() {
                 onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Grado *</Label>
-                <Select value={editForm.grado} onValueChange={(v) => setEditForm({...editForm, grado: v})}>
-                  <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                  <SelectContent>
-                    {grados.map(g => <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Materia *</Label>
-                <Select value={editForm.materia} onValueChange={(v) => setEditForm({...editForm, materia: v})}>
-                  <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                  <SelectContent>
-                    {materias.map(m => <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+
+            {/* Category Selection */}
+            <div>
+              <Label>Categoría *</Label>
+              <Select value={editForm.categoria} onValueChange={(v) => setEditForm({...editForm, categoria: v})}>
+                <SelectTrigger><SelectValue placeholder="Seleccionar categoría" /></SelectTrigger>
+                <SelectContent>
+                  {categorias.map(cat => (
+                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                      <span className="flex items-center gap-2">
+                        <span>{cat.icono}</span> {cat.nombre}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            {/* Grade/Subject - Only for Books */}
+            {editForm.categoria === 'libros' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Grado</Label>
+                  <Select value={editForm.grado} onValueChange={(v) => setEditForm({...editForm, grado: v})}>
+                    <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                    <SelectContent>
+                      {grados.map(g => <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Materia</Label>
+                  <Select value={editForm.materia} onValueChange={(v) => setEditForm({...editForm, materia: v})}>
+                    <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                    <SelectContent>
+                      {materias.map(m => <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Precio *</Label>
@@ -550,6 +572,7 @@ export default function StoreModule() {
                 />
               </div>
             </div>
+
             <div>
               <Label>Descripción</Label>
               <Textarea
@@ -557,9 +580,73 @@ export default function StoreModule() {
                 onChange={(e) => setEditForm({...editForm, descripcion: e.target.value})}
               />
             </div>
+
+            {/* Requires Preparation Toggle */}
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div className="space-y-0.5">
+                <Label className="text-base flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-orange-500" />
+                  Requiere Preparación
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Activa si este producto necesita tiempo de preparación (ej: hotdog, cappuccino)
+                </p>
+              </div>
+              <Switch
+                checked={editForm.requiere_preparacion}
+                onCheckedChange={(v) => setEditForm({...editForm, requiere_preparacion: v})}
+              />
+            </div>
+
             <Button onClick={handleSaveProduct} disabled={saving} className="w-full gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Guardar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Dialog */}
+      <Dialog open={categoryDialog} onOpenChange={setCategoryDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Nombre *</Label>
+              <Input
+                value={categoryForm.nombre}
+                onChange={(e) => setCategoryForm({...categoryForm, nombre: e.target.value})}
+                placeholder="Ej: Bebidas"
+              />
+            </div>
+            <div>
+              <Label>Icono (emoji)</Label>
+              <Input
+                value={categoryForm.icono}
+                onChange={(e) => setCategoryForm({...categoryForm, icono: e.target.value})}
+                placeholder="Ej: 🥤"
+                className="text-2xl"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Puedes copiar emojis desde emojipedia.org
+              </p>
+            </div>
+            <div>
+              <Label>Orden</Label>
+              <Input
+                type="number"
+                value={categoryForm.orden}
+                onChange={(e) => setCategoryForm({...categoryForm, orden: parseInt(e.target.value) || 1})}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Define el orden de aparición (menor número = aparece primero)
+              </p>
+            </div>
+            <Button onClick={handleSaveCategory} disabled={savingCategory} className="w-full gap-2">
+              {savingCategory ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Guardar Categoría
             </Button>
           </div>
         </DialogContent>
