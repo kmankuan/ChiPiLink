@@ -1955,12 +1955,12 @@ async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
     return {"success": True}
 
 @api_router.put("/admin/landing-page/blocks/reorder")
-async def reorder_blocks(block_orders: List[dict], admin: dict = Depends(get_admin_user)):
+async def reorder_blocks(block_orders: List[BlockOrderItem], admin: dict = Depends(get_admin_user)):
     """Reorder blocks - expects list of {bloque_id, orden}"""
     for item in block_orders:
         await db.paginas.update_one(
-            {"pagina_id": "landing", "bloques.bloque_id": item["bloque_id"]},
-            {"$set": {"bloques.$.orden": item["orden"]}}
+            {"pagina_id": "landing", "bloques.bloque_id": item.bloque_id},
+            {"$set": {"bloques.$.orden": item.orden}}
         )
     
     await db.paginas.update_one(
