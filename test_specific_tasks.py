@@ -181,13 +181,17 @@ class SpecificTasksTester:
                 
                 # Check client data
                 cliente_data = receipt_result['cliente']
-                required_client_fields = ['nombre', 'email']
-                for field in required_client_fields:
-                    if field in cliente_data:
-                        self.log_test(f"Receipt Client Contains '{field}'", True)
-                    else:
-                        self.log_test(f"Receipt Client Contains '{field}'", False, f"Missing '{field}' field")
-                        success = False
+                if cliente_data:
+                    required_client_fields = ['nombre', 'email']
+                    for field in required_client_fields:
+                        if field in cliente_data:
+                            self.log_test(f"Receipt Client Contains '{field}'", True)
+                        else:
+                            self.log_test(f"Receipt Client Contains '{field}'", False, f"Missing '{field}' field")
+                            success = False
+                else:
+                    self.log_test("Receipt Client Data", False, "Client data is None")
+                    success = False
                         
                 # Check items structure
                 if 'items' in pedido_data and len(pedido_data['items']) > 0:
