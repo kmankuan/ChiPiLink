@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useReactToPrint } from 'react-to-print';
@@ -14,6 +15,7 @@ export default function Receipt() {
   const shouldPrint = searchParams.get('print') === 'true';
   const { t } = useTranslation();
   const { api } = useAuth();
+  const { siteConfig } = useSiteConfig();
   const navigate = useNavigate();
   const printRef = useRef();
 
