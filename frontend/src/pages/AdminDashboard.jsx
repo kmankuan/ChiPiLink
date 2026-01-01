@@ -2135,7 +2135,7 @@ export default function AdminDashboard() {
 
         {/* Monday.com Integration Tab */}
         <TabsContent value="monday">
-          <MondayIntegration />
+          <MondayModule />
         </TabsContent>
       </Tabs>
     </div>
