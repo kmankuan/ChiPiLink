@@ -4,24 +4,18 @@ import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-  Book,
   Search,
   ShoppingCart,
   Loader2,
   Store,
   Plus,
   Check,
-  Clock
+  Clock,
+  ChevronLeft,
+  Home
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -47,8 +41,11 @@ export default function Unatienda() {
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategoria, setSelectedCategoria] = useState('all');
-  const [selectedGrado, setSelectedGrado] = useState('all');
+  
+  // Hierarchical navigation state
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
+  
   const [addedItems, setAddedItems] = useState({});
 
   useEffect(() => {
@@ -78,16 +75,56 @@ export default function Unatienda() {
     }
   };
 
+  // Filter products based on hierarchical selection
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
       product.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategoria = selectedCategoria === 'all' || product.categoria === selectedCategoria;
-    const matchesGrado = selectedGrado === 'all' || 
-      (selectedCategoria === 'libros' && (product.grado === selectedGrado || product.grados?.includes(selectedGrado)));
     
-    return matchesSearch && matchesCategoria && (selectedCategoria !== 'libros' || matchesGrado);
+    // No category selected = show all
+    if (!selectedCategoria) {
+      return matchesSearch;
+    }
+    
+    // Category selected
+    const matchesCategoria = product.categoria === selectedCategoria;
+    
+    // If subcategory selected (for books = grade)
+    if (selectedSubcategoria && selectedCategoria === 'libros') {
+      const matchesGrado = product.grado === selectedSubcategoria || 
+        product.grados?.includes(selectedSubcategoria);
+      return matchesSearch && matchesCategoria && matchesGrado;
+    }
+    
+    return matchesSearch && matchesCategoria;
   });
+
+  // Check if current category has subcategories
+  const hasSubcategories = selectedCategoria === 'libros';
+  const subcategories = hasSubcategories ? grados : [];
+
+  // Navigation handlers
+  const handleSelectCategoria = (categoriaId) => {
+    setSelectedCategoria(categoriaId);
+    setSelectedSubcategoria(null);
+  };
+
+  const handleSelectSubcategoria = (subcategoriaId) => {
+    setSelectedSubcategoria(subcategoriaId);
+  };
+
+  const handleGoBack = () => {
+    if (selectedSubcategoria) {
+      setSelectedSubcategoria(null);
+    } else {
+      setSelectedCategoria(null);
+    }
+  };
+
+  const handleGoHome = () => {
+    setSelectedCategoria(null);
+    setSelectedSubcategoria(null);
+  };
 
   const handleAddToCart = (product) => {
     if (product.cantidad_inventario <= 0) {
@@ -116,6 +153,19 @@ export default function Unatienda() {
   const getCategoryInfo = (categoriaId) => {
     const cat = categorias.find(c => c.categoria_id === categoriaId);
     return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
+  };
+
+  // Get current navigation title
+  const getCurrentTitle = () => {
+    if (selectedSubcategoria) {
+      const grado = grados.find(g => g.id === selectedSubcategoria);
+      return grado?.nombre || selectedSubcategoria;
+    }
+    if (selectedCategoria) {
+      const cat = getCategoryInfo(selectedCategoria);
+      return `${cat.icono} ${cat.nombre}`;
+    }
+    return null;
   };
 
   if (loading) {
@@ -149,9 +199,9 @@ export default function Unatienda() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-8 p-4 rounded-2xl bg-card border border-border/50">
-          <div className="relative flex-1">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar productos..."
@@ -160,67 +210,94 @@ export default function Unatienda() {
               className="pl-10 h-11"
             />
           </div>
-          
-          <div className="flex gap-3 flex-wrap">
-            {/* Category Filter */}
-            <Select value={selectedCategoria} onValueChange={(v) => { setSelectedCategoria(v); setSelectedGrado('all'); }}>
-              <SelectTrigger className="w-[180px] h-11">
-                <SelectValue placeholder="Categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {categorias.map((cat) => (
-                  <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
-                    <span className="flex items-center gap-2">
-                      <span>{cat.icono}</span>
-                      {cat.nombre}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            {/* Grade Filter - Only show for Books */}
-            {selectedCategoria === 'libros' && (
-              <Select value={selectedGrado} onValueChange={setSelectedGrado}>
-                <SelectTrigger className="w-[160px] h-11">
-                  <SelectValue placeholder="Grado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los grados</SelectItem>
-                  {grados.map((grado) => (
-                    <SelectItem key={grado.id} value={grado.id}>
-                      {grado.nombre}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </div>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex gap-2 flex-wrap mb-6">
-          <Button
-            variant={selectedCategoria === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => { setSelectedCategoria('all'); setSelectedGrado('all'); }}
-            className="rounded-full"
-          >
-            Todos
-          </Button>
-          {categorias.map((cat) => (
+        {/* Category Navigation */}
+        <div className="mb-8">
+          {/* Breadcrumb / Back Navigation */}
+          {(selectedCategoria || selectedSubcategoria) && (
+            <div className="flex items-center gap-2 mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Regresar
+              </Button>
+              {getCurrentTitle() && (
+                <span className="text-lg font-semibold">{getCurrentTitle()}</span>
+              )}
+            </div>
+          )}
+
+          {/* Category/Subcategory Pills */}
+          <div className="flex gap-2 flex-wrap">
+            {/* Home/All button - always visible */}
             <Button
-              key={cat.categoria_id}
-              variant={selectedCategoria === cat.categoria_id ? 'default' : 'outline'}
+              variant={!selectedCategoria ? 'default' : 'outline'}
               size="sm"
-              onClick={() => { setSelectedCategoria(cat.categoria_id); setSelectedGrado('all'); }}
-              className="rounded-full"
+              onClick={handleGoHome}
+              className="rounded-full gap-1.5"
             >
-              <span className="mr-1.5">{cat.icono}</span>
-              {cat.nombre}
+              <Home className="h-4 w-4" />
+              Todos
             </Button>
-          ))}
+
+            {/* Show categories or subcategories based on state */}
+            {!selectedCategoria ? (
+              // Main categories
+              categorias.map((cat) => (
+                <Button
+                  key={cat.categoria_id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSelectCategoria(cat.categoria_id)}
+                  className="rounded-full"
+                >
+                  <span className="mr-1.5">{cat.icono}</span>
+                  {cat.nombre}
+                </Button>
+              ))
+            ) : hasSubcategories && !selectedSubcategoria ? (
+              // Subcategories (grades for books)
+              <>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setSelectedSubcategoria(null)}
+                  className="rounded-full"
+                >
+                  Todos los grados
+                </Button>
+                {subcategories.map((sub) => (
+                  <Button
+                    key={sub.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSelectSubcategoria(sub.id)}
+                    className="rounded-full"
+                  >
+                    {sub.nombre}
+                  </Button>
+                ))}
+              </>
+            ) : hasSubcategories && selectedSubcategoria ? (
+              // When subcategory is selected, show siblings for easy switching
+              subcategories.map((sub) => (
+                <Button
+                  key={sub.id}
+                  variant={selectedSubcategoria === sub.id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleSelectSubcategoria(sub.id)}
+                  className="rounded-full"
+                >
+                  {sub.nombre}
+                </Button>
+              ))
+            ) : null}
+          </div>
         </div>
 
         {/* Results Count */}
