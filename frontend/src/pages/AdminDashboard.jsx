@@ -2143,6 +2143,7 @@ export default function AdminDashboard() {
 
 // Monday.com Integration Component
 function MondayIntegration() {
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
