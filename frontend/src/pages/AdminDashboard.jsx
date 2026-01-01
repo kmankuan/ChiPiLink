@@ -2142,6 +2142,11 @@ export default function AdminDashboard() {
         <TabsContent value="monday">
           <MondayModule />
         </TabsContent>
+
+        {/* Unatienda Platform Store Tab */}
+        <TabsContent value="unatienda">
+          <PlatformStoreModule />
+        </TabsContent>
       </Tabs>
     </div>
   );
