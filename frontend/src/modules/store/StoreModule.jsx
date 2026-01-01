@@ -31,6 +31,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 import {
   Package,
   Plus,
@@ -42,7 +43,10 @@ import {
   Download,
   Loader2,
   AlertTriangle,
-  Box
+  Box,
+  Tags,
+  Clock,
+  GripVertical
 } from 'lucide-react';
 
 const emptyProductRow = {
