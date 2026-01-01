@@ -151,9 +151,12 @@ class SpecificTasksTester:
             self.log_test("Thermal Receipt Test", False, "No existing orders found")
             return False
         
-        # Use the first order
-        order = orders[0]
-        pedido_id = order['pedido_id']
+        # Find a registered user order (has cliente_id) for better testing
+        registered_orders = [o for o in orders if o.get('cliente_id')]
+        test_order = registered_orders[0] if registered_orders else orders[0]
+        
+        pedido_id = test_order['pedido_id']
+        is_registered_order = bool(test_order.get('cliente_id'))
         
         # Test the receipt endpoint with admin token (admin can access any receipt)
         receipt_result = self.run_test(
@@ -179,19 +182,27 @@ class SpecificTasksTester:
                         self.log_test(f"Receipt Order Contains '{field}'", False, f"Missing '{field}' field")
                         success = False
                 
-                # Check client data
+                # Check client data based on order type
                 cliente_data = receipt_result['cliente']
-                if cliente_data:
-                    required_client_fields = ['nombre', 'email']
-                    for field in required_client_fields:
-                        if field in cliente_data:
-                            self.log_test(f"Receipt Client Contains '{field}'", True)
-                        else:
-                            self.log_test(f"Receipt Client Contains '{field}'", False, f"Missing '{field}' field")
-                            success = False
+                if is_registered_order:
+                    if cliente_data:
+                        required_client_fields = ['nombre', 'email']
+                        for field in required_client_fields:
+                            if field in cliente_data:
+                                self.log_test(f"Receipt Client Contains '{field}'", True)
+                            else:
+                                self.log_test(f"Receipt Client Contains '{field}'", False, f"Missing '{field}' field")
+                                success = False
+                    else:
+                        self.log_test("Receipt Client Data for Registered Order", False, "Client data is None for registered order")
+                        success = False
                 else:
-                    self.log_test("Receipt Client Data", False, "Client data is None")
-                    success = False
+                    # For public orders, cliente should be None
+                    if cliente_data is None:
+                        self.log_test("Receipt Client Data for Public Order", True, "Client data is None as expected for public order")
+                    else:
+                        self.log_test("Receipt Client Data for Public Order", False, "Client data should be None for public order")
+                        success = False
                         
                 # Check items structure
                 if 'items' in pedido_data and len(pedido_data['items']) > 0:
