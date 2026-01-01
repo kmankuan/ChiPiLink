@@ -207,7 +207,7 @@ export default function OrderForm() {
                 <p><span className="text-muted-foreground">Banco:</span> Banco General</p>
                 <p><span className="text-muted-foreground">Tipo:</span> Cuenta Corriente</p>
                 <p><span className="text-muted-foreground">Número:</span> XXXX-XXXX-XXXX</p>
-                <p><span className="text-muted-foreground">Titular:</span> Librería Escolar S.A.</p>
+                <p><span className="text-muted-foreground">Titular:</span> {siteConfig?.nombre_sitio || 'Mi Tienda'} S.A.</p>
               </div>
               <Separator className="my-4" />
               <p className="text-sm text-muted-foreground">
