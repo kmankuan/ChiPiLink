@@ -10,20 +10,20 @@ import os
 
 router = APIRouter(prefix="/membership", tags=["membership"])
 
-# These will be injected from server.py
+# These will be set by the main server
 db = None
-get_current_user_func = None
-get_admin_user_func = None
+get_admin_user = None
+get_current_user = None
 
-def init_routes(database, admin_dep, user_dep):
-    global db, get_admin_user_func, get_current_user_func
-    db = database
-    get_admin_user_func = admin_dep
-    get_current_user_func = user_dep
+def init_routes(_db, _get_admin_user, _get_current_user):
+    global db, get_admin_user, get_current_user
+    db = _db
+    get_admin_user = _get_admin_user
+    get_current_user = _get_current_user
 
-# Club location for geofencing (to be configured)
+# Club location for geofencing
 CLUB_LOCATION = {
-    "latitude": 9.0,  # Panama City approximate
+    "latitude": 9.0,
     "longitude": -79.5,
     "radius_meters": 100
 }
@@ -40,7 +40,7 @@ async def get_membership_plans():
     return plans
 
 @router.get("/my-membership")
-async def get_my_membership(user = Depends(get_current_user_func)):
+async def get_my_membership(user = Depends(lambda: get_current_user)):
     """Get current user's membership status"""
     member = await db.members.find_one(
         {"user_id": user["id"]},
@@ -50,7 +50,6 @@ async def get_my_membership(user = Depends(get_current_user_func)):
     if not member:
         return {"has_membership": False}
     
-    # Get plan details if active
     plan = None
     if member.get("current_plan_id"):
         plan = await db.membership_plans.find_one(
@@ -67,7 +66,7 @@ async def get_my_membership(user = Depends(get_current_user_func)):
 @router.get("/my-visits")
 async def get_my_visits(
     limit: int = Query(default=20, le=100),
-    user = Depends(get_current_user_func)
+    user = Depends(lambda: get_current_user)
 ):
     """Get current user's visit history"""
     visits = await db.checkins.find(
@@ -83,7 +82,7 @@ async def member_check_in(
     code: Optional[str] = None,
     latitude: Optional[float] = None,
     longitude: Optional[float] = None,
-    user = Depends(get_current_user_func)
+    user = Depends(lambda: get_current_user)
 ):
     """Check in a member"""
     member = await db.members.find_one({"user_id": user["id"]})
@@ -93,7 +92,6 @@ async def member_check_in(
     if member.get("membership_status") != "active":
         raise HTTPException(status_code=400, detail="Membership is not active")
     
-    # Check if already checked in
     active_checkin = await db.checkins.find_one({
         "member_id": member["member_id"],
         "check_out_time": None
@@ -102,13 +100,11 @@ async def member_check_in(
     if active_checkin:
         raise HTTPException(status_code=400, detail="Already checked in")
     
-    # For credit-based plans, check credits
     plan = await db.membership_plans.find_one({"plan_id": member.get("current_plan_id")})
     if plan and plan.get("plan_type", "").startswith("credits_"):
         if member.get("credits_remaining", 0) <= 0:
             raise HTTPException(status_code=400, detail="No credits remaining")
     
-    # Create check-in record
     checkin = {
         "checkin_id": str(uuid4()),
         "member_id": member["member_id"],
@@ -118,18 +114,13 @@ async def member_check_in(
         "method": method,
         "latitude": latitude,
         "longitude": longitude,
-        "location_verified": False,
+        "location_verified": latitude is not None and longitude is not None,
         "credit_deducted": False,
         "notes": None
     }
     
-    # Verify geolocation if provided
-    if latitude and longitude:
-        checkin["location_verified"] = True
-    
     await db.checkins.insert_one(checkin)
     
-    # Update member stats
     await db.members.update_one(
         {"member_id": member["member_id"]},
         {
@@ -141,13 +132,12 @@ async def member_check_in(
     return {"success": True, "checkin_id": checkin["checkin_id"]}
 
 @router.post("/check-out")
-async def member_check_out(user = Depends(get_current_user_func)):
+async def member_check_out(user = Depends(lambda: get_current_user)):
     """Check out a member"""
     member = await db.members.find_one({"user_id": user["id"]})
     if not member:
         raise HTTPException(status_code=404, detail="No membership found")
     
-    # Find active check-in
     active_checkin = await db.checkins.find_one({
         "member_id": member["member_id"],
         "check_out_time": None
@@ -160,7 +150,6 @@ async def member_check_out(user = Depends(get_current_user_func)):
     checkin_time = datetime.fromisoformat(active_checkin["check_in_time"].replace('Z', '+00:00'))
     duration = int((checkout_time - checkin_time).total_seconds() / 60)
     
-    # Update check-in record
     await db.checkins.update_one(
         {"checkin_id": active_checkin["checkin_id"]},
         {
@@ -171,7 +160,6 @@ async def member_check_out(user = Depends(get_current_user_func)):
         }
     )
     
-    # Deduct credit for credit-based plans
     plan = await db.membership_plans.find_one({"plan_id": member.get("current_plan_id")})
     if plan and plan.get("plan_type", "").startswith("credits_"):
         await db.members.update_one(
@@ -183,10 +171,7 @@ async def member_check_out(user = Depends(get_current_user_func)):
             {"$set": {"credit_deducted": True}}
         )
     
-    return {
-        "success": True,
-        "duration_minutes": duration
-    }
+    return {"success": True, "duration_minutes": duration}
 
 # ==================== ADMIN ENDPOINTS ====================
 
@@ -194,7 +179,7 @@ async def member_check_out(user = Depends(get_current_user_func)):
 async def admin_get_members(
     status: Optional[str] = None,
     limit: int = Query(default=50, le=200),
-    admin = Depends(get_admin_user_func)
+    admin = Depends(lambda: get_admin_user)
 ):
     """Get all members (admin)"""
     query = {}
@@ -210,7 +195,7 @@ async def admin_get_checkins(
     member_id: Optional[str] = None,
     active_only: bool = False,
     limit: int = Query(default=50, le=200),
-    admin = Depends(get_admin_user_func)
+    admin = Depends(lambda: get_admin_user)
 ):
     """Get check-in records (admin)"""
     query = {}
@@ -230,10 +215,7 @@ async def admin_get_checkins(
     return checkins
 
 @router.post("/admin/plans")
-async def admin_create_plan(
-    plan: dict,
-    admin = Depends(get_admin_user_func)
-):
+async def admin_create_plan(plan: dict, admin = Depends(lambda: get_admin_user)):
     """Create a new membership plan (admin)"""
     plan_data = {
         "plan_id": str(uuid4()),
@@ -252,11 +234,22 @@ async def admin_create_plan(
     await db.membership_plans.insert_one(plan_data)
     return {"success": True, "plan_id": plan_data["plan_id"]}
 
+@router.put("/admin/plans/{plan_id}")
+async def admin_update_plan(plan_id: str, plan: dict, admin = Depends(lambda: get_admin_user)):
+    """Update a membership plan (admin)"""
+    result = await db.membership_plans.update_one(
+        {"plan_id": plan_id},
+        {"$set": plan}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    return {"success": True}
+
 @router.post("/admin/assign-membership")
 async def admin_assign_membership(
     user_id: str,
     plan_id: str,
-    admin = Depends(get_admin_user_func)
+    admin = Depends(lambda: get_admin_user)
 ):
     """Assign membership to a user (admin)"""
     plan = await db.membership_plans.find_one({"plan_id": plan_id})
@@ -307,7 +300,7 @@ async def admin_assign_membership(
 async def admin_manual_checkin(
     member_id: str,
     notes: Optional[str] = None,
-    admin = Depends(get_admin_user_func)
+    admin = Depends(lambda: get_admin_user)
 ):
     """Manually check in a member (admin)"""
     member = await db.members.find_one({"member_id": member_id})
@@ -340,8 +333,37 @@ async def admin_manual_checkin(
     
     return {"success": True, "checkin_id": checkin["checkin_id"]}
 
+@router.post("/admin/manual-checkout/{checkin_id}")
+async def admin_manual_checkout(
+    checkin_id: str,
+    admin = Depends(lambda: get_admin_user)
+):
+    """Manually check out a member (admin)"""
+    checkin = await db.checkins.find_one({"checkin_id": checkin_id})
+    if not checkin:
+        raise HTTPException(status_code=404, detail="Check-in not found")
+    
+    if checkin.get("check_out_time"):
+        raise HTTPException(status_code=400, detail="Already checked out")
+    
+    checkout_time = datetime.now(timezone.utc)
+    checkin_time = datetime.fromisoformat(checkin["check_in_time"].replace('Z', '+00:00'))
+    duration = int((checkout_time - checkin_time).total_seconds() / 60)
+    
+    await db.checkins.update_one(
+        {"checkin_id": checkin_id},
+        {
+            "$set": {
+                "check_out_time": checkout_time.isoformat(),
+                "duration_minutes": duration
+            }
+        }
+    )
+    
+    return {"success": True, "duration_minutes": duration}
+
 @router.get("/admin/stats")
-async def admin_get_stats(admin = Depends(get_admin_user_func)):
+async def admin_get_stats(admin = Depends(lambda: get_admin_user)):
     """Get membership statistics (admin)"""
     total_members = await db.members.count_documents({})
     active_members = await db.members.count_documents({"membership_status": "active"})
