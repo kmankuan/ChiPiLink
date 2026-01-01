@@ -2818,6 +2818,9 @@ class TextbookStoreAPITester:
             # NEW: Yappy Checkout Flow Tests (from review request)
             ("Yappy Checkout Flow Implementation", self.test_yappy_checkout_flow_simple),
             
+            # NEW: Multi-Category Product System Tests (from review request)
+            ("Multi-Category Product System", self.test_multi_category_system),
+            
             # Other existing tests
             ("Block-Based Landing Page - Public Endpoints", self.test_block_based_landing_page_public_endpoints),
             ("Block-Based Landing Page - Admin Endpoints", self.test_block_based_landing_page_admin_endpoints),
