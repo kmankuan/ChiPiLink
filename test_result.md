@@ -236,11 +236,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Branding Neutralization (P1)"
-    - "Thermal Receipt (P2)"
-    - "Monday.com Integration (P3)"
+    - "Add Block Dialog in Live Edit Mode"
+    - "Monday.com Configurable Board ID"
+    - "Modular Architecture - Admin Tabs"
   stuck_tasks:
     - "Block Reorder Operations"
+    - "Add Block Dialog in Live Edit Mode"
   test_all: false
   test_priority: "high_first"
 
