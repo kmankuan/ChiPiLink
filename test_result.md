@@ -145,6 +145,18 @@ backend:
         agent: "testing"
         comment: "PUT /api/admin/landing-page/publish successfully toggles published status between true and false"
 
+  - task: "Multi-Category Product System"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUES FOUND: Multi-category system partially implemented. ✅ Categories CRUD working: GET /api/categorias returns 6 default categories (libros, snacks, bebidas, preparados, uniformes, servicios), POST/PUT/DELETE admin endpoints functional. ✅ Products with categories: GET /api/platform-store/products shows products with 'categoria' field, existing products have categoria='libros', category filtering works. ❌ BACKEND MODEL ISSUE: LibroBase model missing 'categoria' and 'requiere_preparacion' fields - new products created without these fields. ❌ CATEGORY DELETION PROTECTION: Should block deletion of categories with products but currently allows it. Backend needs model updates and business logic fixes."
+
 new_features_testing:
   - feature: "Add Block Dialog in Live Edit Mode"
     implemented: true
