@@ -1855,6 +1855,381 @@ class TextbookStoreAPITester:
                 200
             )
 
+    def test_yappy_checkout_flow(self):
+        """Test Yappy Checkout Flow Implementation"""
+        print("\n💳 Testing Yappy Checkout Flow Implementation...")
+        
+        # Test 1: GET /api/pedidos/{pedido_id}/public - Get order details for checkout
+        test_order_id = "ped_363bbcd6c5f4"
+        
+        # Remove auth for public endpoint
+        old_token = self.token
+        self.token = None
+        
+        order_details = self.run_test(
+            "GET /api/pedidos/{pedido_id}/public - Get order details for checkout",
+            "GET",
+            f"pedidos/{test_order_id}/public",
+            200
+        )
+        
+        success = True
+        if order_details:
+            # Validate response structure
+            required_fields = ['pedido_id', 'items', 'subtotal', 'total', 'estado', 'estado_pago']
+            for field in required_fields:
+                if field in order_details:
+                    self.log_test(f"Order Details Contains '{field}'", True)
+                else:
+                    self.log_test(f"Order Details Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+            
+            # Validate specific values
+            if order_details.get('pedido_id') == test_order_id:
+                self.log_test("Order ID Matches Request", True)
+            else:
+                self.log_test("Order ID Matches Request", False, f"Expected {test_order_id}, got {order_details.get('pedido_id')}")
+                success = False
+        else:
+            success = False
+        
+        # Test 2: POST /api/platform-store/yappy/validate - Validate Yappy merchant
+        yappy_validate = self.run_test(
+            "POST /api/platform-store/yappy/validate - Validate Yappy merchant",
+            "POST",
+            "platform-store/yappy/validate",
+            200
+        )
+        
+        if yappy_validate:
+            # Should return success=true with token
+            if yappy_validate.get('success'):
+                self.log_test("Yappy Validation Success", True)
+                if 'token' in yappy_validate:
+                    self.log_test("Yappy Validation Returns Token", True)
+                    yappy_token = yappy_validate['token']
+                else:
+                    self.log_test("Yappy Validation Returns Token", False, "Missing token in response")
+                    success = False
+            else:
+                self.log_test("Yappy Validation Success", False, f"Validation failed: {yappy_validate.get('error', 'Unknown error')}")
+                success = False
+        else:
+            success = False
+        
+        # Test 3: POST /api/platform-store/yappy/create-order - Create Yappy payment
+        create_order_data = {
+            "order_id": "TEST123",
+            "alias_yappy": "60001234",
+            "subtotal": 10.00,
+            "taxes": 0.00,
+            "discount": 0.00,
+            "total": 10.00
+        }
+        
+        yappy_create_order = self.run_test(
+            "POST /api/platform-store/yappy/create-order - Create Yappy payment",
+            "POST",
+            "platform-store/yappy/create-order",
+            200,
+            create_order_data
+        )
+        
+        if yappy_create_order:
+            if yappy_create_order.get('success'):
+                self.log_test("Yappy Create Order Success", True)
+                # Check for expected fields
+                expected_fields = ['transaction_id', 'token', 'document_name']
+                for field in expected_fields:
+                    if field in yappy_create_order:
+                        self.log_test(f"Yappy Order Response Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Yappy Order Response Contains '{field}'", False, f"Missing '{field}' field")
+            else:
+                self.log_test("Yappy Create Order Success", False, f"Order creation failed: {yappy_create_order.get('error', 'Unknown error')}")
+                success = False
+        else:
+            success = False
+        
+        # Test 4: GET /api/platform-store/yappy/ipn - IPN callback endpoint
+        ipn_params = {
+            "orderId": "TEST123",
+            "Hash": "test_hash_value",
+            "status": "E",  # E=Ejecutado (successful)
+            "domain": "https://unatienda.preview.emergentagent.com"
+        }
+        
+        # Build query string for GET request
+        query_string = "&".join([f"{k}={v}" for k, v in ipn_params.items()])
+        
+        yappy_ipn = self.run_test(
+            "GET /api/platform-store/yappy/ipn - IPN callback endpoint",
+            "GET",
+            f"platform-store/yappy/ipn?{query_string}",
+            200
+        )
+        
+        if yappy_ipn:
+            # Should verify hash and update order status
+            if yappy_ipn.get('status') == 'ok':
+                self.log_test("Yappy IPN Callback Success", True)
+                if 'order_id' in yappy_ipn and 'payment_status' in yappy_ipn:
+                    self.log_test("Yappy IPN Response Complete", True)
+                else:
+                    self.log_test("Yappy IPN Response Complete", False, "Missing order_id or payment_status")
+                    success = False
+            else:
+                self.log_test("Yappy IPN Callback Success", False, f"IPN failed: {yappy_ipn.get('message', 'Unknown error')}")
+                success = False
+        else:
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        
+        return success and all([order_details, yappy_validate, yappy_create_order, yappy_ipn])
+
+    def test_yappy_checkout_flow_with_real_order(self):
+        """Test Yappy Checkout Flow with a real order creation"""
+        print("\n🛒 Testing Yappy Checkout Flow with Real Order...")
+        
+        # First create a real order to test with
+        if not self.admin_token:
+            self.log_test("Yappy Real Order Test", False, "Admin token required for setup")
+            return False
+        
+        # Use admin token to create test data
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Get available books
+        books = self.run_test(
+            "Get Books for Yappy Test",
+            "GET",
+            "libros",
+            200
+        )
+        
+        if not books or len(books) == 0:
+            self.log_test("Yappy Real Order Test", False, "No books available for testing")
+            self.token = old_token
+            return False
+        
+        # Create a test user for the order
+        test_user_data = {
+            "email": f"yappy_test_{datetime.now().strftime('%H%M%S')}@test.com",
+            "contrasena": "TestPass123!",
+            "nombre": "Yappy Test User",
+            "telefono": "507-6123-4567",
+            "direccion": "Test Address for Yappy"
+        }
+        
+        user_result = self.run_test(
+            "Create Test User for Yappy",
+            "POST",
+            "auth/registro",
+            200,
+            test_user_data
+        )
+        
+        if not user_result or 'token' not in user_result:
+            self.log_test("Yappy Real Order Test", False, "Failed to create test user")
+            self.token = old_token
+            return False
+        
+        # Switch to user token
+        user_token = user_result['token']
+        self.token = user_token
+        
+        # Add a student
+        student_data = {
+            "nombre": "Carlos",
+            "apellido": "Yappy Test",
+            "grado": "3",
+            "escuela": "Escuela Test Yappy",
+            "es_nuevo": True
+        }
+        
+        student_result = self.run_test(
+            "Create Test Student for Yappy",
+            "POST",
+            "estudiantes",
+            200,
+            student_data
+        )
+        
+        if not student_result or 'estudiante_id' not in student_result:
+            self.log_test("Yappy Real Order Test", False, "Failed to create test student")
+            self.token = old_token
+            return False
+        
+        student_id = student_result['estudiante_id']
+        
+        # Get user info for approval
+        user_info = self.run_test(
+            "Get User Info for Yappy Test",
+            "GET",
+            "auth/me",
+            200
+        )
+        
+        if not user_info or 'cliente_id' not in user_info:
+            self.log_test("Yappy Real Order Test", False, "Failed to get user info")
+            self.token = old_token
+            return False
+        
+        cliente_id = user_info['cliente_id']
+        
+        # Switch to admin token to approve enrollment
+        self.token = self.admin_token
+        
+        approval_result = self.run_test(
+            "Approve Student for Yappy Test",
+            "PUT",
+            f"admin/matriculas/{cliente_id}/{student_id}/verificar?accion=aprobar",
+            200
+        )
+        
+        if not approval_result:
+            self.log_test("Yappy Real Order Test", False, "Failed to approve student enrollment")
+            self.token = old_token
+            return False
+        
+        # Switch back to user token to create order
+        self.token = user_token
+        
+        # Create order with Yappy payment method
+        book = books[0]
+        order_data = {
+            "estudiante_id": student_id,
+            "items": [
+                {
+                    "libro_id": book['libro_id'],
+                    "nombre_libro": book['nombre'],
+                    "cantidad": 1,
+                    "precio_unitario": book['precio']
+                }
+            ],
+            "metodo_pago": "yappy",
+            "notas": "Test order for Yappy checkout flow"
+        }
+        
+        order_result = self.run_test(
+            "Create Order with Yappy Payment Method",
+            "POST",
+            "pedidos",
+            200,
+            order_data
+        )
+        
+        if not order_result or 'pedido_id' not in order_result:
+            self.log_test("Yappy Real Order Test", False, "Failed to create test order")
+            self.token = old_token
+            return False
+        
+        pedido_id = order_result['pedido_id']
+        
+        # Now test the public order endpoint with the real order
+        self.token = None  # Remove auth for public endpoint
+        
+        public_order = self.run_test(
+            "GET Real Order Details for Checkout",
+            "GET",
+            f"pedidos/{pedido_id}/public",
+            200
+        )
+        
+        success = True
+        if public_order:
+            # Validate the order has the expected structure and data
+            if public_order.get('pedido_id') == pedido_id:
+                self.log_test("Real Order ID Matches", True)
+            else:
+                self.log_test("Real Order ID Matches", False, f"Expected {pedido_id}, got {public_order.get('pedido_id')}")
+                success = False
+            
+            if public_order.get('items') and len(public_order['items']) > 0:
+                self.log_test("Real Order Has Items", True)
+                item = public_order['items'][0]
+                if item.get('libro_id') == book['libro_id']:
+                    self.log_test("Real Order Item Matches", True)
+                else:
+                    self.log_test("Real Order Item Matches", False, "Order item doesn't match created item")
+                    success = False
+            else:
+                self.log_test("Real Order Has Items", False, "Order has no items")
+                success = False
+            
+            if public_order.get('total') == book['precio']:
+                self.log_test("Real Order Total Correct", True)
+            else:
+                self.log_test("Real Order Total Correct", False, f"Expected {book['precio']}, got {public_order.get('total')}")
+                success = False
+        else:
+            success = False
+        
+        # Test Yappy payment flow with the real order
+        if success and public_order:
+            # Test creating Yappy payment for this order
+            create_yappy_data = {
+                "order_id": pedido_id,
+                "alias_yappy": "60001234",  # Test phone number
+                "subtotal": public_order.get('total', 0),
+                "taxes": 0.00,
+                "discount": 0.00,
+                "total": public_order.get('total', 0)
+            }
+            
+            yappy_payment = self.run_test(
+                "Create Yappy Payment for Real Order",
+                "POST",
+                "platform-store/yappy/create-order",
+                200,
+                create_yappy_data
+            )
+            
+            if yappy_payment and yappy_payment.get('success'):
+                self.log_test("Yappy Payment Creation for Real Order", True)
+                
+                # Test IPN callback for the real order
+                ipn_params = {
+                    "orderId": pedido_id,
+                    "Hash": "test_hash_for_real_order",
+                    "status": "E",  # Successful payment
+                    "domain": "https://unatienda.preview.emergentagent.com"
+                }
+                
+                query_string = "&".join([f"{k}={v}" for k, v in ipn_params.items()])
+                
+                ipn_result = self.run_test(
+                    "Process IPN for Real Order",
+                    "GET",
+                    f"platform-store/yappy/ipn?{query_string}",
+                    200
+                )
+                
+                if ipn_result and ipn_result.get('status') == 'ok':
+                    self.log_test("IPN Processing for Real Order", True)
+                else:
+                    self.log_test("IPN Processing for Real Order", False, "IPN processing failed")
+                    success = False
+            else:
+                self.log_test("Yappy Payment Creation for Real Order", False, "Failed to create Yappy payment")
+                success = False
+        
+        # Cleanup - delete the test student
+        self.token = user_token
+        delete_result = self.run_test(
+            "Cleanup Yappy Test Student",
+            "DELETE",
+            f"estudiantes/{student_id}",
+            200
+        )
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def run_all_tests(self):
         """Run all tests"""
         print("🚀 Starting Textbook Store API Tests")
