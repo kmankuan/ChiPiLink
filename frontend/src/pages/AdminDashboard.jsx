@@ -66,6 +66,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import GoogleSheetsSync from '@/components/admin/GoogleSheetsSync';
+import LandingPageEditor from '@/components/admin/LandingPageEditor';
+import { Layers } from 'lucide-react';
 
 // Empty product row template
 const emptyProductRow = {
