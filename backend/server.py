@@ -1983,6 +1983,112 @@ async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admi
     )
     return {"success": True, "publicada": publicada}
 
+# ============== MONDAY.COM ADMIN ROUTES ==============
+
+@api_router.get("/admin/monday/status")
+async def get_monday_status(admin: dict = Depends(get_admin_user)):
+    """Check Monday.com integration status"""
+    status = {
+        "api_key_configured": bool(MONDAY_API_KEY),
+        "board_id_configured": bool(MONDAY_BOARD_ID),
+        "board_id": MONDAY_BOARD_ID if MONDAY_BOARD_ID else None,
+        "connected": False,
+        "boards": []
+    }
+    
+    if MONDAY_API_KEY:
+        try:
+            query = '''
+            query {
+                boards (limit: 20) {
+                    id
+                    name
+                }
+            }
+            '''
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://api.monday.com/v2",
+                    json={"query": query},
+                    headers={
+                        "Authorization": MONDAY_API_KEY,
+                        "Content-Type": "application/json"
+                    },
+                    timeout=10.0
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if "data" in result and "boards" in result["data"]:
+                        status["connected"] = True
+                        status["boards"] = result["data"]["boards"]
+        except Exception as e:
+            logger.error(f"Error checking Monday.com status: {e}")
+    
+    return status
+
+@api_router.post("/admin/monday/test")
+async def test_monday_integration(admin: dict = Depends(get_admin_user)):
+    """Test Monday.com integration by creating a test item"""
+    if not MONDAY_API_KEY or not MONDAY_BOARD_ID:
+        raise HTTPException(
+            status_code=400, 
+            detail="Monday.com no está configurado. Configure MONDAY_API_KEY y MONDAY_BOARD_ID en las variables de entorno."
+        )
+    
+    try:
+        import json
+        test_item_name = f"TEST-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+        
+        column_values = json.dumps({
+            "text": "Cliente de Prueba",
+            "text4": "Estudiante de Prueba",
+            "numbers": "100",
+            "status": {"label": "pendiente"},
+            "text0": "transferencia_bancaria"
+        })
+        
+        mutation = f'''
+        mutation {{
+            create_item (
+                board_id: {MONDAY_BOARD_ID},
+                item_name: "{test_item_name}",
+                column_values: {json.dumps(column_values)}
+            ) {{
+                id
+            }}
+        }}
+        '''
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.monday.com/v2",
+                json={"query": mutation},
+                headers={
+                    "Authorization": MONDAY_API_KEY,
+                    "Content-Type": "application/json"
+                },
+                timeout=10.0
+            )
+            
+            result = response.json()
+            
+            if response.status_code == 200 and "data" in result and "create_item" in result["data"]:
+                return {
+                    "success": True,
+                    "message": "Item de prueba creado exitosamente en Monday.com",
+                    "item_id": result["data"]["create_item"]["id"],
+                    "item_name": test_item_name
+                }
+            
+            error_msg = result.get("errors", [{"message": "Error desconocido"}])[0].get("message", "Error desconocido")
+            raise HTTPException(status_code=400, detail=f"Error de Monday.com: {error_msg}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error conectando con Monday.com: {str(e)}")
+
 # ============== ADMIN SETUP ==============
 
 @api_router.post("/admin/setup")
