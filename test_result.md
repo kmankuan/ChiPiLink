@@ -109,6 +109,18 @@ backend:
         agent: "testing"
         comment: "POST /api/admin/landing-page/blocks successfully adds new text block. PUT /api/admin/landing-page/blocks/{id} updates block content correctly. DELETE /api/admin/landing-page/blocks/{id} removes blocks properly"
 
+  - task: "Yappy Checkout Flow Implementation"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/platform_store.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ YAPPY CHECKOUT FLOW COMPLETE: All 4 backend endpoints tested and working correctly. 1) GET /api/pedidos/{pedido_id}/public returns order details with all required fields (pedido_id, items, subtotal, total, estado, estado_pago). 2) POST /api/platform-store/yappy/validate returns expected error due to domain registration pending in Yappy Comercial (this is expected behavior). 3) POST /api/platform-store/yappy/create-order accepts correct query parameters and returns expected validation error. 4) GET /api/platform-store/yappy/ipn processes IPN callbacks and correctly validates hash (rejects invalid hash as expected). All endpoints have proper structure and error handling."
+
   - task: "Block Reorder Operations"
     implemented: true
     working: false
