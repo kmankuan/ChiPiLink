@@ -208,6 +208,68 @@ async def yappy_ipn_callback(
     return {"status": "ok", "order_id": orderId, "payment_status": new_status}
 
 
+# ============== ORDER ENDPOINTS ==============
+
+@router.post("/orders")
+async def create_platform_order(order_data: dict):
+    """Create a new order for platform store (public)"""
+    from uuid import uuid4
+    
+    # Validate required fields
+    if not order_data.get("items") or len(order_data["items"]) == 0:
+        raise HTTPException(status_code=400, detail="El carrito está vacío")
+    
+    if not order_data.get("cliente_email"):
+        raise HTTPException(status_code=400, detail="Email es requerido")
+    
+    # Generate order ID
+    pedido_id = f"UNA-{uuid4().hex[:8].upper()}"
+    
+    # Calculate totals
+    subtotal = sum(item["precio_unitario"] * item["cantidad"] for item in order_data["items"])
+    total = order_data.get("total", subtotal)
+    
+    # Create order document
+    order_doc = {
+        "pedido_id": pedido_id,
+        "tipo": "unatienda",
+        "items": order_data["items"],
+        "cliente_nombre": order_data.get("cliente_nombre", ""),
+        "cliente_email": order_data["cliente_email"],
+        "cliente_telefono": order_data.get("cliente_telefono", ""),
+        "subtotal": subtotal,
+        "impuestos": order_data.get("impuestos", 0),
+        "descuento": order_data.get("descuento", 0),
+        "total": total,
+        "estado": "pendiente",
+        "estado_pago": "pendiente",
+        "fecha_creacion": datetime.now(timezone.utc).isoformat(),
+        "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.pedidos.insert_one(order_doc)
+    
+    # Update inventory (reserve stock)
+    for item in order_data["items"]:
+        await db.libros.update_one(
+            {"libro_id": item["libro_id"]},
+            {"$inc": {"cantidad_inventario": -item["cantidad"]}}
+        )
+    
+    return {"pedido_id": pedido_id, "total": total, "status": "created"}
+
+
+@router.get("/orders/{pedido_id}")
+async def get_platform_order(pedido_id: str):
+    """Get order details (public)"""
+    order = await db.pedidos.find_one({"pedido_id": pedido_id}, {"_id": 0})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    return order
+
+
 # ============== ADMIN ENDPOINTS ==============
 
 @router.get("/admin/config")
