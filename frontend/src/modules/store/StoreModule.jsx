@@ -94,12 +94,14 @@ export default function StoreModule() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [invRes, gradosRes, materiasRes] = await Promise.all([
+      const [invRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
         api.get('/admin/inventario'),
+        api.get('/categorias'),
         api.get('/grados'),
         api.get('/materias')
       ]);
       setInventario(invRes.data);
+      setCategorias(categoriasRes.data || []);
       setGrados(gradosRes.data.grados);
       setMaterias(materiasRes.data.materias);
     } catch (error) {
@@ -109,21 +111,73 @@ export default function StoreModule() {
     }
   };
 
-  const filteredProducts = inventario.libros?.filter(libro =>
-    libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    libro.grado?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    libro.materia?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredProducts = inventario.libros?.filter(libro => {
+    const matchesSearch = libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      libro.grado?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      libro.materia?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
+    return matchesSearch && matchesCategoria;
+  }) || [];
 
   const openEditDialog = (product = null) => {
     if (product) {
       setEditingProduct(product);
-      setEditForm(product);
+      setEditForm({
+        ...emptyProductRow,
+        ...product,
+        requiere_preparacion: product.requiere_preparacion || false
+      });
     } else {
       setEditingProduct(null);
       setEditForm({...emptyProductRow});
     }
     setEditDialog(true);
+  };
+
+  // Category management functions
+  const openCategoryDialog = (category = null) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryForm({ nombre: category.nombre, icono: category.icono, orden: category.orden });
+    } else {
+      setEditingCategory(null);
+      setCategoryForm({ nombre: '', icono: '📦', orden: categorias.length + 1 });
+    }
+    setCategoryDialog(true);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!categoryForm.nombre.trim()) {
+      toast.error('El nombre es requerido');
+      return;
+    }
+    setSavingCategory(true);
+    try {
+      if (editingCategory) {
+        await api.put(`/admin/categorias/${editingCategory.categoria_id}`, categoryForm);
+        toast.success('Categoría actualizada');
+      } else {
+        await api.post('/admin/categorias', categoryForm);
+        toast.success('Categoría creada');
+      }
+      setCategoryDialog(false);
+      fetchData();
+    } catch (error) {
+      toast.error('Error al guardar categoría');
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async (categoriaId) => {
+    if (!confirm('¿Eliminar esta categoría?')) return;
+    try {
+      await api.delete(`/admin/categorias/${categoriaId}`);
+      toast.success('Categoría eliminada');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al eliminar');
+    }
   };
 
   const handleSaveProduct = async () => {
