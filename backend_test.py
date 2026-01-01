@@ -1651,6 +1651,253 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_multi_category_system(self):
+        """Test Multi-Category Product System for Unatienda"""
+        print("\n🏪 Testing Multi-Category Product System...")
+        
+        # Use admin token for category management
+        old_token = self.token
+        self.token = self.admin_token
+        
+        success = True
+        
+        # 1. Test Categories CRUD
+        print("\n📂 Testing Categories CRUD...")
+        
+        # Test GET /api/categorias - Should return default categories
+        categorias = self.run_test(
+            "GET /api/categorias",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        if categorias:
+            # Validate default categories structure
+            expected_categories = ["libros", "snacks", "bebidas", "preparados", "uniformes", "servicios"]
+            found_categories = [cat.get("categoria_id") for cat in categorias]
+            
+            for expected_cat in expected_categories:
+                if expected_cat in found_categories:
+                    self.log_test(f"Default Category '{expected_cat}' Present", True)
+                else:
+                    self.log_test(f"Default Category '{expected_cat}' Present", False, f"Missing category '{expected_cat}'")
+                    success = False
+            
+            # Validate category structure
+            if len(categorias) > 0:
+                category = categorias[0]
+                required_fields = ['categoria_id', 'nombre', 'icono', 'orden', 'activo']
+                for field in required_fields:
+                    if field in category:
+                        self.log_test(f"Category Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Category Contains '{field}'", False, f"Missing '{field}' field")
+                        success = False
+        else:
+            success = False
+        
+        # Test POST /api/admin/categorias - Create new category
+        new_category_data = {
+            "categoria_id": "test_category",
+            "nombre": "Categoría de Prueba",
+            "icono": "🧪",
+            "orden": 10
+        }
+        
+        created_category = self.run_test(
+            "POST /api/admin/categorias",
+            "POST",
+            "admin/categorias",
+            200,
+            new_category_data
+        )
+        
+        if created_category and created_category.get("categoria_id") == "test_category":
+            self.log_test("Create New Category", True)
+            
+            # Test PUT /api/admin/categorias/{categoria_id} - Update category
+            update_data = {
+                "nombre": "Categoría de Prueba Actualizada",
+                "icono": "🔬",
+                "orden": 15
+            }
+            
+            updated_category = self.run_test(
+                "PUT /api/admin/categorias/test_category",
+                "PUT",
+                "admin/categorias/test_category",
+                200,
+                update_data
+            )
+            
+            if updated_category and updated_category.get("nombre") == "Categoría de Prueba Actualizada":
+                self.log_test("Update Category", True)
+            else:
+                self.log_test("Update Category", False, "Category update failed")
+                success = False
+            
+            # Test DELETE /api/admin/categorias/{categoria_id} - Delete category (should work since no products)
+            delete_result = self.run_test(
+                "DELETE /api/admin/categorias/test_category",
+                "DELETE",
+                "admin/categorias/test_category",
+                200
+            )
+            
+            if delete_result and delete_result.get("success"):
+                self.log_test("Delete Empty Category", True)
+            else:
+                self.log_test("Delete Empty Category", False, "Category deletion failed")
+                success = False
+        else:
+            self.log_test("Create New Category", False, "Category creation failed")
+            success = False
+        
+        # 2. Test Products with Categories
+        print("\n📚 Testing Products with Categories...")
+        
+        # Test GET /api/platform-store/products - Should show products with categoria field
+        self.token = None  # Remove auth for public endpoint
+        
+        platform_products = self.run_test(
+            "GET /api/platform-store/products",
+            "GET",
+            "platform-store/products",
+            200
+        )
+        
+        if platform_products and platform_products.get('products'):
+            products = platform_products['products']
+            if len(products) > 0:
+                # Check if products have categoria field
+                product = products[0]
+                if 'categoria' in product:
+                    self.log_test("Products Have 'categoria' Field", True, f"Category: {product.get('categoria', 'None')}")
+                else:
+                    self.log_test("Products Have 'categoria' Field", False, "Missing 'categoria' field")
+                    success = False
+                
+                # Check if existing products have categoria="libros" (as mentioned in review)
+                libros_products = [p for p in products if p.get('categoria') == 'libros']
+                if len(libros_products) > 0:
+                    self.log_test("Existing Products Have categoria='libros'", True, f"Found {len(libros_products)} books")
+                else:
+                    self.log_test("Existing Products Have categoria='libros'", False, "No products with categoria='libros'")
+                    success = False
+            else:
+                self.log_test("Products Available for Category Testing", False, "No products found")
+                success = False
+        else:
+            success = False
+        
+        # Test category filtering
+        category_filtered = self.run_test(
+            "GET /api/platform-store/products?categoria=libros",
+            "GET",
+            "platform-store/products?categoria=libros",
+            200
+        )
+        
+        if category_filtered and category_filtered.get('products'):
+            filtered_products = category_filtered['products']
+            # All products should have categoria="libros"
+            all_libros = all(p.get('categoria') == 'libros' for p in filtered_products)
+            if all_libros:
+                self.log_test("Category Filtering Works", True, f"All {len(filtered_products)} products are 'libros'")
+            else:
+                self.log_test("Category Filtering Works", False, "Some products don't match filter")
+                success = False
+        else:
+            self.log_test("Category Filtering Works", False, "Category filtering failed")
+            success = False
+        
+        # Test GET /api/libros - Existing books endpoint should still work
+        self.token = old_token  # Restore token for authenticated endpoint
+        
+        libros_endpoint = self.run_test(
+            "GET /api/libros (Legacy Endpoint)",
+            "GET",
+            "libros",
+            200
+        )
+        
+        if libros_endpoint:
+            self.log_test("Legacy Books Endpoint Still Works", True, f"Found {len(libros_endpoint)} books")
+        else:
+            self.log_test("Legacy Books Endpoint Still Works", False, "Legacy endpoint failed")
+            success = False
+        
+        # 3. Test New Product Fields
+        print("\n🔧 Testing New Product Fields...")
+        
+        # Test creating a product with new fields
+        self.token = self.admin_token
+        
+        # Create a test product with requiere_preparacion and categoria
+        test_product_data = {
+            "nombre": "Hotdog Especial",
+            "descripcion": "Hotdog con ingredientes especiales que requiere preparación",
+            "grado": "N/A",  # Not applicable for prepared foods
+            "materia": "N/A",  # Not applicable for prepared foods
+            "precio": 3.50,
+            "cantidad_inventario": 50,
+            "categoria": "preparados",
+            "requiere_preparacion": True
+        }
+        
+        # Note: The current LibroBase model doesn't include categoria or requiere_preparacion fields
+        # This test will likely fail, indicating the backend needs to be updated
+        created_product = self.run_test(
+            "Create Product with New Fields",
+            "POST",
+            "admin/libros",
+            200,
+            test_product_data
+        )
+        
+        if created_product:
+            if 'categoria' in created_product and 'requiere_preparacion' in created_product:
+                self.log_test("Product Created with New Fields", True)
+                
+                # Clean up - delete the test product
+                product_id = created_product.get('libro_id')
+                if product_id:
+                    self.run_test(
+                        "Cleanup Test Product",
+                        "DELETE",
+                        f"admin/libros/{product_id}",
+                        200
+                    )
+            else:
+                self.log_test("Product Created with New Fields", False, "New fields not present in created product")
+                success = False
+        else:
+            self.log_test("Product Created with New Fields", False, "Product creation failed - backend may need model updates")
+            success = False
+        
+        # 4. Test Category Deletion Protection
+        print("\n🛡️ Testing Category Deletion Protection...")
+        
+        # Try to delete a category that has products (should fail)
+        delete_protected = self.run_test(
+            "DELETE Category with Products (Should Fail)",
+            "DELETE",
+            "admin/categorias/libros",
+            400  # Expecting failure
+        )
+        
+        # If we get None (meaning 400 was returned), the protection works
+        if delete_protected is None:
+            self.log_test("Category Deletion Protection Works", True, "Cannot delete category with products")
+        else:
+            self.log_test("Category Deletion Protection Works", False, "Category deletion should be blocked")
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_unatienda_public_store_backend_apis(self):
         """Test Unatienda Public Store Backend APIs as requested in review"""
         print("\n🏪 Testing Unatienda Public Store Backend APIs...")
