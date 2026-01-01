@@ -28,6 +28,7 @@ import {
   Link as LinkIcon
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
+import InlineEditToggle from '@/components/common/InlineEditToggle';
 
 export function Header() {
   const { t, i18n } = useTranslation();
