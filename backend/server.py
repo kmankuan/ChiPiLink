@@ -382,6 +382,9 @@ class BlockOrderItem(BaseModel):
     bloque_id: str
     orden: int
 
+class ReorderBlocksRequest(BaseModel):
+    orders: List[BlockOrderItem]
+
 class ItemPedido(BaseModel):
     libro_id: str
     nombre_libro: str
