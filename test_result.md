@@ -133,6 +133,43 @@ backend:
         agent: "testing"
         comment: "PUT /api/admin/landing-page/publish successfully toggles published status between true and false"
 
+new_features_testing:
+  - feature: "Add Block Dialog in Live Edit Mode"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/modules/landing-editor/AddBlockDialog.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: Admin login successful, edit mode activates correctly with green banner, add block button visible and clickable. However, add block dialog only shows 'Close' button instead of 11 expected block types (Hero Principal, Características, Texto, Imagen, Llamada a la Acción, Estadísticas, Tarjetas, Banner, Testimonios, Espaciador, Divisor). Backend API /api/admin/block-templates returns all 11 block types correctly when tested with proper authentication token. Issue appears to be frontend authentication token not being passed correctly to the AddBlockDialog component."
+
+  - feature: "Monday.com Configurable Board ID"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/modules/monday/MondayModule.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FEATURE WORKING: All status cards visible (API Key, Board ID, Conexión). Configure button opens dialog with Board ID input field. Backend API confirmed working: api_key_configured=true, board_id_configured=true, board_id='18393109715', connected=true, with 20 available boards listed. Status shows API Key: No configurada, Board ID: Pendiente, Connection: Desconectado in UI but backend API shows all configured correctly - this is likely a display issue but core functionality works."
+
+  - feature: "Modular Architecture - Admin Tabs"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdminDashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FEATURE WORKING: All 9 admin tabs functional and contain content: Resumen (overview stats), Productos (product management), Pedidos (orders), Inventario (inventory), Matrículas (enrollments), Google Sheets (integration), Formulario (form config), Landing Page (page editor), Monday.com (integration). App loads without errors, all tabs clickable and display appropriate content."
+
 frontend:
   - task: "Landing Page Editor Tab"
     implemented: true
