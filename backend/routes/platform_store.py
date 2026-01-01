@@ -140,9 +140,9 @@ async def create_yappy_order(
     if not validation["success"]:
         raise HTTPException(status_code=400, detail=validation.get("error"))
     
-    # Get IPN URL from config
-    site_config = await db.site_config.find_one({"config_id": "main"})
-    base_url = site_config.get("base_url", "") if site_config else ""
+    # Get IPN URL from Yappy config domain
+    yappy_config = await db.app_config.find_one({"config_key": "platform_store_yappy"})
+    base_url = yappy_config.get("value", {}).get("url_domain", "") if yappy_config else ""
     ipn_url = f"{base_url}/api/platform-store/yappy/ipn"
     
     # Create order
