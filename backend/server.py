@@ -2485,13 +2485,13 @@ async def get_embed_code(admin: dict = Depends(get_admin_user)):
         "direct_url": f"{base_url}/embed/orden"
     }
 
-# Include router
-app.include_router(api_router)
-
 # Include Platform Store routes
 from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
 init_platform_store_routes(db, get_admin_user, get_current_user)
 api_router.include_router(platform_store_router)
+
+# Include router
+app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
