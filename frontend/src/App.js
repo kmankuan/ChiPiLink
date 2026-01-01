@@ -8,6 +8,7 @@ import '@/i18n';
 // Contexts
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { SiteConfigProvider } from '@/contexts/SiteConfigContext';
 
 // Layout
 import { Header } from '@/components/layout/Header';
