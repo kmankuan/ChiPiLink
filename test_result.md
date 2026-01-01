@@ -199,7 +199,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Block Reorder Operations"
+    - "Branding Neutralization (P1)"
+    - "Thermal Receipt (P2)"
+    - "Monday.com Integration (P3)"
   stuck_tasks:
     - "Block Reorder Operations"
   test_all: false
@@ -212,3 +214,5 @@ agent_communication:
     message: "✅ FRONTEND TESTING COMPLETED SUCCESSFULLY! All 3 frontend tasks are now working correctly. Dynamic landing page renders properly with all expected content sections. Admin dashboard Landing Page Editor is fully functional with all required UI elements. Block management interface working with add block dialog, site configuration dialog, and proper empty state display. Admin login working with provided credentials. Only remaining issue is backend block reorder endpoint FastAPI model problem."
   - agent: "testing"
     message: "✅ LIVE EDIT MODE TESTING COMPLETED! Successfully tested the new Live Edit Mode feature on the Landing Page. All core functionality working: Admin-only edit button visibility, edit mode activation with green banner, inline text editing with EditableText component, image editing with hover overlays, save functionality with unsaved changes indicator, and proper exit edit mode behavior. Feature is fully functional and ready for use."
+  - agent: "testing"
+    message: "🎯 PRIORITY TASKS TESTING COMPLETED! Successfully tested the 3 completed tasks from review request: ✅ Task 1 (P1): Branding Neutralization - Site name is now dynamic and configurable, no longer hardcoded as 'Librería Escolar'. ✅ Task 2 (P2): Thermal Receipt - Receipt endpoint working perfectly, returns complete order and client data for both registered and public orders. ✅ Task 3 (P3): Monday.com Integration - Admin status endpoint functional, shows API key configured, board ID pending (as expected), connection working, and lists available boards. All 3 priority tasks are fully functional and ready for use."
