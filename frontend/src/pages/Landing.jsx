@@ -523,7 +523,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'features':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || config.subtitulo || isEditMode) && (
               <div className="text-center mb-12">
@@ -602,7 +602,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'text':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section 
             className="px-4 md:px-8 lg:px-12 py-12 md:py-16 max-w-7xl mx-auto"
             style={{ textAlign: config.alineacion || 'center' }}
@@ -632,7 +632,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'image':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
             <figure style={{ width: config.ancho || '100%', margin: '0 auto' }}>
               <EditableImage 
@@ -657,7 +657,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'cta':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             <div 
               className="relative rounded-3xl overflow-hidden p-8 md:p-12 lg:p-16"
@@ -705,7 +705,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'stats':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-16 max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {(config.items || []).map((item, index) => (
@@ -752,7 +752,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'cards':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || isEditMode) && (
               <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-12 text-center">
@@ -823,7 +823,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'banner':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
             <div 
               className="rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8"
@@ -873,7 +873,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'testimonials':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || isEditMode) && (
               <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-12 text-center">
@@ -954,7 +954,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'spacer':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <div 
             style={{ height: config.altura || '60px' }} 
             className={isEditMode ? 'bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300' : ''}
@@ -970,7 +970,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave }) {
 
     case 'divider':
       return (
-        <BlockWrapper>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
           <div 
             className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12"
             style={{ padding: `${config.margen || '40px'} 0` }}
