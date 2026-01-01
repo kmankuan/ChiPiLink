@@ -78,6 +78,7 @@ import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import GoogleSheetsSync from '@/components/admin/GoogleSheetsSync';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
+import MondayModule from '@/modules/monday/MondayModule';
 import { Layers } from 'lucide-react';
 
 // Empty product row template
