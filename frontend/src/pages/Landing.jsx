@@ -195,6 +195,7 @@ export default function Landing() {
   const [editingBlockId, setEditingBlockId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [addBlockDialogOpen, setAddBlockDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchLandingData();
@@ -217,13 +218,35 @@ export default function Landing() {
         setBlocks(activeBlocks);
         setUseStaticPage(false);
       } else {
-        setUseStaticPage(true);
+        // Even without blocks, show the dynamic editor if admin is in edit mode
+        setBlocks([]);
+        setUseStaticPage(false);
       }
     } catch (error) {
       console.error('Error fetching landing data:', error);
       setUseStaticPage(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBlockAdded = (newBlock) => {
+    setBlocks(prev => [...prev, newBlock].sort((a, b) => a.orden - b.orden));
+    setHasChanges(true);
+  };
+
+  const handleDeleteBlock = async (blockId) => {
+    if (!window.confirm('¿Eliminar este bloque?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${BACKEND_URL}/api/admin/landing-page/blocks/${blockId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBlocks(prev => prev.filter(b => b.bloque_id !== blockId));
+      toast.success('Bloque eliminado');
+    } catch (error) {
+      toast.error('Error eliminando bloque');
     }
   };
 
