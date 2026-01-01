@@ -2251,6 +2251,10 @@ class TextbookStoreAPITester:
             ("Platform Store Admin Endpoints", self.test_platform_store_admin_endpoints),
             ("Platform Store Yappy Integration", self.test_platform_store_yappy_integration),
             
+            # NEW: Yappy Checkout Flow Tests (from review request)
+            ("Yappy Checkout Flow Implementation", self.test_yappy_checkout_flow),
+            ("Yappy Checkout Flow with Real Order", self.test_yappy_checkout_flow_with_real_order),
+            
             # Other existing tests
             ("Block-Based Landing Page - Public Endpoints", self.test_block_based_landing_page_public_endpoints),
             ("Block-Based Landing Page - Admin Endpoints", self.test_block_based_landing_page_admin_endpoints),
