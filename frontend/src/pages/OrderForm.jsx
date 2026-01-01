@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,7 @@ import {
 export default function OrderForm() {
   const { t } = useTranslation();
   const { api, user } = useAuth();
+  const { siteConfig } = useSiteConfig();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedStudent = searchParams.get('estudiante');
