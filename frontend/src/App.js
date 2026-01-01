@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { SiteConfigProvider } from '@/contexts/SiteConfigContext';
 import { InlineTranslationProvider } from '@/contexts/InlineTranslationContext';
+import { CartProvider } from '@/contexts/CartContext';
 
 // Layout
 import { Header } from '@/components/layout/Header';
@@ -29,6 +30,11 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import EmbedOrderForm from '@/pages/EmbedOrderForm';
 import Checkout from '@/pages/Checkout';
 import PaymentResult from '@/pages/PaymentResult';
+import Unatienda from '@/pages/Unatienda';
+import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
+
+// Components
+import CartDrawer from '@/components/cart/CartDrawer';
 
 import '@/App.css';
 
@@ -103,6 +109,10 @@ function AppRouter() {
       <Route path="/checkout/:pedidoId" element={<Checkout />} />
       <Route path="/payment/result" element={<PaymentResult />} />
       
+      {/* Unatienda Store Routes */}
+      <Route path="/unatienda" element={<><Header /><Unatienda /></>} />
+      <Route path="/unatienda/checkout" element={<UnatiendaCheckout />} />
+      
       {/* Protected Routes */}
       <Route 
         path="/dashboard" 
@@ -174,19 +184,22 @@ function App() {
       <AuthProvider>
         <SiteConfigProvider>
           <InlineTranslationProvider>
-            <BrowserRouter>
-              <div className="App min-h-screen bg-background noise-bg">
-                <AppRouter />
-                <Toaster 
-                  position="top-right" 
-                richColors 
-                closeButton
-                toastOptions={{
-                  className: 'font-sans'
-                }}
-              />
-            </div>
-          </BrowserRouter>
+            <CartProvider>
+              <BrowserRouter>
+                <div className="App min-h-screen bg-background noise-bg">
+                  <AppRouter />
+                  <CartDrawer />
+                  <Toaster 
+                    position="top-right" 
+                    richColors 
+                    closeButton
+                    toastOptions={{
+                      className: 'font-sans'
+                    }}
+                  />
+                </div>
+              </BrowserRouter>
+            </CartProvider>
           </InlineTranslationProvider>
         </SiteConfigProvider>
       </AuthProvider>
