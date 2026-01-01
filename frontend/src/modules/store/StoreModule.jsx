@@ -47,22 +47,26 @@ import {
 
 const emptyProductRow = {
   nombre: '',
+  categoria: '',
   grado: '',
   materia: '',
   precio: '',
   cantidad_inventario: '',
   descripcion: '',
   isbn: '',
-  editorial: ''
+  editorial: '',
+  requiere_preparacion: false
 };
 
 export default function StoreModule() {
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [inventario, setInventario] = useState({ libros: [], alertas_bajo_stock: [] });
+  const [categorias, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategoria, setFilterCategoria] = useState('all');
   
   // Edit dialog
   const [editDialog, setEditDialog] = useState(false);
@@ -74,6 +78,12 @@ export default function StoreModule() {
   const [bulkDialog, setBulkDialog] = useState(false);
   const [bulkProducts, setBulkProducts] = useState([{...emptyProductRow}]);
   const [savingBulk, setSavingBulk] = useState(false);
+
+  // Category management
+  const [categoryDialog, setCategoryDialog] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryForm, setCategoryForm] = useState({ nombre: '', icono: '📦', orden: 99 });
+  const [savingCategory, setSavingCategory] = useState(false);
   
   const fileInputRef = useRef(null);
 
