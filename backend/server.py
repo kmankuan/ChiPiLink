@@ -29,9 +29,18 @@ JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
 
 # Monday.com Configuration
 MONDAY_API_KEY = os.environ.get('MONDAY_API_KEY', '')
-MONDAY_BOARD_ID = os.environ.get('MONDAY_BOARD_ID', '')
+# Board ID will be loaded from database, fallback to env
+MONDAY_BOARD_ID_ENV = os.environ.get('MONDAY_BOARD_ID', '')
 
-app = FastAPI(title="Librería - Textbook Store API")
+# Helper to get Monday Board ID from DB or env
+async def get_monday_board_id():
+    """Get Monday Board ID from database or fallback to env"""
+    config = await db.app_config.find_one({"config_key": "monday_board_id"})
+    if config and config.get("value"):
+        return config["value"]
+    return MONDAY_BOARD_ID_ENV
+
+app = FastAPI(title="Plataforma E-Commerce API")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer(auto_error=False)
 
