@@ -9,11 +9,13 @@ import {
   Settings,
   Palette,
   FileText,
-  Users
+  Users,
+  Languages
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
 import FormConfigModule from './FormConfigModule';
+import TranslationsModule from './TranslationsModule';
 
 export default function AdminModule() {
   return (
@@ -32,6 +34,10 @@ export default function AdminModule() {
             <FileText className="h-4 w-4" />
             Formularios
           </TabsTrigger>
+          <TabsTrigger value="translations" className="gap-2">
+            <Languages className="h-4 w-4" />
+            Traducciones
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
@@ -44,6 +50,10 @@ export default function AdminModule() {
 
         <TabsContent value="forms">
           <FormConfigModule />
+        </TabsContent>
+
+        <TabsContent value="translations">
+          <TranslationsModule />
         </TabsContent>
       </Tabs>
     </div>
