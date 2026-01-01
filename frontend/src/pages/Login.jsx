@@ -57,11 +57,10 @@ export default function Login() {
         <div className="absolute inset-0 bg-primary/80" />
         <div className="relative z-10 p-12 flex flex-col justify-end text-primary-foreground">
           <h2 className="font-serif text-4xl font-bold mb-4">
-            Librería Escolar
+            {siteConfig?.nombre_sitio || 'Mi Tienda'}
           </h2>
           <p className="text-lg opacity-90 max-w-md">
-            Su destino único para todos los libros de texto escolares. 
-            Ordenar nunca fue tan fácil.
+            {siteConfig?.descripcion || 'Plataforma de comercio electrónico'}
           </p>
         </div>
       </div>
@@ -74,7 +73,7 @@ export default function Login() {
             <div className="p-2 rounded-xl bg-primary text-primary-foreground">
               <Book className="h-6 w-6" />
             </div>
-            <span className="font-serif text-2xl font-bold">Librería Escolar</span>
+            <span className="font-serif text-2xl font-bold">{siteConfig?.nombre_sitio || 'Mi Tienda'}</span>
           </div>
 
           <div className="mb-8">
