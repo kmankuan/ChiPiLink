@@ -807,6 +807,89 @@ async def logout(request: Request, response: Response):
     response.delete_cookie(key="session_token", path="/")
     return {"success": True}
 
+# ============== CATEGORÍAS DE PRODUCTOS ==============
+
+@api_router.get("/categorias")
+async def get_categorias():
+    """Get all product categories"""
+    categorias = await db.categorias.find({"activo": True}, {"_id": 0}).to_list(100)
+    if not categorias:
+        # Return default categories if none exist
+        return [
+            {"categoria_id": "libros", "nombre": "Libros", "icono": "📚", "orden": 1, "activo": True},
+            {"categoria_id": "snacks", "nombre": "Snacks", "icono": "🍫", "orden": 2, "activo": True},
+            {"categoria_id": "bebidas", "nombre": "Bebidas", "icono": "🥤", "orden": 3, "activo": True},
+            {"categoria_id": "preparados", "nombre": "Preparados", "icono": "🌭", "orden": 4, "activo": True},
+            {"categoria_id": "uniformes", "nombre": "Uniformes", "icono": "👕", "orden": 5, "activo": True},
+            {"categoria_id": "servicios", "nombre": "Servicios", "icono": "🔧", "orden": 6, "activo": True},
+        ]
+    return sorted(categorias, key=lambda x: x.get("orden", 99))
+
+
+@api_router.post("/admin/categorias")
+async def create_categoria(categoria: dict, admin: dict = Depends(get_admin_user)):
+    """Create a new product category"""
+    categoria_id = categoria.get("categoria_id") or f"cat_{uuid.uuid4().hex[:8]}"
+    
+    doc = {
+        "categoria_id": categoria_id,
+        "nombre": categoria.get("nombre", "Nueva Categoría"),
+        "icono": categoria.get("icono", "📦"),
+        "orden": categoria.get("orden", 99),
+        "activo": True,
+        "fecha_creacion": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.categorias.insert_one(doc)
+    return {k: v for k, v in doc.items() if k != "_id"}
+
+
+@api_router.put("/admin/categorias/{categoria_id}")
+async def update_categoria(categoria_id: str, categoria: dict, admin: dict = Depends(get_admin_user)):
+    """Update a product category"""
+    update_data = {
+        "nombre": categoria.get("nombre"),
+        "icono": categoria.get("icono"),
+        "orden": categoria.get("orden"),
+        "activo": categoria.get("activo", True)
+    }
+    # Remove None values
+    update_data = {k: v for k, v in update_data.items() if v is not None}
+    
+    result = await db.categorias.update_one(
+        {"categoria_id": categoria_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    updated = await db.categorias.find_one({"categoria_id": categoria_id}, {"_id": 0})
+    return updated
+
+
+@api_router.delete("/admin/categorias/{categoria_id}")
+async def delete_categoria(categoria_id: str, admin: dict = Depends(get_admin_user)):
+    """Soft delete a product category"""
+    # Check if category has products
+    products_count = await db.libros.count_documents({"categoria": categoria_id, "activo": True})
+    if products_count > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"No se puede eliminar. Hay {products_count} productos en esta categoría."
+        )
+    
+    result = await db.categorias.update_one(
+        {"categoria_id": categoria_id},
+        {"$set": {"activo": False}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    return {"success": True}
+
+
 # ============== LIBROS (TEXTBOOKS) ROUTES ==============
 
 @api_router.get("/libros", response_model=List[dict])
