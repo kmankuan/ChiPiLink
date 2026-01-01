@@ -124,6 +124,12 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
+        ) : Object.keys(templates).length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Layers className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>No se pudieron cargar las plantillas de bloques.</p>
+            <p className="text-sm mt-2">Por favor verifica tu conexión e intenta de nuevo.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
             {Object.entries(templates).map(([tipo, template]) => {
