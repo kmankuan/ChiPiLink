@@ -377,6 +377,7 @@ test_plan:
     - "Navigation and URL Routing"
     - "Lazy Loading and Performance"
     - "Mobile Responsiveness"
+    - "Yappy Checkout Frontend Pages"
 
 agent_communication:
   - agent: "testing"
