@@ -89,7 +89,7 @@ export default function Receipt() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-serif text-2xl font-bold mb-2">
-            Librería Escolar
+            {siteConfig?.nombre_sitio || 'Mi Tienda'}
           </h1>
           <p className="text-sm text-muted-foreground">
             Recibo de Pedido
