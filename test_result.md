@@ -369,10 +369,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Modular Admin Dashboard Testing"
+    - "Multi-Category Product System"
   stuck_tasks:
     - "Block Reorder Operations"
     - "Add Block Dialog in Live Edit Mode"
+    - "Multi-Category Product System"
   test_all: false
   test_priority: "high_first"
   completed_testing:
