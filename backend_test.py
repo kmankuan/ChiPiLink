@@ -1668,11 +1668,18 @@ class TextbookStoreAPITester:
         print("🚀 Starting Textbook Store API Tests")
         print(f"Testing against: {self.base_url}")
         
-        # Test sequence
+        # Test sequence - prioritizing the 3 specific tasks from review request
         tests = [
             ("Admin Setup", self.test_admin_setup),
             ("Admin Login", self.test_admin_login),
             ("Seed Data", self.test_seed_data),
+            
+            # Priority tests from review request
+            ("Task 1: Branding Neutralization (P1)", self.test_branding_neutralization),
+            ("Task 2: Thermal Receipt (P2)", self.test_thermal_receipt),
+            ("Task 3: Monday.com Integration (P3)", self.test_monday_integration),
+            
+            # Other existing tests
             ("Block-Based Landing Page - Public Endpoints", self.test_block_based_landing_page_public_endpoints),
             ("Block-Based Landing Page - Admin Endpoints", self.test_block_based_landing_page_admin_endpoints),
             ("Block CRUD Operations", self.test_block_crud_operations),
