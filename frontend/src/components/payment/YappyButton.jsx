@@ -52,23 +52,6 @@ export default function YappyButton({
     }
   };
 
-  const loadYappyScript = () => {
-    // Check if script already exists
-    if (document.querySelector('script[data-yappy-btn]')) {
-      scriptLoaded.current = true;
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = cdnUrl;
-    script.async = true;
-    script.setAttribute('data-yappy-btn', 'true');
-    script.onload = () => {
-      scriptLoaded.current = true;
-    };
-    document.body.appendChild(script);
-  };
-
   const initiatePayment = async (phoneNumber) => {
     if (!phoneNumber || phoneNumber.length < 8) {
       toast.error('Número de teléfono inválido');
