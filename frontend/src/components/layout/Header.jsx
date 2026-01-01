@@ -24,8 +24,10 @@ import {
   Settings,
   ShoppingCart,
   Users,
-  LayoutDashboard
+  LayoutDashboard,
+  Link as LinkIcon
 } from 'lucide-react';
+import LanguageSelector from '@/components/common/LanguageSelector';
 
 export function Header() {
   const { t, i18n } = useTranslation();
