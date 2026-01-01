@@ -165,19 +165,21 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <div className="App min-h-screen bg-background noise-bg">
-            <AppRouter />
-            <Toaster 
-              position="top-right" 
-              richColors 
-              closeButton
-              toastOptions={{
-                className: 'font-sans'
-              }}
-            />
-          </div>
-        </BrowserRouter>
+        <SiteConfigProvider>
+          <BrowserRouter>
+            <div className="App min-h-screen bg-background noise-bg">
+              <AppRouter />
+              <Toaster 
+                position="top-right" 
+                richColors 
+                closeButton
+                toastOptions={{
+                  className: 'font-sans'
+                }}
+              />
+            </div>
+          </BrowserRouter>
+        </SiteConfigProvider>
       </AuthProvider>
     </ThemeProvider>
   );
