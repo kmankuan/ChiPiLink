@@ -1651,6 +1651,318 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_unatienda_public_store_backend_apis(self):
+        """Test Unatienda Public Store Backend APIs as requested in review"""
+        print("\n🏪 Testing Unatienda Public Store Backend APIs...")
+        
+        # Remove auth for public endpoints
+        old_token = self.token
+        self.token = None
+        
+        # Test GET /api/platform-store/products - Get products list
+        products_result = self.run_test(
+            "GET /api/platform-store/products",
+            "GET",
+            "platform-store/products",
+            200
+        )
+        
+        success = True
+        
+        # Validate products response structure
+        if products_result:
+            required_fields = ['products', 'total', 'page', 'pages']
+            for field in required_fields:
+                if field in products_result:
+                    self.log_test(f"Products Response Contains '{field}'", True)
+                else:
+                    self.log_test(f"Products Response Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+            
+            # Check if we have products with pagination
+            if 'products' in products_result and isinstance(products_result['products'], list):
+                products = products_result['products']
+                self.log_test("Products List Available", True, f"Found {len(products)} products")
+                
+                # Validate product structure if we have products
+                if len(products) > 0:
+                    product = products[0]
+                    product_fields = ['libro_id', 'nombre', 'precio', 'cantidad_inventario']
+                    for field in product_fields:
+                        if field in product:
+                            self.log_test(f"Product Contains '{field}'", True)
+                        else:
+                            self.log_test(f"Product Contains '{field}'", False, f"Missing '{field}' field")
+                            success = False
+            else:
+                self.log_test("Products List Available", False, "Products field is not a list")
+                success = False
+        else:
+            success = False
+        
+        # Test search/filter functionality
+        search_result = self.run_test(
+            "GET /api/platform-store/products with search",
+            "GET",
+            "platform-store/products?buscar=matematicas",
+            200
+        )
+        
+        if search_result:
+            self.log_test("Products Search Functionality", True)
+        else:
+            self.log_test("Products Search Functionality", False, "Search failed")
+            success = False
+        
+        # Test pagination
+        page_result = self.run_test(
+            "GET /api/platform-store/products with pagination",
+            "GET",
+            "platform-store/products?page=1&limit=5",
+            200
+        )
+        
+        if page_result and 'products' in page_result:
+            products_count = len(page_result['products'])
+            if products_count <= 5:
+                self.log_test("Products Pagination", True, f"Returned {products_count} products (limit 5)")
+            else:
+                self.log_test("Products Pagination", False, f"Returned {products_count} products, expected max 5")
+                success = False
+        else:
+            self.log_test("Products Pagination", False, "Pagination failed")
+            success = False
+        
+        # Restore token for order tests
+        self.token = old_token
+        
+        return success and all([products_result, search_result, page_result])
+
+    def test_unatienda_order_creation_api(self):
+        """Test Unatienda Order Creation API as requested in review"""
+        print("\n📦 Testing Unatienda Order Creation API...")
+        
+        # Remove auth for public order creation
+        old_token = self.token
+        self.token = None
+        
+        # First get available products
+        products_result = self.run_test(
+            "Get Products for Order Creation",
+            "GET",
+            "platform-store/products?limit=5",
+            200
+        )
+        
+        if not products_result or not products_result.get('products') or len(products_result['products']) == 0:
+            self.log_test("Order Creation Test", False, "No products available for testing")
+            self.token = old_token
+            return False
+        
+        # Select a product for testing
+        product = products_result['products'][0]
+        
+        # Test POST /api/platform-store/orders - Create order endpoint
+        order_data = {
+            "items": [
+                {
+                    "libro_id": product['libro_id'],
+                    "nombre": product['nombre'],
+                    "cantidad": 2,
+                    "precio_unitario": product['precio']
+                }
+            ],
+            "cliente_nombre": "María García López",
+            "cliente_email": "maria.garcia.test@example.com",
+            "cliente_telefono": "+507 6123-4567",
+            "subtotal": product['precio'] * 2,
+            "total": product['precio'] * 2
+        }
+        
+        order_result = self.run_test(
+            "POST /api/platform-store/orders",
+            "POST",
+            "platform-store/orders",
+            200,
+            order_data
+        )
+        
+        success = True
+        created_order_id = None
+        
+        if order_result:
+            # Verify order ID format starts with "UNA-"
+            if 'pedido_id' in order_result:
+                pedido_id = order_result['pedido_id']
+                created_order_id = pedido_id
+                if pedido_id.startswith('UNA-'):
+                    self.log_test("Order ID Format (starts with 'UNA-')", True, f"Order ID: {pedido_id}")
+                else:
+                    self.log_test("Order ID Format (starts with 'UNA-')", False, f"Expected 'UNA-' prefix, got: {pedido_id}")
+                    success = False
+            else:
+                self.log_test("Order Creation Response Contains pedido_id", False, "Missing pedido_id in response")
+                success = False
+            
+            # Verify other response fields
+            required_fields = ['total', 'status']
+            for field in required_fields:
+                if field in order_result:
+                    self.log_test(f"Order Response Contains '{field}'", True)
+                else:
+                    self.log_test(f"Order Response Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+        else:
+            success = False
+        
+        # Test inventory decrement (check if product stock was reduced)
+        if created_order_id:
+            # Get the product again to check if inventory was decremented
+            updated_products = self.run_test(
+                "Check Inventory Decrement",
+                "GET",
+                f"platform-store/products",
+                200
+            )
+            
+            if updated_products and updated_products.get('products'):
+                updated_product = next((p for p in updated_products['products'] if p['libro_id'] == product['libro_id']), None)
+                if updated_product:
+                    original_stock = product['cantidad_inventario']
+                    new_stock = updated_product['cantidad_inventario']
+                    expected_stock = original_stock - 2  # We ordered 2 items
+                    
+                    if new_stock == expected_stock:
+                        self.log_test("Inventory Decremented After Order", True, f"Stock: {original_stock} → {new_stock}")
+                    else:
+                        self.log_test("Inventory Decremented After Order", False, f"Expected {expected_stock}, got {new_stock}")
+                        success = False
+                else:
+                    self.log_test("Inventory Decremented After Order", False, "Product not found after order")
+                    success = False
+        
+        # Test GET /api/platform-store/orders/{pedido_id} - Get order details
+        if created_order_id:
+            order_details = self.run_test(
+                "GET /api/platform-store/orders/{pedido_id}",
+                "GET",
+                f"platform-store/orders/{created_order_id}",
+                200
+            )
+            
+            if order_details:
+                # Verify order details structure
+                order_fields = ['pedido_id', 'items', 'cliente_nombre', 'cliente_email', 'subtotal', 'total', 'estado', 'estado_pago']
+                for field in order_fields:
+                    if field in order_details:
+                        self.log_test(f"Order Details Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Order Details Contains '{field}'", False, f"Missing '{field}' field")
+                        success = False
+                
+                # Verify order data matches what we sent
+                if order_details.get('cliente_email') == order_data['cliente_email']:
+                    self.log_test("Order Details Match Input Data", True)
+                else:
+                    self.log_test("Order Details Match Input Data", False, "Order data doesn't match input")
+                    success = False
+            else:
+                self.log_test("Get Order Details", False, "Failed to retrieve order details")
+                success = False
+        
+        # Test GET /api/platform-store/orders/{invalid_id} - Test with invalid order ID
+        invalid_order_test = self.run_test(
+            "GET /api/platform-store/orders/{invalid_id} (should return 404)",
+            "GET",
+            "platform-store/orders/INVALID-ORDER-ID",
+            404
+        )
+        
+        # For 404 test, None result means we got the expected 404 status
+        if invalid_order_test is None:
+            self.log_test("Invalid Order ID Returns 404", True)
+        else:
+            self.log_test("Invalid Order ID Returns 404", False, "Expected 404, got different response")
+            success = False
+        
+        # Store the created order ID for cleanup or further testing
+        if created_order_id:
+            self.created_resources['orders'].append(created_order_id)
+        
+        # Restore token
+        self.token = old_token
+        
+        return success and order_result is not None
+
+    def test_unatienda_order_validation(self):
+        """Test Unatienda Order Validation"""
+        print("\n✅ Testing Unatienda Order Validation...")
+        
+        # Remove auth for public order creation
+        old_token = self.token
+        self.token = None
+        
+        success = True
+        
+        # Test empty cart validation
+        empty_cart_data = {
+            "items": [],
+            "cliente_nombre": "Test User",
+            "cliente_email": "test@example.com",
+            "subtotal": 0,
+            "total": 0
+        }
+        
+        empty_cart_result = self.run_test(
+            "Order Creation with Empty Cart (should fail)",
+            "POST",
+            "platform-store/orders",
+            400,  # Expecting 400 error
+            empty_cart_data
+        )
+        
+        # None result means we got the expected 400 status
+        if empty_cart_result is None:
+            self.log_test("Empty Cart Validation", True, "Empty cart properly rejected")
+        else:
+            self.log_test("Empty Cart Validation", False, "Empty cart should be rejected")
+            success = False
+        
+        # Test missing email validation
+        missing_email_data = {
+            "items": [
+                {
+                    "libro_id": "test_libro_123",
+                    "nombre": "Test Book",
+                    "cantidad": 1,
+                    "precio_unitario": 25.00
+                }
+            ],
+            "cliente_nombre": "Test User",
+            "subtotal": 25.00,
+            "total": 25.00
+        }
+        
+        missing_email_result = self.run_test(
+            "Order Creation without Email (should fail)",
+            "POST",
+            "platform-store/orders",
+            400,  # Expecting 400 error
+            missing_email_data
+        )
+        
+        # None result means we got the expected 400 status
+        if missing_email_result is None:
+            self.log_test("Missing Email Validation", True, "Missing email properly rejected")
+        else:
+            self.log_test("Missing Email Validation", False, "Missing email should be rejected")
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        
+        return success
+
     def test_user_login_with_test_credentials(self):
         """Test login with the specific test credentials mentioned in the review"""
         print("\n🔐 Testing Login with Test Credentials...")
