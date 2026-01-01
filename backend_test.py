@@ -1914,9 +1914,9 @@ class TextbookStoreAPITester:
                 self.log_test("Yappy Validation Expected Error", True, "Got expected validation error")
                 yappy_validation_success = True
         
-        # Test 3: Test the endpoint structure for create-order (without actually creating)
-        # We'll test that the endpoint exists and has the right parameter structure
-        create_order_data = {
+        # Test 3: Test the endpoint structure for create-order (with query parameters)
+        # Build query string for POST request
+        create_order_params = {
             "order_id": "TEST123",
             "alias_yappy": "60001234", 
             "subtotal": 10.00,
@@ -1925,13 +1925,14 @@ class TextbookStoreAPITester:
             "total": 10.00
         }
         
-        # Test with POST request body (correct way)
+        query_string = "&".join([f"{k}={v}" for k, v in create_order_params.items()])
+        
+        # Test with POST request with query parameters (correct way)
         yappy_create_order = self.run_test(
             "POST /api/platform-store/yappy/create-order - Test endpoint structure",
             "POST",
-            "platform-store/yappy/create-order",
-            400,  # Expecting 400 because Yappy validation will fail
-            create_order_data
+            f"platform-store/yappy/create-order?{query_string}",
+            400  # Expecting 400 because Yappy validation will fail
         )
         
         # For create order, we expect a 400 error because Yappy validation will fail
