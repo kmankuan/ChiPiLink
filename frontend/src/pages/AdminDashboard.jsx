@@ -60,7 +60,9 @@ import {
   FileImage,
   User,
   Phone,
-  Mail
+  Mail,
+  Send,
+  RefreshCw
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
