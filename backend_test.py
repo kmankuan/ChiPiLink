@@ -1147,6 +1147,318 @@ class TextbookStoreAPITester:
         self.token = old_token
         return False
 
+    def test_branding_neutralization(self):
+        """Test Task 1: Branding Neutralization (P1)"""
+        print("\n🏷️ Testing Branding Neutralization (P1)...")
+        
+        # Remove auth for public endpoint
+        old_token = self.token
+        self.token = None
+        
+        # Test public site config endpoint
+        site_config = self.run_test(
+            "GET /api/public/site-config",
+            "GET",
+            "public/site-config",
+            200
+        )
+        
+        success = True
+        if site_config:
+            # Check that it returns current site config with nombre_sitio
+            if 'nombre_sitio' in site_config:
+                site_name = site_config['nombre_sitio']
+                self.log_test("Site Config Contains 'nombre_sitio'", True, f"Site name: {site_name}")
+                
+                # Check that it's not the old hardcoded "Librería Escolar"
+                if site_name != "Librería Escolar":
+                    self.log_test("Site Name is Dynamic (not 'Librería Escolar')", True, f"Current name: {site_name}")
+                else:
+                    self.log_test("Site Name is Dynamic (not 'Librería Escolar')", False, "Still using hardcoded 'Librería Escolar'")
+                    success = False
+            else:
+                self.log_test("Site Config Contains 'nombre_sitio'", False, "Missing 'nombre_sitio' field")
+                success = False
+                
+            # Check for other required fields
+            required_fields = ['color_primario', 'color_secundario', 'footer_texto']
+            for field in required_fields:
+                if field in site_config:
+                    self.log_test(f"Site Config Contains '{field}'", True)
+                else:
+                    self.log_test(f"Site Config Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+        else:
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
+    def test_thermal_receipt(self):
+        """Test Task 2: Thermal Receipt (P2)"""
+        print("\n🧾 Testing Thermal Receipt (P2)...")
+        
+        # First, create a test order
+        if not self.admin_token:
+            self.log_test("Thermal Receipt Test", False, "Admin token required for setup")
+            return False
+        
+        # Use admin token to create test data
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Get available books
+        books = self.run_test(
+            "Get Books for Receipt Test",
+            "GET",
+            "libros",
+            200
+        )
+        
+        if not books or len(books) == 0:
+            self.log_test("Thermal Receipt Test", False, "No books available for testing")
+            self.token = old_token
+            return False
+        
+        # Create a test user for the order
+        test_user_data = {
+            "email": f"receipt_test_{datetime.now().strftime('%H%M%S')}@test.com",
+            "contrasena": "TestPass123!",
+            "nombre": "Receipt Test User",
+            "telefono": "507-1234-5678",
+            "direccion": "Test Address"
+        }
+        
+        user_result = self.run_test(
+            "Create Test User for Receipt",
+            "POST",
+            "auth/registro",
+            200,
+            test_user_data
+        )
+        
+        if not user_result or 'token' not in user_result:
+            self.log_test("Thermal Receipt Test", False, "Failed to create test user")
+            self.token = old_token
+            return False
+        
+        # Switch to user token
+        user_token = user_result['token']
+        self.token = user_token
+        
+        # Add a student
+        student_data = {
+            "nombre": "Test",
+            "apellido": "Student Receipt",
+            "grado": "1",
+            "escuela": "Test School",
+            "es_nuevo": True
+        }
+        
+        student_result = self.run_test(
+            "Create Test Student for Receipt",
+            "POST",
+            "estudiantes",
+            200,
+            student_data
+        )
+        
+        if not student_result or 'estudiante_id' not in student_result:
+            self.log_test("Thermal Receipt Test", False, "Failed to create test student")
+            self.token = old_token
+            return False
+        
+        student_id = student_result['estudiante_id']
+        
+        # Get user info for approval
+        user_info = self.run_test(
+            "Get User Info for Receipt Test",
+            "GET",
+            "auth/me",
+            200
+        )
+        
+        if not user_info or 'cliente_id' not in user_info:
+            self.log_test("Thermal Receipt Test", False, "Failed to get user info")
+            self.token = old_token
+            return False
+        
+        cliente_id = user_info['cliente_id']
+        
+        # Switch to admin token to approve enrollment
+        self.token = self.admin_token
+        
+        approval_result = self.run_test(
+            "Approve Student for Receipt Test",
+            "PUT",
+            f"admin/matriculas/{cliente_id}/{student_id}/verificar?accion=aprobar",
+            200
+        )
+        
+        if not approval_result:
+            self.log_test("Thermal Receipt Test", False, "Failed to approve student enrollment")
+            self.token = old_token
+            return False
+        
+        # Switch back to user token to create order
+        self.token = user_token
+        
+        # Create order
+        book = books[0]
+        order_data = {
+            "estudiante_id": student_id,
+            "items": [
+                {
+                    "libro_id": book['libro_id'],
+                    "nombre_libro": book['nombre'],
+                    "cantidad": 1,
+                    "precio_unitario": book['precio']
+                }
+            ],
+            "metodo_pago": "transferencia_bancaria",
+            "notas": "Test order for receipt"
+        }
+        
+        order_result = self.run_test(
+            "Create Order for Receipt Test",
+            "POST",
+            "pedidos",
+            200,
+            order_data
+        )
+        
+        if not order_result or 'pedido_id' not in order_result:
+            self.log_test("Thermal Receipt Test", False, "Failed to create test order")
+            self.token = old_token
+            return False
+        
+        pedido_id = order_result['pedido_id']
+        
+        # Now test the receipt endpoint
+        receipt_result = self.run_test(
+            "GET /api/pedidos/{pedido_id}/recibo",
+            "GET",
+            f"pedidos/{pedido_id}/recibo",
+            200
+        )
+        
+        success = True
+        if receipt_result:
+            # Validate receipt structure
+            if 'pedido' in receipt_result and 'cliente' in receipt_result:
+                self.log_test("Receipt Contains Order and Client Data", True)
+                
+                # Check order data
+                pedido_data = receipt_result['pedido']
+                required_order_fields = ['pedido_id', 'items', 'total', 'metodo_pago', 'fecha_creacion']
+                for field in required_order_fields:
+                    if field in pedido_data:
+                        self.log_test(f"Receipt Order Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Receipt Order Contains '{field}'", False, f"Missing '{field}' field")
+                        success = False
+                
+                # Check client data
+                cliente_data = receipt_result['cliente']
+                required_client_fields = ['nombre', 'email']
+                for field in required_client_fields:
+                    if field in cliente_data:
+                        self.log_test(f"Receipt Client Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Receipt Client Contains '{field}'", False, f"Missing '{field}' field")
+                        success = False
+            else:
+                self.log_test("Receipt Contains Order and Client Data", False, "Missing 'pedido' or 'cliente' fields")
+                success = False
+        else:
+            success = False
+        
+        # Cleanup - delete the test student
+        delete_result = self.run_test(
+            "Cleanup Test Student",
+            "DELETE",
+            f"estudiantes/{student_id}",
+            200
+        )
+        
+        # Restore token
+        self.token = old_token
+        return success
+
+    def test_monday_integration(self):
+        """Test Task 3: Monday.com Integration (P3)"""
+        print("\n📋 Testing Monday.com Integration (P3)...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Test Monday.com status endpoint
+        monday_status = self.run_test(
+            "GET /api/admin/monday/status",
+            "GET",
+            "admin/monday/status",
+            200
+        )
+        
+        success = True
+        if monday_status:
+            # Check required fields in response
+            required_fields = ['api_key_configured', 'board_id_configured', 'connected', 'boards']
+            for field in required_fields:
+                if field in monday_status:
+                    self.log_test(f"Monday Status Contains '{field}'", True)
+                else:
+                    self.log_test(f"Monday Status Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+            
+            # Validate expected values based on environment
+            if 'api_key_configured' in monday_status:
+                api_key_configured = monday_status['api_key_configured']
+                if api_key_configured:
+                    self.log_test("Monday API Key Configured", True)
+                else:
+                    self.log_test("Monday API Key Configured", False, "API key not configured")
+                    success = False
+            
+            if 'board_id_configured' in monday_status:
+                board_id_configured = monday_status['board_id_configured']
+                if not board_id_configured:
+                    self.log_test("Monday Board ID Not Configured (Expected)", True, "MONDAY_BOARD_ID is empty as expected")
+                else:
+                    self.log_test("Monday Board ID Not Configured (Expected)", False, "Board ID should be empty for this test")
+            
+            if 'connected' in monday_status:
+                connected = monday_status['connected']
+                if connected:
+                    self.log_test("Monday API Connection Working", True)
+                else:
+                    self.log_test("Monday API Connection Working", False, "API connection failed")
+                    success = False
+            
+            if 'boards' in monday_status:
+                boards = monday_status['boards']
+                if isinstance(boards, list) and len(boards) > 0:
+                    self.log_test("Monday Boards List Available", True, f"Found {len(boards)} boards")
+                    
+                    # Check board structure
+                    first_board = boards[0]
+                    if isinstance(first_board, dict) and 'id' in first_board and 'name' in first_board:
+                        self.log_test("Monday Board Structure Valid", True, f"Board: {first_board.get('name', 'Unknown')}")
+                    else:
+                        self.log_test("Monday Board Structure Valid", False, "Invalid board structure")
+                        success = False
+                else:
+                    self.log_test("Monday Boards List Available", False, "No boards found or invalid format")
+                    success = False
+        else:
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_user_login_with_test_credentials(self):
         """Test login with the specific test credentials mentioned in the review"""
         print("\n🔐 Testing Login with Test Credentials...")
