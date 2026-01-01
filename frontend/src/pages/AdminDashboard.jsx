@@ -79,7 +79,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import GoogleSheetsSync from '@/components/admin/GoogleSheetsSync';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import MondayModule from '@/modules/monday/MondayModule';
-import { Layers } from 'lucide-react';
+import PlatformStoreModule from '@/modules/platform-store/PlatformStoreModule';
+import { Layers, Store } from 'lucide-react';
 
 // Empty product row template
 const emptyProductRow = {
@@ -762,6 +763,10 @@ export default function AdminDashboard() {
           <TabsTrigger value="monday" className="gap-2">
             <ExternalLink className="h-4 w-4" />
             Monday.com
+          </TabsTrigger>
+          <TabsTrigger value="unatienda" className="gap-2">
+            <Store className="h-4 w-4" />
+            Unatienda
           </TabsTrigger>
         </TabsList>
 
