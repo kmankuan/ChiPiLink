@@ -2093,7 +2093,7 @@ class TextbookStoreAPITester:
             # For now, let's just approve the enrollment which should work
             self.log_test("Student Enrollment Approved for Yappy Test", True)
         
-        if not approval_result:
+        if not await_result:
             self.log_test("Yappy Real Order Test", False, "Failed to approve student enrollment")
             self.token = old_token
             return False
