@@ -212,7 +212,7 @@ export default function Receipt() {
             ¡Gracias por su compra!
           </p>
           <p className="text-xs text-muted-foreground">
-            Librería Escolar - educación.pa
+            {siteConfig?.nombre_sitio || 'Mi Tienda'} {siteConfig?.email_contacto ? `- ${siteConfig.email_contacto}` : ''}
           </p>
         </div>
       </div>
