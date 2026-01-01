@@ -90,7 +90,7 @@ export default function Register() {
             <div className="p-2 rounded-xl bg-primary text-primary-foreground">
               <Book className="h-6 w-6" />
             </div>
-            <span className="font-serif text-2xl font-bold">Librería Escolar</span>
+            <span className="font-serif text-2xl font-bold">{siteConfig?.nombre_sitio || 'Mi Tienda'}</span>
           </div>
 
           <div className="mb-8">
