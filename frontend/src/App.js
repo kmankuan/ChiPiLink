@@ -26,6 +26,8 @@ import Orders from '@/pages/Orders';
 import Receipt from '@/pages/Receipt';
 import AdminDashboard from '@/pages/AdminDashboard';
 import EmbedOrderForm from '@/pages/EmbedOrderForm';
+import Checkout from '@/pages/Checkout';
+import PaymentResult from '@/pages/PaymentResult';
 
 import '@/App.css';
 
@@ -95,6 +97,10 @@ function AppRouter() {
       
       {/* Embed Route - No header */}
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
+      
+      {/* Public Checkout Routes */}
+      <Route path="/checkout/:pedidoId" element={<Checkout />} />
+      <Route path="/payment/result" element={<PaymentResult />} />
       
       {/* Protected Routes */}
       <Route 
