@@ -187,6 +187,7 @@ function App() {
               />
             </div>
           </BrowserRouter>
+          </InlineTranslationProvider>
         </SiteConfigProvider>
       </AuthProvider>
     </ThemeProvider>
