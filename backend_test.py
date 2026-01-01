@@ -866,6 +866,324 @@ class TextbookStoreAPITester:
             print("❌ Could not get student's book list")
             return False
 
+    def test_block_based_landing_page_public_endpoints(self):
+        """Test Block-Based Landing Page Editor - Public Endpoints"""
+        print("\n🏠 Testing Block-Based Landing Page - Public Endpoints...")
+        
+        # Remove auth for public endpoints
+        old_token = self.token
+        self.token = None
+        
+        # Test public site config
+        site_config = self.run_test(
+            "Get Public Site Configuration",
+            "GET",
+            "public/site-config",
+            200
+        )
+        
+        # Test public landing page
+        landing_page = self.run_test(
+            "Get Public Landing Page",
+            "GET",
+            "public/landing-page",
+            200
+        )
+        
+        # Restore token
+        self.token = old_token
+        
+        # Validate response structure
+        success = True
+        if site_config:
+            required_fields = ['nombre_sitio', 'color_primario', 'color_secundario', 'footer_texto']
+            for field in required_fields:
+                if field not in site_config:
+                    self.log_test(f"Site Config Field '{field}'", False, f"Missing required field")
+                    success = False
+                else:
+                    self.log_test(f"Site Config Field '{field}'", True)
+        
+        if landing_page:
+            required_fields = ['pagina_id', 'titulo', 'bloques', 'publicada']
+            for field in required_fields:
+                if field not in landing_page:
+                    self.log_test(f"Landing Page Field '{field}'", False, f"Missing required field")
+                    success = False
+                else:
+                    self.log_test(f"Landing Page Field '{field}'", True)
+        
+        return success and all([site_config, landing_page])
+
+    def test_block_based_landing_page_admin_endpoints(self):
+        """Test Block-Based Landing Page Editor - Admin Endpoints"""
+        print("\n👑 Testing Block-Based Landing Page - Admin Endpoints...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Test get block templates
+        block_templates = self.run_test(
+            "Get Block Templates",
+            "GET",
+            "admin/block-templates",
+            200
+        )
+        
+        # Validate block templates
+        if block_templates:
+            expected_blocks = ['hero', 'features', 'text', 'image', 'cta', 'stats', 'cards', 'banner', 'testimonials', 'spacer', 'divider']
+            found_blocks = list(block_templates.keys())
+            
+            if len(found_blocks) >= 11:
+                self.log_test("Block Templates Count (11+ types)", True)
+            else:
+                self.log_test("Block Templates Count (11+ types)", False, f"Expected 11+, got {len(found_blocks)}")
+            
+            for block_type in expected_blocks:
+                if block_type in block_templates:
+                    self.log_test(f"Block Template '{block_type}'", True)
+                else:
+                    self.log_test(f"Block Template '{block_type}'", False, f"Missing block type")
+        
+        # Test get admin site config
+        admin_site_config = self.run_test(
+            "Get Admin Site Configuration",
+            "GET",
+            "admin/site-config",
+            200
+        )
+        
+        # Test update site config
+        if admin_site_config:
+            updated_config = admin_site_config.copy()
+            updated_config['nombre_sitio'] = "Mi Plataforma"
+            updated_config['color_primario'] = "#16a34a"
+            updated_config['footer_texto'] = "© 2025 Mi Plataforma - Todos los derechos reservados"
+            
+            update_result = self.run_test(
+                "Update Site Configuration",
+                "PUT",
+                "admin/site-config",
+                200,
+                updated_config
+            )
+            
+            # Verify the update worked
+            if update_result and update_result.get('success'):
+                self.log_test("Site Config Update Success", True)
+            else:
+                self.log_test("Site Config Update Success", False, "Update did not return success")
+        
+        # Test get admin landing page
+        admin_landing_page = self.run_test(
+            "Get Admin Landing Page",
+            "GET",
+            "admin/landing-page",
+            200
+        )
+        
+        # Store initial block count for later comparison
+        initial_block_count = 0
+        if admin_landing_page and admin_landing_page.get('bloques'):
+            initial_block_count = len(admin_landing_page['bloques'])
+            self.log_test(f"Initial Landing Page Blocks ({initial_block_count} blocks)", True)
+        
+        # Restore token
+        self.token = old_token
+        
+        return all([block_templates, admin_site_config, admin_landing_page])
+
+    def test_block_crud_operations(self):
+        """Test Block CRUD Operations"""
+        print("\n🧱 Testing Block CRUD Operations...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Test adding a new text block
+        add_block_result = self.run_test(
+            "Add Text Block",
+            "POST",
+            "admin/landing-page/blocks?tipo=text",
+            200
+        )
+        
+        block_id = None
+        if add_block_result and add_block_result.get('block') and add_block_result['block'].get('bloque_id'):
+            block_id = add_block_result['block']['bloque_id']
+            self.log_test("Text Block Creation", True)
+            
+            # Test updating the text block
+            update_config = {
+                "titulo": "Bloque de Texto de Prueba",
+                "contenido": "Este es un bloque de texto creado durante las pruebas automatizadas.",
+                "alineacion": "center",
+                "ancho_max": "600px"
+            }
+            
+            update_result = self.run_test(
+                "Update Text Block Content",
+                "PUT",
+                f"admin/landing-page/blocks/{block_id}",
+                200,
+                update_config
+            )
+            
+            if update_result and update_result.get('success'):
+                self.log_test("Text Block Update", True)
+                
+                # Test deleting the text block
+                delete_result = self.run_test(
+                    "Delete Text Block",
+                    "DELETE",
+                    f"admin/landing-page/blocks/{block_id}",
+                    200
+                )
+                
+                if delete_result and delete_result.get('success'):
+                    self.log_test("Text Block Deletion", True)
+                    
+                    # Restore token
+                    self.token = old_token
+                    return True
+                else:
+                    self.log_test("Text Block Deletion", False, "Delete did not return success")
+            else:
+                self.log_test("Text Block Update", False, "Update did not return success")
+        else:
+            self.log_test("Text Block Creation", False, "Block creation failed or missing block_id")
+        
+        # Restore token
+        self.token = old_token
+        return False
+
+    def test_block_reorder_operations(self):
+        """Test Block Reorder Operations"""
+        print("\n🔄 Testing Block Reorder Operations...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # First, get current landing page to see existing blocks
+        current_page = self.run_test(
+            "Get Current Landing Page for Reorder",
+            "GET",
+            "admin/landing-page",
+            200
+        )
+        
+        if current_page and current_page.get('bloques') and len(current_page['bloques']) >= 2:
+            blocks = current_page['bloques']
+            
+            # Create reorder data - reverse the order of first two blocks
+            reorder_data = []
+            for i, block in enumerate(blocks[:2]):
+                reorder_data.append({
+                    "bloque_id": block['bloque_id'],
+                    "orden": 1 - i  # Reverse order: 0->1, 1->0
+                })
+            
+            # Add remaining blocks with their current order + adjustment
+            for i, block in enumerate(blocks[2:], start=2):
+                reorder_data.append({
+                    "bloque_id": block['bloque_id'],
+                    "orden": i
+                })
+            
+            reorder_result = self.run_test(
+                "Reorder Landing Page Blocks",
+                "PUT",
+                "admin/landing-page/blocks/reorder",
+                200,
+                reorder_data
+            )
+            
+            if reorder_result and reorder_result.get('success'):
+                self.log_test("Block Reorder Operation", True)
+                
+                # Verify the reorder worked by getting the page again
+                updated_page = self.run_test(
+                    "Verify Block Reorder",
+                    "GET",
+                    "admin/landing-page",
+                    200
+                )
+                
+                if updated_page and updated_page.get('bloques'):
+                    # Check if the order changed
+                    updated_blocks = updated_page['bloques']
+                    if len(updated_blocks) >= 2:
+                        # Sort by order to verify
+                        sorted_blocks = sorted(updated_blocks, key=lambda x: x.get('orden', 0))
+                        if (len(sorted_blocks) >= 2 and 
+                            sorted_blocks[0]['bloque_id'] == blocks[1]['bloque_id'] and
+                            sorted_blocks[1]['bloque_id'] == blocks[0]['bloque_id']):
+                            self.log_test("Block Reorder Verification", True)
+                            
+                            # Restore token
+                            self.token = old_token
+                            return True
+                        else:
+                            self.log_test("Block Reorder Verification", False, "Blocks not reordered as expected")
+                    else:
+                        self.log_test("Block Reorder Verification", False, "Not enough blocks to verify reorder")
+                else:
+                    self.log_test("Block Reorder Verification", False, "Could not get updated page")
+            else:
+                self.log_test("Block Reorder Operation", False, "Reorder did not return success")
+        else:
+            self.log_test("Block Reorder Prerequisites", False, "Need at least 2 blocks to test reordering")
+        
+        # Restore token
+        self.token = old_token
+        return False
+
+    def test_landing_page_publish_toggle(self):
+        """Test Landing Page Publish Toggle"""
+        print("\n📢 Testing Landing Page Publish Toggle...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Test unpublishing the landing page
+        unpublish_result = self.run_test(
+            "Unpublish Landing Page",
+            "PUT",
+            "admin/landing-page/publish?publicada=false",
+            200
+        )
+        
+        if unpublish_result and unpublish_result.get('success'):
+            self.log_test("Landing Page Unpublish", True)
+            
+            # Test publishing it back
+            publish_result = self.run_test(
+                "Publish Landing Page",
+                "PUT",
+                "admin/landing-page/publish?publicada=true",
+                200
+            )
+            
+            if publish_result and publish_result.get('success'):
+                self.log_test("Landing Page Publish", True)
+                
+                # Restore token
+                self.token = old_token
+                return True
+            else:
+                self.log_test("Landing Page Publish", False, "Publish did not return success")
+        else:
+            self.log_test("Landing Page Unpublish", False, "Unpublish did not return success")
+        
+        # Restore token
+        self.token = old_token
+        return False
+
     def test_user_login_with_test_credentials(self):
         """Test login with the specific test credentials mentioned in the review"""
         print("\n🔐 Testing Login with Test Credentials...")
