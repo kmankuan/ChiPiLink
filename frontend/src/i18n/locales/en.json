@@ -1,0 +1,156 @@
+{
+  "app": {
+    "name": "ChiPi Link",
+    "tagline": "Your community connected",
+    "description": "The Chinese community super app in Panama"
+  },
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "orders": "My Orders",
+    "students": "Students",
+    "profile": "Profile",
+    "admin": "Administration",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "membership": "Membership",
+    "tournaments": "Tournaments",
+    "community": "Community"
+  },
+  "landing": {
+    "hero": {
+      "title": "Welcome to ChiPi Link",
+      "subtitle": "Your Chinese community in Panama, connected",
+      "cta": "Get Started",
+      "ctaAdmin": "Admin Access"
+    },
+    "features": {
+      "store": "Store",
+      "storeDesc": "Shop products from our community",
+      "membership": "Membership",
+      "membershipDesc": "Join the club and enjoy exclusive benefits",
+      "tournaments": "Tournaments",
+      "tournamentsDesc": "Participate in table tennis tournaments",
+      "community": "Community",
+      "communityDesc": "Connect with other members"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full Name",
+    "phone": "Phone",
+    "address": "Address",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWithGoogle": "Continue with Google",
+    "orContinueWith": "or continue with"
+  },
+  "membership": {
+    "title": "Club Membership",
+    "plans": "Available Plans",
+    "monthly": "Monthly Unlimited",
+    "credits": "Visit Credits",
+    "visitsRemaining": "Visits remaining",
+    "checkIn": "Check In",
+    "checkOut": "Check Out",
+    "scanQR": "Scan QR",
+    "enterPIN": "Enter PIN",
+    "history": "Visit History",
+    "myMembership": "My Membership",
+    "renewMembership": "Renew Membership",
+    "planTypes": {
+      "unlimited": "Unlimited",
+      "credits10": "10 Visits",
+      "credits12": "12 Visits",
+      "credits15": "15 Visits"
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "pending": "Pending"
+    }
+  },
+  "tournaments": {
+    "title": "Table Tennis Tournaments",
+    "createTournament": "Create Tournament",
+    "joinTournament": "Join Tournament",
+    "myTournaments": "My Tournaments",
+    "leaderboard": "Leaderboard",
+    "ranking": "Ranking",
+    "matches": "Matches",
+    "results": "Results",
+    "brackets": "Brackets",
+    "formats": {
+      "singleElimination": "Single Elimination",
+      "doubleElimination": "Double Elimination",
+      "roundRobin": "Round Robin",
+      "league": "League Points",
+      "swiss": "Swiss System"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "store": {
+    "title": "Store",
+    "products": "Products",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "vendors": "Vendors",
+    "myStore": "My Store",
+    "addProduct": "Add Product"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "store": "Store",
+    "orders": "Orders",
+    "customers": "Customers",
+    "settings": "Settings",
+    "integrations": "Integrations",
+    "members": "Members",
+    "tournaments": "Tournaments",
+    "totalProducts": "Total Products",
+    "pendingOrders": "Pending Orders",
+    "confirmedOrders": "Confirmed Orders",
+    "activeMembers": "Active Members"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "noResults": "No results"
+  },
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "preparing": "Preparing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "active": "Active",
+    "inactive": "Inactive"
+  }
+}

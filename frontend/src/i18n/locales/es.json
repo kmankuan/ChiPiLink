@@ -1,0 +1,156 @@
+{
+  "app": {
+    "name": "ChiPi Link",
+    "tagline": "Tu comunidad conectada",
+    "description": "La super app de la comunidad china en Panamá"
+  },
+  "nav": {
+    "home": "Inicio",
+    "catalog": "Catálogo",
+    "orders": "Mis Pedidos",
+    "students": "Estudiantes",
+    "profile": "Perfil",
+    "admin": "Administración",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "membership": "Membresía",
+    "tournaments": "Torneos",
+    "community": "Comunidad"
+  },
+  "landing": {
+    "hero": {
+      "title": "Bienvenido a ChiPi Link",
+      "subtitle": "Tu comunidad china en Panamá, conectada",
+      "cta": "Comenzar",
+      "ctaAdmin": "Acceso Administrador"
+    },
+    "features": {
+      "store": "Tienda",
+      "storeDesc": "Compra productos de nuestra comunidad",
+      "membership": "Membresía",
+      "membershipDesc": "Únete al club y disfruta beneficios exclusivos",
+      "tournaments": "Torneos",
+      "tournamentsDesc": "Participa en torneos de tenis de mesa",
+      "community": "Comunidad",
+      "communityDesc": "Conecta con otros miembros"
+    }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Crear Cuenta",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "name": "Nombre Completo",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "noAccount": "¿No tiene cuenta?",
+    "hasAccount": "¿Ya tiene cuenta?",
+    "loginWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continúe con"
+  },
+  "membership": {
+    "title": "Membresía del Club",
+    "plans": "Planes Disponibles",
+    "monthly": "Mensual Ilimitado",
+    "credits": "Créditos de Visita",
+    "visitsRemaining": "Visitas restantes",
+    "checkIn": "Registrar Entrada",
+    "checkOut": "Registrar Salida",
+    "scanQR": "Escanear QR",
+    "enterPIN": "Ingresar PIN",
+    "history": "Historial de Visitas",
+    "myMembership": "Mi Membresía",
+    "renewMembership": "Renovar Membresía",
+    "planTypes": {
+      "unlimited": "Ilimitado",
+      "credits10": "10 Visitas",
+      "credits12": "12 Visitas",
+      "credits15": "15 Visitas"
+    },
+    "status": {
+      "active": "Activa",
+      "expired": "Expirada",
+      "pending": "Pendiente"
+    }
+  },
+  "tournaments": {
+    "title": "Torneos de Tenis de Mesa",
+    "createTournament": "Crear Torneo",
+    "joinTournament": "Unirse al Torneo",
+    "myTournaments": "Mis Torneos",
+    "leaderboard": "Clasificación",
+    "ranking": "Ranking",
+    "matches": "Partidos",
+    "results": "Resultados",
+    "brackets": "Llaves",
+    "formats": {
+      "singleElimination": "Eliminación Directa",
+      "doubleElimination": "Doble Eliminación",
+      "roundRobin": "Todos contra Todos",
+      "league": "Liga por Puntos",
+      "swiss": "Sistema Suizo"
+    },
+    "status": {
+      "upcoming": "Próximo",
+      "inProgress": "En Progreso",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
+    }
+  },
+  "store": {
+    "title": "Tienda",
+    "products": "Productos",
+    "cart": "Carrito",
+    "checkout": "Pagar",
+    "vendors": "Vendedores",
+    "myStore": "Mi Tienda",
+    "addProduct": "Agregar Producto"
+  },
+  "admin": {
+    "dashboard": "Panel de Control",
+    "store": "Tienda",
+    "orders": "Pedidos",
+    "customers": "Clientes",
+    "settings": "Configuración",
+    "integrations": "Integraciones",
+    "members": "Miembros",
+    "tournaments": "Torneos",
+    "totalProducts": "Total Productos",
+    "pendingOrders": "Pedidos Pendientes",
+    "confirmedOrders": "Pedidos Confirmados",
+    "activeMembers": "Miembros Activos"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "yes": "Sí",
+    "no": "No",
+    "all": "Todos",
+    "none": "Ninguno",
+    "select": "Seleccionar",
+    "noResults": "Sin resultados"
+  },
+  "status": {
+    "pending": "Pendiente",
+    "confirmed": "Confirmado",
+    "preparing": "Preparando",
+    "shipped": "Enviado",
+    "delivered": "Entregado",
+    "cancelled": "Cancelado",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  }
+}

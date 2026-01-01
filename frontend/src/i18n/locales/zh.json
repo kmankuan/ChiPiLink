@@ -1,0 +1,156 @@
+{
+  "app": {
+    "name": "ChiPi Link",
+    "tagline": "连接你的社区",
+    "description": "巴拿马华人社区超级应用"
+  },
+  "nav": {
+    "home": "首页",
+    "catalog": "目录",
+    "orders": "我的订单",
+    "students": "学生",
+    "profile": "个人资料",
+    "admin": "管理",
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出",
+    "membership": "会员",
+    "tournaments": "赛事",
+    "community": "社区"
+  },
+  "landing": {
+    "hero": {
+      "title": "欢迎来到 ChiPi Link",
+      "subtitle": "连接巴拿马华人社区",
+      "cta": "开始使用",
+      "ctaAdmin": "管理员登录"
+    },
+    "features": {
+      "store": "商店",
+      "storeDesc": "购买社区商品",
+      "membership": "会员",
+      "membershipDesc": "加入俱乐部享受专属福利",
+      "tournaments": "赛事",
+      "tournamentsDesc": "参加乒乓球比赛",
+      "community": "社区",
+      "communityDesc": "与其他成员交流"
+    }
+  },
+  "auth": {
+    "login": "登录",
+    "register": "创建账户",
+    "email": "电子邮箱",
+    "password": "密码",
+    "name": "全名",
+    "phone": "电话",
+    "address": "地址",
+    "forgotPassword": "忘记密码？",
+    "noAccount": "没有账户？",
+    "hasAccount": "已有账户？",
+    "loginWithGoogle": "使用 Google 继续",
+    "orContinueWith": "或继续使用"
+  },
+  "membership": {
+    "title": "俱乐部会员",
+    "plans": "可用计划",
+    "monthly": "月度无限",
+    "credits": "访问次数",
+    "visitsRemaining": "剩余次数",
+    "checkIn": "签到",
+    "checkOut": "签退",
+    "scanQR": "扫描二维码",
+    "enterPIN": "输入PIN码",
+    "history": "访问记录",
+    "myMembership": "我的会员",
+    "renewMembership": "续费会员",
+    "planTypes": {
+      "unlimited": "无限次",
+      "credits10": "10次",
+      "credits12": "12次",
+      "credits15": "15次"
+    },
+    "status": {
+      "active": "有效",
+      "expired": "已过期",
+      "pending": "待处理"
+    }
+  },
+  "tournaments": {
+    "title": "乒乓球赛事",
+    "createTournament": "创建比赛",
+    "joinTournament": "参加比赛",
+    "myTournaments": "我的比赛",
+    "leaderboard": "排行榜",
+    "ranking": "排名",
+    "matches": "对战",
+    "results": "结果",
+    "brackets": "对阵表",
+    "formats": {
+      "singleElimination": "单败淘汰",
+      "doubleElimination": "双败淘汰",
+      "roundRobin": "循环赛",
+      "league": "积分联赛",
+      "swiss": "瑞士制"
+    },
+    "status": {
+      "upcoming": "即将开始",
+      "inProgress": "进行中",
+      "completed": "已结束",
+      "cancelled": "已取消"
+    }
+  },
+  "store": {
+    "title": "商店",
+    "products": "商品",
+    "cart": "购物车",
+    "checkout": "结账",
+    "vendors": "商家",
+    "myStore": "我的店铺",
+    "addProduct": "添加商品"
+  },
+  "admin": {
+    "dashboard": "控制面板",
+    "store": "商店",
+    "orders": "订单",
+    "customers": "客户",
+    "settings": "设置",
+    "integrations": "集成",
+    "members": "会员",
+    "tournaments": "赛事",
+    "totalProducts": "商品总数",
+    "pendingOrders": "待处理订单",
+    "confirmedOrders": "已确认订单",
+    "activeMembers": "活跃会员"
+  },
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "search": "搜索",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步",
+    "close": "关闭",
+    "yes": "是",
+    "no": "否",
+    "all": "全部",
+    "none": "无",
+    "select": "选择",
+    "noResults": "无结果"
+  },
+  "status": {
+    "pending": "待处理",
+    "confirmed": "已确认",
+    "preparing": "准备中",
+    "shipped": "已发货",
+    "delivered": "已送达",
+    "cancelled": "已取消",
+    "active": "活跃",
+    "inactive": "非活跃"
+  }
+}
