@@ -68,12 +68,24 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('No estás autenticado. Por favor, inicia sesión.');
+        setLoading(false);
+        return;
+      }
+      
       const response = await axios.get(`${BACKEND_URL}/api/admin/block-templates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTemplates(response.data);
     } catch (error) {
-      toast.error('Error cargando plantillas de bloques');
+      console.error('Error fetching templates:', error);
+      if (error.response?.status === 401) {
+        toast.error('Sesión expirada. Por favor, inicia sesión de nuevo.');
+      } else {
+        toast.error('Error cargando plantillas de bloques');
+      }
     } finally {
       setLoading(false);
     }
