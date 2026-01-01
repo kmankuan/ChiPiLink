@@ -403,6 +403,67 @@ agent_communication:
   - agent: "testing"
     message: "🎯 YAPPY CHECKOUT FRONTEND TESTING COMPLETED SUCCESSFULLY! Comprehensive browser automation testing of Yappy Checkout frontend pages as requested in review: ✅ CHECKOUT PAGE (/checkout/ped_363bbcd6c5f4): All required elements verified - Order summary shows pedido_id (ped_363bbcd6c5f4), items list with quantities and prices, subtotal ($50.00), total ($50.00), 'Pendiente' status badge correctly displayed. ✅ YAPPY PAYMENT BUTTON: Green gradient background (#00D4AA to #00B894) correctly applied, 'Pagar con Yappy' text visible, phone input field with placeholder '6XXX-XXXX' working, 'Pagar' button functional, total amount ($50.00) displayed prominently. ✅ PAYMENT RESULT PAGES: Success page (status=E) shows '¡Pago Exitoso!' with green checkmark icon and correct message. Rejected page (status=R) shows 'Pago Rechazado' with red X icon and 'Intentar de nuevo' button. Cancelled page (status=C) shows 'Pago Cancelado' with orange X icon. All pages display order ID (#TEST123) and 'Ir al inicio' button. ✅ RESPONSIVE DESIGN: Mobile view (390x844) tested - all elements remain functional and properly styled. ✅ UI LAYOUT: Clean checkout layout with proper card structure, appropriate spacing, and professional styling. All requirements from review request successfully verified and working perfectly."
 
+unatienda_public_store:
+  - feature: "Public Store Page (/unatienda)"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/frontend/src/pages/Unatienda.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ Created public store page with: Modern grid layout for products, Search functionality, Grade and subject filters, Stock status badges (Disponible, Solo X, Agotado), Add to cart buttons with visual feedback, Cart quantity badges on products."
+
+  - feature: "Shopping Cart (Context + Drawer)"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/frontend/src/contexts/CartContext.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ Implemented CartContext with: Add/remove/update items, localStorage persistence, Item count and subtotal calculations, Cart drawer with quantity controls."
+
+  - feature: "Unatienda Checkout Page"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/frontend/src/pages/UnatiendaCheckout.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ Created checkout page with: Cart summary with quantity editing, Customer info form (name, email, phone), Order creation via API, Yappy payment integration."
+
+  - feature: "Create Order API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/platform_store.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ POST /api/platform-store/orders endpoint working. Creates order with UNA-XXXXXXXX ID format, calculates totals, reserves inventory."
+
+  - feature: "Header Cart Integration"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/frontend/src/components/layout/Header.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ Added: Tienda link in navigation, Cart button with item count badge, Opens cart drawer on click."
+
 unatienda_integration:
   - feature: "Platform Store Backend Routes"
     implemented: true
