@@ -226,7 +226,7 @@ export default function LandingPageEditor() {
       const token = localStorage.getItem('token');
       await axios.put(
         `${BACKEND_URL}/api/admin/landing-page/blocks/reorder`,
-        orders,
+        { orders },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
