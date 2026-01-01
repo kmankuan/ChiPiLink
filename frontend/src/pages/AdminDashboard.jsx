@@ -747,6 +747,10 @@ export default function AdminDashboard() {
             <Layers className="h-4 w-4" />
             Landing Page
           </TabsTrigger>
+          <TabsTrigger value="monday" className="gap-2">
+            <ExternalLink className="h-4 w-4" />
+            Monday.com
+          </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
