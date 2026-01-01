@@ -173,11 +173,12 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <SiteConfigProvider>
-          <BrowserRouter>
-            <div className="App min-h-screen bg-background noise-bg">
-              <AppRouter />
-              <Toaster 
-                position="top-right" 
+          <InlineTranslationProvider>
+            <BrowserRouter>
+              <div className="App min-h-screen bg-background noise-bg">
+                <AppRouter />
+                <Toaster 
+                  position="top-right" 
                 richColors 
                 closeButton
                 toastOptions={{
