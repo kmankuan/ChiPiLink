@@ -743,6 +743,10 @@ export default function AdminDashboard() {
             <Settings className="h-4 w-4" />
             Formulario
           </TabsTrigger>
+          <TabsTrigger value="landing-editor" className="gap-2">
+            <Layers className="h-4 w-4" />
+            Landing Page
+          </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
