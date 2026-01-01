@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { 
@@ -18,16 +17,15 @@ import {
   Star,
   Mail,
   Phone,
-  MapPin,
   Loader2,
   Quote,
   Edit3,
   Save,
   X,
   Plus,
-  Trash2,
-  Settings
+  Trash2
 } from 'lucide-react';
+import { AddBlockDialog, FloatingAddBlockButton } from '@/modules/landing-editor/AddBlockDialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
