@@ -106,6 +106,9 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
+            {/* Inline Edit Toggle (Admin only) */}
+            <InlineEditToggle />
+
             {/* Language Selector */}
             <LanguageSelector />
 
