@@ -52,7 +52,7 @@ class YappyService:
                 
                 result = response.json()
                 
-                if response.status_code == 200 and result.get("status", {}).get("code") == "00":
+                if response.status_code == 200 and result.get("status", {}).get("code") in ["00", "0000"]:
                     return {
                         "success": True,
                         "token": result.get("body", {}).get("token"),
@@ -119,7 +119,7 @@ class YappyService:
                 
                 result = response.json()
                 
-                if response.status_code == 200 and result.get("status", {}).get("code") == "00":
+                if response.status_code == 200 and result.get("status", {}).get("code") in ["00", "0000"]:
                     body = result.get("body", {})
                     return {
                         "success": True,
