@@ -2518,6 +2518,11 @@ from routes.membership import router as membership_router, init_routes as init_m
 init_membership_routes(db, get_admin_user, get_current_user)
 api_router.include_router(membership_router)
 
+# Include Translations routes
+from routes.translations import router as translations_router, init_routes as init_translations_routes
+init_translations_routes(db, get_admin_user, get_current_user)
+api_router.include_router(translations_router)
+
 # Include router
 app.include_router(api_router)
 
