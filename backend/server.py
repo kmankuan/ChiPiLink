@@ -1313,6 +1313,29 @@ async def confirmar_pago(pedido_id: str, admin: dict = Depends(get_admin_user)):
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     return {"success": True}
 
+@api_router.get("/pedidos/{pedido_id}/public")
+async def get_pedido_public(pedido_id: str):
+    """Get order details for public checkout page (limited info)"""
+    pedido = await db.pedidos.find_one({"pedido_id": pedido_id}, {"_id": 0})
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    # Return limited info for checkout
+    return {
+        "pedido_id": pedido.get("pedido_id"),
+        "items": pedido.get("items", []),
+        "subtotal": pedido.get("subtotal", pedido.get("total", 0)),
+        "impuestos": pedido.get("impuestos", 0),
+        "descuento": pedido.get("descuento", 0),
+        "total": pedido.get("total", 0),
+        "estado": pedido.get("estado"),
+        "estado_pago": pedido.get("estado_pago", "pendiente"),
+        "cliente_email": pedido.get("cliente_email"),
+        "cliente_telefono": pedido.get("cliente_telefono"),
+        "yappy_status": pedido.get("yappy_status"),
+        "yappy_status_descripcion": pedido.get("yappy_status_descripcion")
+    }
+
 @api_router.get("/pedidos/{pedido_id}/recibo")
 async def get_recibo(pedido_id: str, current_user: dict = Depends(get_current_user)):
     pedido = await db.pedidos.find_one({"pedido_id": pedido_id}, {"_id": 0})
