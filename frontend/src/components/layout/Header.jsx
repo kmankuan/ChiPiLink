@@ -64,7 +64,7 @@ export function Header() {
               <Book className="h-5 w-5" />
             </div>
             <span className="font-serif text-xl font-bold tracking-tight hidden sm:inline">
-              Librería Escolar
+              {siteConfig?.nombre_sitio || 'Mi Tienda'}
             </span>
           </Link>
 
