@@ -100,39 +100,48 @@ backend:
 frontend:
   - task: "Landing Page Editor Tab"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/AdminDashboard.js"
+    working: true
+    file: "/app/frontend/src/pages/AdminDashboard.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend UI testing not performed - requires browser automation"
+      - working: true
+        agent: "testing"
+        comment: "✓ Landing Page Editor tab working correctly. Found in admin dashboard with proper header 'Editor de Landing Page', all required UI elements present: Configuración del Sitio button, Publicada toggle switch, Agregar Bloque button. Admin login successful with admin@libreria.com credentials."
 
   - task: "Block Management UI"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/LandingPageEditor.js"
+    working: true
+    file: "/app/frontend/src/components/admin/LandingPageEditor.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend UI testing not performed - requires browser automation"
+      - working: true
+        agent: "testing"
+        comment: "✓ Block Management UI working correctly. Add block dialog opens with 22 buttons total, site configuration dialog functional with all required fields (Nombre del Sitio, Descripción, Color Primario, Color Secundario, Texto del Footer). Found 8 input fields and 1 textarea. Block editor shows 'No hay bloques en la página' state correctly when empty."
 
   - task: "Dynamic Landing Page Rendering"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/components/LandingPage.js"
+    working: true
+    file: "/app/frontend/src/pages/Landing.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend UI testing not performed - requires browser automation"
+      - working: true
+        agent: "testing"
+        comment: "✓ Dynamic Landing Page rendering working perfectly. Shows 'Bienvenido a nuestra tienda' hero title, '¿Por qué elegirnos?' features section, stats section with '1000+ Clientes', testimonials section 'Lo que dicen nuestros clientes', CTA section '¿Listo para comenzar?', and footer with correct site name. Dynamic content is properly rendered instead of static fallback."
 
 metadata:
   created_by: "testing_agent"
