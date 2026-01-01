@@ -1,235 +1,170 @@
 <analysis>**original_problem_statement:**
-The user wants to build a full-stack application to sell textbooks online.
+The user wants to build a full-stack application to sell textbooks online. The core requirements evolved significantly through the conversation.
 
-**PRODUCT REQUIREMENTS:**
-1.  **Product Management:** Add, edit, and manage textbook products, categorized by grade and subject. Track inventory.
-2.  **Customer Profiles:** Accounts for parents, with profiles for one or more students (children).
-3.  **Order Form:** An easy-to-use form for parents to select a student and order textbooks. Should support auto-fill for repeat orders.
-4.  **Admin Dashboard:** View, search, edit, and fulfill orders; add new products; update stock; and receive low inventory alerts.
-    *   **Enhancement 1:** The Add Product form should be a table to allow adding multiple products at once.
-    *   **Enhancement 2:** Implement CSV import and export for products.
-5.  **Print Order Receipts:** Generate a printable order document formatted for a thermal printer.
-6.  **Monday.com Integration:** Automatically send order and customer details to a designated Monday.com board when a new order is submitted.
-7.  **Embeddable Form:** The order form should be embeddable as a standalone widget/iframe on an external website (like Invisionpower Suite) and should not require user registration. It should use the inventory system and trigger the Monday.com integration. The fields of this form should be configurable from the admin dashboard.
-8.  **Notification System:** A persistent, small notification bar in the admin dashboard for configurable alerts (e.g., new orders, low stock).
-9.  **Design & Usability:** Clean, user-friendly, responsive design.
-10. **Internationalization:** Use Spanish terms for code/database values. The frontend UI must support both Chinese and Spanish, with language auto-detection and a toggle button.
-11. **Payments:** Initial support for manual bank transfers. Future integration with Yappy Comercial from Panama.
+**PRODUCT REQUIREMENTS (Initial):**
+1.  **Product Management:** Add, edit, manage textbooks, categorized by grade/subject, and track inventory.
+2.  **Customer/Student Profiles:** Accounts for parents, with profiles for their children (students).
+3.  **Order Form:** An easy-to-use form for parents to order textbooks for a selected student.
+4.  **Admin Dashboard:** Manage orders, products, stock, and receive alerts.
+5.  **Print Order Receipts:** Format receipts for thermal printers.
+6.  **Monday.com Integration:** Send order details to a Monday.com board.
+7.  **Embeddable Form:** A standalone order form for external websites, with configurable fields.
+8.  **Notification System:** A persistent notification bar in the admin dashboard.
+9.  **Internationalization:** UI in Chinese and Spanish.
+
+**PRODUCT REQUIREMENTS (Evolved & Current):**
+1.  **Student Verification Flow:** Instead of open registration, parents register and add their students. The system must verify the student against an official school enrollment list.
+2.  **Google Sheets Sync:** The student enrollment list is a Google Sheet. The application must sync with it. This system should be intelligent:
+    *   **Columns:** Auto-detect and map columns. Allow admins to fix columns to prevent changes. Alert on schema differences.
+    *   **Rows:** Automatically add new students. Require manual admin approval for modifications or deletions, with a full change history.
+3.  **Automated Student Matching:** When a parent adds a student, the system should automatically search the synced Google Sheet data and match the student based on name/grade similarity (>= 90%). The student's status becomes Encontrado (Found) or No Encontrado (Not Found).
+4.  **Restricted Purchasing:** Only parents of Encontrado students can purchase books. The Buy Books button is only enabled for them.
+5.  **Restricted Catalog:** Customers can no longer see the full product catalog. They only see a list of books relevant to their Encontrado student's grade when they click Buy Books. The full catalog is now an admin-only view.
+6.  **Block-Based Landing Page:** The user wants to convert the static homepage into a dynamic, block-based system editable from the admin panel.
+7.  **Platform Neutrality:** The user wants to move away from a bookstore look and feel towards a more neutral, multi-vendor e-commerce platform.
 
 **User's preferred language**: Spanish
 
 **what currently exists?**
-A full-stack application with a FastAPI backend and React frontend.
-- **Authentication:** JWT-based user registration and login is implemented.
-- **Internationalization:** The frontend supports Spanish and Chinese with a working language toggle and dark/light mode.
-- **Backend:** Models and API endpoints exist for products (), customers (), students (), and orders ().
-- **Admin Dashboard:** A comprehensive admin dashboard is in place, allowing management of products, orders, and inventory. It includes:
-    - A summary view with stats.
-    - A product list.
-    - A feature to add products in bulk via a dynamic table.
-    - A feature to export the product list to a CSV file.
-- **In-Progress Features:** The backend and frontend foundations for an embeddable order form and an admin notification bar have been created.
+A full-stack FastAPI/React application with JWT auth, i18n, and a comprehensive admin dashboard. The application has a fully implemented student verification workflow that automatically matches students added by parents against data synced from a Google Sheet. The UI for managing the Google Sheets connection (connecting sheets, mapping columns, viewing changes) is complete. The purchasing flow is restricted to verified students, who only see books for their specific grade. The admin dashboard includes tabs for managing products, orders, inventory, form configuration, and the new Google Sheets sync. The initial broken CSV import functionality has been fixed.
 
 **Last working item**:
-    - Last item agent was working: The agent was implementing two major features requested by the user: a standalone, embeddable order form and an admin notification system. It had just added the backend API endpoints (, , ) in  and created the basic frontend components (, ). The agent was in the process of integrating the  component into the main  layout.
-    - Status: IN PROGRESS
+    - Last item agent was working: The user requested a major new feature: transforming the static landing page () into a dynamic, block-based system managed from the admin panel. The user also expressed a desire to make the platform's branding more neutral, moving towards a generic multi-vendor e-commerce platform. The agent acknowledged this, formulated a plan, and was about to begin implementation.
+    - Status: NOT STARTED
     - Agent Testing Done: N
     - Which testing method agent to use? both
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: CSV Import is broken (P0)
-
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: The agent implemented the UI and logic for CSV import in  using the  library's concepts. However, it never installed the required dependency ( or ). When the Import CSV button is used and a file is selected, the application will crash because the parsing library is not available.
-     - Next debug checklist: 
-        1. Install the CSV parsing library: yarn add v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-success Saved 1 new dependency.
-info Direct dependencies
-└─ papaparse@5.5.3
-info All dependencies
-└─ papaparse@5.5.3
-Done in 64.20s..
-        2. Verify the import statement in  matches the installed library (e.g., ).
-        3. Retest the CSV import functionality end-to-end.
-     - Why fix this issue and what will be achieved with the fix? This is a user-requested feature for bulk product management. Fixing it will allow the admin to efficiently add a large number of products from a CSV file.
-     - Status:  NOT STARTED
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: None
+  - There are no known pending issues. The previous CSV import bug was resolved.
 
 **In progress Task List**:
-  - Task 1: Complete Standalone Embeddable Order Form (P1)
-  - Task 2: Complete Admin Notification System (P2)
+  - Task 1: Implement Block-Based Landing Page Editor (P0)
 
  Task Detail:
   - Task 1: 
-     - Where to resume: The backend endpoint () and a basic frontend page () have been created. The next steps are to fully develop the UI of the embeddable form, ensure it fetches product data, validates user input, submits the order to the new public endpoint, and correctly deducts from inventory and triggers the Monday.com integration.
-     - What will be achieved with this? This will fulfill a key user requirement to capture orders from an external website without forcing customers to create an account, thereby reducing friction.
-     - Status:  IN PROGRESS
-     - Should Test frontend/backend/both after fix? Both
-     - Blocked on something: None
-  - Task 2: 
-     - Where to resume: The backend endpoint () and a UI component () have been created. The agent was adding this component to . The next steps are to ensure the component fetches notifications, displays them correctly in a persistent top bar, and implements the logic for marking notifications as read. Also, the backend logic for *creating* notifications (e.g., for low stock or new public orders) needs to be integrated into the relevant API endpoints.
-     - What will be achieved with this? This will provide the admin with real-time updates on important application events, improving store management efficiency.
-     - Status:  IN PROGRESS
+     - Where to resume: The task has not started. The next step is to design and implement the backend models and API endpoints to store and manage the landing page blocks. Then, create the frontend UI in the admin dashboard for adding, editing, reordering, and deleting blocks. Finally, modify the  page to dynamically render the blocks fetched from the API.
+     - What will be achieved with this? This will give the admin full control over the content and layout of the homepage without needing code changes, fulfilling a key user request.
+     - Status:  NOT STARTED
      - Should Test frontend/backend/both after fix? Both
      - Blocked on something: None
 
 **Upcoming and Future Tasks**
     Upcoming Tasks:
-    - **Admin UI for Form Configuration (P2):** Build the frontend interface within the Admin Dashboard that allows the admin to manage the fields of the embeddable order form, using the  endpoints.
-    - **Thermal Printer Receipt Formatting (P3):** Implement the specific CSS and layout for the  page to ensure it prints correctly on a standard thermal printer.
-    
+    - **Neutralize Platform Branding (P1):** Go through the application and change hardcoded text like Librería Escolar to be more generic or configurable from the admin dashboard, in line with the user's vision of a multi-vendor platform.
+    - **Thermal Printer Receipt Formatting (P2):** Implement the specific CSS and layout for  to ensure it prints correctly on a thermal printer.
+    - **Verify Monday.com Integration (P3):** The logic exists, but it needs to be tested end-to-end, especially with the new order flows.
+
     Future Tasks:
-    - **Verify Monday.com Integration (P4):** Although the backend function exists, it needs to be explicitly tested, especially its triggering from the new public order endpoint.
-    - **Yappy Comercial Payment Integration (P5):** Integrate the Panama-based payment gateway as a payment option.
+    - **Yappy Comercial Payment Integration (P4):** Integrate the Panama-based payment gateway.
+    - **Multi-vendor Functionality (P5):** Implement models for Shops/Vendors, a dashboard for vendors to manage their own products, and a commission system. This is a long-term user vision.
 
 **Completed work in this session**
-- List of all completed tasks with file and method name:
-  - **User Authentication:** Implemented JWT-based registration and login.
-  - **Multi-language & Theming:** Integrated Spanish/Chinese languages with a working toggle () and a light/dark mode theme toggle.
-  - **Admin Product Management:**
-    - Bulk Product Creation: Implemented a table-based form in  to add multiple products at once.
-    - CSV Product Export: Implemented functionality in  to export all products to a CSV file.
-  - **Core Application Structure:** Created all initial pages, routing (), contexts (, ), and backend API structure ().
-
-- Recently completed:
-  - Bulk Product Add (DONE)
-  - CSV Product Export (DONE)
-  - Language Toggle and Theming (DONE)
+- **Fixed CSV Import:** Installed the  dependency and fixed the broken CSV import feature in .
+- **Implemented Student Verification Flow:**
+  - Created a new user dashboard () for parents to register and manage their students.
+  - Implemented an automatic student verification system that replaces the manual admin approval process.
+- **Implemented Google Sheets Synchronization:**
+  - Integrated Google Sheets API using a service account for backend-to-backend sync.
+  - Built a full admin UI () to connect sheets, view synced data, manage column mappings, and track changes.
+- **Implemented Automated Student Matching:** When a parent adds a student, the backend now uses fuzzy string matching () to find a match in the synced Google Sheet data and automatically sets the student's status to Encontrado or No Encontrado.
+- **Refactored Purchasing Flow:**
+  - Restricted the Buy Books functionality to only Encontrado students.
+  - Removed the public  route for customers; they now only see books for their student's grade in a modal. The catalog is now admin-only.
+- **Implemented Admin Form Configurator:** Built the UI in the admin dashboard for configuring the embeddable order form fields.
+- **Resolved Login/CORS Issue:** Fixed a CORS misconfiguration that was preventing admin login.
+- **Added Demo Data:** Populated the database with numerous sample products across different grades.
 
 **Earlier issues found/mentioned but not fixed**
-   - Issue 1: The CSV Import feature is broken. The UI was built in , but the required  dependency was never installed, which will cause a runtime crash.
-     - Debug checklist:
-       1. Run yarn add v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved 1 new dependency.
-info Direct dependencies
-└─ papaparse@5.5.3
-info All dependencies
-└─ papaparse@5.5.3
-Done in 6.20s..
-       2. Check  to ensure  is used correctly.
-       3. Test the import flow.
-     - Why to solve this issue and what will be achieved with this? This is a core part of the user's request for efficient bulk product management.
-     - Should Test frontend/backend/both after fix: Frontend
-     - Is recurring issue? N
+   - None. The main issue from the previous fork (broken CSV import) was resolved.
 
 **Known issue recurrence from previous fork**
-  - None
+  - None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI, MongoDB (via ), Pydantic for data validation, JWT for authentication.
-- **Frontend:** React, React Router, Axios for API calls, Tailwind CSS for styling, Shadcn/UI for components.
-- **Internationalization:**  and  for Spanish and Chinese language support.
+- **Backend:** FastAPI, MongoDB (), Pydantic, JWT.
+- **Frontend:** React, React Router, Axios, Tailwind CSS, Shadcn/UI.
+- **Internationalization:** .
+- **New Libraries:**
+    -  (frontend) for CSV parsing.
+    - ,  (backend) for Google Sheets integration.
+    -  (backend) for fuzzy string matching for student verification.
 
 **key DB schema**
-  - **libros:** { , , , , , ,  }
-  - **clientes:** { , , ,  ('cliente' or 'admin'),  }
-  - **estudiantes:** { , ,  }
-  - **pedidos:** { , , , , ,  ('pendiente', 'confirmado', 'enviado'),  }
-  - **notificaciones:** { ,  ('stock', 'pedido'), ,  }
-  - **form_configs:** { ,  (dictionary of form fields) }
+  - **estudiantes:** { , , , ,  ('nuevo'/'anterior'),  ('encontrado'/'no_encontrado'/'pendiente'), ,  (list of book IDs) }
+  - **google_sheet_configs:** { , , , ,  }
+  - **libros:** {  (now a List[str]), , , ,  }
+  - **clientes:** { , , , ,  (list of student objects) }
 
 **changes in tech stack**
-  - None.
+  - No core stack changes. Added Python libraries for Google Sheets integration and fuzzy search.
 
 **All files of reference**
-- : The single file containing the entire FastAPI backend, including all models, routes, and business logic. Recently updated with endpoints for public orders and notifications.
-- : A large component managing the entire admin interface. Recently updated to add bulk add, CSV import/export, and is the source of the broken CSV import feature.
-- : A new page created to serve as the standalone, embeddable order form.
-- : A new component for the admin notification system.
-- : The main router for the frontend application. Recently updated to add the .
-- : Contains all translation strings for Spanish and Chinese.
+- : Heavily modified to add all logic for Google Sheets sync, automatic student matching, and updating the order/student endpoints.
+- : Completely rewritten to implement the new parent dashboard for managing students and initiating purchases.
+- : Heavily modified to add new tabs and logic for Matrículas (now legacy, but UI elements repurposed) and Google Sheets.
+- : New file. The entire UI for managing the Google Sheets synchronization feature.
+- : Modified to hide the Catálogo link from non-admin users.
+- : Modified to make the  route admin-only.
 
 **Areas that need refactoring**:
-- The  component has grown very large (over 1000 lines) and contains logic for multiple tabs, dialogs, and features (bulk add, CSV import/export, product editing, etc.). It should be broken down into smaller, more manageable sub-components.
-- The  file contains all backend logic. It could be split into separate files for models, routes, and services for better organization as the application grows.
+-  and  have become extremely large and complex. They should be broken down into smaller, more focused modules/components. For example,  could be split into , , and .  could have each tab's content extracted into its own component.  is also growing and could benefit from similar refactoring.
 
 **key api endpoints**
-- , : User authentication.
-- : Fetch all textbook products.
-- : Create a new order (for authenticated users).
-- , : Fetch data for the admin dashboard.
-- : Add multiple products at once.
-- : **(New)** Create a new order without authentication for the embeddable form.
-- : **(New)** Fetch notifications for the admin bar.
-- : **(New)** Manage the configuration of the embeddable form.
+- : Add a student (now triggers automatic verification).
+- : Manually re-trigger the verification check.
+- : Get available books for a specific student's grade.
+- : Create order (now checks for encontrado status and tracks purchased books).
+- **Google Sheets Sync Endpoints:**
+    - : Connect a new Google Sheet.
+    - : Get all connected sheets.
+    - : Trigger a manual sync.
+    - : Update column mappings.
+    - : Disconnect a sheet.
 
 **Critical Info for New Agent**
-The most critical issue is that the CSV import feature in  is broken. The agent wrote the code to parse a CSV file but **forgot to install the  dependency**. This needs to be fixed with yarn add v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-success Saved 1 new dependency.
-info Direct dependencies
-└─ papaparse@5.5.3
-info All dependencies
-└─ papaparse@5.5.3
-Done in 0.25s. before proceeding. The agent was also in the middle of a major feature implementation (embeddable form and notifications), which is incomplete and untested.
+The user has pivoted to a new major feature: a block-based, editable landing page. This is now the highest priority (P0). The previous complex workflow of student registration and verification against a Google Sheet is now complete and has been tested. Do not try to modify that flow unless the user requests it. The next steps are to focus entirely on building the backend and frontend for the new landing page block editor and neutralizing the platform's branding.
 
 **documents and test reports created in this job**
-- 
-- 
-- 
+-  (updated with results from the new student verification flow).
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **User:** Asks to add CSV export functionality.
-9. **Agent:** Implements CSV export. (Completed)
-8. **User:** Requests two major new features: 1) A standalone, embeddable order form that doesn't require registration but uses the inventory and Monday.com integration. 2) A persistent notification bar in the admin dashboard for alerts like low stock.
-7. **Agent:** Acknowledges the request and starts implementation. (In Progress)
-6. **User:** Asks to add a CSV import feature.
-5. **Agent:** Implements the UI and logic for CSV import. (Completed, but broken)
-4. **User:** Confirms the new bulk-add product form is working and asks for CSV import.
-3. **Agent:** Finishes and confirms the functionality of the bulk-add product form. Suggests adding CSV import.
-2. **User:** Asks to change the single-product Add Product form to a table-based form for adding multiple products at once.
-1. **Agent:** Acknowledges the request and begins modifying the  component.
+10. **User:** I want to synchronize with a Google Sheet for student enrollment.
+9.  **Agent:** Clarifies implementation details (credentials, connection method).
+8.  **User:** Provides details: use Emergent credentials, connect via public sheet URL, and specifies purchase flow rules (1 book per type unless admin unlocks).
+7.  **Agent:** Implements the full Google Sheets sync feature (backend & frontend).
+6.  **User:** Now that we have the official list, we don't need manual verification. The system should automatically match students with >90% similarity when a parent adds them. Status should be Found or Not Found.
+5.  **Agent:** Implements the automatic matching system using fuzzy search, updating the backend logic and frontend UI.
+4.  **User:** How can I modify the home page?
+3.  **Agent:** Shows the current  file and asks for desired modifications.
+2.  **User:** I want to convert the page into a system of addable/editable blocks.
+1.  **User:** Also, I want the app to be more neutral, not just a bookstore, to eventually become a multi-vendor platform. The block system and neutral branding are the first steps.
 
 **Project Health Check:**
-- **Broken:** The CSV Product Import feature in  is non-functional due to a missing  npm package.
+- **Broken:** None.
 - **Mocked:** None.
 
 **3rd Party Integrations**
-- **Monday.com:** Logic is present in  () but end-to-end testing, especially with the new public order endpoint, is pending. Requires user-provided API key.
-- **Yappy Comercial:** Requested by the user, but not yet implemented.
+- **Monday.com:** Logic is present in . End-to-end testing is pending. Requires user API key (which has been provided and is in ).
+- **Google Sheets:** Integrated for student data synchronization via a public sheet URL. Uses  and service account credentials managed on the backend.
+- **Yappy Comercial:** Requested by user, not implemented.
 
 **Testing status**
-  - Testing agent used after significant changes: YES
+  - Testing agent used after significant changes: YES (After implementing the full student verification and purchase flow).
   - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: None
-  - Known regressions: None
+  - Test files created: None.
+  - Known regressions: None.
 
 **Credentials to test flow:**
-An admin user has been created. The credentials can be found in the agent's thought process when it created the user (Message 50 & 51).
-- Email: 
-- Password: 
+- **Admin:**
+  - Email: 
+  - Password: 
+- **Customer (Parent):**
+  - Email: 
+  - Password: 
 
 **What agent forgot to execute**
-- **yarn add v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved 1 new dependency.
-info Direct dependencies
-└─ papaparse@5.5.3
-info All dependencies
-└─ papaparse@5.5.3
-Done in 0.21s.:** The agent implemented the CSV import feature in  but forgot to install the necessary dependency, rendering the feature broken.
-- **Thermal Printer Formatting:** The requirement to format order receipts for a thermal printer has not been addressed.
-- **Admin UI for Form Fields:** The requirement for the admin to configure the fields of the embeddable form has backend endpoints but no corresponding frontend UI has been built.</analysis>
+- The agent has not forgotten any recent user requests. The implementation of the block-based editor is the next logical step and has not started yet. Older, lower-priority requests like Thermal Printer Formatting and Yappy Integration are still in the backlog.</analysis>
