@@ -244,6 +244,9 @@ test_plan:
     - "Add Block Dialog in Live Edit Mode"
   test_all: false
   test_priority: "high_first"
+  completed_testing:
+    - "Unatienda/Platform Store Integration"
+    - "Yappy Payment Gateway Integration"
 
 agent_communication:
   - agent: "testing"
