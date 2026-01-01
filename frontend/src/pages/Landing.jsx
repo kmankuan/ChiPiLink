@@ -490,7 +490,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
   switch (block.tipo) {
     case 'hero':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section 
             className="relative overflow-hidden"
             style={{ minHeight: config.altura || '500px' }}
@@ -577,7 +577,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'features':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || config.subtitulo || isEditMode) && (
               <div className="text-center mb-12">
@@ -656,7 +656,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'text':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section 
             className="px-4 md:px-8 lg:px-12 py-12 md:py-16 max-w-7xl mx-auto"
             style={{ textAlign: config.alineacion || 'center' }}
@@ -686,7 +686,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'image':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
             <figure style={{ width: config.ancho || '100%', margin: '0 auto' }}>
               <EditableImage 
@@ -711,7 +711,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'cta':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             <div 
               className="relative rounded-3xl overflow-hidden p-8 md:p-12 lg:p-16"
@@ -759,7 +759,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'stats':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-16 max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {(config.items || []).map((item, index) => (
@@ -806,7 +806,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'cards':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || isEditMode) && (
               <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-12 text-center">
@@ -877,7 +877,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'banner':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
             <div 
               className="rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8"
@@ -927,7 +927,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'testimonials':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || isEditMode) && (
               <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-12 text-center">
@@ -1008,7 +1008,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'spacer':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <div 
             style={{ height: config.altura || '60px' }} 
             className={isEditMode ? 'bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300' : ''}
@@ -1024,7 +1024,7 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
 
     case 'divider':
       return (
-        <BlockWrapper isEditMode={isEditMode} onSave={onSave}>
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
           <div 
             className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12"
             style={{ padding: `${config.margen || '40px'} 0` }}
