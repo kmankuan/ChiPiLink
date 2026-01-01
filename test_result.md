@@ -288,6 +288,9 @@ unatienda_integration:
       - working: true
         agent: "main"
         comment: "✅ Frontend module visible in AdminDashboard as 'Unatienda' tab. Shows General and Yappy Comercial sub-tabs. Merchant ID, Secret Key and Estado shown as 'Configurado' with green checkmarks. Test connection button functional."
+      - working: true
+        agent: "testing"
+        comment: "✅ UNATIENDA TAB UI TESTING COMPLETED! Comprehensive browser automation testing performed: ✅ Admin login successful with admin@libreria.com credentials. ✅ Unatienda tab found and navigable (10th tab in admin dashboard). ✅ General sub-tab: Tienda Activa toggle ON, Nombre de la Tienda shows 'Unatienda Test', Descripción textarea functional, URL del Logo field present, Guardar Configuración button working. ✅ Yappy Comercial sub-tab: Estado de Yappy Comercial section with 3 status cards all showing green checkmarks - Merchant ID 'Configurado', Clave Secreta 'Configurada', Estado 'Activo'. ✅ Yappy Activo toggle ON, Ambiente selector shows 'Producción', ID del Comercio shows 'BAQIJ-98619452', Clave Secreta input (password type), URL del Dominio shows correct domain, Guardar and Probar Conexión buttons present. ✅ 'Activa' badge displayed at top right. All UI elements working as expected per test requirements."
 
   - feature: "Yappy API Integration"
     implemented: true
