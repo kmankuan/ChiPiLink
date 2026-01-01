@@ -33,26 +33,17 @@ export default function YappyButton({
 }) {
   const [loading, setLoading] = useState(true);
   const [yappyActive, setYappyActive] = useState(false);
-  const [cdnUrl, setCdnUrl] = useState(null);
   const [processing, setProcessing] = useState(false);
-  const scriptLoaded = useRef(false);
 
   useEffect(() => {
     loadYappyConfig();
   }, []);
-
-  useEffect(() => {
-    if (cdnUrl && !scriptLoaded.current) {
-      loadYappyScript();
-    }
-  }, [cdnUrl]);
 
   const loadYappyConfig = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/platform-store/yappy/cdn`);
       if (response.data.activo) {
         setYappyActive(true);
-        setCdnUrl(response.data.cdn_url);
       }
     } catch (error) {
       console.error('Error loading Yappy config:', error);
