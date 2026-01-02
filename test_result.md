@@ -390,9 +390,7 @@ test_plan:
     - "Shopping Cart (Context + Drawer)"
     - "Unatienda Checkout Page"
     - "Header Cart Integration"
-  stuck_tasks:
-    - "Block Reorder Operations"
-    - "Add Block Dialog in Live Edit Mode"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
   completed_testing:
