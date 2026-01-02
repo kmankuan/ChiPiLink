@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   Home
 } from 'lucide-react';
+import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
