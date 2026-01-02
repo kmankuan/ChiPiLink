@@ -157,6 +157,19 @@ export default function FloatingStoreNav({
       {/* Collapsed State - Compact Button */}
       {!isExpanded && (
         <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-background/95 backdrop-blur-sm border shadow-md">
+          {/* Back arrow button - for navigation history */}
+          {(showBackToStore || selectedCategoria || selectedSubcategoria) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={showBackToStore ? handleBackToStore : handleBackClick}
+              className="h-7 w-7 rounded-full"
+              title={showBackToStore ? "Volver a la tienda" : "Regresar"}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </Button>
+          )}
+
           {/* Home button (for product detail page) - goes to store main */}
           {showBackToStore && (
             <Button
