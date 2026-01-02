@@ -163,6 +163,7 @@ export default function Unatienda() {
   const handleGoHome = () => {
     setSelectedCategoria(null);
     setSelectedSubcategoria(null);
+    setShowLandingView(true);
   };
 
   const handleAddToCart = (product) => {
