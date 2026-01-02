@@ -213,28 +213,10 @@ export default function Unatienda() {
         </div>
 
         {/* Category Navigation */}
-        <div className="mb-8">
-          {/* Breadcrumb / Back Navigation */}
-          {(selectedCategoria || selectedSubcategoria) && (
-            <div className="flex items-center gap-2 mb-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleGoBack}
-                className="gap-1 text-muted-foreground hover:text-foreground"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Regresar
-              </Button>
-              {getCurrentTitle() && (
-                <span className="text-lg font-semibold">{getCurrentTitle()}</span>
-              )}
-            </div>
-          )}
-
-          {/* Category/Subcategory Pills */}
-          <div className="flex gap-2 flex-wrap">
-            {/* Home/All button - always visible */}
+        <div className="mb-6">
+          {/* Navigation Pills - Single Row */}
+          <div className="flex gap-2 flex-wrap items-center">
+            {/* Home/All button - always first */}
             <Button
               variant={!selectedCategoria ? 'default' : 'outline'}
               size="sm"
@@ -245,7 +227,25 @@ export default function Unatienda() {
               Todos
             </Button>
 
-            {/* Show categories or subcategories based on state */}
+            {/* Back button - only when in a category/subcategory */}
+            {(selectedCategoria || selectedSubcategoria) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="rounded-full gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Regresar
+              </Button>
+            )}
+
+            {/* Separator when in category */}
+            {selectedCategoria && (
+              <span className="text-muted-foreground/50 mx-1">|</span>
+            )}
+
+            {/* Current category title or category pills */}
             {!selectedCategoria ? (
               // Main categories
               categorias.map((cat) => (
