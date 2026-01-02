@@ -261,15 +261,18 @@ export default function Unatienda() {
                 </Button>
               ))
             ) : hasSubcategories && !selectedSubcategoria ? (
-              // Subcategories (grades for books)
+              // Subcategories (grades for books) - show category name + all grades option
               <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}:
+                </span>
                 <Button
                   variant="default"
                   size="sm"
                   onClick={() => setSelectedSubcategoria(null)}
                   className="rounded-full"
                 >
-                  Todos los grados
+                  Todos
                 </Button>
                 {subcategories.map((sub) => (
                   <Button
@@ -284,19 +287,29 @@ export default function Unatienda() {
                 ))}
               </>
             ) : hasSubcategories && selectedSubcategoria ? (
-              // When subcategory is selected, show siblings for easy switching
-              subcategories.map((sub) => (
-                <Button
-                  key={sub.id}
-                  variant={selectedSubcategoria === sub.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleSelectSubcategoria(sub.id)}
-                  className="rounded-full"
-                >
-                  {sub.nombre}
-                </Button>
-              ))
-            ) : null}
+              // When subcategory is selected, show category name + siblings for easy switching
+              <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}:
+                </span>
+                {subcategories.map((sub) => (
+                  <Button
+                    key={sub.id}
+                    variant={selectedSubcategoria === sub.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleSelectSubcategoria(sub.id)}
+                    className="rounded-full"
+                  >
+                    {sub.nombre}
+                  </Button>
+                ))}
+              </>
+            ) : (
+              // Category selected but no subcategories - just show category name
+              <span className="font-semibold text-sm flex items-center gap-1">
+                {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+              </span>
+            )}
           </div>
         </div>
 
