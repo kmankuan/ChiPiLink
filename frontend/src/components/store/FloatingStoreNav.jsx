@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,8 @@ import {
   ChevronLeft,
   Search,
   X,
-  ChevronUp
+  ChevronUp,
+  GripVertical
 } from 'lucide-react';
 
 const categoryIcons = {
@@ -17,6 +18,31 @@ const categoryIcons = {
   'preparados': '🌭',
   'uniformes': '👕',
   'servicios': '🔧'
+};
+
+// Storage key for position
+const POSITION_STORAGE_KEY = 'floating-nav-position';
+
+// Get saved position from localStorage
+const getSavedPosition = () => {
+  try {
+    const saved = localStorage.getItem(POSITION_STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error reading saved position:', e);
+  }
+  return null;
+};
+
+// Save position to localStorage
+const savePosition = (position) => {
+  try {
+    localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(position));
+  } catch (e) {
+    console.error('Error saving position:', e);
+  }
 };
 
 export default function FloatingStoreNav({
@@ -38,6 +64,13 @@ export default function FloatingStoreNav({
   const [localSearch, setLocalSearch] = useState(searchTerm);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  
+  // Dragging state
+  const [position, setPosition] = useState(() => getSavedPosition() || { x: 12, y: 64 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const dragStartPos = useRef({ x: 0, y: 0 });
+  const hasMoved = useRef(false);
 
   // Show floating nav when category navigation is out of view
   useEffect(() => {
