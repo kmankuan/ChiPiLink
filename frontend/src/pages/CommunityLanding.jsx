@@ -427,7 +427,7 @@ export default function CommunityLanding() {
           <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
           <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
           <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
-          <QuickAccessButton icon={Trophy} label="Torneos" to="/torneos" />
+          <QuickAccessButton icon={Trophy} label="Torneos" to="/pingpong" />
           <QuickAccessButton icon={Users} label="Club" to="/club" />
           <QuickAccessButton icon={Send} label="Telegram" to="/telegram" />
         </section>
