@@ -460,50 +460,48 @@ export default function Unatienda() {
         )}
       </div>
 
-      {/* Floating Navigation Buttons - Top Left */}
+      {/* Floating Navigation Buttons - Top Left (Compact) */}
       <div 
-        className={`fixed top-20 left-4 z-50 transition-all duration-300 ${
+        className={`fixed top-16 left-3 z-50 transition-all duration-300 ${
           showFloatingNav 
             ? 'opacity-100 translate-y-0' 
             : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
-        <div className="flex gap-2 p-2 rounded-full bg-background/95 backdrop-blur-md border shadow-lg">
+        <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-background/90 backdrop-blur-sm border shadow-md text-xs">
           {/* Home/All button */}
           <Button
-            variant={!selectedCategoria ? 'default' : 'outline'}
-            size="sm"
+            variant={!selectedCategoria ? 'default' : 'ghost'}
+            size="icon"
             onClick={handleGoHome}
-            className="rounded-full gap-1.5 h-9 px-3"
+            className="h-7 w-7 rounded-full"
           >
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline">Todos</span>
+            <Home className="h-3.5 w-3.5" />
           </Button>
 
           {/* Back button - only when in a category/subcategory */}
           {(selectedCategoria || selectedSubcategoria) && (
             <Button
-              variant="outline"
-              size="sm"
+              variant="ghost"
+              size="icon"
               onClick={handleGoBack}
-              className="rounded-full gap-1 h-9 px-3"
+              className="h-7 w-7 rounded-full"
             >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Regresar</span>
+              <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
           )}
 
           {/* Current category indicator */}
           {selectedCategoria && (
-            <div className="flex items-center px-3 text-sm font-medium bg-muted rounded-full">
-              <span>{getCategoryInfo(selectedCategoria).icono}</span>
-              <span className="ml-1.5 max-w-[120px] sm:max-w-none truncate">
+            <span className="px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              {getCategoryInfo(selectedCategoria).icono}
+              <span className="ml-1">
                 {selectedSubcategoria 
                   ? grados.find(g => g.id === selectedSubcategoria)?.nombre 
                   : getCategoryInfo(selectedCategoria).nombre
                 }
               </span>
-            </div>
+            </span>
           )}
         </div>
       </div>
