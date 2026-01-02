@@ -460,12 +460,12 @@ export default function Unatienda() {
         )}
       </div>
 
-      {/* Floating Navigation Buttons */}
+      {/* Floating Navigation Buttons - Top Left */}
       <div 
-        className={`fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+        className={`fixed top-20 left-4 z-50 transition-all duration-300 ${
           showFloatingNav 
             ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10 pointer-events-none'
+            : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
         <div className="flex gap-2 p-2 rounded-full bg-background/95 backdrop-blur-md border shadow-lg">
@@ -474,7 +474,7 @@ export default function Unatienda() {
             variant={!selectedCategoria ? 'default' : 'outline'}
             size="sm"
             onClick={handleGoHome}
-            className="rounded-full gap-1.5 h-10 px-4"
+            className="rounded-full gap-1.5 h-9 px-3"
           >
             <Home className="h-4 w-4" />
             <span className="hidden sm:inline">Todos</span>
@@ -486,7 +486,7 @@ export default function Unatienda() {
               variant="outline"
               size="sm"
               onClick={handleGoBack}
-              className="rounded-full gap-1 h-10 px-4"
+              className="rounded-full gap-1 h-9 px-3"
             >
               <ChevronLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Regresar</span>
@@ -495,9 +495,9 @@ export default function Unatienda() {
 
           {/* Current category indicator */}
           {selectedCategoria && (
-            <div className="hidden sm:flex items-center px-3 text-sm font-medium">
+            <div className="flex items-center px-3 text-sm font-medium bg-muted rounded-full">
               <span>{getCategoryInfo(selectedCategoria).icono}</span>
-              <span className="ml-1 text-muted-foreground">
+              <span className="ml-1.5 max-w-[120px] sm:max-w-none truncate">
                 {selectedSubcategoria 
                   ? grados.find(g => g.id === selectedSubcategoria)?.nombre 
                   : getCategoryInfo(selectedCategoria).nombre
