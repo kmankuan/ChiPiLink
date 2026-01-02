@@ -915,85 +915,61 @@ class TextbookStoreAPITester:
         
         return success and all([site_config, landing_page])
 
-    def test_block_based_landing_page_admin_endpoints(self):
-        """Test Block-Based Landing Page Editor - Admin Endpoints"""
-        print("\n👑 Testing Block-Based Landing Page - Admin Endpoints...")
+    def test_block_templates_api_review_request(self):
+        """Test Block Templates API - REVIEW REQUEST SPECIFIC TEST"""
+        print("\n🧱 Testing Block Templates API (Review Request)...")
         
         # Use admin token
         old_token = self.token
         self.token = self.admin_token
         
-        # Test get block templates
+        # Test GET /api/admin/block-templates
         block_templates = self.run_test(
-            "Get Block Templates",
+            "GET /api/admin/block-templates",
             "GET",
             "admin/block-templates",
             200
         )
         
-        # Validate block templates
+        success = True
+        
+        # Validate block templates - should return all 11 block types
         if block_templates:
             expected_blocks = ['hero', 'features', 'text', 'image', 'cta', 'stats', 'cards', 'banner', 'testimonials', 'spacer', 'divider']
             found_blocks = list(block_templates.keys())
             
             if len(found_blocks) >= 11:
-                self.log_test("Block Templates Count (11+ types)", True)
+                self.log_test("Block Templates Count (11 types)", True, f"Found {len(found_blocks)} block types")
             else:
-                self.log_test("Block Templates Count (11+ types)", False, f"Expected 11+, got {len(found_blocks)}")
+                self.log_test("Block Templates Count (11 types)", False, f"Expected 11, got {len(found_blocks)}")
+                success = False
             
+            # Check each expected block type
             for block_type in expected_blocks:
                 if block_type in block_templates:
-                    self.log_test(f"Block Template '{block_type}'", True)
+                    self.log_test(f"Block Template '{block_type}' Present", True)
                 else:
-                    self.log_test(f"Block Template '{block_type}'", False, f"Missing block type")
-        
-        # Test get admin site config
-        admin_site_config = self.run_test(
-            "Get Admin Site Configuration",
-            "GET",
-            "admin/site-config",
-            200
-        )
-        
-        # Test update site config
-        if admin_site_config:
-            updated_config = admin_site_config.copy()
-            updated_config['nombre_sitio'] = "Mi Plataforma"
-            updated_config['color_primario'] = "#16a34a"
-            updated_config['footer_texto'] = "© 2025 Mi Plataforma - Todos los derechos reservados"
+                    self.log_test(f"Block Template '{block_type}' Present", False, f"Missing block type '{block_type}'")
+                    success = False
             
-            update_result = self.run_test(
-                "Update Site Configuration",
-                "PUT",
-                "admin/site-config",
-                200,
-                updated_config
-            )
-            
-            # Verify the update worked
-            if update_result and update_result.get('success'):
-                self.log_test("Site Config Update Success", True)
-            else:
-                self.log_test("Site Config Update Success", False, "Update did not return success")
-        
-        # Test get admin landing page
-        admin_landing_page = self.run_test(
-            "Get Admin Landing Page",
-            "GET",
-            "admin/landing-page",
-            200
-        )
-        
-        # Store initial block count for later comparison
-        initial_block_count = 0
-        if admin_landing_page and admin_landing_page.get('bloques'):
-            initial_block_count = len(admin_landing_page['bloques'])
-            self.log_test(f"Initial Landing Page Blocks ({initial_block_count} blocks)", True)
+            # Validate structure of first block template
+            if len(found_blocks) > 0:
+                first_block_type = found_blocks[0]
+                first_block = block_templates[first_block_type]
+                
+                required_fields = ['nombre', 'descripcion', 'config_default']
+                for field in required_fields:
+                    if field in first_block:
+                        self.log_test(f"Block Template Structure Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Block Template Structure Contains '{field}'", False, f"Missing '{field}' field")
+                        success = False
+        else:
+            success = False
         
         # Restore token
         self.token = old_token
-        
-        return all([block_templates, admin_site_config, admin_landing_page])
+        return success
 
     def test_block_crud_operations(self):
         """Test Block CRUD Operations"""
