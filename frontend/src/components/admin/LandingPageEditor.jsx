@@ -114,7 +114,7 @@ export default function LandingPageEditor() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const headers = { Authorization: `Bearer ${token}` };
 
       const [pageRes, templatesRes, configRes] = await Promise.all([
@@ -139,7 +139,7 @@ export default function LandingPageEditor() {
 
   const handleAddBlock = async (tipo) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const res = await axios.post(
         `${BACKEND_URL}/api/admin/landing-page/blocks?tipo=${tipo}`,
         {},
@@ -159,7 +159,7 @@ export default function LandingPageEditor() {
   const handleUpdateBlock = async (bloqueId, config, activo = null) => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       
       let url = `${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}`;
       const params = new URLSearchParams();
@@ -190,7 +190,7 @@ export default function LandingPageEditor() {
     if (!window.confirm('¿Eliminar este bloque?')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.delete(`${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -223,7 +223,7 @@ export default function LandingPageEditor() {
     const orders = newBlocks.map((b, i) => ({ bloque_id: b.bloque_id, orden: i }));
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(
         `${BACKEND_URL}/api/admin/landing-page/blocks/reorder`,
         { orders },
@@ -239,7 +239,7 @@ export default function LandingPageEditor() {
   const handleUpdateSiteConfig = async () => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(`${BACKEND_URL}/api/admin/site-config`, siteConfig, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -254,7 +254,7 @@ export default function LandingPageEditor() {
 
   const handleTogglePublish = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(
         `${BACKEND_URL}/api/admin/landing-page/publish?publicada=${!isPublished}`,
         {},

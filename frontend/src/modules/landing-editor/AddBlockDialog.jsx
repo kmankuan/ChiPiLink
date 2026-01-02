@@ -67,7 +67,7 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
   const fetchTemplates = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       
       if (!token) {
         toast.error('No estás autenticado. Por favor, inicia sesión.');
@@ -94,7 +94,7 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
   const handleAddBlock = async (tipo) => {
     try {
       setAdding(tipo);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await axios.post(
         `${BACKEND_URL}/api/admin/landing-page/blocks?tipo=${tipo}`,
         {},

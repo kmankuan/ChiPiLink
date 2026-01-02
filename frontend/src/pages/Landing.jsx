@@ -239,7 +239,7 @@ export default function Landing() {
     if (!window.confirm('¿Eliminar este bloque?')) return;
     
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.delete(`${BACKEND_URL}/api/admin/landing-page/blocks/${blockId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -265,7 +265,7 @@ export default function Landing() {
 
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(
         `${BACKEND_URL}/api/admin/landing-page/blocks/${blockId}`,
         block.config,
@@ -283,7 +283,7 @@ export default function Landing() {
   const saveAllBlocks = async () => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       
       for (const block of blocks) {
         await axios.put(
@@ -304,7 +304,7 @@ export default function Landing() {
 
   const saveSiteConfig = async (newConfig) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(`${BACKEND_URL}/api/admin/site-config`, newConfig, {
         headers: { Authorization: `Bearer ${token}` }
       });

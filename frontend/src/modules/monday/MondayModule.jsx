@@ -48,7 +48,7 @@ export default function MondayModule() {
   const fetchStatus = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await axios.get(`${BACKEND_URL}/api/admin/monday/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -69,7 +69,7 @@ export default function MondayModule() {
 
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(
         `${BACKEND_URL}/api/admin/monday/config`,
         { board_id: selectedBoardId.trim() },
@@ -93,7 +93,7 @@ export default function MondayModule() {
 
     try {
       setTesting(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await axios.post(`${BACKEND_URL}/api/admin/monday/test`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });

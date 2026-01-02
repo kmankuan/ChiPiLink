@@ -79,7 +79,7 @@ export default function PlatformStoreModule() {
   const fetchConfig = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await axios.get(`${BACKEND_URL}/api/platform-store/admin/config`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -94,7 +94,7 @@ export default function PlatformStoreModule() {
   const saveConfig = async () => {
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       await axios.put(`${BACKEND_URL}/api/platform-store/admin/config`, config, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -109,7 +109,7 @@ export default function PlatformStoreModule() {
   const testYappy = async () => {
     try {
       setTesting(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token');
       const response = await axios.post(`${BACKEND_URL}/api/platform-store/admin/yappy/test`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
