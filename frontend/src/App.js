@@ -35,6 +35,12 @@ import Unatienda from '@/pages/Unatienda';
 import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
 
+// Ping Pong Module
+import PingPongDashboard from '@/modules/pingpong/pages/PingPongDashboard';
+import PingPongMatch from '@/modules/pingpong/pages/PingPongMatch';
+import PingPongArbiter from '@/modules/pingpong/pages/PingPongArbiter';
+import PingPongSpectator from '@/modules/pingpong/pages/PingPongSpectator';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 
