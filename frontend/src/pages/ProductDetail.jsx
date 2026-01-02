@@ -332,6 +332,10 @@ export default function ProductDetail() {
         categorias={categorias}
         grados={grados}
         showBackToStore={true}
+        onSearchChange={(term) => {
+          // Navigate to store with search term
+          navigate(`/unatienda?search=${encodeURIComponent(term)}`);
+        }}
       />
     </div>
   );
