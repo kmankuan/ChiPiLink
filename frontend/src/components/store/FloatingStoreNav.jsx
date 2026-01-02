@@ -124,6 +124,9 @@ export default function FloatingStoreNav({
   const handleBackClick = () => {
     if (onGoBack) {
       onGoBack();
+    } else if (showBackToStore) {
+      // On product detail page, go back in browser history
+      navigate(-1);
     }
     setIsExpanded(false);
   };
