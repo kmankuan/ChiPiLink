@@ -338,7 +338,8 @@ export default function Unatienda() {
               return (
                 <div
                   key={product.libro_id}
-                  className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+                  className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  onClick={() => navigate(`/unatienda/producto/${product.libro_id}`)}
                 >
                   {/* Product Image */}
                   <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center overflow-hidden">
@@ -350,23 +351,6 @@ export default function Unatienda() {
                       />
                     ) : (
                       <span className="text-5xl">{catInfo.icono}</span>
-                    )}
-                    
-                    {/* Quick Add Button (overlay) */}
-                    {stockStatus.canBuy && (
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Button
-                          size="lg"
-                          className="rounded-full shadow-lg"
-                          onClick={() => handleAddToCart(product)}
-                        >
-                          {justAdded ? (
-                            <><Check className="h-4 w-4 mr-2" /> Agregado</>
-                          ) : (
-                            <><Plus className="h-4 w-4 mr-2" /> Agregar</>
-                          )}
-                        </Button>
-                      </div>
                     )}
                   </div>
                   
@@ -440,10 +424,15 @@ export default function Unatienda() {
                         size="sm"
                         variant={inCart ? "secondary" : "default"}
                         className="rounded-full"
-                        onClick={() => inCart ? openCart() : handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          inCart ? openCart() : handleAddToCart(product);
+                        }}
                         disabled={!stockStatus.canBuy}
                       >
-                        {inCart ? (
+                        {justAdded ? (
+                          <><Check className="h-4 w-4 mr-1" /> Listo</>
+                        ) : inCart ? (
                           <><ShoppingCart className="h-4 w-4 mr-1" /> Ver</>
                         ) : (
                           <><Plus className="h-4 w-4 mr-1" /> Agregar</>
