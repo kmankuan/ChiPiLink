@@ -85,6 +85,10 @@ export default function FloatingStoreNav({
   const handleCategorySelect = (categoriaId) => {
     if (onSelectCategoria) {
       onSelectCategoria(categoriaId);
+      setIsExpanded(false);
+    } else if (showBackToStore) {
+      // If we're on product detail page, navigate to store with category
+      navigate(`/unatienda?categoria=${categoriaId}`);
     }
     setIsExpanded(false);
   };
@@ -99,6 +103,9 @@ export default function FloatingStoreNav({
   const handleHomeClick = () => {
     if (onGoHome) {
       onGoHome();
+    } else if (showBackToStore) {
+      // If we're on product detail page, navigate to store home
+      navigate('/unatienda');
     }
     setIsExpanded(false);
   };
