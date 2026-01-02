@@ -389,8 +389,16 @@ export default function Unatienda() {
           </p>
         )}
 
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+        {/* Category Landing Page or Products Grid */}
+        {shouldShowLanding ? (
+          <CategoryLanding
+            categoria={selectedCategoria}
+            categoriaInfo={getCategoryInfo(selectedCategoria)}
+            grados={grados}
+            onSelectSubcategoria={handleSelectSubcategoria}
+            onViewAllProducts={handleViewAllProducts}
+          />
+        ) : filteredProducts.length === 0 ? (
           <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
             <Store className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
             <p className="text-muted-foreground">No se encontraron productos</p>
