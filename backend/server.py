@@ -3304,6 +3304,10 @@ from routes.platform_store import router as platform_store_router, init_routes a
 init_platform_store_routes(db, get_admin_user, get_current_user)
 api_router.include_router(platform_store_router)
 
+# Include Ping Pong Club routes
+from routes.pingpong import pingpong_router
+api_router.include_router(pingpong_router)
+
 # Include Membership routes
 from routes.membership import router as membership_router, init_routes as init_membership_routes
 init_membership_routes(db, get_admin_user, get_current_user)
