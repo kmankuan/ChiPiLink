@@ -33,6 +33,7 @@ const categoryIcons = {
 
 export default function Unatienda() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { addItem, items, openCart } = useCart();
   
   const [products, setProducts] = useState([]);
