@@ -2907,13 +2907,22 @@ async def get_community_event(evento_id: str):
 @api_router.post("/admin/community/events")
 async def create_community_event(event: dict, admin: dict = Depends(get_admin_user)):
     """Create a new community event"""
+    # Parse dates
+    fecha_inicio = event.get("fecha_inicio")
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.fromisoformat(fecha_inicio.replace('Z', '+00:00'))
+    
+    fecha_fin = event.get("fecha_fin")
+    if isinstance(fecha_fin, str):
+        fecha_fin = datetime.fromisoformat(fecha_fin.replace('Z', '+00:00'))
+    
     doc = {
         "evento_id": f"evento_{uuid.uuid4().hex[:12]}",
         "titulo": event.get("titulo"),
         "descripcion": event.get("descripcion"),
         "tipo": event.get("tipo", "otro"),
-        "fecha_inicio": event.get("fecha_inicio"),
-        "fecha_fin": event.get("fecha_fin"),
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
         "lugar": event.get("lugar"),
         "imagen_url": event.get("imagen_url"),
         "requiere_inscripcion": event.get("requiere_inscripcion", False),
