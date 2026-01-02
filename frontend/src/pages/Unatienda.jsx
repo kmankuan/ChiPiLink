@@ -300,20 +300,28 @@ export default function Unatienda() {
                   {cat.nombre}
                 </Button>
               ))
+            ) : hasSubcategories && shouldShowLanding ? (
+              // Category with subcategories in landing view - show category name + explore options
+              <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleViewAllProducts}
+                  className="rounded-full gap-1"
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Ver catálogo
+                </Button>
+              </>
             ) : hasSubcategories && !selectedSubcategoria ? (
               // Subcategories (grades for books) - show category name + all grades option
               <>
                 <span className="font-semibold text-sm flex items-center gap-1">
                   {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}:
                 </span>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setSelectedSubcategoria(null)}
-                  className="rounded-full"
-                >
-                  Todos
-                </Button>
                 {subcategories.map((sub) => (
                   <Button
                     key={sub.id}
@@ -344,19 +352,42 @@ export default function Unatienda() {
                   </Button>
                 ))}
               </>
+            ) : shouldShowLanding ? (
+              // Category without subcategories in landing view
+              <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleViewAllProducts}
+                  className="rounded-full gap-1"
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Ver catálogo
+                </Button>
+              </>
             ) : (
-              // Category selected but no subcategories - just show category name
-              <span className="font-semibold text-sm flex items-center gap-1">
-                {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
-              </span>
+              // Category selected, viewing all products
+              <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                </span>
+                <Badge variant="secondary" className="text-xs">
+                  Catálogo completo
+                </Badge>
+              </>
             )}
           </div>
         </div>
 
-        {/* Results Count */}
-        <p className="text-sm text-muted-foreground mb-6">
-          {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
-        </p>
+        {/* Results Count - only show when not in landing view */}
+        {!shouldShowLanding && (
+          <p className="text-sm text-muted-foreground mb-6">
+            {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+          </p>
+        )}
 
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
