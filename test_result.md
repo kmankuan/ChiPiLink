@@ -147,6 +147,9 @@ backend:
       - working: true
         agent: "main"
         comment: "✅ FIXED: Issue was database seeding - admin user was missing from 'test_database'. Created admin user (admin@libreria.com/adminpassword) and site config in correct DB. Backend endpoint was working correctly all along, error was due to empty database causing auth failures."
+      - working: true
+        agent: "testing"
+        comment: "✅ REVIEW REQUEST TESTING COMPLETED: PUT /api/admin/landing-page/blocks/reorder endpoint tested successfully with admin@libreria.com/adminpassword credentials. Used exact payload format from review request: {'orders': [{'bloque_id': 'some_id', 'orden': 0}]}. Endpoint returns {'success': true} as expected. No 401 or 422 errors encountered. Block reorder functionality working correctly."
 
   - task: "Landing Page Publish Toggle"
     implemented: true
