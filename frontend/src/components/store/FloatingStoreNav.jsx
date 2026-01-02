@@ -157,20 +157,20 @@ export default function FloatingStoreNav({
       {/* Collapsed State - Compact Button */}
       {!isExpanded && (
         <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-background/95 backdrop-blur-sm border shadow-md">
-          {/* Back to Store (for product detail page) */}
+          {/* Home button (for product detail page) - goes to store main */}
           {showBackToStore && (
             <Button
               variant="ghost"
               size="icon"
               onClick={handleBackToStore}
               className="h-7 w-7 rounded-full"
-              title="Volver a la tienda"
+              title="Ir a la tienda"
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <Home className="h-3.5 w-3.5" />
             </Button>
           )}
 
-          {/* Main toggle button */}
+          {/* Main toggle button - no Home icon, just text + arrow */}
           <Button
             variant="outline"
             size="sm"
@@ -188,10 +188,7 @@ export default function FloatingStoreNav({
                 </span>
               </>
             ) : (
-              <>
-                <Home className="h-3.5 w-3.5" />
-                <span>Navegar</span>
-              </>
+              <span>Navegar</span>
             )}
             <ChevronUp className={`h-3 w-3 transition-transform ${isExpanded ? '' : 'rotate-180'}`} />
           </Button>
