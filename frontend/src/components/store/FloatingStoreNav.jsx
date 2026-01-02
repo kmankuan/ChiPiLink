@@ -356,9 +356,27 @@ export default function FloatingStoreNav({
       {/* Expanded State - Full Navigation */}
       {isExpanded && (
         <div className="bg-background/98 backdrop-blur-md border rounded-2xl shadow-xl p-3 min-w-[280px] max-w-[90vw] animate-in fade-in slide-in-from-top-2 duration-200">
-          {/* Header with close button */}
+          {/* Header with drag handle and close button */}
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-muted-foreground">Navegar tienda</span>
+            <div className="flex items-center gap-2">
+              {/* Drag handle - always visible */}
+              <div
+                className="flex items-center justify-center h-6 w-5 cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground touch-none"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleDragStart(e.clientX, e.clientY);
+                }}
+                onTouchStart={(e) => {
+                  if (e.touches[0]) {
+                    handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+                  }
+                }}
+                title="Arrastra para mover"
+              >
+                <GripVertical className="h-3.5 w-3.5" />
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">Navegar tienda</span>
+            </div>
             <Button
               variant="ghost"
               size="icon"
