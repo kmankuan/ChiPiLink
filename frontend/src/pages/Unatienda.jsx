@@ -122,20 +122,11 @@ export default function Unatienda() {
     } else {
       setSelectedCategoria(null);
     }
-    // Scroll to top to show navigation
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoHome = () => {
-    // If already on main page, just scroll to top to show category navigation
-    if (!selectedCategoria && !selectedSubcategoria) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    // Otherwise, reset categories and scroll to top
     setSelectedCategoria(null);
     setSelectedSubcategoria(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddToCart = (product) => {
