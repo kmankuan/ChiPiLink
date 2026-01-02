@@ -239,12 +239,12 @@ export default function FloatingStoreNav({
               <div className="flex flex-wrap gap-1.5">
                 <Button
                   variant={!selectedCategoria ? 'default' : 'outline'}
-                  size="sm"
+                  size="icon"
                   onClick={handleHomeClick}
-                  className="h-8 rounded-full text-xs gap-1.5"
+                  className="h-8 w-8 rounded-full"
+                  title="Inicio"
                 >
-                  <Home className="h-3.5 w-3.5" />
-                  Todos
+                  <Home className="h-4 w-4" />
                 </Button>
                 {categorias.map((cat) => (
                   <Button
