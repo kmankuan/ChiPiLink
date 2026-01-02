@@ -117,13 +117,100 @@ export default function FloatingStoreNav({
     setLocalSearch(searchTerm);
   }, [searchTerm]);
 
+  // Drag handlers
+  const handleDragStart = useCallback((clientX, clientY) => {
+    if (isExpanded) return; // Don't drag when expanded
+    
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      setDragOffset({
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      });
+      dragStartPos.current = { x: clientX, y: clientY };
+      hasMoved.current = false;
+      setIsDragging(true);
+    }
+  }, [isExpanded]);
+
+  const handleDragMove = useCallback((clientX, clientY) => {
+    if (!isDragging) return;
+    
+    // Check if we've moved enough to consider it a drag
+    const dx = Math.abs(clientX - dragStartPos.current.x);
+    const dy = Math.abs(clientY - dragStartPos.current.y);
+    if (dx > 5 || dy > 5) {
+      hasMoved.current = true;
+    }
+    
+    const newX = clientX - dragOffset.x;
+    const newY = clientY - dragOffset.y;
+    
+    // Keep within viewport bounds
+    const maxX = window.innerWidth - (containerRef.current?.offsetWidth || 100);
+    const maxY = window.innerHeight - (containerRef.current?.offsetHeight || 40);
+    
+    setPosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isDragging, dragOffset]);
+
+  const handleDragEnd = useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false);
+      // Save position to localStorage
+      savePosition(position);
+    }
+  }, [isDragging, position]);
+
+  // Mouse events
+  useEffect(() => {
+    const handleMouseMove = (e) => handleDragMove(e.clientX, e.clientY);
+    const handleMouseUp = () => handleDragEnd();
+    
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
+  // Touch events
+  useEffect(() => {
+    const handleTouchMove = (e) => {
+      if (isDragging && e.touches[0]) {
+        e.preventDefault();
+        handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+    const handleTouchEnd = () => handleDragEnd();
+    
+    if (isDragging) {
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+    
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
   const getCategoryInfo = (categoriaId) => {
     const cat = categorias.find(c => c.categoria_id === categoriaId);
     return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
   };
 
   const handleToggle = () => {
-    setIsExpanded(!isExpanded);
+    // Only toggle if we didn't drag
+    if (!hasMoved.current) {
+      setIsExpanded(!isExpanded);
+    }
   };
 
   const handleCategorySelect = (categoriaId) => {
