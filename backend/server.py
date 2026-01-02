@@ -2628,6 +2628,229 @@ async def get_embed_code(admin: dict = Depends(get_admin_user)):
         "direct_url": f"{base_url}/embed/orden"
     }
 
+# ============== CATEGORY LANDING PAGE ROUTES ==============
+
+# --- Category Banners ---
+
+@api_router.get("/category-banners/{categoria}")
+async def get_category_banners(categoria: str):
+    """Get active banners for a category (public)"""
+    now = datetime.now(timezone.utc)
+    query = {
+        "categoria": categoria,
+        "activo": True,
+        "$or": [
+            {"fecha_inicio": None, "fecha_fin": None},
+            {"fecha_inicio": {"$lte": now}, "fecha_fin": None},
+            {"fecha_inicio": None, "fecha_fin": {"$gte": now}},
+            {"fecha_inicio": {"$lte": now}, "fecha_fin": {"$gte": now}}
+        ]
+    }
+    banners = await db.category_banners.find(query, {"_id": 0}).sort("orden", 1).to_list(20)
+    return banners
+
+@api_router.get("/admin/category-banners")
+async def get_all_category_banners(admin: dict = Depends(get_admin_user)):
+    """Get all banners (admin)"""
+    banners = await db.category_banners.find({}, {"_id": 0}).sort([("categoria", 1), ("orden", 1)]).to_list(100)
+    return banners
+
+@api_router.post("/admin/category-banners")
+async def create_category_banner(banner: dict, admin: dict = Depends(get_admin_user)):
+    """Create a new category banner"""
+    doc = {
+        "banner_id": f"banner_{uuid.uuid4().hex[:12]}",
+        "categoria": banner.get("categoria"),
+        "titulo": banner.get("titulo"),
+        "subtitulo": banner.get("subtitulo"),
+        "imagen_url": banner.get("imagen_url"),
+        "link_url": banner.get("link_url"),
+        "activo": banner.get("activo", True),
+        "orden": banner.get("orden", 0),
+        "fecha_inicio": banner.get("fecha_inicio"),
+        "fecha_fin": banner.get("fecha_fin"),
+        "creado_por": "admin",
+        "fecha_creacion": datetime.now(timezone.utc)
+    }
+    await db.category_banners.insert_one(doc)
+    del doc["_id"]
+    return doc
+
+@api_router.put("/admin/category-banners/{banner_id}")
+async def update_category_banner(banner_id: str, banner: dict, admin: dict = Depends(get_admin_user)):
+    """Update a category banner"""
+    update_data = {k: v for k, v in banner.items() if k not in ["banner_id", "_id", "fecha_creacion"]}
+    update_data["fecha_actualizacion"] = datetime.now(timezone.utc)
+    
+    result = await db.category_banners.update_one(
+        {"banner_id": banner_id},
+        {"$set": update_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Banner no encontrado")
+    
+    updated = await db.category_banners.find_one({"banner_id": banner_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/admin/category-banners/{banner_id}")
+async def delete_category_banner(banner_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a category banner"""
+    result = await db.category_banners.delete_one({"banner_id": banner_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner no encontrado")
+    return {"success": True}
+
+# --- Featured & Promotional Products ---
+
+@api_router.get("/category-featured/{categoria}")
+async def get_category_featured_products(categoria: str, limit: int = 10):
+    """Get featured products for a category (public)"""
+    query = {"categoria": categoria, "destacado": True, "activo": True}
+    products = await db.libros.find(query, {"_id": 0}).sort("orden_destacado", 1).to_list(limit)
+    return products
+
+@api_router.get("/category-promotions/{categoria}")
+async def get_category_promotional_products(categoria: str, limit: int = 10):
+    """Get promotional products for a category (public)"""
+    query = {"categoria": categoria, "en_promocion": True, "activo": True, "precio_oferta": {"$ne": None}}
+    products = await db.libros.find(query, {"_id": 0}).to_list(limit)
+    return products
+
+@api_router.get("/category-newest/{categoria}")
+async def get_category_newest_products(categoria: str, limit: int = 8):
+    """Get newest products for a category (public)"""
+    query = {"categoria": categoria, "activo": True}
+    products = await db.libros.find(query, {"_id": 0}).sort("fecha_creacion", -1).to_list(limit)
+    return products
+
+@api_router.put("/admin/products/{libro_id}/featured")
+async def toggle_product_featured(libro_id: str, data: dict, admin: dict = Depends(get_admin_user)):
+    """Toggle featured status of a product"""
+    update_data = {
+        "destacado": data.get("destacado", False),
+        "orden_destacado": data.get("orden_destacado", 0)
+    }
+    result = await db.libros.update_one(
+        {"libro_id": libro_id},
+        {"$set": update_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    return {"success": True}
+
+@api_router.put("/admin/products/{libro_id}/promotion")
+async def toggle_product_promotion(libro_id: str, data: dict, admin: dict = Depends(get_admin_user)):
+    """Toggle promotion status of a product"""
+    update_data = {
+        "en_promocion": data.get("en_promocion", False),
+        "precio_oferta": data.get("precio_oferta")
+    }
+    result = await db.libros.update_one(
+        {"libro_id": libro_id},
+        {"$set": update_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    return {"success": True}
+
+# --- Vendor Permissions ---
+
+@api_router.get("/admin/vendor-permissions")
+async def get_all_vendor_permissions(admin: dict = Depends(get_admin_user)):
+    """Get all vendor permissions (admin only)"""
+    permissions = await db.vendor_permissions.find({}, {"_id": 0}).to_list(100)
+    return permissions
+
+@api_router.get("/admin/vendor-permissions/{vendor_id}")
+async def get_vendor_permissions(vendor_id: str, admin: dict = Depends(get_admin_user)):
+    """Get permissions for a specific vendor"""
+    permissions = await db.vendor_permissions.find_one({"vendor_id": vendor_id}, {"_id": 0})
+    if not permissions:
+        # Return default permissions
+        return {
+            "vendor_id": vendor_id,
+            "puede_crear_banners": False,
+            "puede_destacar_productos": False,
+            "puede_crear_promociones": False,
+            "puede_publicar_noticias": False,
+            "max_banners": 3,
+            "max_productos_destacados": 5
+        }
+    return permissions
+
+@api_router.put("/admin/vendor-permissions/{vendor_id}")
+async def update_vendor_permissions(vendor_id: str, data: dict, admin: dict = Depends(get_admin_user)):
+    """Update vendor permissions (admin only)"""
+    update_data = {
+        "vendor_id": vendor_id,
+        "puede_crear_banners": data.get("puede_crear_banners", False),
+        "puede_destacar_productos": data.get("puede_destacar_productos", False),
+        "puede_crear_promociones": data.get("puede_crear_promociones", False),
+        "puede_publicar_noticias": data.get("puede_publicar_noticias", False),
+        "max_banners": data.get("max_banners", 3),
+        "max_productos_destacados": data.get("max_productos_destacados", 5),
+        "fecha_actualizacion": datetime.now(timezone.utc)
+    }
+    await db.vendor_permissions.update_one(
+        {"vendor_id": vendor_id},
+        {"$set": update_data},
+        upsert=True
+    )
+    return {"success": True, "permissions": update_data}
+
+# --- Category Landing Page Data (combined endpoint) ---
+
+@api_router.get("/category-landing/{categoria}")
+async def get_category_landing_data(categoria: str):
+    """Get all data needed for a category landing page"""
+    now = datetime.now(timezone.utc)
+    
+    # Get category info
+    cat_info = await db.categorias.find_one({"categoria_id": categoria}, {"_id": 0})
+    
+    # Get active banners
+    banner_query = {
+        "categoria": categoria,
+        "activo": True,
+        "$or": [
+            {"fecha_inicio": None, "fecha_fin": None},
+            {"fecha_inicio": {"$lte": now}, "fecha_fin": None},
+            {"fecha_inicio": None, "fecha_fin": {"$gte": now}},
+            {"fecha_inicio": {"$lte": now}, "fecha_fin": {"$gte": now}}
+        ]
+    }
+    banners = await db.category_banners.find(banner_query, {"_id": 0}).sort("orden", 1).to_list(10)
+    
+    # Get featured products
+    featured = await db.libros.find(
+        {"categoria": categoria, "destacado": True, "activo": True},
+        {"_id": 0}
+    ).sort("orden_destacado", 1).to_list(10)
+    
+    # Get promotional products
+    promotions = await db.libros.find(
+        {"categoria": categoria, "en_promocion": True, "activo": True, "precio_oferta": {"$ne": None}},
+        {"_id": 0}
+    ).to_list(10)
+    
+    # Get newest products
+    newest = await db.libros.find(
+        {"categoria": categoria, "activo": True},
+        {"_id": 0}
+    ).sort("fecha_creacion", -1).to_list(8)
+    
+    # Get total product count for this category
+    total_products = await db.libros.count_documents({"categoria": categoria, "activo": True})
+    
+    return {
+        "categoria": cat_info,
+        "banners": banners,
+        "destacados": featured,
+        "promociones": promotions,
+        "novedades": newest,
+        "total_productos": total_products
+    }
+
 # Include Platform Store routes
 from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
 init_platform_store_routes(db, get_admin_user, get_current_user)
