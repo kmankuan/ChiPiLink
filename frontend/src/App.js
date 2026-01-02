@@ -32,6 +32,7 @@ import Checkout from '@/pages/Checkout';
 import PaymentResult from '@/pages/PaymentResult';
 import Unatienda from '@/pages/Unatienda';
 import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
+import ProductDetail from '@/pages/ProductDetail';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
