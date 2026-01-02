@@ -251,32 +251,25 @@ export default function FloatingStoreNav({
             ) : (
               // Show subcategories (grades for books)
               <div className="space-y-2">
-                {/* Back to categories */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackClick}
-                  className="h-7 rounded-full text-xs gap-1 text-muted-foreground"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  Volver a categorías
-                </Button>
-                
-                {/* Category header */}
-                <div className="text-xs font-medium text-muted-foreground px-1">
-                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                {/* Category header with back button */}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-medium flex items-center gap-1">
+                    <span>{getCategoryInfo(selectedCategoria).icono}</span>
+                    <span>{getCategoryInfo(selectedCategoria).nombre}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleHomeClick}
+                    className="h-6 text-xs gap-1 text-muted-foreground px-2"
+                  >
+                    <Home className="h-3 w-3" />
+                    Categorías
+                  </Button>
                 </div>
                 
                 {/* Subcategory pills */}
                 <div className="flex flex-wrap gap-1.5">
-                  <Button
-                    variant={!selectedSubcategoria ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handleSubcategorySelect(null)}
-                    className="h-8 rounded-full text-xs"
-                  >
-                    Todos
-                  </Button>
                   {grados.map((grado) => (
                     <Button
                       key={grado.id}
@@ -289,6 +282,18 @@ export default function FloatingStoreNav({
                     </Button>
                   ))}
                 </div>
+
+                {/* Show all grades button */}
+                {selectedSubcategoria && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleSubcategorySelect(null)}
+                    className="w-full h-7 text-xs text-muted-foreground"
+                  >
+                    Ver todos los grados
+                  </Button>
+                )}
               </div>
             )}
           </div>
