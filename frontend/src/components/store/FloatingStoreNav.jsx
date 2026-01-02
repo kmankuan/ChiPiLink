@@ -298,8 +298,8 @@ export default function FloatingStoreNav({
             )}
           </div>
 
-          {/* Quick Home Button (when in category) */}
-          {selectedCategoria && (
+          {/* Quick Home Button - only when in category WITHOUT subcategories view */}
+          {selectedCategoria && !hasSubcategories && (
             <div className="mt-3 pt-3 border-t">
               <Button
                 variant="ghost"
