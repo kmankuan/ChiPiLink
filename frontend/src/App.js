@@ -102,6 +102,13 @@ function AppRouter() {
       <Route path="/eventos" element={<CommunityLanding />} />
       <Route path="/galeria" element={<CommunityLanding />} />
       
+      {/* Ping Pong Club Routes */}
+      <Route path="/pingpong" element={<PingPongDashboard />} />
+      <Route path="/pingpong/match/new" element={<PingPongMatch />} />
+      <Route path="/pingpong/match/:matchId" element={<PingPongMatch />} />
+      <Route path="/pingpong/arbiter/:matchId" element={<PingPongArbiter />} />
+      <Route path="/pingpong/spectator/:matchId" element={<PingPongSpectator />} />
+      
       {/* Catalog - Admin only */}
       <Route 
         path="/catalogo" 
