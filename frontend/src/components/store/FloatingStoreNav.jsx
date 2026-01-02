@@ -49,8 +49,8 @@ export default function FloatingStoreNav({
         // Show floating nav when category nav is completely above viewport
         setShowFloating(rect.bottom < 0);
       } else {
-        // Fallback: show when scrolled past 350px (for product detail page)
-        setShowFloating(window.scrollY > 350);
+        // Fallback for product detail page: show when scrolled past 100px
+        setShowFloating(window.scrollY > 100);
       }
     };
 
