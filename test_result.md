@@ -381,11 +381,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Multi-Category Product System"
+    - "Shopping Cart (Context + Drawer)"
+    - "Unatienda Checkout Page"
+    - "Header Cart Integration"
   stuck_tasks:
     - "Block Reorder Operations"
     - "Add Block Dialog in Live Edit Mode"
-    - "Multi-Category Product System"
   test_all: false
   test_priority: "high_first"
   completed_testing:
@@ -403,6 +404,9 @@ test_plan:
     - "Lazy Loading and Performance"
     - "Mobile Responsiveness"
     - "Yappy Checkout Frontend Pages"
+    - "Category Landing Page"
+    - "Floating Store Navigation Component"
+    - "Public Store Page (/unatienda)"
 
 agent_communication:
   - agent: "testing"
