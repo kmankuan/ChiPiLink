@@ -88,10 +88,19 @@ function AppRouter() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<><Header /><Landing /></>} />
+      <Route path="/" element={<CommunityLanding />} />
+      <Route path="/landing-editor" element={<><Header /><Landing /></>} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      
+      {/* Community Routes */}
+      <Route path="/comunidad" element={<CommunityLanding />} />
+      <Route path="/comunidad/post/:postId" element={<CommunityLanding />} />
+      <Route path="/comunidad/evento/:eventoId" element={<CommunityLanding />} />
+      <Route path="/comunidad/galeria/:albumId" element={<CommunityLanding />} />
+      <Route path="/eventos" element={<CommunityLanding />} />
+      <Route path="/galeria" element={<CommunityLanding />} />
       
       {/* Catalog - Admin only */}
       <Route 
