@@ -50,19 +50,6 @@ export default function Unatienda() {
   const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
   
   const [addedItems, setAddedItems] = useState({});
-  
-  // Scroll state for floating buttons
-  const [showFloatingNav, setShowFloatingNav] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      // Show floating nav when scrolled more than 200px
-      setShowFloatingNav(window.scrollY > 200);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     fetchData();
