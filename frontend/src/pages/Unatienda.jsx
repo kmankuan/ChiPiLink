@@ -16,9 +16,11 @@ import {
   Check,
   Clock,
   ChevronLeft,
-  Home
+  Home,
+  LayoutGrid
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
+import CategoryLanding from '@/components/store/CategoryLanding';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -48,6 +50,8 @@ export default function Unatienda() {
   // Hierarchical navigation state
   const [selectedCategoria, setSelectedCategoria] = useState(null);
   const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
+  // New state to toggle between landing view and product grid
+  const [showLandingView, setShowLandingView] = useState(true);
   
   const [addedItems, setAddedItems] = useState({});
 
