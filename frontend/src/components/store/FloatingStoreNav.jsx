@@ -39,13 +39,24 @@ export default function FloatingStoreNav({
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Show floating nav when scrolled
+  // Show floating nav when category navigation is out of view
   useEffect(() => {
-    const handleScroll = () => {
-      setShowFloating(window.scrollY > 150);
+    // Look for the category navigation element
+    const checkVisibility = () => {
+      const categoryNav = document.querySelector('[data-category-nav]');
+      if (categoryNav) {
+        const rect = categoryNav.getBoundingClientRect();
+        // Show floating nav when category nav is completely above viewport
+        setShowFloating(rect.bottom < 0);
+      } else {
+        // Fallback: show when scrolled past 350px (for product detail page)
+        setShowFloating(window.scrollY > 350);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', checkVisibility);
+    checkVisibility(); // Check on mount
+    return () => window.removeEventListener('scroll', checkVisibility);
   }, []);
 
   // Close when clicking outside
