@@ -1,6 +1,18 @@
 # Test Results - Block-Based Landing Page Editor
 
 backend:
+  - task: "Category Landing Page APIs"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ NEW FEATURE: Category landing page APIs implemented. Endpoints: GET /api/category-landing/{categoria} (combined data), GET /api/category-featured/{categoria}, GET /api/category-promotions/{categoria}, GET /api/category-newest/{categoria}, GET /api/category-banners/{categoria}. Admin endpoints for managing banners, featured products, and promotions working correctly."
+
   - task: "Branding Neutralization (P1)"
     implemented: true
     working: true
