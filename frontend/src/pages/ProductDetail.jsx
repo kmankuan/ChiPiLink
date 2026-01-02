@@ -326,6 +326,13 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Floating Navigation Component - Back to Store */}
+      <FloatingStoreNav
+        categorias={categorias}
+        grados={grados}
+        showBackToStore={true}
+      />
     </div>
   );
 }
