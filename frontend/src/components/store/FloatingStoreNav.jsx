@@ -119,8 +119,6 @@ export default function FloatingStoreNav({
 
   // Drag handlers
   const handleDragStart = useCallback((clientX, clientY) => {
-    if (isExpanded) return; // Don't drag when expanded
-    
     const rect = containerRef.current?.getBoundingClientRect();
     if (rect) {
       setDragOffset({
@@ -131,7 +129,7 @@ export default function FloatingStoreNav({
       hasMoved.current = false;
       setIsDragging(true);
     }
-  }, [isExpanded]);
+  }, []);
 
   const handleDragMove = useCallback((clientX, clientY) => {
     if (!isDragging) return;
