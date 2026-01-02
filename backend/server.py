@@ -58,12 +58,17 @@ class LibroBase(BaseModel):
     grados: Optional[List[str]] = None  # Additional grades that use this book
     materia: Optional[str] = None  # Subject (only for books)
     precio: float
+    precio_oferta: Optional[float] = None  # Sale price (if on promotion)
     cantidad_inventario: int = 0
     isbn: Optional[str] = None
     editorial: Optional[str] = None  # Publisher
     imagen_url: Optional[str] = None
     activo: bool = True
     requiere_preparacion: bool = False  # For prepared items (hotdogs, coffee, etc.)
+    # New fields for category landing page
+    destacado: bool = False  # Featured product
+    en_promocion: bool = False  # On sale/promotion
+    orden_destacado: int = 0  # Order for featured products display
 
 class LibroCreate(LibroBase):
     pass
@@ -72,6 +77,36 @@ class Libro(LibroBase):
     model_config = ConfigDict(extra="ignore")
     libro_id: str = Field(default_factory=lambda: f"libro_{uuid.uuid4().hex[:12]}")
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Category Banner Model
+class CategoryBannerBase(BaseModel):
+    categoria: str  # Category ID this banner belongs to
+    titulo: Optional[str] = None
+    subtitulo: Optional[str] = None
+    imagen_url: str
+    link_url: Optional[str] = None  # Optional link when clicked
+    activo: bool = True
+    orden: int = 0
+    fecha_inicio: Optional[datetime] = None  # When to start showing
+    fecha_fin: Optional[datetime] = None  # When to stop showing
+    creado_por: Optional[str] = None  # "admin" or vendor_id
+
+class CategoryBanner(CategoryBannerBase):
+    model_config = ConfigDict(extra="ignore")
+    banner_id: str = Field(default_factory=lambda: f"banner_{uuid.uuid4().hex[:12]}")
+    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Vendor Permissions Model
+class VendorPermissions(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    vendor_id: str
+    puede_crear_banners: bool = False
+    puede_destacar_productos: bool = False
+    puede_crear_promociones: bool = False
+    puede_publicar_noticias: bool = False
+    max_banners: int = 3  # Maximum banners allowed
+    max_productos_destacados: int = 5  # Maximum featured products
+    fecha_actualizacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # Current school year helper
 def get_current_school_year() -> str:
