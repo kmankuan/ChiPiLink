@@ -2877,9 +2877,45 @@ class TextbookStoreAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    tester = TextbookStoreAPITester()
-    success = tester.run_all_tests()
-    return 0 if success else 1
+    import sys
+    
+    # Check if we should run only the review request tests
+    if len(sys.argv) > 1 and sys.argv[1] == "review":
+        print("🎯 Running Review Request Tests Only")
+        tester = TextbookStoreAPITester()
+        
+        # Setup admin user and login
+        if not tester.test_admin_setup():
+            print("❌ Admin setup failed - stopping tests")
+            return 1
+        
+        if not tester.test_admin_login():
+            print("❌ Admin login failed - stopping tests")
+            return 1
+        
+        # Run the specific review request tests
+        success = tester.test_review_request_features()
+        
+        # Print summary
+        print(f"\n📊 Review Request Test Summary:")
+        print(f"Tests run: {tester.tests_run}")
+        print(f"Tests passed: {tester.tests_passed}")
+        print(f"Tests failed: {tester.tests_run - tester.tests_passed}")
+        print(f"Success rate: {(tester.tests_passed/tester.tests_run*100):.1f}%")
+        
+        if tester.failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for failed_test in tester.failed_tests:
+                print(f"  • {failed_test}")
+        else:
+            print("\n✅ ALL REVIEW REQUEST TESTS PASSED!")
+        
+        return 0 if success else 1
+    else:
+        # Run all tests
+        tester = TextbookStoreAPITester()
+        success = tester.run_all_tests()
+        return 0 if success else 1
 
 if __name__ == "__main__":
     sys.exit(main())
