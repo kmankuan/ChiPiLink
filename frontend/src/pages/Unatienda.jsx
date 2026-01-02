@@ -227,18 +227,18 @@ export default function Unatienda() {
         </div>
 
         {/* Category Navigation */}
-        <div className="mb-6">
+        <div className="mb-6" data-category-nav>
           {/* Navigation Pills - Single Row */}
           <div className="flex gap-2 flex-wrap items-center">
-            {/* Home/All button - always first */}
+            {/* Home/All button - always first (icon only) */}
             <Button
               variant={!selectedCategoria ? 'default' : 'outline'}
-              size="sm"
+              size="icon"
               onClick={handleGoHome}
-              className="rounded-full gap-1.5"
+              className="h-9 w-9 rounded-full"
+              title="Inicio - Todas las categorías"
             >
               <Home className="h-4 w-4" />
-              Todos
             </Button>
 
             {/* Back button - only when in a category/subcategory */}
