@@ -459,6 +459,54 @@ export default function Unatienda() {
           </div>
         )}
       </div>
+
+      {/* Floating Navigation Buttons */}
+      <div 
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
+          showFloatingNav 
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-10 pointer-events-none'
+        }`}
+      >
+        <div className="flex gap-2 p-2 rounded-full bg-background/95 backdrop-blur-md border shadow-lg">
+          {/* Home/All button */}
+          <Button
+            variant={!selectedCategoria ? 'default' : 'outline'}
+            size="sm"
+            onClick={handleGoHome}
+            className="rounded-full gap-1.5 h-10 px-4"
+          >
+            <Home className="h-4 w-4" />
+            <span className="hidden sm:inline">Todos</span>
+          </Button>
+
+          {/* Back button - only when in a category/subcategory */}
+          {(selectedCategoria || selectedSubcategoria) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGoBack}
+              className="rounded-full gap-1 h-10 px-4"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Regresar</span>
+            </Button>
+          )}
+
+          {/* Current category indicator */}
+          {selectedCategoria && (
+            <div className="hidden sm:flex items-center px-3 text-sm font-medium">
+              <span>{getCategoryInfo(selectedCategoria).icono}</span>
+              <span className="ml-1 text-muted-foreground">
+                {selectedSubcategoria 
+                  ? grados.find(g => g.id === selectedSubcategoria)?.nombre 
+                  : getCategoryInfo(selectedCategoria).nombre
+                }
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
