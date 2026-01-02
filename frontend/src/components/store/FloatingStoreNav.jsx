@@ -211,10 +211,7 @@ export default function FloatingStoreNav({
   };
 
   const handleToggle = () => {
-    // Only toggle if we didn't drag
-    if (!hasMoved.current) {
-      setIsExpanded(!isExpanded);
-    }
+    setIsExpanded(!isExpanded);
   };
 
   const handleCategorySelect = (categoriaId) => {
