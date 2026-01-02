@@ -84,6 +84,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "GET /api/admin/block-templates returns all 11 block types (hero, features, text, image, cta, stats, cards, banner, testimonials, spacer, divider) with proper configuration templates"
+      - working: true
+        agent: "testing"
+        comment: "✅ REVIEW REQUEST TESTING COMPLETED: GET /api/admin/block-templates endpoint tested successfully with admin@libreria.com/adminpassword credentials. Returns all 11 block types as expected: hero, features, text, image, cta, stats, cards, banner, testimonials, spacer, divider. Each block template contains proper structure with 'nombre', 'descripcion', and 'config_default' fields. No 401 or 422 errors encountered. Block templates API working correctly."
 
   - task: "Admin Site Configuration CRUD"
     implemented: true
