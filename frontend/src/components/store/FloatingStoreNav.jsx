@@ -271,15 +271,36 @@ export default function FloatingStoreNav({
   return (
     <div 
       ref={containerRef}
-      className={`fixed top-16 left-3 z-50 transition-all duration-300 ${
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+      }}
+      className={`fixed z-50 transition-opacity duration-300 ${
         showFloating 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 -translate-y-4 pointer-events-none'
-      }`}
+          ? 'opacity-100' 
+          : 'opacity-0 pointer-events-none'
+      } ${isDragging ? 'cursor-grabbing' : ''}`}
     >
       {/* Collapsed State - Compact Button */}
       {!isExpanded && (
         <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-background/95 backdrop-blur-sm border shadow-md">
+          {/* Drag handle */}
+          <div
+            className="flex items-center justify-center h-7 w-5 cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground touch-none"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleDragStart(e.clientX, e.clientY);
+            }}
+            onTouchStart={(e) => {
+              if (e.touches[0]) {
+                handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+              }
+            }}
+            title="Arrastra para mover"
+          >
+            <GripVertical className="h-3.5 w-3.5" />
+          </div>
+
           {/* Home button (for product detail page) - goes to store main - FIRST */}
           {showBackToStore && (
             <Button
