@@ -419,6 +419,18 @@ agent_communication:
     message: "🏪 MULTI-CATEGORY PRODUCT SYSTEM TESTING COMPLETED! Comprehensive testing of the new multi-category system for Unatienda as requested in review: ✅ CATEGORIES CRUD: GET /api/categorias returns 6 default categories (📚 Libros, 🍫 Snacks, 🥤 Bebidas, 🌭 Preparados, 👕 Uniformes, 🔧 Servicios) with proper structure (categoria_id, nombre, icono, orden, activo). POST/PUT/DELETE admin endpoints working correctly for category management. ✅ PRODUCTS WITH CATEGORIES: GET /api/platform-store/products shows products with 'categoria' field, existing products have categoria='libros' as expected. Category filtering works (GET /api/platform-store/products?categoria=libros). Legacy GET /api/libros endpoint still functional. ❌ CRITICAL BACKEND ISSUES: 1) LibroBase model missing 'categoria' and 'requiere_preparacion' fields - new products created without these fields. 2) Category deletion protection not working - should block deletion of categories with products but currently allows it. Backend needs model updates and business logic fixes for full multi-category support."
 
 unatienda_public_store:
+  - feature: "Floating Store Navigation Component"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/store/FloatingStoreNav.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ Floating navigation component completed with all 3 user-requested adjustments: 1) Home icon (🏠) visible on product detail page for navigation to store main. 2) 'Navegar' button in collapsed state has no duplicate home icon. 3) Search bar now appears in expanded menu on product detail page - searches redirect to main store with search term. Component uses IntersectionObserver for precise scroll-based visibility (100px threshold for product detail, data-category-nav detection for main store)."
+
   - feature: "Public Store Page (/unatienda)"
     implemented: true
     working: "needs_testing"
