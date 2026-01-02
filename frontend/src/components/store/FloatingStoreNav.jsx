@@ -161,6 +161,10 @@ export default function FloatingStoreNav({
       setIsDragging(false);
       // Save position to localStorage
       savePosition(position);
+      // Reset hasMoved after a short delay to allow click events to complete
+      setTimeout(() => {
+        hasMoved.current = false;
+      }, 100);
     }
   }, [isDragging, position]);
 
