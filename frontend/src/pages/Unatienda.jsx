@@ -127,21 +127,36 @@ export default function Unatienda() {
   const hasSubcategories = selectedCategoria === 'libros';
   const subcategories = hasSubcategories ? grados : [];
 
+  // Determine if we should show landing view
+  // Show landing when: category selected + no subcategory selected + showLandingView is true + no search term
+  const shouldShowLanding = selectedCategoria && !selectedSubcategoria && showLandingView && !searchTerm;
+
   // Navigation handlers
   const handleSelectCategoria = (categoriaId) => {
     setSelectedCategoria(categoriaId);
     setSelectedSubcategoria(null);
+    setShowLandingView(true); // Reset to landing view when selecting new category
   };
 
   const handleSelectSubcategoria = (subcategoriaId) => {
     setSelectedSubcategoria(subcategoriaId);
+    setShowLandingView(false); // Switch to product grid when selecting subcategory
+  };
+
+  const handleViewAllProducts = () => {
+    setShowLandingView(false); // Switch to product grid view
   };
 
   const handleGoBack = () => {
-    if (selectedSubcategoria) {
+    if (!showLandingView && selectedCategoria && !selectedSubcategoria) {
+      // If viewing all products in a category, go back to landing
+      setShowLandingView(true);
+    } else if (selectedSubcategoria) {
       setSelectedSubcategoria(null);
+      setShowLandingView(true); // Go back to landing when leaving subcategory
     } else {
       setSelectedCategoria(null);
+      setShowLandingView(true);
     }
   };
 
