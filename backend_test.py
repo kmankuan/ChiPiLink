@@ -2783,6 +2783,26 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_review_request_features(self):
+        """Test the specific features mentioned in the review request"""
+        print("\n🎯 TESTING REVIEW REQUEST FEATURES")
+        print("=" * 60)
+        
+        # Ensure we have admin authentication
+        if not self.admin_token:
+            print("❌ Admin token required for review request tests")
+            return False
+        
+        # Test 1: Block Reorder Operations
+        print("\n1️⃣ Testing Block Reorder Operations...")
+        reorder_success = self.test_block_reorder_operations()
+        
+        # Test 2: Block Templates API
+        print("\n2️⃣ Testing Block Templates API...")
+        templates_success = self.test_block_templates_api_review_request()
+        
+        return reorder_success and templates_success
+
     def run_all_tests(self):
         """Run all tests"""
         print("🚀 Starting Textbook Store API Tests")
