@@ -51,6 +51,17 @@ export default function Unatienda() {
   
   const [addedItems, setAddedItems] = useState({});
 
+  // Read category from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const categoria = params.get('categoria');
+    if (categoria) {
+      setSelectedCategoria(categoria);
+      // Clean up URL
+      window.history.replaceState({}, '', '/unatienda');
+    }
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, []);
