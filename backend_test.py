@@ -1061,8 +1061,8 @@ class TextbookStoreAPITester:
         return False
 
     def test_block_reorder_operations(self):
-        """Test Block Reorder Operations"""
-        print("\n🔄 Testing Block Reorder Operations...")
+        """Test Block Reorder Operations - REVIEW REQUEST SPECIFIC TEST"""
+        print("\n🔄 Testing Block Reorder Operations (Review Request)...")
         
         # Use admin token
         old_token = self.token
@@ -1076,34 +1076,47 @@ class TextbookStoreAPITester:
             200
         )
         
-        if current_page and current_page.get('bloques') and len(current_page['bloques']) >= 2:
+        if current_page and current_page.get('bloques') and len(current_page['bloques']) >= 1:
             blocks = current_page['bloques']
             
-            # Create reorder data - reverse the order of first two blocks
-            reorder_data = []
-            for i, block in enumerate(blocks[:2]):
-                reorder_data.append({
-                    "bloque_id": block['bloque_id'],
-                    "orden": 1 - i  # Reverse order: 0->1, 1->0
-                })
+            # Use the exact payload format from the review request
+            reorder_payload = {
+                "orders": [
+                    {
+                        "bloque_id": blocks[0]['bloque_id'],
+                        "orden": 0
+                    }
+                ]
+            }
             
-            # Add remaining blocks with their current order + adjustment
-            for i, block in enumerate(blocks[2:], start=2):
-                reorder_data.append({
-                    "bloque_id": block['bloque_id'],
-                    "orden": i
-                })
+            # Test the PUT /api/admin/landing-page/blocks/reorder endpoint
+            reorder_result = self.run_test(
+                "PUT /api/admin/landing-page/blocks/reorder",
+                "PUT",
+                "admin/landing-page/blocks/reorder",
+                200,
+                reorder_payload
+            )
             
-            # Note: The reorder endpoint has a FastAPI model issue - it expects List[dict] 
-            # but FastAPI interprets this as expecting a dict wrapper. This is a backend issue.
-            self.log_test("Block Reorder Operation", False, "Backend endpoint expects List[dict] but FastAPI requires wrapper model")
+            # Check if it returns {"success": true} as expected
+            if reorder_result and reorder_result.get('success') == True:
+                self.log_test("Block Reorder Returns Success", True)
+                success = True
+            else:
+                self.log_test("Block Reorder Returns Success", False, f"Expected {{'success': true}}, got {reorder_result}")
+                success = False
+            
             self.log_test("Block Reorder Prerequisites", True, f"Found {len(blocks)} blocks ready for reordering")
+            
+            # Restore token
+            self.token = old_token
+            return success
         else:
-            self.log_test("Block Reorder Prerequisites", False, "Need at least 2 blocks to test reordering")
-        
-        # Restore token
-        self.token = old_token
-        return False
+            self.log_test("Block Reorder Prerequisites", False, "Need at least 1 block to test reordering")
+            
+            # Restore token
+            self.token = old_token
+            return False
 
     def test_landing_page_publish_toggle(self):
         """Test Landing Page Publish Toggle"""
