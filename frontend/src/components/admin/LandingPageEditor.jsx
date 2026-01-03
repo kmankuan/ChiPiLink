@@ -55,7 +55,11 @@ import {
   Minus,
   ExternalLink,
   Palette,
-  Globe
+  Globe,
+  Construction,
+  CheckCircle2,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
