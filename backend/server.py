@@ -2186,12 +2186,15 @@ async def update_block(
     bloque_id: str,
     config: dict,
     activo: Optional[bool] = None,
+    publicado: Optional[bool] = None,
     admin: dict = Depends(get_admin_user)
 ):
     """Update block configuration"""
     update_doc = {"bloques.$.config": config}
     if activo is not None:
         update_doc["bloques.$.activo"] = activo
+    if publicado is not None:
+        update_doc["bloques.$.publicado"] = publicado
     update_doc["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.paginas.update_one(
@@ -2203,6 +2206,22 @@ async def update_block(
         raise HTTPException(status_code=404, detail="Bloque no encontrado")
     
     return {"success": True}
+
+@api_router.put("/admin/landing-page/blocks/{bloque_id}/publish")
+async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = Depends(get_admin_user)):
+    """Toggle block publish status (Publicado/En construcción)"""
+    result = await db.paginas.update_one(
+        {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
+        {"$set": {
+            "bloques.$.publicado": publicado,
+            "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Bloque no encontrado")
+    
+    return {"success": True, "publicado": publicado}
 
 @api_router.delete("/admin/landing-page/blocks/{bloque_id}")
 async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
