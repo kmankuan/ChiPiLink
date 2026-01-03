@@ -213,6 +213,24 @@ export default function LandingPageEditor() {
     }
   };
 
+  const handleToggleBlockPublish = async (bloqueId, currentPublicado) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      await axios.put(
+        `${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}/publish?publicado=${!currentPublicado}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setBlocks(prev => prev.map(b => 
+        b.bloque_id === bloqueId ? { ...b, publicado: !currentPublicado } : b
+      ));
+      toast.success(!currentPublicado ? 'Bloque publicado' : 'Bloque marcado en construcción');
+    } catch (error) {
+      toast.error('Error cambiando estado de publicación');
+    }
+  };
+
   const handleMoveBlock = async (bloqueId, direction) => {
     const idx = blocks.findIndex(b => b.bloque_id === bloqueId);
     if ((direction === 'up' && idx === 0) || (direction === 'down' && idx === blocks.length - 1)) {
