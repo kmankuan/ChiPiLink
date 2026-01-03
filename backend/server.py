@@ -2055,7 +2055,7 @@ async def get_public_site_config():
 
 @api_router.get("/public/landing-page")
 async def get_public_landing_page():
-    """Get landing page blocks (public)"""
+    """Get landing page blocks (public) - only returns published blocks"""
     page = await db.paginas.find_one({"pagina_id": "landing"}, {"_id": 0})
     if not page:
         # Return empty page with default blocks
@@ -2065,6 +2065,14 @@ async def get_public_landing_page():
             "bloques": [],
             "publicada": True
         }
+    
+    # Filter only published and active blocks for public view
+    if page.get("bloques"):
+        page["bloques"] = [
+            b for b in page["bloques"] 
+            if b.get("activo", True) and b.get("publicado", True)
+        ]
+    
     return page
 
 @api_router.get("/admin/site-config")
