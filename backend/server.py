@@ -356,6 +356,7 @@ class BloquePagina(BaseModel):
     tipo: str  # hero, features, text, image, cta, stats, cards, banner, testimonials
     orden: int = 0
     activo: bool = True
+    publicado: bool = True  # True = visible para todos, False = solo visible para admin (en construcción)
     config: dict = {}  # Block-specific configuration
 
 class ConfiguracionSitio(BaseModel):
