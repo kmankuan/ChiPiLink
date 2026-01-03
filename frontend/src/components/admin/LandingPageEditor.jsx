@@ -467,11 +467,12 @@ export default function LandingPageEditor() {
           {blocks.map((block, index) => {
             const Icon = BLOCK_ICONS[block.tipo] || Layers;
             const template = templates[block.tipo];
+            const isPublicado = block.publicado !== false; // Default to true if undefined
             
             return (
               <Card
                 key={block.bloque_id}
-                className={`transition-all ${!block.activo ? 'opacity-50' : ''} ${BLOCK_COLORS[block.tipo] || ''}`}
+                className={`transition-all ${!block.activo ? 'opacity-50' : ''} ${!isPublicado ? 'border-orange-300 bg-orange-50/50' : ''} ${BLOCK_COLORS[block.tipo] || ''}`}
               >
                 <CardHeader className="py-3">
                   <div className="flex items-center justify-between">
@@ -484,7 +485,7 @@ export default function LandingPageEditor() {
                           onClick={() => handleMoveBlock(block.bloque_id, 'up')}
                           disabled={index === 0}
                         >
-                          <span className="text-xs">▲</span>
+                          <ChevronUp className="h-3 w-3" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -493,14 +494,39 @@ export default function LandingPageEditor() {
                           onClick={() => handleMoveBlock(block.bloque_id, 'down')}
                           disabled={index === blocks.length - 1}
                         >
-                          <span className="text-xs">▼</span>
+                          <ChevronDown className="h-3 w-3" />
                         </Button>
                       </div>
                       <div className="p-2 rounded-lg bg-white/50">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <CardTitle className="text-base">{template?.nombre || block.tipo}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-base">{template?.nombre || block.tipo}</CardTitle>
+                          {/* Badge de estado de publicación */}
+                          <Badge 
+                            variant={isPublicado ? "default" : "outline"}
+                            className={`text-xs cursor-pointer transition-colors ${
+                              isPublicado 
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' 
+                                : 'bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-300'
+                            }`}
+                            onClick={() => handleToggleBlockPublish(block.bloque_id, isPublicado)}
+                            title={isPublicado ? 'Clic para marcar en construcción' : 'Clic para publicar'}
+                          >
+                            {isPublicado ? (
+                              <>
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Publicado
+                              </>
+                            ) : (
+                              <>
+                                <Construction className="h-3 w-3 mr-1" />
+                                En construcción
+                              </>
+                            )}
+                          </Badge>
+                        </div>
                         <CardDescription className="text-xs">
                           {block.config?.titulo || template?.descripcion || ''}
                         </CardDescription>
@@ -511,6 +537,7 @@ export default function LandingPageEditor() {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleToggleBlock(block.bloque_id, block.activo)}
+                        title={block.activo ? 'Desactivar bloque' : 'Activar bloque'}
                       >
                         {block.activo ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                       </Button>
@@ -518,6 +545,7 @@ export default function LandingPageEditor() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setEditingBlock(block)}
+                        title="Configurar bloque"
                       >
                         <Settings className="h-4 w-4" />
                       </Button>
@@ -526,6 +554,7 @@ export default function LandingPageEditor() {
                         size="icon"
                         className="text-destructive hover:text-destructive"
                         onClick={() => handleDeleteBlock(block.bloque_id)}
+                        title="Eliminar bloque"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
