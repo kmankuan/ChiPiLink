@@ -208,10 +208,10 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
         mapeo = config.get("mapeo_columnas", [])
         fila_inicio = config.get("fila_inicio_datos", 2) - 1  # 0-indexed
         
-        # Get existing records
+        # Get existing records (OPTIMIZED: only fetch needed fields for comparison)
         existing = await db.estudiantes_sincronizados.find(
             {"config_id": config_id, "estado": "activo"},
-            {"_id": 0}
+            {"_id": 0, "sync_id": 1, "fila_original": 1, "datos": 1, "hash_datos": 1}
         ).to_list(10000)
         existing_by_row = {e["fila_original"]: e for e in existing}
         
