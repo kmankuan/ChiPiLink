@@ -76,11 +76,20 @@ class TextbookStoreAPITester:
         """Test admin user setup"""
         print("\n🔧 Testing Admin Setup...")
         
-        # Try to create admin user with query parameters
-        url = f"{self.base_url}/api/admin/setup?email=admin@libreria.com&contrasena=adminpassword"
+        # Try to create admin user with body data
+        admin_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "adminpassword",
+            "nombre": "Administrador"
+        }
         
         try:
-            response = requests.post(url, headers={'Content-Type': 'application/json'}, timeout=10)
+            response = requests.post(
+                f"{self.base_url}/api/admin/setup", 
+                json=admin_data,
+                headers={'Content-Type': 'application/json'}, 
+                timeout=10
+            )
             success = response.status_code == 200 or response.status_code == 400  # 400 if admin already exists
             
             if response.status_code == 400:
