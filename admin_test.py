@@ -52,14 +52,14 @@ def test_admin_endpoints():
                 
                 # Test Google Sheets integration
                 try:
-                    response = requests.get(f"{base_url}/api/sheets/status", 
+                    response = requests.get(f"{base_url}/api/sheets/configs", 
                                           headers=headers, timeout=10)
                     if response.status_code == 200:
-                        print("✅ GET /api/sheets/status")
-                    elif response.status_code == 404:
-                        print("⚠️ GET /api/sheets/status: 404 (Not implemented)")
+                        print("✅ GET /api/sheets/configs")
+                        sheets_data = response.json()
+                        print(f"   - Configurations: {len(sheets_data)}")
                     else:
-                        print(f"❌ GET /api/sheets/status: {response.status_code}")
+                        print(f"❌ GET /api/sheets/configs: {response.status_code}")
                 except Exception as e:
                     print(f"❌ Sheets Integration Error: {e}")
                 
