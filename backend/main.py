@@ -1,0 +1,159 @@
+"""
+ChiPi Link - Main Application Entry Point
+
+Modular Monolith Architecture
+All modules are organized for future microservices separation.
+"""
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import os
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+# Create FastAPI app
+app = FastAPI(
+    title="ChiPi Link API",
+    description="Super App - Modular Monolith Backend",
+    version="2.0.0"
+)
+
+# ============== IMPORT CORE ==============
+from core.database import db, client, close_database
+from core.config import CORS_ORIGINS
+from core.auth import get_current_user, get_admin_user
+
+# ============== IMPORT MODULE ROUTERS ==============
+
+# Auth Module
+from modules.auth.routes import router as auth_router
+
+# Store Module (products, orders, inventory, categories, students)
+from modules.store.routes import router as store_router
+
+# Landing Page Builder Module
+from modules.landing.routes import router as landing_router
+
+# Community Module (posts, events, gallery)
+from modules.community.routes import router as community_router
+
+# Integrations Module
+from modules.integrations.monday.routes import router as monday_router
+from modules.integrations.sheets.routes import router as sheets_router
+
+# Admin Module (notifications, config, setup)
+from modules.admin.routes import router as admin_router
+
+# Invision Module (placeholder for laopan.online integration)
+from modules.invision.routes import router as invision_router
+
+# ============== IMPORT EXISTING ROUTES ==============
+
+# Platform Store (Unatienda/Yappy) - Already modularized
+from routes.platform_store import router as platform_store_router, init_routes as init_platform_store_routes
+
+# Ping Pong Club - Already modularized
+from routes.pingpong import pingpong_router
+
+# Membership - Already modularized
+from routes.membership import router as membership_router, init_routes as init_membership_routes
+
+# Translations - Already modularized
+from routes.translations import router as translations_router, init_routes as init_translations_routes
+
+# ============== INITIALIZE ROUTES WITH DB ==============
+
+# Initialize routes that need db injection
+init_platform_store_routes(db, get_admin_user, get_current_user)
+init_membership_routes(db, get_admin_user, get_current_user)
+init_translations_routes(db, get_admin_user, get_current_user)
+
+# ============== REGISTER ROUTERS ==============
+
+# Create main API router with /api prefix
+from fastapi import APIRouter
+api_router = APIRouter(prefix="/api")
+
+# Register module routers
+api_router.include_router(auth_router)
+api_router.include_router(store_router)
+api_router.include_router(landing_router)
+api_router.include_router(community_router)
+api_router.include_router(monday_router)
+api_router.include_router(sheets_router)
+api_router.include_router(admin_router)
+api_router.include_router(invision_router)
+
+# Register existing modular routes
+api_router.include_router(platform_store_router)
+api_router.include_router(pingpong_router)
+api_router.include_router(membership_router)
+api_router.include_router(translations_router)
+
+# Include main router in app
+app.include_router(api_router)
+
+# ============== MIDDLEWARE ==============
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=CORS_ORIGINS if CORS_ORIGINS != ['*'] else ["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ============== LIFECYCLE EVENTS ==============
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize application on startup"""
+    logger.info("ChiPi Link API starting up...")
+    logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
+    logger.info("All modules loaded successfully")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    logger.info("ChiPi Link API shutting down...")
+    await close_database()
+    logger.info("Database connection closed")
+
+# ============== HEALTH CHECK ==============
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "version": "2.0.0",
+        "architecture": "modular_monolith",
+        "modules": [
+            "auth",
+            "store",
+            "landing",
+            "community",
+            "integrations/monday",
+            "integrations/sheets",
+            "admin",
+            "invision",
+            "platform_store",
+            "pingpong",
+            "membership",
+            "translations"
+        ]
+    }
+
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "message": "ChiPi Link API v2.0.0",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
