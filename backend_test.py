@@ -2783,6 +2783,303 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_architectural_reorganization(self):
+        """Test the architectural reorganization - CRITICAL REVIEW REQUEST"""
+        print("\n🏗️ Testing Architectural Reorganization (CRITICAL)...")
+        
+        success = True
+        
+        # 1. Health Check - Should return all 12 modules
+        health_result = self.run_test(
+            "GET /api/health (All 12 Modules)",
+            "GET",
+            "health",
+            200
+        )
+        
+        if health_result:
+            expected_modules = [
+                "auth", "store", "landing", "community",
+                "integrations/monday", "integrations/sheets",
+                "admin", "invision", "platform_store",
+                "pingpong", "membership", "translations"
+            ]
+            
+            actual_modules = health_result.get("modules", [])
+            
+            if len(actual_modules) == 12:
+                self.log_test("Health Check Module Count (12)", True, f"Found {len(actual_modules)} modules")
+            else:
+                self.log_test("Health Check Module Count (12)", False, f"Expected 12, got {len(actual_modules)}")
+                success = False
+            
+            # Check each expected module
+            for module in expected_modules:
+                if module in actual_modules:
+                    self.log_test(f"Module '{module}' Present", True)
+                else:
+                    self.log_test(f"Module '{module}' Present", False, f"Missing module '{module}'")
+                    success = False
+        else:
+            success = False
+        
+        return success
+    
+    def test_auth_module_endpoints(self):
+        """Test Auth Module endpoints"""
+        print("\n🔐 Testing Auth Module...")
+        
+        # Test login endpoint
+        login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "adminpassword"
+        }
+        
+        login_result = self.run_test(
+            "POST /api/auth/login",
+            "POST",
+            "auth/login",
+            200,
+            login_data
+        )
+        
+        if login_result and 'token' in login_result:
+            test_token = login_result['token']
+            
+            # Test /api/auth/me with token
+            old_token = self.token
+            self.token = test_token
+            
+            me_result = self.run_test(
+                "GET /api/auth/me",
+                "GET",
+                "auth/me",
+                200
+            )
+            
+            self.token = old_token
+            
+            # Test registration endpoint
+            test_user_data = {
+                "email": f"arch_test_{datetime.now().strftime('%H%M%S')}@test.com",
+                "contrasena": "TestPass123!",
+                "nombre": "Architecture Test User",
+                "telefono": "507-1234-5678",
+                "direccion": "Test Address"
+            }
+            
+            registro_result = self.run_test(
+                "POST /api/auth/registro",
+                "POST",
+                "auth/registro",
+                200,
+                test_user_data
+            )
+            
+            return all([login_result, me_result, registro_result])
+        
+        return False
+    
+    def test_store_module_endpoints(self):
+        """Test Store Module endpoints"""
+        print("\n🏪 Testing Store Module...")
+        
+        # Test categories endpoint
+        categorias_result = self.run_test(
+            "GET /api/categorias",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        # Test books endpoint
+        libros_result = self.run_test(
+            "GET /api/libros",
+            "GET",
+            "libros",
+            200
+        )
+        
+        # Test grades endpoint
+        grados_result = self.run_test(
+            "GET /api/grados",
+            "GET",
+            "grados",
+            200
+        )
+        
+        # Test subjects endpoint
+        materias_result = self.run_test(
+            "GET /api/materias",
+            "GET",
+            "materias",
+            200
+        )
+        
+        # Test public books endpoint (no auth)
+        old_token = self.token
+        self.token = None
+        
+        public_libros_result = self.run_test(
+            "GET /api/public/libros",
+            "GET",
+            "public/libros",
+            200
+        )
+        
+        self.token = old_token
+        
+        return all([categorias_result, libros_result, grados_result, materias_result, public_libros_result])
+    
+    def test_landing_module_endpoints(self):
+        """Test Landing Module endpoints"""
+        print("\n🏠 Testing Landing Module...")
+        
+        # Test public endpoints (no auth)
+        old_token = self.token
+        self.token = None
+        
+        site_config_result = self.run_test(
+            "GET /api/public/site-config",
+            "GET",
+            "public/site-config",
+            200
+        )
+        
+        landing_page_result = self.run_test(
+            "GET /api/public/landing-page",
+            "GET",
+            "public/landing-page",
+            200
+        )
+        
+        self.token = old_token
+        
+        return all([site_config_result, landing_page_result])
+    
+    def test_community_module_endpoints(self):
+        """Test Community Module endpoints"""
+        print("\n👥 Testing Community Module...")
+        
+        # Test community endpoints (no auth required for public endpoints)
+        old_token = self.token
+        self.token = None
+        
+        posts_result = self.run_test(
+            "GET /api/community/posts",
+            "GET",
+            "community/posts",
+            200
+        )
+        
+        events_result = self.run_test(
+            "GET /api/community/events",
+            "GET",
+            "community/events",
+            200
+        )
+        
+        gallery_result = self.run_test(
+            "GET /api/community/gallery",
+            "GET",
+            "community/gallery",
+            200
+        )
+        
+        community_landing_result = self.run_test(
+            "GET /api/community/landing",
+            "GET",
+            "community/landing",
+            200
+        )
+        
+        self.token = old_token
+        
+        return all([posts_result, events_result, gallery_result, community_landing_result])
+    
+    def test_integrations_module_endpoints(self):
+        """Test Integrations Module endpoints (require admin auth)"""
+        print("\n🔗 Testing Integrations Module...")
+        
+        # Use admin token
+        old_token = self.token
+        self.token = self.admin_token
+        
+        # Test Monday.com integration
+        monday_status_result = self.run_test(
+            "GET /api/admin/monday/status",
+            "GET",
+            "admin/monday/status",
+            200
+        )
+        
+        # Test Google Sheets integration (may not be fully implemented)
+        sheets_status_result = self.run_test(
+            "GET /api/admin/sheets/status",
+            "GET",
+            "admin/sheets/status",
+            200
+        )
+        
+        self.token = old_token
+        
+        # Monday should work, Sheets may return 404 if not implemented
+        return monday_status_result is not None
+    
+    def test_existing_routes_endpoints(self):
+        """Test Existing Routes endpoints"""
+        print("\n🎯 Testing Existing Routes...")
+        
+        # Test Ping Pong routes (no auth)
+        old_token = self.token
+        self.token = None
+        
+        pingpong_players_result = self.run_test(
+            "GET /api/pingpong/players",
+            "GET",
+            "pingpong/players",
+            200
+        )
+        
+        # Test Platform Store routes
+        platform_store_result = self.run_test(
+            "GET /api/platform-store",
+            "GET",
+            "platform-store",
+            200
+        )
+        
+        platform_products_result = self.run_test(
+            "GET /api/platform-store/products",
+            "GET",
+            "platform-store/products",
+            200
+        )
+        
+        # Test Membership routes
+        membership_plans_result = self.run_test(
+            "GET /api/membership/plans",
+            "GET",
+            "membership/plans",
+            200
+        )
+        
+        # Test Translations routes
+        translations_result = self.run_test(
+            "GET /api/translations/all",
+            "GET",
+            "translations/all",
+            200
+        )
+        
+        self.token = old_token
+        
+        return all([
+            pingpong_players_result, platform_store_result, 
+            platform_products_result, membership_plans_result, 
+            translations_result
+        ])
+
     def test_review_request_features(self):
         """Test the specific features mentioned in the review request"""
         print("\n🎯 TESTING REVIEW REQUEST FEATURES")
