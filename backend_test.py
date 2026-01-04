@@ -1640,6 +1640,237 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_cxgenie_integration(self):
+        """Test CXGenie Chat Support Integration"""
+        print("\n💬 Testing CXGenie Integration...")
+        
+        success = True
+        
+        # 1. Test CXGenie Widget Code (Public)
+        old_token = self.token
+        self.token = None  # Remove auth for public endpoint
+        
+        widget_code = self.run_test(
+            "GET /api/cxgenie/widget-code",
+            "GET",
+            "cxgenie/widget-code",
+            200
+        )
+        
+        if widget_code:
+            # Validate widget code response
+            if widget_code.get("activo") == True:
+                self.log_test("CXGenie Widget Active", True)
+                
+                # Check widget_id
+                widget_id = widget_code.get("widget_id")
+                expected_widget_id = "398b0403-4898-4256-a629-51246daac9d8"
+                if widget_id == expected_widget_id:
+                    self.log_test("CXGenie Widget ID Correct", True, f"Widget ID: {widget_id}")
+                else:
+                    self.log_test("CXGenie Widget ID Correct", False, f"Expected {expected_widget_id}, got {widget_id}")
+                    success = False
+                
+                # Check widget_code contains script tag
+                widget_script = widget_code.get("widget_code", "")
+                if "<script" in widget_script and widget_id in widget_script:
+                    self.log_test("CXGenie Widget Code Contains Script", True)
+                else:
+                    self.log_test("CXGenie Widget Code Contains Script", False, "Missing script tag or widget ID")
+                    success = False
+            else:
+                self.log_test("CXGenie Widget Active", False, "Widget not active")
+                success = False
+        else:
+            success = False
+        
+        # 2. Test CXGenie Status
+        cxgenie_status = self.run_test(
+            "GET /api/cxgenie/status",
+            "GET",
+            "cxgenie/status",
+            200
+        )
+        
+        if cxgenie_status:
+            # Check widget and agent_panel both active
+            widget_active = cxgenie_status.get("widget", {}).get("activo")
+            agent_panel_active = cxgenie_status.get("agent_panel", {}).get("activo")
+            
+            if widget_active:
+                self.log_test("CXGenie Status - Widget Active", True)
+            else:
+                self.log_test("CXGenie Status - Widget Active", False, "Widget not active in status")
+                success = False
+            
+            if agent_panel_active:
+                self.log_test("CXGenie Status - Agent Panel Active", True)
+            else:
+                self.log_test("CXGenie Status - Agent Panel Active", False, "Agent panel not active in status")
+                success = False
+        else:
+            success = False
+        
+        # Restore token for admin tests
+        self.token = self.admin_token
+        
+        # 3. Test CXGenie Agent Panel (Admin only)
+        agent_panel = self.run_test(
+            "GET /api/cxgenie/agent-panel",
+            "GET",
+            "cxgenie/agent-panel",
+            200
+        )
+        
+        if agent_panel:
+            # Check panel_urls structure
+            panel_urls = agent_panel.get("panel_urls", {})
+            expected_urls = ["live_chat", "all_tickets", "open_tickets", "pending_tickets", "resolved_tickets"]
+            
+            for url_type in expected_urls:
+                if url_type in panel_urls:
+                    self.log_test(f"CXGenie Agent Panel URL '{url_type}' Present", True)
+                else:
+                    self.log_test(f"CXGenie Agent Panel URL '{url_type}' Present", False, f"Missing {url_type} URL")
+                    success = False
+        else:
+            success = False
+        
+        # 4. Test CXGenie Agent Panel Embed
+        agent_panel_embed = self.run_test(
+            "GET /api/cxgenie/agent-panel/embed?tab=live-chat",
+            "GET",
+            "cxgenie/agent-panel/embed?tab=live-chat",
+            200
+        )
+        
+        if agent_panel_embed:
+            # Check embed_url is present
+            embed_url = agent_panel_embed.get("embed_url")
+            if embed_url and "live-chat" in embed_url:
+                self.log_test("CXGenie Agent Panel Embed URL", True, f"Embed URL: {embed_url}")
+            else:
+                self.log_test("CXGenie Agent Panel Embed URL", False, "Missing or invalid embed URL")
+                success = False
+        else:
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_placeholder_modules(self):
+        """Test New Placeholder Modules Status Endpoints"""
+        print("\n🔧 Testing Placeholder Modules...")
+        
+        success = True
+        
+        # Remove auth for public status endpoints
+        old_token = self.token
+        self.token = None
+        
+        # Test each placeholder module status endpoint
+        modules = [
+            ("chess", "Chess Club"),
+            ("content-hub", "Content Hub"),
+            ("ai-tutor", "AI Tutor"),
+            ("fusebase", "FuseBase"),
+            ("task-supervisor", "Task Supervisor")
+        ]
+        
+        for module_path, module_name in modules:
+            status_result = self.run_test(
+                f"GET /api/{module_path}/status",
+                "GET",
+                f"{module_path}/status",
+                200
+            )
+            
+            if status_result:
+                # Check basic status structure
+                if "module" in status_result and "status" in status_result:
+                    self.log_test(f"{module_name} Status Structure", True)
+                    
+                    # Check status is placeholder
+                    if status_result.get("status") == "placeholder":
+                        self.log_test(f"{module_name} Status Placeholder", True)
+                    else:
+                        self.log_test(f"{module_name} Status Placeholder", False, f"Expected 'placeholder', got '{status_result.get('status')}'")
+                        success = False
+                else:
+                    self.log_test(f"{module_name} Status Structure", False, "Missing 'module' or 'status' fields")
+                    success = False
+            else:
+                success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
+    def test_health_check_18_modules(self):
+        """Test Health Check - Verify 18 modules"""
+        print("\n🏥 Testing Health Check - 18 Modules...")
+        
+        # Remove auth for public health endpoint
+        old_token = self.token
+        self.token = None
+        
+        health_result = self.run_test(
+            "GET /api/health",
+            "GET",
+            "health",
+            200
+        )
+        
+        success = True
+        
+        if health_result:
+            modules = health_result.get("modules", [])
+            
+            # Expected modules (18 total)
+            expected_modules = [
+                # Core modules
+                "auth", "store", "landing", "community", "admin",
+                # Integrations
+                "integrations/monday", "integrations/sheets", "invision",
+                # Community/Activities
+                "chess", "content_hub",
+                # Support & Education
+                "cxgenie", "ai_tutor", "fusebase", "task_supervisor",
+                # Existing routes
+                "platform_store", "pingpong", "membership", "translations"
+            ]
+            
+            # Check total count
+            if len(modules) >= 18:
+                self.log_test("Health Check Module Count (18+)", True, f"Found {len(modules)} modules")
+            else:
+                self.log_test("Health Check Module Count (18+)", False, f"Expected 18+, got {len(modules)}")
+                success = False
+            
+            # Check each expected module
+            for expected_module in expected_modules:
+                if expected_module in modules:
+                    self.log_test(f"Health Check Module '{expected_module}' Present", True)
+                else:
+                    self.log_test(f"Health Check Module '{expected_module}' Present", False, f"Missing module '{expected_module}'")
+                    success = False
+            
+            # Check for new modules specifically
+            new_modules = ["chess", "content_hub", "cxgenie", "ai_tutor", "fusebase", "task_supervisor"]
+            for new_module in new_modules:
+                if new_module in modules:
+                    self.log_test(f"Health Check New Module '{new_module}' Present", True)
+                else:
+                    self.log_test(f"Health Check New Module '{new_module}' Present", False, f"Missing new module '{new_module}'")
+                    success = False
+        else:
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_multi_category_system(self):
         """Test Multi-Category Product System for Unatienda"""
         print("\n🏪 Testing Multi-Category Product System...")
