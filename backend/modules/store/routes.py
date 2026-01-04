@@ -321,10 +321,10 @@ async def add_estudiante(estudiante: EstudianteCreate, current_user: dict = Depe
     estudiante_dict = estudiante_obj.model_dump()
     estudiante_dict["fecha_registro"] = estudiante_dict["fecha_registro"].isoformat()
     
-    # Auto-search in enrollment database
+    # Auto-search in enrollment database (OPTIMIZED: only fetch needed fields)
     estudiantes_sync = await db.estudiantes_sincronizados.find(
         {"estado": "activo"},
-        {"_id": 0}
+        {"_id": 0, "sync_id": 1, "datos": 1}  # Only fetch required fields
     ).to_list(2000)
     
     coincidencia = buscar_estudiante_en_matriculas(
