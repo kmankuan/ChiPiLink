@@ -3341,6 +3341,90 @@ class TextbookStoreAPITester:
         
         return reorder_success and templates_success
 
+    def test_performance_optimization_verification(self):
+        """Test specific endpoints requested for performance optimization verification"""
+        print("\n⚡ Testing Performance Optimization Verification...")
+        
+        # Remove auth for public endpoints
+        old_token = self.token
+        self.token = None
+        
+        # 1. GET /api/health - verify status healthy
+        health_result = self.run_test(
+            "GET /api/health",
+            "GET",
+            "health",
+            200
+        )
+        
+        # 2. GET /api/platform-store/products - verify returns products
+        products_result = self.run_test(
+            "GET /api/platform-store/products",
+            "GET",
+            "platform-store/products",
+            200
+        )
+        
+        # 3. GET /api/categorias - verify returns categories
+        categories_result = self.run_test(
+            "GET /api/categorias",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        # 4. GET /api/libros - verify returns books
+        books_result = self.run_test(
+            "GET /api/libros",
+            "GET",
+            "libros",
+            200
+        )
+        
+        # Restore token
+        self.token = old_token
+        
+        # Validate basic response structures
+        success = True
+        
+        if health_result:
+            self.log_test("Health endpoint returns data", True)
+        else:
+            self.log_test("Health endpoint returns data", False, "No response data")
+            success = False
+        
+        if products_result:
+            self.log_test("Platform store products endpoint returns data", True)
+        else:
+            self.log_test("Platform store products endpoint returns data", False, "No response data")
+            success = False
+        
+        if categories_result:
+            self.log_test("Categories endpoint returns data", True)
+        else:
+            self.log_test("Categories endpoint returns data", False, "No response data")
+            success = False
+        
+        if books_result:
+            self.log_test("Books endpoint returns data", True)
+        else:
+            self.log_test("Books endpoint returns data", False, "No response data")
+            success = False
+        
+        return success
+
+    def run_quick_verification_tests(self):
+        """Run only the quick verification tests requested in the review"""
+        print("⚡ Starting Quick Performance Optimization Verification...")
+        print(f"🌐 Base URL: {self.base_url}")
+        print("=" * 60)
+        
+        # Run only the specific tests requested
+        self.test_performance_optimization_verification()
+        
+        # Print summary
+        self.print_summary()
+
     def run_all_tests(self):
         """Run all tests"""
         print("🚀 Starting ChiPi Link API Tests")
