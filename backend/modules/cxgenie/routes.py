@@ -24,9 +24,11 @@ router = APIRouter(prefix="/cxgenie", tags=["CXGenie Chat Support"])
 # Default configuration for CXGenie
 DEFAULT_CXGENIE_CONFIG = {
     "config_id": "cxgenie_main",
-    # Widget Configuration (para usuarios)
+    # Ticket Widget Configuration (para usuarios)
+    "widget_type": "ticket",  # "ticket" o "chat"
     "widget_id": "398b0403-4898-4256-a629-51246daac9d8",
-    "widget_script_url": "https://widget.cxgenie.ai/widget.js",
+    "widget_script_url": "https://ticket.kohbiz.com/widget.js",
+    "widget_data_attribute": "data-bid",  # data-bid para tickets, data-aid para chat
     "widget_lang": "es",
     # Agent Panel Configuration (para equipo)
     "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
