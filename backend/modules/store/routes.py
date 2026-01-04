@@ -429,10 +429,10 @@ async def update_estudiante(estudiante_id: str, estudiante: EstudianteCreate, cu
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
-    # Re-verify enrollment after update
+    # Re-verify enrollment after update (OPTIMIZED: only fetch needed fields)
     estudiantes_sync = await db.estudiantes_sincronizados.find(
         {"estado": "activo"},
-        {"_id": 0}
+        {"_id": 0, "sync_id": 1, "datos": 1}  # Only fetch required fields
     ).to_list(2000)
     
     coincidencia = buscar_estudiante_en_matriculas(
