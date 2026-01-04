@@ -1,6 +1,6 @@
 /**
- * CXGenie Chat Widget Component
- * Loads the CXGenie chat widget dynamically based on backend configuration
+ * CXGenie Ticket Widget Component
+ * Loads the CXGenie ticket widget dynamically based on backend configuration
  */
 import { useEffect, useState } from 'react';
 
@@ -23,7 +23,8 @@ export function CXGenieWidget() {
         }
 
         // Check if script already exists
-        if (document.querySelector('script[data-aid]')) {
+        const existingScript = document.querySelector('script[data-bid], script[data-aid]');
+        if (existingScript) {
           console.log('CXGenie widget already loaded');
           setLoaded(true);
           return;
@@ -32,18 +33,21 @@ export function CXGenieWidget() {
         // Create and inject the script
         const script = document.createElement('script');
         script.src = data.script_url;
-        script.setAttribute('data-aid', data.widget_id);
+        
+        // Use the correct data attribute based on widget type
+        const dataAttr = data.data_attribute || 'data-bid';
+        script.setAttribute(dataAttr.replace('data-', ''), data.widget_id);
         script.setAttribute('data-lang', data.lang || 'es');
         script.async = true;
         
         script.onload = () => {
-          console.log('CXGenie widget loaded successfully');
+          console.log(`CXGenie ${data.widget_type || 'ticket'} widget loaded successfully`);
           setLoaded(true);
         };
         
         script.onerror = () => {
           console.error('Failed to load CXGenie widget');
-          setError('Failed to load chat widget');
+          setError('Failed to load ticket widget');
         };
 
         document.body.appendChild(script);
