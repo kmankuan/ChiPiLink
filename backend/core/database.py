@@ -26,3 +26,42 @@ def get_database():
 async def close_database():
     """Close database connection"""
     client.close()
+
+
+async def create_indexes():
+    """
+    Create database indexes for optimized queries.
+    Call this on application startup.
+    """
+    try:
+        # Index for estudiantes_sincronizados - most queried collection
+        await db.estudiantes_sincronizados.create_index("estado")
+        await db.estudiantes_sincronizados.create_index("sync_id", unique=True)
+        
+        # Index for clientes
+        await db.clientes.create_index("cliente_id", unique=True)
+        await db.clientes.create_index("email", unique=True, sparse=True)
+        
+        # Index for pedidos (orders)
+        await db.pedidos.create_index("pedido_id", unique=True)
+        await db.pedidos.create_index("estado")
+        await db.pedidos.create_index("cliente_id")
+        await db.pedidos.create_index("fecha_creacion")
+        
+        # Index for libros (products)
+        await db.libros.create_index("libro_id", unique=True)
+        await db.libros.create_index("categoria")
+        await db.libros.create_index("grado")
+        await db.libros.create_index("activo")
+        
+        # Index for categorias
+        await db.categorias.create_index("categoria_id", unique=True)
+        
+        # Compound indexes for common queries
+        await db.libros.create_index([("categoria", 1), ("activo", 1)])
+        await db.libros.create_index([("grado", 1), ("activo", 1)])
+        await db.pedidos.create_index([("estado", 1), ("fecha_creacion", -1)])
+        
+        print("✅ Database indexes created successfully")
+    except Exception as e:
+        print(f"⚠️ Error creating indexes (may already exist): {e}")
