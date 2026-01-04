@@ -199,6 +199,16 @@ function AppRouter() {
         } 
       />
       
+      {/* Agent Panel - CXGenie Help Desk */}
+      <Route 
+        path="/admin/chat" 
+        element={
+          <ProtectedRoute adminOnly>
+            <AgentPanel />
+          </ProtectedRoute>
+        } 
+      />
+      
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
