@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const API_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
 
-export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
+export function CXGenieAgentPanel({ panel = 'tickets', className = '' }) {
   const { token } = useAuth();
   const [panelData, setPanelData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
 
       try {
         const response = await fetch(
-          `${API_URL}/api/cxgenie/agent-panel/embed?tab=${tab}`,
+          `${API_URL}/api/cxgenie/agent-panel/embed?panel=${panel}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -46,7 +46,7 @@ export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
     };
 
     fetchPanelData();
-  }, [token, tab]);
+  }, [token, panel]);
 
   if (loading) {
     return (
@@ -60,7 +60,7 @@ export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
     return (
       <div className={`flex items-center justify-center h-96 bg-red-50 rounded-lg ${className}`}>
         <div className="text-center">
-          <p className="text-red-600 font-medium">Error loading chat panel</p>
+          <p className="text-red-600 font-medium">Error loading panel</p>
           <p className="text-red-500 text-sm mt-1">{error}</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
     <div className={`w-full h-full min-h-[600px] ${className}`}>
       <iframe
         src={panelData.embed_url}
-        title="CXGenie Agent Panel"
+        title={`CXGenie ${panel === 'tickets' ? 'Tickets' : 'Chat'} Panel`}
         className="w-full h-full border-0 rounded-lg"
         style={{ minHeight: '600px' }}
         allow="microphone; camera"
@@ -89,10 +89,47 @@ export function CXGenieAgentPanel({ tab = 'live-chat', className = '' }) {
 }
 
 /**
- * Tab selector for agent panel
+ * Panel selector for switching between Tickets and Chat
+ */
+export function CXGeniePanelSelector({ activePanel, onPanelChange }) {
+  const panels = [
+    { id: 'tickets', label: 'Tickets', icon: '🎫', description: 'Gestionar tickets de soporte' },
+    { id: 'live-chat', label: 'Chat en Vivo', icon: '💬', description: 'Conversaciones en tiempo real' },
+  ];
+
+  return (
+    <div className="flex space-x-3 mb-4">
+      {panels.map((panel) => (
+        <button
+          key={panel.id}
+          onClick={() => onPanelChange(panel.id)}
+          className={`flex-1 p-4 rounded-lg text-left transition-all ${
+            activePanel === panel.id
+              ? 'bg-primary text-white shadow-lg'
+              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{panel.icon}</span>
+            <div>
+              <div className="font-semibold">{panel.label}</div>
+              <div className={`text-sm ${activePanel === panel.id ? 'text-white/80' : 'text-gray-500'}`}>
+                {panel.description}
+              </div>
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Tab selector for additional views (legacy support)
  */
 export function CXGenieAgentTabs({ activeTab, onTabChange }) {
   const tabs = [
+    { id: 'tickets', label: 'Tickets', icon: '🎫' },
     { id: 'live-chat', label: 'Live Chat', icon: '💬' },
     { id: 'all', label: 'Todos', icon: '📋' },
     { id: 'open', label: 'Abiertos', icon: '🔵' },
