@@ -1,12 +1,12 @@
 """
 CXGenie Routes - Endpoints para Chat Support
 
-PLACEHOLDER - Endpoints a implementar:
+Endpoints implementados:
 - GET /cxgenie/status - Estado de la integración
-- GET/PUT /cxgenie/config - Configuración del widget
-- GET /cxgenie/widget-code - Código de embed para frontend
-- GET /cxgenie/conversations - Lista de conversaciones (para agentes)
-- GET /cxgenie/conversations/{id}/messages - Mensajes de una conversación
+- GET/PUT /cxgenie/config - Configuración del widget y panel
+- GET /cxgenie/widget-code - Código de embed para frontend (usuarios)
+- GET /cxgenie/agent-panel - URL del panel de agentes
+- GET /cxgenie/integration-info - Información de la integración
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
@@ -20,6 +20,26 @@ from .models import CXGenieConfig
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/cxgenie", tags=["CXGenie Chat Support"])
+
+# Default configuration for CXGenie
+DEFAULT_CXGENIE_CONFIG = {
+    "config_id": "cxgenie_main",
+    # Widget Configuration (para usuarios)
+    "widget_id": "398b0403-4898-4256-a629-51246daac9d8",
+    "widget_script_url": "https://widget.cxgenie.ai/widget.js",
+    "widget_lang": "es",
+    # Agent Panel Configuration (para equipo)
+    "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
+    "agent_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
+    # Display Settings
+    "posicion": "bottom-right",
+    "mostrar_en_paginas": ["all"],  # all, public, store, etc.
+    "ocultar_en_admin": False,
+    # Status
+    "widget_activo": True,
+    "agent_panel_activo": True,
+    "fecha_configuracion": None
+}
 
 
 # ============== STATUS ==============
