@@ -34,6 +34,7 @@ import PaymentResult from '@/pages/PaymentResult';
 import Unatienda from '@/pages/Unatienda';
 import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
+import AgentPanel from '@/pages/AgentPanel';
 
 // Ping Pong Module
 import PingPongDashboard from '@/modules/pingpong/pages/PingPongDashboard';
