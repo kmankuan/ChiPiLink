@@ -140,7 +140,13 @@ export default function AdminDashboard() {
                       "w-full justify-start gap-3",
                       collapsed && "justify-center px-2"
                     )}
-                    onClick={() => setActiveModule(item.id)}
+                    onClick={() => {
+                      if (item.isExternal && item.path) {
+                        navigate(item.path);
+                      } else {
+                        setActiveModule(item.id);
+                      }
+                    }}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     {!collapsed && <span>{item.label}</span>}
