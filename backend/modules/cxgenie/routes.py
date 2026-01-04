@@ -81,27 +81,29 @@ async def get_cxgenie_config(admin: dict = Depends(get_admin_user)):
     config = await db.app_config.find_one({"config_key": "cxgenie"}, {"_id": 0})
     
     if not config:
-        return CXGenieConfig().model_dump()
+        return DEFAULT_CXGENIE_CONFIG
     
-    return config.get("value", CXGenieConfig().model_dump())
+    return config.get("value", DEFAULT_CXGENIE_CONFIG)
 
 
 @router.put("/config")
 async def update_cxgenie_config(config: dict, admin: dict = Depends(get_admin_user)):
     """Update CXGenie configuration"""
-    config["fecha_configuracion"] = datetime.now(timezone.utc).isoformat()
+    # Merge with defaults
+    updated_config = {**DEFAULT_CXGENIE_CONFIG, **config}
+    updated_config["fecha_configuracion"] = datetime.now(timezone.utc).isoformat()
     
     await db.app_config.update_one(
         {"config_key": "cxgenie"},
         {"$set": {
             "config_key": "cxgenie",
-            "value": config,
+            "value": updated_config,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }},
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración de CXGenie actualizada"}
+    return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
 
 
 # ============== WIDGET CODE ==============
