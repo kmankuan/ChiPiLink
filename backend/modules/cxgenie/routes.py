@@ -159,7 +159,7 @@ async def get_widget_code():
 
 @router.get("/agent-panel")
 async def get_agent_panel(admin: dict = Depends(get_admin_user)):
-    """Get agent panel URL for team members to handle chats"""
+    """Get agent panel URLs for team members to handle chats and tickets"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     
     if not config:
@@ -170,25 +170,38 @@ async def get_agent_panel(admin: dict = Depends(get_admin_user)):
     if not value.get("agent_panel_activo", True):
         return {
             "activo": False,
-            "panel_url": None,
+            "panels": None,
             "message": "Panel de agentes no activo"
         }
     
     workspace_id = value.get("workspace_id", DEFAULT_CXGENIE_CONFIG["workspace_id"])
-    base_url = value.get("agent_panel_url", DEFAULT_CXGENIE_CONFIG["agent_panel_url"])
+    base_url = value.get("agent_panel_base_url", DEFAULT_CXGENIE_CONFIG["agent_panel_base_url"])
     
     return {
         "activo": True,
         "workspace_id": workspace_id,
-        "panel_urls": {
-            "live_chat": f"{base_url}?t=live-chat&type=ALL",
-            "all_tickets": f"{base_url}?t=all&type=ALL",
-            "open_tickets": f"{base_url}?t=open&type=ALL",
-            "pending_tickets": f"{base_url}?t=pending&type=ALL",
-            "resolved_tickets": f"{base_url}?t=resolved&type=ALL"
+        "panels": {
+            "tickets": {
+                "name": "Tickets",
+                "description": "Gestionar tickets de soporte",
+                "url": value.get("tickets_panel_url", f"{base_url}?t=tickets"),
+                "icon": "🎫"
+            },
+            "live_chat": {
+                "name": "Chat en Vivo",
+                "description": "Conversaciones en tiempo real",
+                "url": value.get("chat_panel_url", f"{base_url}?t=live-chat&type=ALL"),
+                "icon": "💬"
+            }
+        },
+        "additional_views": {
+            "all": f"{base_url}?t=all&type=ALL",
+            "open": f"{base_url}?t=open&type=ALL",
+            "pending": f"{base_url}?t=pending&type=ALL",
+            "resolved": f"{base_url}?t=resolved&type=ALL"
         },
         "embed_info": {
-            "description": "Estas URLs pueden cargarse en un iframe o WebView para que el equipo atienda chats",
+            "description": "Estas URLs pueden cargarse en un iframe o WebView para que el equipo atienda",
             "recommended_height": "100vh",
             "recommended_width": "100%"
         }
@@ -197,7 +210,7 @@ async def get_agent_panel(admin: dict = Depends(get_admin_user)):
 
 @router.get("/agent-panel/embed")
 async def get_agent_panel_embed(
-    tab: str = "live-chat",
+    panel: str = "tickets",
     admin: dict = Depends(get_admin_user)
 ):
     """Get specific agent panel embed URL"""
@@ -208,23 +221,24 @@ async def get_agent_panel_embed(
     else:
         value = config.get("value", DEFAULT_CXGENIE_CONFIG)
     
-    base_url = value.get("agent_panel_url", DEFAULT_CXGENIE_CONFIG["agent_panel_url"])
+    base_url = value.get("agent_panel_base_url", DEFAULT_CXGENIE_CONFIG["agent_panel_base_url"])
     
-    # Map tab names
-    tab_map = {
-        "live-chat": "live-chat",
-        "all": "all",
-        "open": "open",
-        "pending": "pending",
-        "resolved": "resolved"
+    # Map panel names to URLs
+    panel_urls = {
+        "tickets": value.get("tickets_panel_url", f"{base_url}?t=tickets"),
+        "live-chat": value.get("chat_panel_url", f"{base_url}?t=live-chat&type=ALL"),
+        "chat": value.get("chat_panel_url", f"{base_url}?t=live-chat&type=ALL"),
+        "all": f"{base_url}?t=all&type=ALL",
+        "open": f"{base_url}?t=open&type=ALL",
+        "pending": f"{base_url}?t=pending&type=ALL",
+        "resolved": f"{base_url}?t=resolved&type=ALL"
     }
     
-    selected_tab = tab_map.get(tab, "live-chat")
-    embed_url = f"{base_url}?t={selected_tab}&type=ALL"
+    embed_url = panel_urls.get(panel, panel_urls["tickets"])
     
     return {
+        "panel": panel,
         "embed_url": embed_url,
-        "tab": selected_tab,
         "iframe_code": f'<iframe src="{embed_url}" width="100%" height="100%" frameborder="0" allow="microphone; camera"></iframe>'
     }
 
