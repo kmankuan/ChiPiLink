@@ -159,17 +159,28 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "version": "2.0.0",
+        "version": "2.1.0",
         "architecture": "modular_monolith",
         "modules": [
+            # Core modules
             "auth",
             "store",
             "landing",
             "community",
+            "admin",
+            # Integrations
             "integrations/monday",
             "integrations/sheets",
-            "admin",
             "invision",
+            # Community/Activities
+            "chess",
+            "content_hub",
+            # Support & Education
+            "cxgenie",
+            "ai_tutor",
+            "fusebase",
+            "task_supervisor",
+            # Existing routes
             "platform_store",
             "pingpong",
             "membership",
