@@ -219,30 +219,78 @@ async def get_agent_panel_embed(
     }
 
 
+# ============== TOGGLE ENDPOINTS ==============
+
+@router.put("/widget/toggle")
+async def toggle_widget(activo: bool, admin: dict = Depends(get_admin_user)):
+    """Enable/disable the chat widget"""
+    config = await db.app_config.find_one({"config_key": "cxgenie"})
+    
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG.copy()
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG.copy())
+    
+    value["widget_activo"] = activo
+    
+    await db.app_config.update_one(
+        {"config_key": "cxgenie"},
+        {"$set": {"config_key": "cxgenie", "value": value}},
+        upsert=True
+    )
+    
+    return {"success": True, "widget_activo": activo}
+
+
+@router.put("/agent-panel/toggle")
+async def toggle_agent_panel(activo: bool, admin: dict = Depends(get_admin_user)):
+    """Enable/disable the agent panel"""
+    config = await db.app_config.find_one({"config_key": "cxgenie"})
+    
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG.copy()
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG.copy())
+    
+    value["agent_panel_activo"] = activo
+    
+    await db.app_config.update_one(
+        {"config_key": "cxgenie"},
+        {"$set": {"config_key": "cxgenie", "value": value}},
+        upsert=True
+    )
+    
+    return {"success": True, "agent_panel_activo": activo}
+
+
 # ============== INTEGRATION INFO ==============
 
 @router.get("/integration-info")
 async def get_integration_info():
-    """Get information about CXGenie integration options"""
+    """Get information about CXGenie integration"""
     return {
         "module": "cxgenie",
         "description": "Integración con CXGenie para atención al cliente",
-        "integration_options": {
-            "widget": {
-                "description": "Widget de chat embebido en la app",
-                "required": ["widget_id o embed_code"],
-                "features": ["Chat en vivo", "Bot automático", "Historial de conversaciones"]
+        "status": "implemented",
+        "features": {
+            "widget_chat": {
+                "description": "Widget de chat embebido para usuarios",
+                "endpoint": "/api/cxgenie/widget-code",
+                "status": "active"
             },
-            "api": {
-                "description": "API para panel de agentes nativo",
-                "required": ["api_url", "api_key"],
-                "features": ["Panel de agentes personalizado", "Notificaciones push", "Experiencia nativa móvil"]
+            "agent_panel": {
+                "description": "Panel de agentes para atender chats (embebido)",
+                "endpoint": "/api/cxgenie/agent-panel",
+                "status": "active",
+                "tabs": ["live-chat", "all", "open", "pending", "resolved"]
             }
         },
-        "setup_steps": [
-            "1. Obtener Widget ID o código de embed de CXGenie",
-            "2. Configurar en /api/cxgenie/config",
-            "3. El widget aparecerá automáticamente en el frontend",
-            "4. (Opcional) Configurar API para panel de agentes nativo"
-        ]
+        "frontend_implementation": {
+            "widget": "Inyectar el script del widget en las páginas públicas",
+            "agent_panel": "Cargar la URL del panel en un iframe para administradores"
+        },
+        "mobile_implementation": {
+            "widget": "El widget funciona en WebView móvil",
+            "agent_panel": "Cargar en react-native-webview para experiencia nativa"
+        }
     }
