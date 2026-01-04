@@ -3413,6 +3413,23 @@ class TextbookStoreAPITester:
         
         return success
 
+    def print_summary(self):
+        """Print test summary"""
+        print("\n" + "=" * 60)
+        print("📊 TEST SUMMARY")
+        print(f"Tests run: {self.tests_run}")
+        print(f"Tests passed: {self.tests_passed}")
+        print(f"Tests failed: {self.tests_run - self.tests_passed}")
+        if self.tests_run > 0:
+            print(f"Success rate: {(self.tests_passed/self.tests_run*100):.1f}%")
+        
+        if self.failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for failed_test in self.failed_tests:
+                print(f"  • {failed_test}")
+        else:
+            print("\n✅ ALL TESTS PASSED!")
+
     def run_quick_verification_tests(self):
         """Run only the quick verification tests requested in the review"""
         print("⚡ Starting Quick Performance Optimization Verification...")
