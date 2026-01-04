@@ -62,6 +62,7 @@ async def get_cxgenie_status():
         "status": "active" if value.get("widget_activo") else "inactive",
         "configured": True,
         "widget": {
+            "type": value.get("widget_type", "ticket"),
             "activo": value.get("widget_activo", True),
             "widget_id": value.get("widget_id"),
             "lang": value.get("widget_lang", "es"),
