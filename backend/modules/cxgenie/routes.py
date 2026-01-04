@@ -32,7 +32,10 @@ DEFAULT_CXGENIE_CONFIG = {
     "widget_lang": "es",
     # Agent Panel Configuration (para equipo)
     "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
-    "agent_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
+    "agent_panel_base_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
+    # Panel URLs específicos
+    "tickets_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=tickets",
+    "chat_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=live-chat&type=ALL",
     # Display Settings
     "posicion": "bottom-right",
     "mostrar_en_paginas": ["all"],  # all, public, store, etc.
