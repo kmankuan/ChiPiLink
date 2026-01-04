@@ -3102,15 +3102,40 @@ class TextbookStoreAPITester:
 
     def run_all_tests(self):
         """Run all tests"""
-        print("🚀 Starting Textbook Store API Tests")
+        print("🚀 Starting ChiPi Link API Tests")
         print(f"Testing against: {self.base_url}")
+        
+        # Setup phase
+        if not self.test_admin_setup():
+            print("❌ Admin setup failed - stopping tests")
+            return False
+        
+        if not self.test_admin_login():
+            print("❌ Admin login failed - stopping tests")
+            return False
+        
+        if not self.test_seed_data():
+            print("❌ Data seeding failed - continuing with other tests")
+        
+        # CRITICAL: Test Architectural Reorganization
+        print("\n" + "="*60)
+        print("🏗️ CRITICAL: ARCHITECTURAL REORGANIZATION TESTING")
+        print("="*60)
+        
+        arch_success = self.test_architectural_reorganization()
+        if not arch_success:
+            print("❌ CRITICAL: Architectural reorganization has issues!")
+        
+        # Test all modules systematically
+        auth_success = self.test_auth_module_endpoints()
+        store_success = self.test_store_module_endpoints()
+        landing_success = self.test_landing_module_endpoints()
+        community_success = self.test_community_module_endpoints()
+        integrations_success = self.test_integrations_module_endpoints()
+        existing_routes_success = self.test_existing_routes_endpoints()
         
         # Test sequence - prioritizing the 3 specific tasks from review request
         tests = [
-            ("Admin Setup", self.test_admin_setup),
-            ("Admin Login", self.test_admin_login),
-            ("Seed Data", self.test_seed_data),
-            
             # Priority tests from review request
             ("Task 1: Branding Neutralization (P1)", self.test_branding_neutralization),
             ("Task 2: Thermal Receipt (P2)", self.test_thermal_receipt),
