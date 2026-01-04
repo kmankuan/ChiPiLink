@@ -3563,6 +3563,14 @@ def main():
             print("\n✅ ALL REVIEW REQUEST TESTS PASSED!")
         
         return 0 if success else 1
+    elif len(sys.argv) > 1 and sys.argv[1] == "quick":
+        # Run only the quick verification tests for performance optimization
+        print("⚡ Running Quick Performance Optimization Verification")
+        tester = TextbookStoreAPITester()
+        tester.run_quick_verification_tests()
+        
+        success = tester.tests_passed == tester.tests_run
+        return 0 if success else 1
     else:
         # Run all tests
         tester = TextbookStoreAPITester()
