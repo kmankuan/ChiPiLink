@@ -109,6 +109,14 @@ api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
 api_router.include_router(invision_router)
 
+# Register new modules (placeholders)
+api_router.include_router(chess_router)
+api_router.include_router(content_hub_router)
+api_router.include_router(cxgenie_router)
+api_router.include_router(ai_tutor_router)
+api_router.include_router(fusebase_router)
+api_router.include_router(task_supervisor_router)
+
 # Register existing modular routes
 api_router.include_router(platform_store_router)
 api_router.include_router(pingpong_router)
