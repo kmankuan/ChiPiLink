@@ -49,24 +49,27 @@ async def get_cxgenie_status():
     """Get CXGenie integration status"""
     config = await db.app_config.find_one({"config_key": "cxgenie"}, {"_id": 0})
     
-    if not config or not config.get("value", {}).get("widget_id"):
-        return {
-            "module": "cxgenie",
-            "status": "not_configured",
-            "configured": False,
-            "activo": False,
-            "message": "CXGenie no configurado. Configure el Widget ID o el código de embed."
-        }
+    # Use default config if not configured
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG)
     
-    value = config.get("value", {})
     return {
         "module": "cxgenie",
-        "status": "configured" if value.get("activo") else "inactive",
+        "status": "active" if value.get("widget_activo") else "inactive",
         "configured": True,
-        "activo": value.get("activo", False),
-        "widget_id": value.get("widget_id"),
-        "modo": value.get("modo", "widget"),
-        "posicion": value.get("posicion", "bottom-right")
+        "widget": {
+            "activo": value.get("widget_activo", True),
+            "widget_id": value.get("widget_id"),
+            "lang": value.get("widget_lang", "es"),
+            "posicion": value.get("posicion", "bottom-right")
+        },
+        "agent_panel": {
+            "activo": value.get("agent_panel_activo", True),
+            "workspace_id": value.get("workspace_id"),
+            "url_disponible": bool(value.get("agent_panel_url"))
+        }
     }
 
 
