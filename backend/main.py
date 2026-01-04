@@ -143,6 +143,10 @@ async def startup_event():
     """Initialize application on startup"""
     logger.info("ChiPi Link API starting up...")
     logger.info(f"Database: {os.environ.get('DB_NAME', 'chipi_link')}")
+    
+    # Create database indexes for optimized queries
+    await create_indexes()
+    
     logger.info("All modules loaded successfully")
 
 @app.on_event("shutdown")
