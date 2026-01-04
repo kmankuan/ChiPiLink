@@ -109,11 +109,11 @@ async def update_cxgenie_config(config: dict, admin: dict = Depends(get_admin_us
     return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
 
 
-# ============== WIDGET CODE (Para usuarios) ==============
+# ============== WIDGET CODE (Para usuarios - Sistema de Tickets) ==============
 
 @router.get("/widget-code")
 async def get_widget_code():
-    """Get widget embed code for frontend (public) - Para mostrar chat a usuarios"""
+    """Get ticket widget embed code for frontend (public) - Sistema de tickets para usuarios"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     
     # Use default or stored config
@@ -126,22 +126,26 @@ async def get_widget_code():
         return {
             "activo": False,
             "widget_code": None,
-            "message": "Widget de chat no activo"
+            "message": "Widget de tickets no activo"
         }
     
     widget_id = value.get("widget_id", DEFAULT_CXGENIE_CONFIG["widget_id"])
     script_url = value.get("widget_script_url", DEFAULT_CXGENIE_CONFIG["widget_script_url"])
+    data_attr = value.get("widget_data_attribute", "data-bid")
     lang = value.get("widget_lang", "es")
+    widget_type = value.get("widget_type", "ticket")
     
-    # Generate widget code
-    widget_code = f'''<!-- CXGenie Chat Widget -->
-<script src="{script_url}" data-aid="{widget_id}" data-lang="{lang}"></script>'''
+    # Generate widget code - Ticket system uses data-bid
+    widget_code = f'''<!-- CXGenie Ticket Widget -->
+<script src="{script_url}" {data_attr}="{widget_id}" data-lang="{lang}"></script>'''
     
     return {
         "activo": True,
+        "widget_type": widget_type,
         "widget_code": widget_code,
         "widget_id": widget_id,
         "script_url": script_url,
+        "data_attribute": data_attr,
         "lang": lang,
         "posicion": value.get("posicion", "bottom-right"),
         "mostrar_en_paginas": value.get("mostrar_en_paginas", ["all"])
