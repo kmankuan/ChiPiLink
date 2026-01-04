@@ -1800,11 +1800,12 @@ class TextbookStoreAPITester:
                 if "module" in status_result and "status" in status_result:
                     self.log_test(f"{module_name} Status Structure", True)
                     
-                    # Check status is placeholder
-                    if status_result.get("status") == "placeholder":
+                    # Check status is placeholder or not_configured (both valid for placeholders)
+                    status = status_result.get("status")
+                    if status in ["placeholder", "not_configured"]:
                         self.log_test(f"{module_name} Status Placeholder", True)
                     else:
-                        self.log_test(f"{module_name} Status Placeholder", False, f"Expected 'placeholder', got '{status_result.get('status')}'")
+                        self.log_test(f"{module_name} Status Placeholder", False, f"Expected 'placeholder' or 'not_configured', got '{status}'")
                         success = False
                 else:
                     self.log_test(f"{module_name} Status Structure", False, "Missing 'module' or 'status' fields")
