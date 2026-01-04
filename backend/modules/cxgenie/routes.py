@@ -106,99 +106,116 @@ async def update_cxgenie_config(config: dict, admin: dict = Depends(get_admin_us
     return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
 
 
-# ============== WIDGET CODE ==============
+# ============== WIDGET CODE (Para usuarios) ==============
 
 @router.get("/widget-code")
 async def get_widget_code():
-    """Get widget embed code for frontend (public)"""
+    """Get widget embed code for frontend (public) - Para mostrar chat a usuarios"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     
-    if not config or not config.get("value", {}).get("activo"):
+    # Use default or stored config
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG)
+    
+    if not value.get("widget_activo", True):
         return {
             "activo": False,
             "widget_code": None,
             "message": "Widget de chat no activo"
         }
     
-    value = config["value"]
+    widget_id = value.get("widget_id", DEFAULT_CXGENIE_CONFIG["widget_id"])
+    script_url = value.get("widget_script_url", DEFAULT_CXGENIE_CONFIG["widget_script_url"])
+    lang = value.get("widget_lang", "es")
     
-    # Si hay código de embed personalizado, usarlo
-    if value.get("embed_code"):
-        return {
-            "activo": True,
-            "widget_code": value["embed_code"],
-            "posicion": value.get("posicion", "bottom-right")
-        }
-    
-    # Si hay widget_id, generar código estándar
-    if value.get("widget_id"):
-        widget_id = value["widget_id"]
-        script_url = value.get("widget_script_url", f"https://widget.cxgenie.ai/{widget_id}/widget.js")
-        
-        widget_code = f'''<!-- CXGenie Chat Widget -->
-<script>
-  (function(w,d,s,id) {{
-    if (d.getElementById(id)) return;
-    var js = d.createElement(s); js.id = id;
-    js.src = "{script_url}";
-    js.async = true;
-    d.head.appendChild(js);
-  }})(window, document, 'script', 'cxgenie-widget');
-</script>'''
-        
-        return {
-            "activo": True,
-            "widget_code": widget_code,
-            "widget_id": widget_id,
-            "posicion": value.get("posicion", "bottom-right")
-        }
+    # Generate widget code
+    widget_code = f'''<!-- CXGenie Chat Widget -->
+<script src="{script_url}" data-aid="{widget_id}" data-lang="{lang}"></script>'''
     
     return {
-        "activo": False,
-        "widget_code": None,
-        "message": "Widget ID no configurado"
+        "activo": True,
+        "widget_code": widget_code,
+        "widget_id": widget_id,
+        "script_url": script_url,
+        "lang": lang,
+        "posicion": value.get("posicion", "bottom-right"),
+        "mostrar_en_paginas": value.get("mostrar_en_paginas", ["all"])
     }
 
 
-# ============== AGENT PANEL (PLACEHOLDER) ==============
+# ============== AGENT PANEL (Para equipo/administradores) ==============
 
-@router.get("/conversations")
-async def get_conversations(
-    estado: Optional[str] = None,
-    limit: int = 50,
-    admin: dict = Depends(get_admin_user)
-):
-    """Get chat conversations for agent panel - PLACEHOLDER"""
-    query = {}
-    if estado:
-        query["estado"] = estado
+@router.get("/agent-panel")
+async def get_agent_panel(admin: dict = Depends(get_admin_user)):
+    """Get agent panel URL for team members to handle chats"""
+    config = await db.app_config.find_one({"config_key": "cxgenie"})
     
-    conversations = await db.chat_conversations.find(query, {"_id": 0}).sort(
-        "fecha_ultima_actividad", -1
-    ).to_list(limit)
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG)
+    
+    if not value.get("agent_panel_activo", True):
+        return {
+            "activo": False,
+            "panel_url": None,
+            "message": "Panel de agentes no activo"
+        }
+    
+    workspace_id = value.get("workspace_id", DEFAULT_CXGENIE_CONFIG["workspace_id"])
+    base_url = value.get("agent_panel_url", DEFAULT_CXGENIE_CONFIG["agent_panel_url"])
     
     return {
-        "conversations": conversations,
-        "total": len(conversations),
-        "message": "Panel de agentes - Placeholder. Las conversaciones se sincronizarán con CXGenie."
+        "activo": True,
+        "workspace_id": workspace_id,
+        "panel_urls": {
+            "live_chat": f"{base_url}?t=live-chat&type=ALL",
+            "all_tickets": f"{base_url}?t=all&type=ALL",
+            "open_tickets": f"{base_url}?t=open&type=ALL",
+            "pending_tickets": f"{base_url}?t=pending&type=ALL",
+            "resolved_tickets": f"{base_url}?t=resolved&type=ALL"
+        },
+        "embed_info": {
+            "description": "Estas URLs pueden cargarse en un iframe o WebView para que el equipo atienda chats",
+            "recommended_height": "100vh",
+            "recommended_width": "100%"
+        }
     }
 
 
-@router.get("/conversations/{conversation_id}/messages")
-async def get_conversation_messages(
-    conversation_id: str,
+@router.get("/agent-panel/embed")
+async def get_agent_panel_embed(
+    tab: str = "live-chat",
     admin: dict = Depends(get_admin_user)
 ):
-    """Get messages for a conversation - PLACEHOLDER"""
-    messages = await db.chat_messages.find(
-        {"conversation_id": conversation_id},
-        {"_id": 0}
-    ).sort("fecha_envio", 1).to_list(500)
+    """Get specific agent panel embed URL"""
+    config = await db.app_config.find_one({"config_key": "cxgenie"})
+    
+    if not config:
+        value = DEFAULT_CXGENIE_CONFIG
+    else:
+        value = config.get("value", DEFAULT_CXGENIE_CONFIG)
+    
+    base_url = value.get("agent_panel_url", DEFAULT_CXGENIE_CONFIG["agent_panel_url"])
+    
+    # Map tab names
+    tab_map = {
+        "live-chat": "live-chat",
+        "all": "all",
+        "open": "open",
+        "pending": "pending",
+        "resolved": "resolved"
+    }
+    
+    selected_tab = tab_map.get(tab, "live-chat")
+    embed_url = f"{base_url}?t={selected_tab}&type=ALL"
     
     return {
-        "conversation_id": conversation_id,
-        "messages": messages,
-        "message": "Mensajes - Placeholder. Se sincronizarán con CXGenie API."
+        "embed_url": embed_url,
+        "tab": selected_tab,
+        "iframe_code": f'<iframe src="{embed_url}" width="100%" height="100%" frameborder="0" allow="microphone; camera"></iframe>'
     }
 
 
