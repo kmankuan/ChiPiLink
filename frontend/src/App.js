@@ -215,6 +215,8 @@ function App() {
                 <div className="App min-h-screen bg-background noise-bg">
                   <AppRouter />
                   <CartDrawer />
+                  {/* CXGenie Chat Widget - appears on all pages */}
+                  <CXGenieWidget />
                   <Toaster 
                     position="top-right" 
                     richColors 
