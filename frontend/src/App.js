@@ -43,6 +43,7 @@ import PingPongSpectator from '@/modules/pingpong/pages/PingPongSpectator';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
+import { CXGenieWidget } from '@/components/chat';
 
 import '@/App.css';
 
