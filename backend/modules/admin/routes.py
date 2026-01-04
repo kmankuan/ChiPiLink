@@ -1,0 +1,295 @@
+"""
+Admin Routes - Notifications, form config, setup endpoints
+"""
+from fastapi import APIRouter, HTTPException, Depends
+from typing import Optional, List
+from datetime import datetime, timezone
+import uuid
+import logging
+
+from core.database import db
+from core.auth import get_admin_user, hash_password
+from core.config import FRONTEND_URL
+from .models import Notificacion, NotificacionCreate, ConfiguracionNotificaciones
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/admin", tags=["Admin"])
+
+
+# ============== SETUP ROUTES ==============
+
+@router.post("/setup")
+async def setup_admin(admin_data: dict):
+    """Initial admin setup - only works if no admin exists"""
+    existing_admin = await db.clientes.find_one({"es_admin": True})
+    if existing_admin:
+        raise HTTPException(status_code=400, detail="Ya existe un administrador")
+    
+    admin_doc = {
+        "cliente_id": f"admin_{uuid.uuid4().hex[:8]}",
+        "email": admin_data.get("email"),
+        "nombre": admin_data.get("nombre", "Administrador"),
+        "contrasena_hash": hash_password(admin_data.get("contrasena")),
+        "es_admin": True,
+        "estudiantes": [],
+        "fecha_creacion": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.clientes.insert_one(admin_doc)
+    
+    return {"success": True, "message": "Administrador creado exitosamente"}
+
+
+@router.post("/seed")
+async def seed_data(admin: dict = Depends(get_admin_user)):
+    """Seed initial data for development/testing"""
+    seeded = []
+    
+    # Seed categories if empty
+    cat_count = await db.categorias.count_documents({})
+    if cat_count == 0:
+        categorias = [
+            {"categoria_id": "libros", "nombre": "Libros", "icono": "\ud83d\udcda", "orden": 1, "activo": True},
+            {"categoria_id": "snacks", "nombre": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "activo": True},
+            {"categoria_id": "bebidas", "nombre": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "activo": True},
+            {"categoria_id": "preparados", "nombre": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "activo": True},
+            {"categoria_id": "uniformes", "nombre": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "activo": True},
+            {"categoria_id": "servicios", "nombre": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "activo": True},
+        ]
+        await db.categorias.insert_many(categorias)
+        seeded.append("categorias")
+    
+    # Seed sample products if empty
+    libro_count = await db.libros.count_documents({})
+    if libro_count == 0:
+        libros = [
+            {
+                "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
+                "nombre": "Matem\u00e1ticas 1",
+                "descripcion": "Libro de matem\u00e1ticas para primer grado",
+                "categoria": "libros",
+                "grado": "1",
+                "materia": "matematicas",
+                "precio": 25.00,
+                "cantidad_inventario": 50,
+                "activo": True,
+                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
+                "nombre": "Espa\u00f1ol 1",
+                "descripcion": "Libro de espa\u00f1ol para primer grado",
+                "categoria": "libros",
+                "grado": "1",
+                "materia": "espanol",
+                "precio": 22.00,
+                "cantidad_inventario": 45,
+                "activo": True,
+                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            },
+        ]
+        await db.libros.insert_many(libros)
+        seeded.append("libros")
+    
+    return {"success": True, "seeded": seeded}
+
+
+# ============== NOTIFICATIONS ROUTES ==============
+
+@router.get("/notificaciones")
+async def get_notificaciones(
+    leidas: Optional[bool] = None,
+    tipo: Optional[str] = None,
+    limite: int = 50,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get notifications for admin"""
+    query = {}
+    if leidas is not None:
+        query["leida"] = leidas
+    if tipo:
+        query["tipo"] = tipo
+    
+    notificaciones = await db.notificaciones.find(query, {"_id": 0}).sort(
+        "fecha_creacion", -1
+    ).to_list(limite)
+    
+    # Count unread
+    no_leidas = await db.notificaciones.count_documents({"leida": False})
+    
+    return {
+        "notificaciones": notificaciones,
+        "no_leidas": no_leidas
+    }
+
+
+@router.put("/notificaciones/{notificacion_id}/leer")
+async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_user)):
+    """Mark notification as read"""
+    result = await db.notificaciones.update_one(
+        {"notificacion_id": notificacion_id},
+        {"$set": {"leida": True}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Notificaci\u00f3n no encontrada")
+    return {"success": True}
+
+
+@router.put("/notificaciones/leer-todas")
+async def marcar_todas_leidas(admin: dict = Depends(get_admin_user)):
+    """Mark all notifications as read"""
+    await db.notificaciones.update_many(
+        {"leida": False},
+        {"$set": {"leida": True}}
+    )
+    return {"success": True}
+
+
+@router.delete("/notificaciones/{notificacion_id}")
+async def delete_notificacion(notificacion_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a notification"""
+    result = await db.notificaciones.delete_one({"notificacion_id": notificacion_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notificaci\u00f3n no encontrada")
+    return {"success": True}
+
+
+@router.get("/notificaciones/config")
+async def get_notificaciones_config(admin: dict = Depends(get_admin_user)):
+    """Get notification preferences"""
+    config = await db.app_config.find_one({"config_key": "notificaciones"}, {"_id": 0})
+    if not config:
+        return ConfiguracionNotificaciones().model_dump()
+    return config.get("value", ConfiguracionNotificaciones().model_dump())
+
+
+@router.put("/notificaciones/config")
+async def update_notificaciones_config(
+    config: ConfiguracionNotificaciones,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update notification preferences"""
+    await db.app_config.update_one(
+        {"config_key": "notificaciones"},
+        {"$set": {
+            "config_key": "notificaciones",
+            "value": config.model_dump(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    return {"success": True}
+
+
+# ============== FORM CONFIGURATION ROUTES ==============
+
+@router.get("/form-config/{form_id}")
+async def get_form_config(form_id: str, admin: dict = Depends(get_admin_user)):
+    """Get form configuration"""
+    config = await db.form_configs.find_one({"form_id": form_id}, {"_id": 0})
+    if not config:
+        # Return default config
+        return {
+            "form_id": form_id,
+            "nombre": "Formulario de Pedido",
+            "campos": [],
+            "activo": True
+        }
+    return config
+
+
+@router.put("/form-config/{form_id}")
+async def update_form_config(form_id: str, config: dict, admin: dict = Depends(get_admin_user)):
+    """Update form configuration"""
+    config["form_id"] = form_id
+    config["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.form_configs.update_one(
+        {"form_id": form_id},
+        {"$set": config},
+        upsert=True
+    )
+    return {"success": True}
+
+
+@router.get("/form-config/{form_id}/embed-code")
+async def get_embed_code(form_id: str, admin: dict = Depends(get_admin_user)):
+    """Generate embed code for public form"""
+    embed_url = f"{FRONTEND_URL}/embed/{form_id}"
+    
+    iframe_code = f'''<iframe 
+  src="{embed_url}" 
+  width="100%" 
+  height="800" 
+  frameborder="0" 
+  style="border: none; max-width: 600px;">
+</iframe>'''
+    
+    script_code = f'''<div id="form-container-{form_id}"></div>
+<script src="{FRONTEND_URL}/embed.js" data-form-id="{form_id}"></script>'''
+    
+    return {
+        "embed_url": embed_url,
+        "iframe_code": iframe_code,
+        "script_code": script_code
+    }
+
+
+# ============== PUBLIC FORM CONFIG ROUTES ==============
+
+@router.get("/public/form-config/{form_id}")
+async def get_public_form_config(form_id: str):
+    """Get form configuration for public forms (no auth)"""
+    config = await db.form_configs.find_one(
+        {"form_id": form_id, "activo": True},
+        {"_id": 0}
+    )
+    if not config:
+        return {
+            "form_id": form_id,
+            "nombre": "Formulario de Pedido",
+            "campos": [],
+            "activo": True
+        }
+    return config
+
+
+# ============== DASHBOARD STATS ==============
+
+@router.get("/dashboard/stats")
+async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
+    """Get dashboard statistics"""
+    # Orders stats
+    total_pedidos = await db.pedidos.count_documents({})
+    pedidos_pendientes = await db.pedidos.count_documents({"estado": "pendiente"})
+    
+    # Products stats
+    total_productos = await db.libros.count_documents({"activo": True})
+    productos_bajo_stock = await db.libros.count_documents({
+        "activo": True,
+        "cantidad_inventario": {"$lt": 10}
+    })
+    
+    # Users stats
+    total_usuarios = await db.clientes.count_documents({"es_admin": False})
+    
+    # Notifications
+    notificaciones_no_leidas = await db.notificaciones.count_documents({"leida": False})
+    
+    return {
+        "pedidos": {
+            "total": total_pedidos,
+            "pendientes": pedidos_pendientes
+        },
+        "productos": {
+            "total": total_productos,
+            "bajo_stock": productos_bajo_stock
+        },
+        "usuarios": {
+            "total": total_usuarios
+        },
+        "notificaciones": {
+            "no_leidas": notificaciones_no_leidas
+        }
+    }
