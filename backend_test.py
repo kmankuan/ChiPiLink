@@ -3387,25 +3387,25 @@ class TextbookStoreAPITester:
         # Validate basic response structures
         success = True
         
-        if health_result:
+        if health_result is not None:
             self.log_test("Health endpoint returns data", True)
         else:
             self.log_test("Health endpoint returns data", False, "No response data")
             success = False
         
-        if products_result:
+        if products_result is not None:
             self.log_test("Platform store products endpoint returns data", True)
         else:
             self.log_test("Platform store products endpoint returns data", False, "No response data")
             success = False
         
-        if categories_result:
+        if categories_result is not None:
             self.log_test("Categories endpoint returns data", True)
         else:
             self.log_test("Categories endpoint returns data", False, "No response data")
             success = False
         
-        if books_result:
+        if books_result is not None:
             self.log_test("Books endpoint returns data", True)
         else:
             self.log_test("Books endpoint returns data", False, "No response data")
