@@ -179,7 +179,14 @@ export default function AdminDashboard() {
                       key={item.id}
                       variant={isActive ? "secondary" : "ghost"}
                       className="w-full justify-start gap-3"
-                      onClick={() => setActiveModule(item.id)}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        if (item.isExternal && item.path) {
+                          navigate(item.path);
+                        } else {
+                          setActiveModule(item.id);
+                        }
+                      }}
                     >
                       <Icon className="h-5 w-5" />
                       <span>{item.label}</span>
