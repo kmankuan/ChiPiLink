@@ -1,16 +1,16 @@
 /**
  * CXGenie Agent Panel Page
- * Full-page agent panel for handling customer conversations
+ * Full-page agent panel for handling customer tickets and chats
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CXGenieAgentPanel, CXGenieAgentTabs } from '@/components/chat';
+import { CXGenieAgentPanel, CXGeniePanelSelector, CXGenieAgentTabs } from '@/components/chat';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
 
 export default function AgentPanel() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('live-chat');
+  const [activePanel, setActivePanel] = useState('tickets'); // 'tickets' or 'live-chat'
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullscreen = () => {
@@ -24,11 +24,21 @@ export default function AgentPanel() {
   };
 
   const openInNewWindow = () => {
-    window.open(
-      `https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=${activeTab}&type=ALL`,
-      '_blank',
-      'width=1200,height=800'
-    );
+    const baseUrl = 'https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk';
+    const url = activePanel === 'tickets' 
+      ? `${baseUrl}?t=tickets`
+      : `${baseUrl}?t=live-chat&type=ALL`;
+    window.open(url, '_blank', 'width=1200,height=800');
+  };
+
+  const getPanelTitle = () => {
+    return activePanel === 'tickets' ? '🎫 Panel de Tickets' : '💬 Chat en Vivo';
+  };
+
+  const getPanelDescription = () => {
+    return activePanel === 'tickets' 
+      ? 'Gestiona los tickets de soporte de clientes'
+      : 'Atiende conversaciones en tiempo real';
   };
 
   return (
@@ -49,10 +59,10 @@ export default function AgentPanel() {
               </Button>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  💬 Panel de Atención al Cliente
+                  {getPanelTitle()}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  CXGenie Help Desk - Gestiona las conversaciones con clientes
+                  {getPanelDescription()}
                 </p>
               </div>
             </div>
@@ -89,17 +99,24 @@ export default function AgentPanel() {
         </div>
       )}
 
-      {/* Tab Selector */}
+      {/* Panel Selector - Tickets vs Chat */}
       {!isFullscreen && (
         <div className="max-w-7xl mx-auto mb-4">
-          <CXGenieAgentTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <CXGeniePanelSelector activePanel={activePanel} onPanelChange={setActivePanel} />
+        </div>
+      )}
+
+      {/* Additional Tabs for filtering */}
+      {!isFullscreen && (
+        <div className="max-w-7xl mx-auto mb-4">
+          <CXGenieAgentTabs activeTab={activePanel} onTabChange={setActivePanel} />
         </div>
       )}
 
       {/* Agent Panel */}
       <div className={`${isFullscreen ? 'h-screen' : 'max-w-7xl mx-auto'}`}>
-        <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${isFullscreen ? 'h-full' : 'h-[calc(100vh-200px)]'}`}>
-          <CXGenieAgentPanel tab={activeTab} className="h-full" />
+        <div className={`bg-white rounded-lg shadow-sm overflow-hidden ${isFullscreen ? 'h-full' : 'h-[calc(100vh-280px)]'}`}>
+          <CXGenieAgentPanel panel={activePanel} className="h-full" />
         </div>
       </div>
 
