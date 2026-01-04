@@ -52,6 +52,26 @@ from modules.admin.routes import router as admin_router
 # Invision Module (placeholder for laopan.online integration)
 from modules.invision.routes import router as invision_router
 
+# ============== NEW MODULES (Placeholders) ==============
+
+# Chess Club Module
+from modules.chess.routes import router as chess_router
+
+# Content Hub Module (video/post curation)
+from modules.content_hub.routes import router as content_hub_router
+
+# CXGenie Chat Support Module
+from modules.cxgenie.routes import router as cxgenie_router
+
+# AI Tutor Module (language learning)
+from modules.ai_tutor.routes import router as ai_tutor_router
+
+# FuseBase Documents Module
+from modules.fusebase.routes import router as fusebase_router
+
+# Task Supervisor Module (voice-assisted task management)
+from modules.task_supervisor.routes import router as task_supervisor_router
+
 # ============== IMPORT EXISTING ROUTES ==============
 
 # Platform Store (Unatienda/Yappy) - Already modularized
