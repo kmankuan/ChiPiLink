@@ -37,31 +37,29 @@ def test_admin_endpoints():
                 
                 # Test Monday.com integration
                 try:
-                    response = requests.get(f"{base_url}/api/admin/monday/status", 
+                    response = requests.get(f"{base_url}/api/monday/status", 
                                           headers=headers, timeout=10)
                     if response.status_code == 200:
-                        print("✅ GET /api/admin/monday/status")
+                        print("✅ GET /api/monday/status")
                         monday_data = response.json()
-                        print(f"   - API Key Configured: {monday_data.get('api_key_configured', False)}")
-                        print(f"   - Board ID Configured: {monday_data.get('board_id_configured', False)}")
+                        print(f"   - Configured: {monday_data.get('configured', False)}")
                         print(f"   - Connected: {monday_data.get('connected', False)}")
-                        if monday_data.get('boards'):
-                            print(f"   - Available Boards: {len(monday_data['boards'])}")
+                        print(f"   - Message: {monday_data.get('message', 'N/A')}")
                     else:
-                        print(f"❌ GET /api/admin/monday/status: {response.status_code}")
+                        print(f"❌ GET /api/monday/status: {response.status_code}")
                 except Exception as e:
                     print(f"❌ Monday Integration Error: {e}")
                 
                 # Test Google Sheets integration
                 try:
-                    response = requests.get(f"{base_url}/api/admin/sheets/status", 
+                    response = requests.get(f"{base_url}/api/sheets/status", 
                                           headers=headers, timeout=10)
                     if response.status_code == 200:
-                        print("✅ GET /api/admin/sheets/status")
+                        print("✅ GET /api/sheets/status")
                     elif response.status_code == 404:
-                        print("⚠️ GET /api/admin/sheets/status: 404 (Not implemented)")
+                        print("⚠️ GET /api/sheets/status: 404 (Not implemented)")
                     else:
-                        print(f"❌ GET /api/admin/sheets/status: {response.status_code}")
+                        print(f"❌ GET /api/sheets/status: {response.status_code}")
                 except Exception as e:
                     print(f"❌ Sheets Integration Error: {e}")
                 
