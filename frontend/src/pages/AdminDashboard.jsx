@@ -42,7 +42,7 @@ const navItems = [
   { id: 'customers', label: 'Clientes', icon: Users },
   { id: 'admin', label: 'Administración', icon: Settings },
   { id: 'integrations', label: 'Integraciones', icon: Plug },
-  { id: 'chat', label: 'Chat Soporte', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
+  { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
 ];
 
 export default function AdminDashboard() {
