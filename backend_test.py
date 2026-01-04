@@ -3365,9 +3365,14 @@ class TextbookStoreAPITester:
         integrations_success = self.test_integrations_module_endpoints()
         existing_routes_success = self.test_existing_routes_endpoints()
         
-        # Test sequence - prioritizing the 3 specific tasks from review request
+        # Test sequence - prioritizing the review request tests
         tests = [
-            # Priority tests from review request
+            # REVIEW REQUEST: CXGenie Integration and New Placeholder Modules
+            ("CXGenie Integration", self.test_cxgenie_integration),
+            ("Placeholder Modules Status", self.test_placeholder_modules),
+            ("Health Check - 18 Modules", self.test_health_check_18_modules),
+            
+            # Priority tests from previous review requests
             ("Task 1: Branding Neutralization (P1)", self.test_branding_neutralization),
             ("Task 2: Thermal Receipt (P2)", self.test_thermal_receipt),
             ("Task 3: Monday.com Integration (P3)", self.test_monday_integration),
