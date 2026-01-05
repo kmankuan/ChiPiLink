@@ -676,64 +676,6 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
             </div>
           </section>
         </BlockWrapper>
-      );}
-                      placeholder="Subtítulo opcional"
-                    />
-                  </p>
-                )}
-              </div>
-            )}
-            <div className={`grid grid-cols-1 md:grid-cols-${config.columnas || 3} gap-6 md:gap-8`}>
-              {(config.items || []).map((item, index) => {
-                const Icon = ICON_MAP[item.icono] || CheckCircle2;
-                return (
-                  <div 
-                    key={index}
-                    className="group relative bg-card rounded-2xl p-8 border border-border/50 hover:border-primary/50 transition-all duration-300 soft-shadow"
-                  >
-                    {isEditMode && (
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeItem(index)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    )}
-                    <div className="p-3 rounded-xl bg-primary/10 w-fit mb-6 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-serif text-xl font-bold mb-3">
-                      <EditableText 
-                        value={item.titulo}
-                        onChange={(v) => updateItemConfig(index, 'titulo', v)}
-                        placeholder="Título"
-                      />
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      <EditableText 
-                        value={item.descripcion}
-                        onChange={(v) => updateItemConfig(index, 'descripcion', v)}
-                        placeholder="Descripción"
-                        multiline
-                      />
-                    </p>
-                  </div>
-                );
-              })}
-              {isEditMode && (
-                <button
-                  onClick={() => addItem({ icono: 'check', titulo: 'Nueva característica', descripcion: 'Descripción' })}
-                  className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors"
-                >
-                  <Plus className="h-8 w-8 mb-2" />
-                  Agregar característica
-                </button>
-              )}
-            </div>
-          </section>
-        </BlockWrapper>
       );
 
     case 'text':
@@ -746,8 +688,35 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
             <div style={{ maxWidth: config.ancho_max || '800px', margin: '0 auto' }}>
               {(config.titulo || isEditMode) && (
                 <h2 className="font-serif text-2xl md:text-3xl font-bold mb-6">
-                  <EditableText 
-                    value={config.titulo}
+                  {isEditMode ? (
+                    <EditableText 
+                      value={L(config.titulo)}
+                      onChange={(v) => updateConfig('titulo', v)}
+                      placeholder="Título"
+                    />
+                  ) : (
+                    L(config.titulo)
+                  )}
+                </h2>
+              )}
+              {(config.contenido || isEditMode) && (
+                <div className="prose prose-lg max-w-none text-muted-foreground">
+                  {isEditMode ? (
+                    <EditableText 
+                      value={L(config.contenido)}
+                      onChange={(v) => updateConfig('contenido', v)}
+                      placeholder="Contenido del texto"
+                      multiline
+                    />
+                  ) : (
+                    L(config.contenido)
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        </BlockWrapper>
+      );
                     onChange={(v) => updateConfig('titulo', v)}
                     placeholder="Título"
                   />
