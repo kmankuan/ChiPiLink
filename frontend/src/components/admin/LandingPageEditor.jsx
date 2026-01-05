@@ -1216,10 +1216,11 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 <div className="space-y-2">
                   <Label className="text-xs">URL del enlace</Label>
                   <Input
-                  value={item.link || ''}
-                  onChange={(e) => handleItemChange(index, 'link', e.target.value)}
-                  placeholder="Link (opcional)"
-                />
+                    value={item.link || ''}
+                    onChange={(e) => handleItemChange(index, 'link', e.target.value)}
+                    placeholder="Link (opcional)"
+                  />
+                </div>
               </div>
             ))}
           </div>
