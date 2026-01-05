@@ -332,92 +332,249 @@ export default function LandingPageEditor() {
                 Configuración del Sitio
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-2xl max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle>Configuración del Sitio</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label>Nombre del Sitio</Label>
-                  <Input
-                    value={siteConfig.nombre_sitio}
-                    onChange={(e) => setSiteConfig({ ...siteConfig, nombre_sitio: e.target.value })}
-                    placeholder="Mi Tienda"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Descripción</Label>
-                  <Textarea
-                    value={siteConfig.descripcion}
-                    onChange={(e) => setSiteConfig({ ...siteConfig, descripcion: e.target.value })}
-                    placeholder="Descripción del sitio"
-                    rows={2}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Color Primario</Label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={siteConfig.color_primario}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, color_primario: e.target.value })}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
+              <Tabs defaultValue="general" className="mt-4">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="general" className="text-xs sm:text-sm">
+                    <Globe className="h-4 w-4 mr-1 hidden sm:inline" />
+                    General
+                  </TabsTrigger>
+                  <TabsTrigger value="seo" className="text-xs sm:text-sm">
+                    <Search className="h-4 w-4 mr-1 hidden sm:inline" />
+                    SEO
+                  </TabsTrigger>
+                  <TabsTrigger value="branding" className="text-xs sm:text-sm">
+                    <Palette className="h-4 w-4 mr-1 hidden sm:inline" />
+                    Marca
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="text-xs sm:text-sm">
+                    <BarChart className="h-4 w-4 mr-1 hidden sm:inline" />
+                    Analytics
+                  </TabsTrigger>
+                </TabsList>
+
+                <ScrollArea className="h-[400px] mt-4 pr-4">
+                  {/* General Tab */}
+                  <TabsContent value="general" className="space-y-4 mt-0">
+                    <div className="space-y-2">
+                      <Label>Nombre del Sitio</Label>
                       <Input
-                        value={siteConfig.color_primario}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, color_primario: e.target.value })}
-                        placeholder="#16a34a"
+                        value={siteConfig.nombre_sitio}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, nombre_sitio: e.target.value })}
+                        placeholder="Mi Tienda"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Nombre que aparece en el header y footer
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Descripción del Sitio</Label>
+                      <Textarea
+                        value={siteConfig.descripcion}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, descripcion: e.target.value })}
+                        placeholder="Descripción del sitio"
+                        rows={2}
                       />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Color Secundario</Label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={siteConfig.color_secundario}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, color_secundario: e.target.value })}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
+                    <div className="space-y-2">
+                      <Label>Email de Contacto</Label>
                       <Input
-                        value={siteConfig.color_secundario}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, color_secundario: e.target.value })}
-                        placeholder="#0f766e"
+                        type="email"
+                        value={siteConfig.email_contacto || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, email_contacto: e.target.value })}
+                        placeholder="contacto@ejemplo.com"
                       />
                     </div>
-                  </div>
+                    <div className="space-y-2">
+                      <Label>Teléfono de Contacto</Label>
+                      <Input
+                        value={siteConfig.telefono_contacto || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, telefono_contacto: e.target.value })}
+                        placeholder="+507 6000-0000"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Texto del Footer</Label>
+                      <Input
+                        value={siteConfig.footer_texto}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, footer_texto: e.target.value })}
+                        placeholder="© 2025 Mi Tienda"
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* SEO Tab */}
+                  <TabsContent value="seo" className="space-y-4 mt-0">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-blue-800">
+                        <Search className="h-4 w-4 inline mr-1" />
+                        Optimiza cómo aparece tu sitio en Google y redes sociales
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Título de la Pestaña del Navegador</Label>
+                      <Input
+                        value={siteConfig.meta_titulo || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, meta_titulo: e.target.value })}
+                        placeholder="ChiPi Link | Tu Super App"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Si está vacío, se usa el nombre del sitio
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Meta Descripción (SEO)</Label>
+                      <Textarea
+                        value={siteConfig.meta_descripcion || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, meta_descripcion: e.target.value })}
+                        placeholder="Descripción que aparece en los resultados de Google (máx 160 caracteres)"
+                        rows={3}
+                        maxLength={160}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {(siteConfig.meta_descripcion || '').length}/160 caracteres
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Palabras Clave</Label>
+                      <Input
+                        value={siteConfig.meta_keywords || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, meta_keywords: e.target.value })}
+                        placeholder="tienda, ecommerce, productos, panama"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Separadas por comas
+                      </p>
+                    </div>
+                    <Separator />
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Share2 className="h-4 w-4" />
+                        Imagen para Redes Sociales (Open Graph)
+                      </Label>
+                      <Input
+                        value={siteConfig.og_image || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, og_image: e.target.value })}
+                        placeholder="https://ejemplo.com/imagen-compartir.jpg"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Imagen que aparece al compartir en Facebook, Twitter, WhatsApp (1200x630px recomendado)
+                      </p>
+                      {siteConfig.og_image && (
+                        <img 
+                          src={siteConfig.og_image} 
+                          alt="Preview" 
+                          className="mt-2 rounded-lg max-h-32 object-cover border"
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  {/* Branding Tab */}
+                  <TabsContent value="branding" className="space-y-4 mt-0">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Color Primario</Label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={siteConfig.color_primario}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, color_primario: e.target.value })}
+                            className="w-10 h-10 rounded cursor-pointer border"
+                          />
+                          <Input
+                            value={siteConfig.color_primario}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, color_primario: e.target.value })}
+                            placeholder="#16a34a"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Color Secundario</Label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={siteConfig.color_secundario}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, color_secundario: e.target.value })}
+                            className="w-10 h-10 rounded cursor-pointer border"
+                          />
+                          <Input
+                            value={siteConfig.color_secundario}
+                            onChange={(e) => setSiteConfig({ ...siteConfig, color_secundario: e.target.value })}
+                            placeholder="#0f766e"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <Separator />
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <FileImage className="h-4 w-4" />
+                        URL del Logo
+                      </Label>
+                      <Input
+                        value={siteConfig.logo_url || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, logo_url: e.target.value })}
+                        placeholder="https://ejemplo.com/logo.png"
+                      />
+                      {siteConfig.logo_url && (
+                        <img 
+                          src={siteConfig.logo_url} 
+                          alt="Logo Preview" 
+                          className="mt-2 max-h-16 object-contain"
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Link2 className="h-4 w-4" />
+                        URL del Favicon
+                      </Label>
+                      <Input
+                        value={siteConfig.favicon_url || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, favicon_url: e.target.value })}
+                        placeholder="https://ejemplo.com/favicon.ico"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Icono pequeño que aparece en la pestaña del navegador (32x32px)
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Analytics Tab */}
+                  <TabsContent value="analytics" className="space-y-4 mt-0">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                      <p className="text-sm text-amber-800">
+                        <BarChart className="h-4 w-4 inline mr-1" />
+                        Conecta herramientas de análisis para medir el tráfico
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Google Analytics 4 - Measurement ID</Label>
+                      <Input
+                        value={siteConfig.google_analytics_id || ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, google_analytics_id: e.target.value })}
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Encuentra tu ID en Google Analytics → Admin → Data Streams
+                      </p>
+                    </div>
+                  </TabsContent>
+                </ScrollArea>
+
+                <div className="mt-4 pt-4 border-t">
+                  <Button onClick={handleUpdateSiteConfig} disabled={saving} className="w-full">
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                    Guardar Configuración
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label>Email de Contacto</Label>
-                  <Input
-                    type="email"
-                    value={siteConfig.email_contacto || ''}
-                    onChange={(e) => setSiteConfig({ ...siteConfig, email_contacto: e.target.value })}
-                    placeholder="contacto@ejemplo.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Teléfono de Contacto</Label>
-                  <Input
-                    value={siteConfig.telefono_contacto || ''}
-                    onChange={(e) => setSiteConfig({ ...siteConfig, telefono_contacto: e.target.value })}
-                    placeholder="+507 6000-0000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Texto del Footer</Label>
-                  <Input
-                    value={siteConfig.footer_texto}
-                    onChange={(e) => setSiteConfig({ ...siteConfig, footer_texto: e.target.value })}
-                    placeholder="© 2025 Mi Tienda"
-                  />
-                </div>
-                <Button onClick={handleUpdateSiteConfig} disabled={saving} className="w-full">
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                  Guardar Configuración
-                </Button>
-              </div>
+              </Tabs>
             </DialogContent>
           </Dialog>
 
