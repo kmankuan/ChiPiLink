@@ -24,7 +24,7 @@ app = FastAPI(
 )
 
 # ============== IMPORT CORE ==============
-from core.database import db, client, close_database, create_indexes
+from core.database import db, client, close_database, create_indexes, seed_admin_user, seed_site_config
 from core.config import CORS_ORIGINS
 from core.auth import get_current_user, get_admin_user
 
