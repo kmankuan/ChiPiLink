@@ -59,7 +59,12 @@ import {
   Construction,
   CheckCircle2,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Search,
+  Share2,
+  BarChart,
+  FileImage,
+  Link2
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
