@@ -558,6 +558,7 @@ test_plan:
     - "Category Landing Page"
     - "Floating Store Navigation Component"
     - "Public Store Page (/unatienda)"
+    - "Site Configuration SEO Fields"
 
 agent_communication:
   - agent: "testing"
