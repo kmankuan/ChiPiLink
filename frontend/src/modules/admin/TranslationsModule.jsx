@@ -262,9 +262,9 @@ export default function TranslationsModule() {
       <Card>
         <CardContent className="p-0">
           {/* Mobile scroll hint */}
-          <div className="md:hidden px-3 py-2 bg-muted/30 border-b text-xs text-muted-foreground flex items-center gap-2">
-            <span>👆</span>
-            <span>Desliza horizontalmente para ver todas las columnas</span>
+          <div className="md:hidden px-3 py-2 bg-blue-50 dark:bg-blue-950 border-b text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2">
+            <span>↔️</span>
+            <span>Desliza para ver todas las columnas</span>
           </div>
           
           {loading ? (
