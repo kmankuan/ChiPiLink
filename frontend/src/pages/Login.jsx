@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Book, Mail, Lock, Loader2 } from 'lucide-react';
+import { Book, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const { t } = useTranslation();
