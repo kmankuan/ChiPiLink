@@ -3,6 +3,9 @@ Database configuration and connection for ChiPi Link
 """
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import bcrypt
+import uuid
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -26,6 +29,72 @@ def get_database():
 async def close_database():
     """Close database connection"""
     client.close()
+
+
+async def seed_admin_user():
+    """
+    Create default admin user if it doesn't exist.
+    This ensures there's always an admin account in production.
+    """
+    try:
+        # Check if admin exists
+        admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
+        admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
+        
+        existing_admin = await db.clientes.find_one({"email": admin_email})
+        
+        if not existing_admin:
+            # Create admin user
+            hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            
+            admin_doc = {
+                "cliente_id": f"admin_{uuid.uuid4().hex[:8]}",
+                "nombre": "Administrador",
+                "apellido": "ChiPi Link",
+                "email": admin_email,
+                "telefono": "",
+                "contrasena_hash": hashed_password,
+                "es_admin": True,
+                "estudiantes": [],
+                "direccion": {},
+                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.clientes.insert_one(admin_doc)
+            print(f"✅ Admin user created: {admin_email}")
+        else:
+            print(f"✅ Admin user already exists: {admin_email}")
+            
+    except Exception as e:
+        print(f"⚠️ Error seeding admin user: {e}")
+
+
+async def seed_site_config():
+    """
+    Create default site configuration if it doesn't exist.
+    """
+    try:
+        existing_config = await db.site_config.find_one({"config_id": "main"})
+        
+        if not existing_config:
+            config_doc = {
+                "config_id": "main",
+                "nombre_sitio": "ChiPi Link",
+                "descripcion": "Tu Super App",
+                "color_primario": "#16a34a",
+                "color_secundario": "#0f766e",
+                "footer_texto": "© 2025 ChiPi Link - Todos los derechos reservados",
+                "meta_titulo": "ChiPi Link | Tu Super App",
+                "meta_descripcion": "La mejor plataforma para tu negocio"
+            }
+            
+            await db.site_config.insert_one(config_doc)
+            print("✅ Site config created")
+        else:
+            print("✅ Site config already exists")
+            
+    except Exception as e:
+        print(f"⚠️ Error seeding site config: {e}")
 
 
 async def create_indexes():
