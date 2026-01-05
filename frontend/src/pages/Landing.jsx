@@ -338,6 +338,9 @@ export default function Landing() {
 
   return (
     <EditModeContext.Provider value={editModeValue}>
+      {/* Dynamic Head - Updates title, meta tags, favicon, etc */}
+      <DynamicHead siteConfig={siteConfig} />
+      
       <div className="min-h-screen relative">
         {/* Admin Edit Mode Toggle */}
         {isAdmin && (
