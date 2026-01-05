@@ -27,15 +27,16 @@ DEFAULT_CXGENIE_CONFIG = {
     # Ticket Widget Configuration (para usuarios)
     "widget_type": "ticket",  # "ticket" o "chat"
     "widget_id": "398b0403-4898-4256-a629-51246daac9d8",
-    "widget_script_url": "https://ticket.kohbiz.com/widget.js",
+    "widget_script_url": "https://ticket.chipilink.com/widget.js",
     "widget_data_attribute": "data-bid",  # data-bid para tickets, data-aid para chat
     "widget_lang": "es",
     # Agent Panel Configuration (para equipo)
     "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
-    "agent_panel_base_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
-    # Panel URLs específicos
-    "tickets_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=tickets",
-    "chat_panel_url": "https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=live-chat&type=ALL",
+    "workspace_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VfaWQiOiIwM2EzNWY1Zi1mNzc3LTQ4OWEtYjYwYy02OTkzOWFjODljNDkiLCJpYXQiOjE3NDQwODk1NDJ9.cOcc7_FFaetfR1tKQ0IciSfs3qV6JM8hH26eSzsg13M",
+    "agent_panel_base_url": "https://livechat.chipilink.com",
+    # Panel URLs específicos - usando subdominios personalizados
+    "tickets_panel_url": "https://livechat.chipilink.com/help-desk?t=tickets",
+    "chat_panel_url": "https://livechat.chipilink.com/help-desk?t=live-chat&type=ALL",
     # Display Settings
     "posicion": "bottom-right",
     "mostrar_en_paginas": ["all"],  # all, public, store, etc.
