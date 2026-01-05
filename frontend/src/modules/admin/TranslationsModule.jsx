@@ -271,9 +271,9 @@ export default function TranslationsModule() {
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="text-left p-3 font-medium">Clave</th>
+                    <th className="text-left p-3 font-medium">🇺🇸 English</th>
                     <th className="text-left p-3 font-medium">🇵🇦 Español</th>
                     <th className="text-left p-3 font-medium">🇨🇳 中文</th>
-                    <th className="text-left p-3 font-medium">🇺🇸 English</th>
                     <th className="text-left p-3 font-medium">Estado</th>
                     <th className="text-right p-3 font-medium">Acciones</th>
                   </tr>
@@ -284,14 +284,14 @@ export default function TranslationsModule() {
                       <td className="p-3">
                         <code className="text-xs bg-muted px-2 py-1 rounded">{item.key}</code>
                       </td>
+                      <td className="p-3 max-w-xs truncate" title={item.en}>
+                        {item.en || <span className="text-muted-foreground italic">Sin traducir</span>}
+                      </td>
                       <td className="p-3 max-w-xs truncate" title={item.es}>
                         {item.es || <span className="text-muted-foreground italic">Sin traducir</span>}
                       </td>
                       <td className="p-3 max-w-xs truncate" title={item.zh}>
                         {item.zh || <span className="text-muted-foreground italic">Sin traducir</span>}
-                      </td>
-                      <td className="p-3 max-w-xs truncate" title={item.en}>
-                        {item.en || <span className="text-muted-foreground italic">Sin traducir</span>}
                       </td>
                       <td className="p-3">{getMissingBadge(item)}</td>
                       <td className="p-3 text-right">
