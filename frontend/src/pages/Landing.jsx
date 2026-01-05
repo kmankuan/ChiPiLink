@@ -1344,5 +1344,6 @@ function StaticLandingPage({ siteConfig }) {
       {/* Footer */}
       <Footer siteConfig={siteConfig} />
     </div>
+    </>
   );
 }
