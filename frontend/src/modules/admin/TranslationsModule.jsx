@@ -354,6 +354,17 @@ export default function TranslationsModule() {
             
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
+                🇺🇸 English
+              </label>
+              <Textarea
+                value={editForm.en}
+                onChange={(e) => setEditForm({...editForm, en: e.target.value})}
+                rows={2}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium flex items-center gap-2">
                 🇵🇦 Español
               </label>
               <Textarea
@@ -370,17 +381,6 @@ export default function TranslationsModule() {
               <Textarea
                 value={editForm.zh}
                 onChange={(e) => setEditForm({...editForm, zh: e.target.value})}
-                rows={2}
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2">
-                🇺🇸 English
-              </label>
-              <Textarea
-                value={editForm.en}
-                onChange={(e) => setEditForm({...editForm, en: e.target.value})}
                 rows={2}
               />
             </div>
