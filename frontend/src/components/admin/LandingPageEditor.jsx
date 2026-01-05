@@ -977,11 +977,7 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               multiline
               rows={6}
             />
-                onChange={(e) => handleChange('contenido', e.target.value)}
-                placeholder="Escribe tu contenido aquí..."
-                rows={6}
-              />
-            </div>
+            
             <div className="space-y-2">
               <Label>Alineación</Label>
               <Select value={config.alineacion || 'center'} onValueChange={(v) => handleChange('alineacion', v)}>
