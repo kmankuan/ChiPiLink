@@ -102,7 +102,7 @@ async def seed_landing_page():
     Create default landing page with initial blocks if it doesn't exist.
     """
     try:
-        existing_page = await db.landing_pages.find_one({"pagina_id": "landing"})
+        existing_page = await db.paginas.find_one({"pagina_id": "landing"})
         
         if existing_page and existing_page.get("bloques") and len(existing_page.get("bloques", [])) > 0:
             print(f"✅ Landing page already has {len(existing_page.get('bloques', []))} blocks")
@@ -115,6 +115,7 @@ async def seed_landing_page():
                 "tipo": "hero",
                 "orden": 1,
                 "activo": True,
+                "publicado": True,
                 "config": {
                     "titulo": "Bienvenido a ChiPi Link",
                     "subtitulo": "Tu comunidad china en Panamá, conectada",
@@ -130,6 +131,7 @@ async def seed_landing_page():
                 "tipo": "features",
                 "orden": 2,
                 "activo": True,
+                "publicado": True,
                 "config": {
                     "titulo": "Nuestros Servicios",
                     "subtitulo": "Todo lo que necesitas en un solo lugar",
@@ -163,6 +165,7 @@ async def seed_landing_page():
                 "tipo": "cta",
                 "orden": 3,
                 "activo": True,
+                "publicado": True,
                 "config": {
                     "titulo": "¿Listo para comenzar?",
                     "descripcion": "Únete a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
@@ -184,8 +187,8 @@ async def seed_landing_page():
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # Use upsert to update or create
-        await db.landing_pages.update_one(
+        # Use upsert to update or create - use db.paginas (correct collection)
+        await db.paginas.update_one(
             {"pagina_id": "landing"},
             {"$set": landing_doc},
             upsert=True
