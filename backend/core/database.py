@@ -97,6 +97,66 @@ async def seed_site_config():
         print(f"⚠️ Error seeding site config: {e}")
 
 
+async def seed_translations():
+    """
+    Sync translations from JSON files to database on startup.
+    This ensures all translation keys are available in the admin panel.
+    """
+    import json
+    
+    try:
+        # Check if translations already exist
+        count = await db.translations.count_documents({})
+        if count > 0:
+            print(f"✅ Translations already synced ({count} entries)")
+            return
+        
+        base_path = "/app/frontend/src/i18n/locales"
+        synced = 0
+        
+        def flatten_dict(d, parent_key=''):
+            items = []
+            for k, v in d.items():
+                new_key = f"{parent_key}.{k}" if parent_key else k
+                if isinstance(v, dict):
+                    items.extend(flatten_dict(v, new_key))
+                else:
+                    items.append((new_key, str(v)))
+            return items
+        
+        for lang in ["es", "zh", "en"]:
+            file_path = f"{base_path}/{lang}.json"
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                
+                flat = flatten_dict(data)
+                
+                for key, value in flat:
+                    await db.translations.update_one(
+                        {"key": key, "lang": lang},
+                        {
+                            "$set": {"value": value},
+                            "$setOnInsert": {
+                                "key": key,
+                                "lang": lang,
+                                "created_at": datetime.now(timezone.utc).isoformat()
+                            }
+                        },
+                        upsert=True
+                    )
+                    synced += 1
+            except FileNotFoundError:
+                print(f"⚠️ Translation file not found: {file_path}")
+            except Exception as e:
+                print(f"⚠️ Error loading {lang} translations: {e}")
+        
+        print(f"✅ Translations synced: {synced} entries")
+        
+    except Exception as e:
+        print(f"⚠️ Error seeding translations: {e}")
+
+
 async def create_indexes():
     """
     Create database indexes for optimized queries.
