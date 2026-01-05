@@ -871,50 +871,30 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
             </div>
           </div>
         );
-                  value={config.boton_secundario_texto || ''}
-                  onChange={(e) => handleChange('boton_secundario_texto', e.target.value)}
-                  placeholder="Ver Catálogo"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>URL Botón Secundario</Label>
-                <Input
-                  value={config.boton_secundario_url || ''}
-                  onChange={(e) => handleChange('boton_secundario_url', e.target.value)}
-                  placeholder="/catalogo"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Altura (px)</Label>
-              <Input
-                value={config.altura || '500px'}
-                onChange={(e) => handleChange('altura', e.target.value)}
-                placeholder="500px"
-              />
-            </div>
-          </div>
-        );
 
       case 'features':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Título de la Sección</Label>
-              <Input
-                value={config.titulo || ''}
-                onChange={(e) => handleChange('titulo', e.target.value)}
-                placeholder="¿Por qué elegirnos?"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Cada campo de texto tiene soporte para 3 idiomas.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label>Subtítulo</Label>
-              <Input
-                value={config.subtitulo || ''}
-                onChange={(e) => handleChange('subtitulo', e.target.value)}
-                placeholder="Descripción opcional"
-              />
-            </div>
+            
+            <MultilingualInput
+              label="Título de la Sección"
+              value={config.titulo}
+              onChange={(val) => handleChange('titulo', val)}
+              placeholder={{ en: "Why choose us?", es: "¿Por qué elegirnos?", zh: "为什么选择我们？" }}
+            />
+            
+            <MultilingualInput
+              label="Subtítulo"
+              value={config.subtitulo}
+              onChange={(val) => handleChange('subtitulo', val)}
+              placeholder={{ en: "Optional description", es: "Descripción opcional", zh: "可选描述" }}
+            />
+            
             <div className="space-y-2">
               <Label>Columnas</Label>
               <Select value={String(config.columnas || 3)} onValueChange={(v) => handleChange('columnas', parseInt(v))}>
@@ -928,6 +908,7 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 </SelectContent>
               </Select>
             </div>
+            
             <Separator />
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -936,28 +917,35 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                   <Plus className="h-4 w-4 mr-1" /> Agregar
                 </Button>
               </div>
-              {(config.items || []).map((item, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-3">
+              {(config.items || config.features || []).map((item, index) => (
+                <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/30">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Característica {index + 1}</span>
                     <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(index)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  <Input
-                    value={item.icono || ''}
-                    onChange={(e) => handleItemChange(index, 'icono', e.target.value)}
-                    placeholder="Icono (shield, truck, headphones...)"
+                  <div className="space-y-2">
+                    <Label className="text-xs">Icono</Label>
+                    <Input
+                      value={item.icono || ''}
+                      onChange={(e) => handleItemChange(index, 'icono', e.target.value)}
+                      placeholder="Store, Users, Calendar, Shield..."
+                    />
+                  </div>
+                  <MultilingualInput
+                    label="Título"
+                    value={item.titulo}
+                    onChange={(val) => handleItemChange(index, 'titulo', val)}
+                    placeholder={{ en: "Feature title", es: "Título", zh: "标题" }}
                   />
-                  <Input
-                    value={item.titulo || ''}
-                    onChange={(e) => handleItemChange(index, 'titulo', e.target.value)}
-                    placeholder="Título"
-                  />
-                  <Input
-                    value={item.descripcion || ''}
-                    onChange={(e) => handleItemChange(index, 'descripcion', e.target.value)}
-                    placeholder="Descripción"
+                  <MultilingualInput
+                    label="Descripción"
+                    value={item.descripcion}
+                    onChange={(val) => handleItemChange(index, 'descripcion', val)}
+                    placeholder={{ en: "Feature description", es: "Descripción", zh: "描述" }}
+                    multiline
+                    rows={2}
                   />
                 </div>
               ))}
