@@ -104,7 +104,18 @@ export default function LandingPageEditor() {
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
-    footer_texto: '© 2025 Todos los derechos reservados'
+    footer_texto: '© 2025 Todos los derechos reservados',
+    logo_url: '',
+    favicon_url: '',
+    email_contacto: '',
+    telefono_contacto: '',
+    // SEO & Meta
+    meta_titulo: '',
+    meta_descripcion: '',
+    meta_keywords: '',
+    og_image: '',
+    // Analytics
+    google_analytics_id: ''
   });
   const [editingBlock, setEditingBlock] = useState(null);
   const [addBlockDialog, setAddBlockDialog] = useState(false);
