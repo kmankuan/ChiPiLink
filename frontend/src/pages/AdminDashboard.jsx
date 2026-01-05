@@ -69,8 +69,8 @@ export default function AdminDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Get active module from URL hash
-  const activeModule = location.hash.replace('#', '') || 'dashboard';
+  // Get active module from URL hash (default to 'admin' for Administración)
+  const activeModule = location.hash.replace('#', '') || 'admin';
 
   useEffect(() => {
     if (!isAdmin) {
