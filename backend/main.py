@@ -158,9 +158,15 @@ async def shutdown_event():
 
 # ============== HEALTH CHECK ==============
 
+# Kubernetes health check endpoint (without /api prefix)
+@app.get("/health")
+async def kubernetes_health_check():
+    """Health check endpoint for Kubernetes liveness/readiness probes"""
+    return {"status": "healthy"}
+
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint with detailed info"""
     return {
         "status": "healthy",
         "version": "2.1.0",
