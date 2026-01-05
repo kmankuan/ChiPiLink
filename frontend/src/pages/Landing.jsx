@@ -1159,25 +1159,29 @@ function StaticLandingPage({ siteConfig }) {
   const siteName = siteConfig?.nombre_sitio || t('app.name') || 'Tienda';
 
   return (
-    <div className="min-h-screen noise-bg">
-      {/* Hero Section - Bento Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
-        {/* Main Hero Card */}
-        <div 
-          className="col-span-full md:col-span-8 row-span-2 min-h-[400px] md:min-h-[500px] rounded-3xl overflow-hidden relative group"
-          data-testid="hero-main-card"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200" 
-            alt="Students with textbooks"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
-            <p className="uppercase tracking-[0.2em] text-xs font-bold text-accent mb-4">
-              {siteName}
-            </p>
+    <>
+      {/* Dynamic Head - Updates title, meta tags, favicon, etc */}
+      <DynamicHead siteConfig={siteConfig} />
+      
+      <div className="min-h-screen noise-bg">
+        {/* Hero Section - Bento Grid */}
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
+          {/* Main Hero Card */}
+          <div 
+            className="col-span-full md:col-span-8 row-span-2 min-h-[400px] md:min-h-[500px] rounded-3xl overflow-hidden relative group"
+            data-testid="hero-main-card"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200" 
+              alt="Students with textbooks"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-12">
+              <p className="uppercase tracking-[0.2em] text-xs font-bold text-accent mb-4">
+                {siteName}
+              </p>
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 max-w-2xl">
               {t('landing.hero.title')}
             </h1>
