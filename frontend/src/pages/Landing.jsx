@@ -798,7 +798,6 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                     ) : (
                       L(config.boton_texto) || 'Comenzar'
                     )}
-                    />
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 )}
@@ -826,30 +825,29 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                     </Button>
                   )}
                   <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-2">
-                    <EditableText 
-                      value={item.numero}
-                      onChange={(v) => updateItemConfig(index, 'numero', v)}
-                      placeholder="100+"
-                    />
+                    {isEditMode ? (
+                      <EditableText 
+                        value={item.numero}
+                        onChange={(v) => updateItemConfig(index, 'numero', v)}
+                        placeholder="100+"
+                      />
+                    ) : (
+                      item.numero
+                    )}
                   </p>
                   <p className="text-muted-foreground">
-                    <EditableText 
-                      value={item.label}
-                      onChange={(v) => updateItemConfig(index, 'label', v)}
-                      placeholder="Etiqueta"
-                    />
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(item.label)}
+                        onChange={(v) => updateItemConfig(index, 'label', v)}
+                        placeholder="Etiqueta"
+                      />
+                    ) : (
+                      L(item.label)
+                    )}
                   </p>
                 </div>
               ))}
-              {isEditMode && (
-                <button
-                  onClick={() => addItem({ numero: '100+', label: 'Nueva estadística' })}
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors"
-                >
-                  <Plus className="h-6 w-6 mb-1" />
-                  Agregar
-                </button>
-              )}
             </div>
           </section>
         </BlockWrapper>
@@ -861,11 +859,15 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
           <section className="px-4 md:px-8 lg:px-12 py-12 md:py-20 max-w-7xl mx-auto">
             {(config.titulo || isEditMode) && (
               <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-12 text-center">
-                <EditableText 
-                  value={config.titulo}
-                  onChange={(v) => updateConfig('titulo', v)}
-                  placeholder="Título de la sección"
-                />
+                {isEditMode ? (
+                  <EditableText 
+                    value={L(config.titulo)}
+                    onChange={(v) => updateConfig('titulo', v)}
+                    placeholder="Título de la sección"
+                  />
+                ) : (
+                  L(config.titulo)
+                )}
               </h2>
             )}
             <div className={`grid grid-cols-1 md:grid-cols-${config.columnas || 3} gap-6 md:gap-8`}>
