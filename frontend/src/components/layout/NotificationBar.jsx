@@ -261,7 +261,8 @@ export function NotificationBar() {
                   ) : (
                     <div className="divide-y divide-border">
                       {filteredNotifications.map((notif) => {
-                        const typeConfig = NOTIFICATION_TYPES[notif.tipo] || NOTIFICATION_TYPES.pedido_nuevo;
+                        const typeConfig = NOTIFICATION_TYPES[notif?.tipo] || NOTIFICATION_TYPES.pedido_nuevo;
+                        if (!typeConfig) return null;
                         const Icon = typeConfig.icon;
                         
                         return (
