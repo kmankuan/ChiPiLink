@@ -97,6 +97,106 @@ async def seed_site_config():
         print(f"⚠️ Error seeding site config: {e}")
 
 
+async def seed_landing_page():
+    """
+    Create default landing page with initial blocks if it doesn't exist.
+    """
+    try:
+        existing_page = await db.landing_pages.find_one({"pagina_id": "landing"})
+        
+        if existing_page and existing_page.get("bloques") and len(existing_page.get("bloques", [])) > 0:
+            print(f"✅ Landing page already has {len(existing_page.get('bloques', []))} blocks")
+            return
+        
+        # Create initial blocks for the Super App landing page
+        initial_blocks = [
+            {
+                "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
+                "tipo": "hero",
+                "orden": 1,
+                "activo": True,
+                "config": {
+                    "titulo": "Bienvenido a ChiPi Link",
+                    "subtitulo": "Tu comunidad china en Panamá, conectada",
+                    "descripcion": "La super app que conecta a la comunidad china en Panamá con servicios, comercio y entretenimiento.",
+                    "cta_texto": "Explorar",
+                    "cta_link": "/unatienda",
+                    "imagen_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
+                    "estilo": "gradient"
+                }
+            },
+            {
+                "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
+                "tipo": "features",
+                "orden": 2,
+                "activo": True,
+                "config": {
+                    "titulo": "Nuestros Servicios",
+                    "subtitulo": "Todo lo que necesitas en un solo lugar",
+                    "features": [
+                        {
+                            "icono": "Store",
+                            "titulo": "Tienda Online",
+                            "descripcion": "Compra productos de nuestra comunidad"
+                        },
+                        {
+                            "icono": "Users",
+                            "titulo": "Comunidad",
+                            "descripcion": "Conecta con otros miembros"
+                        },
+                        {
+                            "icono": "Calendar",
+                            "titulo": "Eventos",
+                            "descripcion": "Participa en actividades y torneos"
+                        },
+                        {
+                            "icono": "MessageSquare",
+                            "titulo": "Soporte",
+                            "descripcion": "Asistencia en tu idioma"
+                        }
+                    ],
+                    "columnas": 4
+                }
+            },
+            {
+                "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
+                "tipo": "cta",
+                "orden": 3,
+                "activo": True,
+                "config": {
+                    "titulo": "¿Listo para comenzar?",
+                    "descripcion": "Únete a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
+                    "cta_texto": "Registrarse",
+                    "cta_link": "/registro",
+                    "cta_secundario_texto": "Ver Tienda",
+                    "cta_secundario_link": "/unatienda",
+                    "estilo": "centered"
+                }
+            }
+        ]
+        
+        landing_doc = {
+            "pagina_id": "landing",
+            "titulo": "Página Principal",
+            "bloques": initial_blocks,
+            "publicada": True,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Use upsert to update or create
+        await db.landing_pages.update_one(
+            {"pagina_id": "landing"},
+            {"$set": landing_doc},
+            upsert=True
+        )
+        
+        print(f"✅ Landing page created with {len(initial_blocks)} blocks")
+        
+    except Exception as e:
+        print(f"⚠️ Error seeding landing page: {e}")
+
+
 async def seed_translations():
     """
     Sync translations from JSON files to database on startup.
