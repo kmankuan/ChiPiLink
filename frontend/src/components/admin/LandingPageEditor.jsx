@@ -799,23 +799,28 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'hero':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Título Principal</Label>
-              <Input
-                value={config.titulo || ''}
-                onChange={(e) => handleChange('titulo', e.target.value)}
-                placeholder="Bienvenido a nuestra tienda"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Cada campo de texto tiene soporte para 3 idiomas. Haz clic en las pestañas para editar cada idioma.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label>Subtítulo</Label>
-              <Textarea
-                value={config.subtitulo || ''}
-                onChange={(e) => handleChange('subtitulo', e.target.value)}
-                placeholder="Descripción breve"
-                rows={2}
-              />
-            </div>
+            
+            <MultilingualInput
+              label="Título Principal"
+              value={config.titulo}
+              onChange={(val) => handleChange('titulo', val)}
+              placeholder={{ en: "Welcome to our store", es: "Bienvenido a nuestra tienda", zh: "欢迎来到我们的商店" }}
+            />
+            
+            <MultilingualInput
+              label="Subtítulo"
+              value={config.subtitulo}
+              onChange={(val) => handleChange('subtitulo', val)}
+              placeholder={{ en: "Brief description", es: "Descripción breve", zh: "简短描述" }}
+              multiline
+              rows={2}
+            />
+            
             <div className="space-y-2">
               <Label>URL de Imagen de Fondo</Label>
               <Input
@@ -827,15 +832,17 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 <img src={config.imagen_url} alt="Preview" className="w-full h-32 object-cover rounded-lg mt-2" />
               )}
             </div>
+            
+            <Separator />
+            <p className="text-sm font-medium text-muted-foreground">Botones de Acción</p>
+            
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Texto del Botón</Label>
-                <Input
-                  value={config.boton_texto || ''}
-                  onChange={(e) => handleChange('boton_texto', e.target.value)}
-                  placeholder="Comenzar"
-                />
-              </div>
+              <MultilingualInput
+                label="Texto del Botón Principal"
+                value={config.boton_texto}
+                onChange={(val) => handleChange('boton_texto', val)}
+                placeholder={{ en: "Get Started", es: "Comenzar", zh: "开始" }}
+              />
               <div className="space-y-2">
                 <Label>URL del Botón</Label>
                 <Input
@@ -845,10 +852,25 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 />
               </div>
             </div>
+            
             <div className="grid grid-cols-2 gap-4">
+              <MultilingualInput
+                label="Texto Botón Secundario"
+                value={config.boton_secundario_texto}
+                onChange={(val) => handleChange('boton_secundario_texto', val)}
+                placeholder={{ en: "Learn More", es: "Ver más", zh: "了解更多" }}
+              />
               <div className="space-y-2">
-                <Label>Texto Botón Secundario</Label>
+                <Label>URL Botón Secundario</Label>
                 <Input
+                  value={config.boton_secundario_url || ''}
+                  onChange={(e) => handleChange('boton_secundario_url', e.target.value)}
+                  placeholder="/productos"
+                />
+              </div>
+            </div>
+          </div>
+        );
                   value={config.boton_secundario_texto || ''}
                   onChange={(e) => handleChange('boton_secundario_texto', e.target.value)}
                   placeholder="Ver Catálogo"
