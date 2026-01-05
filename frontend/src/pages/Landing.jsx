@@ -611,18 +611,72 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
               <div className="text-center mb-12">
                 {(config.titulo || isEditMode) && (
                   <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-                    <EditableText 
-                      value={config.titulo}
-                      onChange={(v) => updateConfig('titulo', v)}
-                      placeholder="Título de la sección"
-                    />
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(config.titulo)}
+                        onChange={(v) => updateConfig('titulo', v)}
+                        placeholder="Título de la sección"
+                      />
+                    ) : (
+                      L(config.titulo)
+                    )}
                   </h2>
                 )}
                 {(config.subtitulo || isEditMode) && (
                   <p className="text-muted-foreground max-w-2xl mx-auto">
-                    <EditableText 
-                      value={config.subtitulo}
-                      onChange={(v) => updateConfig('subtitulo', v)}
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(config.subtitulo)}
+                        onChange={(v) => updateConfig('subtitulo', v)}
+                        placeholder="Subtítulo opcional"
+                      />
+                    ) : (
+                      L(config.subtitulo)
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${config.columnas || 3} gap-6 md:gap-8`}>
+              {(config.items || config.features || []).map((item, index) => {
+                const IconComponent = getIconComponent(item.icono);
+                return (
+                  <div key={index} className="group p-6 rounded-2xl bg-card border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    {IconComponent && (
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <IconComponent className="h-6 w-6" />
+                      </div>
+                    )}
+                    <h3 className="font-semibold text-lg mb-2">
+                      {isEditMode ? (
+                        <EditableText 
+                          value={L(item.titulo)}
+                          onChange={(v) => updateItemConfig(index, 'titulo', v)}
+                          placeholder="Título"
+                        />
+                      ) : (
+                        L(item.titulo)
+                      )}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {isEditMode ? (
+                        <EditableText 
+                          value={L(item.descripcion)}
+                          onChange={(v) => updateItemConfig(index, 'descripcion', v)}
+                          placeholder="Descripción"
+                          multiline
+                        />
+                      ) : (
+                        L(item.descripcion)
+                      )}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </BlockWrapper>
+      );}
                       placeholder="Subtítulo opcional"
                     />
                   </p>
