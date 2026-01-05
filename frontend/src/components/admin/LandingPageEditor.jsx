@@ -1114,6 +1114,11 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'stats':
         return (
           <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Soporte multilingüe habilitado.
+              </p>
+            </div>
             <div className="flex items-center justify-between">
               <Label>Estadísticas</Label>
               <Button type="button" variant="outline" size="sm" onClick={handleAddItem}>
@@ -1121,22 +1126,26 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               </Button>
             </div>
             {(config.items || []).map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-3">
+              <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/30">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Estadística {index + 1}</span>
                   <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(index)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <Input
-                  value={item.numero || ''}
-                  onChange={(e) => handleItemChange(index, 'numero', e.target.value)}
-                  placeholder="1000+"
-                />
-                <Input
-                  value={item.label || ''}
-                  onChange={(e) => handleItemChange(index, 'label', e.target.value)}
-                  placeholder="Clientes"
+                <div className="space-y-2">
+                  <Label className="text-xs">Número/Valor</Label>
+                  <Input
+                    value={item.numero || ''}
+                    onChange={(e) => handleItemChange(index, 'numero', e.target.value)}
+                    placeholder="1000+"
+                  />
+                </div>
+                <MultilingualInput
+                  label="Etiqueta"
+                  value={item.label}
+                  onChange={(val) => handleItemChange(index, 'label', val)}
+                  placeholder={{ en: "Customers", es: "Clientes", zh: "客户" }}
                 />
               </div>
             ))}
@@ -1146,14 +1155,19 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'cards':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Título de la Sección</Label>
-              <Input
-                value={config.titulo || ''}
-                onChange={(e) => handleChange('titulo', e.target.value)}
-                placeholder="Nuestros Productos"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Soporte multilingüe habilitado.
+              </p>
             </div>
+            
+            <MultilingualInput
+              label="Título de la Sección"
+              value={config.titulo}
+              onChange={(val) => handleChange('titulo', val)}
+              placeholder={{ en: "Our Products", es: "Nuestros Productos", zh: "我们的产品" }}
+            />
+            
             <div className="space-y-2">
               <Label>Columnas</Label>
               <Select value={String(config.columnas || 3)} onValueChange={(v) => handleChange('columnas', parseInt(v))}>
@@ -1175,29 +1189,37 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               </Button>
             </div>
             {(config.items || []).map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-3">
+              <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/30">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">Tarjeta {index + 1}</span>
                   <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveItem(index)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-                <Input
-                  value={item.titulo || ''}
-                  onChange={(e) => handleItemChange(index, 'titulo', e.target.value)}
-                  placeholder="Título"
+                <MultilingualInput
+                  label="Título"
+                  value={item.titulo}
+                  onChange={(val) => handleItemChange(index, 'titulo', val)}
+                  placeholder={{ en: "Title", es: "Título", zh: "标题" }}
                 />
-                <Input
-                  value={item.descripcion || ''}
-                  onChange={(e) => handleItemChange(index, 'descripcion', e.target.value)}
-                  placeholder="Descripción"
+                <MultilingualInput
+                  label="Descripción"
+                  value={item.descripcion}
+                  onChange={(val) => handleItemChange(index, 'descripcion', val)}
+                  placeholder={{ en: "Description", es: "Descripción", zh: "描述" }}
+                  multiline
                 />
-                <Input
-                  value={item.imagen_url || ''}
-                  onChange={(e) => handleItemChange(index, 'imagen_url', e.target.value)}
-                  placeholder="URL de imagen"
-                />
-                <Input
+                <div className="space-y-2">
+                  <Label className="text-xs">URL de imagen</Label>
+                  <Input
+                    value={item.imagen_url || ''}
+                    onChange={(e) => handleItemChange(index, 'imagen_url', e.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">URL del enlace</Label>
+                  <Input
                   value={item.link || ''}
                   onChange={(e) => handleItemChange(index, 'link', e.target.value)}
                   placeholder="Link (opcional)"
