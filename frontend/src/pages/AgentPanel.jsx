@@ -24,7 +24,7 @@ export default function AgentPanel() {
   };
 
   const openInNewWindow = () => {
-    const baseUrl = 'https://app.cxgenie.ai/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk';
+    const baseUrl = 'https://livechat.chipilink.com/help-desk';
     const url = activePanel === 'tickets' 
       ? `${baseUrl}?t=tickets`
       : `${baseUrl}?t=live-chat&type=ALL`;
