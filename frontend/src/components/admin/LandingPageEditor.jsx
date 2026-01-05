@@ -1041,31 +1041,33 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'cta':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Título</Label>
-              <Input
-                value={config.titulo || ''}
-                onChange={(e) => handleChange('titulo', e.target.value)}
-                placeholder="¿Listo para comenzar?"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Soporte multilingüe habilitado.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label>Subtítulo</Label>
-              <Input
-                value={config.subtitulo || ''}
-                onChange={(e) => handleChange('subtitulo', e.target.value)}
-                placeholder="Únete a miles de clientes"
-              />
-            </div>
+            
+            <MultilingualInput
+              label="Título"
+              value={config.titulo}
+              onChange={(val) => handleChange('titulo', val)}
+              placeholder={{ en: "Ready to get started?", es: "¿Listo para comenzar?", zh: "准备开始了吗？" }}
+            />
+            
+            <MultilingualInput
+              label="Subtítulo"
+              value={config.subtitulo}
+              onChange={(val) => handleChange('subtitulo', val)}
+              placeholder={{ en: "Join thousands of customers", es: "Únete a miles de clientes", zh: "加入成千上万的客户" }}
+            />
+            
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Texto del Botón</Label>
-                <Input
-                  value={config.boton_texto || ''}
-                  onChange={(e) => handleChange('boton_texto', e.target.value)}
-                  placeholder="Registrarse"
-                />
-              </div>
+              <MultilingualInput
+                label="Texto del Botón"
+                value={config.boton_texto}
+                onChange={(val) => handleChange('boton_texto', val)}
+                placeholder={{ en: "Sign Up", es: "Registrarse", zh: "注册" }}
+              />
               <div className="space-y-2">
                 <Label>URL del Botón</Label>
                 <Input
