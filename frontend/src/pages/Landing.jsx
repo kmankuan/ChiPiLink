@@ -559,9 +559,6 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                     )}
                   </p>
                 )}
-                    />
-                  </p>
-                )}
                 <div className="flex flex-wrap gap-4">
                   {(config.boton_texto || isEditMode) && (
                     <Button 
@@ -569,11 +566,15 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                       onClick={() => !isEditMode && navigate(config.boton_url || '/registro')}
                       className="rounded-full px-8 py-6 text-lg font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                     >
-                      <EditableText 
-                        value={config.boton_texto}
-                        onChange={(v) => updateConfig('boton_texto', v)}
-                        placeholder="Texto del botón"
-                      />
+                      {isEditMode ? (
+                        <EditableText 
+                          value={L(config.boton_texto)}
+                          onChange={(v) => updateConfig('boton_texto', v)}
+                          placeholder="Texto del botón"
+                        />
+                      ) : (
+                        L(config.boton_texto) || 'Comenzar'
+                      )}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   )}
@@ -584,11 +585,15 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                       onClick={() => !isEditMode && navigate(config.boton_secundario_url || '/')}
                       className="rounded-full px-8 py-6 text-lg bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm"
                     >
-                      <EditableText 
-                        value={config.boton_secundario_texto}
-                        onChange={(v) => updateConfig('boton_secundario_texto', v)}
-                        placeholder="Botón secundario"
-                      />
+                      {isEditMode ? (
+                        <EditableText 
+                          value={L(config.boton_secundario_texto)}
+                          onChange={(v) => updateConfig('boton_secundario_texto', v)}
+                          placeholder="Botón secundario"
+                        />
+                      ) : (
+                        L(config.boton_secundario_texto) || 'Ver más'
+                      )}
                     </Button>
                   )}
                 </div>
