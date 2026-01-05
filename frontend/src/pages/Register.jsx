@@ -208,15 +208,23 @@ export default function Register() {
                   <Input
                     id="contrasena"
                     name="contrasena"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={formData.contrasena}
                     onChange={handleChange}
-                    className="h-12 pl-10 rounded-lg"
+                    className="h-12 pl-10 pr-10 rounded-lg"
                     required
                     minLength={6}
                     data-testid="password-input"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -227,15 +235,23 @@ export default function Register() {
                   <Input
                     id="confirmarContrasena"
                     name="confirmarContrasena"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={formData.confirmarContrasena}
                     onChange={handleChange}
-                    className="h-12 pl-10 rounded-lg"
+                    className="h-12 pl-10 pr-10 rounded-lg"
                     required
                     minLength={6}
                     data-testid="confirm-password-input"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
             </div>
