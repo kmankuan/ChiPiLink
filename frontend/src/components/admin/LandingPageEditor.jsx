@@ -1012,22 +1012,21 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 <img src={config.imagen_url} alt="Preview" className="w-full h-48 object-cover rounded-lg mt-2" />
               )}
             </div>
-            <div className="space-y-2">
-              <Label>Texto Alternativo (Alt)</Label>
-              <Input
-                value={config.alt || ''}
-                onChange={(e) => handleChange('alt', e.target.value)}
-                placeholder="Descripción de la imagen"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Pie de Imagen (Caption)</Label>
-              <Input
-                value={config.caption || ''}
-                onChange={(e) => handleChange('caption', e.target.value)}
-                placeholder="Texto debajo de la imagen"
-              />
-            </div>
+            
+            <MultilingualInput
+              label="Texto Alternativo (Alt)"
+              value={config.alt}
+              onChange={(val) => handleChange('alt', val)}
+              placeholder={{ en: "Image description", es: "Descripción de la imagen", zh: "图片描述" }}
+            />
+            
+            <MultilingualInput
+              label="Pie de Imagen (Caption)"
+              value={config.caption}
+              onChange={(val) => handleChange('caption', val)}
+              placeholder={{ en: "Text below the image", es: "Texto debajo de la imagen", zh: "图片下方的文字" }}
+            />
+            
             <div className="flex items-center gap-2">
               <Switch
                 checked={config.redondeado !== false}
