@@ -154,7 +154,8 @@ export function NotificationBar() {
           <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
             {visibleTypes.map(type => {
               const typeConfig = NOTIFICATION_TYPES[type];
-              const count = countByType[type] || 0;
+              if (!typeConfig) return null;
+              const count = (countByType && countByType[type]) || 0;
               if (count === 0) return null;
               
               const Icon = typeConfig.icon;
