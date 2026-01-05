@@ -535,19 +535,30 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                   </p>
                 )}
                 <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 max-w-2xl">
-                  <EditableText 
-                    value={config.titulo}
-                    onChange={(v) => updateConfig('titulo', v)}
-                    placeholder="Título principal"
-                  />
+                  {isEditMode ? (
+                    <EditableText 
+                      value={L(config.titulo)}
+                      onChange={(v) => updateConfig('titulo', v)}
+                      placeholder="Título principal"
+                    />
+                  ) : (
+                    L(config.titulo) || 'Título principal'
+                  )}
                 </h1>
                 {(config.subtitulo || isEditMode) && (
                   <p className="text-white/80 text-base md:text-lg mb-8 max-w-xl leading-relaxed">
-                    <EditableText 
-                      value={config.subtitulo}
-                      onChange={(v) => updateConfig('subtitulo', v)}
-                      placeholder="Subtítulo o descripción"
-                      multiline
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(config.subtitulo)}
+                        onChange={(v) => updateConfig('subtitulo', v)}
+                        placeholder="Subtítulo o descripción"
+                        multiline
+                      />
+                    ) : (
+                      L(config.subtitulo)
+                    )}
+                  </p>
+                )}
                     />
                   </p>
                 )}
