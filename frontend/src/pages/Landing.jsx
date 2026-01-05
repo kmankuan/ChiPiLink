@@ -470,7 +470,14 @@ function BlockWrapper({ children, isEditMode, onSave, onDelete }) {
 function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) {
   const navigate = useNavigate();
   const { isEditMode } = useEditMode();
+  const { i18n } = useTranslation();
   const config = block.config || {};
+  
+  // Get current language for localized content
+  const lang = i18n.language?.split('-')[0] || 'es';
+  
+  // Helper to get localized text
+  const L = (value) => getLocalizedText(value, lang);
 
   const updateConfig = (key, value) => {
     onUpdateConfig({ [key]: value });
