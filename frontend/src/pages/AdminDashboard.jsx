@@ -1,9 +1,18 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Loader2 } from 'lucide-react';
 import {
   LayoutDashboard,
@@ -15,7 +24,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  MessageSquare
+  MessageSquare,
+  Link as LinkIcon,
+  User,
+  LogOut,
+  Sun,
+  Moon,
+  Home,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
