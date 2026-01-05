@@ -21,6 +21,7 @@ export default function Login() {
     contrasena: ''
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({
