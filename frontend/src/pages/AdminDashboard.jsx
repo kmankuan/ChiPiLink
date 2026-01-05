@@ -135,12 +135,6 @@ export default function AdminDashboard() {
                 ChiPi Link
               </span>
             </Link>
-            
-            <Separator orientation="vertical" className="h-6 hidden sm:block" />
-            
-            <Badge variant="secondary" className="hidden sm:inline-flex">
-              Panel Admin
-            </Badge>
           </div>
 
           {/* Center: Current Module (Mobile) */}
