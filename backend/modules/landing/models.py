@@ -30,6 +30,15 @@ class ConfiguracionSitio(BaseModel):
     direccion: Optional[str] = None
     redes_sociales: dict = {}  # {facebook: url, instagram: url, etc}
     footer_texto: str = "© 2025 Todos los derechos reservados"
+    # SEO & Meta Tags
+    meta_titulo: Optional[str] = None  # Browser tab title (falls back to nombre_sitio)
+    meta_descripcion: Optional[str] = None  # Meta description for SEO
+    meta_keywords: Optional[str] = None  # Meta keywords
+    og_image: Optional[str] = None  # Open Graph image for social sharing
+    # Analytics & Scripts
+    google_analytics_id: Optional[str] = None  # GA4 Measurement ID
+    custom_head_scripts: Optional[str] = None  # Custom scripts for <head>
+    custom_body_scripts: Optional[str] = None  # Custom scripts for <body>
 
 
 class PaginaBuilder(BaseModel):
