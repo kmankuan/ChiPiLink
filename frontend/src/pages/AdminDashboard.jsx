@@ -62,7 +62,8 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -76,6 +77,11 @@ export default function AdminDashboard() {
       navigate('/');
     }
   }, [isAdmin, navigate]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const setActiveModule = (moduleId) => {
     navigate(`/admin#${moduleId}`);
