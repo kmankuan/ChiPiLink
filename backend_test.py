@@ -3589,6 +3589,9 @@ class TextbookStoreAPITester:
             ("Task 2: Thermal Receipt (P2)", self.test_thermal_receipt),
             ("Task 3: Monday.com Integration (P3)", self.test_monday_integration),
             
+            # NEW: Site Configuration SEO Fields Test (Review Request)
+            ("Site Configuration SEO Fields", self.test_site_config_seo_fields),
+            
             # NEW: Unatienda/Platform Store Integration Tests
             ("Platform Store Public Endpoints", self.test_platform_store_public_endpoints),
             ("Platform Store Admin Endpoints", self.test_platform_store_admin_endpoints),
