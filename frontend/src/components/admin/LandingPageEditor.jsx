@@ -956,18 +956,27 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'text':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Título (opcional)</Label>
-              <Input
-                value={config.titulo || ''}
-                onChange={(e) => handleChange('titulo', e.target.value)}
-                placeholder="Título"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                🌐 Soporte multilingüe habilitado.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label>Contenido</Label>
-              <Textarea
-                value={config.contenido || ''}
+            
+            <MultilingualInput
+              label="Título (opcional)"
+              value={config.titulo}
+              onChange={(val) => handleChange('titulo', val)}
+              placeholder={{ en: "Title", es: "Título", zh: "标题" }}
+            />
+            
+            <MultilingualInput
+              label="Contenido"
+              value={config.contenido}
+              onChange={(val) => handleChange('contenido', val)}
+              placeholder={{ en: "Write your content here...", es: "Escribe tu contenido aquí...", zh: "在这里写内容..." }}
+              multiline
+              rows={6}
+            />
                 onChange={(e) => handleChange('contenido', e.target.value)}
                 placeholder="Escribe tu contenido aquí..."
                 rows={6}
