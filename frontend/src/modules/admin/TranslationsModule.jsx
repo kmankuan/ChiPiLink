@@ -266,16 +266,16 @@ export default function TranslationsModule() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
+              <table className="w-full min-w-[800px]">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-3 font-medium">Clave</th>
-                    <th className="text-left p-3 font-medium">🇺🇸 English</th>
-                    <th className="text-left p-3 font-medium">🇵🇦 Español</th>
-                    <th className="text-left p-3 font-medium">🇨🇳 中文</th>
-                    <th className="text-left p-3 font-medium">Estado</th>
-                    <th className="text-right p-3 font-medium">Acciones</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap">Clave</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap">🇺🇸 English</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap">🇵🇦 Español</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap">🇨🇳 中文</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap">Estado</th>
+                    <th className="text-right p-3 font-medium whitespace-nowrap">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
