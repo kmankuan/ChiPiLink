@@ -717,23 +717,6 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
           </section>
         </BlockWrapper>
       );
-                    onChange={(v) => updateConfig('titulo', v)}
-                    placeholder="Título"
-                  />
-                </h2>
-              )}
-              <div className="prose prose-lg max-w-none text-muted-foreground">
-                <EditableText 
-                  value={config.contenido}
-                  onChange={(v) => updateConfig('contenido', v)}
-                  placeholder="Contenido del texto..."
-                  multiline
-                />
-              </div>
-            </div>
-          </section>
-        </BlockWrapper>
-      );
 
     case 'image':
       return (
@@ -742,17 +725,21 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
             <figure style={{ width: config.ancho || '100%', margin: '0 auto' }}>
               <EditableImage 
                 src={config.imagen_url} 
-                alt={config.alt || ''} 
+                alt={L(config.alt) || ''} 
                 className={`w-full h-auto ${config.redondeado !== false ? 'rounded-2xl' : ''}`}
                 onChangeSrc={(url) => updateConfig('imagen_url', url)}
               />
               {(config.caption || isEditMode) && (
                 <figcaption className="text-center text-sm text-muted-foreground mt-4">
-                  <EditableText 
-                    value={config.caption}
-                    onChange={(v) => updateConfig('caption', v)}
-                    placeholder="Pie de imagen"
-                  />
+                  {isEditMode ? (
+                    <EditableText 
+                      value={L(config.caption)}
+                      onChange={(v) => updateConfig('caption', v)}
+                      placeholder="Pie de imagen"
+                    />
+                  ) : (
+                    L(config.caption)
+                  )}
                 </figcaption>
               )}
             </figure>
@@ -773,19 +760,27 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
             >
               <div className="relative z-10 max-w-2xl">
                 <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-                  <EditableText 
-                    value={config.titulo}
-                    onChange={(v) => updateConfig('titulo', v)}
-                    placeholder="Título CTA"
-                  />
+                  {isEditMode ? (
+                    <EditableText 
+                      value={L(config.titulo)}
+                      onChange={(v) => updateConfig('titulo', v)}
+                      placeholder="Título CTA"
+                    />
+                  ) : (
+                    L(config.titulo)
+                  )}
                 </h2>
                 {(config.subtitulo || isEditMode) && (
                   <p className="mb-8 leading-relaxed opacity-90">
-                    <EditableText 
-                      value={config.subtitulo}
-                      onChange={(v) => updateConfig('subtitulo', v)}
-                      placeholder="Subtítulo"
-                    />
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(config.subtitulo)}
+                        onChange={(v) => updateConfig('subtitulo', v)}
+                        placeholder="Subtítulo"
+                      />
+                    ) : (
+                      L(config.subtitulo)
+                    )}
                   </p>
                 )}
                 {(config.boton_texto || isEditMode) && (
@@ -794,10 +789,15 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
                     onClick={() => !isEditMode && navigate(config.boton_url || '/registro')}
                     className="rounded-full px-8 py-6 text-lg font-medium bg-white text-gray-900 hover:bg-white/90"
                   >
-                    <EditableText 
-                      value={config.boton_texto}
-                      onChange={(v) => updateConfig('boton_texto', v)}
-                      placeholder="Texto del botón"
+                    {isEditMode ? (
+                      <EditableText 
+                        value={L(config.boton_texto)}
+                        onChange={(v) => updateConfig('boton_texto', v)}
+                        placeholder="Texto del botón"
+                      />
+                    ) : (
+                      L(config.boton_texto) || 'Comenzar'
+                    )}
                     />
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
