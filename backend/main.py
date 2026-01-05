@@ -147,9 +147,10 @@ async def startup_event():
     # Create database indexes for optimized queries
     await create_indexes()
     
-    # Seed essential data (admin user, site config)
+    # Seed essential data (admin user, site config, translations)
     await seed_admin_user()
     await seed_site_config()
+    await seed_translations()
     
     logger.info("All modules loaded successfully")
 
