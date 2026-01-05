@@ -1457,6 +1457,107 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_site_config_seo_fields(self):
+        """Test Site Configuration with SEO Fields - REVIEW REQUEST"""
+        print("\n🔍 Testing Site Configuration SEO Fields (Review Request)...")
+        
+        success = True
+        
+        # 1. Test GET /api/public/site-config - verify SEO fields are returned
+        old_token = self.token
+        self.token = None  # Remove auth for public endpoint
+        
+        public_config = self.run_test(
+            "GET /api/public/site-config (Check SEO Fields)",
+            "GET",
+            "public/site-config",
+            200
+        )
+        
+        if public_config:
+            # Check for new SEO fields
+            seo_fields = ['meta_titulo', 'meta_descripcion', 'meta_keywords', 'og_image', 'google_analytics_id']
+            for field in seo_fields:
+                if field in public_config:
+                    self.log_test(f"Public Site Config Contains SEO Field '{field}'", True)
+                else:
+                    self.log_test(f"Public Site Config Contains SEO Field '{field}'", False, f"Missing SEO field '{field}'")
+                    success = False
+        else:
+            success = False
+        
+        # Restore token for admin tests
+        self.token = self.admin_token
+        
+        # 2. Test admin login and PUT /api/admin/site-config with SEO fields
+        if self.admin_token:
+            # Test data from review request
+            seo_config_data = {
+                "nombre_sitio": "ChiPi Link",
+                "descripcion": "Tu Super App",
+                "meta_titulo": "ChiPi Link | Tu Super App",
+                "meta_descripcion": "La mejor plataforma para tu negocio",
+                "meta_keywords": "chipi, link, super app, panama",
+                "color_primario": "#16a34a",
+                "color_secundario": "#0f766e",
+                "footer_texto": "© 2025 ChiPi Link"
+            }
+            
+            update_result = self.run_test(
+                "PUT /api/admin/site-config (With SEO Fields)",
+                "PUT",
+                "admin/site-config",
+                200,
+                seo_config_data
+            )
+            
+            if update_result and update_result.get('success'):
+                self.log_test("Site Config Update with SEO Fields", True)
+                
+                # 3. Verify changes were saved with GET /api/public/site-config
+                self.token = None  # Remove auth for public endpoint
+                
+                updated_config = self.run_test(
+                    "GET /api/public/site-config (Verify SEO Changes Saved)",
+                    "GET",
+                    "public/site-config",
+                    200
+                )
+                
+                if updated_config:
+                    # Verify each field was saved correctly
+                    expected_values = {
+                        "nombre_sitio": "ChiPi Link",
+                        "descripcion": "Tu Super App",
+                        "meta_titulo": "ChiPi Link | Tu Super App",
+                        "meta_descripcion": "La mejor plataforma para tu negocio",
+                        "meta_keywords": "chipi, link, super app, panama",
+                        "color_primario": "#16a34a",
+                        "color_secundario": "#0f766e",
+                        "footer_texto": "© 2025 ChiPi Link"
+                    }
+                    
+                    for field, expected_value in expected_values.items():
+                        actual_value = updated_config.get(field)
+                        if actual_value == expected_value:
+                            self.log_test(f"SEO Field '{field}' Saved Correctly", True, f"Value: {actual_value}")
+                        else:
+                            self.log_test(f"SEO Field '{field}' Saved Correctly", False, f"Expected '{expected_value}', got '{actual_value}'")
+                            success = False
+                else:
+                    self.log_test("Verify SEO Changes Saved", False, "Could not retrieve updated config")
+                    success = False
+            else:
+                self.log_test("Site Config Update with SEO Fields", False, "Update did not return success")
+                success = False
+        else:
+            self.log_test("Admin Authentication for SEO Test", False, "Admin token not available")
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_platform_store_public_endpoints(self):
         """Test Platform Store Public Endpoints"""
         print("\n🏪 Testing Platform Store Public Endpoints...")
