@@ -266,16 +266,16 @@ export default function TranslationsModule() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
-              <table className="w-full min-w-[800px]">
-                <thead className="bg-muted/50">
+            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <table className="w-full min-w-[900px]">
+                <thead className="bg-muted/50 sticky top-0">
                   <tr>
-                    <th className="text-left p-3 font-medium whitespace-nowrap">Clave</th>
-                    <th className="text-left p-3 font-medium whitespace-nowrap">🇺🇸 English</th>
-                    <th className="text-left p-3 font-medium whitespace-nowrap">🇵🇦 Español</th>
-                    <th className="text-left p-3 font-medium whitespace-nowrap">🇨🇳 中文</th>
-                    <th className="text-left p-3 font-medium whitespace-nowrap">Estado</th>
-                    <th className="text-right p-3 font-medium whitespace-nowrap">Acciones</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap min-w-[150px]">Clave</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap min-w-[180px]">🇺🇸 English</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap min-w-[180px]">🇵🇦 Español</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap min-w-[180px]">🇨🇳 中文</th>
+                    <th className="text-left p-3 font-medium whitespace-nowrap min-w-[100px]">Estado</th>
+                    <th className="text-right p-3 font-medium whitespace-nowrap min-w-[100px]">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
