@@ -126,6 +126,10 @@ function AppRouter() {
       <Route path="/tv/pingpong" element={<PingPongTV />} />
       <Route path="/tv" element={<PingPongTV />} />
       
+      {/* Ping Pong Canvas - Customizable Widget Layout */}
+      <Route path="/canvas" element={<PingPongCanvas />} />
+      <Route path="/tv/canvas" element={<PingPongCanvas />} />
+      
       {/* Ping Pong Mobile Arbiter */}
       <Route path="/pingpong/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
       
