@@ -142,19 +142,54 @@ export default function PingPongMobileArbiter() {
     }
   };
 
-  const sendAction = (action, data = {}) => {
+  const sendAction = async (action, data = {}) => {
+    // Try WebSocket first
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ action, ...data }));
-      
-      // Haptic feedback
-      if (hapticEnabled && navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-      
-      setLastAction({ action, time: Date.now() });
     } else {
-      setError('No conectado');
+      // Fallback to HTTP
+      try {
+        let response;
+        if (action === 'point') {
+          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/point`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jugador: data.jugador, tipo: data.tipo || 'normal' })
+          });
+        } else if (action === 'undo') {
+          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/undo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } else if (action === 'start') {
+          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } else if (action === 'pause') {
+          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/pause`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        
+        if (response?.ok) {
+          const result = await response.json();
+          if (result.match) {
+            setMatch(result.match);
+          }
+        }
+      } catch (err) {
+        setError('Error al enviar acción');
+      }
     }
+    
+    // Haptic feedback
+    if (hapticEnabled && navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    
+    setLastAction({ action, time: Date.now() });
   };
 
   // ============== EFFECTS ==============
