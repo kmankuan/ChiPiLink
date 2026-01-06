@@ -123,6 +123,7 @@ api_router.include_router(task_supervisor_router)
 api_router.include_router(platform_store_router)
 api_router.include_router(pingpong_router)
 api_router.include_router(pingpong_ws_router)
+api_router.include_router(pingpong_sponsors_router)
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 
