@@ -62,19 +62,56 @@ export default function PingPongMobileArbiter() {
       wsRef.current.onclose = () => {
         console.log('Arbiter WebSocket disconnected');
         setWsConnected(false);
-        // Reconnect after 2 seconds
-        setTimeout(connectWebSocket, 2000);
+        // Fallback to HTTP polling
+        startHttpPolling();
       };
       
       wsRef.current.onerror = (err) => {
         console.error('WebSocket error:', err);
-        setError('Error de conexión');
+        // Fallback to HTTP
+        startHttpPolling();
       };
     } catch (err) {
       console.error('Failed to connect:', err);
-      setError('No se pudo conectar');
+      // Fallback to HTTP
+      startHttpPolling();
     }
   }, [matchId]);
+
+  // HTTP Polling fallback when WebSocket doesn't work
+  const pollingRef = useRef(null);
+  
+  const startHttpPolling = useCallback(() => {
+    if (pollingRef.current) return; // Already polling
+    
+    console.log('Starting HTTP polling fallback');
+    
+    const poll = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/live`);
+        if (response.ok) {
+          const data = await response.json();
+          setMatch(data);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    };
+    
+    // Initial fetch
+    poll();
+    
+    // Poll every 2 seconds
+    pollingRef.current = setInterval(poll, 2000);
+  }, [matchId]);
+
+  const stopHttpPolling = () => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  };
 
   const handleMessage = (data) => {
     console.log('Arbiter received:', data.type);
