@@ -80,7 +80,7 @@ export default function SponsorsAdmin() {
 
   const fetchSponsors = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/sponsors/?activo=`);
+      const response = await fetch(`${API_URL}/api/pingpong/sponsors/`);
       const data = await response.json();
       setSponsors(data);
     } catch (error) {
