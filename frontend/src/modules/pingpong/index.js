@@ -7,6 +7,8 @@ export { default as PingPongDashboard } from './pages/PingPongDashboard';
 export { default as PingPongMatch } from './pages/PingPongMatch';
 export { default as PingPongArbiter } from './pages/PingPongArbiter';
 export { default as PingPongSpectator } from './pages/PingPongSpectator';
+export { default as PingPongTV } from './pages/PingPongTV';
+export { default as PingPongMobileArbiter } from './pages/PingPongMobileArbiter';
 
 // Components
 export { default as ScoreBoard } from './components/ScoreBoard';
