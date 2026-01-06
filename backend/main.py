@@ -79,6 +79,7 @@ from routes.platform_store import router as platform_store_router, init_routes a
 
 # Ping Pong Club - Already modularized
 from routes.pingpong import pingpong_router
+from routes.pingpong_websocket import pingpong_ws_router
 
 # Membership - Already modularized
 from routes.membership import router as membership_router, init_routes as init_membership_routes
