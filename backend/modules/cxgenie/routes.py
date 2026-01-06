@@ -33,10 +33,14 @@ DEFAULT_CXGENIE_CONFIG = {
     # Agent Panel Configuration (para equipo)
     "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
     "workspace_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VfaWQiOiIwM2EzNWY1Zi1mNzc3LTQ4OWEtYjYwYy02OTkzOWFjODljNDkiLCJpYXQiOjE3NDQwODk1NDJ9.cOcc7_FFaetfR1tKQ0IciSfs3qV6JM8hH26eSzsg13M",
-    "agent_panel_base_url": "https://livechat.chipilink.com",
-    # Panel URLs específicos - usando subdominios personalizados
-    "tickets_panel_url": "https://livechat.chipilink.com/help-desk?t=tickets",
-    "chat_panel_url": "https://livechat.chipilink.com/help-desk?t=live-chat&type=ALL",
+    "agent_panel_base_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
+    # Panel URLs específicos - usando subdominios personalizados con workspace ID
+    "tickets_panel_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=tickets",
+    "chat_panel_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=live-chat&type=ALL",
+    "sign_in_url": "https://livechat.chipilink.com/sign-in",
+    # Embedding disabled - CXGenie uses frame-ancestors 'none'
+    "iframe_enabled": False,
+    "iframe_blocked_reason": "CXGenie CSP blocks iframe embedding (frame-ancestors 'none')",
     # Display Settings
     "posicion": "bottom-right",
     "mostrar_en_paginas": ["all"],  # all, public, store, etc.
