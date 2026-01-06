@@ -254,11 +254,32 @@ export default function PingPongTV() {
     // Fetch initial data
     fetchRankings();
     fetchRecentResults();
+    fetchSponsors();
     
     // Refresh rankings periodically
     const interval = setInterval(fetchRankings, 60000);
-    return () => clearInterval(interval);
+    // Refresh sponsors every 5 minutes
+    const sponsorInterval = setInterval(fetchSponsors, 300000);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(sponsorInterval);
+    };
   }, []);
+
+  // Banner rotation effect
+  useEffect(() => {
+    const bannerSponsors = sponsors.banner_bottom;
+    if (bannerSponsors.length <= 1) return;
+    
+    const rotationInterval = sponsorLayout?.espacios?.find(e => e.space_id === 'banner_bottom')?.intervalo_rotacion || 10;
+    
+    const interval = setInterval(() => {
+      setCurrentBannerIndex(prev => (prev + 1) % bannerSponsors.length);
+    }, rotationInterval * 1000);
+    
+    return () => clearInterval(interval);
+  }, [sponsors.banner_bottom, sponsorLayout]);
 
   useEffect(() => {
     // Update URL params when mode changes
