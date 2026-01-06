@@ -758,6 +758,155 @@ export default function PingPongTV() {
           <Minimize2 className="w-6 h-6 text-white" />
         </button>
       )}
+
+      {/* Bottom Banner - Primary Sponsors */}
+      {!(isFullscreen && mode === 'single') && sponsors.banner_bottom?.length > 0 && (
+        <SponsorBanner 
+          sponsors={sponsors.banner_bottom}
+          currentIndex={currentBannerIndex}
+          layout={sponsorLayout}
+        />
+      )}
+    </div>
+  );
+}
+
+// ============== SPONSOR COMPONENTS ==============
+
+function SponsorSpace({ sponsors, position, className = '' }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    if (sponsors.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % sponsors.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [sponsors.length]);
+
+  if (!sponsors || sponsors.length === 0) {
+    return (
+      <div className={`${className} rounded-lg bg-white/5 border border-dashed border-white/20 flex items-center justify-center`}>
+        <span className="text-white/30 text-xs">Patrocinador</span>
+      </div>
+    );
+  }
+
+  const sponsor = sponsors[currentIndex];
+  const logo = sponsor.logo_base64 || sponsor.logo_url;
+
+  return (
+    <div 
+      className={`${className} rounded-lg overflow-hidden transition-all duration-500`}
+      style={{
+        background: sponsor.gradiente 
+          ? `linear-gradient(to right, ${sponsor.color_fondo}, ${sponsor.color_acento || sponsor.color_fondo})`
+          : sponsor.color_fondo || 'transparent',
+        boxShadow: sponsor.sombra ? '0 4px 15px rgba(0,0,0,0.3)' : 'none'
+      }}
+    >
+      <a 
+        href={sponsor.website_url || '#'} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="w-full h-full flex items-center justify-center p-2"
+      >
+        {logo ? (
+          <img 
+            src={logo} 
+            alt={sponsor.nombre}
+            className={`object-contain max-h-full ${
+              sponsor.tamano_logo === 'small' ? 'max-w-[60%]' :
+              sponsor.tamano_logo === 'large' ? 'max-w-[95%]' :
+              'max-w-[80%]'
+            }`}
+          />
+        ) : (
+          <span 
+            className="font-bold text-sm truncate"
+            style={{ color: sponsor.color_texto || '#fff' }}
+          >
+            {sponsor.nombre}
+          </span>
+        )}
+      </a>
+    </div>
+  );
+}
+
+function SponsorBanner({ sponsors, currentIndex, layout }) {
+  const sponsor = sponsors[currentIndex % sponsors.length];
+  
+  if (!sponsor) return null;
+
+  const logo = sponsor.logo_base64 || sponsor.logo_url;
+  const spaceConfig = layout?.espacios?.find(e => e.space_id === 'banner_bottom');
+  
+  return (
+    <div 
+      className="w-full transition-all duration-700 ease-in-out"
+      style={{
+        height: spaceConfig?.alto || '100px',
+        background: sponsor.gradiente 
+          ? `linear-gradient(to right, ${sponsor.color_fondo}, ${sponsor.color_acento || sponsor.color_fondo})`
+          : sponsor.color_fondo || '#1a1a2e'
+      }}
+    >
+      <a 
+        href={sponsor.website_url || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="h-full flex items-center justify-center gap-6 px-8"
+      >
+        {/* Logo */}
+        {logo && (
+          <img 
+            src={logo}
+            alt={sponsor.nombre}
+            className={`object-contain h-[70%] ${
+              sponsor.tamano_logo === 'small' ? 'max-w-[150px]' :
+              sponsor.tamano_logo === 'large' ? 'max-w-[300px]' :
+              'max-w-[200px]'
+            } ${sponsor.animacion === 'pulse' ? 'animate-pulse' : ''}`}
+          />
+        )}
+        
+        {/* Text Content */}
+        <div className="flex flex-col items-start">
+          {sponsor.mostrar_nombre && (
+            <span 
+              className="text-2xl font-bold"
+              style={{ color: sponsor.color_texto || '#fff' }}
+            >
+              {sponsor.nombre}
+            </span>
+          )}
+          {sponsor.texto_promocional && (
+            <span 
+              className="text-lg opacity-80"
+              style={{ color: sponsor.color_texto || '#fff' }}
+            >
+              {sponsor.texto_promocional}
+            </span>
+          )}
+        </div>
+
+        {/* Multiple sponsors indicator */}
+        {sponsors.length > 1 && (
+          <div className="absolute bottom-2 right-4 flex gap-1">
+            {sponsors.map((_, i) => (
+              <div 
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === currentIndex % sponsors.length 
+                    ? 'bg-white' 
+                    : 'bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </a>
     </div>
   );
 }
