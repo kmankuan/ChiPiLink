@@ -10,6 +10,7 @@ export { default as PingPongSpectator } from './pages/PingPongSpectator';
 export { default as PingPongTV } from './pages/PingPongTV';
 export { default as PingPongMobileArbiter } from './pages/PingPongMobileArbiter';
 export { default as SponsorsAdmin } from './pages/SponsorsAdmin';
+export { default as PingPongCanvas } from './pages/PingPongCanvas';
 
 // Components
 export { default as ScoreBoard } from './components/ScoreBoard';
