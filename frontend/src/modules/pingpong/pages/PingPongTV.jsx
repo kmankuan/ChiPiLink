@@ -632,13 +632,20 @@ export default function PingPongTV() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 ${isFullscreen ? '' : ''}`}>
-      {/* Header (hidden in fullscreen single mode) */}
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 flex flex-col ${isFullscreen ? '' : ''}`}>
+      {/* Header with Sponsor Spaces */}
       {!(isFullscreen && mode === 'single') && (
         <header className="bg-black/50 backdrop-blur-md border-b border-white/10">
           <div className="flex items-center justify-between px-4 py-3">
+            {/* Left Sponsor Space */}
+            <SponsorSpace 
+              sponsors={sponsors.header_left} 
+              position="header_left"
+              className="w-[140px] h-[55px] flex-shrink-0"
+            />
+
             {/* Logo */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mx-4">
               <span className="text-3xl">🏓</span>
               <div>
                 <h1 className="text-xl font-bold text-white">Club de Tenis de Mesa</h1>
@@ -711,12 +718,19 @@ export default function PingPongTV() {
                 {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
             </div>
+
+            {/* Right Sponsor Space */}
+            <SponsorSpace 
+              sponsors={sponsors.header_right} 
+              position="header_right"
+              className="w-[140px] h-[55px] flex-shrink-0"
+            />
           </div>
         </header>
       )}
 
       {/* Main Content */}
-      <main className={isFullscreen && mode === 'single' ? 'h-screen' : 'h-[calc(100vh-64px)]'}>
+      <main className={`flex-1 ${isFullscreen && mode === 'single' ? 'h-screen' : ''}`}>
         {mode === 'single' && renderSingleMatch()}
         {mode === 'multi' && renderMultiMatch()}
         {mode === 'dashboard' && renderDashboard()}
