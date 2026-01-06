@@ -50,6 +50,18 @@ export default function PingPongTV() {
   const [recentResults, setRecentResults] = useState([]);
   const [upcomingMatches, setUpcomingMatches] = useState([]);
   
+  // Sponsors state
+  const [sponsors, setSponsors] = useState({
+    header_left: [],
+    header_right: [],
+    banner_top: [],
+    banner_bottom: [],
+    sidebar_left: [],
+    sidebar_right: []
+  });
+  const [sponsorLayout, setSponsorLayout] = useState(null);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  
   // UI state
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
