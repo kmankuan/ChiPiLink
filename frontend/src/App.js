@@ -119,6 +119,13 @@ function AppRouter() {
       <Route path="/pingpong/arbiter/:matchId" element={<PingPongArbiter />} />
       <Route path="/pingpong/spectator/:matchId" element={<PingPongSpectator />} />
       
+      {/* Ping Pong TV Display - Public URL for TVs */}
+      <Route path="/tv/pingpong" element={<PingPongTV />} />
+      <Route path="/tv" element={<PingPongTV />} />
+      
+      {/* Ping Pong Mobile Arbiter */}
+      <Route path="/pingpong/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
+      
       {/* Catalog - Admin only */}
       <Route 
         path="/catalogo" 
