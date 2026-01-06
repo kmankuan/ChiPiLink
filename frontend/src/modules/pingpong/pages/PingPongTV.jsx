@@ -320,6 +320,17 @@ export default function PingPongTV() {
     }
   };
 
+  const fetchSponsors = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/pingpong/sponsors/tv/display`);
+      const data = await response.json();
+      setSponsors(data.sponsors || {});
+      setSponsorLayout(data.layout || null);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+    }
+  };
+
   // ============== UI HELPERS ==============
   
   const toggleFullscreen = () => {
