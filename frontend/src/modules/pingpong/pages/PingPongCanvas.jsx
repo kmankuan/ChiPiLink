@@ -72,29 +72,14 @@ export default function PingPongCanvas() {
   
   const fetchMatches = useCallback(async () => {
     try {
-      // Fetch all active/pending matches
-      const response = await fetch(`${API_URL}/api/pingpong/matches?estado=en_curso,pendiente`);
+      // Fetch all matches (including active and pending)
+      const response = await fetch(`${API_URL}/api/pingpong/matches`);
       const data = await response.json();
-      setActiveMatches(data.filter(m => m.estado === 'en_curso'));
-      setAllMatches(data);
       
-      // Update widget matches with player info
-      const matchesById = {};
-      for (const match of data) {
-        matchesById[match.partido_id] = match;
-      }
-      
-      // Fetch player info for each match
-      for (const match of data) {
-        if (!match.jugador_a_info) {
-          const playerA = await fetchPlayer(match.jugador_a_id);
-          const playerB = await fetchPlayer(match.jugador_b_id);
-          match.jugador_a_info = playerA;
-          match.jugador_b_info = playerB;
-        }
-      }
-      
-      setAllMatches([...data]);
+      // Filter for active and pending
+      const filtered = data.filter(m => m.estado === 'en_curso' || m.estado === 'pendiente');
+      setActiveMatches(filtered.filter(m => m.estado === 'en_curso'));
+      setAllMatches(filtered);
     } catch (error) {
       console.error('Error fetching matches:', error);
     }
