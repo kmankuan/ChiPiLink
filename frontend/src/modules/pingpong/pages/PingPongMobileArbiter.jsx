@@ -165,6 +165,7 @@ export default function PingPongMobileArbiter() {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      stopHttpPolling();
     };
   }, [connectWebSocket]);
 
