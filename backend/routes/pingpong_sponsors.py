@@ -206,7 +206,7 @@ async def crear_patrocinador(sponsor: SponsorCreate):
 async def listar_patrocinadores(
     tipo: Optional[SponsorType] = None,
     posicion: Optional[SponsorPosition] = None,
-    activo: Optional[bool] = True
+    activo: Optional[bool] = None
 ):
     """Listar todos los patrocinadores"""
     from main import db
