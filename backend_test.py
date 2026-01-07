@@ -3833,6 +3833,9 @@ class TextbookStoreAPITester:
             # NEW: Multi-Category Product System Tests (from review request)
             ("Multi-Category Product System", self.test_multi_category_system),
             
+            # NEW: Ping Pong Monday.com Integration Tests (from review request)
+            ("Ping Pong Monday.com Integration", self.test_pingpong_monday_integration),
+            
             # Other existing tests
             ("Block-Based Landing Page - Public Endpoints", self.test_block_based_landing_page_public_endpoints),
             ("Block-Based Landing Page - Admin Endpoints", self.test_block_based_landing_page_admin_endpoints),
