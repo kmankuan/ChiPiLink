@@ -345,6 +345,215 @@ const AlbumCard = ({ album }) => {
   );
 };
 
+// Ping Pong Section Component
+const PingPongSection = () => {
+  const navigate = useNavigate();
+  const [matches, setMatches] = useState([]);
+  const [rankings, setRankings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPingPongData = async () => {
+      try {
+        // Fetch active matches
+        const matchesRes = await axios.get(`${API_URL}/api/pingpong/matches`);
+        const activeMatches = matchesRes.data.filter(m => m.estado === 'en_curso');
+        setMatches(activeMatches.slice(0, 3));
+
+        // Fetch rankings
+        const rankingsRes = await axios.get(`${API_URL}/api/pingpong/rankings?limit=5`);
+        setRankings(rankingsRes.data);
+      } catch (error) {
+        console.error('Error fetching ping pong data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPingPongData();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchPingPongData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 rounded-3xl p-6 md:p-8">
+      <SectionHeader 
+        icon={Trophy} 
+        title="🏓 Club de Tenis de Mesa" 
+        action="Ver todo"
+        actionLink="/pingpong"
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Live Matches */}
+        <div className="lg:col-span-2">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            Partidos en Vivo
+          </h3>
+          
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : matches.length > 0 ? (
+            <div className="space-y-3">
+              {matches.map((match) => (
+                <Card 
+                  key={match.partido_id}
+                  className="cursor-pointer hover:shadow-md transition-all"
+                  onClick={() => navigate(`/pingpong/spectator/${match.partido_id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                          {match.jugador_a_info?.nombre?.[0] || 'A'}
+                        </div>
+                        <div>
+                          <div className="font-medium">{match.jugador_a_info?.apodo || match.jugador_a_info?.nombre || 'Jugador A'}</div>
+                          <div className="text-xs text-muted-foreground">Mesa {match.mesa || '?'}</div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-black">{match.puntos_jugador_a}</span>
+                          <span className="text-muted-foreground">:</span>
+                          <span className="text-2xl font-black">{match.puntos_jugador_b}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Sets: {match.sets_jugador_a} - {match.sets_jugador_b}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="font-medium">{match.jugador_b_info?.apodo || match.jugador_b_info?.nombre || 'Jugador B'}</div>
+                          <div className="text-xs text-red-500 flex items-center gap-1 justify-end">
+                            <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                            EN VIVO
+                          </div>
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+                          {match.jugador_b_info?.nombre?.[0] || 'B'}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="bg-muted/50">
+              <CardContent className="p-8 text-center">
+                <div className="text-4xl mb-2">🏓</div>
+                <p className="text-muted-foreground">No hay partidos en vivo</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-3"
+                  onClick={() => navigate('/pingpong')}
+                >
+                  Ver dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => navigate('/canvas')}
+            >
+              <Play className="h-4 w-4" />
+              Ver TV
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => navigate('/pingpong')}
+            >
+              <Trophy className="h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hidden md:flex"
+              onClick={() => navigate('/pingpong/sponsors')}
+            >
+              <Star className="h-4 w-4" />
+              Patrocinadores
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hidden md:flex"
+              onClick={() => window.open('/tv/pingpong', '_blank')}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Pantalla TV
+            </Button>
+          </div>
+        </div>
+
+        {/* Rankings */}
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+            <Trophy className="h-4 w-4" />
+            Top 5 Ranking
+          </h3>
+          
+          <Card>
+            <CardContent className="p-0">
+              {rankings.length > 0 ? (
+                <div className="divide-y">
+                  {rankings.map((player, index) => (
+                    <div 
+                      key={player.jugador_id} 
+                      className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => navigate('/pingpong')}
+                    >
+                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
+                        index === 0 ? 'bg-yellow-500 text-black' :
+                        index === 1 ? 'bg-gray-400 text-black' :
+                        index === 2 ? 'bg-orange-600 text-white' :
+                        'bg-muted text-muted-foreground'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{player.apodo || player.nombre}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {player.partidos_ganados}W - {player.partidos_perdidos}L
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-primary">{player.elo_rating}</div>
+                        <div className="text-xs text-muted-foreground">ELO</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-muted-foreground text-sm">
+                  No hay jugadores registrados
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // Quick Access Button
 const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => (
   <Link to={to}>
