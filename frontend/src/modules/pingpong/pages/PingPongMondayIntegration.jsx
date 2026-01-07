@@ -205,7 +205,7 @@ export default function PingPongMondayIntegration() {
               alt="Monday.com" 
               className="h-8 w-8"
             />
-            Monday.com + Ping Pong
+            Monday.com + PinpanClub
           </h2>
           <p className="text-muted-foreground">
             Sincroniza jugadores, partidos y resultados con Monday.com
