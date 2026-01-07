@@ -131,7 +131,8 @@ api_router.include_router(platform_store_router)
 
 # PinpanClub - New microservices-ready module
 api_router.include_router(pinpanclub_router)
-# Legacy routes (backward compatibility)
+# Legacy routes (backward compatibility with frontend)
+api_router.include_router(pingpong_router)
 api_router.include_router(pingpong_ws_router)
 api_router.include_router(pingpong_sponsors_router)
 api_router.include_router(pingpong_canvas_router)
