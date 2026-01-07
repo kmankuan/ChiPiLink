@@ -85,20 +85,6 @@ export function Header() {
               Tienda
             </Link>
 
-            {/* Ping Pong - Club de Tenis de Mesa */}
-            <Link 
-              to="/pingpong" 
-              className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                location.pathname.startsWith('/pingpong') || location.pathname.startsWith('/canvas') || location.pathname.startsWith('/tv')
-                  ? 'text-primary' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-              data-testid="pingpong-nav-link"
-            >
-              <Trophy className="h-4 w-4" />
-              Tenis de Mesa
-            </Link>
-
             {/* Catalog only visible for admins */}
             {isAdmin && (
               <Link 
@@ -125,6 +111,19 @@ export function Header() {
                   data-testid="orders-nav-link"
                 >
                   {t('nav.orders')}
+                </Link>
+                {/* Ping Pong - Club de Tenis de Mesa (Solo autenticados) */}
+                <Link 
+                  to="/pingpong" 
+                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                    location.pathname.startsWith('/pingpong') || location.pathname.startsWith('/canvas') || location.pathname.startsWith('/tv')
+                      ? 'text-primary' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  data-testid="pingpong-nav-link"
+                >
+                  <Trophy className="h-4 w-4" />
+                  🏓 Ping Pong
                 </Link>
               </>
             )}
