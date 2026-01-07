@@ -55,7 +55,7 @@ class LayoutRepository(BaseRepository):
     Repository para layouts del canvas.
     """
     
-    COLLECTION_NAME = "pinpanclub_layouts"
+    COLLECTION_NAME = "pingpong_layouts"  # Keep existing collection
     ID_FIELD = "layout_id"
     
     def __init__(self):
