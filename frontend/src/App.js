@@ -45,6 +45,7 @@ import PingPongTV from '@/modules/pingpong/pages/PingPongTV';
 import PingPongMobileArbiter from '@/modules/pingpong/pages/PingPongMobileArbiter';
 import SponsorsAdmin from '@/modules/pingpong/pages/SponsorsAdmin';
 import PingPongCanvas from '@/modules/pingpong/pages/PingPongCanvas';
+import PingPongMondayIntegration from '@/modules/pingpong/pages/PingPongMondayIntegration';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
