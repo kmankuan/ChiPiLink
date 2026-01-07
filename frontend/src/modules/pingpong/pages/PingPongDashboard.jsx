@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,11 +40,15 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [activeMatches, setActiveMatches] = useState([]);
   const [rankings, setRankings] = useState([]);
   const [upcomingTournaments, setUpcomingTournaments] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
+  
+  // Detectar si estamos dentro del admin panel
+  const isInsideAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     fetchDashboardData();
