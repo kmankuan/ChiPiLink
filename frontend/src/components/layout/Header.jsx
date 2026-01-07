@@ -292,6 +292,19 @@ export function Header() {
                 Tienda
               </Link>
 
+              {/* Ping Pong - Tenis de Mesa */}
+              <Link 
+                to="/pingpong"
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                  location.pathname.startsWith('/pingpong') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+                data-testid="mobile-pingpong-link"
+              >
+                <Trophy className="h-4 w-4" />
+                🏓 Tenis de Mesa
+              </Link>
+
               {/* Catalog only for admins */}
               {isAdmin && (
                 <Link 
