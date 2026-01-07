@@ -122,6 +122,7 @@ function AppRouter() {
       <Route path="/pingpong/arbiter/:matchId" element={<PingPongArbiter />} />
       <Route path="/pingpong/spectator/:matchId" element={<PingPongSpectator />} />
       <Route path="/pingpong/sponsors" element={<SponsorsAdmin />} />
+      <Route path="/pingpong/monday" element={<PingPongMondayIntegration />} />
       
       {/* Ping Pong TV Display - Public URL for TVs */}
       <Route path="/tv/pingpong" element={<PingPongTV />} />
