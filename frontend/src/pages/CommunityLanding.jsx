@@ -558,7 +558,7 @@ export default function CommunityLanding() {
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: Users, label: 'Miembros', value: '150+' },
-            { icon: Trophy, label: 'Torneos', value: '12' },
+            { icon: Store, label: 'Productos', value: '50+' },
             { icon: Calendar, label: 'Eventos', value: '24' },
             { icon: Image, label: 'Fotos', value: '500+' }
           ].map((stat, idx) => (
