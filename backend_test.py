@@ -1720,6 +1720,236 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_pingpong_monday_integration(self):
+        """Test Ping Pong Monday.com Integration - REVIEW REQUEST"""
+        print("\n🏓 Testing Ping Pong Monday.com Integration...")
+        
+        # First, try to login with provided credentials
+        login_data = {
+            "email": "teck@koh.one",
+            "contrasena": "Acdb##0897"
+        }
+        
+        login_result = self.run_test(
+            "Login with Ping Pong Credentials",
+            "POST",
+            "auth/login",
+            200,
+            login_data
+        )
+        
+        if not login_result or 'token' not in login_result:
+            # If login fails, use admin token
+            print("⚠️ Ping Pong user login failed, using admin token")
+            old_token = self.token
+            self.token = self.admin_token
+        else:
+            old_token = self.token
+            self.token = login_result['token']
+            print("✅ Successfully logged in with ping pong credentials")
+        
+        success = True
+        
+        # 1. Test GET /api/pingpong/monday/status
+        status_result = self.run_test(
+            "GET /api/pingpong/monday/status",
+            "GET",
+            "pingpong/monday/status",
+            200
+        )
+        
+        if status_result:
+            # Validate required fields
+            required_fields = ['api_key_configured', 'players_board_configured', 'matches_board_configured', 'connection_status']
+            for field in required_fields:
+                if field in status_result:
+                    self.log_test(f"Status Contains '{field}'", True)
+                else:
+                    self.log_test(f"Status Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+            
+            # Check if monday_user is present when connected
+            if status_result.get('connection_status') == 'connected' and 'monday_user' in status_result:
+                self.log_test("Status Contains Monday User Info", True, f"User: {status_result['monday_user']}")
+        else:
+            success = False
+        
+        # 2. Test GET /api/pingpong/monday/config
+        config_result = self.run_test(
+            "GET /api/pingpong/monday/config",
+            "GET",
+            "pingpong/monday/config",
+            200
+        )
+        
+        if config_result:
+            required_fields = ['has_api_key', 'config']
+            for field in required_fields:
+                if field in config_result:
+                    self.log_test(f"Config Contains '{field}'", True)
+                else:
+                    self.log_test(f"Config Contains '{field}'", False, f"Missing '{field}' field")
+                    success = False
+            
+            # Validate config structure
+            if 'config' in config_result:
+                config = config_result['config']
+                config_fields = ['players_board_id', 'matches_board_id', 'auto_sync_players']
+                for field in config_fields:
+                    if field in config:
+                        self.log_test(f"Config Object Contains '{field}'", True)
+                    else:
+                        self.log_test(f"Config Object Contains '{field}'", False, f"Missing '{field}' field")
+        else:
+            success = False
+        
+        # 3. Test PUT /api/pingpong/monday/config
+        test_config = {
+            "players_board_id": "test123",
+            "matches_board_id": "test456", 
+            "auto_sync_players": True
+        }
+        
+        update_config_result = self.run_test(
+            "PUT /api/pingpong/monday/config",
+            "PUT",
+            "pingpong/monday/config",
+            200,
+            test_config
+        )
+        
+        if update_config_result:
+            if update_config_result.get('success'):
+                self.log_test("Config Update Success", True)
+            else:
+                self.log_test("Config Update Success", False, "Update did not return success")
+                success = False
+        else:
+            success = False
+        
+        # 4. Test GET /api/pingpong/monday/boards
+        boards_result = self.run_test(
+            "GET /api/pingpong/monday/boards",
+            "GET",
+            "pingpong/monday/boards",
+            200
+        )
+        
+        if boards_result:
+            if 'boards' in boards_result:
+                boards = boards_result['boards']
+                if isinstance(boards, list):
+                    self.log_test("Boards List Structure Valid", True, f"Found {len(boards)} boards")
+                    
+                    # Check board structure if boards exist
+                    if len(boards) > 0:
+                        first_board = boards[0]
+                        board_fields = ['id', 'name', 'columns', 'groups']
+                        for field in board_fields:
+                            if field in first_board:
+                                self.log_test(f"Board Contains '{field}'", True)
+                            else:
+                                self.log_test(f"Board Contains '{field}'", False, f"Missing '{field}' field")
+                else:
+                    self.log_test("Boards List Structure Valid", False, "Boards is not a list")
+                    success = False
+            else:
+                self.log_test("Boards Response Contains 'boards'", False, "Missing 'boards' field")
+                success = False
+        else:
+            success = False
+        
+        # 5. Test GET /api/pingpong/monday/stats
+        stats_result = self.run_test(
+            "GET /api/pingpong/monday/stats",
+            "GET",
+            "pingpong/monday/stats",
+            200
+        )
+        
+        if stats_result:
+            required_sections = ['players', 'matches']
+            for section in required_sections:
+                if section in stats_result:
+                    self.log_test(f"Stats Contains '{section}' Section", True)
+                    
+                    # Check section structure
+                    if section == 'players':
+                        player_fields = ['total', 'synced', 'pending']
+                        for field in player_fields:
+                            if field in stats_result[section]:
+                                self.log_test(f"Players Stats Contains '{field}'", True)
+                            else:
+                                self.log_test(f"Players Stats Contains '{field}'", False, f"Missing '{field}' field")
+                    
+                    elif section == 'matches':
+                        match_fields = ['total', 'synced', 'by_status']
+                        for field in match_fields:
+                            if field in stats_result[section]:
+                                self.log_test(f"Matches Stats Contains '{field}'", True)
+                            else:
+                                self.log_test(f"Matches Stats Contains '{field}'", False, f"Missing '{field}' field")
+                else:
+                    self.log_test(f"Stats Contains '{section}' Section", False, f"Missing '{section}' section")
+                    success = False
+        else:
+            success = False
+        
+        # 6. Test POST /api/pingpong/monday/test
+        test_connection_result = self.run_test(
+            "POST /api/pingpong/monday/test",
+            "POST",
+            "pingpong/monday/test",
+            200
+        )
+        
+        if test_connection_result:
+            if test_connection_result.get('success'):
+                self.log_test("Monday Connection Test Success", True)
+                
+                # Check for user and sample_boards
+                if 'user' in test_connection_result:
+                    self.log_test("Test Returns Monday User Info", True)
+                if 'sample_boards' in test_connection_result:
+                    self.log_test("Test Returns Sample Boards", True)
+            else:
+                self.log_test("Monday Connection Test Success", False, "Test did not return success")
+                success = False
+        else:
+            success = False
+        
+        # 7. Test POST /api/pingpong/monday/sync/players (expect failure if no board configured)
+        sync_players_result = self.run_test(
+            "POST /api/pingpong/monday/sync/players (No Board)",
+            "POST",
+            "pingpong/monday/sync/players",
+            400  # Expecting failure due to no board configured
+        )
+        
+        # This should fail with 400 since we set test board IDs
+        if sync_players_result is None:  # None means test "passed" (got expected 400)
+            self.log_test("Players Sync Fails Without Board Config", True, "Expected 400 error received")
+        else:
+            self.log_test("Players Sync Fails Without Board Config", False, "Should have failed with 400")
+        
+        # 8. Test POST /api/pingpong/monday/sync/matches/active (expect failure if no board configured)
+        sync_matches_result = self.run_test(
+            "POST /api/pingpong/monday/sync/matches/active (No Board)",
+            "POST",
+            "pingpong/monday/sync/matches/active",
+            400  # Expecting failure due to no board configured
+        )
+        
+        # This should fail with 400 since we set test board IDs
+        if sync_matches_result is None:  # None means test "passed" (got expected 400)
+            self.log_test("Matches Sync Fails Without Board Config", True, "Expected 400 error received")
+        else:
+            self.log_test("Matches Sync Fails Without Board Config", False, "Should have failed with 400")
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
     def test_platform_store_yappy_integration(self):
         """Test Platform Store Yappy Integration"""
         print("\n💳 Testing Platform Store Yappy Integration...")
