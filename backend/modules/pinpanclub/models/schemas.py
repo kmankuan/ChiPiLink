@@ -112,13 +112,13 @@ class Match(MatchBase):
     set_actual: int = 1
     historial_sets: List[Dict] = []
     ganador_id: Optional[str] = None
-    fecha_inicio: Optional[str] = None
-    fecha_fin: Optional[str] = None
+    fecha_inicio: Optional[Any] = None  # Can be string or datetime
+    fecha_fin: Optional[Any] = None  # Can be string or datetime
     monday_item_id: Optional[str] = None
     jugador_a_info: Optional[Dict] = None
     jugador_b_info: Optional[Dict] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
+    created_at: Optional[Any] = None
+    updated_at: Optional[Any] = None
 
 
 # ============== TOURNAMENT MODELS ==============
