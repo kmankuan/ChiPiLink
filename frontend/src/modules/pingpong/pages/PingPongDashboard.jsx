@@ -140,6 +140,37 @@ export default function PingPongDashboard() {
                 <Trophy className="h-4 w-4 mr-2" />
                 Torneos
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Administración
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate('/pingpong/monday')}>
+                    <img 
+                      src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
+                      alt="Monday.com" 
+                      className="h-4 w-4 mr-2"
+                    />
+                    Monday.com
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/pingpong/sponsors')}>
+                    <Image className="h-4 w-4 mr-2" />
+                    Patrocinadores
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/tv/pingpong')}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Vista TV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/canvas')}>
+                    <CalendarDays className="h-4 w-4 mr-2" />
+                    Canvas
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
                 <Plus className="h-4 w-4 mr-2" />
                 Nuevo Partido
