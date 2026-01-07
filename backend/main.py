@@ -127,11 +127,13 @@ api_router.include_router(task_supervisor_router)
 
 # Register existing modular routes
 api_router.include_router(platform_store_router)
-api_router.include_router(pingpong_router)
+
+# PinpanClub - New microservices-ready module
+api_router.include_router(pinpanclub_router)
+# Legacy routes (backward compatibility)
 api_router.include_router(pingpong_ws_router)
 api_router.include_router(pingpong_sponsors_router)
 api_router.include_router(pingpong_canvas_router)
-api_router.include_router(pingpong_monday_router)
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 
