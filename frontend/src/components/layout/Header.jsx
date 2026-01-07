@@ -112,7 +112,7 @@ export function Header() {
                 >
                   {t('nav.orders')}
                 </Link>
-                {/* Ping Pong - Club de Tenis de Mesa (Solo autenticados) */}
+                {/* PinpanClub - Club de Tenis de Mesa (Solo autenticados) */}
                 <Link 
                   to="/pingpong" 
                   className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
@@ -123,7 +123,7 @@ export function Header() {
                   data-testid="pingpong-nav-link"
                 >
                   <Trophy className="h-4 w-4" />
-                  🏓 Ping Pong
+                  PinpanClub
                 </Link>
               </>
             )}
