@@ -28,7 +28,8 @@ import {
   Users,
   LayoutDashboard,
   Link as LinkIcon,
-  Store
+  Store,
+  Trophy
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
