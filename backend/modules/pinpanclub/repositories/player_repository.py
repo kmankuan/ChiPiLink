@@ -14,7 +14,7 @@ class PlayerRepository(BaseRepository):
     Maneja todas las operaciones de base de datos para jugadores.
     """
     
-    COLLECTION_NAME = "pinpanclub_players"
+    COLLECTION_NAME = "pingpong_players"  # Keep existing collection for backward compatibility
     ID_FIELD = "jugador_id"
     
     def __init__(self):
