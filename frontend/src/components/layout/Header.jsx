@@ -208,7 +208,7 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link to="/pingpong" className="flex items-center gap-2" data-testid="menu-pingpong">
                       <Trophy className="h-4 w-4" />
-                      🏓 Tenis de Mesa
+                      PinpanClub
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
