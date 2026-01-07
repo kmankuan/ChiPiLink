@@ -3838,7 +3838,7 @@ class TextbookStoreAPITester:
             
             # Other existing tests
             ("Block-Based Landing Page - Public Endpoints", self.test_block_based_landing_page_public_endpoints),
-            ("Block-Based Landing Page - Admin Endpoints", self.test_block_based_landing_page_admin_endpoints),
+            ("Block Templates API", self.test_block_templates_api_review_request),
             ("Block CRUD Operations", self.test_block_crud_operations),
             ("Block Reorder Operations", self.test_block_reorder_operations),
             ("Landing Page Publish Toggle", self.test_landing_page_publish_toggle),
