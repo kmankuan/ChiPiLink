@@ -82,6 +82,7 @@ from routes.pingpong import pingpong_router
 from routes.pingpong_websocket import pingpong_ws_router
 from routes.pingpong_sponsors import router as pingpong_sponsors_router
 from routes.pingpong_canvas import router as pingpong_canvas_router
+from routes.pingpong_monday import router as pingpong_monday_router
 
 # Membership - Already modularized
 from routes.membership import router as membership_router, init_routes as init_membership_routes
