@@ -127,6 +127,7 @@ api_router.include_router(pingpong_router)
 api_router.include_router(pingpong_ws_router)
 api_router.include_router(pingpong_sponsors_router)
 api_router.include_router(pingpong_canvas_router)
+api_router.include_router(pingpong_monday_router)
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 
