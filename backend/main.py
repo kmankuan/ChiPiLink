@@ -98,6 +98,9 @@ init_platform_store_routes(db, get_admin_user, get_current_user)
 init_membership_routes(db, get_admin_user, get_current_user)
 init_translations_routes(db, get_admin_user, get_current_user)
 
+# Initialize PinpanClub module (event handlers)
+init_pinpanclub()
+
 # ============== REGISTER ROUTERS ==============
 
 # Create main API router with /api prefix
