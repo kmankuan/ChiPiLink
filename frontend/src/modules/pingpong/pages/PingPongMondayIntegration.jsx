@@ -623,14 +623,14 @@ export default function PingPongMondayIntegration() {
                   Board de Jugadores
                 </Label>
                 <Select
-                  value={config.players_board_id}
-                  onValueChange={(value) => setConfig({ ...config, players_board_id: value })}
+                  value={config.players_board_id || "none"}
+                  onValueChange={(value) => setConfig({ ...config, players_board_id: value === "none" ? "" : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar board..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin configurar</SelectItem>
+                    <SelectItem value="none">Sin configurar</SelectItem>
                     {boards.map((board) => (
                       <SelectItem key={board.id} value={board.id}>
                         {board.name} ({board.items_count} items)
@@ -649,14 +649,14 @@ export default function PingPongMondayIntegration() {
                   Board de Partidos
                 </Label>
                 <Select
-                  value={config.matches_board_id}
-                  onValueChange={(value) => setConfig({ ...config, matches_board_id: value })}
+                  value={config.matches_board_id || "none"}
+                  onValueChange={(value) => setConfig({ ...config, matches_board_id: value === "none" ? "" : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar board..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin configurar</SelectItem>
+                    <SelectItem value="none">Sin configurar</SelectItem>
                     {boards.map((board) => (
                       <SelectItem key={board.id} value={board.id}>
                         {board.name} ({board.items_count} items)
@@ -675,14 +675,14 @@ export default function PingPongMondayIntegration() {
                   Board de Torneos (Opcional)
                 </Label>
                 <Select
-                  value={config.tournaments_board_id}
-                  onValueChange={(value) => setConfig({ ...config, tournaments_board_id: value })}
+                  value={config.tournaments_board_id || "none"}
+                  onValueChange={(value) => setConfig({ ...config, tournaments_board_id: value === "none" ? "" : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar board..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin configurar</SelectItem>
+                    <SelectItem value="none">Sin configurar</SelectItem>
                     {boards.map((board) => (
                       <SelectItem key={board.id} value={board.id}>
                         {board.name} ({board.items_count} items)
