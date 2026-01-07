@@ -14,7 +14,7 @@ class ConfigRepository(BaseRepository):
     Maneja configuraciones de Monday.com, layouts, etc.
     """
     
-    COLLECTION_NAME = "pinpanclub_config"
+    COLLECTION_NAME = "app_config"  # Use existing app_config collection
     ID_FIELD = "config_key"
     
     def __init__(self):
