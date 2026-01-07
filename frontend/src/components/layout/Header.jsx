@@ -327,7 +327,7 @@ export function Header() {
                   >
                     {t('nav.orders')}
                   </Link>
-                  {/* Ping Pong - Solo autenticados */}
+                  {/* PinpanClub - Solo autenticados */}
                   <Link 
                     to="/pingpong"
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
@@ -337,7 +337,7 @@ export function Header() {
                     data-testid="mobile-pingpong-link"
                   >
                     <Trophy className="h-4 w-4" />
-                    🏓 Ping Pong
+                    PinpanClub
                   </Link>
                 </>
               )}
