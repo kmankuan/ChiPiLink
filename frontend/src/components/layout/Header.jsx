@@ -207,6 +207,12 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link to="/pingpong" className="flex items-center gap-2" data-testid="menu-pingpong">
+                      <Trophy className="h-4 w-4" />
+                      🏓 Tenis de Mesa
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link to="/dashboard/estudiantes" className="flex items-center gap-2" data-testid="menu-students">
                       <Users className="h-4 w-4" />
                       {t('nav.students')}
