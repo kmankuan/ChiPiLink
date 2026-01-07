@@ -123,68 +123,108 @@ export default function PingPongDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link to="/" className="text-muted-foreground hover:text-foreground">
-                ← Inicio
-              </Link>
-              <span className="text-2xl">🏓</span>
-              <h1 className="font-bold text-xl">PinpanClub</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
-                <Users className="h-4 w-4 mr-2" />
-                Jugadores
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
-                <Trophy className="h-4 w-4 mr-2" />
-                Torneos
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Administración
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate('/pingpong/monday')}>
-                    <img 
-                      src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
-                      alt="Monday.com" 
-                      className="h-4 w-4 mr-2"
-                    />
-                    Monday.com
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/pingpong/sponsors')}>
-                    <Image className="h-4 w-4 mr-2" />
-                    Patrocinadores
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/tv/pingpong')}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Vista TV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/canvas')}>
-                    <CalendarDays className="h-4 w-4 mr-2" />
-                    Canvas
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Partido
-              </Button>
+    <div className={isInsideAdmin ? "" : "min-h-screen bg-background"}>
+      {/* Header - Solo mostrar si NO estamos dentro del admin */}
+      {!isInsideAdmin && (
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Link to="/" className="text-muted-foreground hover:text-foreground">
+                  ← Inicio
+                </Link>
+                <span className="text-2xl">🏓</span>
+                <h1 className="font-bold text-xl">PinpanClub</h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
+                  <Users className="h-4 w-4 mr-2" />
+                  Jugadores
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Torneos
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configuración
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate('/pingpong/monday')}>
+                      <img 
+                        src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
+                        alt="Monday.com" 
+                        className="h-4 w-4 mr-2"
+                      />
+                      Monday.com
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/pingpong/sponsors')}>
+                      <Image className="h-4 w-4 mr-2" />
+                      Patrocinadores
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/tv/pingpong')}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Vista TV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/canvas')}>
+                      <CalendarDays className="h-4 w-4 mr-2" />
+                      Canvas
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Partido
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
+      {/* Quick Actions Bar - Solo dentro del admin */}
+      {isInsideAdmin && (
+        <div className="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b">
+          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
+            <Users className="h-4 w-4 mr-2" />
+            Jugadores
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
+            <Trophy className="h-4 w-4 mr-2" />
+            Torneos
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/monday')}>
+            <img 
+              src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
+              alt="Monday.com" 
+              className="h-4 w-4 mr-2"
+            />
+            Monday.com
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/sponsors')}>
+            <Image className="h-4 w-4 mr-2" />
+            Patrocinadores
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.open('/tv/pingpong', '_blank')}>
+            <Eye className="h-4 w-4 mr-2" />
+            Vista TV
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.open('/canvas', '_blank')}>
+            <CalendarDays className="h-4 w-4 mr-2" />
+            Canvas
+          </Button>
+          <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Partido
+          </Button>
+        </div>
+      )}
+
+      <main className={isInsideAdmin ? "space-y-6" : "container mx-auto px-4 py-8 space-y-8"}>
         {/* Quick Stats */}
         <QuickStats />
 
