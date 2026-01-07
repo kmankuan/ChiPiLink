@@ -541,9 +541,6 @@ export default function CommunityLanding() {
           </section>
         )}
 
-        {/* Ping Pong Section */}
-        <PingPongSection />
-
         {/* Telegram Section (Placeholder) */}
         <section className="bg-[#0088cc]/5 rounded-3xl p-6 md:p-8 text-center">
           <div className="max-w-md mx-auto">
