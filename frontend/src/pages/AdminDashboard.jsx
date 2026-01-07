@@ -31,7 +31,8 @@ import {
   Sun,
   Moon,
   Home,
-  X
+  X,
+  Trophy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
