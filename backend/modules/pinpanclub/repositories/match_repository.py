@@ -14,7 +14,7 @@ class MatchRepository(BaseRepository):
     Maneja todas las operaciones de base de datos para partidos.
     """
     
-    COLLECTION_NAME = "pinpanclub_matches"
+    COLLECTION_NAME = "pingpong_matches"  # Keep existing collection for backward compatibility
     ID_FIELD = "partido_id"
     
     def __init__(self):
