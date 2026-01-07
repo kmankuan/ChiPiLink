@@ -182,7 +182,7 @@ class MondayService(BaseService):
         if player.get("monday_item_id"):
             return player["monday_item_id"]
         
-        nombre_completo = f"{player.get('nombre', '')} {player.get('apellido', '')}".
+        nombre_completo = f"{player.get('nombre', '')} {player.get('apellido', '')}"
         if player.get("apodo"):
             nombre_completo += f" ({player['apodo']})"
         
