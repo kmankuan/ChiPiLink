@@ -72,8 +72,8 @@ class Player(PlayerBase):
     partidos_perdidos: int = 0
     activo: bool = True
     monday_item_id: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
+    created_at: Optional[Any] = None
+    updated_at: Optional[Any] = None
 
 
 # ============== MATCH MODELS ==============
