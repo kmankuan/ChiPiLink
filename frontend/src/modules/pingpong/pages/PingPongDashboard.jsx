@@ -129,7 +129,7 @@ export default function PingPongDashboard() {
                 ← Inicio
               </Link>
               <span className="text-2xl">🏓</span>
-              <h1 className="font-bold text-xl">Club de Ping Pong</h1>
+              <h1 className="font-bold text-xl">PinpanClub</h1>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
