@@ -13,7 +13,7 @@ class SponsorRepository(BaseRepository):
     Repository para patrocinadores de PinpanClub.
     """
     
-    COLLECTION_NAME = "pinpanclub_sponsors"
+    COLLECTION_NAME = "pingpong_sponsors"  # Keep existing collection
     ID_FIELD = "sponsor_id"
     
     def __init__(self):
