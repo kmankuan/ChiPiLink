@@ -22,8 +22,18 @@ import {
   Eye,
   Gavel,
   Medal,
-  Target
+  Target,
+  Settings,
+  Image,
+  CalendarDays
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import ScoreBoard from '../components/ScoreBoard';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
