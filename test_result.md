@@ -375,6 +375,18 @@ new_features_testing:
         comment: "✅ FEATURE WORKING: All 9 admin tabs functional and contain content: Resumen (overview stats), Productos (product management), Pedidos (orders), Inventario (inventory), Matrículas (enrollments), Google Sheets (integration), Formulario (form config), Landing Page (page editor), Monday.com (integration). App loads without errors, all tabs clickable and display appropriate content."
 
 frontend:
+  - task: "Ping Pong Monday.com Integration Frontend"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/modules/pingpong/pages/PingPongMondayIntegration.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "🏓 PING PONG MONDAY.COM INTEGRATION FRONTEND TESTING COMPLETED SUCCESSFULLY! Comprehensive UI testing performed on all requested elements from review request: ✅ MAIN PAGE LOAD: Title 'Monday.com + Ping Pong' displayed with Monday.com logo, subtitle 'Sincroniza jugadores, partidos y resultados con Monday.com' visible. ✅ STATUS CARDS: All 4 status cards verified - Conexión shows 'Conectado' with green checkmark and user name 'Kevin', Board Jugadores shows 'Configurado' status, Board Partidos shows 'Configurado' status, Board Torneos shows 'Pendiente' status in yellow. ✅ TABS SECTION: Both tabs present and functional - 'Sincronización' and 'Estadísticas' tabs working correctly, statistics content displays when clicked, tab switching working properly. ✅ SYNC CARDS: All 3 sync cards verified - 'Sincronizar Jugadores' with stats (Total: 4, Sincronizados: 0, Pendientes: 4) and green sync button, 'Sincronizar Partidos' with stats (Total: 4, En Curso: 4, Pendientes: 0) and orange sync button, 'Sincronizar Resultados' with stats (Finalizados: 0, Cancelados: 0) and green sync button. ✅ CONFIGURATION DIALOG: 'Configurar' button opens dialog with title 'Configurar Integración Monday.com', 3 board selectors (Board de Jugadores, Board de Partidos, Board de Torneos), 'Sincronización Automática' section with 3 toggle switches, 'Probar Conexión' button present, 'Cancelar' button closes dialog. ✅ HELP SECTION: Help section appropriately hidden when boards are configured (expected behavior). ✅ MOBILE RESPONSIVENESS: All elements accessible and readable on mobile viewport (375x667), status cards stack properly, tabs functional, title and main elements visible. All requirements from review request successfully verified and working perfectly. Frontend integration is fully functional and ready for production use."
+
   - task: "Landing Page Editor Tab"
     implemented: true
     working: true
