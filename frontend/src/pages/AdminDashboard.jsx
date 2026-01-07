@@ -43,6 +43,7 @@ const OrdersModule = lazy(() => import('@/modules/store/OrdersModule'));
 const CustomersModule = lazy(() => import('@/modules/customers/CustomersModule'));
 const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
+const PinpanClubModule = lazy(() => import('@/modules/pingpong/pages/PingPongDashboard'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
