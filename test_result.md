@@ -553,6 +553,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
   completed_testing:
+    - "Ping Pong Monday.com Integration"
     - "Unatienda/Platform Store Integration"
     - "Yappy Payment Gateway Integration"
     - "Yappy Checkout Flow Implementation"
