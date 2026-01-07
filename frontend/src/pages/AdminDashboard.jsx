@@ -58,6 +58,7 @@ const navItems = [
   { id: 'store', label: 'Tienda', icon: ShoppingBag },
   { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
   { id: 'customers', label: 'Clientes', icon: Users },
+  { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy },
   { id: 'admin', label: 'Administración', icon: Settings },
   { id: 'integrations', label: 'Integraciones', icon: Plug },
   { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
