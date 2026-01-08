@@ -4162,6 +4162,11 @@ class TextbookStoreAPITester:
         
         # Test sequence - prioritizing the review request tests
         tests = [
+            # REVIEW REQUEST: Auth and Store Module Refactored Endpoints
+            ("Auth Module Refactored Endpoints", self.test_auth_module_refactored_endpoints),
+            ("Store Module Refactored Endpoints", self.test_store_module_refactored_endpoints),
+            ("Backward Compatibility Endpoints", self.test_backward_compatibility_endpoints),
+            
             # REVIEW REQUEST: CXGenie Integration and New Placeholder Modules
             ("CXGenie Integration", self.test_cxgenie_integration),
             ("Placeholder Modules Status", self.test_placeholder_modules),
@@ -4174,9 +4179,6 @@ class TextbookStoreAPITester:
             
             # NEW: Site Configuration SEO Fields Test (Review Request)
             ("Site Configuration SEO Fields", self.test_site_config_seo_fields),
-            
-            # NEW: Store Module Refactored Endpoints Test (Review Request)
-            ("Store Module Refactored Endpoints", self.test_store_module_refactored_endpoints),
             
             # NEW: Unatienda/Platform Store Integration Tests
             ("Platform Store Public Endpoints", self.test_platform_store_public_endpoints),
