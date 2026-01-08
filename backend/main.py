@@ -30,8 +30,11 @@ from core.auth import get_current_user, get_admin_user
 
 # ============== IMPORT MODULE ROUTERS ==============
 
-# Auth Module
-from modules.auth.routes import router as auth_router
+# Auth Module - Refactored as Microservices-Ready Module
+from modules.auth import init_module as init_auth
+from modules.auth import auth_refactored_router
+# Legacy routes (keep for backward compatibility with frontend)
+from modules.auth.legacy_routes import router as auth_router
 
 # Store Module (products, orders, inventory, categories, students)
 # Refactored as Microservices-Ready Module
