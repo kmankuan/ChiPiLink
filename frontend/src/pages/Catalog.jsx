@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Book, Search, Filter, ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
