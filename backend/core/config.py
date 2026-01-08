@@ -55,7 +55,8 @@ settings = Settings()
 # Helper to get Monday Board ID from DB or env
 async def get_monday_board_id(db):
     """Get Monday Board ID from database or fallback to env"""
-    config = await db.app_config.find_one({"config_key": "monday_board_id"})
+    from .constants import CoreCollections
+    config = await db[CoreCollections.APP_CONFIG].find_one({"config_key": "monday_board_id"})
     if config and config.get("value"):
         return config["value"]
     return MONDAY_BOARD_ID_ENV
