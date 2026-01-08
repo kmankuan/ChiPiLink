@@ -1457,106 +1457,198 @@ class ChiPiLinkMicroservicesAPITester:
         self.token = old_token
         return success
 
-    def test_site_config_seo_fields(self):
-        """Test Site Configuration with SEO Fields - REVIEW REQUEST"""
-        print("\n🔍 Testing Site Configuration SEO Fields (Review Request)...")
+    def test_microservices_migration(self):
+        """Test microservices architecture migration - REVIEW REQUEST SPECIFIC"""
+        print("\n🏗️ Testing Microservices Architecture Migration...")
         
         success = True
         
-        # 1. Test GET /api/public/site-config - verify SEO fields are returned
-        old_token = self.token
-        self.token = None  # Remove auth for public endpoint
+        # ============== 1. AUTH MODULE (new collection: auth_users) ==============
+        print("\n🔐 Testing Auth Module with new auth_users collection...")
         
-        public_config = self.run_test(
-            "GET /api/public/site-config (Check SEO Fields)",
+        # Test POST /api/auth-v2/login with admin@libreria.com/admin
+        login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        auth_login = self.run_test(
+            "POST /api/auth-v2/login (admin@libreria.com/admin)",
+            "POST",
+            "auth-v2/login",
+            200,
+            login_data
+        )
+        
+        auth_token = None
+        if auth_login and 'token' in auth_login:
+            auth_token = auth_login['token']
+            self.log_test("Auth V2 Token Received", True, "Login successful with new auth_users collection")
+        else:
+            self.log_test("Auth V2 Token Received", False, "Login failed - auth_users collection may not be working")
+            success = False
+        
+        # ============== 2. STORE MODULE (new collections: store_products, store_categories) ==============
+        print("\n🏪 Testing Store Module with new collections...")
+        
+        if auth_token:
+            old_token = self.token
+            self.token = auth_token
+            
+            # Test GET /api/store/categories
+            categories = self.run_test(
+                "GET /api/store/categories",
+                "GET",
+                "store/categories",
+                200
+            )
+            
+            if categories:
+                self.log_test("Store Categories from store_categories collection", True, f"Found {len(categories) if isinstance(categories, list) else 'data'}")
+            else:
+                self.log_test("Store Categories from store_categories collection", False, "Failed to load from store_categories")
+                success = False
+            
+            # Test GET /api/store/products
+            products = self.run_test(
+                "GET /api/store/products",
+                "GET",
+                "store/products",
+                200
+            )
+            
+            if products:
+                self.log_test("Store Products from store_products collection", True, f"Found {len(products) if isinstance(products, list) else 'data'}")
+            else:
+                self.log_test("Store Products from store_products collection", False, "Failed to load from store_products")
+                success = False
+            
+            self.token = old_token
+        
+        # ============== 3. PINPANCLUB MODULE (new collections: pinpanclub_players, pinpanclub_matches) ==============
+        print("\n🏓 Testing PinpanClub Module with new collections...")
+        
+        if auth_token:
+            old_token = self.token
+            self.token = auth_token
+            
+            # Test GET /api/pinpanclub/players
+            players = self.run_test(
+                "GET /api/pinpanclub/players",
+                "GET",
+                "pinpanclub/players",
+                200
+            )
+            
+            if players:
+                self.log_test("PinpanClub Players from pinpanclub_players collection", True, f"Found {len(players) if isinstance(players, list) else 'data'}")
+            else:
+                self.log_test("PinpanClub Players from pinpanclub_players collection", False, "Failed to load from pinpanclub_players")
+                success = False
+            
+            # Test GET /api/pinpanclub/matches/active
+            active_matches = self.run_test(
+                "GET /api/pinpanclub/matches/active",
+                "GET",
+                "pinpanclub/matches/active",
+                200
+            )
+            
+            if active_matches is not None:  # Could be empty list
+                self.log_test("PinpanClub Active Matches from pinpanclub_matches collection", True, f"Found {len(active_matches) if isinstance(active_matches, list) else 'data'}")
+            else:
+                self.log_test("PinpanClub Active Matches from pinpanclub_matches collection", False, "Failed to load from pinpanclub_matches")
+                success = False
+            
+            self.token = old_token
+        
+        # ============== 4. HEALTH CHECK ==============
+        print("\n❤️ Testing Health Check...")
+        
+        # Remove auth for health check
+        old_token = self.token
+        self.token = None
+        
+        health = self.run_test(
+            "GET /api/health",
             "GET",
-            "public/site-config",
+            "health",
             200
         )
         
-        if public_config:
-            # Check for new SEO fields
-            seo_fields = ['meta_titulo', 'meta_descripcion', 'meta_keywords', 'og_image', 'google_analytics_id']
-            for field in seo_fields:
-                if field in public_config:
-                    self.log_test(f"Public Site Config Contains SEO Field '{field}'", True)
+        if health and 'modules' in health:
+            modules = health['modules']
+            expected_modules = ['auth', 'store', 'pinpanclub']
+            
+            for module in expected_modules:
+                if module in modules:
+                    self.log_test(f"Health Check Reports '{module}' Module", True)
                 else:
-                    self.log_test(f"Public Site Config Contains SEO Field '{field}'", False, f"Missing SEO field '{field}'")
+                    self.log_test(f"Health Check Reports '{module}' Module", False, f"Module '{module}' not found in health check")
                     success = False
         else:
+            self.log_test("Health Check Endpoint", False, "Health check failed or missing modules info")
             success = False
         
-        # Restore token for admin tests
-        self.token = self.admin_token
+        self.token = old_token
         
-        # 2. Test admin login and PUT /api/admin/site-config with SEO fields
-        if self.admin_token:
-            # Test data from review request
-            seo_config_data = {
-                "nombre_sitio": "ChiPi Link",
-                "descripcion": "Tu Super App",
-                "meta_titulo": "ChiPi Link | Tu Super App",
-                "meta_descripcion": "La mejor plataforma para tu negocio",
-                "meta_keywords": "chipi, link, super app, panama",
-                "color_primario": "#16a34a",
-                "color_secundario": "#0f766e",
-                "footer_texto": "© 2025 ChiPi Link"
-            }
+        # ============== 5. LEGACY ENDPOINT COMPATIBILITY ==============
+        print("\n🔄 Testing Legacy Endpoint Compatibility...")
+        
+        if auth_token:
+            old_token = self.token
+            self.token = auth_token
             
-            update_result = self.run_test(
-                "PUT /api/admin/site-config (With SEO Fields)",
-                "PUT",
-                "admin/site-config",
-                200,
-                seo_config_data
+            # Test GET /api/pingpong/players (should still work as legacy)
+            legacy_players = self.run_test(
+                "GET /api/pingpong/players (Legacy Compatibility)",
+                "GET",
+                "pingpong/players",
+                200
             )
             
-            if update_result and update_result.get('success'):
-                self.log_test("Site Config Update with SEO Fields", True)
-                
-                # 3. Verify changes were saved with GET /api/public/site-config
-                self.token = None  # Remove auth for public endpoint
-                
-                updated_config = self.run_test(
-                    "GET /api/public/site-config (Verify SEO Changes Saved)",
-                    "GET",
-                    "public/site-config",
-                    200
-                )
-                
-                if updated_config:
-                    # Verify each field was saved correctly
-                    expected_values = {
-                        "nombre_sitio": "ChiPi Link",
-                        "descripcion": "Tu Super App",
-                        "meta_titulo": "ChiPi Link | Tu Super App",
-                        "meta_descripcion": "La mejor plataforma para tu negocio",
-                        "meta_keywords": "chipi, link, super app, panama",
-                        "color_primario": "#16a34a",
-                        "color_secundario": "#0f766e",
-                        "footer_texto": "© 2025 ChiPi Link"
-                    }
-                    
-                    for field, expected_value in expected_values.items():
-                        actual_value = updated_config.get(field)
-                        if actual_value == expected_value:
-                            self.log_test(f"SEO Field '{field}' Saved Correctly", True, f"Value: {actual_value}")
-                        else:
-                            self.log_test(f"SEO Field '{field}' Saved Correctly", False, f"Expected '{expected_value}', got '{actual_value}'")
-                            success = False
-                else:
-                    self.log_test("Verify SEO Changes Saved", False, "Could not retrieve updated config")
-                    success = False
+            if legacy_players is not None:
+                self.log_test("Legacy PingPong Players Endpoint", True, "Legacy endpoint still working")
             else:
-                self.log_test("Site Config Update with SEO Fields", False, "Update did not return success")
+                self.log_test("Legacy PingPong Players Endpoint", False, "Legacy endpoint broken")
                 success = False
-        else:
-            self.log_test("Admin Authentication for SEO Test", False, "Admin token not available")
-            success = False
+            
+            self.token = old_token
         
-        # Restore token
-        self.token = old_token
         return success
+
+    def run_microservices_migration_tests(self):
+        """Run all microservices migration tests"""
+        print("=" * 80)
+        print("🏗️ CHIPI LINK MICROSERVICES ARCHITECTURE MIGRATION TESTS")
+        print("=" * 80)
+        print(f"Testing against: {self.base_url}")
+        print(f"Test started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print()
+        
+        # Run the microservices migration test
+        migration_success = self.test_microservices_migration()
+        
+        # Print summary
+        print("\n" + "=" * 80)
+        print("📊 MICROSERVICES MIGRATION TEST SUMMARY")
+        print("=" * 80)
+        print(f"Tests run: {self.tests_run}")
+        print(f"Tests passed: {self.tests_passed}")
+        print(f"Tests failed: {self.tests_run - self.tests_passed}")
+        print(f"Success rate: {(self.tests_passed/self.tests_run*100):.1f}%" if self.tests_run > 0 else "0%")
+        
+        if self.failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for test in self.failed_tests:
+                print(f"  - {test}")
+        
+        if migration_success and len(self.failed_tests) == 0:
+            print("\n✅ MICROSERVICES MIGRATION: ALL TESTS PASSED")
+            return True
+        else:
+            print("\n❌ MICROSERVICES MIGRATION: SOME TESTS FAILED")
+            return False
 
     def test_auth_module_refactored_endpoints(self):
         """Test Auth Module Refactored Endpoints - REVIEW REQUEST"""
