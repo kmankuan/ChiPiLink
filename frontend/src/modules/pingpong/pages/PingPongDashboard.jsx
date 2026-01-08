@@ -35,6 +35,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import ScoreBoard from '../components/ScoreBoard';
+import { PINPANCLUB_API } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
