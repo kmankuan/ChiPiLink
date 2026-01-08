@@ -360,8 +360,33 @@ Los archivos de configuración para la Fase 3 han sido creados:
 |------|--------|-------------|
 | **Fase 1** | ✅ Completada | Refactorización a arquitectura modular |
 | **Fase 1.5** | ✅ Completada | Migración del frontend a nuevos endpoints |
-| **Fase 2** | ✅ Documentada | Separación de schemas de BD |
-| **Fase 3** | 📝 Preparada | Containerización y API Gateway |
+| **Fase 2** | ✅ Completada | Migración de nombres de colecciones MongoDB |
+| **Fase 3** | ✅ Completada | Containerización y estructura de servicios |
+
+### Colecciones MongoDB (Fase 2)
+
+| Módulo | Colecciones |
+|--------|-------------|
+| **Auth** | `auth_users`, `auth_sessions` |
+| **Store** | `store_products`, `store_orders`, `store_categories`, `store_students` |
+| **PinpanClub** | `pinpanclub_players`, `pinpanclub_matches`, `pinpanclub_sponsors`, `pinpanclub_config`, `pinpanclub_layouts`, `pinpanclub_superpin_*` |
+| **Community** | `community_posts`, `community_events`, `community_albums`, `community_comments` |
+| **Core** | `core_app_config`, `core_site_config`, `core_notifications`, `core_translations`, `core_pages` |
+
+### Estructura de Servicios (Fase 3)
+
+```
+/app/services/
+├── auth/
+│   ├── main.py           # Entry point del servicio
+│   ├── Dockerfile        # Configuración Docker
+│   ├── requirements.txt  # Dependencias
+│   ├── app/              # Módulo auth copiado
+│   └── core/             # Core compartido
+├── store/
+├── pinpanclub/
+└── community/
+```
 
 ### Módulos Refactorizados
 
@@ -377,6 +402,8 @@ Los archivos de configuración para la Fase 3 han sido creados:
 3. **Event Bus** - Comunicación desacoplada entre módulos
 4. **Backward Compatibility** - Endpoints legacy mantenidos
 5. **Configuración Centralizada** - Frontend con archivos de configuración de API
+6. **Constantes de Colecciones** - `/app/backend/core/constants.py`
+7. **Servicios Independientes** - Listos para ejecutar como contenedores
 
 ---
 
