@@ -16,7 +16,7 @@ class UserBase(BaseModel):
     email: EmailStr
     nombre: str
     telefono: Optional[str] = None
-    direccion: Optional[str] = None
+    direccion: Optional[Any] = None  # Can be str, dict, or None
 
 
 class UserCreate(UserBase):
