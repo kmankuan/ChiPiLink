@@ -5,7 +5,8 @@ from .event_bus import (
     event_bus,
     PinpanClubEvents,
     StoreEvents,
-    AuthEvents
+    AuthEvents,
+    CommunityEvents
 )
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     'event_bus',
     'PinpanClubEvents',
     'StoreEvents',
-    'AuthEvents'
+    'AuthEvents',
+    'CommunityEvents'
 ]
