@@ -4884,75 +4884,15 @@ class ChiPiLinkMicroservicesAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    import sys
+    """Main function to run microservices migration tests"""
+    # Create tester instance
+    tester = ChiPiLinkMicroservicesAPITester()
     
-    # Check if we should run only the microservices refactoring tests
-    if len(sys.argv) > 1 and sys.argv[1] == "microservices":
-        print("🚀 Running Microservices Refactoring Tests Only")
-        tester = TextbookStoreAPITester()
-        
-        # Run the microservices refactoring tests
-        success = tester.run_microservices_refactoring_tests()
-        
-        # Print summary
-        print(f"\n📊 Microservices Refactoring Test Summary:")
-        print(f"Tests run: {tester.tests_run}")
-        print(f"Tests passed: {tester.tests_passed}")
-        print(f"Tests failed: {tester.tests_run - tester.tests_passed}")
-        print(f"Success rate: {(tester.tests_passed/tester.tests_run*100):.1f}%")
-        
-        if tester.failed_tests:
-            print("\n❌ FAILED TESTS:")
-            for failed_test in tester.failed_tests:
-                print(f"  • {failed_test}")
-        else:
-            print("\n✅ ALL MICROSERVICES REFACTORING TESTS PASSED!")
-        
-        return 0 if success else 1
-    elif len(sys.argv) > 1 and sys.argv[1] == "review":
-        print("🎯 Running Review Request Tests Only")
-        tester = TextbookStoreAPITester()
-        
-        # Setup admin user and login
-        if not tester.test_admin_setup():
-            print("❌ Admin setup failed - stopping tests")
-            return 1
-        
-        if not tester.test_admin_login():
-            print("❌ Admin login failed - stopping tests")
-            return 1
-        
-        # Run the specific review request tests
-        success = tester.test_review_request_features()
-        
-        # Print summary
-        print(f"\n📊 Review Request Test Summary:")
-        print(f"Tests run: {tester.tests_run}")
-        print(f"Tests passed: {tester.tests_passed}")
-        print(f"Tests failed: {tester.tests_run - tester.tests_passed}")
-        print(f"Success rate: {(tester.tests_passed/tester.tests_run*100):.1f}%")
-        
-        if tester.failed_tests:
-            print("\n❌ FAILED TESTS:")
-            for failed_test in tester.failed_tests:
-                print(f"  • {failed_test}")
-        else:
-            print("\n✅ ALL REVIEW REQUEST TESTS PASSED!")
-        
-        return 0 if success else 1
-    elif len(sys.argv) > 1 and sys.argv[1] == "quick":
-        # Run only the quick verification tests for performance optimization
-        print("⚡ Running Quick Performance Optimization Verification")
-        tester = TextbookStoreAPITester()
-        tester.run_quick_verification_tests()
-        
-        success = tester.tests_passed == tester.tests_run
-        return 0 if success else 1
-    else:
-        # Run all tests
-        tester = TextbookStoreAPITester()
-        success = tester.run_all_tests()
-        return 0 if success else 1
+    # Run microservices migration tests
+    success = tester.run_microservices_migration_tests()
+    
+    # Exit with appropriate code
+    return 0 if success else 1
 
 if __name__ == "__main__":
     sys.exit(main())
