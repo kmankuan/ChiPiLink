@@ -117,7 +117,8 @@ api_router = APIRouter(prefix="/api")
 
 # Register module routers
 api_router.include_router(auth_router)
-api_router.include_router(store_router)
+api_router.include_router(store_router)  # Legacy routes for backward compatibility
+api_router.include_router(store_refactored_router)  # New microservices-ready routes
 api_router.include_router(landing_router)
 api_router.include_router(community_router)
 api_router.include_router(monday_router)
