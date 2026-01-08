@@ -647,14 +647,20 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Shopping Cart (Context + Drawer)"
-    - "Unatienda Checkout Page"
-    - "Header Cart Integration"
+    - "Community Module Refactored with Microservices Architecture"
+    - "Auth Module Refactored with Microservices Architecture"
+    - "Store Module Refactored with Microservices Architecture"
+    - "Backward Compatibility Verification"
+    - "Microservices Architecture Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
   completed_testing:
     - "Store Module Refactored with Microservices Architecture"
+    - "Auth Module Refactored with Microservices Architecture"
+    - "Community Module Refactored with Microservices Architecture"
+    - "Backward Compatibility Verification"
+    - "Microservices Architecture Verification"
     - "Ping Pong Monday.com Integration"
     - "Ping Pong Monday.com Integration Frontend"
     - "Unatienda/Platform Store Integration"
