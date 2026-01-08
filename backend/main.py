@@ -38,7 +38,7 @@ from modules.auth.routes import router as auth_router
 from modules.store import init_module as init_store
 from modules.store import store_refactored_router
 # Legacy routes (keep for backward compatibility with frontend)
-from modules.store.routes import router as store_router
+from modules.store.legacy_routes import router as store_router
 
 # Landing Page Builder Module
 from modules.landing.routes import router as landing_router
