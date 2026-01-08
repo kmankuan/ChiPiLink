@@ -814,3 +814,32 @@ store_module_refactor:
       - "GET /api/store/public/grades"
       - "GET /api/store/public/subjects"
 
+
+# ============== AUTH MODULE REFACTOR ==============
+auth_module_refactor:
+  - task: "Auth Module Microservices-Ready Refactor"
+    implemented: true
+    working: pending_testing
+    files:
+      - "/app/backend/modules/auth/models/schemas.py"
+      - "/app/backend/modules/auth/repositories/user_repository.py"
+      - "/app/backend/modules/auth/repositories/session_repository.py"
+      - "/app/backend/modules/auth/services/auth_service.py"
+      - "/app/backend/modules/auth/services/user_service.py"
+      - "/app/backend/modules/auth/events/handlers.py"
+      - "/app/backend/modules/auth/routes/auth.py"
+      - "/app/backend/modules/auth/routes/users.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    description: "Auth module refactored to microservices-ready architecture. New endpoints at /api/auth-v2/* with Service Layer, Repository Pattern, and Event Bus integration. Legacy endpoints kept at /api/auth/* for backward compatibility."
+    new_endpoints:
+      - "POST /api/auth-v2/register"
+      - "POST /api/auth-v2/login"
+      - "GET /api/auth-v2/me"
+      - "POST /api/auth-v2/logout"
+      - "POST /api/auth-v2/change-password"
+      - "GET /api/auth-v2/users"
+      - "GET /api/auth-v2/users/stats"
+      - "GET /api/auth-v2/users/{cliente_id}"
+
