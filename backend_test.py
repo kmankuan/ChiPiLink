@@ -4052,6 +4052,9 @@ class TextbookStoreAPITester:
             # NEW: Site Configuration SEO Fields Test (Review Request)
             ("Site Configuration SEO Fields", self.test_site_config_seo_fields),
             
+            # NEW: Store Module Refactored Endpoints Test (Review Request)
+            ("Store Module Refactored Endpoints", self.test_store_module_refactored_endpoints),
+            
             # NEW: Unatienda/Platform Store Integration Tests
             ("Platform Store Public Endpoints", self.test_platform_store_public_endpoints),
             ("Platform Store Admin Endpoints", self.test_platform_store_admin_endpoints),
