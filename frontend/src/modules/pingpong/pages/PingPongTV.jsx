@@ -82,9 +82,7 @@ export default function PingPongTV() {
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
     
-    const wsUrl = matchId 
-      ? `${WS_URL}/api/pingpong/ws/live?type=tv&match_id=${matchId}`
-      : `${WS_URL}/api/pingpong/ws/live?type=tv`;
+    const wsUrl = PINPANCLUB_WS.liveTv(matchId);
     
     console.log('Connecting to WebSocket:', wsUrl);
     
