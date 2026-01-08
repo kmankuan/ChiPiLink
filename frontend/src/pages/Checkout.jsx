@@ -54,7 +54,7 @@ export default function Checkout() {
 
   const fetchOrder = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/pedidos/${pedidoId}/public`);
+      const response = await axios.get(buildUrl(STORE_ENDPOINTS.orderPublicById(pedidoId)));
       setOrder(response.data);
       
       // Check payment status
