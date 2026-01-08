@@ -1582,8 +1582,8 @@ class TextbookStoreAPITester:
         )
         
         auth_v2_token = None
-        if login_result and 'access_token' in login_result:
-            auth_v2_token = login_result['access_token']
+        if login_result and 'token' in login_result:
+            auth_v2_token = login_result['token']
             self.log_test("Auth V2 Login Success", True, "Admin login successful")
         else:
             self.log_test("Auth V2 Login Success", False, "Login failed or missing token")
