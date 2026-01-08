@@ -4710,6 +4710,9 @@ class TextbookStoreAPITester:
         
         # Test sequence - prioritizing the review request tests
         tests = [
+            # REVIEW REQUEST: Frontend Migration to New API Endpoints
+            ("Frontend Migration to New API Endpoints", self.test_frontend_migration_verification),
+            
             # REVIEW REQUEST: Auth and Store Module Refactored Endpoints
             ("Auth Module Refactored Endpoints", self.test_auth_module_refactored_endpoints),
             ("Store Module Refactored Endpoints", self.test_store_module_refactored_endpoints),
