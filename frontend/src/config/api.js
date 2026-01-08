@@ -54,6 +54,7 @@ export const STORE_ENDPOINTS = {
   // Orders
   orders: USE_NEW_ENDPOINTS ? '/store/orders' : '/pedidos',
   orderById: (id) => USE_NEW_ENDPOINTS ? `/store/orders/${id}` : `/pedidos/${id}`,
+  orderPublicById: (id) => USE_NEW_ENDPOINTS ? `/store/public/order/${id}` : `/pedidos/${id}/public`,
   createOrder: USE_NEW_ENDPOINTS ? '/store/orders' : '/pedidos',
   publicOrder: USE_NEW_ENDPOINTS ? '/store/public/order' : '/pedidos/publico',
   
