@@ -218,9 +218,62 @@ El frontend ha sido actualizado para usar los nuevos endpoints. Se creó un arch
 - `src/contexts/AuthContext.js` - Usa nuevos endpoints Auth
 - `src/pages/CommunityLanding.jsx` - Usa nuevos endpoints Community
 - `src/pages/Catalog.jsx` - Usa nuevos endpoints Store
+- `modules/pingpong/config/api.js` - Configuración centralizada PinpanClub
+
+---
+
+## Fase 2: Separación de Schemas de Base de Datos
+
+### Convención de Nombres de Colecciones
+
+Cada módulo tiene su propio prefijo para las colecciones de MongoDB:
+
+| Módulo | Prefijo | Colecciones |
+|--------|---------|-------------|
+| **Auth** | `auth_` | `clientes` (users), `user_sessions` |
+| **Store** | `store_` | `libros` (products), `pedidos` (orders), `categorias` |
+| **PinpanClub** | `pingpong_` | `pingpong_players`, `pingpong_matches`, `pingpong_sponsors`, `pingpong_config` |
+| **Community** | `community_` | `community_posts`, `community_events`, `gallery_albums`, `community_comments` |
+| **Shared** | (ninguno) | `app_config`, `site_config`, `notificaciones`, `translations` |
+
+### Colecciones Actuales en MongoDB
+
+```
+├── Auth Module
+│   └── clientes (10 users)
+│
+├── Store Module
+│   ├── libros (6 products)
+│   ├── pedidos (0 orders)
+│   ├── categorias (1 category)
+│   └── estudiantes_sincronizados (0)
+│
+├── PinpanClub Module
+│   ├── pingpong_players (4)
+│   ├── pingpong_matches (4)
+│   ├── pingpong_sponsors (5)
+│   └── pingpong_config (1)
+│
+├── Community Module
+│   └── (collections will be created on first use)
+│
+└── Shared/Core
+    ├── app_config (4)
+    ├── site_config (1)
+    ├── notificaciones (4)
+    ├── translations (366)
+    └── paginas (1)
+```
+
+### Beneficios de la Separación
+
+1. **Aislamiento de datos** - Cada módulo tiene sus propias colecciones
+2. **Facilita migración** - Exportar colecciones por prefijo es más fácil
+3. **Permisos granulares** - Se pueden asignar permisos por módulo
+4. **Backup selectivo** - Respaldar solo las colecciones de un módulo
 
 ---
 
 *Documentación creada: Enero 2026*
-*Estado actual: Fase 1 completada + Frontend migrado a nuevos endpoints*
-*Próximo paso: Fase 2 - Separación de servicios (schemas de BD por módulo) y eliminación de routers legacy*
+*Estado actual: Fase 1 completada + Frontend migrado + Fase 2 documentada*
+*Próximo paso: Fase 3 - Containerización y API Gateway*
