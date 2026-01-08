@@ -5,7 +5,7 @@ import sys
 import json
 from datetime import datetime
 
-class TextbookStoreAPITester:
+class ChiPiLinkMicroservicesAPITester:
     def __init__(self, base_url="https://leaderboard-system.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
