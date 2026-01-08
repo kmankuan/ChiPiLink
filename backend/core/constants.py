@@ -97,3 +97,11 @@ LEGACY_TO_NEW = {
     "translations": CoreCollections.TRANSLATIONS,
     "paginas": CoreCollections.PAGES,
 }
+
+
+def get_collection_name(legacy_name: str) -> str:
+    """
+    Get the new collection name from a legacy name.
+    Use this during transition period.
+    """
+    return LEGACY_TO_NEW.get(legacy_name, legacy_name)
