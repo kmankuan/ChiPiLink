@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
     }
     
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get(AUTH_ENDPOINTS.me);
       setUser(response.data);
     } catch (error) {
       console.error('Auth check error:', error);
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
   }, [checkAuth]);
 
   const login = async (email, contrasena) => {
-    const response = await api.post('/auth/login', { email, contrasena });
+    const response = await api.post(AUTH_ENDPOINTS.login, { email, contrasena });
     const { token: newToken, cliente } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (data) => {
-    const response = await api.post('/auth/registro', data);
+    const response = await api.post(AUTH_ENDPOINTS.register, data);
     const { token: newToken, cliente } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
@@ -80,14 +80,14 @@ export function AuthProvider({ children }) {
   const processGoogleCallback = async (sessionId) => {
     try {
       // Get session data from Emergent
-      const response = await api.get('/auth/session', {
+      const response = await api.get(AUTH_ENDPOINTS.session, {
         headers: { 'X-Session-ID': sessionId }
       });
       
       const { session_token, cliente } = response.data;
       
       // Set cookie via backend
-      await api.post('/auth/session', { session_token });
+      await api.post(AUTH_ENDPOINTS.session, { session_token });
       
       setUser(cliente);
       return cliente;
@@ -99,7 +99,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post(AUTH_ENDPOINTS.logout);
     } catch (error) {
       console.error('Logout error:', error);
     }
