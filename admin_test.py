@@ -7,7 +7,7 @@ def test_admin_endpoints():
     """Test admin endpoints that require authentication"""
     print("👑 Testing Admin Endpoints...")
     
-    base_url = "https://pinpanclub.preview.emergentagent.com"
+    base_url = "https://leaderboard-system.preview.emergentagent.com"
     
     # 1. Admin Login
     print("\n1. Testing Admin Login...")
