@@ -1,0 +1,42 @@
+# ============================================================
+# Service Dockerfile Template
+# ============================================================
+# Este es un template para cuando se extraigan los módulos
+# como microservicios independientes.
+#
+# Uso:
+#   1. Copiar este archivo a /services/{module}/Dockerfile
+#   2. Copiar el módulo de /backend/modules/{module}/ a /services/{module}/app/
+#   3. Copiar /backend/core/ a /services/{module}/core/
+#   4. Crear main.py específico para el servicio
+# ============================================================
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD curl -f http://localhost:${SERVICE_PORT:-8000}/health || exit 1
+
+# Run the service
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${SERVICE_PORT:-8000}"]
