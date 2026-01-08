@@ -202,15 +202,25 @@ services:
 
 ## Módulos Actuales
 
-| Módulo | Estado | Arquitectura |
-|--------|--------|--------------|
-| PinpanClub | ✅ Refactorizado | Microservices-Ready |
-| Store | ✅ Refactorizado | Microservices-Ready |
-| Auth | ✅ Refactorizado | Microservices-Ready |
-| Community | ✅ Refactorizado | Microservices-Ready |
+| Módulo | Estado | Arquitectura | Endpoints Nuevos |
+|--------|--------|--------------|------------------|
+| PinpanClub | ✅ Refactorizado | Microservices-Ready | `/api/pinpanclub/*` |
+| Store | ✅ Refactorizado | Microservices-Ready | `/api/store/*` |
+| Auth | ✅ Refactorizado | Microservices-Ready | `/api/auth-v2/*` |
+| Community | ✅ Refactorizado | Microservices-Ready | `/api/community-v2/*` |
+
+## Frontend Migration
+
+El frontend ha sido actualizado para usar los nuevos endpoints. Se creó un archivo de configuración centralizado en `/app/frontend/src/config/api.js` que permite alternar entre endpoints legacy y nuevos mediante el flag `USE_NEW_ENDPOINTS`.
+
+### Archivos Actualizados
+- `src/config/api.js` - Configuración centralizada de endpoints
+- `src/contexts/AuthContext.js` - Usa nuevos endpoints Auth
+- `src/pages/CommunityLanding.jsx` - Usa nuevos endpoints Community
+- `src/pages/Catalog.jsx` - Usa nuevos endpoints Store
 
 ---
 
 *Documentación creada: Enero 2026*
-*Estado actual: Fase 1 completada - Todos los módulos principales refactorizados*
-*Próximo paso: Fase 2 - Separación de servicios (schemas de BD por módulo) y actualización del frontend*
+*Estado actual: Fase 1 completada + Frontend migrado a nuevos endpoints*
+*Próximo paso: Fase 2 - Separación de servicios (schemas de BD por módulo) y eliminación de routers legacy*
