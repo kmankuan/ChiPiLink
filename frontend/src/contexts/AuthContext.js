@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { AUTH_ENDPOINTS } from '@/config/api';
 
 const AuthContext = createContext(null);
 
