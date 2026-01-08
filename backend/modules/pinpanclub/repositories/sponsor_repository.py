@@ -5,6 +5,7 @@ Acceso a datos de patrocinadores
 from typing import List, Optional, Dict
 from core.base import BaseRepository
 from core.database import db
+from core.constants import PinpanClubCollections
 import uuid
 
 
@@ -13,7 +14,7 @@ class SponsorRepository(BaseRepository):
     Repository para patrocinadores de PinpanClub.
     """
     
-    COLLECTION_NAME = "pingpong_sponsors"  # Keep existing collection
+    COLLECTION_NAME = PinpanClubCollections.SPONSORS
     ID_FIELD = "sponsor_id"
     
     def __init__(self):

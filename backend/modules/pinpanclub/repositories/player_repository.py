@@ -5,6 +5,7 @@ Acceso a datos de jugadores
 from typing import List, Optional, Dict
 from core.base import BaseRepository
 from core.database import db
+from core.constants import PinpanClubCollections
 import uuid
 
 
@@ -14,7 +15,7 @@ class PlayerRepository(BaseRepository):
     Maneja todas las operaciones de base de datos para jugadores.
     """
     
-    COLLECTION_NAME = "pingpong_players"  # Keep existing collection for backward compatibility
+    COLLECTION_NAME = PinpanClubCollections.PLAYERS
     ID_FIELD = "jugador_id"
     
     def __init__(self):

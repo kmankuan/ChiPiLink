@@ -5,6 +5,7 @@ Acceso a datos de configuración
 from typing import Optional, Dict, Any
 from core.base import BaseRepository
 from core.database import db
+from core.constants import CoreCollections, PinpanClubCollections
 import uuid
 
 
@@ -14,7 +15,7 @@ class ConfigRepository(BaseRepository):
     Maneja configuraciones de Monday.com, layouts, etc.
     """
     
-    COLLECTION_NAME = "app_config"  # Use existing app_config collection
+    COLLECTION_NAME = CoreCollections.APP_CONFIG
     ID_FIELD = "config_key"
     
     def __init__(self):
@@ -55,7 +56,7 @@ class LayoutRepository(BaseRepository):
     Repository para layouts del canvas.
     """
     
-    COLLECTION_NAME = "pingpong_layouts"  # Keep existing collection
+    COLLECTION_NAME = PinpanClubCollections.LAYOUTS
     ID_FIELD = "layout_id"
     
     def __init__(self):

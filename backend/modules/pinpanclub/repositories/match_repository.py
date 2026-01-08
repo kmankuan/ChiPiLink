@@ -5,6 +5,7 @@ Acceso a datos de partidos
 from typing import List, Optional, Dict
 from core.base import BaseRepository
 from core.database import db
+from core.constants import PinpanClubCollections
 import uuid
 
 
@@ -14,7 +15,7 @@ class MatchRepository(BaseRepository):
     Maneja todas las operaciones de base de datos para partidos.
     """
     
-    COLLECTION_NAME = "pingpong_matches"  # Keep existing collection for backward compatibility
+    COLLECTION_NAME = PinpanClubCollections.MATCHES
     ID_FIELD = "partido_id"
     
     def __init__(self):

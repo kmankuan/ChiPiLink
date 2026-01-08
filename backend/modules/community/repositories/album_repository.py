@@ -8,6 +8,7 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import CommunityCollections
 
 
 class AlbumRepository(BaseRepository):
@@ -15,7 +16,7 @@ class AlbumRepository(BaseRepository):
     Repository para álbumes de galería.
     """
     
-    COLLECTION_NAME = "gallery_albums"
+    COLLECTION_NAME = CommunityCollections.ALBUMS
     ID_FIELD = "album_id"
     
     def __init__(self):
