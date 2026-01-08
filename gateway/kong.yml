@@ -1,0 +1,125 @@
+# ============================================================
+# Kong API Gateway Configuration
+# ============================================================
+# Este archivo define las rutas del API Gateway para cuando
+# los módulos se extraigan como microservicios independientes.
+# ============================================================
+
+_format_version: "3.0"
+_transform: true
+
+services:
+  # ============== AUTH SERVICE ==============
+  - name: auth-service
+    url: http://auth-service:8010
+    routes:
+      - name: auth-routes
+        paths:
+          - /api/auth
+          - /api/auth-v2
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 100
+          policy: local
+
+  # ============== STORE SERVICE ==============
+  - name: store-service
+    url: http://store-service:8011
+    routes:
+      - name: store-routes
+        paths:
+          - /api/store
+          - /api/libros
+          - /api/categorias
+          - /api/pedidos
+          - /api/grados
+          - /api/materias
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          policy: local
+
+  # ============== PINPANCLUB SERVICE ==============
+  - name: pinpanclub-service
+    url: http://pinpanclub-service:8012
+    routes:
+      - name: pinpanclub-routes
+        paths:
+          - /api/pinpanclub
+          - /api/pingpong
+        strip_path: false
+      # WebSocket route
+      - name: pinpanclub-ws
+        paths:
+          - /api/pingpong/ws
+          - /api/pinpanclub/ws
+        strip_path: false
+        protocols:
+          - http
+          - https
+          - ws
+          - wss
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 500
+          policy: local
+
+  # ============== COMMUNITY SERVICE ==============
+  - name: community-service
+    url: http://community-service:8013
+    routes:
+      - name: community-routes
+        paths:
+          - /api/community
+          - /api/community-v2
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 150
+          policy: local
+
+# Global plugins
+plugins:
+  # CORS
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+        - PATCH
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+        - X-Session-ID
+      exposed_headers:
+        - X-Auth-Token
+      credentials: true
+      max_age: 3600
+  
+  # Request logging
+  - name: file-log
+    config:
+      path: /tmp/kong_access.log
+      reopen: true
+
+# Consumers (for API key auth if needed)
+consumers:
+  - username: frontend-app
+    keyauth_credentials:
+      - key: frontend-api-key
+  
+  - username: mobile-app
+    keyauth_credentials:
+      - key: mobile-api-key
