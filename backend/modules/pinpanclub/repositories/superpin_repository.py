@@ -8,6 +8,7 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import PinpanClubCollections
 
 
 class SuperPinLeagueRepository(BaseRepository):
@@ -15,7 +16,7 @@ class SuperPinLeagueRepository(BaseRepository):
     Repository para ligas Super Pin.
     """
     
-    COLLECTION_NAME = "superpin_leagues"
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_LEAGUES
     ID_FIELD = "liga_id"
     
     def __init__(self):
@@ -76,7 +77,7 @@ class PlayerCheckInRepository(BaseRepository):
     Repository para check-ins de jugadores.
     """
     
-    COLLECTION_NAME = "superpin_checkins"
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_CHECKINS
     ID_FIELD = "checkin_id"
     
     def __init__(self):
@@ -144,7 +145,7 @@ class SuperPinMatchRepository(BaseRepository):
     Repository para partidos Super Pin.
     """
     
-    COLLECTION_NAME = "superpin_matches"
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_MATCHES
     ID_FIELD = "partido_id"
     
     def __init__(self):
@@ -228,7 +229,7 @@ class RankingRepository(BaseRepository):
     Repository para el ranking.
     """
     
-    COLLECTION_NAME = "superpin_rankings"
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_RANKINGS
     ID_FIELD = "ranking_id"
     
     def __init__(self):
@@ -333,7 +334,7 @@ class SeasonTournamentRepository(BaseRepository):
     Repository para torneos de temporada.
     """
     
-    COLLECTION_NAME = "superpin_tournaments"
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_TOURNAMENTS
     ID_FIELD = "torneo_id"
     
     def __init__(self):
