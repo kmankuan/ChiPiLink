@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-01-08T13:44:47.525299",
+  "action": "migrate",
+  "migrated": [
+    {
+      "old": "clientes",
+      "new": "auth_users",
+      "count": 10
+    },
+    {
+      "old": "libros",
+      "new": "store_products",
+      "count": 6
+    },
+    {
+      "old": "pedidos",
+      "new": "store_orders",
+      "count": 0
+    },
+    {
+      "old": "categorias",
+      "new": "store_categories",
+      "count": 1
+    },
+    {
+      "old": "estudiantes_sincronizados",
+      "new": "store_students",
+      "count": 0
+    },
+    {
+      "old": "pingpong_players",
+      "new": "pinpanclub_players",
+      "count": 4
+    },
+    {
+      "old": "pingpong_matches",
+      "new": "pinpanclub_matches",
+      "count": 4
+    },
+    {
+      "old": "pingpong_sponsors",
+      "new": "pinpanclub_sponsors",
+      "count": 5
+    },
+    {
+      "old": "pingpong_config",
+      "new": "pinpanclub_config",
+      "count": 1
+    },
+    {
+      "old": "app_config",
+      "new": "core_app_config",
+      "count": 4
+    },
+    {
+      "old": "site_config",
+      "new": "core_site_config",
+      "count": 1
+    },
+    {
+      "old": "notificaciones",
+      "new": "core_notifications",
+      "count": 4
+    },
+    {
+      "old": "translations",
+      "new": "core_translations",
+      "count": 366
+    },
+    {
+      "old": "paginas",
+      "new": "core_pages",
+      "count": 1
+    }
+  ],
+  "errors": []
+}
