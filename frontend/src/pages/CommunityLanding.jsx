@@ -369,7 +369,7 @@ export default function CommunityLanding() {
   const fetchLandingData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/api/community/landing`);
+      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing));
       setData(response.data);
     } catch (error) {
       console.error('Error fetching landing data:', error);
