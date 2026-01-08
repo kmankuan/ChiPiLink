@@ -11,6 +11,7 @@ import {
   Volume2, VolumeX, Clock, AlertTriangle, Check, X,
   ChevronUp, ChevronDown
 } from 'lucide-react';
+import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
@@ -43,7 +44,7 @@ export default function PingPongMobileArbiter() {
   const connectWebSocket = useCallback(() => {
     if (!matchId) return;
     
-    const wsUrl = `${WS_URL}/api/pingpong/ws/arbiter/${matchId}`;
+    const wsUrl = PINPANCLUB_WS.arbiter(matchId);
     console.log('Arbiter connecting to:', wsUrl);
     
     try {
