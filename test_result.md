@@ -690,6 +690,7 @@ test_plan:
   completed_testing:
     - "Frontend Migration to New API Endpoints Verification"
     - "Frontend Migration to New API Endpoints - UI Flow Testing"
+    - "Frontend API Migration Re-Verification (Production URL)"
     - "Store Module Refactored with Microservices Architecture"
     - "Auth Module Refactored with Microservices Architecture"
     - "Community Module Refactored with Microservices Architecture"
