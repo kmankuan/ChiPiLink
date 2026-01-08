@@ -16,6 +16,7 @@ import {
   Volume2, VolumeX, Settings, Wifi, WifiOff, RefreshCw,
   Trophy, Users, Clock, Zap
 } from 'lucide-react';
+import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
