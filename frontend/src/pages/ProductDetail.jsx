@@ -50,9 +50,9 @@ export default function ProductDetail() {
   const fetchProduct = async () => {
     try {
       const [productRes, categoriasRes, gradosRes] = await Promise.all([
-        axios.get(`${API_URL}/api/libros/${productId}`),
-        axios.get(`${API_URL}/api/categorias`),
-        axios.get(`${API_URL}/api/grados`)
+        axios.get(buildUrl(STORE_ENDPOINTS.productById(productId))),
+        axios.get(buildUrl(STORE_ENDPOINTS.categories)),
+        axios.get(buildUrl(STORE_ENDPOINTS.grades))
       ]);
       
       setProduct(productRes.data);
