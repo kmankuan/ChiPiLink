@@ -130,19 +130,56 @@ export const PINPANCLUB_ENDPOINTS = {
   // Players
   players: '/pinpanclub/players',
   playerById: (id) => `/pinpanclub/players/${id}`,
+  rankings: '/pinpanclub/rankings',
   
   // Matches
   matches: '/pinpanclub/matches',
   activeMatches: '/pinpanclub/matches/active',
+  activeMatchesAll: '/pinpanclub/matches/active/all',
   matchById: (id) => `/pinpanclub/matches/${id}`,
+  matchLive: (id) => `/pinpanclub/matches/${id}/live`,
+  matchPoint: (id) => `/pinpanclub/matches/${id}/point`,
+  matchUndo: (id) => `/pinpanclub/matches/${id}/undo`,
+  matchStart: (id) => `/pinpanclub/matches/${id}/start`,
+  matchPause: (id) => `/pinpanclub/matches/${id}/pause`,
+  
+  // Tournaments
+  tournaments: '/pinpanclub/tournaments',
+  tournamentById: (id) => `/pinpanclub/tournaments/${id}`,
   
   // Sponsors
   sponsors: '/pinpanclub/sponsors',
   sponsorById: (id) => `/pinpanclub/sponsors/${id}`,
+  sponsorsTvDisplay: '/pinpanclub/sponsors/tv/display',
+  sponsorsConfigLayout: '/pinpanclub/sponsors/config/layout',
+  sponsorsConfigSpace: (id) => `/pinpanclub/sponsors/config/space/${id}`,
+  
+  // Canvas
+  canvasLayouts: '/pinpanclub/canvas/layouts',
   
   // Monday.com integration
   mondayStatus: '/pinpanclub/monday/status',
   mondaySync: '/pinpanclub/monday/sync',
+  
+  // Legacy endpoints (for backward compatibility)
+  legacy: {
+    players: '/pingpong/players',
+    matches: '/pingpong/matches',
+    activeMatchesAll: '/pingpong/matches/active/all',
+    matchById: (id) => `/pingpong/matches/${id}`,
+    matchLive: (id) => `/pingpong/matches/${id}/live`,
+    matchPoint: (id) => `/pingpong/matches/${id}/point`,
+    matchUndo: (id) => `/pingpong/matches/${id}/undo`,
+    matchStart: (id) => `/pingpong/matches/${id}/start`,
+    matchPause: (id) => `/pingpong/matches/${id}/pause`,
+    rankings: '/pingpong/rankings',
+    tournaments: '/pingpong/tournaments',
+    sponsors: '/pingpong/sponsors',
+    sponsorsTvDisplay: '/pingpong/sponsors/tv/display',
+    sponsorsConfigLayout: '/pingpong/sponsors/config/layout',
+    canvasLayouts: '/pingpong/canvas/layouts',
+  }
+};
 };
 
 // ============== HELPER FUNCTIONS ==============
