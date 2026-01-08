@@ -1814,8 +1814,8 @@ class TextbookStoreAPITester:
         
         # Test legacy auth login
         legacy_login_data = {
-            "email": "admin@libreria.com",
-            "contrasena": "adminpassword"
+            "email": "teck@koh.one",
+            "contrasena": "Acdb##0897"
         }
         
         legacy_auth = self.run_test(
