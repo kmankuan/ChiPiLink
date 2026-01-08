@@ -205,11 +205,11 @@ services:
 | Módulo | Estado | Arquitectura |
 |--------|--------|--------------|
 | PinpanClub | ✅ Refactorizado | Microservices-Ready |
+| Store | ✅ Refactorizado | Microservices-Ready |
 | Auth | 🔄 Legacy | Pendiente refactor |
-| Store | 🔄 Legacy | Pendiente refactor |
 | Community | 🔄 Legacy | Pendiente refactor |
 
 ---
 
 *Documentación creada: Enero 2026*
-*Próximo paso: Refactorizar módulo Store siguiendo el patrón PinpanClub*
+*Próximo paso: Refactorizar módulo Auth siguiendo el patrón PinpanClub/Store*
