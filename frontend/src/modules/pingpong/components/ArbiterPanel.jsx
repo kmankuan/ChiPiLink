@@ -78,7 +78,7 @@ export default function ArbiterPanel({
     setLoading(true);
     try {
       const response = await axios.post(
-        `${API_URL}/api/pingpong/matches/${partido_id}/point`,
+        PINPANCLUB_API.matchPoint(partido_id),
         { jugador, tipo: pointType }
       );
       
@@ -102,9 +102,7 @@ export default function ArbiterPanel({
   const handleUndo = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_URL}/api/pingpong/matches/${partido_id}/undo`
-      );
+      const response = await axios.post(PINPANCLUB_API.matchUndo(partido_id));
       
       if (response.data.success) {
         toast.info('Punto deshecho');
@@ -120,14 +118,12 @@ export default function ArbiterPanel({
   const handleStartMatch = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_URL}/api/pingpong/matches/${partido_id}/start`
-      );
+      const response = await axios.post(PINPANCLUB_API.matchStart(partido_id));
       
       if (response.data.success) {
         toast.success('¡Partido iniciado!');
         // Refresh match data
-        const matchResponse = await axios.get(`${API_URL}/api/pingpong/matches/${partido_id}`);
+        const matchResponse = await axios.get(PINPANCLUB_API.matchById(partido_id));
         onMatchUpdate(matchResponse.data);
       }
     } catch (error) {
@@ -140,14 +136,12 @@ export default function ArbiterPanel({
   const handlePauseMatch = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${API_URL}/api/pingpong/matches/${partido_id}/pause`
-      );
+      const response = await axios.post(PINPANCLUB_API.matchPause(partido_id));
       
       if (response.data.success) {
         toast.info('Partido pausado');
         // Refresh match data
-        const matchResponse = await axios.get(`${API_URL}/api/pingpong/matches/${partido_id}`);
+        const matchResponse = await axios.get(PINPANCLUB_API.matchById(partido_id));
         onMatchUpdate(matchResponse.data);
       }
     } catch (error) {
