@@ -15,7 +15,7 @@ from core.auth import (
     get_current_user,
     security
 )
-from .models import ClienteCreate, Cliente, LoginRequest, TokenResponse
+from .legacy_models import ClienteCreate, Cliente, LoginRequest, TokenResponse
 
 logger = logging.getLogger(__name__)
 
