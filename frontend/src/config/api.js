@@ -180,7 +180,6 @@ export const PINPANCLUB_ENDPOINTS = {
     canvasLayouts: '/pingpong/canvas/layouts',
   }
 };
-};
 
 // ============== HELPER FUNCTIONS ==============
 
