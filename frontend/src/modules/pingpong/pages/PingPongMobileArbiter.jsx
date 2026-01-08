@@ -89,7 +89,7 @@ export default function PingPongMobileArbiter() {
     
     const poll = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/live`);
+        const response = await fetch(PINPANCLUB_API.matchLive(matchId));
         if (response.ok) {
           const data = await response.json();
           setMatch(data);
@@ -152,23 +152,23 @@ export default function PingPongMobileArbiter() {
       try {
         let response;
         if (action === 'point') {
-          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/point`, {
+          response = await fetch(PINPANCLUB_API.matchPoint(matchId), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jugador: data.jugador, tipo: data.tipo || 'normal' })
           });
         } else if (action === 'undo') {
-          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/undo`, {
+          response = await fetch(PINPANCLUB_API.matchUndo(matchId), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
           });
         } else if (action === 'start') {
-          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/start`, {
+          response = await fetch(PINPANCLUB_API.matchStart(matchId), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
           });
         } else if (action === 'pause') {
-          response = await fetch(`${API_URL}/api/pingpong/matches/${matchId}/pause`, {
+          response = await fetch(PINPANCLUB_API.matchPause(matchId), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
           });
