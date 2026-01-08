@@ -21,7 +21,7 @@ Beneficios de esta arquitectura:
 """
 
 # Legacy router (compatibilidad con frontend actual)
-from .routes import router as legacy_router
+from .legacy_routes import router as legacy_router
 
 # New refactored router
 from .routes import router as store_refactored_router
