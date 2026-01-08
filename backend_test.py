@@ -1569,8 +1569,8 @@ class TextbookStoreAPITester:
         
         # 1. Login with admin credentials
         login_data = {
-            "email": "admin@libreria.com",
-            "password": "admin"
+            "email": "teck@koh.one",
+            "password": "Acdb##0897"
         }
         
         login_result = self.run_test(
