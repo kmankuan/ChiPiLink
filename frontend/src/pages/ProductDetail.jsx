@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { STORE_ENDPOINTS, buildUrl } from '@/config/api';
 import {
   ChevronLeft,
   ShoppingCart,
