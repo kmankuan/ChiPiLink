@@ -8,15 +8,15 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import AuthCollections
 
 
 class UserRepository(BaseRepository):
     """
     Repository para usuarios/clientes.
-    Usa la colección 'clientes' existente.
     """
     
-    COLLECTION_NAME = "clientes"
+    COLLECTION_NAME = AuthCollections.USERS
     ID_FIELD = "cliente_id"
     
     def __init__(self):

@@ -8,6 +8,7 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import AuthCollections
 
 
 class SessionRepository(BaseRepository):
@@ -15,7 +16,7 @@ class SessionRepository(BaseRepository):
     Repository para sesiones de usuario.
     """
     
-    COLLECTION_NAME = "user_sessions"
+    COLLECTION_NAME = AuthCollections.SESSIONS
     ID_FIELD = "session_id"
     
     def __init__(self):

@@ -8,6 +8,7 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import StoreCollections
 
 
 class OrderRepository(BaseRepository):
@@ -15,7 +16,7 @@ class OrderRepository(BaseRepository):
     Repository para pedidos de la tienda.
     """
     
-    COLLECTION_NAME = "pedidos"
+    COLLECTION_NAME = StoreCollections.ORDERS
     ID_FIELD = "pedido_id"
     
     def __init__(self):

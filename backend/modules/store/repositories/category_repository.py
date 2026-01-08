@@ -8,6 +8,7 @@ import uuid
 
 from core.base import BaseRepository
 from core.database import db
+from core.constants import StoreCollections
 
 
 class CategoryRepository(BaseRepository):
@@ -15,7 +16,7 @@ class CategoryRepository(BaseRepository):
     Repository para categorías de productos.
     """
     
-    COLLECTION_NAME = "categorias"
+    COLLECTION_NAME = StoreCollections.CATEGORIES
     ID_FIELD = "categoria_id"
     
     # Default categories
