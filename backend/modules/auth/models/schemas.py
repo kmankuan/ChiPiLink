@@ -40,6 +40,8 @@ class User(UserBase):
     es_admin: bool = False
     google_id: Optional[str] = None
     fecha_creacion: Optional[Any] = None
+    activo: Optional[bool] = True
+    ultimo_login: Optional[str] = None
 
 
 # ============== AUTH MODELS ==============
