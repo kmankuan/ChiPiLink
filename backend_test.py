@@ -112,8 +112,8 @@ class TextbookStoreAPITester:
         print("\n🔐 Testing Admin Authentication...")
         
         login_data = {
-            "email": "admin@libreria.com",
-            "contrasena": "adminpassword"
+            "email": "teck@koh.one",
+            "contrasena": "Acdb##0897"
         }
         
         result = self.run_test(
