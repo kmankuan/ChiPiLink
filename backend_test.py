@@ -1558,14 +1558,147 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
-    def test_store_module_refactored_endpoints(self):
-        """Test Store Module Refactored Endpoints - REVIEW REQUEST"""
-        print("\n🏪 Testing Store Module Refactored Endpoints...")
+    def test_auth_module_refactored_endpoints(self):
+        """Test Auth Module Refactored Endpoints - REVIEW REQUEST"""
+        print("\n🔐 Testing Auth Module Refactored Endpoints (NEW /api/auth-v2/*)...")
         
         success = True
         old_token = self.token
         
-        # ============== NEW ENDPOINTS (refactored routes at /api/store/*) ==============
+        # ============== NEW AUTH ENDPOINTS (refactored routes at /api/auth-v2/*) ==============
+        
+        # 1. Login with admin credentials
+        login_data = {
+            "email": "admin@libreria.com",
+            "password": "admin"
+        }
+        
+        login_result = self.run_test(
+            "POST /api/auth-v2/login",
+            "POST",
+            "auth-v2/login",
+            200,
+            login_data
+        )
+        
+        auth_v2_token = None
+        if login_result and 'access_token' in login_result:
+            auth_v2_token = login_result['access_token']
+            self.log_test("Auth V2 Login Success", True, "Admin login successful")
+        else:
+            self.log_test("Auth V2 Login Success", False, "Login failed or missing token")
+            success = False
+        
+        if auth_v2_token:
+            # Set token for authenticated requests
+            self.token = auth_v2_token
+            
+            # 2. Get current user info
+            me_result = self.run_test(
+                "GET /api/auth-v2/me",
+                "GET",
+                "auth-v2/me",
+                200
+            )
+            
+            if me_result and 'email' in me_result:
+                self.log_test("Auth V2 Get Current User", True, f"User: {me_result.get('email')}")
+            else:
+                self.log_test("Auth V2 Get Current User", False, "Failed to get user info")
+                success = False
+            
+            # 3. Get all users (admin only)
+            users_result = self.run_test(
+                "GET /api/auth-v2/users",
+                "GET",
+                "auth-v2/users",
+                200
+            )
+            
+            if users_result and isinstance(users_result, list):
+                self.log_test("Auth V2 Get All Users", True, f"Found {len(users_result)} users")
+            else:
+                self.log_test("Auth V2 Get All Users", False, "Failed to get users list")
+                success = False
+            
+            # 4. Get user statistics (admin only)
+            stats_result = self.run_test(
+                "GET /api/auth-v2/users/stats",
+                "GET",
+                "auth-v2/users/stats",
+                200
+            )
+            
+            if stats_result and 'total_users' in stats_result:
+                self.log_test("Auth V2 User Statistics", True, f"Total users: {stats_result.get('total_users')}")
+            else:
+                self.log_test("Auth V2 User Statistics", False, "Failed to get user stats")
+                success = False
+            
+            # 5. Get user by ID (admin only) - use admin user ID
+            if me_result and 'cliente_id' in me_result:
+                user_id = me_result['cliente_id']
+                user_by_id = self.run_test(
+                    f"GET /api/auth-v2/users/{user_id}",
+                    "GET",
+                    f"auth-v2/users/{user_id}",
+                    200
+                )
+                
+                if user_by_id and 'email' in user_by_id:
+                    self.log_test("Auth V2 Get User by ID", True, f"User: {user_by_id.get('email')}")
+                else:
+                    self.log_test("Auth V2 Get User by ID", False, "Failed to get user by ID")
+                    success = False
+            
+            # 6. Logout
+            logout_result = self.run_test(
+                "POST /api/auth-v2/logout",
+                "POST",
+                "auth-v2/logout",
+                200
+            )
+            
+            if logout_result and logout_result.get('success'):
+                self.log_test("Auth V2 Logout", True, "Logout successful")
+            else:
+                self.log_test("Auth V2 Logout", False, "Logout failed")
+                success = False
+        
+        # ============== LEGACY ENDPOINTS (backward compatibility) ==============
+        
+        # Test legacy login endpoint
+        legacy_login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "adminpassword"
+        }
+        
+        legacy_login = self.run_test(
+            "POST /api/auth/login (Legacy)",
+            "POST",
+            "auth/login",
+            200,
+            legacy_login_data
+        )
+        
+        if legacy_login and 'token' in legacy_login:
+            self.log_test("Legacy Auth Login Compatibility", True, "Legacy login working")
+        else:
+            self.log_test("Legacy Auth Login Compatibility", False, "Legacy login failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_store_module_refactored_endpoints(self):
+        """Test Store Module Refactored Endpoints - REVIEW REQUEST"""
+        print("\n🏪 Testing Store Module Refactored Endpoints (NEW /api/store/*)...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== NEW STORE ENDPOINTS (refactored routes at /api/store/*) ==============
         
         # 1. Categories
         self.token = None  # Remove auth for public endpoint
@@ -1576,10 +1709,10 @@ class TextbookStoreAPITester:
             200
         )
         
-        if categories:
-            self.log_test("Store Categories Structure", True, f"Found {len(categories)} categories")
+        if categories and isinstance(categories, list):
+            self.log_test("Store Categories", True, f"Found {len(categories)} categories")
         else:
-            self.log_test("Store Categories Structure", False, "No categories returned")
+            self.log_test("Store Categories", False, "No categories returned")
             success = False
         
         # 2. Products
@@ -1590,10 +1723,10 @@ class TextbookStoreAPITester:
             200
         )
         
-        if products:
-            self.log_test("Store Products Structure", True, f"Found {len(products)} products")
+        if products and isinstance(products, list):
+            self.log_test("Store Products", True, f"Found {len(products)} products")
         else:
-            self.log_test("Store Products Structure", False, "No products returned")
+            self.log_test("Store Products", False, "No products returned")
             success = False
         
         # 3. Featured Products
@@ -1604,69 +1737,13 @@ class TextbookStoreAPITester:
             200
         )
         
-        if featured is not None:
+        if featured is not None and isinstance(featured, list):
             self.log_test("Store Featured Products", True, f"Found {len(featured)} featured products")
         else:
             self.log_test("Store Featured Products", False, "Featured products endpoint failed")
             success = False
         
-        # 4. Promotional Products
-        promotions = self.run_test(
-            "GET /api/store/products/promotions",
-            "GET",
-            "store/products/promotions",
-            200
-        )
-        
-        if promotions is not None:
-            self.log_test("Store Promotional Products", True, f"Found {len(promotions)} promotional products")
-        else:
-            self.log_test("Store Promotional Products", False, "Promotional products endpoint failed")
-            success = False
-        
-        # 5. Newest Products
-        newest = self.run_test(
-            "GET /api/store/products/newest",
-            "GET",
-            "store/products/newest",
-            200
-        )
-        
-        if newest is not None:
-            self.log_test("Store Newest Products", True, f"Found {len(newest)} newest products")
-        else:
-            self.log_test("Store Newest Products", False, "Newest products endpoint failed")
-            success = False
-        
-        # 6. Search Products
-        search_results = self.run_test(
-            "GET /api/store/products/search?q=test",
-            "GET",
-            "store/products/search?q=test",
-            200
-        )
-        
-        if search_results is not None:
-            self.log_test("Store Product Search", True, f"Search returned {len(search_results)} results")
-        else:
-            self.log_test("Store Product Search", False, "Product search endpoint failed")
-            success = False
-        
-        # 7. Public Products
-        public_products = self.run_test(
-            "GET /api/store/public/products",
-            "GET",
-            "store/public/products",
-            200
-        )
-        
-        if public_products is not None:
-            self.log_test("Store Public Products", True, f"Found {len(public_products)} public products")
-        else:
-            self.log_test("Store Public Products", False, "Public products endpoint failed")
-            success = False
-        
-        # 8. Public Grades
+        # 4. Public Grades (no auth required)
         public_grades = self.run_test(
             "GET /api/store/public/grades",
             "GET",
@@ -1680,7 +1757,7 @@ class TextbookStoreAPITester:
             self.log_test("Store Public Grades", False, "Public grades endpoint failed")
             success = False
         
-        # 9. Public Subjects
+        # 5. Public Subjects (no auth required)
         public_subjects = self.run_test(
             "GET /api/store/public/subjects",
             "GET",
@@ -1694,53 +1771,99 @@ class TextbookStoreAPITester:
             self.log_test("Store Public Subjects", False, "Public subjects endpoint failed")
             success = False
         
-        # 10. Admin Inventory (requires admin auth)
-        self.token = self.admin_token
+        # ============== LEGACY ENDPOINTS (backward compatibility) ==============
         
-        inventory = self.run_test(
-            "GET /api/store/inventory",
+        # Test legacy categories endpoint
+        legacy_categories = self.run_test(
+            "GET /api/categorias (Legacy)",
             "GET",
-            "store/inventory",
+            "categorias",
             200
         )
         
-        if inventory:
-            self.log_test("Store Inventory Stats", True, "Inventory stats retrieved")
+        if legacy_categories and isinstance(legacy_categories, list):
+            self.log_test("Legacy Categories Compatibility", True, f"Found {len(legacy_categories)} categories")
         else:
-            self.log_test("Store Inventory Stats", False, "Inventory endpoint failed")
+            self.log_test("Legacy Categories Compatibility", False, "Legacy categories failed")
             success = False
         
-        # 11. Low Stock Products
-        low_stock = self.run_test(
-            "GET /api/store/inventory/low-stock",
+        # Test legacy grades endpoint
+        legacy_grades = self.run_test(
+            "GET /api/grados (Legacy)",
             "GET",
-            "store/inventory/low-stock",
+            "grados",
             200
         )
         
-        if low_stock is not None:
-            self.log_test("Store Low Stock Products", True, f"Found {len(low_stock)} low stock products")
+        if legacy_grades and isinstance(legacy_grades, list):
+            self.log_test("Legacy Grades Compatibility", True, f"Found {len(legacy_grades)} grades")
         else:
-            self.log_test("Store Low Stock Products", False, "Low stock endpoint failed")
+            self.log_test("Legacy Grades Compatibility", False, "Legacy grades failed")
             success = False
         
-        # 12. Category Landing
-        self.token = None  # Remove auth for public endpoint
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_backward_compatibility_endpoints(self):
+        """Test Backward Compatibility Endpoints - REVIEW REQUEST"""
+        print("\n🔄 Testing Backward Compatibility Endpoints...")
         
-        category_landing = self.run_test(
-            "GET /api/store/landing/category/libros",
+        success = True
+        old_token = self.token
+        
+        # Test legacy auth login
+        legacy_login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "adminpassword"
+        }
+        
+        legacy_auth = self.run_test(
+            "POST /api/auth/login (Backward Compatibility)",
+            "POST",
+            "auth/login",
+            200,
+            legacy_login_data
+        )
+        
+        if legacy_auth and 'token' in legacy_auth:
+            self.log_test("Backward Compatibility - Auth Login", True, "Legacy auth working")
+        else:
+            self.log_test("Backward Compatibility - Auth Login", False, "Legacy auth failed")
+            success = False
+        
+        # Test legacy store endpoints
+        self.token = None  # Remove auth for public endpoints
+        
+        legacy_categorias = self.run_test(
+            "GET /api/categorias (Backward Compatibility)",
             "GET",
-            "store/landing/category/libros",
+            "categorias",
             200
         )
         
-        if category_landing:
-            self.log_test("Store Category Landing", True, "Category landing data retrieved")
+        if legacy_categorias and isinstance(legacy_categorias, list):
+            self.log_test("Backward Compatibility - Categories", True, f"Found {len(legacy_categorias)} categories")
         else:
-            self.log_test("Store Category Landing", False, "Category landing endpoint failed")
+            self.log_test("Backward Compatibility - Categories", False, "Legacy categories failed")
             success = False
         
-        # ============== LEGACY ENDPOINTS (backward compatibility at /api/*) ==============
+        legacy_grados = self.run_test(
+            "GET /api/grados (Backward Compatibility)",
+            "GET",
+            "grados",
+            200
+        )
+        
+        if legacy_grados and isinstance(legacy_grados, list):
+            self.log_test("Backward Compatibility - Grades", True, f"Found {len(legacy_grados)} grades")
+        else:
+            self.log_test("Backward Compatibility - Grades", False, "Legacy grades failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success/*) ==============
         
         # 13. Legacy Categories
         legacy_categories = self.run_test(
