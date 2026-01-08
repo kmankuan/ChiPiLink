@@ -37,9 +37,9 @@ export default function Catalog() {
   const fetchData = async () => {
     try {
       const [librosRes, gradosRes, materiasRes] = await Promise.all([
-        axios.get(`${API_URL}/api/libros`),
-        axios.get(`${API_URL}/api/grados`),
-        axios.get(`${API_URL}/api/materias`)
+        axios.get(buildUrl(STORE_ENDPOINTS.products)),
+        axios.get(buildUrl(STORE_ENDPOINTS.grades)),
+        axios.get(buildUrl(STORE_ENDPOINTS.subjects))
       ]);
       
       setLibros(librosRes.data);
