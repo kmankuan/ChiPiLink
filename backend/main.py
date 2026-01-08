@@ -47,7 +47,11 @@ from modules.store.legacy_routes import router as store_router
 from modules.landing.routes import router as landing_router
 
 # Community Module (posts, events, gallery)
-from modules.community.routes import router as community_router
+# Refactored as Microservices-Ready Module
+from modules.community import init_module as init_community
+from modules.community import community_refactored_router
+# Legacy routes (keep for backward compatibility with frontend)
+from modules.community.legacy_routes import router as community_router
 
 # Integrations Module
 from modules.integrations.monday.routes import router as monday_router
