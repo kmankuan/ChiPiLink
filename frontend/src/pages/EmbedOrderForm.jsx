@@ -75,7 +75,7 @@ export default function EmbedOrderForm() {
       try {
         const [configRes, gradosRes] = await Promise.all([
           axios.get(`${API_URL}/api/public/config-formulario`),
-          axios.get(`${API_URL}/api/grados`)
+          axios.get(buildUrl(STORE_ENDPOINTS.grades))
         ]);
         
         setFormConfig(configRes.data);
@@ -99,7 +99,7 @@ export default function EmbedOrderForm() {
     }
     
     try {
-      const response = await axios.get(`${API_URL}/api/public/libros`, {
+      const response = await axios.get(buildUrl(STORE_ENDPOINTS.products), {
         params: { grado }
       });
       setLibros(response.data);
