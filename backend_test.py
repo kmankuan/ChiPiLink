@@ -2000,6 +2000,239 @@ class TextbookStoreAPITester:
         if featured is not None and isinstance(featured, list):
             self.log_test("Store Featured Products", True, f"Found {len(featured)} featured products")
         else:
+            self.log_test("Store Featured Products", False, "No featured products returned")
+            success = False
+        
+        # 4. Public Grades
+        grades = self.run_test(
+            "GET /api/store/public/grades",
+            "GET",
+            "store/public/grades",
+            200
+        )
+        
+        if grades and isinstance(grades, list):
+            self.log_test("Store Public Grades", True, f"Found {len(grades)} grade levels")
+        else:
+            self.log_test("Store Public Grades", False, "No grades returned")
+            success = False
+        
+        # ============== LEGACY ENDPOINTS (backward compatibility) ==============
+        
+        # Test legacy categories endpoint
+        legacy_categories = self.run_test(
+            "GET /api/categorias (Legacy)",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        if legacy_categories and isinstance(legacy_categories, list):
+            self.log_test("Legacy Categories Compatibility", True, f"Found {len(legacy_categories)} categories")
+        else:
+            self.log_test("Legacy Categories Compatibility", False, "Legacy categories failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_backward_compatibility_endpoints(self):
+        """Test Backward Compatibility Endpoints - REVIEW REQUEST"""
+        print("\n🔄 Testing Backward Compatibility Endpoints...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== COMMUNITY LEGACY ==============
+        
+        # Remove auth for public endpoints
+        self.token = None
+        
+        # 1. Community Legacy - GET /api/community/posts
+        legacy_posts = self.run_test(
+            "GET /api/community/posts (Legacy)",
+            "GET",
+            "community/posts",
+            200
+        )
+        
+        if legacy_posts and isinstance(legacy_posts, list):
+            self.log_test("Legacy Community Posts", True, f"Found {len(legacy_posts)} posts")
+        else:
+            self.log_test("Legacy Community Posts", False, "Legacy community posts failed")
+            success = False
+        
+        # 2. Community Legacy - GET /api/community/landing
+        legacy_community_landing = self.run_test(
+            "GET /api/community/landing (Legacy)",
+            "GET",
+            "community/landing",
+            200
+        )
+        
+        if legacy_community_landing and isinstance(legacy_community_landing, dict):
+            self.log_test("Legacy Community Landing", True, "Legacy community landing working")
+        else:
+            self.log_test("Legacy Community Landing", False, "Legacy community landing failed")
+            success = False
+        
+        # ============== STORE LEGACY ==============
+        
+        # 3. Store Legacy - GET /api/categorias
+        legacy_store_categories = self.run_test(
+            "GET /api/categorias (Legacy Store)",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        if legacy_store_categories and isinstance(legacy_store_categories, list):
+            self.log_test("Legacy Store Categories", True, f"Found {len(legacy_store_categories)} categories")
+        else:
+            self.log_test("Legacy Store Categories", False, "Legacy store categories failed")
+            success = False
+        
+        # ============== AUTH LEGACY ==============
+        
+        # 4. Auth Legacy - POST /api/auth/login
+        legacy_auth_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        legacy_auth_login = self.run_test(
+            "POST /api/auth/login (Legacy Auth)",
+            "POST",
+            "auth/login",
+            200,
+            legacy_auth_data
+        )
+        
+        if legacy_auth_login and 'token' in legacy_auth_login:
+            self.log_test("Legacy Auth Login", True, "Legacy auth login working")
+        else:
+            self.log_test("Legacy Auth Login", False, "Legacy auth login failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_microservices_architecture_verification(self):
+        """Test Microservices Architecture Verification - REVIEW REQUEST"""
+        print("\n🏗️ Testing Microservices Architecture Verification...")
+        
+        success = True
+        old_token = self.token
+        
+        # Test health endpoint to verify all modules are loaded
+        self.token = None  # Remove auth for public endpoint
+        
+        health = self.run_test(
+            "GET /api/health",
+            "GET",
+            "health",
+            200
+        )
+        
+        if health and isinstance(health, dict):
+            modules = health.get('modules', [])
+            if isinstance(modules, list) and len(modules) > 0:
+                self.log_test("Health Check Modules", True, f"Found {len(modules)} modules: {modules}")
+                
+                # Check for expected refactored modules
+                expected_modules = ['auth', 'store', 'community']
+                found_modules = [mod for mod in expected_modules if mod in modules]
+                
+                if len(found_modules) == len(expected_modules):
+                    self.log_test("Refactored Modules Present", True, f"All refactored modules found: {found_modules}")
+                else:
+                    missing = [mod for mod in expected_modules if mod not in modules]
+                    self.log_test("Refactored Modules Present", False, f"Missing modules: {missing}")
+                    success = False
+            else:
+                self.log_test("Health Check Modules", False, "No modules found in health check")
+                success = False
+        else:
+            self.log_test("Health Check", False, "Health endpoint failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def run_microservices_refactoring_tests(self):
+        """Run all microservices refactoring tests - REVIEW REQUEST MAIN"""
+        print("\n" + "="*80)
+        print("🚀 MICROSERVICES REFACTORING TESTS - REVIEW REQUEST")
+        print("="*80)
+        
+        # Setup admin user and login
+        if not self.test_admin_setup():
+            print("❌ Admin setup failed, cannot continue with tests")
+            return False
+        
+        if not self.test_admin_login():
+            print("❌ Admin login failed, cannot continue with tests")
+            return False
+        
+        # Run all refactoring tests
+        test_results = []
+        
+        # 1. Community Module Tests (NEW endpoints at /api/community-v2/*)
+        print("\n" + "="*60)
+        print("🏘️ COMMUNITY MODULE TESTS (NEW /api/community-v2/*)")
+        print("="*60)
+        test_results.append(("Community Module Refactored", self.test_community_module_refactored_endpoints()))
+        
+        # 2. Quick verification of other modules
+        print("\n" + "="*60)
+        print("🔐 AUTH MODULE QUICK VERIFICATION")
+        print("="*60)
+        test_results.append(("Auth Module Quick Verification", self.test_auth_module_refactored_endpoints_quick()))
+        
+        print("\n" + "="*60)
+        print("🏪 STORE MODULE QUICK VERIFICATION")
+        print("="*60)
+        test_results.append(("Store Module Quick Verification", self.test_store_module_refactored_endpoints_quick()))
+        
+        # 3. Backward Compatibility
+        print("\n" + "="*60)
+        print("🔄 BACKWARD COMPATIBILITY TESTS")
+        print("="*60)
+        test_results.append(("Backward Compatibility", self.test_backward_compatibility_endpoints()))
+        
+        # 4. Architecture Verification
+        print("\n" + "="*60)
+        print("🏗️ MICROSERVICES ARCHITECTURE VERIFICATION")
+        print("="*60)
+        test_results.append(("Architecture Verification", self.test_microservices_architecture_verification()))
+        
+        # Summary
+        print("\n" + "="*80)
+        print("📊 MICROSERVICES REFACTORING TEST SUMMARY")
+        print("="*80)
+        
+        passed_tests = [name for name, result in test_results if result]
+        failed_tests = [name for name, result in test_results if not result]
+        
+        print(f"✅ Passed: {len(passed_tests)}/{len(test_results)}")
+        for test_name in passed_tests:
+            print(f"   ✅ {test_name}")
+        
+        if failed_tests:
+            print(f"\n❌ Failed: {len(failed_tests)}/{len(test_results)}")
+            for test_name in failed_tests:
+                print(f"   ❌ {test_name}")
+        
+        overall_success = len(failed_tests) == 0
+        
+        print(f"\n🎯 Overall Result: {'✅ ALL TESTS PASSED' if overall_success else '❌ SOME TESTS FAILED'}")
+        
+        return overall_success
+            self.log_test("Store Featured Products", True, f"Found {len(featured)} featured products")
+        else:
             self.log_test("Store Featured Products", False, "Featured products endpoint failed")
             success = False
         
