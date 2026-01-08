@@ -4690,8 +4690,30 @@ class TextbookStoreAPITester:
 def main():
     import sys
     
-    # Check if we should run only the review request tests
-    if len(sys.argv) > 1 and sys.argv[1] == "review":
+    # Check if we should run only the microservices refactoring tests
+    if len(sys.argv) > 1 and sys.argv[1] == "microservices":
+        print("🚀 Running Microservices Refactoring Tests Only")
+        tester = TextbookStoreAPITester()
+        
+        # Run the microservices refactoring tests
+        success = tester.run_microservices_refactoring_tests()
+        
+        # Print summary
+        print(f"\n📊 Microservices Refactoring Test Summary:")
+        print(f"Tests run: {tester.tests_run}")
+        print(f"Tests passed: {tester.tests_passed}")
+        print(f"Tests failed: {tester.tests_run - tester.tests_passed}")
+        print(f"Success rate: {(tester.tests_passed/tester.tests_run*100):.1f}%")
+        
+        if tester.failed_tests:
+            print("\n❌ FAILED TESTS:")
+            for failed_test in tester.failed_tests:
+                print(f"  • {failed_test}")
+        else:
+            print("\n✅ ALL MICROSERVICES REFACTORING TESTS PASSED!")
+        
+        return 0 if success else 1
+    elif len(sys.argv) > 1 and sys.argv[1] == "review":
         print("🎯 Running Review Request Tests Only")
         tester = TextbookStoreAPITester()
         
