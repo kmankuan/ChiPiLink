@@ -112,6 +112,9 @@ init_pinpanclub()
 # Initialize Store module (event handlers)
 init_store()
 
+# Initialize Auth module (event handlers)
+init_auth()
+
 # ============== REGISTER ROUTERS ==============
 
 # Create main API router with /api prefix
