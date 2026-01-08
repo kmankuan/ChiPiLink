@@ -26,6 +26,7 @@ import {
   RefreshCw,
   Loader2
 } from 'lucide-react';
+import { PINPANCLUB_API } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
