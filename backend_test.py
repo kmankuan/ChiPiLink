@@ -1691,6 +1691,266 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_community_module_refactored_endpoints(self):
+        """Test Community Module Refactored Endpoints - REVIEW REQUEST"""
+        print("\n🏘️ Testing Community Module Refactored Endpoints (NEW /api/community-v2/*)...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== NEW COMMUNITY ENDPOINTS (refactored routes at /api/community-v2/*) ==============
+        
+        # 1. Posts - GET /api/community-v2/posts
+        self.token = None  # Remove auth for public endpoint
+        posts = self.run_test(
+            "GET /api/community-v2/posts",
+            "GET",
+            "community-v2/posts",
+            200
+        )
+        
+        if posts and isinstance(posts, list):
+            self.log_test("Community V2 Posts", True, f"Found {len(posts)} published posts")
+        else:
+            self.log_test("Community V2 Posts", False, "No posts returned")
+            success = False
+        
+        # 2. Single Post - GET /api/community-v2/posts/{post_id} (may be empty)
+        if posts and len(posts) > 0:
+            post_id = posts[0].get('post_id')
+            if post_id:
+                single_post = self.run_test(
+                    f"GET /api/community-v2/posts/{post_id}",
+                    "GET",
+                    f"community-v2/posts/{post_id}",
+                    200
+                )
+                
+                if single_post and single_post.get('post_id'):
+                    self.log_test("Community V2 Single Post", True, f"Retrieved post: {single_post.get('titulo', 'Unknown')}")
+                else:
+                    self.log_test("Community V2 Single Post", False, "Failed to retrieve single post")
+                    success = False
+            else:
+                self.log_test("Community V2 Single Post", False, "No post_id found in posts")
+                success = False
+        else:
+            # Test with a dummy ID - should return 404 but endpoint should exist
+            dummy_post = self.run_test(
+                "GET /api/community-v2/posts/dummy_id (404 expected)",
+                "GET",
+                "community-v2/posts/dummy_id",
+                404
+            )
+            if dummy_post is None:  # 404 is expected, so None means test passed
+                self.log_test("Community V2 Single Post Endpoint", True, "Endpoint exists (404 for non-existent post)")
+            else:
+                self.log_test("Community V2 Single Post Endpoint", False, "Endpoint should return 404 for non-existent post")
+                success = False
+        
+        # 3. Events - GET /api/community-v2/events (upcoming)
+        events = self.run_test(
+            "GET /api/community-v2/events",
+            "GET",
+            "community-v2/events",
+            200
+        )
+        
+        if events and isinstance(events, list):
+            self.log_test("Community V2 Events (Upcoming)", True, f"Found {len(events)} upcoming events")
+        else:
+            self.log_test("Community V2 Events (Upcoming)", False, "No upcoming events returned")
+            success = False
+        
+        # 4. Past Events - GET /api/community-v2/events?upcoming=false
+        past_events = self.run_test(
+            "GET /api/community-v2/events?upcoming=false",
+            "GET",
+            "community-v2/events?upcoming=false",
+            200
+        )
+        
+        if past_events and isinstance(past_events, list):
+            self.log_test("Community V2 Events (Past)", True, f"Found {len(past_events)} past events")
+        else:
+            self.log_test("Community V2 Events (Past)", False, "No past events returned")
+            success = False
+        
+        # 5. Gallery - GET /api/community-v2/gallery
+        gallery = self.run_test(
+            "GET /api/community-v2/gallery",
+            "GET",
+            "community-v2/gallery",
+            200
+        )
+        
+        if gallery and isinstance(gallery, list):
+            self.log_test("Community V2 Gallery", True, f"Found {len(gallery)} active albums")
+        else:
+            self.log_test("Community V2 Gallery", False, "No gallery albums returned")
+            success = False
+        
+        # 6. Landing - GET /api/community-v2/landing (combined data)
+        landing = self.run_test(
+            "GET /api/community-v2/landing",
+            "GET",
+            "community-v2/landing",
+            200
+        )
+        
+        if landing and isinstance(landing, dict):
+            expected_keys = ['destacados', 'noticias', 'anuncios', 'eventos', 'galerias', 'productos_destacados', 'productos_promocion']
+            found_keys = list(landing.keys())
+            self.log_test("Community V2 Landing Data", True, f"Found landing data with keys: {found_keys}")
+            
+            # Check if all expected keys are present
+            missing_keys = [key for key in expected_keys if key not in found_keys]
+            if missing_keys:
+                self.log_test("Community V2 Landing Complete", False, f"Missing keys: {missing_keys}")
+                success = False
+            else:
+                self.log_test("Community V2 Landing Complete", True, "All expected data sections present")
+        else:
+            self.log_test("Community V2 Landing Data", False, "No landing data returned")
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
+    def test_auth_module_refactored_endpoints_quick(self):
+        """Test Auth Module Refactored Endpoints - QUICK VERIFICATION"""
+        print("\n🔐 Testing Auth Module Refactored Endpoints (Quick Verification)...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== NEW AUTH ENDPOINTS (refactored routes at /api/auth-v2/*) ==============
+        
+        # 1. Login with admin credentials
+        login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        login_result = self.run_test(
+            "POST /api/auth-v2/login",
+            "POST",
+            "auth-v2/login",
+            200,
+            login_data
+        )
+        
+        auth_v2_token = None
+        if login_result and 'token' in login_result:
+            auth_v2_token = login_result['token']
+            self.log_test("Auth V2 Login Success", True, "Admin login successful")
+        else:
+            self.log_test("Auth V2 Login Success", False, "Login failed or missing token")
+            success = False
+        
+        if auth_v2_token:
+            # Set token for authenticated requests
+            self.token = auth_v2_token
+            
+            # 2. Get user statistics (admin only)
+            stats_result = self.run_test(
+                "GET /api/auth-v2/users/stats",
+                "GET",
+                "auth-v2/users/stats",
+                200
+            )
+            
+            if stats_result and 'total_users' in stats_result:
+                self.log_test("Auth V2 User Statistics", True, f"Total users: {stats_result.get('total_users')}")
+            else:
+                self.log_test("Auth V2 User Statistics", False, "Failed to get user stats")
+                success = False
+        
+        # ============== LEGACY ENDPOINTS (backward compatibility) ==============
+        
+        # Test legacy login endpoint
+        legacy_login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        legacy_login = self.run_test(
+            "POST /api/auth/login (Legacy)",
+            "POST",
+            "auth/login",
+            200,
+            legacy_login_data
+        )
+        
+        if legacy_login and 'token' in legacy_login:
+            self.log_test("Legacy Auth Login Compatibility", True, "Legacy login working")
+        else:
+            self.log_test("Legacy Auth Login Compatibility", False, "Legacy login failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
+    def test_store_module_refactored_endpoints_quick(self):
+        """Test Store Module Refactored Endpoints - QUICK VERIFICATION"""
+        print("\n🏪 Testing Store Module Refactored Endpoints (Quick Verification)...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== NEW STORE ENDPOINTS (refactored routes at /api/store/*) ==============
+        
+        # 1. Categories
+        self.token = None  # Remove auth for public endpoint
+        categories = self.run_test(
+            "GET /api/store/categories",
+            "GET",
+            "store/categories",
+            200
+        )
+        
+        if categories and isinstance(categories, list):
+            self.log_test("Store Categories", True, f"Found {len(categories)} categories")
+        else:
+            self.log_test("Store Categories", False, "No categories returned")
+            success = False
+        
+        # 2. Public Grades
+        grades = self.run_test(
+            "GET /api/store/public/grades",
+            "GET",
+            "store/public/grades",
+            200
+        )
+        
+        if grades and isinstance(grades, list):
+            self.log_test("Store Public Grades", True, f"Found {len(grades)} grade levels")
+        else:
+            self.log_test("Store Public Grades", False, "No grades returned")
+            success = False
+        
+        # ============== LEGACY ENDPOINTS (backward compatibility) ==============
+        
+        # Test legacy categories endpoint
+        legacy_categories = self.run_test(
+            "GET /api/categorias (Legacy)",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        if legacy_categories and isinstance(legacy_categories, list):
+            self.log_test("Legacy Categories Compatibility", True, f"Found {len(legacy_categories)} categories")
+        else:
+            self.log_test("Legacy Categories Compatibility", False, "Legacy categories failed")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
     def test_store_module_refactored_endpoints(self):
         """Test Store Module Refactored Endpoints - REVIEW REQUEST"""
         print("\n🏪 Testing Store Module Refactored Endpoints (NEW /api/store/*)...")
