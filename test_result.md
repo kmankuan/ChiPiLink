@@ -580,6 +580,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
   completed_testing:
+    - "Store Module Refactored with Microservices Architecture"
     - "Ping Pong Monday.com Integration"
     - "Ping Pong Monday.com Integration Frontend"
     - "Unatienda/Platform Store Integration"
