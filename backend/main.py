@@ -34,6 +34,10 @@ from core.auth import get_current_user, get_admin_user
 from modules.auth.routes import router as auth_router
 
 # Store Module (products, orders, inventory, categories, students)
+# Refactored as Microservices-Ready Module
+from modules.store import init_module as init_store
+from modules.store import store_refactored_router
+# Legacy routes (keep for backward compatibility with frontend)
 from modules.store.routes import router as store_router
 
 # Landing Page Builder Module
