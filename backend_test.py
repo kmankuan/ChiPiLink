@@ -1558,6 +1558,236 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_store_module_refactored_endpoints(self):
+        """Test Store Module Refactored Endpoints - REVIEW REQUEST"""
+        print("\n🏪 Testing Store Module Refactored Endpoints...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== NEW ENDPOINTS (refactored routes at /api/store/*) ==============
+        
+        # 1. Categories
+        self.token = None  # Remove auth for public endpoint
+        categories = self.run_test(
+            "GET /api/store/categories",
+            "GET",
+            "store/categories",
+            200
+        )
+        
+        if categories:
+            self.log_test("Store Categories Structure", True, f"Found {len(categories)} categories")
+        else:
+            self.log_test("Store Categories Structure", False, "No categories returned")
+            success = False
+        
+        # 2. Products
+        products = self.run_test(
+            "GET /api/store/products",
+            "GET",
+            "store/products",
+            200
+        )
+        
+        if products:
+            self.log_test("Store Products Structure", True, f"Found {len(products)} products")
+        else:
+            self.log_test("Store Products Structure", False, "No products returned")
+            success = False
+        
+        # 3. Featured Products
+        featured = self.run_test(
+            "GET /api/store/products/featured",
+            "GET",
+            "store/products/featured",
+            200
+        )
+        
+        if featured is not None:
+            self.log_test("Store Featured Products", True, f"Found {len(featured)} featured products")
+        else:
+            self.log_test("Store Featured Products", False, "Featured products endpoint failed")
+            success = False
+        
+        # 4. Promotional Products
+        promotions = self.run_test(
+            "GET /api/store/products/promotions",
+            "GET",
+            "store/products/promotions",
+            200
+        )
+        
+        if promotions is not None:
+            self.log_test("Store Promotional Products", True, f"Found {len(promotions)} promotional products")
+        else:
+            self.log_test("Store Promotional Products", False, "Promotional products endpoint failed")
+            success = False
+        
+        # 5. Newest Products
+        newest = self.run_test(
+            "GET /api/store/products/newest",
+            "GET",
+            "store/products/newest",
+            200
+        )
+        
+        if newest is not None:
+            self.log_test("Store Newest Products", True, f"Found {len(newest)} newest products")
+        else:
+            self.log_test("Store Newest Products", False, "Newest products endpoint failed")
+            success = False
+        
+        # 6. Search Products
+        search_results = self.run_test(
+            "GET /api/store/products/search?q=test",
+            "GET",
+            "store/products/search?q=test",
+            200
+        )
+        
+        if search_results is not None:
+            self.log_test("Store Product Search", True, f"Search returned {len(search_results)} results")
+        else:
+            self.log_test("Store Product Search", False, "Product search endpoint failed")
+            success = False
+        
+        # 7. Public Products
+        public_products = self.run_test(
+            "GET /api/store/public/products",
+            "GET",
+            "store/public/products",
+            200
+        )
+        
+        if public_products is not None:
+            self.log_test("Store Public Products", True, f"Found {len(public_products)} public products")
+        else:
+            self.log_test("Store Public Products", False, "Public products endpoint failed")
+            success = False
+        
+        # 8. Public Grades
+        public_grades = self.run_test(
+            "GET /api/store/public/grades",
+            "GET",
+            "store/public/grades",
+            200
+        )
+        
+        if public_grades and 'grados' in public_grades:
+            self.log_test("Store Public Grades", True, f"Found {len(public_grades['grados'])} grades")
+        else:
+            self.log_test("Store Public Grades", False, "Public grades endpoint failed")
+            success = False
+        
+        # 9. Public Subjects
+        public_subjects = self.run_test(
+            "GET /api/store/public/subjects",
+            "GET",
+            "store/public/subjects",
+            200
+        )
+        
+        if public_subjects and 'materias' in public_subjects:
+            self.log_test("Store Public Subjects", True, f"Found {len(public_subjects['materias'])} subjects")
+        else:
+            self.log_test("Store Public Subjects", False, "Public subjects endpoint failed")
+            success = False
+        
+        # 10. Admin Inventory (requires admin auth)
+        self.token = self.admin_token
+        
+        inventory = self.run_test(
+            "GET /api/store/inventory",
+            "GET",
+            "store/inventory",
+            200
+        )
+        
+        if inventory:
+            self.log_test("Store Inventory Stats", True, "Inventory stats retrieved")
+        else:
+            self.log_test("Store Inventory Stats", False, "Inventory endpoint failed")
+            success = False
+        
+        # 11. Low Stock Products
+        low_stock = self.run_test(
+            "GET /api/store/inventory/low-stock",
+            "GET",
+            "store/inventory/low-stock",
+            200
+        )
+        
+        if low_stock is not None:
+            self.log_test("Store Low Stock Products", True, f"Found {len(low_stock)} low stock products")
+        else:
+            self.log_test("Store Low Stock Products", False, "Low stock endpoint failed")
+            success = False
+        
+        # 12. Category Landing
+        self.token = None  # Remove auth for public endpoint
+        
+        category_landing = self.run_test(
+            "GET /api/store/landing/category/libros",
+            "GET",
+            "store/landing/category/libros",
+            200
+        )
+        
+        if category_landing:
+            self.log_test("Store Category Landing", True, "Category landing data retrieved")
+        else:
+            self.log_test("Store Category Landing", False, "Category landing endpoint failed")
+            success = False
+        
+        # ============== LEGACY ENDPOINTS (backward compatibility at /api/*) ==============
+        
+        # 13. Legacy Categories
+        legacy_categories = self.run_test(
+            "GET /api/categorias (Legacy)",
+            "GET",
+            "categorias",
+            200
+        )
+        
+        if legacy_categories:
+            self.log_test("Legacy Categories Compatibility", True, f"Found {len(legacy_categories)} categories")
+        else:
+            self.log_test("Legacy Categories Compatibility", False, "Legacy categories endpoint failed")
+            success = False
+        
+        # 14. Legacy Books
+        legacy_books = self.run_test(
+            "GET /api/libros (Legacy)",
+            "GET",
+            "libros",
+            200
+        )
+        
+        if legacy_books is not None:
+            self.log_test("Legacy Books Compatibility", True, f"Found {len(legacy_books)} books")
+        else:
+            self.log_test("Legacy Books Compatibility", False, "Legacy books endpoint failed")
+            success = False
+        
+        # 15. Legacy Grades
+        legacy_grades = self.run_test(
+            "GET /api/grados (Legacy)",
+            "GET",
+            "grados",
+            200
+        )
+        
+        if legacy_grades:
+            self.log_test("Legacy Grades Compatibility", True, f"Found {len(legacy_grades)} grades")
+        else:
+            self.log_test("Legacy Grades Compatibility", False, "Legacy grades endpoint failed")
+            success = False
+        
+        # Restore token
+        self.token = old_token
+        return success
+
     def test_platform_store_public_endpoints(self):
         """Test Platform Store Public Endpoints"""
         print("\n🏪 Testing Platform Store Public Endpoints...")
