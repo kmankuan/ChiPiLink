@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class TextbookStoreAPITester:
-    def __init__(self, base_url="https://matchpoint-30.preview.emergentagent.com"):
+    def __init__(self, base_url="https://pinpanclub.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.admin_token = None
@@ -1696,7 +1696,7 @@ class TextbookStoreAPITester:
                 "yappy": {
                     "merchant_id": "BAQIJ-98619452",
                     "secret_key": "test_secret_key",
-                    "url_domain": "https://matchpoint-30.preview.emergentagent.com",
+                    "url_domain": "https://pinpanclub.preview.emergentagent.com",
                     "activo": True,
                     "ambiente": "produccion"
                 }
@@ -3073,7 +3073,7 @@ class TextbookStoreAPITester:
             "orderId": "TEST123",
             "Hash": "test_hash_value",
             "status": "E",  # E=Ejecutado (successful)
-            "domain": "https://matchpoint-30.preview.emergentagent.com"
+            "domain": "https://pinpanclub.preview.emergentagent.com"
         }
         
         # Build query string for GET request
@@ -3321,7 +3321,7 @@ class TextbookStoreAPITester:
                     "orderId": pedido_id,
                     "Hash": "test_hash_for_real_order",
                     "status": "E",  # Successful payment
-                    "domain": "https://matchpoint-30.preview.emergentagent.com"
+                    "domain": "https://pinpanclub.preview.emergentagent.com"
                 }
                 
                 query_string = "&".join([f"{k}={v}" for k, v in ipn_params.items()])
