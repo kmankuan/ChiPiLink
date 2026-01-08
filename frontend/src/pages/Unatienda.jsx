@@ -82,9 +82,9 @@ export default function Unatienda() {
       const [productsRes, storeRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
         axios.get(`${API_URL}/api/platform-store/products`),
         axios.get(`${API_URL}/api/platform-store`),
-        axios.get(`${API_URL}/api/categorias`),
-        axios.get(`${API_URL}/api/grados`),
-        axios.get(`${API_URL}/api/materias`)
+        axios.get(buildUrl(STORE_ENDPOINTS.categories)),
+        axios.get(buildUrl(STORE_ENDPOINTS.grades)),
+        axios.get(buildUrl(STORE_ENDPOINTS.subjects))
       ]);
       
       setProducts(productsRes.data.products || []);
