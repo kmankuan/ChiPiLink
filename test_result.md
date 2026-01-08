@@ -767,3 +767,35 @@ unatienda_integration:
         agent: "testing"
         comment: "✅ YAPPY INTEGRATION TESTED SUCCESSFULLY! All Platform Store endpoints working correctly: ✅ GET /api/platform-store returns store info (nombre: 'Unatienda Test', activo: true). ✅ GET /api/platform-store/products returns 20 products with proper pagination. ✅ GET /api/platform-store/yappy/cdn returns CDN URL for production environment. ✅ GET /api/platform-store/admin/config returns full store and Yappy configuration (Merchant ID: BAQIJ-98619452, ambiente: produccion). ✅ PUT /api/platform-store/admin/config successfully saves configuration. ✅ POST /api/platform-store/admin/yappy/test returns expected error 'Error en el request o algun campo puede estar vacio' - this is expected behavior as domain registration is pending in Yappy Comercial dashboard. All backend routes functional and ready for production use."
 
+
+# ============== STORE MODULE REFACTOR ==============
+store_module_refactor:
+  - task: "Store Module Microservices-Ready Refactor"
+    implemented: true
+    working: pending_testing
+    files:
+      - "/app/backend/modules/store/routes/__init__.py"
+      - "/app/backend/modules/store/routes/products.py"
+      - "/app/backend/modules/store/routes/orders.py"
+      - "/app/backend/modules/store/routes/categories.py"
+      - "/app/backend/modules/store/routes/inventory.py"
+      - "/app/backend/modules/store/routes/students.py"
+      - "/app/backend/modules/store/routes/public.py"
+      - "/app/backend/modules/store/routes/landing.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    description: "Store module refactored to microservices-ready architecture following PinpanClub pattern. New endpoints at /api/store/* with Service Layer, Repository Pattern, and Event Bus integration. Legacy endpoints kept at /api/* for backward compatibility."
+    new_endpoints:
+      - "GET /api/store/categories"
+      - "GET /api/store/products"
+      - "GET /api/store/products/featured"
+      - "GET /api/store/products/promotions"
+      - "GET /api/store/products/newest"
+      - "GET /api/store/products/search"
+      - "GET /api/store/orders"
+      - "GET /api/store/inventory"
+      - "GET /api/store/public/products"
+      - "GET /api/store/public/grades"
+      - "GET /api/store/public/subjects"
+
