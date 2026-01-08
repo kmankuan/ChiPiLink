@@ -1,0 +1,18 @@
+"""
+Auth Module - Main Router
+Agrega todos los routers del módulo de autenticación
+"""
+from fastapi import APIRouter
+
+from .auth import router as auth_router
+from .users import router as users_router
+
+# Router principal del módulo Auth (refactorizado)
+router = APIRouter(prefix="/auth-v2", tags=["Auth"])
+
+# Incluir sub-routers
+router.include_router(auth_router)
+router.include_router(users_router)
+
+# Re-exportar para compatibilidad
+auth_refactored_router = router
