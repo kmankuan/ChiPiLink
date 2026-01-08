@@ -261,7 +261,7 @@ async def get_public_libros(grado: Optional[str] = None):
     
     libros = await db.libros.find(query, {"_id": 0}).to_list(500)
     # Filter only books with stock > 0
-    libros_disponibles = [l for l in libros if l.get("cantidad_inventario", 0) > 0]
+    libros_disponibles = [libro for libro in libros if libro.get("cantidad_inventario", 0) > 0]
     return libros_disponibles
 
 
