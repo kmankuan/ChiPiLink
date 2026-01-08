@@ -301,7 +301,7 @@ export default function PingPongTV() {
   
   const fetchRankings = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/rankings?limit=10`);
+      const response = await fetch(`${PINPANCLUB_API.rankings}?limit=10`);
       const data = await response.json();
       setRankings(data);
     } catch (error) {
@@ -311,7 +311,7 @@ export default function PingPongTV() {
 
   const fetchRecentResults = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/matches?estado=finalizado&limit=5`);
+      const response = await fetch(`${PINPANCLUB_API.matches}?estado=finalizado&limit=5`);
       const data = await response.json();
       setRecentResults(data);
     } catch (error) {
@@ -321,7 +321,7 @@ export default function PingPongTV() {
 
   const fetchSponsors = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/sponsors/tv/display`);
+      const response = await fetch(PINPANCLUB_API.sponsorsTvDisplay);
       const data = await response.json();
       setSponsors(data.sponsors || {});
       setSponsorLayout(data.layout || null);
