@@ -78,8 +78,8 @@ class TextbookStoreAPITester:
         
         # Try to create admin user with body data
         admin_data = {
-            "email": "admin@libreria.com",
-            "contrasena": "adminpassword",
+            "email": "teck@koh.one",
+            "contrasena": "Acdb##0897",
             "nombre": "Administrador"
         }
         
