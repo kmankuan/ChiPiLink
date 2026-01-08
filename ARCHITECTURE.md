@@ -206,10 +206,10 @@ services:
 |--------|--------|--------------|
 | PinpanClub | ✅ Refactorizado | Microservices-Ready |
 | Store | ✅ Refactorizado | Microservices-Ready |
-| Auth | 🔄 Legacy | Pendiente refactor |
+| Auth | ✅ Refactorizado | Microservices-Ready |
 | Community | 🔄 Legacy | Pendiente refactor |
 
 ---
 
 *Documentación creada: Enero 2026*
-*Próximo paso: Refactorizar módulo Auth siguiendo el patrón PinpanClub/Store*
+*Próximo paso: Refactorizar módulo Community siguiendo el patrón PinpanClub/Store/Auth*
