@@ -20,13 +20,19 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from core.database import db
 
-# Module to collection mapping
+# Module to collection mapping (Updated for Phase 2 naming convention)
 MODULE_COLLECTIONS = {
-    "auth": ["clientes", "user_sessions"],
-    "store": ["libros", "pedidos", "categorias", "estudiantes_sincronizados", "category_banners", "vendor_permissions"],
-    "pinpanclub": ["pingpong_players", "pingpong_matches", "pingpong_sponsors", "pingpong_config", "pinpanclub_configs"],
-    "community": ["community_posts", "community_events", "gallery_albums", "community_comments"],
-    "shared": ["app_config", "site_config", "notificaciones", "translations", "paginas"]
+    "auth": ["auth_users", "auth_sessions"],
+    "store": ["store_products", "store_orders", "store_categories", "store_students"],
+    "pinpanclub": [
+        "pinpanclub_players", "pinpanclub_matches", "pinpanclub_sponsors", 
+        "pinpanclub_config", "pinpanclub_layouts",
+        "pinpanclub_superpin_leagues", "pinpanclub_superpin_checkins",
+        "pinpanclub_superpin_matches", "pinpanclub_superpin_rankings",
+        "pinpanclub_superpin_tournaments"
+    ],
+    "community": ["community_posts", "community_events", "community_albums", "community_comments"],
+    "core": ["core_app_config", "core_site_config", "core_notifications", "core_translations", "core_pages"]
 }
 
 
