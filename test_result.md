@@ -473,6 +473,18 @@ new_features_testing:
         comment: "✅ FEATURE WORKING: All 9 admin tabs functional and contain content: Resumen (overview stats), Productos (product management), Pedidos (orders), Inventario (inventory), Matrículas (enrollments), Google Sheets (integration), Formulario (form config), Landing Page (page editor), Monday.com (integration). App loads without errors, all tabs clickable and display appropriate content."
 
 frontend:
+  - task: "Frontend Migration to New API Endpoints - UI Flow Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "🎯 FRONTEND FLOWS TESTING AFTER API MIGRATION COMPLETED SUCCESSFULLY! Comprehensive browser automation testing performed on all 4 requested flows from review request: ✅ TEST 1 - LOGIN FLOW: Successfully navigated to /login, filled credentials (admin@libreria.com/admin), clicked login button, verified user redirected to admin dashboard (/admin), confirmed '¡Bienvenido, Admin!' message appears in top-right corner. Authentication working perfectly with new auth-v2 endpoints. ✅ TEST 2 - COMMUNITY LANDING PAGE: Successfully navigated to /comunidad, verified page loads without errors, confirmed sections 'Eventos' and 'Galería' are visible in navigation and page content, found substantial page content (4665 characters), no loading indicators or error messages detected. ✅ TEST 3 - STORE/TIENDA PAGE: Successfully navigated to /unatienda, verified page loads without errors, confirmed category tabs are visible (Libros, Snacks, Bebidas, Uniformes, Preparados, Servicios), verified search bar is functional (successfully filled with 'libro' and placeholder shows 'Buscar productos'), found 13 interactive buttons and proper store layout. ✅ TEST 4 - ADMIN DASHBOARD: After login, verified admin dashboard loads correctly, confirmed sidebar navigation is visible with all key modules (Dashboard, Tienda, Pedidos, Clientes, Administración, Integraciones, PinpanClub), verified key modules Tienda, Comunidad, and PinpanClub are accessible. ✅ NO JAVASCRIPT ERRORS: All pages loaded without JavaScript errors or console errors. ✅ API INTEGRATION: All new endpoints (auth-v2, store, community-v2) are working correctly with frontend. ✅ USER AUTHENTICATION: Login flow works correctly and admin dashboard is accessible after login. All 4 test flows completed successfully - frontend migration to new API endpoints is fully functional and ready for production use."
+
   - task: "Ping Pong Monday.com Integration Frontend"
     implemented: true
     working: true
