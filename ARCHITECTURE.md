@@ -207,9 +207,10 @@ services:
 | PinpanClub | ✅ Refactorizado | Microservices-Ready |
 | Store | ✅ Refactorizado | Microservices-Ready |
 | Auth | ✅ Refactorizado | Microservices-Ready |
-| Community | 🔄 Legacy | Pendiente refactor |
+| Community | ✅ Refactorizado | Microservices-Ready |
 
 ---
 
 *Documentación creada: Enero 2026*
-*Próximo paso: Refactorizar módulo Community siguiendo el patrón PinpanClub/Store/Auth*
+*Estado actual: Fase 1 completada - Todos los módulos principales refactorizados*
+*Próximo paso: Fase 2 - Separación de servicios (schemas de BD por módulo) y actualización del frontend*
