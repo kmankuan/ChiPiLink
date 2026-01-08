@@ -3710,8 +3710,8 @@ class TextbookStoreAPITester:
         
         # Test login endpoint
         login_data = {
-            "email": "admin@libreria.com",
-            "contrasena": "adminpassword"
+            "email": "teck@koh.one",
+            "contrasena": "Acdb##0897"
         }
         
         login_result = self.run_test(
