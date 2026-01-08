@@ -277,3 +277,107 @@ Cada módulo tiene su propio prefijo para las colecciones de MongoDB:
 *Documentación creada: Enero 2026*
 *Estado actual: Fase 1 completada + Frontend migrado + Fase 2 documentada*
 *Próximo paso: Fase 3 - Containerización y API Gateway*
+
+---
+
+## Fase 3: Containerización y API Gateway (Preparado)
+
+Los archivos de configuración para la Fase 3 han sido creados:
+
+### Archivos Creados
+
+| Archivo | Descripción |
+|---------|-------------|
+| `/docker-compose.microservices.yml` | Configuración Docker Compose para microservicios |
+| `/gateway/kong.yml` | Configuración del API Gateway (Kong) |
+| `/services/Dockerfile.template` | Template de Dockerfile para servicios |
+| `/services/main.template.py` | Template de main.py para servicios |
+| `/backend/scripts/db_manager.py` | Utilidades para gestión de BD por módulo |
+
+### Arquitectura de Microservicios (Cuando se active)
+
+```
+                    ┌─────────────────┐
+                    │    Frontend     │
+                    │   (React)       │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   API Gateway   │
+                    │     (Kong)      │
+                    └────────┬────────┘
+                             │
+        ┌────────────┬───────┴────────┬────────────┐
+        │            │                │            │
+   ┌────▼────┐  ┌────▼────┐    ┌─────▼────┐  ┌────▼────┐
+   │  Auth   │  │  Store  │    │ PinpanClub│  │Community│
+   │ Service │  │ Service │    │  Service │  │ Service │
+   └────┬────┘  └────┬────┘    └─────┬────┘  └────┬────┘
+        │            │                │            │
+        └────────────┴───────┬────────┴────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │    MongoDB      │
+                    └─────────────────┘
+```
+
+### Pasos para Activar Microservicios
+
+1. **Extraer módulos a servicios independientes:**
+   ```bash
+   # Ejemplo para PinpanClub
+   mkdir -p services/pinpanclub
+   cp -r backend/modules/pinpanclub services/pinpanclub/app
+   cp -r backend/core services/pinpanclub/core
+   cp services/Dockerfile.template services/pinpanclub/Dockerfile
+   ```
+
+2. **Configurar Event Bus distribuido (Redis):**
+   ```python
+   # Reemplazar event_bus local por Redis
+   from core.events import RedisEventBus
+   event_bus = RedisEventBus(redis_url="redis://redis:6379")
+   ```
+
+3. **Iniciar con Docker Compose:**
+   ```bash
+   docker-compose -f docker-compose.microservices.yml up -d
+   ```
+
+### Notas Importantes
+
+- La aplicación actualmente funciona como **monolito modular**
+- La migración a microservicios es **opcional** y solo recomendada cuando:
+  - Se necesite escalar módulos de forma independiente
+  - Se quiera desplegar módulos en diferentes regiones
+  - Se requiera usar diferentes tecnologías por módulo
+
+---
+
+## Resumen del Proyecto
+
+| Fase | Estado | Descripción |
+|------|--------|-------------|
+| **Fase 1** | ✅ Completada | Refactorización a arquitectura modular |
+| **Fase 1.5** | ✅ Completada | Migración del frontend a nuevos endpoints |
+| **Fase 2** | ✅ Documentada | Separación de schemas de BD |
+| **Fase 3** | 📝 Preparada | Containerización y API Gateway |
+
+### Módulos Refactorizados
+
+- ✅ **PinpanClub** - `/api/pinpanclub/*`
+- ✅ **Store** - `/api/store/*`
+- ✅ **Auth** - `/api/auth-v2/*`
+- ✅ **Community** - `/api/community-v2/*`
+
+### Características Implementadas
+
+1. **Service Layer Pattern** - Lógica de negocio encapsulada
+2. **Repository Pattern** - Acceso a datos abstraído
+3. **Event Bus** - Comunicación desacoplada entre módulos
+4. **Backward Compatibility** - Endpoints legacy mantenidos
+5. **Configuración Centralizada** - Frontend con archivos de configuración de API
+
+---
+
+*Última actualización: Enero 2026*
