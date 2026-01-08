@@ -261,3 +261,16 @@ class AuthEvents:
     USER_LOGGED_IN = "auth.user.logged_in"
     USER_LOGGED_OUT = "auth.user.logged_out"
     USER_UPDATED = "auth.user.updated"
+
+
+class CommunityEvents:
+    """Tipos de eventos del módulo Community"""
+    POST_CREATED = "community.post.created"
+    POST_UPDATED = "community.post.updated"
+    POST_DELETED = "community.post.deleted"
+    POST_LIKED = "community.post.liked"
+    
+    EVENT_CREATED = "community.event.created"
+    EVENT_UPDATED = "community.event.updated"
+    EVENT_DELETED = "community.event.deleted"
+    EVENT_REGISTRATION = "community.event.registration"
