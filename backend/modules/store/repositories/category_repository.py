@@ -64,7 +64,7 @@ class CategoryRepository(BaseRepository):
     
     async def count_products(self, categoria_id: str) -> int:
         """Contar productos en una categoría"""
-        return await db.libros.count_documents({
+        return await db[StoreCollections.PRODUCTS].count_documents({
             "categoria": categoria_id,
             "activo": True
         })
