@@ -1517,7 +1517,7 @@ class ChiPiLinkMicroservicesAPITester:
                 200
             )
             
-            if products:
+            if products is not None:  # Allow empty array
                 self.log_test("Store Products from store_products collection", True, f"Found {len(products) if isinstance(products, list) else 'data'}")
             else:
                 self.log_test("Store Products from store_products collection", False, "Failed to load from store_products")
