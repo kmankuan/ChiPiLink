@@ -10,6 +10,7 @@ import jwt
 
 from .config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRATION_HOURS
 from .database import db
+from .constants import AuthCollections
 
 # Security scheme
 security = HTTPBearer(auto_error=False)
@@ -46,7 +47,7 @@ async def get_current_user(
     session_token = request.cookies.get("session_token")
     if session_token:
         # Verify session from database
-        session = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
+        session = await db[AuthCollections.SESSIONS].find_one({"session_token": session_token}, {"_id": 0})
         if session:
             expires_at = session.get("expires_at")
             if isinstance(expires_at, str):
@@ -54,7 +55,7 @@ async def get_current_user(
             if expires_at.tzinfo is None:
                 expires_at = expires_at.replace(tzinfo=timezone.utc)
             if expires_at > datetime.now(timezone.utc):
-                user = await db.clientes.find_one(
+                user = await db[AuthCollections.USERS].find_one(
                     {"cliente_id": session["cliente_id"]}, 
                     {"_id": 0, "contrasena_hash": 0}
                 )
@@ -71,7 +72,7 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         cliente_id = payload.get("sub")
-        user = await db.clientes.find_one(
+        user = await db[AuthCollections.USERS].find_one(
             {"cliente_id": cliente_id}, 
             {"_id": 0, "contrasena_hash": 0}
         )
