@@ -1578,7 +1578,7 @@ class ChiPiLinkMicroservicesAPITester:
         
         if health and 'modules' in health:
             modules = health['modules']
-            expected_modules = ['auth', 'store', 'pinpanclub']
+            expected_modules = ['auth', 'store', 'pingpong']  # pingpong is the legacy name in health check
             
             for module in expected_modules:
                 if module in modules:
