@@ -1691,6 +1691,173 @@ class TextbookStoreAPITester:
         self.token = old_token
         return success
 
+    def test_frontend_migration_verification(self):
+        """Test Frontend Migration to New API Endpoints - REVIEW REQUEST"""
+        print("\n🔄 Testing Frontend Migration to New API Endpoints...")
+        
+        success = True
+        old_token = self.token
+        
+        # ============== AUTH MODULE (using new endpoints /api/auth-v2/*) ==============
+        print("\n🔐 Testing Auth Module Migration...")
+        
+        # 1. POST /api/auth-v2/login - Login with email/password
+        login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        login_result = self.run_test(
+            "POST /api/auth-v2/login (admin@libreria.com/admin)",
+            "POST",
+            "auth-v2/login",
+            200,
+            login_data
+        )
+        
+        auth_v2_token = None
+        if login_result and 'token' in login_result:
+            auth_v2_token = login_result['token']
+            self.log_test("Auth V2 Login Success", True, "Admin login successful")
+        else:
+            self.log_test("Auth V2 Login Success", False, "Login failed or missing token")
+            success = False
+        
+        if auth_v2_token:
+            # Set token for authenticated requests
+            self.token = auth_v2_token
+            
+            # 2. GET /api/auth-v2/me - Get current user info (requires auth)
+            me_result = self.run_test(
+                "GET /api/auth-v2/me",
+                "GET",
+                "auth-v2/me",
+                200
+            )
+            
+            if me_result and 'email' in me_result:
+                self.log_test("Auth V2 Get Current User", True, f"User: {me_result.get('email')}")
+            else:
+                self.log_test("Auth V2 Get Current User", False, "Failed to get user info")
+                success = False
+            
+            # 3. GET /api/auth-v2/users/stats - Get user statistics (requires admin auth)
+            stats_result = self.run_test(
+                "GET /api/auth-v2/users/stats",
+                "GET",
+                "auth-v2/users/stats",
+                200
+            )
+            
+            if stats_result:
+                self.log_test("Auth V2 User Statistics", True, f"Stats retrieved: {stats_result}")
+            else:
+                self.log_test("Auth V2 User Statistics", False, "Failed to get user stats")
+                success = False
+        
+        # ============== STORE MODULE (using new endpoints /api/store/*) ==============
+        print("\n🏪 Testing Store Module Migration...")
+        
+        # Remove auth for public endpoints
+        self.token = None
+        
+        # 1. GET /api/store/categories - Get categories
+        categories = self.run_test(
+            "GET /api/store/categories",
+            "GET",
+            "store/categories",
+            200
+        )
+        
+        if categories:
+            self.log_test("Store Categories", True, f"Found categories: {len(categories) if isinstance(categories, list) else 'data returned'}")
+        else:
+            self.log_test("Store Categories", False, "Failed to get categories")
+            success = False
+        
+        # 2. GET /api/store/products - Get products
+        products = self.run_test(
+            "GET /api/store/products",
+            "GET",
+            "store/products",
+            200
+        )
+        
+        if products:
+            self.log_test("Store Products", True, f"Found products: {len(products) if isinstance(products, list) else 'data returned'}")
+        else:
+            self.log_test("Store Products", False, "Failed to get products")
+            success = False
+        
+        # 3. GET /api/store/public/grades - Get grade levels
+        grades = self.run_test(
+            "GET /api/store/public/grades",
+            "GET",
+            "store/public/grades",
+            200
+        )
+        
+        if grades:
+            self.log_test("Store Public Grades", True, f"Found grades: {grades}")
+        else:
+            self.log_test("Store Public Grades", False, "Failed to get grades")
+            success = False
+        
+        # ============== COMMUNITY MODULE (using new endpoints /api/community-v2/*) ==============
+        print("\n🏘️ Testing Community Module Migration...")
+        
+        # 1. GET /api/community-v2/posts - Get posts
+        posts = self.run_test(
+            "GET /api/community-v2/posts",
+            "GET",
+            "community-v2/posts",
+            200
+        )
+        
+        if posts is not None:  # Allow empty arrays
+            if isinstance(posts, list):
+                self.log_test("Community V2 Posts", True, f"Found {len(posts)} posts (empty array is valid)")
+            else:
+                self.log_test("Community V2 Posts", True, f"Posts data returned: {posts}")
+        else:
+            self.log_test("Community V2 Posts", False, "Failed to get posts")
+            success = False
+        
+        # 2. GET /api/community-v2/events - Get events
+        events = self.run_test(
+            "GET /api/community-v2/events",
+            "GET",
+            "community-v2/events",
+            200
+        )
+        
+        if events is not None:  # Allow empty arrays
+            if isinstance(events, list):
+                self.log_test("Community V2 Events", True, f"Found {len(events)} events (empty array is valid)")
+            else:
+                self.log_test("Community V2 Events", True, f"Events data returned: {events}")
+        else:
+            self.log_test("Community V2 Events", False, "Failed to get events")
+            success = False
+        
+        # 3. GET /api/community-v2/landing - Get landing data
+        landing = self.run_test(
+            "GET /api/community-v2/landing",
+            "GET",
+            "community-v2/landing",
+            200
+        )
+        
+        if landing is not None:  # Allow empty arrays
+            self.log_test("Community V2 Landing", True, f"Landing data returned: {type(landing)}")
+        else:
+            self.log_test("Community V2 Landing", False, "Failed to get landing data")
+            success = False
+        
+        # Restore original token
+        self.token = old_token
+        return success
+
     def test_community_module_refactored_endpoints(self):
         """Test Community Module Refactored Endpoints - REVIEW REQUEST"""
         print("\n🏘️ Testing Community Module Refactored Endpoints (NEW /api/community-v2/*)...")
