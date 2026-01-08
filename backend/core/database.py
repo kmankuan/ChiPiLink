@@ -20,6 +20,12 @@ db_name = os.environ.get('DB_NAME', 'chipi_link')
 client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
 
+# Import collection constants after db is defined
+from .constants import (
+    AuthCollections, StoreCollections, PinpanClubCollections,
+    CommunityCollections, CoreCollections
+)
+
 
 def get_database():
     """Get database instance - useful for dependency injection"""
@@ -41,7 +47,7 @@ async def seed_admin_user():
         admin_email = os.environ.get('ADMIN_EMAIL', 'teck@koh.one')
         admin_password = os.environ.get('ADMIN_PASSWORD', 'Acdb##0897')
         
-        existing_admin = await db.clientes.find_one({"email": admin_email})
+        existing_admin = await db[AuthCollections.USERS].find_one({"email": admin_email})
         
         if not existing_admin:
             # Create admin user
@@ -60,7 +66,7 @@ async def seed_admin_user():
                 "fecha_creacion": datetime.now(timezone.utc).isoformat()
             }
             
-            await db.clientes.insert_one(admin_doc)
+            await db[AuthCollections.USERS].insert_one(admin_doc)
             print(f"✅ Admin user created: {admin_email}")
         else:
             print(f"✅ Admin user already exists: {admin_email}")
@@ -74,7 +80,7 @@ async def seed_site_config():
     Create default site configuration if it doesn't exist.
     """
     try:
-        existing_config = await db.site_config.find_one({"config_id": "main"})
+        existing_config = await db[CoreCollections.SITE_CONFIG].find_one({"config_id": "main"})
         
         if not existing_config:
             config_doc = {
@@ -88,7 +94,7 @@ async def seed_site_config():
                 "meta_descripcion": "La mejor plataforma para tu negocio"
             }
             
-            await db.site_config.insert_one(config_doc)
+            await db[CoreCollections.SITE_CONFIG].insert_one(config_doc)
             print("✅ Site config created")
         else:
             print("✅ Site config already exists")
@@ -102,7 +108,7 @@ async def seed_landing_page():
     Create default landing page with initial blocks if it doesn't exist.
     """
     try:
-        existing_page = await db.paginas.find_one({"pagina_id": "landing"})
+        existing_page = await db[CoreCollections.PAGES].find_one({"pagina_id": "landing"})
         
         if existing_page and existing_page.get("bloques") and len(existing_page.get("bloques", [])) > 0:
             print(f"✅ Landing page already has {len(existing_page.get('bloques', []))} blocks")
@@ -187,8 +193,8 @@ async def seed_landing_page():
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # Use upsert to update or create - use db.paginas (correct collection)
-        await db.paginas.update_one(
+        # Use upsert to update or create
+        await db[CoreCollections.PAGES].update_one(
             {"pagina_id": "landing"},
             {"$set": landing_doc},
             upsert=True
@@ -209,7 +215,7 @@ async def seed_translations():
     
     try:
         # Check if translations already exist
-        count = await db.translations.count_documents({})
+        count = await db[CoreCollections.TRANSLATIONS].count_documents({})
         if count > 0:
             print(f"✅ Translations already synced ({count} entries)")
             return
@@ -236,7 +242,7 @@ async def seed_translations():
                 flat = flatten_dict(data)
                 
                 for key, value in flat:
-                    await db.translations.update_one(
+                    await db[CoreCollections.TRANSLATIONS].update_one(
                         {"key": key, "lang": lang},
                         {
                             "$set": {"value": value},
@@ -266,33 +272,33 @@ async def create_indexes():
     Call this on application startup.
     """
     try:
-        # Index for estudiantes_sincronizados - most queried collection
-        await db.estudiantes_sincronizados.create_index("estado")
-        await db.estudiantes_sincronizados.create_index("sync_id", unique=True)
+        # Index for store_students
+        await db[StoreCollections.STUDENTS].create_index("estado")
+        await db[StoreCollections.STUDENTS].create_index("sync_id", unique=True)
         
-        # Index for clientes
-        await db.clientes.create_index("cliente_id", unique=True)
-        await db.clientes.create_index("email", unique=True, sparse=True)
+        # Index for auth_users
+        await db[AuthCollections.USERS].create_index("cliente_id", unique=True)
+        await db[AuthCollections.USERS].create_index("email", unique=True, sparse=True)
         
-        # Index for pedidos (orders)
-        await db.pedidos.create_index("pedido_id", unique=True)
-        await db.pedidos.create_index("estado")
-        await db.pedidos.create_index("cliente_id")
-        await db.pedidos.create_index("fecha_creacion")
+        # Index for store_orders
+        await db[StoreCollections.ORDERS].create_index("pedido_id", unique=True)
+        await db[StoreCollections.ORDERS].create_index("estado")
+        await db[StoreCollections.ORDERS].create_index("cliente_id")
+        await db[StoreCollections.ORDERS].create_index("fecha_creacion")
         
-        # Index for libros (products)
-        await db.libros.create_index("libro_id", unique=True)
-        await db.libros.create_index("categoria")
-        await db.libros.create_index("grado")
-        await db.libros.create_index("activo")
+        # Index for store_products
+        await db[StoreCollections.PRODUCTS].create_index("libro_id", unique=True)
+        await db[StoreCollections.PRODUCTS].create_index("categoria")
+        await db[StoreCollections.PRODUCTS].create_index("grado")
+        await db[StoreCollections.PRODUCTS].create_index("activo")
         
-        # Index for categorias
-        await db.categorias.create_index("categoria_id", unique=True)
+        # Index for store_categories
+        await db[StoreCollections.CATEGORIES].create_index("categoria_id", unique=True)
         
         # Compound indexes for common queries
-        await db.libros.create_index([("categoria", 1), ("activo", 1)])
-        await db.libros.create_index([("grado", 1), ("activo", 1)])
-        await db.pedidos.create_index([("estado", 1), ("fecha_creacion", -1)])
+        await db[StoreCollections.PRODUCTS].create_index([("categoria", 1), ("activo", 1)])
+        await db[StoreCollections.PRODUCTS].create_index([("grado", 1), ("activo", 1)])
+        await db[StoreCollections.ORDERS].create_index([("estado", 1), ("fecha_creacion", -1)])
         
         print("✅ Database indexes created successfully")
     except Exception as e:
