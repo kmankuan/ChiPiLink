@@ -39,20 +39,34 @@ class BaseRepository(ABC, Generic[T]):
             {"_id": 0}
         )
     
-    async def find_one(self, query: Dict) -> Optional[Dict]:
+    async def find_one(
+        self,
+        query: Dict,
+        exclude_fields: List[str] = None
+    ) -> Optional[Dict]:
         """Buscar un documento por query"""
-        return await self._collection.find_one(query, {"_id": 0})
+        projection = {"_id": 0}
+        if exclude_fields:
+            for field in exclude_fields:
+                projection[field] = 0
+        return await self._collection.find_one(query, projection)
     
     async def find_many(
         self,
         query: Dict = None,
         skip: int = 0,
         limit: int = 100,
-        sort: List[tuple] = None
+        sort: List[tuple] = None,
+        exclude_fields: List[str] = None
     ) -> List[Dict]:
         """Buscar múltiples documentos"""
         query = query or {}
-        cursor = self._collection.find(query, {"_id": 0})
+        projection = {"_id": 0}
+        if exclude_fields:
+            for field in exclude_fields:
+                projection[field] = 0
+        
+        cursor = self._collection.find(query, projection)
         
         if sort:
             cursor = cursor.sort(sort)
