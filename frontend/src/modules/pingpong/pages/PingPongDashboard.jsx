@@ -63,10 +63,10 @@ export default function PingPongDashboard() {
     try {
       setLoading(true);
       const [matchesRes, rankingsRes, tournamentsRes, recentRes] = await Promise.all([
-        axios.get(`${API_URL}/api/pingpong/matches/active/all`),
-        axios.get(`${API_URL}/api/pingpong/rankings?limit=10`),
-        axios.get(`${API_URL}/api/pingpong/tournaments?estado=inscripcion&limit=5`),
-        axios.get(`${API_URL}/api/pingpong/matches?estado=finalizado&limit=5`)
+        axios.get(PINPANCLUB_API.activeMatchesAll),
+        axios.get(`${PINPANCLUB_API.rankings}?limit=10`),
+        axios.get(`${PINPANCLUB_API.tournaments}?estado=inscripcion&limit=5`),
+        axios.get(`${PINPANCLUB_API.matches}?estado=finalizado&limit=5`)
       ]);
       
       setActiveMatches(matchesRes.data);
