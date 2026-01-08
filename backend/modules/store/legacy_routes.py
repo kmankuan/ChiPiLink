@@ -10,7 +10,7 @@ import logging
 from core.database import db
 from core.auth import get_current_user, get_admin_user
 from shared.utils import get_current_school_year, buscar_estudiante_en_matriculas
-from .models import (
+from .legacy_models import (
     LibroBase, LibroCreate, Libro,
     ItemPedido, PedidoCreate, Pedido, PedidoPublicoCreate,
     EstudianteBase, EstudianteCreate, Estudiante,
