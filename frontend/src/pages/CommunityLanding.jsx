@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { COMMUNITY_ENDPOINTS, buildUrl } from '@/config/api';
 import {
   Newspaper,
   Calendar,
