@@ -272,7 +272,7 @@ async def get_inventario(admin: dict = Depends(get_admin_user)):
     """Get inventory status"""
     libros = await db.libros.find({"activo": True}, {"_id": 0}).to_list(500)
     
-    alertas_bajo_stock = [l for l in libros if l.get("cantidad_inventario", 0) < 10]
+    alertas_bajo_stock = [libro for libro in libros if libro.get("cantidad_inventario", 0) < 10]
     
     return {
         "libros": libros,
