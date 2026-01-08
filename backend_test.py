@@ -1863,7 +1863,7 @@ class TextbookStoreAPITester:
         
         # Restore original token
         self.token = old_token
-        return success/*) ==============
+        return success
         
         # 13. Legacy Categories
         legacy_categories = self.run_test(
