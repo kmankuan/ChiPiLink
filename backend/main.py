@@ -119,6 +119,9 @@ init_store()
 # Initialize Auth module (event handlers)
 init_auth()
 
+# Initialize Community module (event handlers)
+init_community()
+
 # ============== REGISTER ROUTERS ==============
 
 # Create main API router with /api prefix
