@@ -1864,52 +1864,6 @@ class TextbookStoreAPITester:
         # Restore original token
         self.token = old_token
         return success
-        
-        # 13. Legacy Categories
-        legacy_categories = self.run_test(
-            "GET /api/categorias (Legacy)",
-            "GET",
-            "categorias",
-            200
-        )
-        
-        if legacy_categories:
-            self.log_test("Legacy Categories Compatibility", True, f"Found {len(legacy_categories)} categories")
-        else:
-            self.log_test("Legacy Categories Compatibility", False, "Legacy categories endpoint failed")
-            success = False
-        
-        # 14. Legacy Books
-        legacy_books = self.run_test(
-            "GET /api/libros (Legacy)",
-            "GET",
-            "libros",
-            200
-        )
-        
-        if legacy_books is not None:
-            self.log_test("Legacy Books Compatibility", True, f"Found {len(legacy_books)} books")
-        else:
-            self.log_test("Legacy Books Compatibility", False, "Legacy books endpoint failed")
-            success = False
-        
-        # 15. Legacy Grades
-        legacy_grades = self.run_test(
-            "GET /api/grados (Legacy)",
-            "GET",
-            "grados",
-            200
-        )
-        
-        if legacy_grades:
-            self.log_test("Legacy Grades Compatibility", True, f"Found {len(legacy_grades)} grades")
-        else:
-            self.log_test("Legacy Grades Compatibility", False, "Legacy grades endpoint failed")
-            success = False
-        
-        # Restore token
-        self.token = old_token
-        return success
 
     def test_platform_store_public_endpoints(self):
         """Test Platform Store Public Endpoints"""
