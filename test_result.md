@@ -668,6 +668,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
   completed_testing:
+    - "Frontend Migration to New API Endpoints Verification"
     - "Store Module Refactored with Microservices Architecture"
     - "Auth Module Refactored with Microservices Architecture"
     - "Community Module Refactored with Microservices Architecture"
