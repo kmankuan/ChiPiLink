@@ -138,6 +138,16 @@ export default function PingPongDashboard() {
                 <h1 className="font-bold text-xl">PinpanClub</h1>
               </div>
               <div className="flex items-center gap-2">
+                {/* Super Pin - Destacado */}
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => navigate('/pinpanclub/superpin/ranking')}
+                  className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                >
+                  <Trophy className="h-4 w-4 mr-2" />
+                  🏆 Super Pin
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
                   Jugadores
@@ -154,6 +164,11 @@ export default function PingPongDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/superpin/admin')}>
+                      <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
+                      Super Pin Admin
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
                       <img 
                         src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
