@@ -54,7 +54,7 @@ export default function SuperPinAdmin() {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
       if (!token) {
         alert('Sesión expirada. Por favor inicie sesión nuevamente.');
         return;
