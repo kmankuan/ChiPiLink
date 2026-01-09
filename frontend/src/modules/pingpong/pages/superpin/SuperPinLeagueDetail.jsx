@@ -245,7 +245,7 @@ export default function SuperPinLeagueDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         <Button
           variant={activeTab === 'ranking' ? 'default' : 'outline'}
           onClick={() => setActiveTab('ranking')}
@@ -258,6 +258,14 @@ export default function SuperPinLeagueDetail() {
         >
           <Target className="h-4 w-4 mr-2" /> {t('superpin.matches.title')}
         </Button>
+        {league.estado === 'active' && (
+          <Button
+            variant={activeTab === 'checkin' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('checkin')}
+          >
+            <CheckCircle className="h-4 w-4 mr-2" /> {t('superpin.checkin.title')}
+          </Button>
+        )}
       </div>
 
       {/* Content */}
