@@ -259,6 +259,26 @@
     "stats": {
       "points": "积分",
       "eloChange": "ELO变化"
+    },
+    "checkin": {
+      "title": "选手签到",
+      "method": "签到方式",
+      "checkIn": "签到",
+      "checkOut": "签退",
+      "presentPlayers": "在场选手",
+      "noPlayersCheckedIn": "暂无选手签到",
+      "scanQrInstructions": "生成二维码供选手扫描",
+      "selectForQr": "选择选手生成二维码",
+      "confirmQr": "确认签到",
+      "geoInstructions": "将验证您的位置以确认您在俱乐部",
+      "gettingLocation": "正在获取位置...",
+      "locationVerified": "位置已验证",
+      "locationError": "位置错误",
+      "verifyAndCheckIn": "验证并签到",
+      "geoNotSupported": "此浏览器不支持地理定位",
+      "geoError": "获取位置时出错",
+      "geoOutOfRange": "您不在俱乐部允许的范围内",
+      "invalidQr": "无效的二维码"
     }
   }
 }

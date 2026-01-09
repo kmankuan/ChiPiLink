@@ -259,6 +259,26 @@
     "stats": {
       "points": "Puntos",
       "eloChange": "Cambio ELO"
+    },
+    "checkin": {
+      "title": "Check-in de Jugadores",
+      "method": "Método de Check-in",
+      "checkIn": "Registrar Entrada",
+      "checkOut": "Registrar Salida",
+      "presentPlayers": "Jugadores Presentes",
+      "noPlayersCheckedIn": "No hay jugadores registrados todavía",
+      "scanQrInstructions": "Genera un código QR para que el jugador lo escanee",
+      "selectForQr": "Selecciona jugador para generar QR",
+      "confirmQr": "Confirmar Check-in",
+      "geoInstructions": "Se verificará tu ubicación para confirmar que estás en el club",
+      "gettingLocation": "Obteniendo ubicación...",
+      "locationVerified": "Ubicación verificada",
+      "locationError": "Error de ubicación",
+      "verifyAndCheckIn": "Verificar y Registrar",
+      "geoNotSupported": "La geolocalización no está soportada en este navegador",
+      "geoError": "Error al obtener ubicación",
+      "geoOutOfRange": "Estás fuera del rango permitido del club",
+      "invalidQr": "Código QR inválido"
     }
   }
 }

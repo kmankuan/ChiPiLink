@@ -259,6 +259,26 @@
     "stats": {
       "points": "Points",
       "eloChange": "ELO Change"
+    },
+    "checkin": {
+      "title": "Player Check-in",
+      "method": "Check-in Method",
+      "checkIn": "Check In",
+      "checkOut": "Check Out",
+      "presentPlayers": "Present Players",
+      "noPlayersCheckedIn": "No players checked in yet",
+      "scanQrInstructions": "Generate a QR code for the player to scan",
+      "selectForQr": "Select player to generate QR",
+      "confirmQr": "Confirm Check-in",
+      "geoInstructions": "Your location will be verified to confirm you're at the club",
+      "gettingLocation": "Getting location...",
+      "locationVerified": "Location verified",
+      "locationError": "Location error",
+      "verifyAndCheckIn": "Verify and Check In",
+      "geoNotSupported": "Geolocation is not supported in this browser",
+      "geoError": "Error getting location",
+      "geoOutOfRange": "You're outside the allowed club range",
+      "invalidQr": "Invalid QR code"
     }
   }
 }
