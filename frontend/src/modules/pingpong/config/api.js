@@ -2,6 +2,8 @@
  * PinpanClub API Configuration
  * Centralizes all PinpanClub endpoint definitions
  * 
+ * Updated for Microservices Architecture - Phase 3
+ * 
  * Note: This module supports both legacy (/api/pingpong/*) and new (/api/pinpanclub/*) endpoints.
  * The backend maintains backward compatibility, so both work.
  * 
@@ -11,8 +13,8 @@
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const WS_URL = API_URL?.replace('https://', 'wss://').replace('http://', 'ws://');
 
-// Feature flag - set to true to use new endpoints
-const USE_NEW_ENDPOINTS = false; // Keep legacy for now since WebSocket endpoints are not migrated
+// Use new microservices-ready endpoints
+const USE_NEW_ENDPOINTS = true;
 
 // Base paths
 const BASE_PATH = USE_NEW_ENDPOINTS ? '/api/pinpanclub' : '/api/pingpong';
