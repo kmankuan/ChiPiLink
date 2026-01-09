@@ -186,7 +186,8 @@
       "activate": "激活",
       "pause": "暂停",
       "noLeagues": "暂无联赛",
-      "createFirst": "创建第一个联赛"
+      "createFirst": "创建第一个联赛",
+      "notFound": "未找到联赛"
     },
     "players": {
       "title": "选手",
@@ -195,7 +196,20 @@
       "playerA": "选手A",
       "playerB": "选手B",
       "noPlayers": "排名中暂无选手",
-      "noPlayersDesc": "选手在进行首场比赛后将会显示"
+      "noPlayersDesc": "选手在进行首场比赛后将会显示",
+      "source": "选手来源",
+      "appUsers": "应用用户",
+      "selectUsersDesc": "选择已注册用户将其转换为选手：",
+      "noUsers": "暂无已注册用户",
+      "alreadyPlayer": "已是选手",
+      "addedSuccess": "{{name}}已被注册为选手",
+      "afterAddingSelect": "添加后，从'PinpanClub'中选择选手",
+      "mondayPlayers": "来自Monday.com的选手：",
+      "sync": "同步",
+      "loadingMonday": "正在从Monday.com加载...",
+      "noMondayPlayers": "Monday.com中暂无选手或未配置",
+      "alreadySynced": "已同步",
+      "syncComingSoon": "自动同步功能即将推出"
     },
     "matches": {
       "title": "比赛",
@@ -221,7 +235,8 @@
       "createFirst": "创建第一场比赛",
       "differentPlayers": "选手必须不同",
       "matchFinished": "比赛结束！",
-      "winner": "获胜者"
+      "winner": "获胜者",
+      "notFound": "未找到比赛"
     },
     "ranking": {
       "title": "排行榜",
