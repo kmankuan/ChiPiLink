@@ -324,10 +324,10 @@ export default function SuperPinAdmin() {
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+              <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button onClick={createLeague} className="bg-green-600 hover:bg-green-700">
+              <Button type="button" onClick={createLeague} className="bg-green-600 hover:bg-green-700">
                 {t('superpin.leagues.create')}
               </Button>
             </div>
