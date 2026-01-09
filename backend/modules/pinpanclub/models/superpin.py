@@ -76,7 +76,8 @@ class ScoringConfig(BaseModel):
 
 class CheckInConfig(BaseModel):
     """Configuración de check-in"""
-    method: CheckInMethod = CheckInMethod.MANUAL
+    method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - mantener para compatibilidad
+    methods: List[str] = ["manual"]  # Lista de métodos permitidos
     require_referee: bool = False  # Requiere árbitro/testigo
     referee_can_be_player: bool = True  # Otro jugador puede ser árbitro
     
