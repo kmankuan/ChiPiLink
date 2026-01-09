@@ -1617,6 +1617,153 @@ class ChiPiLinkMicroservicesAPITester:
         
         return success
 
+    def test_microservices_migration_review_request(self):
+        """Test microservices architecture migration - REVIEW REQUEST SPECIFIC"""
+        print("\n🏗️ Testing Microservices Architecture Migration (Review Request)...")
+        
+        success = True
+        
+        # ============== 1. TEST NEW ENDPOINTS (Should Work) ==============
+        print("\n✅ Testing NEW endpoints (should work)...")
+        
+        # 1. POST /api/auth-v2/login with admin@libreria.com/admin
+        login_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        
+        auth_login = self.run_test(
+            "POST /api/auth-v2/login (admin@libreria.com/admin)",
+            "POST",
+            "auth-v2/login",
+            200,
+            login_data
+        )
+        
+        auth_token = None
+        if auth_login and 'token' in auth_login:
+            auth_token = auth_login['token']
+            success = success and True
+        else:
+            success = False
+        
+        # Set auth token for subsequent requests
+        if auth_token:
+            old_token = self.token
+            self.token = auth_token
+            
+            # 2. GET /api/store/categories
+            categories = self.run_test(
+                "GET /api/store/categories",
+                "GET",
+                "store/categories",
+                200
+            )
+            success = success and (categories is not None)
+            
+            # 3. GET /api/community-v2/landing
+            community_landing = self.run_test(
+                "GET /api/community-v2/landing",
+                "GET",
+                "community-v2/landing",
+                200
+            )
+            success = success and (community_landing is not None)
+            
+            # 4. GET /api/pinpanclub/players
+            players = self.run_test(
+                "GET /api/pinpanclub/players",
+                "GET",
+                "pinpanclub/players",
+                200
+            )
+            success = success and (players is not None)
+            
+            # 5. GET /api/pinpanclub/sponsors/ (note trailing slash)
+            sponsors = self.run_test(
+                "GET /api/pinpanclub/sponsors/",
+                "GET",
+                "pinpanclub/sponsors/",
+                200
+            )
+            success = success and (sponsors is not None)
+            
+            # 6. GET /api/pinpanclub/canvas/layouts
+            canvas_layouts = self.run_test(
+                "GET /api/pinpanclub/canvas/layouts",
+                "GET",
+                "pinpanclub/canvas/layouts",
+                200
+            )
+            success = success and (canvas_layouts is not None)
+            
+            self.token = old_token
+        
+        # ============== 2. TEST LEGACY ENDPOINTS (Should Return 404) ==============
+        print("\n❌ Testing LEGACY endpoints (should return 404)...")
+        
+        # Remove auth for legacy endpoint tests
+        old_token = self.token
+        self.token = None
+        
+        # 1. GET /api/pingpong/players (should return 404)
+        legacy_players = self.run_test(
+            "GET /api/pingpong/players (should return 404)",
+            "GET",
+            "pingpong/players",
+            404
+        )
+        # For 404 tests, success means we got None (expected 404)
+        success = success and (legacy_players is None)
+        
+        # 2. GET /api/libros (should return 404)
+        legacy_libros = self.run_test(
+            "GET /api/libros (should return 404)",
+            "GET",
+            "libros",
+            404
+        )
+        success = success and (legacy_libros is None)
+        
+        # 3. POST /api/auth/login (should return 404)
+        legacy_auth_data = {
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        }
+        legacy_auth = self.run_test(
+            "POST /api/auth/login (should return 404)",
+            "POST",
+            "auth/login",
+            404,
+            legacy_auth_data
+        )
+        success = success and (legacy_auth is None)
+        
+        self.token = old_token
+        
+        # ============== 3. TEST HEALTH CHECK ==============
+        print("\n❤️ Testing Health Check...")
+        
+        # Remove auth for health check
+        old_token = self.token
+        self.token = None
+        
+        health = self.run_test(
+            "GET /api/health",
+            "GET",
+            "health",
+            200
+        )
+        
+        if health and 'status' in health and health['status'] == 'healthy':
+            success = success and True
+        else:
+            success = False
+        
+        self.token = old_token
+        
+        return success
+
     def run_microservices_migration_tests(self):
         """Run all microservices migration tests"""
         print("=" * 80)
@@ -1627,7 +1774,7 @@ class ChiPiLinkMicroservicesAPITester:
         print()
         
         # Run the microservices migration test
-        migration_success = self.test_microservices_migration()
+        migration_success = self.test_microservices_migration_review_request()
         
         # Print summary
         print("\n" + "=" * 80)
