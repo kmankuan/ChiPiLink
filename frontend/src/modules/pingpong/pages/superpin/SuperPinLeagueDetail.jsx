@@ -4,9 +4,10 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Trophy, Users, Target, ArrowLeft, Settings, Play,
-  Plus, Medal, TrendingUp, TrendingDown, Minus, Clock
+  Plus, Medal, TrendingUp, TrendingDown, Minus, Clock, UserPlus, RefreshCw
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
@@ -15,16 +16,21 @@ import { Badge } from '../../../../components/ui/badge';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinLeagueDetail() {
+  const { t } = useTranslation();
   const { ligaId } = useParams();
   const navigate = useNavigate();
   const [league, setLeague] = useState(null);
   const [ranking, setRanking] = useState(null);
   const [matches, setMatches] = useState([]);
   const [availablePlayers, setAvailablePlayers] = useState([]);
+  const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [mondayPlayers, setMondayPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ranking');
   const [showNewMatchModal, setShowNewMatchModal] = useState(false);
+  const [playerSource, setPlayerSource] = useState('pinpanclub'); // 'pinpanclub', 'users', 'monday'
   const [newMatch, setNewMatch] = useState({ jugador_a_id: '', jugador_b_id: '' });
+  const [loadingMonday, setLoadingMonday] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -32,26 +38,77 @@ export default function SuperPinLeagueDetail() {
 
   const fetchData = async () => {
     try {
-      const [leagueRes, rankingRes, matchesRes, playersRes] = await Promise.all([
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      
+      const [leagueRes, rankingRes, matchesRes, playersRes, usersRes] = await Promise.all([
         fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}`),
         fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/ranking`),
         fetch(`${API_URL}/api/pinpanclub/superpin/leagues/${ligaId}/matches?limit=20`),
-        fetch(`${API_URL}/api/pinpanclub/players`)
+        fetch(`${API_URL}/api/pinpanclub/players`),
+        fetch(`${API_URL}/api/auth-v2/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch(() => ({ ok: false }))
       ]);
 
       const leagueData = await leagueRes.json();
       const rankingData = await rankingRes.json();
       const matchesData = await matchesRes.json();
       const playersData = await playersRes.json();
+      const usersData = usersRes.ok ? await usersRes.json() : [];
 
       setLeague(leagueData);
       setRanking(rankingData);
       setMatches(matchesData);
       setAvailablePlayers(playersData);
+      setRegisteredUsers(usersData);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMondayPlayers = async () => {
+    setLoadingMonday(true);
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/pinpanclub/monday/players`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMondayPlayers(data.players || data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching Monday players:', error);
+    } finally {
+      setLoadingMonday(false);
+    }
+  };
+
+  const convertUserToPlayer = async (user) => {
+    try {
+      const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/pinpanclub/players`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          nombre: `${user.nombre} ${user.apellido || ''}`.trim(),
+          email: user.email,
+          user_id: user.cliente_id,
+          nivel: 'principiante'
+        })
+      });
+      if (response.ok) {
+        const newPlayer = await response.json();
+        setAvailablePlayers([...availablePlayers, newPlayer]);
+        alert(`${user.nombre} ha sido registrado como jugador`);
+      }
+    } catch (error) {
+      console.error('Error converting user to player:', error);
     }
   };
 
