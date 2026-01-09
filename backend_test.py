@@ -1790,7 +1790,10 @@ class ChiPiLinkMicroservicesAPITester:
             for test in self.failed_tests:
                 print(f"  - {test}")
         
-        if migration_success and len(self.failed_tests) == 0:
+        # Check if all tests passed
+        all_tests_passed = (self.tests_run > 0 and self.tests_passed == self.tests_run and len(self.failed_tests) == 0)
+        
+        if all_tests_passed:
             print("\n✅ MICROSERVICES MIGRATION: ALL TESTS PASSED")
             return True
         else:
