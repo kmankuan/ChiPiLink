@@ -80,7 +80,7 @@ export default function SponsorsAdmin() {
 
   const fetchSponsors = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/sponsors/`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/sponsors/`);
       const data = await response.json();
       setSponsors(data);
     } catch (error) {
@@ -92,7 +92,7 @@ export default function SponsorsAdmin() {
 
   const fetchLayoutConfig = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/sponsors/config/layout`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/sponsors/config/layout`);
       const data = await response.json();
       setLayoutConfig(data);
     } catch (error) {
@@ -105,8 +105,8 @@ export default function SponsorsAdmin() {
     
     try {
       const url = selectedSponsor 
-        ? `${API_URL}/api/pingpong/sponsors/${selectedSponsor.sponsor_id}`
-        : `${API_URL}/api/pingpong/sponsors/`;
+        ? `${API_URL}/api/pinpanclub/sponsors/${selectedSponsor.sponsor_id}`
+        : `${API_URL}/api/pinpanclub/sponsors/`;
       
       const method = selectedSponsor ? 'PUT' : 'POST';
       
@@ -129,7 +129,7 @@ export default function SponsorsAdmin() {
     if (!confirm('¿Eliminar este patrocinador?')) return;
     
     try {
-      await fetch(`${API_URL}/api/pingpong/sponsors/${sponsorId}`, {
+      await fetch(`${API_URL}/api/pinpanclub/sponsors/${sponsorId}`, {
         method: 'DELETE'
       });
       fetchSponsors();
@@ -140,7 +140,7 @@ export default function SponsorsAdmin() {
 
   const handleToggleActive = async (sponsor) => {
     try {
-      await fetch(`${API_URL}/api/pingpong/sponsors/${sponsor.sponsor_id}`, {
+      await fetch(`${API_URL}/api/pinpanclub/sponsors/${sponsor.sponsor_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ activo: !sponsor.activo })
@@ -754,7 +754,7 @@ function SpacesConfig({ layout, onUpdate }) {
       const space = spaces.find(s => s.space_id === spaceId);
       const updated = { ...space, ...updates };
       
-      await fetch(`${API_URL}/api/pingpong/sponsors/config/space/${spaceId}`, {
+      await fetch(`${API_URL}/api/pinpanclub/sponsors/config/space/${spaceId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)

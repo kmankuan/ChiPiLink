@@ -23,7 +23,7 @@ export default function PingPongSpectator() {
 
   const fetchMatch = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/pingpong/matches/${matchId}/live`);
+      const response = await axios.get(`${API_URL}/api/pinpanclub/matches/${matchId}/live`);
       setMatch(response.data);
       setLastUpdate(new Date());
     } catch (error) {

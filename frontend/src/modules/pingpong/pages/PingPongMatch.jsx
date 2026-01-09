@@ -42,7 +42,7 @@ export default function PingPongMatch() {
 
   const fetchPlayers = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/pingpong/players?activo=true`);
+      const response = await axios.get(`${API_URL}/api/pinpanclub/players?activo=true`);
       setPlayers(response.data);
     } catch (error) {
       toast.error('Error al cargar jugadores');
@@ -64,7 +64,7 @@ export default function PingPongMatch() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/pingpong/matches`, formData);
+      const response = await axios.post(`${API_URL}/api/pinpanclub/matches`, formData);
       toast.success('Partido creado');
       navigate(`/pingpong/arbiter/${response.data.partido_id}`);
     } catch (error) {

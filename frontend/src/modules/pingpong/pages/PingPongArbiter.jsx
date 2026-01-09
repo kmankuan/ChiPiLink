@@ -28,7 +28,7 @@ export default function PingPongArbiter() {
   const fetchMatch = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/api/pingpong/matches/${matchId}`);
+      const response = await axios.get(`${API_URL}/api/pinpanclub/matches/${matchId}`);
       setMatch(response.data);
     } catch (error) {
       toast.error('Error al cargar el partido');

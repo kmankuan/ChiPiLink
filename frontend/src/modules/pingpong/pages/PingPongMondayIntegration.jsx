@@ -87,9 +87,9 @@ export default function PingPongMondayIntegration() {
 
       // Fetch status, config and stats in parallel
       const [statusRes, configRes, statsRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/api/pingpong/monday/status`, { headers }),
-        axios.get(`${BACKEND_URL}/api/pingpong/monday/config`, { headers }),
-        axios.get(`${BACKEND_URL}/api/pingpong/monday/stats`, { headers })
+        axios.get(`${BACKEND_URL}/api/pinpanclub/monday/status`, { headers }),
+        axios.get(`${BACKEND_URL}/api/pinpanclub/monday/config`, { headers }),
+        axios.get(`${BACKEND_URL}/api/pinpanclub/monday/stats`, { headers })
       ]);
 
       setStatus(statusRes.data);
@@ -99,7 +99,7 @@ export default function PingPongMondayIntegration() {
       // Fetch boards if API key is configured
       if (configRes.data.has_api_key) {
         try {
-          const boardsRes = await axios.get(`${BACKEND_URL}/api/pingpong/monday/boards`, { headers });
+          const boardsRes = await axios.get(`${BACKEND_URL}/api/pinpanclub/monday/boards`, { headers });
           setBoards(boardsRes.data.boards || []);
         } catch (e) {
           console.error('Error fetching boards:', e);
@@ -117,7 +117,7 @@ export default function PingPongMondayIntegration() {
     try {
       setSaving(true);
       const headers = getAuthHeaders();
-      await axios.put(`${BACKEND_URL}/api/pingpong/monday/config`, config, { headers });
+      await axios.put(`${BACKEND_URL}/api/pinpanclub/monday/config`, config, { headers });
       toast.success('Configuración guardada');
       setConfigDialog(false);
       fetchData();
@@ -132,7 +132,7 @@ export default function PingPongMondayIntegration() {
     try {
       setSyncing(true);
       const headers = getAuthHeaders();
-      const response = await axios.post(`${BACKEND_URL}/api/pingpong/monday/sync/players`, {}, { headers });
+      const response = await axios.post(`${BACKEND_URL}/api/pinpanclub/monday/sync/players`, {}, { headers });
       setSyncResults({ type: 'players', ...response.data });
       toast.success(`${response.data.synced_count} jugadores sincronizados`);
       fetchData();
@@ -147,7 +147,7 @@ export default function PingPongMondayIntegration() {
     try {
       setSyncing(true);
       const headers = getAuthHeaders();
-      const response = await axios.post(`${BACKEND_URL}/api/pingpong/monday/sync/matches/active`, {}, { headers });
+      const response = await axios.post(`${BACKEND_URL}/api/pinpanclub/monday/sync/matches/active`, {}, { headers });
       setSyncResults({ type: 'matches', ...response.data });
       toast.success(`${response.data.synced_count} partidos sincronizados`);
       fetchData();
@@ -162,7 +162,7 @@ export default function PingPongMondayIntegration() {
     try {
       setSyncing(true);
       const headers = getAuthHeaders();
-      const response = await axios.post(`${BACKEND_URL}/api/pingpong/monday/sync/results`, {}, { headers });
+      const response = await axios.post(`${BACKEND_URL}/api/pinpanclub/monday/sync/results`, {}, { headers });
       setSyncResults({ type: 'results', ...response.data });
       toast.success(`${response.data.synced_count} resultados sincronizados`);
       fetchData();
@@ -177,7 +177,7 @@ export default function PingPongMondayIntegration() {
     try {
       setSyncing(true);
       const headers = getAuthHeaders();
-      const response = await axios.post(`${BACKEND_URL}/api/pingpong/monday/test`, {}, { headers });
+      const response = await axios.post(`${BACKEND_URL}/api/pinpanclub/monday/test`, {}, { headers });
       toast.success(`Conectado como: ${response.data.user?.name}`);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error de conexión');

@@ -73,7 +73,7 @@ export default function PingPongCanvas() {
   const fetchMatches = useCallback(async () => {
     try {
       // Fetch all matches (including active and pending)
-      const response = await fetch(`${API_URL}/api/pingpong/matches`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/matches`);
       const data = await response.json();
       
       // Filter for active and pending
@@ -87,7 +87,7 @@ export default function PingPongCanvas() {
 
   const fetchPlayer = async (playerId) => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/players/${playerId}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/players/${playerId}`);
       if (response.ok) {
         return await response.json();
       }
@@ -99,7 +99,7 @@ export default function PingPongCanvas() {
 
   const fetchLayouts = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pingpong/canvas/layouts`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/canvas/layouts`);
       if (response.ok) {
         const data = await response.json();
         setSavedLayouts(data);
@@ -124,7 +124,7 @@ export default function PingPongCanvas() {
         settings: { cols, rowHeight, showQR }
       };
       
-      const response = await fetch(`${API_URL}/api/pingpong/canvas/layouts`, {
+      const response = await fetch(`${API_URL}/api/pinpanclub/canvas/layouts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(layoutData)
@@ -152,7 +152,7 @@ export default function PingPongCanvas() {
   // ============== WEBSOCKET / POLLING ==============
   
   const connectWebSocket = useCallback(() => {
-    const wsUrl = `${WS_URL}/api/pingpong/ws/live?type=tv`;
+    const wsUrl = `${WS_URL}/api/pinpanclub/ws/live?type=tv`;
     
     try {
       wsRef.current = new WebSocket(wsUrl);

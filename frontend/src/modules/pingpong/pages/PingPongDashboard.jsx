@@ -82,7 +82,7 @@ export default function PingPongDashboard() {
 
   const fetchActiveMatches = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/pingpong/matches/active/all`);
+      const response = await axios.get(`${API_URL}/api/pinpanclub/matches/active/all`);
       setActiveMatches(response.data);
     } catch (error) {
       console.error('Error fetching active matches:', error);
