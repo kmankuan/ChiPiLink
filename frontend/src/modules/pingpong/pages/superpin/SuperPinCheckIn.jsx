@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -291,7 +291,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                 {/* Display QR code for selected player */}
                 {qrCodeValue && (
                   <div className="bg-white p-4 rounded-lg inline-block">
-                    <QRCode 
+                    <QRCodeSVG 
                       value={generatePlayerQr(qrCodeValue)} 
                       size={150}
                       level="M"
