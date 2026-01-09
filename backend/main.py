@@ -85,11 +85,6 @@ from routes.platform_store import router as platform_store_router, init_routes a
 # Ping Pong Club - Refactored as Microservices-Ready Module
 from modules.pinpanclub import init_module as init_pinpanclub
 from modules.pinpanclub.routes import router as pinpanclub_router
-# Legacy routes (keep for backward compatibility with frontend)
-from routes.pingpong import pingpong_router
-from routes.pingpong_websocket import pingpong_ws_router
-from routes.pingpong_sponsors import router as pingpong_sponsors_router
-from routes.pingpong_canvas import router as pingpong_canvas_router
 
 # Membership - Already modularized
 from routes.membership import router as membership_router, init_routes as init_membership_routes
