@@ -186,7 +186,8 @@
       "activate": "Activar",
       "pause": "Pausar",
       "noLeagues": "No hay ligas creadas",
-      "createFirst": "Crear primera liga"
+      "createFirst": "Crear primera liga",
+      "notFound": "Liga no encontrada"
     },
     "players": {
       "title": "Jugadores",
@@ -195,7 +196,20 @@
       "playerA": "Jugador A",
       "playerB": "Jugador B",
       "noPlayers": "No hay jugadores en el ranking todavía",
-      "noPlayersDesc": "Los jugadores aparecerán cuando jueguen su primer partido"
+      "noPlayersDesc": "Los jugadores aparecerán cuando jueguen su primer partido",
+      "source": "Fuente de Jugadores",
+      "appUsers": "Usuarios App",
+      "selectUsersDesc": "Selecciona usuarios registrados para convertirlos en jugadores:",
+      "noUsers": "No hay usuarios registrados",
+      "alreadyPlayer": "Ya es jugador",
+      "addedSuccess": "{{name}} ha sido registrado como jugador",
+      "afterAddingSelect": "Después de agregar, selecciona los jugadores desde 'PinpanClub'",
+      "mondayPlayers": "Jugadores desde Monday.com:",
+      "sync": "Sincronizar",
+      "loadingMonday": "Cargando desde Monday.com...",
+      "noMondayPlayers": "No hay jugadores en Monday.com o no está configurado",
+      "alreadySynced": "Ya sincronizado",
+      "syncComingSoon": "Sincronización automática próximamente"
     },
     "matches": {
       "title": "Partidos",
@@ -221,7 +235,8 @@
       "createFirst": "Crear primer partido",
       "differentPlayers": "Los jugadores deben ser diferentes",
       "matchFinished": "¡Partido terminado!",
-      "winner": "Ganador"
+      "winner": "Ganador",
+      "notFound": "Partido no encontrado"
     },
     "ranking": {
       "title": "Clasificación",
