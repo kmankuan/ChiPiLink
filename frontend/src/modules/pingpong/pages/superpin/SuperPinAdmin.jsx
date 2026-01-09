@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Trophy, Users, Calendar, Settings, Plus, Play, Pause,
   ChevronRight, Medal, Target, Award, TrendingUp
@@ -16,6 +17,7 @@ import PINPANCLUB_API from '../../config/api';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinAdmin() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
