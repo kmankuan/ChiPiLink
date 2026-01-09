@@ -118,32 +118,36 @@ function AppRouter() {
       <Route path="/eventos" element={<CommunityLanding />} />
       <Route path="/galeria" element={<CommunityLanding />} />
       
-      {/* Ping Pong Club Routes */}
-      <Route path="/pingpong" element={<PingPongDashboard />} />
-      <Route path="/pingpong/match/new" element={<PingPongMatch />} />
-      <Route path="/pingpong/match/:matchId" element={<PingPongMatch />} />
-      <Route path="/pingpong/arbiter/:matchId" element={<PingPongArbiter />} />
-      <Route path="/pingpong/spectator/:matchId" element={<PingPongSpectator />} />
-      <Route path="/pingpong/sponsors" element={<SponsorsAdmin />} />
-      <Route path="/pingpong/monday" element={<PingPongMondayIntegration />} />
+      {/* PinpanClub Routes */}
+      <Route path="/pinpanclub" element={<PingPongDashboard />} />
+      <Route path="/pinpanclub/match/new" element={<PingPongMatch />} />
+      <Route path="/pinpanclub/match/:matchId" element={<PingPongMatch />} />
+      <Route path="/pinpanclub/arbiter/:matchId" element={<PingPongArbiter />} />
+      <Route path="/pinpanclub/spectator/:matchId" element={<PingPongSpectator />} />
+      <Route path="/pinpanclub/sponsors" element={<SponsorsAdmin />} />
+      <Route path="/pinpanclub/monday" element={<PingPongMondayIntegration />} />
       
-      {/* Ping Pong TV Display - Public URL for TVs */}
-      <Route path="/tv/pingpong" element={<PingPongTV />} />
+      {/* PinpanClub TV Display - Public URL for TVs */}
+      <Route path="/tv/pinpanclub" element={<PingPongTV />} />
       <Route path="/tv" element={<PingPongTV />} />
       
-      {/* Ping Pong Canvas - Customizable Widget Layout */}
+      {/* PinpanClub Canvas - Customizable Widget Layout */}
       <Route path="/canvas" element={<PingPongCanvas />} />
       <Route path="/tv/canvas" element={<PingPongCanvas />} />
       
-      {/* Ping Pong Mobile Arbiter */}
-      <Route path="/pingpong/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
+      {/* PinpanClub Mobile Arbiter */}
+      <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
       
       {/* Super Pin Routes */}
-      <Route path="/pingpong/superpin/admin" element={<SuperPinAdmin />} />
-      <Route path="/pingpong/superpin/league/:ligaId" element={<SuperPinLeagueDetail />} />
-      <Route path="/pingpong/superpin/match/:partidoId" element={<SuperPinMatch />} />
-      <Route path="/pingpong/superpin/ranking" element={<SuperPinRanking />} />
-      <Route path="/pingpong/superpin/ranking/:ligaId" element={<SuperPinRanking />} />
+      <Route path="/pinpanclub/superpin/admin" element={<SuperPinAdmin />} />
+      <Route path="/pinpanclub/superpin/league/:ligaId" element={<SuperPinLeagueDetail />} />
+      <Route path="/pinpanclub/superpin/match/:partidoId" element={<SuperPinMatch />} />
+      <Route path="/pinpanclub/superpin/ranking" element={<SuperPinRanking />} />
+      <Route path="/pinpanclub/superpin/ranking/:ligaId" element={<SuperPinRanking />} />
+      
+      {/* Legacy redirects for backward compatibility */}
+      <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
+      <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
       
       {/* Catalog - Admin only */}
       <Route 
