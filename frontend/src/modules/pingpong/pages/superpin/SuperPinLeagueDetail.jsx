@@ -392,6 +392,15 @@ export default function SuperPinLeagueDetail() {
         </Card>
       )}
 
+      {/* Check-in Tab */}
+      {activeTab === 'checkin' && league.estado === 'active' && (
+        <SuperPinCheckIn 
+          ligaId={ligaId} 
+          leagueConfig={league}
+          onCheckInComplete={fetchData}
+        />
+      )}
+
       {/* New Match Modal */}
       {showNewMatchModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
