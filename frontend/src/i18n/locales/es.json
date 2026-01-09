@@ -152,5 +152,98 @@
     "cancelled": "Cancelado",
     "active": "Activo",
     "inactive": "Inactivo"
+  },
+  "superpin": {
+    "title": "Super Pin",
+    "admin": "Super Pin - Admin",
+    "adminDesc": "Gestiona ligas, rankings y torneos",
+    "ranking": "Super Pin Ranking",
+    "rankingDesc": "Sistema de ranking individual con ligas y temporadas",
+    "viewRanking": "Ver Ranking",
+    "manage": "Administrar",
+    "leagues": {
+      "title": "Ligas",
+      "total": "Ligas Totales",
+      "active": "Ligas Activas",
+      "new": "Nueva Liga",
+      "create": "Crear Liga",
+      "name": "Nombre",
+      "season": "Temporada",
+      "description": "Descripción",
+      "scoring": "Sistema de Puntuación",
+      "scoringSimple": "Puntos Simples (+3 victoria, +1 derrota)",
+      "scoringElo": "Sistema ELO",
+      "checkin": "Método de Check-in",
+      "checkinManual": "Manual",
+      "checkinQr": "Código QR",
+      "checkinGeo": "Geolocalización",
+      "status": {
+        "draft": "Borrador",
+        "active": "Activa",
+        "paused": "Pausada",
+        "finished": "Finalizada"
+      },
+      "activate": "Activar",
+      "pause": "Pausar",
+      "noLeagues": "No hay ligas creadas",
+      "createFirst": "Crear primera liga"
+    },
+    "players": {
+      "title": "Jugadores",
+      "total": "Jugadores Total",
+      "selectPlayer": "Seleccionar jugador",
+      "playerA": "Jugador A",
+      "playerB": "Jugador B",
+      "noPlayers": "No hay jugadores en el ranking todavía",
+      "noPlayersDesc": "Los jugadores aparecerán cuando jueguen su primer partido"
+    },
+    "matches": {
+      "title": "Partidos",
+      "total": "Partidos Total",
+      "recent": "Partidos Recientes",
+      "new": "Nuevo Partido",
+      "create": "Crear Partido",
+      "start": "Iniciar Partido",
+      "point": "Punto",
+      "ace": "Ace",
+      "set": "Set",
+      "sets": "Sets",
+      "pointsPerSet": "puntos por set",
+      "bestOf": "Mejor de",
+      "setHistory": "Historial de Sets",
+      "status": {
+        "pending": "Pendiente",
+        "inProgress": "En Curso",
+        "live": "En Vivo",
+        "finished": "Finalizado"
+      },
+      "noMatches": "No hay partidos todavía",
+      "createFirst": "Crear primer partido",
+      "differentPlayers": "Los jugadores deben ser diferentes",
+      "matchFinished": "¡Partido terminado!",
+      "winner": "Ganador"
+    },
+    "ranking": {
+      "title": "Clasificación",
+      "position": "Posición",
+      "player": "Jugador",
+      "points": "Puntos",
+      "elo": "ELO",
+      "played": "PJ",
+      "won": "PG",
+      "lost": "PP",
+      "winRate": "Win%",
+      "streak": "Racha",
+      "change": "Cambio",
+      "lastUpdated": "Última actualización"
+    },
+    "tournaments": {
+      "title": "Torneos",
+      "season": "Temporada"
+    },
+    "stats": {
+      "points": "Puntos",
+      "eloChange": "Cambio ELO"
+    }
   }
 }
