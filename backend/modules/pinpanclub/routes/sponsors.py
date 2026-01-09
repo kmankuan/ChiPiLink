@@ -11,7 +11,7 @@ from enum import Enum
 import uuid
 import base64
 
-router = APIRouter(prefix="/pingpong/sponsors", tags=["Ping Pong Sponsors"])
+router = APIRouter(prefix="/sponsors", tags=["PinpanClub Sponsors"])
 
 # ============== MODELS ==============
 

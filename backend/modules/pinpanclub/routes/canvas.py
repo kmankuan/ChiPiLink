@@ -8,7 +8,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 import uuid
 
-router = APIRouter(prefix="/pingpong/canvas", tags=["Ping Pong Canvas"])
+router = APIRouter(prefix="/canvas", tags=["PinpanClub Canvas"])
 
 # ============== MODELS ==============
 
