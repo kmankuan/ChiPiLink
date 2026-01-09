@@ -114,9 +114,9 @@ export function Header() {
                 </Link>
                 {/* PinpanClub - Club de Tenis de Mesa (Solo autenticados) */}
                 <Link 
-                  to="/pingpong" 
+                  to="/pinpanclub" 
                   className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                    location.pathname.startsWith('/pingpong') || location.pathname.startsWith('/canvas') || location.pathname.startsWith('/tv')
+                    location.pathname.startsWith('/pinpanclub') || location.pathname.startsWith('/canvas') || location.pathname.startsWith('/tv')
                       ? 'text-primary' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
@@ -206,7 +206,7 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/pingpong" className="flex items-center gap-2" data-testid="menu-pingpong">
+                    <Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong">
                       <Trophy className="h-4 w-4" />
                       PinpanClub
                     </Link>
@@ -329,9 +329,9 @@ export function Header() {
                   </Link>
                   {/* PinpanClub - Solo autenticados */}
                   <Link 
-                    to="/pingpong"
+                    to="/pinpanclub"
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                      location.pathname.startsWith('/pingpong') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                      location.pathname.startsWith('/pinpanclub') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                     data-testid="mobile-pingpong-link"
