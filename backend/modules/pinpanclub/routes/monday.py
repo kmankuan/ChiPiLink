@@ -178,6 +178,23 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
     }
 
 
+@router.get("/players")
+async def get_monday_players(admin: dict = Depends(get_admin_user)):
+    """Obtener jugadores desde Monday.com (para selección en partidos)"""
+    config = await monday_service.get_config()
+    if not config.players_board_id:
+        return {"players": [], "message": "Board de jugadores no configurado en Monday.com"}
+    
+    if not MONDAY_API_KEY:
+        return {"players": [], "message": "API Key de Monday.com no configurada"}
+    
+    try:
+        players = await monday_service.get_players_from_monday()
+        return {"players": players}
+    except Exception as e:
+        return {"players": [], "error": str(e)}
+
+
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
     """Obtener estadísticas de sincronización"""
