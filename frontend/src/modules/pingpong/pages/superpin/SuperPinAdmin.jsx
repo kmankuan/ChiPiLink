@@ -168,7 +168,7 @@ export default function SuperPinAdmin() {
               <Target className="h-6 w-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Partidos Total</p>
+              <p className="text-sm text-gray-600">{t('superpin.matches.total')}</p>
               <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_partidos || 0), 0)}</p>
             </div>
           </CardContent>
@@ -179,16 +179,16 @@ export default function SuperPinAdmin() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Medal className="h-5 w-5" /> Ligas
+            <Medal className="h-5 w-5" /> {t('superpin.leagues.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {leagues.length === 0 ? (
             <div className="text-center py-12">
               <Trophy className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No hay ligas creadas</p>
+              <p className="text-gray-500">{t('superpin.leagues.noLeagues')}</p>
               <Button onClick={() => setShowCreateModal(true)} className="mt-4">
-                Crear primera liga
+                {t('superpin.leagues.createFirst')}
               </Button>
             </div>
           ) : (
@@ -205,7 +205,7 @@ export default function SuperPinAdmin() {
                     <div>
                       <h3 className="font-semibold text-gray-900">{league.nombre}</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-500">Temporada {league.temporada}</span>
+                        <span className="text-sm text-gray-500">{t('superpin.tournaments.season')} {league.temporada}</span>
                         <span className="text-gray-300">•</span>
                         <span className="text-sm text-gray-500">{getScoringLabel(league.scoring_config?.system)}</span>
                       </div>
@@ -213,8 +213,8 @@ export default function SuperPinAdmin() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right mr-4">
-                      <p className="text-sm text-gray-500">{league.total_jugadores || 0} jugadores</p>
-                      <p className="text-sm text-gray-500">{league.total_partidos || 0} partidos</p>
+                      <p className="text-sm text-gray-500">{league.total_jugadores || 0} {t('superpin.players.title').toLowerCase()}</p>
+                      <p className="text-sm text-gray-500">{league.total_partidos || 0} {t('superpin.matches.title').toLowerCase()}</p>
                     </div>
                     {getStatusBadge(league.estado)}
                     {league.estado === 'draft' && (
