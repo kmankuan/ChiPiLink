@@ -76,7 +76,7 @@ export default function SuperPinAdmin() {
           temporada: new Date().getFullYear().toString(),
           descripcion: '',
           scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
-          checkin_config: { method: 'manual' }
+          checkin_config: { methods: ['manual'] }
         });
         fetchLeagues();
       } else {
