@@ -186,7 +186,8 @@
       "activate": "Activate",
       "pause": "Pause",
       "noLeagues": "No leagues created",
-      "createFirst": "Create first league"
+      "createFirst": "Create first league",
+      "notFound": "League not found"
     },
     "players": {
       "title": "Players",
@@ -195,7 +196,20 @@
       "playerA": "Player A",
       "playerB": "Player B",
       "noPlayers": "No players in the ranking yet",
-      "noPlayersDesc": "Players will appear when they play their first match"
+      "noPlayersDesc": "Players will appear when they play their first match",
+      "source": "Player Source",
+      "appUsers": "App Users",
+      "selectUsersDesc": "Select registered users to convert them to players:",
+      "noUsers": "No registered users",
+      "alreadyPlayer": "Already a player",
+      "addedSuccess": "{{name}} has been registered as a player",
+      "afterAddingSelect": "After adding, select players from 'PinpanClub'",
+      "mondayPlayers": "Players from Monday.com:",
+      "sync": "Sync",
+      "loadingMonday": "Loading from Monday.com...",
+      "noMondayPlayers": "No players in Monday.com or not configured",
+      "alreadySynced": "Already synced",
+      "syncComingSoon": "Automatic sync coming soon"
     },
     "matches": {
       "title": "Matches",
@@ -221,7 +235,8 @@
       "createFirst": "Create first match",
       "differentPlayers": "Players must be different",
       "matchFinished": "Match finished!",
-      "winner": "Winner"
+      "winner": "Winner",
+      "notFound": "Match not found"
     },
     "ranking": {
       "title": "Standings",
