@@ -315,19 +315,38 @@ export default function SuperPinAdmin() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.checkin')}</label>
-                <select
-                  value={newLeague.checkin_config.method}
-                  onChange={(e) => setNewLeague({
-                    ...newLeague,
-                    checkin_config: { ...newLeague.checkin_config, method: e.target.value }
-                  })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="manual">{t('superpin.leagues.checkinManual')}</option>
-                  <option value="qr_code">{t('superpin.leagues.checkinQr')}</option>
-                  <option value="geolocation">{t('superpin.leagues.checkinGeo')}</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('superpin.leagues.checkin')}</label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'manual', label: t('superpin.leagues.checkinManual'), icon: '✋' },
+                    { value: 'qr_code', label: t('superpin.leagues.checkinQr'), icon: '📱' },
+                    { value: 'geolocation', label: t('superpin.leagues.checkinGeo'), icon: '📍' }
+                  ].map((method) => (
+                    <label key={method.value} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={newLeague.checkin_config.methods?.includes(method.value)}
+                        onChange={(e) => {
+                          const methods = newLeague.checkin_config.methods || [];
+                          if (e.target.checked) {
+                            setNewLeague({
+                              ...newLeague,
+                              checkin_config: { ...newLeague.checkin_config, methods: [...methods, method.value] }
+                            });
+                          } else {
+                            setNewLeague({
+                              ...newLeague,
+                              checkin_config: { ...newLeague.checkin_config, methods: methods.filter(m => m !== method.value) }
+                            });
+                          }
+                        }}
+                        className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                      />
+                      <span className="text-xl">{method.icon}</span>
+                      <span className="text-gray-700">{method.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
