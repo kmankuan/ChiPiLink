@@ -47,6 +47,9 @@ import SponsorsAdmin from '@/modules/pingpong/pages/SponsorsAdmin';
 import PingPongCanvas from '@/modules/pingpong/pages/PingPongCanvas';
 import PingPongMondayIntegration from '@/modules/pingpong/pages/PingPongMondayIntegration';
 
+// Super Pin Module
+import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking } from '@/modules/pingpong/pages/superpin';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
