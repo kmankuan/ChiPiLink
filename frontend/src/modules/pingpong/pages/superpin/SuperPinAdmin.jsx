@@ -223,13 +223,13 @@ export default function SuperPinAdmin() {
                         variant="outline"
                         onClick={() => activateLeague(league.liga_id)}
                       >
-                        <Play className="h-4 w-4 mr-1" /> Activar
+                        <Play className="h-4 w-4 mr-1" /> {t('superpin.leagues.activate')}
                       </Button>
                     )}
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => navigate(`/pingpong/superpin/league/${league.liga_id}`)}
+                      onClick={() => navigate(`/pinpanclub/superpin/league/${league.liga_id}`)}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -246,11 +246,11 @@ export default function SuperPinAdmin() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Plus className="h-5 w-5" /> Nueva Liga
+              <Plus className="h-5 w-5" /> {t('superpin.leagues.new')}
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.name')}</label>
                 <input
                   type="text"
                   value={newLeague.nombre}
@@ -260,7 +260,7 @@ export default function SuperPinAdmin() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Temporada</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.tournaments.season')}</label>
                 <input
                   type="text"
                   value={newLeague.temporada}
@@ -270,17 +270,16 @@ export default function SuperPinAdmin() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.description')}</label>
                 <textarea
                   value={newLeague.descripcion}
                   onChange={(e) => setNewLeague({ ...newLeague, descripcion: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                   rows={2}
-                  placeholder="Descripción de la liga..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sistema de Puntuación</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.scoring')}</label>
                 <select
                   value={newLeague.scoring_config.system}
                   onChange={(e) => setNewLeague({
