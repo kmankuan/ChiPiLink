@@ -117,12 +117,12 @@ export default function SuperPinAdmin() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <Trophy className="h-8 w-8 text-yellow-500" />
-              Super Pin - Admin
+              {t('superpin.admin')}
             </h1>
-            <p className="text-gray-600 mt-1">Gestiona ligas, rankings y torneos</p>
+            <p className="text-gray-600 mt-1">{t('superpin.adminDesc')}</p>
           </div>
           <Button onClick={() => setShowCreateModal(true)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="h-4 w-4 mr-2" /> Nueva Liga
+            <Plus className="h-4 w-4 mr-2" /> {t('superpin.leagues.new')}
           </Button>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function SuperPinAdmin() {
               <Trophy className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Ligas Totales</p>
+              <p className="text-sm text-gray-600">{t('superpin.leagues.total')}</p>
               <p className="text-2xl font-bold">{leagues.length}</p>
             </div>
           </CardContent>
@@ -146,7 +146,7 @@ export default function SuperPinAdmin() {
               <Play className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Ligas Activas</p>
+              <p className="text-sm text-gray-600">{t('superpin.leagues.active')}</p>
               <p className="text-2xl font-bold">{leagues.filter(l => l.estado === 'active').length}</p>
             </div>
           </CardContent>
@@ -157,7 +157,7 @@ export default function SuperPinAdmin() {
               <Users className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Jugadores Total</p>
+              <p className="text-sm text-gray-600">{t('superpin.players.total')}</p>
               <p className="text-2xl font-bold">{leagues.reduce((acc, l) => acc + (l.total_jugadores || 0), 0)}</p>
             </div>
           </CardContent>
