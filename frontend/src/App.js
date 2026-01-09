@@ -138,6 +138,13 @@ function AppRouter() {
       {/* Ping Pong Mobile Arbiter */}
       <Route path="/pingpong/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
       
+      {/* Super Pin Routes */}
+      <Route path="/pingpong/superpin/admin" element={<SuperPinAdmin />} />
+      <Route path="/pingpong/superpin/league/:ligaId" element={<SuperPinLeagueDetail />} />
+      <Route path="/pingpong/superpin/match/:partidoId" element={<SuperPinMatch />} />
+      <Route path="/pingpong/superpin/ranking" element={<SuperPinRanking />} />
+      <Route path="/pingpong/superpin/ranking/:ligaId" element={<SuperPinRanking />} />
+      
       {/* Catalog - Admin only */}
       <Route 
         path="/catalogo" 
