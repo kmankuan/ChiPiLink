@@ -36,19 +36,19 @@ import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
 import AgentPanel from '@/pages/AgentPanel';
 
-// Ping Pong Module
-import PingPongDashboard from '@/modules/pingpong/pages/PingPongDashboard';
-import PingPongMatch from '@/modules/pingpong/pages/PingPongMatch';
-import PingPongArbiter from '@/modules/pingpong/pages/PingPongArbiter';
-import PingPongSpectator from '@/modules/pingpong/pages/PingPongSpectator';
-import PingPongTV from '@/modules/pingpong/pages/PingPongTV';
-import PingPongMobileArbiter from '@/modules/pingpong/pages/PingPongMobileArbiter';
-import SponsorsAdmin from '@/modules/pingpong/pages/SponsorsAdmin';
-import PingPongCanvas from '@/modules/pingpong/pages/PingPongCanvas';
-import PingPongMondayIntegration from '@/modules/pingpong/pages/PingPongMondayIntegration';
+// PinpanClub Module
+import PingPongDashboard from '@/modules/pinpanclub/pages/PingPongDashboard';
+import PingPongMatch from '@/modules/pinpanclub/pages/PingPongMatch';
+import PingPongArbiter from '@/modules/pinpanclub/pages/PingPongArbiter';
+import PingPongSpectator from '@/modules/pinpanclub/pages/PingPongSpectator';
+import PingPongTV from '@/modules/pinpanclub/pages/PingPongTV';
+import PingPongMobileArbiter from '@/modules/pinpanclub/pages/PingPongMobileArbiter';
+import SponsorsAdmin from '@/modules/pinpanclub/pages/SponsorsAdmin';
+import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
+import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
 
 // Super Pin Module
-import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking } from '@/modules/pingpong/pages/superpin';
+import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking } from '@/modules/pinpanclub/pages/superpin';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
