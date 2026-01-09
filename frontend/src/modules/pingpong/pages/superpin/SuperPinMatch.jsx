@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, Play, CheckCircle, Trophy, Plus, Minus,
   Zap, Target, RotateCcw
@@ -15,6 +16,7 @@ import { Badge } from '../../../../components/ui/badge';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinMatch() {
+  const { t } = useTranslation();
   const { partidoId } = useParams();
   const navigate = useNavigate();
   const [match, setMatch] = useState(null);
@@ -67,9 +69,9 @@ export default function SuperPinMatch() {
         setMatch(result.match);
 
         if (result.partido_terminado) {
-          // Mostrar mensaje de victoria
           setTimeout(() => {
-            alert(`¡Partido terminado! Ganador: ${result.ganador_partido === 'a' ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre}`);
+            const winnerName = result.ganador_partido === 'a' ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre;
+            alert(t('superpin.matches.matchFinished') + ' ' + t('superpin.matches.winner') + ': ' + winnerName);
           }, 500);
         }
       }
@@ -91,7 +93,7 @@ export default function SuperPinMatch() {
   if (!match) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <p className="text-white">Partido no encontrado</p>
+        <p className="text-white">{t('superpin.matches.notFound')}</p>
       </div>
     );
   }
@@ -109,16 +111,16 @@ export default function SuperPinMatch() {
           className="text-white hover:text-gray-300"
           onClick={() => navigate(-1)}
         >
-          <ArrowLeft className="h-5 w-5 mr-2" /> Volver
+          <ArrowLeft className="h-5 w-5 mr-2" /> {t('common.back')}
         </Button>
         <Badge className={{
           pendiente: 'bg-gray-600',
           en_curso: 'bg-green-600',
           finalizado: 'bg-blue-600'
         }[match.estado]}>
-          {isPending && 'Pendiente'}
-          {isInProgress && '🔴 En Vivo'}
-          {isFinished && '✅ Finalizado'}
+          {isPending && t('superpin.matches.status.pending')}
+          {isInProgress && '🔴 ' + t('superpin.matches.status.live')}
+          {isFinished && '✅ ' + t('superpin.matches.status.finished')}
         </Badge>
       </div>
 
@@ -128,7 +130,7 @@ export default function SuperPinMatch() {
           {/* Sets */}
           <div className="flex items-center justify-center gap-8 mb-8">
             <div className="text-center">
-              <p className="text-gray-400 text-sm mb-1">Sets</p>
+              <p className="text-gray-400 text-sm mb-1">{t('superpin.matches.sets')}</p>
               <div className="flex items-center gap-4">
                 <span className="text-5xl font-bold text-white">{match.sets_jugador_a}</span>
                 <span className="text-2xl text-gray-500">-</span>
@@ -145,13 +147,13 @@ export default function SuperPinMatch() {
                 <div className="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
                   {match.jugador_a_info?.nombre?.[0] || 'A'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.jugador_a_info?.nombre || 'Jugador A'}</h3>
+                <h3 className="text-xl font-bold text-white">{match.jugador_a_info?.nombre || t('superpin.players.playerA')}</h3>
                 {match.jugador_a_info?.apodo && (
                   <p className="text-gray-400">"{match.jugador_a_info.apodo}"</p>
                 )}
               </div>
               <div className="text-center">
-                <p className="text-gray-400 text-sm">Puntos Set {match.set_actual}</p>
+                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
                 <p className="text-6xl font-bold text-white">{match.puntos_jugador_a}</p>
               </div>
               {isInProgress && (
@@ -161,7 +163,7 @@ export default function SuperPinMatch() {
                     onClick={() => recordPoint('a')}
                     disabled={recording}
                   >
-                    <Plus className="h-6 w-6 mr-2" /> Punto
+                    <Plus className="h-6 w-6 mr-2" /> {t('superpin.matches.point')}
                   </Button>
                   <Button
                     variant="outline"
@@ -169,7 +171,7 @@ export default function SuperPinMatch() {
                     onClick={() => recordPoint('a', { ace: true })}
                     disabled={recording}
                   >
-                    <Zap className="h-4 w-4 mr-2" /> Ace
+                    <Zap className="h-4 w-4 mr-2" /> {t('superpin.matches.ace')}
                   </Button>
                 </div>
               )}
@@ -181,13 +183,13 @@ export default function SuperPinMatch() {
                 <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
                   {match.jugador_b_info?.nombre?.[0] || 'B'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.jugador_b_info?.nombre || 'Jugador B'}</h3>
+                <h3 className="text-xl font-bold text-white">{match.jugador_b_info?.nombre || t('superpin.players.playerB')}</h3>
                 {match.jugador_b_info?.apodo && (
                   <p className="text-gray-400">"{match.jugador_b_info.apodo}"</p>
                 )}
               </div>
               <div className="text-center">
-                <p className="text-gray-400 text-sm">Puntos Set {match.set_actual}</p>
+                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
                 <p className="text-6xl font-bold text-white">{match.puntos_jugador_b}</p>
               </div>
               {isInProgress && (
@@ -197,7 +199,7 @@ export default function SuperPinMatch() {
                     onClick={() => recordPoint('b')}
                     disabled={recording}
                   >
-                    <Plus className="h-6 w-6 mr-2" /> Punto
+                    <Plus className="h-6 w-6 mr-2" /> {t('superpin.matches.point')}
                   </Button>
                   <Button
                     variant="outline"
@@ -205,7 +207,7 @@ export default function SuperPinMatch() {
                     onClick={() => recordPoint('b', { ace: true })}
                     disabled={recording}
                   >
-                    <Zap className="h-4 w-4 mr-2" /> Ace
+                    <Zap className="h-4 w-4 mr-2" /> {t('superpin.matches.ace')}
                   </Button>
                 </div>
               )}
@@ -214,17 +216,17 @@ export default function SuperPinMatch() {
 
           {/* Match Info */}
           <div className="mt-6 text-center text-gray-400">
-            <p>Mejor de {match.mejor_de} • {match.puntos_por_set} puntos por set</p>
+            <p>{t('superpin.matches.bestOf')} {match.mejor_de} • {match.puntos_por_set} {t('superpin.matches.pointsPerSet')}</p>
           </div>
 
           {/* Set History */}
           {match.historial_sets?.length > 0 && (
             <div className="mt-6">
-              <p className="text-gray-400 text-sm mb-2 text-center">Historial de Sets</p>
+              <p className="text-gray-400 text-sm mb-2 text-center">{t('superpin.matches.setHistory')}</p>
               <div className="flex justify-center gap-4">
                 {match.historial_sets.map((set, i) => (
                   <div key={i} className="bg-gray-700 px-4 py-2 rounded-lg text-center">
-                    <p className="text-xs text-gray-400">Set {set.set}</p>
+                    <p className="text-xs text-gray-400">{t('superpin.matches.set')} {set.set}</p>
                     <p className="text-white font-bold">{set.puntos_a} - {set.puntos_b}</p>
                   </div>
                 ))}
@@ -242,7 +244,7 @@ export default function SuperPinMatch() {
             className="bg-green-600 hover:bg-green-700 px-12 py-6 text-xl"
             onClick={startMatch}
           >
-            <Play className="h-6 w-6 mr-2" /> Iniciar Partido
+            <Play className="h-6 w-6 mr-2" /> {t('superpin.matches.start')}
           </Button>
         </div>
       )}
@@ -251,19 +253,19 @@ export default function SuperPinMatch() {
         <Card className="bg-green-900/20 border-green-700">
           <CardContent className="p-6 text-center">
             <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-white mb-2">¡Partido Finalizado!</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">{t('superpin.matches.matchFinished')}</h3>
             <p className="text-green-400 text-lg">
-              Ganador: {match.ganador_id === match.jugador_a_id ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre}
+              {t('superpin.matches.winner')}: {match.ganador_id === match.jugador_a_id ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre}
             </p>
             {(match.elo_change_a || match.puntos_ganador) && (
               <div className="mt-4 flex justify-center gap-8">
                 <div className="text-center">
-                  <p className="text-gray-400 text-sm">Puntos</p>
+                  <p className="text-gray-400 text-sm">{t('superpin.stats.points')}</p>
                   <p className="text-white">+{match.puntos_ganador} / +{match.puntos_perdedor}</p>
                 </div>
                 {match.elo_change_a !== undefined && (
                   <div className="text-center">
-                    <p className="text-gray-400 text-sm">ELO Change</p>
+                    <p className="text-gray-400 text-sm">{t('superpin.stats.eloChange')}</p>
                     <p className="text-white">
                       {match.elo_change_a > 0 ? '+' : ''}{match.elo_change_a} / {match.elo_change_b > 0 ? '+' : ''}{match.elo_change_b}
                     </p>
