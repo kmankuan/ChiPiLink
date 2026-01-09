@@ -1,6 +1,8 @@
 """
-Ping Pong WebSocket Module - Real-time synchronization for live scoreboards
+PinpanClub WebSocket Module - Real-time synchronization for live scoreboards
 Provides instant updates to all connected TVs, spectators, and mobile devices
+
+Migrated from /routes/pingpong_websocket.py to modules/pinpanclub/routes/websocket.py
 """
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
@@ -13,8 +15,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Router
-pingpong_ws_router = APIRouter(prefix="/pingpong/ws", tags=["Ping Pong WebSocket"])
+# Router - New microservices-ready path
+ws_router = APIRouter(prefix="/ws", tags=["PinpanClub WebSocket"])
 
 # ============== CONNECTION MANAGER ==============
 
