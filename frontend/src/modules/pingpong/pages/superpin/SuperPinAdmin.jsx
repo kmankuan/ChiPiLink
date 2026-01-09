@@ -288,12 +288,12 @@ export default function SuperPinAdmin() {
                   })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="simple">Puntos Simples (+3 victoria, +1 derrota)</option>
-                  <option value="elo">Sistema ELO</option>
+                  <option value="simple">{t('superpin.leagues.scoringSimple')}</option>
+                  <option value="elo">{t('superpin.leagues.scoringElo')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Método de Check-in</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.leagues.checkin')}</label>
                 <select
                   value={newLeague.checkin_config.method}
                   onChange={(e) => setNewLeague({
@@ -302,18 +302,18 @@ export default function SuperPinAdmin() {
                   })}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="manual">Manual</option>
-                  <option value="qr_code">Código QR</option>
-                  <option value="geolocation">Geolocalización</option>
+                  <option value="manual">{t('superpin.leagues.checkinManual')}</option>
+                  <option value="qr_code">{t('superpin.leagues.checkinQr')}</option>
+                  <option value="geolocation">{t('superpin.leagues.checkinGeo')}</option>
                 </select>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="outline" onClick={() => setShowCreateModal(false)}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button onClick={createLeague} className="bg-green-600 hover:bg-green-700">
-                Crear Liga
+                {t('superpin.leagues.create')}
               </Button>
             </div>
           </div>
