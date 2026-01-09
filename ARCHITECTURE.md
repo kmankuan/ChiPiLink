@@ -362,6 +362,8 @@ Los archivos de configuración para la Fase 3 han sido creados:
 | **Fase 1.5** | ✅ Completada | Migración del frontend a nuevos endpoints |
 | **Fase 2** | ✅ Completada | Migración de nombres de colecciones MongoDB |
 | **Fase 3** | ✅ Completada | Containerización y estructura de servicios |
+| **Tarea 2** | ✅ Completada | Deprecar rutas legacy (Auth, Store, Community, PingPong) |
+| **Tarea 3** | ✅ Completada | Refactorizar WebSocket y rutas PinpanClub |
 
 ### Colecciones MongoDB (Fase 2)
 
