@@ -138,11 +138,11 @@ export default function PingPongDashboard() {
                 <h1 className="font-bold text-xl">PinpanClub</h1>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
                   Jugadores
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
+                <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
                   <Trophy className="h-4 w-4 mr-2" />
                   Torneos
                 </Button>
@@ -154,7 +154,7 @@ export default function PingPongDashboard() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate('/pingpong/monday')}>
+                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
                       <img 
                         src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
                         alt="Monday.com" 
@@ -162,12 +162,12 @@ export default function PingPongDashboard() {
                       />
                       Monday.com
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/pingpong/sponsors')}>
+                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/sponsors')}>
                       <Image className="h-4 w-4 mr-2" />
                       Patrocinadores
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/tv/pingpong')}>
+                    <DropdownMenuItem onClick={() => navigate('/tv/pinpanclub')}>
                       <Eye className="h-4 w-4 mr-2" />
                       Vista TV
                     </DropdownMenuItem>
@@ -177,7 +177,7 @@ export default function PingPongDashboard() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
+                <Button size="sm" onClick={() => navigate('/pinpanclub/match/new')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Nuevo Partido
                 </Button>
@@ -190,15 +190,15 @@ export default function PingPongDashboard() {
       {/* Quick Actions Bar - Solo dentro del admin */}
       {isInsideAdmin && (
         <div className="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b">
-          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/players')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
             <Users className="h-4 w-4 mr-2" />
             Jugadores
           </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
             <Trophy className="h-4 w-4 mr-2" />
             Torneos
           </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/monday')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/monday')}>
             <img 
               src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
               alt="Monday.com" 
@@ -206,11 +206,11 @@ export default function PingPongDashboard() {
             />
             Monday.com
           </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate('/pingpong/sponsors')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/sponsors')}>
             <Image className="h-4 w-4 mr-2" />
             Patrocinadores
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.open('/tv/pingpong', '_blank')}>
+          <Button variant="outline" size="sm" onClick={() => window.open('/tv/pinpanclub', '_blank')}>
             <Eye className="h-4 w-4 mr-2" />
             Vista TV
           </Button>
@@ -218,7 +218,7 @@ export default function PingPongDashboard() {
             <CalendarDays className="h-4 w-4 mr-2" />
             Canvas
           </Button>
-          <Button size="sm" onClick={() => navigate('/pingpong/match/new')}>
+          <Button size="sm" onClick={() => navigate('/pinpanclub/match/new')}>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Partido
           </Button>
@@ -237,7 +237,7 @@ export default function PingPongDashboard() {
               Partidos en Vivo
             </h2>
             {activeMatches.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/pingpong/live')}>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/live')}>
                 Ver todos
               </Button>
             )}
@@ -247,7 +247,7 @@ export default function PingPongDashboard() {
             <Card className="p-8 text-center">
               <Play className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30" />
               <p className="text-muted-foreground">No hay partidos en vivo</p>
-              <Button className="mt-4" onClick={() => navigate('/pingpong/match/new')}>
+              <Button className="mt-4" onClick={() => navigate('/pinpanclub/match/new')}>
                 Iniciar un Partido
               </Button>
             </Card>
@@ -286,7 +286,7 @@ export default function PingPongDashboard() {
               <Medal className="h-5 w-5 text-yellow-500" />
               Ranking
             </h2>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/pingpong/rankings')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/rankings')}>
               Ver completo
             </Button>
           </div>
@@ -354,7 +354,7 @@ export default function PingPongDashboard() {
                 <Trophy className="h-5 w-5 text-purple-500" />
                 Torneos Próximos
               </h2>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/pingpong/tournaments')}>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
                 Ver todos
               </Button>
             </div>
@@ -405,7 +405,7 @@ export default function PingPongDashboard() {
                 <TrendingUp className="h-5 w-5 text-green-500" />
                 Partidos Recientes
               </h2>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/pingpong/matches')}>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/pinpanclub/matches')}>
                 Ver historial
               </Button>
             </div>

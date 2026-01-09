@@ -54,7 +54,7 @@ export default function PingPongArbiter() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Partido no encontrado</p>
-        <Button onClick={() => navigate('/pingpong')}>Volver al Dashboard</Button>
+        <Button onClick={() => navigate('/pinpanclub')}>Volver al Dashboard</Button>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function PingPongArbiter() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/pingpong')}>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <span className="text-2xl">🏓</span>

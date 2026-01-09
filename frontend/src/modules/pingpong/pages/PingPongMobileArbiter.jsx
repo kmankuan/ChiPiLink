@@ -253,7 +253,7 @@ export default function PingPongMobileArbiter() {
           <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
           <h2 className="text-xl font-bold mb-2">Partido no encontrado</h2>
           <button
-            onClick={() => navigate('/pingpong')}
+            onClick={() => navigate('/pinpanclub')}
             className="mt-4 bg-white/20 px-6 py-2 rounded-lg"
           >
             Volver
@@ -271,7 +271,7 @@ export default function PingPongMobileArbiter() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white flex flex-col">
       {/* Header */}
       <header className="bg-black/50 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => navigate('/pingpong')} className="p-2">
+        <button onClick={() => navigate('/pinpanclub')} className="p-2">
           <ArrowLeft className="w-6 h-6" />
         </button>
         
@@ -470,7 +470,7 @@ export default function PingPongMobileArbiter() {
               {match.sets_jugador_a} - {match.sets_jugador_b}
             </div>
             <button
-              onClick={() => navigate('/pingpong')}
+              onClick={() => navigate('/pinpanclub')}
               className="bg-white text-black px-8 py-3 rounded-full font-bold"
             >
               Volver al Dashboard

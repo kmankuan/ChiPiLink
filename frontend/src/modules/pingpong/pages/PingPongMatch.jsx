@@ -80,7 +80,7 @@ export default function PingPongMatch() {
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/pingpong')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <span className="text-2xl">🏓</span>
@@ -231,7 +231,7 @@ export default function PingPongMatch() {
                     type="button" 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate('/pingpong/players/new')}
+                    onClick={() => navigate('/pinpanclub/players/new')}
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Agregar Jugador

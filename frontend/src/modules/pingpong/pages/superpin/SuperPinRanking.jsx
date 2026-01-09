@@ -102,7 +102,7 @@ export default function SuperPinRanking() {
             <Button
               variant="ghost"
               className="text-white hover:text-gray-300"
-              onClick={() => navigate('/pingpong')}
+              onClick={() => navigate('/pinpanclub')}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
