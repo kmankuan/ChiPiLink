@@ -205,6 +205,15 @@ export default function PingPongDashboard() {
       {/* Quick Actions Bar - Solo dentro del admin */}
       {isInsideAdmin && (
         <div className="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => navigate('/pinpanclub/superpin/admin')}
+            className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+          >
+            <Trophy className="h-4 w-4 mr-2" />
+            🏆 Super Pin
+          </Button>
           <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
             <Users className="h-4 w-4 mr-2" />
             Jugadores
