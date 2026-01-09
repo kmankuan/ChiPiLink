@@ -152,5 +152,98 @@
     "cancelled": "Cancelled",
     "active": "Active",
     "inactive": "Inactive"
+  },
+  "superpin": {
+    "title": "Super Pin",
+    "admin": "Super Pin - Admin",
+    "adminDesc": "Manage leagues, rankings and tournaments",
+    "ranking": "Super Pin Ranking",
+    "rankingDesc": "Individual ranking system with leagues and seasons",
+    "viewRanking": "View Ranking",
+    "manage": "Manage",
+    "leagues": {
+      "title": "Leagues",
+      "total": "Total Leagues",
+      "active": "Active Leagues",
+      "new": "New League",
+      "create": "Create League",
+      "name": "Name",
+      "season": "Season",
+      "description": "Description",
+      "scoring": "Scoring System",
+      "scoringSimple": "Simple Points (+3 win, +1 loss)",
+      "scoringElo": "ELO System",
+      "checkin": "Check-in Method",
+      "checkinManual": "Manual",
+      "checkinQr": "QR Code",
+      "checkinGeo": "Geolocation",
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "paused": "Paused",
+        "finished": "Finished"
+      },
+      "activate": "Activate",
+      "pause": "Pause",
+      "noLeagues": "No leagues created",
+      "createFirst": "Create first league"
+    },
+    "players": {
+      "title": "Players",
+      "total": "Total Players",
+      "selectPlayer": "Select player",
+      "playerA": "Player A",
+      "playerB": "Player B",
+      "noPlayers": "No players in the ranking yet",
+      "noPlayersDesc": "Players will appear when they play their first match"
+    },
+    "matches": {
+      "title": "Matches",
+      "total": "Total Matches",
+      "recent": "Recent Matches",
+      "new": "New Match",
+      "create": "Create Match",
+      "start": "Start Match",
+      "point": "Point",
+      "ace": "Ace",
+      "set": "Set",
+      "sets": "Sets",
+      "pointsPerSet": "points per set",
+      "bestOf": "Best of",
+      "setHistory": "Set History",
+      "status": {
+        "pending": "Pending",
+        "inProgress": "In Progress",
+        "live": "Live",
+        "finished": "Finished"
+      },
+      "noMatches": "No matches yet",
+      "createFirst": "Create first match",
+      "differentPlayers": "Players must be different",
+      "matchFinished": "Match finished!",
+      "winner": "Winner"
+    },
+    "ranking": {
+      "title": "Standings",
+      "position": "Position",
+      "player": "Player",
+      "points": "Points",
+      "elo": "ELO",
+      "played": "GP",
+      "won": "W",
+      "lost": "L",
+      "winRate": "Win%",
+      "streak": "Streak",
+      "change": "Change",
+      "lastUpdated": "Last updated"
+    },
+    "tournaments": {
+      "title": "Tournaments",
+      "season": "Season"
+    },
+    "stats": {
+      "points": "Points",
+      "eloChange": "ELO Change"
+    }
   }
 }
