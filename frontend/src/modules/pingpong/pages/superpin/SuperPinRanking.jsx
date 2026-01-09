@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Trophy, Medal, TrendingUp, TrendingDown, Minus,
   Users, Target, Calendar, ArrowLeft, RefreshCw
@@ -15,6 +16,7 @@ import { Badge } from '../../../../components/ui/badge';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinRanking() {
+  const { t } = useTranslation();
   const { ligaId } = useParams();
   const navigate = useNavigate();
   const [leagues, setLeagues] = useState([]);
