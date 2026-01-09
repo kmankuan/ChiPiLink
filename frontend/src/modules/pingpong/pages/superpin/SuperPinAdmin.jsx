@@ -94,17 +94,11 @@ export default function SuperPinAdmin() {
       paused: 'bg-yellow-100 text-yellow-800',
       finished: 'bg-blue-100 text-blue-800'
     };
-    const labels = {
-      draft: 'Borrador',
-      active: 'Activa',
-      paused: 'Pausada',
-      finished: 'Finalizada'
-    };
-    return <Badge className={styles[estado]}>{labels[estado]}</Badge>;
+    return <Badge className={styles[estado]}>{t(`superpin.leagues.status.${estado}`)}</Badge>;
   };
 
   const getScoringLabel = (system) => {
-    return system === 'elo' ? 'Sistema ELO' : 'Puntos Simples';
+    return system === 'elo' ? t('superpin.leagues.scoringElo') : t('superpin.leagues.scoringSimple');
   };
 
   if (loading) {
