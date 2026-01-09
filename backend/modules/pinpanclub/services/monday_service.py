@@ -118,6 +118,65 @@ class MondayService(BaseService):
         result = await self._graphql_request(query)
         return result.get("data", {}).get("boards", [])
     
+    async def get_board_items(self, board_id: str) -> List[Dict]:
+        """Obtener items de un board específico (jugadores)"""
+        query = f'''
+        query {{
+            boards(ids: [{board_id}]) {{
+                items_page(limit: 100) {{
+                    items {{
+                        id
+                        name
+                        column_values {{
+                            id
+                            text
+                            value
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        '''
+        result = await self._graphql_request(query)
+        boards = result.get("data", {}).get("boards", [])
+        if not boards:
+            return []
+        
+        items = boards[0].get("items_page", {}).get("items", [])
+        
+        # Transformar a formato de jugadores
+        players = []
+        for item in items:
+            player = {
+                "id": item["id"],
+                "name": item["name"],
+                "nombre": item["name"],
+                "email": None
+            }
+            
+            # Extraer datos de columnas
+            for col in item.get("column_values", []):
+                col_id = col.get("id", "").lower()
+                col_text = col.get("text", "")
+                
+                if "email" in col_id or col_id == "text4":
+                    player["email"] = col_text
+                elif col_id == "text":
+                    if col_text:
+                        player["nombre"] = col_text
+            
+            players.append(player)
+        
+        return players
+    
+    async def get_players_from_monday(self) -> List[Dict]:
+        """Obtener jugadores desde el board configurado de Monday.com"""
+        config = await self.get_config()
+        if not config.players_board_id:
+            return []
+        
+        return await self.get_board_items(config.players_board_id)
+    
     async def create_item(
         self,
         board_id: str,
