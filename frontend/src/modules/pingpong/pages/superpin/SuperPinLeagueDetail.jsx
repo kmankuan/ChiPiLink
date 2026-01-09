@@ -375,47 +375,191 @@ export default function SuperPinLeagueDetail() {
       {/* New Match Modal */}
       {showNewMatchModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <Plus className="h-5 w-5" /> Nuevo Partido
             </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jugador A</label>
-                <select
-                  value={newMatch.jugador_a_id}
-                  onChange={(e) => setNewMatch({ ...newMatch, jugador_a_id: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+            
+            {/* Player Source Selector */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Fuente de Jugadores</label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={playerSource === 'pinpanclub' ? 'default' : 'outline'}
+                  onClick={() => setPlayerSource('pinpanclub')}
                 >
-                  <option value="">Seleccionar jugador</option>
-                  {availablePlayers.map((player) => (
-                    <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Jugador B</label>
-                <select
-                  value={newMatch.jugador_b_id}
-                  onChange={(e) => setNewMatch({ ...newMatch, jugador_b_id: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                  🏓 PinpanClub
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={playerSource === 'users' ? 'default' : 'outline'}
+                  onClick={() => setPlayerSource('users')}
                 >
-                  <option value="">Seleccionar jugador</option>
-                  {availablePlayers.filter(p => p.jugador_id !== newMatch.jugador_a_id).map((player) => (
-                    <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
-                    </option>
-                  ))}
-                </select>
+                  👤 Usuarios App
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={playerSource === 'monday' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setPlayerSource('monday');
+                    if (mondayPlayers.length === 0) fetchMondayPlayers();
+                  }}
+                >
+                  <img src="https://cdn.monday.com/images/logos/monday_logo_icon.png" alt="Monday" className="h-4 w-4 mr-1" />
+                  Monday.com
+                </Button>
               </div>
             </div>
+
+            {/* Players List Based on Source */}
+            <div className="space-y-4">
+              {playerSource === 'pinpanclub' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Jugador A</label>
+                    <select
+                      value={newMatch.jugador_a_id}
+                      onChange={(e) => setNewMatch({ ...newMatch, jugador_a_id: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Seleccionar jugador</option>
+                      {availablePlayers.map((player) => (
+                        <option key={player.jugador_id} value={player.jugador_id}>
+                          {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Jugador B</label>
+                    <select
+                      value={newMatch.jugador_b_id}
+                      onChange={(e) => setNewMatch({ ...newMatch, jugador_b_id: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Seleccionar jugador</option>
+                      {availablePlayers.filter(p => p.jugador_id !== newMatch.jugador_a_id).map((player) => (
+                        <option key={player.jugador_id} value={player.jugador_id}>
+                          {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {playerSource === 'users' && (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-500">
+                    Selecciona usuarios registrados para convertirlos en jugadores:
+                  </p>
+                  {registeredUsers.length === 0 ? (
+                    <p className="text-center py-4 text-gray-400">No hay usuarios registrados</p>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto space-y-2">
+                      {registeredUsers.map((user) => {
+                        const isAlreadyPlayer = availablePlayers.some(p => p.email === user.email || p.user_id === user.cliente_id);
+                        return (
+                          <div key={user.cliente_id} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <p className="font-medium">{user.nombre} {user.apellido || ''}</p>
+                              <p className="text-sm text-gray-500">{user.email}</p>
+                            </div>
+                            {isAlreadyPlayer ? (
+                              <Badge className="bg-green-100 text-green-800">Ya es jugador</Badge>
+                            ) : (
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => convertUserToPlayer(user)}
+                              >
+                                <UserPlus className="h-4 w-4 mr-1" /> Agregar
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    Después de agregar, selecciona los jugadores desde "PinpanClub"
+                  </p>
+                </div>
+              )}
+
+              {playerSource === 'monday' && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-gray-500">
+                      Jugadores desde Monday.com:
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={fetchMondayPlayers}
+                      disabled={loadingMonday}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-1 ${loadingMonday ? 'animate-spin' : ''}`} />
+                      Sincronizar
+                    </Button>
+                  </div>
+                  {loadingMonday ? (
+                    <div className="text-center py-4">
+                      <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
+                      <p className="text-sm text-gray-500 mt-2">Cargando desde Monday.com...</p>
+                    </div>
+                  ) : mondayPlayers.length === 0 ? (
+                    <p className="text-center py-4 text-gray-400">
+                      No hay jugadores en Monday.com o no está configurado
+                    </p>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto space-y-2">
+                      {mondayPlayers.map((player, idx) => {
+                        const isAlreadyPlayer = availablePlayers.some(p => p.monday_id === player.id || p.email === player.email);
+                        return (
+                          <div key={player.id || idx} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <p className="font-medium">{player.nombre || player.name}</p>
+                              {player.email && <p className="text-sm text-gray-500">{player.email}</p>}
+                            </div>
+                            {isAlreadyPlayer ? (
+                              <Badge className="bg-green-100 text-green-800">Ya sincronizado</Badge>
+                            ) : (
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => {
+                                  // TODO: Implement Monday player sync
+                                  alert('Sincronización automática próximamente. Por ahora, los jugadores se sincronizan desde la página de Monday.com');
+                                }}
+                              >
+                                <UserPlus className="h-4 w-4 mr-1" /> Sincronizar
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="flex justify-end gap-3 mt-6">
-              <Button variant="outline" onClick={() => setShowNewMatchModal(false)}>
+              <Button type="button" variant="outline" onClick={() => setShowNewMatchModal(false)}>
                 Cancelar
               </Button>
-              <Button onClick={createMatch} className="bg-green-600 hover:bg-green-700">
+              <Button 
+                type="button" 
+                onClick={createMatch} 
+                className="bg-green-600 hover:bg-green-700"
+                disabled={playerSource !== 'pinpanclub' || !newMatch.jugador_a_id || !newMatch.jugador_b_id}
+              >
                 Crear Partido
               </Button>
             </div>
