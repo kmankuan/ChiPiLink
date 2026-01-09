@@ -152,5 +152,98 @@
     "cancelled": "已取消",
     "active": "活跃",
     "inactive": "非活跃"
+  },
+  "superpin": {
+    "title": "超级排名",
+    "admin": "超级排名 - 管理",
+    "adminDesc": "管理联赛、排名和锦标赛",
+    "ranking": "超级排名榜",
+    "rankingDesc": "个人排名系统，包含联赛和赛季",
+    "viewRanking": "查看排名",
+    "manage": "管理",
+    "leagues": {
+      "title": "联赛",
+      "total": "联赛总数",
+      "active": "活跃联赛",
+      "new": "新联赛",
+      "create": "创建联赛",
+      "name": "名称",
+      "season": "赛季",
+      "description": "描述",
+      "scoring": "计分系统",
+      "scoringSimple": "简单积分（胜+3分，负+1分）",
+      "scoringElo": "ELO系统",
+      "checkin": "签到方式",
+      "checkinManual": "手动",
+      "checkinQr": "二维码",
+      "checkinGeo": "地理位置",
+      "status": {
+        "draft": "草稿",
+        "active": "进行中",
+        "paused": "已暂停",
+        "finished": "已结束"
+      },
+      "activate": "激活",
+      "pause": "暂停",
+      "noLeagues": "暂无联赛",
+      "createFirst": "创建第一个联赛"
+    },
+    "players": {
+      "title": "选手",
+      "total": "选手总数",
+      "selectPlayer": "选择选手",
+      "playerA": "选手A",
+      "playerB": "选手B",
+      "noPlayers": "排名中暂无选手",
+      "noPlayersDesc": "选手在进行首场比赛后将会显示"
+    },
+    "matches": {
+      "title": "比赛",
+      "total": "比赛总数",
+      "recent": "最近比赛",
+      "new": "新比赛",
+      "create": "创建比赛",
+      "start": "开始比赛",
+      "point": "得分",
+      "ace": "Ace球",
+      "set": "局",
+      "sets": "局数",
+      "pointsPerSet": "每局分数",
+      "bestOf": "三局两胜",
+      "setHistory": "局数记录",
+      "status": {
+        "pending": "待开始",
+        "inProgress": "进行中",
+        "live": "直播中",
+        "finished": "已结束"
+      },
+      "noMatches": "暂无比赛",
+      "createFirst": "创建第一场比赛",
+      "differentPlayers": "选手必须不同",
+      "matchFinished": "比赛结束！",
+      "winner": "获胜者"
+    },
+    "ranking": {
+      "title": "排行榜",
+      "position": "排名",
+      "player": "选手",
+      "points": "积分",
+      "elo": "ELO分",
+      "played": "场次",
+      "won": "胜",
+      "lost": "负",
+      "winRate": "胜率",
+      "streak": "连胜/连负",
+      "change": "变化",
+      "lastUpdated": "最后更新"
+    },
+    "tournaments": {
+      "title": "锦标赛",
+      "season": "赛季"
+    },
+    "stats": {
+      "points": "积分",
+      "eloChange": "ELO变化"
+    }
   }
 }
