@@ -135,7 +135,7 @@ export default function SuperPinLeagueDetail() {
         const match = await response.json();
         setShowNewMatchModal(false);
         setNewMatch({ jugador_a_id: '', jugador_b_id: '' });
-        navigate(`/pingpong/superpin/match/${match.partido_id}`);
+        navigate(`/pinpanclub/superpin/match/${match.partido_id}`);
       }
     } catch (error) {
       console.error('Error creating match:', error);
@@ -344,7 +344,7 @@ export default function SuperPinLeagueDetail() {
                   <div
                     key={match.partido_id}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate(`/pingpong/superpin/match/${match.partido_id}`)}
+                    onClick={() => navigate(`/pinpanclub/superpin/match/${match.partido_id}`)}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div className="text-center flex-1">
