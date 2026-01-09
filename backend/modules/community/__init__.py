@@ -9,7 +9,7 @@ Arquitectura Microservices-Ready:
 ├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
 ├── services/         # Lógica de negocio
 ├── events/           # Event handlers y tipos de eventos
-├── routes/           # API endpoints (FastAPI routers) - REFACTORIZADO
+├── routes/           # API endpoints (FastAPI routers)
 └── __init__.py       # Inicialización del módulo
 
 Beneficios de esta arquitectura:
@@ -20,10 +20,7 @@ Beneficios de esta arquitectura:
 ─────────────────────────────────────────────────────────
 """
 
-# Legacy router (compatibilidad con frontend actual)
-from .legacy_routes import router as legacy_router
-
-# New refactored router
+# Refactored router (microservices-ready)
 from .routes import router as community_refactored_router
 
 # Modelos nuevos
@@ -66,11 +63,11 @@ def init_module():
 
 
 # Alias para compatibilidad
-router = legacy_router
+router = community_refactored_router
 
 __all__ = [
     # Routers
-    'router', 'legacy_router', 'community_refactored_router',
+    'router', 'community_refactored_router',
     # Enums
     'PostType', 'EventStatus', 'EventType',
     # Post Models
