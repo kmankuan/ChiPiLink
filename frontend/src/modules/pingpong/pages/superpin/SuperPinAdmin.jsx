@@ -47,8 +47,19 @@ export default function SuperPinAdmin() {
   };
 
   const createLeague = async () => {
+    // Validación
+    if (!newLeague.nombre || newLeague.nombre.trim() === '') {
+      alert(t('superpin.leagues.name') + ' es requerido');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Sesión expirada. Por favor inicie sesión nuevamente.');
+        return;
+      }
+
       const response = await fetch(`${API_URL}/api/pinpanclub/superpin/leagues`, {
         method: 'POST',
         headers: {
@@ -68,9 +79,13 @@ export default function SuperPinAdmin() {
           checkin_config: { method: 'manual' }
         });
         fetchLeagues();
+      } else {
+        const error = await response.json();
+        alert('Error: ' + (error.detail || 'No se pudo crear la liga'));
       }
     } catch (error) {
       console.error('Error creating league:', error);
+      alert('Error de conexión. Intente nuevamente.');
     }
   };
 
