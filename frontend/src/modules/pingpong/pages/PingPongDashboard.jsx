@@ -253,6 +253,44 @@ export default function PingPongDashboard() {
         {/* Quick Stats */}
         <QuickStats />
 
+        {/* Super Pin Banner */}
+        <section>
+          <Card className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 border-0 overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-yellow-500/20 rounded-xl">
+                    <Trophy className="h-10 w-10 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                      🏆 Super Pin Ranking
+                    </h2>
+                    <p className="text-green-200">Sistema de ranking individual con ligas y temporadas</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="border-white/30 text-white hover:bg-white/10"
+                    onClick={() => navigate('/pinpanclub/superpin/ranking')}
+                  >
+                    <Medal className="h-4 w-4 mr-2" />
+                    Ver Ranking
+                  </Button>
+                  <Button 
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                    onClick={() => navigate('/pinpanclub/superpin/admin')}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Administrar
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Live Matches */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -284,14 +322,14 @@ export default function PingPongDashboard() {
                     <Button 
                       size="sm" 
                       variant="secondary"
-                      onClick={() => navigate(`/pingpong/spectator/${match.partido_id}`)}
+                      onClick={() => navigate(`/pinpanclub/spectator/${match.partido_id}`)}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Ver
                     </Button>
                     <Button 
                       size="sm"
-                      onClick={() => navigate(`/pingpong/arbiter/${match.partido_id}`)}
+                      onClick={() => navigate(`/pinpanclub/arbiter/${match.partido_id}`)}
                     >
                       <Gavel className="h-4 w-4 mr-1" />
                       Arbitrar
