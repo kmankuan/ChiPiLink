@@ -161,7 +161,7 @@ manager = ConnectionManager()
 
 # ============== WEBSOCKET ENDPOINTS ==============
 
-@pingpong_ws_router.websocket("/live")
+@ws_router.websocket("/live")
 async def websocket_live(websocket: WebSocket):
     """
     Main WebSocket endpoint for live updates
@@ -199,7 +199,7 @@ async def websocket_live(websocket: WebSocket):
         manager.disconnect(client_id)
 
 
-@pingpong_ws_router.websocket("/arbiter/{match_id}")
+@ws_router.websocket("/arbiter/{match_id}")
 async def websocket_arbiter(websocket: WebSocket, match_id: str):
     """
     WebSocket endpoint specifically for arbiters
@@ -627,13 +627,13 @@ async def handle_timeout(match_id: str, data: dict, arbiter_id: str):
 
 # ============== REST ENDPOINTS FOR WEBSOCKET MANAGEMENT ==============
 
-@pingpong_ws_router.get("/stats")
+@ws_router.get("/stats")
 async def get_websocket_stats():
     """Get WebSocket connection statistics"""
     return manager.get_stats()
 
 
-@pingpong_ws_router.post("/broadcast")
+@ws_router.post("/broadcast")
 async def broadcast_message(message: dict):
     """Broadcast a message to all connected clients (admin only)"""
     await manager.broadcast_all(message)
