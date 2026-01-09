@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Trophy, Users, Calendar, Settings, Plus, Play, Pause,
-  ChevronRight, Medal, Target, Award, TrendingUp
+  ChevronRight, Medal, Target, Award, TrendingUp, ArrowLeft
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
@@ -27,7 +27,7 @@ export default function SuperPinAdmin() {
     temporada: new Date().getFullYear().toString(),
     descripcion: '',
     scoring_config: { system: 'simple', points_win: 3, points_loss: 1 },
-    checkin_config: { method: 'manual' }
+    checkin_config: { methods: ['manual'], require_all: false }
   });
 
   useEffect(() => {
