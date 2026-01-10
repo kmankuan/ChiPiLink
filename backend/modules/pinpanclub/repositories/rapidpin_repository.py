@@ -147,6 +147,21 @@ class RapidPinMatchRepository(BaseRepository):
             sort=[("created_at", -1)]
         )
     
+    async def get_all_pending_matches_for_user(self, user_id: str) -> List[Dict]:
+        """Obtener TODOS los partidos pendientes de confirmación donde el usuario participa (todas las temporadas)"""
+        return await self.find_many(
+            query={
+                "estado": "pending",
+                "$or": [
+                    {"jugador_a_id": user_id},
+                    {"jugador_b_id": user_id},
+                    {"arbitro_id": user_id}
+                ],
+                "registrado_por_id": {"$ne": user_id}  # No puede confirmar su propio registro
+            },
+            sort=[("created_at", -1)]
+        )
+    
     async def get_player_matches(
         self,
         season_id: str,
