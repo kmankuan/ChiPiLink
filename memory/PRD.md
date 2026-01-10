@@ -1,7 +1,7 @@
 # ChiPi Link - Product Requirements Document
 
 ## Original Problem Statement
-Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanClub** para gestión de clubes de ping pong, incluyendo el sistema de ranking **Super Pin**.
+Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanClub** para gestión de clubes de ping pong, incluyendo el sistema de ranking **Super Pin** y el nuevo sistema de partidos espontáneos **Rapid Pin**.
 
 ## Completed Features Summary
 
@@ -13,12 +13,52 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 | P3 | Badge/Achievement System | 20/20 | ✅ 100% |
 | P4 | Player Profile Dashboard | 18/18 | ✅ 100% |
 | P5 | Multi-Player Comparison Tool | 20/20 | ✅ 100% |
+| P6 | **Rapid Pin System** | 21/21 | ✅ 100% |
 
-**Total: 104/104 tests passed** 🎉
+**Total: 125/125 tests passed** 🎉
 
 ## Feature Details
 
-### Multi-Player Comparison (P5) ✅ NEW
+### Rapid Pin System (P6) ✅ NEW (Enero 2026)
+Sistema de partidos espontáneos sin organización previa. "¿Echamos un Rapid Pin?"
+
+**Concepto Core:**
+- 2 jugadores + 1 árbitro = Partido válido
+- Sin organización previa requerida
+- Ranking acumulativo por temporada
+
+**Sistema de Puntuación:**
+| Resultado | Puntos |
+|-----------|--------|
+| Victoria | +3 |
+| Derrota | +1 |
+| Árbitro | +2 |
+
+**Validación de Partidos:**
+- Cualquiera de los 3 puede registrar
+- Estado inicial: "Pendiente"
+- Requiere 1 confirmación adicional → "Validado"
+- Solo partidos validados cuentan
+
+**Temporadas:**
+- Múltiples temporadas paralelas permitidas
+- Fecha de cierre configurable
+- Premios para jugadores Y árbitros
+
+**Frontend Pages:**
+- `/pinpanclub/rapidpin` - Dashboard de temporadas
+- `/pinpanclub/rapidpin/season/:seasonId` - Detalle con ranking y partidos
+
+**API Endpoints:**
+- `GET/POST /api/pinpanclub/rapidpin/seasons` - Gestión de temporadas
+- `GET /api/pinpanclub/rapidpin/seasons/{id}` - Detalle de temporada
+- `POST /api/pinpanclub/rapidpin/matches` - Registrar partido
+- `POST /api/pinpanclub/rapidpin/matches/{id}/confirm` - Confirmar partido
+- `GET /api/pinpanclub/rapidpin/seasons/{id}/ranking` - Ranking de jugadores
+- `GET /api/pinpanclub/rapidpin/seasons/{id}/ranking/referees` - Ranking de árbitros
+- `GET /api/pinpanclub/rapidpin/scoring` - Config de puntuación
+
+### Multi-Player Comparison (P5) ✅
 - **Unlimited player selection** - Add as many players as desired
 - **Searchable player dropdown** - Filter players by name/nickname
 - **Comparison table with 10+ statistics:**
@@ -33,13 +73,19 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 - **Access from Ranking** - "Compare Players" button
 
 ## Frontend Routes
+
+### Super Pin
 - `/pinpanclub/superpin/admin` - Admin Dashboard
 - `/pinpanclub/superpin/ranking` - Public Ranking
 - `/pinpanclub/superpin/league/:ligaId` - League Detail
 - `/pinpanclub/superpin/match/:partidoId` - Match View
 - `/pinpanclub/superpin/tournament/:torneoId` - Tournament Brackets
 - `/pinpanclub/superpin/player/:jugadorId` - Player Profile
-- `/pinpanclub/superpin/compare` - **Multi-Player Comparison** ⭐ NEW
+- `/pinpanclub/superpin/compare` - Multi-Player Comparison
+
+### Rapid Pin ⭐ NEW
+- `/pinpanclub/rapidpin` - Dashboard de temporadas
+- `/pinpanclub/rapidpin/season/:seasonId` - Vista de temporada
 
 ## API Endpoints
 
