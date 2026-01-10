@@ -966,6 +966,183 @@ class SuperPinService(BaseService):
             badge["rarity"] = badge_def.get("rarity", "common")
         
         return badges
+    
+    # ============== PLAYER STATISTICS ==============
+    
+    async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
+        """Obtener estadísticas detalladas de un jugador"""
+        
+        # Info básica del jugador
+        player = await self.player_repo.get_by_id(jugador_id)
+        if not player:
+            return None
+        
+        # Obtener rankings de todas las ligas o una específica
+        if liga_id:
+            rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
+            rankings = [r for r in rankings if r]
+        else:
+            # Buscar en todas las ligas activas
+            leagues = await self.league_repo.get_all_leagues()
+            rankings = []
+            for league in leagues:
+                ranking = await self.ranking_repo.get_player_ranking(league["liga_id"], jugador_id)
+                if ranking:
+                    ranking["liga_nombre"] = league.get("nombre")
+                    rankings.append(ranking)
+        
+        # Obtener historial de partidos
+        matches = await self.match_repo.find_many(
+            query={
+                "$or": [
+                    {"jugador_a_id": jugador_id},
+                    {"jugador_b_id": jugador_id}
+                ],
+                "estado": "finalizado"
+            },
+            sort=[("fecha_partido", -1)],
+            limit=20
+        )
+        
+        # Enriquecer partidos con info de oponente
+        match_history = []
+        for match in matches:
+            is_player_a = match.get("jugador_a_id") == jugador_id
+            opponent_id = match.get("jugador_b_id") if is_player_a else match.get("jugador_a_id")
+            opponent = await self.player_repo.get_by_id(opponent_id)
+            
+            player_sets = match.get("sets_jugador_a") if is_player_a else match.get("sets_jugador_b")
+            opponent_sets = match.get("sets_jugador_b") if is_player_a else match.get("sets_jugador_a")
+            is_winner = match.get("ganador_id") == jugador_id
+            
+            match_history.append({
+                "partido_id": match.get("partido_id"),
+                "fecha": match.get("fecha_partido"),
+                "opponent": {
+                    "jugador_id": opponent_id,
+                    "nombre": opponent.get("nombre") if opponent else "Desconocido",
+                    "apodo": opponent.get("apodo") if opponent else None
+                },
+                "resultado": f"{player_sets}-{opponent_sets}",
+                "is_winner": is_winner,
+                "liga_id": match.get("liga_id"),
+                "elo_change": match.get("elo_change_a") if is_player_a else match.get("elo_change_b")
+            })
+        
+        # Obtener badges
+        badges = await self.get_player_badges(jugador_id)
+        
+        # Calcular estadísticas agregadas
+        total_matches = sum(r.get("partidos_jugados", 0) for r in rankings)
+        total_wins = sum(r.get("partidos_ganados", 0) for r in rankings)
+        total_losses = sum(r.get("partidos_perdidos", 0) for r in rankings)
+        total_sets_won = sum(r.get("sets_ganados", 0) for r in rankings)
+        total_sets_lost = sum(r.get("sets_perdidos", 0) for r in rankings)
+        best_streak = max((r.get("mejor_racha", 0) for r in rankings), default=0)
+        
+        win_rate = (total_wins / total_matches * 100) if total_matches > 0 else 0
+        set_win_rate = (total_sets_won / (total_sets_won + total_sets_lost) * 100) if (total_sets_won + total_sets_lost) > 0 else 0
+        
+        # Racha de forma (últimos 10 partidos)
+        recent_form = []
+        for m in match_history[:10]:
+            recent_form.append("W" if m["is_winner"] else "L")
+        
+        return {
+            "jugador_id": jugador_id,
+            "player_info": {
+                "nombre": player.get("nombre"),
+                "apellido": player.get("apellido"),
+                "apodo": player.get("apodo"),
+                "nivel": player.get("nivel"),
+                "foto_url": player.get("foto_url"),
+                "fecha_registro": player.get("fecha_registro") or player.get("created_at"),
+                "elo_rating": player.get("elo_rating", 1000)
+            },
+            "overall_stats": {
+                "total_matches": total_matches,
+                "wins": total_wins,
+                "losses": total_losses,
+                "win_rate": round(win_rate, 1),
+                "sets_won": total_sets_won,
+                "sets_lost": total_sets_lost,
+                "set_win_rate": round(set_win_rate, 1),
+                "best_streak": best_streak,
+                "leagues_played": len(rankings)
+            },
+            "league_rankings": rankings,
+            "match_history": match_history,
+            "badges": badges,
+            "recent_form": recent_form,
+            "badge_count": {
+                "total": len(badges),
+                "legendary": sum(1 for b in badges if b.get("rarity") == "legendary"),
+                "epic": sum(1 for b in badges if b.get("rarity") == "epic"),
+                "rare": sum(1 for b in badges if b.get("rarity") == "rare"),
+                "common": sum(1 for b in badges if b.get("rarity") == "common")
+            }
+        }
+    
+    async def get_head_to_head(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
+        """Obtener estadísticas de enfrentamientos directos entre dos jugadores"""
+        
+        matches = await self.match_repo.find_many(
+            query={
+                "$or": [
+                    {"jugador_a_id": jugador_a_id, "jugador_b_id": jugador_b_id},
+                    {"jugador_a_id": jugador_b_id, "jugador_b_id": jugador_a_id}
+                ],
+                "estado": "finalizado"
+            },
+            sort=[("fecha_partido", -1)]
+        )
+        
+        player_a = await self.player_repo.get_by_id(jugador_a_id)
+        player_b = await self.player_repo.get_by_id(jugador_b_id)
+        
+        wins_a = 0
+        wins_b = 0
+        sets_a = 0
+        sets_b = 0
+        
+        for match in matches:
+            is_a_first = match.get("jugador_a_id") == jugador_a_id
+            
+            if match.get("ganador_id") == jugador_a_id:
+                wins_a += 1
+            else:
+                wins_b += 1
+            
+            if is_a_first:
+                sets_a += match.get("sets_jugador_a", 0)
+                sets_b += match.get("sets_jugador_b", 0)
+            else:
+                sets_a += match.get("sets_jugador_b", 0)
+                sets_b += match.get("sets_jugador_a", 0)
+        
+        return {
+            "player_a": {
+                "jugador_id": jugador_a_id,
+                "nombre": player_a.get("nombre") if player_a else "Desconocido",
+                "apodo": player_a.get("apodo") if player_a else None,
+                "wins": wins_a,
+                "sets": sets_a
+            },
+            "player_b": {
+                "jugador_id": jugador_b_id,
+                "nombre": player_b.get("nombre") if player_b else "Desconocido",
+                "apodo": player_b.get("apodo") if player_b else None,
+                "wins": wins_b,
+                "sets": sets_b
+            },
+            "total_matches": len(matches),
+            "matches": [{
+                "partido_id": m.get("partido_id"),
+                "fecha": m.get("fecha_partido"),
+                "ganador_id": m.get("ganador_id"),
+                "score": f"{m.get('sets_jugador_a')}-{m.get('sets_jugador_b')}"
+            } for m in matches[:10]]
+        }
 
 
 # Instancia singleton
