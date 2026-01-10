@@ -25,8 +25,10 @@ import {
   Sparkles,
   Bell,
   Store,
-  Send
+  Send,
+  Trophy
 } from 'lucide-react';
+import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
