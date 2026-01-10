@@ -13,7 +13,8 @@ from ..repositories.superpin_repository import (
     PlayerCheckInRepository,
     SuperPinMatchRepository,
     RankingRepository,
-    SeasonTournamentRepository
+    SeasonTournamentRepository,
+    PlayerBadgeRepository
 )
 from ..repositories.player_repository import PlayerRepository
 from ..models.superpin import (
@@ -22,7 +23,8 @@ from ..models.superpin import (
     RankingEntry, RankingTable,
     PlayerCheckIn, PlayerCheckInCreate,
     ScoringSystem, CheckInMethod, StatsLevel,
-    SeasonTournament, SeasonTournamentCreate
+    SeasonTournament, SeasonTournamentCreate,
+    BadgeType, PlayerBadge, PlayerBadgeCreate, BADGE_DEFINITIONS
 )
 
 
@@ -41,6 +43,7 @@ class SuperPinService(BaseService):
         self.ranking_repo = RankingRepository()
         self.tournament_repo = SeasonTournamentRepository()
         self.player_repo = PlayerRepository()
+        self.badge_repo = PlayerBadgeRepository()
     
     # ============== LEAGUE MANAGEMENT ==============
     
