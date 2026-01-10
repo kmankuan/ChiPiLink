@@ -146,7 +146,9 @@ export default function MembershipCard({ token }) {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString(lang, { 
+    // Use proper locale codes to avoid RangeError with invalid language tags
+    const locale = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
+    return new Date(dateStr).toLocaleDateString(locale, { 
       month: 'short', 
       day: 'numeric',
       year: 'numeric'
@@ -155,7 +157,9 @@ export default function MembershipCard({ token }) {
 
   const formatTime = (dateStr) => {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleTimeString(lang, { 
+    // Use proper locale codes to avoid RangeError with invalid language tags
+    const locale = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
+    return new Date(dateStr).toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit'
     });
