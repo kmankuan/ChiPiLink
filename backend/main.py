@@ -183,6 +183,9 @@ async def startup_event():
     # Initialize Users module (async init)
     await init_users()
     
+    # Initialize Notifications module (async init)
+    await init_notifications()
+    
     logger.info("All modules loaded successfully")
 
 @app.on_event("shutdown")
