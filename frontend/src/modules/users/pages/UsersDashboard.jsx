@@ -31,7 +31,7 @@ export default function UsersDashboard() {
       wallet: 'ChipiWallet',
       profile: 'Perfil',
       membership: 'Membresía',
-      settings: 'Configuración',
+      notifications: 'Notificaciones',
       loginRequired: 'Debes iniciar sesión para acceder a esta sección',
       login: 'Iniciar Sesión'
     },
@@ -41,7 +41,7 @@ export default function UsersDashboard() {
       wallet: 'ChipiWallet',
       profile: 'Profile',
       membership: 'Membership',
-      settings: 'Settings',
+      notifications: 'Notifications',
       loginRequired: 'You must log in to access this section',
       login: 'Log In'
     },
@@ -51,7 +51,7 @@ export default function UsersDashboard() {
       wallet: 'ChipiWallet',
       profile: '个人资料',
       membership: '会员资格',
-      settings: '设置',
+      notifications: '通知',
       loginRequired: '您必须登录才能访问此部分',
       login: '登录'
     }
