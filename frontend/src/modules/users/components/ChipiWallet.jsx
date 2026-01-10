@@ -388,8 +388,12 @@ export default function ChipiWallet({ token }) {
       </div>
 
       {/* Transactions & History */}
-      <Tabs defaultValue="transactions" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="qrcode" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="qrcode" data-testid="qrcode-tab">
+            <QrCode className="h-4 w-4 mr-2" />
+            QR Code
+          </TabsTrigger>
           <TabsTrigger value="transactions" data-testid="transactions-tab">
             <History className="h-4 w-4 mr-2" />
             {txt.transactions}
@@ -399,6 +403,10 @@ export default function ChipiWallet({ token }) {
             {txt.pointsHistory}
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="qrcode">
+          <UserQRCode token={token} wallet={summary} />
+        </TabsContent>
 
         <TabsContent value="transactions">
           <Card>
