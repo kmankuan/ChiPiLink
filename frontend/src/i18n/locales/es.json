@@ -353,6 +353,25 @@
       "noPlayersSelected": "Ningún jugador seleccionado",
       "selectToCompare": "Agrega jugadores para ver la tabla comparativa",
       "addFirstPlayer": "Agregar Primer Jugador"
+    },
+    "predictor": {
+      "title": "Predictor de Partidos",
+      "subtitle": "Predicción basada en ELO, historial y racha",
+      "predictMatch": "Predecir Partido",
+      "selectTwoPlayers": "Selecciona exactamente 2 jugadores para predecir",
+      "probability": "Probabilidad",
+      "favorite": "Favorito",
+      "confidence": "Confianza",
+      "confidenceHigh": "Alta",
+      "confidenceMedium": "Media",
+      "confidenceLow": "Baja",
+      "factors": "Factores de Predicción",
+      "eloBased": "Basado en ELO",
+      "h2hAdjust": "Ajuste por H2H",
+      "streakAdjust": "Ajuste por Racha",
+      "advantages": "Ventajas",
+      "noAdvantages": "Partido muy parejo",
+      "vsHistory": "Historial de Enfrentamientos"
     }
   },
   "rapidpin": {
