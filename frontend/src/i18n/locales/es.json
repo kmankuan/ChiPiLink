@@ -670,5 +670,25 @@
     "avgDuration": "Duración promedio",
     "selectPlan": "Seleccionar Plan",
     "availablePlans": "Planes Disponibles"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "preferences": "Preferencias de Notificaciones",
+    "globalSettings": "Configuración General",
+    "pushEnabled": "Notificaciones Push",
+    "emailEnabled": "Notificaciones por Email",
+    "quietHours": "Horario Silencioso",
+    "categories": "Categorías",
+    "save": "Guardar",
+    "saved": "Preferencias guardadas",
+    "history": "Historial de Notificaciones",
+    "noNotifications": "No hay notificaciones",
+    "admin": {
+      "title": "Administración de Notificaciones",
+      "providers": "Proveedores",
+      "send": "Enviar",
+      "newCategory": "Nueva Categoría",
+      "createPost": "Nuevo Post"
+    }
   }
 }
