@@ -3,7 +3,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Wallet, ArrowUpRight, ArrowDownLeft, RefreshCw, History, Gift, CreditCard, DollarSign } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, RefreshCw, History, Gift, CreditCard, DollarSign, QrCode } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import UserQRCode from './UserQRCode';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
