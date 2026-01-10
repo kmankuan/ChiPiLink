@@ -11,6 +11,7 @@ from .sponsors import router as sponsors_router
 from .canvas import router as canvas_router
 from .websocket import ws_router
 from .superpin import router as superpin_router
+from .rapidpin import router as rapidpin_router
 
 # Router principal del módulo
 router = APIRouter(prefix="/pinpanclub", tags=["PinpanClub"])
@@ -23,6 +24,7 @@ router.include_router(sponsors_router)
 router.include_router(canvas_router)
 router.include_router(ws_router)
 router.include_router(superpin_router)
+router.include_router(rapidpin_router)
 
 # Re-exportar para compatibilidad con rutas antiguas
 pinpanclub_router = router
