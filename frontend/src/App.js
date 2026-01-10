@@ -158,6 +158,9 @@ function AppRouter() {
       <Route path="/pinpanclub/rapidpin" element={<RapidPinDashboard />} />
       <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<RapidPinSeason />} />
       
+      {/* Weekly Challenges Route */}
+      <Route path="/pinpanclub/challenges" element={<WeeklyChallengesPage />} />
+      
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
       <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
