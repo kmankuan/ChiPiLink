@@ -336,3 +336,20 @@ async def get_badge_definitions():
     """Obtener todas las definiciones de badges"""
     from ..models.superpin import BADGE_DEFINITIONS
     return BADGE_DEFINITIONS
+
+
+# ============== PLAYER STATISTICS ==============
+
+@router.get("/players/{jugador_id}/statistics")
+async def get_player_statistics(jugador_id: str, liga_id: str = None):
+    """Obtener estadísticas detalladas de un jugador"""
+    stats = await superpin_service.get_player_statistics(jugador_id, liga_id)
+    if not stats:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+    return stats
+
+
+@router.get("/head-to-head")
+async def get_head_to_head(jugador_a_id: str, jugador_b_id: str):
+    """Obtener estadísticas de enfrentamientos directos"""
+    return await superpin_service.get_head_to_head(jugador_a_id, jugador_b_id)
