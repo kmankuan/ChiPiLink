@@ -1378,8 +1378,8 @@ class SuperPinService(BaseService):
             advantages.append({"category": "elo", "player": "b", "detail": f"+{elo_b - elo_a} ELO"})
         
         # Win Rate
-        wr_a = stats_a.get("win_rate", 0)
-        wr_b = stats_b.get("win_rate", 0)
+        wr_a = stats_a.get("overall_stats", {}).get("win_rate", 0)
+        wr_b = stats_b.get("overall_stats", {}).get("win_rate", 0)
         if wr_a > wr_b + 5:
             advantages.append({"category": "win_rate", "player": "a", "detail": f"{wr_a:.0f}% vs {wr_b:.0f}%"})
         elif wr_b > wr_a + 5:
