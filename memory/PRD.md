@@ -427,10 +427,13 @@ Planes de membresía y sistema de visitas inteligente:
 3. **Sistema de referidos** - Bonus por invitar amigos
 
 ### P2 - Backlog
+### P2 - Backlog
 1. **Containerización completa:** Desplegar módulos como microservicios separados
 2. **Mobile app:** Versión nativa para iOS/Android
 3. **Sistema de torneos automáticos:** Brackets generados automáticamente
 4. **Integración con redes sociales:** Compartir logros y resultados
+5. **Sistema de equipos/clanes:** Recompensas colectivas
+6. **Push notifications:** Notificaciones móviles
 
 ## Known Issues
 - **WebSocket en Preview:** Las conexiones WebSocket pueden fallar en el ambiente de preview debido a la configuración del ingress. El sistema tiene fallback a REST API que funciona correctamente.
