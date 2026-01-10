@@ -25,7 +25,11 @@ import {
   Target,
   Settings,
   Image,
-  CalendarDays
+  CalendarDays,
+  Zap,
+  Check,
+  Clock,
+  Scale
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -35,7 +39,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import ScoreBoard from '../components/ScoreBoard';
-import { PINPANCLUB_API } from '../config/api';
+import { PINPANCLUB_API, API_BASE } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -47,12 +51,14 @@ export default function PingPongDashboard() {
   const [rankings, setRankings] = useState([]);
   const [upcomingTournaments, setUpcomingTournaments] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
+  const [rapidPinData, setRapidPinData] = useState({ matches: [], season: null });
   
   // Detectar si estamos dentro del admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     fetchDashboardData();
+    fetchRapidPinActivity();
     
     // Poll for active matches every 5 seconds
     const interval = setInterval(fetchActiveMatches, 5000);
@@ -86,6 +92,24 @@ export default function PingPongDashboard() {
       setActiveMatches(response.data);
     } catch (error) {
       console.error('Error fetching active matches:', error);
+    }
+  };
+
+  const fetchRapidPinActivity = async () => {
+    try {
+      // Get active seasons
+      const seasonsRes = await axios.get(`${API_BASE}/rapidpin/seasons?active_only=true`);
+      if (seasonsRes.data && seasonsRes.data.length > 0) {
+        const activeSeason = seasonsRes.data[0];
+        // Get recent matches for this season
+        const matchesRes = await axios.get(`${API_BASE}/rapidpin/seasons/${activeSeason.season_id}/matches?limit=5`);
+        setRapidPinData({
+          season: activeSeason,
+          matches: matchesRes.data || []
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching Rapid Pin activity:', error);
     }
   };
 
