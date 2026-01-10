@@ -170,6 +170,49 @@ Sistema de recompensas que se otorgan automáticamente al subir de rango:
 
 **Test Results:** 15/15 tests passed (100%)
 
+### 7. Sistema de Temporadas de Ranking 🏆 NEW
+Sistema de temporadas competitivas con resets periódicos y recompensas exclusivas:
+
+**Características Principales:**
+- **Auto-creación de temporadas mensuales** con fechas y nombres localizados
+- **Contador regresivo** en tiempo real (días, horas, minutos)
+- **Leaderboard de temporada** ordenado por puntos con iconos de posición
+- **5 niveles de recompensas** al final de cada temporada
+- **Temas visuales** por temporada (primavera, verano, otoño, invierno, campeonato)
+- **Requisitos de calificación:** mín. 5 retos + 50 puntos
+
+**Recompensas por Posición:**
+| Tier | Posición | Puntos Bonus | Badge | Perks |
+|------|----------|--------------|-------|-------|
+| Champion | #1 | +1000 | 🏆 Legendario | frame, emotes, priority |
+| Top 3 | #2-3 | +500 | 🥇 Épico | frame |
+| Top 10 | #4-10 | +250 | ⭐ Raro | - |
+| Top 25 | #11-25 | +100 | 🌟 Común | - |
+| Participant | #26+ | +25 | - | - |
+
+**Multi-idioma:** Nombres, descripciones y notificaciones en ES, EN, ZH
+
+**Endpoints:**
+- `GET /api/pinpanclub/seasons/current?lang=es` - Temporada activa con localización
+- `GET /api/pinpanclub/seasons/current/leaderboard` - Clasificación de temporada
+- `GET /api/pinpanclub/seasons/player/{jugador_id}/current` - Stats del jugador
+- `GET /api/pinpanclub/seasons/player/{jugador_id}/rewards` - Recompensas ganadas
+- `GET /api/pinpanclub/seasons/all` - Todas las temporadas
+- `GET /api/pinpanclub/seasons/past` - Temporadas pasadas
+- `POST /api/pinpanclub/seasons/{season_id}/close` - Cerrar y otorgar recompensas (admin)
+- `POST /api/pinpanclub/seasons/ensure-active` - Asegurar temporada activa (cron)
+
+**Frontend:** `/pinpanclub/seasons` y `/pinpanclub/seasons/:seasonId`
+
+**Archivos:**
+- `/app/backend/modules/pinpanclub/models/seasons.py`
+- `/app/backend/modules/pinpanclub/services/seasons_service.py`
+- `/app/backend/modules/pinpanclub/routes/seasons.py`
+- `/app/frontend/src/modules/pinpanclub/components/RankingSeasons.jsx`
+- `/app/frontend/src/modules/pinpanclub/pages/SeasonsPage.jsx`
+
+**Test Results:** 30/30 tests passed (100%)
+
 ## Frontend Routes
 
 ### Super Pin
