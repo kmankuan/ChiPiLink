@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, Wallet, CreditCard, Settings, ChevronRight } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ChipiWallet from '../components/ChipiWallet';
 import UserProfile from '../components/UserProfile';
 import MembershipCard from '../components/MembershipCard';
