@@ -18,7 +18,8 @@ import {
   MousePointer,
   Layers,
   Minus,
-  Loader2
+  Loader2,
+  Trophy
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -35,7 +36,8 @@ const BLOCK_ICONS = {
   banner: Image,
   testimonials: MessageSquare,
   spacer: Minus,
-  divider: Minus
+  divider: Minus,
+  pinpanclub_feed: Trophy
 };
 
 // Color classes for block types
@@ -50,7 +52,8 @@ const BLOCK_COLORS = {
   banner: 'bg-yellow-50 border-yellow-200 hover:border-yellow-400',
   testimonials: 'bg-indigo-50 border-indigo-200 hover:border-indigo-400',
   spacer: 'bg-gray-50 border-gray-200 hover:border-gray-400',
-  divider: 'bg-gray-50 border-gray-200 hover:border-gray-400'
+  divider: 'bg-gray-50 border-gray-200 hover:border-gray-400',
+  pinpanclub_feed: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400'
 };
 
 export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
