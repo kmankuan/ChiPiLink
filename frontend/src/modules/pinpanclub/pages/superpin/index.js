@@ -10,3 +10,4 @@ export { default as SuperPinTournament } from './SuperPinTournament';
 export { default as PlayerBadges, BadgeFeed, BadgeLeaderboard } from './PlayerBadges';
 export { default as PlayerProfile } from './PlayerProfile';
 export { default as PlayerComparison } from './PlayerComparison';
+export { default as MatchPredictor } from './MatchPredictor';
