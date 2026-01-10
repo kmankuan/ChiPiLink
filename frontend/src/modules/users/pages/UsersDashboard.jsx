@@ -18,11 +18,31 @@ export default function UsersDashboard() {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('wallet');
+  const [walletBalance, setWalletBalance] = useState(null);
 
   const lang = i18n.language || 'es';
 
   // Get token from localStorage 
   const token = localStorage.getItem('auth_token');
+
+  // Fetch wallet balance when component mounts
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_URL}/api/wallet/summary`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setWalletBalance(data.wallet);
+        }
+      } catch (error) {
+        console.error('Error fetching wallet:', error);
+      }
+    };
+    fetchWalletBalance();
+  }, [token]);
 
   const texts = {
     es: {
