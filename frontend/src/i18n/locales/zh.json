@@ -311,6 +311,25 @@
         "epic": "史诗",
         "legendary": "传说"
       }
+    },
+    "profile": {
+      "notFound": "未找到选手",
+      "matches": "比赛",
+      "winRate": "胜率",
+      "since": "加入于",
+      "overview": "概览",
+      "history": "历史",
+      "statistics": "统计",
+      "wins": "胜场",
+      "losses": "负场",
+      "setsWon": "赢得局数",
+      "bestStreak": "最佳连胜",
+      "recentForm": "近期表现",
+      "noMatches": "无近期比赛",
+      "leaguePositions": "联赛排名",
+      "matchesPlayed": "场比赛",
+      "matchHistory": "比赛历史",
+      "noMatchHistory": "无比赛历史"
     }
   }
 }

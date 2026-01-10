@@ -311,6 +311,25 @@
         "epic": "Épico",
         "legendary": "Legendario"
       }
+    },
+    "profile": {
+      "notFound": "Jugador no encontrado",
+      "matches": "Partidos",
+      "winRate": "% Victorias",
+      "since": "Desde",
+      "overview": "Resumen",
+      "history": "Historial",
+      "statistics": "Estadísticas",
+      "wins": "Victorias",
+      "losses": "Derrotas",
+      "setsWon": "Sets Ganados",
+      "bestStreak": "Mejor Racha",
+      "recentForm": "Forma Reciente",
+      "noMatches": "Sin partidos recientes",
+      "leaguePositions": "Posiciones en Ligas",
+      "matchesPlayed": "partidos jugados",
+      "matchHistory": "Historial de Partidos",
+      "noMatchHistory": "Sin historial de partidos"
     }
   }
 }

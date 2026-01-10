@@ -311,6 +311,25 @@
         "epic": "Epic",
         "legendary": "Legendary"
       }
+    },
+    "profile": {
+      "notFound": "Player not found",
+      "matches": "Matches",
+      "winRate": "Win Rate",
+      "since": "Since",
+      "overview": "Overview",
+      "history": "History",
+      "statistics": "Statistics",
+      "wins": "Wins",
+      "losses": "Losses",
+      "setsWon": "Sets Won",
+      "bestStreak": "Best Streak",
+      "recentForm": "Recent Form",
+      "noMatches": "No recent matches",
+      "leaguePositions": "League Positions",
+      "matchesPlayed": "matches played",
+      "matchHistory": "Match History",
+      "noMatchHistory": "No match history"
     }
   }
 }
