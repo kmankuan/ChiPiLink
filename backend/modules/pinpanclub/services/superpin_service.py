@@ -1344,8 +1344,8 @@ class SuperPinService(BaseService):
         
         # Ajustar por racha actual
         streak_adjustment = 0
-        streak_a = stats_a.get("best_streak", 0)
-        streak_b = stats_b.get("best_streak", 0)
+        streak_a = stats_a.get("overall_stats", {}).get("best_streak", 0)
+        streak_b = stats_b.get("overall_stats", {}).get("best_streak", 0)
         
         # Racha positiva da pequeña ventaja (máx ±5%)
         if streak_a > 0 and streak_b <= 0:
