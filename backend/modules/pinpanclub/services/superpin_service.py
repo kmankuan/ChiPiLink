@@ -1324,8 +1324,8 @@ class SuperPinService(BaseService):
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
         
         # Calcular probabilidad basada en ELO
-        elo_a = stats_a.get("player", {}).get("elo_rating", 1200)
-        elo_b = stats_b.get("player", {}).get("elo_rating", 1200)
+        elo_a = stats_a.get("player_info", {}).get("elo_rating", 1200)
+        elo_b = stats_b.get("player_info", {}).get("elo_rating", 1200)
         
         # Fórmula ELO de probabilidad esperada
         expected_a = 1 / (1 + math.pow(10, (elo_b - elo_a) / 400))
