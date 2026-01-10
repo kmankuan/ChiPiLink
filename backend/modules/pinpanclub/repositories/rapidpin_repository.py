@@ -7,14 +7,34 @@ from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 
 from core.base import BaseRepository
+from core.database import db
+from core.constants import PinpanClubCollections
 
 
 class RapidPinSeasonRepository(BaseRepository):
     """Repositorio para temporadas Rapid Pin"""
     
-    COLLECTION = "pinpanclub_rapidpin_seasons"
+    COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_SEASONS
     ID_FIELD = "season_id"
-    ID_PREFIX = "rps"
+    
+    def __init__(self):
+        super().__init__(db, self.COLLECTION_NAME)
+    
+    async def create(self, season_data: Dict) -> Dict:
+        """Crear nueva temporada"""
+        season_data["season_id"] = f"rps_{uuid.uuid4().hex[:12]}"
+        season_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        season_data["updated_at"] = season_data["created_at"]
+        return await self.insert_one(season_data)
+    
+    async def get_by_id(self, season_id: str) -> Optional[Dict]:
+        """Obtener temporada por ID"""
+        return await self.find_one({self.ID_FIELD: season_id})
+    
+    async def update(self, season_id: str, data: Dict) -> bool:
+        """Actualizar temporada"""
+        data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        return await self.update_by_id(self.ID_FIELD, season_id, data)
     
     async def get_active_seasons(self) -> List[Dict]:
         """Obtener temporadas activas"""
@@ -60,7 +80,7 @@ class RapidPinSeasonRepository(BaseRepository):
         if not update:
             return True
         
-        result = await self.collection.update_one(
+        result = await self._collection.update_one(
             {self.ID_FIELD: season_id},
             {"$inc": update}
         )
@@ -70,9 +90,25 @@ class RapidPinSeasonRepository(BaseRepository):
 class RapidPinMatchRepository(BaseRepository):
     """Repositorio para partidos Rapid Pin"""
     
-    COLLECTION = "pinpanclub_rapidpin_matches"
+    COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_MATCHES
     ID_FIELD = "match_id"
-    ID_PREFIX = "rpm"
+    
+    def __init__(self):
+        super().__init__(db, self.COLLECTION_NAME)
+    
+    async def create(self, match_data: Dict) -> Dict:
+        """Crear nuevo partido"""
+        match_data["match_id"] = f"rpm_{uuid.uuid4().hex[:12]}"
+        match_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        return await self.insert_one(match_data)
+    
+    async def get_by_id(self, match_id: str) -> Optional[Dict]:
+        """Obtener partido por ID"""
+        return await self.find_one({self.ID_FIELD: match_id})
+    
+    async def update(self, match_id: str, data: Dict) -> bool:
+        """Actualizar partido"""
+        return await self.update_by_id(self.ID_FIELD, match_id, data)
     
     async def get_season_matches(
         self,
@@ -138,7 +174,7 @@ class RapidPinMatchRepository(BaseRepository):
         confirmado_por_id: str
     ) -> bool:
         """Confirmar un partido pendiente"""
-        result = await self.collection.update_one(
+        result = await self._collection.update_one(
             {
                 self.ID_FIELD: match_id,
                 "estado": "pending"
@@ -155,7 +191,7 @@ class RapidPinMatchRepository(BaseRepository):
     
     async def get_validated_matches_count(self, season_id: str) -> int:
         """Contar partidos validados en una temporada"""
-        return await self.collection.count_documents({
+        return await self._collection.count_documents({
             "season_id": season_id,
             "estado": "validated"
         })
@@ -164,9 +200,18 @@ class RapidPinMatchRepository(BaseRepository):
 class RapidPinRankingRepository(BaseRepository):
     """Repositorio para rankings Rapid Pin"""
     
-    COLLECTION = "pinpanclub_rapidpin_rankings"
+    COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_RANKINGS
     ID_FIELD = "ranking_id"
-    ID_PREFIX = "rpr"
+    
+    def __init__(self):
+        super().__init__(db, self.COLLECTION_NAME)
+    
+    async def create(self, ranking_data: Dict) -> Dict:
+        """Crear nueva entrada de ranking"""
+        ranking_data["ranking_id"] = f"rpr_{uuid.uuid4().hex[:12]}"
+        ranking_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        ranking_data["updated_at"] = ranking_data["created_at"]
+        return await self.insert_one(ranking_data)
     
     async def get_or_create(
         self,
@@ -250,7 +295,7 @@ class RapidPinRankingRepository(BaseRepository):
         else:
             inc_data["partidos_perdidos"] = 1
         
-        result = await self.collection.update_one(
+        result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
             {
                 "$inc": inc_data,
@@ -268,7 +313,7 @@ class RapidPinRankingRepository(BaseRepository):
         points: int
     ) -> bool:
         """Actualizar estadísticas de árbitro"""
-        result = await self.collection.update_one(
+        result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
             {
                 "$inc": {
@@ -291,7 +336,7 @@ class RapidPinRankingRepository(BaseRepository):
         
         # Actualizar posiciones
         for idx, ranking in enumerate(rankings, start=1):
-            await self.collection.update_one(
+            await self._collection.update_one(
                 {self.ID_FIELD: ranking["ranking_id"]},
                 {"$set": {"posicion": idx}}
             )
@@ -300,12 +345,12 @@ class RapidPinRankingRepository(BaseRepository):
     
     async def get_season_participants_count(self, season_id: str) -> Dict:
         """Obtener conteo de participantes únicos"""
-        players = await self.collection.count_documents({
+        players = await self._collection.count_documents({
             "season_id": season_id,
             "partidos_jugados": {"$gt": 0}
         })
         
-        referees = await self.collection.count_documents({
+        referees = await self._collection.count_documents({
             "season_id": season_id,
             "partidos_arbitrados": {"$gt": 0}
         })
