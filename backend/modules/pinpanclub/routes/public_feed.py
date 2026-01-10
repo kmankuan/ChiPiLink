@@ -11,7 +11,7 @@ from core.database import db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/pinpanclub/public", tags=["PinPanClub - Public Feed"])
+router = APIRouter(prefix="/public", tags=["PinPanClub - Public Feed"])
 
 
 @router.get("/activity-feed")
