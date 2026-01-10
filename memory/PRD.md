@@ -447,7 +447,8 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 9. **ChipiWallet (Phase 1)** ✅
 10. **Sistema de Membresías (Phase 1)** ✅
 11. **Sistema de QR Code para Check-in y Pagos** ✅
-12. **Sistema de Notificaciones Push** ✅ NEW (Enero 10, 2026)
+12. **Sistema de Notificaciones Push** ✅ (Enero 10, 2026)
+13. **Demo Data Seeding System** ✅ NEW (Enero 10, 2026)
 
 ### P0 - Fase 2: Sistema de Usuarios Avanzado
 1. **Límites de gasto configurables** para cuentas de niños
