@@ -62,6 +62,9 @@ import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
 // Seasons Page
 import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
 
+// Users Module
+import UsersDashboard from '@/modules/users/pages/UsersDashboard';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
