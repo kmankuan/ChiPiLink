@@ -626,7 +626,7 @@ class SuperPinService(BaseService):
             })
         
         # Actualizar torneo con brackets
-        await self.tournament_repo.update(torneo_id, {
+        await self.tournament_repo.update_tournament(torneo_id, {
             "brackets": brackets,
             "estado": "en_curso"
         })
@@ -688,7 +688,7 @@ class SuperPinService(BaseService):
                         break
         
         # Actualizar brackets en DB
-        await self.tournament_repo.update(torneo_id, {"brackets": brackets})
+        await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
         # Verificar si el torneo terminó
         final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
@@ -711,7 +711,7 @@ class SuperPinService(BaseService):
                         "jugador_id": third_bracket["matches"][0]["winner"]
                     })
                 
-                await self.tournament_repo.update(torneo_id, {
+                await self.tournament_repo.update_tournament(torneo_id, {
                     "estado": "finalizado",
                     "resultados_finales": resultados
                 })
