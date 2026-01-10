@@ -466,6 +466,26 @@
       "title": "Prizes",
       "player": "Player Prizes",
       "referee": "Referee Prizes"
+    },
+    "closeSeason": {
+      "title": "Close Season",
+      "confirm": "Are you sure you want to close this season?",
+      "confirmDesc": "This action will fix the final ranking and assign prizes. No more matches can be registered.",
+      "close": "Close Season",
+      "cancel": "Cancel",
+      "success": "Season closed successfully",
+      "results": "Final Results",
+      "playerResults": "Player Results",
+      "refereeResults": "Referee Results",
+      "prize": "Prize",
+      "position": "Position",
+      "points": "Points"
+    },
+    "notifications": {
+      "pendingTitle": "Pending Matches",
+      "pendingDesc": "You have matches waiting for your confirmation",
+      "confirmNow": "Confirm Now",
+      "noPending": "No pending matches"
     }
   }
 }
