@@ -301,3 +301,38 @@ async def get_tournament_brackets(torneo_id: str):
         "participantes": tournament.get("participantes", []),
         "resultados_finales": tournament.get("resultados_finales", [])
     }
+
+
+# ============== BADGES ==============
+
+@router.get("/badges/recent")
+async def get_recent_badges(limit: int = 20):
+    """Obtener badges más recientes (feed)"""
+    return await superpin_service.get_recent_badges(limit)
+
+
+@router.get("/badges/leaderboard")
+async def get_badge_leaderboard(liga_id: str = None, limit: int = 10):
+    """Obtener ranking de jugadores por badges"""
+    return await superpin_service.get_badge_leaderboard(liga_id, limit)
+
+
+@router.get("/players/{jugador_id}/badges")
+async def get_player_badges(jugador_id: str):
+    """Obtener todos los badges de un jugador"""
+    badges = await superpin_service.get_player_badges(jugador_id)
+    return {"jugador_id": jugador_id, "badges": badges, "total": len(badges)}
+
+
+@router.post("/tournaments/{torneo_id}/award-badges")
+async def award_tournament_badges(torneo_id: str, admin: dict = Depends(get_admin_user)):
+    """Otorgar badges a los ganadores de un torneo finalizado"""
+    badges = await superpin_service.award_tournament_badges(torneo_id)
+    return {"awarded_badges": badges, "total": len(badges)}
+
+
+@router.get("/badges/definitions")
+async def get_badge_definitions():
+    """Obtener todas las definiciones de badges"""
+    from ..models.superpin import BADGE_DEFINITIONS
+    return BADGE_DEFINITIONS
