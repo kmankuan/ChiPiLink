@@ -17,6 +17,7 @@ import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import PlayerBadges from './PlayerBadges';
 import { FollowButton, FollowStats, CommentsSection } from '../../components/SocialFeatures';
+import AchievementShowcase from '../../components/AchievementShowcase';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
