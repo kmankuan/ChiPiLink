@@ -52,6 +52,7 @@ export default function PingPongDashboard() {
   const [upcomingTournaments, setUpcomingTournaments] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
   const [rapidPinData, setRapidPinData] = useState({ matches: [], season: null });
+  const [rapidPinPendingCount, setRapidPinPendingCount] = useState(0);
   
   // Detectar si estamos dentro del admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
