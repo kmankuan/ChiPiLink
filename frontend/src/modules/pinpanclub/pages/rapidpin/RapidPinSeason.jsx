@@ -7,11 +7,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Zap, ArrowLeft, Plus, Trophy, Users, Clock, Check, 
-  AlertCircle, ChevronDown, Calendar, Award, Scale
+  AlertCircle, ChevronDown, Calendar, Award, Scale, Lock, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +33,8 @@ export default function RapidPinSeason() {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNewMatch, setShowNewMatch] = useState(false);
+  const [showCloseSeason, setShowCloseSeason] = useState(false);
+  const [closingResults, setClosingResults] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   
   const [newMatch, setNewMatch] = useState({
