@@ -348,6 +348,19 @@ export default function PlayerProfile() {
                 )}
               </CardContent>
             </Card>
+            
+            {/* Rank Progress Card */}
+            <Card className="bg-white lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-purple-500" />
+                  Tu Rango de Retos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RankProgressCard jugadorId={jugadorId} />
+              </CardContent>
+            </Card>
           </div>
         )}
 
