@@ -403,10 +403,16 @@ export default function MembershipCard({ token, walletBalance }) {
               {/* Check-in/out Button */}
               <div className="pt-4">
                 {checkedIn ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-green-300">
-                      <MapPin className="h-4 w-4 animate-pulse" />
-                      {txt.currentlyIn}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-green-300">
+                        <MapPin className="h-4 w-4 animate-pulse" />
+                        {txt.currentlyIn}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-indigo-100">
+                        <Timer className="h-4 w-4" />
+                        {currentVisitDuration} {txt.minutes}
+                      </div>
                     </div>
                     <Button 
                       variant="secondary" 
