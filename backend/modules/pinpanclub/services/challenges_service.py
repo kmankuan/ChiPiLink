@@ -298,6 +298,30 @@ class ChallengeService(BaseService):
                 self.log_info(f"Awarded {len(awarded)} achievements to {jugador_id}")
         except Exception as e:
             self.log_error(f"Error checking achievements: {e}")
+        
+        # Check for rank promotion and grant rewards
+        try:
+            from .rank_rewards_service import rank_rewards_service
+            
+            # Get updated points
+            updated_entry = await db.pinpanclub_challenges_leaderboard.find_one(
+                {"jugador_id": jugador_id},
+                {"_id": 0, "total_points": 1}
+            )
+            new_total_points = updated_entry.get("total_points", 0) if updated_entry else 0
+            
+            # Calculate old points (before this challenge)
+            old_points = new_total_points - challenge.get("points_reward", 0)
+            
+            # Check promotion
+            promotion = await rank_rewards_service.check_rank_promotion(
+                jugador_id, old_points, new_total_points, "es"
+            )
+            
+            if promotion:
+                self.log_info(f"Rank promotion: {jugador_id} -> {promotion['new_rank']['id']}")
+        except Exception as e:
+            self.log_error(f"Error checking rank promotion: {e}")
     
     async def get_player_challenges(
         self,
