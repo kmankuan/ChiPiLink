@@ -244,30 +244,34 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
   }
 
   const sections = config?.sections || {};
+  const hasTitle = config?.titulo && (L(config.titulo) || '').trim().length > 0;
 
   return (
-    <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto" data-testid="pinpanclub-feed-block">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold">
-            {L(config?.titulo) || txt.recentMatches}
-          </h2>
-          {config?.subtitulo && (
-            <p className="text-muted-foreground mt-2">{L(config.subtitulo)}</p>
-          )}
-        </div>
-        
-        {/* Admin Settings */}
-        {isEditMode && (
-          <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                {txt.settings}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="overflow-y-auto">
+    <section className="px-4 md:px-8 lg:px-12 py-8 max-w-7xl mx-auto" data-testid="pinpanclub-feed-block">
+      {/* Header - Only show if title is configured */}
+      {(hasTitle || isEditMode) && (
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            {hasTitle && (
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-bold">
+                {L(config.titulo)}
+              </h2>
+            )}
+            {config?.subtitulo && L(config.subtitulo) && (
+              <p className="text-muted-foreground mt-2">{L(config.subtitulo)}</p>
+            )}
+          </div>
+          
+          {/* Admin Settings */}
+          {isEditMode && (
+            <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  {txt.settings}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>{txt.settings}</SheetTitle>
                 <SheetDescription>{txt.settingsDesc}</SheetDescription>
