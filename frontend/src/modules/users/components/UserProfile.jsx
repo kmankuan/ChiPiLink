@@ -450,7 +450,7 @@ export default function UserProfile({ token, user }) {
                     <div>
                       <p className="text-sm text-muted-foreground">{txt.birthDate}</p>
                       <p className="font-medium">
-                        {profile.birth_date ? new Date(profile.birth_date).toLocaleDateString(lang) : '-'}
+                        {profile.birth_date ? new Date(profile.birth_date).toLocaleDateString(getLocale()) : '-'}
                       </p>
                     </div>
                     <div>
