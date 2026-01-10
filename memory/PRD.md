@@ -92,6 +92,21 @@ Sistema que otorga logros automáticamente al completar retos:
 - `GET /api/pinpanclub/social/user/{user_id}/warnings` - Obtener amonestaciones
 - `POST /api/pinpanclub/social/comments/{comment_id}/report` - Reportar comentario
 
+### 4. Achievement Showcase (Badges Visuales) 🎖️ NEW
+Componente visual de badges en el header del perfil:
+- **Muestra los 5 logros más importantes** (ordenados por rareza)
+- **Etiqueta "NEW"** para logros obtenidos en las últimas 24 horas
+- **Estilos por rareza:**
+  - Común: Fondo gris, borde gris
+  - Raro: Fondo azul, borde azul con sombra
+  - Épico: Fondo púrpura, borde púrpura, icono de sparkles
+  - Legendario: Fondo dorado, borde amarillo, animación de pulso
+- **Tooltips interactivos** con descripción completa del logro
+- **Animación de celebración** (confeti) al obtener logros recientes
+- **Contador "+X"** para logros adicionales
+
+**Archivo:** `/app/frontend/src/modules/pinpanclub/components/AchievementShowcase.jsx`
+
 ## Frontend Routes
 
 ### Super Pin
