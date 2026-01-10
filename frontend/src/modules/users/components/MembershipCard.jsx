@@ -70,6 +70,14 @@ export default function MembershipCard({ token, walletBalance }) {
         // Check if currently checked in
         const activeVisit = data.visits?.find(v => !v.check_out_time);
         setCheckedIn(!!activeVisit);
+        
+        // Calculate current visit duration
+        if (activeVisit) {
+          const checkInTime = new Date(activeVisit.check_in_time);
+          const now = new Date();
+          const diffMinutes = Math.floor((now - checkInTime) / 60000);
+          setCurrentVisitDuration(diffMinutes);
+        }
       }
 
       if (statsRes.ok) {
