@@ -31,7 +31,8 @@ import {
   Check,
   Clock,
   Scale,
-  Award
+  Award,
+  BarChart3
 } from 'lucide-react';
 import NotificationCenter from '../components/NotificationCenter';
 import WeeklyChallenges from '../components/WeeklyChallenges';
@@ -228,6 +229,10 @@ export default function PingPongDashboard() {
                     <DropdownMenuItem onClick={() => navigate('/pinpanclub/superpin/admin')}>
                       <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
                       Super Pin Admin
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/analytics')}>
+                      <BarChart3 className="h-4 w-4 mr-2 text-indigo-500" />
+                      Analytics Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
