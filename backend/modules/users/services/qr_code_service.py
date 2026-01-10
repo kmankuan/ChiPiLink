@@ -350,27 +350,24 @@ class QRCodeService:
                     "required": amount
                 }
             
-            # Crear transacción
+            # Crear transacción usando la firma correcta
             transaction = await wallet_service.create_transaction(
-                wallet_id=wallet["wallet_id"],
                 user_id=user_id,
                 transaction_type=TransactionType.PURCHASE,
                 currency=Currency.USD,
                 amount=amount,
-                description=description or "QR Payment",
-                description_i18n={
-                    "es": f"Pago QR: ${amount:.2f}",
-                    "en": f"QR Payment: ${amount:.2f}",
-                    "zh": f"二维码支付: ${amount:.2f}"
-                },
+                description=description or f"Pago QR: ${amount:.2f}",
                 reference_type="qr_payment",
-                processed_by=processed_by
+                metadata={"processed_by": processed_by}
             )
+            
+            # Completar transacción
+            completed = await wallet_service.complete_transaction(transaction["transaction_id"])
             
             return {
                 "success": True,
-                "transaction": transaction,
-                "new_balance": transaction["balance_after"],
+                "transaction": completed,
+                "new_balance": completed["balance_after"],
                 "message": {
                     "es": f"Pago de ${amount:.2f} procesado",
                     "en": f"Payment of ${amount:.2f} processed",
