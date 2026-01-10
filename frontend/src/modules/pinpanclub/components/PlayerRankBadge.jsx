@@ -149,24 +149,12 @@ export default function PlayerRankBadge({ jugadorId, showProgress = true, size =
   
   const fetchRankData = async () => {
     try {
-      // Get player's challenge leaderboard entry for points
-      const response = await fetch(
-        `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
-      );
-      
       let totalPoints = 0;
       
-      if (response.ok) {
-        const data = await response.json();
-        // Find this player in the leaderboard
-        const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
-        totalPoints = playerEntry?.total_points || 0;
-      }
-      
-      // Also try direct endpoint
+      // Try direct rank endpoint first
       try {
         const directResponse = await fetch(
-          `${API_URL}/api/pinpanclub/player/${jugadorId}/rank`
+          `${API_URL}/api/pinpanclub/challenges/player/${jugadorId}/rank`
         );
         if (directResponse.ok) {
           const directData = await directResponse.json();
@@ -175,7 +163,20 @@ export default function PlayerRankBadge({ jugadorId, showProgress = true, size =
           }
         }
       } catch (e) {
-        // Fallback already set
+        console.log('Direct rank endpoint failed, trying leaderboard');
+      }
+      
+      // Fallback to leaderboard if direct endpoint didn't work
+      if (totalPoints === 0) {
+        const response = await fetch(
+          `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
+          totalPoints = playerEntry?.total_points || 0;
+        }
       }
       
       const currentRank = getRankByPoints(totalPoints);
