@@ -353,6 +353,25 @@
       "noPlayersSelected": "No players selected",
       "selectToCompare": "Add players to see the comparison table",
       "addFirstPlayer": "Add First Player"
+    },
+    "predictor": {
+      "title": "Match Predictor",
+      "subtitle": "Prediction based on ELO, history and streak",
+      "predictMatch": "Predict Match",
+      "selectTwoPlayers": "Select exactly 2 players to predict",
+      "probability": "Probability",
+      "favorite": "Favorite",
+      "confidence": "Confidence",
+      "confidenceHigh": "High",
+      "confidenceMedium": "Medium",
+      "confidenceLow": "Low",
+      "factors": "Prediction Factors",
+      "eloBased": "ELO Based",
+      "h2hAdjust": "H2H Adjustment",
+      "streakAdjust": "Streak Adjustment",
+      "advantages": "Advantages",
+      "noAdvantages": "Very even match",
+      "vsHistory": "Head-to-Head History"
     }
   },
   "rapidpin": {
