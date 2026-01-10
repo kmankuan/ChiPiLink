@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../../config/api';
 
 export default function RapidPinDashboard() {
   const { t } = useTranslation();

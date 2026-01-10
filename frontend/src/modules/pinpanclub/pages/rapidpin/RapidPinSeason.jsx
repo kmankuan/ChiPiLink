@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { API_BASE } from '../config/api';
+import { API_BASE } from '../../config/api';
 
 export default function RapidPinSeason() {
   const { t } = useTranslation();
