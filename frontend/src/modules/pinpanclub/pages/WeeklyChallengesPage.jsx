@@ -2,27 +2,17 @@
  * Weekly Challenges Page
  * Página dedicada para mostrar todos los retos semanales
  */
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import WeeklyChallenges from '../components/WeeklyChallenges';
 
 export default function WeeklyChallengesPage() {
   const navigate = useNavigate();
-  const [currentUserId, setCurrentUserId] = useState(null);
-
-  useEffect(() => {
-    const authData = localStorage.getItem('chipi_auth');
-    if (authData) {
-      try {
-        const parsed = JSON.parse(authData);
-        setCurrentUserId(parsed.user?.user_id || null);
-      } catch (e) {
-        console.error('Error parsing auth data:', e);
-      }
-    }
-  }, []);
+  const { user } = useAuth();
+  const currentUserId = user?.cliente_id || user?.user_id || null;
 
   return (
     <div className="min-h-screen bg-background">
