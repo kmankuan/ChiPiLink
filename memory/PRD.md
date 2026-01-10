@@ -529,6 +529,149 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 ```
 
 ---
-*Last Updated: January 2026*
-*All Priorities Complete: P0-P9 + Phase 1 Users + QR System*
-*237/238 tests passed across all features* (188 + 27 + 22 new)
+*Last Updated: January 10, 2026*
+*All Priorities Complete: P0-P9 + Phase 1 Users + QR System + Push Notifications*
+*278/279 tests passed across all features* (188 + 27 + 22 + 41 new)
+
+---
+
+## 🆕 Sistema de Notificaciones Push (Enero 2026) ✅
+
+### Descripción
+Sistema de notificaciones push altamente configurable con soporte para múltiples proveedores (FCM, OneSignal), categorías configurables, editor avanzado de posts tipo bloques, y preferencias de usuario.
+
+### Panel de Administración ✅
+**Ruta:** `/admin/notifications`
+
+**Características:**
+- **Tab Proveedores:** Configuración de FCM y OneSignal
+  - Enable/disable cada proveedor
+  - API Keys y credenciales (ocultas en respuestas)
+  - Peso de balanceo de carga
+  - Rate limits por minuto
+  - Estrategia de load balancing (weighted, round_robin, least_loaded)
+  - Failover automático
+
+- **Tab Categorías:** Gestión de categorías de notificación
+  - 8 categorías predeterminadas (QR Payments, Check-in, Memberships, etc.)
+  - CRUD completo con soporte multi-idioma (ES, EN, ZH)
+  - Iconos emoji personalizables
+  - Colores personalizables
+  - Prioridad (low, normal, high, urgent)
+  - Módulo asociado
+
+- **Tab Enviar:** Formulario de envío de notificaciones
+  - Audiencia: Todos los usuarios o usuario específico
+  - Selector de categoría
+  - Título y mensaje
+  - URL de imagen y acción opcionales
+
+### Gestión de Posts/Anuncios ✅
+**Ruta:** `/admin/posts`
+
+**Características:**
+- **Listado de posts** con búsqueda y filtros (Todos, Borradores, Publicados, Programados)
+- **Editor avanzado tipo bloques** con 12+ tipos:
+  - Párrafo, Heading 1/2/3
+  - Lista, Lista numerada
+  - Imagen, Video
+  - Cita, Callout (info/warning/success/error)
+  - Botón, Embed, Separador
+- **Multi-idioma** para título, resumen y contenido
+- **Publicar/Programar** posts
+- **Enviar notificación** al publicar
+
+### Preferencias de Usuario ✅
+**Ruta:** `/mi-cuenta` → Tab "Notificaciones"
+
+**Características:**
+- **Configuración Global:**
+  - Toggle Push Notifications
+  - Toggle Email Notifications
+  - Horario Silencioso (quiet hours)
+
+- **Preferencias por Categoría:**
+  - Enable/disable cada categoría
+  - Toggle Push por categoría
+  - Toggle Email por categoría
+
+### Endpoints API
+
+**Categorías:**
+- `GET /api/notifications/categories` - Listar categorías (público)
+- `GET /api/notifications/categories/{id}` - Obtener categoría
+- `POST /api/notifications/admin/categories` - Crear categoría (admin)
+- `PUT /api/notifications/admin/categories/{id}` - Actualizar categoría
+- `DELETE /api/notifications/admin/categories/{id}` - Eliminar categoría
+
+**Preferencias:**
+- `GET /api/notifications/preferences` - Obtener preferencias
+- `PUT /api/notifications/preferences` - Actualizar preferencias globales
+- `PUT /api/notifications/preferences/category/{id}` - Actualizar por categoría
+
+**Proveedores (Admin):**
+- `GET /api/notifications/admin/config` - Obtener configuración
+- `PUT /api/notifications/admin/config/{provider}` - Actualizar proveedor
+
+**Envío (Admin):**
+- `POST /api/notifications/admin/send` - Enviar a usuario
+- `POST /api/notifications/admin/send/bulk` - Enviar masivo
+
+**Dispositivos:**
+- `GET /api/notifications/devices` - Mis dispositivos
+- `POST /api/notifications/devices/register` - Registrar dispositivo
+- `DELETE /api/notifications/devices/{token}` - Eliminar dispositivo
+
+**Posts:**
+- `GET /api/posts/` - Posts públicos
+- `GET /api/posts/{id}` - Obtener post
+- `POST /api/posts/{id}/like` - Like post
+- `GET /api/posts/admin/all` - Todos los posts (admin)
+- `POST /api/posts/admin/create` - Crear post
+- `PUT /api/posts/admin/{id}` - Actualizar post
+- `POST /api/posts/admin/{id}/publish` - Publicar post
+- `DELETE /api/posts/admin/{id}` - Eliminar post
+
+**Historial:**
+- `GET /api/notifications/history` - Mi historial
+- `GET /api/notifications/admin/logs` - Logs admin
+
+### Collections MongoDB
+- `notifications_categories` - Categorías de notificación
+- `notifications_preferences` - Preferencias de usuarios
+- `notifications_devices` - Dispositivos registrados
+- `notifications_config` - Configuración de proveedores
+- `notifications_logs` - Historial de envíos
+- `notifications_posts` - Posts/anuncios
+- `notifications_templates` - Plantillas
+
+### Archivos Nuevos
+**Backend:**
+- `/app/backend/modules/notifications/models/notification_models.py`
+- `/app/backend/modules/notifications/services/push_service.py`
+- `/app/backend/modules/notifications/services/post_service.py`
+- `/app/backend/modules/notifications/providers/push_providers.py` (MOCK)
+- `/app/backend/modules/notifications/routes/notifications.py`
+- `/app/backend/modules/notifications/routes/posts.py`
+
+**Frontend:**
+- `/app/frontend/src/modules/notifications/pages/AdminNotifications.jsx`
+- `/app/frontend/src/modules/notifications/pages/AdminPosts.jsx`
+- `/app/frontend/src/modules/notifications/components/ProviderConfig.jsx`
+- `/app/frontend/src/modules/notifications/components/CategoryManager.jsx`
+- `/app/frontend/src/modules/notifications/components/SendNotification.jsx`
+- `/app/frontend/src/modules/notifications/components/PostEditor.jsx`
+- `/app/frontend/src/modules/notifications/components/NotificationPreferences.jsx`
+- `/app/frontend/src/modules/notifications/components/NotificationHistory.jsx`
+
+### Integraciones MOCKED
+- **FCM Push Sending** - Placeholder en `push_providers.py`
+- **OneSignal Push Sending** - Placeholder en `push_providers.py`
+- **Monday.com Integration** - Placeholder para contenido programado
+- **Fusebase Integration** - Placeholder para contenido programado
+
+### Test Results
+- **Backend:** 41/41 tests passed (100%)
+- **Frontend:** 100% paneles funcionando
+
+---
