@@ -466,6 +466,26 @@
       "title": "Premios",
       "player": "Premios Jugadores",
       "referee": "Premios Árbitros"
+    },
+    "closeSeason": {
+      "title": "Cerrar Temporada",
+      "confirm": "¿Estás seguro de cerrar esta temporada?",
+      "confirmDesc": "Esta acción fijará el ranking final y asignará los premios. No se podrán registrar más partidos.",
+      "close": "Cerrar Temporada",
+      "cancel": "Cancelar",
+      "success": "Temporada cerrada exitosamente",
+      "results": "Resultados Finales",
+      "playerResults": "Resultados Jugadores",
+      "refereeResults": "Resultados Árbitros",
+      "prize": "Premio",
+      "position": "Posición",
+      "points": "Puntos"
+    },
+    "notifications": {
+      "pendingTitle": "Partidos Pendientes",
+      "pendingDesc": "Tienes partidos esperando tu confirmación",
+      "confirmNow": "Confirmar Ahora",
+      "noPending": "No tienes partidos pendientes"
     }
   }
 }
