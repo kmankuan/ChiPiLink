@@ -8,3 +8,4 @@ export { default as SuperPinRanking } from './SuperPinRanking';
 export { default as SuperPinCheckIn } from './SuperPinCheckIn';
 export { default as SuperPinTournament } from './SuperPinTournament';
 export { default as PlayerBadges, BadgeFeed, BadgeLeaderboard } from './PlayerBadges';
+export { default as PlayerProfile } from './PlayerProfile';
