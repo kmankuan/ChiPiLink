@@ -606,6 +606,98 @@ export default function SuperPinLeagueDetail() {
           </div>
         </div>
       )}
+
+      {/* Create Tournament Modal */}
+      {showCreateTournamentModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-yellow-500" /> {t('superpin.tournaments.createTournament')}
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('superpin.tournaments.tournamentName')}
+                </label>
+                <input
+                  type="text"
+                  value={newTournament.nombre}
+                  onChange={(e) => setNewTournament({ ...newTournament, nombre: e.target.value })}
+                  placeholder={`Torneo ${league?.temporada}`}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('superpin.tournaments.startDate')}
+                </label>
+                <input
+                  type="date"
+                  value={newTournament.fecha_inicio}
+                  onChange={(e) => setNewTournament({ ...newTournament, fecha_inicio: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
+              
+              <div className="p-3 bg-yellow-50 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>{t('superpin.tournaments.participants')}:</strong> Top {Math.min(ranking?.entries?.length || 0, 8)} jugadores del ranking actual
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowCreateTournamentModal(false);
+                  setNewTournament({ nombre: '', fecha_inicio: '' });
+                }}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button 
+                type="button" 
+                onClick={async () => {
+                  if (!newTournament.nombre || !newTournament.fecha_inicio) {
+                    alert('Por favor completa todos los campos');
+                    return;
+                  }
+                  try {
+                    const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
+                    const response = await fetch(`${API_URL}/api/pinpanclub/superpin/tournaments`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        liga_id: ligaId,
+                        nombre: newTournament.nombre,
+                        fecha_inicio: newTournament.fecha_inicio
+                      })
+                    });
+                    if (response.ok) {
+                      const data = await response.json();
+                      setShowCreateTournamentModal(false);
+                      setNewTournament({ nombre: '', fecha_inicio: '' });
+                      navigate(`/pinpanclub/superpin/tournament/${data.torneo_id}`);
+                    }
+                  } catch (error) {
+                    console.error('Error creating tournament:', error);
+                  }
+                }}
+                className="bg-yellow-500 hover:bg-yellow-600"
+              >
+                {t('superpin.tournaments.createTournament')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
