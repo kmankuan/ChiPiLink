@@ -76,7 +76,9 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
   const [loading, setLoading] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const lang = i18n.language?.split('-')[0] || 'es';
+  // Default to Spanish if language not properly detected
+  const detectedLang = i18n.language?.split('-')[0];
+  const lang = ['es', 'en', 'zh'].includes(detectedLang) ? detectedLang : 'es';
   const L = (value) => getLocalizedText(value, lang);
 
   const texts = {
