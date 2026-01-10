@@ -134,6 +134,7 @@ api_router.include_router(admin_router)
 api_router.include_router(invision_router)
 
 # Register new modules (placeholders)
+api_router.include_router(users_router)
 api_router.include_router(chess_router)
 api_router.include_router(content_hub_router)
 api_router.include_router(cxgenie_router)
