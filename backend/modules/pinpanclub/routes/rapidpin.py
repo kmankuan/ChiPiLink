@@ -135,6 +135,20 @@ async def get_pending_confirmations(
     }
 
 
+@router.get("/pending/{user_id}")
+async def get_all_pending_confirmations(user_id: str):
+    """
+    Obtener TODOS los partidos pendientes de confirmación para un usuario.
+    Retorna partidos de todas las temporadas donde el usuario participa pero no fue quien lo registró.
+    """
+    matches = await rapidpin_service.get_all_pending_confirmations(user_id)
+    return {
+        "user_id": user_id,
+        "pending_matches": matches,
+        "total": len(matches)
+    }
+
+
 # ============== RANKING ==============
 
 @router.get("/seasons/{season_id}/ranking", response_model=RapidPinRankingTable)
