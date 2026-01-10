@@ -300,6 +300,17 @@
       "geoError": "Error al obtener ubicación",
       "geoOutOfRange": "Estás fuera del rango permitido del club",
       "invalidQr": "Código QR inválido"
+    },
+    "badges": {
+      "title": "Logros",
+      "noBadges": "No hay logros todavía",
+      "earned": "obtuvo",
+      "rarity": {
+        "common": "Común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
+      }
     }
   }
 }

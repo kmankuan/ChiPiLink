@@ -300,6 +300,17 @@
       "geoError": "获取位置时出错",
       "geoOutOfRange": "您不在俱乐部允许的范围内",
       "invalidQr": "无效的二维码"
+    },
+    "badges": {
+      "title": "成就",
+      "noBadges": "暂无成就",
+      "earned": "获得了",
+      "rarity": {
+        "common": "普通",
+        "rare": "稀有",
+        "epic": "史诗",
+        "legendary": "传说"
+      }
     }
   }
 }
