@@ -7,11 +7,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Trophy, Medal, TrendingUp, TrendingDown, Minus,
-  Users, Target, Calendar, ArrowLeft, RefreshCw
+  Users, Target, Calendar, ArrowLeft, RefreshCw, Award
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
+import PlayerBadges, { BadgeFeed } from './PlayerBadges';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
