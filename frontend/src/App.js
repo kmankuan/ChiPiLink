@@ -59,6 +59,9 @@ import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPag
 // Analytics Dashboard
 import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
 
+// Seasons Page
+import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
@@ -166,6 +169,10 @@ function AppRouter() {
       
       {/* Analytics Dashboard Route */}
       <Route path="/pinpanclub/analytics" element={<AnalyticsDashboard />} />
+      
+      {/* Seasons Page Routes */}
+      <Route path="/pinpanclub/seasons" element={<SeasonsPage />} />
+      <Route path="/pinpanclub/seasons/:seasonId" element={<SeasonsPage />} />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
