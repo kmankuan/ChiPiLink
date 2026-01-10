@@ -322,6 +322,17 @@ class ChallengeService(BaseService):
                 self.log_info(f"Rank promotion: {jugador_id} -> {promotion['new_rank']['id']}")
         except Exception as e:
             self.log_error(f"Error checking rank promotion: {e}")
+        
+        # Update season statistics
+        try:
+            from .seasons_service import seasons_service
+            await seasons_service.update_player_season_stats(
+                jugador_id=jugador_id,
+                points_earned=challenge.get("points_reward", 0),
+                challenge_completed=True
+            )
+        except Exception as e:
+            self.log_error(f"Error updating season stats: {e}")
     
     async def get_player_challenges(
         self,
