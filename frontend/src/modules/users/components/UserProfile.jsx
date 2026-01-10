@@ -134,6 +134,11 @@ export default function UserProfile({ token, user }) {
     return obj[lang] || obj.es || obj.en || Object.values(obj)[0] || '';
   };
 
+  // Helper function to get proper locale code
+  const getLocale = () => {
+    return lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
+  };
+
   const texts = {
     es: {
       title: 'Mi Perfil',
