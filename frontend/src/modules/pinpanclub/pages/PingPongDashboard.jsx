@@ -190,6 +190,13 @@ export default function PingPongDashboard() {
                 <h1 className="font-bold text-xl">PinpanClub</h1>
               </div>
               <div className="flex items-center gap-2">
+                {/* Notification Center */}
+                {currentUserId && (
+                  <NotificationCenter 
+                    userId={currentUserId} 
+                    mode="both"
+                  />
+                )}
                 {/* Super Pin - Destacado */}
                 <Button 
                   variant="default" 
