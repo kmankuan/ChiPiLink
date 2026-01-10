@@ -344,6 +344,24 @@ class TestSeedDemoIntegration:
             "Content-Type": "application/json"
         }
     
+    def test_delete_demo_data_with_admin_auth(self, admin_headers):
+        """DELETE /api/seed/demo-data - should work with admin authentication"""
+        response = requests.delete(
+            f"{BASE_URL}/api/seed/demo-data",
+            headers=admin_headers
+        )
+        assert response.status_code == 200, f"Delete demo data failed: {response.text}"
+        
+        data = response.json()
+        assert data.get("success") is True
+        assert "results" in data
+        
+        # Verify results structure
+        results = data.get("results", {})
+        assert "players_deleted" in results
+        assert "matches_deleted" in results
+        assert "rapid_deleted" in results
+    
     def test_full_seed_workflow(self, admin_headers):
         """Test complete seed → verify → delete workflow"""
         # Step 1: Get initial stats
