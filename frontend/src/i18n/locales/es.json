@@ -354,5 +354,99 @@
       "selectToCompare": "Agrega jugadores para ver la tabla comparativa",
       "addFirstPlayer": "Agregar Primer Jugador"
     }
+  },
+  "rapidpin": {
+    "title": "Rapid Pin",
+    "subtitle": "Partidos espontáneos - ¡2 jugadores + 1 árbitro!",
+    "viewSeason": "Ver Temporada",
+    "info": {
+      "participants": "Participantes",
+      "playersAndReferee": "2 Jugadores + 1 Árbitro",
+      "scoring": "Puntuación",
+      "scoringDesc": "Victoria / Derrota / Árbitro",
+      "validation": "Validación",
+      "oneConfirmation": "1 Confirmación",
+      "validationDesc": "Otro participante debe confirmar"
+    },
+    "seasons": {
+      "title": "Temporadas",
+      "create": "Nueva Temporada",
+      "created": "Temporada creada exitosamente",
+      "name": "Nombre de la Temporada",
+      "namePlaceholder": "Ej: Diciembre 2025",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Descripción opcional...",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Cierre",
+      "fieldsRequired": "Nombre y fecha de cierre son requeridos",
+      "noSeasons": "No hay temporadas",
+      "noSeasonsDesc": "Crea tu primera temporada Rapid Pin para comenzar",
+      "createFirst": "Crear Primera Temporada",
+      "notFound": "Temporada no encontrada",
+      "status": {
+        "active": "Activa",
+        "closed": "Cerrada",
+        "archived": "Archivada"
+      }
+    },
+    "matches": {
+      "title": "Partidos",
+      "register": "Registrar Partido",
+      "registerDesc": "Registra un partido entre 2 jugadores con 1 árbitro",
+      "registered": "Partido registrado. Esperando confirmación.",
+      "confirmed": "Partido confirmado y puntos aplicados",
+      "playerA": "Jugador A",
+      "playerB": "Jugador B",
+      "referee": "Árbitro",
+      "winner": "Ganador",
+      "selectPlayer": "Seleccionar jugador",
+      "selectReferee": "Seleccionar árbitro",
+      "selectWinner": "Seleccionar ganador",
+      "winnerScore": "Puntos Ganador",
+      "loserScore": "Puntos Perdedor",
+      "fieldsRequired": "Todos los campos son requeridos",
+      "differentParticipants": "Los 3 participantes deben ser diferentes",
+      "winnerMustBePlayer": "El ganador debe ser uno de los jugadores",
+      "pendingNote": "El partido quedará pendiente hasta que otro participante lo confirme",
+      "pendingConfirmations": "Partidos Pendientes de Confirmación",
+      "confirm": "Confirmar",
+      "recent": "Partidos Recientes",
+      "noMatches": "No hay partidos registrados",
+      "status": {
+        "pending": "Pendiente",
+        "validated": "Validado",
+        "disputed": "En Disputa",
+        "cancelled": "Cancelado"
+      }
+    },
+    "ranking": {
+      "title": "Ranking",
+      "players": "Ranking de Jugadores",
+      "playersDesc": "Clasificación por puntos totales (victorias + derrotas + arbitrajes)",
+      "referees": "Ranking de Árbitros",
+      "refereesDesc": "Clasificación por partidos arbitrados",
+      "player": "Jugador",
+      "referee": "Árbitro",
+      "points": "Puntos",
+      "played": "PJ",
+      "won": "PG",
+      "lost": "PP",
+      "refereed": "Arb",
+      "matchesRefereed": "Partidos Arbitrados",
+      "refPoints": "Puntos",
+      "noPlayers": "No hay jugadores en el ranking todavía",
+      "noReferees": "No hay árbitros registrados todavía"
+    },
+    "stats": {
+      "matches": "Partidos",
+      "players": "Jugadores",
+      "referees": "Árbitros",
+      "pending": "Pendientes"
+    },
+    "prizes": {
+      "title": "Premios",
+      "player": "Premios Jugadores",
+      "referee": "Premios Árbitros"
+    }
   }
 }
