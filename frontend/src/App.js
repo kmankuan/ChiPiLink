@@ -50,6 +50,9 @@ import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMonday
 // Super Pin Module
 import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking, SuperPinTournament, PlayerProfile, PlayerComparison } from '@/modules/pinpanclub/pages/superpin';
 
+// Rapid Pin Module
+import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
@@ -147,6 +150,10 @@ function AppRouter() {
       <Route path="/pinpanclub/superpin/tournament/:torneoId" element={<SuperPinTournament />} />
       <Route path="/pinpanclub/superpin/player/:jugadorId" element={<PlayerProfile />} />
       <Route path="/pinpanclub/superpin/compare" element={<PlayerComparison />} />
+      
+      {/* Rapid Pin Routes */}
+      <Route path="/pinpanclub/rapidpin" element={<RapidPinDashboard />} />
+      <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<RapidPinSeason />} />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
