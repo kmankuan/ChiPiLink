@@ -278,6 +278,129 @@ Sistema de temporadas competitivas con resets periódicos y recompensas exclusiv
 - Auth endpoint: `/api/auth-v2/login` (field: `contrasena`)
 - Test Player: `jugador_544167d88272` (Carlos González / "El Rayo")
 
+## 🆕 PHASE 1: User Management System & ChipiWallet (Enero 2026)
+
+### Sistema de Usuarios Avanzado ✅
+Sistema configurable de perfiles de usuario con tipos y relaciones:
+
+**Tipos de Usuario (6 por defecto):**
+| ID | Nombre (ES) | Nombre (EN) | Categoría |
+|----|-------------|-------------|-----------|
+| utype_customer | Cliente | Customer | customer |
+| utype_member_adult | Miembro Adulto | Adult Member | member |
+| utype_member_child | Miembro Niño | Child Member | member |
+| utype_guardian | Acudiente | Guardian | family |
+| utype_staff | Personal | Staff | staff |
+| utype_special | Invitado Especial | Special Guest | special |
+
+**Campos de Perfil (8 configurables):**
+- Nombre para mostrar, Biografía, Teléfono, Dirección
+- Contacto de emergencia, Nombre del acudiente
+- Nivel de habilidad, Preferencias de notificación
+
+**Relaciones:**
+- Padre-Hijo, Acudiente-Dependiente, Tutor-Pupilo
+- Permisos configurables: ver wallet, pagar por, gestionar
+
+**Frontend:** `/mi-cuenta` → Tab "Perfil"
+
+### ChipiWallet (Billetera Digital) ✅
+Sistema de billetera con doble moneda:
+
+| Moneda | Descripción | Tasa |
+|--------|-------------|------|
+| USD | Dólares americanos | 1:1 |
+| ChipiPoints | Puntos virtuales | 0.008 USD |
+
+**Funcionalidades:**
+- Depósitos (efectivo, tarjeta, Yappy)
+- Transferencias entre usuarios
+- Conversión ChipiPoints → USD
+- Historial de transacciones
+- Estadísticas de uso
+
+**Frontend:** `/mi-cuenta` → Tab "ChipiWallet"
+
+### Sistema de Membresías ✅
+Planes de membresía y sistema de visitas inteligente:
+
+**Planes por Defecto (5):**
+| Plan | Precio | Visitas | Duración | Bonus |
+|------|--------|---------|----------|-------|
+| Pase 12 Visitas | $300 | 12 | 90 días | 500 pts |
+| Pase 6 Visitas | $165 | 6 | 60 días | 200 pts |
+| Ilimitado Mensual | $150 | ∞ | 30 días | 300 pts |
+| Prueba Gratis | $0 | 2 | 14 días | 50 pts |
+| Cortesía | $0 | ∞ | 365 días | 0 pts |
+
+**Check-in/Check-out Inteligente:**
+- Detecta visitas rápidas (< 15 min) → no consume pase
+- Visitas regulares (> 30 min) → consume 1 pase
+- Auto-checkout después de 8 horas
+
+**Frontend:** `/mi-cuenta` → Tab "Membresía"
+
+### Endpoints API
+
+**Users:**
+- `GET /api/users/types` - Tipos de usuario
+- `GET /api/users/fields` - Campos de perfil
+- `GET /api/users/profile/me` - Mi perfil
+- `POST /api/users/profile` - Crear perfil
+- `PUT /api/users/profile` - Actualizar perfil
+- `GET /api/users/relationships` - Mis relaciones
+
+**Wallet:**
+- `GET /api/wallet/me` - Mi billetera
+- `GET /api/wallet/summary` - Resumen con stats
+- `POST /api/wallet/deposit` - Depositar
+- `POST /api/wallet/transfer` - Transferir
+- `POST /api/wallet/points/convert` - Convertir puntos
+- `GET /api/wallet/transactions` - Historial
+
+**Memberships:**
+- `GET /api/memberships/plans` - Planes disponibles
+- `GET /api/memberships/me/active` - Membresía activa
+- `POST /api/memberships/purchase` - Comprar membresía
+- `POST /api/memberships/visits/checkin` - Registrar entrada
+- `POST /api/memberships/visits/checkout` - Registrar salida
+- `GET /api/memberships/visits/stats` - Estadísticas de visitas
+
+**Test Results:** 27/27 tests passed (100%)
+
+### Collections MongoDB (Nuevas)
+- `chipi_wallets` - Billeteras de usuarios
+- `chipi_transactions` - Transacciones
+- `chipi_points_history` - Historial de puntos
+- `chipi_wallet_config` - Configuración
+- `chipi_user_types` - Tipos de usuario
+- `chipi_profile_fields` - Campos de perfil
+- `chipi_user_profiles` - Perfiles de usuario
+- `chipi_user_relationships` - Relaciones
+- `chipi_membership_plans` - Planes de membresía
+- `chipi_user_memberships` - Membresías de usuarios
+- `chipi_user_visits` - Registro de visitas
+- `chipi_visit_config` - Configuración de visitas
+
+### Archivos Nuevos
+**Backend:**
+- `/app/backend/modules/users/models/user_models.py`
+- `/app/backend/modules/users/models/wallet_models.py`
+- `/app/backend/modules/users/services/user_profile_service.py`
+- `/app/backend/modules/users/services/wallet_service.py`
+- `/app/backend/modules/users/services/membership_service.py`
+- `/app/backend/modules/users/routes/users.py`
+- `/app/backend/modules/users/routes/wallet.py`
+- `/app/backend/modules/users/routes/memberships.py`
+
+**Frontend:**
+- `/app/frontend/src/modules/users/pages/UsersDashboard.jsx`
+- `/app/frontend/src/modules/users/components/ChipiWallet.jsx`
+- `/app/frontend/src/modules/users/components/UserProfile.jsx`
+- `/app/frontend/src/modules/users/components/MembershipCard.jsx`
+
+---
+
 ## Tareas Pendientes (Consolidadas)
 
 ### Completadas ✅
