@@ -163,11 +163,42 @@ export default function PlayerComparison() {
           </div>
           
           {selectedPlayers.length > 0 && (
-            <Button variant="outline" onClick={clearAll} className="text-red-600">
-              <X className="h-4 w-4 mr-2" /> {t('superpin.comparison.clearAll')}
-            </Button>
+            <div className="flex items-center gap-2">
+              {selectedPlayers.length === 2 && (
+                <Button 
+                  variant="default" 
+                  onClick={() => setShowPredictor(!showPredictor)}
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                >
+                  <Zap className="h-4 w-4 mr-2" /> 
+                  {t('superpin.predictor.predictMatch')}
+                </Button>
+              )}
+              <Button variant="outline" onClick={clearAll} className="text-red-600">
+                <X className="h-4 w-4 mr-2" /> {t('superpin.comparison.clearAll')}
+              </Button>
+            </div>
           )}
         </div>
+
+        {/* Match Predictor - Show when exactly 2 players selected */}
+        {showPredictor && selectedPlayers.length === 2 && (
+          <div className="mb-6">
+            <MatchPredictor 
+              playerA={selectedPlayers[0]} 
+              playerB={selectedPlayers[1]} 
+              onClose={() => setShowPredictor(false)}
+            />
+          </div>
+        )}
+
+        {/* Hint for predictor */}
+        {selectedPlayers.length === 1 && (
+          <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg text-purple-700 text-sm flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            {t('superpin.predictor.selectTwoPlayers')}
+          </div>
+        )}
 
         {/* Player Selection */}
         <Card className="mb-6">
