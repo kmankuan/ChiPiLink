@@ -532,8 +532,44 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 
 ---
 *Last Updated: January 10, 2026*
-*All Priorities Complete: P0-P9 + Phase 1 Users + QR System + Push Notifications*
-*278/279 tests passed across all features* (188 + 27 + 22 + 41 new)
+*All Priorities Complete: P0-P9 + Phase 1 Users + QR System + Push Notifications + PinPanClub Feed*
+*293/294 tests passed across all features* (188 + 27 + 22 + 41 + 15 new)
+
+---
+
+## 🆕 PinPanClub Activity Feed Block (Enero 2026) ✅
+
+### Descripción
+Bloque configurable para la página principal (Landing) que muestra actividades del club de PinPanClub. Visible para usuarios no registrados con control granular de visibilidad por audiencia.
+
+### Características
+- **Visibilidad por Audiencia**: Configurable para público, registrado, moderador, admin, super_admin, usuario específico
+- **6 Secciones** (todas habilitadas por defecto):
+  1. **Partidos Recientes** (Super Pin + Rapid Pin)
+  2. **Top Jugadores** (Leaderboard)
+  3. **Retos Activos** (Challenges semanales)
+  4. **Logros Recientes** (Achievements de la comunidad)
+  5. **Estadísticas de Jugadores** (Active Players, matches totales)
+  6. **Próximos Torneos**
+- **Multi-idioma**: ES, EN, ZH
+- **Admin Controls**: Panel de configuración para activar/desactivar secciones y ajustar visibilidad
+
+### Endpoints Públicos (sin autenticación)
+- `GET /api/pinpanclub/public/activity-feed` - Feed completo con parámetros de secciones y límites
+- `GET /api/pinpanclub/public/stats-summary` - Resumen rápido de estadísticas
+
+### Integración
+- **Página principal**: Integrado en `CommunityLanding.jsx` (ruta `/`)
+- **Landing Editor**: Disponible como bloque `pinpanclub_feed` en el editor de landing pages
+
+### Archivos
+- `/app/backend/modules/pinpanclub/routes/public_feed.py`
+- `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx`
+- `/app/backend/modules/landing/models.py` (BLOCK_TEMPLATES)
+
+### Test Results
+- **Backend:** 15/15 tests passed (100%)
+- **Frontend:** 100% componentes funcionando
 
 ---
 
