@@ -185,6 +185,24 @@ function AppRouter() {
       <Route path="/mi-cuenta" element={<UsersDashboard />} />
       <Route path="/my-account" element={<UsersDashboard />} />
       
+      {/* Notifications Admin Routes */}
+      <Route 
+        path="/admin/notifications" 
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminNotifications />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/posts" 
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminPosts />
+          </ProtectedRoute>
+        } 
+      />
+      
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
       <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
