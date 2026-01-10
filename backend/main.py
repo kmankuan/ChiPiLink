@@ -53,6 +53,7 @@ from modules.integrations.sheets.routes import router as sheets_router
 
 # Admin Module (notifications, config, setup)
 from modules.admin.routes import router as admin_router
+from modules.admin.seed_demo import router as seed_demo_router
 
 # Invision Module (placeholder for laopan.online integration)
 from modules.invision.routes import router as invision_router
@@ -131,6 +132,7 @@ api_router.include_router(community_refactored_router)  # Microservices-ready ro
 api_router.include_router(monday_router)
 api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
+api_router.include_router(seed_demo_router)  # Demo data seeding
 api_router.include_router(invision_router)
 
 # Register new modules (placeholders)
