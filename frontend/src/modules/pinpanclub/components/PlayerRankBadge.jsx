@@ -400,16 +400,34 @@ export function RankProgressCard({ jugadorId }) {
   
   const fetchRankData = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
-      );
-      
       let totalPoints = 0;
       
-      if (response.ok) {
-        const data = await response.json();
-        const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
-        totalPoints = playerEntry?.total_points || 0;
+      // Try direct rank endpoint first
+      try {
+        const directResponse = await fetch(
+          `${API_URL}/api/pinpanclub/challenges/player/${jugadorId}/rank`
+        );
+        if (directResponse.ok) {
+          const directData = await directResponse.json();
+          if (directData.total_points !== undefined) {
+            totalPoints = directData.total_points;
+          }
+        }
+      } catch (e) {
+        console.log('Direct rank endpoint failed');
+      }
+      
+      // Fallback to leaderboard
+      if (totalPoints === 0) {
+        const response = await fetch(
+          `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
+          totalPoints = playerEntry?.total_points || 0;
+        }
       }
       
       const currentRank = getRankByPoints(totalPoints);
