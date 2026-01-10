@@ -254,7 +254,28 @@
     },
     "tournaments": {
       "title": "锦标赛",
-      "season": "赛季"
+      "season": "赛季",
+      "participants": "参赛者",
+      "notFound": "未找到锦标赛",
+      "startTournament": "开始锦标赛",
+      "status": {
+        "pendiente": "待开始",
+        "en_curso": "进行中",
+        "finalizado": "已结束",
+        "bye": "轮空"
+      },
+      "bye": "轮空",
+      "tbd": "待定",
+      "thirdPlace": "季军争夺",
+      "semifinalLoser": "半决赛负者",
+      "results": "最终结果",
+      "champion": "冠军",
+      "runnerUp": "亚军",
+      "enterResult": "录入结果",
+      "selectWinner": "选择获胜者",
+      "createTournament": "创建锦标赛",
+      "tournamentName": "锦标赛名称",
+      "startDate": "开始日期"
     },
     "stats": {
       "points": "积分",
