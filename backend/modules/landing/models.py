@@ -188,5 +188,118 @@ BLOCK_TEMPLATES = {
             "ancho": "100%",
             "margen": "40px"
         }
+    },
+    "pinpanclub_feed": {
+        "nombre": "PinPanClub Activity Feed",
+        "descripcion": "Actividades en vivo del club de ping pong",
+        "config_default": {
+            "titulo": {
+                "es": "Actividad del Club",
+                "en": "Club Activity",
+                "zh": "俱乐部活动"
+            },
+            "subtitulo": {
+                "es": "Lo último en PinPanClub",
+                "en": "Latest from PinPanClub",
+                "zh": "PinPanClub最新动态"
+            },
+            # Visibility settings per audience
+            "visibility": {
+                "public": True,           # Non-registered users
+                "registered": True,       # Logged in users
+                "moderator": True,        # Moderators
+                "admin": True,            # Admins
+                "super_admin": True,      # Super Admins
+                "specific_users": []      # List of user IDs
+            },
+            # Section toggles (all enabled by default)
+            "sections": {
+                "recent_matches": {
+                    "enabled": True,
+                    "limit": 5,
+                    "title": {"es": "Partidos Recientes", "en": "Recent Matches", "zh": "最近比赛"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                },
+                "leaderboard": {
+                    "enabled": True,
+                    "limit": 10,
+                    "title": {"es": "Top Jugadores", "en": "Top Players", "zh": "顶级玩家"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                },
+                "active_challenges": {
+                    "enabled": True,
+                    "limit": 4,
+                    "title": {"es": "Retos Activos", "en": "Active Challenges", "zh": "活跃挑战"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                },
+                "recent_achievements": {
+                    "enabled": True,
+                    "limit": 6,
+                    "title": {"es": "Logros Recientes", "en": "Recent Achievements", "zh": "最近成就"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                },
+                "active_players": {
+                    "enabled": True,
+                    "title": {"es": "Jugadores Activos", "en": "Active Players", "zh": "活跃玩家"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                },
+                "upcoming_tournaments": {
+                    "enabled": True,
+                    "limit": 3,
+                    "title": {"es": "Próximos Torneos", "en": "Upcoming Tournaments", "zh": "即将举行的比赛"},
+                    "visibility": {
+                        "public": True,
+                        "registered": True,
+                        "moderator": True,
+                        "admin": True,
+                        "super_admin": True,
+                        "specific_users": []
+                    }
+                }
+            },
+            # Style options
+            "style": {
+                "background": "transparent",
+                "card_style": "default",  # default, compact, expanded
+                "show_cta": True,
+                "cta_text": {"es": "Ver más en PinPanClub", "en": "See more in PinPanClub", "zh": "在PinPanClub查看更多"},
+                "cta_url": "/pinpanclub"
+            }
+        }
     }
 }
