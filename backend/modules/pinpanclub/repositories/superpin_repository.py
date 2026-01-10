@@ -363,3 +363,57 @@ class SeasonTournamentRepository(BaseRepository):
         """Actualizar torneo"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, torneo_id, data)
+
+
+class PlayerBadgeRepository(BaseRepository):
+    """
+    Repository para badges de jugadores.
+    """
+    
+    COLLECTION_NAME = PinpanClubCollections.SUPERPIN_BADGES
+    ID_FIELD = "badge_id"
+    
+    def __init__(self):
+        super().__init__(db, self.COLLECTION_NAME)
+    
+    async def create(self, badge_data: Dict) -> Dict:
+        """Crear nuevo badge"""
+        badge_data["badge_id"] = f"badge_{uuid.uuid4().hex[:12]}"
+        badge_data["earned_at"] = datetime.now(timezone.utc).isoformat()
+        return await self.insert_one(badge_data)
+    
+    async def get_by_id(self, badge_id: str) -> Optional[Dict]:
+        """Obtener badge por ID"""
+        return await self.find_one({self.ID_FIELD: badge_id})
+    
+    async def get_player_badges(self, jugador_id: str) -> List[Dict]:
+        """Obtener todos los badges de un jugador"""
+        return await self.find_many(
+            query={"jugador_id": jugador_id},
+            sort=[("earned_at", -1)]
+        )
+    
+    async def get_badge_by_type(self, jugador_id: str, badge_type: str, **filters) -> Optional[Dict]:
+        """Verificar si un jugador ya tiene un badge específico"""
+        query = {"jugador_id": jugador_id, "badge_type": badge_type}
+        query.update(filters)
+        return await self.find_one(query)
+    
+    async def count_badges_by_type(self, jugador_id: str, badge_type: str) -> int:
+        """Contar badges de un tipo para un jugador"""
+        return await self.count({"jugador_id": jugador_id, "badge_type": badge_type})
+    
+    async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
+        """Obtener badges más recientes (para feed)"""
+        return await self.find_many(
+            query={},
+            limit=limit,
+            sort=[("earned_at", -1)]
+        )
+    
+    async def get_league_badges(self, liga_id: str) -> List[Dict]:
+        """Obtener todos los badges de una liga"""
+        return await self.find_many(
+            query={"liga_id": liga_id},
+            sort=[("earned_at", -1)]
+        )
