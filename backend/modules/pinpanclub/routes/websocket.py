@@ -638,3 +638,176 @@ async def broadcast_message(message: dict):
     """Broadcast a message to all connected clients (admin only)"""
     await manager.broadcast_all(message)
     return {"success": True, "message": "Broadcast sent"}
+
+
+# ============== NOTIFICATION WEBSOCKET ==============
+
+class NotificationManager:
+    """Manages WebSocket connections for user notifications"""
+    
+    def __init__(self):
+        # user_id -> WebSocket connection
+        self.user_connections: Dict[str, WebSocket] = {}
+        # user_id -> connection metadata
+        self.connection_info: Dict[str, dict] = {}
+    
+    async def connect(self, websocket: WebSocket, user_id: str):
+        """Accept a new notification WebSocket connection"""
+        await websocket.accept()
+        
+        # Close existing connection if any
+        if user_id in self.user_connections:
+            try:
+                await self.user_connections[user_id].close()
+            except:
+                pass
+        
+        self.user_connections[user_id] = websocket
+        self.connection_info[user_id] = {
+            "connected_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        logger.info(f"Notification WebSocket connected: {user_id}")
+        
+        # Send connection confirmation
+        await self.send_to_user(user_id, {
+            "type": "connected",
+            "user_id": user_id,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    
+    def disconnect(self, user_id: str):
+        """Remove a disconnected user"""
+        if user_id in self.user_connections:
+            del self.user_connections[user_id]
+        if user_id in self.connection_info:
+            del self.connection_info[user_id]
+        logger.info(f"Notification WebSocket disconnected: {user_id}")
+    
+    async def send_to_user(self, user_id: str, message: dict):
+        """Send notification to specific user"""
+        if user_id in self.user_connections:
+            try:
+                await self.user_connections[user_id].send_json(message)
+                return True
+            except Exception as e:
+                logger.error(f"Error sending notification to {user_id}: {e}")
+                self.disconnect(user_id)
+        return False
+    
+    async def broadcast_to_users(self, user_ids: List[str], message: dict):
+        """Send notification to multiple users"""
+        results = {}
+        for user_id in user_ids:
+            results[user_id] = await self.send_to_user(user_id, message)
+        return results
+    
+    def is_connected(self, user_id: str) -> bool:
+        """Check if user is connected"""
+        return user_id in self.user_connections
+    
+    def get_stats(self) -> dict:
+        """Get notification connection statistics"""
+        return {
+            "connected_users": len(self.user_connections),
+            "user_ids": list(self.user_connections.keys())
+        }
+
+
+# Global notification manager instance
+notification_manager = NotificationManager()
+
+
+@ws_router.websocket("/notifications/{user_id}")
+async def websocket_notifications(websocket: WebSocket, user_id: str):
+    """
+    WebSocket endpoint for real-time user notifications
+    Connects a user to receive instant notifications
+    """
+    await notification_manager.connect(websocket, user_id)
+    
+    try:
+        # Send initial unread count
+        from ..services.social_service import social_service
+        unread_count = await social_service.get_unread_count(user_id)
+        await notification_manager.send_to_user(user_id, {
+            "type": "unread_count",
+            "count": unread_count,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Keep connection alive and handle pings
+        while True:
+            try:
+                data = await asyncio.wait_for(websocket.receive_json(), timeout=30)
+                
+                # Handle client messages
+                if data.get("type") == "pong":
+                    pass  # Client responding to ping
+                elif data.get("type") == "mark_read":
+                    # Client marking notification as read
+                    notification_id = data.get("notification_id")
+                    if notification_id:
+                        await social_service.mark_notification_read(notification_id)
+                        new_count = await social_service.get_unread_count(user_id)
+                        await notification_manager.send_to_user(user_id, {
+                            "type": "unread_count",
+                            "count": new_count,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        })
+                elif data.get("type") == "mark_all_read":
+                    # Client marking all as read
+                    await social_service.mark_all_notifications_read(user_id)
+                    await notification_manager.send_to_user(user_id, {
+                        "type": "unread_count",
+                        "count": 0,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                        
+            except asyncio.TimeoutError:
+                # Send ping to keep connection alive
+                await notification_manager.send_to_user(user_id, {
+                    "type": "ping",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+    
+    except WebSocketDisconnect:
+        notification_manager.disconnect(user_id)
+    except Exception as e:
+        logger.error(f"Notification WebSocket error for {user_id}: {e}")
+        notification_manager.disconnect(user_id)
+
+
+@ws_router.get("/notifications/stats")
+async def get_notification_stats():
+    """Get notification WebSocket connection statistics"""
+    return notification_manager.get_stats()
+
+
+@ws_router.post("/notifications/push/{user_id}")
+async def push_notification_to_user(user_id: str, notification: dict):
+    """Push a notification to a specific connected user (internal use)"""
+    if notification_manager.is_connected(user_id):
+        success = await notification_manager.send_to_user(user_id, {
+            "type": "new_notification",
+            "notification": notification,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        return {"success": success, "user_connected": True}
+    return {"success": False, "user_connected": False}
+
+
+# Helper function to send notifications from other services
+async def push_realtime_notification(user_id: str, notification: dict):
+    """
+    Push a real-time notification to a user if they're connected.
+    Called from social_service when creating notifications.
+    """
+    if notification_manager.is_connected(user_id):
+        await notification_manager.send_to_user(user_id, {
+            "type": "new_notification",
+            "notification": notification,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        return True
+    return False

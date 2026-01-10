@@ -243,9 +243,19 @@ class SocialService(BaseService):
     # ============== NOTIFICATIONS ==============
     
     async def create_notification(self, data: NotificationCreate) -> Notification:
-        """Crear notificación"""
+        """Crear notificación y enviar en tiempo real si el usuario está conectado"""
         result = await self.notification_repo.create(data.model_dump())
-        return Notification(**result)
+        notification = Notification(**result)
+        
+        # Try to push real-time notification
+        try:
+            from ..routes.websocket import push_realtime_notification
+            await push_realtime_notification(data.user_id, result)
+        except Exception as e:
+            # Log but don't fail if real-time push fails
+            self.log_error(f"Failed to push real-time notification: {e}")
+        
+        return notification
     
     async def get_notifications(
         self, 
