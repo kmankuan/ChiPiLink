@@ -235,7 +235,10 @@ export default function SuperPinRanking() {
                               {entry.jugador_info?.nombre?.[0] || '?'}
                             </div>
                             <div>
-                              <p className="font-semibold text-white">{entry.jugador_info?.nombre || 'Jugador'}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-white">{entry.jugador_info?.nombre || 'Jugador'}</p>
+                                <PlayerBadges jugadorId={entry.jugador_id} compact={true} />
+                              </div>
                               {entry.jugador_info?.apodo && (
                                 <p className="text-sm text-white/50">"{entry.jugador_info.apodo}"</p>
                               )}
