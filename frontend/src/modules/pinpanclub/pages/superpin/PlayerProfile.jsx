@@ -5,15 +5,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   User, Trophy, Target, TrendingUp, TrendingDown, Calendar,
   ArrowLeft, Medal, Award, Flame, BarChart3, History,
-  ChevronRight, Loader2, Percent, Zap
+  ChevronRight, Loader2, Percent, Zap, UserPlus, UserMinus,
+  Users, MessageSquare
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
 import PlayerBadges from './PlayerBadges';
+import { FollowButton, FollowStats, CommentsSection } from '../../components/SocialFeatures';
+import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -21,15 +25,33 @@ export default function PlayerProfile() {
   const { t } = useTranslation();
   const { jugadorId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [followStats, setFollowStats] = useState({ followers_count: 0, following_count: 0 });
+  
+  // Current user ID for social features
+  const currentUserId = user?.cliente_id || user?.user_id || null;
 
   useEffect(() => {
     if (jugadorId) {
       fetchStatistics();
+      fetchFollowStats();
     }
   }, [jugadorId]);
+  
+  const fetchFollowStats = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${jugadorId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFollowStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching follow stats:', error);
+    }
+  };
 
   const fetchStatistics = async () => {
     try {
