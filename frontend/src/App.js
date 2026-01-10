@@ -53,6 +53,9 @@ import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking, Su
 // Rapid Pin Module
 import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/rapidpin';
 
+// Weekly Challenges Page
+import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
