@@ -477,6 +477,18 @@ export default function PlayerProfile() {
             </CardContent>
           </Card>
         )}
+
+        {/* Social Tab */}
+        {activeTab === 'social' && (
+          <div className="space-y-6">
+            {/* Comments Section */}
+            <CommentsSection
+              targetId={jugadorId}
+              targetType="player"
+              currentUserId={currentUserId}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
