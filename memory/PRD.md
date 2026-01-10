@@ -13,52 +13,40 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 | P3 | Badge/Achievement System | 20/20 | ✅ 100% |
 | P4 | Player Profile Dashboard | 18/18 | ✅ 100% |
 | P5 | Multi-Player Comparison Tool | 20/20 | ✅ 100% |
-| P6 | **Rapid Pin System** | 21/21 | ✅ 100% |
+| P6 | Rapid Pin System | 21/21 | ✅ 100% |
+| P7 | **Match Predictor + Close Season + Notifications** | 17/17 | ✅ 100% |
 
-**Total: 125/125 tests passed** 🎉
+**Total: 142/142 tests passed** 🎉
 
-## Feature Details
+## Latest Features (P7) ✅ NEW (Enero 2026)
 
-### Rapid Pin System (P6) ✅ NEW (Enero 2026)
-Sistema de partidos espontáneos sin organización previa. "¿Echamos un Rapid Pin?"
+### 1. Head-to-Head Match Predictor 🔮
+Predice el ganador entre dos jugadores basándose en:
+- **ELO Rating** (fórmula de probabilidad esperada)
+- **Historial H2H** (ajuste máx ±10%)
+- **Racha actual** (ajuste máx ±5%)
 
-**Concepto Core:**
-- 2 jugadores + 1 árbitro = Partido válido
-- Sin organización previa requerida
-- Ranking acumulativo por temporada
+**Confianza:**
+- Alta: >70% probabilidad
+- Media: >55% probabilidad
+- Baja: ≤55% probabilidad
 
-**Sistema de Puntuación:**
-| Resultado | Puntos |
-|-----------|--------|
-| Victoria | +3 |
-| Derrota | +1 |
-| Árbitro | +2 |
+**Endpoint:** `GET /api/pinpanclub/superpin/predict-match?jugador_a_id=X&jugador_b_id=Y`
 
-**Validación de Partidos:**
-- Cualquiera de los 3 puede registrar
-- Estado inicial: "Pendiente"
-- Requiere 1 confirmación adicional → "Validado"
-- Solo partidos validados cuentan
+### 2. Cierre de Temporada Rapid Pin 🏆
+- UI para admin cerrar temporada activa
+- Cálculo automático de posiciones finales
+- Asignación de premios a jugadores y árbitros
+- Vista de resultados finales con medallas
 
-**Temporadas:**
-- Múltiples temporadas paralelas permitidas
-- Fecha de cierre configurable
-- Premios para jugadores Y árbitros
+**Endpoint:** `POST /api/pinpanclub/rapidpin/seasons/{id}/close` (requiere admin)
 
-**Frontend Pages:**
-- `/pinpanclub/rapidpin` - Dashboard de temporadas
-- `/pinpanclub/rapidpin/season/:seasonId` - Detalle con ranking y partidos
+### 3. Notificaciones de Partidos Pendientes 🔔
+- Badge con contador en botón Rapid Pin (animado cuando >0)
+- Fetch automático de partidos pendientes de confirmación
+- Acceso rápido desde dashboard principal
 
-**API Endpoints:**
-- `GET/POST /api/pinpanclub/rapidpin/seasons` - Gestión de temporadas
-- `GET /api/pinpanclub/rapidpin/seasons/{id}` - Detalle de temporada
-- `POST /api/pinpanclub/rapidpin/matches` - Registrar partido
-- `POST /api/pinpanclub/rapidpin/matches/{id}/confirm` - Confirmar partido
-- `GET /api/pinpanclub/rapidpin/seasons/{id}/ranking` - Ranking de jugadores
-- `GET /api/pinpanclub/rapidpin/seasons/{id}/ranking/referees` - Ranking de árbitros
-- `GET /api/pinpanclub/rapidpin/scoring` - Config de puntuación
-
-### Multi-Player Comparison (P5) ✅
+**Endpoint:** `GET /api/pinpanclub/rapidpin/seasons/{id}/pending/{user_id}`
 - **Unlimited player selection** - Add as many players as desired
 - **Searchable player dropdown** - Filter players by name/nickname
 - **Comparison table with 10+ statistics:**
