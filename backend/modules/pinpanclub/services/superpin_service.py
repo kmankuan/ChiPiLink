@@ -536,6 +536,194 @@ class SuperPinService(BaseService):
         self.log_info(f"Season tournament created: {result['torneo_id']}")
         
         return SeasonTournament(**result)
+    
+    async def generate_tournament_brackets(self, torneo_id: str) -> dict:
+        """Generar brackets para torneo de eliminación simple"""
+        tournament = await self.tournament_repo.get_by_id(torneo_id)
+        if not tournament:
+            raise ValueError("Torneo no encontrado")
+        
+        participantes = tournament.get("participantes", [])
+        num_players = len(participantes)
+        
+        if num_players < 2:
+            raise ValueError("Se necesitan al menos 2 participantes")
+        
+        # Calcular rondas necesarias
+        import math
+        num_rounds = math.ceil(math.log2(num_players))
+        bracket_size = 2 ** num_rounds
+        
+        # Generar estructura de brackets
+        brackets = []
+        
+        # Primera ronda - emparejar según ranking (1 vs último, 2 vs penúltimo, etc.)
+        round_1_matches = []
+        for i in range(bracket_size // 2):
+            match = {
+                "match_id": f"R1_M{i+1}",
+                "round": 1,
+                "position": i,
+                "player_a": participantes[i] if i < num_players else None,
+                "player_b": participantes[-(i+1)] if (num_players - i - 1) >= 0 and i < num_players // 2 else None,
+                "winner": None,
+                "score_a": 0,
+                "score_b": 0,
+                "estado": "pendiente"
+            }
+            # Si solo hay un jugador, avanza automáticamente (bye)
+            if match["player_a"] and not match["player_b"]:
+                match["winner"] = match["player_a"]["jugador_id"]
+                match["estado"] = "bye"
+            round_1_matches.append(match)
+        
+        brackets.append({"round": 1, "name": "Octavos" if num_rounds >= 3 else "Primera Ronda", "matches": round_1_matches})
+        
+        # Generar rondas siguientes vacías
+        round_names = ["Octavos", "Cuartos", "Semifinal", "Final"]
+        for r in range(2, num_rounds + 1):
+            num_matches = bracket_size // (2 ** r)
+            round_name = round_names[min(r-1, len(round_names)-1)]
+            if r == num_rounds:
+                round_name = "Final"
+            elif r == num_rounds - 1:
+                round_name = "Semifinal"
+            
+            round_matches = [
+                {
+                    "match_id": f"R{r}_M{i+1}",
+                    "round": r,
+                    "position": i,
+                    "player_a": None,
+                    "player_b": None,
+                    "winner": None,
+                    "score_a": 0,
+                    "score_b": 0,
+                    "estado": "pendiente"
+                }
+                for i in range(num_matches)
+            ]
+            brackets.append({"round": r, "name": round_name, "matches": round_matches})
+        
+        # Agregar partido por 3er lugar si está configurado
+        config = tournament.get("tournament_config", {})
+        if config.get("third_place_match", True) and num_rounds >= 2:
+            brackets.append({
+                "round": num_rounds,
+                "name": "Tercer Lugar",
+                "matches": [{
+                    "match_id": "3RD_PLACE",
+                    "round": num_rounds,
+                    "position": 0,
+                    "player_a": None,
+                    "player_b": None,
+                    "winner": None,
+                    "score_a": 0,
+                    "score_b": 0,
+                    "estado": "pendiente",
+                    "is_third_place": True
+                }]
+            })
+        
+        # Actualizar torneo con brackets
+        await self.tournament_repo.update(torneo_id, {
+            "brackets": brackets,
+            "estado": "en_curso"
+        })
+        
+        return {"brackets": brackets, "total_rounds": num_rounds}
+    
+    async def update_tournament_match(
+        self, 
+        torneo_id: str, 
+        match_id: str, 
+        winner_id: str,
+        score_a: int = 0,
+        score_b: int = 0
+    ) -> dict:
+        """Actualizar resultado de un partido del torneo"""
+        tournament = await self.tournament_repo.get_by_id(torneo_id)
+        if not tournament:
+            raise ValueError("Torneo no encontrado")
+        
+        brackets = tournament.get("brackets", [])
+        match_found = False
+        current_round = 0
+        match_position = 0
+        
+        # Buscar y actualizar el partido
+        for bracket in brackets:
+            for match in bracket["matches"]:
+                if match["match_id"] == match_id:
+                    match["winner"] = winner_id
+                    match["score_a"] = score_a
+                    match["score_b"] = score_b
+                    match["estado"] = "finalizado"
+                    match_found = True
+                    current_round = match["round"]
+                    match_position = match["position"]
+                    break
+        
+        if not match_found:
+            raise ValueError("Partido no encontrado")
+        
+        # Avanzar ganador a la siguiente ronda
+        next_round = current_round + 1
+        for bracket in brackets:
+            if bracket["round"] == next_round and bracket.get("name") != "Tercer Lugar":
+                next_match_pos = match_position // 2
+                for match in bracket["matches"]:
+                    if match["position"] == next_match_pos:
+                        # Determinar jugador ganador
+                        winner_info = None
+                        for p in tournament.get("participantes", []):
+                            if p["jugador_id"] == winner_id:
+                                winner_info = p
+                                break
+                        
+                        if match_position % 2 == 0:
+                            match["player_a"] = winner_info
+                        else:
+                            match["player_b"] = winner_info
+                        break
+        
+        # Actualizar brackets en DB
+        await self.tournament_repo.update(torneo_id, {"brackets": brackets})
+        
+        # Verificar si el torneo terminó
+        final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
+        if final_bracket:
+            final_match = final_bracket["matches"][0]
+            if final_match.get("estado") == "finalizado":
+                # Torneo terminado - generar resultados finales
+                resultados = [
+                    {"posicion": 1, "jugador_id": final_match["winner"]},
+                    {"posicion": 2, "jugador_id": final_match["player_a"]["jugador_id"] 
+                     if final_match["player_a"]["jugador_id"] != final_match["winner"] 
+                     else final_match["player_b"]["jugador_id"]}
+                ]
+                
+                # Agregar 3er lugar si existe
+                third_bracket = next((b for b in brackets if b["name"] == "Tercer Lugar"), None)
+                if third_bracket and third_bracket["matches"][0].get("estado") == "finalizado":
+                    resultados.append({
+                        "posicion": 3, 
+                        "jugador_id": third_bracket["matches"][0]["winner"]
+                    })
+                
+                await self.tournament_repo.update(torneo_id, {
+                    "estado": "finalizado",
+                    "resultados_finales": resultados
+                })
+        
+        return {"success": True, "brackets": brackets}
+    
+    async def get_tournament_with_brackets(self, torneo_id: str) -> dict:
+        """Obtener torneo con información completa de brackets"""
+        tournament = await self.tournament_repo.get_by_id(torneo_id)
+        if not tournament:
+            return None
+        return tournament
 
 
 # Instancia singleton
