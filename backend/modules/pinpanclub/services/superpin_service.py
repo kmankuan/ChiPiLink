@@ -727,6 +727,245 @@ class SuperPinService(BaseService):
         if not tournament:
             return None
         return tournament
+    
+    # ============== BADGE SYSTEM ==============
+    
+    async def award_badge(
+        self,
+        jugador_id: str,
+        badge_type: str,
+        liga_id: str = None,
+        torneo_id: str = None,
+        partido_id: str = None,
+        temporada: str = None,
+        allow_duplicates: bool = False,
+        metadata: Dict = None
+    ) -> Optional[Dict]:
+        """Otorgar un badge a un jugador"""
+        
+        # Verificar si ya tiene el badge (si no se permiten duplicados)
+        if not allow_duplicates:
+            existing = await self.badge_repo.get_badge_by_type(
+                jugador_id, badge_type,
+                liga_id=liga_id if liga_id else None,
+                torneo_id=torneo_id if torneo_id else None
+            )
+            if existing:
+                return None  # Ya tiene este badge
+        
+        # Obtener definición del badge
+        badge_def = BADGE_DEFINITIONS.get(badge_type, {})
+        
+        badge_data = {
+            "jugador_id": jugador_id,
+            "badge_type": badge_type,
+            "name": badge_def.get("name", badge_type),
+            "description": badge_def.get("description", ""),
+            "icon": badge_def.get("icon", "🏅"),
+            "liga_id": liga_id,
+            "torneo_id": torneo_id,
+            "partido_id": partido_id,
+            "temporada": temporada,
+            "metadata": metadata or {}
+        }
+        
+        result = await self.badge_repo.create(badge_data)
+        
+        self.log_info(f"Badge awarded: {badge_type} to player {jugador_id}")
+        
+        return result
+    
+    async def award_tournament_badges(self, torneo_id: str) -> List[Dict]:
+        """Otorgar badges a los ganadores de un torneo"""
+        tournament = await self.tournament_repo.get_by_id(torneo_id)
+        if not tournament or tournament.get("estado") != "finalizado":
+            return []
+        
+        awarded_badges = []
+        resultados = tournament.get("resultados_finales", [])
+        liga_id = tournament.get("liga_id")
+        temporada = None
+        
+        # Obtener temporada de la liga
+        league = await self.league_repo.get_by_id(liga_id)
+        if league:
+            temporada = league.get("temporada")
+        
+        for resultado in resultados:
+            posicion = resultado.get("posicion")
+            jugador_id = resultado.get("jugador_id")
+            
+            if posicion == 1:
+                badge = await self.award_badge(
+                    jugador_id=jugador_id,
+                    badge_type=BadgeType.TOURNAMENT_CHAMPION,
+                    liga_id=liga_id,
+                    torneo_id=torneo_id,
+                    temporada=temporada,
+                    metadata={"tournament_name": tournament.get("nombre")}
+                )
+                if badge:
+                    awarded_badges.append(badge)
+                    
+            elif posicion == 2:
+                badge = await self.award_badge(
+                    jugador_id=jugador_id,
+                    badge_type=BadgeType.TOURNAMENT_RUNNER_UP,
+                    liga_id=liga_id,
+                    torneo_id=torneo_id,
+                    temporada=temporada,
+                    metadata={"tournament_name": tournament.get("nombre")}
+                )
+                if badge:
+                    awarded_badges.append(badge)
+                    
+            elif posicion == 3:
+                badge = await self.award_badge(
+                    jugador_id=jugador_id,
+                    badge_type=BadgeType.TOURNAMENT_THIRD,
+                    liga_id=liga_id,
+                    torneo_id=torneo_id,
+                    temporada=temporada,
+                    metadata={"tournament_name": tournament.get("nombre")}
+                )
+                if badge:
+                    awarded_badges.append(badge)
+        
+        return awarded_badges
+    
+    async def check_and_award_match_badges(
+        self,
+        jugador_id: str,
+        liga_id: str,
+        partido_id: str
+    ) -> List[Dict]:
+        """Verificar y otorgar badges basados en estadísticas de partido"""
+        awarded_badges = []
+        
+        # Obtener ranking del jugador
+        ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
+        if not ranking:
+            return awarded_badges
+        
+        # Badge: Primera victoria
+        if ranking.get("partidos_ganados") == 1:
+            badge = await self.award_badge(
+                jugador_id=jugador_id,
+                badge_type=BadgeType.FIRST_WIN,
+                liga_id=liga_id,
+                partido_id=partido_id
+            )
+            if badge:
+                awarded_badges.append(badge)
+        
+        # Badge: Racha de 5 victorias
+        if ranking.get("racha_actual", 0) >= 5:
+            badge = await self.award_badge(
+                jugador_id=jugador_id,
+                badge_type=BadgeType.WIN_STREAK_5,
+                liga_id=liga_id,
+                partido_id=partido_id
+            )
+            if badge:
+                awarded_badges.append(badge)
+        
+        # Badge: Racha de 10 victorias
+        if ranking.get("racha_actual", 0) >= 10:
+            badge = await self.award_badge(
+                jugador_id=jugador_id,
+                badge_type=BadgeType.WIN_STREAK_10,
+                liga_id=liga_id,
+                partido_id=partido_id
+            )
+            if badge:
+                awarded_badges.append(badge)
+        
+        # Badge: 50 partidos jugados
+        if ranking.get("partidos_jugados") == 50:
+            badge = await self.award_badge(
+                jugador_id=jugador_id,
+                badge_type=BadgeType.MATCHES_50,
+                liga_id=liga_id
+            )
+            if badge:
+                awarded_badges.append(badge)
+        
+        # Badge: 100 partidos jugados
+        if ranking.get("partidos_jugados") == 100:
+            badge = await self.award_badge(
+                jugador_id=jugador_id,
+                badge_type=BadgeType.MATCHES_100,
+                liga_id=liga_id
+            )
+            if badge:
+                awarded_badges.append(badge)
+        
+        return awarded_badges
+    
+    async def get_player_badges(self, jugador_id: str) -> List[Dict]:
+        """Obtener todos los badges de un jugador"""
+        badges = await self.badge_repo.get_player_badges(jugador_id)
+        
+        # Enriquecer con definiciones
+        for badge in badges:
+            badge_def = BADGE_DEFINITIONS.get(badge.get("badge_type"), {})
+            badge["rarity"] = badge_def.get("rarity", "common")
+        
+        return badges
+    
+    async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
+        """Obtener jugadores con más badges"""
+        # Esto requiere agregación en MongoDB
+        pipeline = [
+            {"$group": {
+                "_id": "$jugador_id",
+                "total_badges": {"$sum": 1},
+                "legendary": {"$sum": {"$cond": [{"$in": ["$badge_type", [
+                    BadgeType.TOURNAMENT_CHAMPION, BadgeType.SEASON_MVP
+                ]]}, 1, 0]}},
+                "epic": {"$sum": {"$cond": [{"$in": ["$badge_type", [
+                    BadgeType.TOURNAMENT_RUNNER_UP, BadgeType.WIN_STREAK_10, BadgeType.MATCHES_100, BadgeType.COMEBACK_KING
+                ]]}, 1, 0]}}
+            }},
+            {"$sort": {"legendary": -1, "epic": -1, "total_badges": -1}},
+            {"$limit": limit}
+        ]
+        
+        if liga_id:
+            pipeline.insert(0, {"$match": {"liga_id": liga_id}})
+        
+        # Ejecutar agregación
+        collection = self.badge_repo.collection
+        cursor = collection.aggregate(pipeline)
+        results = await cursor.to_list(length=limit)
+        
+        # Enriquecer con info del jugador
+        for entry in results:
+            player = await self.player_repo.get_by_id(entry["_id"])
+            if player:
+                entry["jugador_info"] = {
+                    "nombre": player.get("nombre"),
+                    "apodo": player.get("apodo")
+                }
+        
+        return results
+    
+    async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
+        """Obtener badges más recientes (para feed)"""
+        badges = await self.badge_repo.get_recent_badges(limit)
+        
+        # Enriquecer con info del jugador
+        for badge in badges:
+            player = await self.player_repo.get_by_id(badge.get("jugador_id"))
+            if player:
+                badge["jugador_info"] = {
+                    "nombre": player.get("nombre"),
+                    "apodo": player.get("apodo")
+                }
+            badge_def = BADGE_DEFINITIONS.get(badge.get("badge_type"), {})
+            badge["rarity"] = badge_def.get("rarity", "common")
+        
+        return badges
 
 
 # Instancia singleton
