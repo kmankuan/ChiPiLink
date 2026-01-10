@@ -148,6 +148,16 @@ export default function PingPongDashboard() {
                   <Trophy className="h-4 w-4 mr-2" />
                   🏆 Super Pin
                 </Button>
+                {/* Rapid Pin - Nuevo */}
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => navigate('/pinpanclub/rapidpin')}
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                  data-testid="rapidpin-btn"
+                >
+                  ⚡ Rapid Pin
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
                   Jugadores
