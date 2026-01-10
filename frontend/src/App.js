@@ -177,6 +177,10 @@ function AppRouter() {
       <Route path="/pinpanclub/seasons" element={<SeasonsPage />} />
       <Route path="/pinpanclub/seasons/:seasonId" element={<SeasonsPage />} />
       
+      {/* Users Module Routes */}
+      <Route path="/mi-cuenta" element={<UsersDashboard />} />
+      <Route path="/my-account" element={<UsersDashboard />} />
+      
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
       <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
