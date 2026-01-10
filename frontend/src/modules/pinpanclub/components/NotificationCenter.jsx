@@ -11,21 +11,21 @@ import {
   Trophy, Users, MessageSquare, Heart, Target, Award,
   Clock, ChevronRight, Loader2, Wifi, WifiOff
 } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
-import { Badge } from '../../../../components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '../../../../components/ui/sheet';
+} from '@/components/ui/sheet';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../../components/ui/popover';
-import { ScrollArea } from '../../../../components/ui/scroll-area';
+} from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
