@@ -466,6 +466,26 @@
       "title": "奖品",
       "player": "选手奖品",
       "referee": "裁判奖品"
+    },
+    "closeSeason": {
+      "title": "关闭赛季",
+      "confirm": "确定要关闭此赛季吗？",
+      "confirmDesc": "此操作将确定最终排名并分配奖品。之后无法再登记比赛。",
+      "close": "关闭赛季",
+      "cancel": "取消",
+      "success": "赛季已成功关闭",
+      "results": "最终结果",
+      "playerResults": "选手结果",
+      "refereeResults": "裁判结果",
+      "prize": "奖品",
+      "position": "名次",
+      "points": "积分"
+    },
+    "notifications": {
+      "pendingTitle": "待确认比赛",
+      "pendingDesc": "您有比赛等待确认",
+      "confirmNow": "立即确认",
+      "noPending": "没有待确认比赛"
     }
   }
 }
