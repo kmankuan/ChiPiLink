@@ -203,6 +203,14 @@ function AppRouter() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/admin/memberships" 
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminMemberships />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
