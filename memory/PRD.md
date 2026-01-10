@@ -340,6 +340,38 @@ Planes de membresía y sistema de visitas inteligente:
 
 **Frontend:** `/mi-cuenta` → Tab "Membresía"
 
+### 🆕 Sistema de Códigos QR ✅ (Enero 2026)
+Códigos QR para check-in rápido y pagos desde el perfil del usuario:
+
+**Funcionalidades:**
+- **QR Code único** por usuario (base64 encoded JSON)
+- **Check-in rápido** vía escaneo QR (método: "qr")
+- **Pagos QR con USD** - Deducir saldo del wallet
+- **Pagos QR con ChipiPoints** - Deducir puntos del wallet
+- **Regenerar QR** - Invalidar QR anterior si se pierde
+- **Historial de transacciones QR** - Tracking de todas las acciones
+
+**Endpoints API:**
+- `GET /api/qr/me` - Obtener mi código QR
+- `POST /api/qr/me/regenerate` - Regenerar QR (invalida anterior)
+- `POST /api/qr/scan` (admin) - Escanear QR de cliente
+- `POST /api/qr/process` (admin) - Procesar acción (checkin, pay_usd, pay_points)
+- `POST /api/qr/checkin` (admin) - Check-in rápido
+- `POST /api/qr/pay` (admin) - Procesar pago
+- `GET /api/qr/transactions` - Historial de transacciones QR
+- `POST /api/qr/session/create` - Crear sesión de pago
+
+**Componentes Frontend:**
+- `UserQRCode.jsx` - Muestra QR del usuario con saldo disponible
+- `QRScanner.jsx` - Scanner para staff (check-in y pagos)
+
+**Collections MongoDB:**
+- `chipi_qr_codes` - Códigos QR de usuarios
+- `chipi_qr_transactions` - Transacciones vía QR
+- `chipi_qr_sessions` - Sesiones de pago
+
+**Test Results:** 22/23 tests passed (1 skipped por falta de puntos)
+
 ### Endpoints API
 
 **Users:**
