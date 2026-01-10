@@ -256,3 +256,48 @@ async def get_tournament(torneo_id: str):
     if not tournament:
         raise HTTPException(status_code=404, detail="Torneo no encontrado")
     return SeasonTournament(**tournament)
+
+
+@router.post("/tournaments/{torneo_id}/generate-brackets")
+async def generate_brackets(torneo_id: str, admin: dict = Depends(get_admin_user)):
+    """Generar brackets para torneo de eliminación"""
+    try:
+        result = await superpin_service.generate_tournament_brackets(torneo_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/tournaments/{torneo_id}/matches/{match_id}/result")
+async def update_match_result(
+    torneo_id: str,
+    match_id: str,
+    winner_id: str,
+    score_a: int = 0,
+    score_b: int = 0,
+    admin: dict = Depends(get_admin_user)
+):
+    """Actualizar resultado de un partido del torneo"""
+    try:
+        result = await superpin_service.update_tournament_match(
+            torneo_id, match_id, winner_id, score_a, score_b
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/tournaments/{torneo_id}/brackets")
+async def get_tournament_brackets(torneo_id: str):
+    """Obtener brackets de un torneo"""
+    tournament = await superpin_service.get_tournament_with_brackets(torneo_id)
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Torneo no encontrado")
+    return {
+        "torneo_id": tournament.get("torneo_id"),
+        "nombre": tournament.get("nombre"),
+        "estado": tournament.get("estado"),
+        "brackets": tournament.get("brackets", []),
+        "participantes": tournament.get("participantes", []),
+        "resultados_finales": tournament.get("resultados_finales", [])
+    }
