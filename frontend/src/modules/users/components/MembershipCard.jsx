@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function MembershipCard({ token }) {
+export default function MembershipCard({ token, walletBalance }) {
   const { t, i18n } = useTranslation();
   const [membership, setMembership] = useState(null);
   const [plans, setPlans] = useState([]);
@@ -29,6 +29,10 @@ export default function MembershipCard({ token }) {
   const [loading, setLoading] = useState(true);
   const [checkedIn, setCheckedIn] = useState(false);
   const [isPlansOpen, setIsPlansOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [payWithPoints, setPayWithPoints] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const [currentVisitDuration, setCurrentVisitDuration] = useState(0);
 
   const lang = i18n.language || 'es';
 
