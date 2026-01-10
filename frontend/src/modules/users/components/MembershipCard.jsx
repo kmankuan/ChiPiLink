@@ -106,10 +106,16 @@ export default function MembershipCard({ token, walletBalance }) {
 
       if (res.ok) {
         setCheckedIn(true);
+        setCurrentVisitDuration(0);
+        toast.success(txt.checkInSuccess || 'Check-in registrado');
         fetchData();
+      } else {
+        const error = await res.json();
+        toast.error(error.detail || 'Error al registrar entrada');
       }
     } catch (error) {
       console.error('Error checking in:', error);
+      toast.error('Error al registrar entrada');
     }
   };
 
@@ -125,14 +131,21 @@ export default function MembershipCard({ token, walletBalance }) {
 
       if (res.ok) {
         setCheckedIn(false);
+        setCurrentVisitDuration(0);
+        toast.success(txt.checkOutSuccess || 'Check-out registrado');
         fetchData();
+      } else {
+        const error = await res.json();
+        toast.error(error.detail || 'Error al registrar salida');
       }
     } catch (error) {
       console.error('Error checking out:', error);
+      toast.error('Error al registrar salida');
     }
   };
 
-  const purchaseMembership = async (planId) => {
+  const purchaseMembership = async (planId, usePoints = false) => {
+    setPurchasing(true);
     try {
       const res = await fetch(`${API_URL}/api/memberships/purchase`, {
         method: 'POST',
@@ -142,17 +155,30 @@ export default function MembershipCard({ token, walletBalance }) {
         },
         body: JSON.stringify({
           plan_id: planId,
-          pay_with_points: false
+          pay_with_points: usePoints
         })
       });
 
       if (res.ok) {
+        toast.success(txt.purchaseSuccess || 'Membresía adquirida');
         setIsPlansOpen(false);
+        setSelectedPlan(null);
         fetchData();
+      } else {
+        const error = await res.json();
+        toast.error(error.detail || 'Error al comprar membresía');
       }
     } catch (error) {
       console.error('Error purchasing membership:', error);
+      toast.error('Error al comprar membresía');
+    } finally {
+      setPurchasing(false);
     }
+  };
+
+  const openPurchaseDialog = (plan) => {
+    setSelectedPlan(plan);
+    setPayWithPoints(false);
   };
 
   const getLocalizedText = (obj) => {
