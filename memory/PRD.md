@@ -444,39 +444,58 @@ Planes de membresía y sistema de visitas inteligente:
 /app/
 ├── backend/
 │   └── modules/
-│       └── pinpanclub/
+│       ├── pinpanclub/
+│       │   ├── routes/
+│       │   │   ├── analytics.py      # Dashboard stats
+│       │   │   ├── achievements.py   # Auto achievements
+│       │   │   ├── social.py         # Follow, comments, moderation
+│       │   │   ├── challenges.py
+│       │   │   ├── prizes.py
+│       │   │   └── websocket.py
+│       │   ├── services/
+│       │   │   ├── achievements_service.py
+│       │   │   ├── challenges_service.py
+│       │   │   └── social_service.py
+│       │   └── models/
+│       │       ├── achievements.py
+│       │       ├── challenges.py
+│       │       └── social.py
+│       └── users/                    # 🆕 NEW MODULE
 │           ├── routes/
-│           │   ├── analytics.py      # Dashboard stats
-│           │   ├── achievements.py   # Auto achievements
-│           │   ├── social.py         # Follow, comments, moderation
-│           │   ├── challenges.py
-│           │   ├── prizes.py
-│           │   └── websocket.py
+│           │   ├── users.py          # User profiles
+│           │   ├── wallet.py         # ChipiWallet
+│           │   └── memberships.py    # Membership plans
 │           ├── services/
-│           │   ├── achievements_service.py  # NEW
-│           │   ├── challenges_service.py
-│           │   └── social_service.py
+│           │   ├── user_profile_service.py
+│           │   ├── wallet_service.py
+│           │   └── membership_service.py
 │           └── models/
-│               ├── achievements.py  # NEW
-│               ├── challenges.py
-│               └── social.py
+│               ├── user_models.py
+│               └── wallet_models.py
 └── frontend/
     └── src/
         └── modules/
-            └── pinpanclub/
-                ├── components/
-                │   ├── MatchComments.jsx      # NEW
-                │   ├── SocialFeatures.jsx     # Updated
-                │   ├── NotificationCenter.jsx
-                │   └── WeeklyChallenges.jsx
-                └── pages/
-                    ├── AnalyticsDashboard.jsx # Exists
-                    ├── WeeklyChallengesPage.jsx
-                    └── superpin/
-                        └── PlayerProfile.jsx  # Updated with Social tab
+            ├── pinpanclub/
+            │   ├── components/
+            │   │   ├── MatchComments.jsx
+            │   │   ├── SocialFeatures.jsx
+            │   │   ├── NotificationCenter.jsx
+            │   │   └── WeeklyChallenges.jsx
+            │   └── pages/
+            │       ├── AnalyticsDashboard.jsx
+            │       ├── WeeklyChallengesPage.jsx
+            │       └── superpin/
+            │           └── PlayerProfile.jsx
+            └── users/                # 🆕 NEW MODULE
+                ├── pages/
+                │   └── UsersDashboard.jsx
+                └── components/
+                    ├── ChipiWallet.jsx
+                    ├── UserProfile.jsx
+                    └── MembershipCard.jsx
 ```
 
 ---
 *Last Updated: January 2026*
-*All Priorities Complete: P0-P9*
-*188/188 tests passed across all features*
+*All Priorities Complete: P0-P9 + Phase 1 Users*
+*215/215 tests passed across all features* (188 + 27 new)
