@@ -1096,6 +1096,17 @@ function BlockRenderer({ block, siteConfig, onUpdateConfig, onSave, onDelete }) 
         </BlockWrapper>
       );
 
+    case 'pinpanclub_feed':
+      return (
+        <BlockWrapper isEditMode={isEditMode} onSave={onSave} onDelete={onDelete}>
+          <PinPanClubFeedBlock 
+            config={config}
+            isEditMode={isEditMode}
+            onUpdateConfig={onUpdateConfig}
+          />
+        </BlockWrapper>
+      );
+
     default:
       return null;
   }
