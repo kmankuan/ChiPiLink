@@ -108,6 +108,21 @@ async def get_current_season_leaderboard(
 
 
 @router.get("/{season_id}/leaderboard")
+async def get_season_leaderboard(
+    season_id: str,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0)
+):
+    """Obtener leaderboard de una temporada"""
+    leaderboard = await seasons_service.get_season_leaderboard(season_id, limit, offset)
+    
+    return {
+        "season_id": season_id,
+        "leaderboard": leaderboard,
+        "total": len(leaderboard),
+        "limit": limit,
+        "offset": offset
+    }
 
 
 # ============== PLAYER STATS ==============
