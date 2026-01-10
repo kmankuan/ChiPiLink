@@ -532,5 +532,38 @@
       "epic": "Épico",
       "legendary": "Legendario"
     }
+  },
+  "ranks": {
+    "title": "Rangos",
+    "yourRank": "Tu Rango",
+    "currentRank": "Rango Actual",
+    "nextRank": "Siguiente Rango",
+    "pointsToNext": "puntos para el siguiente",
+    "maxRank": "¡Rango Máximo Alcanzado!",
+    "promotion": "¡Subiste de Rango!",
+    "rewards": "Recompensas",
+    "rewardEarned": "Recompensa Obtenida",
+    "bonusPoints": "Puntos Bonus",
+    "specialBadge": "Badge Especial",
+    "perks": "Beneficios",
+    "viewRewards": "Ver Recompensas",
+    "names": {
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante",
+      "master": "Maestro",
+      "grandmaster": "Gran Maestro"
+    },
+    "descriptions": {
+      "bronze": "Iniciando tu camino",
+      "silver": "Jugador comprometido",
+      "gold": "Jugador destacado",
+      "platinum": "Élite del club",
+      "diamond": "Leyenda viviente",
+      "master": "Dominador absoluto",
+      "grandmaster": "El mejor de todos"
+    }
   }
 }
