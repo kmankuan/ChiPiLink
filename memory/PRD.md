@@ -107,6 +107,35 @@ Componente visual de badges en el header del perfil:
 
 **Archivo:** `/app/frontend/src/modules/pinpanclub/components/AchievementShowcase.jsx`
 
+### 5. Sistema de Niveles/Ranks 🏅 NEW
+Sistema de ranking basado en puntos acumulados de retos:
+- **7 niveles progresivos:**
+
+| Rango | Puntos | Icono | Descripción |
+|-------|--------|-------|-------------|
+| Bronce | 0-99 | 🥉 | Iniciando tu camino |
+| Plata | 100-299 | 🥈 | Jugador comprometido |
+| Oro | 300-599 | 🥇 | Jugador destacado |
+| Platino | 600-999 | 💎 | Élite del club |
+| Diamante | 1000-1999 | 💠 | Leyenda viviente |
+| Maestro | 2000-4999 | 👑 | Dominador absoluto |
+| Gran Maestro | 5000+ | 🏆 | El mejor de todos |
+
+**Características:**
+- **Badge compacto** en esquina del avatar del perfil
+- **Tarjeta de progreso** con barra visual hacia siguiente nivel
+- **Tooltips interactivos** con info del rango
+- **Animaciones para rangos altos** (pulse, sparkles para Diamante+)
+- **Badge "MAX"** al alcanzar Gran Maestro
+- **Efectos shimmer** en barra de progreso
+
+**Endpoints:**
+- `GET /api/pinpanclub/challenges/player/{jugador_id}/rank` - Info completa del rango
+
+**Archivos:**
+- `/app/frontend/src/modules/pinpanclub/components/PlayerRankBadge.jsx`
+- `/app/backend/modules/pinpanclub/routes/challenges.py` (nuevo endpoint)
+
 ## Frontend Routes
 
 ### Super Pin
