@@ -287,6 +287,57 @@ class SocialService(BaseService):
     async def mark_notifications_pushed(self, notification_ids: List[str]) -> int:
         """Marcar notificaciones como enviadas"""
         return await self.notification_repo.mark_as_pushed(notification_ids)
+    
+    # ============== USER WARNINGS (MODERATION) ==============
+    
+    async def get_user_warnings(self, user_id: str) -> int:
+        """Obtener cantidad de amonestaciones de un usuario"""
+        from core.database import db
+        
+        user_mod = await db.pinpanclub_user_moderation.find_one(
+            {"user_id": user_id},
+            {"_id": 0}
+        )
+        return user_mod.get("warnings", 0) if user_mod else 0
+    
+    async def add_user_warning(self, user_id: str, reason: str) -> int:
+        """Añadir una amonestación al usuario"""
+        from core.database import db
+        from datetime import datetime, timezone
+        
+        result = await db.pinpanclub_user_moderation.update_one(
+            {"user_id": user_id},
+            {
+                "$inc": {"warnings": 1},
+                "$push": {
+                    "warning_history": {
+                        "reason": reason,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }
+                },
+                "$setOnInsert": {"user_id": user_id}
+            },
+            upsert=True
+        )
+        
+        # Obtener nuevo conteo
+        return await self.get_user_warnings(user_id)
+    
+    async def report_comment(self, comment_id: str, reporter_id: str, reason: str) -> bool:
+        """Reportar un comentario"""
+        from core.database import db
+        from datetime import datetime, timezone
+        
+        report = {
+            "comment_id": comment_id,
+            "reporter_id": reporter_id,
+            "reason": reason,
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.pinpanclub_comment_reports.insert_one(report)
+        return True
 
 
 # Instancia singleton

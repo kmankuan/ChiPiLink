@@ -175,3 +175,19 @@ async def mark_all_notifications_read(user_id: str):
     """Marcar todas las notificaciones como leídas"""
     count = await social_service.mark_all_notifications_read(user_id)
     return {"user_id": user_id, "marked_count": count}
+
+
+# ============== USER WARNINGS (MODERATION) ==============
+
+@router.get("/user/{user_id}/warnings")
+async def get_user_warnings(user_id: str):
+    """Obtener cantidad de amonestaciones de un usuario"""
+    warnings = await social_service.get_user_warnings(user_id)
+    return {"user_id": user_id, "warnings": warnings}
+
+
+@router.post("/comments/{comment_id}/report")
+async def report_comment(comment_id: str, reporter_id: str, reason: str = "inappropriate"):
+    """Reportar un comentario"""
+    success = await social_service.report_comment(comment_id, reporter_id, reason)
+    return {"success": success}

@@ -15,6 +15,8 @@ from .rapidpin import router as rapidpin_router
 from .social import router as social_router
 from .challenges import router as challenges_router
 from .prizes import router as prizes_router
+from .achievements import router as achievements_router
+from .analytics import router as analytics_router
 
 # Router principal del módulo
 router = APIRouter(prefix="/pinpanclub", tags=["PinpanClub"])
@@ -31,6 +33,8 @@ router.include_router(rapidpin_router)
 router.include_router(social_router)
 router.include_router(challenges_router)
 router.include_router(prizes_router)
+router.include_router(achievements_router)
+router.include_router(analytics_router)
 
 # Re-exportar para compatibilidad con rutas antiguas
 pinpanclub_router = router
