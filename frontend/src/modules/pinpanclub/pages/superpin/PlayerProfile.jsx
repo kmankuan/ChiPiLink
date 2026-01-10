@@ -125,9 +125,15 @@ export default function PlayerProfile() {
         <Card className="bg-white/10 border-white/20 mb-6">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              {/* Avatar */}
-              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg">
-                {player_info.nombre?.[0] || '?'}
+              {/* Avatar with Rank Badge */}
+              <div className="relative">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+                  {player_info.nombre?.[0] || '?'}
+                </div>
+                {/* Rank Badge positioned at bottom-right of avatar */}
+                <div className="absolute -bottom-2 -right-2">
+                  <PlayerRankBadge jugadorId={jugadorId} size="compact" />
+                </div>
               </div>
               
               {/* Info */}
