@@ -28,6 +28,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { AddBlockDialog, FloatingAddBlockButton } from '@/modules/landing-editor/AddBlockDialog';
+import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
