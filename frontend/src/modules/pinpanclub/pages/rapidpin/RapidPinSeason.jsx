@@ -180,6 +180,34 @@ export default function RapidPinSeason() {
     }
   };
 
+  const closeSeason = async () => {
+    try {
+      // Get auth token
+      const authData = localStorage.getItem('chipi_auth');
+      const token = authData ? JSON.parse(authData).token : null;
+      
+      const response = await fetch(`${API_BASE}/rapidpin/seasons/${seasonId}/close`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const results = await response.json();
+        setClosingResults(results);
+        toast.success(t('rapidpin.closeSeason.success'));
+        fetchData();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || t('common.error'));
+      }
+    } catch (error) {
+      console.error('Error closing season:', error);
+      toast.error(t('common.error'));
+    }
+  };
+
   const getPlayerName = (info) => {
     if (!info) return '?';
     return info.apodo || info.nombre || '?';
