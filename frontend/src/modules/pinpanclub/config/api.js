@@ -20,6 +20,9 @@ const USE_NEW_ENDPOINTS = true;
 const BASE_PATH = USE_NEW_ENDPOINTS ? '/api/pinpanclub' : '/api/pingpong';
 const WS_BASE_PATH = USE_NEW_ENDPOINTS ? '/api/pinpanclub' : '/api/pingpong';
 
+// Export API_BASE for direct API calls
+export const API_BASE = `${API_URL}${BASE_PATH}`;
+
 // ============== HTTP ENDPOINTS ==============
 export const PINPANCLUB_API = {
   // Players
