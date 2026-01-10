@@ -443,9 +443,10 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 5. ~~Analytics Dashboard~~ ✅
 6. ~~Sistema de logros automáticos~~ ✅
 7. ~~Social expandido: Botón seguir, moderación~~ ✅
-8. **Sistema de Usuarios Avanzado (Phase 1)** ✅ NEW
-9. **ChipiWallet (Phase 1)** ✅ NEW
-10. **Sistema de Membresías (Phase 1)** ✅ NEW
+8. **Sistema de Usuarios Avanzado (Phase 1)** ✅
+9. **ChipiWallet (Phase 1)** ✅
+10. **Sistema de Membresías (Phase 1)** ✅
+11. **Sistema de QR Code para Check-in y Pagos** ✅ NEW
 
 ### P0 - Fase 2: Sistema de Usuarios Avanzado
 1. **Límites de gasto configurables** para cuentas de niños
