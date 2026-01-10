@@ -362,6 +362,11 @@ export default function PlayerProfile() {
                 <RankProgressCard jugadorId={jugadorId} />
               </CardContent>
             </Card>
+            
+            {/* Rank Rewards Display */}
+            <div className="lg:col-span-2">
+              <RankRewardsDisplay jugadorId={jugadorId} />
+            </div>
           </div>
         )}
 
