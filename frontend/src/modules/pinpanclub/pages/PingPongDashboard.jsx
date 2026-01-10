@@ -29,8 +29,11 @@ import {
   Zap,
   Check,
   Clock,
-  Scale
+  Scale,
+  Award
 } from 'lucide-react';
+import NotificationCenter from '../components/NotificationCenter';
+import WeeklyChallenges from '../components/WeeklyChallenges';
 import {
   DropdownMenu,
   DropdownMenuContent,
