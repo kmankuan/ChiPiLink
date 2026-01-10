@@ -29,9 +29,12 @@ export default function SuperPinLeagueDetail() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ranking');
   const [showNewMatchModal, setShowNewMatchModal] = useState(false);
+  const [showCreateTournamentModal, setShowCreateTournamentModal] = useState(false);
   const [playerSource, setPlayerSource] = useState('pinpanclub');
   const [newMatch, setNewMatch] = useState({ jugador_a_id: '', jugador_b_id: '' });
   const [loadingMonday, setLoadingMonday] = useState(false);
+  const [tournaments, setTournaments] = useState([]);
+  const [newTournament, setNewTournament] = useState({ nombre: '', fecha_inicio: '' });
 
   useEffect(() => {
     fetchData();
