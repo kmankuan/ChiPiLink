@@ -8,11 +8,12 @@ import { useTranslation } from 'react-i18next';
 import {
   Users, Plus, X, BarChart3, Trophy, Target, Flame,
   TrendingUp, Medal, ArrowLeft, RefreshCw, Download,
-  ChevronDown, Check, Loader2
+  ChevronDown, Check, Loader2, Zap
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Badge } from '../../../../components/ui/badge';
+import MatchPredictor from './MatchPredictor';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -26,6 +27,7 @@ export default function PlayerComparison() {
   const [loadingStats, setLoadingStats] = useState(false);
   const [showPlayerSelector, setShowPlayerSelector] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPredictor, setShowPredictor] = useState(false);
 
   useEffect(() => {
     fetchAvailablePlayers();
