@@ -18,6 +18,7 @@ from .prizes import router as prizes_router
 from .achievements import router as achievements_router
 from .analytics import router as analytics_router
 from .rank_rewards import router as rank_rewards_router
+from .seasons import router as seasons_router
 
 # Router principal del módulo
 router = APIRouter(prefix="/pinpanclub", tags=["PinpanClub"])
@@ -37,6 +38,7 @@ router.include_router(prizes_router)
 router.include_router(achievements_router)
 router.include_router(analytics_router)
 router.include_router(rank_rewards_router)
+router.include_router(seasons_router)
 
 # Re-exportar para compatibilidad con rutas antiguas
 pinpanclub_router = router
