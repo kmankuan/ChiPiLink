@@ -411,8 +411,22 @@ Planes de membresía y sistema de visitas inteligente:
 5. ~~Analytics Dashboard~~ ✅
 6. ~~Sistema de logros automáticos~~ ✅
 7. ~~Social expandido: Botón seguir, moderación~~ ✅
+8. **Sistema de Usuarios Avanzado (Phase 1)** ✅ NEW
+9. **ChipiWallet (Phase 1)** ✅ NEW
+10. **Sistema de Membresías (Phase 1)** ✅ NEW
 
-### P3 - Backlog
+### P0 - Fase 2: Sistema de Usuarios Avanzado
+1. **Límites de gasto configurables** para cuentas de niños
+2. **Monitoreo parental** en tiempo real
+3. **Conversión USD → ChipiPoints** (inversa)
+4. **ChipiPoints como método de pago** en la tienda
+
+### P1 - Fase 3: Integración Completa
+1. **Integración wallet con tienda** - Pagar con ChipiWallet
+2. **Rewards automáticos** - ChipiPoints por participación
+3. **Sistema de referidos** - Bonus por invitar amigos
+
+### P2 - Backlog
 1. **Containerización completa:** Desplegar módulos como microservicios separados
 2. **Mobile app:** Versión nativa para iOS/Android
 3. **Sistema de torneos automáticos:** Brackets generados automáticamente
