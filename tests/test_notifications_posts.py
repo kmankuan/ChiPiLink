@@ -533,8 +533,9 @@ class TestPosts(TestSetup):
         
         data = response.json()
         assert data.get("success") is True
-        assert data["post"]["status"] == "published"
-        print(f"Published post: {post_id}")
+        # Status can be "published" or "sent" depending on notification setting
+        assert data["post"]["status"] in ["published", "sent"]
+        print(f"Published post: {post_id}, status: {data['post']['status']}")
     
     def test_get_post_not_found(self, admin_headers):
         """GET /api/posts/{id} - Non-existent post"""
