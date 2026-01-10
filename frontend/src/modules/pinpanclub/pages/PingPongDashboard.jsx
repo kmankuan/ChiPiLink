@@ -72,7 +72,7 @@ export default function PingPongDashboard() {
     // Poll for active matches every 5 seconds
     const interval = setInterval(fetchActiveMatches, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentUserId]);
 
   const fetchDashboardData = async () => {
     try {
