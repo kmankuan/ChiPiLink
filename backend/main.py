@@ -150,6 +150,9 @@ api_router.include_router(pinpanclub_router)
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 
+# Notifications Module
+api_router.include_router(notifications_router)
+
 # Include main router in app
 app.include_router(api_router)
 
