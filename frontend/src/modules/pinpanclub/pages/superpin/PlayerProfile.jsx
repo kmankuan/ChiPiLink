@@ -238,6 +238,13 @@ export default function PlayerProfile() {
           >
             <Award className="h-4 w-4 mr-2" /> {t('superpin.badges.title')} ({badges.length})
           </Button>
+          <Button
+            variant={activeTab === 'social' ? 'default' : 'outline'}
+            className={activeTab === 'social' ? 'bg-green-600' : 'border-white/30 text-white'}
+            onClick={() => setActiveTab('social')}
+          >
+            <MessageSquare className="h-4 w-4 mr-2" /> Social
+          </Button>
         </div>
 
         {/* Overview Tab */}
