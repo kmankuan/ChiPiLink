@@ -577,7 +577,7 @@ class SuperPinService(BaseService):
                 match["estado"] = "bye"
             round_1_matches.append(match)
         
-        brackets.append({"round": 1, "name": "Octavos" if num_rounds >= 3 else "Primera Ronda", "matches": round_1_matches})
+        brackets.append({"round": 1, "name": "Final" if num_rounds == 1 else ("Octavos" if num_rounds >= 3 else "Primera Ronda"), "matches": round_1_matches})
         
         # Generar rondas siguientes vacías
         round_names = ["Octavos", "Cuartos", "Semifinal", "Final"]
