@@ -353,6 +353,25 @@
       "noPlayersSelected": "未选择选手",
       "selectToCompare": "添加选手以查看对比表",
       "addFirstPlayer": "添加第一位选手"
+    },
+    "predictor": {
+      "title": "比赛预测器",
+      "subtitle": "基于ELO、历史和连胜的预测",
+      "predictMatch": "预测比赛",
+      "selectTwoPlayers": "选择2名选手进行预测",
+      "probability": "概率",
+      "favorite": "热门",
+      "confidence": "可信度",
+      "confidenceHigh": "高",
+      "confidenceMedium": "中",
+      "confidenceLow": "低",
+      "factors": "预测因素",
+      "eloBased": "基于ELO",
+      "h2hAdjust": "H2H调整",
+      "streakAdjust": "连胜调整",
+      "advantages": "优势",
+      "noAdvantages": "势均力敌",
+      "vsHistory": "交手记录"
     }
   },
   "rapidpin": {
