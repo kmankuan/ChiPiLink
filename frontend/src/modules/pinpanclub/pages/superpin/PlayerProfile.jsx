@@ -130,7 +130,7 @@ export default function PlayerProfile() {
               
               {/* Info */}
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h1 className="text-3xl font-bold text-white">
                     {player_info.nombre} {player_info.apellido || ''}
                   </h1>
@@ -139,7 +139,27 @@ export default function PlayerProfile() {
                       "{player_info.apodo}"
                     </Badge>
                   )}
+                  {/* Follow Button */}
+                  {currentUserId && currentUserId !== jugadorId && (
+                    <FollowButton 
+                      currentUserId={currentUserId}
+                      targetUserId={jugadorId}
+                      onFollowChange={fetchFollowStats}
+                    />
+                  )}
                 </div>
+                
+                {/* Follow Stats */}
+                <div className="flex items-center gap-4 text-white/70 mb-2">
+                  <span className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">
+                    <Users className="h-4 w-4" />
+                    <strong className="text-white">{followStats.followers_count}</strong> seguidores
+                  </span>
+                  <span className="cursor-pointer hover:text-white transition-colors">
+                    <strong className="text-white">{followStats.following_count}</strong> siguiendo
+                  </span>
+                </div>
+                
                 <div className="flex flex-wrap items-center gap-4 text-white/70">
                   <span className="flex items-center gap-1">
                     <Medal className="h-4 w-4" /> {player_info.nivel || 'Sin nivel'}
