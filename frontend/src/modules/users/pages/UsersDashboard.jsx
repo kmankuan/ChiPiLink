@@ -144,7 +144,7 @@ export default function UsersDashboard() {
           </TabsContent>
 
           <TabsContent value="membership">
-            <MembershipCard token={token} />
+            <MembershipCard token={token} walletBalance={walletBalance} />
           </TabsContent>
 
           <TabsContent value="notifications">
