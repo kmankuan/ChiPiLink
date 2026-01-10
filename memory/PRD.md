@@ -532,8 +532,82 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 
 ---
 *Last Updated: January 10, 2026*
-*All Priorities Complete: P0-P9 + Phase 1 Users + QR System + Push Notifications + PinPanClub Feed*
-*293/294 tests passed across all features* (188 + 27 + 22 + 41 + 15 new)
+*All Priorities Complete: P0-P9 + Phase 1 Users + QR System + Push Notifications + PinPanClub Feed + Memberships*
+*320/321 tests passed across all features* (188 + 27 + 22 + 41 + 15 + 27 new)
+
+---
+
+## 🆕 Sistema de Membresías/Pases Frontend Completo (Enero 2026) ✅
+
+### Panel de Administración
+**Ruta:** `/admin/memberships`
+
+**Características:**
+- **Tab Planes:** CRUD completo de planes de membresía
+  - Crear/Editar planes con multi-idioma (ES, EN, ZH)
+  - Tipos: visits, unlimited, trial, courtesy
+  - Precio en USD y ChipiPoints
+  - Total de visitas, duración en días, bonus points
+  - Toggles: Destacado, Renovación automática
+  - Soft delete (is_active=false)
+
+- **Tab "En el Club":** Visitantes actuales
+  - Lista de usuarios actualmente en el club
+  - Hora de entrada
+  - Botón "Registrar Salida"
+
+- **Otorgar Membresía:** Dialog para dar cortesía
+  - Seleccionar usuario y plan
+  - Agregar nota de cortesía
+
+### MembershipCard del Usuario
+**Ruta:** `/mi-cuenta` → Tab "Membresía"
+
+**Características:**
+- **Tarjeta de membresía activa:**
+  - Nombre y descripción del plan
+  - Progreso de visitas (X/Y restantes)
+  - Fecha de validez
+  - Botón Check-in/Check-out con timer
+
+- **Compra de membresía:**
+  - Grid de planes disponibles
+  - Opción de pago con ChipiPoints o efectivo/tarjeta
+  - Verificación de saldo de puntos
+  - Confirmación de compra
+
+- **Estadísticas:**
+  - Total de visitas
+  - Visitas este mes
+  - Duración promedio
+
+- **Historial de visitas:**
+  - Fecha y hora de entrada/salida
+  - Duración de cada visita
+  - Tipo (regular/quick)
+
+### Endpoints API
+- `GET /api/memberships/plans` - Listar planes (público)
+- `POST /api/memberships/plans` - Crear plan (admin)
+- `PUT /api/memberships/plans/{id}` - Actualizar plan (admin)
+- `DELETE /api/memberships/plans/{id}` - Soft delete plan (admin)
+- `GET /api/memberships/my-membership` - Mi membresía activa
+- `POST /api/memberships/purchase` - Comprar (pay_with_points option)
+- `POST /api/memberships/visits/checkin` - Registrar entrada
+- `POST /api/memberships/visits/checkout` - Registrar salida
+- `GET /api/memberships/visits/recent` - Mis visitas recientes
+- `GET /api/memberships/visits/current` - Visitantes actuales (admin)
+- `POST /api/memberships/admin/grant` - Otorgar cortesía (admin)
+
+### Archivos Principales
+- `/app/frontend/src/modules/users/pages/AdminMemberships.jsx`
+- `/app/frontend/src/modules/users/components/MembershipCard.jsx`
+- `/app/backend/modules/users/routes/memberships.py`
+- `/app/backend/modules/users/services/membership_service.py`
+
+### Test Results
+- **Backend:** 27/27 tests passed (100%)
+- **Frontend:** 17/17 features working (100%)
 
 ---
 
