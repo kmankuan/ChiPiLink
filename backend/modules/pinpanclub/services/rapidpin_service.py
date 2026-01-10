@@ -368,6 +368,11 @@ class RapidPinService(BaseService):
         results = await self.match_repo.get_pending_matches_for_user(season_id, user_id)
         return [RapidPinMatch(**r) for r in results]
     
+    async def get_all_pending_confirmations(self, user_id: str) -> List[RapidPinMatch]:
+        """Obtener TODOS los partidos pendientes de confirmación para un usuario (todas las temporadas)"""
+        results = await self.match_repo.get_all_pending_matches_for_user(user_id)
+        return [RapidPinMatch(**r) for r in results]
+    
     # ============== RANKING ==============
     
     async def get_ranking(self, season_id: str) -> RapidPinRankingTable:
