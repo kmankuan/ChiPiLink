@@ -282,12 +282,13 @@ export default function RapidPinSeason() {
             </div>
             
             {season.estado === 'active' && (
-              <Dialog open={showNewMatch} onOpenChange={setShowNewMatch}>
-                <DialogTrigger asChild>
-                  <Button className="bg-white text-orange-600 hover:bg-white/90" data-testid="new-match-btn">
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t('rapidpin.matches.register')}
-                  </Button>
+              <div className="flex items-center gap-2">
+                <Dialog open={showNewMatch} onOpenChange={setShowNewMatch}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-white text-orange-600 hover:bg-white/90" data-testid="new-match-btn">
+                      <Plus className="w-4 h-4 mr-2" />
+                      {t('rapidpin.matches.register')}
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
