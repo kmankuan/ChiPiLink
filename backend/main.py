@@ -217,6 +217,9 @@ async def health_check():
             "landing",
             "community",
             "admin",
+            # User Management
+            "users",
+            "notifications",
             # Integrations
             "integrations/monday",
             "integrations/sheets",
