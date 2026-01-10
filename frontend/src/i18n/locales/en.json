@@ -330,6 +330,29 @@
       "matchesPlayed": "matches played",
       "matchHistory": "Match History",
       "noMatchHistory": "No match history"
+    },
+    "comparison": {
+      "title": "Compare Players",
+      "subtitle": "Select players to compare their statistics",
+      "addPlayer": "Add Player",
+      "clearAll": "Clear All",
+      "searchPlayer": "Search player...",
+      "noPlayers": "No players available",
+      "statsComparison": "Statistics Comparison",
+      "stat": "Stat",
+      "totalMatches": "Total Matches",
+      "wins": "Wins",
+      "losses": "Losses",
+      "winRate": "Win Rate",
+      "setsWon": "Sets Won",
+      "setWinRate": "Set Win Rate",
+      "bestStreak": "Best Streak",
+      "recentBadges": "Recent Badges",
+      "bestInCategory": "Best in category",
+      "leader": "Leader",
+      "noPlayersSelected": "No players selected",
+      "selectToCompare": "Add players to see the comparison table",
+      "addFirstPlayer": "Add First Player"
     }
   }
 }

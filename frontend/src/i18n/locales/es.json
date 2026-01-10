@@ -330,6 +330,29 @@
       "matchesPlayed": "partidos jugados",
       "matchHistory": "Historial de Partidos",
       "noMatchHistory": "Sin historial de partidos"
+    },
+    "comparison": {
+      "title": "Comparar Jugadores",
+      "subtitle": "Selecciona jugadores para comparar sus estadísticas",
+      "addPlayer": "Agregar Jugador",
+      "clearAll": "Limpiar Todo",
+      "searchPlayer": "Buscar jugador...",
+      "noPlayers": "No hay jugadores disponibles",
+      "statsComparison": "Comparación de Estadísticas",
+      "stat": "Estadística",
+      "totalMatches": "Total Partidos",
+      "wins": "Victorias",
+      "losses": "Derrotas",
+      "winRate": "% Victorias",
+      "setsWon": "Sets Ganados",
+      "setWinRate": "% Sets Ganados",
+      "bestStreak": "Mejor Racha",
+      "recentBadges": "Badges Recientes",
+      "bestInCategory": "Mejor en categoría",
+      "leader": "Líder",
+      "noPlayersSelected": "Ningún jugador seleccionado",
+      "selectToCompare": "Agrega jugadores para ver la tabla comparativa",
+      "addFirstPlayer": "Agregar Primer Jugador"
     }
   }
 }

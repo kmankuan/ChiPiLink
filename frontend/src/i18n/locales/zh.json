@@ -330,6 +330,29 @@
       "matchesPlayed": "场比赛",
       "matchHistory": "比赛历史",
       "noMatchHistory": "无比赛历史"
+    },
+    "comparison": {
+      "title": "选手对比",
+      "subtitle": "选择选手来对比他们的数据",
+      "addPlayer": "添加选手",
+      "clearAll": "清空全部",
+      "searchPlayer": "搜索选手...",
+      "noPlayers": "暂无可用选手",
+      "statsComparison": "数据对比",
+      "stat": "统计项",
+      "totalMatches": "总比赛",
+      "wins": "胜场",
+      "losses": "负场",
+      "winRate": "胜率",
+      "setsWon": "赢得局数",
+      "setWinRate": "局胜率",
+      "bestStreak": "最佳连胜",
+      "recentBadges": "近期徽章",
+      "bestInCategory": "该项最佳",
+      "leader": "领先者",
+      "noPlayersSelected": "未选择选手",
+      "selectToCompare": "添加选手以查看对比表",
+      "addFirstPlayer": "添加第一位选手"
     }
   }
 }
