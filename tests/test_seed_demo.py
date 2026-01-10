@@ -159,23 +159,8 @@ class TestSeedDemoEndpoints:
         response = requests.delete(f"{BASE_URL}/api/seed/demo-data")
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
     
-    def test_delete_demo_data_with_admin_auth(self, admin_headers):
-        """DELETE /api/seed/demo-data - should work with admin authentication"""
-        response = requests.delete(
-            f"{BASE_URL}/api/seed/demo-data",
-            headers=admin_headers
-        )
-        assert response.status_code == 200, f"Delete demo data failed: {response.text}"
-        
-        data = response.json()
-        assert data.get("success") is True
-        assert "results" in data
-        
-        # Verify results structure
-        results = data.get("results", {})
-        assert "players_deleted" in results
-        assert "matches_deleted" in results
-        assert "rapid_deleted" in results
+    # Note: We don't actually delete data here to preserve it for activity feed tests
+    # The delete functionality is tested in the integration test class
     
     # ============== GET /api/pinpanclub/public/activity-feed Tests ==============
     
