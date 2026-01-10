@@ -50,6 +50,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export default function PingPongDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activeMatches, setActiveMatches] = useState([]);
   const [rankings, setRankings] = useState([]);
@@ -57,23 +58,12 @@ export default function PingPongDashboard() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [rapidPinData, setRapidPinData] = useState({ matches: [], season: null });
   const [rapidPinPendingCount, setRapidPinPendingCount] = useState(0);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  
+  // Get current user ID from auth context
+  const currentUserId = user?.cliente_id || user?.user_id || null;
   
   // Detectar si estamos dentro del admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
-
-  // Get current user ID from auth
-  useEffect(() => {
-    const authData = localStorage.getItem('chipi_auth');
-    if (authData) {
-      try {
-        const parsed = JSON.parse(authData);
-        setCurrentUserId(parsed.user?.user_id || null);
-      } catch (e) {
-        console.error('Error parsing auth data:', e);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     fetchDashboardData();
