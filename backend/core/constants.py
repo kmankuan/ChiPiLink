@@ -44,6 +44,11 @@ class PinpanClubCollections:
     SUPERPIN_RANKINGS = "pinpanclub_superpin_rankings"
     SUPERPIN_TOURNAMENTS = "pinpanclub_superpin_tournaments"
     SUPERPIN_BADGES = "pinpanclub_superpin_badges"
+    
+    # RapidPin feature collections
+    RAPIDPIN_SEASONS = "pinpanclub_rapidpin_seasons"
+    RAPIDPIN_MATCHES = "pinpanclub_rapidpin_matches"
+    RAPIDPIN_RANKINGS = "pinpanclub_rapidpin_rankings"
 
 
 # =============================================================================
