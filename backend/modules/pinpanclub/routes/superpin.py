@@ -353,3 +353,12 @@ async def get_player_statistics(jugador_id: str, liga_id: str = None):
 async def get_head_to_head(jugador_a_id: str, jugador_b_id: str):
     """Obtener estadísticas de enfrentamientos directos"""
     return await superpin_service.get_head_to_head(jugador_a_id, jugador_b_id)
+
+
+@router.get("/predict-match")
+async def predict_match(jugador_a_id: str, jugador_b_id: str):
+    """
+    Predice el resultado de un partido entre dos jugadores.
+    Retorna probabilidades basadas en ELO, historial H2H y racha actual.
+    """
+    return await superpin_service.predict_match(jugador_a_id, jugador_b_id)
