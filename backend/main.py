@@ -177,6 +177,9 @@ async def startup_event():
     await seed_translations()
     await seed_landing_page()
     
+    # Initialize Users module (async init)
+    await init_users()
+    
     logger.info("All modules loaded successfully")
 
 @app.on_event("shutdown")
