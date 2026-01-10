@@ -737,3 +737,81 @@ export default function PingPongDashboard() {
     </div>
   );
 }
+
+// Compact Weekly Challenges Preview for Dashboard
+function WeeklyChallengesPreview({ jugadorId }) {
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/pinpanclub/challenges/weekly`);
+        if (response.data) {
+          setChallenges(response.data.challenges?.slice(0, 3) || []);
+        }
+      } catch (error) {
+        console.error('Error fetching challenges:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChallenges();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (challenges.length === 0) {
+    return (
+      <div className="text-center py-4 text-purple-200">
+        <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">No hay retos esta semana</p>
+      </div>
+    );
+  }
+
+  const difficultyColors = {
+    easy: 'bg-green-500',
+    medium: 'bg-yellow-500',
+    hard: 'bg-orange-500',
+    extreme: 'bg-red-500'
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {challenges.map((challenge) => (
+        <div 
+          key={challenge.challenge_id}
+          className="bg-white/10 rounded-lg p-3 hover:bg-white/15 transition-colors cursor-pointer"
+          onClick={() => navigate('/pinpanclub/challenges')}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">{challenge.icon || '🎯'}</span>
+            <div className={`w-2 h-2 rounded-full ${difficultyColors[challenge.difficulty] || 'bg-gray-500'}`} />
+          </div>
+          <h4 className="font-medium text-white text-sm mb-1 line-clamp-1">
+            {challenge.name}
+          </h4>
+          <p className="text-purple-200 text-xs line-clamp-2">
+            {challenge.description}
+          </p>
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-yellow-400 text-xs font-bold">
+              +{challenge.points_reward} pts
+            </span>
+            <Badge variant="outline" className="text-purple-200 border-purple-500/30 text-xs">
+              {challenge.target_value} objetivo
+            </Badge>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
