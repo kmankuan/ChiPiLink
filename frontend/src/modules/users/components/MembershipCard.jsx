@@ -453,64 +453,172 @@ export default function MembershipCard({ token, walletBalance }) {
                     <DialogTitle>{txt.availablePlans}</DialogTitle>
                     <DialogDescription>{txt.selectPlan}</DialogDescription>
                   </DialogHeader>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                    {plans.filter(p => p.is_active).map((plan) => (
-                      <Card 
-                        key={plan.plan_id}
-                        className={`cursor-pointer hover:border-primary transition-colors ${
-                          plan.is_featured ? 'border-2 border-primary' : ''
-                        }`}
-                        data-testid={`plan-${plan.plan_id}`}
-                      >
+                  
+                  {/* Selected Plan Purchase Dialog */}
+                  {selectedPlan ? (
+                    <div className="space-y-6 py-4">
+                      <Card className="border-2 border-primary">
                         <CardContent className="pt-6">
-                          {plan.is_featured && (
-                            <Badge className="mb-2">{txt.featured}</Badge>
-                          )}
-                          <h3 className="font-semibold text-lg">
-                            {getLocalizedText(plan.name)}
+                          <h3 className="font-semibold text-xl">
+                            {getLocalizedText(selectedPlan.name)}
                           </h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {getLocalizedText(plan.description)}
+                          <p className="text-muted-foreground mt-1">
+                            {getLocalizedText(selectedPlan.description)}
                           </p>
                           
-                          <div className="space-y-2 mb-4">
-                            {plan.total_visits && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <CreditCard className="h-4 w-4" />
-                                {plan.total_visits} {txt.visitsRemaining.toLowerCase()}
-                              </div>
+                          <div className="mt-4 space-y-2 text-sm">
+                            {selectedPlan.total_visits && (
+                              <p>• {selectedPlan.total_visits} visitas incluidas</p>
                             )}
-                            {plan.membership_type === 'unlimited' && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <RefreshCw className="h-4 w-4" />
-                                {txt.unlimited}
-                              </div>
+                            <p>• {selectedPlan.duration_days} {txt.daysValid}</p>
+                            {selectedPlan.bonus_points > 0 && (
+                              <p className="text-purple-600">• +{selectedPlan.bonus_points} ChipiPoints bonus</p>
                             )}
-                            {plan.bonus_points > 0 && (
-                              <div className="flex items-center gap-2 text-sm text-purple-600">
-                                <Award className="h-4 w-4" />
-                                +{plan.bonus_points} {txt.bonus} {txt.points}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-2xl font-bold">
-                              ${plan.price}
-                            </span>
-                            <Button 
-                              size="sm"
-                              onClick={() => purchaseMembership(plan.plan_id)}
-                              data-testid={`buy-${plan.plan_id}`}
-                            >
-                              {txt.buy}
-                              <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
+
+                      {/* Payment Options */}
+                      <div className="space-y-4">
+                        <Label className="font-semibold">Método de Pago</Label>
+                        
+                        {/* Pay with Points option */}
+                        {selectedPlan.price_in_points > 0 && (
+                          <div 
+                            className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                              payWithPoints ? 'border-purple-500 bg-purple-50 dark:bg-purple-950/20' : 'border-muted'
+                            }`}
+                            onClick={() => setPayWithPoints(true)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Sparkles className="h-5 w-5 text-purple-600" />
+                                <div>
+                                  <p className="font-medium">{txt.payWithPoints}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {txt.youHave}: {walletBalance?.chipipoints || 0} ChipiPoints
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-xl font-bold text-purple-600">
+                                  {selectedPlan.price_in_points} pts
+                                </p>
+                                {(walletBalance?.chipipoints || 0) < selectedPlan.price_in_points && (
+                                  <p className="text-xs text-red-500">{txt.notEnoughPoints}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Pay with Cash option */}
+                        <div 
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            !payWithPoints ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : 'border-muted'
+                          }`}
+                          onClick={() => setPayWithPoints(false)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Wallet className="h-5 w-5 text-green-600" />
+                              <div>
+                                <p className="font-medium">{txt.payWithCash}</p>
+                                <p className="text-sm text-muted-foreground">Efectivo o tarjeta en el club</p>
+                              </div>
+                            </div>
+                            <p className="text-xl font-bold text-green-600">${selectedPlan.price}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <DialogFooter className="gap-2">
+                        <Button variant="outline" onClick={() => setSelectedPlan(null)}>
+                          {txt.cancel}
+                        </Button>
+                        <Button 
+                          onClick={() => purchaseMembership(selectedPlan.plan_id, payWithPoints)}
+                          disabled={purchasing || (payWithPoints && (walletBalance?.chipipoints || 0) < selectedPlan.price_in_points)}
+                        >
+                          {purchasing ? (
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                          )}
+                          {txt.confirm}
+                        </Button>
+                      </DialogFooter>
+                    </div>
+                  ) : (
+                    /* Plans Grid */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      {plans.filter(p => p.is_active).map((plan) => (
+                        <Card 
+                          key={plan.plan_id}
+                          className={`cursor-pointer hover:border-primary transition-colors ${
+                            plan.is_featured ? 'border-2 border-primary' : ''
+                          }`}
+                          data-testid={`plan-${plan.plan_id}`}
+                          onClick={() => openPurchaseDialog(plan)}
+                        >
+                          <CardContent className="pt-6">
+                            {plan.is_featured && (
+                              <Badge className="mb-2">{txt.featured}</Badge>
+                            )}
+                            <h3 className="font-semibold text-lg">
+                              {getLocalizedText(plan.name)}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {getLocalizedText(plan.description)}
+                            </p>
+                            
+                            <div className="space-y-2 mb-4">
+                              {plan.total_visits && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <CreditCard className="h-4 w-4" />
+                                  {plan.total_visits} {txt.visitsRemaining.toLowerCase()}
+                                </div>
+                              )}
+                              {plan.membership_type === 'unlimited' && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <RefreshCw className="h-4 w-4" />
+                                  {txt.unlimited}
+                                </div>
+                              )}
+                              {plan.bonus_points > 0 && (
+                                <div className="flex items-center gap-2 text-sm text-purple-600">
+                                  <Award className="h-4 w-4" />
+                                  +{plan.bonus_points} {txt.bonus} {txt.points}
+                                </div>
+                              )}
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-4 w-4" />
+                                {plan.duration_days} {txt.daysValid}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="text-2xl font-bold">${plan.price}</span>
+                                {plan.price_in_points > 0 && (
+                                  <span className="text-sm text-purple-600 ml-2">
+                                    o {plan.price_in_points} pts
+                                  </span>
+                                )}
+                              </div>
+                              <Button 
+                                size="sm"
+                                data-testid={`buy-${plan.plan_id}`}
+                              >
+                                {txt.buy}
+                                <ChevronRight className="h-4 w-4 ml-1" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </DialogContent>
               </Dialog>
             </div>
