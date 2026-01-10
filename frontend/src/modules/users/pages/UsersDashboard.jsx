@@ -3,12 +3,14 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Wallet, CreditCard, Settings, ChevronRight } from 'lucide-react';
+import { User, Wallet, CreditCard, Bell, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import ChipiWallet from '../components/ChipiWallet';
 import UserProfile from '../components/UserProfile';
 import MembershipCard from '../components/MembershipCard';
+import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
+import NotificationHistory from '@/modules/notifications/components/NotificationHistory';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
