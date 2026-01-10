@@ -26,7 +26,8 @@ import {
   Loader2,
   Gamepad2,
   Target,
-  Medal
+  Medal,
+  FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 
