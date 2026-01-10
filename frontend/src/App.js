@@ -48,7 +48,7 @@ import PingPongCanvas from '@/modules/pinpanclub/pages/PingPongCanvas';
 import PingPongMondayIntegration from '@/modules/pinpanclub/pages/PingPongMondayIntegration';
 
 // Super Pin Module
-import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking } from '@/modules/pinpanclub/pages/superpin';
+import { SuperPinAdmin, SuperPinLeagueDetail, SuperPinMatch, SuperPinRanking, SuperPinTournament } from '@/modules/pinpanclub/pages/superpin';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
