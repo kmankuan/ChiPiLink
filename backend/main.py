@@ -114,6 +114,9 @@ init_auth()
 # Initialize Community module (event handlers)
 init_community()
 
+# Initialize Users module (event handlers)
+init_users()
+
 # ============== REGISTER ROUTERS ==============
 
 # Create main API router with /api prefix
