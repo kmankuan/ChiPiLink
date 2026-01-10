@@ -254,7 +254,28 @@
     },
     "tournaments": {
       "title": "Tournaments",
-      "season": "Season"
+      "season": "Season",
+      "participants": "Participants",
+      "notFound": "Tournament not found",
+      "startTournament": "Start Tournament",
+      "status": {
+        "pendiente": "Pending",
+        "en_curso": "In Progress",
+        "finalizado": "Finished",
+        "bye": "Bye"
+      },
+      "bye": "Bye",
+      "tbd": "TBD",
+      "thirdPlace": "Third Place",
+      "semifinalLoser": "Semifinal Loser",
+      "results": "Final Results",
+      "champion": "Champion",
+      "runnerUp": "Runner-up",
+      "enterResult": "Enter Result",
+      "selectWinner": "Select Winner",
+      "createTournament": "Create Tournament",
+      "tournamentName": "Tournament Name",
+      "startDate": "Start Date"
     },
     "stats": {
       "points": "Points",
