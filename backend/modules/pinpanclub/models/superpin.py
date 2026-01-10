@@ -385,3 +385,146 @@ class SpecialPrizeTypes:
     MEJOR_DEPORTIVIDAD = "mejor_deportividad"  # Votado por jugadores
     MEJOR_COMEBACK = "mejor_comeback"  # Mejor remontada
     ROOKIE_DEL_ANO = "rookie_del_ano"  # Mejor jugador nuevo
+
+
+# ============== PLAYER BADGES ==============
+
+class BadgeType(str, Enum):
+    """Tipos de badges"""
+    TOURNAMENT_CHAMPION = "tournament_champion"      # 🏆 Campeón de torneo
+    TOURNAMENT_RUNNER_UP = "tournament_runner_up"    # 🥈 Subcampeón
+    TOURNAMENT_THIRD = "tournament_third"            # 🥉 Tercer lugar
+    SEASON_MVP = "season_mvp"                        # ⭐ MVP de temporada
+    WIN_STREAK_5 = "win_streak_5"                    # 🔥 Racha de 5 victorias
+    WIN_STREAK_10 = "win_streak_10"                  # 🔥🔥 Racha de 10 victorias
+    MATCHES_50 = "matches_50"                        # 🎮 50 partidos jugados
+    MATCHES_100 = "matches_100"                      # 🎮🎮 100 partidos jugados
+    FIRST_WIN = "first_win"                          # 🌟 Primera victoria
+    PERFECT_SET = "perfect_set"                      # 💯 Set perfecto (11-0)
+    COMEBACK_KING = "comeback_king"                  # 👑 Rey de remontadas
+
+
+class PlayerBadge(BaseModel):
+    """Badge/logro de un jugador"""
+    model_config = ConfigDict(from_attributes=True)
+    
+    badge_id: str
+    jugador_id: str
+    badge_type: str
+    name: str
+    description: Optional[str] = None
+    icon: str  # Emoji o URL
+    earned_at: Optional[Any] = None
+    
+    # Contexto del badge
+    liga_id: Optional[str] = None
+    torneo_id: Optional[str] = None
+    partido_id: Optional[str] = None
+    temporada: Optional[str] = None
+    
+    # Metadatos adicionales
+    metadata: Dict[str, Any] = {}
+
+
+class PlayerBadgeCreate(BaseModel):
+    """Crear badge para jugador"""
+    jugador_id: str
+    badge_type: str
+    liga_id: Optional[str] = None
+    torneo_id: Optional[str] = None
+    partido_id: Optional[str] = None
+    temporada: Optional[str] = None
+    metadata: Dict[str, Any] = {}
+
+
+# Badge definitions con iconos y descripciones
+BADGE_DEFINITIONS = {
+    BadgeType.TOURNAMENT_CHAMPION: {
+        "name": "Campeón de Torneo",
+        "name_en": "Tournament Champion",
+        "name_zh": "锦标赛冠军",
+        "icon": "🏆",
+        "description": "Ganador de un torneo de temporada",
+        "rarity": "legendary"
+    },
+    BadgeType.TOURNAMENT_RUNNER_UP: {
+        "name": "Subcampeón",
+        "name_en": "Runner-up",
+        "name_zh": "亚军",
+        "icon": "🥈",
+        "description": "Segundo lugar en torneo",
+        "rarity": "epic"
+    },
+    BadgeType.TOURNAMENT_THIRD: {
+        "name": "Tercer Lugar",
+        "name_en": "Third Place",
+        "name_zh": "季军",
+        "icon": "🥉",
+        "description": "Tercer lugar en torneo",
+        "rarity": "rare"
+    },
+    BadgeType.SEASON_MVP: {
+        "name": "MVP de Temporada",
+        "name_en": "Season MVP",
+        "name_zh": "赛季MVP",
+        "icon": "⭐",
+        "description": "Jugador más valioso de la temporada",
+        "rarity": "legendary"
+    },
+    BadgeType.WIN_STREAK_5: {
+        "name": "Racha de Fuego",
+        "name_en": "On Fire",
+        "name_zh": "火热连胜",
+        "icon": "🔥",
+        "description": "5 victorias consecutivas",
+        "rarity": "rare"
+    },
+    BadgeType.WIN_STREAK_10: {
+        "name": "Imparable",
+        "name_en": "Unstoppable",
+        "name_zh": "势不可挡",
+        "icon": "🔥",
+        "description": "10 victorias consecutivas",
+        "rarity": "epic"
+    },
+    BadgeType.MATCHES_50: {
+        "name": "Veterano",
+        "name_en": "Veteran",
+        "name_zh": "老将",
+        "icon": "🎮",
+        "description": "50 partidos jugados",
+        "rarity": "common"
+    },
+    BadgeType.MATCHES_100: {
+        "name": "Leyenda",
+        "name_en": "Legend",
+        "name_zh": "传奇",
+        "icon": "🎮",
+        "description": "100 partidos jugados",
+        "rarity": "epic"
+    },
+    BadgeType.FIRST_WIN: {
+        "name": "Primera Victoria",
+        "name_en": "First Win",
+        "name_zh": "首胜",
+        "icon": "🌟",
+        "description": "Primera victoria en Super Pin",
+        "rarity": "common"
+    },
+    BadgeType.PERFECT_SET: {
+        "name": "Set Perfecto",
+        "name_en": "Perfect Set",
+        "name_zh": "完美一局",
+        "icon": "💯",
+        "description": "Ganar un set 11-0",
+        "rarity": "rare"
+    },
+    BadgeType.COMEBACK_KING: {
+        "name": "Rey de Remontadas",
+        "name_en": "Comeback King",
+        "name_zh": "逆转之王",
+        "icon": "👑",
+        "description": "Remontar estando 0-2 en sets",
+        "rarity": "epic"
+    }
+}
