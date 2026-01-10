@@ -487,5 +487,50 @@
       "confirmNow": "Confirmar Ahora",
       "noPending": "No tienes partidos pendientes"
     }
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Estadísticas y tendencias de la comunidad",
+    "activePlayers": "Jugadores Activos",
+    "matchesThisWeek": "Partidos esta Semana",
+    "challengesCompleted": "Retos Completados",
+    "rapidPinMatches": "Rapid Pin Activos",
+    "weeklyActivity": "Actividad Semanal",
+    "topPlayers": "Jugadores Más Activos",
+    "recentAchievements": "Logros Recientes",
+    "challengeLeaderboard": "Top Retadores",
+    "popularChallenges": "Retos Populares",
+    "newPlayers": "Nuevos Jugadores",
+    "overview": "Resumen",
+    "players": "Jugadores",
+    "matches": "Partidos",
+    "challenges": "Retos"
+  },
+  "social": {
+    "follow": "Seguir",
+    "following": "Siguiendo",
+    "followers": "Seguidores",
+    "unfollow": "Dejar de seguir",
+    "comments": "Comentarios",
+    "noComments": "No hay comentarios aún",
+    "beFirstToComment": "¡Sé el primero en comentar!",
+    "writeComment": "Escribe un comentario...",
+    "publish": "Publicar",
+    "report": "Reportar",
+    "communityRules": "Reglas de la Comunidad",
+    "rulesAccept": "Acepto las Reglas",
+    "moderationWarning": "Tus comentarios serán moderados debido a amonestaciones previas"
+  },
+  "achievements": {
+    "title": "Logros",
+    "newAchievement": "¡Nuevo Logro!",
+    "earned": "Obtenido",
+    "pointsReward": "puntos de recompensa",
+    "rarity": {
+      "common": "Común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario"
+    }
   }
 }
