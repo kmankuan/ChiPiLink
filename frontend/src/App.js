@@ -65,6 +65,10 @@ import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
 // Users Module
 import UsersDashboard from '@/modules/users/pages/UsersDashboard';
 
+// Notifications Module (Admin)
+import AdminNotifications from '@/modules/notifications/pages/AdminNotifications';
+import AdminPosts from '@/modules/notifications/pages/AdminPosts';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
