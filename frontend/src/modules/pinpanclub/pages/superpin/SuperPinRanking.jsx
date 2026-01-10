@@ -236,7 +236,12 @@ export default function SuperPinRanking() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <p className="font-semibold text-white">{entry.jugador_info?.nombre || 'Jugador'}</p>
+                                <p 
+                                  className="font-semibold text-white cursor-pointer hover:text-green-400 transition-colors"
+                                  onClick={() => navigate(`/pinpanclub/superpin/player/${entry.jugador_id}`)}
+                                >
+                                  {entry.jugador_info?.nombre || 'Jugador'}
+                                </p>
                                 <PlayerBadges jugadorId={entry.jugador_id} compact={true} />
                               </div>
                               {entry.jugador_info?.apodo && (
