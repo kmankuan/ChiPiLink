@@ -480,12 +480,41 @@ export default function CommunityLanding() {
               subtitulo: { es: '', en: '', zh: '' },
               visibility: { public: true, registered: true, moderator: true, admin: true, super_admin: true },
               sections: {
-                recent_matches: { enabled: true, limit: 5, visibility: { public: true } },
-                leaderboard: { enabled: true, limit: 10, visibility: { public: true } },
-                active_challenges: { enabled: true, limit: 4, visibility: { public: true } },
-                recent_achievements: { enabled: true, limit: 6, visibility: { public: true } },
-                active_players: { enabled: true, visibility: { public: true } },
-                upcoming_tournaments: { enabled: true, limit: 3, visibility: { public: true } }
+                recent_matches: { 
+                  enabled: true, 
+                  limit: 5, 
+                  title: { es: 'Partidos Recientes', en: 'Recent Matches', zh: '最近比赛' },
+                  visibility: { public: true } 
+                },
+                leaderboard: { 
+                  enabled: true, 
+                  limit: 10, 
+                  title: { es: 'Top Jugadores', en: 'Top Players', zh: '顶级玩家' },
+                  visibility: { public: true } 
+                },
+                active_challenges: { 
+                  enabled: true, 
+                  limit: 4, 
+                  title: { es: 'Retos Activos', en: 'Active Challenges', zh: '活跃挑战' },
+                  visibility: { public: true } 
+                },
+                recent_achievements: { 
+                  enabled: true, 
+                  limit: 6, 
+                  title: { es: 'Logros Recientes', en: 'Recent Achievements', zh: '最近成就' },
+                  visibility: { public: true } 
+                },
+                active_players: { 
+                  enabled: true, 
+                  title: { es: 'Jugadores Activos', en: 'Active Players', zh: '活跃玩家' },
+                  visibility: { public: true } 
+                },
+                upcoming_tournaments: { 
+                  enabled: true, 
+                  limit: 3, 
+                  title: { es: 'Próximos Torneos', en: 'Upcoming Tournaments', zh: '即将举行的比赛' },
+                  visibility: { public: true } 
+                }
               },
               style: { show_cta: false }
             }}
