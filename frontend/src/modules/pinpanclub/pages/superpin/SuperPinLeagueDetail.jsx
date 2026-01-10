@@ -201,6 +201,15 @@ export default function SuperPinLeagueDetail() {
             <Button onClick={() => setShowNewMatchModal(true)} className="bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4 mr-2" /> {t('superpin.matches.new')}
             </Button>
+            {league.estado === 'active' && ranking?.entries?.length >= 4 && (
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCreateTournamentModal(true)}
+                className="border-yellow-500 text-yellow-600 hover:bg-yellow-50"
+              >
+                <Trophy className="h-4 w-4 mr-2" /> {t('superpin.tournaments.createTournament')}
+              </Button>
+            )}
           </div>
         </div>
       </div>
