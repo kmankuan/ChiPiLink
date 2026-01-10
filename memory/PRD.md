@@ -15,85 +15,82 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 | P5 | Multi-Player Comparison Tool | 20/20 | ✅ 100% |
 | P6 | Rapid Pin System | 21/21 | ✅ 100% |
 | P7 | Match Predictor + Close Season + Notifications | 17/17 | ✅ 100% |
-| **P8** | **P1 Features: Social + Challenges + Real-time** | **24/24** | ✅ **100%** |
+| P8 | P1 Features: Social + Challenges + Real-time | 24/24 | ✅ 100% |
+| **P9** | **P2 Features: Analytics + Achievements + Socials** | **22/22** | ✅ **100%** |
 
-**Total: 166/166 tests passed** 🎉
+**Total: 188/188 tests passed** 🎉
 
-## Latest Features (P8) ✅ NEW (Enero 2026)
+## Latest Features (P9) ✅ NEW (Enero 2026)
 
-### 1. Real-time Notifications System 🔔
-Sistema de notificaciones en tiempo real con WebSocket y fallback REST API:
-- **WebSocket endpoint:** `/api/pinpanclub/ws/notifications/{user_id}`
-- **Centro de notificaciones configurable:** campana en header + panel lateral
-- **Tipos de notificaciones:** 
-  - match_pending, match_confirmed
-  - new_follower, new_comment, new_reaction
-  - badge_earned, prize_won
-  - challenge_available, challenge_completed
-  - season_ending, season_closed
-
-**Endpoints:**
-- `GET /api/pinpanclub/social/notifications/{user_id}`
-- `GET /api/pinpanclub/social/notifications/{user_id}/unread-count`
-- `POST /api/pinpanclub/social/notifications/{notification_id}/read`
-- `POST /api/pinpanclub/social/notifications/{user_id}/read-all`
-
-### 2. Weekly Challenges System 🎯
-Sistema de retos semanales con progreso y puntos:
-- **Retos automáticos:** Se generan semanalmente con diferentes dificultades
-- **Dificultades:** Fácil (🟢), Medio (🟡), Difícil (🟠), Extremo (🔴)
-- **Leaderboard:** Ranking de jugadores por puntos de retos
-- **UI dedicada:** Página `/pinpanclub/challenges` con tabs
-
-**Retos de ejemplo:**
-- Jugador Activo: Juega 5 partidos esta semana (50 pts)
-- Colaborador: Arbitra 3 partidos esta semana (75 pts)
-- Constancia: Juega al menos un partido 4 días diferentes (100 pts)
-- Racha Ganadora: Gana 3 partidos seguidos (100 pts)
-- Remontada Épica: Gana un partido después de perder el primer set (150 pts)
+### 1. Analytics Dashboard 📊
+Dashboard completo de estadísticas y tendencias de la comunidad:
+- **Ruta:** `/pinpanclub/analytics`
+- **Endpoint:** `GET /api/pinpanclub/analytics/dashboard`
+- **Métricas incluidas:**
+  - Jugadores activos totales
+  - Partidos esta semana (Super Pin + Rapid Pin)
+  - Retos completados
+  - Actividad semanal (gráfico de barras)
+  - Distribución Super Pin vs Rapid Pin
+  - Top jugadores más activos
+  - Logros recientes
+  - Ranking de retos (leaderboard)
+  - Retos populares
 
 **Endpoints:**
-- `GET /api/pinpanclub/challenges/weekly`
-- `GET /api/pinpanclub/challenges/definitions`
-- `POST /api/pinpanclub/challenges/start/{challenge_id}`
-- `GET /api/pinpanclub/challenges/player/{jugador_id}`
-- `GET /api/pinpanclub/challenges/leaderboard`
+- `GET /api/pinpanclub/analytics/dashboard` - Dashboard completo
+- `GET /api/pinpanclub/analytics/summary` - Resumen rápido
 
-### 3. Social Features 👥
-Sistema de funciones sociales para la comunidad:
+### 2. Sistema de Logros Automáticos 🏆
+Sistema que otorga logros automáticamente al completar retos:
+- **11 tipos de logros diferentes**
+- **Rarezas:** Común, Raro, Épico, Legendario
+- **Triggers automáticos** al completar retos
 
-**Seguir jugadores:**
-- `POST /api/pinpanclub/social/follow`
-- `DELETE /api/pinpanclub/social/follow`
-- `GET /api/pinpanclub/social/followers/{jugador_id}`
-- `GET /api/pinpanclub/social/following/{jugador_id}`
-- `GET /api/pinpanclub/social/follow-stats/{jugador_id}`
-- `GET /api/pinpanclub/social/is-following`
-
-**Comentarios:**
-- `POST /api/pinpanclub/social/comments`
-- `GET /api/pinpanclub/social/comments/{target_type}/{target_id}`
-- `PUT /api/pinpanclub/social/comments/{comment_id}`
-- `DELETE /api/pinpanclub/social/comments/{comment_id}`
-
-**Reacciones:**
-- `POST /api/pinpanclub/social/reactions`
-- `GET /api/pinpanclub/social/reactions/{target_type}/{target_id}`
-- Tipos: 👏 clap, 🔥 fire, 🏆 trophy, ❤️ heart, 😮 wow
-
-**Activity Feed:**
-- `GET /api/pinpanclub/social/feed/{jugador_id}`
-- `GET /api/pinpanclub/social/feed/{jugador_id}/following`
-
-### 4. Advanced Prizes System 🏆
-Sistema de premios avanzado y configurable:
+**Logros disponibles:**
+| Nombre | Requisito | Rareza | Puntos |
+|--------|-----------|--------|--------|
+| Principiante | 1 reto completado | Común | 10 |
+| Retador | 5 retos completados | Común | 25 |
+| Maestro de Retos | 25 retos | Raro | 100 |
+| Leyenda de Retos | 100 retos | Legendario | 500 |
+| Semana Perfecta | Todos los retos de una semana | Épico | 200 |
+| Constante | 3 semanas seguidas | Raro | 75 |
+| Imparable | 10 semanas seguidas | Épico | 300 |
+| Coleccionista | 500 puntos | Raro | 50 |
+| Gran Coleccionista | 2000 puntos | Épico | 200 |
+| Valiente | 5 retos difíciles | Raro | 100 |
+| Intrépido | 3 retos extremos | Épico | 200 |
 
 **Endpoints:**
-- `GET /api/pinpanclub/prizes/catalog`
-- `GET /api/pinpanclub/prizes/definitions`
-- `GET /api/pinpanclub/prizes/player/{jugador_id}`
-- `POST /api/pinpanclub/prizes/award` (admin)
-- `POST /api/pinpanclub/prizes/award/season/{season_id}` (admin)
+- `GET /api/pinpanclub/achievements/` - Listar todos los logros
+- `GET /api/pinpanclub/achievements/player/{jugador_id}` - Logros del jugador
+- `POST /api/pinpanclub/achievements/check/{jugador_id}` - Verificar y otorgar
+- `POST /api/pinpanclub/achievements/initialize` - Inicializar logros (admin)
+
+### 3. Social Features Expandido 👥
+
+#### Botón "Seguir" en Perfiles
+- Integrado en `/pinpanclub/superpin/player/{jugadorId}`
+- Muestra contador de seguidores/siguiendo
+- Solo visible para usuarios autenticados
+- No aparece en tu propio perfil
+
+#### Sistema de Comentarios con Moderación
+- Comentarios en perfiles de jugadores y partidos
+- **Reglas de la comunidad** mostradas al escribir:
+  - Respeto a todos los miembros
+  - Sin lenguaje obsceno
+  - Sin malos valores o pensamientos negativos
+  - Sin comentarios que provoquen consecuencias negativas
+- **Sistema de amonestaciones:**
+  - Primera infracción: Amonestación
+  - Con amonestaciones: Comentarios requieren moderación previa
+- Opción de reportar comentarios
+
+**Endpoints nuevos:**
+- `GET /api/pinpanclub/social/user/{user_id}/warnings` - Obtener amonestaciones
+- `POST /api/pinpanclub/social/comments/{comment_id}/report` - Reportar comentario
 
 ## Frontend Routes
 
@@ -103,43 +100,53 @@ Sistema de premios avanzado y configurable:
 - `/pinpanclub/superpin/league/:ligaId` - League Detail
 - `/pinpanclub/superpin/match/:partidoId` - Match View
 - `/pinpanclub/superpin/tournament/:torneoId` - Tournament Brackets
-- `/pinpanclub/superpin/player/:jugadorId` - Player Profile
+- `/pinpanclub/superpin/player/:jugadorId` - Player Profile (con Social tab)
 - `/pinpanclub/superpin/compare` - Multi-Player Comparison
 
 ### Rapid Pin
 - `/pinpanclub/rapidpin` - Dashboard de temporadas
 - `/pinpanclub/rapidpin/season/:seasonId` - Vista de temporada
 
-### Weekly Challenges ⭐ NEW
+### Analytics & Challenges ⭐ NEW
+- `/pinpanclub/analytics` - Analytics Dashboard
 - `/pinpanclub/challenges` - Página de retos semanales
 
 ## Database Collections
+
+### Core Collections
 - `pinpanclub_superpin_leagues`
 - `pinpanclub_superpin_matches`
 - `pinpanclub_superpin_rankings`
 - `pinpanclub_superpin_checkins`
 - `pinpanclub_superpin_tournaments`
 - `pinpanclub_superpin_badges`
+- `pingpong_players`
 
 ### Rapid Pin Collections
 - `pinpanclub_rapidpin_seasons`
 - `pinpanclub_rapidpin_matches`
 - `pinpanclub_rapidpin_rankings`
 
-### Social Collections ⭐ NEW
+### Social Collections
 - `pinpanclub_follows`
 - `pinpanclub_comments`
 - `pinpanclub_reactions`
 - `pinpanclub_activity_feed`
 - `pinpanclub_notifications`
+- `pinpanclub_user_moderation` ⭐ NEW
+- `pinpanclub_comment_reports` ⭐ NEW
 
-### Challenges Collections ⭐ NEW
+### Challenges Collections
 - `pinpanclub_challenges_definitions`
 - `pinpanclub_challenges_progress`
 - `pinpanclub_challenges_weekly`
 - `pinpanclub_challenges_leaderboard`
 
-### Prizes Collections ⭐ NEW
+### Achievements Collections ⭐ NEW
+- `pinpanclub_achievements`
+- `pinpanclub_player_achievements`
+
+### Prizes Collections
 - `pinpanclub_prizes_catalog`
 - `pinpanclub_prizes_definitions`
 - `pinpanclub_prizes_awarded`
@@ -148,28 +155,67 @@ Sistema de premios avanzado y configurable:
 - Email: admin@libreria.com
 - Password: admin
 - Auth endpoint: `/api/auth-v2/login` (field: `contrasena`)
+- Test Player: `jugador_544167d88272` (Carlos González / "El Rayo")
 
 ## Tareas Pendientes (Consolidadas)
 
-### P1 - Completadas ✅
+### Completadas ✅
 1. ~~Sistema de premios avanzado configurable~~ ✅
 2. ~~Real-time notifications (WebSocket)~~ ✅
 3. ~~Social features: Seguir jugadores, comentarios~~ ✅
 4. ~~Weekly challenges system~~ ✅
-
-### P2 - Próximas
-1. **Analytics Dashboard:** Estadísticas avanzadas de la comunidad, visualización de tendencias
-2. **Integración Social en Perfiles:** Añadir botón "Seguir" a perfiles de jugadores
-3. **Comentarios en Partidos:** Sección de comentarios en detalles de partidos
+5. ~~Analytics Dashboard~~ ✅
+6. ~~Sistema de logros automáticos~~ ✅
+7. ~~Social expandido: Botón seguir, moderación~~ ✅
 
 ### P3 - Backlog
 1. **Containerización completa:** Desplegar módulos como microservicios separados
 2. **Mobile app:** Versión nativa para iOS/Android
+3. **Sistema de torneos automáticos:** Brackets generados automáticamente
+4. **Integración con redes sociales:** Compartir logros y resultados
 
 ## Known Issues
 - **WebSocket en Preview:** Las conexiones WebSocket pueden fallar en el ambiente de preview debido a la configuración del ingress. El sistema tiene fallback a REST API que funciona correctamente.
 
+## Architecture
+
+```
+/app/
+├── backend/
+│   └── modules/
+│       └── pinpanclub/
+│           ├── routes/
+│           │   ├── analytics.py      # Dashboard stats
+│           │   ├── achievements.py   # Auto achievements
+│           │   ├── social.py         # Follow, comments, moderation
+│           │   ├── challenges.py
+│           │   ├── prizes.py
+│           │   └── websocket.py
+│           ├── services/
+│           │   ├── achievements_service.py  # NEW
+│           │   ├── challenges_service.py
+│           │   └── social_service.py
+│           └── models/
+│               ├── achievements.py  # NEW
+│               ├── challenges.py
+│               └── social.py
+└── frontend/
+    └── src/
+        └── modules/
+            └── pinpanclub/
+                ├── components/
+                │   ├── MatchComments.jsx      # NEW
+                │   ├── SocialFeatures.jsx     # Updated
+                │   ├── NotificationCenter.jsx
+                │   └── WeeklyChallenges.jsx
+                └── pages/
+                    ├── AnalyticsDashboard.jsx # Exists
+                    ├── WeeklyChallengesPage.jsx
+                    └── superpin/
+                        └── PlayerProfile.jsx  # Updated with Social tab
+```
+
 ---
 *Last Updated: January 2026*
-*All Priorities Complete: P0 + P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8*
-*166/166 tests passed across all features*
+*All Priorities Complete: P0-P9*
+*188/188 tests passed across all features*
