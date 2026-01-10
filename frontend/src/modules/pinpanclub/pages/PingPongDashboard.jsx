@@ -118,13 +118,9 @@ export default function PingPongDashboard() {
         });
         
         // Get pending matches count for current user
-        const authData = localStorage.getItem('chipi_auth');
-        if (authData) {
-          const userId = JSON.parse(authData).user?.user_id;
-          if (userId) {
-            const pendingRes = await axios.get(`${API_BASE}/rapidpin/seasons/${activeSeason.season_id}/pending/${userId}`);
-            setRapidPinPendingCount(pendingRes.data?.total || 0);
-          }
+        if (currentUserId) {
+          const pendingRes = await axios.get(`${API_BASE}/rapidpin/seasons/${activeSeason.season_id}/pending/${currentUserId}`);
+          setRapidPinPendingCount(pendingRes.data?.total || 0);
         }
       }
     } catch (error) {
