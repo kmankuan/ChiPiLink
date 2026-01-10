@@ -59,6 +59,9 @@ from modules.invision.routes import router as invision_router
 
 # ============== NEW MODULES (Placeholders) ==============
 
+# Users Module (Advanced Profiles + ChipiWallet)
+from modules.users import users_router, init_module as init_users
+
 # Chess Club Module
 from modules.chess.routes import router as chess_router
 
