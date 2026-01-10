@@ -394,6 +394,3 @@ export default function DemoDataModule() {
     </div>
   );
 }
-
-// Missing import fix
-import { FileText } from 'lucide-react';
