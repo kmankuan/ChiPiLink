@@ -120,16 +120,34 @@ Sistema de partidos espontáneos sin organización previa. "¿Echamos un Rapid P
 - `pinpanclub_superpin_tournaments`
 - `pinpanclub_superpin_badges`
 
+### Rapid Pin Collections
+- `pinpanclub_rapidpin_seasons`
+- `pinpanclub_rapidpin_matches`
+- `pinpanclub_rapidpin_rankings`
+
 ## Test Credentials
 - Email: admin@libreria.com
 - Password: admin
+- Auth endpoint: `/api/auth-v2/login` (field: `contrasena`)
 
-## Future Enhancements (Backlog)
-1. Real-time notifications (WebSocket)
-2. Social features (follow players, comments)
-3. Weekly challenges system
+## Tareas Pendientes (Consolidadas)
+
+### P1 - Próximas
+1. **Head-to-Head Match Predictor:** Predecir ganador entre dos jugadores basándose en ELO e historial
+2. **Cierre de temporada Rapid Pin:** Implementar UI para cerrar temporada y asignar premios automáticamente
+3. **Notificaciones de partidos pendientes:** Alertar a usuarios con partidos sin confirmar
+
+### P2 - Futuras
+1. **Sistema de premios avanzado configurable:** Expandir premios más allá de badges
+2. **Real-time notifications (WebSocket):** Notificaciones en tiempo real
+3. **Social features:** Seguir jugadores, comentarios
+4. **Weekly challenges system:** Retos semanales
+
+### P3 - Backlog
+1. **Containerización completa:** Desplegar módulos como microservicios separados
+2. **Analytics dashboard:** Estadísticas avanzadas de la comunidad
 
 ---
 *Last Updated: January 2026*
-*All Priorities Complete: P0 + P1 + P2 + P3 + P4 + P5*
-*104/104 tests passed across all features*
+*All Priorities Complete: P0 + P1 + P2 + P3 + P4 + P5 + P6*
+*125/125 tests passed across all features*
