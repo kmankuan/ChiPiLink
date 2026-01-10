@@ -5,7 +5,7 @@ import sys
 import json
 
 class FrontendMigrationTester:
-    def __init__(self, base_url="https://lightning-tournament.preview.emergentagent.com"):
+    def __init__(self, base_url="https://paddle-clash-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
