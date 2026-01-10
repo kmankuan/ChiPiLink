@@ -289,6 +289,15 @@ class ChallengeService(BaseService):
         ))
         
         self.log_info(f"Challenge completed: {jugador_id} - {challenge.get('name')}")
+        
+        # Check and award automatic achievements
+        try:
+            from .achievements_service import achievements_service
+            awarded = await achievements_service.check_and_award_achievements(jugador_id)
+            if awarded:
+                self.log_info(f"Awarded {len(awarded)} achievements to {jugador_id}")
+        except Exception as e:
+            self.log_error(f"Error checking achievements: {e}")
     
     async def get_player_challenges(
         self,
