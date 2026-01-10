@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, Wallet, CreditCard, Settings, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
 import ChipiWallet from '../components/ChipiWallet';
 import UserProfile from '../components/UserProfile';
 import MembershipCard from '../components/MembershipCard';
@@ -13,29 +14,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function UsersDashboard() {
   const { t, i18n } = useTranslation();
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('wallet');
 
   const lang = i18n.language || 'es';
 
-  useEffect(() => {
-    // Get token from localStorage
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken) {
-      setToken(storedToken);
-    }
-    
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error parsing user:', e);
-      }
-    }
-  }, []);
+  // Get token from localStorage 
+  const token = localStorage.getItem('auth_token');
 
   const texts = {
     es: {
@@ -72,14 +57,22 @@ export default function UsersDashboard() {
 
   const txt = texts[lang] || texts.es;
 
-  if (!token) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !token) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <User className="h-16 w-16 mx-auto text-muted-foreground" />
           <h2 className="text-2xl font-bold">{txt.loginRequired}</h2>
           <a 
-            href="/auth/login"
+            href="/login"
             className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
             {txt.login}
