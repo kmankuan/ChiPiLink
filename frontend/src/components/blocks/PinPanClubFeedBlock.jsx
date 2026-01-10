@@ -315,7 +315,8 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
             </SheetContent>
           </Sheet>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Stats Summary */}
       {sections.active_players?.enabled !== false && 
