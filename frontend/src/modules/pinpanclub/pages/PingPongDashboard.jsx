@@ -479,6 +479,40 @@ export default function PingPongDashboard() {
           </section>
         )}
 
+        {/* Weekly Challenges Section */}
+        {currentUserId && (
+          <section>
+            <Card className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 border-0 overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-purple-500/20 rounded-xl">
+                      <Target className="h-8 w-8 text-purple-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                        🎯 Retos Semanales
+                      </h2>
+                      <p className="text-purple-200 text-sm">Completa retos y gana puntos extra</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="border-white/30 text-white hover:bg-white/10"
+                    onClick={() => navigate('/pinpanclub/challenges')}
+                  >
+                    <Award className="h-4 w-4 mr-2" />
+                    Ver Todos
+                  </Button>
+                </div>
+                
+                {/* Compact Weekly Challenges Preview */}
+                <WeeklyChallengesPreview jugadorId={currentUserId} />
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {/* Live Matches */}
         <section>
           <div className="flex items-center justify-between mb-4">
