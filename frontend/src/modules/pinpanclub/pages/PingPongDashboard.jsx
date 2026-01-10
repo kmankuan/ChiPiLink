@@ -325,6 +325,120 @@ export default function PingPongDashboard() {
           </Card>
         </section>
 
+        {/* Rapid Pin Activity Leaderboard */}
+        {rapidPinData.season && (
+          <section>
+            <Card className="bg-gradient-to-r from-orange-900 via-red-900 to-orange-900 border-0 overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-yellow-500/20 rounded-xl">
+                      <Zap className="h-8 w-8 text-yellow-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                        ⚡ Rapid Pin - {rapidPinData.season.nombre}
+                      </h2>
+                      <p className="text-orange-200 text-sm">Actividad reciente de partidos espontáneos</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="border-white/30 text-white hover:bg-white/10"
+                    onClick={() => navigate(`/pinpanclub/rapidpin/season/${rapidPinData.season.season_id}`)}
+                  >
+                    <Trophy className="h-4 w-4 mr-2" />
+                    Ver Ranking
+                  </Button>
+                </div>
+
+                {rapidPinData.matches.length === 0 ? (
+                  <div className="text-center py-6 text-orange-200">
+                    <Zap className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                    <p>¡Aún no hay partidos! ¿Echamos un Rapid Pin?</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {rapidPinData.matches.slice(0, 5).map((match) => {
+                      const isPlayerAWinner = match.ganador_id === match.jugador_a_id;
+                      return (
+                        <div 
+                          key={match.match_id}
+                          className={`flex items-center justify-between p-3 rounded-lg ${
+                            match.estado === 'validated' 
+                              ? 'bg-green-500/10 border border-green-500/20' 
+                              : 'bg-yellow-500/10 border border-yellow-500/20'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`font-medium text-white ${isPlayerAWinner ? 'text-green-400' : ''}`}>
+                                {match.jugador_a_info?.apodo || match.jugador_a_info?.nombre || '?'}
+                              </span>
+                              <span className="text-orange-300">vs</span>
+                              <span className={`font-medium text-white ${!isPlayerAWinner ? 'text-green-400' : ''}`}>
+                                {match.jugador_b_info?.apodo || match.jugador_b_info?.nombre || '?'}
+                              </span>
+                            </div>
+                            <Badge variant="outline" className="text-orange-200 border-orange-500/30 text-xs">
+                              <Scale className="w-3 h-3 mr-1" />
+                              {match.arbitro_info?.apodo || match.arbitro_info?.nombre || '?'}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-white">
+                              {isPlayerAWinner 
+                                ? `${match.score_ganador}-${match.score_perdedor}`
+                                : `${match.score_perdedor}-${match.score_ganador}`
+                              }
+                            </span>
+                            {match.estado === 'validated' ? (
+                              <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                                <Check className="w-3 h-3 mr-1" />
+                                Validado
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Pendiente
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+                  <div className="flex items-center gap-6 text-sm text-orange-200">
+                    <span className="flex items-center gap-1">
+                      <Trophy className="w-4 h-4" />
+                      {rapidPinData.season.total_matches || 0} partidos
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {rapidPinData.season.total_players || 0} jugadores
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Scale className="w-4 h-4" />
+                      {rapidPinData.season.total_referees || 0} árbitros
+                    </span>
+                  </div>
+                  <Button 
+                    size="sm"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                    onClick={() => navigate('/pinpanclub/rapidpin')}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Registrar Partido
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {/* Live Matches */}
         <section>
           <div className="flex items-center justify-between mb-4">
