@@ -414,6 +414,93 @@ export default function RapidPinSeason() {
                   </div>
                 </DialogContent>
               </Dialog>
+              
+              {/* Close Season Button */}
+              <Dialog open={showCloseSeason} onOpenChange={setShowCloseSeason}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10" data-testid="close-season-btn">
+                    <Lock className="w-4 h-4 mr-2" />
+                    {t('rapidpin.closeSeason.title')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Lock className="w-5 h-5 text-red-500" />
+                      {t('rapidpin.closeSeason.title')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t('rapidpin.closeSeason.confirmDesc')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  {closingResults ? (
+                    <div className="space-y-4 mt-4">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                        <Trophy className="w-10 h-10 mx-auto text-yellow-500 mb-2" />
+                        <h3 className="font-bold text-lg">{t('rapidpin.closeSeason.results')}</h3>
+                      </div>
+                      
+                      {/* Player Results */}
+                      <div>
+                        <h4 className="font-semibold mb-2">{t('rapidpin.closeSeason.playerResults')}</h4>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {closingResults.player_results?.slice(0, 5).map((result, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                              <span className="flex items-center gap-2">
+                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`}
+                                {result.jugador_info?.apodo || result.jugador_info?.nombre || '?'}
+                              </span>
+                              <span className="font-bold">{result.puntos_finales} pts</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Referee Results */}
+                      {closingResults.referee_results?.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">{t('rapidpin.closeSeason.refereeResults')}</h4>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {closingResults.referee_results?.slice(0, 3).map((result, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-2 bg-purple-50 rounded">
+                                <span className="flex items-center gap-2">
+                                  {idx === 0 ? '⚖️' : `${idx + 1}.`}
+                                  {result.jugador_info?.apodo || result.jugador_info?.nombre || '?'}
+                                </span>
+                                <span className="font-bold">{result.puntos_finales} arbitrajes</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <Button onClick={() => setShowCloseSeason(false)} className="w-full">
+                        {t('common.close')}
+                      </Button>
+                    </div>
+                  ) : (
+                    <DialogFooter className="mt-4">
+                      <Button variant="outline" onClick={() => setShowCloseSeason(false)}>
+                        {t('rapidpin.closeSeason.cancel')}
+                      </Button>
+                      <Button variant="destructive" onClick={closeSeason}>
+                        <Lock className="w-4 h-4 mr-2" />
+                        {t('rapidpin.closeSeason.close')}
+                      </Button>
+                    </DialogFooter>
+                  )}
+                </DialogContent>
+              </Dialog>
+              </div>
+            )}
+            
+            {/* Show results badge if season is closed */}
+            {season.estado === 'closed' && (
+              <Badge className="bg-yellow-500/20 text-yellow-100 border-yellow-500/30">
+                <Lock className="w-3 h-3 mr-1" />
+                {t('rapidpin.seasons.status.closed')}
+              </Badge>
             )}
           </div>
         </div>
