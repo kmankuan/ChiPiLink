@@ -4,7 +4,7 @@ ChipiWallet Service - Gestión de billetera y ChipiPoints
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timezone
 
-from core.base import BaseService
+from core.base.service import BaseService
 from core.database import db
 from ..models.wallet_models import (
     TransactionType, TransactionStatus, Currency, PaymentMethod,
