@@ -1,0 +1,435 @@
+"""
+ChipiWallet - Modelos para sistema de billetera digital
+Soporta USD y ChipiPoints con transacciones y conversiones
+"""
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
+from datetime import datetime, timezone
+from enum import Enum
+import uuid
+
+
+# ============== ENUMS ==============
+
+class TransactionType(str, Enum):
+    """Tipos de transacción"""
+    # Entradas de dinero
+    DEPOSIT = "deposit"                 # Depósito/Recarga
+    REFUND = "refund"                   # Reembolso
+    TRANSFER_IN = "transfer_in"         # Transferencia recibida
+    REWARD = "reward"                   # Recompensa/Premio
+    BONUS = "bonus"                     # Bono
+    
+    # Salidas de dinero
+    PURCHASE = "purchase"               # Compra
+    PAYMENT = "payment"                 # Pago de servicio
+    TRANSFER_OUT = "transfer_out"       # Transferencia enviada
+    WITHDRAWAL = "withdrawal"           # Retiro
+    FEE = "fee"                         # Comisión
+    
+    # Conversiones
+    POINTS_TO_USD = "points_to_usd"     # Convertir puntos a dólares
+    USD_TO_POINTS = "usd_to_points"     # Convertir dólares a puntos
+    
+    # Ajustes
+    ADJUSTMENT = "adjustment"           # Ajuste manual (admin)
+    CORRECTION = "correction"           # Corrección
+
+
+class TransactionStatus(str, Enum):
+    """Estado de una transacción"""
+    PENDING = "pending"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+    REFUNDED = "refunded"
+
+
+class Currency(str, Enum):
+    """Monedas soportadas"""
+    USD = "USD"
+    CHIPIPOINTS = "CHIPIPOINTS"
+
+
+class PaymentMethod(str, Enum):
+    """Métodos de pago"""
+    CASH = "cash"
+    CARD = "card"
+    YAPPY = "yappy"
+    BANK_TRANSFER = "bank_transfer"
+    CHIPIPOINTS = "chipipoints"
+    MIXED = "mixed"                     # Combinación USD + Puntos
+    WALLET = "wallet"                   # Desde saldo de billetera
+
+
+class PointsEarnType(str, Enum):
+    """Formas de ganar ChipiPoints"""
+    PURCHASE = "purchase"               # Por compras
+    CHALLENGE = "challenge"             # Por retos completados
+    ACHIEVEMENT = "achievement"         # Por logros
+    REFERRAL = "referral"               # Por referidos
+    WORK = "work"                       # Por trabajo/ayuda
+    PROMOTION = "promotion"             # Promoción especial
+    SEASON_REWARD = "season_reward"     # Recompensa de temporada
+    RANK_UP = "rank_up"                 # Subida de rango
+    MANUAL = "manual"                   # Otorgado manualmente
+    MEMBERSHIP = "membership"           # Bonus de membresía
+
+
+# ============== CONFIGURACIÓN DE CHIPIPOINTS ==============
+
+class ChipiPointsConfig(BaseModel):
+    """Configuración global de ChipiPoints"""
+    config_id: str = "chipipoints_config"
+    
+    # Tasa de conversión
+    points_per_dollar: float = 100      # Cuántos puntos equivalen a $1 USD
+    conversion_rate: float = 0.008      # 1 punto = $0.008 USD (1000 pts = $8)
+    
+    # Conversión habilitada
+    allow_points_to_usd: bool = True
+    allow_usd_to_points: bool = True
+    
+    # Mínimos para conversión
+    min_points_to_convert: int = 100
+    min_usd_to_convert: float = 1.0
+    
+    # Ganancia de puntos por compras
+    points_per_dollar_spent: int = 10   # Puntos ganados por cada $1 gastado
+    
+    # Vencimiento
+    points_expire: bool = False
+    expiration_days: Optional[int] = None  # Días hasta vencimiento
+    
+    # Límites
+    max_points_per_transaction: Optional[int] = None
+    daily_conversion_limit: Optional[float] = None
+    
+    # Estado
+    is_active: bool = True
+    
+    updated_at: Optional[str] = None
+    updated_by: Optional[str] = None
+
+
+class PointsEarnRule(BaseModel):
+    """Regla para ganar ChipiPoints"""
+    rule_id: str = Field(default_factory=lambda: f"rule_{uuid.uuid4().hex[:8]}")
+    
+    # Nombre y descripción
+    name: Dict[str, str]
+    description: Dict[str, str] = {}
+    
+    # Tipo de acción que otorga puntos
+    earn_type: PointsEarnType
+    
+    # Puntos a otorgar
+    points_amount: int
+    
+    # O porcentaje del valor
+    points_percentage: Optional[float] = None  # Ej: 5% del valor de compra
+    
+    # Condiciones
+    min_purchase_amount: Optional[float] = None
+    max_points_per_day: Optional[int] = None
+    applicable_user_types: List[str] = []  # Vacío = todos
+    
+    # Vigencia
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    
+    # Estado
+    is_active: bool = True
+    
+    created_at: Optional[str] = None
+
+
+# ============== BILLETERA ==============
+
+class Wallet(BaseModel):
+    """Billetera de un usuario"""
+    wallet_id: str = Field(default_factory=lambda: f"wallet_{uuid.uuid4().hex[:8]}")
+    
+    # Usuario
+    user_id: str
+    profile_id: Optional[str] = None
+    
+    # Saldos
+    balance_usd: float = 0.0
+    balance_points: int = 0
+    
+    # Puntos pendientes (por compras no confirmadas, etc.)
+    pending_points: int = 0
+    
+    # Totales históricos
+    total_deposited: float = 0.0
+    total_spent: float = 0.0
+    total_points_earned: int = 0
+    total_points_spent: int = 0
+    total_points_converted: int = 0
+    
+    # Límites personalizados (null = usar global)
+    daily_spend_limit: Optional[float] = None
+    daily_transfer_limit: Optional[float] = None
+    
+    # Estado
+    is_active: bool = True
+    is_locked: bool = False
+    lock_reason: Optional[str] = None
+    
+    # PIN de seguridad (hash)
+    security_pin_hash: Optional[str] = None
+    
+    # Timestamps
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+# ============== TRANSACCIONES ==============
+
+class Transaction(BaseModel):
+    """Transacción en la billetera"""
+    transaction_id: str = Field(default_factory=lambda: f"txn_{uuid.uuid4().hex[:8]}")
+    
+    # Billetera
+    wallet_id: str
+    user_id: str
+    
+    # Tipo y estado
+    transaction_type: TransactionType
+    status: TransactionStatus = TransactionStatus.PENDING
+    
+    # Moneda y monto
+    currency: Currency
+    amount: float               # Monto de la transacción
+    
+    # Saldos resultantes
+    balance_before: float = 0
+    balance_after: float = 0
+    
+    # Para transacciones mixtas (USD + Puntos)
+    usd_amount: Optional[float] = None
+    points_amount: Optional[int] = None
+    
+    # Método de pago (para depósitos/compras)
+    payment_method: Optional[PaymentMethod] = None
+    payment_reference: Optional[str] = None
+    
+    # Relacionados
+    related_user_id: Optional[str] = None       # Usuario relacionado (transferencias)
+    related_transaction_id: Optional[str] = None # Transacción relacionada
+    
+    # Referencia a compra/servicio
+    reference_type: Optional[str] = None        # "purchase", "membership", "service"
+    reference_id: Optional[str] = None
+    
+    # Descripción
+    description: Optional[str] = None
+    description_i18n: Dict[str, str] = {}
+    
+    # Notas
+    notes: Optional[str] = None
+    internal_notes: Optional[str] = None        # Solo visible para admin
+    
+    # Metadata
+    metadata: Dict[str, Any] = {}
+    
+    # Procesado por
+    processed_by: Optional[str] = None          # user_id del admin (si manual)
+    
+    # Timestamps
+    created_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    
+    # IP y dispositivo (seguridad)
+    ip_address: Optional[str] = None
+    device_info: Optional[str] = None
+
+
+# ============== CONVERSIONES ==============
+
+class PointsConversion(BaseModel):
+    """Registro de conversión de puntos"""
+    conversion_id: str = Field(default_factory=lambda: f"conv_{uuid.uuid4().hex[:8]}")
+    
+    # Usuario
+    wallet_id: str
+    user_id: str
+    
+    # Dirección de conversión
+    from_currency: Currency
+    to_currency: Currency
+    
+    # Montos
+    from_amount: float
+    to_amount: float
+    
+    # Tasa aplicada
+    conversion_rate: float
+    
+    # Estado
+    status: TransactionStatus = TransactionStatus.COMPLETED
+    
+    # Transacciones relacionadas
+    transaction_id_from: Optional[str] = None
+    transaction_id_to: Optional[str] = None
+    
+    created_at: Optional[str] = None
+
+
+# ============== SALDO PENDIENTE (NIÑOS) ==============
+
+class PendingBalance(BaseModel):
+    """Saldo pendiente de un usuario (cargado a acudiente)"""
+    pending_id: str = Field(default_factory=lambda: f"pend_{uuid.uuid4().hex[:8]}")
+    
+    # Usuario que consumió
+    user_id: str
+    profile_id: Optional[str] = None
+    
+    # Acudiente responsable
+    guardian_user_id: str
+    
+    # Monto pendiente
+    amount: float
+    currency: Currency = Currency.USD
+    
+    # Detalle de consumos
+    items: List[Dict] = []  # [{"description": "...", "amount": X, "date": "..."}]
+    
+    # Estado
+    status: str = "pending"  # pending, notified, paid, cancelled
+    
+    # Fechas
+    created_at: Optional[str] = None
+    notified_at: Optional[str] = None
+    paid_at: Optional[str] = None
+    paid_transaction_id: Optional[str] = None
+    
+    notes: Optional[str] = None
+
+
+# ============== PRODUCTOS CON CHIPIPOINTS ==============
+
+class PointsProduct(BaseModel):
+    """Producto/servicio adquirible con ChipiPoints"""
+    product_id: str = Field(default_factory=lambda: f"pprod_{uuid.uuid4().hex[:8]}")
+    
+    # Información
+    name: Dict[str, str]
+    description: Dict[str, str] = {}
+    image_url: Optional[str] = None
+    
+    # Precios
+    price_usd: Optional[float] = None       # Precio en USD (puede ser null)
+    price_points: int                        # Precio en ChipiPoints
+    
+    # Categoría
+    category: str = "general"
+    
+    # Stock
+    has_stock: bool = False
+    stock_quantity: Optional[int] = None
+    
+    # Restricciones
+    applicable_user_types: List[str] = []
+    max_per_user: Optional[int] = None
+    
+    # Vigencia
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    
+    # Estado
+    is_active: bool = True
+    is_featured: bool = False
+    
+    sort_order: int = 0
+    
+    created_at: Optional[str] = None
+
+
+# ============== HISTORIAL DE PUNTOS ==============
+
+class PointsHistory(BaseModel):
+    """Historial de puntos ganados/usados"""
+    history_id: str = Field(default_factory=lambda: f"ph_{uuid.uuid4().hex[:8]}")
+    
+    wallet_id: str
+    user_id: str
+    
+    # Acción
+    action: str  # earned, spent, converted, expired, adjusted
+    earn_type: Optional[PointsEarnType] = None
+    
+    # Puntos
+    points: int  # Positivo = ganado, Negativo = gastado
+    balance_after: int
+    
+    # Descripción
+    description: Dict[str, str] = {}
+    
+    # Referencias
+    transaction_id: Optional[str] = None
+    reference_type: Optional[str] = None
+    reference_id: Optional[str] = None
+    
+    # Vencimiento (si aplica)
+    expires_at: Optional[str] = None
+    
+    created_at: Optional[str] = None
+
+
+# ============== FUNCIONES DE UTILIDAD ==============
+
+def get_default_points_config() -> Dict:
+    """Configuración por defecto de ChipiPoints"""
+    return {
+        "config_id": "chipipoints_config",
+        "points_per_dollar": 100,
+        "conversion_rate": 0.008,
+        "allow_points_to_usd": True,
+        "allow_usd_to_points": True,
+        "min_points_to_convert": 100,
+        "min_usd_to_convert": 1.0,
+        "points_per_dollar_spent": 10,
+        "points_expire": False,
+        "is_active": True
+    }
+
+
+def get_default_earn_rules() -> List[Dict]:
+    """Reglas por defecto para ganar puntos"""
+    return [
+        {
+            "rule_id": "rule_purchase",
+            "name": {"es": "Puntos por Compra", "en": "Purchase Points", "zh": "购物积分"},
+            "description": {"es": "Gana 10 puntos por cada $1 gastado", "en": "Earn 10 points per $1 spent", "zh": "每消费1美元获得10积分"},
+            "earn_type": "purchase",
+            "points_percentage": 10,  # 10 puntos por dólar
+            "is_active": True
+        },
+        {
+            "rule_id": "rule_challenge",
+            "name": {"es": "Reto Completado", "en": "Challenge Completed", "zh": "完成挑战"},
+            "description": {"es": "Puntos por completar retos semanales", "en": "Points for completing weekly challenges", "zh": "完成每周挑战获得积分"},
+            "earn_type": "challenge",
+            "points_amount": 50,
+            "is_active": True
+        },
+        {
+            "rule_id": "rule_work",
+            "name": {"es": "Ayuda en el Club", "en": "Club Help", "zh": "俱乐部帮助"},
+            "description": {"es": "Puntos por ayudar en tareas del club", "en": "Points for helping with club tasks", "zh": "帮助俱乐部任务获得积分"},
+            "earn_type": "work",
+            "points_amount": 10,
+            "is_active": True
+        },
+        {
+            "rule_id": "rule_referral",
+            "name": {"es": "Referido", "en": "Referral", "zh": "推荐"},
+            "description": {"es": "Puntos por traer nuevos miembros", "en": "Points for bringing new members", "zh": "推荐新会员获得积分"},
+            "earn_type": "referral",
+            "points_amount": 100,
+            "is_active": True
+        }
+    ]
