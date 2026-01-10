@@ -291,12 +291,12 @@ export default function UserProfile({ token, user }) {
                 {profile.birth_date && (
                   <span className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {new Date(profile.birth_date).toLocaleDateString(lang)}
+                    {new Date(profile.birth_date).toLocaleDateString(getLocale())}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
                   <Shield className="h-4 w-4" />
-                  {txt.memberSince}: {new Date(profile.created_at).toLocaleDateString(lang)}
+                  {txt.memberSince}: {new Date(profile.created_at).toLocaleDateString(getLocale())}
                 </span>
               </div>
             </div>
