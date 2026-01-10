@@ -43,6 +43,7 @@ class PinpanClubCollections:
     SUPERPIN_MATCHES = "pinpanclub_superpin_matches"
     SUPERPIN_RANKINGS = "pinpanclub_superpin_rankings"
     SUPERPIN_TOURNAMENTS = "pinpanclub_superpin_tournaments"
+    SUPERPIN_BADGES = "pinpanclub_superpin_badges"
 
 
 # =============================================================================
