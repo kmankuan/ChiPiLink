@@ -139,7 +139,74 @@ async def get_player_challenge_stats(jugador_id: str):
 
 # ============== LEADERBOARD ==============
 
-@router.get("/leaderboard", response_model=ChallengeLeaderboard)
-async def get_leaderboard(limit: int = Query(50, ge=1, le=100)):
+@router.get("/leaderboard")
+async def get_leaderboard(
+    limit: int = 20,
+    offset: int = 0,
+    jugador_id: Optional[str] = None
+):
     """Obtener leaderboard de retos"""
-    return await challenge_service.get_leaderboard(limit)
+    leaderboard = await challenge_service.get_leaderboard(limit, offset)
+    return {
+        "leaderboard": leaderboard,
+        "total": len(leaderboard),
+        "limit": limit,
+        "offset": offset
+    }
+
+
+@router.get("/player/{jugador_id}/rank")
+async def get_player_rank(jugador_id: str):
+    """Obtener información de rango de un jugador"""
+    from core.database import db
+    
+    # Obtener entrada del leaderboard
+    entry = await db.pinpanclub_challenges_leaderboard.find_one(
+        {"jugador_id": jugador_id},
+        {"_id": 0}
+    )
+    
+    total_points = entry.get("total_points", 0) if entry else 0
+    challenges_completed = entry.get("challenges_completed", 0) if entry else 0
+    current_streak = entry.get("current_streak", 0) if entry else 0
+    
+    # Calcular rank basado en puntos
+    ranks = [
+        {"id": "bronze", "name": "Bronce", "min": 0, "max": 99, "icon": "🥉"},
+        {"id": "silver", "name": "Plata", "min": 100, "max": 299, "icon": "🥈"},
+        {"id": "gold", "name": "Oro", "min": 300, "max": 599, "icon": "🥇"},
+        {"id": "platinum", "name": "Platino", "min": 600, "max": 999, "icon": "💎"},
+        {"id": "diamond", "name": "Diamante", "min": 1000, "max": 1999, "icon": "💠"},
+        {"id": "master", "name": "Maestro", "min": 2000, "max": 4999, "icon": "👑"},
+        {"id": "grandmaster", "name": "Gran Maestro", "min": 5000, "max": float('inf'), "icon": "🏆"}
+    ]
+    
+    current_rank = ranks[0]
+    next_rank = ranks[1] if len(ranks) > 1 else None
+    
+    for i, rank in enumerate(ranks):
+        if total_points >= rank["min"]:
+            current_rank = rank
+            next_rank = ranks[i + 1] if i + 1 < len(ranks) else None
+    
+    # Calcular progreso
+    progress = 0
+    points_to_next = 0
+    if next_rank:
+        range_size = next_rank["min"] - current_rank["min"]
+        progress_points = total_points - current_rank["min"]
+        progress = min(round((progress_points / range_size) * 100), 100)
+        points_to_next = next_rank["min"] - total_points
+    else:
+        progress = 100
+    
+    return {
+        "jugador_id": jugador_id,
+        "total_points": total_points,
+        "challenges_completed": challenges_completed,
+        "current_streak": current_streak,
+        "current_rank": current_rank,
+        "next_rank": next_rank,
+        "progress": progress,
+        "points_to_next": points_to_next
+    }
