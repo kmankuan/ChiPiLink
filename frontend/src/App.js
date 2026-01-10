@@ -144,6 +144,7 @@ function AppRouter() {
       <Route path="/pinpanclub/superpin/match/:partidoId" element={<SuperPinMatch />} />
       <Route path="/pinpanclub/superpin/ranking" element={<SuperPinRanking />} />
       <Route path="/pinpanclub/superpin/ranking/:ligaId" element={<SuperPinRanking />} />
+      <Route path="/pinpanclub/superpin/tournament/:torneoId" element={<SuperPinTournament />} />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
