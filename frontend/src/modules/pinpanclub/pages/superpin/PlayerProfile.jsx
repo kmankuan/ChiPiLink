@@ -180,24 +180,6 @@ export default function PlayerProfile() {
                 <div className="mt-4">
                   <AchievementShowcase jugadorId={jugadorId} maxDisplay={5} showTitle={true} />
                 </div>
-                
-                {/* Badges Preview */}
-                {badges.length > 0 && (
-                  <div className="flex gap-2 mt-3">
-                    {badges.slice(0, 6).map((badge) => (
-                      <span 
-                        key={badge.badge_id} 
-                        className={`text-2xl ${badge.rarity === 'legendary' ? 'animate-pulse' : ''}`}
-                        title={badge.name}
-                      >
-                        {badge.icon}
-                      </span>
-                    ))}
-                    {badges.length > 6 && (
-                      <span className="text-white/50 text-sm">+{badges.length - 6}</span>
-                    )}
-                  </div>
-                )}
               </div>
               
               {/* Quick Stats */}
