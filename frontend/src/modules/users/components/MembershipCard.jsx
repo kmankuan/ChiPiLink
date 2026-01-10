@@ -232,7 +232,22 @@ export default function MembershipCard({ token, walletBalance }) {
       perVisit: 'por visita',
       unlimited: 'Ilimitado',
       trial: 'Prueba',
-      buy: 'Comprar'
+      buy: 'Comprar',
+      payWithPoints: 'Pagar con ChipiPoints',
+      payWithCash: 'Pagar en efectivo/tarjeta',
+      youHave: 'Tienes',
+      notEnoughPoints: 'Puntos insuficientes',
+      confirm: 'Confirmar Compra',
+      cancel: 'Cancelar',
+      checkInSuccess: 'Entrada registrada',
+      checkOutSuccess: 'Salida registrada',
+      purchaseSuccess: 'Membresía adquirida con éxito',
+      duration: 'Duración',
+      daysValid: 'días de validez',
+      noVisits: 'Sin visitas registradas',
+      visitHistory: 'Historial de Visitas',
+      viewAll: 'Ver todo',
+      timeInClub: 'Tiempo en el club'
     },
     en: {
       title: 'My Membership',
@@ -258,7 +273,22 @@ export default function MembershipCard({ token, walletBalance }) {
       perVisit: 'per visit',
       unlimited: 'Unlimited',
       trial: 'Trial',
-      buy: 'Buy'
+      buy: 'Buy',
+      payWithPoints: 'Pay with ChipiPoints',
+      payWithCash: 'Pay with cash/card',
+      youHave: 'You have',
+      notEnoughPoints: 'Not enough points',
+      confirm: 'Confirm Purchase',
+      cancel: 'Cancel',
+      checkInSuccess: 'Check-in registered',
+      checkOutSuccess: 'Check-out registered',
+      purchaseSuccess: 'Membership acquired successfully',
+      duration: 'Duration',
+      daysValid: 'days valid',
+      noVisits: 'No visits recorded',
+      visitHistory: 'Visit History',
+      viewAll: 'View all',
+      timeInClub: 'Time at club'
     },
     zh: {
       title: '我的会员资格',
@@ -284,7 +314,22 @@ export default function MembershipCard({ token, walletBalance }) {
       perVisit: '每次访问',
       unlimited: '无限',
       trial: '试用',
-      buy: '购买'
+      buy: '购买',
+      payWithPoints: '使用ChipiPoints支付',
+      payWithCash: '现金/卡支付',
+      youHave: '您有',
+      notEnoughPoints: '积分不足',
+      confirm: '确认购买',
+      cancel: '取消',
+      checkInSuccess: '签到成功',
+      checkOutSuccess: '签退成功',
+      purchaseSuccess: '会员资格获取成功',
+      duration: '时长',
+      daysValid: '天有效',
+      noVisits: '无访问记录',
+      visitHistory: '访问历史',
+      viewAll: '查看全部',
+      timeInClub: '在俱乐部时间'
     }
   };
 
