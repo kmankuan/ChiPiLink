@@ -480,6 +480,12 @@ Sistema para poblar la aplicación con datos demo realistas para pruebas y demos
 
 **Archivos:**
 - `/app/backend/modules/admin/seed_demo.py`
+- `/app/frontend/src/modules/admin/DemoDataModule.jsx` (UI para admin)
+
+**Frontend:**
+- Panel Admin → Administración → Pestaña "Datos Demo"
+- Botones: "Crear Datos Demo", "Limpiar Datos Demo"
+- Estadísticas en tiempo real de todos los módulos
 
 **Test Results:** 18/18 tests passed (100%)
 
