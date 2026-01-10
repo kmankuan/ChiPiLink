@@ -13,65 +13,60 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 ### Architecture (COMPLETED ✅)
 - ✅ Modular Monolith architecture (microservices-ready)
 - ✅ Backend organized into modules: auth, store, pinpanclub, community
-- ✅ Database collections with module-specific prefixes (auth_users, pinpanclub_players, etc.)
+- ✅ Database collections with module-specific prefixes
 - ✅ Service Layer + Repository Pattern
-- ✅ In-memory Event Bus for inter-module communication
+- ✅ Frontend folder renamed from `pingpong` to `pinpanclub` for consistency
 
 ### Super Pin Feature (P0 - COMPLETED ✅)
-**Implemented Features:**
 1. ✅ League management (create, activate, list)
 2. ✅ Multiple check-in methods selection (QR, Manual, Geolocation)
 3. ✅ "Back to PinpanClub" navigation button
-4. ✅ Player source selection in new match modal:
-   - PinpanClub registered players
-   - App registered users
-   - Monday.com integration
+4. ✅ Player source selection (PinpanClub, App Users, Monday.com)
 5. ✅ Ranking system with ELO or Simple Points
 6. ✅ Match tracking and scoring
 7. ✅ Admin Dashboard at /pinpanclub/superpin/admin
 8. ✅ Public Ranking View at /pinpanclub/superpin/ranking
-9. ✅ League Detail View with ranking table
 
 ### Multi-language Support (P1 - COMPLETED ✅)
 - ✅ i18next integrated for ALL Super Pin components
-- ✅ SuperPinAdmin.jsx fully translated
-- ✅ SuperPinRanking.jsx fully translated
-- ✅ SuperPinLeagueDetail.jsx fully translated (Jan 2026)
-- ✅ SuperPinMatch.jsx fully translated (Jan 2026)
-- ✅ SuperPinCheckIn.jsx fully translated (Jan 2026)
-- Languages: Spanish (ES), English (EN), Chinese (ZH)
+- ✅ Languages: Spanish (ES), English (EN), Chinese (ZH)
+- ✅ All components translated: Admin, Ranking, LeagueDetail, Match, CheckIn, Tournament
 
-### Check-in Functionality (P1 - COMPLETED ✅)
-- ✅ Manual check-in implementation
-- ✅ QR Code check-in implementation (QR generation + validation)
-- ✅ Geolocation check-in implementation (with coordinates validation)
-- ✅ Check-in tab in League Detail page (only for active leagues)
-- ✅ Present Players list with check-out functionality
+### Check-in System (P1 - COMPLETED ✅)
+- ✅ Manual check-in
+- ✅ QR Code check-in (QR generation + validation)
+- ✅ Geolocation check-in (coordinates validation)
+- ✅ Present Players list with check-out
 - ✅ Backend endpoints: checkin, checkout, available-players
 
-### Season Tournaments (P2 - PENDING ⏳)
-- ⏳ Bracket view for top 8 players
-- ⏳ Tournament creation and management
+### Tournament System (P2 - COMPLETED ✅)
+- ✅ Create season tournaments from top-ranked players
+- ✅ Bracket generation (single elimination)
+- ✅ Match result tracking with winner progression
+- ✅ Bracket visualization at /pinpanclub/superpin/tournament/:torneoId
+- ✅ Third place match support
+- ✅ Final results display (Champion, Runner-up, Third Place)
+- ✅ "Create Tournament" button in league detail page
 
 ## Key API Endpoints
-- `GET /api/pinpanclub/superpin/leagues` - List leagues
-- `POST /api/pinpanclub/superpin/leagues` - Create league (admin)
-- `GET /api/pinpanclub/superpin/leagues/{id}` - League detail
-- `GET /api/pinpanclub/superpin/leagues/{id}/ranking` - Ranking table
+
+### Super Pin
+- `GET/POST /api/pinpanclub/superpin/leagues` - Leagues CRUD
+- `GET /api/pinpanclub/superpin/leagues/{id}/ranking` - Ranking
 - `POST /api/pinpanclub/superpin/matches` - Create match
-- `POST /api/pinpanclub/superpin/leagues/{id}/checkin` - Player check-in
-- `POST /api/pinpanclub/superpin/leagues/{id}/checkout` - Player check-out
-- `GET /api/pinpanclub/superpin/leagues/{id}/available-players` - Checked-in players
-- `GET /api/auth-v2/users` - List registered users (admin)
-- `GET /api/pinpanclub/monday/players` - Get players from Monday.com (admin)
+- `POST /api/pinpanclub/superpin/leagues/{id}/checkin` - Check-in
+- `POST /api/pinpanclub/superpin/leagues/{id}/checkout` - Check-out
+
+### Tournaments
+- `POST /api/pinpanclub/superpin/tournaments` - Create tournament
+- `GET /api/pinpanclub/superpin/tournaments/{id}/brackets` - Get brackets
+- `POST /api/pinpanclub/superpin/tournaments/{id}/generate-brackets` - Generate brackets
+- `POST /api/pinpanclub/superpin/tournaments/{id}/matches/{match_id}/result` - Update result
 
 ## Database Collections
-- `auth_users` - Registered users
-- `pinpanclub_players` - Registered players
-- `pinpanclub_superpin_leagues` - Super Pin leagues
-- `pinpanclub_superpin_matches` - Super Pin matches
-- `pinpanclub_superpin_rankings` - Player rankings per league
-- `pinpanclub_superpin_checkins` - Check-in records
+- `auth_users`, `pinpanclub_players`, `pinpanclub_superpin_leagues`
+- `pinpanclub_superpin_matches`, `pinpanclub_superpin_rankings`
+- `pinpanclub_superpin_checkins`, `pinpanclub_superpin_tournaments`
 
 ## Tech Stack
 - **Backend:** FastAPI, Pydantic, MongoDB (motor)
@@ -83,18 +78,20 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 - Password: admin
 
 ## Current Status
-✅ **P0 + P1 Complete** - Super Pin feature fully functional with all 3 check-in methods and complete multi-language support (ES/EN/ZH).
+✅ **P0 + P1 + P2 Complete** - Super Pin fully functional with check-in system and tournament brackets.
+
+## Test Results Summary
+- **iteration_3.json:** P0 improvements (12/12 passed)
+- **iteration_4.json:** P1 check-in + i18n (15/15 passed)
+- **iteration_5.json:** P2 tournaments (19/19 passed)
 
 ## Roadmap
 
-### P2 - Next Priority
-1. Season tournaments with bracket view (top 8 players)
-2. Advanced statistics and prize system
-
-### P3 - Future
-1. Full containerization when needed
+### P3 - Future Enhancements
+1. Advanced statistics and prize system
 2. Real-time notifications
+3. Full containerization when needed
 
 ---
 *Last Updated: January 2026*
-*Completed: P0 improvements (3 enhancements) + P1 (i18n + check-in system)*
+*Completed: P0 (3 enhancements) + P1 (i18n + check-in) + P2 (tournaments)*
