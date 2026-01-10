@@ -56,6 +56,9 @@ import { RapidPinDashboard, RapidPinSeason } from '@/modules/pinpanclub/pages/ra
 // Weekly Challenges Page
 import WeeklyChallengesPage from '@/modules/pinpanclub/pages/WeeklyChallengesPage';
 
+// Analytics Dashboard
+import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
@@ -160,6 +163,9 @@ function AppRouter() {
       
       {/* Weekly Challenges Route */}
       <Route path="/pinpanclub/challenges" element={<WeeklyChallengesPage />} />
+      
+      {/* Analytics Dashboard Route */}
+      <Route path="/pinpanclub/analytics" element={<AnalyticsDashboard />} />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
