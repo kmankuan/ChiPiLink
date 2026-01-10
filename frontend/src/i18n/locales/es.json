@@ -254,7 +254,28 @@
     },
     "tournaments": {
       "title": "Torneos",
-      "season": "Temporada"
+      "season": "Temporada",
+      "participants": "Participantes",
+      "notFound": "Torneo no encontrado",
+      "startTournament": "Iniciar Torneo",
+      "status": {
+        "pendiente": "Pendiente",
+        "en_curso": "En Curso",
+        "finalizado": "Finalizado",
+        "bye": "Pase Directo"
+      },
+      "bye": "Pase",
+      "tbd": "Por definir",
+      "thirdPlace": "Tercer Lugar",
+      "semifinalLoser": "Perdedor Semifinal",
+      "results": "Resultados Finales",
+      "champion": "Campeón",
+      "runnerUp": "Subcampeón",
+      "enterResult": "Registrar Resultado",
+      "selectWinner": "Seleccionar Ganador",
+      "createTournament": "Crear Torneo",
+      "tournamentName": "Nombre del Torneo",
+      "startDate": "Fecha de Inicio"
     },
     "stats": {
       "points": "Puntos",
