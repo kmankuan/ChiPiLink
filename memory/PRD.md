@@ -456,6 +456,33 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 3. **Conversión USD → ChipiPoints** (inversa)
 4. **ChipiPoints como método de pago** en la tienda
 
+### 🆕 Demo Data Seeding System ✅ (Enero 10, 2026)
+Sistema para poblar la aplicación con datos demo realistas para pruebas y demos:
+
+**Datos Generados:**
+| Módulo | Datos | Cantidad |
+|--------|-------|----------|
+| PinPanClub | Jugadores | 12 |
+| PinPanClub | Rankings | 12 |
+| PinPanClub | Partidos Super Pin | 30 |
+| PinPanClub | Partidos Rapid Pin | 20 |
+| PinPanClub | Retos | 4 |
+| PinPanClub | Logros | 4 |
+| PinPanClub | Torneos | 1 |
+| Users/Wallets | Usuarios demo | 3 |
+| Users/Wallets | Wallets | 3 |
+| Notifications | Posts | 3 |
+
+**Endpoints API:**
+- `POST /api/seed/demo-data` (admin) - Crear datos demo
+- `GET /api/seed/demo-stats` (público) - Estadísticas de datos
+- `DELETE /api/seed/demo-data` (admin) - Limpiar datos demo
+
+**Archivos:**
+- `/app/backend/modules/admin/seed_demo.py`
+
+**Test Results:** 18/18 tests passed (100%)
+
 ### P1 - Fase 3: Integración Completa
 1. **Integración wallet con tienda** - Pagar con ChipiWallet
 2. **Rewards automáticos** - ChipiPoints por participación
