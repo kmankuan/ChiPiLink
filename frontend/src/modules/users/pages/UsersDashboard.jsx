@@ -96,7 +96,7 @@ export default function UsersDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="wallet" data-testid="wallet-tab">
               <Wallet className="h-4 w-4 mr-2" />
               {txt.wallet}
@@ -108,6 +108,10 @@ export default function UsersDashboard() {
             <TabsTrigger value="membership" data-testid="membership-tab">
               <CreditCard className="h-4 w-4 mr-2" />
               {txt.membership}
+            </TabsTrigger>
+            <TabsTrigger value="notifications" data-testid="notifications-tab">
+              <Bell className="h-4 w-4 mr-2" />
+              {txt.notifications}
             </TabsTrigger>
           </TabsList>
 
@@ -121,6 +125,13 @@ export default function UsersDashboard() {
 
           <TabsContent value="membership">
             <MembershipCard token={token} />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <div className="space-y-6">
+              <NotificationPreferences token={token} />
+              <NotificationHistory token={token} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
