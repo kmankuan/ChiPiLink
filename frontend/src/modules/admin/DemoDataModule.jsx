@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,9 +32,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
-
 export default function DemoDataModule() {
+  const { api } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
@@ -43,10 +43,9 @@ export default function DemoDataModule() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/seed/demo-stats`);
-      const data = await response.json();
-      if (data.success) {
-        setStats(data.stats);
+      const response = await api.get('/seed/demo-stats');
+      if (response.data.success) {
+        setStats(response.data.stats);
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -64,19 +63,10 @@ export default function DemoDataModule() {
     setLastResult(null);
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/seed/demo-data`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.post('/seed/demo-data');
       
-      const data = await response.json();
-      
-      if (data.success) {
-        setLastResult(data.results);
+      if (response.data.success) {
+        setLastResult(response.data.results);
         toast.success('¡Datos demo creados exitosamente!');
         fetchStats();
       } else {
@@ -84,7 +74,7 @@ export default function DemoDataModule() {
       }
     } catch (error) {
       console.error('Error seeding data:', error);
-      toast.error('Error de conexión');
+      toast.error('Error al crear datos demo');
     } finally {
       setSeeding(false);
     }
@@ -95,18 +85,9 @@ export default function DemoDataModule() {
     setShowClearDialog(false);
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/seed/demo-data`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.delete('/seed/demo-data');
       
-      const data = await response.json();
-      
-      if (data.success) {
+      if (response.data.success) {
         toast.success('Datos demo eliminados');
         setLastResult(null);
         fetchStats();
@@ -115,7 +96,7 @@ export default function DemoDataModule() {
       }
     } catch (error) {
       console.error('Error clearing data:', error);
-      toast.error('Error de conexión');
+      toast.error('Error al eliminar datos');
     } finally {
       setClearing(false);
     }
