@@ -30,6 +30,7 @@ class UserProfileService(BaseService):
             )
             if not existing:
                 type_data["created_at"] = datetime.now(timezone.utc).isoformat()
+                type_data["is_active"] = True  # Ensure is_active is set
                 await db.chipi_user_types.insert_one(type_data)
                 created += 1
         
@@ -38,7 +39,9 @@ class UserProfileService(BaseService):
     
     async def get_user_types(self, active_only: bool = True) -> List[Dict]:
         """Obtener todos los tipos de usuario"""
-        query = {"is_active": True} if active_only else {}
+        query = {}
+        if active_only:
+            query["$or"] = [{"is_active": True}, {"is_active": {"$exists": False}}]
         cursor = db.chipi_user_types.find(query, {"_id": 0}).sort("sort_order", 1)
         return await cursor.to_list(length=50)
     
