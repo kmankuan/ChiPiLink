@@ -116,15 +116,25 @@ export default function SuperPinRanking() {
               </h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="border-white/30 text-white hover:bg-white/10"
-            onClick={fetchRanking}
-            disabled={refreshing}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Actualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="border-yellow-400/50 text-yellow-400 hover:bg-yellow-400/10"
+              onClick={() => navigate('/pinpanclub/superpin/compare')}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              {t('superpin.comparison.title')}
+            </Button>
+            <Button
+              variant="outline"
+              className="border-white/30 text-white hover:bg-white/10"
+              onClick={fetchRanking}
+              disabled={refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Actualizar
+            </Button>
+          </div>
         </div>
       </div>
 
