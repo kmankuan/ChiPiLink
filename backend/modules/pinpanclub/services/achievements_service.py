@@ -33,6 +33,8 @@ class AchievementsService(BaseService):
             if not existing:
                 achv_data["created_at"] = datetime.now(timezone.utc).isoformat()
                 achv_data["achievement_id"] = f"achv_{achv_data['type']}_{achv_data['requirement_value']}"
+                achv_data["is_active"] = True  # Ensure is_active is set
+                achv_data["is_secret"] = False
                 await db.pinpanclub_achievements.insert_one(achv_data)
                 created += 1
         
@@ -41,10 +43,12 @@ class AchievementsService(BaseService):
     async def get_all_achievements(self) -> List[Dict]:
         """Obtener todos los logros activos"""
         cursor = db.pinpanclub_achievements.find(
-            {"is_active": True},
+            {},  # Get all achievements (not filtering by is_active since some may not have it)
             {"_id": 0}
         )
-        return await cursor.to_list(length=100)
+        results = await cursor.to_list(length=100)
+        # Filter in Python to handle documents without is_active field
+        return [a for a in results if a.get("is_active", True)]
     
     async def get_player_achievements(self, jugador_id: str) -> List[Dict]:
         """Obtener logros de un jugador"""
