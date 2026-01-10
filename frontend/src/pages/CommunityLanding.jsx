@@ -466,6 +466,34 @@ export default function CommunityLanding() {
           </section>
         )}
 
+        {/* PinPanClub Activity Feed Section */}
+        <section>
+          <SectionHeader 
+            icon={Trophy} 
+            title="PinPanClub - Actividad del Club" 
+            action="Ver más"
+            actionLink="/pinpanclub"
+          />
+          <PinPanClubFeedBlock 
+            config={{
+              titulo: { es: '', en: '', zh: '' },
+              subtitulo: { es: '', en: '', zh: '' },
+              visibility: { public: true, registered: true, moderator: true, admin: true, super_admin: true },
+              sections: {
+                recent_matches: { enabled: true, limit: 5, visibility: { public: true } },
+                leaderboard: { enabled: true, limit: 10, visibility: { public: true } },
+                active_challenges: { enabled: true, limit: 4, visibility: { public: true } },
+                recent_achievements: { enabled: true, limit: 6, visibility: { public: true } },
+                active_players: { enabled: true, visibility: { public: true } },
+                upcoming_tournaments: { enabled: true, limit: 3, visibility: { public: true } }
+              },
+              style: { show_cta: false }
+            }}
+            isEditMode={false}
+            onUpdateConfig={() => {}}
+          />
+        </section>
+
         {/* Events Section */}
         {eventos && eventos.length > 0 && (
           <section>
