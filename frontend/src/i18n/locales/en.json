@@ -487,5 +487,79 @@
       "confirmNow": "Confirm Now",
       "noPending": "No pending matches"
     }
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Community statistics and trends",
+    "activePlayers": "Active Players",
+    "matchesThisWeek": "Matches This Week",
+    "challengesCompleted": "Challenges Completed",
+    "rapidPinMatches": "Rapid Pin Active",
+    "weeklyActivity": "Weekly Activity",
+    "topPlayers": "Most Active Players",
+    "recentAchievements": "Recent Achievements",
+    "challengeLeaderboard": "Top Challengers",
+    "popularChallenges": "Popular Challenges",
+    "newPlayers": "New Players"
+  },
+  "social": {
+    "follow": "Follow",
+    "following": "Following",
+    "followers": "Followers",
+    "unfollow": "Unfollow",
+    "comments": "Comments",
+    "noComments": "No comments yet",
+    "beFirstToComment": "Be the first to comment!",
+    "writeComment": "Write a comment...",
+    "publish": "Publish",
+    "report": "Report",
+    "communityRules": "Community Rules",
+    "rulesAccept": "I Accept the Rules",
+    "moderationWarning": "Your comments will be moderated due to previous warnings"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "newAchievement": "New Achievement!",
+    "earned": "Earned",
+    "pointsReward": "reward points",
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    }
+  },
+  "ranks": {
+    "title": "Ranks",
+    "yourRank": "Your Rank",
+    "currentRank": "Current Rank",
+    "nextRank": "Next Rank",
+    "pointsToNext": "points to next",
+    "maxRank": "Maximum Rank Achieved!",
+    "promotion": "You Ranked Up!",
+    "rewards": "Rewards",
+    "rewardEarned": "Reward Earned",
+    "bonusPoints": "Bonus Points",
+    "specialBadge": "Special Badge",
+    "perks": "Perks",
+    "viewRewards": "View Rewards",
+    "names": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond",
+      "master": "Master",
+      "grandmaster": "Grand Master"
+    },
+    "descriptions": {
+      "bronze": "Starting your journey",
+      "silver": "Committed player",
+      "gold": "Outstanding player",
+      "platinum": "Club elite",
+      "diamond": "Living legend",
+      "master": "Absolute dominator",
+      "grandmaster": "The best of all"
+    }
   }
 }
