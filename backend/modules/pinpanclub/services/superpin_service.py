@@ -1306,6 +1306,126 @@ class SuperPinService(BaseService):
             "total_active": len(active_matches)
         }
 
+    # ============== HEAD-TO-HEAD PREDICTOR ==============
+    
+    async def predict_match(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
+        """
+        Predice el resultado de un partido entre dos jugadores.
+        Usa ELO rating, historial de enfrentamientos y racha actual.
+        """
+        # Obtener estadísticas de ambos jugadores
+        stats_a = await self.get_player_statistics(jugador_a_id)
+        stats_b = await self.get_player_statistics(jugador_b_id)
+        
+        if not stats_a or not stats_b:
+            return {"error": "Jugador no encontrado"}
+        
+        # Obtener historial head-to-head
+        h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
+        
+        # Calcular probabilidad basada en ELO
+        elo_a = stats_a.get("player", {}).get("elo_rating", 1200)
+        elo_b = stats_b.get("player", {}).get("elo_rating", 1200)
+        
+        # Fórmula ELO de probabilidad esperada
+        expected_a = 1 / (1 + math.pow(10, (elo_b - elo_a) / 400))
+        expected_b = 1 - expected_a
+        
+        # Ajustar por historial H2H
+        h2h_adjustment = 0
+        if h2h.get("total_matches", 0) > 0:
+            wins_a = h2h.get("player_a_wins", 0)
+            wins_b = h2h.get("player_b_wins", 0)
+            total = wins_a + wins_b
+            if total > 0:
+                # Factor de ajuste basado en H2H (máx ±10%)
+                h2h_ratio = (wins_a - wins_b) / total
+                h2h_adjustment = h2h_ratio * 0.10
+        
+        # Ajustar por racha actual
+        streak_adjustment = 0
+        streak_a = stats_a.get("best_streak", 0)
+        streak_b = stats_b.get("best_streak", 0)
+        
+        # Racha positiva da pequeña ventaja (máx ±5%)
+        if streak_a > 0 and streak_b <= 0:
+            streak_adjustment = min(streak_a * 0.01, 0.05)
+        elif streak_b > 0 and streak_a <= 0:
+            streak_adjustment = -min(streak_b * 0.01, 0.05)
+        
+        # Probabilidad final ajustada
+        prob_a = max(0.05, min(0.95, expected_a + h2h_adjustment + streak_adjustment))
+        prob_b = 1 - prob_a
+        
+        # Determinar favorito
+        if prob_a > prob_b:
+            favorite = "player_a"
+            confidence = "high" if prob_a > 0.7 else "medium" if prob_a > 0.55 else "low"
+        elif prob_b > prob_a:
+            favorite = "player_b"
+            confidence = "high" if prob_b > 0.7 else "medium" if prob_b > 0.55 else "low"
+        else:
+            favorite = "draw"
+            confidence = "low"
+        
+        # Calcular ventajas por categoría
+        advantages = []
+        
+        # ELO
+        if elo_a > elo_b + 50:
+            advantages.append({"category": "elo", "player": "a", "detail": f"+{elo_a - elo_b} ELO"})
+        elif elo_b > elo_a + 50:
+            advantages.append({"category": "elo", "player": "b", "detail": f"+{elo_b - elo_a} ELO"})
+        
+        # Win Rate
+        wr_a = stats_a.get("win_rate", 0)
+        wr_b = stats_b.get("win_rate", 0)
+        if wr_a > wr_b + 5:
+            advantages.append({"category": "win_rate", "player": "a", "detail": f"{wr_a:.0f}% vs {wr_b:.0f}%"})
+        elif wr_b > wr_a + 5:
+            advantages.append({"category": "win_rate", "player": "b", "detail": f"{wr_b:.0f}% vs {wr_a:.0f}%"})
+        
+        # H2H
+        if h2h.get("total_matches", 0) >= 3:
+            wins_a = h2h.get("player_a_wins", 0)
+            wins_b = h2h.get("player_b_wins", 0)
+            if wins_a > wins_b:
+                advantages.append({"category": "h2h", "player": "a", "detail": f"{wins_a}-{wins_b} en H2H"})
+            elif wins_b > wins_a:
+                advantages.append({"category": "h2h", "player": "b", "detail": f"{wins_b}-{wins_a} en H2H"})
+        
+        return {
+            "player_a": {
+                "jugador_id": jugador_a_id,
+                "nombre": stats_a.get("player", {}).get("nombre", "?"),
+                "apodo": stats_a.get("player", {}).get("apodo"),
+                "elo": elo_a,
+                "win_rate": wr_a,
+                "probability": round(prob_a * 100, 1)
+            },
+            "player_b": {
+                "jugador_id": jugador_b_id,
+                "nombre": stats_b.get("player", {}).get("nombre", "?"),
+                "apodo": stats_b.get("player", {}).get("apodo"),
+                "elo": elo_b,
+                "win_rate": wr_b,
+                "probability": round(prob_b * 100, 1)
+            },
+            "prediction": {
+                "favorite": favorite,
+                "confidence": confidence,
+                "probability_a": round(prob_a * 100, 1),
+                "probability_b": round(prob_b * 100, 1)
+            },
+            "factors": {
+                "elo_based": round(expected_a * 100, 1),
+                "h2h_adjustment": round(h2h_adjustment * 100, 1),
+                "streak_adjustment": round(streak_adjustment * 100, 1)
+            },
+            "advantages": advantages,
+            "head_to_head": h2h
+        }
+
 
 # Instancia singleton
 superpin_service = SuperPinService()
