@@ -122,7 +122,7 @@ Sistema de ranking basado en puntos acumulados de retos:
 | Gran Maestro | 5000+ | 🏆 | El mejor de todos |
 
 **Características:**
-- **Badge compacto** en esquina del avatar del perfil
+- **Badge compacto** en esquina del avatar (con tooltip)
 - **Tarjeta de progreso** con barra visual hacia siguiente nivel
 - **Tooltips interactivos** con info del rango
 - **Animaciones para rangos altos** (pulse, sparkles para Diamante+)
@@ -135,6 +135,40 @@ Sistema de ranking basado en puntos acumulados de retos:
 **Archivos:**
 - `/app/frontend/src/modules/pinpanclub/components/PlayerRankBadge.jsx`
 - `/app/backend/modules/pinpanclub/routes/challenges.py` (nuevo endpoint)
+
+### 6. Recompensas Automáticas por Subida de Rango 🎁 NEW
+Sistema de recompensas que se otorgan automáticamente al subir de rango:
+
+| Rango | Recompensa | Badges/Perks |
+|-------|------------|--------------|
+| Plata | +50 pts | - |
+| Oro | +100 pts | - |
+| Platino | +200 pts | ⚡ Badge "Élite del Club" (rare) |
+| Diamante | +500 pts | Título "Leyenda" |
+| Maestro | +1000 pts | 👑 Badge "Maestro Supremo" (epic) + VIP Access |
+| Gran Maestro | +2500 pts | 🏆 Badge Legendario + Hall of Fame + Todos los perks |
+
+**Características:**
+- **Detección automática** de promoción al completar retos
+- **Multi-idioma** (es, en, zh) para nombres y descripciones
+- **Modal de celebración** con confeti al subir de rango
+- **Historial de promociones** por jugador
+- **Prevención de duplicados** - no otorga recompensa si ya fue recibida
+- **Notificaciones** automáticas al subir de rango
+- **Activity Feed** - se publica en el feed social
+
+**Endpoints:**
+- `GET /api/pinpanclub/rank-rewards/info?lang=es` - Info de todos los rangos con recompensas
+- `GET /api/pinpanclub/rank-rewards/current/{jugador_id}?lang=es` - Rango actual con progreso
+- `GET /api/pinpanclub/rank-rewards/player/{jugador_id}/history` - Historial de promociones
+- `POST /api/pinpanclub/rank-rewards/check-promotion/{jugador_id}?old_points=X&new_points=Y` - Verificar y otorgar promoción
+
+**Archivos:**
+- `/app/backend/modules/pinpanclub/services/rank_rewards_service.py`
+- `/app/backend/modules/pinpanclub/routes/rank_rewards.py`
+- `/app/frontend/src/modules/pinpanclub/components/RankRewardsDisplay.jsx`
+
+**Test Results:** 15/15 tests passed (100%)
 
 ## Frontend Routes
 
