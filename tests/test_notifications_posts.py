@@ -437,7 +437,7 @@ class TestPosts(TestSetup):
                     "type": "callout",
                     "content": "Este es un callout informativo",
                     "icon": "💡",
-                    "style": "info"
+                    "style": {"type": "info"}
                 },
                 {
                     "type": "divider"
