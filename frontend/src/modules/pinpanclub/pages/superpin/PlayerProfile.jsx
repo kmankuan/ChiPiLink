@@ -176,6 +176,11 @@ export default function PlayerProfile() {
                   )}
                 </div>
                 
+                {/* Achievement Showcase */}
+                <div className="mt-4">
+                  <AchievementShowcase jugadorId={jugadorId} maxDisplay={5} showTitle={true} />
+                </div>
+                
                 {/* Badges Preview */}
                 {badges.length > 0 && (
                   <div className="flex gap-2 mt-3">
