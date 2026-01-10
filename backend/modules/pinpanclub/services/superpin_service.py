@@ -1397,16 +1397,16 @@ class SuperPinService(BaseService):
         return {
             "player_a": {
                 "jugador_id": jugador_a_id,
-                "nombre": stats_a.get("player", {}).get("nombre", "?"),
-                "apodo": stats_a.get("player", {}).get("apodo"),
+                "nombre": stats_a.get("player_info", {}).get("nombre", "?"),
+                "apodo": stats_a.get("player_info", {}).get("apodo"),
                 "elo": elo_a,
                 "win_rate": wr_a,
                 "probability": round(prob_a * 100, 1)
             },
             "player_b": {
                 "jugador_id": jugador_b_id,
-                "nombre": stats_b.get("player", {}).get("nombre", "?"),
-                "apodo": stats_b.get("player", {}).get("apodo"),
+                "nombre": stats_b.get("player_info", {}).get("nombre", "?"),
+                "apodo": stats_b.get("player_info", {}).get("apodo"),
                 "elo": elo_b,
                 "win_rate": wr_b,
                 "probability": round(prob_b * 100, 1)
