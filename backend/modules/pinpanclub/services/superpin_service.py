@@ -1143,6 +1143,168 @@ class SuperPinService(BaseService):
                 "score": f"{m.get('sets_jugador_a')}-{m.get('sets_jugador_b')}"
             } for m in matches[:10]]
         }
+    
+    # ============== QUICK TOURNAMENT (TORNEO RELÁMPAGO) ==============
+    
+    async def create_quick_tournament(
+        self,
+        liga_id: str,
+        nombre: str = None,
+        pairing_mode: str = "random",  # random, by_ranking, swiss
+        match_format: str = "best_of_1",  # best_of_1, best_of_3
+        points_per_set: int = 11
+    ) -> Dict:
+        """
+        Crear torneo relámpago con jugadores que tienen check-in activo.
+        
+        pairing_mode:
+        - random: Emparejar aleatoriamente
+        - by_ranking: Mejor vs Peor ranking
+        - swiss: Sistema suizo (similar nivel)
+        """
+        import random
+        from datetime import datetime, timezone
+        
+        # Obtener jugadores con check-in activo
+        available_players = await self.get_available_players(liga_id)
+        
+        if len(available_players) < 2:
+            raise ValueError("Se necesitan al menos 2 jugadores con check-in activo")
+        
+        # Obtener info de ranking para cada jugador
+        players_with_ranking = []
+        for checkin in available_players:
+            jugador_id = checkin.get("jugador_id")
+            ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
+            player = await self.player_repo.get_by_id(jugador_id)
+            
+            players_with_ranking.append({
+                "jugador_id": jugador_id,
+                "jugador_info": {
+                    "nombre": player.get("nombre") if player else "Desconocido",
+                    "apodo": player.get("apodo") if player else None
+                },
+                "elo": ranking.get("elo_rating", 1000) if ranking else 1000,
+                "posicion": ranking.get("posicion", 999) if ranking else 999
+            })
+        
+        # Ordenar y emparejar según el modo
+        if pairing_mode == "by_ranking":
+            # Ordenar por posición (mejor primero)
+            players_with_ranking.sort(key=lambda x: x["posicion"])
+        elif pairing_mode == "swiss":
+            # Ordenar por ELO (similar nivel)
+            players_with_ranking.sort(key=lambda x: x["elo"])
+        else:
+            # Random
+            random.shuffle(players_with_ranking)
+        
+        # Crear emparejamientos
+        pairings = []
+        used_players = set()
+        
+        if pairing_mode == "by_ranking":
+            # Mejor vs Peor
+            n = len(players_with_ranking)
+            for i in range(n // 2):
+                player_a = players_with_ranking[i]
+                player_b = players_with_ranking[n - 1 - i]
+                pairings.append((player_a, player_b))
+        elif pairing_mode == "swiss":
+            # Jugadores de nivel similar
+            for i in range(0, len(players_with_ranking) - 1, 2):
+                pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
+        else:
+            # Random pairs
+            for i in range(0, len(players_with_ranking) - 1, 2):
+                pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
+        
+        # Jugador sin pareja (si número impar)
+        bye_player = None
+        if len(players_with_ranking) % 2 == 1:
+            bye_player = players_with_ranking[-1]
+        
+        # Crear los partidos
+        created_matches = []
+        mejor_de = 1 if match_format == "best_of_1" else 3
+        
+        for player_a, player_b in pairings:
+            match_data = SuperPinMatchCreate(
+                liga_id=liga_id,
+                jugador_a_id=player_a["jugador_id"],
+                jugador_b_id=player_b["jugador_id"],
+                mejor_de=mejor_de,
+                puntos_por_set=points_per_set,
+                match_type="quick"
+            )
+            
+            match = await self.create_match(match_data)
+            # Iniciar el partido automáticamente
+            await self.start_match(match.partido_id)
+            
+            created_matches.append({
+                "partido_id": match.partido_id,
+                "jugador_a": player_a,
+                "jugador_b": player_b,
+                "estado": "en_curso"
+            })
+        
+        # Generar nombre del torneo
+        if not nombre:
+            nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
+        
+        quick_tournament = {
+            "quick_tournament_id": f"qt_{uuid.uuid4().hex[:12]}",
+            "liga_id": liga_id,
+            "nombre": nombre,
+            "pairing_mode": pairing_mode,
+            "match_format": match_format,
+            "total_players": len(players_with_ranking),
+            "total_matches": len(created_matches),
+            "matches": created_matches,
+            "bye_player": bye_player,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "estado": "en_curso"
+        }
+        
+        self.log_info(f"Quick tournament created: {quick_tournament['quick_tournament_id']} with {len(created_matches)} matches")
+        
+        return quick_tournament
+    
+    async def get_quick_tournament_status(self, liga_id: str) -> Dict:
+        """Obtener estado de partidos rápidos activos en una liga"""
+        # Buscar partidos tipo 'quick' en curso
+        active_matches = await self.match_repo.find_many(
+            query={
+                "liga_id": liga_id,
+                "match_type": "quick",
+                "estado": {"$in": ["pendiente", "en_curso"]}
+            },
+            sort=[("created_at", -1)]
+        )
+        
+        finished_today = await self.match_repo.find_many(
+            query={
+                "liga_id": liga_id,
+                "match_type": "quick",
+                "estado": "finalizado"
+            },
+            sort=[("fecha_partido", -1)],
+            limit=20
+        )
+        
+        # Enriquecer con info de jugadores
+        for match in active_matches + finished_today:
+            player_a = await self.player_repo.get_by_id(match.get("jugador_a_id"))
+            player_b = await self.player_repo.get_by_id(match.get("jugador_b_id"))
+            match["jugador_a_info"] = {"nombre": player_a.get("nombre") if player_a else "?"} 
+            match["jugador_b_info"] = {"nombre": player_b.get("nombre") if player_b else "?"}
+        
+        return {
+            "active_matches": active_matches,
+            "finished_today": finished_today,
+            "total_active": len(active_matches)
+        }
 
 
 # Instancia singleton
