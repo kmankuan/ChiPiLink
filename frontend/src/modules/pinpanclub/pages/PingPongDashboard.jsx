@@ -56,9 +56,23 @@ export default function PingPongDashboard() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [rapidPinData, setRapidPinData] = useState({ matches: [], season: null });
   const [rapidPinPendingCount, setRapidPinPendingCount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState(null);
   
   // Detectar si estamos dentro del admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
+
+  // Get current user ID from auth
+  useEffect(() => {
+    const authData = localStorage.getItem('chipi_auth');
+    if (authData) {
+      try {
+        const parsed = JSON.parse(authData);
+        setCurrentUserId(parsed.user?.user_id || null);
+      } catch (e) {
+        console.error('Error parsing auth data:', e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
