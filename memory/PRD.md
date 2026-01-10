@@ -529,5 +529,5 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 
 ---
 *Last Updated: January 2026*
-*All Priorities Complete: P0-P9 + Phase 1 Users*
-*215/215 tests passed across all features* (188 + 27 new)
+*All Priorities Complete: P0-P9 + Phase 1 Users + QR System*
+*237/238 tests passed across all features* (188 + 27 + 22 new)
