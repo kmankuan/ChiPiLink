@@ -271,10 +271,10 @@ class TestSeedDemoEndpoints:
         data = response.json()
         stats = data.get("stats", {})
         
-        # Should have stats
+        # Should have stats (note: field names are total_superpin_matches, total_rapidpin_matches)
         assert "active_players" in stats
-        assert "superpin_matches" in stats
-        assert "rapidpin_matches" in stats
+        assert "total_superpin_matches" in stats
+        assert "total_rapidpin_matches" in stats
         assert "total_matches" in stats
     
     def test_activity_feed_returns_tournaments(self):
