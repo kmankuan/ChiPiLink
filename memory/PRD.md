@@ -1145,7 +1145,7 @@ Sistema de vinculación con flujo de aprobaciones:
 ### P1 - Alta Prioridad ✅ COMPLETADO
 - [x] Notificaciones push para aprobaciones de vinculación
 - [x] Agregar enlace a "Mis Libros Escolares" en el menú principal
-- [ ] Integración con Monday.com para seguimiento de pedidos
+- [x] Integración con Monday.com para seguimiento de pedidos
 
 ### P2 - Media Prioridad
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
