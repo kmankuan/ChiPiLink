@@ -1484,11 +1484,28 @@ class RapidPinService(BaseService):
         await db["rapidpin_comments"].insert_one(comment)
         
         # Solo incrementar contador si está aprobado
+        new_count = queue_entry.get("comments_count", 0)
         if is_approved:
             await db["rapidpin_queue"].update_one(
                 {"queue_id": queue_id},
                 {"$inc": {"comments_count": 1}}
             )
+            new_count += 1
+            
+            # Emit WebSocket event only for approved comments
+            try:
+                from modules.realtime.services import emit_comment_event
+                user_name = (user_info or {}).get("nombre", "Usuario")
+                await emit_comment_event(
+                    queue_id=queue_id,
+                    comment_id=comment["comment_id"],
+                    user_id=user_id,
+                    user_name=user_name,
+                    content=content,
+                    new_count=new_count
+                )
+            except Exception as e:
+                self.log_error(f"Error emitting comment event: {e}")
         
         comment.pop("_id", None)
         
