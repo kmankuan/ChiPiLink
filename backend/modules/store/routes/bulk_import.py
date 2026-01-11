@@ -169,3 +169,45 @@ async def get_grados_disponibles(
     """
     grados = await bulk_import_service.get_grados_disponibles()
     return {"grados": grados}
+
+
+@router.get("/estudiantes")
+async def get_estudiantes_importados(
+    grado: Optional[str] = None,
+    buscar: Optional[str] = None,
+    estado: str = "activo",
+    limit: int = 100,
+    skip: int = 0,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Obtener estudiantes importados con filtros.
+    """
+    from core.database import db
+    
+    query = {}
+    if grado:
+        query["grado"] = grado
+    if estado:
+        query["estado"] = estado
+    if buscar:
+        query["$or"] = [
+            {"nombre_completo": {"$regex": buscar, "$options": "i"}},
+            {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
+        ]
+    
+    total = await db.estudiantes_sincronizados.count_documents(query)
+    
+    cursor = db.estudiantes_sincronizados.find(
+        query,
+        {"_id": 0}
+    ).sort("nombre_completo", 1).skip(skip).limit(limit)
+    
+    estudiantes = await cursor.to_list(length=limit)
+    
+    return {
+        "total": total,
+        "estudiantes": estudiantes,
+        "pagina": skip // limit + 1 if limit > 0 else 1,
+        "total_paginas": (total + limit - 1) // limit if limit > 0 else 1
+    }
