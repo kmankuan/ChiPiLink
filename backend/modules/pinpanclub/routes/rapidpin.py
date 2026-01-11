@@ -192,7 +192,62 @@ async def get_scoring_config():
     }
 
 
-# ============== MATCH QUEUE (Waiting for Referee) ==============
+# ============== CHALLENGE & QUEUE SYSTEM ==============
+
+@router.post("/challenge")
+async def create_challenge(
+    season_id: str,
+    challenger_id: str,
+    opponent_id: str,
+    notes: Optional[str] = None
+):
+    """
+    Crear desafío de jugador a jugador.
+    El oponente debe aceptar antes de que se busque árbitro.
+    """
+    try:
+        return await rapidpin_service.create_challenge(
+            season_id=season_id,
+            challenger_id=challenger_id,
+            opponent_id=opponent_id,
+            notes=notes
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/challenge/{queue_id}/accept")
+async def accept_challenge(
+    queue_id: str,
+    user_id: str,
+    user_role: str = "player"
+):
+    """
+    Aceptar desafío.
+    - El oponente (player2) puede aceptar
+    - Admin/Mod pueden forzar aceptación
+    """
+    try:
+        return await rapidpin_service.accept_challenge(queue_id, user_id, user_role)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/challenge/{queue_id}/decline")
+async def decline_challenge(
+    queue_id: str,
+    user_id: str,
+    reason: Optional[str] = None
+):
+    """
+    Rechazar desafío.
+    Solo el oponente puede rechazar.
+    """
+    try:
+        return await rapidpin_service.decline_challenge(queue_id, user_id, reason)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post("/queue")
 async def create_queue_match(
@@ -200,48 +255,93 @@ async def create_queue_match(
     player1_id: str,
     player2_id: str,
     created_by_id: str,
+    created_by_role: str = "admin",
     notes: Optional[str] = None
 ):
     """
-    Crear partido en cola esperando árbitro.
-    Dos jugadores quieren jugar y buscan un árbitro.
+    Crear partido directamente en cola (admin/mod).
+    Salta la fase de desafío, va directo a esperar árbitro.
     """
-    if player1_id == player2_id:
-        raise HTTPException(status_code=400, detail="Los jugadores deben ser diferentes")
-    
-    queue_entry = await rapidpin_service.create_queue_match(
-        season_id=season_id,
-        player1_id=player1_id,
-        player2_id=player2_id,
-        created_by_id=created_by_id,
-        notes=notes
-    )
-    return queue_entry
+    try:
+        return await rapidpin_service.create_queue_match(
+            season_id=season_id,
+            player1_id=player1_id,
+            player2_id=player2_id,
+            created_by_id=created_by_id,
+            created_by_role=created_by_role,
+            notes=notes
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/queue")
 async def get_queue_matches(
     season_id: Optional[str] = None,
-    status: Optional[str] = "waiting"
+    status: Optional[str] = None,
+    player_id: Optional[str] = None
 ):
     """
-    Obtener partidos en cola.
-    Por defecto solo los que están esperando árbitro.
+    Obtener partidos en cola/desafíos.
+    - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos activos)
+    - player_id: filtrar por jugador involucrado
     """
-    return await rapidpin_service.get_queue_matches(season_id, status)
+    return await rapidpin_service.get_queue_matches(season_id, status, player_id)
+
+
+@router.get("/my-challenges/{player_id}")
+async def get_my_challenges(
+    player_id: str,
+    season_id: Optional[str] = None
+):
+    """
+    Obtener mis desafíos pendientes (enviados y recibidos).
+    """
+    db = await rapidpin_service.get_db()
+    
+    query = {
+        "status": "challenge_pending",
+        "$or": [
+            {"player1_id": player_id},
+            {"player2_id": player_id}
+        ]
+    }
+    if season_id:
+        query["season_id"] = season_id
+    
+    cursor = db["rapidpin_queue"].find(query, {"_id": 0}).sort("created_at", -1)
+    challenges = await cursor.to_list(length=50)
+    
+    # Separar enviados y recibidos
+    sent = [c for c in challenges if c["player1_id"] == player_id]
+    received = [c for c in challenges if c["player2_id"] == player_id]
+    
+    return {
+        "sent": sent,
+        "received": received,
+        "total": len(challenges)
+    }
 
 
 @router.post("/queue/{queue_id}/assign")
 async def assign_referee(
     queue_id: str,
-    referee_id: str
+    referee_id: str,
+    assigned_by_id: Optional[str] = None,
+    assigned_by_role: str = "player"
 ):
     """
     Asignarse como árbitro de un partido en cola.
-    El árbitro no puede ser uno de los jugadores.
+    - Cualquier usuario logueado puede asignarse (referee_id = su ID)
+    - Admin/Mod pueden asignar a cualquiera
     """
     try:
-        return await rapidpin_service.assign_referee(queue_id, referee_id)
+        return await rapidpin_service.assign_referee(
+            queue_id, 
+            referee_id, 
+            assigned_by_id,
+            assigned_by_role
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -254,7 +354,7 @@ async def complete_queue_match(
     score_perdedor: int = 0
 ):
     """
-    Completar partido de la cola con el resultado.
+    Completar partido con resultado.
     Solo el árbitro asignado puede completarlo.
     """
     try:
