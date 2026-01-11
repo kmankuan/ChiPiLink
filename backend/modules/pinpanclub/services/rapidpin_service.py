@@ -31,7 +31,7 @@ async def send_challenge_notification(
 ) -> bool:
     """
     Enviar notificación push de desafío.
-    notification_type: 'challenge_received', 'challenge_accepted', 'referee_needed'
+    notification_type: 'challenge_received', 'challenge_accepted', 'referee_needed', 'referee_assigned'
     """
     try:
         from modules.notifications.services.push_service import push_notification_service
@@ -48,6 +48,18 @@ async def send_challenge_notification(
             "referee_needed": {
                 "title": "🏓 ¡Partido esperando árbitro!",
                 "body": f"El partido entre {challenger_name} está esperando un árbitro"
+            },
+            "referee_assigned": {
+                "title": "🎮 ¡Tu partido está listo!",
+                "body": f"{challenger_name} será el árbitro de tu partido. ¡A jugar!"
+            },
+            "date_proposed": {
+                "title": "📅 Nueva propuesta de fecha",
+                "body": f"{challenger_name} propone una nueva fecha para el reto"
+            },
+            "date_accepted": {
+                "title": "✅ ¡Fecha acordada!",
+                "body": f"{challenger_name} aceptó la fecha. El reto está confirmado"
             }
         }
         
