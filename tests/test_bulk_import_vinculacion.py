@@ -321,10 +321,8 @@ TEST_BOOK_{unique_id}_2\tLibro Prueba 2\t19.99\tEditorial Test"""
                     "codigo": 0,
                     "nombre": 1,
                     "precio": 2,
-                    "editorial": 3,
-                    "isbn": None,
-                    "grado": None,
-                    "materia": None
+                    "editorial": 3
+                    # Omit isbn, grado, materia - they don't exist in data
                 },
                 "catalogo_id": None,
                 "grado_default": "1er Grado",
