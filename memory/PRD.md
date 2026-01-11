@@ -1127,14 +1127,20 @@ Sistema de vinculación con flujo de aprobaciones:
 - **Backend:** 20/20 tests passed (100%)
 - **Frontend:** 100% funcionalidades verificadas
 
+### Test P0 - Flujo de Pedidos
+- **Backend:** 20/20 tests passed (100%) - iteration_24.json
+- **Frontend:** 100% funcionalidades verificadas
+
 ---
 
 ## Próximas Tareas (Backlog)
 
-### P0 - Crítico
-- [ ] Flujo de pedidos de libros para acudientes vinculados
-- [ ] Restricción: un libro por estudiante por año escolar
-- [ ] Sistema de pre-ordenes con demanda agregada
+### P0 - Crítico ✅ COMPLETADO
+- [x] Vista previa del pedido mostrando todos los libros del grado
+- [x] Flujo de pedidos de libros para acudientes vinculados
+- [x] Restricción: un libro por estudiante por año escolar
+- [x] Sistema de pre-órdenes con demanda agregada
+- [x] Panel admin con demanda agregada y gestión de estados
 
 ### P1 - Alta Prioridad
 - [ ] Integración con Monday.com para seguimiento de pedidos
