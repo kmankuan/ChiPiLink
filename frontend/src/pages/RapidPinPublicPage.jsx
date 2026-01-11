@@ -112,6 +112,111 @@ export default function RapidPinPublicPage() {
     }
   };
 
+  const fetchCommentConfig = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/comment-config`);
+      if (response.ok) {
+        const data = await response.json();
+        setCommentConfig(data);
+      }
+    } catch (error) {
+      console.error('Error fetching comment config:', error);
+    }
+  };
+
+  const fetchComments = async (queueId) => {
+    try {
+      setLoadingComments(true);
+      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/comments`);
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const checkIfLiked = async (queueId) => {
+    if (!isAuthenticated || !currentPlayerId) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/liked?user_id=${currentPlayerId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLikedChallenges(prev => ({ ...prev, [queueId]: data.liked }));
+      }
+    } catch (error) {
+      console.error('Error checking like:', error);
+    }
+  };
+
+  const handleToggleLike = async (queueId) => {
+    if (!isAuthenticated) {
+      toast.error('Debes iniciar sesión para dar like');
+      return;
+    }
+    
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setLikedChallenges(prev => ({ ...prev, [queueId]: data.action === 'liked' }));
+        fetchFeed(); // Refresh to update like count
+      }
+    } catch (error) {
+      toast.error('Error al procesar like');
+    }
+  };
+
+  const handleOpenComments = (challenge) => {
+    setSelectedChallengeForComments(challenge);
+    setShowCommentsModal(true);
+    fetchComments(challenge.queue_id);
+    checkIfLiked(challenge.queue_id);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!newComment.trim()) return;
+    if (!isAuthenticated) {
+      toast.error('Debes iniciar sesión para comentar');
+      return;
+    }
+    
+    setSubmittingComment(true);
+    try {
+      const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${selectedChallengeForComments.queue_id}/comment?user_id=${currentPlayerId}&content=${encodeURIComponent(newComment)}&user_name=${encodeURIComponent(userName)}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.is_pending_moderation) {
+          toast.info('Tu comentario está pendiente de moderación');
+        } else {
+          toast.success('Comentario agregado');
+        }
+        setNewComment('');
+        fetchComments(selectedChallengeForComments.queue_id);
+        fetchFeed();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Error al agregar comentario');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   const fetchPlayers = async (search = '') => {
     try {
       setLoadingPlayers(true);
