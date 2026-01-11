@@ -41,7 +41,7 @@ class RapidPinService(BaseService):
     
     async def get_db(self):
         """Obtener conexión a la base de datos"""
-        return await get_database()
+        return get_database()
     
     # ============== SEASON MANAGEMENT ==============
     
