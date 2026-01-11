@@ -351,3 +351,51 @@ async def initialize_notifications(admin=Depends(get_admin_user)):
         "success": True,
         "message": "Notification system initialized"
     }
+
+
+class TestPushRequest(BaseModel):
+    title: str = "Test Notification"
+    body: str = "This is a test push notification from ChiPi Link"
+    segment: str = "Subscribed Users"
+
+
+@router.post("/admin/test-push")
+async def test_push_notification(
+    data: TestPushRequest,
+    admin=Depends(get_admin_user)
+):
+    """Enviar notificación push de prueba a un segmento de OneSignal (admin)"""
+    from modules.notifications.providers.push_providers import OneSignalProvider
+    import os
+    
+    # Get config from environment
+    app_id = os.environ.get("ONESIGNAL_APP_ID")
+    api_key = os.environ.get("ONESIGNAL_API_KEY")
+    
+    if not app_id or not api_key:
+        return {
+            "success": False,
+            "error": "OneSignal not configured. Set ONESIGNAL_APP_ID and ONESIGNAL_API_KEY in .env"
+        }
+    
+    provider = OneSignalProvider({
+        "app_id": app_id,
+        "api_key": api_key
+    })
+    
+    result = await provider.send_to_segment(
+        segments=[data.segment],
+        title=data.title,
+        body=data.body,
+        data={"test": True, "from": "ChiPi Link Admin"},
+        action_url="https://chipipass.preview.emergentagent.com"
+    )
+    
+    return {
+        "success": result.get("success", False),
+        "provider": "onesignal",
+        "segment": data.segment,
+        "notification_id": result.get("notification_id"),
+        "recipients": result.get("recipients", 0),
+        "errors": result.get("errors", [])
+    }
