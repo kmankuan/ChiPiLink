@@ -20,6 +20,7 @@ import { NotificationBar } from '@/components/layout/NotificationBar';
 // Pages
 import Landing from '@/pages/Landing';
 import CommunityLanding from '@/pages/CommunityLanding';
+import RapidPinPublicPage from '@/pages/RapidPinPublicPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AuthCallback from '@/pages/AuthCallback';
