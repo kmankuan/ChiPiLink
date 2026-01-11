@@ -635,7 +635,7 @@ export default function RapidPinPublicPage() {
                       <Calendar className="h-3 w-3 mt-1" />
                       <div>
                         <span className="font-medium">{item.proposed_by_name}</span>: {new Date(item.proposed_date).toLocaleString()}
-                        {item.message && <span className="italic"> - "{item.message}"</span>}
+                        {item.message && <span className="italic"> - &ldquo;{item.message}&rdquo;</span>}
                       </div>
                     </div>
                   ))}
