@@ -51,7 +51,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export default function PingPongDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activeMatches, setActiveMatches] = useState([]);
   const [rankings, setRankings] = useState([]);
@@ -62,6 +62,9 @@ export default function PingPongDashboard() {
   
   // Get current user ID from auth context
   const currentUserId = user?.cliente_id || user?.user_id || null;
+  
+  // Check if user is admin or moderator
+  const canManage = isAdmin || user?.role === 'moderator' || user?.rol === 'moderator';
   
   // Detectar si estamos dentro del admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
