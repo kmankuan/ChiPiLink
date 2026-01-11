@@ -887,6 +887,19 @@ class RapidPinService(BaseService):
         
         self.log_info(f"Referee {referee_id} assigned to queue {queue_id} by {assigned_by_id or referee_id}")
         
+        # Notify both players that referee is assigned
+        referee_name = referee_info.get("apodo") or referee_info.get("nombre", "Un árbitro") if referee_info else "Un árbitro"
+        await send_challenge_notification(
+            recipient_id=queue_entry["player1_id"],
+            challenger_name=referee_name,
+            notification_type="referee_assigned"
+        )
+        await send_challenge_notification(
+            recipient_id=queue_entry["player2_id"],
+            challenger_name=referee_name,
+            notification_type="referee_assigned"
+        )
+        
         updated = await db["rapidpin_queue"].find_one(
             {"queue_id": queue_id},
             {"_id": 0}
