@@ -3,11 +3,13 @@
  * Feed de actividad, partidos en cola esperando árbitro, ranking
  * Sistema de desafíos jugador vs jugador con negociación de fecha
  * Sistema de likes y comentarios
+ * Notificaciones en tiempo real via WebSocket
  */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWebSocket } from '@/hooks/useWebSocket';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +24,7 @@ import {
   RefreshCw, AlertCircle, CheckCircle2, Scale,
   ArrowRight, Loader2, Hand, Swords, Search, X,
   Send, Inbox, Check, XCircle, Heart, MessageCircle,
-  Calendar, CalendarCheck, Pause, RotateCcw
+  Calendar, CalendarCheck, Pause, RotateCcw, Wifi, WifiOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 
