@@ -1142,10 +1142,10 @@ Sistema de vinculación con flujo de aprobaciones:
 - [x] Sistema de pre-órdenes con demanda agregada
 - [x] Panel admin con demanda agregada y gestión de estados
 
-### P1 - Alta Prioridad
+### P1 - Alta Prioridad ✅ COMPLETADO
+- [x] Notificaciones push para aprobaciones de vinculación
+- [x] Agregar enlace a "Mis Libros Escolares" en el menú principal
 - [ ] Integración con Monday.com para seguimiento de pedidos
-- [ ] Notificaciones push para aprobaciones de vinculación
-- [ ] Panel de acudiente para ver estudiantes y hacer pedidos
 
 ### P2 - Media Prioridad
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
