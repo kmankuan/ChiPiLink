@@ -1002,15 +1002,42 @@ export default function RapidPinPublicPage() {
                                 <p className="font-medium">
                                   {challenge.player2_info?.nickname || challenge.player2_info?.nombre || 'Oponente'}
                                 </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Esperando respuesta...
-                                </p>
+                                {challenge.status === 'date_negotiation' && challenge.proposed_date ? (
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {challenge.proposed_by_id === currentPlayerId ? 'Esperando respuesta' : 'Nueva propuesta'}
+                                  </p>
+                                ) : challenge.status === 'queued' ? (
+                                  <p className="text-xs text-amber-600">En cola</p>
+                                ) : (
+                                  <p className="text-xs text-muted-foreground">Esperando respuesta...</p>
+                                )}
                               </div>
                             </div>
-                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
-                              <Clock className="h-3 w-3 mr-1" />
-                              Pendiente
-                            </Badge>
+                            {challenge.status === 'date_negotiation' && challenge.proposed_by_id !== currentPlayerId ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleOpenDateNegotiation(challenge)}
+                              >
+                                <Calendar className="h-4 w-4 mr-1" />
+                                Responder
+                              </Button>
+                            ) : challenge.status === 'queued' ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleOpenDateNegotiation(challenge)}
+                              >
+                                <RotateCcw className="h-4 w-4 mr-1" />
+                                Retomar
+                              </Button>
+                            ) : (
+                              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {challenge.status === 'date_negotiation' ? 'Esperando' : 'Pendiente'}
+                              </Badge>
+                            )}
                           </div>
                         ))}
                       </div>
