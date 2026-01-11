@@ -255,15 +255,16 @@ export default function RapidPinPublicPage() {
     }
     
     try {
+      const userName = user?.nombre || user?.email?.split('@')[0] || 'Usuario';
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}`,
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/like?user_id=${currentPlayerId}&user_name=${encodeURIComponent(userName)}`,
         { method: 'POST' }
       );
       
       if (response.ok) {
         const data = await response.json();
         setLikedChallenges(prev => ({ ...prev, [queueId]: data.action === 'liked' }));
-        fetchFeed(); // Refresh to update like count
+        // No need to fetchFeed - WebSocket will handle the update
       }
     } catch (error) {
       toast.error('Error al procesar like');
