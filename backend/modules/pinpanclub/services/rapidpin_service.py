@@ -503,6 +503,8 @@ class RapidPinService(BaseService):
         await db["rapidpin_queue"].insert_one(queue_entry)
         self.log_info(f"Challenge created: {queue_entry['queue_id']} - {challenger_id} vs {opponent_id}")
         
+        # Remove MongoDB _id before returning
+        queue_entry.pop("_id", None)
         return queue_entry
     
     async def create_queue_match(
