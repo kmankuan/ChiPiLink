@@ -412,7 +412,7 @@ export default function CommunityLanding() {
         <section className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
           <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
           <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
-          <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/pinpanclub/rapidpin" color="orange" />
+          <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
           <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
           <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
           <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" />
