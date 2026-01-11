@@ -507,8 +507,10 @@ Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid P
 **Notificaciones Push:** ✅ Integrado
 - `challenge_received`: Notifica al oponente cuando recibe un desafío
 - `challenge_accepted`: Notifica al retador cuando su desafío es aceptado
+- `referee_needed`: **Broadcast** a todos los usuarios cuando hay un partido esperando árbitro
 - Usa categoría `cat_rapidpin` con prioridad alta
 - Multi-idioma (ES/EN/ZH)
+- Excluye a los jugadores del partido en el broadcast
 
 **Archivos:**
 - `/app/frontend/src/pages/RapidPinPublicPage.jsx` (Frontend completo)
