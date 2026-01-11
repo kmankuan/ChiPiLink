@@ -11,6 +11,7 @@ import UserProfile from '../components/UserProfile';
 import MembershipCard from '../components/MembershipCard';
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
 import NotificationHistory from '@/modules/notifications/components/NotificationHistory';
+import PushNotificationSubscribe from '@/components/notifications/PushNotificationSubscribe';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
