@@ -1043,11 +1043,10 @@ function EstudiantesTab({ token }) {
   const [search, setSearch] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
   const [grados, setGrados] = useState([]);
-  const [stats, setStats] = useState(null);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     loadGrados();
-    loadStats();
   }, []);
 
   useEffect(() => {
@@ -1066,24 +1065,6 @@ function EstudiantesTab({ token }) {
     }
   };
 
-  const loadStats = async () => {
-    try {
-      // Using the google sheets service stats endpoint
-      const res = await fetch(`${API}/api/store/bulk-import/history?tipo=estudiantes&limit=1`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      // Count total estudiantes
-      const countRes = await fetch(`${API}/api/store/bulk-import/grados`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const countData = await countRes.json();
-      setStats({ total_grados: countData.grados?.length || 0, ultima_importacion: data[0]?.fecha });
-    } catch (err) {
-      console.error('Error loading stats:', err);
-    }
-  };
-
   const loadEstudiantes = async () => {
     setLoading(true);
     try {
@@ -1092,11 +1073,12 @@ function EstudiantesTab({ token }) {
       if (gradeFilter) params.append('grado', gradeFilter);
       params.append('limit', '100');
       
-      // We need to add this endpoint - for now use a workaround
-      // This will be a direct DB query
-      const url = `${API}/api/store/bulk-import/estudiantes/preview`;
-      // For now, show message that estudiantes are loaded via import
-      setEstudiantes([]);
+      const res = await fetch(`${API}/api/store/bulk-import/estudiantes?${params}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setEstudiantes(data.estudiantes || []);
+      setTotal(data.total || 0);
     } catch (err) {
       toast.error('Error cargando estudiantes');
     } finally {
@@ -1124,7 +1106,7 @@ function EstudiantesTab({ token }) {
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="h-8 w-8 text-green-500" />
               <div>
-                <p className="text-2xl font-bold">-</p>
+                <p className="text-2xl font-bold">{total}</p>
                 <p className="text-sm text-muted-foreground">Estudiantes</p>
               </div>
             </div>
@@ -1164,13 +1146,51 @@ function EstudiantesTab({ token }) {
                 ))}
               </SelectContent>
             </Select>
+            <Button variant="outline" onClick={loadEstudiantes}>
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
 
-          <div className="text-center py-8 text-muted-foreground">
-            <FileSpreadsheet className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Importa estudiantes desde la pestaña "Importar Estudiantes"</p>
-            <p className="text-sm">Los datos se cargarán desde tu Google Sheet</p>
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : estudiantes.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <FileSpreadsheet className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>No hay estudiantes importados</p>
+              <p className="text-sm">Importa estudiantes desde la pestaña "Importar Estudiantes"</p>
+            </div>
+          ) : (
+            <ScrollArea className="h-[400px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Número</TableHead>
+                    <TableHead>Nombre Completo</TableHead>
+                    <TableHead>Grado</TableHead>
+                    <TableHead>Sección</TableHead>
+                    <TableHead>Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {estudiantes.map((est) => (
+                    <TableRow key={est.sync_id}>
+                      <TableCell className="font-mono">{est.numero_estudiante}</TableCell>
+                      <TableCell>{est.nombre_completo}</TableCell>
+                      <TableCell>{est.grado}</TableCell>
+                      <TableCell>{est.seccion || '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={est.estado === 'activo' ? 'default' : 'secondary'}>
+                          {est.estado}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
     </div>
