@@ -903,6 +903,14 @@ export default function RapidPinPublicPage() {
                 <div className="flex items-center gap-3 mb-2">
                   <Zap className="h-10 w-10" />
                   <h1 className="text-4xl font-bold">Rapid Pin</h1>
+                  {/* WebSocket connection indicator */}
+                  <span 
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${wsConnected ? 'bg-green-500/20 text-green-100' : 'bg-red-500/20 text-red-100'}`}
+                    title={wsConnected ? 'Conectado en tiempo real' : 'Sin conexión en tiempo real'}
+                  >
+                    {wsConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+                    {wsConnected ? 'LIVE' : 'Offline'}
+                  </span>
                 </div>
                 <p className="text-orange-100 text-lg">
                   Partidos relámpago • 2 jugadores + 1 árbitro
