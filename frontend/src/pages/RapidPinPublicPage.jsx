@@ -235,14 +235,149 @@ export default function RapidPinPublicPage() {
     );
   }
 
-  const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, scoring_rules } = feedData || {};
+  const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, pending_challenges, scoring_rules } = feedData || {};
+
+  // Filtered players for search
+  const filteredPlayers = useMemo(() => {
+    if (!searchQuery.trim()) return players;
+    const query = searchQuery.toLowerCase();
+    return players.filter(p => 
+      (p.nombre?.toLowerCase().includes(query)) ||
+      (p.nickname?.toLowerCase().includes(query))
+    );
+  }, [players, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background dark:from-orange-950/20 dark:to-background">
+        {/* Challenge Modal */}
+        <Dialog open={showChallengeModal} onOpenChange={setShowChallengeModal}>
+          <DialogContent className="sm:max-w-md" data-testid="challenge-modal">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Swords className="h-5 w-5 text-orange-500" />
+                我要挑战 - Desafiar
+              </DialogTitle>
+              <DialogDescription>
+                Selecciona un oponente para desafiarlo a un partido Rapid Pin
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar jugador..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                  data-testid="player-search-input"
+                />
+              </div>
+
+              {/* Selected opponent */}
+              {selectedOpponent && (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 border border-orange-300">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 ring-2 ring-orange-500">
+                      <AvatarImage src={selectedOpponent.avatar} />
+                      <AvatarFallback>{selectedOpponent.nombre?.charAt(0) || '?'}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{selectedOpponent.nickname || selectedOpponent.nombre}</p>
+                      {selectedOpponent.nickname && (
+                        <p className="text-xs text-muted-foreground">{selectedOpponent.nombre}</p>
+                      )}
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => setSelectedOpponent(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Player list */}
+              {!selectedOpponent && (
+                <ScrollArea className="h-[250px] border rounded-lg">
+                  {loadingPlayers ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+                    </div>
+                  ) : filteredPlayers.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
+                      <Users className="h-8 w-8 mb-2 opacity-50" />
+                      <p>No se encontraron jugadores</p>
+                    </div>
+                  ) : (
+                    <div className="p-2 space-y-1">
+                      {filteredPlayers.map((player) => (
+                        <button
+                          key={player.player_id}
+                          onClick={() => setSelectedOpponent(player)}
+                          className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors text-left"
+                          data-testid={`player-option-${player.player_id}`}
+                        >
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={player.avatar} />
+                            <AvatarFallback>{player.nombre?.charAt(0) || '?'}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {player.nickname || player.nombre}
+                            </p>
+                            {player.nickname && (
+                              <p className="text-xs text-muted-foreground">{player.nombre}</p>
+                            )}
+                          </div>
+                          {player.elo && (
+                            <Badge variant="outline" className="ml-auto">
+                              ELO {player.elo}
+                            </Badge>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              )}
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowChallengeModal(false);
+                  setSelectedOpponent(null);
+                  setSearchQuery('');
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleSendChallenge}
+                disabled={!selectedOpponent || sendingChallenge}
+                className="bg-orange-500 hover:bg-orange-600"
+                data-testid="send-challenge-btn"
+              >
+                {sendingChallenge ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
+                Enviar Desafío
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white py-12">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <Zap className="h-10 w-10" />
@@ -252,6 +387,20 @@ export default function RapidPinPublicPage() {
                   Partidos relámpago • 2 jugadores + 1 árbitro
                 </p>
               </div>
+              
+              {/* Main Challenge Button */}
+              {isAuthenticated && active_season && (
+                <Button
+                  onClick={handleOpenChallengeModal}
+                  size="lg"
+                  className="bg-white text-orange-600 hover:bg-orange-50 shadow-lg text-lg px-6 py-6"
+                  data-testid="main-challenge-btn"
+                >
+                  <Swords className="h-6 w-6 mr-2" />
+                  我要挑战
+                </Button>
+              )}
+
               <div className="hidden md:flex items-center gap-4">
                 <div className="text-center">
                   <p className="text-3xl font-bold">{stats?.total_matches || 0}</p>
@@ -271,6 +420,146 @@ export default function RapidPinPublicPage() {
         </div>
 
         <div className="container mx-auto px-4 py-8">
+          {/* My Challenges Section - Only for authenticated users */}
+          {isAuthenticated && (myChallenges.sent.length > 0 || myChallenges.received.length > 0) && (
+            <Card className="mb-8 border-2 border-purple-200 dark:border-purple-800" data-testid="my-challenges-section">
+              <CardHeader className="bg-purple-50 dark:bg-purple-950/30">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-purple-600">
+                    <Swords className="h-5 w-5" />
+                    Mis Desafíos
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" onClick={fetchMyChallenges} disabled={loadingChallenges}>
+                    <RefreshCw className={`h-4 w-4 ${loadingChallenges ? 'animate-spin' : ''}`} />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <Tabs defaultValue="received" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="received" className="flex items-center gap-2">
+                      <Inbox className="h-4 w-4" />
+                      Recibidos ({myChallenges.received.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="sent" className="flex items-center gap-2">
+                      <Send className="h-4 w-4" />
+                      Enviados ({myChallenges.sent.length})
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Received Challenges */}
+                  <TabsContent value="received">
+                    {myChallenges.received.length === 0 ? (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <Inbox className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No tienes desafíos pendientes</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {myChallenges.received.map((challenge) => (
+                          <div 
+                            key={challenge.queue_id}
+                            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40 border border-purple-200 dark:border-purple-800"
+                            data-testid={`received-challenge-${challenge.queue_id}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10 ring-2 ring-purple-400">
+                                <AvatarImage src={challenge.player1_info?.avatar} />
+                                <AvatarFallback>{challenge.player1_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">
+                                  {challenge.player1_info?.nickname || challenge.player1_info?.nombre || 'Retador'}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Te ha desafiado
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                onClick={() => handleDeclineChallenge(challenge.queue_id)}
+                                disabled={processingChallengeId === challenge.queue_id}
+                                data-testid={`decline-btn-${challenge.queue_id}`}
+                              >
+                                {processingChallengeId === challenge.queue_id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <XCircle className="h-4 w-4 mr-1" />
+                                    Rechazar
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="bg-green-500 hover:bg-green-600"
+                                onClick={() => handleAcceptChallenge(challenge.queue_id)}
+                                disabled={processingChallengeId === challenge.queue_id}
+                                data-testid={`accept-btn-${challenge.queue_id}`}
+                              >
+                                {processingChallengeId === challenge.queue_id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <Check className="h-4 w-4 mr-1" />
+                                    Aceptar
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  {/* Sent Challenges */}
+                  <TabsContent value="sent">
+                    {myChallenges.sent.length === 0 ? (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <Send className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p>No has enviado desafíos</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {myChallenges.sent.map((challenge) => (
+                          <div 
+                            key={challenge.queue_id}
+                            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/40 dark:to-cyan-950/40 border border-blue-200 dark:border-blue-800"
+                            data-testid={`sent-challenge-${challenge.queue_id}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10 ring-2 ring-blue-400">
+                                <AvatarImage src={challenge.player2_info?.avatar} />
+                                <AvatarFallback>{challenge.player2_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">
+                                  {challenge.player2_info?.nickname || challenge.player2_info?.nombre || 'Oponente'}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Esperando respuesta...
+                                </p>
+                              </div>
+                            </div>
+                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pendiente
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Active Season Banner */}
           {active_season && (
             <Card className="mb-8 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30">
