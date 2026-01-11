@@ -31,7 +31,8 @@ import {
   Store,
   Trophy,
   Zap,
-  Calendar
+  Calendar,
+  BookOpen
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
