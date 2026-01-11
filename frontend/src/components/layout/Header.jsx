@@ -85,6 +85,50 @@ export function Header() {
               Tienda
             </Link>
 
+            {/* PinPanClub Quick Access - Public */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                    location.pathname.startsWith('/pinpanclub')
+                      ? 'text-primary' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  data-testid="pinpanclub-dropdown"
+                >
+                  <Trophy className="h-4 w-4" />
+                  PinPanClub
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                  <Link to="/pinpanclub/superpin/ranking" className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    🏆 Super Pin
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/pinpanclub/rapidpin" className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-orange-500" />
+                    ⚡ Rapid Pin
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/pinpanclub/players" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Jugadores
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/pinpanclub/tournaments" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Torneos
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Catalog only visible for admins */}
             {isAdmin && (
               <Link 
