@@ -34,11 +34,13 @@ class RapidPinRole(str, Enum):
 
 
 class RapidPinQueueStatus(str, Enum):
-    """Estado de la cola de partidos esperando árbitro"""
-    WAITING = "waiting"          # Esperando árbitro
-    ASSIGNED = "assigned"        # Árbitro asignado, partido en curso
-    COMPLETED = "completed"      # Partido completado
-    CANCELLED = "cancelled"      # Cancelado
+    """Estado de la cola de partidos"""
+    CHALLENGE_PENDING = "challenge_pending"  # Desafío enviado, esperando aceptación
+    WAITING_REFEREE = "waiting"              # Aceptado, esperando árbitro
+    ASSIGNED = "assigned"                    # Árbitro asignado, partido en curso
+    COMPLETED = "completed"                  # Partido completado
+    CANCELLED = "cancelled"                  # Cancelado
+    DECLINED = "declined"                    # Desafío rechazado
 
 
 # ============== SCORING CONSTANTS ==============
