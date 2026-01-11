@@ -171,7 +171,7 @@ function AppRouter() {
       <Route path="/pinpanclub/superpin/compare" element={<PlayerComparison />} />
       
       {/* Rapid Pin Routes */}
-      <Route path="/rapidpin" element={<RapidPinPublicPage />} />
+      <Route path="/rapidpin" element={<><Header /><RapidPinPublicPage /></>} />
       <Route path="/pinpanclub/rapidpin" element={<RapidPinDashboard />} />
       <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<RapidPinSeason />} />
       
