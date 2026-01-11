@@ -46,7 +46,10 @@ import {
   UserPlus,
   UserCheck,
   Clock,
-  XCircle
+  XCircle,
+  Settings,
+  ExternalLink,
+  Plug
 } from 'lucide-react';
 import { toast } from 'sonner';
 
