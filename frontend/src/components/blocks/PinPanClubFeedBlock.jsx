@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   Trophy, Swords, Target, Medal, Users, Calendar, 
   ArrowRight, ChevronRight, Flame, Star, Crown,
-  Settings, Eye, EyeOff, RefreshCw
+  Settings, Eye, EyeOff, RefreshCw, Zap
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
