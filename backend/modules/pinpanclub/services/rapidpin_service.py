@@ -670,6 +670,15 @@ class RapidPinService(BaseService):
         
         self.log_info(f"Challenge {queue_id} accepted by {user_id} (role: {user_role})")
         
+        # Send push notification to challenger that their challenge was accepted
+        accepter_info = queue_entry.get("player2_info") or {}
+        accepter_name = accepter_info.get("nickname") or accepter_info.get("nombre", "Tu oponente")
+        await send_challenge_notification(
+            recipient_id=queue_entry["player1_id"],
+            challenger_name=accepter_name,
+            notification_type="challenge_accepted"
+        )
+        
         updated = await db["rapidpin_queue"].find_one({"queue_id": queue_id}, {"_id": 0})
         return updated
     
