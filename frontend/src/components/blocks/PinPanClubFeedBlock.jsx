@@ -603,7 +603,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
         <div className="text-center mt-8">
           <Button 
             size="lg"
-            onClick={() => navigate(config?.style?.cta_url || '/pinpanclub')}
+            onClick={() => navigate(config?.style?.cta_url || '/pinpanclub/superpin/ranking')}
             className="rounded-full px-8"
           >
             {L(config?.style?.cta_text) || txt.viewAll}
