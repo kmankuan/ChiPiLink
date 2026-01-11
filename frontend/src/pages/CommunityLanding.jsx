@@ -449,7 +449,7 @@ export default function CommunityLanding() {
             icon={Trophy} 
             title="PinPanClub - Actividad del Club" 
             action="Ver más"
-            actionLink="/pinpanclub"
+            actionLink="/pinpanclub/superpin/ranking"
           />
           <PinPanClubFeedBlock 
             config={{
