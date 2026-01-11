@@ -24,6 +24,53 @@ from ..models.rapidpin import (
 )
 
 
+async def send_challenge_notification(
+    recipient_id: str,
+    challenger_name: str,
+    notification_type: str = "challenge_received"
+) -> bool:
+    """
+    Enviar notificación push de desafío.
+    notification_type: 'challenge_received', 'challenge_accepted', 'referee_needed'
+    """
+    try:
+        from modules.notifications.services.push_service import push_notification_service
+        
+        messages = {
+            "challenge_received": {
+                "title": "⚔️ ¡Nuevo Desafío!",
+                "body": f"{challenger_name} te ha desafiado a un partido de Rapid Pin"
+            },
+            "challenge_accepted": {
+                "title": "✅ ¡Desafío Aceptado!",
+                "body": f"{challenger_name} aceptó tu desafío. ¡A buscar árbitro!"
+            },
+            "referee_needed": {
+                "title": "🏓 ¡Partido esperando árbitro!",
+                "body": f"El partido entre {challenger_name} está esperando un árbitro"
+            }
+        }
+        
+        msg = messages.get(notification_type, messages["challenge_received"])
+        
+        result = await push_notification_service.send_notification(
+            user_id=recipient_id,
+            category_id="cat_pinpanclub",
+            title=msg["title"],
+            body=msg["body"],
+            data={
+                "type": notification_type,
+                "action": "/rapidpin"
+            },
+            action_url="/rapidpin"
+        )
+        
+        return result.get("success", False)
+    except Exception as e:
+        print(f"[RapidPin] Error sending notification: {e}")
+        return False
+
+
 class RapidPinService(BaseService):
     """
     Servicio principal para Rapid Pin.
