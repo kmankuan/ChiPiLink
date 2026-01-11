@@ -731,6 +731,17 @@ class RapidPinService(BaseService):
             notification_type="challenge_accepted"
         )
         
+        # Send broadcast to all users that a match is waiting for referee
+        player1_info = queue_entry.get("player1_info") or {}
+        player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")
+        player2_name = accepter_info.get("nickname") or accepter_info.get("nombre", "Jugador 2")
+        
+        await send_referee_needed_broadcast(
+            player1_name=player1_name,
+            player2_name=player2_name,
+            exclude_player_ids=[queue_entry["player1_id"], queue_entry["player2_id"]]
+        )
+        
         updated = await db["rapidpin_queue"].find_one({"queue_id": queue_id}, {"_id": 0})
         return updated
     
