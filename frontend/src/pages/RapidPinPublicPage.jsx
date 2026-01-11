@@ -32,10 +32,29 @@ export default function RapidPinPublicPage() {
   const [loading, setLoading] = useState(true);
   const [feedData, setFeedData] = useState(null);
   const [assigningId, setAssigningId] = useState(null);
+  
+  // Challenge system state
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [players, setPlayers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loadingPlayers, setLoadingPlayers] = useState(false);
+  const [selectedOpponent, setSelectedOpponent] = useState(null);
+  const [sendingChallenge, setSendingChallenge] = useState(false);
+  
+  // My challenges state
+  const [myChallenges, setMyChallenges] = useState({ sent: [], received: [], total: 0 });
+  const [loadingChallenges, setLoadingChallenges] = useState(false);
+  const [processingChallengeId, setProcessingChallengeId] = useState(null);
+
+  // Get current user's player ID
+  const currentPlayerId = user?.cliente_id || user?.user_id;
 
   useEffect(() => {
     fetchFeed();
-  }, []);
+    if (isAuthenticated && currentPlayerId) {
+      fetchMyChallenges();
+    }
+  }, [isAuthenticated, currentPlayerId]);
 
   const fetchFeed = async () => {
     try {
