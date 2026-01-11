@@ -378,6 +378,16 @@ class RapidPinMatchQueue(BaseModel):
     
     # Match ID cuando se complete
     match_id: Optional[str] = None
+    
+    # === Negociación de fecha ===
+    proposed_date: Optional[str] = None           # Fecha propuesta (ISO format)
+    proposed_by_id: Optional[str] = None          # Quién propuso la fecha actual
+    date_history: List[Dict] = []                 # Historial de propuestas de fecha
+    agreed_date: Optional[str] = None             # Fecha acordada final
+    
+    # === Interacciones del público ===
+    likes_count: int = 0
+    comments_count: int = 0
 
 
 class RapidPinAcceptChallenge(BaseModel):
@@ -396,4 +406,77 @@ class RapidPinQueueComplete(BaseModel):
     ganador_id: str
     score_ganador: int = 11
     score_perdedor: int = 0
+
+
+# ============== DATE NEGOTIATION MODELS ==============
+
+class DateProposal(BaseModel):
+    """Propuesta de fecha"""
+    proposal_id: str = Field(default_factory=lambda: f"prop_{uuid.uuid4().hex[:8]}")
+    queue_id: str
+    proposed_by_id: str
+    proposed_date: str          # ISO format
+    message: Optional[str] = None
+    status: DateProposalStatus = DateProposalStatus.PENDING
+    created_at: Optional[Any] = None
+    responded_at: Optional[Any] = None
+    response_by_id: Optional[str] = None
+
+
+class DateProposalCreate(BaseModel):
+    """Crear propuesta de fecha"""
+    proposed_date: str  # ISO format (YYYY-MM-DDTHH:MM)
+    message: Optional[str] = None
+
+
+class DateProposalResponse(BaseModel):
+    """Responder a propuesta de fecha"""
+    action: str  # "accept", "counter", "queue" (poner en cola)
+    counter_date: Optional[str] = None  # Solo si action = "counter"
+    message: Optional[str] = None
+
+
+# ============== LIKES & COMMENTS MODELS ==============
+
+class ChallengeReaction(BaseModel):
+    """Like/reacción a un reto"""
+    reaction_id: str = Field(default_factory=lambda: f"react_{uuid.uuid4().hex[:8]}")
+    queue_id: str
+    user_id: str
+    user_info: Optional[Dict] = None
+    reaction_type: str = "like"  # Extensible a otros tipos
+    created_at: Optional[Any] = None
+
+
+class ChallengeComment(BaseModel):
+    """Comentario en un reto"""
+    comment_id: str = Field(default_factory=lambda: f"comment_{uuid.uuid4().hex[:8]}")
+    queue_id: str
+    user_id: str
+    user_info: Optional[Dict] = None
+    content: str
+    is_moderated: bool = False        # Si está en moderación
+    is_approved: bool = True          # Si fue aprobado (default: True para publicación directa)
+    is_hidden: bool = False           # Si fue ocultado por moderador
+    moderation_reason: Optional[str] = None
+    created_at: Optional[Any] = None
+    updated_at: Optional[Any] = None
+
+
+class ChallengeCommentCreate(BaseModel):
+    """Crear comentario"""
+    content: str = Field(..., max_length=500)  # Se validará con límite configurable
+
+
+class ChallengeCommentModerationConfig(BaseModel):
+    """Configuración de moderación de comentarios"""
+    config_id: str = "rapidpin_comment_config"
+    max_comment_length: int = 280
+    require_approval_for_new_users: bool = False
+    require_approval_for_flagged_users: bool = True
+    warning_message: Dict[str, str] = {
+        "es": "Recuerda mantener un ambiente respetuoso. Los comentarios inapropiados pueden resultar en sanciones.",
+        "en": "Remember to keep a respectful environment. Inappropriate comments may result in sanctions.",
+        "zh": "请保持尊重的环境。不当评论可能会导致处罚。"
+    }
 
