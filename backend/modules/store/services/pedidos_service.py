@@ -692,6 +692,8 @@ class PedidosService:
         if not pedido:
             raise ValueError("Pedido no encontrado")
         
+        estado_anterior = pedido.get("estado")
+        
         now = datetime.now(timezone.utc).isoformat()
         
         update_data = {
@@ -710,6 +712,19 @@ class PedidosService:
             {"pedido_id": pedido_id},
             {"$set": update_data}
         )
+        
+        # Enviar notificación push si el estado cambió
+        if estado_anterior != nuevo_estado:
+            try:
+                from .vinculacion_notification_service import vinculacion_notification_service
+                await vinculacion_notification_service.notificar_cambio_estado_pedido(
+                    pedido_id=pedido_id,
+                    acudiente_id=pedido["acudiente_cliente_id"],
+                    estudiante_nombre=pedido.get("estudiante_nombre", ""),
+                    nuevo_estado=nuevo_estado
+                )
+            except Exception as e:
+                logger.warning(f"No se pudo enviar notificación de cambio de estado: {e}")
         
         return {"success": True, "estado": nuevo_estado}
 
