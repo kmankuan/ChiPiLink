@@ -1096,48 +1096,84 @@ export default function RapidPinPublicPage() {
                       {waiting_for_referee.map((queue) => (
                         <div 
                           key={queue.queue_id}
-                          className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-950/40 dark:to-amber-950/40 border border-orange-200 dark:border-orange-800"
+                          className="p-4 rounded-xl bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-950/40 dark:to-amber-950/40 border border-orange-200 dark:border-orange-800"
                         >
-                          <div className="flex items-center gap-4">
-                            {/* Player 1 */}
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-10 w-10 ring-2 ring-orange-400">
-                                <AvatarImage src={queue.player1_info?.avatar} />
-                                <AvatarFallback>{queue.player1_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
-                              </Avatar>
-                              <span className="font-medium">
-                                {queue.player1_info?.nickname || queue.player1_info?.nombre || 'Jugador 1'}
-                              </span>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-4">
+                              {/* Player 1 */}
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-10 w-10 ring-2 ring-orange-400">
+                                  <AvatarImage src={queue.player1_info?.avatar} />
+                                  <AvatarFallback>{queue.player1_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium">
+                                  {queue.player1_info?.nickname || queue.player1_info?.nombre || 'Jugador 1'}
+                                </span>
+                              </div>
+                              
+                              <span className="text-orange-500 font-bold">VS</span>
+                              
+                              {/* Player 2 */}
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-10 w-10 ring-2 ring-orange-400">
+                                  <AvatarImage src={queue.player2_info?.avatar} />
+                                  <AvatarFallback>{queue.player2_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium">
+                                  {queue.player2_info?.nickname || queue.player2_info?.nombre || 'Jugador 2'}
+                                </span>
+                              </div>
                             </div>
                             
-                            <span className="text-orange-500 font-bold">VS</span>
-                            
-                            {/* Player 2 */}
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-10 w-10 ring-2 ring-orange-400">
-                                <AvatarImage src={queue.player2_info?.avatar} />
-                                <AvatarFallback>{queue.player2_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
-                              </Avatar>
-                              <span className="font-medium">
-                                {queue.player2_info?.nickname || queue.player2_info?.nombre || 'Jugador 2'}
-                              </span>
-                            </div>
+                            <Button 
+                              onClick={() => handleAssignReferee(queue.queue_id)}
+                              disabled={assigningId === queue.queue_id || currentPlayerId === queue.player1_id || currentPlayerId === queue.player2_id}
+                              className="bg-orange-500 hover:bg-orange-600"
+                            >
+                              {assigningId === queue.queue_id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Scale className="h-4 w-4 mr-2" />
+                                  Yo Arbitro
+                                </>
+                              )}
+                            </Button>
                           </div>
                           
-                          <Button 
-                            onClick={() => handleAssignReferee(queue.queue_id)}
-                            disabled={assigningId === queue.queue_id}
-                            className="bg-orange-500 hover:bg-orange-600"
-                          >
-                            {assigningId === queue.queue_id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Scale className="h-4 w-4 mr-2" />
-                                Ser Árbitro
-                              </>
-                            )}
-                          </Button>
+                          {/* Date and Interactions Row */}
+                          <div className="flex items-center justify-between pt-2 border-t border-orange-200/50">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              {queue.agreed_date && (
+                                <span className="flex items-center gap-1">
+                                  <CalendarCheck className="h-4 w-4 text-green-500" />
+                                  {new Date(queue.agreed_date).toLocaleDateString()} {new Date(queue.agreed_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Like & Comment buttons */}
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`text-xs ${likedChallenges[queue.queue_id] ? 'text-red-500' : 'text-muted-foreground'}`}
+                                onClick={() => handleToggleLike(queue.queue_id)}
+                              >
+                                <Heart className={`h-4 w-4 mr-1 ${likedChallenges[queue.queue_id] ? 'fill-red-500' : ''}`} />
+                                {queue.likes_count || 0}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs text-muted-foreground"
+                                onClick={() => handleOpenComments(queue)}
+                              >
+                                <MessageCircle className="h-4 w-4 mr-1" />
+                                {queue.comments_count || 0}
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -1149,9 +1185,9 @@ export default function RapidPinPublicPage() {
                         <Button 
                           variant="outline" 
                           className="mt-4"
-                          onClick={() => navigate('/pinpanclub/rapidpin')}
+                          onClick={handleOpenChallengeModal}
                         >
-                          Crear partido
+                          Desafiar a alguien
                         </Button>
                       )}
                     </div>
