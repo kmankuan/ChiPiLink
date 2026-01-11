@@ -221,50 +221,56 @@ export default function PingPongDashboard() {
                   <Trophy className="h-4 w-4 mr-2" />
                   Torneos
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Configuración
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/superpin/admin')}>
-                      <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
-                      Super Pin Admin
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/analytics')}>
-                      <BarChart3 className="h-4 w-4 mr-2 text-indigo-500" />
-                      Analytics Dashboard
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
-                      <img 
-                        src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
-                        alt="Monday.com" 
-                        className="h-4 w-4 mr-2"
-                      />
-                      Monday.com
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/pinpanclub/sponsors')}>
-                      <Image className="h-4 w-4 mr-2" />
-                      Patrocinadores
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/tv/pinpanclub')}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      Vista TV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/canvas')}>
-                      <CalendarDays className="h-4 w-4 mr-2" />
-                      Canvas
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button size="sm" onClick={() => navigate('/pinpanclub/match/new')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Partido
-                </Button>
+                {/* Configuration Menu - Only for admins/moderators */}
+                {canManage && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Configuración
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => navigate('/pinpanclub/superpin/admin')}>
+                        <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
+                        Super Pin Admin
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/pinpanclub/analytics')}>
+                        <BarChart3 className="h-4 w-4 mr-2 text-indigo-500" />
+                        Analytics Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/pinpanclub/monday')}>
+                        <img 
+                          src="https://cdn.monday.com/images/logos/monday_logo_icon.png" 
+                          alt="Monday.com" 
+                          className="h-4 w-4 mr-2"
+                        />
+                        Monday.com
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/pinpanclub/sponsors')}>
+                        <Image className="h-4 w-4 mr-2" />
+                        Patrocinadores
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/tv/pinpanclub')}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        Vista TV
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/canvas')}>
+                        <CalendarDays className="h-4 w-4 mr-2" />
+                        Canvas
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                {/* New Match button - Only for authenticated users */}
+                {isAuthenticated && (
+                  <Button size="sm" onClick={() => navigate('/pinpanclub/match/new')}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nuevo Partido
+                  </Button>
+                )}
               </div>
             </div>
           </div>
