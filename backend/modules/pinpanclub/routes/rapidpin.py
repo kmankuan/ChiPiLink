@@ -497,14 +497,16 @@ async def update_comment_configuration(
 @router.post("/challenge/{queue_id}/like")
 async def toggle_challenge_like(
     queue_id: str,
-    user_id: str
+    user_id: str,
+    user_name: Optional[str] = None
 ):
     """
     Dar o quitar like a un reto.
     Requiere usuario autenticado.
+    Emite evento WebSocket en tiempo real.
     """
     try:
-        return await rapidpin_service.toggle_like(queue_id, user_id)
+        return await rapidpin_service.toggle_like(queue_id, user_id, user_name)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
