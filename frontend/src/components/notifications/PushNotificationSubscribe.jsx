@@ -128,13 +128,18 @@ export default function PushNotificationSubscribe({ variant = 'full' }) {
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <Alert variant="destructive">
+          <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error.includes('environment') 
+                ? 'Las notificaciones push estarán disponibles en producción (chipilink.me)'
+                : error
+              }
+            </AlertDescription>
           </Alert>
         )}
 
-        {permission === 'denied' && (
+        {permission === 'denied' && !error && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
@@ -150,7 +155,7 @@ export default function PushNotificationSubscribe({ variant = 'full' }) {
               Recibirás notificaciones de partidos, retos y anuncios importantes.
             </span>
           </div>
-        ) : (
+        ) : !error && (
           <div className="text-sm text-muted-foreground">
             <p className="mb-2">Al activar las notificaciones push recibirás:</p>
             <ul className="space-y-1 ml-4">
@@ -162,34 +167,36 @@ export default function PushNotificationSubscribe({ variant = 'full' }) {
           </div>
         )}
 
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleToggleSubscription}
-            disabled={!isInitialized || loading || permission === 'denied'}
-            variant={isSubscribed ? "outline" : "default"}
-            className="flex-1"
-            data-testid="push-toggle-btn"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Procesando...
-              </>
-            ) : isSubscribed ? (
-              <>
-                <BellOff className="h-4 w-4 mr-2" />
-                Desactivar Notificaciones
-              </>
-            ) : (
-              <>
-                <Bell className="h-4 w-4 mr-2" />
-                Activar Notificaciones
-              </>
-            )}
-          </Button>
-        </div>
+        {!error && (
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleToggleSubscription}
+              disabled={!isInitialized || loading || permission === 'denied'}
+              variant={isSubscribed ? "outline" : "default"}
+              className="flex-1"
+              data-testid="push-toggle-btn"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Procesando...
+                </>
+              ) : isSubscribed ? (
+                <>
+                  <BellOff className="h-4 w-4 mr-2" />
+                  Desactivar Notificaciones
+                </>
+              ) : (
+                <>
+                  <Bell className="h-4 w-4 mr-2" />
+                  Activar Notificaciones
+                </>
+              )}
+            </Button>
+          </div>
+        )}
 
-        {!isInitialized && (
+        {!isInitialized && !error && (
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Cargando...
