@@ -552,6 +552,15 @@ class RapidPinService(BaseService):
         
         # Remove MongoDB _id before returning
         queue_entry.pop("_id", None)
+        
+        # Send push notification to opponent
+        challenger_name = challenger_info.get("apodo") or challenger_info.get("nombre", "Un jugador") if challenger_info else "Un jugador"
+        await send_challenge_notification(
+            recipient_id=opponent_id,
+            challenger_name=challenger_name,
+            notification_type="challenge_received"
+        )
+        
         return queue_entry
     
     async def create_queue_match(
