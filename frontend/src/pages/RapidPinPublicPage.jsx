@@ -1,7 +1,8 @@
 /**
  * Rapid Pin - Página Pública Exclusiva
  * Feed de actividad, partidos en cola esperando árbitro, ranking
- * Sistema de desafíos jugador vs jugador
+ * Sistema de desafíos jugador vs jugador con negociación de fecha
+ * Sistema de likes y comentarios
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,13 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Zap, Trophy, Users, Clock, ChevronRight, Play, 
   RefreshCw, AlertCircle, CheckCircle2, Scale,
   ArrowRight, Loader2, Hand, Swords, Search, X,
-  Send, Inbox, Check, XCircle
+  Send, Inbox, Check, XCircle, Heart, MessageCircle,
+  Calendar, CalendarCheck, Pause, RotateCcw
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -41,16 +44,37 @@ export default function RapidPinPublicPage() {
   const [selectedOpponent, setSelectedOpponent] = useState(null);
   const [sendingChallenge, setSendingChallenge] = useState(false);
   
+  // Date proposal state
+  const [proposedDate, setProposedDate] = useState('');
+  const [proposalMessage, setProposalMessage] = useState('');
+  
   // My challenges state
   const [myChallenges, setMyChallenges] = useState({ sent: [], received: [], total: 0 });
   const [loadingChallenges, setLoadingChallenges] = useState(false);
   const [processingChallengeId, setProcessingChallengeId] = useState(null);
+  
+  // Date negotiation modal
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [counterDate, setCounterDate] = useState('');
+  const [counterMessage, setCounterMessage] = useState('');
+  
+  // Comments state
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [selectedChallengeForComments, setSelectedChallengeForComments] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentConfig, setCommentConfig] = useState({ max_comment_length: 280 });
+  const [likedChallenges, setLikedChallenges] = useState({});
 
   // Get current user's player ID
   const currentPlayerId = user?.cliente_id || user?.user_id;
 
   useEffect(() => {
     fetchFeed();
+    fetchCommentConfig();
     if (isAuthenticated && currentPlayerId) {
       fetchMyChallenges();
     }
