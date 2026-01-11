@@ -895,45 +895,82 @@ export default function RapidPinPublicPage() {
                                 <p className="font-medium">
                                   {challenge.player1_info?.nickname || challenge.player1_info?.nombre || 'Retador'}
                                 </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Te ha desafiado
-                                </p>
+                                {challenge.status === 'date_negotiation' && challenge.proposed_date ? (
+                                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    Propone: {new Date(challenge.proposed_date).toLocaleDateString()} {new Date(challenge.proposed_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  </p>
+                                ) : challenge.status === 'queued' ? (
+                                  <p className="text-xs text-amber-600">En cola - Sin fecha acordada</p>
+                                ) : (
+                                  <p className="text-xs text-muted-foreground">Te ha desafiado</p>
+                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                                onClick={() => handleDeclineChallenge(challenge.queue_id)}
-                                disabled={processingChallengeId === challenge.queue_id}
-                                data-testid={`decline-btn-${challenge.queue_id}`}
-                              >
-                                {processingChallengeId === challenge.queue_id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <XCircle className="h-4 w-4 mr-1" />
-                                    Rechazar
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                className="bg-green-500 hover:bg-green-600"
-                                onClick={() => handleAcceptChallenge(challenge.queue_id)}
-                                disabled={processingChallengeId === challenge.queue_id}
-                                data-testid={`accept-btn-${challenge.queue_id}`}
-                              >
-                                {processingChallengeId === challenge.queue_id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Check className="h-4 w-4 mr-1" />
-                                    Aceptar
-                                  </>
-                                )}
-                              </Button>
+                              {challenge.status === 'date_negotiation' && challenge.proposed_by_id !== currentPlayerId ? (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleOpenDateNegotiation(challenge)}
+                                    disabled={processingChallengeId === challenge.queue_id}
+                                  >
+                                    <Calendar className="h-4 w-4 mr-1" />
+                                    Ver Fecha
+                                  </Button>
+                                </>
+                              ) : challenge.status === 'queued' ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleOpenDateNegotiation(challenge)}
+                                >
+                                  <RotateCcw className="h-4 w-4 mr-1" />
+                                  Retomar
+                                </Button>
+                              ) : challenge.status === 'challenge_pending' ? (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 border-red-200 hover:bg-red-50"
+                                    onClick={() => handleDeclineChallenge(challenge.queue_id)}
+                                    disabled={processingChallengeId === challenge.queue_id}
+                                    data-testid={`decline-btn-${challenge.queue_id}`}
+                                  >
+                                    {processingChallengeId === challenge.queue_id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <>
+                                        <XCircle className="h-4 w-4 mr-1" />
+                                        Rechazar
+                                      </>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-500 hover:bg-green-600"
+                                    onClick={() => handleAcceptChallenge(challenge.queue_id)}
+                                    disabled={processingChallengeId === challenge.queue_id}
+                                    data-testid={`accept-btn-${challenge.queue_id}`}
+                                  >
+                                    {processingChallengeId === challenge.queue_id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <>
+                                        <Check className="h-4 w-4 mr-1" />
+                                        Aceptar
+                                      </>
+                                    )}
+                                  </Button>
+                                </>
+                              ) : (
+                                <Badge variant="secondary">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Esperando
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         ))}
