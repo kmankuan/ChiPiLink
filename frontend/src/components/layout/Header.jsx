@@ -158,19 +158,6 @@ export function Header() {
                 >
                   {t('nav.orders')}
                 </Link>
-                {/* PinpanClub - Club de Tenis de Mesa (Solo autenticados) */}
-                <Link 
-                  to="/pinpanclub" 
-                  className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                    location.pathname.startsWith('/pinpanclub') || location.pathname.startsWith('/canvas') || location.pathname.startsWith('/tv')
-                      ? 'text-primary' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                  data-testid="pingpong-nav-link"
-                >
-                  <Trophy className="h-4 w-4" />
-                  PinpanClub
-                </Link>
               </>
             )}
             
