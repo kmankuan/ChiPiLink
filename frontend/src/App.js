@@ -319,28 +319,30 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <SiteConfigProvider>
-          <InlineTranslationProvider>
-            <CartProvider>
-              <BrowserRouter>
-                <div className="App min-h-screen bg-background noise-bg">
-                  <AppRouter />
-                  <CartDrawer />
-                  {/* CXGenie Chat Widget - appears on all pages */}
-                  <CXGenieWidget />
-                  <Toaster 
-                    position="top-right" 
-                    richColors 
-                    closeButton
-                    toastOptions={{
-                      className: 'font-sans'
-                    }}
-                  />
-                </div>
-              </BrowserRouter>
-            </CartProvider>
-          </InlineTranslationProvider>
-        </SiteConfigProvider>
+        <OneSignalProvider>
+          <SiteConfigProvider>
+            <InlineTranslationProvider>
+              <CartProvider>
+                <BrowserRouter>
+                  <div className="App min-h-screen bg-background noise-bg">
+                    <AppRouter />
+                    <CartDrawer />
+                    {/* CXGenie Chat Widget - appears on all pages */}
+                    <CXGenieWidget />
+                    <Toaster 
+                      position="top-right" 
+                      richColors 
+                      closeButton
+                      toastOptions={{
+                        className: 'font-sans'
+                      }}
+                    />
+                  </div>
+                </BrowserRouter>
+              </CartProvider>
+            </InlineTranslationProvider>
+          </SiteConfigProvider>
+        </OneSignalProvider>
       </AuthProvider>
     </ThemeProvider>
   );
