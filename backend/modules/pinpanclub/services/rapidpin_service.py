@@ -55,7 +55,7 @@ async def send_challenge_notification(
         
         result = await push_notification_service.send_notification(
             user_id=recipient_id,
-            category_id="cat_pinpanclub",
+            category_id="cat_rapidpin",
             title=msg["title"],
             body=msg["body"],
             data={
