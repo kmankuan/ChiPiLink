@@ -97,12 +97,13 @@ export default function RapidPinPublicPage() {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        // Filter out current user - normalize player_id field
+        // Filter out current user - normalize player fields
         const normalizedPlayers = data.map(p => ({
           ...p,
           player_id: p.jugador_id || p.player_id,
           nickname: p.apodo || p.nickname,
-          avatar: p.foto_url || p.avatar
+          avatar: p.foto_url || p.avatar,
+          elo: p.elo_rating || p.elo
         }));
         setPlayers(normalizedPlayers.filter(p => p.player_id !== currentPlayerId));
       }
