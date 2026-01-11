@@ -142,7 +142,7 @@ class TestBulkImportVinculacion:
     
     def test_preview_estudiantes_with_grado_default(self):
         """Test preview with default grade when not in data"""
-        # TSV without grade column
+        # TSV without grade column - only include columns that exist
         tsv_no_grade = """Numero\tNombre
 TEST_004\tPedro Gómez
 TEST_005\tAna Martínez"""
@@ -153,9 +153,8 @@ TEST_005\tAna Martínez"""
                 "raw_text": tsv_no_grade,
                 "column_mapping": {
                     "numero_estudiante": 0,
-                    "nombre_completo": 1,
-                    "grado": None,
-                    "seccion": None
+                    "nombre_completo": 1
+                    # Omit grado and seccion - they don't exist in data
                 },
                 "grado_default": "3er Grado"
             }
