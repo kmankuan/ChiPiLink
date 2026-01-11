@@ -4,6 +4,7 @@ Lógica de negocio para el sistema de partidos espontáneos
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
+import uuid
 
 from core.base import BaseService
 from core.database import get_database
