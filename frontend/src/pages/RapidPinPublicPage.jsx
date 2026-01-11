@@ -71,6 +71,128 @@ export default function RapidPinPublicPage() {
     }
   };
 
+  const fetchMyChallenges = async () => {
+    if (!currentPlayerId) return;
+    
+    try {
+      setLoadingChallenges(true);
+      const response = await fetch(`${API_BASE}/api/pinpanclub/rapidpin/my-challenges/${currentPlayerId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMyChallenges(data);
+      }
+    } catch (error) {
+      console.error('Error fetching my challenges:', error);
+    } finally {
+      setLoadingChallenges(false);
+    }
+  };
+
+  const fetchPlayers = async (search = '') => {
+    try {
+      setLoadingPlayers(true);
+      const url = search 
+        ? `${API_BASE}/api/pinpanclub/players?search=${encodeURIComponent(search)}&limit=50`
+        : `${API_BASE}/api/pinpanclub/players?limit=50`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        // Filter out current user
+        setPlayers(data.filter(p => p.player_id !== currentPlayerId));
+      }
+    } catch (error) {
+      console.error('Error fetching players:', error);
+    } finally {
+      setLoadingPlayers(false);
+    }
+  };
+
+  const handleOpenChallengeModal = () => {
+    if (!isAuthenticated) {
+      toast.error('Debes iniciar sesión para desafiar');
+      navigate('/login');
+      return;
+    }
+    setShowChallengeModal(true);
+    fetchPlayers();
+  };
+
+  const handleSendChallenge = async () => {
+    if (!selectedOpponent || !feedData?.active_season?.season_id) {
+      toast.error('Selecciona un oponente');
+      return;
+    }
+
+    setSendingChallenge(true);
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge?season_id=${feedData.active_season.season_id}&challenger_id=${currentPlayerId}&opponent_id=${selectedOpponent.player_id}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        toast.success(`¡Desafío enviado a ${selectedOpponent.nickname || selectedOpponent.nombre}!`);
+        setShowChallengeModal(false);
+        setSelectedOpponent(null);
+        setSearchQuery('');
+        fetchMyChallenges();
+        fetchFeed();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Error al enviar desafío');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setSendingChallenge(false);
+    }
+  };
+
+  const handleAcceptChallenge = async (queueId) => {
+    setProcessingChallengeId(queueId);
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/accept?user_id=${currentPlayerId}&user_role=player`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        toast.success('¡Desafío aceptado! Esperando árbitro...');
+        fetchMyChallenges();
+        fetchFeed();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Error al aceptar desafío');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setProcessingChallengeId(null);
+    }
+  };
+
+  const handleDeclineChallenge = async (queueId) => {
+    setProcessingChallengeId(queueId);
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/decline?user_id=${currentPlayerId}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        toast.success('Desafío rechazado');
+        fetchMyChallenges();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Error al rechazar desafío');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setProcessingChallengeId(null);
+    }
+  };
+
   const handleAssignReferee = async (queueId) => {
     if (!isAuthenticated || !user) {
       toast.error('Debes iniciar sesión para ser árbitro');
