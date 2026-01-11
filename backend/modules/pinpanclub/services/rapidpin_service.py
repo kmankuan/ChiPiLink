@@ -683,8 +683,18 @@ class RapidPinService(BaseService):
         
         return await cursor.to_list(length=50)
     
-    async def assign_referee(self, queue_id: str, referee_id: str) -> Dict:
-        """Asignar árbitro a partido en cola"""
+    async def assign_referee(
+        self, 
+        queue_id: str, 
+        referee_id: str,
+        assigned_by_id: Optional[str] = None,
+        assigned_by_role: str = "player"
+    ) -> Dict:
+        """
+        Asignar árbitro a partido en cola.
+        - Cualquier usuario logueado puede asignarse
+        - Admin/Mod pueden asignar a cualquiera
+        """
         db = await self.get_db()
         
         queue_entry = await db["rapidpin_queue"].find_one(
@@ -696,7 +706,7 @@ class RapidPinService(BaseService):
             raise ValueError("Partido no encontrado en cola")
         
         if queue_entry["status"] != "waiting":
-            raise ValueError("Este partido ya tiene árbitro asignado o está completado")
+            raise ValueError("Este partido no está esperando árbitro")
         
         # Verificar que el árbitro no sea uno de los jugadores
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
@@ -707,14 +717,10 @@ class RapidPinService(BaseService):
         
         update_data = {
             "referee_id": referee_id,
-            "referee_info": {
-                "player_id": referee_info.get("player_id"),
-                "nombre": referee_info.get("nombre"),
-                "nickname": referee_info.get("nickname"),
-                "avatar": referee_info.get("avatar")
-            } if referee_info else None,
+            "referee_info": self._get_player_info(referee_info),
             "status": "assigned",
-            "assigned_at": datetime.now(timezone.utc).isoformat()
+            "assigned_at": datetime.now(timezone.utc).isoformat(),
+            "assigned_by_id": assigned_by_id or referee_id
         }
         
         await db["rapidpin_queue"].update_one(
@@ -722,7 +728,7 @@ class RapidPinService(BaseService):
             {"$set": update_data}
         )
         
-        self.log_info(f"Referee {referee_id} assigned to queue {queue_id}")
+        self.log_info(f"Referee {referee_id} assigned to queue {queue_id} by {assigned_by_id or referee_id}")
         
         updated = await db["rapidpin_queue"].find_one(
             {"queue_id": queue_id},
