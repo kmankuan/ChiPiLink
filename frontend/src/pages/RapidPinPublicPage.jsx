@@ -250,6 +250,8 @@ export default function RapidPinPublicPage() {
       return;
     }
     setShowChallengeModal(true);
+    setProposedDate('');
+    setProposalMessage('');
     fetchPlayers();
   };
 
@@ -258,11 +260,26 @@ export default function RapidPinPublicPage() {
       toast.error('Selecciona un oponente');
       return;
     }
+    
+    if (!proposedDate) {
+      toast.error('Propón una fecha para el reto');
+      return;
+    }
 
     setSendingChallenge(true);
     try {
+      const params = new URLSearchParams({
+        season_id: feedData.active_season.season_id,
+        challenger_id: currentPlayerId,
+        opponent_id: selectedOpponent.player_id,
+        proposed_date: proposedDate
+      });
+      if (proposalMessage) {
+        params.append('message', proposalMessage);
+      }
+      
       const response = await fetch(
-        `${API_BASE}/api/pinpanclub/rapidpin/challenge?season_id=${feedData.active_season.season_id}&challenger_id=${currentPlayerId}&opponent_id=${selectedOpponent.player_id}`,
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge-with-date?${params.toString()}`,
         { method: 'POST' }
       );
       
@@ -271,6 +288,8 @@ export default function RapidPinPublicPage() {
         setShowChallengeModal(false);
         setSelectedOpponent(null);
         setSearchQuery('');
+        setProposedDate('');
+        setProposalMessage('');
         fetchMyChallenges();
         fetchFeed();
       } else {
@@ -282,6 +301,57 @@ export default function RapidPinPublicPage() {
     } finally {
       setSendingChallenge(false);
     }
+  };
+
+  const handleRespondToDate = async (queueId, action, counterDateVal = null) => {
+    setProcessingChallengeId(queueId);
+    try {
+      const params = new URLSearchParams({
+        user_id: currentPlayerId,
+        action: action
+      });
+      
+      if (action === 'counter' && counterDateVal) {
+        params.append('counter_date', counterDateVal);
+      }
+      if (counterMessage) {
+        params.append('message', counterMessage);
+      }
+      
+      const response = await fetch(
+        `${API_BASE}/api/pinpanclub/rapidpin/challenge/${queueId}/respond-date?${params.toString()}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        const messages = {
+          accept: '¡Fecha aceptada! Esperando árbitro...',
+          counter: 'Propuesta de fecha enviada',
+          queue: 'Reto puesto en cola'
+        };
+        toast.success(messages[action] || 'Respuesta enviada');
+        setShowDateModal(false);
+        setSelectedChallenge(null);
+        setCounterDate('');
+        setCounterMessage('');
+        fetchMyChallenges();
+        fetchFeed();
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Error al responder');
+      }
+    } catch (error) {
+      toast.error('Error de conexión');
+    } finally {
+      setProcessingChallengeId(null);
+    }
+  };
+
+  const handleOpenDateNegotiation = (challenge) => {
+    setSelectedChallenge(challenge);
+    setCounterDate('');
+    setCounterMessage('');
+    setShowDateModal(true);
   };
 
   const handleAcceptChallenge = async (queueId) => {
