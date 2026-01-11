@@ -448,7 +448,49 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 10. **Sistema de Membresías (Phase 1)** ✅
 11. **Sistema de QR Code para Check-in y Pagos** ✅
 12. **Sistema de Notificaciones Push** ✅ (Enero 10, 2026)
-13. **Demo Data Seeding System** ✅ NEW (Enero 10, 2026)
+13. **Demo Data Seeding System** ✅ (Enero 10, 2026)
+14. **Integración OneSignal** ✅ NEW (Enero 11, 2026)
+
+### 🆕 Integración OneSignal ✅ (Enero 11, 2026)
+Integración completa con OneSignal para envío de notificaciones push reales:
+
+**Configuración:**
+| Variable | Valor |
+|----------|-------|
+| App ID | `f102b19d-0897-4480-b0f8-6eef3bfb8669` |
+| Dominio configurado | `https://www.chipilink.me` |
+| API Key | Configurada en backend/.env |
+
+**Backend:**
+- Provider `OneSignalProvider` actualizado a API v2
+- Soporte para envío por segmentos, external_id, subscription_id
+- Endpoint de prueba: `POST /api/notifications/admin/test-push`
+
+**Frontend:**
+- Contexto `OneSignalContext.js` para gestión de suscripciones
+- Componente `PushNotificationSubscribe.jsx` con 3 variantes (full, button, switch)
+- Integrado en dashboard de usuario → Tab "Notificaciones"
+
+**Funcionalidades:**
+- ✅ Suscripción/desuscripción de usuarios
+- ✅ Envío a segmentos ("Subscribed Users", etc.)
+- ✅ Envío por external_id (cliente_id)
+- ✅ Envío por subscription_id
+- ✅ Tags para categorías de notificación
+- ✅ Manejo de permisos denegados
+- ✅ Multi-idioma (ES/EN)
+
+**Endpoints API:**
+- `POST /api/notifications/admin/test-push` - Enviar push de prueba a segmento
+- `POST /api/notifications/admin/send` - Enviar a usuario específico
+- `POST /api/notifications/admin/send/bulk` - Enviar masivo
+
+**Archivos:**
+- `/app/backend/modules/notifications/providers/push_providers.py` (OneSignalProvider)
+- `/app/frontend/src/contexts/OneSignalContext.js`
+- `/app/frontend/src/components/notifications/PushNotificationSubscribe.jsx`
+
+**Nota:** Frontend solo funciona en dominio de producción (`chipilink.me`). En preview muestra mensaje informativo.
 
 ### P0 - Fase 2: Sistema de Usuarios Avanzado
 1. **Límites de gasto configurables** para cuentas de niños
