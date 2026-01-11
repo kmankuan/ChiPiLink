@@ -1,8 +1,9 @@
 /**
  * Rapid Pin - Página Pública Exclusiva
  * Feed de actividad, partidos en cola esperando árbitro, ranking
+ * Sistema de desafíos jugador vs jugador
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,10 +12,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Zap, Trophy, Users, Clock, ChevronRight, Play, 
   RefreshCw, AlertCircle, CheckCircle2, Scale,
-  ArrowRight, Loader2, Hand
+  ArrowRight, Loader2, Hand, Swords, Search, X,
+  Send, Inbox, Check, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
