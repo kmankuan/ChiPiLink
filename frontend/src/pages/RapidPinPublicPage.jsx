@@ -83,21 +83,16 @@ export default function RapidPinPublicPage() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+      </div>
     );
   }
 
   const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, scoring_rules } = feedData || {};
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background dark:from-orange-950/20 dark:to-background">
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background dark:from-orange-950/20 dark:to-background">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white py-12">
           <div className="container mx-auto px-4">
