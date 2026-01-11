@@ -1153,12 +1153,12 @@ function EstudiantesTab({ token }) {
                 />
               </div>
             </div>
-            <Select value={gradeFilter} onValueChange={setGradeFilter}>
+            <Select value={gradeFilter || 'all'} onValueChange={(v) => setGradeFilter(v === 'all' ? '' : v)}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Todos los grados" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos los grados</SelectItem>
+                <SelectItem value="all">Todos los grados</SelectItem>
                 {grados.map((g) => (
                   <SelectItem key={g} value={g}>{g}</SelectItem>
                 ))}
