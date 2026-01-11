@@ -1487,6 +1487,350 @@ function PedidosAdminTab({ token }) {
   );
 }
 
+// Componente de Tab de Configuración Monday.com
+function MondayConfigTab({ token }) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [connectionInfo, setConnectionInfo] = useState(null);
+  const [boards, setBoards] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [config, setConfig] = useState({
+    board_id: '',
+    group_id: '',
+    auto_sync: true,
+    column_mapping: {
+      estudiante: 'text',
+      grado: 'text0',
+      acudiente: 'text4',
+      libros: 'long_text',
+      total: 'numbers',
+      estado: 'status',
+      fecha: 'date',
+      pedido_id: 'text6'
+    }
+  });
+
+  useEffect(() => {
+    testConnection();
+    loadConfig();
+  }, []);
+
+  useEffect(() => {
+    if (config.board_id) {
+      loadBoardColumns(config.board_id);
+    }
+  }, [config.board_id]);
+
+  const testConnection = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/test-connection`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setConnected(data.connected);
+      setConnectionInfo(data);
+      
+      if (data.connected) {
+        loadBoards();
+      }
+    } catch (err) {
+      setConnected(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadConfig = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/config`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.board_id) {
+        setConfig(prev => ({ ...prev, ...data }));
+      }
+    } catch (err) {
+      console.error('Error loading config:', err);
+    }
+  };
+
+  const loadBoards = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/boards`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setBoards(data.boards || []);
+    } catch (err) {
+      toast.error('Error cargando boards');
+    }
+  };
+
+  const loadBoardColumns = async (boardId) => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/boards/${boardId}/columns`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setColumns(data.columns || []);
+      setGroups(data.groups || []);
+    } catch (err) {
+      console.error('Error loading columns:', err);
+    }
+  };
+
+  const handleSaveConfig = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/config`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config)
+      });
+      
+      if (!res.ok) throw new Error('Error guardando');
+      toast.success('Configuración guardada');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSyncAll = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/sync-all`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        toast.success(`Sincronizados: ${data.synced}, Fallidos: ${data.failed}`);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Estado de conexión */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plug className="h-5 w-5" />
+            Conexión con Monday.com
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {connected ? (
+                <>
+                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  <div>
+                    <p className="font-medium text-green-600">Conectado</p>
+                    {connectionInfo?.user && (
+                      <p className="text-sm text-muted-foreground">
+                        {connectionInfo.user.name} ({connectionInfo.user.email})
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-6 w-6 text-red-500" />
+                  <div>
+                    <p className="font-medium text-red-600">No conectado</p>
+                    <p className="text-sm text-muted-foreground">
+                      {connectionInfo?.error || 'Configura MONDAY_API_KEY en el .env'}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+            <Button variant="outline" onClick={testConnection}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Verificar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {connected && (
+        <>
+          {/* Configuración del Board */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Configuración del Board de Pedidos</CardTitle>
+              <CardDescription>
+                Selecciona el board de Monday.com donde se sincronizarán los pedidos de Books de Light
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Board de Pedidos</Label>
+                  <Select 
+                    value={config.board_id} 
+                    onValueChange={(v) => setConfig(prev => ({...prev, board_id: v}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un board" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {boards.map((board) => (
+                        <SelectItem key={board.id} value={board.id}>
+                          {board.name} ({board.items_count} items)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {groups.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Grupo (opcional)</Label>
+                    <Select 
+                      value={config.group_id || 'none'} 
+                      onValueChange={(v) => setConfig(prev => ({...prev, group_id: v === 'none' ? '' : v}))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un grupo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sin grupo específico</SelectItem>
+                        {groups.map((group) => (
+                          <SelectItem key={group.id} value={group.id}>
+                            {group.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Switch 
+                  id="auto-sync"
+                  checked={config.auto_sync}
+                  onCheckedChange={(checked) => setConfig(prev => ({...prev, auto_sync: checked}))}
+                />
+                <Label htmlFor="auto-sync">Sincronizar automáticamente al cambiar estado de pedidos</Label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Mapeo de columnas */}
+          {config.board_id && columns.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Mapeo de Columnas</CardTitle>
+                <CardDescription>
+                  Asocia cada campo del pedido con una columna de Monday.com
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {['estudiante', 'grado', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
+                    <div key={field} className="space-y-2">
+                      <Label className="capitalize">{field.replace('_', ' ')}</Label>
+                      <Select 
+                        value={config.column_mapping[field] || 'none'} 
+                        onValueChange={(v) => setConfig(prev => ({
+                          ...prev, 
+                          column_mapping: {
+                            ...prev.column_mapping,
+                            [field]: v === 'none' ? '' : v
+                          }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Columna" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No mapear</SelectItem>
+                          {columns.map((col) => (
+                            <SelectItem key={col.id} value={col.id}>
+                              {col.title} ({col.type})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Acciones */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex gap-4 flex-wrap">
+                <Button onClick={handleSaveConfig} disabled={saving || !config.board_id}>
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                  )}
+                  Guardar Configuración
+                </Button>
+                
+                <Button variant="outline" onClick={handleSyncAll} disabled={syncing || !config.board_id}>
+                  {syncing ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  Sincronizar Todos los Pedidos
+                </Button>
+                
+                {config.board_id && (
+                  <Button 
+                    variant="outline" 
+                    asChild
+                  >
+                    <a 
+                      href={`https://view.monday.com/board/${config.board_id}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Ver Board en Monday.com
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+}
+
 // Componente Principal
 export default function BookOrdersAdmin() {
   const { token } = useAuth();
@@ -1505,7 +1849,7 @@ export default function BookOrdersAdmin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+        <TabsList className="grid w-full grid-cols-6 mb-6">
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Estudiantes</span>
@@ -1520,11 +1864,15 @@ export default function BookOrdersAdmin() {
           </TabsTrigger>
           <TabsTrigger value="vinculaciones" className="flex items-center gap-2">
             <Link2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Vinculaciones</span>
+            <span className="hidden sm:inline">Vincul.</span>
           </TabsTrigger>
           <TabsTrigger value="pedidos" className="flex items-center gap-2">
             <ClipboardPaste className="h-4 w-4" />
             <span className="hidden sm:inline">Pedidos</span>
+          </TabsTrigger>
+          <TabsTrigger value="monday" className="flex items-center gap-2">
+            <Plug className="h-4 w-4" />
+            <span className="hidden sm:inline">Monday</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1546,6 +1894,10 @@ export default function BookOrdersAdmin() {
 
         <TabsContent value="pedidos">
           <PedidosAdminTab token={token} />
+        </TabsContent>
+
+        <TabsContent value="monday">
+          <MondayConfigTab token={token} />
         </TabsContent>
       </Tabs>
     </div>
