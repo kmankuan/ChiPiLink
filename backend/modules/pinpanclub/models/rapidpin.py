@@ -36,11 +36,20 @@ class RapidPinRole(str, Enum):
 class RapidPinQueueStatus(str, Enum):
     """Estado de la cola de partidos"""
     CHALLENGE_PENDING = "challenge_pending"  # Desafío enviado, esperando aceptación
-    WAITING_REFEREE = "waiting"              # Aceptado, esperando árbitro
+    DATE_NEGOTIATION = "date_negotiation"    # Negociando fecha del partido
+    QUEUED = "queued"                        # Reto en cola (sin fecha acordada)
+    WAITING_REFEREE = "waiting"              # Fecha acordada, esperando árbitro
     ASSIGNED = "assigned"                    # Árbitro asignado, partido en curso
     COMPLETED = "completed"                  # Partido completado
     CANCELLED = "cancelled"                  # Cancelado
     DECLINED = "declined"                    # Desafío rechazado
+
+
+class DateProposalStatus(str, Enum):
+    """Estado de propuesta de fecha"""
+    PENDING = "pending"      # Esperando respuesta
+    ACCEPTED = "accepted"    # Aceptada
+    COUNTERED = "countered"  # Contrapropuesta enviada
 
 
 # ============== SCORING CONSTANTS ==============
