@@ -451,7 +451,7 @@ export default function RapidPinPublicPage() {
     );
   }
 
-  const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, pending_challenges, scoring_rules } = feedData || {};
+  const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, pending_challenges, queued_challenges, date_negotiation, scoring_rules } = feedData || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background dark:from-orange-950/20 dark:to-background">
