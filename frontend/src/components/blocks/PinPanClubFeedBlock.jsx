@@ -85,6 +85,8 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
     es: {
       loading: 'Cargando actividad...',
       recentMatches: 'Partidos Recientes',
+      superPinMatches: '🏆 Super Pin',
+      rapidPinMatches: '⚡ Rapid Pin',
       leaderboard: 'Top Jugadores',
       activeChallenges: 'Retos Activos',
       recentAchievements: 'Logros Recientes',
@@ -112,6 +114,8 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
     en: {
       loading: 'Loading activity...',
       recentMatches: 'Recent Matches',
+      superPinMatches: '🏆 Super Pin',
+      rapidPinMatches: '⚡ Rapid Pin',
       leaderboard: 'Top Players',
       activeChallenges: 'Active Challenges',
       recentAchievements: 'Recent Achievements',
@@ -139,6 +143,8 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
     zh: {
       loading: '加载活动...',
       recentMatches: '最近比赛',
+      superPinMatches: '🏆 Super Pin',
+      rapidPinMatches: '⚡ Rapid Pin',
       leaderboard: '顶级玩家',
       activeChallenges: '活跃挑战',
       recentAchievements: '最近成就',
