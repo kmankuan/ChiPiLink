@@ -725,6 +725,16 @@ class PedidosService:
                 )
             except Exception as e:
                 logger.warning(f"No se pudo enviar notificación de cambio de estado: {e}")
+            
+            # Sincronizar con Monday.com si está configurado
+            try:
+                from .monday_pedidos_service import monday_pedidos_service
+                config = await monday_pedidos_service.get_config()
+                if config.get("auto_sync") and config.get("board_id"):
+                    await monday_pedidos_service.sync_estado_pedido(pedido_id, nuevo_estado)
+                    logger.info(f"Pedido {pedido_id} sincronizado con Monday.com (estado: {nuevo_estado})")
+            except Exception as e:
+                logger.warning(f"No se pudo sincronizar con Monday.com: {e}")
         
         return {"success": True, "estado": nuevo_estado}
 
