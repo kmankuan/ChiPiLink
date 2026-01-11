@@ -453,19 +453,14 @@ export default function CommunityLanding() {
           </section>
         )}
 
-        {/* PinPanClub Activity Feed Section */}
+        {/* PinPanClub Activity Feed Section - Sin título, solo estadísticas */}
         <section>
-          <SectionHeader 
-            icon={Trophy} 
-            title="PinPanClub - Actividad del Club" 
-            action="Ver más"
-            actionLink="/pinpanclub/superpin/ranking"
-          />
           <PinPanClubFeedBlock 
             config={{
               titulo: { es: '', en: '', zh: '' },
               subtitulo: { es: '', en: '', zh: '' },
               visibility: { public: true, registered: true, moderator: true, admin: true, super_admin: true },
+              style: { show_cta: false }, // Sin botón CTA ya que está en Quick Access
               sections: {
                 recent_matches: { 
                   enabled: true, 
