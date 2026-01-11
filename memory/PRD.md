@@ -1030,3 +1030,123 @@ Sistema de notificaciones push altamente configurable con soporte para múltiple
 - **Frontend:** 100% paneles funcionando
 
 ---
+
+## P11: Sistema de Pedidos de Libros Escolares ✅ NUEVO (Enero 2026)
+
+### Descripción
+Sistema completo para pre-pedidos de libros escolares con funcionalidad de importación masiva desde Google Sheets (copiar/pegar) y sistema de vinculación estudiante-acudiente.
+
+### Funcionalidades Implementadas
+
+#### 1. Importación Masiva de Datos (Bulk Import) ✅
+**Ruta Admin:** `/admin/book-orders`
+
+**Características:**
+- **Parseo TSV** - Procesa datos copiados de Google Sheets (tab-separated)
+- **Mapeo de Columnas** - Selector intuitivo para mapear columnas A, B, C... a campos
+- **Preview antes de Importar** - Validación de datos con detección de:
+  - Duplicados en la importación
+  - Registros existentes en DB
+  - Errores de validación
+  - Resumen de acciones (crear/actualizar)
+- **Importación de Estudiantes** - Con grado, sección, nombre completo
+- **Importación de Libros** - Con código, precio, editorial, ISBN, grado, materia
+- **Historial de Importaciones** - Registro de todas las importaciones con auditoría
+
+**Endpoints API:**
+- `POST /api/store/bulk-import/parse` - Parsear texto TSV
+- `POST /api/store/bulk-import/estudiantes/preview` - Preview de estudiantes
+- `POST /api/store/bulk-import/estudiantes/import` - Importar estudiantes
+- `GET /api/store/bulk-import/estudiantes` - Listar estudiantes importados
+- `GET /api/store/bulk-import/grados` - Obtener grados disponibles
+- `POST /api/store/bulk-import/libros/preview` - Preview de libros
+- `POST /api/store/bulk-import/libros/import` - Importar libros
+- `GET /api/store/bulk-import/history` - Historial de importaciones
+
+#### 2. Sistema de Vinculación Estudiante-Acudiente ✅
+Sistema de vinculación con flujo de aprobaciones:
+
+**Flujos de Aprobación:**
+- **Primera Vinculación:** Acudiente solicita → Admin aprueba → Rol "principal"
+- **Vinculaciones Posteriores:** Acudiente solicita → Principal aprueba (o Admin)
+- **Invitación:** Principal invita → Invitado acepta → Rol "autorizado"
+
+**Roles:**
+- `principal` - Acudiente principal, puede invitar otros
+- `autorizado` - Acudiente autorizado por el principal
+- `solo_lectura` - Solo puede ver información
+
+**Endpoints API:**
+- `POST /api/store/vinculacion/buscar-estudiante` - Buscar estudiante por número
+- `POST /api/store/vinculacion/solicitar` - Solicitar vinculación
+- `GET /api/store/vinculacion/mis-estudiantes` - Mis estudiantes vinculados
+- `GET /api/store/vinculacion/mis-solicitudes-pendientes` - Solicitudes pendientes (principal)
+- `POST /api/store/vinculacion/invitar` - Invitar otro acudiente (principal)
+- `POST /api/store/vinculacion/invitacion/{id}/aceptar` - Aceptar invitación
+- `POST /api/store/vinculacion/{id}/aprobar` - Aprobar vinculación (principal)
+- `POST /api/store/vinculacion/{id}/rechazar` - Rechazar vinculación
+- `DELETE /api/store/vinculacion/{id}` - Desvincularse
+
+**Endpoints Admin:**
+- `GET /api/store/vinculacion/admin/solicitudes-pendientes` - Solicitudes pendientes
+- `GET /api/store/vinculacion/admin/todas` - Todas las vinculaciones
+- `GET /api/store/vinculacion/admin/estudiante/{id}/acudientes` - Acudientes de estudiante
+- `POST /api/store/vinculacion/admin/{id}/aprobar` - Aprobar (admin)
+- `POST /api/store/vinculacion/admin/{id}/rechazar` - Rechazar (admin)
+- `POST /api/store/vinculacion/admin/{id}/cambiar-rol` - Cambiar rol
+- `DELETE /api/store/vinculacion/admin/{id}` - Desvincular (admin)
+- `POST /api/store/vinculacion/admin/vincular-directo` - Vincular sin aprobación
+
+#### 3. Panel de Administración Frontend ✅
+**Ruta:** `/admin/book-orders`
+
+**Pestañas:**
+1. **Estudiantes** - Lista de estudiantes importados con búsqueda y filtros por grado
+2. **Importar Estudiantes** - Interfaz de copiar/pegar desde Google Sheets
+3. **Importar Libros** - Interfaz de copiar/pegar para catálogo de libros
+4. **Vinculaciones** - Gestión de solicitudes pendientes y todas las vinculaciones
+
+### Archivos Nuevos
+
+**Backend:**
+- `/app/backend/modules/store/services/bulk_import_service.py`
+- `/app/backend/modules/store/routes/bulk_import.py`
+- `/app/backend/modules/store/routes/vinculacion.py`
+
+**Frontend:**
+- `/app/frontend/src/modules/store/BookOrdersAdmin.jsx`
+
+### Collections MongoDB
+- `estudiantes_sincronizados` - Estudiantes importados desde Google Sheets
+- `libros` - Catálogo de libros escolares
+- `vinculaciones` - Vinculaciones estudiante-acudiente
+- `invitaciones_acudiente` - Invitaciones entre acudientes
+- `import_logs` - Historial de importaciones
+
+### Test Results
+- **Backend:** 20/20 tests passed (100%)
+- **Frontend:** 100% funcionalidades verificadas
+
+---
+
+## Próximas Tareas (Backlog)
+
+### P0 - Crítico
+- [ ] Flujo de pedidos de libros para acudientes vinculados
+- [ ] Restricción: un libro por estudiante por año escolar
+- [ ] Sistema de pre-ordenes con demanda agregada
+
+### P1 - Alta Prioridad
+- [ ] Integración con Monday.com para seguimiento de pedidos
+- [ ] Notificaciones push para aprobaciones de vinculación
+- [ ] Panel de acudiente para ver estudiantes y hacer pedidos
+
+### P2 - Media Prioridad
+- [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
+- [ ] Solicitud especial para re-compras (libro perdido)
+- [ ] Reporte de demanda para publishers
+
+### P3 - Baja Prioridad
+- [ ] Integración directa con Google Sheets (Service Account)
+- [ ] Sincronización automática programada
+- [ ] Límites de gasto configurables por acudiente
