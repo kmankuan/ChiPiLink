@@ -74,6 +74,100 @@ export default function RapidPinPublicPage() {
   // Get current user's player ID
   const currentPlayerId = user?.cliente_id || user?.user_id;
 
+  // WebSocket for real-time updates
+  const handleWebSocketMessage = useCallback((message) => {
+    console.log('[WS] Received:', message.type);
+    
+    switch (message.type) {
+      case 'like_update':
+        // Update like count in real-time
+        setFeedData(prev => {
+          if (!prev) return prev;
+          
+          const updateLikes = (items) => 
+            items?.map(item => 
+              item.queue_id === message.queue_id 
+                ? { ...item, likes_count: message.likes_count }
+                : item
+            );
+          
+          return {
+            ...prev,
+            waiting_for_referee: updateLikes(prev.waiting_for_referee),
+            in_progress: updateLikes(prev.in_progress)
+          };
+        });
+        
+        // Show toast if not the current user
+        if (message.user?.user_id !== currentPlayerId) {
+          toast.info(message.text, { duration: 3000 });
+        }
+        break;
+        
+      case 'comment_added':
+        // Update comment count in real-time
+        setFeedData(prev => {
+          if (!prev) return prev;
+          
+          const updateComments = (items) => 
+            items?.map(item => 
+              item.queue_id === message.queue_id 
+                ? { ...item, comments_count: message.comments_count }
+                : item
+            );
+          
+          return {
+            ...prev,
+            waiting_for_referee: updateComments(prev.waiting_for_referee),
+            in_progress: updateComments(prev.in_progress)
+          };
+        });
+        
+        // Refresh comments if viewing the same challenge
+        if (selectedChallengeForComments?.queue_id === message.queue_id) {
+          fetchComments(message.queue_id);
+        }
+        
+        // Show toast if not the current user
+        if (message.comment?.user_id !== currentPlayerId) {
+          toast.info(message.text, { duration: 3000 });
+        }
+        break;
+        
+      case 'challenge_created':
+      case 'date_accepted':
+      case 'waiting_referee':
+      case 'referee_assigned':
+        // Refresh feed for major events
+        toast.info(message.text, { duration: 4000 });
+        fetchFeed();
+        if (isAuthenticated && currentPlayerId) {
+          fetchMyChallenges();
+        }
+        break;
+        
+      case 'date_proposed':
+        // Refresh challenges if it's for us
+        if (isAuthenticated && currentPlayerId) {
+          fetchMyChallenges();
+        }
+        toast.info(message.text, { duration: 4000 });
+        break;
+        
+      default:
+        break;
+    }
+  }, [currentPlayerId, isAuthenticated, selectedChallengeForComments]);
+
+  const { isConnected: wsConnected } = useWebSocket({
+    room: 'rapidpin',
+    userId: currentPlayerId,
+    autoConnect: true,
+    onMessage: handleWebSocketMessage,
+    onConnect: () => console.log('[WS] Connected to rapidpin room'),
+    onDisconnect: () => console.log('[WS] Disconnected from rapidpin room')
+  });
+
   useEffect(() => {
     fetchFeed();
     fetchCommentConfig();
