@@ -393,3 +393,200 @@ async def get_rapid_pin_public_feed():
     """
     return await rapidpin_service.get_public_feed()
 
+
+# ============== DATE NEGOTIATION ==============
+
+@router.post("/challenge-with-date")
+async def create_challenge_with_date(
+    season_id: str,
+    challenger_id: str,
+    opponent_id: str,
+    proposed_date: str,
+    message: Optional[str] = None
+):
+    """
+    Crear desafío con propuesta de fecha inicial.
+    El reto inicia en estado date_negotiation.
+    """
+    try:
+        return await rapidpin_service.create_challenge_with_date(
+            season_id=season_id,
+            challenger_id=challenger_id,
+            opponent_id=opponent_id,
+            proposed_date=proposed_date,
+            message=message
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/challenge/{queue_id}/respond-date")
+async def respond_to_date_proposal(
+    queue_id: str,
+    user_id: str,
+    action: str,  # "accept", "counter", "queue"
+    counter_date: Optional[str] = None,
+    message: Optional[str] = None
+):
+    """
+    Responder a propuesta de fecha.
+    - accept: Acepta la fecha -> pasa a waiting
+    - counter: Propone otra fecha -> sigue negociando
+    - queue: Poner en cola para retomar después
+    """
+    try:
+        return await rapidpin_service.respond_to_date(
+            queue_id=queue_id,
+            user_id=user_id,
+            action=action,
+            counter_date=counter_date,
+            message=message
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/challenge/{queue_id}/resume")
+async def resume_challenge_from_queue(
+    queue_id: str,
+    user_id: str,
+    proposed_date: str,
+    message: Optional[str] = None
+):
+    """
+    Retomar un reto de la cola proponiendo nueva fecha.
+    """
+    try:
+        return await rapidpin_service.resume_from_queue(
+            queue_id=queue_id,
+            user_id=user_id,
+            proposed_date=proposed_date,
+            message=message
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== LIKES & COMMENTS ==============
+
+@router.get("/comment-config")
+async def get_comment_configuration():
+    """Obtener configuración de comentarios"""
+    return await rapidpin_service.get_comment_config()
+
+
+@router.put("/comment-config")
+async def update_comment_configuration(
+    max_comment_length: Optional[int] = None,
+    require_approval_for_flagged_users: Optional[bool] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Actualizar configuración de comentarios (admin)"""
+    updates = {}
+    if max_comment_length is not None:
+        updates["max_comment_length"] = max_comment_length
+    if require_approval_for_flagged_users is not None:
+        updates["require_approval_for_flagged_users"] = require_approval_for_flagged_users
+    
+    if not updates:
+        raise HTTPException(status_code=400, detail="No hay cambios para aplicar")
+    
+    return await rapidpin_service.update_comment_config(updates)
+
+
+@router.post("/challenge/{queue_id}/like")
+async def toggle_challenge_like(
+    queue_id: str,
+    user_id: str
+):
+    """
+    Dar o quitar like a un reto.
+    Requiere usuario autenticado.
+    """
+    try:
+        return await rapidpin_service.toggle_like(queue_id, user_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/challenge/{queue_id}/liked")
+async def check_user_liked_challenge(
+    queue_id: str,
+    user_id: str
+):
+    """Verificar si un usuario ya dio like a un reto"""
+    liked = await rapidpin_service.check_user_liked(queue_id, user_id)
+    return {"liked": liked}
+
+
+@router.post("/challenge/{queue_id}/comment")
+async def add_challenge_comment(
+    queue_id: str,
+    user_id: str,
+    content: str,
+    user_name: Optional[str] = None,
+    user_avatar: Optional[str] = None
+):
+    """
+    Agregar comentario a un reto.
+    Requiere usuario autenticado.
+    Si el usuario tiene sanciones, el comentario irá a moderación.
+    """
+    try:
+        user_info = {
+            "user_id": user_id,
+            "nombre": user_name,
+            "avatar": user_avatar
+        } if user_name else None
+        
+        return await rapidpin_service.add_comment(
+            queue_id=queue_id,
+            user_id=user_id,
+            content=content,
+            user_info=user_info
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/challenge/{queue_id}/comments")
+async def get_challenge_comments(
+    queue_id: str,
+    limit: int = 50
+):
+    """Obtener comentarios de un reto"""
+    return await rapidpin_service.get_comments(queue_id, limit=limit)
+
+
+@router.post("/comment/{comment_id}/moderate")
+async def moderate_challenge_comment(
+    comment_id: str,
+    action: str,  # "approve", "reject", "hide"
+    moderator_id: str,
+    reason: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Moderar un comentario (admin/mod).
+    - approve: Aprobar comentario pendiente
+    - reject: Rechazar y ocultar
+    - hide: Ocultar comentario aprobado
+    """
+    try:
+        return await rapidpin_service.moderate_comment(
+            comment_id=comment_id,
+            action=action,
+            moderator_id=moderator_id,
+            reason=reason
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/comments/pending")
+async def get_pending_moderation_comments(
+    limit: int = 50,
+    admin: dict = Depends(get_admin_user)
+):
+    """Obtener comentarios pendientes de moderación (admin/mod)"""
+    return await rapidpin_service.get_pending_comments(limit=limit)
