@@ -14,6 +14,7 @@ from .landing import router as landing_router
 from .bulk_import import router as bulk_import_router
 from .vinculacion import router as vinculacion_router
 from .pedidos import router as pedidos_router
+from .monday import router as monday_router
 
 # Router principal del módulo Store (refactorizado)
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -29,6 +30,7 @@ router.include_router(landing_router)
 router.include_router(bulk_import_router)
 router.include_router(vinculacion_router)
 router.include_router(pedidos_router)
+router.include_router(monday_router)
 
 # Re-exportar para compatibilidad
 store_refactored_router = router
