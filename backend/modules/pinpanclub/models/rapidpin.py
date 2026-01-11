@@ -304,27 +304,35 @@ def get_default_referee_prizes() -> List[RapidPinPrize]:
     ]
 
 
-# ============== MATCH QUEUE (Waiting for Referee) ==============
+# ============== MATCH QUEUE (Challenge & Referee System) ==============
+
+class RapidPinChallengeCreate(BaseModel):
+    """Crear desafío a otro jugador"""
+    season_id: str
+    challenger_id: str      # Quien desafía
+    opponent_id: str        # A quien desafía
+    notes: Optional[str] = None
+
 
 class RapidPinMatchQueueCreate(BaseModel):
-    """Crear partido en cola esperando árbitro"""
+    """Crear partido en cola (admin/mod) - Salta la fase de desafío"""
     season_id: str
     player1_id: str
     player2_id: str
     created_by_id: str
-    notes: Optional[str] = None  # Notas opcionales (ubicación, etc.)
+    notes: Optional[str] = None
 
 
 class RapidPinMatchQueue(BaseModel):
-    """Partido en cola esperando árbitro"""
+    """Partido en cola / Desafío"""
     model_config = ConfigDict(from_attributes=True)
     
     queue_id: str = Field(default_factory=lambda: f"queue_{uuid.uuid4().hex[:12]}")
     season_id: str
     
     # Jugadores
-    player1_id: str
-    player2_id: str
+    player1_id: str  # Challenger / Jugador 1
+    player2_id: str  # Opponent / Jugador 2
     player1_info: Optional[Dict] = None
     player2_info: Optional[Dict] = None
     
@@ -333,19 +341,40 @@ class RapidPinMatchQueue(BaseModel):
     referee_info: Optional[Dict] = None
     
     # Estado
-    status: RapidPinQueueStatus = RapidPinQueueStatus.WAITING
+    status: RapidPinQueueStatus = RapidPinQueueStatus.CHALLENGE_PENDING
     
     # Timestamps
     created_at: Optional[Any] = None
     created_by_id: str = ""
+    created_by_role: str = "player"  # player, moderator, admin
+    
+    # Aceptación
+    accepted_at: Optional[Any] = None
+    accepted_by_id: Optional[str] = None  # Quien aceptó (jugador 2 o admin/mod)
+    
+    # Árbitro
     assigned_at: Optional[Any] = None
+    assigned_by_id: Optional[str] = None  # Quien asignó (árbitro mismo o admin/mod)
+    
+    # Completado
     completed_at: Optional[Any] = None
+    
+    # Cancelado/Rechazado
+    cancelled_at: Optional[Any] = None
+    cancelled_by_id: Optional[str] = None
+    decline_reason: Optional[str] = None
     
     # Notas
     notes: Optional[str] = None
     
     # Match ID cuando se complete
     match_id: Optional[str] = None
+
+
+class RapidPinAcceptChallenge(BaseModel):
+    """Aceptar o rechazar desafío"""
+    accepted: bool = True
+    decline_reason: Optional[str] = None
 
 
 class RapidPinQueueAssign(BaseModel):
