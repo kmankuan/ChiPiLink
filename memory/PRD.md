@@ -504,6 +504,12 @@ Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid P
 - Admins/Mods pueden forzar aceptación
 - El árbitro no puede ser uno de los jugadores
 
+**Notificaciones Push:** ✅ Integrado
+- `challenge_received`: Notifica al oponente cuando recibe un desafío
+- `challenge_accepted`: Notifica al retador cuando su desafío es aceptado
+- Usa categoría `cat_rapidpin` con prioridad alta
+- Multi-idioma (ES/EN/ZH)
+
 **Archivos:**
 - `/app/frontend/src/pages/RapidPinPublicPage.jsx` (Frontend completo)
 - `/app/backend/modules/pinpanclub/routes/rapidpin.py` (Endpoints)
