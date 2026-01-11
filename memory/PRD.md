@@ -452,8 +452,61 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 13. **Demo Data Seeding System** ✅ (Enero 10, 2026)
 14. **Integración OneSignal** ✅ (Enero 11, 2026)
 15. **Sistema de Desafíos Rapid Pin** ✅ (Enero 11, 2026)
-16. **Negociación de Fecha para Desafíos** ✅ NEW (Enero 11, 2026)
-17. **Likes y Comentarios en Partidos** ✅ NEW (Enero 11, 2026)
+16. **Negociación de Fecha para Desafíos** ✅ (Enero 11, 2026)
+17. **Likes y Comentarios en Partidos** ✅ (Enero 11, 2026)
+18. **WebSocket para Notificaciones en Tiempo Real** ✅ NEW (Enero 11, 2026)
+
+### 🆕 WebSocket Real-Time Notifications ✅ (Enero 11, 2026)
+Sistema de notificaciones en tiempo real usando WebSocket:
+
+**Características:**
+- Conexión WebSocket persistente con reconexión automática
+- Soporte multi-idioma (ES/EN/ZH) - mensajes localizados según preferencia del usuario
+- Múltiples rooms/canales (global, rapidpin, community, store)
+- Indicador visual de conexión (LIVE/Offline)
+- Keep-alive con ping/pong cada 30 segundos
+
+**Eventos Emitidos:**
+- `like_update`: Cuando alguien da/quita like (actualiza contador en tiempo real)
+- `comment_added`: Cuando se agrega un comentario aprobado
+- `challenge_created`: Cuando se crea un nuevo desafío
+- `date_proposed`: Cuando se propone nueva fecha
+- `date_accepted`: Cuando se acepta fecha
+- `waiting_referee`: Cuando partido espera árbitro
+- `referee_assigned`: Cuando se asigna árbitro
+
+**Rooms Disponibles:**
+| Room | Descripción |
+|------|-------------|
+| `global` | Notificaciones generales |
+| `rapidpin` | Desafíos, likes, comentarios de Rapid Pin |
+| `community` | Posts y eventos de la comunidad |
+| `store` | Actualizaciones de pedidos |
+
+**Arquitectura Multi-Servicio:**
+- Módulo independiente `/app/backend/modules/realtime/`
+- Singleton `ws_manager` para gestión de conexiones
+- Helper functions para emitir eventos desde otros módulos
+- Preparado para separación a microservicio
+
+**Endpoints REST:**
+- `GET /api/realtime/stats` - Estadísticas de conexiones
+- `GET /api/realtime/rooms` - Lista de rooms disponibles
+- `WS /api/realtime/ws` - WebSocket endpoint
+
+**Frontend Hook:**
+- `useWebSocket` hook en `/app/frontend/src/hooks/useWebSocket.js`
+- Auto-connect con reconexión automática
+- Callback handlers para diferentes eventos
+
+**Nota:** En ambiente de preview el WebSocket se desconecta por restricciones del proxy. Funcionará correctamente en producción.
+
+**Archivos:**
+- `/app/backend/modules/realtime/__init__.py`
+- `/app/backend/modules/realtime/routes.py`
+- `/app/backend/modules/realtime/services/websocket_manager.py`
+- `/app/frontend/src/hooks/useWebSocket.js`
+- `/app/frontend/src/pages/RapidPinPublicPage.jsx` (integración)
 
 ### 🆕 Sistema de Desafíos Rapid Pin ✅ (Enero 11, 2026)
 Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid Pin:
