@@ -154,6 +154,26 @@ def get_default_notification_categories() -> List[Dict]:
             "sort_order": 5
         },
         {
+            "category_id": "cat_rapidpin",
+            "name": {
+                "es": "Desafíos Rapid Pin",
+                "en": "Rapid Pin Challenges",
+                "zh": "快速对决挑战"
+            },
+            "description": {
+                "es": "Nuevos desafíos, aceptaciones, partidos esperando árbitro",
+                "en": "New challenges, acceptances, matches waiting for referee",
+                "zh": "新挑战、接受、等待裁判的比赛"
+            },
+            "icon": "⚔️",
+            "color": "#f97316",
+            "default_enabled": True,
+            "default_provider": NotificationProvider.AUTO.value,
+            "priority": NotificationPriority.HIGH.value,
+            "module": "pinpanclub",
+            "sort_order": 5.5
+        },
+        {
             "category_id": "cat_social",
             "name": {
                 "es": "Social",
