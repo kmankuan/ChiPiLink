@@ -29,7 +29,9 @@ import {
   LayoutDashboard,
   Link as LinkIcon,
   Store,
-  Trophy
+  Trophy,
+  Zap,
+  Calendar
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
