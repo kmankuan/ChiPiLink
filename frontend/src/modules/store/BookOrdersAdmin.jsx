@@ -600,14 +600,14 @@ function ImportBooksTab({ token }) {
             <div className="space-y-2">
               <Label>Editorial</Label>
               <Select 
-                value={columnMapping.editorial?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, editorial: v ? parseInt(v) : null}))}
+                value={columnMapping.editorial !== null && columnMapping.editorial !== undefined ? columnMapping.editorial.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, editorial: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)}
@@ -620,14 +620,14 @@ function ImportBooksTab({ token }) {
             <div className="space-y-2">
               <Label>ISBN</Label>
               <Select 
-                value={columnMapping.isbn?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, isbn: v ? parseInt(v) : null}))}
+                value={columnMapping.isbn !== null && columnMapping.isbn !== undefined ? columnMapping.isbn.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, isbn: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)}
@@ -640,14 +640,14 @@ function ImportBooksTab({ token }) {
             <div className="space-y-2">
               <Label>Grado</Label>
               <Select 
-                value={columnMapping.grado?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, grado: v ? parseInt(v) : null}))}
+                value={columnMapping.grado !== null && columnMapping.grado !== undefined ? columnMapping.grado.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, grado: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)}
@@ -660,14 +660,14 @@ function ImportBooksTab({ token }) {
             <div className="space-y-2">
               <Label>Materia</Label>
               <Select 
-                value={columnMapping.materia?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, materia: v ? parseInt(v) : null}))}
+                value={columnMapping.materia !== null && columnMapping.materia !== undefined ? columnMapping.materia.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, materia: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)}
