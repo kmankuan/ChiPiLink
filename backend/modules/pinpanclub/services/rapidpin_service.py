@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 
 from core.base import BaseService
+from core.database import get_database
 from ..repositories.rapidpin_repository import (
     RapidPinSeasonRepository,
     RapidPinMatchRepository,
@@ -37,6 +38,10 @@ class RapidPinService(BaseService):
         self.match_repo = RapidPinMatchRepository()
         self.ranking_repo = RapidPinRankingRepository()
         self.player_repo = PlayerRepository()
+    
+    async def get_db(self):
+        """Obtener conexión a la base de datos"""
+        return await get_database()
     
     # ============== SEASON MANAGEMENT ==============
     
