@@ -32,7 +32,8 @@ import {
   Moon,
   Home,
   X,
-  Trophy
+  Trophy,
+  BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +63,7 @@ const navItems = [
   { id: 'admin', label: 'Administración', icon: Settings },
   { id: 'integrations', label: 'Integraciones', icon: Plug },
   { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
-  { id: 'book-orders', label: 'Libros Escolares', icon: ShoppingBag, isExternal: true, path: '/admin/book-orders' },
+  { id: 'book-orders', label: 'Libros Escolares', icon: BookOpen, isExternal: true, path: '/admin/book-orders' },
 ];
 
 export default function AdminDashboard() {
