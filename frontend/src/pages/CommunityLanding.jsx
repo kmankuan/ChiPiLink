@@ -347,16 +347,24 @@ const AlbumCard = ({ album }) => {
 };
 
 // Quick Access Button
-const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => (
-  <Link to={to}>
-    <div className={`flex flex-col items-center gap-2 p-4 rounded-2xl bg-${color}/5 hover:bg-${color}/10 transition-colors cursor-pointer group`}>
-      <div className={`p-3 rounded-xl bg-${color}/10 group-hover:bg-${color}/20 transition-colors`}>
-        <Icon className={`h-6 w-6 text-${color}`} />
+const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => {
+  const colorClasses = {
+    primary: 'bg-primary/5 hover:bg-primary/10 [&_.icon-bg]:bg-primary/10 [&_.icon-bg]:hover:bg-primary/20 [&_.icon]:text-primary',
+    yellow: 'bg-yellow-500/5 hover:bg-yellow-500/10 [&_.icon-bg]:bg-yellow-500/10 [&_.icon-bg]:hover:bg-yellow-500/20 [&_.icon]:text-yellow-500',
+    orange: 'bg-orange-500/5 hover:bg-orange-500/10 [&_.icon-bg]:bg-orange-500/10 [&_.icon-bg]:hover:bg-orange-500/20 [&_.icon]:text-orange-500',
+  };
+
+  return (
+    <Link to={to}>
+      <div className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-colors cursor-pointer group ${colorClasses[color] || colorClasses.primary}`}>
+        <div className="icon-bg p-3 rounded-xl transition-colors">
+          <Icon className="icon h-6 w-6" />
+        </div>
+        <span className="text-sm font-medium text-center">{label}</span>
       </div>
-      <span className="text-sm font-medium">{label}</span>
-    </div>
-  </Link>
-);
+    </Link>
+  );
+};
 
 // Main Community Landing Component
 export default function CommunityLanding() {
