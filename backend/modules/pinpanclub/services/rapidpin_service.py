@@ -1059,8 +1059,513 @@ class RapidPinService(BaseService):
             "pending_challenges": pending_challenges,
             "waiting_for_referee": waiting_matches,
             "in_progress": in_progress_matches,
+            "queued_challenges": await self.get_queue_matches(
+                season_id=active_season.season_id if active_season else None,
+                status="queued"
+            ),
+            "date_negotiation": await self.get_queue_matches(
+                season_id=active_season.season_id if active_season else None,
+                status="date_negotiation"
+            ),
             "scoring_rules": RAPID_PIN_SCORING
         }
+    
+    # ============== DATE NEGOTIATION METHODS ==============
+    
+    async def create_challenge_with_date(
+        self,
+        season_id: str,
+        challenger_id: str,
+        opponent_id: str,
+        proposed_date: str,
+        message: str = None
+    ) -> Dict:
+        """
+        Crear desafío con propuesta de fecha inicial.
+        El reto inicia en estado date_negotiation.
+        """
+        db = await self.get_db()
+        
+        # Validaciones básicas
+        if challenger_id == opponent_id:
+            raise ValueError("No puedes desafiarte a ti mismo")
+        
+        # Verificar que no exista un desafío activo entre estos jugadores
+        existing = await db["rapidpin_queue"].find_one({
+            "$or": [
+                {"player1_id": challenger_id, "player2_id": opponent_id},
+                {"player1_id": opponent_id, "player2_id": challenger_id}
+            ],
+            "status": {"$in": ["challenge_pending", "date_negotiation", "waiting", "assigned", "queued"]}
+        })
+        
+        if existing:
+            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
+        
+        # Obtener info de jugadores
+        challenger_info = await self.player_repo.get_by_id(challenger_id)
+        opponent_info = await self.player_repo.get_by_id(opponent_id)
+        
+        now = datetime.now(timezone.utc).isoformat()
+        
+        # Crear historial de fecha inicial
+        date_history = [{
+            "proposed_date": proposed_date,
+            "proposed_by_id": challenger_id,
+            "proposed_by_name": challenger_info.get("apodo") or challenger_info.get("nombre") if challenger_info else "Retador",
+            "message": message,
+            "created_at": now,
+            "status": "pending"
+        }]
+        
+        queue_entry = {
+            "queue_id": f"queue_{uuid.uuid4().hex[:12]}",
+            "season_id": season_id,
+            "player1_id": challenger_id,
+            "player2_id": opponent_id,
+            "player1_info": self._get_player_info(challenger_info),
+            "player2_info": self._get_player_info(opponent_info),
+            "referee_id": None,
+            "referee_info": None,
+            "status": "date_negotiation",
+            "created_at": now,
+            "created_by_id": challenger_id,
+            "created_by_role": "player",
+            "proposed_date": proposed_date,
+            "proposed_by_id": challenger_id,
+            "date_history": date_history,
+            "agreed_date": None,
+            "accepted_at": None,
+            "accepted_by_id": None,
+            "assigned_at": None,
+            "assigned_by_id": None,
+            "completed_at": None,
+            "cancelled_at": None,
+            "cancelled_by_id": None,
+            "decline_reason": None,
+            "notes": None,
+            "match_id": None,
+            "likes_count": 0,
+            "comments_count": 0
+        }
+        
+        await db["rapidpin_queue"].insert_one(queue_entry)
+        self.log_info(f"Challenge with date created: {queue_entry['queue_id']} - {challenger_id} vs {opponent_id}")
+        
+        queue_entry.pop("_id", None)
+        
+        # Notificar al oponente
+        challenger_name = challenger_info.get("apodo") or challenger_info.get("nombre", "Un jugador") if challenger_info else "Un jugador"
+        await send_challenge_notification(
+            recipient_id=opponent_id,
+            challenger_name=challenger_name,
+            notification_type="date_proposed"
+        )
+        
+        return queue_entry
+    
+    async def respond_to_date(
+        self,
+        queue_id: str,
+        user_id: str,
+        action: str,  # "accept", "counter", "queue"
+        counter_date: str = None,
+        message: str = None
+    ) -> Dict:
+        """
+        Responder a una propuesta de fecha.
+        - accept: Acepta la fecha propuesta -> pasa a waiting
+        - counter: Propone otra fecha -> sigue en date_negotiation
+        - queue: Poner en cola para retomar después -> pasa a queued
+        """
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Reto no encontrado")
+        
+        if queue_entry["status"] not in ["date_negotiation", "queued"]:
+            raise ValueError("Este reto no está en fase de negociación de fecha")
+        
+        # Verificar que sea uno de los jugadores
+        if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
+            raise ValueError("Solo los jugadores del reto pueden responder")
+        
+        # Verificar que no sea la misma persona que propuso
+        if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
+            raise ValueError("Debes esperar la respuesta del otro jugador")
+        
+        now = datetime.now(timezone.utc).isoformat()
+        other_player_id = queue_entry["player2_id"] if user_id == queue_entry["player1_id"] else queue_entry["player1_id"]
+        
+        # Obtener info del usuario
+        user_info = await self.player_repo.get_by_id(user_id)
+        user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
+        
+        # Actualizar historial de fecha
+        date_history = queue_entry.get("date_history", [])
+        if date_history and len(date_history) > 0:
+            date_history[-1]["status"] = action
+            date_history[-1]["responded_at"] = now
+            date_history[-1]["response_by_id"] = user_id
+        
+        update_data = {
+            "date_history": date_history
+        }
+        
+        if action == "accept":
+            # Aceptar fecha - pasar a waiting
+            update_data["status"] = "waiting"
+            update_data["agreed_date"] = queue_entry.get("proposed_date")
+            update_data["accepted_at"] = now
+            update_data["accepted_by_id"] = user_id
+            
+            # Notificar al otro jugador
+            await send_challenge_notification(
+                recipient_id=other_player_id,
+                challenger_name=user_name,
+                notification_type="date_accepted"
+            )
+            
+            # Broadcast para buscar árbitro
+            player1_info = queue_entry.get("player1_info") or {}
+            player2_info = queue_entry.get("player2_info") or {}
+            player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")
+            player2_name = player2_info.get("nickname") or player2_info.get("nombre", "Jugador 2")
+            
+            await send_referee_needed_broadcast(
+                player1_name=player1_name,
+                player2_name=player2_name,
+                exclude_player_ids=[queue_entry["player1_id"], queue_entry["player2_id"]]
+            )
+            
+        elif action == "counter":
+            if not counter_date:
+                raise ValueError("Debes proponer una fecha alternativa")
+            
+            # Agregar nueva propuesta al historial
+            date_history.append({
+                "proposed_date": counter_date,
+                "proposed_by_id": user_id,
+                "proposed_by_name": user_name,
+                "message": message,
+                "created_at": now,
+                "status": "pending"
+            })
+            
+            update_data["proposed_date"] = counter_date
+            update_data["proposed_by_id"] = user_id
+            update_data["date_history"] = date_history
+            update_data["status"] = "date_negotiation"
+            
+            # Notificar al otro jugador
+            await send_challenge_notification(
+                recipient_id=other_player_id,
+                challenger_name=user_name,
+                notification_type="date_proposed"
+            )
+            
+        elif action == "queue":
+            # Poner en cola para retomar después
+            update_data["status"] = "queued"
+            
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": update_data}
+        )
+        
+        self.log_info(f"Date response for {queue_id}: {action} by {user_id}")
+        
+        updated = await db["rapidpin_queue"].find_one({"queue_id": queue_id}, {"_id": 0})
+        return updated
+    
+    async def resume_from_queue(
+        self,
+        queue_id: str,
+        user_id: str,
+        proposed_date: str,
+        message: str = None
+    ) -> Dict:
+        """
+        Retomar un reto de la cola proponiendo nueva fecha.
+        """
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Reto no encontrado")
+        
+        if queue_entry["status"] != "queued":
+            raise ValueError("Este reto no está en cola")
+        
+        if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
+            raise ValueError("Solo los jugadores del reto pueden retomarlo")
+        
+        # Usar respond_to_date con action=counter para proponer nueva fecha
+        return await self.respond_to_date(
+            queue_id=queue_id,
+            user_id=user_id,
+            action="counter",
+            counter_date=proposed_date,
+            message=message
+        )
+    
+    # ============== LIKES & COMMENTS METHODS ==============
+    
+    async def get_comment_config(self) -> Dict:
+        """Obtener configuración de comentarios"""
+        db = await self.get_db()
+        
+        config = await db["rapidpin_config"].find_one(
+            {"config_id": "comment_config"},
+            {"_id": 0}
+        )
+        
+        if not config:
+            # Crear configuración por defecto
+            config = {
+                "config_id": "comment_config",
+                "max_comment_length": 280,
+                "require_approval_for_flagged_users": True,
+                "warning_message": {
+                    "es": "Recuerda mantener un ambiente respetuoso. Los comentarios inapropiados pueden resultar en sanciones.",
+                    "en": "Remember to keep a respectful environment. Inappropriate comments may result in sanctions.",
+                    "zh": "请保持尊重的环境。不当评论可能会导致处罚。"
+                }
+            }
+            await db["rapidpin_config"].insert_one(config)
+            config.pop("_id", None)
+        
+        return config
+    
+    async def update_comment_config(self, updates: Dict) -> Dict:
+        """Actualizar configuración de comentarios (admin)"""
+        db = await self.get_db()
+        
+        await db["rapidpin_config"].update_one(
+            {"config_id": "comment_config"},
+            {"$set": updates},
+            upsert=True
+        )
+        
+        return await self.get_comment_config()
+    
+    async def toggle_like(self, queue_id: str, user_id: str) -> Dict:
+        """Dar o quitar like a un reto"""
+        db = await self.get_db()
+        
+        # Verificar que el reto existe
+        queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
+        if not queue_entry:
+            raise ValueError("Reto no encontrado")
+        
+        # Verificar si ya existe el like
+        existing = await db["rapidpin_reactions"].find_one({
+            "queue_id": queue_id,
+            "user_id": user_id,
+            "reaction_type": "like"
+        })
+        
+        if existing:
+            # Quitar like
+            await db["rapidpin_reactions"].delete_one({"_id": existing["_id"]})
+            await db["rapidpin_queue"].update_one(
+                {"queue_id": queue_id},
+                {"$inc": {"likes_count": -1}}
+            )
+            return {"action": "unliked", "likes_count": queue_entry.get("likes_count", 1) - 1}
+        else:
+            # Dar like
+            reaction = {
+                "reaction_id": f"react_{uuid.uuid4().hex[:8]}",
+                "queue_id": queue_id,
+                "user_id": user_id,
+                "reaction_type": "like",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db["rapidpin_reactions"].insert_one(reaction)
+            await db["rapidpin_queue"].update_one(
+                {"queue_id": queue_id},
+                {"$inc": {"likes_count": 1}}
+            )
+            return {"action": "liked", "likes_count": queue_entry.get("likes_count", 0) + 1}
+    
+    async def check_user_liked(self, queue_id: str, user_id: str) -> bool:
+        """Verificar si un usuario ya dio like"""
+        db = await self.get_db()
+        
+        existing = await db["rapidpin_reactions"].find_one({
+            "queue_id": queue_id,
+            "user_id": user_id,
+            "reaction_type": "like"
+        })
+        
+        return existing is not None
+    
+    async def add_comment(
+        self,
+        queue_id: str,
+        user_id: str,
+        content: str,
+        user_info: Dict = None
+    ) -> Dict:
+        """Agregar comentario a un reto"""
+        db = await self.get_db()
+        
+        # Verificar que el reto existe
+        queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
+        if not queue_entry:
+            raise ValueError("Reto no encontrado")
+        
+        # Obtener config
+        config = await self.get_comment_config()
+        max_length = config.get("max_comment_length", 280)
+        
+        # Validar longitud
+        if len(content) > max_length:
+            raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
+        
+        # Verificar si el usuario está flaggeado (tiene sanciones)
+        user_moderation = await db["user_moderations"].find_one({
+            "user_id": user_id,
+            "status": {"$in": ["warning", "sanctioned"]}
+        })
+        
+        is_moderated = False
+        is_approved = True
+        
+        if user_moderation and config.get("require_approval_for_flagged_users", True):
+            is_moderated = True
+            is_approved = False
+        
+        now = datetime.now(timezone.utc).isoformat()
+        
+        comment = {
+            "comment_id": f"comment_{uuid.uuid4().hex[:8]}",
+            "queue_id": queue_id,
+            "user_id": user_id,
+            "user_info": user_info,
+            "content": content,
+            "is_moderated": is_moderated,
+            "is_approved": is_approved,
+            "is_hidden": False,
+            "moderation_reason": None,
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        await db["rapidpin_comments"].insert_one(comment)
+        
+        # Solo incrementar contador si está aprobado
+        if is_approved:
+            await db["rapidpin_queue"].update_one(
+                {"queue_id": queue_id},
+                {"$inc": {"comments_count": 1}}
+            )
+        
+        comment.pop("_id", None)
+        
+        return {
+            "comment": comment,
+            "is_pending_moderation": is_moderated and not is_approved,
+            "warning_message": config.get("warning_message", {})
+        }
+    
+    async def get_comments(
+        self,
+        queue_id: str,
+        include_hidden: bool = False,
+        limit: int = 50
+    ) -> List[Dict]:
+        """Obtener comentarios de un reto"""
+        db = await self.get_db()
+        
+        query = {"queue_id": queue_id, "is_approved": True}
+        if not include_hidden:
+            query["is_hidden"] = False
+        
+        cursor = db["rapidpin_comments"].find(
+            query,
+            {"_id": 0}
+        ).sort("created_at", -1).limit(limit)
+        
+        return await cursor.to_list(length=limit)
+    
+    async def moderate_comment(
+        self,
+        comment_id: str,
+        action: str,  # "approve", "reject", "hide"
+        moderator_id: str,
+        reason: str = None
+    ) -> Dict:
+        """Moderar un comentario (admin/mod)"""
+        db = await self.get_db()
+        
+        comment = await db["rapidpin_comments"].find_one(
+            {"comment_id": comment_id},
+            {"_id": 0}
+        )
+        
+        if not comment:
+            raise ValueError("Comentario no encontrado")
+        
+        update_data = {
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "moderation_reason": reason
+        }
+        
+        was_approved = comment.get("is_approved", True)
+        
+        if action == "approve":
+            update_data["is_approved"] = True
+            update_data["is_moderated"] = False
+            
+            # Incrementar contador si no estaba aprobado antes
+            if not was_approved:
+                await db["rapidpin_queue"].update_one(
+                    {"queue_id": comment["queue_id"]},
+                    {"$inc": {"comments_count": 1}}
+                )
+                
+        elif action == "reject":
+            update_data["is_approved"] = False
+            update_data["is_hidden"] = True
+            
+        elif action == "hide":
+            update_data["is_hidden"] = True
+            
+            # Decrementar contador si estaba aprobado
+            if was_approved:
+                await db["rapidpin_queue"].update_one(
+                    {"queue_id": comment["queue_id"]},
+                    {"$inc": {"comments_count": -1}}
+                )
+        
+        await db["rapidpin_comments"].update_one(
+            {"comment_id": comment_id},
+            {"$set": update_data}
+        )
+        
+        return await db["rapidpin_comments"].find_one({"comment_id": comment_id}, {"_id": 0})
+    
+    async def get_pending_comments(self, limit: int = 50) -> List[Dict]:
+        """Obtener comentarios pendientes de moderación"""
+        db = await self.get_db()
+        
+        cursor = db["rapidpin_comments"].find(
+            {"is_moderated": True, "is_approved": False},
+            {"_id": 0}
+        ).sort("created_at", 1).limit(limit)
+        
+        return await cursor.to_list(length=limit)
 
 
 # Instancia singleton
