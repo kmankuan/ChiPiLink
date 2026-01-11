@@ -474,6 +474,16 @@ class PedidosService:
             }
         )
         
+        # Sincronizar con Monday.com (crear item)
+        try:
+            from .monday_pedidos_service import monday_pedidos_service
+            config = await monday_pedidos_service.get_config()
+            if config.get("auto_sync") and config.get("board_id"):
+                await monday_pedidos_service.sync_pedido(pedido_id)
+                logger.info(f"Pedido {pedido_id} creado en Monday.com")
+        except Exception as e:
+            logger.warning(f"No se pudo sincronizar con Monday.com: {e}")
+        
         return {
             "success": True,
             "estado": nuevo_estado,
