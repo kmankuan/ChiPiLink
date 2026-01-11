@@ -19,6 +19,13 @@ export function OneSignalProvider({ children }) {
         return;
       }
 
+      // Check if already initialized
+      if (window.OneSignalInitialized) {
+        console.log('OneSignal already initialized');
+        setIsInitialized(true);
+        return;
+      }
+
       try {
         await OneSignal.init({
           appId: ONESIGNAL_APP_ID,
@@ -28,6 +35,7 @@ export function OneSignalProvider({ children }) {
           },
         });
 
+        window.OneSignalInitialized = true;
         setIsInitialized(true);
 
         // Check current permission and subscription status
@@ -55,8 +63,10 @@ export function OneSignalProvider({ children }) {
 
         console.log('OneSignal initialized successfully');
       } catch (err) {
-        console.error('OneSignal initialization error:', err);
-        setError(err.message);
+        // Don't break the app if OneSignal fails to initialize
+        // This can happen in preview environments or unsupported domains
+        console.warn('OneSignal initialization error (non-fatal):', err.message);
+        setError('Push notifications not available in this environment');
       }
     };
 
