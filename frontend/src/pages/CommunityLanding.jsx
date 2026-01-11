@@ -373,6 +373,7 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => (
 export default function CommunityLanding() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -391,6 +392,11 @@ export default function CommunityLanding() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   if (loading) {
@@ -418,11 +424,68 @@ export default function CommunityLanding() {
               <Link to="/comunidad" className="text-sm hover:text-primary transition-colors">Comunidad</Link>
               <Link to="/eventos" className="text-sm hover:text-primary transition-colors">Eventos</Link>
               <Link to="/galeria" className="text-sm hover:text-primary transition-colors">Galería</Link>
+              {isAuthenticated && (
+                <Link to="/pinpanclub" className="text-sm hover:text-primary transition-colors flex items-center gap-1">
+                  <Trophy className="h-4 w-4" />
+                  PinpanClub
+                </Link>
+              )}
+              {isAdmin && (
+                <Link to="/admin" className="text-sm text-accent hover:text-accent/80 transition-colors">
+                  Admin
+                </Link>
+              )}
             </nav>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                Iniciar Sesión
-              </Button>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="max-w-[100px] truncate">
+                        {user?.nombre?.split(' ')[0] || 'Usuario'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/mi-cuenta" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Mi Cuenta
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/pinpanclub" className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4" />
+                        PinpanClub
+                      </Link>
+                    </DropdownMenuItem>
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center gap-2 text-accent">
+                            <Settings className="h-4 w-4" />
+                            Panel Admin
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar Sesión
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+                  Iniciar Sesión
+                </Button>
+              )}
             </div>
           </div>
         </div>
