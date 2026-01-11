@@ -451,20 +451,26 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 12. **Sistema de Notificaciones Push** ✅ (Enero 10, 2026)
 13. **Demo Data Seeding System** ✅ (Enero 10, 2026)
 14. **Integración OneSignal** ✅ (Enero 11, 2026)
-15. **Sistema de Desafíos Rapid Pin** ✅ NEW (Enero 11, 2026)
+15. **Sistema de Desafíos Rapid Pin** ✅ (Enero 11, 2026)
+16. **Negociación de Fecha para Desafíos** ✅ NEW (Enero 11, 2026)
+17. **Likes y Comentarios en Partidos** ✅ NEW (Enero 11, 2026)
 
 ### 🆕 Sistema de Desafíos Rapid Pin ✅ (Enero 11, 2026)
 Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid Pin:
 
-**Flujo de Desafío:**
+**Flujo de Desafío con Negociación de Fecha:** ✅ ACTUALIZADO
 1. Jugador A hace clic en el botón "我要挑战" (Quiero desafiar)
-2. Modal muestra lista de jugadores disponibles con búsqueda
-3. Jugador A selecciona un oponente y envía el desafío
-4. Jugador B recibe el desafío en su sección "Mis Desafíos"
-5. Jugador B puede aceptar o rechazar el desafío
-6. Si se acepta, el partido pasa a la cola "Esperando Árbitro"
-7. Cualquier usuario autenticado puede ofrecerse como árbitro
-8. El árbitro registra el resultado del partido
+2. Modal muestra lista de jugadores con búsqueda + **selector de fecha**
+3. Jugador A selecciona oponente, propone fecha y envía desafío
+4. Jugador B recibe notificación y puede:
+   - ✅ **Aceptar fecha** → pasa a "Esperando Árbitro"
+   - 🔄 **Contraproponer fecha** → sigue negociando
+   - ⏸️ **Poner en cola** → queda en "Retos en Cola" para retomar
+5. Negociación continúa hasta acordar o poner en cola
+6. Con fecha acordada, aparece botón "Yo Arbitro"
+7. El público puede dar **likes** y **comentarios** en los partidos
+8. Árbitro se ofrece y notifica a los jugadores
+9. El árbitro registra el resultado del partido
 
 **Ruta Frontend:** `/rapidpin`
 
@@ -473,16 +479,35 @@ Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid P
 - Modal de selección de oponente con:
   - Búsqueda de jugadores
   - Avatar, nombre, apodo y rating ELO
-  - Selección visual del oponente
+  - **Selector de fecha y hora (datetime-local)**
+  - Campo de mensaje opcional
+- Modal de negociación de fecha con:
+  - Historial de propuestas
+  - Botones: Aceptar / Contraproponer / Poner en Cola
 - Sección "Mis Desafíos" con tabs:
-  - Recibidos (con botones Aceptar/Rechazar)
-  - Enviados (con estado Pendiente)
-- Sección "Partidos Esperando Árbitro" con botón "Ser Árbitro"
+  - Recibidos (con botones según estado)
+  - Enviados (con estado y acciones)
+- Sección "Partidos Esperando Árbitro":
+  - Muestra fecha acordada
+  - **Botones de Like y Comentarios**
+  - Botón "Yo Arbitro"
+- Modal de comentarios con:
+  - Contador de likes y comentarios
+  - Lista de comentarios con avatar y fecha
+  - Textarea con límite configurable (280 chars)
+  - Mensaje de advertencia de moderación
 
 **Endpoints API:**
 | Endpoint | Método | Descripción |
 |----------|--------|-------------|
-| `/api/pinpanclub/rapidpin/challenge` | POST | Crear desafío |
+| `/api/pinpanclub/rapidpin/challenge-with-date` | POST | Crear desafío con fecha |
+| `/api/pinpanclub/rapidpin/challenge/{id}/respond-date` | POST | Responder a propuesta (accept/counter/queue) |
+| `/api/pinpanclub/rapidpin/challenge/{id}/resume` | POST | Retomar reto de cola |
+| `/api/pinpanclub/rapidpin/challenge/{id}/like` | POST | Toggle like |
+| `/api/pinpanclub/rapidpin/challenge/{id}/comment` | POST | Agregar comentario |
+| `/api/pinpanclub/rapidpin/challenge/{id}/comments` | GET | Obtener comentarios |
+| `/api/pinpanclub/rapidpin/comment-config` | GET/PUT | Configuración de comentarios |
+| `/api/pinpanclub/rapidpin/challenge` | POST | Crear desafío (sin fecha) |
 | `/api/pinpanclub/rapidpin/challenge/{id}/accept` | POST | Aceptar desafío |
 | `/api/pinpanclub/rapidpin/challenge/{id}/decline` | POST | Rechazar desafío |
 | `/api/pinpanclub/rapidpin/my-challenges/{player_id}` | GET | Mis desafíos |
@@ -490,33 +515,53 @@ Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid P
 | `/api/pinpanclub/rapidpin/queue/{id}/complete` | POST | Completar partido |
 
 **Estados del Desafío:**
-- `challenge_pending`: Esperando respuesta del oponente
-- `waiting`: Aceptado, esperando árbitro
+- `challenge_pending`: Esperando respuesta (sin fecha)
+- `date_negotiation`: Negociando fecha
+- `queued`: En cola sin fecha acordada
+- `waiting`: Fecha acordada, esperando árbitro
 - `assigned`: Árbitro asignado, partido en curso
 - `completed`: Partido finalizado
 - `declined`: Rechazado
 - `cancelled`: Cancelado
 
+**Campos de Negociación de Fecha:**
+- `proposed_date`: Fecha propuesta actual
+- `proposed_by_id`: Quién propuso la fecha actual
+- `date_history[]`: Historial completo de propuestas
+- `agreed_date`: Fecha acordada final
+
+**Sistema de Likes y Comentarios:**
+- `likes_count`: Contador de likes
+- `comments_count`: Contador de comentarios
+- **Moderación**: Usuarios sancionados van a moderación
+- **Configurable**: Límite de caracteres (280 por defecto)
+- **Multi-idioma**: Mensajes de advertencia en ES/EN/ZH
+
 **Validaciones:**
 - No puedes desafiarte a ti mismo
 - No puede haber múltiples desafíos activos entre mismos jugadores
-- Solo el oponente (player2) puede aceptar/rechazar
-- Admins/Mods pueden forzar aceptación
+- Solo el otro jugador puede responder a propuestas de fecha
+- Admins/Mods pueden forzar acciones
 - El árbitro no puede ser uno de los jugadores
+- Comentarios de usuarios sancionados van a moderación
 
 **Notificaciones Push:** ✅ Integrado
 - `challenge_received`: Notifica al oponente cuando recibe un desafío
+- `date_proposed`: Notifica cuando hay nueva propuesta de fecha
+- `date_accepted`: Notifica cuando se acepta la fecha
 - `challenge_accepted`: Notifica al retador cuando su desafío es aceptado
-- `referee_needed`: **Broadcast** a todos los usuarios cuando hay un partido esperando árbitro
+- `referee_assigned`: **Notifica a AMBOS jugadores** cuando se asigna árbitro
+- `referee_needed`: **Broadcast** a todos cuando hay partido esperando árbitro
 - Usa categoría `cat_rapidpin` con prioridad alta
 - Multi-idioma (ES/EN/ZH)
-- Excluye a los jugadores del partido en el broadcast
+
+**Tests:** 19/19 passed (100%) - `/app/tests/test_rapidpin_date_likes_comments.py`
 
 **Archivos:**
 - `/app/frontend/src/pages/RapidPinPublicPage.jsx` (Frontend completo)
 - `/app/backend/modules/pinpanclub/routes/rapidpin.py` (Endpoints)
 - `/app/backend/modules/pinpanclub/services/rapidpin_service.py` (Lógica)
-- `/app/tests/test_rapidpin_challenges.py` (Tests)
+- `/app/backend/modules/pinpanclub/models/rapidpin.py` (Modelos)
 
 **Test Results:** 13/13 tests passed (100%)
 
