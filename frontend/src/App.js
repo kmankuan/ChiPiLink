@@ -125,19 +125,19 @@ function AppRouter() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<CommunityLanding />} />
+      <Route path="/" element={<><Header /><CommunityLanding /></>} />
       <Route path="/landing-editor" element={<><Header /><Landing /></>} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       
       {/* Community Routes */}
-      <Route path="/comunidad" element={<CommunityLanding />} />
-      <Route path="/comunidad/post/:postId" element={<CommunityLanding />} />
-      <Route path="/comunidad/evento/:eventoId" element={<CommunityLanding />} />
-      <Route path="/comunidad/galeria/:albumId" element={<CommunityLanding />} />
-      <Route path="/eventos" element={<CommunityLanding />} />
-      <Route path="/galeria" element={<CommunityLanding />} />
+      <Route path="/comunidad" element={<><Header /><CommunityLanding /></>} />
+      <Route path="/comunidad/post/:postId" element={<><Header /><CommunityLanding /></>} />
+      <Route path="/comunidad/evento/:eventoId" element={<><Header /><CommunityLanding /></>} />
+      <Route path="/comunidad/galeria/:albumId" element={<><Header /><CommunityLanding /></>} />
+      <Route path="/eventos" element={<><Header /><CommunityLanding /></>} />
+      <Route path="/galeria" element={<><Header /><CommunityLanding /></>} />
       
       {/* PinpanClub Routes */}
       <Route path="/pinpanclub" element={<PingPongDashboard />} />
