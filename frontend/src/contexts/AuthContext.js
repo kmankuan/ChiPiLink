@@ -41,9 +41,14 @@ export function AuthProvider({ children }) {
       setUser(response.data);
     } catch (error) {
       console.error('Auth check error:', error);
-      setUser(null);
-      localStorage.removeItem('auth_token');
-      setToken(null);
+      // Only clear auth on 401 (unauthorized) - token is invalid/expired
+      // Don't clear on network errors or other issues
+      if (error.response?.status === 401) {
+        setUser(null);
+        localStorage.removeItem('auth_token');
+        setToken(null);
+      }
+      // For other errors, keep the user logged in but log the error
     } finally {
       setLoading(false);
     }
