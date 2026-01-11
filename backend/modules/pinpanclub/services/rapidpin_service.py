@@ -566,6 +566,8 @@ class RapidPinService(BaseService):
         await db["rapidpin_queue"].insert_one(queue_entry)
         self.log_info(f"Queue match created by {created_by_role}: {queue_entry['queue_id']}")
         
+        # Remove MongoDB _id before returning
+        queue_entry.pop("_id", None)
         return queue_entry
     
     async def accept_challenge(
