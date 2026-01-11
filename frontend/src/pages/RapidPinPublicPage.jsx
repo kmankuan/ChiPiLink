@@ -227,6 +227,16 @@ export default function RapidPinPublicPage() {
     }
   };
 
+  // Filtered players for search - must be before conditional returns
+  const filteredPlayers = useMemo(() => {
+    if (!searchQuery.trim()) return players;
+    const query = searchQuery.toLowerCase();
+    return players.filter(p => 
+      (p.nombre?.toLowerCase().includes(query)) ||
+      (p.nickname?.toLowerCase().includes(query))
+    );
+  }, [players, searchQuery]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -236,16 +246,6 @@ export default function RapidPinPublicPage() {
   }
 
   const { stats, active_season, recent_matches, top_players, waiting_for_referee, in_progress, pending_challenges, scoring_rules } = feedData || {};
-
-  // Filtered players for search
-  const filteredPlayers = useMemo(() => {
-    if (!searchQuery.trim()) return players;
-    const query = searchQuery.toLowerCase();
-    return players.filter(p => 
-      (p.nombre?.toLowerCase().includes(query)) ||
-      (p.nickname?.toLowerCase().includes(query))
-    );
-  }, [players, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-background dark:from-orange-950/20 dark:to-background">
