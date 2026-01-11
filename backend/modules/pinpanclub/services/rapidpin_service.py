@@ -422,7 +422,88 @@ class RapidPinService(BaseService):
             "recent_matches": [RapidPinMatch(**m) for m in matches]
         }
     
-    # ============== MATCH QUEUE (Waiting for Referee) ==============
+    # ============== CHALLENGE & QUEUE SYSTEM ==============
+    
+    def _get_player_info(self, player_data: Optional[Dict]) -> Optional[Dict]:
+        """Extraer info relevante del jugador"""
+        if not player_data:
+            return None
+        return {
+            "player_id": player_data.get("player_id"),
+            "nombre": player_data.get("nombre"),
+            "nickname": player_data.get("nickname"),
+            "avatar": player_data.get("avatar")
+        }
+    
+    async def create_challenge(
+        self,
+        season_id: str,
+        challenger_id: str,
+        opponent_id: str,
+        notes: Optional[str] = None
+    ) -> Dict:
+        """
+        Crear desafío de jugador a jugador.
+        Estado: CHALLENGE_PENDING hasta que el oponente acepte.
+        """
+        import uuid
+        
+        if challenger_id == opponent_id:
+            raise ValueError("No puedes desafiarte a ti mismo")
+        
+        # Verificar temporada activa
+        season = await self.season_repo.get_by_id(season_id)
+        if not season:
+            raise ValueError("Temporada no encontrada")
+        if season.get("estado") != "active":
+            raise ValueError("La temporada no está activa")
+        
+        # Verificar que no haya ya un desafío pendiente entre estos jugadores
+        db = await self.get_db()
+        existing = await db["rapidpin_queue"].find_one({
+            "season_id": season_id,
+            "status": {"$in": ["challenge_pending", "waiting", "assigned"]},
+            "$or": [
+                {"player1_id": challenger_id, "player2_id": opponent_id},
+                {"player1_id": opponent_id, "player2_id": challenger_id}
+            ]
+        })
+        if existing:
+            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
+        
+        # Obtener info de jugadores
+        challenger_info = await self.player_repo.get_by_id(challenger_id)
+        opponent_info = await self.player_repo.get_by_id(opponent_id)
+        
+        queue_entry = {
+            "queue_id": f"queue_{uuid.uuid4().hex[:12]}",
+            "season_id": season_id,
+            "player1_id": challenger_id,
+            "player2_id": opponent_id,
+            "player1_info": self._get_player_info(challenger_info),
+            "player2_info": self._get_player_info(opponent_info),
+            "referee_id": None,
+            "referee_info": None,
+            "status": "challenge_pending",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_by_id": challenger_id,
+            "created_by_role": "player",
+            "accepted_at": None,
+            "accepted_by_id": None,
+            "assigned_at": None,
+            "assigned_by_id": None,
+            "completed_at": None,
+            "cancelled_at": None,
+            "cancelled_by_id": None,
+            "decline_reason": None,
+            "notes": notes,
+            "match_id": None
+        }
+        
+        await db["rapidpin_queue"].insert_one(queue_entry)
+        self.log_info(f"Challenge created: {queue_entry['queue_id']} - {challenger_id} vs {opponent_id}")
+        
+        return queue_entry
     
     async def create_queue_match(
         self,
@@ -430,12 +511,19 @@ class RapidPinService(BaseService):
         player1_id: str,
         player2_id: str,
         created_by_id: str,
+        created_by_role: str = "admin",
         notes: Optional[str] = None
     ) -> Dict:
-        """Crear partido en cola esperando árbitro"""
+        """
+        Crear partido directamente en cola (admin/mod).
+        Salta la fase de desafío, va directo a WAITING_REFEREE.
+        """
         import uuid
         
-        # Verificar que la temporada existe y está activa
+        if player1_id == player2_id:
+            raise ValueError("Los jugadores deben ser diferentes")
+        
+        # Verificar temporada activa
         season = await self.season_repo.get_by_id(season_id)
         if not season:
             raise ValueError("Temporada no encontrada")
@@ -446,53 +534,147 @@ class RapidPinService(BaseService):
         player1_info = await self.player_repo.get_by_id(player1_id)
         player2_info = await self.player_repo.get_by_id(player2_id)
         
+        db = await self.get_db()
+        
         queue_entry = {
             "queue_id": f"queue_{uuid.uuid4().hex[:12]}",
             "season_id": season_id,
             "player1_id": player1_id,
             "player2_id": player2_id,
-            "player1_info": {
-                "player_id": player1_info.get("player_id"),
-                "nombre": player1_info.get("nombre"),
-                "nickname": player1_info.get("nickname"),
-                "avatar": player1_info.get("avatar")
-            } if player1_info else None,
-            "player2_info": {
-                "player_id": player2_info.get("player_id"),
-                "nombre": player2_info.get("nombre"),
-                "nickname": player2_info.get("nickname"),
-                "avatar": player2_info.get("avatar")
-            } if player2_info else None,
+            "player1_info": self._get_player_info(player1_info),
+            "player2_info": self._get_player_info(player2_info),
             "referee_id": None,
             "referee_info": None,
-            "status": "waiting",
+            "status": "waiting",  # Directo a esperando árbitro
             "created_at": datetime.now(timezone.utc).isoformat(),
             "created_by_id": created_by_id,
+            "created_by_role": created_by_role,
+            "accepted_at": datetime.now(timezone.utc).isoformat(),  # Auto-aceptado
+            "accepted_by_id": created_by_id,
             "assigned_at": None,
+            "assigned_by_id": None,
             "completed_at": None,
+            "cancelled_at": None,
+            "cancelled_by_id": None,
+            "decline_reason": None,
             "notes": notes,
             "match_id": None
         }
         
-        db = await self.get_db()
         await db["rapidpin_queue"].insert_one(queue_entry)
+        self.log_info(f"Queue match created by {created_by_role}: {queue_entry['queue_id']}")
         
-        self.log_info(f"Queue match created: {queue_entry['queue_id']}")
         return queue_entry
+    
+    async def accept_challenge(
+        self,
+        queue_id: str,
+        user_id: str,
+        user_role: str = "player"
+    ) -> Dict:
+        """
+        Aceptar desafío.
+        - El oponente (player2) puede aceptar
+        - Admin/Mod pueden forzar aceptación
+        """
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Desafío no encontrado")
+        
+        if queue_entry["status"] != "challenge_pending":
+            raise ValueError("Este desafío ya fue procesado")
+        
+        # Verificar permisos: solo player2 o admin/mod
+        is_opponent = user_id == queue_entry["player2_id"]
+        is_privileged = user_role in ["admin", "moderator"]
+        
+        if not is_opponent and not is_privileged:
+            raise ValueError("Solo el oponente o un admin/moderador puede aceptar este desafío")
+        
+        update_data = {
+            "status": "waiting",
+            "accepted_at": datetime.now(timezone.utc).isoformat(),
+            "accepted_by_id": user_id
+        }
+        
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": update_data}
+        )
+        
+        self.log_info(f"Challenge {queue_id} accepted by {user_id} (role: {user_role})")
+        
+        updated = await db["rapidpin_queue"].find_one({"queue_id": queue_id}, {"_id": 0})
+        return updated
+    
+    async def decline_challenge(
+        self,
+        queue_id: str,
+        user_id: str,
+        reason: Optional[str] = None
+    ) -> Dict:
+        """Rechazar desafío"""
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Desafío no encontrado")
+        
+        if queue_entry["status"] != "challenge_pending":
+            raise ValueError("Este desafío ya fue procesado")
+        
+        # Solo player2 puede rechazar
+        if user_id != queue_entry["player2_id"]:
+            raise ValueError("Solo el oponente puede rechazar el desafío")
+        
+        update_data = {
+            "status": "declined",
+            "cancelled_at": datetime.now(timezone.utc).isoformat(),
+            "cancelled_by_id": user_id,
+            "decline_reason": reason
+        }
+        
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": update_data}
+        )
+        
+        self.log_info(f"Challenge {queue_id} declined by {user_id}")
+        
+        return {"queue_id": queue_id, "status": "declined", "reason": reason}
     
     async def get_queue_matches(
         self,
         season_id: Optional[str] = None,
-        status: Optional[str] = "waiting"
+        status: Optional[str] = None,
+        player_id: Optional[str] = None
     ) -> List[Dict]:
-        """Obtener partidos en cola"""
+        """Obtener partidos en cola con filtros"""
         db = await self.get_db()
         
         query = {}
         if season_id:
             query["season_id"] = season_id
         if status:
-            query["status"] = status
+            if status == "active":
+                query["status"] = {"$in": ["challenge_pending", "waiting", "assigned"]}
+            else:
+                query["status"] = status
+        if player_id:
+            query["$or"] = [
+                {"player1_id": player_id},
+                {"player2_id": player_id}
+            ]
         
         cursor = db["rapidpin_queue"].find(
             query,
