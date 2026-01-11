@@ -11,6 +11,8 @@ from .inventory import router as inventory_router
 from .students import router as students_router
 from .public import router as public_router
 from .landing import router as landing_router
+from .bulk_import import router as bulk_import_router
+from .vinculacion import router as vinculacion_router
 
 # Router principal del módulo Store (refactorizado)
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -23,6 +25,8 @@ router.include_router(inventory_router)
 router.include_router(students_router)
 router.include_router(public_router)
 router.include_router(landing_router)
+router.include_router(bulk_import_router)
+router.include_router(vinculacion_router)
 
 # Re-exportar para compatibilidad
 store_refactored_router = router
