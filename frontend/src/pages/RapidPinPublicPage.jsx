@@ -438,6 +438,5 @@ export default function RapidPinPublicPage() {
           </div>
         </div>
       </div>
-    </>
   );
 }
