@@ -449,7 +449,67 @@ Códigos QR para check-in rápido y pagos desde el perfil del usuario:
 11. **Sistema de QR Code para Check-in y Pagos** ✅
 12. **Sistema de Notificaciones Push** ✅ (Enero 10, 2026)
 13. **Demo Data Seeding System** ✅ (Enero 10, 2026)
-14. **Integración OneSignal** ✅ NEW (Enero 11, 2026)
+14. **Integración OneSignal** ✅ (Enero 11, 2026)
+15. **Sistema de Desafíos Rapid Pin** ✅ NEW (Enero 11, 2026)
+
+### 🆕 Sistema de Desafíos Rapid Pin ✅ (Enero 11, 2026)
+Sistema completo para que jugadores se desafíen entre sí a partidos de Rapid Pin:
+
+**Flujo de Desafío:**
+1. Jugador A hace clic en el botón "我要挑战" (Quiero desafiar)
+2. Modal muestra lista de jugadores disponibles con búsqueda
+3. Jugador A selecciona un oponente y envía el desafío
+4. Jugador B recibe el desafío en su sección "Mis Desafíos"
+5. Jugador B puede aceptar o rechazar el desafío
+6. Si se acepta, el partido pasa a la cola "Esperando Árbitro"
+7. Cualquier usuario autenticado puede ofrecerse como árbitro
+8. El árbitro registra el resultado del partido
+
+**Ruta Frontend:** `/rapidpin`
+
+**Componentes UI:**
+- Botón principal "我要挑战" visible para usuarios autenticados
+- Modal de selección de oponente con:
+  - Búsqueda de jugadores
+  - Avatar, nombre, apodo y rating ELO
+  - Selección visual del oponente
+- Sección "Mis Desafíos" con tabs:
+  - Recibidos (con botones Aceptar/Rechazar)
+  - Enviados (con estado Pendiente)
+- Sección "Partidos Esperando Árbitro" con botón "Ser Árbitro"
+
+**Endpoints API:**
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/pinpanclub/rapidpin/challenge` | POST | Crear desafío |
+| `/api/pinpanclub/rapidpin/challenge/{id}/accept` | POST | Aceptar desafío |
+| `/api/pinpanclub/rapidpin/challenge/{id}/decline` | POST | Rechazar desafío |
+| `/api/pinpanclub/rapidpin/my-challenges/{player_id}` | GET | Mis desafíos |
+| `/api/pinpanclub/rapidpin/queue/{id}/assign` | POST | Asignar árbitro |
+| `/api/pinpanclub/rapidpin/queue/{id}/complete` | POST | Completar partido |
+
+**Estados del Desafío:**
+- `challenge_pending`: Esperando respuesta del oponente
+- `waiting`: Aceptado, esperando árbitro
+- `assigned`: Árbitro asignado, partido en curso
+- `completed`: Partido finalizado
+- `declined`: Rechazado
+- `cancelled`: Cancelado
+
+**Validaciones:**
+- No puedes desafiarte a ti mismo
+- No puede haber múltiples desafíos activos entre mismos jugadores
+- Solo el oponente (player2) puede aceptar/rechazar
+- Admins/Mods pueden forzar aceptación
+- El árbitro no puede ser uno de los jugadores
+
+**Archivos:**
+- `/app/frontend/src/pages/RapidPinPublicPage.jsx` (Frontend completo)
+- `/app/backend/modules/pinpanclub/routes/rapidpin.py` (Endpoints)
+- `/app/backend/modules/pinpanclub/services/rapidpin_service.py` (Lógica)
+- `/app/tests/test_rapidpin_challenges.py` (Tests)
+
+**Test Results:** 13/13 tests passed (100%)
 
 ### 🆕 Integración OneSignal ✅ (Enero 11, 2026)
 Integración completa con OneSignal para envío de notificaciones push reales:
