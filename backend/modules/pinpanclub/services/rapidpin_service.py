@@ -676,6 +676,19 @@ class RapidPinService(BaseService):
         
         # Remove MongoDB _id before returning
         queue_entry.pop("_id", None)
+        
+        # Send broadcast to all users that a match is waiting for referee
+        player1_info_data = queue_entry.get("player1_info") or {}
+        player2_info_data = queue_entry.get("player2_info") or {}
+        player1_name = player1_info_data.get("nickname") or player1_info_data.get("nombre", "Jugador 1")
+        player2_name = player2_info_data.get("nickname") or player2_info_data.get("nombre", "Jugador 2")
+        
+        await send_referee_needed_broadcast(
+            player1_name=player1_name,
+            player2_name=player2_name,
+            exclude_player_ids=[player1_id, player2_id]
+        )
+        
         return queue_entry
     
     async def accept_challenge(
