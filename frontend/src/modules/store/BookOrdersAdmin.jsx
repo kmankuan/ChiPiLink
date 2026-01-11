@@ -220,14 +220,14 @@ function ImportStudentsTab({ token }) {
             <div className="space-y-2">
               <Label>Grado</Label>
               <Select 
-                value={columnMapping.grado?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, grado: v ? parseInt(v) : null}))}
+                value={columnMapping.grado !== null && columnMapping.grado !== undefined ? columnMapping.grado.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, grado: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)} ({i + 1})
@@ -240,14 +240,14 @@ function ImportStudentsTab({ token }) {
             <div className="space-y-2">
               <Label>Sección</Label>
               <Select 
-                value={columnMapping.seccion?.toString() ?? ''} 
-                onValueChange={(v) => setColumnMapping(prev => ({...prev, seccion: v ? parseInt(v) : null}))}
+                value={columnMapping.seccion !== null && columnMapping.seccion !== undefined ? columnMapping.seccion.toString() : 'none'} 
+                onValueChange={(v) => setColumnMapping(prev => ({...prev, seccion: v === 'none' ? null : parseInt(v)}))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No incluido" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No incluido</SelectItem>
+                  <SelectItem value="none">No incluido</SelectItem>
                   {[...Array(10)].map((_, i) => (
                     <SelectItem key={i} value={i.toString()}>
                       Columna {getColumnLetter(i)} ({i + 1})
