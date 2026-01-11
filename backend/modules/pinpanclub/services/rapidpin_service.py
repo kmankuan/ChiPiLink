@@ -1359,7 +1359,7 @@ class RapidPinService(BaseService):
         
         return await self.get_comment_config()
     
-    async def toggle_like(self, queue_id: str, user_id: str) -> Dict:
+    async def toggle_like(self, queue_id: str, user_id: str, user_name: str = None) -> Dict:
         """Dar o quitar like a un reto"""
         db = await self.get_db()
         
@@ -1382,7 +1382,8 @@ class RapidPinService(BaseService):
                 {"queue_id": queue_id},
                 {"$inc": {"likes_count": -1}}
             )
-            return {"action": "unliked", "likes_count": queue_entry.get("likes_count", 1) - 1}
+            new_count = queue_entry.get("likes_count", 1) - 1
+            action = "unliked"
         else:
             # Dar like
             reaction = {
@@ -1397,7 +1398,24 @@ class RapidPinService(BaseService):
                 {"queue_id": queue_id},
                 {"$inc": {"likes_count": 1}}
             )
-            return {"action": "liked", "likes_count": queue_entry.get("likes_count", 0) + 1}
+            new_count = queue_entry.get("likes_count", 0) + 1
+            action = "liked"
+        
+        # Emit WebSocket event
+        try:
+            from modules.realtime.services import emit_like_event
+            await emit_like_event(
+                queue_id=queue_id,
+                user_id=user_id,
+                user_name=user_name or "Usuario",
+                action=action,
+                new_count=new_count,
+                player_ids=[queue_entry.get("player1_id"), queue_entry.get("player2_id")]
+            )
+        except Exception as e:
+            self.log_error(f"Error emitting like event: {e}")
+        
+        return {"action": action, "likes_count": new_count}
     
     async def check_user_liked(self, queue_id: str, user_id: str) -> bool:
         """Verificar si un usuario ya dio like"""
