@@ -26,7 +26,8 @@ import {
   Bell,
   Store,
   Send,
-  Trophy
+  Trophy,
+  Zap
 } from 'lucide-react';
 import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
 
