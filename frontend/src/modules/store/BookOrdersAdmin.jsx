@@ -1197,6 +1197,293 @@ function EstudiantesTab({ token }) {
   );
 }
 
+// Componente de Tab de Demanda Agregada y Pedidos
+function PedidosAdminTab({ token }) {
+  const [demanda, setDemanda] = useState(null);
+  const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState('demanda');
+  const [filtroEstado, setFiltroEstado] = useState('all');
+
+  useEffect(() => {
+    if (view === 'demanda') {
+      loadDemanda();
+    } else {
+      loadPedidos();
+    }
+  }, [view, filtroEstado]);
+
+  const loadDemanda = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/store/pedidos/admin/demanda`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setDemanda(data);
+    } catch (err) {
+      toast.error('Error cargando demanda');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPedidos = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filtroEstado && filtroEstado !== 'all') params.append('estado', filtroEstado);
+      
+      const res = await fetch(`${API}/api/store/pedidos/admin/todos?${params}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setPedidos(data.pedidos || []);
+    } catch (err) {
+      toast.error('Error cargando pedidos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCambiarEstado = async (pedidoId, nuevoEstado) => {
+    try {
+      const res = await fetch(`${API}/api/store/pedidos/admin/${pedidoId}/estado`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nuevo_estado: nuevoEstado })
+      });
+      if (!res.ok) throw new Error('Error actualizando estado');
+      toast.success('Estado actualizado');
+      loadPedidos();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const getEstadoBadge = (estado) => {
+    const configs = {
+      borrador: { label: 'Borrador', className: 'bg-gray-500' },
+      pre_orden: { label: 'Pre-Orden', className: 'bg-blue-500' },
+      confirmado: { label: 'Confirmado', className: 'bg-green-500' },
+      en_proceso: { label: 'En Proceso', className: 'bg-yellow-500' },
+      listo_retiro: { label: 'Listo Retiro', className: 'bg-purple-500' },
+      entregado: { label: 'Entregado', className: 'bg-green-700' },
+      cancelado: { label: 'Cancelado', className: 'bg-red-500' }
+    };
+    const config = configs[estado] || configs.borrador;
+    return <Badge className={`${config.className} text-white`}>{config.label}</Badge>;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Toggle vista */}
+      <div className="flex gap-2">
+        <Button 
+          variant={view === 'demanda' ? 'default' : 'outline'} 
+          onClick={() => setView('demanda')}
+        >
+          Demanda Agregada
+        </Button>
+        <Button 
+          variant={view === 'pedidos' ? 'default' : 'outline'} 
+          onClick={() => setView('pedidos')}
+        >
+          Todos los Pedidos
+        </Button>
+      </div>
+
+      {view === 'demanda' ? (
+        // Vista de Demanda Agregada
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Demanda Agregada de Libros</span>
+              <Button variant="outline" size="sm" onClick={loadDemanda}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Actualizar
+              </Button>
+            </CardTitle>
+            <CardDescription>
+              Resumen de pre-órdenes y pedidos confirmados para planificación de compras
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : demanda ? (
+              <div className="space-y-6">
+                {/* Resumen */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold text-blue-600">{demanda.total_pre_ordenes}</div>
+                      <div className="text-sm text-muted-foreground">Pre-Órdenes</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold text-green-600">{demanda.total_confirmados}</div>
+                      <div className="text-sm text-muted-foreground">Confirmados</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold">{demanda.total_estudiantes}</div>
+                      <div className="text-sm text-muted-foreground">Estudiantes</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-2xl font-bold text-primary">${demanda.valor_total_estimado?.toFixed(2)}</div>
+                      <div className="text-sm text-muted-foreground">Valor Total</div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Tabla de libros */}
+                <ScrollArea className="h-[400px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Código</TableHead>
+                        <TableHead>Libro</TableHead>
+                        <TableHead>Editorial</TableHead>
+                        <TableHead>Grados</TableHead>
+                        <TableHead className="text-center">Pre-Órdenes</TableHead>
+                        <TableHead className="text-center">Confirmados</TableHead>
+                        <TableHead className="text-center">Total</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {demanda.libros?.map((libro) => (
+                        <TableRow key={libro.libro_id}>
+                          <TableCell className="font-mono">{libro.codigo}</TableCell>
+                          <TableCell>{libro.nombre}</TableCell>
+                          <TableCell>{libro.editorial || '-'}</TableCell>
+                          <TableCell>
+                            {libro.grados?.map(g => (
+                              <Badge key={g} variant="outline" className="mr-1">{g}</Badge>
+                            ))}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge variant="secondary">{libro.cantidad_pre_ordenes}</Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge className="bg-green-500">{libro.cantidad_confirmados}</Badge>
+                          </TableCell>
+                          <TableCell className="text-center font-bold">{libro.cantidad_total}</TableCell>
+                          <TableCell className="text-right font-medium">${libro.valor_total?.toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No hay datos de demanda
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        // Vista de Todos los Pedidos
+        <Card>
+          <CardHeader>
+            <CardTitle>Todos los Pedidos</CardTitle>
+            <CardDescription>
+              Gestiona el estado de los pedidos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* Filtros */}
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {['all', 'pre_orden', 'confirmado', 'en_proceso', 'listo_retiro', 'entregado'].map((estado) => (
+                <Button 
+                  key={estado}
+                  variant={filtroEstado === estado ? 'default' : 'outline'} 
+                  size="sm"
+                  onClick={() => setFiltroEstado(estado)}
+                >
+                  {estado === 'all' ? 'Todos' : estado.replace('_', ' ')}
+                </Button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : pedidos.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No hay pedidos
+              </div>
+            ) : (
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Pedido</TableHead>
+                      <TableHead>Estudiante</TableHead>
+                      <TableHead>Acudiente</TableHead>
+                      <TableHead>Items</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead>Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pedidos.map((pedido) => (
+                      <TableRow key={pedido.pedido_id}>
+                        <TableCell className="font-mono text-xs">
+                          {pedido.pedido_id?.slice(-8)}
+                        </TableCell>
+                        <TableCell>
+                          <div>{pedido.estudiante_nombre}</div>
+                          <div className="text-xs text-muted-foreground">{pedido.estudiante_grado}</div>
+                        </TableCell>
+                        <TableCell>{pedido.acudiente?.nombre || '-'}</TableCell>
+                        <TableCell>{pedido.items?.length || 0}</TableCell>
+                        <TableCell className="font-medium">${pedido.total?.toFixed(2)}</TableCell>
+                        <TableCell>{getEstadoBadge(pedido.estado)}</TableCell>
+                        <TableCell>
+                          <Select 
+                            value={pedido.estado} 
+                            onValueChange={(v) => handleCambiarEstado(pedido.pedido_id, v)}
+                          >
+                            <SelectTrigger className="w-[140px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pre_orden">Pre-Orden</SelectItem>
+                              <SelectItem value="confirmado">Confirmado</SelectItem>
+                              <SelectItem value="en_proceso">En Proceso</SelectItem>
+                              <SelectItem value="listo_retiro">Listo Retiro</SelectItem>
+                              <SelectItem value="entregado">Entregado</SelectItem>
+                              <SelectItem value="cancelado">Cancelado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 // Componente Principal
 export default function BookOrdersAdmin() {
   const { token } = useAuth();
@@ -1210,27 +1497,31 @@ export default function BookOrdersAdmin() {
           Gestión de Libros Escolares
         </h1>
         <p className="text-muted-foreground mt-1">
-          Administra estudiantes, libros y vinculaciones para pedidos de textos escolares
+          Administra estudiantes, libros, vinculaciones y pedidos de textos escolares
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Estudiantes</span>
           </TabsTrigger>
           <TabsTrigger value="import-estudiantes" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">Importar Estudiantes</span>
+            <span className="hidden sm:inline">Import Est.</span>
           </TabsTrigger>
           <TabsTrigger value="import-libros" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Importar Libros</span>
+            <span className="hidden sm:inline">Import Lib.</span>
           </TabsTrigger>
           <TabsTrigger value="vinculaciones" className="flex items-center gap-2">
             <Link2 className="h-4 w-4" />
             <span className="hidden sm:inline">Vinculaciones</span>
+          </TabsTrigger>
+          <TabsTrigger value="pedidos" className="flex items-center gap-2">
+            <ClipboardPaste className="h-4 w-4" />
+            <span className="hidden sm:inline">Pedidos</span>
           </TabsTrigger>
         </TabsList>
 
@@ -1248,6 +1539,10 @@ export default function BookOrdersAdmin() {
 
         <TabsContent value="vinculaciones">
           <VinculacionesTab token={token} />
+        </TabsContent>
+
+        <TabsContent value="pedidos">
+          <PedidosAdminTab token={token} />
         </TabsContent>
       </Tabs>
     </div>
