@@ -257,6 +257,12 @@ export function Header() {
                       {t('nav.orders')}
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/mis-pedidos-libros" className="flex items-center gap-2" data-testid="menu-book-orders">
+                      <BookOpen className="h-4 w-4" />
+                      Mis Libros Escolares
+                    </Link>
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
