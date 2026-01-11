@@ -300,3 +300,60 @@ def get_default_referee_prizes() -> List[RapidPinPrize]:
             special_type="participation"
         )
     ]
+
+
+# ============== MATCH QUEUE (Waiting for Referee) ==============
+
+class RapidPinMatchQueueCreate(BaseModel):
+    """Crear partido en cola esperando árbitro"""
+    season_id: str
+    player1_id: str
+    player2_id: str
+    created_by_id: str
+    notes: Optional[str] = None  # Notas opcionales (ubicación, etc.)
+
+
+class RapidPinMatchQueue(BaseModel):
+    """Partido en cola esperando árbitro"""
+    model_config = ConfigDict(from_attributes=True)
+    
+    queue_id: str = Field(default_factory=lambda: f"queue_{uuid.uuid4().hex[:12]}")
+    season_id: str
+    
+    # Jugadores
+    player1_id: str
+    player2_id: str
+    player1_info: Optional[Dict] = None
+    player2_info: Optional[Dict] = None
+    
+    # Árbitro (cuando se asigne)
+    referee_id: Optional[str] = None
+    referee_info: Optional[Dict] = None
+    
+    # Estado
+    status: RapidPinQueueStatus = RapidPinQueueStatus.WAITING
+    
+    # Timestamps
+    created_at: Optional[Any] = None
+    created_by_id: str = ""
+    assigned_at: Optional[Any] = None
+    completed_at: Optional[Any] = None
+    
+    # Notas
+    notes: Optional[str] = None
+    
+    # Match ID cuando se complete
+    match_id: Optional[str] = None
+
+
+class RapidPinQueueAssign(BaseModel):
+    """Asignar árbitro a partido en cola"""
+    referee_id: str
+
+
+class RapidPinQueueComplete(BaseModel):
+    """Completar partido de la cola con resultado"""
+    ganador_id: str
+    score_ganador: int = 11
+    score_perdedor: int = 0
+
