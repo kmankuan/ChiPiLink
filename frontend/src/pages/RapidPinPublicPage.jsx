@@ -550,6 +550,31 @@ export default function RapidPinPublicPage() {
                   )}
                 </ScrollArea>
               )}
+              
+              {/* Date Proposal (shown when opponent is selected) */}
+              {selectedOpponent && (
+                <div className="space-y-3 pt-2 border-t">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-orange-500" />
+                    Propón fecha y hora
+                  </label>
+                  <Input
+                    type="datetime-local"
+                    value={proposedDate}
+                    onChange={(e) => setProposedDate(e.target.value)}
+                    className="w-full"
+                    min={new Date().toISOString().slice(0, 16)}
+                    data-testid="proposed-date-input"
+                  />
+                  <Textarea
+                    placeholder="Mensaje opcional (ej: 'Te veo en el club')"
+                    value={proposalMessage}
+                    onChange={(e) => setProposalMessage(e.target.value)}
+                    className="h-16 resize-none"
+                    maxLength={200}
+                  />
+                </div>
+              )}
             </div>
 
             <DialogFooter className="gap-2">
@@ -559,13 +584,15 @@ export default function RapidPinPublicPage() {
                   setShowChallengeModal(false);
                   setSelectedOpponent(null);
                   setSearchQuery('');
+                  setProposedDate('');
+                  setProposalMessage('');
                 }}
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSendChallenge}
-                disabled={!selectedOpponent || sendingChallenge}
+                disabled={!selectedOpponent || !proposedDate || sendingChallenge}
                 className="bg-orange-500 hover:bg-orange-600"
                 data-testid="send-challenge-btn"
               >
@@ -577,6 +604,197 @@ export default function RapidPinPublicPage() {
                 Enviar Desafío
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Date Negotiation Modal */}
+        <Dialog open={showDateModal} onOpenChange={setShowDateModal}>
+          <DialogContent className="sm:max-w-md" data-testid="date-modal">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-orange-500" />
+                Negociar Fecha
+              </DialogTitle>
+              <DialogDescription>
+                {selectedChallenge && (
+                  <>
+                    Fecha propuesta: <strong>{new Date(selectedChallenge.proposed_date).toLocaleString()}</strong>
+                    <br />
+                    Por: <strong>{selectedChallenge.date_history?.[selectedChallenge.date_history.length - 1]?.proposed_by_name || 'Oponente'}</strong>
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Date History */}
+              {selectedChallenge?.date_history?.length > 0 && (
+                <div className="max-h-32 overflow-y-auto space-y-2 text-sm">
+                  {selectedChallenge.date_history.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-muted-foreground">
+                      <Calendar className="h-3 w-3 mt-1" />
+                      <div>
+                        <span className="font-medium">{item.proposed_by_name}</span>: {new Date(item.proposed_date).toLocaleString()}
+                        {item.message && <span className="italic"> - "{item.message}"</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Counter proposal input */}
+              <div className="space-y-3 pt-2 border-t">
+                <label className="text-sm font-medium">Proponer otra fecha:</label>
+                <Input
+                  type="datetime-local"
+                  value={counterDate}
+                  onChange={(e) => setCounterDate(e.target.value)}
+                  className="w-full"
+                  min={new Date().toISOString().slice(0, 16)}
+                />
+                <Textarea
+                  placeholder="Mensaje (opcional)"
+                  value={counterMessage}
+                  onChange={(e) => setCounterMessage(e.target.value)}
+                  className="h-16 resize-none"
+                  maxLength={200}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => handleRespondToDate(selectedChallenge?.queue_id, 'queue')}
+                disabled={processingChallengeId === selectedChallenge?.queue_id}
+                className="w-full sm:w-auto"
+              >
+                <Pause className="h-4 w-4 mr-2" />
+                Poner en Cola
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleRespondToDate(selectedChallenge?.queue_id, 'counter', counterDate)}
+                disabled={!counterDate || processingChallengeId === selectedChallenge?.queue_id}
+                className="w-full sm:w-auto"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Contrapropuesta
+              </Button>
+              <Button
+                onClick={() => handleRespondToDate(selectedChallenge?.queue_id, 'accept')}
+                disabled={processingChallengeId === selectedChallenge?.queue_id}
+                className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
+              >
+                {processingChallengeId === selectedChallenge?.queue_id ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <CalendarCheck className="h-4 w-4 mr-2" />
+                )}
+                Aceptar Fecha
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Comments Modal */}
+        <Dialog open={showCommentsModal} onOpenChange={setShowCommentsModal}>
+          <DialogContent className="sm:max-w-lg" data-testid="comments-modal">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-orange-500" />
+                Comentarios del Reto
+              </DialogTitle>
+              {selectedChallengeForComments && (
+                <DialogDescription>
+                  {selectedChallengeForComments.player1_info?.nombre || selectedChallengeForComments.player1_info?.nickname} vs {selectedChallengeForComments.player2_info?.nombre || selectedChallengeForComments.player2_info?.nickname}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Like button */}
+              <div className="flex items-center gap-4 py-2 border-b">
+                <Button
+                  variant={likedChallenges[selectedChallengeForComments?.queue_id] ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => selectedChallengeForComments && handleToggleLike(selectedChallengeForComments.queue_id)}
+                  className={likedChallenges[selectedChallengeForComments?.queue_id] ? "bg-red-500 hover:bg-red-600" : ""}
+                >
+                  <Heart className={`h-4 w-4 mr-1 ${likedChallenges[selectedChallengeForComments?.queue_id] ? 'fill-white' : ''}`} />
+                  {selectedChallengeForComments?.likes_count || 0} likes
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {selectedChallengeForComments?.comments_count || 0} comentarios
+                </span>
+              </div>
+              
+              {/* Comments list */}
+              <ScrollArea className="h-[200px]">
+                {loadingComments ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="h-6 w-6 animate-spin text-orange-500" />
+                  </div>
+                ) : comments.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                    <MessageCircle className="h-8 w-8 mb-2 opacity-50" />
+                    <p>Sé el primero en comentar</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pr-3">
+                    {comments.map((comment) => (
+                      <div key={comment.comment_id} className="flex gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={comment.user_info?.avatar} />
+                          <AvatarFallback>{comment.user_info?.nombre?.charAt(0) || '?'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">{comment.user_info?.nombre || 'Usuario'}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(comment.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-foreground/90 break-words">{comment.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+              
+              {/* Add comment */}
+              {isAuthenticated && (
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="text-xs text-muted-foreground">
+                    {commentConfig.warning_message?.es}
+                  </div>
+                  <div className="flex gap-2">
+                    <Textarea
+                      placeholder="Escribe un comentario..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="h-16 resize-none flex-1"
+                      maxLength={commentConfig.max_comment_length}
+                    />
+                    <Button
+                      onClick={handleSubmitComment}
+                      disabled={!newComment.trim() || submittingComment}
+                      className="bg-orange-500 hover:bg-orange-600"
+                    >
+                      {submittingComment ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <div className="text-xs text-right text-muted-foreground">
+                    {newComment.length}/{commentConfig.max_comment_length}
+                  </div>
+                </div>
+              )}
+            </div>
           </DialogContent>
         </Dialog>
 
