@@ -72,6 +72,9 @@ import AdminMemberships from '@/modules/users/pages/AdminMemberships';
 import AdminNotifications from '@/modules/notifications/pages/AdminNotifications';
 import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 
+// Book Orders Module (Admin)
+import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 import { CXGenieWidget } from '@/components/chat';
@@ -211,6 +214,14 @@ function AppRouter() {
         element={
           <ProtectedRoute adminOnly>
             <AdminMemberships />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin/book-orders" 
+        element={
+          <ProtectedRoute adminOnly>
+            <BookOrdersAdmin />
           </ProtectedRoute>
         } 
       />
