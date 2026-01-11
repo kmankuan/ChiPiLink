@@ -280,13 +280,13 @@ class FCMProvider(PushProvider):
 
 
 class OneSignalProvider(PushProvider):
-    """OneSignal Push Provider"""
+    """OneSignal Push Provider - API v2"""
     
     def __init__(self, config: Dict):
         self.config = config
         self.app_id = config.get("app_id")
         self.api_key = config.get("api_key")
-        self.base_url = "https://onesignal.com/api/v1"
+        self.base_url = "https://api.onesignal.com"
     
     @property
     def provider_name(self) -> str:
@@ -295,6 +295,13 @@ class OneSignalProvider(PushProvider):
     def validate_config(self) -> bool:
         """Validar configuración OneSignal"""
         return all([self.app_id, self.api_key])
+    
+    def _get_headers(self) -> Dict[str, str]:
+        """Obtener headers para la API"""
+        return {
+            "Authorization": f"Key {self.api_key}",
+            "Content-Type": "application/json"
+        }
     
     async def send_notification(
         self,
@@ -305,7 +312,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Enviar notificación a dispositivos específicos"""
+        """Enviar notificación a dispositivos específicos (por subscription_id)"""
         if not self.validate_config():
             return {
                 "success": False,
@@ -314,29 +321,31 @@ class OneSignalProvider(PushProvider):
             }
         
         url = f"{self.base_url}/notifications"
-        headers = {
-            "Authorization": f"Basic {self.api_key}",
-            "Content-Type": "application/json"
-        }
         
         payload = {
             "app_id": self.app_id,
-            "include_player_ids": device_tokens,
-            "headings": {"en": title},
-            "contents": {"en": body},
-            "data": data or {}
+            "include_subscription_ids": device_tokens,
+            "headings": {"en": title, "es": title},
+            "contents": {"en": body, "es": body},
+            "data": data or {},
+            "target_channel": "push"
         }
         
         if image_url:
+            payload["chrome_web_image"] = image_url
             payload["big_picture"] = image_url
-            payload["ios_attachments"] = {"image": image_url}
         
         if action_url:
             payload["url"] = action_url
         
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, json=payload, headers=headers)
+                response = await client.post(
+                    url, 
+                    json=payload, 
+                    headers=self._get_headers(),
+                    timeout=30.0
+                )
                 result = response.json()
                 
                 if response.status_code == 200:
@@ -365,6 +374,57 @@ class OneSignalProvider(PushProvider):
                     "failed": len(device_tokens)
                 }
     
+    async def send_to_segment(
+        self,
+        segments: List[str],
+        title: str,
+        body: str,
+        data: Dict = None,
+        image_url: str = None,
+        action_url: str = None
+    ) -> Dict:
+        """Enviar notificación a segmentos de OneSignal"""
+        if not self.validate_config():
+            return {"success": False, "error": "OneSignal not configured"}
+        
+        url = f"{self.base_url}/notifications"
+        
+        payload = {
+            "app_id": self.app_id,
+            "included_segments": segments,
+            "headings": {"en": title, "es": title},
+            "contents": {"en": body, "es": body},
+            "data": data or {},
+            "target_channel": "push"
+        }
+        
+        if image_url:
+            payload["chrome_web_image"] = image_url
+            payload["big_picture"] = image_url
+        
+        if action_url:
+            payload["url"] = action_url
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    url, 
+                    json=payload, 
+                    headers=self._get_headers(),
+                    timeout=30.0
+                )
+                result = response.json()
+                
+                return {
+                    "success": response.status_code == 200,
+                    "provider": self.provider_name,
+                    "notification_id": result.get("id"),
+                    "recipients": result.get("recipients", 0),
+                    "errors": result.get("errors", [])
+                }
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+    
     async def send_to_topic(
         self,
         topic: str,
@@ -372,27 +432,29 @@ class OneSignalProvider(PushProvider):
         body: str,
         data: Dict = None
     ) -> Dict:
-        """Enviar notificación a un segmento/tag"""
+        """Enviar notificación usando filtros de tags"""
         if not self.validate_config():
             return {"success": False, "error": "OneSignal not configured"}
         
         url = f"{self.base_url}/notifications"
-        headers = {
-            "Authorization": f"Basic {self.api_key}",
-            "Content-Type": "application/json"
-        }
         
         payload = {
             "app_id": self.app_id,
-            "filters": [{"field": "tag", "key": "topic", "value": topic}],
-            "headings": {"en": title},
-            "contents": {"en": body},
-            "data": data or {}
+            "filters": [{"field": "tag", "key": "topic", "relation": "=", "value": topic}],
+            "headings": {"en": title, "es": title},
+            "contents": {"en": body, "es": body},
+            "data": data or {},
+            "target_channel": "push"
         }
         
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, json=payload, headers=headers)
+                response = await client.post(
+                    url, 
+                    json=payload, 
+                    headers=self._get_headers(),
+                    timeout=30.0
+                )
                 result = response.json()
                 
                 return {
@@ -404,13 +466,81 @@ class OneSignalProvider(PushProvider):
             except Exception as e:
                 return {"success": False, "error": str(e)}
     
+    async def send_to_all(
+        self,
+        title: str,
+        body: str,
+        data: Dict = None,
+        image_url: str = None,
+        action_url: str = None
+    ) -> Dict:
+        """Enviar notificación a todos los suscriptores"""
+        return await self.send_to_segment(
+            segments=["Subscribed Users"],
+            title=title,
+            body=body,
+            data=data,
+            image_url=image_url,
+            action_url=action_url
+        )
+    
+    async def send_by_external_id(
+        self,
+        external_ids: List[str],
+        title: str,
+        body: str,
+        data: Dict = None,
+        image_url: str = None,
+        action_url: str = None
+    ) -> Dict:
+        """Enviar notificación a usuarios por external_id (cliente_id)"""
+        if not self.validate_config():
+            return {"success": False, "error": "OneSignal not configured"}
+        
+        url = f"{self.base_url}/notifications"
+        
+        payload = {
+            "app_id": self.app_id,
+            "include_aliases": {"external_id": external_ids},
+            "target_channel": "push",
+            "headings": {"en": title, "es": title},
+            "contents": {"en": body, "es": body},
+            "data": data or {}
+        }
+        
+        if image_url:
+            payload["chrome_web_image"] = image_url
+            payload["big_picture"] = image_url
+        
+        if action_url:
+            payload["url"] = action_url
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(
+                    url, 
+                    json=payload, 
+                    headers=self._get_headers(),
+                    timeout=30.0
+                )
+                result = response.json()
+                
+                return {
+                    "success": response.status_code == 200,
+                    "provider": self.provider_name,
+                    "notification_id": result.get("id"),
+                    "recipients": result.get("recipients", 0),
+                    "errors": result.get("errors", [])
+                }
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+    
     async def subscribe_to_topic(
         self,
         device_tokens: List[str],
         topic: str
     ) -> Dict:
-        """OneSignal usa tags en lugar de topics"""
-        # En OneSignal, los tags se manejan desde el cliente
+        """OneSignal usa tags - se maneja desde el cliente SDK"""
         return {
             "success": True,
             "provider": self.provider_name,
@@ -422,7 +552,7 @@ class OneSignalProvider(PushProvider):
         device_tokens: List[str],
         topic: str
     ) -> Dict:
-        """OneSignal usa tags en lugar de topics"""
+        """OneSignal usa tags - se maneja desde el cliente SDK"""
         return {
             "success": True,
             "provider": self.provider_name,
