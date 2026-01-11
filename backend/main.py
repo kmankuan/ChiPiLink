@@ -158,6 +158,9 @@ api_router.include_router(translations_router)
 # Notifications Module
 api_router.include_router(notifications_router)
 
+# Realtime WebSocket Module
+api_router.include_router(realtime_router)
+
 # Include main router in app
 app.include_router(api_router)
 
