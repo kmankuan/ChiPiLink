@@ -97,8 +97,14 @@ export default function RapidPinPublicPage() {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        // Filter out current user
-        setPlayers(data.filter(p => p.player_id !== currentPlayerId));
+        // Filter out current user - normalize player_id field
+        const normalizedPlayers = data.map(p => ({
+          ...p,
+          player_id: p.jugador_id || p.player_id,
+          nickname: p.apodo || p.nickname,
+          avatar: p.foto_url || p.avatar
+        }));
+        setPlayers(normalizedPlayers.filter(p => p.player_id !== currentPlayerId));
       }
     } catch (error) {
       console.error('Error fetching players:', error);
