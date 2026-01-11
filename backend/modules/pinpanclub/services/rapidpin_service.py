@@ -873,6 +873,12 @@ class RapidPinService(BaseService):
             status="assigned"
         )
         
+        # Desafíos pendientes de aceptación
+        pending_challenges = await self.get_queue_matches(
+            season_id=active_season.season_id if active_season else None,
+            status="challenge_pending"
+        )
+        
         return {
             "success": True,
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -880,6 +886,7 @@ class RapidPinService(BaseService):
             "active_season": active_season.model_dump() if active_season else None,
             "recent_matches": recent_matches,
             "top_players": top_players,
+            "pending_challenges": pending_challenges,
             "waiting_for_referee": waiting_matches,
             "in_progress": in_progress_matches,
             "scoring_rules": RAPID_PIN_SCORING
