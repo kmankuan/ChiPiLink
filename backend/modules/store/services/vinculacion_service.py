@@ -561,7 +561,7 @@ class VinculacionService:
         mensaje: str,
         datos: Dict = None
     ):
-        """Crear notificación para un usuario"""
+        """Crear notificación para un usuario y enviar push"""
         notif = {
             "notificacion_id": f"notif_{uuid.uuid4().hex[:12]}",
             "destinatario_id": destinatario_id,
@@ -573,6 +573,20 @@ class VinculacionService:
             "fecha_creacion": datetime.now(timezone.utc).isoformat()
         }
         await db.notificaciones.insert_one(notif)
+        
+        # Enviar push notification
+        try:
+            from modules.notifications.services.push_service import push_service
+            await push_service.send_notification(
+                user_id=destinatario_id,
+                category_id="system",
+                title=titulo,
+                body=mensaje,
+                data={"type": tipo, **(datos or {})},
+                action_url="/mis-pedidos-libros"
+            )
+        except Exception as e:
+            logger.warning(f"No se pudo enviar push notification: {e}")
     
     async def _crear_notificacion_admin(
         self,
@@ -581,7 +595,7 @@ class VinculacionService:
         mensaje: str,
         datos: Dict = None
     ):
-        """Crear notificación para admins"""
+        """Crear notificación para admins y enviar push"""
         notif = {
             "notificacion_id": f"notif_{uuid.uuid4().hex[:12]}",
             "destinatario_id": "admin",
@@ -593,6 +607,26 @@ class VinculacionService:
             "fecha_creacion": datetime.now(timezone.utc).isoformat()
         }
         await db.notificaciones_admin.insert_one(notif)
+        
+        # Buscar admins y enviar push a cada uno
+        try:
+            from modules.notifications.services.push_service import push_service
+            admins = await db.auth_users.find(
+                {"es_admin": True},
+                {"cliente_id": 1}
+            ).to_list(50)
+            
+            for admin in admins:
+                await push_service.send_notification(
+                    user_id=admin["cliente_id"],
+                    category_id="system",
+                    title=titulo,
+                    body=mensaje,
+                    data={"type": tipo, **(datos or {})},
+                    action_url="/admin/book-orders"
+                )
+        except Exception as e:
+            logger.warning(f"No se pudo enviar push notification a admins: {e}")
 
 
 # Singleton
