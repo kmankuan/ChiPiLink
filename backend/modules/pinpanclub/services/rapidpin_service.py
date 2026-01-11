@@ -71,6 +71,58 @@ async def send_challenge_notification(
         return False
 
 
+async def send_referee_needed_broadcast(
+    player1_name: str,
+    player2_name: str,
+    exclude_player_ids: list = None
+) -> bool:
+    """
+    Enviar notificación broadcast a todos los usuarios cuando hay un partido esperando árbitro.
+    Excluye a los jugadores involucrados en el partido.
+    """
+    try:
+        from modules.notifications.services.push_service import push_notification_service
+        from core.database import db
+        
+        # Get all users with devices, excluding the players in the match
+        pipeline = [
+            {"$match": {"is_active": True}},
+            {"$group": {"_id": "$user_id"}}
+        ]
+        
+        user_docs = await db["chipi_user_devices"].aggregate(pipeline).to_list(length=10000)
+        user_ids = [doc["_id"] for doc in user_docs]
+        
+        # Exclude the players
+        if exclude_player_ids:
+            user_ids = [uid for uid in user_ids if uid not in exclude_player_ids]
+        
+        if not user_ids:
+            print("[RapidPin] No users to notify for referee needed")
+            return False
+        
+        title = "⚖️ ¡Se busca árbitro!"
+        body = f"{player1_name} vs {player2_name} esperan un árbitro. ¡Gana +2 puntos!"
+        
+        result = await push_notification_service.send_to_users(
+            user_ids=user_ids,
+            category_id="cat_rapidpin",
+            title=title,
+            body=body,
+            data={
+                "type": "referee_needed",
+                "action": "/rapidpin"
+            },
+            action_url="/rapidpin"
+        )
+        
+        print(f"[RapidPin] Referee needed broadcast sent to {result.get('sent', 0)} users")
+        return result.get("success", False)
+    except Exception as e:
+        print(f"[RapidPin] Error sending referee needed broadcast: {e}")
+        return False
+
+
 class RapidPinService(BaseService):
     """
     Servicio principal para Rapid Pin.
