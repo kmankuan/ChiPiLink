@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,19 +26,8 @@ import {
   Bell,
   Store,
   Send,
-  Trophy,
-  User,
-  LogOut,
-  Settings,
-  LayoutDashboard
+  Trophy
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
