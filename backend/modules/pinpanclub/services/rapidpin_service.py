@@ -416,6 +416,281 @@ class RapidPinService(BaseService):
             "ranking": RapidPinRankingEntry(**ranking),
             "recent_matches": [RapidPinMatch(**m) for m in matches]
         }
+    
+    # ============== MATCH QUEUE (Waiting for Referee) ==============
+    
+    async def create_queue_match(
+        self,
+        season_id: str,
+        player1_id: str,
+        player2_id: str,
+        created_by_id: str,
+        notes: Optional[str] = None
+    ) -> Dict:
+        """Crear partido en cola esperando árbitro"""
+        import uuid
+        
+        # Verificar que la temporada existe y está activa
+        season = await self.season_repo.get_by_id(season_id)
+        if not season:
+            raise ValueError("Temporada no encontrada")
+        if season.get("estado") != "active":
+            raise ValueError("La temporada no está activa")
+        
+        # Obtener info de jugadores
+        player1_info = await self.player_repo.get_by_id(player1_id)
+        player2_info = await self.player_repo.get_by_id(player2_id)
+        
+        queue_entry = {
+            "queue_id": f"queue_{uuid.uuid4().hex[:12]}",
+            "season_id": season_id,
+            "player1_id": player1_id,
+            "player2_id": player2_id,
+            "player1_info": {
+                "player_id": player1_info.get("player_id"),
+                "nombre": player1_info.get("nombre"),
+                "nickname": player1_info.get("nickname"),
+                "avatar": player1_info.get("avatar")
+            } if player1_info else None,
+            "player2_info": {
+                "player_id": player2_info.get("player_id"),
+                "nombre": player2_info.get("nombre"),
+                "nickname": player2_info.get("nickname"),
+                "avatar": player2_info.get("avatar")
+            } if player2_info else None,
+            "referee_id": None,
+            "referee_info": None,
+            "status": "waiting",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_by_id": created_by_id,
+            "assigned_at": None,
+            "completed_at": None,
+            "notes": notes,
+            "match_id": None
+        }
+        
+        db = await self.get_db()
+        await db["rapidpin_queue"].insert_one(queue_entry)
+        
+        self.log_info(f"Queue match created: {queue_entry['queue_id']}")
+        return queue_entry
+    
+    async def get_queue_matches(
+        self,
+        season_id: Optional[str] = None,
+        status: Optional[str] = "waiting"
+    ) -> List[Dict]:
+        """Obtener partidos en cola"""
+        db = await self.get_db()
+        
+        query = {}
+        if season_id:
+            query["season_id"] = season_id
+        if status:
+            query["status"] = status
+        
+        cursor = db["rapidpin_queue"].find(
+            query,
+            {"_id": 0}
+        ).sort("created_at", -1).limit(50)
+        
+        return await cursor.to_list(length=50)
+    
+    async def assign_referee(self, queue_id: str, referee_id: str) -> Dict:
+        """Asignar árbitro a partido en cola"""
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Partido no encontrado en cola")
+        
+        if queue_entry["status"] != "waiting":
+            raise ValueError("Este partido ya tiene árbitro asignado o está completado")
+        
+        # Verificar que el árbitro no sea uno de los jugadores
+        if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
+            raise ValueError("El árbitro no puede ser uno de los jugadores")
+        
+        # Obtener info del árbitro
+        referee_info = await self.player_repo.get_by_id(referee_id)
+        
+        update_data = {
+            "referee_id": referee_id,
+            "referee_info": {
+                "player_id": referee_info.get("player_id"),
+                "nombre": referee_info.get("nombre"),
+                "nickname": referee_info.get("nickname"),
+                "avatar": referee_info.get("avatar")
+            } if referee_info else None,
+            "status": "assigned",
+            "assigned_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": update_data}
+        )
+        
+        self.log_info(f"Referee {referee_id} assigned to queue {queue_id}")
+        
+        updated = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        return updated
+    
+    async def complete_queue_match(
+        self,
+        queue_id: str,
+        ganador_id: str,
+        score_ganador: int = 11,
+        score_perdedor: int = 0
+    ) -> Dict:
+        """Completar partido de la cola y registrarlo como partido oficial"""
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Partido no encontrado en cola")
+        
+        if queue_entry["status"] != "assigned":
+            raise ValueError("El partido debe tener árbitro asignado para completarse")
+        
+        # Verificar que el ganador sea uno de los jugadores
+        if ganador_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
+            raise ValueError("El ganador debe ser uno de los jugadores")
+        
+        # Determinar perdedor
+        perdedor_id = queue_entry["player2_id"] if ganador_id == queue_entry["player1_id"] else queue_entry["player1_id"]
+        
+        # Registrar el partido oficial
+        match_data = RapidPinMatchCreate(
+            season_id=queue_entry["season_id"],
+            jugador_a_id=queue_entry["player1_id"],
+            jugador_b_id=queue_entry["player2_id"],
+            arbitro_id=queue_entry["referee_id"],
+            ganador_id=ganador_id,
+            score_ganador=score_ganador,
+            score_perdedor=score_perdedor,
+            registrado_por_id=queue_entry["referee_id"]
+        )
+        
+        match = await self.register_match(match_data)
+        
+        # Marcar como completado en la cola
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+                "match_id": match.match_id
+            }}
+        )
+        
+        self.log_info(f"Queue match {queue_id} completed with match {match.match_id}")
+        
+        return {
+            "queue_id": queue_id,
+            "match_id": match.match_id,
+            "status": "completed",
+            "ganador_id": ganador_id,
+            "score": f"{score_ganador}-{score_perdedor}"
+        }
+    
+    async def cancel_queue_match(self, queue_id: str, cancelled_by_id: str) -> Dict:
+        """Cancelar partido en cola"""
+        db = await self.get_db()
+        
+        queue_entry = await db["rapidpin_queue"].find_one(
+            {"queue_id": queue_id},
+            {"_id": 0}
+        )
+        
+        if not queue_entry:
+            raise ValueError("Partido no encontrado en cola")
+        
+        if queue_entry["status"] in ["completed", "cancelled"]:
+            raise ValueError("No se puede cancelar un partido ya completado o cancelado")
+        
+        await db["rapidpin_queue"].update_one(
+            {"queue_id": queue_id},
+            {"$set": {
+                "status": "cancelled",
+                "cancelled_by_id": cancelled_by_id,
+                "cancelled_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        self.log_info(f"Queue match {queue_id} cancelled by {cancelled_by_id}")
+        
+        return {"queue_id": queue_id, "status": "cancelled"}
+    
+    # ============== PUBLIC FEED ==============
+    
+    async def get_public_feed(self) -> Dict:
+        """Obtener feed público de Rapid Pin"""
+        db = await self.get_db()
+        
+        # Obtener temporada activa
+        active_seasons = await self.get_active_seasons()
+        active_season = active_seasons[0] if active_seasons else None
+        
+        # Estadísticas generales
+        stats = {
+            "total_seasons": await db["rapidpin_seasons"].count_documents({}),
+            "total_matches": await db["rapidpin_matches"].count_documents({"estado": "validated"}),
+            "active_season": active_season.model_dump() if active_season else None
+        }
+        
+        # Partidos recientes (últimos 10 validados)
+        recent_matches = []
+        if active_season:
+            matches_cursor = db["rapidpin_matches"].find(
+                {"season_id": active_season.season_id, "estado": "validated"},
+                {"_id": 0}
+            ).sort("fecha_confirmacion", -1).limit(10)
+            recent_matches = await matches_cursor.to_list(length=10)
+        
+        # Top jugadores de la temporada activa
+        top_players = []
+        if active_season:
+            ranking_cursor = db["rapidpin_ranking"].find(
+                {"season_id": active_season.season_id},
+                {"_id": 0}
+            ).sort("puntos_totales", -1).limit(10)
+            top_players = await ranking_cursor.to_list(length=10)
+        
+        # Partidos en cola esperando árbitro
+        waiting_matches = await self.get_queue_matches(
+            season_id=active_season.season_id if active_season else None,
+            status="waiting"
+        )
+        
+        # Partidos en progreso (con árbitro asignado)
+        in_progress_matches = await self.get_queue_matches(
+            season_id=active_season.season_id if active_season else None,
+            status="assigned"
+        )
+        
+        return {
+            "success": True,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "stats": stats,
+            "active_season": active_season.model_dump() if active_season else None,
+            "recent_matches": recent_matches,
+            "top_players": top_players,
+            "waiting_for_referee": waiting_matches,
+            "in_progress": in_progress_matches,
+            "scoring_rules": RAPID_PIN_SCORING
+        }
 
 
 # Instancia singleton
