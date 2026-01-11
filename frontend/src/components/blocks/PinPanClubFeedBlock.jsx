@@ -364,67 +364,135 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Matches & Challenges */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Recent Matches */}
+          {/* Recent Matches - Tabs for Super Pin and Rapid Pin */}
           {sections.recent_matches?.enabled !== false && 
            checkVisibility(sections.recent_matches?.visibility, user) && (
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Swords className="h-5 w-5 text-primary" />
                   {L(sections.recent_matches?.title) || txt.recentMatches}
                 </CardTitle>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate('/pinpanclub/superpin/ranking')}
-                >
-                  {txt.viewAll}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
               </CardHeader>
               <CardContent>
-                {feedData?.recent_matches?.length > 0 ? (
-                  <div className="space-y-3">
-                    {feedData.recent_matches.map((match, idx) => (
-                      <div 
-                        key={match.match_id || idx}
-                        className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={match.player1?.avatar} />
-                            <AvatarFallback>{match.player1?.name?.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium truncate ${match.winner_id === match.player1?.id ? 'text-green-600' : ''}`}>
-                              {match.player1?.nickname || match.player1?.name}
-                            </p>
+                <Tabs defaultValue="superpin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="superpin" className="gap-2">
+                      <Trophy className="h-4 w-4 text-yellow-500" />
+                      {txt.superPinMatches}
+                    </TabsTrigger>
+                    <TabsTrigger value="rapidpin" className="gap-2">
+                      <Zap className="h-4 w-4 text-orange-500" />
+                      {txt.rapidPinMatches}
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  {/* Super Pin Matches */}
+                  <TabsContent value="superpin">
+                    {feedData?.recent_matches?.filter(m => m.type === 'superpin').length > 0 ? (
+                      <div className="space-y-3">
+                        {feedData.recent_matches.filter(m => m.type === 'superpin').slice(0, 5).map((match, idx) => (
+                          <div 
+                            key={match.match_id || idx}
+                            className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-yellow-50 to-transparent dark:from-yellow-950/20 hover:from-yellow-100 dark:hover:from-yellow-950/30 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1">
+                              <Avatar className="h-8 w-8 ring-2 ring-yellow-400">
+                                <AvatarImage src={match.player1?.avatar} />
+                                <AvatarFallback>{match.player1?.name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium truncate ${match.winner_id === match.player1?.id ? 'text-green-600' : ''}`}>
+                                  {match.player1?.nickname || match.player1?.name}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 px-3">
+                              <Badge className="bg-yellow-500 text-white text-xs">
+                                {match.result}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 flex-1 justify-end">
+                              <div className="flex-1 min-w-0 text-right">
+                                <p className={`text-sm font-medium truncate ${match.winner_id === match.player2?.id ? 'text-green-600' : ''}`}>
+                                  {match.player2?.nickname || match.player2?.name}
+                                </p>
+                              </div>
+                              <Avatar className="h-8 w-8 ring-2 ring-yellow-400">
+                                <AvatarImage src={match.player2?.avatar} />
+                                <AvatarFallback>{match.player2?.name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 px-3">
-                          <Badge variant={match.type === 'superpin' ? 'default' : 'secondary'} className="text-xs">
-                            {match.result}
-                          </Badge>
-                        </div>
-                        
-                        <div className="flex items-center gap-3 flex-1 justify-end">
-                          <div className="flex-1 min-w-0 text-right">
-                            <p className={`text-sm font-medium truncate ${match.winner_id === match.player2?.id ? 'text-green-600' : ''}`}>
-                              {match.player2?.nickname || match.player2?.name}
-                            </p>
-                          </div>
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={match.player2?.avatar} />
-                            <AvatarFallback>{match.player2?.name?.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                        </div>
+                        ))}
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => navigate('/pinpanclub/superpin/ranking')}
+                        >
+                          {txt.viewAll} Super Pin
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
-                )}
+                    ) : (
+                      <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                    )}
+                  </TabsContent>
+                  
+                  {/* Rapid Pin Matches */}
+                  <TabsContent value="rapidpin">
+                    {feedData?.recent_matches?.filter(m => m.type === 'rapidpin').length > 0 ? (
+                      <div className="space-y-3">
+                        {feedData.recent_matches.filter(m => m.type === 'rapidpin').slice(0, 5).map((match, idx) => (
+                          <div 
+                            key={match.match_id || idx}
+                            className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-orange-50 to-transparent dark:from-orange-950/20 hover:from-orange-100 dark:hover:from-orange-950/30 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1">
+                              <Avatar className="h-8 w-8 ring-2 ring-orange-400">
+                                <AvatarImage src={match.player1?.avatar} />
+                                <AvatarFallback>{match.player1?.name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium truncate ${match.winner_id === match.player1?.id ? 'text-green-600' : ''}`}>
+                                  {match.player1?.nickname || match.player1?.name}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 px-3">
+                              <Badge className="bg-orange-500 text-white text-xs">
+                                {match.result}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 flex-1 justify-end">
+                              <div className="flex-1 min-w-0 text-right">
+                                <p className={`text-sm font-medium truncate ${match.winner_id === match.player2?.id ? 'text-green-600' : ''}`}>
+                                  {match.player2?.nickname || match.player2?.name}
+                                </p>
+                              </div>
+                              <Avatar className="h-8 w-8 ring-2 ring-orange-400">
+                                <AvatarImage src={match.player2?.avatar} />
+                                <AvatarFallback>{match.player2?.name?.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            </div>
+                          </div>
+                        ))}
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => navigate('/pinpanclub/rapidpin')}
+                        >
+                          {txt.viewAll} Rapid Pin
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           )}
