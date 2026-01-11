@@ -150,6 +150,7 @@ export default function UsersDashboard() {
 
           <TabsContent value="notifications">
             <div className="space-y-6">
+              <PushNotificationSubscribe />
               <NotificationPreferences token={token} />
               <NotificationHistory token={token} />
             </div>
