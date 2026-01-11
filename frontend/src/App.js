@@ -74,6 +74,7 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 
 // Book Orders Module (Admin)
 import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
+import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
@@ -222,6 +223,14 @@ function AppRouter() {
         element={
           <ProtectedRoute adminOnly>
             <BookOrdersAdmin />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/mis-pedidos-libros" 
+        element={
+          <ProtectedRoute>
+            <MisPedidosLibros />
           </ProtectedRoute>
         } 
       />
