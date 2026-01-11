@@ -190,3 +190,106 @@ async def get_scoring_config():
             "points_referee": RAPID_PIN_SCORING["referee"]
         }
     }
+
+
+# ============== MATCH QUEUE (Waiting for Referee) ==============
+
+@router.post("/queue")
+async def create_queue_match(
+    season_id: str,
+    player1_id: str,
+    player2_id: str,
+    created_by_id: str,
+    notes: Optional[str] = None
+):
+    """
+    Crear partido en cola esperando árbitro.
+    Dos jugadores quieren jugar y buscan un árbitro.
+    """
+    if player1_id == player2_id:
+        raise HTTPException(status_code=400, detail="Los jugadores deben ser diferentes")
+    
+    queue_entry = await rapidpin_service.create_queue_match(
+        season_id=season_id,
+        player1_id=player1_id,
+        player2_id=player2_id,
+        created_by_id=created_by_id,
+        notes=notes
+    )
+    return queue_entry
+
+
+@router.get("/queue")
+async def get_queue_matches(
+    season_id: Optional[str] = None,
+    status: Optional[str] = "waiting"
+):
+    """
+    Obtener partidos en cola.
+    Por defecto solo los que están esperando árbitro.
+    """
+    return await rapidpin_service.get_queue_matches(season_id, status)
+
+
+@router.post("/queue/{queue_id}/assign")
+async def assign_referee(
+    queue_id: str,
+    referee_id: str
+):
+    """
+    Asignarse como árbitro de un partido en cola.
+    El árbitro no puede ser uno de los jugadores.
+    """
+    try:
+        return await rapidpin_service.assign_referee(queue_id, referee_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/queue/{queue_id}/complete")
+async def complete_queue_match(
+    queue_id: str,
+    ganador_id: str,
+    score_ganador: int = 11,
+    score_perdedor: int = 0
+):
+    """
+    Completar partido de la cola con el resultado.
+    Solo el árbitro asignado puede completarlo.
+    """
+    try:
+        return await rapidpin_service.complete_queue_match(
+            queue_id=queue_id,
+            ganador_id=ganador_id,
+            score_ganador=score_ganador,
+            score_perdedor=score_perdedor
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/queue/{queue_id}")
+async def cancel_queue_match(
+    queue_id: str,
+    cancelled_by_id: str
+):
+    """
+    Cancelar partido en cola.
+    Solo puede cancelar quien lo creó o un admin.
+    """
+    try:
+        return await rapidpin_service.cancel_queue_match(queue_id, cancelled_by_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============== PUBLIC FEED ==============
+
+@router.get("/public/feed")
+async def get_rapid_pin_public_feed():
+    """
+    Feed público de Rapid Pin.
+    Incluye estadísticas, partidos recientes, ranking y cola de partidos.
+    """
+    return await rapidpin_service.get_public_feed()
+
