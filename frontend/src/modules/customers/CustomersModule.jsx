@@ -41,8 +41,11 @@ import {
   Loader2,
   Mail,
   Phone,
-  RefreshCw
+  RefreshCw,
+  Settings,
+  Link2
 } from 'lucide-react';
+import AdminUsuariosConexiones from '@/modules/users/components/AdminUsuariosConexiones';
 
 export default function CustomersModule() {
   const { api } = useAuth();
