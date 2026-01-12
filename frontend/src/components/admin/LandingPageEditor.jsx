@@ -957,7 +957,7 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
           <div className="space-y-4">
             <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                🌐 Soporte multilingüe habilitado.
+                ✨ Editor de texto enriquecido con soporte para formato, listas, enlaces e imágenes.
               </p>
             </div>
             
@@ -968,14 +968,19 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               placeholder={{ en: "Title", es: "Título", zh: "标题" }}
             />
             
-            <MultilingualInput
-              label="Contenido"
-              value={config.contenido}
-              onChange={(val) => handleChange('contenido', val)}
-              placeholder={{ en: "Write your content here...", es: "Escribe tu contenido aquí...", zh: "在这里写内容..." }}
-              multiline
-              rows={6}
-            />
+            <div className="space-y-2">
+              <Label>Contenido (Editor Enriquecido)</Label>
+              <RichTextEditor
+                value={config.contenido_html || ''}
+                onChange={(html) => handleChange('contenido_html', html)}
+                placeholder="Escribe tu contenido aquí..."
+                onImageUpload={uploadImage}
+                minHeight="300px"
+              />
+              <p className="text-xs text-muted-foreground">
+                Usa la barra de herramientas para dar formato al texto, agregar enlaces e insertar imágenes.
+              </p>
+            </div>
             
             <div className="space-y-2">
               <Label>Alineación</Label>
@@ -996,8 +1001,12 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
       case 'image':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>URL de la Imagen</Label>
+            <ImageUploader
+              label="Imagen Principal"
+              value={config.imagen_url}
+              onChange={(url) => handleChange('imagen_url', url)}
+              aspectRatio="16/9"
+            />
               <Input
                 value={config.imagen_url || ''}
                 onChange={(e) => handleChange('imagen_url', e.target.value)}
