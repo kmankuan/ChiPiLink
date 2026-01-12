@@ -270,12 +270,22 @@ export default function MisConexiones({ token }) {
         body: JSON.stringify({ aceptar: accept })
       });
       
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.detail || 'Error');
       }
       
-      toast.success(accept ? 'Solicitud aceptada' : 'Solicitud rechazada');
+      // Mensaje con indicador de notificación
+      const pushSent = data.push_notification?.success;
+      if (accept) {
+        toast.success(pushSent 
+          ? 'Solicitud aceptada 🔔 Se notificó al usuario' 
+          : 'Solicitud aceptada');
+      } else {
+        toast.success(pushSent 
+          ? 'Solicitud rechazada 🔔 Se notificó al usuario'
+          : 'Solicitud rechazada');
+      }
       loadData();
     } catch (err) {
       toast.error(err.message);
