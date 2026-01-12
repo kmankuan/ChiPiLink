@@ -367,11 +367,23 @@ class MondayPedidosService:
             "cancelado": "Cancelado"
         }
         
+        # Mapeo a índices para boards genéricos
+        estado_index_map = {
+            "Borrador": 0,       # Working on it
+            "Pre-Orden": 0,      # Working on it
+            "Confirmado": 1,     # Done
+            "En Proceso": 0,     # Working on it
+            "Listo para Retiro": 1,  # Done
+            "Entregado": 1,      # Done
+            "Cancelado": 2       # Stuck
+        }
+        
         col_map = config.get("column_mapping", {})
         estado_col = col_map.get("estado", "status")
+        estado_label = estado_map.get(nuevo_estado, "Pre-Orden")
         
         column_values = {
-            estado_col: {"label": estado_map.get(nuevo_estado, "Pre-Orden")}
+            estado_col: {"index": estado_index_map.get(estado_label, 0)}
         }
         
         return await self.update_item(
