@@ -77,28 +77,63 @@ export function Header() {
     }
   };
 
-  // Hide floating widget on mount (move it to header)
+  // Hide floating widget on mount and continuously monitor for dynamic injections
   useEffect(() => {
     const hideFloatingWidget = () => {
-      const style = document.createElement('style');
-      style.id = 'cxgenie-hide-floating';
-      style.innerHTML = `
-        .cxgenie-widget-button,
-        [class*="cxgenie-float"],
-        [class*="cxgenie-launcher"],
-        #cxgenie-floating-button {
-          display: none !important;
-        }
-      `;
+      // Inject CSS to hide any floating widgets
       if (!document.getElementById('cxgenie-hide-floating')) {
+        const style = document.createElement('style');
+        style.id = 'cxgenie-hide-floating';
+        style.innerHTML = `
+          /* Hide CXGenie and similar floating widgets */
+          [class*="cxgenie"],
+          [id*="cxgenie"],
+          [data-cxgenie],
+          [data-bid],
+          [data-aid],
+          iframe[src*="cxgenie"],
+          iframe[src*="widget"],
+          div[style*="position: fixed"][style*="z-index: 9999"]:not(#root):not(.toast),
+          div[style*="position: fixed"][style*="z-index: 99999"] {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+          }
+        `;
         document.head.appendChild(style);
       }
+      
+      // Also try to remove any dynamically injected elements
+      const selectors = [
+        '[data-bid]',
+        '[data-aid]',
+        'iframe[src*="cxgenie"]',
+        'iframe[src*="widget.cxgenie"]',
+        '[class*="cxgenie"]',
+        '[id*="cxgenie"]'
+      ];
+      
+      selectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+          el.style.display = 'none';
+          el.style.visibility = 'hidden';
+        });
+      });
     };
     
-    // Run immediately and after a delay (widget may load async)
+    // Run immediately
     hideFloatingWidget();
-    const timer = setTimeout(hideFloatingWidget, 2000);
-    return () => clearTimeout(timer);
+    
+    // Run periodically to catch async-loaded widgets
+    const interval = setInterval(hideFloatingWidget, 1000);
+    
+    // Stop after 10 seconds
+    const timeout = setTimeout(() => clearInterval(interval), 10000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (
