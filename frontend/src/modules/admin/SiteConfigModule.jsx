@@ -157,25 +157,20 @@ export default function SiteConfigModule() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>URL del Logo</Label>
-              <Input
-                value={config.logo_url}
-                onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
-                placeholder="https://..."
-              />
-              {config.logo_url && (
-                <img src={config.logo_url} alt="Logo" className="h-12 mt-2 rounded" />
-              )}
-            </div>
-            <div>
-              <Label>URL del Favicon</Label>
-              <Input
-                value={config.favicon_url}
-                onChange={(e) => setConfig({ ...config, favicon_url: e.target.value })}
-                placeholder="https://..."
-              />
-            </div>
+            <ImageUploader
+              label="Logo del Sitio"
+              value={config.logo_url}
+              onChange={(url) => setConfig({ ...config, logo_url: url })}
+              aspectRatio="4/1"
+              maxSize={2}
+            />
+            <ImageUploader
+              label="Favicon (Icono de pestaña)"
+              value={config.favicon_url}
+              onChange={(url) => setConfig({ ...config, favicon_url: url })}
+              aspectRatio="1/1"
+              maxSize={1}
+            />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
