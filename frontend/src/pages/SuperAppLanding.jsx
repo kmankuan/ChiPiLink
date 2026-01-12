@@ -455,6 +455,15 @@ export default function SuperAppLanding() {
   // Get sorted blocks for rendering
   const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order);
 
+  // Create edit mode context value
+  const editModeValue = {
+    isEditMode,
+    editingBlockId: null,
+    setEditingBlockId: () => {},
+    updateBlockConfig: () => {},
+    saveBlock: () => {}
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
