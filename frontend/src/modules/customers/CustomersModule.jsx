@@ -126,8 +126,12 @@ export default function CustomersModule() {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="students">
+      <Tabs defaultValue="conexiones">
         <TabsList>
+          <TabsTrigger value="conexiones" className="gap-2">
+            <Link2 className="h-4 w-4" />
+            Conexiones y Capacidades
+          </TabsTrigger>
           <TabsTrigger value="students" className="gap-2">
             <GraduationCap className="h-4 w-4" />
             Estudiantes / Matrículas
@@ -137,6 +141,11 @@ export default function CustomersModule() {
             Clientes
           </TabsTrigger>
         </TabsList>
+
+        {/* Sistema de Conexiones y Capacidades */}
+        <TabsContent value="conexiones" className="space-y-4">
+          <AdminUsuariosConexiones token={localStorage.getItem('auth_token')} />
+        </TabsContent>
 
         {/* Students/Enrollments Tab */}
         <TabsContent value="students" className="space-y-4">
