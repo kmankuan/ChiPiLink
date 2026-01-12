@@ -58,6 +58,49 @@ export function Header() {
     navigate('/');
   };
 
+  // Function to toggle CXGenie chat widget
+  const toggleSupportChat = () => {
+    // CXGenie widget from emergent-main.js exposes window.CXGenie or similar
+    if (window.CXGenie?.toggle) {
+      window.CXGenie.toggle();
+    } else if (window.Emergent?.openChat) {
+      window.Emergent.openChat();
+    } else {
+      // Fallback: try to find and click the widget button
+      const widgetButton = document.querySelector('[data-cxgenie-trigger], .cxgenie-widget-button, [class*="cxgenie"]');
+      if (widgetButton) {
+        widgetButton.click();
+      } else {
+        // Last resort: dispatch custom event
+        window.dispatchEvent(new CustomEvent('cxgenie:toggle'));
+      }
+    }
+  };
+
+  // Hide floating widget on mount (move it to header)
+  useEffect(() => {
+    const hideFloatingWidget = () => {
+      const style = document.createElement('style');
+      style.id = 'cxgenie-hide-floating';
+      style.innerHTML = `
+        .cxgenie-widget-button,
+        [class*="cxgenie-float"],
+        [class*="cxgenie-launcher"],
+        #cxgenie-floating-button {
+          display: none !important;
+        }
+      `;
+      if (!document.getElementById('cxgenie-hide-floating')) {
+        document.head.appendChild(style);
+      }
+    };
+    
+    // Run immediately and after a delay (widget may load async)
+    hideFloatingWidget();
+    const timer = setTimeout(hideFloatingWidget, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 w-full glass border-b border-border/50">
       <div className="container mx-auto px-4 md:px-8">
