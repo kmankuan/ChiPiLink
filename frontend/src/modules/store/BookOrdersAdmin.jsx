@@ -1552,8 +1552,8 @@ function MondayConfigTab({ token }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setWorkspaceConfig(data);
-        setWorkspaces(data.workspaces || []);
+        setWorkspaceConfig(data || { workspaces: [], active_workspace_id: null });
+        setWorkspaces(data?.workspaces || []);
       }
     } catch (err) {
       console.error('Error loading workspaces:', err);
@@ -1567,7 +1567,7 @@ function MondayConfigTab({ token }) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      setConnected(data.connected);
+      setConnected(data.connected || false);
       setConnectionInfo(data);
       
       if (data.connected) {
@@ -1575,6 +1575,7 @@ function MondayConfigTab({ token }) {
       }
     } catch (err) {
       setConnected(false);
+      setConnectionInfo({ error: 'Error de conexión' });
     } finally {
       setTestingConnection(false);
       setLoading(false);
@@ -1587,8 +1588,14 @@ function MondayConfigTab({ token }) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (data.board_id) {
-        setConfig(prev => ({ ...prev, ...data }));
+      if (data) {
+        setConfig(prev => ({ 
+          ...prev, 
+          ...data,
+          board_id: data.board_id || '',
+          group_id: data.group_id || '',
+          auto_sync: data.auto_sync !== false
+        }));
       }
     } catch (err) {
       console.error('Error loading config:', err);
