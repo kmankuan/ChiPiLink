@@ -114,11 +114,24 @@ class ConexionesService:
         
         # Obtener permisos por defecto si no se especifican
         if not permisos:
-            config = await db.config_permisos_relacion.find_one({
-                "tipo": tipo,
-                "subtipo": subtipo
-            })
-            permisos = config.get("permisos_default", {}) if config else {}
+            # Para acudiente→acudido, el acudiente tiene permisos completos
+            if subtipo == "acudido":
+                # El acudiente tiene permisos sobre el acudido
+                config = await db.config_permisos_relacion.find_one({
+                    "tipo": "especial",
+                    "subtipo": "acudiente"  # Permisos del acudiente
+                })
+            else:
+                config = await db.config_permisos_relacion.find_one({
+                    "tipo": tipo,
+                    "subtipo": subtipo
+                })
+            permisos = config.get("permisos_default", {}) if config else {
+                "transferir_wallet": True,
+                "ver_wallet": True,
+                "recargar_wallet": True,
+                "recibir_alertas": True
+            }
         
         conexion = {
             "conexion_id": f"con_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{destino_user_id[-6:]}",
