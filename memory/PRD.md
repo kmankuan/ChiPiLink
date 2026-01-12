@@ -1404,6 +1404,37 @@ Integración de notificaciones push para el flujo completo de solicitudes de con
 
 **Test Results:** 12/12 tests passed (5 skipped) - iteration_30.json
 
+### 🆕 Unificación Landing Pages → SuperAppLanding ✅ (Enero 12, 2026)
+Se unificaron `Landing.jsx` y `CommunityLanding.jsx` en un solo componente `SuperAppLanding.jsx`.
+
+**Archivos eliminados:**
+- `/app/frontend/src/pages/Landing.jsx` (1410 líneas)
+- `/app/frontend/src/pages/CommunityLanding.jsx` (635 líneas)
+
+**Archivo creado:**
+- `/app/frontend/src/pages/SuperAppLanding.jsx` - Página principal unificada
+
+**Características del nuevo SuperAppLanding:**
+- **Hero Carousel** - Posts destacados rotativos
+- **Quick Access** - 6 botones de acceso rápido (Tienda, Super Pin, Rapid Pin, Eventos, Galería, Jugadores)
+- **Announcements Banner** - Anuncios importantes
+- **PinPanClub Feed** - Actividad del club (stats, matches, challenges)
+- **News Section** - Últimas noticias con cards
+- **Events Section** - Próximos eventos
+- **Gallery Section** - Álbumes de fotos
+
+**Modo de Edición (Solo Admins):**
+- Botón "Editar" flotante en esquina inferior derecha
+- Panel lateral con toggle de visibilidad por bloque
+- 7 bloques configurables: Hero, Quick Access, Announcements, PinPanClub, News, Events, Gallery
+
+**Rutas actualizadas:**
+- `/` → SuperAppLanding (página principal)
+- `/comunidad` → SuperAppLanding
+- `/eventos` → SuperAppLanding
+- `/galeria` → SuperAppLanding
+- Eliminada: `/landing-editor` (ya no necesaria)
+
 ---
 
 ### P2 - Media Prioridad
