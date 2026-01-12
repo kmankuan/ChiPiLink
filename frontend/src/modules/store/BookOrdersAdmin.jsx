@@ -2186,7 +2186,7 @@ export default function BookOrdersAdmin() {
         </TabsContent>
 
         <TabsContent value="monday">
-          <MondayConfigTab token={token} />
+          <MondayQuickAccess navigate={navigate} />
         </TabsContent>
       </Tabs>
     </div>
