@@ -474,3 +474,141 @@ async def resolver_alerta(
         raise HTTPException(status_code=404, detail="Alerta no encontrada")
     
     return {"success": True}
+
+
+
+# ============== ADMIN: PERMISOS Y CAPACIDADES ==============
+
+@router.get("/admin/permisos-relacion")
+async def admin_get_permisos_relacion(admin: dict = Depends(get_admin_user)):
+    """Admin: Obtener todos los permisos configurados por tipo de relación"""
+    from core.database import db
+    cursor = db.config_permisos_relacion.find({}, {"_id": 0})
+    permisos = await cursor.to_list(length=100)
+    return {"permisos": permisos}
+
+
+@router.put("/admin/permisos-relacion")
+async def admin_update_permisos_relacion(
+    request: PermisosRelacionRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin: Actualizar permisos para un tipo de relación"""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    permisos = {
+        "transferir_wallet": request.transferir_wallet,
+        "ver_wallet": request.ver_wallet,
+        "recargar_wallet": request.recargar_wallet,
+        "recibir_alertas": request.recibir_alertas,
+        "limite_transferencia_diario": request.limite_transferencia_diario
+    }
+    
+    result = await db.config_permisos_relacion.update_one(
+        {"tipo": request.tipo, "subtipo": request.subtipo},
+        {
+            "$set": {
+                "permisos": permisos,
+                "actualizado_por": admin["cliente_id"],
+                "actualizado_en": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        upsert=True
+    )
+    
+    return {"success": True, "modified": result.modified_count > 0}
+
+
+@router.post("/admin/capacidades")
+async def admin_crear_capacidad(
+    request: CapacidadCreateRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin: Crear nueva capacidad"""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    # Verificar que no existe
+    existing = await db.capacidades_config.find_one({"capacidad_id": request.capacidad_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya existe una capacidad con ese ID")
+    
+    capacidad = {
+        "capacidad_id": request.capacidad_id,
+        "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
+        "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
+        "icono": request.icono or "⚡",
+        "color": request.color or "#6366f1",
+        "tipo": request.tipo,
+        "membresia_requerida": request.membresia_requerida,
+        "requiere_aprobacion": request.requiere_aprobacion,
+        "activa": request.activa,
+        "orden": 99,
+        "creado_por": admin["cliente_id"],
+        "creado_en": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.capacidades_config.insert_one(capacidad)
+    capacidad.pop("_id", None)
+    
+    return {"success": True, "capacidad": capacidad}
+
+
+@router.put("/admin/capacidades/{capacidad_id}")
+async def admin_actualizar_capacidad(
+    capacidad_id: str,
+    request: CapacidadCreateRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin: Actualizar capacidad existente"""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    existing = await db.capacidades_config.find_one({"capacidad_id": capacidad_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Capacidad no encontrada")
+    
+    updates = {
+        "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
+        "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
+        "icono": request.icono or existing.get("icono", "⚡"),
+        "color": request.color or existing.get("color", "#6366f1"),
+        "tipo": request.tipo,
+        "membresia_requerida": request.membresia_requerida,
+        "requiere_aprobacion": request.requiere_aprobacion,
+        "activa": request.activa,
+        "actualizado_por": admin["cliente_id"],
+        "actualizado_en": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.capacidades_config.update_one(
+        {"capacidad_id": capacidad_id},
+        {"$set": updates}
+    )
+    
+    return {"success": True}
+
+
+@router.delete("/admin/capacidades/{capacidad_id}")
+async def admin_eliminar_capacidad(
+    capacidad_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin: Desactivar capacidad (no elimina, solo desactiva)"""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    result = await db.capacidades_config.update_one(
+        {"capacidad_id": capacidad_id},
+        {"$set": {
+            "activa": False,
+            "desactivado_por": admin["cliente_id"],
+            "desactivado_en": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Capacidad no encontrada")
+    
+    return {"success": True}
