@@ -586,122 +586,136 @@ export default function SuperAppLanding() {
         )}
 
         <main className={`container mx-auto px-4 py-8 space-y-12 ${isEditMode ? 'ml-80' : ''}`}>
-          {/* Hero Section */}
-          {isBlockVisible('hero') && (
-            <section data-block="hero">
-              <HeroCarousel posts={destacados || []} />
-            </section>
-          )}
-
-          {/* Quick Access */}
-          {isBlockVisible('quickAccess') && (
-            <section data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-              <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
-              <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
-              <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
-              <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
-              <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
-              <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" />
-            </section>
-          )}
-
-          {/* Announcements Banner */}
-          {isBlockVisible('announcements') && anuncios && anuncios.length > 0 && (
-            <section data-block="announcements" className="bg-primary/5 rounded-2xl p-4 md:p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
-                  <Bell className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">{anuncios[0].titulo}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {anuncios[0].resumen || anuncios[0].contenido}
-                  </p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate(`/comunidad/post/${anuncios[0].post_id}`)}
-                >
-                  Ver más
-                </Button>
-              </div>
-            </section>
-          )}
-
-          {/* PinPanClub Feed */}
-          {isBlockVisible('pinpanclub') && (
-            <section data-block="pinpanclub">
-              <PinPanClubFeedBlock 
-                config={{
-                  titulo: { es: 'Actividad del Club', en: 'Club Activity' },
-                  subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
-                  sections: {
-                    recent_matches: { enabled: true, limit: 5 },
-                    leaderboard: { enabled: true, limit: 10 },
-                    active_challenges: { enabled: true, limit: 4 },
-                    recent_achievements: { enabled: true, limit: 6 }
-                  },
-                  style: {
-                    show_cta: true,
-                    cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' },
-                    cta_url: '/pinpanclub'
-                  }
-                }}
-              />
-            </section>
-          )}
-
-          {/* News Section */}
-          {isBlockVisible('news') && noticias && noticias.length > 0 && (
-            <section data-block="news">
-              <SectionHeader 
-                icon={Newspaper} 
-                title="Últimas Noticias" 
-                action="Ver todas"
-                actionLink="/comunidad/noticias"
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {noticias.slice(0, 3).map((post) => (
-                  <NewsCard key={post.post_id} post={post} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Events Section */}
-          {isBlockVisible('events') && eventos && eventos.length > 0 && (
-            <section data-block="events">
-              <SectionHeader 
-                icon={Calendar} 
-                title="Próximos Eventos" 
-                action="Ver todos"
-                actionLink="/eventos"
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {eventos.slice(0, 4).map((evento) => (
-                  <EventCard key={evento.evento_id} evento={evento} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Gallery Section */}
-          {isBlockVisible('gallery') && galerias && galerias.length > 0 && (
-            <section data-block="gallery">
-              <SectionHeader 
-                icon={Image} 
-                title="Galería" 
-                action="Ver todo"
-                actionLink="/galeria"
-              />
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {galerias.slice(0, 4).map((album) => (
-                  <GalleryCard key={album.album_id} album={album} />
-                ))}
-              </div>
-            </section>
-          )}
+          {/* Render blocks dynamically based on sortedBlocks order */}
+          {sortedBlocks.map((block) => {
+            if (!block.visible) return null;
+            
+            switch (block.id) {
+              case 'hero':
+                return (
+                  <section key={block.id} data-block="hero">
+                    <HeroCarousel posts={destacados || []} />
+                  </section>
+                );
+              
+              case 'quickAccess':
+                return (
+                  <section key={block.id} data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
+                    <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
+                    <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
+                    <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
+                    <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
+                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" />
+                  </section>
+                );
+              
+              case 'announcements':
+                if (!anuncios || anuncios.length === 0) return null;
+                return (
+                  <section key={block.id} data-block="announcements" className="bg-primary/5 rounded-2xl p-4 md:p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
+                        <Bell className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">{anuncios[0].titulo}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {anuncios[0].resumen || anuncios[0].contenido}
+                        </p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => navigate(`/comunidad/post/${anuncios[0].post_id}`)}
+                      >
+                        Ver más
+                      </Button>
+                    </div>
+                  </section>
+                );
+              
+              case 'pinpanclub':
+                return (
+                  <section key={block.id} data-block="pinpanclub">
+                    <PinPanClubFeedBlock 
+                      config={{
+                        titulo: { es: 'Actividad del Club', en: 'Club Activity' },
+                        subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
+                        sections: {
+                          recent_matches: { enabled: true, limit: 5 },
+                          leaderboard: { enabled: true, limit: 10 },
+                          active_challenges: { enabled: true, limit: 4 },
+                          recent_achievements: { enabled: true, limit: 6 }
+                        },
+                        style: {
+                          show_cta: true,
+                          cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' },
+                          cta_url: '/pinpanclub'
+                        }
+                      }}
+                    />
+                  </section>
+                );
+              
+              case 'news':
+                if (!noticias || noticias.length === 0) return null;
+                return (
+                  <section key={block.id} data-block="news">
+                    <SectionHeader 
+                      icon={Newspaper} 
+                      title="Últimas Noticias" 
+                      action="Ver todas"
+                      actionLink="/comunidad/noticias"
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {noticias.slice(0, 3).map((post) => (
+                        <NewsCard key={post.post_id} post={post} />
+                      ))}
+                    </div>
+                  </section>
+                );
+              
+              case 'events':
+                if (!eventos || eventos.length === 0) return null;
+                return (
+                  <section key={block.id} data-block="events">
+                    <SectionHeader 
+                      icon={Calendar} 
+                      title="Próximos Eventos" 
+                      action="Ver todos"
+                      actionLink="/eventos"
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {eventos.slice(0, 4).map((evento) => (
+                        <EventCard key={evento.evento_id} evento={evento} />
+                      ))}
+                    </div>
+                  </section>
+                );
+              
+              case 'gallery':
+                if (!galerias || galerias.length === 0) return null;
+                return (
+                  <section key={block.id} data-block="gallery">
+                    <SectionHeader 
+                      icon={Image} 
+                      title="Galería" 
+                      action="Ver todo"
+                      actionLink="/galeria"
+                    />
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {galerias.slice(0, 4).map((album) => (
+                        <GalleryCard key={album.album_id} album={album} />
+                      ))}
+                    </div>
+                  </section>
+                );
+              
+              default:
+                return null;
+            }
+          })}
 
           {/* Empty State */}
           {!destacados?.length && !noticias?.length && !eventos?.length && !galerias?.length && (
