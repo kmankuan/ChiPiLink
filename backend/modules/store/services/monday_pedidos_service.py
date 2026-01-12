@@ -140,6 +140,11 @@ class MondayPedidosService:
             }
         return {"columns": [], "groups": []}
     
+    def _escape_for_graphql(self, value: str) -> str:
+        """Escape string for use in GraphQL query"""
+        # Escape backslashes first, then quotes, then newlines
+        return value.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '')
+    
     async def create_item(
         self,
         board_id: str,
@@ -148,7 +153,10 @@ class MondayPedidosService:
         group_id: str = None
     ) -> Optional[str]:
         """Crear item en Monday.com"""
-        column_values_json = json.dumps(column_values).replace('"', '\\"')
+        # Properly escape JSON for GraphQL
+        column_values_json = json.dumps(column_values, ensure_ascii=False)
+        column_values_escaped = self._escape_for_graphql(column_values_json)
+        item_name_escaped = self._escape_for_graphql(item_name)
         
         group_part = f', group_id: "{group_id}"' if group_id else ''
         
@@ -156,8 +164,8 @@ class MondayPedidosService:
         mutation {{
             create_item (
                 board_id: {board_id},
-                item_name: "{item_name}"{group_part},
-                column_values: "{column_values_json}"
+                item_name: "{item_name_escaped}"{group_part},
+                column_values: "{column_values_escaped}"
             ) {{
                 id
                 name
