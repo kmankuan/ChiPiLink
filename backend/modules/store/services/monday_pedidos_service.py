@@ -631,12 +631,30 @@ class MondayPedidosService:
             
             # Detectar si es del cliente o de Books de Light
             body = update.get("text_body", "") or update.get("body", "")
-            is_from_client = "[🏠 Cliente]" in body or body.startswith("**") and "Cliente" in body
+            body_lower = body.lower()
+            # Detectar cliente por marcadores de texto
+            is_from_client = (
+                "cliente]" in body_lower or
+                "[cliente]" in body_lower or
+                "🏠" in body
+            )
             
             # Limpiar el prefijo del mensaje
             clean_body = body
-            for prefix in ["[🏠 Cliente]\n", "[📚 Books de Light]\n", "[🏠 Cliente]", "[📚 Books de Light]"]:
+            prefixes_to_remove = [
+                "[🏠 Cliente]\n", "[📚 Books de Light]\n", 
+                "[🏠 Cliente]", "[📚 Books de Light]",
+                "[Cliente]\n", "[Books de Light]\n",
+                "[Cliente]", "[Books de Light]"
+            ]
+            for prefix in prefixes_to_remove:
                 clean_body = clean_body.replace(prefix, "")
+            
+            # También limpiar el formato de autor al inicio
+            if clean_body.startswith("**") and ":**\n" in clean_body:
+                idx = clean_body.find(":**\n")
+                if idx > 0 and idx < 50:  # Nombre de autor no debería ser muy largo
+                    clean_body = clean_body[idx + 4:]
             
             messages.append({
                 "id": update.get("id"),
