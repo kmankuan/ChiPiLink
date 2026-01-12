@@ -159,10 +159,12 @@ export default function PushNotificationSubscribe({ variant = 'full' }) {
           <div className="text-sm text-muted-foreground">
             <p className="mb-2">Al activar las notificaciones push recibirás:</p>
             <ul className="space-y-1 ml-4">
-              <li>• Alertas de nuevos partidos y resultados</li>
-              <li>• Recordatorios de retos semanales</li>
-              <li>• Anuncios importantes del club</li>
-              <li>• Promociones y eventos especiales</li>
+              <li>• 💰 Alertas de saldo insuficiente</li>
+              <li>• 💸 Confirmaciones de transferencias recibidas</li>
+              <li>• 🔗 Solicitudes de conexión nuevas</li>
+              <li>• 🏓 Alertas de partidos y resultados</li>
+              <li>• 🏆 Recordatorios de retos semanales</li>
+              <li>• 📢 Anuncios importantes del club</li>
             </ul>
           </div>
         )}
