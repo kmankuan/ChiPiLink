@@ -18,6 +18,7 @@ import MisAcudidos from '../components/MisAcudidos';
 import MisCapacidades from '../components/MisCapacidades';
 import ServiciosSugeridos from '../components/ServiciosSugeridos';
 import TransferenciasDialog from '../components/TransferenciasDialog';
+import AlertasSaldo from '../components/AlertasSaldo';
 
 // Componentes de notificaciones
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
