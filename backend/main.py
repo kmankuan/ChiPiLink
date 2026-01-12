@@ -6,6 +6,7 @@ All modules are organized for future microservices separation.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import os
 import logging
 
@@ -16,12 +17,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Create uploads directory
+UPLOAD_DIR = "/app/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 # Create FastAPI app
 app = FastAPI(
     title="ChiPi Link API",
     description="Super App - Modular Monolith Backend",
     version="2.0.0"
 )
+
+# Mount static files for uploads
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # ============== IMPORT CORE ==============
 from core.database import db, client, close_database, create_indexes, seed_admin_user, seed_site_config, seed_translations, seed_landing_page
