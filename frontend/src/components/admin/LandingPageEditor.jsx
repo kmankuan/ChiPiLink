@@ -515,39 +515,20 @@ export default function LandingPageEditor() {
                       </div>
                     </div>
                     <Separator />
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <FileImage className="h-4 w-4" />
-                        URL del Logo
-                      </Label>
-                      <Input
-                        value={siteConfig.logo_url || ''}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, logo_url: e.target.value })}
-                        placeholder="https://ejemplo.com/logo.png"
-                      />
-                      {siteConfig.logo_url && (
-                        <img 
-                          src={siteConfig.logo_url} 
-                          alt="Logo Preview" 
-                          className="mt-2 max-h-16 object-contain"
-                          onError={(e) => e.target.style.display = 'none'}
-                        />
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Link2 className="h-4 w-4" />
-                        URL del Favicon
-                      </Label>
-                      <Input
-                        value={siteConfig.favicon_url || ''}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, favicon_url: e.target.value })}
-                        placeholder="https://ejemplo.com/favicon.ico"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Icono pequeño que aparece en la pestaña del navegador (32x32px)
-                      </p>
-                    </div>
+                    <ImageUploader
+                      label="Logo del Sitio"
+                      value={siteConfig.logo_url}
+                      onChange={(url) => setSiteConfig({ ...siteConfig, logo_url: url })}
+                      aspectRatio="4/1"
+                      maxSize={2}
+                    />
+                    <ImageUploader
+                      label="Favicon (Icono de pestaña)"
+                      value={siteConfig.favicon_url}
+                      onChange={(url) => setSiteConfig({ ...siteConfig, favicon_url: url })}
+                      aspectRatio="1/1"
+                      maxSize={1}
+                    />
                   </TabsContent>
 
                   {/* Analytics Tab */}
