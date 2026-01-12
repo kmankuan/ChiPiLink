@@ -1494,6 +1494,7 @@ Se unificaron `Landing.jsx` y `CommunityLanding.jsx` en un solo componente `Supe
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
 - [ ] Solicitud especial para re-compras (libro perdido)
 - [ ] Reporte de demanda para publishers
+- [ ] **Selector de plantillas prediseñadas** para bloques de texto (títulos, CTAs, anuncios con estilos consistentes)
 
 ### P3 - Baja Prioridad
 - [ ] Integración directa con Google Sheets (Service Account)
