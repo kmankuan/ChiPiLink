@@ -18,8 +18,7 @@ import { Header } from '@/components/layout/Header';
 import { NotificationBar } from '@/components/layout/NotificationBar';
 
 // Pages
-import Landing from '@/pages/Landing';
-import CommunityLanding from '@/pages/CommunityLanding';
+import SuperAppLanding from '@/pages/SuperAppLanding';
 import RapidPinPublicPage from '@/pages/RapidPinPublicPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
