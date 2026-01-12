@@ -1840,10 +1840,33 @@ function MondayConfigTab({ token }) {
 export default function BookOrdersAdmin() {
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('estudiantes');
+  const navigate = useNavigate();
 
   return (
     <div className="container mx-auto py-6 px-4 max-w-7xl">
+      {/* Header con navegación */}
       <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver
+          </Button>
+          <Separator orientation="vertical" className="h-6" />
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/admin')}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Panel Admin
+          </Button>
+        </div>
         <h1 className="text-3xl font-bold flex items-center gap-3">
           <BookOpen className="h-8 w-8" />
           Gestión de Libros Escolares
