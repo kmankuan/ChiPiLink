@@ -294,3 +294,39 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
         }
     }
 
+
+
+
+# ============== LANDING PAGE CONFIG ==============
+
+@router.get("/landing-page/config")
+async def get_landing_page_config(admin: dict = Depends(get_admin_user)):
+    """Get landing page block configuration"""
+    config = await db.site_config.find_one(
+        {"config_type": "landing_page_blocks"},
+        {"_id": 0}
+    )
+    if not config:
+        return {"blocks": {}}
+    return {"blocks": config.get("blocks", {})}
+
+
+@router.put("/landing-page/config")
+async def update_landing_page_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update landing page block configuration"""
+    blocks = data.get("blocks", {})
+    
+    await db.site_config.update_one(
+        {"config_type": "landing_page_blocks"},
+        {
+            "$set": {
+                "config_type": "landing_page_blocks",
+                "blocks": blocks,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_by": admin.get("cliente_id")
+            }
+        },
+        upsert=True
+    )
+    
+    return {"success": True, "message": "Configuración guardada"}
