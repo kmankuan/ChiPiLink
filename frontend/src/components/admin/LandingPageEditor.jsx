@@ -770,6 +770,7 @@ export default function LandingPageEditor() {
 // Block Configuration Editor Component
 function BlockConfigEditor({ block, template, onSave, saving }) {
   const [config, setConfig] = useState(block.config || {});
+  const uploadImage = useImageUpload();
 
   const handleChange = (key, value) => {
     setConfig(prev => ({ ...prev, [key]: value }));
