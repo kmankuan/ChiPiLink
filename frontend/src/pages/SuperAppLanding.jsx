@@ -494,30 +494,87 @@ export default function SuperAppLanding() {
 
         {/* Edit Mode Sidebar */}
         {isAdmin && isEditMode && (
-          <div className="fixed left-6 top-24 z-50 bg-card border rounded-xl shadow-lg p-4 w-64">
+          <div className="fixed left-6 top-24 z-50 bg-card border rounded-xl shadow-lg p-4 w-72 max-h-[calc(100vh-120px)] overflow-y-auto">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <Settings className="h-4 w-4" />
-              Bloques
+              Configurar Bloques
             </h3>
+            <p className="text-xs text-muted-foreground mb-4">
+              Usa las flechas para reordenar y el ojo para mostrar/ocultar
+            </p>
             <div className="space-y-2">
-              {[
-                { id: 'hero', label: 'Hero Carousel', icon: Image },
-                { id: 'quickAccess', label: 'Acceso Rápido', icon: Zap },
-                { id: 'announcements', label: 'Anuncios', icon: Bell },
-                { id: 'pinpanclub', label: 'PinPanClub', icon: Trophy },
-                { id: 'news', label: 'Noticias', icon: Newspaper },
-                { id: 'events', label: 'Eventos', icon: Calendar },
-                { id: 'gallery', label: 'Galería', icon: Image },
-              ].map(block => (
-                <button
-                  key={block.id}
-                  onClick={() => toggleBlockVisibility(block.id)}
-                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left text-sm transition-colors ${
-                    blockVisibility[block.id] 
-                      ? 'bg-primary/10 text-primary' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}
+              {sortedBlocks.map((block, idx) => {
+                const IconComponent = block.icon;
+                return (
+                  <div
+                    key={block.id}
+                    className={`flex items-center gap-2 p-2 rounded-lg text-sm transition-colors ${
+                      block.visible 
+                        ? 'bg-primary/10 border border-primary/20' 
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {/* Move buttons */}
+                    <div className="flex flex-col">
+                      <button
+                        onClick={() => moveBlock(block.id, 'up')}
+                        disabled={idx === 0}
+                        className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30"
+                      >
+                        <ChevronRight className="h-3 w-3 -rotate-90" />
+                      </button>
+                      <button
+                        onClick={() => moveBlock(block.id, 'down')}
+                        disabled={idx === sortedBlocks.length - 1}
+                        className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30"
+                      >
+                        <ChevronRight className="h-3 w-3 rotate-90" />
+                      </button>
+                    </div>
+                    
+                    {/* Block info */}
+                    <IconComponent className="h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1 truncate">{block.label}</span>
+                    
+                    {/* Visibility toggle */}
+                    <button
+                      onClick={() => toggleBlockVisibility(block.id)}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        block.visible 
+                          ? 'text-primary hover:bg-primary/20' 
+                          : 'text-muted-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {block.visible ? (
+                        <Eye className="h-4 w-4" />
+                      ) : (
+                        <EyeOff className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {hasChanges && (
+              <div className="mt-4 pt-4 border-t">
+                <Button 
+                  onClick={saveAllChanges} 
+                  disabled={saving}
+                  className="w-full"
+                  size="sm"
                 >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-2" />
+                  )}
+                  Guardar Cambios
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
                   {blockVisibility[block.id] ? (
                     <Eye className="h-4 w-4" />
                   ) : (
