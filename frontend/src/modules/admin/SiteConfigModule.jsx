@@ -36,12 +36,31 @@ export default function SiteConfigModule() {
     fetchConfig();
   }, []);
 
+  // Helper to safely get string value from potentially multilingual objects
+  const safeString = (value) => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') return value.es || value.en || '';
+    return '';
+  };
+
   const fetchConfig = async () => {
     try {
       setLoading(true);
       const res = await api.get('/admin/site-config');
       if (res.data) {
-        setConfig(prev => ({ ...prev, ...res.data }));
+        const data = res.data;
+        setConfig({
+          nombre_sitio: safeString(data.nombre_sitio),
+          descripcion: safeString(data.descripcion),
+          logo_url: safeString(data.logo_url),
+          favicon_url: safeString(data.favicon_url),
+          color_primario: data.color_primario || '#16a34a',
+          color_secundario: data.color_secundario || '#0f766e',
+          email_contacto: safeString(data.email_contacto),
+          telefono_contacto: safeString(data.telefono_contacto),
+          direccion: safeString(data.direccion),
+          footer_texto: safeString(data.footer_texto)
+        });
       }
     } catch (error) {
       console.error('Error loading config:', error);
