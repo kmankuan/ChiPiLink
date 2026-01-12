@@ -1,0 +1,97 @@
+{
+  "summary": "Completed testing of Sistema de Conexiones y Capacidades for ChiPiLink - Admin Permisos and Capacidades CRUD. All 16 backend API tests passed. Frontend Admin panel correctly shows Permisos table with 10 relation types and interactive switches, Nueva Capacidad dialog with complete form. CXGenie floating widget is NOT visible, support button (MessageCircle) is visible in header.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Admin > Clientes page",
+        "issues": ["'Error al cargar matrículas' toast appears on page load - this is a known issue from the old student system and doesn't affect the new Conexiones functionality"]
+      }
+    ]
+  },
+
+  "passed_tests": [
+    "GET /api/conexiones/admin/permisos-relacion - Returns list of configured permissions",
+    "PUT /api/conexiones/admin/permisos-relacion - Updates permissions for relation type (familiar/padre)",
+    "PUT /api/conexiones/admin/permisos-relacion - Updates permissions for relation type (especial/acudiente)",
+    "GET /api/conexiones/admin/permisos-relacion - Verifies permisos were persisted correctly",
+    "POST /api/conexiones/admin/capacidades - Creates new capacidad with all fields",
+    "POST /api/conexiones/admin/capacidades - Rejects duplicate capacidad_id (400)",
+    "PUT /api/conexiones/admin/capacidades/{id} - Updates existing capacidad",
+    "GET /api/conexiones/capacidades - Verifies capacidad was updated",
+    "DELETE /api/conexiones/admin/capacidades/{id} - Deactivates capacidad",
+    "GET /api/conexiones/capacidades - Verifies deactivated capacidad is filtered from public list",
+    "DELETE /api/conexiones/admin/capacidades/{id} - Returns 404 for non-existent capacidad",
+    "PUT /api/conexiones/admin/capacidades/{id} - Returns 404 for non-existent capacidad",
+    "GET/PUT /api/conexiones/admin/permisos-relacion - Requires admin authentication (401/403)",
+    "POST/PUT/DELETE /api/conexiones/admin/capacidades - Requires admin authentication (401/403)",
+    "POST /api/conexiones/admin/capacidades - Validates required fields (422)",
+    "PUT /api/conexiones/admin/permisos-relacion - Validates required fields (422)"
+  ],
+
+  "frontend_tests_passed": [
+    "CXGenie floating widget is NOT visible on any page",
+    "Support chat button (MessageCircle icon) is visible in header with title 'Soporte'",
+    "Cart button is visible next to support button in header",
+    "Admin > Clientes > Conexiones y Capacidades tab loads correctly",
+    "Stats cards show: 6 Capacidades, 1 Solicitudes Pendientes, 6 Permisos Configurados, 10 Tipos de Relación",
+    "Capacidades tab shows table with 6 capacidades (Cliente, Jugador en Ranking, Árbitro, Acudiente, Estudiante Tutoría, Instructor)",
+    "Permisos tab shows table with 10 relation types (Acudiente, Acudido, Padre/Madre, Hijo/a, Hermano/a, Tío/Tía, Abuelo/a, Amigo, Conocido, Compañero)",
+    "Permisos table has 4 permission columns: Transferir, Ver Wallet, Recargar, Alertas",
+    "Permisos table has Límite Diario input column",
+    "Switches in Permisos table are interactive and change state on click",
+    "Permisos changes auto-save (message shown: 'Los cambios se guardan automáticamente')",
+    "Nueva Capacidad button opens dialog",
+    "Nueva Capacidad dialog has all required fields: ID único, Tipo, Nombre ES/EN, Descripción, Ícono, Color, Membresía Req., Requiere aprobación, Activa",
+    "Nueva Capacidad dialog has color picker input",
+    "Nueva Capacidad dialog has Tipo dropdown with options",
+    "Nueva Capacidad dialog has Cancelar and Crear Capacidad buttons"
+  ],
+
+  "test_report_links": [
+    "/app/tests/test_admin_permisos_capacidades.py",
+    "/app/test_reports/pytest/pytest_results_admin_permisos.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "All admin endpoints properly require admin authentication",
+    "Capacidades CRUD endpoints correctly handle create, update, and soft-delete (deactivate)",
+    "Permisos update endpoint uses upsert for new relation types",
+    "Public GET /api/conexiones/capacidades correctly filters out inactive capacidades",
+    "Frontend AdminUsuariosConexiones component properly handles all CRUD operations with loading states and toast notifications"
+  ],
+
+  "updated_files": [
+    "/app/tests/test_admin_permisos_capacidades.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (16/16 tests passed)",
+    "frontend": "100% (all features working correctly)"
+  },
+
+  "test_credentials": {
+    "email": "admin@libreria.com",
+    "password": "admin",
+    "login_endpoint": "/api/auth-v2/login",
+    "auth_field": "contrasena"
+  },
+
+  "seed_data_creation": "Created TEST_ prefixed capacidades during testing (automatically deactivated after tests)",
+
+  "mocked_integrations": ["OneSignal Push Notifications"],
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Admin Permisos and Capacidades CRUD fully tested. Key endpoints: GET/PUT /api/conexiones/admin/permisos-relacion (list/update permissions by relation type), POST/PUT/DELETE /api/conexiones/admin/capacidades (CRUD for capacidades). Frontend: Admin > Clientes > Conexiones y Capacidades tab has 4 sub-tabs (Capacidades, Permisos, Solicitudes, Otorgar). Permisos table shows 10 relation types with interactive switches. Nueva Capacidad dialog has complete form with all fields. CXGenie floating widget removed - access via header support button. 'Error al cargar matrículas' toast is a known issue from old student system."
+}
