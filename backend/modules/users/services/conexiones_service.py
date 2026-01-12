@@ -278,7 +278,7 @@ class ConexionesService:
             return {"error": "Usuario destino no encontrado"}
         
         solicitud = {
-            "solicitud_id": f"sol_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "solicitud_id": f"sol_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{de_usuario_id[:8]}",
             "de_usuario_id": de_usuario_id,
             "de_usuario_nombre": f"{de_usuario.get('nombre', '')} {de_usuario.get('apellido', '')}".strip() if de_usuario else None,
             "para_usuario_id": para_usuario_id,
@@ -296,7 +296,49 @@ class ConexionesService:
         # Remove MongoDB _id before returning
         solicitud.pop("_id", None)
         
-        return {"success": True, "solicitud": solicitud}
+        # Enviar notificación push al destinatario
+        push_result = None
+        try:
+            from modules.notifications.services.push_service import push_notification_service
+            
+            de_nombre = solicitud["de_usuario_nombre"] or "Alguien"
+            subtipo_label = self._get_subtipo_label(subtipo)
+            
+            push_result = await push_notification_service.send_notification(
+                user_id=para_usuario_id,
+                category_id="connections",
+                title="🔗 Nueva Solicitud de Conexión",
+                body=f"{de_nombre} quiere conectarse contigo como {subtipo_label}",
+                data={
+                    "type": "connection_request",
+                    "solicitud_id": solicitud["solicitud_id"],
+                    "de_usuario_id": de_usuario_id,
+                    "action": "view_requests"
+                },
+                action_url="/mi-cuenta?tab=conexiones"
+            )
+        except Exception as e:
+            logger.error(f"Error enviando push notification para solicitud: {e}")
+        
+        return {"success": True, "solicitud": solicitud, "push_notification": push_result}
+    
+    def _get_subtipo_label(self, subtipo: str) -> str:
+        """Obtener etiqueta legible para subtipo de relación"""
+        labels = {
+            "acudiente": "Acudiente",
+            "acudido": "Acudido",
+            "padre": "Padre/Madre",
+            "hijo": "Hijo/a",
+            "hermano": "Hermano/a",
+            "tio": "Tío/Tía",
+            "abuelo": "Abuelo/a",
+            "primo": "Primo/a",
+            "amigo": "Amigo",
+            "conocido": "Conocido",
+            "companero": "Compañero",
+            "otro": "Otro"
+        }
+        return labels.get(subtipo, subtipo)
     
     async def get_solicitudes_pendientes(self, user_id: str) -> List[Dict]:
         """Obtener solicitudes pendientes para un usuario"""
