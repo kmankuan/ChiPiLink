@@ -107,6 +107,8 @@ export default function AdminDashboard() {
         return <OrdersModule />;
       case 'customers':
         return <CustomersModule />;
+      case 'memberships':
+        return <AdminMemberships />;
       case 'pinpanclub':
         return <PinpanClubModule />;
       case 'admin':
