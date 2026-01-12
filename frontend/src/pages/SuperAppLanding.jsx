@@ -715,5 +715,6 @@ export default function SuperAppLanding() {
           )}
         </main>
       </div>
+    </EditModeContext.Provider>
   );
 }
