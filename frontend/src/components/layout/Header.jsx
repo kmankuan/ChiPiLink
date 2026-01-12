@@ -290,9 +290,6 @@ export function Header() {
               <span className="sr-only">Carrito</span>
             </Button>
 
-            {/* Inline Edit Toggle (Admin only) */}
-            <InlineEditToggle />
-
             {/* Language Selector */}
             <LanguageSelector />
 
