@@ -1282,6 +1282,51 @@ Nuevo sistema de gestión de usuarios que unifica "Clientes", "Usuarios" y "Memb
 
 **Test Results:** 17/17 tests passed (100%) - iteration_26.json
 
+### 🆕 Transferencias Wallet y Alertas Bilaterales ✅ (Enero 12, 2026)
+Sistema completo de transferencias de wallet entre usuarios conectados y alertas bilaterales para saldo insuficiente.
+
+**Backend APIs:**
+- `POST /api/conexiones/transferir` - Transferir saldo entre usuarios conectados
+- `POST /api/conexiones/alerta-saldo-insuficiente` - Crear alerta bilateral
+- `GET /api/conexiones/mis-alertas` - Obtener alertas (como usuario o acudiente)
+- `POST /api/conexiones/alertas/{alerta_id}/resolver` - Marcar alerta como resuelta
+
+**Características de Transferencias:**
+- Requiere conexión entre usuarios con permiso `transferir_wallet`
+- Valida límite diario de transferencia por relación
+- Valida saldo suficiente antes de transferir
+- Registra historial de transferencias
+
+**Sistema de Alertas Bilaterales:**
+- Las alertas se envían al usuario y a sus acudientes automáticamente
+- Marcador `es_mia` o `es_de_acudido` para diferenciar
+- Acudientes pueden recargar saldo desde la alerta
+- Botón "Resolver" para marcar alertas como atendidas
+
+**Frontend Updates:**
+- Componente `AlertasSaldo` en `/mi-cuenta` (arriba de "Services for you")
+- Badge "Mi alerta" / "De acudido" según corresponda
+- Botón "Recargar" para acudientes con transferencia directa
+- Botón "Resolver" para cerrar alertas
+
+**Archivos creados/modificados:**
+- `/app/backend/modules/users/routes/conexiones.py` - Endpoints de alertas
+- `/app/backend/modules/users/services/conexiones_service.py` - Lógica de transferencias
+- `/app/frontend/src/modules/users/components/AlertasSaldo.jsx` - Componente UI
+
+**Test Results:** 20/20 tests passed (1 skipped) - iteration_27.json
+
+### 🆕 CXGenie Widget Movido al Header ✅ (Enero 12, 2026)
+El botón de soporte/chat se movió al header para mejor accesibilidad.
+
+**Cambios:**
+- Nuevo botón `MessageCircle` en el header junto al carrito
+- CSS para ocultar el widget flotante original
+- Función `toggleSupportChat()` para abrir el chat desde el header
+
+**Archivo modificado:**
+- `/app/frontend/src/components/layout/Header.jsx`
+
 ---
 
 ### P2 - Media Prioridad
