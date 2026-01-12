@@ -232,6 +232,46 @@ def get_default_notification_categories() -> List[Dict]:
             "priority": NotificationPriority.LOW.value,
             "module": "marketing",
             "sort_order": 8
+        },
+        {
+            "category_id": "wallet_alerts",
+            "name": {
+                "es": "Alertas de Wallet",
+                "en": "Wallet Alerts",
+                "zh": "钱包警报"
+            },
+            "description": {
+                "es": "Alertas de saldo insuficiente, transferencias, recargas",
+                "en": "Insufficient balance alerts, transfers, recharges",
+                "zh": "余额不足警报、转账、充值"
+            },
+            "icon": "💰",
+            "color": "#f59e0b",
+            "default_enabled": True,
+            "default_provider": NotificationProvider.AUTO.value,
+            "priority": NotificationPriority.HIGH.value,
+            "module": "wallet",
+            "sort_order": 0.5
+        },
+        {
+            "category_id": "connections",
+            "name": {
+                "es": "Conexiones",
+                "en": "Connections",
+                "zh": "连接"
+            },
+            "description": {
+                "es": "Solicitudes de conexión, aprobaciones, nuevos acudidos",
+                "en": "Connection requests, approvals, new dependents",
+                "zh": "连接请求、批准、新的受抚养人"
+            },
+            "icon": "🔗",
+            "color": "#8b5cf6",
+            "default_enabled": True,
+            "default_provider": NotificationProvider.AUTO.value,
+            "priority": NotificationPriority.NORMAL.value,
+            "module": "users",
+            "sort_order": 0.7
         }
     ]
 
