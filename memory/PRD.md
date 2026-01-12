@@ -1146,6 +1146,42 @@ Sistema de vinculación con flujo de aprobaciones:
 - [x] Notificaciones push para aprobaciones de vinculación
 - [x] Agregar enlace a "Mis Libros Escolares" en el menú principal
 - [x] Integración con Monday.com para seguimiento de pedidos
+- [x] **Chat con Monday.com Updates** - Comunicación bidireccional cliente ↔ Books de Light ✅ NEW (Enero 12, 2026)
+
+### 🆕 Chat con Monday.com Updates ✅ (Enero 12, 2026)
+Sistema de chat integrado que usa Monday.com Updates como canal de comunicación:
+
+**Características:**
+- Comunicación bidireccional entre cliente (en ChipiLink) y equipo de Books de Light (en Monday.com)
+- Los mensajes enviados desde la app aparecen como Updates en Monday.com
+- Los mensajes de Monday.com aparecen en el chat de la app
+- Auto-detección de origen del mensaje (cliente vs Books de Light)
+- Limpieza automática de prefijos y formato del autor
+
+**Flujo:**
+1. El pedido se sincroniza con Monday.com (automático al confirmar o manual vía admin)
+2. El cliente abre el pedido confirmado y hace clic en "Abrir Chat con Books de Light"
+3. El cliente puede enviar mensajes que aparecen en Monday.com
+4. El equipo de Books de Light responde desde Monday.com
+5. El cliente ve las respuestas en tiempo real (al refrescar o polling)
+
+**Endpoints API:**
+- `GET /api/store/monday/pedido/{pedido_id}/messages` - Obtener mensajes del chat
+- `POST /api/store/monday/pedido/{pedido_id}/message` - Enviar mensaje
+- `POST /api/store/monday/sync/{pedido_id}` - Sincronizar pedido con Monday.com (admin)
+
+**Componentes Frontend:**
+- `PedidoChat` - Panel de chat con historial y envío de mensajes
+- `PedidoDetalle` - Vista de detalle con botón para abrir/ocultar chat
+
+**Archivos:**
+- `/app/backend/modules/store/routes/monday.py`
+- `/app/backend/modules/store/services/monday_pedidos_service.py`
+- `/app/frontend/src/modules/store/MisPedidosLibros.jsx`
+
+**Test Results:** 15/15 tests passed (100%) - iteration_25.json
+
+---
 
 ### P2 - Media Prioridad
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
