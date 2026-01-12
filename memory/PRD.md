@@ -3,6 +3,24 @@
 ## Original Problem Statement
 Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanClub** para gestión de clubes de ping pong, incluyendo el sistema de ranking **Super Pin** y el nuevo sistema de partidos espontáneos **Rapid Pin**.
 
+También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
+
+## Latest Update (Enero 2026)
+
+### UI/UX Fixes Completados ✅
+| Issue | Descripción | Estado |
+|-------|-------------|--------|
+| Back Button | Botón "Volver" en `/mis-pedidos-libros` | ✅ Verificado |
+| Header Cleanup | Eliminado botón "Editar Texto" del header | ✅ Verificado |
+| Landing Page Editor | Panel de admin con controles funcionales (reordenar, mostrar/ocultar bloques) | ✅ Verificado |
+
+### Landing Page Unificada
+- `Landing.jsx` y `CommunityLanding.jsx` fusionados en `SuperAppLanding.jsx`
+- Editor de bloques para admins con:
+  - Reordenamiento (flechas arriba/abajo)
+  - Toggle visibilidad (ícono de ojo)
+  - Guardado de configuración
+
 ## Módulos Activos en Admin
 
 | Módulo | Descripción | Estado |
