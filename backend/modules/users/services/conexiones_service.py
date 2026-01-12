@@ -640,19 +640,25 @@ class ConexionesService:
         descripcion: str
     ) -> Dict:
         """Crear alerta de saldo insuficiente (envía a usuario y acudientes)"""
-        # Obtener acudientes
+        from modules.notifications.services.push_service import push_notification_service
+        
+        # Obtener usuario
         usuario = await db.auth_users.find_one({"cliente_id": usuario_id})
         if not usuario:
             return {"error": "Usuario no encontrado"}
         
+        usuario_nombre = f"{usuario.get('nombre', '')} {usuario.get('apellido', '')}".strip() or "Usuario"
+        
+        # Obtener acudientes con permiso de alertas
         acudientes_ids = []
         for con in usuario.get("conexiones", []):
             if con.get("subtipo") == "acudiente" and con.get("permisos", {}).get("recibir_alertas"):
                 acudientes_ids.append(con["user_id"])
         
         alerta = {
-            "alerta_id": f"alrt_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "alerta_id": f"alrt_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{usuario_id[:8]}",
             "usuario_id": usuario_id,
+            "usuario_nombre": usuario_nombre,
             "acudientes_ids": acudientes_ids,
             "monto_requerido": monto_requerido,
             "saldo_actual": saldo_actual,
@@ -662,16 +668,55 @@ class ConexionesService:
         }
         
         await db.alertas_wallet.insert_one(alerta)
-        
-        # Remove MongoDB _id before returning
         alerta.pop("_id", None)
         
-        # TODO: Enviar notificaciones push
-        # await send_push_notification(usuario_id, alerta)
-        # for acudiente_id in acudientes_ids:
-        #     await send_push_notification(acudiente_id, alerta)
+        # Enviar notificaciones push
+        push_results = {"usuario": None, "acudientes": []}
         
-        return {"success": True, "alerta": alerta}
+        try:
+            # Notificar al usuario
+            push_results["usuario"] = await push_notification_service.send_notification(
+                user_id=usuario_id,
+                category_id="wallet_alerts",
+                title="💰 Saldo Insuficiente",
+                body=f"Necesitas ${monto_requerido:.2f} para: {descripcion}. Saldo actual: ${saldo_actual:.2f}",
+                data={
+                    "type": "wallet_alert",
+                    "alerta_id": alerta["alerta_id"],
+                    "action": "view_wallet"
+                },
+                action_url="/mi-cuenta?tab=wallet"
+            )
+            
+            # Notificar a acudientes
+            for acudiente_id in acudientes_ids:
+                result = await push_notification_service.send_notification(
+                    user_id=acudiente_id,
+                    category_id="wallet_alerts",
+                    title="🔔 Alerta de Acudido",
+                    body=f"{usuario_nombre} necesita ${monto_requerido:.2f} para: {descripcion}",
+                    data={
+                        "type": "acudido_wallet_alert",
+                        "alerta_id": alerta["alerta_id"],
+                        "acudido_id": usuario_id,
+                        "action": "recargar_acudido"
+                    },
+                    action_url="/mi-cuenta?tab=acudidos"
+                )
+                push_results["acudientes"].append({
+                    "acudiente_id": acudiente_id,
+                    "result": result
+                })
+                
+        except Exception as e:
+            logger.error(f"Error enviando push notifications: {e}")
+            push_results["error"] = str(e)
+        
+        return {
+            "success": True, 
+            "alerta": alerta,
+            "push_notifications": push_results
+        }
     
     # ============== CAPACIDADES ==============
     
