@@ -487,8 +487,6 @@ class TestAdminSolicitudesEndpoint:
             assert "para_usuario_id" in sol, "solicitud should have para_usuario_id"
             assert "estado" in sol, "solicitud should have estado"
             print(f"   - Sample: {sol.get('solicitud_id')} from {sol.get('de_usuario_nombre')} to {sol.get('para_usuario_nombre')}")
-        
-        return solicitudes
     
     def test_admin_responder_solicitud_returns_push_notification(self):
         """Test admin responding to request returns push_notification"""
@@ -527,8 +525,255 @@ class TestAdminSolicitudesEndpoint:
         assert "push_notification" in data, "Response should have 'push_notification' field"
         
         print(f"✅ Admin response includes push_notification: {data.get('push_notification')}")
+
+
+class TestPushNotificationE2EFlow:
+    """End-to-end tests for push notification flow in connection requests"""
+    
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        """Setup test - login as admin"""
+        self.session = requests.Session()
+        self.session.headers.update({"Content-Type": "application/json"})
         
-        return data
+        # Login as admin
+        login_response = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
+            "email": "admin@libreria.com",
+            "contrasena": "admin"
+        })
+        assert login_response.status_code == 200, f"Login failed: {login_response.text}"
+        
+        login_data = login_response.json()
+        self.token = login_data.get("token")
+        self.user_id = login_data.get("user", {}).get("cliente_id")
+        assert self.token, "No token received"
+        
+        self.session.headers.update({"Authorization": f"Bearer {self.token}"})
+        
+        yield
+    
+    def test_e2e_crear_solicitud_push_notification_structure(self):
+        """E2E: Test creating connection request returns correct push_notification structure"""
+        # Search for a user to send request to
+        search_response = self.session.get(f"{BASE_URL}/api/conexiones/buscar?q=test")
+        assert search_response.status_code == 200
+        
+        usuarios = search_response.json().get("usuarios", [])
+        if not usuarios:
+            pytest.skip("No users found to test with")
+        
+        # Find a user without existing connection or pending request
+        target_user = None
+        conexiones_response = self.session.get(f"{BASE_URL}/api/conexiones/mis-conexiones")
+        conexiones = conexiones_response.json().get("conexiones", [])
+        connected_ids = [c.get("user_id") for c in conexiones]
+        
+        enviadas_response = self.session.get(f"{BASE_URL}/api/conexiones/solicitudes/enviadas")
+        enviadas = enviadas_response.json().get("solicitudes", [])
+        pending_ids = [s.get("para_usuario_id") for s in enviadas if s.get("estado") == "pendiente"]
+        
+        for user in usuarios:
+            user_id = user.get("cliente_id")
+            if user_id not in connected_ids and user_id not in pending_ids:
+                target_user = user
+                break
+        
+        if not target_user:
+            pytest.skip("No suitable user found (all have connections or pending requests)")
+        
+        # Create connection request
+        timestamp = datetime.now().strftime("%H%M%S")
+        response = self.session.post(f"{BASE_URL}/api/conexiones/solicitar", json={
+            "para_usuario_id": target_user.get("cliente_id"),
+            "tipo": "social",
+            "subtipo": "amigo",
+            "etiqueta": f"TEST_e2e_{timestamp}",
+            "mensaje": f"E2E test {timestamp}"
+        })
+        
+        if response.status_code == 400:
+            error = response.json().get("detail", "")
+            if "Ya existe" in error:
+                pytest.skip("Connection already exists")
+            pytest.fail(f"Unexpected error: {error}")
+        
+        assert response.status_code == 200, f"Failed: {response.text}"
+        
+        data = response.json()
+        
+        # Verify complete response structure
+        assert data.get("success") == True
+        assert "solicitud" in data
+        assert "push_notification" in data
+        
+        solicitud = data["solicitud"]
+        push = data["push_notification"]
+        
+        # Verify solicitud
+        assert solicitud.get("solicitud_id")
+        assert solicitud.get("estado") == "pendiente"
+        assert solicitud.get("tipo") == "social"
+        assert solicitud.get("subtipo") == "amigo"
+        
+        # Verify push_notification structure (in preview, success=false is expected)
+        assert push is not None, "push_notification should not be None"
+        
+        # In preview environment, we expect success=false with reason
+        if push.get("success") == False:
+            assert "reason" in push or "sent" in push, "Should have reason or sent field"
+            print(f"✅ Push notification attempted (preview mode): {push}")
+        else:
+            print(f"✅ Push notification sent: {push}")
+        
+        # Store for cleanup
+        self.test_solicitud_id = solicitud.get("solicitud_id")
+        print(f"✅ E2E: Created solicitud {self.test_solicitud_id} with push_notification")
+    
+    def test_e2e_responder_aceptar_push_notification_structure(self):
+        """E2E: Test accepting request returns correct push_notification with category"""
+        # First create a request to respond to
+        search_response = self.session.get(f"{BASE_URL}/api/conexiones/buscar?q=arch")
+        usuarios = search_response.json().get("usuarios", [])
+        
+        if not usuarios:
+            pytest.skip("No users found")
+        
+        # Find user without connection
+        conexiones = self.session.get(f"{BASE_URL}/api/conexiones/mis-conexiones").json().get("conexiones", [])
+        connected_ids = [c.get("user_id") for c in conexiones]
+        
+        target_user = None
+        for user in usuarios:
+            if user.get("cliente_id") not in connected_ids:
+                target_user = user
+                break
+        
+        if not target_user:
+            pytest.skip("No suitable user found")
+        
+        # Create request
+        timestamp = datetime.now().strftime("%H%M%S")
+        create_response = self.session.post(f"{BASE_URL}/api/conexiones/solicitar", json={
+            "para_usuario_id": target_user.get("cliente_id"),
+            "tipo": "social",
+            "subtipo": "companero",
+            "mensaje": f"E2E accept test {timestamp}"
+        })
+        
+        if create_response.status_code == 400:
+            # Try to find existing pending request
+            enviadas = self.session.get(f"{BASE_URL}/api/conexiones/solicitudes/enviadas").json().get("solicitudes", [])
+            pending = [s for s in enviadas if s.get("estado") == "pendiente"]
+            if not pending:
+                pytest.skip("No pending requests available")
+            solicitud_id = pending[0].get("solicitud_id")
+        else:
+            assert create_response.status_code == 200
+            solicitud_id = create_response.json().get("solicitud", {}).get("solicitud_id")
+        
+        # Admin accepts the request
+        accept_response = self.session.post(
+            f"{BASE_URL}/api/conexiones/admin/solicitudes/{solicitud_id}/responder",
+            json={"aceptar": True}
+        )
+        
+        if accept_response.status_code == 400:
+            error = accept_response.json().get("detail", "")
+            if "ya fue respondida" in error.lower():
+                pytest.skip("Request already responded")
+            pytest.fail(f"Unexpected error: {error}")
+        
+        assert accept_response.status_code == 200
+        
+        data = accept_response.json()
+        
+        # Verify response
+        assert data.get("success") == True
+        assert data.get("estado") == "aceptada"
+        assert "push_notification" in data
+        
+        push = data["push_notification"]
+        assert push is not None
+        
+        # Verify category_id is 'connections'
+        if "category_id" in push:
+            assert push.get("category_id") == "connections", f"Expected category 'connections', got {push.get('category_id')}"
+            print(f"✅ Push notification uses category 'connections'")
+        
+        print(f"✅ E2E: Accepted request with push_notification: {push}")
+    
+    def test_e2e_responder_rechazar_push_notification_structure(self):
+        """E2E: Test rejecting request returns correct push_notification with category"""
+        # Search for users
+        search_response = self.session.get(f"{BASE_URL}/api/conexiones/buscar?q=test")
+        usuarios = search_response.json().get("usuarios", [])
+        
+        if not usuarios:
+            pytest.skip("No users found")
+        
+        # Find user without connection
+        conexiones = self.session.get(f"{BASE_URL}/api/conexiones/mis-conexiones").json().get("conexiones", [])
+        connected_ids = [c.get("user_id") for c in conexiones]
+        
+        target_user = None
+        for user in usuarios:
+            if user.get("cliente_id") not in connected_ids:
+                target_user = user
+                break
+        
+        if not target_user:
+            pytest.skip("No suitable user found")
+        
+        # Create request
+        timestamp = datetime.now().strftime("%H%M%S")
+        create_response = self.session.post(f"{BASE_URL}/api/conexiones/solicitar", json={
+            "para_usuario_id": target_user.get("cliente_id"),
+            "tipo": "social",
+            "subtipo": "conocido",
+            "mensaje": f"E2E reject test {timestamp}"
+        })
+        
+        if create_response.status_code == 400:
+            # Try to find existing pending request
+            enviadas = self.session.get(f"{BASE_URL}/api/conexiones/solicitudes/enviadas").json().get("solicitudes", [])
+            pending = [s for s in enviadas if s.get("estado") == "pendiente"]
+            if not pending:
+                pytest.skip("No pending requests available")
+            solicitud_id = pending[0].get("solicitud_id")
+        else:
+            assert create_response.status_code == 200
+            solicitud_id = create_response.json().get("solicitud", {}).get("solicitud_id")
+        
+        # Admin rejects the request
+        reject_response = self.session.post(
+            f"{BASE_URL}/api/conexiones/admin/solicitudes/{solicitud_id}/responder",
+            json={"aceptar": False}
+        )
+        
+        if reject_response.status_code == 400:
+            error = reject_response.json().get("detail", "")
+            if "ya fue respondida" in error.lower():
+                pytest.skip("Request already responded")
+            pytest.fail(f"Unexpected error: {error}")
+        
+        assert reject_response.status_code == 200
+        
+        data = reject_response.json()
+        
+        # Verify response
+        assert data.get("success") == True
+        assert data.get("estado") == "rechazada"
+        assert "push_notification" in data
+        
+        push = data["push_notification"]
+        assert push is not None
+        
+        # Verify category_id is 'connections'
+        if "category_id" in push:
+            assert push.get("category_id") == "connections", f"Expected category 'connections', got {push.get('category_id')}"
+            print(f"✅ Push notification uses category 'connections'")
+        
+        print(f"✅ E2E: Rejected request with push_notification: {push}")
 
 
 if __name__ == "__main__":
