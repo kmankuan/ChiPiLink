@@ -353,8 +353,14 @@ class TestPushNotificationContent:
             assert response.status_code == 200
             data = response.json()
             
-            assert data.get("icon") == "🔗", f"Expected icon 🔗, got {data.get('icon')}"
-            print(f"✅ connections category has correct icon: {data.get('icon')}")
+            # Response may have category nested inside 'category' key
+            category_data = data.get("category", data)
+            
+            assert category_data.get("icon") == "🔗", f"Expected icon 🔗, got {category_data.get('icon')}"
+            assert category_data.get("color") == "#8b5cf6", f"Expected color #8b5cf6, got {category_data.get('color')}"
+            print(f"✅ connections category has correct properties:")
+            print(f"   - icon: {category_data.get('icon')}")
+            print(f"   - color: {category_data.get('color')}")
     
     def test_code_review_crear_solicitud_push_content(self):
         """Code review: Verify crear_solicitud sends correct push notification content"""
