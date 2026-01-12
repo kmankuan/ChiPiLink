@@ -643,6 +643,112 @@ function EditorPedido({ pedido, onUpdate, onConfirmar, token }) {
   );
 }
 
+// Componente de Detalle de Pedido con Chat
+function PedidoDetalle({ pedido, token, userName, onBack, onUpdate }) {
+  const [showChat, setShowChat] = useState(false);
+  
+  // Solo mostrar chat si el pedido ya está confirmado (no en borrador)
+  const canChat = pedido && pedido.estado !== 'borrador';
+  
+  return (
+    <div className="space-y-4">
+      {/* Botón volver */}
+      <Button variant="ghost" onClick={onBack} className="mb-2">
+        <X className="h-4 w-4 mr-2" />
+        Volver a lista
+      </Button>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Detalle del pedido */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Pedido #{pedido.pedido_id?.slice(-8)}
+                </CardTitle>
+                <CardDescription>
+                  {pedido.estudiante_nombre} - {pedido.estudiante_grado}
+                </CardDescription>
+              </div>
+              <EstadoBadge estado={pedido.estado} />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Items */}
+            <div className="space-y-2">
+              <h4 className="font-medium">Libros del Pedido</h4>
+              {pedido.items?.map((item) => (
+                <div 
+                  key={item.item_id}
+                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="font-medium">{item.libro_nombre}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Código: {item.libro_codigo}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-medium">${item.subtotal?.toFixed(2)}</div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Totales */}
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${pedido.subtotal?.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold">
+                <span>Total</span>
+                <span>${pedido.total?.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            {/* Info del pedido */}
+            <Separator />
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p>Creado: {new Date(pedido.fecha_creacion).toLocaleDateString()}</p>
+              {pedido.fecha_confirmacion && (
+                <p>Confirmado: {new Date(pedido.fecha_confirmacion).toLocaleDateString()}</p>
+              )}
+              {pedido.notas && <p>Notas: {pedido.notas}</p>}
+            </div>
+          </CardContent>
+          
+          {canChat && (
+            <CardFooter>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setShowChat(!showChat)}
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                {showChat ? 'Ocultar Chat' : 'Abrir Chat con Books de Light'}
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
+        
+        {/* Chat */}
+        {canChat && showChat && (
+          <PedidoChat 
+            pedidoId={pedido.pedido_id}
+            token={token}
+            userName={userName}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Componente de lista de pedidos
 function ListaPedidos({ pedidos, onSelect }) {
   if (!pedidos || pedidos.length === 0) {
