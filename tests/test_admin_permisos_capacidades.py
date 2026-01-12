@@ -293,30 +293,31 @@ class TestAdminPermisosCapacidades:
         print(f"✓ Capacidad deactivated: {test_cap_id}")
     
     def test_10_verify_capacidad_deactivated(self):
-        """GET /api/conexiones/capacidades - Verify capacidad was deactivated"""
+        """GET /api/conexiones/capacidades - Verify deactivated capacidad is NOT in public list"""
         self.get_auth_token()
         
         test_cap_id = getattr(self.__class__, 'test_capacidad_id', None)
         if not test_cap_id:
             pytest.skip("No test capacidad created")
         
+        # The public endpoint only returns active capacidades
         response = self.session.get(f"{BASE_URL}/api/conexiones/capacidades")
         assert response.status_code == 200
         
         data = response.json()
         capacidades = data.get("capacidades", [])
         
-        # Find our test capacidad
+        # Find our test capacidad - it should NOT be in the list (filtered out)
         test_cap = None
         for cap in capacidades:
             if cap.get("capacidad_id") == test_cap_id:
                 test_cap = cap
                 break
         
-        assert test_cap is not None, f"Test capacidad {test_cap_id} should still exist"
-        assert test_cap.get("activa") == False, "Capacidad should be deactivated"
+        # Deactivated capacidad should NOT appear in public list
+        assert test_cap is None, f"Deactivated capacidad {test_cap_id} should NOT appear in public list"
         
-        print(f"✓ Capacidad deactivation verified: activa={test_cap.get('activa')}")
+        print(f"✓ Deactivated capacidad correctly filtered from public list")
     
     def test_11_delete_nonexistent_capacidad(self):
         """DELETE /api/conexiones/admin/capacidades/{id} - Non-existent returns 404"""
