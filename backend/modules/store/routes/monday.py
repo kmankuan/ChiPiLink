@@ -1,9 +1,10 @@
 """
 Store Module - Monday.com Integration Routes
 Endpoints para configurar y sincronizar pedidos con Monday.com
+Soporta múltiples workspaces y tableros
 """
 from fastapi import APIRouter, HTTPException, Depends
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 from pydantic import BaseModel
 
 from core.auth import get_admin_user, get_current_user
@@ -31,7 +32,104 @@ class MondayConfigRequest(BaseModel):
     }
 
 
-# ============== ENDPOINTS ==============
+class AddWorkspaceRequest(BaseModel):
+    """Request para agregar un nuevo workspace"""
+    api_key: str
+    name: Optional[str] = None
+
+
+class ApiKeyRequest(BaseModel):
+    """Request para configurar API Key"""
+    api_key: str
+
+
+# ============== WORKSPACE MANAGEMENT ==============
+
+@router.get("/workspaces")
+async def get_workspaces(
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Obtener lista de workspaces configurados.
+    Cada workspace tiene su propia API Key.
+    """
+    result = await monday_pedidos_service.get_workspaces()
+    return result
+
+
+@router.post("/workspaces")
+async def add_workspace(
+    request: AddWorkspaceRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Agregar un nuevo workspace con su API Key.
+    La API Key se valida conectándose a Monday.com.
+    """
+    result = await monday_pedidos_service.add_workspace(
+        api_key=request.api_key,
+        name=request.name
+    )
+    
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    
+    return result
+
+
+@router.post("/workspaces/{workspace_id}/activate")
+async def activate_workspace(
+    workspace_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Establecer un workspace como el activo para las operaciones.
+    """
+    result = await monday_pedidos_service.set_active_workspace(workspace_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Workspace no encontrado")
+    
+    return {"success": True, "message": "Workspace activado"}
+
+
+@router.delete("/workspaces/{workspace_id}")
+async def remove_workspace(
+    workspace_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Eliminar un workspace de la configuración.
+    """
+    result = await monday_pedidos_service.remove_workspace(workspace_id)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Workspace no encontrado")
+    
+    return {"success": True, "message": "Workspace eliminado"}
+
+
+@router.post("/api-key")
+async def set_api_key(
+    request: ApiKeyRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Configurar o actualizar la API Key principal de Monday.com.
+    Equivalente a agregar el primer workspace.
+    """
+    result = await monday_pedidos_service.add_workspace(
+        api_key=request.api_key,
+        name="Principal"
+    )
+    
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    
+    return {"success": True, "message": "API Key configurada"}
+
+
+# ============== ENDPOINTS EXISTENTES ==============
 
 @router.get("/test-connection")
 async def test_monday_connection(
