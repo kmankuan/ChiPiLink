@@ -575,29 +575,17 @@ export default function SuperAppLanding() {
             )}
           </div>
         )}
-                  {blockVisibility[block.id] ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                  <block.icon className="h-4 w-4" />
-                  {block.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
-        <main className={`container mx-auto px-4 py-8 space-y-12 ${isEditMode ? 'ml-72' : ''}`}>
+        <main className={`container mx-auto px-4 py-8 space-y-12 ${isEditMode ? 'ml-80' : ''}`}>
           {/* Hero Section */}
-          {blockVisibility.hero && (
+          {isBlockVisible('hero') && (
             <section data-block="hero">
               <HeroCarousel posts={destacados || []} />
             </section>
           )}
 
           {/* Quick Access */}
-          {blockVisibility.quickAccess && (
+          {isBlockVisible('quickAccess') && (
             <section data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
               <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
               <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
@@ -609,7 +597,7 @@ export default function SuperAppLanding() {
           )}
 
           {/* Announcements Banner */}
-          {blockVisibility.announcements && anuncios && anuncios.length > 0 && (
+          {isBlockVisible('announcements') && anuncios && anuncios.length > 0 && (
             <section data-block="announcements" className="bg-primary/5 rounded-2xl p-4 md:p-6">
               <div className="flex items-start gap-4">
                 <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
