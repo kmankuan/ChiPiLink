@@ -3,6 +3,34 @@
   min-height: 100vh;
 }
 
+/* ===== HIDE CXGenie/Emergent Floating Widgets ===== */
+/* Access support via header button instead */
+[class*="cxgenie"],
+[class*="CXGenie"],
+[id*="cxgenie"],
+[id*="CXGenie"],
+[data-cxgenie],
+[data-bid],
+[data-aid],
+.cxgenie-widget-button,
+.cxgenie-launcher,
+.cxgenie-floating,
+#cxgenie-floating-button,
+#cxgenie-widget,
+#cxgenie-chat-widget,
+iframe[src*="cxgenie"],
+iframe[src*="widget.cxgenie"],
+div[style*="position: fixed"][style*="bottom"][style*="right"]:has(iframe),
+/* Target common floating chat widget patterns */
+div[style*="position: fixed"][style*="z-index: 9999"],
+div[style*="position: fixed"][style*="z-index: 99999"],
+div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Remove default App-header styles - using Tailwind now */
 .App-logo {
   height: 40vmin;
