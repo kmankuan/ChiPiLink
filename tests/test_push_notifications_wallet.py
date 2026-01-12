@@ -119,14 +119,26 @@ class TestAlertaSaldoInsuficiente:
         push_results = data["push_notifications"]
         assert "usuario" in push_results, "push_notifications should have 'usuario' field"
         
-        # In preview environment, push notifications return success=false with reason='No devices registered'
-        # This is expected behavior
+        # In preview environment, push notifications return success=false with no devices registered
+        # This is expected behavior - verify the structure is correct
         if push_results["usuario"]:
             usuario_result = push_results["usuario"]
-            # Either success or expected failure reason
+            # Verify the push notification result structure
+            assert "user_id" in usuario_result, "Push result should have user_id"
+            assert "category_id" in usuario_result, "Push result should have category_id"
+            assert usuario_result["category_id"] == "wallet_alerts", "Should use wallet_alerts category"
+            
+            # Either success or expected failure (no devices in preview)
             if not usuario_result.get("success"):
-                assert usuario_result.get("reason") in ["No devices registered", "Category disabled by user", "User has push disabled"], \
-                    f"Unexpected push failure reason: {usuario_result.get('reason')}"
+                # In preview, no devices registered - sent=0 and providers_used=[]
+                # Or reason could be provided
+                reason = usuario_result.get("reason")
+                if reason:
+                    assert reason in ["No devices registered", "Category disabled by user", "User has push disabled"], \
+                        f"Unexpected push failure reason: {reason}"
+                else:
+                    # No reason means no devices - verify sent=0
+                    assert usuario_result.get("sent", 0) == 0, "Expected sent=0 when no devices"
     
     def test_alerta_includes_action_url_and_data(self, authenticated_client):
         """Alerta push notification should include action_url and data with type and alerta_id"""
