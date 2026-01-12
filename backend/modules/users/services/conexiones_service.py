@@ -627,6 +627,46 @@ class ConexionesService:
         }
         
         await db.transferencias_wallet.insert_one(transferencia)
+        transferencia.pop("_id", None)
+        
+        # Enviar notificaciones push
+        try:
+            from modules.notifications.services.push_service import push_notification_service
+            
+            de_nombre = f"{de_usuario.get('nombre', '')} {de_usuario.get('apellido', '')}".strip() or "Alguien"
+            para_nombre = f"{para_usuario.get('nombre', '')} {para_usuario.get('apellido', '')}".strip() or "Usuario"
+            
+            # Notificar al remitente
+            await push_notification_service.send_notification(
+                user_id=de_usuario_id,
+                category_id="wallet_alerts",
+                title="💸 Transferencia Enviada",
+                body=f"Enviaste ${monto:.2f} a {para_nombre}",
+                data={
+                    "type": "transfer_sent",
+                    "transferencia_id": transferencia["transferencia_id"],
+                    "monto": monto
+                },
+                action_url="/mi-cuenta?tab=wallet"
+            )
+            
+            # Notificar al destinatario
+            await push_notification_service.send_notification(
+                user_id=para_usuario_id,
+                category_id="wallet_alerts",
+                title="💰 Transferencia Recibida",
+                body=f"{de_nombre} te envió ${monto:.2f}" + (f" - {mensaje}" if mensaje else ""),
+                data={
+                    "type": "transfer_received",
+                    "transferencia_id": transferencia["transferencia_id"],
+                    "monto": monto,
+                    "de_usuario_id": de_usuario_id
+                },
+                action_url="/mi-cuenta?tab=wallet"
+            )
+            
+        except Exception as e:
+            logger.error(f"Error enviando push notifications para transferencia: {e}")
         
         return {"success": True, "transferencia": transferencia}
     
