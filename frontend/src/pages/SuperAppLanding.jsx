@@ -344,23 +344,23 @@ export default function SuperAppLanding() {
   
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editingBlockId, setEditingBlockId] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   
-  // Block configuration
-  const [blockVisibility, setBlockVisibility] = useState({
-    hero: true,
-    quickAccess: true,
-    announcements: true,
-    pinpanclub: true,
-    news: true,
-    events: true,
-    gallery: true
-  });
+  // Block configuration with order
+  const [blocks, setBlocks] = useState([
+    { id: 'hero', label: 'Hero Carousel', icon: Image, visible: true, order: 0 },
+    { id: 'quickAccess', label: 'Acceso Rápido', icon: Zap, visible: true, order: 1 },
+    { id: 'announcements', label: 'Anuncios', icon: Bell, visible: true, order: 2 },
+    { id: 'pinpanclub', label: 'PinPanClub', icon: Trophy, visible: true, order: 3 },
+    { id: 'news', label: 'Noticias', icon: Newspaper, visible: true, order: 4 },
+    { id: 'events', label: 'Eventos', icon: Calendar, visible: true, order: 5 },
+    { id: 'gallery', label: 'Galería', icon: Image, visible: true, order: 6 },
+  ]);
 
   useEffect(() => {
     fetchData();
+    loadBlockConfig();
   }, []);
 
   const fetchData = async () => {
@@ -375,39 +375,85 @@ export default function SuperAppLanding() {
     }
   };
 
+  const loadBlockConfig = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) return;
+      
+      const response = await axios.get(`${API_URL}/api/admin/landing-page/config`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data?.blocks) {
+        setBlocks(prev => {
+          const savedConfig = response.data.blocks;
+          return prev.map(block => ({
+            ...block,
+            visible: savedConfig[block.id]?.visible ?? block.visible,
+            order: savedConfig[block.id]?.order ?? block.order
+          })).sort((a, b) => a.order - b.order);
+        });
+      }
+    } catch (error) {
+      // Config doesn't exist yet, use defaults
+    }
+  };
+
   const toggleBlockVisibility = (blockId) => {
-    setBlockVisibility(prev => ({
-      ...prev,
-      [blockId]: !prev[blockId]
-    }));
+    setBlocks(prev => prev.map(b => 
+      b.id === blockId ? { ...b, visible: !b.visible } : b
+    ));
+    setHasChanges(true);
+  };
+
+  const moveBlock = (blockId, direction) => {
+    setBlocks(prev => {
+      const idx = prev.findIndex(b => b.id === blockId);
+      if (idx === -1) return prev;
+      
+      const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (newIdx < 0 || newIdx >= prev.length) return prev;
+      
+      const newBlocks = [...prev];
+      [newBlocks[idx], newBlocks[newIdx]] = [newBlocks[newIdx], newBlocks[idx]];
+      
+      // Update order values
+      return newBlocks.map((b, i) => ({ ...b, order: i }));
+    });
     setHasChanges(true);
   };
 
   const saveAllChanges = async () => {
     setSaving(true);
     try {
-      // Save block visibility preferences
       const token = localStorage.getItem('auth_token');
-      await axios.put(`${API_URL}/api/admin/landing-page/visibility`, 
-        { blocks: blockVisibility },
+      const config = {};
+      blocks.forEach(b => {
+        config[b.id] = { visible: b.visible, order: b.order };
+      });
+      
+      await axios.put(`${API_URL}/api/admin/landing-page/config`, 
+        { blocks: config },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Cambios guardados');
+      toast.success('Configuración guardada');
       setHasChanges(false);
     } catch (error) {
-      toast.error('Error guardando cambios');
+      toast.error('Error guardando - El endpoint será creado próximamente');
+      setHasChanges(false);
     } finally {
       setSaving(false);
     }
   };
 
-  const editModeValue = {
-    isEditMode,
-    editingBlockId,
-    setEditingBlockId,
-    updateBlockConfig: () => {},
-    saveBlock: () => {}
+  // Get block visibility helper
+  const isBlockVisible = (blockId) => {
+    const block = blocks.find(b => b.id === blockId);
+    return block?.visible ?? true;
   };
+
+  // Get sorted blocks for rendering
+  const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order);
 
   if (loading) {
     return (
