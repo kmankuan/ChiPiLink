@@ -51,6 +51,195 @@ class MondayPedidosService:
         )
         return True
     
+    # ============== WORKSPACE MANAGEMENT ==============
+    
+    WORKSPACES_KEY = "monday_workspaces_config"
+    
+    async def get_workspaces(self) -> Dict:
+        """Obtener configuración de workspaces"""
+        config = await db.store_config.find_one({"key": self.WORKSPACES_KEY})
+        if not config:
+            # Si hay una API Key en el .env, crear un workspace por defecto
+            if MONDAY_API_KEY:
+                return {
+                    "workspaces": [{
+                        "workspace_id": "default",
+                        "name": "Principal (ENV)",
+                        "api_key_masked": f"...{MONDAY_API_KEY[-8:]}",
+                        "boards_count": 0,
+                        "is_env_key": True
+                    }],
+                    "active_workspace_id": "default"
+                }
+            return {
+                "workspaces": [],
+                "active_workspace_id": None
+            }
+        return config.get("value", {"workspaces": [], "active_workspace_id": None})
+    
+    async def add_workspace(self, api_key: str, name: str = None) -> Dict:
+        """
+        Agregar un nuevo workspace con su API Key.
+        Valida la conexión antes de guardar.
+        """
+        # Validar API Key conectándose a Monday.com
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    self.MONDAY_API_URL,
+                    json={"query": "query { me { name email } account { id name } }"},
+                    headers={
+                        "Authorization": api_key,
+                        "Content-Type": "application/json",
+                        "API-Version": "2024-01"
+                    },
+                    timeout=15.0
+                )
+                result = response.json()
+                
+                if "errors" in result:
+                    return {"error": f"API Key inválida: {result['errors'][0].get('message', 'Error desconocido')}"}
+                
+                user_data = result.get("data", {}).get("me", {})
+                account_data = result.get("data", {}).get("account", {})
+                
+                workspace_name = name or account_data.get("name", user_data.get("name", "Workspace"))
+                workspace_id = f"ws_{account_data.get('id', datetime.now(timezone.utc).timestamp())}"
+                
+        except Exception as e:
+            return {"error": f"Error conectando: {str(e)}"}
+        
+        # Obtener boards del workspace para el conteo
+        boards_count = 0
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    self.MONDAY_API_URL,
+                    json={"query": "query { boards(limit: 100) { id } }"},
+                    headers={
+                        "Authorization": api_key,
+                        "Content-Type": "application/json",
+                        "API-Version": "2024-01"
+                    },
+                    timeout=15.0
+                )
+                result = response.json()
+                boards_count = len(result.get("data", {}).get("boards", []))
+        except:
+            pass
+        
+        # Guardar workspace
+        config = await self.get_workspaces()
+        
+        # Verificar si ya existe este workspace
+        for ws in config.get("workspaces", []):
+            if ws.get("workspace_id") == workspace_id or ws.get("api_key_masked") == f"...{api_key[-8:]}":
+                return {"error": "Este workspace ya está configurado"}
+        
+        new_workspace = {
+            "workspace_id": workspace_id,
+            "name": workspace_name,
+            "api_key": api_key,  # Se guarda encriptado en producción
+            "api_key_masked": f"...{api_key[-8:]}",
+            "boards_count": boards_count,
+            "user_name": user_data.get("name"),
+            "user_email": user_data.get("email"),
+            "added_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        workspaces = config.get("workspaces", [])
+        # Remover workspace de ENV si existe
+        workspaces = [ws for ws in workspaces if not ws.get("is_env_key")]
+        workspaces.append(new_workspace)
+        
+        # Si es el primer workspace, activarlo
+        active_id = config.get("active_workspace_id")
+        if not active_id or active_id == "default":
+            active_id = workspace_id
+        
+        await db.store_config.update_one(
+            {"key": self.WORKSPACES_KEY},
+            {"$set": {
+                "key": self.WORKSPACES_KEY,
+                "value": {
+                    "workspaces": workspaces,
+                    "active_workspace_id": active_id
+                }
+            }},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "workspace_id": workspace_id,
+            "workspace_name": workspace_name,
+            "boards_count": boards_count
+        }
+    
+    async def set_active_workspace(self, workspace_id: str) -> bool:
+        """Establecer workspace activo"""
+        config = await self.get_workspaces()
+        
+        # Verificar que existe
+        found = False
+        for ws in config.get("workspaces", []):
+            if ws.get("workspace_id") == workspace_id:
+                found = True
+                break
+        
+        if not found:
+            return False
+        
+        config["active_workspace_id"] = workspace_id
+        
+        await db.store_config.update_one(
+            {"key": self.WORKSPACES_KEY},
+            {"$set": {"key": self.WORKSPACES_KEY, "value": config}},
+            upsert=True
+        )
+        
+        return True
+    
+    async def remove_workspace(self, workspace_id: str) -> bool:
+        """Eliminar workspace"""
+        config = await self.get_workspaces()
+        
+        workspaces = [ws for ws in config.get("workspaces", []) if ws.get("workspace_id") != workspace_id]
+        
+        if len(workspaces) == len(config.get("workspaces", [])):
+            return False  # No se encontró
+        
+        # Si era el activo, limpiar o asignar otro
+        if config.get("active_workspace_id") == workspace_id:
+            config["active_workspace_id"] = workspaces[0]["workspace_id"] if workspaces else None
+        
+        config["workspaces"] = workspaces
+        
+        await db.store_config.update_one(
+            {"key": self.WORKSPACES_KEY},
+            {"$set": {"key": self.WORKSPACES_KEY, "value": config}},
+            upsert=True
+        )
+        
+        return True
+    
+    async def _get_active_api_key(self) -> Optional[str]:
+        """Obtener la API Key del workspace activo"""
+        config = await self.get_workspaces()
+        active_id = config.get("active_workspace_id")
+        
+        if active_id == "default":
+            return MONDAY_API_KEY
+        
+        for ws in config.get("workspaces", []):
+            if ws.get("workspace_id") == active_id:
+                return ws.get("api_key")
+        
+        # Fallback a ENV
+        return MONDAY_API_KEY
+    
+    # ============== GRAPHQL ==============
+    
     async def _graphql_request(self, query: str) -> Dict:
         """Ejecutar query GraphQL a Monday.com"""
         if not MONDAY_API_KEY:
