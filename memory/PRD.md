@@ -1181,6 +1181,36 @@ Sistema de chat integrado que usa Monday.com Updates como canal de comunicación
 
 **Test Results:** 15/15 tests passed (100%) - iteration_25.json
 
+### 🆕 Monday.com Multi-Workspace Support ✅ (Enero 12, 2026)
+Soporte para múltiples workspaces de Monday.com con configuración de API Keys desde la UI:
+
+**Características:**
+- Agregar múltiples workspaces, cada uno con su propia API Key
+- Activar/desactivar workspaces según necesidad
+- API Key enmascarada por seguridad (solo muestra últimos 8 caracteres)
+- Validación de API Key al agregar (verifica conexión con Monday.com)
+- Fallback a API Key de .env si no hay workspaces configurados
+- Seleccionar diferentes boards dentro de cada workspace
+
+**Endpoints API:**
+- `GET /api/store/monday/workspaces` - Obtener workspaces configurados
+- `POST /api/store/monday/workspaces` - Agregar nuevo workspace
+- `POST /api/store/monday/workspaces/{id}/activate` - Activar workspace
+- `DELETE /api/store/monday/workspaces/{id}` - Eliminar workspace
+- `POST /api/store/monday/api-key` - Configurar API Key principal
+
+**UI Frontend:**
+- Sección "Workspaces de Monday.com" en pestaña Monday del admin
+- Lista de workspaces con indicador de activo
+- Botón "+ Agregar Workspace" con formulario de API Key
+- Instrucciones de cómo obtener API Key de Monday.com
+
+### 🆕 Navegación Mejorada en Admin ✅ (Enero 12, 2026)
+Botones de navegación agregados al panel de Libros Escolares:
+
+- **Botón "Volver"** - Regresa a la página anterior (history.back)
+- **Botón "Panel Admin"** - Navega directamente a `/admin`
+
 ---
 
 ### P2 - Media Prioridad
