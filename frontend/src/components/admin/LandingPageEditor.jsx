@@ -390,7 +390,7 @@ export default function LandingPageEditor() {
                     <div className="space-y-2">
                       <Label>Nombre del Sitio</Label>
                       <Input
-                        value={siteConfig.nombre_sitio}
+                        value={typeof siteConfig.nombre_sitio === 'string' ? siteConfig.nombre_sitio : ''}
                         onChange={(e) => setSiteConfig({ ...siteConfig, nombre_sitio: e.target.value })}
                         placeholder="Mi Tienda"
                       />
