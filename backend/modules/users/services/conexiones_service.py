@@ -293,6 +293,9 @@ class ConexionesService:
         
         await db.solicitudes_conexion.insert_one(solicitud)
         
+        # Remove MongoDB _id before returning
+        solicitud.pop("_id", None)
+        
         return {"success": True, "solicitud": solicitud}
     
     async def get_solicitudes_pendientes(self, user_id: str) -> List[Dict]:
