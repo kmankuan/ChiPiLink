@@ -1003,14 +1003,28 @@ export default function MisPedidosLibros() {
                 </Card>
               )}
               
-              {/* Vista previa o editor de pedido */}
+              {/* Vista previa, editor o detalle de pedido */}
               {pedidoActual ? (
-                <EditorPedido 
-                  pedido={pedidoActual}
-                  onUpdate={handleUpdatePedido}
-                  onConfirmar={handlePedidoConfirmado}
-                  token={token}
-                />
+                // Si es borrador, mostrar editor; si no, mostrar detalle con chat
+                pedidoActual.estado === 'borrador' ? (
+                  <EditorPedido 
+                    pedido={pedidoActual}
+                    onUpdate={handleUpdatePedido}
+                    onConfirmar={handlePedidoConfirmado}
+                    token={token}
+                  />
+                ) : (
+                  <PedidoDetalle
+                    pedido={pedidoActual}
+                    token={token}
+                    userName={user?.nombre || 'Usuario'}
+                    onBack={() => {
+                      setPedidoActual(null);
+                      loadMisPedidos();
+                    }}
+                    onUpdate={handleUpdatePedido}
+                  />
+                )
               ) : preview && (
                 <VistaPreviewPedido 
                   estudiante={estudianteSeleccionado}
