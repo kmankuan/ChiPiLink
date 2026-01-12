@@ -934,6 +934,17 @@ export default function MisPedidosLibros() {
   return (
     <div className="container mx-auto py-6 px-4 max-w-4xl">
       <div className="mb-6">
+        {/* Botón de regreso */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => window.history.back()}
+          className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+        >
+          <ChevronRight className="h-4 w-4 rotate-180 mr-1" />
+          Volver
+        </Button>
+        
         <h1 className="text-3xl font-bold flex items-center gap-3">
           <BookOpen className="h-8 w-8" />
           Mis Pedidos de Libros
