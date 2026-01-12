@@ -280,10 +280,23 @@ class MondayPedidosService:
         if col_map.get("total"):
             column_values[col_map["total"]] = pedido.get("total", 0)
         
+        # Estado: solo agregar si el board tiene mapeo correcto de estados
+        # Si el board usa índices en lugar de labels, usar índices
         if col_map.get("estado"):
-            column_values[col_map["estado"]] = {
-                "label": estado_map.get(pedido.get("estado"), "Pre-Orden")
+            estado_label = estado_map.get(pedido.get("estado"), "Pre-Orden")
+            # Intentar mapear a índices comunes si el board no tiene labels personalizados
+            estado_index_map = {
+                "Borrador": 0,       # Working on it
+                "Pre-Orden": 0,      # Working on it
+                "Confirmado": 1,     # Done
+                "En Proceso": 0,     # Working on it
+                "Listo para Retiro": 1,  # Done
+                "Entregado": 1,      # Done
+                "Cancelado": 2       # Stuck
             }
+            # Usar índice si existe
+            if estado_label in estado_index_map:
+                column_values[col_map["estado"]] = {"index": estado_index_map[estado_label]}
         
         if col_map.get("fecha"):
             fecha = pedido.get("fecha_creacion", "")
