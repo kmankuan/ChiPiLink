@@ -1232,6 +1232,58 @@ Toda la configuración de Monday.com centralizada en Admin → Integraciones →
 
 ---
 
+### 🆕 Sistema de Conexiones y Capacidades ✅ (Enero 12, 2026)
+Nuevo sistema de gestión de usuarios que unifica "Clientes", "Usuarios" y "Membresías" en una arquitectura flexible basada en Capacidades, Membresías y Conexiones.
+
+**Conceptos clave:**
+- **Capacidades:** Habilidades/roles que pueden tener los usuarios (predeterminada, por_suscripcion, beneficio_extendido, solicitada)
+- **Conexiones:** Relaciones entre usuarios con permisos específicos (familiar, social, especial)
+- **Acudidos:** Cuentas dependientes gestionadas por un Acudiente
+- **Marketing configurable:** Servicios sugeridos personalizables por admin
+
+**Backend APIs creados:**
+- `GET /api/conexiones/mis-conexiones` - Conexiones del usuario
+- `GET /api/conexiones/capacidades` - Capacidades disponibles
+- `GET /api/conexiones/mis-capacidades` - Capacidades activas del usuario
+- `POST /api/conexiones/solicitar` - Crear solicitud de conexión
+- `GET /api/conexiones/solicitudes/recibidas` - Solicitudes recibidas
+- `GET /api/conexiones/solicitudes/enviadas` - Solicitudes enviadas
+- `POST /api/conexiones/crear-acudido` - Crear usuario dependiente
+- `GET /api/conexiones/mis-acudidos` - Obtener acudidos del usuario
+- `GET /api/conexiones/servicios-sugeridos` - Marketing configurable
+- `GET /api/conexiones/buscar?q=X` - Buscar usuarios
+- `POST /api/conexiones/invitar` - Invitar usuario no registrado
+- `GET /api/conexiones/admin/solicitudes-pendientes` - Admin: solicitudes pendientes
+- `POST /api/conexiones/admin/otorgar-capacidad` - Admin: otorgar capacidad
+
+**Frontend - /mi-cuenta:**
+- **Tabs nuevos:** Conexiones, Acudidos, Capacidades
+- **Transferencias:** Botón "Transferir" en header + dialog completo
+- **Marketing:** Sección "Servicios para ti" con sugerencias configurables
+
+**Frontend - Admin > Clientes:**
+- **Tab nuevo:** "Conexiones y Capacidades"
+- **Sistema de Usuarios panel** con stats cards
+- **Tabla de Capacidades:** 5 capacidades configuradas (Cliente, Jugador en Ranking, Árbitro, Acudiente, Estudiante Tutoría)
+- **Sub-tabs:** Capacidades, Solicitudes, Otorgar Capacidad, Permisos
+
+**Archivos creados/modificados:**
+- `/app/backend/modules/users/models/conexiones_models.py` - Modelos de datos
+- `/app/backend/modules/users/routes/conexiones.py` - Rutas API
+- `/app/backend/modules/users/services/conexiones_service.py` - Lógica de negocio
+- `/app/frontend/src/modules/users/pages/UsersDashboard.jsx` - Página Mi Cuenta actualizada
+- `/app/frontend/src/modules/users/components/MisConexiones.jsx` - Gestión de conexiones
+- `/app/frontend/src/modules/users/components/MisAcudidos.jsx` - Gestión de acudidos
+- `/app/frontend/src/modules/users/components/MisCapacidades.jsx` - Ver capacidades
+- `/app/frontend/src/modules/users/components/TransferenciasDialog.jsx` - Transferir fondos
+- `/app/frontend/src/modules/users/components/ServiciosSugeridos.jsx` - Marketing
+- `/app/frontend/src/modules/users/components/AdminUsuariosConexiones.jsx` - Panel Admin
+- `/app/frontend/src/modules/customers/CustomersModule.jsx` - Integrado con nuevo sistema
+
+**Test Results:** 17/17 tests passed (100%) - iteration_26.json
+
+---
+
 ### P2 - Media Prioridad
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
 - [ ] Solicitud especial para re-compras (libro perdido)
