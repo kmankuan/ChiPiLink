@@ -1327,6 +1327,30 @@ El botón de soporte/chat se movió al header para mejor accesibilidad.
 **Archivo modificado:**
 - `/app/frontend/src/components/layout/Header.jsx`
 
+### 🆕 Admin: Edición de Permisos y Capacidades ✅ (Enero 12, 2026)
+Panel completo de administración con CRUD interactivo para permisos por relación y capacidades.
+
+**Backend APIs:**
+- `GET /api/conexiones/admin/permisos-relacion` - Lista permisos configurados
+- `PUT /api/conexiones/admin/permisos-relacion` - Actualizar permisos por relación (upsert)
+- `POST /api/conexiones/admin/capacidades` - Crear nueva capacidad
+- `PUT /api/conexiones/admin/capacidades/{id}` - Actualizar capacidad
+- `DELETE /api/conexiones/admin/capacidades/{id}` - Desactivar capacidad (soft delete)
+
+**Frontend - Admin > Clientes > Permisos:**
+- Tabla con 10 tipos de relación (Acudiente, Padre/Madre, Amigo, etc.)
+- 5 columnas de permisos: Transferir, Ver Wallet, Recargar, Alertas, Límite Diario
+- Switches interactivos con auto-guardado
+- Input de límite diario por relación
+
+**Frontend - Admin > Clientes > Capacidades:**
+- Botón "Nueva Capacidad" con formulario completo
+- Campos: ID único, Nombre ES/EN, Descripción, Ícono (emoji), Color (picker), Tipo, Membresía requerida, Requiere aprobación, Activa
+- Botones de edición y eliminación por capacidad
+- Tabla con 6 capacidades activas
+
+**Test Results:** 16/16 tests passed (100%) - iteration_28.json
+
 ---
 
 ### P2 - Media Prioridad
