@@ -1497,11 +1497,20 @@ function MondayConfigTab({ token }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [testingConnection, setTestingConnection] = useState(false);
   const [connected, setConnected] = useState(false);
   const [connectionInfo, setConnectionInfo] = useState(null);
   const [boards, setBoards] = useState([]);
   const [columns, setColumns] = useState([]);
   const [groups, setGroups] = useState([]);
+  
+  // Nueva estructura para múltiples workspaces
+  const [workspaces, setWorkspaces] = useState([]);
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [savingApiKey, setSavingApiKey] = useState(false);
+  
+  // Configuración actual
   const [config, setConfig] = useState({
     board_id: '',
     group_id: '',
@@ -1517,8 +1526,15 @@ function MondayConfigTab({ token }) {
       pedido_id: 'text6'
     }
   });
+  
+  // Configuración de workspaces guardada
+  const [workspaceConfig, setWorkspaceConfig] = useState({
+    workspaces: [],  // Array de { workspace_id, name, api_key_masked, boards: [] }
+    active_workspace_id: null
+  });
 
   useEffect(() => {
+    loadWorkspaceConfig();
     testConnection();
     loadConfig();
   }, []);
@@ -1529,7 +1545,23 @@ function MondayConfigTab({ token }) {
     }
   }, [config.board_id]);
 
+  const loadWorkspaceConfig = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/workspaces`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setWorkspaceConfig(data);
+        setWorkspaces(data.workspaces || []);
+      }
+    } catch (err) {
+      console.error('Error loading workspaces:', err);
+    }
+  };
+
   const testConnection = async () => {
+    setTestingConnection(true);
     try {
       const res = await fetch(`${API}/api/store/monday/test-connection`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -1544,6 +1576,7 @@ function MondayConfigTab({ token }) {
     } catch (err) {
       setConnected(false);
     } finally {
+      setTestingConnection(false);
       setLoading(false);
     }
   };
@@ -1608,6 +1641,111 @@ function MondayConfigTab({ token }) {
     }
   };
 
+  const handleSaveApiKey = async () => {
+    if (!apiKeyInput.trim()) {
+      toast.error('Ingresa una API Key válida');
+      return;
+    }
+    
+    setSavingApiKey(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/api-key`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ api_key: apiKeyInput })
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || 'Error guardando API Key');
+      }
+      
+      toast.success('API Key guardada correctamente');
+      setApiKeyInput('');
+      setShowApiKeyInput(false);
+      // Recargar conexión
+      await testConnection();
+      await loadWorkspaceConfig();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSavingApiKey(false);
+    }
+  };
+
+  const handleAddWorkspace = async () => {
+    if (!apiKeyInput.trim()) {
+      toast.error('Ingresa una API Key válida');
+      return;
+    }
+    
+    setSavingApiKey(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/workspaces`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ api_key: apiKeyInput })
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || 'Error agregando workspace');
+      }
+      
+      const data = await res.json();
+      toast.success(`Workspace "${data.workspace_name}" agregado`);
+      setApiKeyInput('');
+      setShowApiKeyInput(false);
+      await loadWorkspaceConfig();
+      await testConnection();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSavingApiKey(false);
+    }
+  };
+
+  const handleSetActiveWorkspace = async (workspaceId) => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/workspaces/${workspaceId}/activate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Error activando workspace');
+      
+      toast.success('Workspace activado');
+      await loadWorkspaceConfig();
+      await testConnection();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleRemoveWorkspace = async (workspaceId) => {
+    if (!confirm('¿Estás seguro de eliminar este workspace?')) return;
+    
+    try {
+      const res = await fetch(`${API}/api/store/monday/workspaces/${workspaceId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Error eliminando workspace');
+      
+      toast.success('Workspace eliminado');
+      await loadWorkspaceConfig();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   const handleSyncAll = async () => {
     setSyncing(true);
     try {
@@ -1639,12 +1777,116 @@ function MondayConfigTab({ token }) {
 
   return (
     <div className="space-y-6">
-      {/* Estado de conexión */}
+      {/* Sección de Workspaces */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Workspaces de Monday.com
+          </CardTitle>
+          <CardDescription>
+            Configura una o más cuentas/workspaces de Monday.com. Cada workspace requiere su propia API Key.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Lista de workspaces configurados */}
+          {workspaces.length > 0 && (
+            <div className="space-y-2">
+              {workspaces.map((ws) => (
+                <div 
+                  key={ws.workspace_id}
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    ws.workspace_id === workspaceConfig.active_workspace_id 
+                      ? 'bg-primary/5 border-primary' 
+                      : 'bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {ws.workspace_id === workspaceConfig.active_workspace_id ? (
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                    ) : (
+                      <Building2 className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-medium">{ws.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        API Key: {ws.api_key_masked} • {ws.boards_count || 0} boards
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {ws.workspace_id !== workspaceConfig.active_workspace_id && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleSetActiveWorkspace(ws.workspace_id)}
+                      >
+                        Activar
+                      </Button>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleRemoveWorkspace(ws.workspace_id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Agregar nuevo workspace */}
+          {showApiKeyInput ? (
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+              <Label>API Key de Monday.com</Label>
+              <p className="text-sm text-muted-foreground">
+                Obtén tu API Key desde Monday.com → Admin → API → Personal API tokens
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  type="password"
+                  placeholder="eyJhbGciOiJIUzI1NiJ9..."
+                  value={apiKeyInput}
+                  onChange={(e) => setApiKeyInput(e.target.value)}
+                  className="font-mono text-sm"
+                />
+                <Button onClick={handleAddWorkspace} disabled={savingApiKey}>
+                  {savingApiKey ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Agregar'
+                  )}
+                </Button>
+                <Button variant="ghost" onClick={() => {
+                  setShowApiKeyInput(false);
+                  setApiKeyInput('');
+                }}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button 
+              variant="outline" 
+              onClick={() => setShowApiKeyInput(true)}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Workspace
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Estado de conexión del workspace activo */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plug className="h-5 w-5" />
-            Conexión con Monday.com
+            Conexión Activa
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -1668,14 +1910,22 @@ function MondayConfigTab({ token }) {
                   <div>
                     <p className="font-medium text-red-600">No conectado</p>
                     <p className="text-sm text-muted-foreground">
-                      {connectionInfo?.error || 'Configura MONDAY_API_KEY en el .env'}
+                      {connectionInfo?.error || 'Agrega un workspace con API Key válida'}
                     </p>
                   </div>
                 </>
               )}
             </div>
-            <Button variant="outline" onClick={testConnection}>
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <Button 
+              variant="outline" 
+              onClick={testConnection}
+              disabled={testingConnection}
+            >
+              {testingConnection ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
               Verificar
             </Button>
           </div>
@@ -1687,9 +1937,13 @@ function MondayConfigTab({ token }) {
           {/* Configuración del Board */}
           <Card>
             <CardHeader>
-              <CardTitle>Configuración del Board de Pedidos</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <LayoutGrid className="h-5 w-5" />
+                Configuración del Board de Pedidos
+              </CardTitle>
               <CardDescription>
-                Selecciona el board de Monday.com donde se sincronizarán los pedidos de Books de Light
+                Selecciona el board de Monday.com donde se sincronizarán los pedidos de Books de Light.
+                Puedes conectar diferentes boards para diferentes propósitos.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
