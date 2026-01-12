@@ -401,6 +401,9 @@ class ConexionesService:
         
         await db.invitaciones.insert_one(invitacion)
         
+        # Remove MongoDB _id before returning
+        invitacion.pop("_id", None)
+        
         # TODO: Enviar email de invitación
         # send_invitation_email(email, invitacion)
         
