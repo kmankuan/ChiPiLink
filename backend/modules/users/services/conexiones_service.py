@@ -395,7 +395,40 @@ class ConexionesService:
             if result.get("error"):
                 return result
         
-        return {"success": True, "estado": nuevo_estado}
+        # Enviar notificación push al solicitante original
+        push_result = None
+        try:
+            from modules.notifications.services.push_service import push_notification_service
+            
+            para_nombre = solicitud.get("para_usuario_nombre") or "Un usuario"
+            subtipo_label = self._get_subtipo_label(solicitud.get("subtipo", ""))
+            
+            if aceptar:
+                title = "✅ Conexión Aceptada"
+                body = f"{para_nombre} aceptó tu solicitud de conexión como {subtipo_label}"
+                notification_type = "connection_accepted"
+            else:
+                title = "❌ Conexión Rechazada"
+                body = f"{para_nombre} rechazó tu solicitud de conexión"
+                notification_type = "connection_rejected"
+            
+            push_result = await push_notification_service.send_notification(
+                user_id=solicitud["de_usuario_id"],
+                category_id="connections",
+                title=title,
+                body=body,
+                data={
+                    "type": notification_type,
+                    "solicitud_id": solicitud_id,
+                    "para_usuario_id": solicitud["para_usuario_id"],
+                    "action": "view_connections" if aceptar else "view_requests"
+                },
+                action_url="/mi-cuenta?tab=conexiones"
+            )
+        except Exception as e:
+            logger.error(f"Error enviando push notification para respuesta solicitud: {e}")
+        
+        return {"success": True, "estado": nuevo_estado, "push_notification": push_result}
     
     # ============== INVITACIONES ==============
     
