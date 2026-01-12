@@ -77,6 +77,204 @@ const EstadoBadge = ({ estado }) => {
   );
 };
 
+// Componente de Chat del Pedido (Monday.com Updates)
+function PedidoChat({ pedidoId, token, userName }) {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const scrollRef = useRef(null);
+  
+  useEffect(() => {
+    if (pedidoId) {
+      loadMessages();
+    }
+  }, [pedidoId]);
+  
+  useEffect(() => {
+    // Auto-scroll al final cuando hay nuevos mensajes
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+  
+  const loadMessages = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/pedido/${pedidoId}/messages`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      // Ordenar mensajes del más antiguo al más nuevo
+      const sorted = (data.messages || []).reverse();
+      setMessages(sorted);
+    } catch (err) {
+      console.error('Error loading messages:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleSend = async () => {
+    if (!newMessage.trim()) return;
+    
+    setSending(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/pedido/${pedidoId}/message`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: newMessage,
+          author_name: userName
+        })
+      });
+      
+      if (!res.ok) throw new Error('Error enviando mensaje');
+      
+      setNewMessage('');
+      // Recargar mensajes
+      await loadMessages();
+    } catch (err) {
+      toast.error('Error enviando mensaje');
+    } finally {
+      setSending(false);
+    }
+  };
+  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+  
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleString('es', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+  };
+  
+  return (
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center justify-between text-lg">
+          <span className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Chat con Books de Light
+          </span>
+          <Button variant="ghost" size="icon" onClick={loadMessages}>
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        </CardTitle>
+        <CardDescription>
+          Comunícate directamente con el equipo de Books de Light
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="flex-1 flex flex-col min-h-0">
+        {/* Área de mensajes */}
+        <ScrollArea 
+          ref={scrollRef}
+          className="flex-1 pr-4 mb-4"
+          style={{ maxHeight: '300px' }}
+        >
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <MessageCircle className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <p>No hay mensajes aún</p>
+              <p className="text-sm">¡Envía el primer mensaje!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((msg) => (
+                <div 
+                  key={msg.id}
+                  className={`flex gap-3 ${msg.is_from_client ? 'flex-row-reverse' : ''}`}
+                >
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    {msg.author?.photo ? (
+                      <AvatarImage src={msg.author.photo} />
+                    ) : null}
+                    <AvatarFallback className={msg.is_from_client ? 'bg-primary text-primary-foreground' : 'bg-orange-500 text-white'}>
+                      {msg.is_from_client ? 'Tú' : 'BL'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className={`flex-1 max-w-[80%] ${msg.is_from_client ? 'text-right' : ''}`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium">
+                        {msg.is_from_client ? 'Tú' : (msg.author?.name || 'Books de Light')}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(msg.created_at)}
+                      </span>
+                    </div>
+                    <div 
+                      className={`rounded-lg p-3 text-sm ${
+                        msg.is_from_client 
+                          ? 'bg-primary text-primary-foreground ml-auto' 
+                          : 'bg-muted'
+                      }`}
+                    >
+                      {msg.body}
+                    </div>
+                    
+                    {/* Respuestas */}
+                    {msg.replies?.length > 0 && (
+                      <div className="mt-2 ml-4 space-y-2 border-l-2 border-muted pl-3">
+                        {msg.replies.map((reply) => (
+                          <div key={reply.id} className="text-sm">
+                            <span className="font-medium text-xs">{reply.author?.name}</span>
+                            <p className="text-muted-foreground">{reply.body}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+        
+        {/* Input de mensaje */}
+        <div className="flex gap-2 pt-2 border-t">
+          <Input
+            placeholder="Escribe tu mensaje..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={sending}
+            className="flex-1"
+          />
+          <Button 
+            onClick={handleSend}
+            disabled={sending || !newMessage.trim()}
+            size="icon"
+          >
+            {sending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Componente de Vista Previa del Pedido
 function VistaPreviewPedido({ estudiante, preview, onCrearPedido, loading }) {
   if (!preview) return null;
