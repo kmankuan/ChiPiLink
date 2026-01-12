@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, Dict
 from pydantic import BaseModel
 
-from core.auth import get_admin_user
+from core.auth import get_admin_user, get_current_user
 from ..services.monday_pedidos_service import monday_pedidos_service
 
 router = APIRouter(prefix="/monday", tags=["Store - Monday.com"])
