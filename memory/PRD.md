@@ -10,7 +10,7 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 | Dashboard | Vista general de la tienda | ✅ Activo |
 | Tienda | Gestión de productos e inventario | ✅ Activo |
 | Pedidos | Administración de pedidos | ✅ Activo |
-| Clientes | Gestión de clientes y estudiantes | ✅ Activo |
+| Clientes | Gestión de clientes, conexiones y capacidades | ✅ **Actualizado** |
 | **Membresías** | Planes, membresías, visitas y QR codes | ✅ **Recuperado** |
 | PinpanClub | Club de Tenis de Mesa | ✅ Activo |
 | Administración | Configuración del sitio | ✅ Activo |
@@ -21,7 +21,7 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 | Ruta | Descripción | Estado |
 |------|-------------|--------|
-| `/mi-cuenta` | Dashboard de usuario con ChipiWallet, QR Code, Membresía | ✅ **Recuperado** |
+| `/mi-cuenta` | Dashboard con Wallet, Conexiones, Acudidos, Capacidades | ✅ **Actualizado** |
 | `/mis-pedidos-libros` | Pedidos de libros escolares | ✅ Activo |
 | `/pinpanclub` | Club de Ping Pong para usuarios | ✅ Activo |
 
