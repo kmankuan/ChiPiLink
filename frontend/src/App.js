@@ -78,7 +78,7 @@ import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
-import { CXGenieWidget } from '@/components/chat';
+// CXGenieWidget removed - access via header support button instead
 
 import '@/App.css';
 
