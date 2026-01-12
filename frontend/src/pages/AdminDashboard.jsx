@@ -33,7 +33,9 @@ import {
   Home,
   X,
   Trophy,
-  BookOpen
+  BookOpen,
+  CreditCard,
+  QrCode
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +47,7 @@ const CustomersModule = lazy(() => import('@/modules/customers/CustomersModule')
 const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
+const AdminMemberships = lazy(() => import('@/modules/users/pages/AdminMemberships'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
