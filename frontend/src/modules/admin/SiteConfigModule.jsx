@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Save, Loader2, Globe, Palette } from 'lucide-react';
+import ImageUploader from '@/components/common/ImageUploader';
 
 export default function SiteConfigModule() {
   const { api } = useAuth();
