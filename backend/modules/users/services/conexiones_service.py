@@ -564,11 +564,17 @@ class ConexionesService:
         # Verificar conexión y permisos
         conexion = None
         de_usuario = await db.auth_users.find_one({"cliente_id": de_usuario_id})
-        if de_usuario:
-            for con in de_usuario.get("conexiones", []):
-                if con["user_id"] == para_usuario_id:
-                    conexion = con
-                    break
+        para_usuario = await db.auth_users.find_one({"cliente_id": para_usuario_id})
+        
+        if not de_usuario:
+            return {"error": "Usuario origen no encontrado"}
+        if not para_usuario:
+            return {"error": "Usuario destino no encontrado"}
+            
+        for con in de_usuario.get("conexiones", []):
+            if con["user_id"] == para_usuario_id:
+                conexion = con
+                break
         
         if not conexion:
             return {"error": "Debes tener conexión con el usuario para transferir"}
