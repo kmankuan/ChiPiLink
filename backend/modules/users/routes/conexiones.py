@@ -364,3 +364,89 @@ async def admin_get_solicitudes_pendientes(
     ).sort("creado_en", -1)
     solicitudes = await cursor.to_list(length=100)
     return {"solicitudes": solicitudes}
+
+
+# ============== ENDPOINTS DE ALERTAS ==============
+
+class AlertaSaldoRequest(BaseModel):
+    monto_requerido: float
+    descripcion: str
+
+
+@router.post("/alerta-saldo-insuficiente")
+async def crear_alerta_saldo(
+    request: AlertaSaldoRequest,
+    user: dict = Depends(get_current_user)
+):
+    """Crear alerta de saldo insuficiente (notifica al usuario y sus acudientes)"""
+    wallet = user.get("wallet", {})
+    saldo_actual = wallet.get("USD", 0)
+    
+    result = await conexiones_service.crear_alerta_saldo_insuficiente(
+        usuario_id=user["cliente_id"],
+        monto_requerido=request.monto_requerido,
+        saldo_actual=saldo_actual,
+        descripcion=request.descripcion
+    )
+    
+    return result
+
+
+@router.get("/mis-alertas")
+async def get_mis_alertas(user: dict = Depends(get_current_user)):
+    """Obtener mis alertas (como usuario o como acudiente)"""
+    from core.database import db
+    
+    # Alertas donde soy el usuario afectado
+    mis_alertas = await db.alertas_wallet.find(
+        {"usuario_id": user["cliente_id"], "estado": {"$ne": "resuelta"}},
+        {"_id": 0}
+    ).sort("creado_en", -1).to_list(length=50)
+    
+    # Alertas donde soy acudiente
+    alertas_acudidos = await db.alertas_wallet.find(
+        {"acudientes_ids": user["cliente_id"], "estado": {"$ne": "resuelta"}},
+        {"_id": 0}
+    ).sort("creado_en", -1).to_list(length=50)
+    
+    # Combinar y marcar tipo
+    for a in mis_alertas:
+        a["es_mia"] = True
+    for a in alertas_acudidos:
+        a["es_de_acudido"] = True
+    
+    todas = mis_alertas + alertas_acudidos
+    # Ordenar por fecha
+    todas.sort(key=lambda x: x.get("creado_en", ""), reverse=True)
+    
+    return {"alertas": todas}
+
+
+@router.post("/alertas/{alerta_id}/resolver")
+async def resolver_alerta(
+    alerta_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Marcar alerta como resuelta"""
+    from core.database import db
+    from datetime import datetime, timezone
+    
+    result = await db.alertas_wallet.update_one(
+        {
+            "alerta_id": alerta_id,
+            "$or": [
+                {"usuario_id": user["cliente_id"]},
+                {"acudientes_ids": user["cliente_id"]}
+            ]
+        },
+        {"$set": {
+            "estado": "resuelta",
+            "resuelto_por": user["cliente_id"],
+            "resuelto_en": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Alerta no encontrada")
+    
+    return {"success": True}
