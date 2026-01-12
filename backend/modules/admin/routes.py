@@ -293,3 +293,4 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
             "no_leidas": notificaciones_no_leidas
         }
     }
+
