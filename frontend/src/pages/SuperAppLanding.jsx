@@ -1,0 +1,629 @@
+/**
+ * SuperAppLanding - Página principal unificada de la Super App
+ * Combina:
+ * - Sistema de bloques editables (antes en Landing.jsx)
+ * - Contenido de comunidad: noticias, eventos, galería (antes en CommunityLanding.jsx)
+ * - Hero section, Quick Access, PinPanClub feed
+ */
+import { useState, useEffect, createContext, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import axios from 'axios';
+import { COMMUNITY_ENDPOINTS, buildUrl } from '@/config/api';
+import {
+  Newspaper,
+  Calendar,
+  Image,
+  Users,
+  ChevronRight,
+  Clock,
+  MapPin,
+  Bell,
+  Store,
+  Trophy,
+  Zap,
+  Loader2,
+  Edit,
+  Save,
+  Plus,
+  GripVertical,
+  Eye,
+  EyeOff,
+  Settings,
+  X
+} from 'lucide-react';
+import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// ============== CONTEXT FOR EDIT MODE ==============
+const EditModeContext = createContext({
+  isEditMode: false,
+  editingBlockId: null,
+  setEditingBlockId: () => {},
+  updateBlockConfig: () => {},
+  saveBlock: () => {}
+});
+
+export const useEditMode = () => useContext(EditModeContext);
+
+// ============== HELPER FUNCTIONS ==============
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('es-PA', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
+const formatEventDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return {
+    day: date.getDate(),
+    month: date.toLocaleDateString('es-PA', { month: 'short' }).toUpperCase(),
+    time: date.toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })
+  };
+};
+
+// ============== REUSABLE COMPONENTS ==============
+
+const SectionHeader = ({ icon: Icon, title, action, actionLink, className = '' }) => (
+  <div className={`flex items-center justify-between mb-6 ${className}`}>
+    <div className="flex items-center gap-3">
+      <div className="p-2 rounded-xl bg-primary/10">
+        <Icon className="h-5 w-5 text-primary" />
+      </div>
+      <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
+    </div>
+    {action && (
+      <Link to={actionLink || '#'}>
+        <Button variant="ghost" size="sm" className="text-primary gap-1">
+          {action}
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </Link>
+    )}
+  </div>
+);
+
+const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => {
+  const navigate = useNavigate();
+  const colorClasses = {
+    primary: 'bg-primary/10 text-primary hover:bg-primary/20',
+    yellow: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+    orange: 'bg-orange-100 text-orange-700 hover:bg-orange-200',
+    green: 'bg-green-100 text-green-700 hover:bg-green-200',
+    blue: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+  };
+
+  return (
+    <button
+      onClick={() => navigate(to)}
+      className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
+    >
+      <Icon className="h-6 w-6 mb-2" />
+      <span className="text-xs font-medium text-center">{label}</span>
+    </button>
+  );
+};
+
+const HeroCarousel = ({ posts }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!posts || posts.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % posts.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [posts]);
+
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+        <div className="text-center p-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Bienvenido a ChiPi Link</h1>
+          <p className="text-muted-foreground">Tu Super App de comunidad y servicios</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentPost = posts[currentIndex];
+
+  return (
+    <div className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden group">
+      <img
+        src={currentPost.imagen_portada || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200'}
+        alt={currentPost.titulo}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      
+      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+        {currentPost.categoria && (
+          <Badge className="mb-3">{currentPost.categoria}</Badge>
+        )}
+        <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 line-clamp-2">
+          {currentPost.titulo}
+        </h1>
+        <p className="text-white/80 text-sm md:text-base mb-4 line-clamp-2">
+          {currentPost.resumen}
+        </p>
+        <Button 
+          onClick={() => navigate(`/comunidad/post/${currentPost.post_id}`)}
+          className="gap-2"
+        >
+          Leer más <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {posts.length > 1 && (
+        <div className="absolute bottom-4 right-4 flex gap-2">
+          {posts.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                idx === currentIndex ? 'bg-white w-6' : 'bg-white/50'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const NewsCard = ({ post }) => {
+  const navigate = useNavigate();
+  
+  return (
+    <Card 
+      className="overflow-hidden cursor-pointer group hover:shadow-lg transition-all"
+      onClick={() => navigate(`/comunidad/post/${post.post_id}`)}
+    >
+      <div className="aspect-video relative overflow-hidden">
+        <img
+          src={post.imagen_portada || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400'}
+          alt={post.titulo}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        {post.categoria && (
+          <Badge className="absolute top-3 left-3">{post.categoria}</Badge>
+        )}
+      </div>
+      <CardContent className="p-4">
+        <h3 className="font-semibold line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+          {post.titulo}
+        </h3>
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          {post.resumen}
+        </p>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {formatDate(post.fecha_publicacion)}
+          </span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const EventCard = ({ evento }) => {
+  const navigate = useNavigate();
+  const dateInfo = formatEventDate(evento.fecha_inicio);
+
+  return (
+    <Card 
+      className="overflow-hidden cursor-pointer group hover:shadow-lg transition-all"
+      onClick={() => navigate(`/comunidad/evento/${evento.evento_id}`)}
+    >
+      <div className="flex">
+        <div className="w-20 flex-shrink-0 bg-primary/10 flex flex-col items-center justify-center p-3">
+          <span className="text-2xl font-bold text-primary">{dateInfo.day}</span>
+          <span className="text-xs font-medium text-primary">{dateInfo.month}</span>
+        </div>
+        <CardContent className="p-4 flex-1">
+          <h3 className="font-semibold line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+            {evento.titulo}
+          </h3>
+          <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+            {evento.descripcion}
+          </p>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {dateInfo.time}
+            </span>
+            {evento.ubicacion && (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {evento.ubicacion}
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </div>
+    </Card>
+  );
+};
+
+const GalleryCard = ({ album }) => {
+  const navigate = useNavigate();
+
+  return (
+    <Card 
+      className="overflow-hidden cursor-pointer group"
+      onClick={() => navigate(`/comunidad/galeria/${album.album_id}`)}
+    >
+      <div className="aspect-square relative overflow-hidden">
+        <img
+          src={album.portada || album.imagenes?.[0]?.url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
+          alt={album.titulo}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="font-semibold text-white line-clamp-1">{album.titulo}</h3>
+          <p className="text-xs text-white/80">{album.imagenes?.length || 0} fotos</p>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+// ============== EDITABLE BLOCK WRAPPER ==============
+const EditableBlockWrapper = ({ blockId, blockType, children, onDelete }) => {
+  const { isEditMode, editingBlockId, setEditingBlockId, saveBlock } = useEditMode();
+  
+  if (!isEditMode) return children;
+  
+  const isEditing = editingBlockId === blockId;
+  
+  return (
+    <div className={`relative group ${isEditing ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+      <div className="absolute -top-3 -left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-background rounded-lg shadow-lg p-1">
+        <Button size="icon" variant="ghost" className="h-7 w-7 cursor-grab">
+          <GripVertical className="h-4 w-4" />
+        </Button>
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          className="h-7 w-7"
+          onClick={() => setEditingBlockId(isEditing ? null : blockId)}
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
+        {isEditing && (
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            className="h-7 w-7 text-green-600"
+            onClick={() => saveBlock(blockId)}
+          >
+            <Save className="h-4 w-4" />
+          </Button>
+        )}
+        <Button 
+          size="icon" 
+          variant="ghost" 
+          className="h-7 w-7 text-red-600"
+          onClick={() => onDelete?.(blockId)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="text-xs text-muted-foreground absolute -top-6 left-8 opacity-0 group-hover:opacity-100 transition-opacity">
+        {blockType}
+      </div>
+      {children}
+    </div>
+  );
+};
+
+// ============== MAIN COMPONENT ==============
+export default function SuperAppLanding() {
+  const { t } = useTranslation();
+  const { isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  
+  // Community data
+  const [communityData, setCommunityData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Edit mode state
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingBlockId, setEditingBlockId] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+  
+  // Block configuration
+  const [blockVisibility, setBlockVisibility] = useState({
+    hero: true,
+    quickAccess: true,
+    announcements: true,
+    pinpanclub: true,
+    news: true,
+    events: true,
+    gallery: true
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing));
+      setCommunityData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleBlockVisibility = (blockId) => {
+    setBlockVisibility(prev => ({
+      ...prev,
+      [blockId]: !prev[blockId]
+    }));
+    setHasChanges(true);
+  };
+
+  const saveAllChanges = async () => {
+    setSaving(true);
+    try {
+      // Save block visibility preferences
+      const token = localStorage.getItem('auth_token');
+      await axios.put(`${API_URL}/api/admin/landing-page/visibility`, 
+        { blocks: blockVisibility },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Cambios guardados');
+      setHasChanges(false);
+    } catch (error) {
+      toast.error('Error guardando cambios');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const editModeValue = {
+    isEditMode,
+    editingBlockId,
+    setEditingBlockId,
+    updateBlockConfig: () => {},
+    saveBlock: () => {}
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const { destacados, noticias, anuncios, eventos, galerias } = communityData || {};
+
+  return (
+    <EditModeContext.Provider value={editModeValue}>
+      <div className="min-h-screen bg-background">
+        {/* Admin Edit Mode Controls */}
+        {isAdmin && (
+          <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+            {isEditMode && hasChanges && (
+              <Button 
+                onClick={saveAllChanges} 
+                disabled={saving}
+                className="shadow-lg"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                Guardar
+              </Button>
+            )}
+            <Button
+              variant={isEditMode ? "default" : "outline"}
+              onClick={() => setIsEditMode(!isEditMode)}
+              className="shadow-lg"
+            >
+              {isEditMode ? <Eye className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+              {isEditMode ? 'Vista previa' : 'Editar'}
+            </Button>
+          </div>
+        )}
+
+        {/* Edit Mode Sidebar */}
+        {isAdmin && isEditMode && (
+          <div className="fixed left-6 top-24 z-50 bg-card border rounded-xl shadow-lg p-4 w-64">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Bloques
+            </h3>
+            <div className="space-y-2">
+              {[
+                { id: 'hero', label: 'Hero Carousel', icon: Image },
+                { id: 'quickAccess', label: 'Acceso Rápido', icon: Zap },
+                { id: 'announcements', label: 'Anuncios', icon: Bell },
+                { id: 'pinpanclub', label: 'PinPanClub', icon: Trophy },
+                { id: 'news', label: 'Noticias', icon: Newspaper },
+                { id: 'events', label: 'Eventos', icon: Calendar },
+                { id: 'gallery', label: 'Galería', icon: Image },
+              ].map(block => (
+                <button
+                  key={block.id}
+                  onClick={() => toggleBlockVisibility(block.id)}
+                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left text-sm transition-colors ${
+                    blockVisibility[block.id] 
+                      ? 'bg-primary/10 text-primary' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {blockVisibility[block.id] ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                  <block.icon className="h-4 w-4" />
+                  {block.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <main className={`container mx-auto px-4 py-8 space-y-12 ${isEditMode ? 'ml-72' : ''}`}>
+          {/* Hero Section */}
+          {blockVisibility.hero && (
+            <section data-block="hero">
+              <HeroCarousel posts={destacados || []} />
+            </section>
+          )}
+
+          {/* Quick Access */}
+          {blockVisibility.quickAccess && (
+            <section data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+              <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
+              <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
+              <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
+              <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
+              <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
+              <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" />
+            </section>
+          )}
+
+          {/* Announcements Banner */}
+          {blockVisibility.announcements && anuncios && anuncios.length > 0 && (
+            <section data-block="announcements" className="bg-primary/5 rounded-2xl p-4 md:p-6">
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
+                  <Bell className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-1">{anuncios[0].titulo}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {anuncios[0].resumen || anuncios[0].contenido}
+                  </p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate(`/comunidad/post/${anuncios[0].post_id}`)}
+                >
+                  Ver más
+                </Button>
+              </div>
+            </section>
+          )}
+
+          {/* PinPanClub Feed */}
+          {blockVisibility.pinpanclub && (
+            <section data-block="pinpanclub">
+              <PinPanClubFeedBlock 
+                config={{
+                  titulo: { es: 'Actividad del Club', en: 'Club Activity' },
+                  subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
+                  sections: {
+                    recent_matches: { enabled: true, limit: 5 },
+                    leaderboard: { enabled: true, limit: 10 },
+                    active_challenges: { enabled: true, limit: 4 },
+                    recent_achievements: { enabled: true, limit: 6 }
+                  },
+                  style: {
+                    show_cta: true,
+                    cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' },
+                    cta_url: '/pinpanclub'
+                  }
+                }}
+              />
+            </section>
+          )}
+
+          {/* News Section */}
+          {blockVisibility.news && noticias && noticias.length > 0 && (
+            <section data-block="news">
+              <SectionHeader 
+                icon={Newspaper} 
+                title="Últimas Noticias" 
+                action="Ver todas"
+                actionLink="/comunidad/noticias"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {noticias.slice(0, 3).map((post) => (
+                  <NewsCard key={post.post_id} post={post} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Events Section */}
+          {blockVisibility.events && eventos && eventos.length > 0 && (
+            <section data-block="events">
+              <SectionHeader 
+                icon={Calendar} 
+                title="Próximos Eventos" 
+                action="Ver todos"
+                actionLink="/eventos"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {eventos.slice(0, 4).map((evento) => (
+                  <EventCard key={evento.evento_id} evento={evento} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Gallery Section */}
+          {blockVisibility.gallery && galerias && galerias.length > 0 && (
+            <section data-block="gallery">
+              <SectionHeader 
+                icon={Image} 
+                title="Galería" 
+                action="Ver todo"
+                actionLink="/galeria"
+              />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {galerias.slice(0, 4).map((album) => (
+                  <GalleryCard key={album.album_id} album={album} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Empty State */}
+          {!destacados?.length && !noticias?.length && !eventos?.length && !galerias?.length && (
+            <div className="text-center py-20">
+              <h2 className="text-2xl font-bold mb-4">Bienvenido a ChiPi Link</h2>
+              <p className="text-muted-foreground mb-8">
+                Tu Super App de comunidad y servicios
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Button onClick={() => navigate('/pinpanclub')}>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Ir a PinPanClub
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/unatienda')}>
+                  <Store className="h-4 w-4 mr-2" />
+                  Ver Tienda
+                </Button>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </EditModeContext.Provider>
+  );
+}
