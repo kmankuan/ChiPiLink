@@ -1554,8 +1554,6 @@ function MondayQuickAccess({ navigate }) {
     </div>
   );
 }
-  );
-}
 
 // Componente Principal
 export default function BookOrdersAdmin() {
