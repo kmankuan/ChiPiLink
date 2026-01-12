@@ -2023,7 +2023,7 @@ function MondayConfigTab({ token }) {
                     <div key={field} className="space-y-2">
                       <Label className="capitalize">{field.replace('_', ' ')}</Label>
                       <Select 
-                        value={config.column_mapping[field] || 'none'} 
+                        value={config.column_mapping?.[field] || 'none'} 
                         onValueChange={(v) => setConfig(prev => ({
                           ...prev, 
                           column_mapping: {
