@@ -3,6 +3,28 @@
 ## Original Problem Statement
 Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanClub** para gestión de clubes de ping pong, incluyendo el sistema de ranking **Super Pin** y el nuevo sistema de partidos espontáneos **Rapid Pin**.
 
+## Módulos Activos en Admin
+
+| Módulo | Descripción | Estado |
+|--------|-------------|--------|
+| Dashboard | Vista general de la tienda | ✅ Activo |
+| Tienda | Gestión de productos e inventario | ✅ Activo |
+| Pedidos | Administración de pedidos | ✅ Activo |
+| Clientes | Gestión de clientes y estudiantes | ✅ Activo |
+| **Membresías** | Planes, membresías, visitas y QR codes | ✅ **Recuperado** |
+| PinpanClub | Club de Tenis de Mesa | ✅ Activo |
+| Administración | Configuración del sitio | ✅ Activo |
+| Integraciones | Monday.com, Google Sheets, Yappy | ✅ Activo |
+| Libros Escolares | Pre-pedidos de libros | ✅ Activo |
+
+## Módulos de Usuario
+
+| Ruta | Descripción | Estado |
+|------|-------------|--------|
+| `/mi-cuenta` | Dashboard de usuario con ChipiWallet, QR Code, Membresía | ✅ **Recuperado** |
+| `/mis-pedidos-libros` | Pedidos de libros escolares | ✅ Activo |
+| `/pinpanclub` | Club de Ping Pong para usuarios | ✅ Activo |
+
 ## Completed Features Summary
 
 | Priority | Feature | Tests | Status |
