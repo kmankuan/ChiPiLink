@@ -62,6 +62,7 @@ const navItems = [
   { id: 'store', label: 'Tienda', icon: ShoppingBag },
   { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
   { id: 'customers', label: 'Clientes', icon: Users },
+  { id: 'memberships', label: 'Membresías', icon: CreditCard },
   { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy },
   { id: 'admin', label: 'Administración', icon: Settings },
   { id: 'integrations', label: 'Integraciones', icon: Plug },
