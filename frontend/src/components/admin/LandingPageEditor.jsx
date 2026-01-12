@@ -825,17 +825,12 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               rows={2}
             />
             
-            <div className="space-y-2">
-              <Label>URL de Imagen de Fondo</Label>
-              <Input
-                value={config.imagen_url || ''}
-                onChange={(e) => handleChange('imagen_url', e.target.value)}
-                placeholder="https://..."
-              />
-              {config.imagen_url && (
-                <img src={config.imagen_url} alt="Preview" className="w-full h-32 object-cover rounded-lg mt-2" />
-              )}
-            </div>
+            <ImageUploader
+              label="Imagen de Fondo"
+              value={config.imagen_url}
+              onChange={(url) => handleChange('imagen_url', url)}
+              aspectRatio="16/9"
+            />
             
             <Separator />
             <p className="text-sm font-medium text-muted-foreground">Botones de Acción</p>
