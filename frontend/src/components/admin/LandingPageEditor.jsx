@@ -165,12 +165,17 @@ export default function LandingPageEditor() {
       setSiteConfig({
         ...config,
         nombre_sitio: safeString(config.nombre_sitio),
+        descripcion: safeString(config.descripcion),
         footer_texto: safeString(config.footer_texto),
         meta_titulo: safeString(config.meta_titulo),
         meta_descripcion: safeString(config.meta_descripcion),
         meta_keywords: safeString(config.meta_keywords),
         email_contacto: safeString(config.email_contacto),
-        telefono_contacto: safeString(config.telefono_contacto)
+        telefono_contacto: safeString(config.telefono_contacto),
+        logo_url: safeString(config.logo_url),
+        favicon_url: safeString(config.favicon_url),
+        og_image: safeString(config.og_image),
+        google_analytics_id: safeString(config.google_analytics_id)
       });
       setIsPublished(pageRes.data.publicada !== false);
     } catch (error) {
