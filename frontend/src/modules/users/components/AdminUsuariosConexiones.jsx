@@ -20,6 +20,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -56,7 +57,8 @@ import {
   ArrowRightLeft,
   Eye,
   Bell,
-  Gift
+  Gift,
+  Save
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -70,6 +72,7 @@ export default function AdminUsuariosConexiones({ token }) {
   
   // Data
   const [capacidades, setCapacidades] = useState([]);
+  const [permisosRelacion, setPermisosRelacion] = useState([]);
   const [solicitudesPendientes, setSolicitudesPendientes] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,8 +80,24 @@ export default function AdminUsuariosConexiones({ token }) {
   // Dialog states
   const [showCapacidadDialog, setShowCapacidadDialog] = useState(false);
   const [editingCapacidad, setEditingCapacidad] = useState(null);
-  const [showOtorgarDialog, setShowOtorgarDialog] = useState(false);
   const [selectedUsuario, setSelectedUsuario] = useState(null);
+  const [savingPermisos, setSavingPermisos] = useState({});
+  const [savingCapacidad, setSavingCapacidad] = useState(false);
+  
+  // Capacidad form
+  const [capacidadForm, setCapacidadForm] = useState({
+    capacidad_id: '',
+    nombre_es: '',
+    nombre_en: '',
+    descripcion_es: '',
+    descripcion_en: '',
+    icono: '⚡',
+    color: '#6366f1',
+    tipo: 'solicitada',
+    membresia_requerida: '',
+    requiere_aprobacion: false,
+    activa: true
+  });
 
   useEffect(() => {
     loadData();
@@ -87,8 +106,11 @@ export default function AdminUsuariosConexiones({ token }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [capRes, solRes] = await Promise.all([
+      const [capRes, permRes, solRes] = await Promise.all([
         fetch(`${API}/api/conexiones/capacidades`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`${API}/api/conexiones/admin/permisos-relacion`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
         fetch(`${API}/api/conexiones/admin/solicitudes-pendientes`, {
@@ -99,6 +121,10 @@ export default function AdminUsuariosConexiones({ token }) {
       if (capRes.ok) {
         const data = await capRes.json();
         setCapacidades(data.capacidades || []);
+      }
+      if (permRes.ok) {
+        const data = await permRes.json();
+        setPermisosRelacion(data.permisos || []);
       }
       if (solRes.ok) {
         const data = await solRes.json();
@@ -175,12 +201,155 @@ export default function AdminUsuariosConexiones({ token }) {
       if (!res.ok) throw new Error(data.detail || 'Error');
       
       toast.success('Capacidad otorgada exitosamente');
-      setShowOtorgarDialog(false);
       setSelectedUsuario(null);
     } catch (err) {
       toast.error(err.message);
     }
   };
+
+  // ============== PERMISOS ==============
+  
+  const handleUpdatePermiso = async (tipo, subtipo, field, value) => {
+    const key = `${tipo}-${subtipo}`;
+    setSavingPermisos(prev => ({ ...prev, [key]: true }));
+    
+    // Encontrar el permiso actual
+    const current = permisosRelacion.find(p => p.tipo === tipo && p.subtipo === subtipo);
+    const currentPermisos = current?.permisos || {};
+    
+    const updatedPermisos = {
+      tipo,
+      subtipo,
+      transferir_wallet: currentPermisos.transferir_wallet || false,
+      ver_wallet: currentPermisos.ver_wallet || false,
+      recargar_wallet: currentPermisos.recargar_wallet || false,
+      recibir_alertas: currentPermisos.recibir_alertas || false,
+      limite_transferencia_diario: currentPermisos.limite_transferencia_diario || null,
+      [field]: value
+    };
+    
+    try {
+      const res = await fetch(`${API}/api/conexiones/admin/permisos-relacion`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedPermisos)
+      });
+      
+      if (!res.ok) throw new Error('Error al guardar');
+      
+      // Actualizar estado local
+      setPermisosRelacion(prev => {
+        const idx = prev.findIndex(p => p.tipo === tipo && p.subtipo === subtipo);
+        if (idx >= 0) {
+          const updated = [...prev];
+          updated[idx] = { ...updated[idx], permisos: { ...updated[idx].permisos, [field]: value } };
+          return updated;
+        }
+        return [...prev, { tipo, subtipo, permisos: { [field]: value } }];
+      });
+      
+      toast.success('Permiso actualizado');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSavingPermisos(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  // ============== CAPACIDADES ==============
+  
+  const resetCapacidadForm = () => {
+    setCapacidadForm({
+      capacidad_id: '',
+      nombre_es: '',
+      nombre_en: '',
+      descripcion_es: '',
+      descripcion_en: '',
+      icono: '⚡',
+      color: '#6366f1',
+      tipo: 'solicitada',
+      membresia_requerida: '',
+      requiere_aprobacion: false,
+      activa: true
+    });
+    setEditingCapacidad(null);
+  };
+  
+  const openEditCapacidad = (cap) => {
+    setEditingCapacidad(cap);
+    setCapacidadForm({
+      capacidad_id: cap.capacidad_id,
+      nombre_es: cap.nombre?.es || cap.nombre || '',
+      nombre_en: cap.nombre?.en || '',
+      descripcion_es: cap.descripcion?.es || cap.descripcion || '',
+      descripcion_en: cap.descripcion?.en || '',
+      icono: cap.icono || '⚡',
+      color: cap.color || '#6366f1',
+      tipo: cap.tipo || 'solicitada',
+      membresia_requerida: cap.membresia_requerida || '',
+      requiere_aprobacion: cap.requiere_aprobacion || false,
+      activa: cap.activa !== false
+    });
+    setShowCapacidadDialog(true);
+  };
+  
+  const handleSaveCapacidad = async () => {
+    if (!capacidadForm.capacidad_id || !capacidadForm.nombre_es) {
+      toast.error('ID y nombre son requeridos');
+      return;
+    }
+    
+    setSavingCapacidad(true);
+    try {
+      const url = editingCapacidad 
+        ? `${API}/api/conexiones/admin/capacidades/${editingCapacidad.capacidad_id}`
+        : `${API}/api/conexiones/admin/capacidades`;
+      
+      const res = await fetch(url, {
+        method: editingCapacidad ? 'PUT' : 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(capacidadForm)
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error');
+      
+      toast.success(editingCapacidad ? 'Capacidad actualizada' : 'Capacidad creada');
+      setShowCapacidadDialog(false);
+      resetCapacidadForm();
+      loadData();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSavingCapacidad(false);
+    }
+  };
+  
+  const handleDeleteCapacidad = async (capacidadId) => {
+    if (!confirm('¿Desactivar esta capacidad?')) return;
+    
+    try {
+      const res = await fetch(`${API}/api/conexiones/admin/capacidades/${capacidadId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Error al desactivar');
+      
+      toast.success('Capacidad desactivada');
+      loadData();
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  // ============== HELPERS ==============
 
   const getCapacidadNombre = (cap) => {
     if (cap.nombre && typeof cap.nombre === 'object') {
@@ -208,6 +377,30 @@ export default function AdminUsuariosConexiones({ token }) {
     };
     return variants[tipo] || 'secondary';
   };
+  
+  const getPermisoValue = (tipo, subtipo, field) => {
+    const permiso = permisosRelacion.find(p => p.tipo === tipo && p.subtipo === subtipo);
+    return permiso?.permisos?.[field] ?? false;
+  };
+  
+  const getLimiteValue = (tipo, subtipo) => {
+    const permiso = permisosRelacion.find(p => p.tipo === tipo && p.subtipo === subtipo);
+    return permiso?.permisos?.limite_transferencia_diario ?? null;
+  };
+
+  // Default relation types
+  const defaultRelaciones = [
+    { tipo: 'especial', subtipo: 'acudiente', label: 'Acudiente' },
+    { tipo: 'especial', subtipo: 'acudido', label: 'Acudido' },
+    { tipo: 'familiar', subtipo: 'padre', label: 'Padre/Madre' },
+    { tipo: 'familiar', subtipo: 'hijo', label: 'Hijo/a' },
+    { tipo: 'familiar', subtipo: 'hermano', label: 'Hermano/a' },
+    { tipo: 'familiar', subtipo: 'tio', label: 'Tío/Tía' },
+    { tipo: 'familiar', subtipo: 'abuelo', label: 'Abuelo/a' },
+    { tipo: 'social', subtipo: 'amigo', label: 'Amigo' },
+    { tipo: 'social', subtipo: 'conocido', label: 'Conocido' },
+    { tipo: 'social', subtipo: 'companero', label: 'Compañero' },
+  ];
 
   if (loading) {
     return (
@@ -272,8 +465,8 @@ export default function AdminUsuariosConexiones({ token }) {
                 <Users className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">-</p>
-                <p className="text-xs text-muted-foreground">Conexiones Activas</p>
+                <p className="text-2xl font-bold">{permisosRelacion.length}</p>
+                <p className="text-xs text-muted-foreground">Permisos Configurados</p>
               </div>
             </div>
           </CardContent>
@@ -286,8 +479,8 @@ export default function AdminUsuariosConexiones({ token }) {
                 <CreditCard className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">-</p>
-                <p className="text-xs text-muted-foreground">Membresías</p>
+                <p className="text-2xl font-bold">{defaultRelaciones.length}</p>
+                <p className="text-xs text-muted-foreground">Tipos de Relación</p>
               </div>
             </div>
           </CardContent>
@@ -300,17 +493,17 @@ export default function AdminUsuariosConexiones({ token }) {
             <Zap className="h-4 w-4" />
             Capacidades
           </TabsTrigger>
+          <TabsTrigger value="permisos" className="gap-2">
+            <Settings className="h-4 w-4" />
+            Permisos
+          </TabsTrigger>
           <TabsTrigger value="solicitudes" className="gap-2">
             <Link2 className="h-4 w-4" />
             Solicitudes ({solicitudesPendientes.length})
           </TabsTrigger>
           <TabsTrigger value="otorgar" className="gap-2">
             <Gift className="h-4 w-4" />
-            Otorgar Capacidad
-          </TabsTrigger>
-          <TabsTrigger value="permisos" className="gap-2">
-            <Settings className="h-4 w-4" />
-            Permisos
+            Otorgar
           </TabsTrigger>
         </TabsList>
 
@@ -325,7 +518,7 @@ export default function AdminUsuariosConexiones({ token }) {
                     Define las habilidades y roles que pueden tener los usuarios
                   </CardDescription>
                 </div>
-                <Button size="sm" onClick={() => setShowCapacidadDialog(true)}>
+                <Button size="sm" onClick={() => { resetCapacidadForm(); setShowCapacidadDialog(true); }}>
                   <Plus className="h-4 w-4 mr-2" />
                   Nueva Capacidad
                 </Button>
@@ -337,8 +530,8 @@ export default function AdminUsuariosConexiones({ token }) {
                   <TableRow>
                     <TableHead>Capacidad</TableHead>
                     <TableHead>Tipo</TableHead>
-                    <TableHead>Membresía Requerida</TableHead>
-                    <TableHead>Requiere Aprobación</TableHead>
+                    <TableHead>Membresía</TableHead>
+                    <TableHead>Aprobación</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
@@ -360,9 +553,7 @@ export default function AdminUsuariosConexiones({ token }) {
                           {getTipoLabel(cap.tipo)}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {cap.membresia_requerida || '-'}
-                      </TableCell>
+                      <TableCell>{cap.membresia_requerida || '-'}</TableCell>
                       <TableCell>
                         {cap.requiere_aprobacion ? (
                           <Badge variant="secondary">Sí</Badge>
@@ -378,19 +569,133 @@ export default function AdminUsuariosConexiones({ token }) {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => {
-                            setEditingCapacidad(cap);
-                            setShowCapacidadDialog(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => openEditCapacidad(cap)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          {cap.activa && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleDeleteCapacidad(cap.capacidad_id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab: Permisos por Relación */}
+        <TabsContent value="permisos" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Permisos por Tipo de Relación</CardTitle>
+              <CardDescription>
+                Configura los permisos por defecto para cada tipo de relación. Los cambios se guardan automáticamente.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Relación</TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <ArrowRightLeft className="h-4 w-4" />
+                        Transferir
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Eye className="h-4 w-4" />
+                        Ver Wallet
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <CreditCard className="h-4 w-4" />
+                        Recargar
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Bell className="h-4 w-4" />
+                        Alertas
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-center">Límite Diario</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {defaultRelaciones.map((rel) => {
+                    const key = `${rel.tipo}-${rel.subtipo}`;
+                    const isSaving = savingPermisos[key];
+                    
+                    return (
+                      <TableRow key={key}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{rel.label}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {rel.tipo} / {rel.subtipo}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch 
+                            checked={getPermisoValue(rel.tipo, rel.subtipo, 'transferir_wallet')}
+                            onCheckedChange={(v) => handleUpdatePermiso(rel.tipo, rel.subtipo, 'transferir_wallet', v)}
+                            disabled={isSaving}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch 
+                            checked={getPermisoValue(rel.tipo, rel.subtipo, 'ver_wallet')}
+                            onCheckedChange={(v) => handleUpdatePermiso(rel.tipo, rel.subtipo, 'ver_wallet', v)}
+                            disabled={isSaving}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch 
+                            checked={getPermisoValue(rel.tipo, rel.subtipo, 'recargar_wallet')}
+                            onCheckedChange={(v) => handleUpdatePermiso(rel.tipo, rel.subtipo, 'recargar_wallet', v)}
+                            disabled={isSaving}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch 
+                            checked={getPermisoValue(rel.tipo, rel.subtipo, 'recibir_alertas')}
+                            onCheckedChange={(v) => handleUpdatePermiso(rel.tipo, rel.subtipo, 'recibir_alertas', v)}
+                            disabled={isSaving}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Input
+                            type="number"
+                            className="w-24 h-8 text-center mx-auto"
+                            placeholder="Sin límite"
+                            value={getLimiteValue(rel.tipo, rel.subtipo) || ''}
+                            onChange={(e) => {
+                              const val = e.target.value ? parseFloat(e.target.value) : null;
+                              handleUpdatePermiso(rel.tipo, rel.subtipo, 'limite_transferencia_diario', val);
+                            }}
+                            disabled={isSaving}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>
@@ -470,7 +775,6 @@ export default function AdminUsuariosConexiones({ token }) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Búsqueda de usuario */}
               <div className="space-y-2">
                 <Label>Buscar Usuario</Label>
                 <div className="relative">
@@ -484,7 +788,6 @@ export default function AdminUsuariosConexiones({ token }) {
                 </div>
               </div>
 
-              {/* Resultados de búsqueda */}
               {usuarios.length > 0 && (
                 <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
                   {usuarios.map((user) => (
@@ -496,17 +799,11 @@ export default function AdminUsuariosConexiones({ token }) {
                       onClick={() => setSelectedUsuario(user)}
                     >
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          {user.nombre?.charAt(0) || '?'}
-                        </AvatarFallback>
+                        <AvatarFallback>{user.nombre?.charAt(0) || '?'}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">
-                          {user.nombre} {user.apellido}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
+                        <p className="font-medium">{user.nombre} {user.apellido}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                       {selectedUsuario?.cliente_id === user.cliente_id && (
                         <Check className="h-4 w-4 text-primary" />
@@ -516,22 +813,15 @@ export default function AdminUsuariosConexiones({ token }) {
                 </div>
               )}
 
-              {/* Usuario seleccionado y selección de capacidad */}
               {selectedUsuario && (
                 <div className="space-y-4 pt-4 border-t">
                   <div className="p-3 bg-muted/50 rounded-lg flex items-center gap-3">
                     <Avatar>
-                      <AvatarFallback>
-                        {selectedUsuario.nombre?.charAt(0) || '?'}
-                      </AvatarFallback>
+                      <AvatarFallback>{selectedUsuario.nombre?.charAt(0) || '?'}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">
-                        {selectedUsuario.nombre} {selectedUsuario.apellido}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {selectedUsuario.email}
-                      </p>
+                      <p className="font-medium">{selectedUsuario.nombre} {selectedUsuario.apellido}</p>
+                      <p className="text-xs text-muted-foreground">{selectedUsuario.email}</p>
                     </div>
                   </div>
 
@@ -566,113 +856,146 @@ export default function AdminUsuariosConexiones({ token }) {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {/* Tab: Configuración de Permisos */}
-        <TabsContent value="permisos" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Permisos por Tipo de Relación</CardTitle>
-              <CardDescription>
-                Configura los permisos por defecto para cada tipo de relación
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Relación</TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <ArrowRightLeft className="h-4 w-4" />
-                        Transferir
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Eye className="h-4 w-4" />
-                        Ver Wallet
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <CreditCard className="h-4 w-4" />
-                        Recargar
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Bell className="h-4 w-4" />
-                        Alertas
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-center">Límite Diario</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[
-                    { tipo: 'especial', subtipo: 'acudiente', label: 'Acudiente', permisos: { transferir: true, ver: true, recargar: true, alertas: true, limite: null } },
-                    { tipo: 'especial', subtipo: 'acudido', label: 'Acudido', permisos: { transferir: false, ver: false, recargar: false, alertas: false, limite: null } },
-                    { tipo: 'familiar', subtipo: 'padre', label: 'Padre/Madre', permisos: { transferir: true, ver: false, recargar: true, alertas: false, limite: null } },
-                    { tipo: 'familiar', subtipo: 'tio', label: 'Tío/Tía', permisos: { transferir: true, ver: false, recargar: true, alertas: false, limite: 500 } },
-                    { tipo: 'social', subtipo: 'amigo', label: 'Amigo', permisos: { transferir: true, ver: false, recargar: false, alertas: false, limite: 100 } },
-                    { tipo: 'social', subtipo: 'conocido', label: 'Conocido', permisos: { transferir: true, ver: false, recargar: false, alertas: false, limite: 50 } },
-                  ].map((rel) => (
-                    <TableRow key={`${rel.tipo}-${rel.subtipo}`}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{rel.label}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {rel.tipo} / {rel.subtipo}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch checked={rel.permisos.transferir} disabled />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch checked={rel.permisos.ver} disabled />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch checked={rel.permisos.recargar} disabled />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch checked={rel.permisos.alertas} disabled />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {rel.permisos.limite ? `$${rel.permisos.limite}` : 'Sin límite'}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <p className="text-xs text-muted-foreground mt-4 text-center">
-                * La edición de permisos estará disponible próximamente
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
-      {/* Dialog para crear/editar capacidad (placeholder) */}
-      <Dialog open={showCapacidadDialog} onOpenChange={setShowCapacidadDialog}>
-        <DialogContent>
+      {/* Dialog para crear/editar capacidad */}
+      <Dialog open={showCapacidadDialog} onOpenChange={(open) => { if (!open) resetCapacidadForm(); setShowCapacidadDialog(open); }}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {editingCapacidad ? 'Editar Capacidad' : 'Nueva Capacidad'}
             </DialogTitle>
             <DialogDescription>
-              Esta funcionalidad estará disponible próximamente
+              {editingCapacidad ? 'Modifica los datos de la capacidad' : 'Crea una nueva capacidad para el sistema'}
             </DialogDescription>
           </DialogHeader>
-          <div className="text-center py-8">
-            <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
-              Por ahora, las capacidades se configuran en el código backend.
-            </p>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>ID único *</Label>
+                <Input
+                  value={capacidadForm.capacidad_id}
+                  onChange={(e) => setCapacidadForm(prev => ({ ...prev, capacidad_id: e.target.value.toLowerCase().replace(/\s/g, '_') }))}
+                  placeholder="ej: jugador_premium"
+                  disabled={!!editingCapacidad}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Tipo *</Label>
+                <Select 
+                  value={capacidadForm.tipo} 
+                  onValueChange={(v) => setCapacidadForm(prev => ({ ...prev, tipo: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="predeterminada">Automática (al registrar)</SelectItem>
+                    <SelectItem value="por_suscripcion">Por Suscripción</SelectItem>
+                    <SelectItem value="beneficio_extendido">Beneficio Extendido</SelectItem>
+                    <SelectItem value="solicitada">Solicitable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Nombre (Español) *</Label>
+                <Input
+                  value={capacidadForm.nombre_es}
+                  onChange={(e) => setCapacidadForm(prev => ({ ...prev, nombre_es: e.target.value }))}
+                  placeholder="Jugador Premium"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Nombre (Inglés)</Label>
+                <Input
+                  value={capacidadForm.nombre_en}
+                  onChange={(e) => setCapacidadForm(prev => ({ ...prev, nombre_en: e.target.value }))}
+                  placeholder="Premium Player"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Descripción (Español)</Label>
+              <Textarea
+                value={capacidadForm.descripcion_es}
+                onChange={(e) => setCapacidadForm(prev => ({ ...prev, descripcion_es: e.target.value }))}
+                placeholder="Describe qué permite esta capacidad..."
+                rows={2}
+              />
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Ícono</Label>
+                <Input
+                  value={capacidadForm.icono}
+                  onChange={(e) => setCapacidadForm(prev => ({ ...prev, icono: e.target.value }))}
+                  placeholder="⚡"
+                  className="text-center text-2xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="color"
+                    value={capacidadForm.color}
+                    onChange={(e) => setCapacidadForm(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-12 h-9 p-1"
+                  />
+                  <Input
+                    value={capacidadForm.color}
+                    onChange={(e) => setCapacidadForm(prev => ({ ...prev, color: e.target.value }))}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Membresía Req.</Label>
+                <Input
+                  value={capacidadForm.membresia_requerida}
+                  onChange={(e) => setCapacidadForm(prev => ({ ...prev, membresia_requerida: e.target.value }))}
+                  placeholder="pinpanclub"
+                />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={capacidadForm.requiere_aprobacion}
+                  onCheckedChange={(v) => setCapacidadForm(prev => ({ ...prev, requiere_aprobacion: v }))}
+                />
+                <Label>Requiere aprobación</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={capacidadForm.activa}
+                  onCheckedChange={(v) => setCapacidadForm(prev => ({ ...prev, activa: v }))}
+                />
+                <Label>Activa</Label>
+              </div>
+            </div>
           </div>
-          <Button onClick={() => setShowCapacidadDialog(false)}>
-            Cerrar
-          </Button>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCapacidadDialog(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveCapacidad} disabled={savingCapacidad}>
+              {savingCapacidad ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {editingCapacidad ? 'Guardar Cambios' : 'Crear Capacidad'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
