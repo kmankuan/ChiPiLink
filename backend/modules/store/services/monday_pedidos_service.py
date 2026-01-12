@@ -188,14 +188,15 @@ class MondayPedidosService:
         column_values: Dict
     ) -> bool:
         """Actualizar item en Monday.com"""
-        column_values_json = json.dumps(column_values).replace('"', '\\"')
+        column_values_json = json.dumps(column_values, ensure_ascii=False)
+        column_values_escaped = self._escape_for_graphql(column_values_json)
         
         mutation = f'''
         mutation {{
             change_multiple_column_values (
                 board_id: {board_id},
                 item_id: {item_id},
-                column_values: "{column_values_json}"
+                column_values: "{column_values_escaped}"
             ) {{
                 id
             }}
