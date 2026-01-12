@@ -690,5 +690,122 @@
       "newCategory": "Nueva Categoría",
       "createPost": "Nuevo Post"
     }
+  },
+  "conexiones": {
+    "title": "Mis Conexiones",
+    "subtitle": "Gestiona tus relaciones con otros usuarios",
+    "noConnections": "No tienes conexiones aún",
+    "addConnection": "Agregar Conexión",
+    "searchUser": "Buscar usuario...",
+    "inviteUser": "Invitar usuario",
+    "inviteEmail": "Invitar por correo",
+    "inviteMessage": "Mensaje de invitación",
+    "inviteSent": "Invitación enviada",
+    "relationshipType": "Tipo de relación",
+    "relationshipSubtype": "Especificar relación",
+    "customLabel": "Etiqueta personalizada",
+    "sendRequest": "Enviar solicitud",
+    "requestSent": "Solicitud enviada",
+    "pendingRequests": "Solicitudes pendientes",
+    "sentRequests": "Solicitudes enviadas",
+    "accept": "Aceptar",
+    "reject": "Rechazar",
+    "remove": "Eliminar",
+    "permissions": "Permisos",
+    "canTransfer": "Puede transferir",
+    "canViewWallet": "Puede ver wallet",
+    "canRecharge": "Puede recargar",
+    "receivesAlerts": "Recibe alertas",
+    "types": {
+      "familiar": "Familiar",
+      "social": "Social",
+      "especial": "Especial"
+    },
+    "subtypes": {
+      "padre": "Padre",
+      "madre": "Madre",
+      "hijo": "Hijo",
+      "hija": "Hija",
+      "abuelo": "Abuelo",
+      "abuela": "Abuela",
+      "tio": "Tío",
+      "tia": "Tía",
+      "primo": "Primo",
+      "prima": "Prima",
+      "hermano": "Hermano",
+      "hermana": "Hermana",
+      "amigo": "Amigo",
+      "conocido": "Conocido",
+      "companero_club": "Compañero del Club",
+      "vecino": "Vecino",
+      "acudiente": "Acudiente",
+      "acudido": "Acudido",
+      "tutor": "Tutor"
+    }
+  },
+  "acudidos": {
+    "title": "Mis Acudidos",
+    "subtitle": "Gestiona las cuentas de tus dependientes",
+    "noAcudidos": "No tienes acudidos registrados",
+    "addAcudido": "Agregar Acudido",
+    "createAccount": "Crear cuenta acudida",
+    "name": "Nombre",
+    "lastName": "Apellido",
+    "birthDate": "Fecha de nacimiento",
+    "gender": "Género",
+    "notes": "Notas",
+    "wallet": "Wallet",
+    "recharge": "Recargar",
+    "transfer": "Transferir",
+    "viewHistory": "Ver historial",
+    "created": "Acudido creado exitosamente",
+    "genderOptions": {
+      "male": "Masculino",
+      "female": "Femenino",
+      "other": "Otro"
+    },
+    "accountStatus": {
+      "acudido": "Cuenta Acudida",
+      "activo": "Cuenta Activa"
+    }
+  },
+  "transferencias": {
+    "title": "Transferir",
+    "subtitle": "Envía dinero a tus conexiones",
+    "selectRecipient": "Seleccionar destinatario",
+    "amount": "Monto",
+    "message": "Mensaje (opcional)",
+    "messageHint": "Ej: Para tu almuerzo",
+    "transfer": "Transferir",
+    "confirm": "Confirmar transferencia",
+    "success": "Transferencia exitosa",
+    "yourBalance": "Tu saldo",
+    "insufficientFunds": "Saldo insuficiente",
+    "dailyLimit": "Límite diario",
+    "noPermission": "No tienes permiso para transferir a este usuario",
+    "searchOther": "Buscar otro usuario...",
+    "notRegistered": "Usuario no registrado",
+    "inviteToRegister": "¿Invitar a registrarse?"
+  },
+  "capacidades": {
+    "title": "Mis Capacidades",
+    "subtitle": "Habilidades y permisos activos",
+    "active": "Activas",
+    "available": "Disponibles",
+    "request": "Solicitar",
+    "requestSent": "Solicitud enviada",
+    "types": {
+      "predeterminada": "Automática",
+      "por_suscripcion": "Por suscripción",
+      "beneficio_extendido": "Beneficio extendido",
+      "solicitada": "Solicitada"
+    }
+  },
+  "servicios": {
+    "title": "Servicios para ti",
+    "subtitle": "Descubre nuestras membresías y planes",
+    "viewPlans": "Ver planes",
+    "subscribe": "Suscribirse",
+    "learnMore": "Más información"
   }
 }
