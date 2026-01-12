@@ -711,7 +711,9 @@ export default function LandingPageEditor() {
                           </Badge>
                         </div>
                         <CardDescription className="text-xs">
-                          {block.config?.titulo || template?.descripcion || ''}
+                          {typeof block.config?.titulo === 'string' 
+                            ? block.config.titulo 
+                            : (block.config?.titulo?.es || block.config?.titulo?.en || template?.descripcion || '')}
                         </CardDescription>
                       </div>
                     </div>
