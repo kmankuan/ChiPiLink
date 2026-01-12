@@ -7,11 +7,13 @@ Este módulo provee:
 - Relaciones entre usuarios (padre-hijo, acudiente-dependiente)
 - ChipiWallet con USD y ChipiPoints
 - Sistema de membresías y visitas
+- Sistema de conexiones y capacidades
 """
 from .routes import router as users_router
 from .services.user_profile_service import user_profile_service
 from .services.wallet_service import wallet_service
 from .services.membership_service import membership_service
+from .services.conexiones_service import conexiones_service
 
 
 async def init_module():
@@ -31,6 +33,9 @@ async def init_module():
     # Inicializar planes de membresía
     await membership_service.initialize_default_plans()
     
+    # Inicializar conexiones y capacidades
+    await conexiones_service.initialize_defaults()
+    
     print("[Users Module] Initialized successfully")
 
 
@@ -39,5 +44,6 @@ __all__ = [
     "user_profile_service",
     "wallet_service",
     "membership_service",
+    "conexiones_service",
     "init_module"
 ]
