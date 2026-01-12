@@ -707,7 +707,7 @@ export default function MisConexiones({ token }) {
                           Quiere conectar como: {getSubtypeLabel(sol.tipo, sol.subtipo)}
                         </p>
                         {sol.mensaje && (
-                          <p className="text-sm mt-1 italic">"{sol.mensaje}"</p>
+                          <p className="text-sm mt-1 italic">&ldquo;{sol.mensaje}&rdquo;</p>
                         )}
                       </div>
                       
