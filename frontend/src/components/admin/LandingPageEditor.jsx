@@ -1007,15 +1007,6 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
               onChange={(url) => handleChange('imagen_url', url)}
               aspectRatio="16/9"
             />
-              <Input
-                value={config.imagen_url || ''}
-                onChange={(e) => handleChange('imagen_url', e.target.value)}
-                placeholder="https://..."
-              />
-              {config.imagen_url && (
-                <img src={config.imagen_url} alt="Preview" className="w-full h-48 object-cover rounded-lg mt-2" />
-              )}
-            </div>
             
             <MultilingualInput
               label="Texto Alternativo (Alt)"
