@@ -107,7 +107,7 @@ export default function SiteConfigModule() {
             <div>
               <Label>Nombre del Sitio</Label>
               <Input
-                value={config.nombre_sitio}
+                value={config.nombre_sitio || ''}
                 onChange={(e) => setConfig({ ...config, nombre_sitio: e.target.value })}
                 placeholder="Mi Tienda"
               />
@@ -116,7 +116,7 @@ export default function SiteConfigModule() {
               <Label>Email de Contacto</Label>
               <Input
                 type="email"
-                value={config.email_contacto}
+                value={config.email_contacto || ''}
                 onChange={(e) => setConfig({ ...config, email_contacto: e.target.value })}
                 placeholder="contacto@ejemplo.com"
               />
@@ -126,7 +126,7 @@ export default function SiteConfigModule() {
           <div>
             <Label>Descripción</Label>
             <Textarea
-              value={config.descripcion}
+              value={config.descripcion || ''}
               onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}
               placeholder="Descripción de tu sitio"
               rows={3}
@@ -137,7 +137,7 @@ export default function SiteConfigModule() {
             <div>
               <Label>Teléfono de Contacto</Label>
               <Input
-                value={config.telefono_contacto}
+                value={config.telefono_contacto || ''}
                 onChange={(e) => setConfig({ ...config, telefono_contacto: e.target.value })}
                 placeholder="+507 6000-0000"
               />
@@ -145,7 +145,7 @@ export default function SiteConfigModule() {
             <div>
               <Label>Dirección</Label>
               <Input
-                value={config.direccion}
+                value={config.direccion || ''}
                 onChange={(e) => setConfig({ ...config, direccion: e.target.value })}
                 placeholder="Ciudad, País"
               />
@@ -155,7 +155,7 @@ export default function SiteConfigModule() {
           <div>
             <Label>Texto del Footer</Label>
             <Input
-              value={config.footer_texto}
+              value={config.footer_texto || ''}
               onChange={(e) => setConfig({ ...config, footer_texto: e.target.value })}
               placeholder="© 2025 Mi Tienda. Todos los derechos reservados."
             />
