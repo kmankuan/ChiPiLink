@@ -32,7 +32,10 @@ import {
   Trophy,
   Zap,
   Calendar,
-  BookOpen
+  BookOpen,
+  Wallet,
+  QrCode,
+  CreditCard
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
