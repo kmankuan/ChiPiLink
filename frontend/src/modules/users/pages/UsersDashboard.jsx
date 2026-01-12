@@ -164,6 +164,14 @@ export default function UsersDashboard() {
           </Button>
         </div>
 
+        {/* Alertas de saldo (bilateral) */}
+        <div className="mb-6">
+          <AlertasSaldo 
+            token={token} 
+            onTransfer={handleTransferFromAcudido}
+          />
+        </div>
+
         {/* Servicios sugeridos (marketing) */}
         <div className="mb-6">
           <ServiciosSugeridos token={token} />
