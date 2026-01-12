@@ -1492,608 +1492,68 @@ function PedidosAdminTab({ token }) {
   );
 }
 
-// Componente de Tab de Configuración Monday.com
-function MondayConfigTab({ token }) {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [testingConnection, setTestingConnection] = useState(false);
-  const [connected, setConnected] = useState(false);
-  const [connectionInfo, setConnectionInfo] = useState(null);
-  const [boards, setBoards] = useState([]);
-  const [columns, setColumns] = useState([]);
-  const [groups, setGroups] = useState([]);
-  
-  // Nueva estructura para múltiples workspaces
-  const [workspaces, setWorkspaces] = useState([]);
-  const [apiKeyInput, setApiKeyInput] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
-  const [savingApiKey, setSavingApiKey] = useState(false);
-  
-  // Configuración actual
-  const [config, setConfig] = useState({
-    board_id: '',
-    group_id: '',
-    auto_sync: true,
-    column_mapping: {
-      estudiante: 'text',
-      grado: 'text0',
-      acudiente: 'text4',
-      libros: 'long_text',
-      total: 'numbers',
-      estado: 'status',
-      fecha: 'date',
-      pedido_id: 'text6'
-    }
-  });
-  
-  // Configuración de workspaces guardada
-  const [workspaceConfig, setWorkspaceConfig] = useState({
-    workspaces: [],  // Array de { workspace_id, name, api_key_masked, boards: [] }
-    active_workspace_id: null
-  });
-
-  useEffect(() => {
-    loadWorkspaceConfig();
-    testConnection();
-    loadConfig();
-  }, []);
-
-  useEffect(() => {
-    if (config.board_id) {
-      loadBoardColumns(config.board_id);
-    }
-  }, [config.board_id]);
-
-  const loadWorkspaceConfig = async () => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/workspaces`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setWorkspaceConfig(data || { workspaces: [], active_workspace_id: null });
-        setWorkspaces(data?.workspaces || []);
-      }
-    } catch (err) {
-      console.error('Error loading workspaces:', err);
-    }
-  };
-
-  const testConnection = async () => {
-    setTestingConnection(true);
-    try {
-      const res = await fetch(`${API}/api/store/monday/test-connection`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setConnected(data.connected || false);
-      setConnectionInfo(data);
-      
-      if (data.connected) {
-        loadBoards();
-      }
-    } catch (err) {
-      setConnected(false);
-      setConnectionInfo({ error: 'Error de conexión' });
-    } finally {
-      setTestingConnection(false);
-      setLoading(false);
-    }
-  };
-
-  const loadConfig = async () => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/config`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data) {
-        setConfig(prev => ({ 
-          ...prev, 
-          ...data,
-          board_id: data.board_id || '',
-          group_id: data.group_id || '',
-          auto_sync: data.auto_sync !== false
-        }));
-      }
-    } catch (err) {
-      console.error('Error loading config:', err);
-    }
-  };
-
-  const loadBoards = async () => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/boards`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setBoards(data.boards || []);
-    } catch (err) {
-      toast.error('Error cargando boards');
-    }
-  };
-
-  const loadBoardColumns = async (boardId) => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/boards/${boardId}/columns`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      setColumns(data.columns || []);
-      setGroups(data.groups || []);
-    } catch (err) {
-      console.error('Error loading columns:', err);
-    }
-  };
-
-  const handleSaveConfig = async () => {
-    setSaving(true);
-    try {
-      const res = await fetch(`${API}/api/store/monday/config`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(config)
-      });
-      
-      if (!res.ok) throw new Error('Error guardando');
-      toast.success('Configuración guardada');
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveApiKey = async () => {
-    if (!apiKeyInput.trim()) {
-      toast.error('Ingresa una API Key válida');
-      return;
-    }
-    
-    setSavingApiKey(true);
-    try {
-      const res = await fetch(`${API}/api/store/monday/api-key`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ api_key: apiKeyInput })
-      });
-      
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Error guardando API Key');
-      }
-      
-      toast.success('API Key guardada correctamente');
-      setApiKeyInput('');
-      setShowApiKeyInput(false);
-      // Recargar conexión
-      await testConnection();
-      await loadWorkspaceConfig();
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSavingApiKey(false);
-    }
-  };
-
-  const handleAddWorkspace = async () => {
-    if (!apiKeyInput.trim()) {
-      toast.error('Ingresa una API Key válida');
-      return;
-    }
-    
-    setSavingApiKey(true);
-    try {
-      const res = await fetch(`${API}/api/store/monday/workspaces`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ api_key: apiKeyInput })
-      });
-      
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Error agregando workspace');
-      }
-      
-      const data = await res.json();
-      toast.success(`Workspace "${data.workspace_name}" agregado`);
-      setApiKeyInput('');
-      setShowApiKeyInput(false);
-      await loadWorkspaceConfig();
-      await testConnection();
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSavingApiKey(false);
-    }
-  };
-
-  const handleSetActiveWorkspace = async (workspaceId) => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/workspaces/${workspaceId}/activate`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!res.ok) throw new Error('Error activando workspace');
-      
-      toast.success('Workspace activado');
-      await loadWorkspaceConfig();
-      await testConnection();
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
-
-  const handleRemoveWorkspace = async (workspaceId) => {
-    if (!confirm('¿Estás seguro de eliminar este workspace?')) return;
-    
-    try {
-      const res = await fetch(`${API}/api/store/monday/workspaces/${workspaceId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!res.ok) throw new Error('Error eliminando workspace');
-      
-      toast.success('Workspace eliminado');
-      await loadWorkspaceConfig();
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
-
-  const handleSyncAll = async () => {
-    setSyncing(true);
-    try {
-      const res = await fetch(`${API}/api/store/monday/sync-all`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      
-      if (data.error) {
-        toast.error(data.error);
-      } else {
-        toast.success(`Sincronizados: ${data.synced}, Fallidos: ${data.failed}`);
-      }
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
+// Componente de acceso rápido a Monday.com (redirige a Integraciones)
+function MondayQuickAccess({ navigate }) {
   return (
     <div className="space-y-6">
-      {/* Sección de Workspaces */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Workspaces de Monday.com
-          </CardTitle>
-          <CardDescription>
-            Configura una o más cuentas/workspaces de Monday.com. Cada workspace requiere su propia API Key.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Lista de workspaces configurados */}
-          {workspaces.length > 0 && (
-            <div className="space-y-2">
-              {workspaces.map((ws) => (
-                <div 
-                  key={ws.workspace_id}
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    ws.workspace_id === workspaceConfig.active_workspace_id 
-                      ? 'bg-primary/5 border-primary' 
-                      : 'bg-muted/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {ws.workspace_id === workspaceConfig.active_workspace_id ? (
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                    ) : (
-                      <Building2 className="h-5 w-5 text-muted-foreground" />
-                    )}
-                    <div>
-                      <p className="font-medium">{ws.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        API Key: {ws.api_key_masked} • {ws.boards_count || 0} boards
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {ws.workspace_id !== workspaceConfig.active_workspace_id && (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleSetActiveWorkspace(ws.workspace_id)}
-                      >
-                        Activar
-                      </Button>
-                    )}
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => handleRemoveWorkspace(ws.workspace_id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Agregar nuevo workspace */}
-          {showApiKeyInput ? (
-            <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
-              <Label>API Key de Monday.com</Label>
-              <p className="text-sm text-muted-foreground">
-                Obtén tu API Key desde Monday.com → Admin → API → Personal API tokens
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  type="password"
-                  placeholder="eyJhbGciOiJIUzI1NiJ9..."
-                  value={apiKeyInput}
-                  onChange={(e) => setApiKeyInput(e.target.value)}
-                  className="font-mono text-sm"
-                />
-                <Button onClick={handleAddWorkspace} disabled={savingApiKey}>
-                  {savingApiKey ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    'Agregar'
-                  )}
-                </Button>
-                <Button variant="ghost" onClick={() => {
-                  setShowApiKeyInput(false);
-                  setApiKeyInput('');
-                }}>
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button 
-              variant="outline" 
-              onClick={() => setShowApiKeyInput(true)}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar Workspace
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Estado de conexión del workspace activo */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plug className="h-5 w-5" />
-            Conexión Activa
+            Configuración de Monday.com
           </CardTitle>
+          <CardDescription>
+            La configuración de Monday.com ahora está centralizada en el módulo de Integraciones.
+            Esto permite gestionar múltiples workspaces y configuraciones desde un solo lugar.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {connected ? (
-                <>
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  <div>
-                    <p className="font-medium text-green-600">Conectado</p>
-                    {connectionInfo?.user && (
-                      <p className="text-sm text-muted-foreground">
-                        {connectionInfo.user.name} ({connectionInfo.user.email})
-                      </p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <XCircle className="h-6 w-6 text-red-500" />
-                  <div>
-                    <p className="font-medium text-red-600">No conectado</p>
-                    <p className="text-sm text-muted-foreground">
-                      {connectionInfo?.error || 'Agrega un workspace con API Key válida'}
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
+        <CardContent className="space-y-4">
+          <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+            <h4 className="font-medium">Desde Integraciones → Monday.com puedes:</h4>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+              <li>Agregar y gestionar múltiples workspaces con diferentes API Keys</li>
+              <li>Configurar el board específico para pedidos de libros</li>
+              <li>Mapear columnas de Monday.com con los campos de pedidos</li>
+              <li>Sincronizar todos los pedidos pendientes</li>
+              <li>Ver el estado de conexión en tiempo real</li>
+            </ul>
+          </div>
+          
+          <div className="flex gap-3">
+            <Button onClick={() => navigate('/admin/integraciones')} className="gap-2">
+              <Settings className="h-4 w-4" />
+              Ir a Integraciones
+            </Button>
             <Button 
               variant="outline" 
-              onClick={testConnection}
-              disabled={testingConnection}
+              onClick={() => window.open('https://monday.com', '_blank')}
+              className="gap-2"
             >
-              {testingConnection ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4 mr-2" />
-              )}
-              Verificar
+              <ExternalLink className="h-4 w-4" />
+              Abrir Monday.com
             </Button>
           </div>
         </CardContent>
       </Card>
-
-      {connected && (
-        <>
-          {/* Configuración del Board */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LayoutGrid className="h-5 w-5" />
-                Configuración del Board de Pedidos
-              </CardTitle>
-              <CardDescription>
-                Selecciona el board de Monday.com donde se sincronizarán los pedidos de Books de Light.
-                Puedes conectar diferentes boards para diferentes propósitos.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Board de Pedidos</Label>
-                  <Select 
-                    value={config.board_id || ''} 
-                    onValueChange={(v) => setConfig(prev => ({...prev, board_id: v}))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona un board" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {boards.map((board) => (
-                        <SelectItem key={board.id} value={board.id}>
-                          {board.name} ({board.items_count} items)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {groups.length > 0 && (
-                  <div className="space-y-2">
-                    <Label>Grupo (opcional)</Label>
-                    <Select 
-                      value={config.group_id || 'none'} 
-                      onValueChange={(v) => setConfig(prev => ({...prev, group_id: v === 'none' ? '' : v}))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona un grupo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Sin grupo específico</SelectItem>
-                        {groups.map((group) => (
-                          <SelectItem key={group.id} value={group.id}>
-                            {group.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Switch 
-                  id="auto-sync"
-                  checked={config.auto_sync}
-                  onCheckedChange={(checked) => setConfig(prev => ({...prev, auto_sync: checked}))}
-                />
-                <Label htmlFor="auto-sync">Sincronizar automáticamente al cambiar estado de pedidos</Label>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Mapeo de columnas */}
-          {config.board_id && columns.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Mapeo de Columnas</CardTitle>
-                <CardDescription>
-                  Asocia cada campo del pedido con una columna de Monday.com
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {['estudiante', 'grado', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
-                    <div key={field} className="space-y-2">
-                      <Label className="capitalize">{field.replace('_', ' ')}</Label>
-                      <Select 
-                        value={config.column_mapping?.[field] || 'none'} 
-                        onValueChange={(v) => setConfig(prev => ({
-                          ...prev, 
-                          column_mapping: {
-                            ...prev.column_mapping,
-                            [field]: v === 'none' ? '' : v
-                          }
-                        }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Columna" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No mapear</SelectItem>
-                          {columns.map((col) => (
-                            <SelectItem key={col.id} value={col.id}>
-                              {col.title} ({col.type})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Acciones */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex gap-4 flex-wrap">
-                <Button onClick={handleSaveConfig} disabled={saving || !config.board_id}>
-                  {saving ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                  )}
-                  Guardar Configuración
-                </Button>
-                
-                <Button variant="outline" onClick={handleSyncAll} disabled={syncing || !config.board_id}>
-                  {syncing ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                  )}
-                  Sincronizar Todos los Pedidos
-                </Button>
-                
-                {config.board_id && (
-                  <Button 
-                    variant="outline" 
-                    asChild
-                  >
-                    <a 
-                      href={`https://view.monday.com/board/${config.board_id}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Ver Board en Monday.com
-                    </a>
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
+      
+      {/* Info de ayuda */}
+      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+        <CardHeader>
+          <CardTitle className="text-blue-800 dark:text-blue-200 flex items-center gap-2">
+            <AlertCircle className="h-5 w-5" />
+            Acceso rápido
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-blue-700 dark:text-blue-300">
+          <p>
+            También puedes acceder directamente desde el menú lateral: 
+            <strong> Admin → Integraciones → Monday.com</strong>
+          </p>
+        </CardContent>
+      </Card>
     </div>
+  );
+}
   );
 }
 
