@@ -238,6 +238,3 @@ async def get_pedido_messages(
         "messages": messages,
         "total": len(messages)
     }
-
-
-from core.auth import get_current_user
