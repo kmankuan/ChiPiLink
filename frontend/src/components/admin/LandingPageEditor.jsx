@@ -403,7 +403,7 @@ export default function LandingPageEditor() {
                     <div className="space-y-2">
                       <Label>Texto del Footer</Label>
                       <Input
-                        value={siteConfig.footer_texto}
+                        value={typeof siteConfig.footer_texto === 'string' ? siteConfig.footer_texto : ''}
                         onChange={(e) => setSiteConfig({ ...siteConfig, footer_texto: e.target.value })}
                         placeholder="© 2025 Mi Tienda"
                       />
