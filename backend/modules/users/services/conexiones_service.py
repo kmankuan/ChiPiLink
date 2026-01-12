@@ -663,6 +663,9 @@ class ConexionesService:
         
         await db.alertas_wallet.insert_one(alerta)
         
+        # Remove MongoDB _id before returning
+        alerta.pop("_id", None)
+        
         # TODO: Enviar notificaciones push
         # await send_push_notification(usuario_id, alerta)
         # for acudiente_id in acudientes_ids:
