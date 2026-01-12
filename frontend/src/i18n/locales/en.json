@@ -602,5 +602,122 @@
     "noRewardsYet": "No rewards yet",
     "participateToEarn": "Participate in seasons to earn rewards",
     "yourRewards": "Your Season Rewards"
+  },
+  "conexiones": {
+    "title": "My Connections",
+    "subtitle": "Manage your relationships with other users",
+    "noConnections": "You don't have connections yet",
+    "addConnection": "Add Connection",
+    "searchUser": "Search user...",
+    "inviteUser": "Invite user",
+    "inviteEmail": "Invite by email",
+    "inviteMessage": "Invitation message",
+    "inviteSent": "Invitation sent",
+    "relationshipType": "Relationship type",
+    "relationshipSubtype": "Specify relationship",
+    "customLabel": "Custom label",
+    "sendRequest": "Send request",
+    "requestSent": "Request sent",
+    "pendingRequests": "Pending requests",
+    "sentRequests": "Sent requests",
+    "accept": "Accept",
+    "reject": "Reject",
+    "remove": "Remove",
+    "permissions": "Permissions",
+    "canTransfer": "Can transfer",
+    "canViewWallet": "Can view wallet",
+    "canRecharge": "Can recharge",
+    "receivesAlerts": "Receives alerts",
+    "types": {
+      "familiar": "Family",
+      "social": "Social",
+      "especial": "Special"
+    },
+    "subtypes": {
+      "padre": "Father",
+      "madre": "Mother",
+      "hijo": "Son",
+      "hija": "Daughter",
+      "abuelo": "Grandfather",
+      "abuela": "Grandmother",
+      "tio": "Uncle",
+      "tia": "Aunt",
+      "primo": "Cousin (M)",
+      "prima": "Cousin (F)",
+      "hermano": "Brother",
+      "hermana": "Sister",
+      "amigo": "Friend",
+      "conocido": "Acquaintance",
+      "companero_club": "Club Mate",
+      "vecino": "Neighbor",
+      "acudiente": "Guardian",
+      "acudido": "Dependent",
+      "tutor": "Tutor"
+    }
+  },
+  "acudidos": {
+    "title": "My Dependents",
+    "subtitle": "Manage your dependents' accounts",
+    "noAcudidos": "You don't have dependents registered",
+    "addAcudido": "Add Dependent",
+    "createAccount": "Create dependent account",
+    "name": "Name",
+    "lastName": "Last Name",
+    "birthDate": "Birth date",
+    "gender": "Gender",
+    "notes": "Notes",
+    "wallet": "Wallet",
+    "recharge": "Recharge",
+    "transfer": "Transfer",
+    "viewHistory": "View history",
+    "created": "Dependent created successfully",
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "accountStatus": {
+      "acudido": "Dependent Account",
+      "activo": "Active Account"
+    }
+  },
+  "transferencias": {
+    "title": "Transfer",
+    "subtitle": "Send money to your connections",
+    "selectRecipient": "Select recipient",
+    "amount": "Amount",
+    "message": "Message (optional)",
+    "messageHint": "E.g.: For your lunch",
+    "transfer": "Transfer",
+    "confirm": "Confirm transfer",
+    "success": "Transfer successful",
+    "yourBalance": "Your balance",
+    "insufficientFunds": "Insufficient funds",
+    "dailyLimit": "Daily limit",
+    "noPermission": "You don't have permission to transfer to this user",
+    "searchOther": "Search another user...",
+    "notRegistered": "User not registered",
+    "inviteToRegister": "Invite to register?"
+  },
+  "capacidades": {
+    "title": "My Capabilities",
+    "subtitle": "Active abilities and permissions",
+    "active": "Active",
+    "available": "Available",
+    "request": "Request",
+    "requestSent": "Request sent",
+    "types": {
+      "predeterminada": "Automatic",
+      "por_suscripcion": "By subscription",
+      "beneficio_extendido": "Extended benefit",
+      "solicitada": "Requested"
+    }
+  },
+  "servicios": {
+    "title": "Services for you",
+    "subtitle": "Discover our memberships and plans",
+    "viewPlans": "View plans",
+    "subscribe": "Subscribe",
+    "learnMore": "Learn more"
   }
 }
