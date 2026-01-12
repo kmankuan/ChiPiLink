@@ -240,17 +240,21 @@ class MondayPedidosService:
     
     # ============== GRAPHQL ==============
     
-    async def _graphql_request(self, query: str) -> Dict:
+    async def _graphql_request(self, query: str, api_key: str = None) -> Dict:
         """Ejecutar query GraphQL a Monday.com"""
-        if not MONDAY_API_KEY:
-            raise Exception("Monday.com API Key no configurada. Configúrala en el .env como MONDAY_API_KEY")
+        # Usar API Key proporcionada o obtener del workspace activo
+        if not api_key:
+            api_key = await self._get_active_api_key()
+        
+        if not api_key:
+            raise Exception("Monday.com API Key no configurada. Agrega un workspace con tu API Key.")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 self.MONDAY_API_URL,
                 json={"query": query},
                 headers={
-                    "Authorization": MONDAY_API_KEY,
+                    "Authorization": api_key,
                     "Content-Type": "application/json",
                     "API-Version": "2024-01"
                 },
