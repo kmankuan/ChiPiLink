@@ -37,6 +37,20 @@ import {
   Check
 } from 'lucide-react';
 
+// ToolbarButton component - defined outside MenuBar to avoid recreation on each render
+const ToolbarButton = ({ onClick, isActive, children, title }) => (
+  <Button
+    type="button"
+    variant={isActive ? 'secondary' : 'ghost'}
+    size="icon"
+    className="h-8 w-8"
+    onClick={onClick}
+    title={title}
+  >
+    {children}
+  </Button>
+);
+
 const MenuBar = ({ editor, onImageUpload }) => {
   const [linkUrl, setLinkUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -73,19 +87,6 @@ const MenuBar = ({ editor, onImageUpload }) => {
     }
     setShowImagePopover(false);
   };
-
-  const ToolbarButton = ({ onClick, isActive, children, title }) => (
-    <Button
-      type="button"
-      variant={isActive ? 'secondary' : 'ghost'}
-      size="icon"
-      className="h-8 w-8"
-      onClick={onClick}
-      title={title}
-    >
-      {children}
-    </Button>
-  );
 
   return (
     <div className="flex flex-wrap items-center gap-0.5 p-2 border-b bg-muted/30 rounded-t-lg">
