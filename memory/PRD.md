@@ -1351,6 +1351,37 @@ Panel completo de administración con CRUD interactivo para permisos por relaci�
 
 **Test Results:** 16/16 tests passed (100%) - iteration_28.json
 
+### 🆕 Notificaciones Push Reales para Alertas ✅ (Enero 12, 2026)
+Integración completa de notificaciones push para alertas de wallet y transferencias.
+
+**Backend Integración:**
+- `crear_alerta_saldo_insuficiente()` ahora envía push al usuario Y a todos sus acudientes
+- `transferir_wallet()` envía push al remitente (confirmación) y destinatario (recibido)
+- Notificaciones incluyen `action_url` para navegación directa a `/mi-cuenta?tab=wallet`
+- Datos estructurados: `type`, `alerta_id`/`transferencia_id`, `action`
+
+**Nuevas Categorías de Notificación:**
+- `wallet_alerts`: 💰 Alertas de Wallet (color #f59e0b, prioridad HIGH)
+- `connections`: 🔗 Conexiones (color #8b5cf6, prioridad NORMAL)
+
+**Tipos de Notificación Enviados:**
+| Evento | Destinatario | Título | Categoría |
+|--------|--------------|--------|-----------|
+| Saldo insuficiente | Usuario | 💰 Saldo Insuficiente | wallet_alerts |
+| Saldo insuficiente | Acudiente(s) | 🔔 Alerta de Acudido | wallet_alerts |
+| Transferencia enviada | Remitente | 💸 Transferencia Enviada | wallet_alerts |
+| Transferencia recibida | Destinatario | 💰 Transferencia Recibida | wallet_alerts |
+
+**Frontend:**
+- `PushNotificationSubscribe.jsx` actualizado con nuevos beneficios:
+  - 💰 Alertas de saldo insuficiente
+  - 💸 Confirmaciones de transferencias recibidas
+  - 🔗 Solicitudes de conexión nuevas
+
+**Nota:** En ambiente preview, las notificaciones retornan `success=false` porque no hay dispositivos móviles/web push registrados. En producción (chipilink.me), las notificaciones se enviarán a través de OneSignal.
+
+**Test Results:** 13/13 tests passed (100%) - iteration_29.json
+
 ---
 
 ### P2 - Media Prioridad
