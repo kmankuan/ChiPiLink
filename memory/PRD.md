@@ -14,6 +14,41 @@ También incluye un sistema unificado de gestión de usuarios basado en "Capacid
 | Header Cleanup | Eliminado botón "Editar Texto" del header | ✅ Verificado |
 | Landing Page Editor | Panel de admin con controles funcionales (reordenar, mostrar/ocultar bloques) | ✅ Verificado |
 
+### Mejoras Implementadas - Editor de Landing Page ✅
+
+#### 1. Editor de Texto Enriquecido (RichTextEditor)
+- **Ubicación**: `/app/frontend/src/components/common/RichTextEditor.jsx`
+- **Tecnología**: TipTap
+- **Características**:
+  - Encabezados (H1, H2, H3)
+  - Formato de texto (negrita, cursiva, subrayado, tachado)
+  - Listas (con viñetas y numeradas)
+  - Citas (blockquote)
+  - Alineación de texto (izq, centro, der, justificado)
+  - Enlaces con URL
+  - Inserción de imágenes (URL o subida)
+  - Deshacer/Rehacer
+
+#### 2. Subida de Imágenes (ImageUploader)
+- **Ubicación**: `/app/frontend/src/components/common/ImageUploader.jsx`
+- **Backend**: `/app/backend/modules/upload/routes.py`
+- **Características**:
+  - Drag & drop
+  - Preview de imagen
+  - Barra de progreso
+  - Opción de URL directa
+  - Límites configurables (2MB logo, 1MB favicon)
+  - Soporte para JPG, PNG, GIF, WebP, SVG
+
+#### 3. Integración en Admin
+- **Configuración del Sitio** (`SiteConfigModule.jsx`):
+  - ImageUploader para Logo
+  - ImageUploader para Favicon
+- **Editor de Landing Page** (`LandingPageEditor.jsx`):
+  - RichTextEditor para bloques de texto
+  - ImageUploader para Hero, Banner, Imagen
+  - Editor de bloques funcional con reordenamiento
+
 ### Landing Page Unificada
 - `Landing.jsx` y `CommunityLanding.jsx` fusionados en `SuperAppLanding.jsx`
 - Editor de bloques para admins con:
