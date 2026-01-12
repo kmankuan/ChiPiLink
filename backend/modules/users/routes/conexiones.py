@@ -69,6 +69,30 @@ class OtorgarCapacidadRequest(BaseModel):
     motivo: Optional[str] = None
 
 
+class PermisosRelacionRequest(BaseModel):
+    tipo: str
+    subtipo: str
+    transferir_wallet: bool = False
+    ver_wallet: bool = False
+    recargar_wallet: bool = False
+    recibir_alertas: bool = False
+    limite_transferencia_diario: Optional[float] = None
+
+
+class CapacidadCreateRequest(BaseModel):
+    capacidad_id: str
+    nombre_es: str
+    nombre_en: Optional[str] = None
+    descripcion_es: Optional[str] = None
+    descripcion_en: Optional[str] = None
+    icono: Optional[str] = None
+    color: Optional[str] = None
+    tipo: str = "solicitada"  # predeterminada, por_suscripcion, beneficio_extendido, solicitada
+    membresia_requerida: Optional[str] = None
+    requiere_aprobacion: bool = False
+    activa: bool = True
+
+
 # ============== ENDPOINTS DE CONEXIONES ==============
 
 @router.get("/mis-conexiones")
