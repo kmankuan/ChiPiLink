@@ -136,6 +136,13 @@ export default function LandingPageEditor() {
     fetchData();
   }, []);
 
+  // Helper to safely get string value from potentially multilingual objects
+  const safeString = (value) => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') return value.es || value.en || '';
+    return '';
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -152,7 +159,19 @@ export default function LandingPageEditor() {
       const sortedBlocks = (pageRes.data.bloques || []).sort((a, b) => a.orden - b.orden);
       setBlocks(sortedBlocks);
       setTemplates(templatesRes.data);
-      setSiteConfig(configRes.data);
+      
+      // Normalize config to ensure all values are strings
+      const config = configRes.data || {};
+      setSiteConfig({
+        ...config,
+        nombre_sitio: safeString(config.nombre_sitio),
+        footer_texto: safeString(config.footer_texto),
+        meta_titulo: safeString(config.meta_titulo),
+        meta_descripcion: safeString(config.meta_descripcion),
+        meta_keywords: safeString(config.meta_keywords),
+        email_contacto: safeString(config.email_contacto),
+        telefono_contacto: safeString(config.telefono_contacto)
+      });
       setIsPublished(pageRes.data.publicada !== false);
     } catch (error) {
       console.error('Error fetching data:', error);
