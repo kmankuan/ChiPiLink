@@ -222,6 +222,19 @@ export function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
+            {/* Support Chat Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSupportChat}
+              className="h-9 w-9 rounded-full"
+              data-testid="support-chat-button"
+              title="Soporte"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="sr-only">Soporte</span>
+            </Button>
+
             {/* Cart Button */}
             <Button
               variant="ghost"
