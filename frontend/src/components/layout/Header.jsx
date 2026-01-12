@@ -237,6 +237,12 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
+                    <Link to="/mi-cuenta" className="flex items-center gap-2" data-testid="menu-my-account">
+                      <Wallet className="h-4 w-4" />
+                      Mi Cuenta
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="flex items-center gap-2" data-testid="menu-dashboard">
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
