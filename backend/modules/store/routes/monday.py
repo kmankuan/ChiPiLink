@@ -158,3 +158,86 @@ async def sync_all_pedidos(
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============== CHAT / UPDATES ==============
+
+class PostMessageRequest(BaseModel):
+    """Request para enviar mensaje"""
+    message: str
+    author_name: Optional[str] = None
+
+
+@router.post("/pedido/{pedido_id}/message")
+async def post_pedido_message(
+    pedido_id: str,
+    request: PostMessageRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Enviar un mensaje en el chat del pedido.
+    El mensaje se publica como Update en Monday.com.
+    """
+    from core.database import db
+    
+    # Verificar que el usuario tiene acceso al pedido
+    pedido = await db.pedidos_libros.find_one({"pedido_id": pedido_id})
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    # Solo el acudiente del pedido o admins pueden enviar mensajes
+    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("cliente_id")
+    is_admin = current_user.get("es_admin", False)
+    
+    if not is_owner and not is_admin:
+        raise HTTPException(status_code=403, detail="No tienes permiso para este pedido")
+    
+    author_name = request.author_name or current_user.get("nombre", "Usuario")
+    
+    result = await monday_pedidos_service.post_pedido_message(
+        pedido_id=pedido_id,
+        message=request.message,
+        author_name=author_name,
+        is_from_client=not is_admin  # Si es admin, es de Books de Light
+    )
+    
+    if result.get("success"):
+        return result
+    else:
+        raise HTTPException(status_code=500, detail=result.get("error", "Error enviando mensaje"))
+
+
+@router.get("/pedido/{pedido_id}/messages")
+async def get_pedido_messages(
+    pedido_id: str,
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Obtener mensajes del chat del pedido.
+    Los mensajes vienen de los Updates de Monday.com.
+    """
+    from core.database import db
+    
+    # Verificar que el usuario tiene acceso al pedido
+    pedido = await db.pedidos_libros.find_one({"pedido_id": pedido_id})
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("cliente_id")
+    is_admin = current_user.get("es_admin", False)
+    
+    if not is_owner and not is_admin:
+        raise HTTPException(status_code=403, detail="No tienes permiso para este pedido")
+    
+    messages = await monday_pedidos_service.get_pedido_messages(pedido_id, limit)
+    
+    return {
+        "pedido_id": pedido_id,
+        "monday_item_id": pedido.get("monday_item_id"),
+        "messages": messages,
+        "total": len(messages)
+    }
+
+
+from core.auth import get_current_user
