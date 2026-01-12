@@ -49,8 +49,13 @@ import {
   XCircle,
   Settings,
   ExternalLink,
-  Plug
+  Plug,
+  ArrowLeft,
+  Key,
+  Building2,
+  LayoutGrid
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
