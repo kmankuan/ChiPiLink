@@ -1958,7 +1958,7 @@ function MondayConfigTab({ token }) {
                 <div className="space-y-2">
                   <Label>Board de Pedidos</Label>
                   <Select 
-                    value={config.board_id} 
+                    value={config.board_id || ''} 
                     onValueChange={(v) => setConfig(prev => ({...prev, board_id: v}))}
                   >
                     <SelectTrigger>
