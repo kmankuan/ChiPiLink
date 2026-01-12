@@ -396,7 +396,7 @@ export default function LandingPageEditor() {
                     <div className="space-y-2">
                       <Label>Descripción del Sitio</Label>
                       <Textarea
-                        value={siteConfig.descripcion}
+                        value={typeof siteConfig.descripcion === 'string' ? siteConfig.descripcion : ''}
                         onChange={(e) => setSiteConfig({ ...siteConfig, descripcion: e.target.value })}
                         placeholder="Descripción del sitio"
                         rows={2}
