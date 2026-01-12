@@ -386,6 +386,251 @@ class MondayPedidosService:
                 failed += 1
         
         return {"synced": synced, "failed": failed}
+    
+    # ============== UPDATES (CHAT) ==============
+    
+    async def post_update(
+        self,
+        item_id: str,
+        body: str,
+        author_name: str = None
+    ) -> Optional[str]:
+        """
+        Publicar un update (mensaje) en un item de Monday.com.
+        Esto aparece en la sección de Updates del item.
+        """
+        # Escapar comillas en el mensaje
+        body_escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+        
+        # Si hay nombre de autor, agregarlo al inicio del mensaje
+        if author_name:
+            body_escaped = f"**{author_name}:**\\n{body_escaped}"
+        
+        mutation = f'''
+        mutation {{
+            create_update (
+                item_id: {item_id},
+                body: "{body_escaped}"
+            ) {{
+                id
+                created_at
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(mutation)
+            update = result.get("data", {}).get("create_update")
+            return update.get("id") if update else None
+        except Exception as e:
+            logger.error(f"Error posting Monday update: {e}")
+            return None
+    
+    async def get_updates(
+        self,
+        item_id: str,
+        limit: int = 50
+    ) -> List[Dict]:
+        """
+        Obtener updates (mensajes) de un item de Monday.com.
+        """
+        query = f'''
+        query {{
+            items(ids: [{item_id}]) {{
+                updates(limit: {limit}) {{
+                    id
+                    body
+                    text_body
+                    created_at
+                    creator {{
+                        id
+                        name
+                        email
+                        photo_thumb
+                    }}
+                    replies {{
+                        id
+                        body
+                        text_body
+                        created_at
+                        creator {{
+                            id
+                            name
+                            email
+                            photo_thumb
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(query)
+            items = result.get("data", {}).get("items", [])
+            if items:
+                return items[0].get("updates", [])
+            return []
+        except Exception as e:
+            logger.error(f"Error getting Monday updates: {e}")
+            return []
+    
+    async def reply_to_update(
+        self,
+        update_id: str,
+        body: str,
+        author_name: str = None
+    ) -> Optional[str]:
+        """
+        Responder a un update específico.
+        """
+        body_escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+        
+        if author_name:
+            body_escaped = f"**{author_name}:**\\n{body_escaped}"
+        
+        mutation = f'''
+        mutation {{
+            create_update (
+                update_id: {update_id},
+                body: "{body_escaped}"
+            ) {{
+                id
+                created_at
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(mutation)
+            update = result.get("data", {}).get("create_update")
+            return update.get("id") if update else None
+        except Exception as e:
+            logger.error(f"Error replying to Monday update: {e}")
+            return None
+    
+    async def post_pedido_message(
+        self,
+        pedido_id: str,
+        message: str,
+        author_name: str,
+        is_from_client: bool = True
+    ) -> Dict:
+        """
+        Publicar un mensaje en el pedido (vía Monday.com Updates).
+        
+        Args:
+            pedido_id: ID del pedido en ChipiLink
+            message: Texto del mensaje
+            author_name: Nombre del autor
+            is_from_client: Si es del cliente/acudiente (True) o de Books de Light (False)
+        """
+        pedido = await db.pedidos_libros.find_one(
+            {"pedido_id": pedido_id},
+            {"monday_item_id": 1}
+        )
+        
+        if not pedido:
+            return {"success": False, "error": "Pedido no encontrado"}
+        
+        monday_item_id = pedido.get("monday_item_id")
+        
+        if not monday_item_id:
+            # Si no está sincronizado con Monday, sincronizar primero
+            monday_item_id = await self.sync_pedido(pedido_id)
+            if not monday_item_id:
+                return {"success": False, "error": "No se pudo sincronizar con Monday.com"}
+        
+        # Agregar etiqueta de origen
+        prefix = "🏠 Cliente" if is_from_client else "📚 Books de Light"
+        formatted_message = f"[{prefix}]\n{message}"
+        
+        update_id = await self.post_update(
+            monday_item_id,
+            formatted_message,
+            author_name
+        )
+        
+        if update_id:
+            # Guardar copia local del mensaje
+            from datetime import datetime, timezone
+            import uuid
+            
+            local_message = {
+                "message_id": f"msg_{uuid.uuid4().hex[:12]}",
+                "pedido_id": pedido_id,
+                "monday_update_id": update_id,
+                "monday_item_id": monday_item_id,
+                "author_name": author_name,
+                "message": message,
+                "is_from_client": is_from_client,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.pedido_messages.insert_one(local_message)
+            
+            return {"success": True, "update_id": update_id}
+        
+        return {"success": False, "error": "Error publicando mensaje"}
+    
+    async def get_pedido_messages(
+        self,
+        pedido_id: str,
+        limit: int = 50
+    ) -> List[Dict]:
+        """
+        Obtener mensajes de un pedido desde Monday.com.
+        """
+        pedido = await db.pedidos_libros.find_one(
+            {"pedido_id": pedido_id},
+            {"monday_item_id": 1}
+        )
+        
+        if not pedido or not pedido.get("monday_item_id"):
+            return []
+        
+        updates = await self.get_updates(pedido["monday_item_id"], limit)
+        
+        # Formatear para el frontend
+        messages = []
+        for update in updates:
+            creator = update.get("creator", {})
+            
+            # Detectar si es del cliente o de Books de Light
+            body = update.get("text_body", "") or update.get("body", "")
+            is_from_client = "[🏠 Cliente]" in body or body.startswith("**") and "Cliente" in body
+            
+            # Limpiar el prefijo del mensaje
+            clean_body = body
+            for prefix in ["[🏠 Cliente]\n", "[📚 Books de Light]\n", "[🏠 Cliente]", "[📚 Books de Light]"]:
+                clean_body = clean_body.replace(prefix, "")
+            
+            messages.append({
+                "id": update.get("id"),
+                "body": clean_body.strip(),
+                "raw_body": body,
+                "created_at": update.get("created_at"),
+                "is_from_client": is_from_client,
+                "author": {
+                    "id": creator.get("id"),
+                    "name": creator.get("name", ""),
+                    "email": creator.get("email", ""),
+                    "photo": creator.get("photo_thumb")
+                },
+                "replies": [
+                    {
+                        "id": reply.get("id"),
+                        "body": reply.get("text_body", "") or reply.get("body", ""),
+                        "created_at": reply.get("created_at"),
+                        "author": {
+                            "name": reply.get("creator", {}).get("name", ""),
+                            "photo": reply.get("creator", {}).get("photo_thumb")
+                        }
+                    }
+                    for reply in update.get("replies", [])
+                ]
+            })
+        
+        return messages
 
 
 # Singleton
