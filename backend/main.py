@@ -84,6 +84,9 @@ from modules.fusebase.routes import router as fusebase_router
 # Task Supervisor Module (voice-assisted task management)
 from modules.task_supervisor.routes import router as task_supervisor_router
 
+# Upload Module
+from modules.upload.routes import router as upload_router
+
 # Realtime WebSocket Module
 from modules.realtime import realtime_router
 
