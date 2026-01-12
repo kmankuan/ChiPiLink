@@ -678,7 +678,7 @@ export default function SuperAppLanding() {
           )}
 
           {/* Gallery Section */}
-          {blockVisibility.gallery && galerias && galerias.length > 0 && (
+          {isBlockVisible('gallery') && galerias && galerias.length > 0 && (
             <section data-block="gallery">
               <SectionHeader 
                 icon={Image} 
@@ -715,6 +715,5 @@ export default function SuperAppLanding() {
           )}
         </main>
       </div>
-    </EditModeContext.Provider>
   );
 }
