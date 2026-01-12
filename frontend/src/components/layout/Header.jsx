@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,7 +35,8 @@ import {
   BookOpen,
   Wallet,
   QrCode,
-  CreditCard
+  CreditCard,
+  MessageCircle
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 import InlineEditToggle from '@/components/common/InlineEditToggle';
