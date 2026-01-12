@@ -1244,14 +1244,12 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 placeholder="Aprovecha nuestras ofertas"
               />
             </div>
-            <div className="space-y-2">
-              <Label>URL de Imagen</Label>
-              <Input
-                value={config.imagen_url || ''}
-                onChange={(e) => handleChange('imagen_url', e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
+            <ImageUploader
+              label="Imagen del Banner"
+              value={config.imagen_url}
+              onChange={(url) => handleChange('imagen_url', url)}
+              aspectRatio="21/9"
+            />
             <div className="space-y-2">
               <Label>Color de Fondo</Label>
               <div className="flex gap-2">
