@@ -1382,6 +1382,28 @@ Integración completa de notificaciones push para alertas de wallet y transferen
 
 **Test Results:** 13/13 tests passed (100%) - iteration_29.json
 
+### 🆕 Notificaciones Push para Solicitudes de Conexión ✅ (Enero 12, 2026)
+Integración de notificaciones push para el flujo completo de solicitudes de conexión.
+
+**Eventos que envían notificaciones:**
+| Evento | Destinatario | Título | Tipo |
+|--------|--------------|--------|------|
+| Nueva solicitud | Destinatario | 🔗 Nueva Solicitud de Conexión | connection_request |
+| Solicitud aceptada | Solicitante | ✅ Conexión Aceptada | connection_accepted |
+| Solicitud rechazada | Solicitante | ❌ Conexión Rechazada | connection_rejected |
+
+**Backend:**
+- `crear_solicitud()` envía push al destinatario (para_usuario_id)
+- `responder_solicitud()` envía push al solicitante original (de_usuario_id)
+- Método helper `_get_subtipo_label()` convierte subtipos a etiquetas legibles
+- Todas las notificaciones usan `category_id='connections'` y `action_url='/mi-cuenta?tab=conexiones'`
+
+**Frontend (MisConexiones.jsx):**
+- `handleSendRequest()` muestra toast "🔔 Se notificó al usuario" cuando push es exitoso
+- `handleRespondRequest()` muestra indicador de notificación en toast
+
+**Test Results:** 12/12 tests passed (5 skipped) - iteration_30.json
+
 ---
 
 ### P2 - Media Prioridad
