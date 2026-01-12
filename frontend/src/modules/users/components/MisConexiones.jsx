@@ -194,7 +194,14 @@ export default function MisConexiones({ token }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Error');
       
-      toast.success(t('conexiones.requestSent'));
+      // Mensaje de éxito con info de notificación
+      const pushSent = data.push_notification?.success;
+      if (pushSent) {
+        toast.success(`${t('conexiones.requestSent')} 🔔 Se notificó al usuario`);
+      } else {
+        toast.success(t('conexiones.requestSent'));
+      }
+      
       setShowAddDialog(false);
       resetForm();
       loadData();
