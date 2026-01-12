@@ -621,7 +621,7 @@ export default function SuperAppLanding() {
           )}
 
           {/* PinPanClub Feed */}
-          {blockVisibility.pinpanclub && (
+          {isBlockVisible('pinpanclub') && (
             <section data-block="pinpanclub">
               <PinPanClubFeedBlock 
                 config={{
@@ -644,7 +644,7 @@ export default function SuperAppLanding() {
           )}
 
           {/* News Section */}
-          {blockVisibility.news && noticias && noticias.length > 0 && (
+          {isBlockVisible('news') && noticias && noticias.length > 0 && (
             <section data-block="news">
               <SectionHeader 
                 icon={Newspaper} 
@@ -661,7 +661,7 @@ export default function SuperAppLanding() {
           )}
 
           {/* Events Section */}
-          {blockVisibility.events && eventos && eventos.length > 0 && (
+          {isBlockVisible('events') && eventos && eventos.length > 0 && (
             <section data-block="events">
               <SectionHeader 
                 icon={Calendar} 
