@@ -297,6 +297,7 @@ export default function AdminDashboard() {
                 {activeModule === 'store' && 'Gestiona tus productos e inventario'}
                 {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
                 {activeModule === 'customers' && 'Gestiona clientes, estudiantes y matrículas'}
+                {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
                 {activeModule === 'pinpanclub' && 'Club de Tenis de Mesa - Partidos, jugadores y torneos'}
                 {activeModule === 'admin' && 'Configura tu sitio y personalización'}
                 {activeModule === 'integrations' && 'Conecta con servicios externos'}
