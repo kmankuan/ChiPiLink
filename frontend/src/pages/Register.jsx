@@ -278,39 +278,51 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="telefono">{t('auth.phone')}</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="telefono"
-                  name="telefono"
-                  type="tel"
-                  placeholder="+507 6000-0000"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  className="h-12 pl-10 rounded-lg"
-                  data-testid="phone-input"
-                />
+            {/* Phone field - conditionally visible */}
+            {isFieldVisible('telefono') && (
+              <div className="space-y-2">
+                <Label htmlFor="telefono">
+                  {t('auth.phone')}{isFieldRequired('telefono') ? ' *' : ''}
+                </Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="telefono"
+                    name="telefono"
+                    type="tel"
+                    placeholder="+507 6000-0000"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    className="h-12 pl-10 rounded-lg"
+                    required={isFieldRequired('telefono')}
+                    data-testid="phone-input"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="direccion">{t('auth.address')}</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="direccion"
-                  name="direccion"
-                  type="text"
-                  placeholder="Ciudad de Panamá, Panamá"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  className="h-12 pl-10 rounded-lg"
-                  data-testid="address-input"
-                />
+            {/* Address field - conditionally visible (usually hidden, auto-captured) */}
+            {isFieldVisible('direccion') && (
+              <div className="space-y-2">
+                <Label htmlFor="direccion">
+                  {t('auth.address')}{isFieldRequired('direccion') ? ' *' : ''}
+                </Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="direccion"
+                    name="direccion"
+                    type="text"
+                    placeholder="Ciudad de Panamá, Panamá"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    className="h-12 pl-10 rounded-lg"
+                    required={isFieldRequired('direccion')}
+                    data-testid="address-input"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
