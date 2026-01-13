@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Book, Mail, Lock, User, Phone, MapPin, Loader2, Eye, EyeOff } from 'lucide-react';
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function Register() {
   const { t } = useTranslation();
@@ -27,6 +29,100 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [authConfig, setAuthConfig] = useState({ 
+    methods: [], 
+    registration_fields: {},
+    auto_capture_location: true,
+    loading: true 
+  });
+  const [locationData, setLocationData] = useState(null);
+
+  // Fetch public auth configuration
+  useEffect(() => {
+    const fetchAuthConfig = async () => {
+      try {
+        const res = await fetch(`${API}/api/auth-v2/auth-config/methods/public`);
+        const data = await res.json();
+        setAuthConfig({ 
+          methods: data.methods || [], 
+          registration_fields: data.registration_fields || {},
+          auto_capture_location: data.auto_capture_location !== false,
+          loading: false 
+        });
+      } catch (error) {
+        // Default config if fetch fails
+        setAuthConfig({
+          methods: [
+            { id: 'email_password', enabled: true, visible: true },
+            { id: 'google', enabled: true, visible: true, label: 'Continuar con Google' }
+          ],
+          registration_fields: {
+            nombre: { required: true, visible: true },
+            email: { required: true, visible: true },
+            telefono: { required: false, visible: true },
+            direccion: { required: false, visible: false },
+            contrasena: { required: true, visible: true }
+          },
+          auto_capture_location: true,
+          loading: false
+        });
+      }
+    };
+    fetchAuthConfig();
+  }, []);
+
+  // Auto-capture location via IP geolocation
+  useEffect(() => {
+    if (authConfig.auto_capture_location) {
+      const captureLocation = async () => {
+        try {
+          // Use a free IP geolocation service
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          if (data) {
+            const locationStr = [data.city, data.region, data.country_name].filter(Boolean).join(', ');
+            setLocationData({
+              ip: data.ip,
+              city: data.city,
+              region: data.region,
+              country: data.country_name,
+              country_code: data.country_code,
+              timezone: data.timezone,
+              location_string: locationStr
+            });
+            // Auto-fill direccion (hidden) with captured location
+            setFormData(prev => ({
+              ...prev,
+              direccion: locationStr
+            }));
+          }
+        } catch (error) {
+          console.log('Could not capture location:', error);
+        }
+      };
+      captureLocation();
+    }
+  }, [authConfig.auto_capture_location]);
+
+  const isMethodVisible = (methodId) => {
+    const method = authConfig.methods.find(m => m.id === methodId);
+    return method?.visible !== false;
+  };
+
+  const getMethodLabel = (methodId, defaultLabel) => {
+    const method = authConfig.methods.find(m => m.id === methodId);
+    return method?.label || defaultLabel;
+  };
+
+  const isFieldVisible = (fieldId) => {
+    const field = authConfig.registration_fields?.[fieldId];
+    return field?.visible !== false;
+  };
+
+  const isFieldRequired = (fieldId) => {
+    const field = authConfig.registration_fields?.[fieldId];
+    return field?.required === true;
+  };
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -52,6 +148,16 @@ export default function Register() {
     
     try {
       const { confirmarContrasena, ...registerData } = formData;
+      
+      // Add location metadata if captured
+      if (locationData) {
+        registerData.registro_metadata = {
+          location: locationData,
+          timestamp: new Date().toISOString(),
+          user_agent: navigator.userAgent
+        };
+      }
+      
       await register(registerData);
       toast.success('¡Cuenta creada exitosamente!');
       navigate('/dashboard');
@@ -62,6 +168,8 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  const showGoogleRegister = isMethodVisible('google');
 
   return (
     <div className="min-h-screen flex noise-bg">
