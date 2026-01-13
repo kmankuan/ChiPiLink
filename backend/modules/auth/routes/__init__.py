@@ -6,6 +6,7 @@ from fastapi import APIRouter
 
 from .auth import router as auth_router
 from .users import router as users_router
+from .auth_config import router as auth_config_router
 
 # Router principal del módulo Auth (refactorizado)
 router = APIRouter(prefix="/auth-v2", tags=["Auth"])
@@ -13,6 +14,7 @@ router = APIRouter(prefix="/auth-v2", tags=["Auth"])
 # Incluir sub-routers
 router.include_router(auth_router)
 router.include_router(users_router)
+router.include_router(auth_config_router)
 
 # Re-exportar para compatibilidad
 auth_refactored_router = router
