@@ -222,12 +222,16 @@ async def save_monday_config(
     - group_id: (Opcional) ID del grupo donde crear items
     - auto_sync: Si debe sincronizar automáticamente al cambiar estados
     - column_mapping: Mapeo de campos a columnas de Monday.com
+    - subitems_enabled: Si debe crear subitems para cada producto
+    - subitem_column_mapping: Mapeo de campos de productos a columnas de subitems
     """
     config = {
         "board_id": request.board_id,
         "group_id": request.group_id,
         "auto_sync": request.auto_sync,
-        "column_mapping": request.column_mapping
+        "column_mapping": request.column_mapping,
+        "subitems_enabled": request.subitems_enabled,
+        "subitem_column_mapping": request.subitem_column_mapping
     }
     
     success = await monday_pedidos_service.save_config(config)
@@ -236,6 +240,98 @@ async def save_monday_config(
         return {"success": True, "message": "Configuración guardada"}
     else:
         raise HTTPException(status_code=500, detail="Error guardando configuración")
+
+
+@router.put("/config/subitems")
+async def update_subitems_config(
+    request: SubitemsConfigRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Actualizar solo la configuración de subitems.
+    Más conveniente para habilitar/deshabilitar subitems sin reconfigurar todo.
+    """
+    current_config = await monday_pedidos_service.get_config()
+    
+    current_config["subitems_enabled"] = request.subitems_enabled
+    current_config["subitem_column_mapping"] = request.subitem_column_mapping
+    
+    success = await monday_pedidos_service.save_config(current_config)
+    
+    if success:
+        return {
+            "success": True,
+            "message": "Configuración de subitems actualizada",
+            "subitems_enabled": request.subitems_enabled
+        }
+    else:
+        raise HTTPException(status_code=500, detail="Error guardando configuración")
+
+
+@router.get("/subitems/{pedido_id}")
+async def get_pedido_subitems(
+    pedido_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Obtener los subitems de un pedido desde Monday.com.
+    """
+    from core.database import db
+    
+    pedido = await db.pedidos_libros.find_one(
+        {"pedido_id": pedido_id},
+        {"monday_item_id": 1}
+    )
+    
+    if not pedido or not pedido.get("monday_item_id"):
+        return {"subitems": [], "message": "Pedido no sincronizado con Monday.com"}
+    
+    subitems = await monday_pedidos_service.get_subitems(pedido["monday_item_id"])
+    
+    return {
+        "pedido_id": pedido_id,
+        "monday_item_id": pedido["monday_item_id"],
+        "subitems": subitems
+    }
+
+
+@router.post("/subitems/{pedido_id}/sync")
+async def sync_pedido_subitems(
+    pedido_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Sincronizar manualmente los subitems de un pedido.
+    Útil para re-sincronizar si se agregaron productos después de la sync inicial.
+    """
+    from core.database import db
+    
+    pedido = await db.pedidos_libros.find_one(
+        {"pedido_id": pedido_id},
+        {"monday_item_id": 1, "items": 1}
+    )
+    
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+    
+    if not pedido.get("monday_item_id"):
+        # Sincronizar primero el pedido principal
+        monday_id = await monday_pedidos_service.sync_pedido(pedido_id)
+        if not monday_id:
+            raise HTTPException(status_code=400, detail="Error sincronizando pedido")
+        pedido["monday_item_id"] = monday_id
+    
+    result = await monday_pedidos_service.sync_pedido_subitems(
+        pedido_id,
+        pedido["monday_item_id"],
+        pedido.get("items", [])
+    )
+    
+    return {
+        "success": True,
+        "pedido_id": pedido_id,
+        **result
+    }
 
 
 @router.post("/sync/{pedido_id}")
