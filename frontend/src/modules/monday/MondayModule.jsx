@@ -90,10 +90,24 @@ export default function MondayModule() {
       estado: 'status',
       fecha: 'date',
       pedido_id: 'text6'
+    },
+    // Configuración de subitems para productos
+    subitems_enabled: false,
+    subitem_column_mapping: {
+      nombre: 'name',
+      cantidad: 'numbers',
+      precio_unitario: 'numbers0',
+      subtotal: 'numbers1',
+      codigo: 'text',
+      materia: 'text0',
+      estado: 'status'
     }
   });
   const [savingStoreConfig, setSavingStoreConfig] = useState(false);
   const [syncingAll, setSyncingAll] = useState(false);
+  
+  // Columnas de subitems
+  const [subitemColumns, setSubitemColumns] = useState([]);
 
   // Configuración General (legacy)
   const [legacyStatus, setLegacyStatus] = useState(null);
