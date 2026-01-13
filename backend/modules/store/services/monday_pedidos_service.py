@@ -136,7 +136,7 @@ class MondayPedidosService:
                 )
                 result = response.json()
                 boards_count = len(result.get("data", {}).get("boards", []))
-        except:
+        except Exception:
             pass
         
         # Guardar workspace
