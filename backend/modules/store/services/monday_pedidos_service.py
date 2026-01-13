@@ -38,6 +38,17 @@ class MondayPedidosService:
                     "total": "numbers",
                     "estado": "status",
                     "fecha": "date"
+                },
+                # Configuración de subitems para productos
+                "subitems_enabled": False,
+                "subitem_column_mapping": {
+                    "nombre": "name",           # Nombre del producto (columna especial)
+                    "cantidad": "numbers",       # Cantidad
+                    "precio_unitario": "numbers0",  # Precio unitario
+                    "subtotal": "numbers1",      # Subtotal
+                    "codigo": "text",            # Código del producto
+                    "materia": "text0",          # Materia/Categoría
+                    "estado": "status"           # Estado del item
                 }
             }
         return config.get("value", {})
