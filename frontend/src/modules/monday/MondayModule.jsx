@@ -615,7 +615,7 @@ export default function MondayModule() {
                   <div>
                     <p className="font-medium text-yellow-800">Conexión requerida</p>
                     <p className="text-sm text-yellow-700">
-                      Primero configura un workspace en la pestaña "Workspaces" para poder configurar los pedidos de libros.
+                      Primero configura un workspace en la pestaña &quot;Workspaces&quot; para poder configurar los pedidos de libros.
                     </p>
                   </div>
                 </div>
