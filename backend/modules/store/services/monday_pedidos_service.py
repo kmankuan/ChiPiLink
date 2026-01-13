@@ -704,6 +704,16 @@ class MondayPedidosService:
             success = await self.update_item(board_id, monday_item_id, column_values)
             if success:
                 logger.info(f"Pedido {pedido_id} actualizado en Monday.com (item {monday_item_id})")
+                
+                # Sincronizar subitems si está habilitado
+                if config.get("subitems_enabled") and pedido.get("items"):
+                    subitem_result = await self.sync_pedido_subitems(
+                        pedido_id,
+                        monday_item_id,
+                        pedido.get("items", [])
+                    )
+                    logger.info(f"Subitems sincronizados: {subitem_result}")
+            
             return monday_item_id if success else None
         else:
             # Crear nuevo
@@ -721,6 +731,15 @@ class MondayPedidosService:
                     {"$set": {"monday_item_id": new_item_id}}
                 )
                 logger.info(f"Pedido {pedido_id} creado en Monday.com (item {new_item_id})")
+                
+                # Sincronizar subitems si está habilitado
+                if config.get("subitems_enabled") and pedido.get("items"):
+                    subitem_result = await self.sync_pedido_subitems(
+                        pedido_id,
+                        new_item_id,
+                        pedido.get("items", [])
+                    )
+                    logger.info(f"Subitems sincronizados: {subitem_result}")
             
             return new_item_id
     
