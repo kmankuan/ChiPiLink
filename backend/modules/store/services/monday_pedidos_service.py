@@ -690,7 +690,7 @@ class MondayPedidosService:
                 try:
                     dt = datetime.fromisoformat(fecha.replace('Z', '+00:00'))
                     column_values[col_map["fecha"]] = {"date": dt.strftime("%Y-%m-%d")}
-                except:
+                except Exception:
                     pass
         
         if col_map.get("pedido_id"):
