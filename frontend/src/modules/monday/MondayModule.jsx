@@ -282,7 +282,9 @@ export default function MondayModule() {
           ...data,
           board_id: data.board_id || '',
           group_id: data.group_id || '',
-          auto_sync: data.auto_sync !== false
+          auto_sync: data.auto_sync !== false,
+          subitems_enabled: data.subitems_enabled || false,
+          subitem_column_mapping: data.subitem_column_mapping || prev.subitem_column_mapping
         }));
       }
     } catch (err) {
