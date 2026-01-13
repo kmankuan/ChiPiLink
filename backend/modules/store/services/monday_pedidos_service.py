@@ -414,6 +414,188 @@ class MondayPedidosService:
             logger.error(f"Error updating Monday item: {e}")
             return False
     
+    # ============== SUBITEMS ==============
+    
+    async def create_subitem(
+        self,
+        parent_item_id: str,
+        subitem_name: str,
+        column_values: Dict = None
+    ) -> Optional[str]:
+        """
+        Crear un subitem en Monday.com asociado a un item padre.
+        Usado para los productos/libros dentro de un pedido.
+        """
+        subitem_name_escaped = self._escape_for_graphql(subitem_name)
+        
+        # Construir la parte de column_values solo si hay valores
+        column_values_part = ""
+        if column_values:
+            column_values_json = json.dumps(column_values, ensure_ascii=False)
+            column_values_escaped = self._escape_for_graphql(column_values_json)
+            column_values_part = f', column_values: "{column_values_escaped}"'
+        
+        mutation = f'''
+        mutation {{
+            create_subitem (
+                parent_item_id: {parent_item_id},
+                item_name: "{subitem_name_escaped}"{column_values_part}
+            ) {{
+                id
+                name
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(mutation)
+            subitem = result.get("data", {}).get("create_subitem")
+            return subitem.get("id") if subitem else None
+        except Exception as e:
+            logger.error(f"Error creating Monday subitem: {e}")
+            return None
+    
+    async def get_subitems(self, parent_item_id: str) -> List[Dict]:
+        """Obtener subitems de un item"""
+        query = f'''
+        query {{
+            items(ids: [{parent_item_id}]) {{
+                subitems {{
+                    id
+                    name
+                    column_values {{
+                        id
+                        text
+                        value
+                    }}
+                }}
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(query)
+            items = result.get("data", {}).get("items", [])
+            if items:
+                return items[0].get("subitems", [])
+            return []
+        except Exception as e:
+            logger.error(f"Error getting subitems: {e}")
+            return []
+    
+    async def delete_subitem(self, subitem_id: str) -> bool:
+        """Eliminar un subitem"""
+        mutation = f'''
+        mutation {{
+            delete_item (item_id: {subitem_id}) {{
+                id
+            }}
+        }}
+        '''
+        
+        try:
+            result = await self._graphql_request(mutation)
+            return result.get("data", {}).get("delete_item") is not None
+        except Exception as e:
+            logger.error(f"Error deleting subitem: {e}")
+            return False
+    
+    async def sync_pedido_subitems(
+        self,
+        pedido_id: str,
+        monday_item_id: str,
+        items: List[Dict]
+    ) -> Dict:
+        """
+        Sincronizar los items/productos de un pedido como subitems en Monday.com.
+        
+        Args:
+            pedido_id: ID del pedido local
+            monday_item_id: ID del item padre en Monday.com
+            items: Lista de productos del pedido
+            
+        Returns:
+            Dict con contadores de éxito/error
+        """
+        config = await self.get_config()
+        
+        if not config.get("subitems_enabled"):
+            logger.info(f"Subitems deshabilitados para pedido {pedido_id}")
+            return {"created": 0, "failed": 0, "skipped": True}
+        
+        subitem_col_map = config.get("subitem_column_mapping", {})
+        
+        # Obtener subitems existentes para evitar duplicados
+        existing_subitems = await self.get_subitems(monday_item_id)
+        existing_names = {si.get("name", "").lower() for si in existing_subitems}
+        
+        created = 0
+        failed = 0
+        subitem_ids = []
+        
+        for item in items:
+            libro_nombre = item.get("libro_nombre", "Producto")
+            
+            # Verificar si ya existe (por nombre)
+            if libro_nombre.lower() in existing_names:
+                logger.info(f"Subitem '{libro_nombre}' ya existe, omitiendo")
+                continue
+            
+            # Construir valores de columnas para el subitem
+            column_values = {}
+            
+            if subitem_col_map.get("cantidad"):
+                column_values[subitem_col_map["cantidad"]] = str(item.get("cantidad", 1))
+            
+            if subitem_col_map.get("precio_unitario"):
+                column_values[subitem_col_map["precio_unitario"]] = str(item.get("precio_unitario", 0))
+            
+            if subitem_col_map.get("subtotal"):
+                subtotal = item.get("cantidad", 1) * item.get("precio_unitario", 0)
+                column_values[subitem_col_map["subtotal"]] = str(subtotal)
+            
+            if subitem_col_map.get("codigo"):
+                column_values[subitem_col_map["codigo"]] = item.get("libro_codigo", "")
+            
+            if subitem_col_map.get("materia"):
+                column_values[subitem_col_map["materia"]] = item.get("materia", "")
+            
+            if subitem_col_map.get("estado"):
+                # Mapear estado del item
+                estado_map = {
+                    "pendiente": {"index": 0},
+                    "disponible": {"index": 1},
+                    "reservado": {"index": 0},
+                    "entregado": {"index": 1},
+                    "cancelado": {"index": 2}
+                }
+                estado = item.get("estado", "pendiente")
+                column_values[subitem_col_map["estado"]] = estado_map.get(estado, {"index": 0})
+            
+            # Crear el subitem
+            subitem_id = await self.create_subitem(
+                monday_item_id,
+                libro_nombre,
+                column_values if column_values else None
+            )
+            
+            if subitem_id:
+                created += 1
+                subitem_ids.append(subitem_id)
+                logger.info(f"Subitem creado: {libro_nombre} (ID: {subitem_id})")
+            else:
+                failed += 1
+                logger.error(f"Error creando subitem: {libro_nombre}")
+        
+        # Guardar IDs de subitems en el pedido
+        if subitem_ids:
+            await db.pedidos_libros.update_one(
+                {"pedido_id": pedido_id},
+                {"$set": {"monday_subitem_ids": subitem_ids}}
+            )
+        
+        return {"created": created, "failed": failed, "skipped": False}
+    
     async def sync_pedido(self, pedido_id: str) -> Optional[str]:
         """
         Sincronizar un pedido con Monday.com.
