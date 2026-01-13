@@ -30,6 +30,31 @@ class MondayConfigRequest(BaseModel):
         "fecha": "date",
         "pedido_id": "text6"
     }
+    # Configuración de subitems
+    subitems_enabled: bool = False
+    subitem_column_mapping: Dict[str, str] = {
+        "nombre": "name",
+        "cantidad": "numbers",
+        "precio_unitario": "numbers0",
+        "subtotal": "numbers1",
+        "codigo": "text",
+        "materia": "text0",
+        "estado": "status"
+    }
+
+
+class SubitemsConfigRequest(BaseModel):
+    """Configuración de subitems para productos"""
+    subitems_enabled: bool = True
+    subitem_column_mapping: Dict[str, str] = {
+        "nombre": "name",
+        "cantidad": "numbers",
+        "precio_unitario": "numbers0",
+        "subtotal": "numbers1",
+        "codigo": "text",
+        "materia": "text0",
+        "estado": "status"
+    }
 
 
 class AddWorkspaceRequest(BaseModel):
