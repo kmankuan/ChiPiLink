@@ -11,13 +11,15 @@ import {
   FileText,
   Users,
   Languages,
-  Database
+  Database,
+  Shield
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
 import FormConfigModule from './FormConfigModule';
 import TranslationsModule from './TranslationsModule';
 import DemoDataModule from './DemoDataModule';
+import AuthMethodsConfig from './AuthMethodsConfig';
 
 export default function AdminModule() {
   return (
@@ -28,6 +30,11 @@ export default function AdminModule() {
             <Settings className="h-4 w-4" />
             <span className="hidden sm:inline">Configuración del Sitio</span>
             <span className="sm:hidden">Config</span>
+          </TabsTrigger>
+          <TabsTrigger value="auth" className="gap-2">
+            <Shield className="h-4 w-4" />
+            <span className="hidden sm:inline">Autenticación</span>
+            <span className="sm:hidden">Auth</span>
           </TabsTrigger>
           <TabsTrigger value="landing" className="gap-2">
             <Palette className="h-4 w-4" />
@@ -53,6 +60,10 @@ export default function AdminModule() {
 
         <TabsContent value="site">
           <SiteConfigModule />
+        </TabsContent>
+
+        <TabsContent value="auth">
+          <AuthMethodsConfig />
         </TabsContent>
 
         <TabsContent value="landing">
