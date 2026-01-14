@@ -1490,6 +1490,30 @@ Se unificaron `Landing.jsx` y `CommunityLanding.jsx` en un solo componente `Supe
 
 ---
 
+### 🆕 Datos Demo para Unatienda ✅ (Enero 14, 2026)
+Sistema de generación de datos demo específico para el catálogo privado "Unatienda" (libros escolares).
+
+**Características:**
+- Genera 100 libros de texto para todos los grados (Pre-Kinder a 12vo)
+- Crea ~110 estudiantes distribuidos por grado con datos completos
+- Genera 10 pedidos de ejemplo con múltiples productos
+- Los productos incluyen: código, ISBN, editorial, materia, precio y precio de oferta
+- Los estudiantes incluyen: número, nombre, grado, sección y datos de acudiente
+
+**Ubicación:**
+- Frontend: Admin → Libros Escolares → Tab "Demo"
+- Backend: `/api/admin/unatienda/demo-data` (POST/DELETE)
+- Script: `/app/backend/scripts/generate_unatienda_demo.py`
+
+**Endpoints API:**
+- `POST /api/admin/unatienda/demo-data` - Generar datos demo
+- `DELETE /api/admin/unatienda/demo-data` - Limpiar datos demo
+- `GET /api/admin/unatienda/demo-stats` - Obtener estadísticas
+
+**Nota:** Los pedidos generados pueden sincronizarse con Monday.com si está configurado, incluyendo la creación de subitems para cada producto del pedido.
+
+---
+
 ### P2 - Media Prioridad
 - [ ] Intermediación de pagos (tarjeta crédito → Books de Light)
 - [ ] Solicitud especial para re-compras (libro perdido)
