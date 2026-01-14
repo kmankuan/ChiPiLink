@@ -63,6 +63,20 @@ async def search_products(q: str = Query(..., min_length=2)):
     return await product_service.search_products(q)
 
 
+@router.get("/grades")
+async def get_available_grades():
+    """Get available grades for filtering"""
+    grados = await db.libros.distinct("grado", {"activo": True})
+    return {"grados": sorted([g for g in grados if g])}
+
+
+@router.get("/subjects")
+async def get_available_subjects():
+    """Get available subjects for filtering"""
+    materias = await db.libros.distinct("materia", {"activo": True})
+    return {"materias": sorted([m for m in materias if m])}
+
+
 @router.get("/{libro_id}", response_model=Product)
 async def get_product(libro_id: str):
     """Obtener producto por ID"""
