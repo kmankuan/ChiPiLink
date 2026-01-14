@@ -114,6 +114,43 @@ export default function RolesModule() {
     }
   };
 
+  const fetchAuditLogs = async () => {
+    setLoadingAudit(true);
+    try {
+      const [logsRes, statsRes] = await Promise.all([
+        fetch(`${API}/api/roles/audit/logs?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API}/api/roles/audit/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      
+      const logsData = await logsRes.json();
+      const statsData = await statsRes.json();
+      
+      setAuditLogs(logsData.logs || []);
+      setAuditStats(statsData);
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      toast.error('Error al cargar logs de auditoría');
+    } finally {
+      setLoadingAudit(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('es', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
   const handleOpenRoleForm = (role = null) => {
     if (role) {
       setEditingRole(role);
