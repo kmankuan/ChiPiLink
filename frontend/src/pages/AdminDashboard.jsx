@@ -279,7 +279,7 @@ export default function AdminDashboard() {
             <aside className="absolute left-0 top-14 h-[calc(100%-56px)] w-64 bg-card border-r shadow-lg">
               <ScrollArea className="h-full py-2">
                 <nav className="px-2 space-y-1">
-                  {navItems.map((item) => {
+                  {filteredNavItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeModule === item.id;
                     
