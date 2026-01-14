@@ -496,17 +496,20 @@ export function Header() {
                   >
                     {t('nav.orders')}
                   </Link>
-                  <Link 
-                    to="/mis-pedidos-libros"
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                      location.pathname === '/mis-pedidos-libros' ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-book-orders-link"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    Mis Libros Escolares
-                  </Link>
+                  {/* Show "Mis Libros Escolares" only if user has linked students or permission */}
+                  {(hasLinkedStudents || hasPermission('unatienda.view_private_catalog')) && (
+                    <Link 
+                      to="/mis-pedidos-libros"
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                        location.pathname === '/mis-pedidos-libros' ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid="mobile-book-orders-link"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Mis Libros Escolares
+                    </Link>
+                  )}
                   {/* PinpanClub - Solo autenticados */}
                   <Link 
                     to="/pinpanclub"
@@ -522,7 +525,7 @@ export function Header() {
                 </>
               )}
               
-              {isAdmin && (
+              {canAccessAdmin && (
                 <Link 
                   to="/admin"
                   className="px-4 py-2 text-sm font-medium text-accent hover:bg-muted rounded-lg transition-colors"
