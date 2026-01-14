@@ -330,3 +330,67 @@ async def update_landing_page_config(data: dict, admin: dict = Depends(get_admin
     )
     
     return {"success": True, "message": "Configuración guardada"}
+
+
+# ============== UNATIENDA DEMO DATA ==============
+
+@router.post("/unatienda/demo-data")
+async def generate_unatienda_demo_data(admin: dict = Depends(get_admin_user)):
+    """Generate demo data for Unatienda private catalog"""
+    try:
+        from scripts.generate_unatienda_demo import generate_all_demo_data
+        
+        result = await generate_all_demo_data()
+        
+        return {
+            "success": True,
+            "message": "Datos de demo generados exitosamente",
+            "data": {
+                "productos": result["products"],
+                "estudiantes": result["students"],
+                "pedidos": result["orders"]
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error generando datos demo de Unatienda: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/unatienda/demo-data")
+async def clear_unatienda_demo_data(admin: dict = Depends(get_admin_user)):
+    """Clear demo data for Unatienda private catalog"""
+    try:
+        from scripts.generate_unatienda_demo import clear_demo_data
+        
+        result = await clear_demo_data()
+        
+        return {
+            "success": True,
+            "message": "Datos de demo eliminados",
+            "data": result
+        }
+    except Exception as e:
+        logger.error(f"Error eliminando datos demo de Unatienda: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/unatienda/demo-stats")
+async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
+    """Get statistics for Unatienda demo data"""
+    try:
+        stats = {
+            "productos": await db.libros.count_documents({"es_demo": True}),
+            "estudiantes": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
+            "pedidos": await db.pedidos_libros.count_documents({"es_demo": True}),
+            "productos_total": await db.libros.count_documents({"es_catalogo_privado": True}),
+            "estudiantes_total": await db.estudiantes_sincronizados.count_documents({}),
+            "pedidos_total": await db.pedidos_libros.count_documents({})
+        }
+        
+        return {
+            "success": True,
+            "stats": stats
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo estadísticas de Unatienda: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
