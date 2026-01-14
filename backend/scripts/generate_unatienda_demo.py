@@ -262,6 +262,21 @@ async def generate_all_demo_data():
     }
 
 
+async def clear_demo_data():
+    """Clear all demo data for Unatienda"""
+    print("🗑️ Limpiando datos de demo...")
+    
+    result_libros = await db.libros.delete_many({"es_demo": True})
+    result_estudiantes = await db.estudiantes_sincronizados.delete_many({"es_demo": True})
+    result_pedidos = await db.pedidos_libros.delete_many({"es_demo": True})
+    
+    return {
+        "libros_eliminados": result_libros.deleted_count,
+        "estudiantes_eliminados": result_estudiantes.deleted_count,
+        "pedidos_eliminados": result_pedidos.deleted_count
+    }
+
+
 # Main execution
 if __name__ == "__main__":
     asyncio.run(generate_all_demo_data())
