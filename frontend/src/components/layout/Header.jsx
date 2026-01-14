@@ -55,31 +55,31 @@ export function Header() {
 
   const isUnatiendaPage = location.pathname.startsWith('/unatienda');
 
+  // Helper to determine if user can access admin panel
+  const canAccessAdmin = isAdmin || hasAdminAccess;
+
   // Check if user has linked students for book orders
   useEffect(() => {
+    const checkLinkedStudents = async () => {
+      try {
+        const API_URL = process.env.REACT_APP_BACKEND_URL;
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setHasLinkedStudents(data.estudiantes?.length > 0 || data.length > 0);
+        }
+      } catch (error) {
+        console.error('Error checking linked students:', error);
+      }
+    };
+
     if (isAuthenticated && user?.cliente_id) {
       checkLinkedStudents();
     }
   }, [isAuthenticated, user?.cliente_id]);
-
-  const checkLinkedStudents = async () => {
-    try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL;
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setHasLinkedStudents(data.estudiantes?.length > 0 || data.length > 0);
-      }
-    } catch (error) {
-      console.error('Error checking linked students:', error);
-    }
-  };
-
-  // Helper to determine if user can access admin panel
-  const canAccessAdmin = isAdmin || hasAdminAccess;
 
   const handleLogout = async () => {
     await logout();
