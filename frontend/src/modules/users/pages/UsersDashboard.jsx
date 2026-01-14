@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send } from 'lucide-react';
+import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,6 +19,7 @@ import MisCapacidades from '../components/MisCapacidades';
 import ServiciosSugeridos from '../components/ServiciosSugeridos';
 import TransferenciasDialog from '../components/TransferenciasDialog';
 import AlertasSaldo from '../components/AlertasSaldo';
+import CompraExclusiva from '../components/CompraExclusiva';
 
 // Componentes de notificaciones
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
