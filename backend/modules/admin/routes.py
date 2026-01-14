@@ -394,3 +394,28 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
     except Exception as e:
         logger.error(f"Error obteniendo estadísticas de Unatienda: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/unatienda/stats")
+async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
+    """Get overall statistics for Unatienda module"""
+    try:
+        stats = {
+            "productos_publicos": await db.libros.count_documents({
+                "activo": True,
+                "$or": [{"es_catalogo_privado": {"$exists": False}}, {"es_catalogo_privado": False}]
+            }),
+            "productos_privados": await db.libros.count_documents({
+                "es_catalogo_privado": True,
+                "activo": True
+            }),
+            "estudiantes": await db.estudiantes_sincronizados.count_documents({}),
+            "pedidos_pendientes": await db.pedidos_libros.count_documents({"estado": "pendiente"}),
+            "vinculaciones_activas": await db.vinculaciones.count_documents({"estado": "aprobada", "activo": True}),
+            "vinculaciones_pendientes": await db.vinculaciones.count_documents({"estado": "pendiente"})
+        }
+        
+        return stats
+    except Exception as e:
+        logger.error(f"Error obteniendo estadísticas de Unatienda: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
