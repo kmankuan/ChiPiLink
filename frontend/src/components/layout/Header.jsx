@@ -255,13 +255,7 @@ export function Header() {
             
             {isAuthenticated && (
               <>
-                <Link 
-                  to="/dashboard" 
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  data-testid="dashboard-nav-link"
-                >
-                  {t('nav.students')}
-                </Link>
+                {/* Mis Pedidos - visible para todos los usuarios autenticados */}
                 <Link 
                   to="/pedidos" 
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
