@@ -345,3 +345,97 @@ async def check_multiple_permissions(
         "has_required": has_all,
         "require_all": require_all
     }
+
+
+# ============== AUDIT LOG ENDPOINTS ==============
+
+@router.get("/audit/logs")
+async def get_audit_logs(
+    action: Optional[str] = None,
+    actor_id: Optional[str] = None,
+    target_id: Optional[str] = None,
+    target_type: Optional[str] = None,
+    limit: int = Query(50, ge=1, le=200),
+    skip: int = Query(0, ge=0),
+    admin: dict = Depends(get_admin_user)
+):
+    """Get audit logs with optional filters"""
+    # Check permission
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "roles.view"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de auditoría")
+    
+    filters = AuditLogFilter(
+        action=AuditActionType(action) if action else None,
+        actor_id=actor_id,
+        target_id=target_id,
+        target_type=target_type,
+        limit=limit,
+        skip=skip
+    )
+    
+    logs = await audit_service.get_logs(filters, limit, skip)
+    total = await audit_service.get_logs_count(filters)
+    
+    return {
+        "logs": logs,
+        "total": total,
+        "limit": limit,
+        "skip": skip
+    }
+
+
+@router.get("/audit/stats")
+async def get_audit_stats(admin: dict = Depends(get_admin_user)):
+    """Get audit log statistics"""
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "roles.view"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver estadísticas de auditoría")
+    
+    # Get counts by action type
+    pipeline = [
+        {"$group": {"_id": "$action", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    
+    action_counts = await db.roles_audit_log.aggregate(pipeline).to_list(20)
+    total_logs = await db.roles_audit_log.count_documents({})
+    
+    # Get recent activity (last 24 hours)
+    from datetime import timedelta
+    yesterday = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    recent_count = await db.roles_audit_log.count_documents({"timestamp": {"$gte": yesterday}})
+    
+    return {
+        "total_logs": total_logs,
+        "recent_24h": recent_count,
+        "by_action": {item["_id"]: item["count"] for item in action_counts}
+    }
+
+
+@router.get("/audit/user/{cliente_id}")
+async def get_user_audit_logs(
+    cliente_id: str,
+    limit: int = Query(20, ge=1, le=100),
+    admin: dict = Depends(get_admin_user)
+):
+    """Get audit logs related to a specific user"""
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "users.view"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de usuario")
+    
+    logs = await audit_service.get_user_activity(cliente_id, limit)
+    return {"logs": logs, "cliente_id": cliente_id}
+
