@@ -1916,6 +1916,10 @@ export default function BookOrdersAdmin() {
           <PedidosAdminTab token={token} />
         </TabsContent>
 
+        <TabsContent value="demo">
+          <DemoDatosTab token={token} />
+        </TabsContent>
+
         <TabsContent value="monday">
           <MondayQuickAccess navigate={navigate} />
         </TabsContent>
