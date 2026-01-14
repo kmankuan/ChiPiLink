@@ -34,7 +34,7 @@ class CategoryRepository(BaseRepository):
     
     async def create(self, category_data: Dict) -> Dict:
         """Crear nueva categoría"""
-        if "categoria_id" not in category_data:
+        if not category_data.get("categoria_id"):
             category_data["categoria_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         category_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(category_data)
