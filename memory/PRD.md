@@ -5,7 +5,40 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 2026)
+## Latest Update (Enero 14, 2026)
+
+### 🆕 Catálogo Privado de Unatienda ✅
+
+Sistema completo de gestión de catálogo privado para libros escolares de PCA (Panama Christian Academy).
+
+#### Backend - Endpoints Implementados
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/store/catalogo-privado/acceso` | GET | Verificar acceso del usuario (requiere estudiante vinculado) |
+| `/api/store/catalogo-privado/productos` | GET | Obtener productos del catálogo privado (con filtros) |
+| `/api/store/catalogo-privado/productos/{id}` | GET | Detalle de un producto |
+| `/api/store/catalogo-privado/por-grado/{grado}` | GET | Productos filtrados por grado |
+| `/api/store/catalogo-privado/resumen` | GET | Resumen del catálogo para el usuario |
+| `/api/store/catalogo-privado/admin/productos` | GET | Admin: Listar todos los productos |
+| `/api/store/catalogo-privado/admin/productos` | POST | Admin: Crear producto |
+| `/api/store/catalogo-privado/admin/productos/{id}` | PUT | Admin: Actualizar producto |
+| `/api/store/catalogo-privado/admin/productos/{id}` | DELETE | Admin: Eliminar producto |
+
+#### Frontend - Panel de Admin
+- **Ubicación**: Admin → Libros Escolares → Tab "Catálogo"
+- **Características**:
+  - Vista de tabla con 100 productos
+  - Filtros por grado y materia
+  - Buscador por nombre, código, editorial
+  - Formulario para agregar/editar productos
+  - Estadísticas: total, activos, grados, materias
+
+#### Lógica de Acceso
+- Solo usuarios con estudiantes PCA vinculados pueden ver el catálogo
+- Los productos se filtran automáticamente según el grado del estudiante
+- Campo `es_catalogo_privado: true` identifica productos del catálogo privado
+
+---
 
 ### UI/UX Fixes Completados ✅
 | Issue | Descripción | Estado |
