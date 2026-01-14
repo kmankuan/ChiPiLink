@@ -88,20 +88,24 @@ export function Header() {
 
   // Function to toggle CXGenie chat widget
   const toggleSupportChat = () => {
-    // CXGenie widget from emergent-main.js exposes window.CXGenie or similar
-    if (window.CXGenie?.toggle) {
-      window.CXGenie.toggle();
-    } else if (window.Emergent?.openChat) {
-      window.Emergent.openChat();
-    } else {
-      // Fallback: try to find and click the widget button
-      const widgetButton = document.querySelector('[data-cxgenie-trigger], .cxgenie-widget-button, [class*="cxgenie"]');
-      if (widgetButton) {
-        widgetButton.click();
+    try {
+      // CXGenie widget from emergent-main.js exposes window.CXGenie or similar
+      if (window.CXGenie?.toggle) {
+        window.CXGenie.toggle();
+      } else if (window.Emergent?.openChat) {
+        window.Emergent.openChat();
       } else {
-        // Last resort: dispatch custom event
-        window.dispatchEvent(new CustomEvent('cxgenie:toggle'));
+        // Fallback: try to find and click the widget button
+        const widgetButton = document.querySelector('[data-cxgenie-trigger], .cxgenie-widget-button, [class*="cxgenie"]');
+        if (widgetButton) {
+          widgetButton.click();
+        } else {
+          // Last resort: dispatch custom event
+          window.dispatchEvent(new CustomEvent('cxgenie:toggle'));
+        }
       }
+    } catch (error) {
+      console.warn('Support chat not available:', error);
     }
   };
 
