@@ -51,19 +51,35 @@ async def get_role(role_id: str, admin: dict = Depends(get_admin_user)):
 
 @router.post("")
 async def create_role(
+    request: Request,
     role_data: RoleCreate,
     admin: dict = Depends(get_admin_user)
 ):
     """Create a new custom role"""
     # Check if user has permission
-    has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
-        "roles.create"
-    )
-    if not has_permission:
-        raise HTTPException(status_code=403, detail="No tienes permiso para crear roles")
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "roles.create"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para crear roles")
     
     role = await roles_service.create_role(role_data, admin["cliente_id"])
+    
+    # Log the action
+    await audit_service.log_action(
+        action=AuditActionType.ROLE_CREATED,
+        actor_id=admin["cliente_id"],
+        target_type="role",
+        target_id=role["role_id"],
+        target_nombre=role["nombre"],
+        details={"permisos": role_data.permisos, "nivel": role_data.nivel},
+        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent")
+    )
+    
     return {"success": True, "role": role}
 
 
@@ -71,15 +87,20 @@ async def create_role(
 async def update_role(
     role_id: str,
     updates: RoleUpdate,
+    request: Request,
     admin: dict = Depends(get_admin_user)
 ):
     """Update a role"""
-    has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
-        "roles.edit"
-    )
-    if not has_permission:
-        raise HTTPException(status_code=403, detail="No tienes permiso para editar roles")
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "roles.edit"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para editar roles")
+    
+    # Get old role for comparison
+    old_role = await roles_service.get_role(role_id)
     
     role = await roles_service.update_role(role_id, updates)
     if not role:
