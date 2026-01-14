@@ -100,6 +100,49 @@ Se implementó un sistema completo de log de auditoría para rastrear todas las 
 
 ---
 
+### 🆕 Interfaz de Compra Exclusiva ✅ NUEVO
+
+Se implementó un nuevo flujo para que los usuarios accedan a catálogos exclusivos desde Mi Cuenta.
+
+#### Ubicación
+- Nueva pestaña "Compra Exclusiva" en `/mi-cuenta`
+- Archivo: `/app/frontend/src/modules/users/components/CompraExclusiva.jsx`
+
+#### Funcionalidad
+- Lista de programas exclusivos disponibles (actualmente: "Textos de PCA")
+- Formulario de vinculación de estudiantes con:
+  - Nombre del acudiente (auto-rellenado)
+  - Nombre completo del estudiante
+  - Número de estudiante
+  - Grado (opcional)
+  - Relación con el estudiante (padre, madre, acudiente, estudiante mismo, etc.)
+  - Notas adicionales
+- Gestión de múltiples estudiantes vinculados
+- Estados de solicitud: Pendiente, Verificado, Rechazado
+- Posibilidad de editar y eliminar estudiantes vinculados
+
+---
+
+### 🆕 Tienda Unatienda Unificada ✅ NUEVO
+
+Se rediseñó la página de Unatienda para presentar una tienda unificada sin revelar conceptos de catálogo público/privado.
+
+#### Cambios
+- Eliminados tabs "Catálogo General" y "Libros PCA"
+- Categorías mostradas como botones: Snacks, Bebidas, Comida Preparada, etc.
+- Para usuarios con estudiantes vinculados: aparece botón "Textos Escolares" como una categoría más
+- Al acceder a "Textos Escolares", se muestra header especial con filtros por grado y materia
+- Botón "Ver tienda general" para regresar al catálogo público
+
+---
+
+### 🆕 Renombrado "Clientes" a "Usuarios" ✅ NUEVO
+
+- Sidebar del admin: "Clientes" → "Usuarios"
+- Descripción actualizada: "Gestiona usuarios, sus solicitudes de acceso exclusivo y vinculaciones"
+
+---
+
 ### 🆕 Unificación del Módulo Unatienda ✅
 
 Se completó la unificación del sistema de tienda en un único módulo llamado **Unatienda**.
