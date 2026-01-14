@@ -59,7 +59,7 @@ const ModuleLoader = () => (
 // Navigation items
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'store', label: 'Tienda', icon: ShoppingBag },
+  { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag },
   { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
   { id: 'customers', label: 'Clientes', icon: Users },
   { id: 'memberships', label: 'Membresías', icon: CreditCard },
@@ -67,7 +67,6 @@ const navItems = [
   { id: 'admin', label: 'Administración', icon: Settings },
   { id: 'integrations', label: 'Integraciones', icon: Plug },
   { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
-  { id: 'book-orders', label: 'Libros Escolares', icon: BookOpen, isExternal: true, path: '/admin/book-orders' },
 ];
 
 export default function AdminDashboard() {
