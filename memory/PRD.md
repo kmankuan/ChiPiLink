@@ -62,6 +62,42 @@ Se implementó un sistema completo de roles y permisos para controlar el acceso 
 - **Backend:** 13/13 tests passed (100%)
 - **Frontend:** 100% UI permission checks working
 
+### 📋 Log de Auditoría ✅ NUEVO
+
+Se implementó un sistema completo de log de auditoría para rastrear todas las acciones relacionadas con roles y permisos.
+
+#### Acciones Auditadas
+- `role_created` - Creación de nuevo rol
+- `role_updated` - Actualización de rol
+- `role_deleted` - Eliminación de rol
+- `role_assigned` - Asignación de rol a usuario
+- `role_removed` - Remoción de rol de usuario
+- `permission_added` - Agregado de permiso
+- `permission_removed` - Remoción de permiso
+- `permissions_updated` - Actualización de permisos
+
+#### Información Registrada
+- ID del actor (quién realizó la acción)
+- Email y nombre del actor
+- Tipo de target (role/user)
+- ID y nombre del target
+- Detalles específicos (rol anterior, rol nuevo, permisos agregados/removidos)
+- IP del cliente
+- User-Agent
+- Timestamp ISO
+
+#### Endpoints API de Auditoría
+- `GET /api/roles/audit/logs` - Obtener logs con filtros
+- `GET /api/roles/audit/stats` - Obtener estadísticas (total, últimas 24h, por tipo)
+- `GET /api/roles/audit/user/{cliente_id}` - Logs de un usuario específico
+
+#### UI de Auditoría
+- Pestaña "Auditoría" en el módulo de Roles y Permisos
+- Cards con estadísticas en tiempo real
+- Filtro de búsqueda por actor/destino
+- Lista cronológica de cambios con detalles expandidos
+- Badges de color por tipo de acción
+
 ---
 
 ### 🆕 Unificación del Módulo Unatienda ✅
