@@ -54,6 +54,30 @@ Admin → Unatienda
 
 ---
 
+### 🆕 Vista Pública de Unatienda ✅
+
+Implementada la vista pública de Unatienda (`/unatienda`) con soporte dual de catálogos.
+
+#### Características
+- **Tabs de navegación**: "Catálogo General" y "Libros PCA"
+- **Catálogo General**: Productos públicos visibles para todos
+- **Catálogo Privado PCA**: 
+  - Solo visible para usuarios con estudiantes PCA vinculados
+  - Muestra sección "Tus Estudiantes Vinculados" con nombres y grados
+  - Filtros por grado y materia
+  - Badge "PCA" en cada producto
+- **Banner informativo**: Si el usuario no tiene acceso, muestra CTA para iniciar sesión o vincular estudiante
+- **Cards de producto**: Imagen, grado, materia, editorial, precio, botón agregar al carrito
+
+#### Lógica de Acceso
+```
+Usuario no autenticado → Ve catálogo público + banner de "Iniciar Sesión"
+Usuario autenticado sin estudiantes → Ve catálogo público + banner de "Vincular Estudiante"
+Usuario autenticado con estudiantes → Ve ambos catálogos (público + privado PCA)
+```
+
+---
+
 ### Catálogo Privado de Unatienda ✅
 
 Sistema completo de gestión de catálogo privado para libros escolares de PCA (Panama Christian Academy).
