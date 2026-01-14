@@ -98,6 +98,9 @@ from modules.upload.routes import router as upload_router
 # Realtime WebSocket Module
 from modules.realtime import realtime_router
 
+# Roles & Permissions Module
+from modules.roles import router as roles_router, roles_service
+
 # ============== IMPORT EXISTING ROUTES ==============
 
 # Platform Store (Unatienda/Yappy) - Already modularized
