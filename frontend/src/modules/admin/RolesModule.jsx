@@ -277,7 +277,8 @@ export default function RolesModule() {
     }
   };
 
-  const RoleIcon = ({ iconName, className }) => {
+  // Helper function for role icon
+  const getRoleIcon = (iconName, className) => {
     const Icon = ROLE_ICONS[iconName] || Shield;
     return <Icon className={className} />;
   };
