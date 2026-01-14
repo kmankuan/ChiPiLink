@@ -3,10 +3,11 @@ Authentication helpers and dependencies for ChiPi Link
 """
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Optional
+from typing import Optional, List, Callable
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+import fnmatch
 
 from .config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRATION_HOURS
 from .database import db
