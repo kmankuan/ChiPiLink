@@ -183,7 +183,7 @@ export default function UsersDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-8 h-auto gap-1 p-1">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8 h-auto gap-1 p-1">
             <TabsTrigger value="wallet" data-testid="wallet-tab" className="gap-1 text-xs sm:text-sm">
               <Wallet className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.wallet}</span>
@@ -191,6 +191,10 @@ export default function UsersDashboard() {
             <TabsTrigger value="profile" data-testid="profile-tab" className="gap-1 text-xs sm:text-sm">
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.profile}</span>
+            </TabsTrigger>
+            <TabsTrigger value="exclusive" data-testid="exclusive-tab" className="gap-1 text-xs sm:text-sm">
+              <ShoppingBag className="h-4 w-4" />
+              <span className="hidden sm:inline">{txt.exclusive}</span>
             </TabsTrigger>
             <TabsTrigger value="membership" data-testid="membership-tab" className="gap-1 text-xs sm:text-sm">
               <CreditCard className="h-4 w-4" />
@@ -220,6 +224,10 @@ export default function UsersDashboard() {
 
           <TabsContent value="profile">
             <UserProfile token={token} user={user} />
+          </TabsContent>
+
+          <TabsContent value="exclusive">
+            <CompraExclusiva />
           </TabsContent>
 
           <TabsContent value="membership">
