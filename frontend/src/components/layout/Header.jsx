@@ -479,14 +479,7 @@ export function Header() {
               
               {isAuthenticated && (
                 <>
-                  <Link 
-                    to="/dashboard"
-                    className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-dashboard-link"
-                  >
-                    Dashboard
-                  </Link>
+                  {/* Mis Pedidos - Siempre visible */}
                   <Link 
                     to="/pedidos"
                     className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
@@ -495,8 +488,9 @@ export function Header() {
                   >
                     {t('nav.orders')}
                   </Link>
-                  {/* Show "Mis Libros Escolares" only if user has linked students or permission */}
-                  {(hasLinkedStudents || hasPermission('unatienda.view_private_catalog')) && (
+                  
+                  {/* Mis Libros Escolares - Solo si tiene estudiantes vinculados */}
+                  {hasLinkedStudents && (
                     <Link 
                       to="/mis-pedidos-libros"
                       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
@@ -509,18 +503,21 @@ export function Header() {
                       Mis Libros Escolares
                     </Link>
                   )}
-                  {/* PinpanClub - Solo autenticados */}
-                  <Link 
-                    to="/pinpanclub"
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                      location.pathname.startsWith('/pinpanclub') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-pingpong-link"
-                  >
-                    <Trophy className="h-4 w-4" />
-                    PinpanClub
-                  </Link>
+                  
+                  {/* PinpanClub - Solo si tiene membresía activa */}
+                  {(user?.tiene_membresia_activa || hasPermission('pinpanclub.access')) && (
+                    <Link 
+                      to="/pinpanclub"
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                        location.pathname.startsWith('/pinpanclub') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      data-testid="mobile-pingpong-link"
+                    >
+                      <Trophy className="h-4 w-4" />
+                      PinpanClub
+                    </Link>
+                  )}
                 </>
               )}
               
