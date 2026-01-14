@@ -32,6 +32,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export default function UsersDashboard() {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('wallet');
   const [walletBalance, setWalletBalance] = useState(null);
   
