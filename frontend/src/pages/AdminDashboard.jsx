@@ -100,8 +100,8 @@ export default function AdminDashboard() {
     switch (activeModule) {
       case 'dashboard':
         return <DashboardModule />;
-      case 'store':
-        return <StoreModule />;
+      case 'unatienda':
+        return <UnatiendaModule />;
       case 'orders':
         return <OrdersModule />;
       case 'customers':
