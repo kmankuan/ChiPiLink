@@ -7,7 +7,54 @@ También incluye un sistema unificado de gestión de usuarios basado en "Capacid
 
 ## Latest Update (Enero 14, 2026)
 
-### 🆕 Catálogo Privado de Unatienda ✅
+### 🆕 Unificación del Módulo Unatienda ✅
+
+Se completó la unificación del sistema de tienda en un único módulo llamado **Unatienda**.
+
+#### Estructura del Módulo Unatienda (Admin)
+```
+Admin → Unatienda
+├── 📊 Dashboard (estadísticas generales)
+├── 🏪 Catálogo Público (ecommerce general - todos los usuarios)
+│   ├── Productos
+│   ├── Categorías  
+│   └── Inventario
+├── 📚 Catálogo Privado PCA (solo usuarios con estudiantes vinculados)
+├── 👨‍🎓 Estudiantes (estudiantes PCA sincronizados)
+├── 🔗 Vinculaciones (relación estudiante-acudiente)
+├── 📦 Pedidos (pedidos de libros)
+├── ⚙️ Configuración
+│   ├── General (info de la tienda)
+│   ├── Yappy Comercial (método de pago)
+│   └── Monday.com (enlace a integraciones)
+└── 🧪 Demo (generación de datos de prueba)
+```
+
+#### Cambios Realizados
+1. **Renombrado**: "Tienda" → "Unatienda" en sidebar y títulos
+2. **Consolidado**: "Libros Escolares" absorbido en Unatienda como "Catálogo Privado PCA"
+3. **Movido**: Configuración de Yappy de Integraciones a Unatienda → Config
+4. **Eliminado**: Sección duplicada "Unatienda / Yappy" de Integraciones
+5. **Nuevo módulo**: `/app/frontend/src/modules/unatienda/` con tabs individuales
+
+#### Archivos Creados
+- `/app/frontend/src/modules/unatienda/UnatiendaModule.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/CatalogoPublicoTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/CatalogoPrivadoTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/EstudiantesTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/VinculacionesTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/PedidosTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/ConfiguracionTab.jsx`
+- `/app/frontend/src/modules/unatienda/tabs/DemoDataTab.jsx`
+
+#### Endpoints Backend Nuevos
+- `GET /api/admin/unatienda/stats` - Estadísticas generales de Unatienda
+- `GET /api/store/products/grades` - Grados disponibles para filtros
+- `GET /api/store/products/subjects` - Materias disponibles para filtros
+
+---
+
+### Catálogo Privado de Unatienda ✅
 
 Sistema completo de gestión de catálogo privado para libros escolares de PCA (Panama Christian Academy).
 
