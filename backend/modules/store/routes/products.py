@@ -152,17 +152,3 @@ async def toggle_promotion(
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return {"success": True}
-
-
-@router.get("/grades")
-async def get_available_grades():
-    """Get available grades for filtering"""
-    grados = await db.libros.distinct("grado", {"activo": True})
-    return {"grados": sorted([g for g in grados if g])}
-
-
-@router.get("/subjects")
-async def get_available_subjects():
-    """Get available subjects for filtering"""
-    materias = await db.libros.distinct("materia", {"activo": True})
-    return {"materias": sorted([m for m in materias if m])}
