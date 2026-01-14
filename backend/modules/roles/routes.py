@@ -2,13 +2,13 @@
 Roles Module - API Routes
 Endpoints para gestión de roles y permisos
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List, Optional
 
 from core.auth import get_current_user, get_admin_user
 from core.database import db
-from .models import RoleCreate, RoleUpdate, AVAILABLE_PERMISSIONS
-from .service import roles_service
+from .models import RoleCreate, RoleUpdate, AVAILABLE_PERMISSIONS, AuditActionType, AuditLogFilter
+from .service import roles_service, audit_service
 
 router = APIRouter(prefix="/roles", tags=["Roles & Permissions"])
 
