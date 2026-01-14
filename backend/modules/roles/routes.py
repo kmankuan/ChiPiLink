@@ -28,6 +28,18 @@ async def get_available_permissions(admin: dict = Depends(get_admin_user)):
     return {"permissions": AVAILABLE_PERMISSIONS}
 
 
+@router.get("/my-permissions")
+async def get_my_permissions(current_user: dict = Depends(get_current_user)):
+    """Get current user's role and permissions"""
+    role = await roles_service.get_user_role(current_user["cliente_id"])
+    permissions = await roles_service.get_user_permissions(current_user["cliente_id"])
+    
+    return {
+        "role": role,
+        "permissions": permissions
+    }
+
+
 @router.get("/{role_id}")
 async def get_role(role_id: str, admin: dict = Depends(get_admin_user)):
     """Get a specific role"""
