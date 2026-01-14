@@ -185,6 +185,7 @@ async def get_role_users(role_id: str, admin: dict = Depends(get_admin_user)):
 async def assign_role_to_user(
     cliente_id: str,
     role_id: str,
+    request: Request,
     admin: dict = Depends(get_admin_user)
 ):
     """Assign a role to a user"""
@@ -206,6 +207,12 @@ async def assign_role_to_user(
                 detail="Solo un Super Admin puede asignar el rol de Super Admin"
             )
     
+    # Get previous role for logging
+    old_role = await roles_service.get_user_role(cliente_id)
+    
+    # Get target user info
+    target_user = await db.clientes.find_one({"cliente_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
+    
     success = await roles_service.assign_role_to_user(
         cliente_id, 
         role_id, 
@@ -213,6 +220,28 @@ async def assign_role_to_user(
     )
     if not success:
         raise HTTPException(status_code=400, detail="No se pudo asignar el rol")
+    
+    # Get new role info for logging
+    new_role = await roles_service.get_role(role_id)
+    
+    # Log the action
+    await audit_service.log_action(
+        action=AuditActionType.ROLE_ASSIGNED,
+        actor_id=admin["cliente_id"],
+        target_type="user",
+        target_id=cliente_id,
+        target_nombre=target_user.get("nombre") if target_user else cliente_id,
+        details={
+            "rol_anterior": old_role.get("nombre") if old_role else None,
+            "rol_anterior_id": old_role.get("role_id") if old_role else None,
+            "rol_nuevo": new_role.get("nombre") if new_role else role_id,
+            "rol_nuevo_id": role_id,
+            "target_email": target_user.get("email") if target_user else None
+        },
+        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent")
+    )
     
     return {"success": True, "message": "Rol asignado correctamente"}
 
