@@ -551,81 +551,123 @@ export default function Unatienda() {
           <StudentsInfo />
         )}
 
-        {/* Category Navigation */}
-            <div className="mb-6" data-category-nav>
-              <div className="flex gap-2 flex-wrap items-center">
-                <Button
-                  variant={!selectedCategoria ? 'default' : 'outline'}
-                  size="icon"
-                  onClick={handleGoHome}
-                  className="h-9 w-9 rounded-full"
-                  title="Inicio - Todas las categorías"
-                >
-                  <Home className="h-4 w-4" />
-                </Button>
+        {/* Category Navigation - includes private catalog as a category for authorized users */}
+        <div className="mb-6" data-category-nav>
+          <div className="flex gap-2 flex-wrap items-center">
+            <Button
+              variant={!selectedCategoria ? 'default' : 'outline'}
+              size="icon"
+              onClick={handleGoHome}
+              className="h-9 w-9 rounded-full"
+              title="Inicio - Todas las categorías"
+            >
+              <Home className="h-4 w-4" />
+            </Button>
 
-                {(selectedCategoria || selectedSubcategoria) && (
+            {(selectedCategoria || selectedSubcategoria) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="rounded-full gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Regresar
+              </Button>
+            )}
+
+            {selectedCategoria && (
+              <span className="text-muted-foreground/50 mx-1">|</span>
+            )}
+
+            {!selectedCategoria ? (
+              <>
+                {categorias.map((cat) => (
                   <Button
-                    variant="ghost"
+                    key={cat.categoria_id}
+                    variant="outline"
                     size="sm"
-                    onClick={handleGoBack}
-                    className="rounded-full gap-1 text-muted-foreground hover:text-foreground"
+                    onClick={() => handleSelectCategoria(cat.categoria_id)}
+                    className="rounded-full"
                   >
-                    <ChevronLeft className="h-4 w-4" />
-                    Regresar
+                    <span className="mr-1.5">{cat.icono}</span>
+                    {cat.nombre}
+                  </Button>
+                ))}
+                {/* Show "Textos Escolares" category only for users with access */}
+                {catalogoPrivadoAcceso?.tiene_acceso && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActiveView('privado')}
+                    className="rounded-full border-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-700"
+                  >
+                    <GraduationCap className="h-4 w-4 mr-1.5 text-purple-600" />
+                    <span className="text-purple-700 dark:text-purple-300">Textos Escolares</span>
+                    <Badge variant="secondary" className="ml-1.5 text-xs bg-purple-200 dark:bg-purple-800">
+                      {catalogoPrivadoAcceso.estudiantes?.length || 0}
+                    </Badge>
                   </Button>
                 )}
-
-                {selectedCategoria && (
-                  <span className="text-muted-foreground/50 mx-1">|</span>
-                )}
-
-                {!selectedCategoria ? (
-                  categorias.map((cat) => (
-                    <Button
-                      key={cat.categoria_id}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSelectCategoria(cat.categoria_id)}
-                      className="rounded-full"
-                    >
-                      <span className="mr-1.5">{cat.icono}</span>
-                      {cat.nombre}
-                    </Button>
-                  ))
-                ) : (
-                  <>
-                    <span className="font-semibold text-sm flex items-center gap-1">
-                      {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
-                    </span>
-                    {!showLandingView && (
-                      <Badge variant="secondary" className="text-xs">
-                        {filteredProducts.length} productos
-                      </Badge>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Public Products Grid */}
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
-                <Store className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-muted-foreground">No se encontraron productos</p>
-              </div>
+              </>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.libro_id} product={product} />
-                ))}
-              </div>
+              <>
+                <span className="font-semibold text-sm flex items-center gap-1">
+                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                </span>
+                {!showLandingView && (
+                  <Badge variant="secondary" className="text-xs">
+                    {filteredProducts.length} productos
+                  </Badge>
+                )}
+              </>
             )}
-          </>
-        ) : (
+          </div>
+        </div>
+
+        {/* Content - Public or Private */}
+        {activeView === 'privado' && catalogoPrivadoAcceso?.tiene_acceso ? (
           <>
-            {/* Private Catalog View */}
-            <StudentsInfo />
+            {/* Private Catalog Header */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="h-6 w-6 text-purple-600" />
+                  <div>
+                    <h3 className="font-bold">Textos Escolares</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Catálogo exclusivo para estudiantes vinculados
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setActiveView('publico')}
+                  className="text-muted-foreground"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Ver tienda general
+                </Button>
+              </div>
+              
+              {/* Students badges */}
+              {catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-purple-200 dark:border-purple-700">
+                  <span className="text-sm text-muted-foreground">Estudiantes:</span>
+                  {catalogoPrivadoAcceso.estudiantes.map((est) => (
+                    <Badge 
+                      key={est.sync_id} 
+                      variant="secondary"
+                      className="cursor-pointer hover:bg-purple-100"
+                      onClick={() => setSelectedGradoPrivado(est.grado)}
+                    >
+                      {est.nombre} - {est.grado}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Filters for Private Catalog */}
             <div className="flex flex-wrap gap-3 mb-6">
@@ -686,6 +728,22 @@ export default function Unatienda() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredPrivateProducts.map((product) => (
                   <ProductCard key={product.libro_id} product={product} isPrivate />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Public Products Grid */}
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                <Store className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">No se encontraron productos</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.libro_id} product={product} />
                 ))}
               </div>
             )}
