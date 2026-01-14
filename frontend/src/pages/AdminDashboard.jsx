@@ -65,7 +65,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
   { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
   { id: 'orders', label: 'Pedidos', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
-  { id: 'customers', label: 'Clientes', icon: Users, permission: 'users.view' },
+  { id: 'customers', label: 'Usuarios', icon: Users, permission: 'users.view' },
   { id: 'memberships', label: 'Membresías', icon: CreditCard, permission: 'memberships.view' },
   { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
   { id: 'roles', label: 'Roles y Permisos', icon: Shield, permission: 'roles.view' },
