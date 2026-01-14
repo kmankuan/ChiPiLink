@@ -369,7 +369,7 @@ export default function RolesModule() {
                           className="p-2 rounded-lg"
                           style={{ backgroundColor: `${role.color}20` }}
                         >
-                          <RoleIcon iconName={role.icono} className="h-5 w-5" style={{ color: role.color }} />
+                          {getRoleIcon(role.icono, "h-5 w-5")}
                         </div>
                         <div>
                           <h4 className="font-semibold">{role.nombre}</h4>
@@ -408,7 +408,7 @@ export default function RolesModule() {
                           className="p-3 rounded-xl"
                           style={{ backgroundColor: `${selectedRole.color}20` }}
                         >
-                          <RoleIcon iconName={selectedRole.icono} className="h-6 w-6" style={{ color: selectedRole.color }} />
+                          {getRoleIcon(selectedRole.icono, "h-6 w-6")}
                         </div>
                         <div>
                           <CardTitle>{selectedRole.nombre}</CardTitle>
@@ -878,7 +878,7 @@ export default function RolesModule() {
                       className="p-2 rounded-lg"
                       style={{ backgroundColor: `${role.color}20` }}
                     >
-                      <RoleIcon iconName={role.icono} className="h-5 w-5" style={{ color: role.color }} />
+                      {getRoleIcon(role.icono, "h-5 w-5")}
                     </div>
                     <div>
                       <h4 className="font-semibold">{role.nombre}</h4>
