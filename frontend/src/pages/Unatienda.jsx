@@ -429,62 +429,7 @@ export default function Unatienda() {
     );
   };
 
-  // Private Catalog Access Banner
-  const PrivateAccessBanner = () => {
-    if (!isAuthenticated) {
-      return (
-        <Card className="mb-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
-          <CardContent className="py-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50">
-                <Lock className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-1">Catálogo Privado PCA</h3>
-                <p className="text-muted-foreground text-sm mb-3">
-                  ¿Eres acudiente de un estudiante de Panama Christian Academy? 
-                  Inicia sesión y vincula tu estudiante para acceder a los libros de texto.
-                </p>
-                <Button onClick={() => navigate('/login?redirect=/unatienda?tab=privado')}>
-                  <User className="h-4 w-4 mr-2" />
-                  Iniciar Sesión
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (catalogoPrivadoAcceso && !catalogoPrivadoAcceso.tiene_acceso) {
-      return (
-        <Card className="mb-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
-          <CardContent className="py-6">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/50">
-                <AlertCircle className="h-6 w-6 text-amber-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg mb-1">Vincula tu Estudiante</h3>
-                <p className="text-muted-foreground text-sm mb-3">
-                  Para acceder al catálogo de libros escolares de PCA, necesitas vincular 
-                  a tu estudiante desde tu perfil.
-                </p>
-                <Button onClick={() => navigate('/perfil/estudiantes')}>
-                  <GraduationCap className="h-4 w-4 mr-2" />
-                  Vincular Estudiante
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return null;
-  };
-
-  // Students Info Section (for private catalog)
+  // Students Info Section (for private catalog) - simplified version
   const StudentsInfo = () => {
     if (!catalogoPrivadoAcceso?.estudiantes?.length) return null;
 
