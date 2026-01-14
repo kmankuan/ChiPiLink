@@ -105,18 +105,49 @@ async def update_role(
     role = await roles_service.update_role(role_id, updates)
     if not role:
         raise HTTPException(status_code=404, detail="Rol no encontrado")
+    
+    # Log the action
+    changes = {}
+    if updates.permisos is not None:
+        old_perms = set(old_role.get("permisos", []) if old_role else [])
+        new_perms = set(updates.permisos)
+        changes["permisos_agregados"] = list(new_perms - old_perms)
+        changes["permisos_removidos"] = list(old_perms - new_perms)
+    if updates.nombre:
+        changes["nombre_anterior"] = old_role.get("nombre") if old_role else None
+        changes["nombre_nuevo"] = updates.nombre
+    if updates.nivel is not None:
+        changes["nivel_anterior"] = old_role.get("nivel") if old_role else None
+        changes["nivel_nuevo"] = updates.nivel
+    
+    await audit_service.log_action(
+        action=AuditActionType.ROLE_UPDATED if not updates.permisos else AuditActionType.PERMISSIONS_UPDATED,
+        actor_id=admin["cliente_id"],
+        target_type="role",
+        target_id=role_id,
+        target_nombre=role.get("nombre"),
+        details=changes,
+        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent")
+    )
+    
     return {"success": True, "role": role}
 
 
 @router.delete("/{role_id}")
-async def delete_role(role_id: str, admin: dict = Depends(get_admin_user)):
+async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_admin_user)):
     """Delete a custom role"""
-    has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
-        "roles.delete"
-    )
-    if not has_permission:
-        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar roles")
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "roles.delete"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para eliminar roles")
+    
+    # Get role info before deletion
+    role = await roles_service.get_role(role_id)
     
     success = await roles_service.delete_role(role_id)
     if not success:
@@ -124,6 +155,20 @@ async def delete_role(role_id: str, admin: dict = Depends(get_admin_user)):
             status_code=400, 
             detail="No se puede eliminar este rol (es un rol de sistema o no existe)"
         )
+    
+    # Log the action
+    await audit_service.log_action(
+        action=AuditActionType.ROLE_DELETED,
+        actor_id=admin["cliente_id"],
+        target_type="role",
+        target_id=role_id,
+        target_nombre=role.get("nombre") if role else role_id,
+        details={"permisos": role.get("permisos") if role else []},
+        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent")
+    )
+    
     return {"success": True}
 
 
