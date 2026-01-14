@@ -383,13 +383,16 @@ export function Header() {
                       {t('nav.orders')}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/mis-pedidos-libros" className="flex items-center gap-2" data-testid="menu-book-orders">
-                      <BookOpen className="h-4 w-4" />
-                      Mis Libros Escolares
-                    </Link>
-                  </DropdownMenuItem>
-                  {isAdmin && (
+                  {/* Show "Mis Libros Escolares" only if user has linked students or has admin/view permission */}
+                  {(hasLinkedStudents || hasPermission('unatienda.view_private_catalog')) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/mis-pedidos-libros" className="flex items-center gap-2" data-testid="menu-book-orders">
+                        <BookOpen className="h-4 w-4" />
+                        Mis Libros Escolares
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {canAccessAdmin && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
