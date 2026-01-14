@@ -541,7 +541,7 @@ export default function RolesModule() {
                               }}
                               variant="outline"
                             >
-                              <RoleIcon iconName={userRole.icono} className="h-3 w-3 mr-1" />
+                              {getRoleIcon(userRole.icono, "h-3 w-3 mr-1")}
                               {userRole.nombre}
                             </Badge>
                           )}
