@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
 
 from core.auth import get_admin_user
+from core.database import db
 from ..models import Product, ProductCreate, ProductUpdate
 from ..services import product_service
 
