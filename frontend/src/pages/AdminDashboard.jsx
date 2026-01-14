@@ -50,6 +50,7 @@ const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
 const AdminMemberships = lazy(() => import('@/modules/users/pages/AdminMemberships'));
+const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
@@ -58,17 +59,19 @@ const ModuleLoader = () => (
   </div>
 );
 
-// Navigation items
+// Navigation items with required permissions
+// Each item can have: permission (single), permissions (array), requireAll (bool)
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag },
-  { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
-  { id: 'customers', label: 'Clientes', icon: Users },
-  { id: 'memberships', label: 'Membresías', icon: CreditCard },
-  { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy },
-  { id: 'admin', label: 'Administración', icon: Settings },
-  { id: 'integrations', label: 'Integraciones', icon: Plug },
-  { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, isExternal: true, path: '/admin/chat' },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
+  { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
+  { id: 'orders', label: 'Pedidos', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+  { id: 'customers', label: 'Clientes', icon: Users, permission: 'users.view' },
+  { id: 'memberships', label: 'Membresías', icon: CreditCard, permission: 'memberships.view' },
+  { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
+  { id: 'roles', label: 'Roles y Permisos', icon: Shield, permission: 'roles.view' },
+  { id: 'admin', label: 'Administración', icon: Settings, permission: 'admin.site_config' },
+  { id: 'integrations', label: 'Integraciones', icon: Plug, permission: 'integrations.access' },
+  { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
 ];
 
 export default function AdminDashboard() {
