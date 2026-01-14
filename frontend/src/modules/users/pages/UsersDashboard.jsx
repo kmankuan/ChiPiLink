@@ -79,6 +79,7 @@ export default function UsersDashboard() {
       dependents: 'Acudidos',
       capacities: 'Capacidades',
       notifications: 'Notificaciones',
+      exclusive: 'Compra Exclusiva',
       loginRequired: 'Debes iniciar sesión para acceder a esta sección',
       login: 'Iniciar Sesión',
       transfer: 'Transferir'
@@ -93,6 +94,7 @@ export default function UsersDashboard() {
       dependents: 'Dependents',
       capacities: 'Capacities',
       notifications: 'Notifications',
+      exclusive: 'Exclusive Shopping',
       loginRequired: 'You must log in to access this section',
       login: 'Log In',
       transfer: 'Transfer'
@@ -107,6 +109,7 @@ export default function UsersDashboard() {
       dependents: '受抚养人',
       capacities: '能力',
       notifications: '通知',
+      exclusive: '专属购物',
       loginRequired: '您必须登录才能访问此部分',
       login: '登录',
       transfer: '转账'
