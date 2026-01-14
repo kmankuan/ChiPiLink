@@ -293,7 +293,7 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
               <p className="text-muted-foreground text-sm">
                 {activeModule === 'dashboard' && 'Vista general de tu tienda'}
-                {activeModule === 'store' && 'Gestiona tus productos e inventario'}
+                {activeModule === 'unatienda' && 'Gestiona catálogos, productos, estudiantes y pedidos de Unatienda'}
                 {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
                 {activeModule === 'customers' && 'Gestiona clientes, estudiantes y matrículas'}
                 {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
