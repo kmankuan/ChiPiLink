@@ -10,8 +10,104 @@ import fnmatch
 from core.database import db
 from .models import (
     Role, RoleCreate, RoleUpdate, 
-    DefaultRoles, DEFAULT_ROLE_PERMISSIONS, AVAILABLE_PERMISSIONS
+    DefaultRoles, DEFAULT_ROLE_PERMISSIONS, AVAILABLE_PERMISSIONS,
+    AuditActionType, AuditLogEntry, AuditLogFilter
 )
+
+
+class AuditLogService:
+    """Service for managing audit logs"""
+    
+    def __init__(self):
+        self.collection = db.roles_audit_log
+    
+    async def log_action(
+        self,
+        action: AuditActionType,
+        actor_id: str,
+        target_type: str,
+        target_id: str,
+        details: Dict[str, Any] = None,
+        actor_info: Dict[str, Any] = None,
+        target_nombre: str = None,
+        ip_address: str = None,
+        user_agent: str = None
+    ) -> str:
+        """Log an auditable action"""
+        log_entry = {
+            "log_id": f"audit_{uuid.uuid4().hex[:12]}",
+            "action": action.value if isinstance(action, AuditActionType) else action,
+            "actor_id": actor_id,
+            "actor_email": actor_info.get("email") if actor_info else None,
+            "actor_nombre": actor_info.get("nombre") if actor_info else None,
+            "target_type": target_type,
+            "target_id": target_id,
+            "target_nombre": target_nombre,
+            "details": details or {},
+            "ip_address": ip_address,
+            "user_agent": user_agent,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await self.collection.insert_one(log_entry)
+        return log_entry["log_id"]
+    
+    async def get_logs(
+        self,
+        filters: AuditLogFilter = None,
+        limit: int = 50,
+        skip: int = 0
+    ) -> List[Dict]:
+        """Get audit logs with optional filters"""
+        query = {}
+        
+        if filters:
+            if filters.action:
+                query["action"] = filters.action.value if isinstance(filters.action, AuditActionType) else filters.action
+            if filters.actor_id:
+                query["actor_id"] = filters.actor_id
+            if filters.target_id:
+                query["target_id"] = filters.target_id
+            if filters.target_type:
+                query["target_type"] = filters.target_type
+            if filters.from_date:
+                query["timestamp"] = {"$gte": filters.from_date}
+            if filters.to_date:
+                if "timestamp" in query:
+                    query["timestamp"]["$lte"] = filters.to_date
+                else:
+                    query["timestamp"] = {"$lte": filters.to_date}
+        
+        cursor = self.collection.find(query, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit)
+        return await cursor.to_list(limit)
+    
+    async def get_logs_count(self, filters: AuditLogFilter = None) -> int:
+        """Get total count of audit logs"""
+        query = {}
+        if filters:
+            if filters.action:
+                query["action"] = filters.action.value if isinstance(filters.action, AuditActionType) else filters.action
+            if filters.actor_id:
+                query["actor_id"] = filters.actor_id
+            if filters.target_id:
+                query["target_id"] = filters.target_id
+        
+        return await self.collection.count_documents(query)
+    
+    async def get_user_activity(self, cliente_id: str, limit: int = 20) -> List[Dict]:
+        """Get audit logs for actions performed by or on a specific user"""
+        query = {
+            "$or": [
+                {"actor_id": cliente_id},
+                {"target_id": cliente_id, "target_type": "user"}
+            ]
+        }
+        cursor = self.collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit)
+        return await cursor.to_list(limit)
+
+
+# Singleton instance
+audit_service = AuditLogService()
 
 
 class RolesService:
