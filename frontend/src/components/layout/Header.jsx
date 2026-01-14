@@ -375,8 +375,8 @@ export function Header() {
                     </DropdownMenuItem>
                   )}
                   
-                  {/* PinpanClub - Solo si tiene membresía activa o permiso */}
-                  {(user?.tiene_membresia_activa || hasPermission('pinpanclub.access')) && (
+                  {/* PinpanClub - Solo si tiene membresía activa */}
+                  {user?.tiene_membresia_activa && (
                     <DropdownMenuItem asChild>
                       <Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong">
                         <Trophy className="h-4 w-4" />
