@@ -113,14 +113,17 @@ export default function Unatienda() {
   const fetchData = async () => {
     try {
       const [productsRes, storeRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
-        axios.get(`${API_URL}/api/platform-store/products`),
+        axios.get(`${API_URL}/api/store/products`),
         axios.get(`${API_URL}/api/platform-store`),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
         axios.get(`${API_URL}/api/store/products/grades`),
         axios.get(`${API_URL}/api/store/products/subjects`)
       ]);
       
-      setProducts(productsRes.data.products || []);
+      // Filter only public products (not private catalog)
+      const allProducts = productsRes.data || [];
+      const publicProducts = allProducts.filter(p => !p.es_catalogo_privado);
+      setProducts(publicProducts);
       setStoreInfo(storeRes.data);
       setCategorias(categoriasRes.data || []);
       setGrados(gradosRes.data.grados || []);
