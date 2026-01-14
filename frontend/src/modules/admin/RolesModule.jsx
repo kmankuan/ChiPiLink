@@ -324,7 +324,10 @@ export default function RolesModule() {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="roles" onValueChange={(v) => v === 'users' && fetchUsers()}>
+      <Tabs defaultValue="roles" onValueChange={(v) => {
+        if (v === 'users') fetchUsers();
+        if (v === 'audit') fetchAuditLogs();
+      }}>
         <TabsList>
           <TabsTrigger value="roles" className="gap-2">
             <Shield className="h-4 w-4" />
@@ -333,6 +336,10 @@ export default function RolesModule() {
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
             Usuarios
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="gap-2">
+            <History className="h-4 w-4" />
+            Auditoría
           </TabsTrigger>
         </TabsList>
 
