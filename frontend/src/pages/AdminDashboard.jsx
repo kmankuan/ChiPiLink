@@ -228,7 +228,7 @@ export default function AdminDashboard() {
         >
           <ScrollArea className="flex-1 py-2">
             <nav className="px-2 space-y-1">
-              {navItems.map((item) => {
+              {filteredNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeModule === item.id;
                 
