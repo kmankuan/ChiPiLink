@@ -7,6 +7,63 @@ También incluye un sistema unificado de gestión de usuarios basado en "Capacid
 
 ## Latest Update (Enero 14, 2026)
 
+### 🆕 Sistema RBAC (Role-Based Access Control) ✅ NUEVO
+
+Se implementó un sistema completo de roles y permisos para controlar el acceso a funcionalidades del sistema.
+
+#### Roles del Sistema
+| Rol | Nivel | Descripción | Permisos |
+|-----|-------|-------------|----------|
+| super_admin | 100 | Control total del sistema | `*` (todos) |
+| admin | 80 | Gestión completa de la plataforma | `admin.*`, `users.*`, `unatienda.*`, `pinpanclub.*`, etc. |
+| moderator | 50 | Gestión de contenido y usuarios básicos | `admin.access`, `users.view`, `tickets.*`, etc. |
+| user | 10 | Acceso básico a funcionalidades públicas | `unatienda.access`, `pinpanclub.access`, etc. |
+
+#### Módulos de Permisos
+- **admin**: access, dashboard, site_config, landing_editor
+- **users**: view, create, edit, delete, assign_roles, manage_memberships
+- **roles**: view, create, edit, delete, assign_permissions
+- **unatienda**: access, view_public_catalog, view_private_catalog, manage_products, manage_orders, etc.
+- **pinpanclub**: access, view_rankings, create_match, create_league, admin_panel, etc.
+- **memberships**: view, create_plans, manage_subscriptions
+- **integrations**: access, monday, google_sheets, yappy, notifications
+- **tickets**: access, view, respond, manage
+
+#### Archivos Nuevos
+**Backend:**
+- `/app/backend/modules/roles/models.py` - Modelos y permisos disponibles
+- `/app/backend/modules/roles/routes.py` - Endpoints API
+- `/app/backend/modules/roles/service.py` - Lógica de negocio
+- `/app/backend/core/auth.py` - Funciones `require_permission()`, `require_role()`
+
+**Frontend:**
+- `/app/frontend/src/hooks/usePermissions.js` - Hook para verificar permisos
+- `/app/frontend/src/modules/admin/RolesModule.jsx` - UI de gestión de roles
+
+#### Endpoints API
+- `GET /api/roles` - Listar todos los roles (admin)
+- `GET /api/roles/my-permissions` - Obtener permisos del usuario actual
+- `GET /api/roles/available-permissions` - Listar permisos disponibles
+- `POST /api/roles/assign` - Asignar rol a usuario
+- `GET /api/roles/check/{permission}` - Verificar si usuario tiene permiso
+- `PUT /api/roles/{role_id}` - Actualizar rol
+- `POST /api/roles` - Crear rol personalizado
+
+#### Características Implementadas
+- ✅ Sidebar del admin filtra items según permisos del usuario
+- ✅ Menú de usuario oculta "Admin" para usuarios sin permisos
+- ✅ "Mis Libros Escolares" solo visible para usuarios con estudiantes vinculados
+- ✅ Badge de rol actual visible en header del admin
+- ✅ UI completa para gestionar roles y asignar permisos
+- ✅ Soporte para wildcards (`*`, `modulo.*`)
+- ✅ Cache de permisos en frontend (5 minutos)
+
+#### Test Results
+- **Backend:** 13/13 tests passed (100%)
+- **Frontend:** 100% UI permission checks working
+
+---
+
 ### 🆕 Unificación del Módulo Unatienda ✅
 
 Se completó la unificación del sistema de tienda en un único módulo llamado **Unatienda**.
