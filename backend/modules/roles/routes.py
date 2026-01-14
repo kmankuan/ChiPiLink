@@ -122,15 +122,17 @@ async def assign_role_to_user(
     admin: dict = Depends(get_admin_user)
 ):
     """Assign a role to a user"""
-    has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
-        "users.assign_roles"
-    )
-    if not has_permission:
-        raise HTTPException(status_code=403, detail="No tienes permiso para asignar roles")
+    # Allow if user is legacy admin (es_admin=true) or has permission
+    if not admin.get("es_admin"):
+        has_permission = await roles_service.check_permission(
+            admin["cliente_id"], 
+            "users.assign_roles"
+        )
+        if not has_permission:
+            raise HTTPException(status_code=403, detail="No tienes permiso para asignar roles")
     
-    # Prevent assigning super_admin unless current user is super_admin
-    if role_id == "super_admin":
+    # Prevent assigning super_admin unless current user is super_admin or legacy admin
+    if role_id == "super_admin" and not admin.get("es_admin"):
         current_role = await roles_service.get_user_role(admin["cliente_id"])
         if current_role.get("role_id") != "super_admin":
             raise HTTPException(
