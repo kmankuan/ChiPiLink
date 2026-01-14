@@ -55,6 +55,8 @@ class ProductBase(BaseModel):
     destacado: bool = False
     en_promocion: bool = False
     orden_destacado: int = 0
+    es_catalogo_privado: bool = False
+    codigo: Optional[str] = None
 
 
 class ProductCreate(ProductBase):
