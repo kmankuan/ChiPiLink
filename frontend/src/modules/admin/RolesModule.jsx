@@ -563,6 +563,162 @@ export default function RolesModule() {
             </div>
           )}
         </TabsContent>
+
+        {/* Audit Tab */}
+        <TabsContent value="audit" className="space-y-4">
+          {loadingAudit ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Stats Cards */}
+              {auditStats && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold">{auditStats.total_logs || 0}</div>
+                      <p className="text-sm text-muted-foreground">Total de registros</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold">{auditStats.recent_24h || 0}</div>
+                      <p className="text-sm text-muted-foreground">Últimas 24 horas</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold">{auditStats.by_action?.role_assigned || 0}</div>
+                      <p className="text-sm text-muted-foreground">Roles asignados</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-4">
+                      <div className="text-2xl font-bold">{auditStats.by_action?.permissions_updated || 0}</div>
+                      <p className="text-sm text-muted-foreground">Permisos actualizados</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Actions Bar */}
+              <div className="flex gap-4 items-center">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Filtrar por actor o destino..."
+                    value={auditFilter}
+                    onChange={(e) => setAuditFilter(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Button variant="outline" onClick={fetchAuditLogs} disabled={loadingAudit}>
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loadingAudit ? 'animate-spin' : ''}`} />
+                  Actualizar
+                </Button>
+              </div>
+
+              {/* Audit Logs List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Historial de Cambios
+                  </CardTitle>
+                  <CardDescription>
+                    Registro de todas las acciones realizadas sobre roles y permisos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-3">
+                      {auditLogs.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No hay registros de auditoría aún</p>
+                        </div>
+                      ) : (
+                        auditLogs
+                          .filter(log => {
+                            if (!auditFilter) return true;
+                            const term = auditFilter.toLowerCase();
+                            return (
+                              log.actor_nombre?.toLowerCase().includes(term) ||
+                              log.actor_email?.toLowerCase().includes(term) ||
+                              log.target_nombre?.toLowerCase().includes(term) ||
+                              log.target_id?.toLowerCase().includes(term)
+                            );
+                          })
+                          .map((log) => {
+                            const actionConfig = ACTION_LABELS[log.action] || {
+                              label: log.action,
+                              icon: Shield,
+                              color: 'bg-gray-100 text-gray-700'
+                            };
+                            const ActionIcon = actionConfig.icon;
+
+                            return (
+                              <div
+                                key={log.log_id}
+                                className="flex items-start gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                              >
+                                <div className={`p-2 rounded-lg ${actionConfig.color}`}>
+                                  <ActionIcon className="h-4 w-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Badge variant="secondary" className={actionConfig.color}>
+                                      {actionConfig.label}
+                                    </Badge>
+                                    <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      {formatDate(log.timestamp)}
+                                    </span>
+                                  </div>
+                                  <p className="mt-1 text-sm">
+                                    <strong>{log.actor_nombre || log.actor_email || 'Sistema'}</strong>
+                                    {' '}
+                                    {log.target_type === 'user' ? (
+                                      <>modificó el rol de <strong>{log.target_nombre || log.target_id}</strong></>
+                                    ) : (
+                                      <>modificó el rol <strong>{log.target_nombre || log.target_id}</strong></>
+                                    )}
+                                  </p>
+                                  {log.details && Object.keys(log.details).length > 0 && (
+                                    <div className="mt-2 text-xs text-muted-foreground space-y-1">
+                                      {log.details.rol_anterior && (
+                                        <p>Rol anterior: {log.details.rol_anterior}</p>
+                                      )}
+                                      {log.details.rol_nuevo && (
+                                        <p>Rol nuevo: {log.details.rol_nuevo}</p>
+                                      )}
+                                      {log.details.permisos_agregados?.length > 0 && (
+                                        <p className="text-green-600">
+                                          + Agregados: {log.details.permisos_agregados.slice(0, 3).join(', ')}
+                                          {log.details.permisos_agregados.length > 3 && ` (+${log.details.permisos_agregados.length - 3} más)`}
+                                        </p>
+                                      )}
+                                      {log.details.permisos_removidos?.length > 0 && (
+                                        <p className="text-red-600">
+                                          - Removidos: {log.details.permisos_removidos.slice(0, 3).join(', ')}
+                                          {log.details.permisos_removidos.length > 3 && ` (+${log.details.permisos_removidos.length - 3} más)`}
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
+                      )}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </TabsContent>
       </Tabs>
 
       {/* Role Form Dialog */}
