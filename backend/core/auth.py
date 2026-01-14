@@ -102,3 +102,168 @@ async def get_optional_user(
         return await get_current_user(request, credentials)
     except HTTPException:
         return None
+
+
+# ============== PERMISSION-BASED AUTH ==============
+
+async def get_user_permissions(cliente_id: str) -> List[str]:
+    """Get all permissions for a user from their role and overrides"""
+    # Get user's role assignment
+    user_role = await db.user_roles.find_one({"cliente_id": cliente_id}, {"_id": 0})
+    
+    role_id = user_role.get("role_id") if user_role else "user"
+    
+    # Get role with permissions
+    role = await db.roles.find_one({"role_id": role_id}, {"_id": 0})
+    if not role:
+        # Default to basic user role
+        role = await db.roles.find_one({"role_id": "user"}, {"_id": 0})
+    
+    role_permissions = role.get("permisos", []) if role else []
+    
+    # Get individual overrides
+    overrides = await db.user_permissions.find_one({"cliente_id": cliente_id}, {"_id": 0})
+    additional = overrides.get("permisos_adicionales", []) if overrides else []
+    removed = overrides.get("permisos_removidos", []) if overrides else []
+    
+    # Combine: role permissions + additional - removed
+    all_permissions = set(role_permissions) | set(additional)
+    final_permissions = all_permissions - set(removed)
+    
+    return list(final_permissions)
+
+
+def check_permission_match(user_permissions: List[str], required_permission: str) -> bool:
+    """Check if a user's permissions satisfy a required permission"""
+    for perm in user_permissions:
+        # Wildcard: all permissions
+        if perm == "*":
+            return True
+        # Module wildcard: module.*
+        if perm.endswith(".*"):
+            module = perm[:-2]
+            if required_permission.startswith(module + "."):
+                return True
+        # Pattern match
+        if fnmatch.fnmatch(required_permission, perm):
+            return True
+        # Direct match
+        if perm == required_permission:
+            return True
+    return False
+
+
+def require_permission(permission: str):
+    """
+    Dependency factory that requires a specific permission.
+    Usage: Depends(require_permission("admin.access"))
+    """
+    async def permission_checker(
+        request: Request,
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    ) -> dict:
+        user = await get_current_user(request, credentials)
+        
+        # Super admin always has access (es_admin flag for backward compatibility)
+        if user.get("es_admin"):
+            return user
+        
+        # Check permissions
+        permissions = await get_user_permissions(user["cliente_id"])
+        
+        if not check_permission_match(permissions, permission):
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Acceso denegado - Requiere permiso: {permission}"
+            )
+        
+        return user
+    
+    return permission_checker
+
+
+def require_any_permission(permissions: List[str]):
+    """
+    Dependency factory that requires at least one of the specified permissions.
+    Usage: Depends(require_any_permission(["admin.access", "moderator.access"]))
+    """
+    async def permission_checker(
+        request: Request,
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    ) -> dict:
+        user = await get_current_user(request, credentials)
+        
+        # Super admin always has access
+        if user.get("es_admin"):
+            return user
+        
+        user_permissions = await get_user_permissions(user["cliente_id"])
+        
+        for required_permission in permissions:
+            if check_permission_match(user_permissions, required_permission):
+                return user
+        
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Acceso denegado - Requiere alguno de: {', '.join(permissions)}"
+        )
+    
+    return permission_checker
+
+
+def require_all_permissions(permissions: List[str]):
+    """
+    Dependency factory that requires all of the specified permissions.
+    Usage: Depends(require_all_permissions(["admin.access", "users.edit"]))
+    """
+    async def permission_checker(
+        request: Request,
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    ) -> dict:
+        user = await get_current_user(request, credentials)
+        
+        # Super admin always has access
+        if user.get("es_admin"):
+            return user
+        
+        user_permissions = await get_user_permissions(user["cliente_id"])
+        
+        for required_permission in permissions:
+            if not check_permission_match(user_permissions, required_permission):
+                raise HTTPException(
+                    status_code=403, 
+                    detail=f"Acceso denegado - Requiere permiso: {required_permission}"
+                )
+        
+        return user
+    
+    return permission_checker
+
+
+def require_role(role_id: str):
+    """
+    Dependency factory that requires a specific role.
+    Usage: Depends(require_role("admin"))
+    """
+    async def role_checker(
+        request: Request,
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    ) -> dict:
+        user = await get_current_user(request, credentials)
+        
+        # Super admin always has access
+        if user.get("es_admin"):
+            return user
+        
+        # Get user's role assignment
+        user_role = await db.user_roles.find_one({"cliente_id": user["cliente_id"]}, {"_id": 0})
+        
+        if not user_role or user_role.get("role_id") != role_id:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Acceso denegado - Requiere rol: {role_id}"
+            )
+        
+        return user
+    
+    return role_checker
