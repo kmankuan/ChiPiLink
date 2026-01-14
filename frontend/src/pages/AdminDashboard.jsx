@@ -76,20 +76,36 @@ const navItems = [
 
 export default function AdminDashboard() {
   const { isAdmin, user, logout } = useAuth();
+  const { hasPermission, loading: permissionsLoading, role, isSuperAdmin } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Get active module from URL hash (default to 'admin' for Administración)
-  const activeModule = location.hash.replace('#', '') || 'admin';
+  // Get active module from URL hash (default to 'dashboard')
+  const activeModule = location.hash.replace('#', '') || 'dashboard';
+
+  // Filter nav items based on permissions
+  const filteredNavItems = navItems.filter(item => {
+    // Super admin sees everything
+    if (isSuperAdmin) return true;
+    // Check permission
+    if (item.permission) {
+      return hasPermission(item.permission);
+    }
+    return true;
+  });
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
+    if (!isAdmin && !permissionsLoading) {
+      // Check if user has any admin-level permission
+      const hasAdminAccess = hasPermission('admin.access') || hasPermission('admin.dashboard');
+      if (!hasAdminAccess) {
+        navigate('/');
+      }
     }
-  }, [isAdmin, navigate]);
+  }, [isAdmin, permissionsLoading, hasPermission, navigate]);
 
   const handleLogout = async () => {
     await logout();
