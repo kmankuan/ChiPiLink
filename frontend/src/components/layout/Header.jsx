@@ -501,7 +501,7 @@ export function Header() {
                   )}
                   
                   {/* PinpanClub - Solo si tiene membresía activa */}
-                  {(user?.tiene_membresia_activa || hasPermission('pinpanclub.access')) && (
+                  {user?.tiene_membresia_activa && (
                     <Link 
                       to="/pinpanclub"
                       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
