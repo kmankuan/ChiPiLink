@@ -313,17 +313,36 @@ export default function AdminDashboard() {
           <div className="p-4 lg:p-6 max-w-7xl mx-auto">
             {/* Page Header - Desktop only */}
             <div className="hidden lg:block mb-6">
-              <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
-              <p className="text-muted-foreground text-sm">
-                {activeModule === 'dashboard' && 'Vista general de tu tienda'}
-                {activeModule === 'unatienda' && 'Gestiona catálogos, productos, estudiantes y pedidos de Unatienda'}
-                {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
-                {activeModule === 'customers' && 'Gestiona clientes, estudiantes y matrículas'}
-                {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
-                {activeModule === 'pinpanclub' && 'Club de Tenis de Mesa - Partidos, jugadores y torneos'}
-                {activeModule === 'admin' && 'Configura tu sitio y personalización'}
-                {activeModule === 'integrations' && 'Conecta con servicios externos'}
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
+                  <p className="text-muted-foreground text-sm">
+                    {activeModule === 'dashboard' && 'Vista general de tu tienda'}
+                    {activeModule === 'unatienda' && 'Gestiona catálogos, productos, estudiantes y pedidos de Unatienda'}
+                    {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
+                    {activeModule === 'customers' && 'Gestiona clientes, estudiantes y matrículas'}
+                    {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
+                    {activeModule === 'pinpanclub' && 'Club de Tenis de Mesa - Partidos, jugadores y torneos'}
+                    {activeModule === 'roles' && 'Gestiona roles de usuario y permisos del sistema'}
+                    {activeModule === 'admin' && 'Configura tu sitio y personalización'}
+                    {activeModule === 'integrations' && 'Conecta con servicios externos'}
+                  </p>
+                </div>
+                {role && (
+                  <Badge 
+                    variant="outline" 
+                    className="hidden md:flex items-center gap-1.5"
+                    style={{ 
+                      backgroundColor: `${role.color}15`,
+                      borderColor: role.color,
+                      color: role.color
+                    }}
+                  >
+                    <Shield className="h-3 w-3" />
+                    {role.nombre}
+                  </Badge>
+                )}
+              </div>
             </div>
             
             {/* Module Content */}
