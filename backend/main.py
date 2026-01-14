@@ -217,6 +217,9 @@ async def startup_event():
     # Initialize Notifications module (async init)
     await init_notifications()
     
+    # Initialize Roles module (create default roles)
+    await roles_service.initialize_default_roles()
+    
     logger.info("All modules loaded successfully")
 
 @app.on_event("shutdown")
