@@ -411,7 +411,6 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
     total_logs = await db.roles_audit_log.count_documents({})
     
     # Get recent activity (last 24 hours)
-    from datetime import timedelta
     yesterday = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
     recent_count = await db.roles_audit_log.count_documents({"timestamp": {"$gte": yesterday}})
     
