@@ -13,7 +13,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
   Shield, ShieldCheck, Crown, User, Plus, Edit2, Trash2, Search,
-  Loader2, Save, Users, Key, ChevronRight, AlertTriangle, RefreshCw
+  Loader2, Save, Users, Key, ChevronRight, AlertTriangle, RefreshCw,
+  History, UserPlus, UserMinus, FileEdit, Clock
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -23,6 +24,18 @@ const ROLE_ICONS = {
   'ShieldCheck': ShieldCheck,
   'Shield': Shield,
   'User': User,
+};
+
+// Action type labels and colors
+const ACTION_LABELS = {
+  'role_created': { label: 'Rol Creado', icon: Plus, color: 'bg-green-100 text-green-700' },
+  'role_updated': { label: 'Rol Actualizado', icon: FileEdit, color: 'bg-blue-100 text-blue-700' },
+  'role_deleted': { label: 'Rol Eliminado', icon: Trash2, color: 'bg-red-100 text-red-700' },
+  'role_assigned': { label: 'Rol Asignado', icon: UserPlus, color: 'bg-purple-100 text-purple-700' },
+  'role_removed': { label: 'Rol Removido', icon: UserMinus, color: 'bg-orange-100 text-orange-700' },
+  'permission_added': { label: 'Permiso Agregado', icon: Key, color: 'bg-cyan-100 text-cyan-700' },
+  'permission_removed': { label: 'Permiso Removido', icon: Key, color: 'bg-amber-100 text-amber-700' },
+  'permissions_updated': { label: 'Permisos Actualizados', icon: Shield, color: 'bg-indigo-100 text-indigo-700' },
 };
 
 export default function RolesModule() {
@@ -41,6 +54,12 @@ export default function RolesModule() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUserForRole, setSelectedUserForRole] = useState(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  
+  // Audit log tab
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [auditStats, setAuditStats] = useState(null);
+  const [loadingAudit, setLoadingAudit] = useState(false);
+  const [auditFilter, setAuditFilter] = useState('');
   
   // Form state
   const [formData, setFormData] = useState({
