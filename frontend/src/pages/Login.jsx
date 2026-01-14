@@ -71,7 +71,21 @@ export default function Login() {
     try {
       const user = await login(formData.email, formData.contrasena);
       toast.success(`¡Bienvenido, ${user.nombre}!`);
-      navigate(user.es_admin ? '/admin' : '/dashboard');
+      
+      // Check for redirect parameter in URL
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get('redirect');
+      
+      if (redirectTo) {
+        // Redirect to the page user was trying to access
+        navigate(redirectTo);
+      } else if (user.es_admin) {
+        // Admins go to admin panel
+        navigate('/admin');
+      } else {
+        // Regular users stay on home or go to mi-cuenta
+        navigate('/');
+      }
     } catch (error) {
       const message = error.response?.data?.detail || 'Error al iniciar sesión';
       toast.error(message);
