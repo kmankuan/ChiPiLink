@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 class PlatformStoreAPITester:
-    def __init__(self, base_url="https://capmanage.preview.emergentagent.com"):
+    def __init__(self, base_url="https://landingfix.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0
@@ -163,7 +163,7 @@ class PlatformStoreAPITester:
                 "yappy": {
                     "merchant_id": "BAQIJ-98619452",
                     "secret_key": "test_secret_key",
-                    "url_domain": "https://capmanage.preview.emergentagent.com",
+                    "url_domain": "https://landingfix.preview.emergentagent.com",
                     "activo": True,
                     "ambiente": "produccion"
                 }
