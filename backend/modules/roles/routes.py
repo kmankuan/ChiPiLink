@@ -248,15 +248,3 @@ async def check_multiple_permissions(
         "has_required": has_all,
         "require_all": require_all
     }
-
-
-@router.get("/my-permissions")
-async def get_my_permissions(current_user: dict = Depends(get_current_user)):
-    """Get current user's role and permissions"""
-    role = await roles_service.get_user_role(current_user["cliente_id"])
-    permissions = await roles_service.get_user_permissions(current_user["cliente_id"])
-    
-    return {
-        "role": role,
-        "permissions": permissions
-    }
