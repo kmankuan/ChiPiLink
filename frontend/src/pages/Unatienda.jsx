@@ -533,35 +533,12 @@ export default function Unatienda() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Tabs for Public/Private Catalog */}
-        <Tabs value={activeView} onValueChange={setActiveView} className="mb-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="publico" className="gap-2">
-              <Store className="h-4 w-4" />
-              Catálogo General
-            </TabsTrigger>
-            <TabsTrigger 
-              value="privado" 
-              className="gap-2"
-              disabled={!isAuthenticated || !catalogoPrivadoAcceso?.tiene_acceso}
-            >
-              <BookOpen className="h-4 w-4" />
-              Libros PCA
-              {catalogoPrivadoAcceso?.tiene_acceso && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  {catalogoPrivadoAcceso.estudiantes?.length || 0}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-xl">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={activeView === 'privado' ? "Buscar libros..." : "Buscar productos..."}
+              placeholder="Buscar productos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 h-11"
@@ -569,15 +546,12 @@ export default function Unatienda() {
           </div>
         </div>
 
-        {/* Content based on active view */}
-        {activeView === 'publico' ? (
-          <>
-            {/* Private Catalog Access Banner (show on public view) */}
-            {(!catalogoPrivadoAcceso?.tiene_acceso || !isAuthenticated) && (
-              <PrivateAccessBanner />
-            )}
+        {/* Students Info - Show if user has linked students */}
+        {catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+          <StudentsInfo />
+        )}
 
-            {/* Category Navigation */}
+        {/* Category Navigation */}
             <div className="mb-6" data-category-nav>
               <div className="flex gap-2 flex-wrap items-center">
                 <Button
