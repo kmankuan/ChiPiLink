@@ -353,38 +353,24 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
+                  {/* Mi Cuenta - Siempre visible para usuarios autenticados */}
                   <DropdownMenuItem asChild>
                     <Link to="/mi-cuenta" className="flex items-center gap-2" data-testid="menu-my-account">
                       <Wallet className="h-4 w-4" />
                       Mi Cuenta
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="flex items-center gap-2" data-testid="menu-dashboard">
-                      <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong">
-                      <Trophy className="h-4 w-4" />
-                      PinpanClub
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard/estudiantes" className="flex items-center gap-2" data-testid="menu-students">
-                      <Users className="h-4 w-4" />
-                      {t('nav.students')}
-                    </Link>
-                  </DropdownMenuItem>
+                  
+                  {/* Mis Pedidos - Siempre visible para usuarios autenticados */}
                   <DropdownMenuItem asChild>
                     <Link to="/pedidos" className="flex items-center gap-2" data-testid="menu-orders">
                       <ShoppingCart className="h-4 w-4" />
                       {t('nav.orders')}
                     </Link>
                   </DropdownMenuItem>
-                  {/* Show "Mis Libros Escolares" only if user has linked students or has admin/view permission */}
-                  {(hasLinkedStudents || hasPermission('unatienda.view_private_catalog')) && (
+                  
+                  {/* Mis Libros Escolares - Solo si tiene estudiantes vinculados */}
+                  {hasLinkedStudents && (
                     <DropdownMenuItem asChild>
                       <Link to="/mis-pedidos-libros" className="flex items-center gap-2" data-testid="menu-book-orders">
                         <BookOpen className="h-4 w-4" />
@@ -392,6 +378,18 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                   )}
+                  
+                  {/* PinpanClub - Solo si tiene membresía activa o permiso */}
+                  {(user?.tiene_membresia_activa || hasPermission('pinpanclub.access')) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong">
+                        <Trophy className="h-4 w-4" />
+                        PinpanClub
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  
+                  {/* Admin Section - Solo para admins */}
                   {canAccessAdmin && (
                     <>
                       <DropdownMenuSeparator />
@@ -403,6 +401,7 @@ export function Header() {
                       </DropdownMenuItem>
                     </>
                   )}
+                  
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleLogout}
