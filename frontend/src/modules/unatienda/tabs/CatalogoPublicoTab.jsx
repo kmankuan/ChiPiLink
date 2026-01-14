@@ -66,8 +66,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       const [productsRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
         fetch(`${API}/api/store/products`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API}/api/store/categories`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/api/store/grades`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/api/store/subjects`, { headers: { Authorization: `Bearer ${token}` } })
+        fetch(`${API}/api/store/products/grades`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/api/store/products/subjects`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       
       const productsData = await productsRes.json();
