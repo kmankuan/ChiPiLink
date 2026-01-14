@@ -261,23 +261,14 @@ function AppRouter() {
       <Route path="/unatienda/checkout" element={<UnatiendaCheckout />} />
       
       {/* Protected Routes */}
+      {/* Redirect old /dashboard routes to /mi-cuenta */}
       <Route 
         path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <Header />
-            <Dashboard />
-          </ProtectedRoute>
-        } 
+        element={<Navigate to="/mi-cuenta" replace />}
       />
       <Route 
         path="/dashboard/estudiantes" 
-        element={
-          <ProtectedRoute>
-            <Header />
-            <Dashboard />
-          </ProtectedRoute>
-        } 
+        element={<Navigate to="/mi-cuenta?tab=exclusive" replace />}
       />
       <Route 
         path="/orden" 
