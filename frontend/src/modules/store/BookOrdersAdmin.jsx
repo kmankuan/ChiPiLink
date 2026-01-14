@@ -2393,7 +2393,11 @@ export default function BookOrdersAdmin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-7 mb-6">
+        <TabsList className="grid w-full grid-cols-8 mb-6">
+          <TabsTrigger value="catalogo" className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4" />
+            <span className="hidden sm:inline">Catálogo</span>
+          </TabsTrigger>
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Estudiantes</span>
@@ -2403,7 +2407,7 @@ export default function BookOrdersAdmin() {
             <span className="hidden sm:inline">Import Est.</span>
           </TabsTrigger>
           <TabsTrigger value="import-libros" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
+            <FileSpreadsheet className="h-4 w-4" />
             <span className="hidden sm:inline">Import Lib.</span>
           </TabsTrigger>
           <TabsTrigger value="vinculaciones" className="flex items-center gap-2">
@@ -2423,6 +2427,10 @@ export default function BookOrdersAdmin() {
             <span className="hidden sm:inline">Monday</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="catalogo">
+          <CatalogoPrivadoTab token={token} />
+        </TabsContent>
 
         <TabsContent value="estudiantes">
           <EstudiantesTab token={token} />
