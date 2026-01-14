@@ -2355,7 +2355,7 @@ function MondayQuickAccess({ navigate }) {
 // Componente Principal
 export default function BookOrdersAdmin() {
   const { token } = useAuth();
-  const [activeTab, setActiveTab] = useState('estudiantes');
+  const [activeTab, setActiveTab] = useState('catalogo');
   const navigate = useNavigate();
 
   return (
