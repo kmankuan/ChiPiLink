@@ -53,7 +53,10 @@ import {
   ArrowLeft,
   Key,
   Building2,
-  LayoutGrid
+  LayoutGrid,
+  Database,
+  Play,
+  ShoppingCart
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
