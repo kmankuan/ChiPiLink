@@ -178,6 +178,9 @@ api_router.include_router(upload_router)
 # Realtime WebSocket Module
 api_router.include_router(realtime_router)
 
+# Roles & Permissions Module
+api_router.include_router(roles_router)
+
 # Include main router in app
 app.include_router(api_router)
 
