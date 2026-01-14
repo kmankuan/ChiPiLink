@@ -131,6 +131,8 @@ export default function AdminDashboard() {
         return <AdminMemberships />;
       case 'pinpanclub':
         return <PinpanClubModule />;
+      case 'roles':
+        return <RolesModule />;
       case 'admin':
         return <AdminModule />;
       case 'integrations':
@@ -140,7 +142,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const currentNavItem = navItems.find(item => item.id === activeModule);
+  const currentNavItem = filteredNavItems.find(item => item.id === activeModule) || filteredNavItems[0];
 
   return (
     <div className="min-h-screen bg-background">
