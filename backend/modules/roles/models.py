@@ -204,3 +204,45 @@ class UserRoleAssignment(BaseModel):
     asignado_por: Optional[str] = None
     fecha_asignacion: Optional[str] = None
     notas: Optional[str] = None
+
+
+# ============== AUDIT LOG MODELS ==============
+
+class AuditActionType(str, Enum):
+    """Types of auditable actions"""
+    ROLE_CREATED = "role_created"
+    ROLE_UPDATED = "role_updated"
+    ROLE_DELETED = "role_deleted"
+    ROLE_ASSIGNED = "role_assigned"
+    ROLE_REMOVED = "role_removed"
+    PERMISSION_ADDED = "permission_added"
+    PERMISSION_REMOVED = "permission_removed"
+    PERMISSIONS_UPDATED = "permissions_updated"
+
+
+class AuditLogEntry(BaseModel):
+    """Model for audit log entries"""
+    log_id: Optional[str] = None
+    action: AuditActionType
+    actor_id: str  # Who performed the action
+    actor_email: Optional[str] = None
+    actor_nombre: Optional[str] = None
+    target_type: str  # 'role' or 'user'
+    target_id: str  # role_id or cliente_id
+    target_nombre: Optional[str] = None
+    details: Dict[str, Any] = {}  # Additional details about the action
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    timestamp: Optional[str] = None
+
+
+class AuditLogFilter(BaseModel):
+    """Filter for querying audit logs"""
+    action: Optional[AuditActionType] = None
+    actor_id: Optional[str] = None
+    target_id: Optional[str] = None
+    target_type: Optional[str] = None
+    from_date: Optional[str] = None
+    to_date: Optional[str] = None
+    limit: int = 50
+    skip: int = 0
