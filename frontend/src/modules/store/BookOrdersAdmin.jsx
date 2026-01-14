@@ -1865,7 +1865,7 @@ export default function BookOrdersAdmin() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6 mb-6">
+        <TabsList className="grid w-full grid-cols-7 mb-6">
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Estudiantes</span>
@@ -1885,6 +1885,10 @@ export default function BookOrdersAdmin() {
           <TabsTrigger value="pedidos" className="flex items-center gap-2">
             <ClipboardPaste className="h-4 w-4" />
             <span className="hidden sm:inline">Pedidos</span>
+          </TabsTrigger>
+          <TabsTrigger value="demo" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            <span className="hidden sm:inline">Demo</span>
           </TabsTrigger>
           <TabsTrigger value="monday" className="flex items-center gap-2">
             <Plug className="h-4 w-4" />
