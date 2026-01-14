@@ -320,7 +320,7 @@ export default function AdminDashboard() {
                     {activeModule === 'dashboard' && 'Vista general de tu tienda'}
                     {activeModule === 'unatienda' && 'Gestiona catálogos, productos, estudiantes y pedidos de Unatienda'}
                     {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
-                    {activeModule === 'customers' && 'Gestiona clientes, estudiantes y matrículas'}
+                    {activeModule === 'customers' && 'Gestiona usuarios, sus solicitudes de acceso exclusivo y vinculaciones'}
                     {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
                     {activeModule === 'pinpanclub' && 'Club de Tenis de Mesa - Partidos, jugadores y torneos'}
                     {activeModule === 'roles' && 'Gestiona roles de usuario y permisos del sistema'}
