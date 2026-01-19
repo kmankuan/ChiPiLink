@@ -5,7 +5,38 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 14, 2026)
+## Latest Update (Enero 19, 2026)
+
+### 🆕 Sistema Global de Breadcrumbs ✅ COMPLETADO
+
+Se implementó un sistema global de navegación con breadcrumbs en todas las páginas de la aplicación.
+
+#### Características del Header Global
+- **Botón de Regresar**: Visible en todas las páginas excepto la home, navega a la página anterior
+- **Logo ChiPi Link**: Siempre visible, lleva al inicio al hacer clic
+- **Breadcrumb**: Muestra la ubicación actual con ícono representativo
+- **Dropdown de Navegación**: Acceso rápido a páginas principales
+
+#### Rutas con Header
+- **Públicas**: `/`, `/unatienda`, `/pinpanclub`, `/login`, `/registro`, `/comunidad`, `/eventos`, `/galeria`, `/rapidpin`
+- **Protegidas**: `/mi-cuenta`, `/pedidos`, `/mis-pedidos-libros`, `/orden`, `/recibo/*`, `/catalogo`
+- **Admin**: `/admin`, `/admin/notifications`, `/admin/posts`, `/admin/memberships`, `/admin/book-orders`, `/admin/chat`
+
+#### Rutas SIN Header (por diseño)
+- TV: `/tv`, `/tv/pinpanclub`, `/canvas`, `/tv/canvas`
+- Embed: `/embed/orden`
+- Auth Callback: `/auth/callback`
+
+#### Archivos Modificados
+- `/app/frontend/src/App.js` - Router con Header en todas las rutas relevantes
+- `/app/frontend/src/components/layout/Header.jsx` - Componente Header con ROUTE_CONFIG
+
+#### Test Results
+- **Frontend:** 19/19 tests passed (100%)
+
+---
+
+## Previous Update (Enero 14, 2026)
 
 ### 🆕 Sistema RBAC (Role-Based Access Control) ✅ NUEVO
 
