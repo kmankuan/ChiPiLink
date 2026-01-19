@@ -598,87 +598,111 @@ export default function Unatienda() {
                   Ver tienda general
                 </Button>
               </div>
+            </div>
+
+            {/* Private Catalog Tabs */}
+            <Tabs defaultValue="por-estudiante" className="mb-6">
+              <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsTrigger value="por-estudiante" className="gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Por Estudiante
+                </TabsTrigger>
+                <TabsTrigger value="todos" className="gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  Todos los Libros
+                </TabsTrigger>
+              </TabsList>
               
-              {/* Students badges */}
-              {catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-purple-200 dark:border-purple-700">
-                  <span className="text-sm text-muted-foreground">Estudiantes:</span>
-                  {catalogoPrivadoAcceso.estudiantes.map((est) => (
-                    <Badge 
-                      key={est.sync_id} 
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-purple-100"
-                      onClick={() => setSelectedGradoPrivado(est.grado)}
+              {/* Tab: Books by Student */}
+              <TabsContent value="por-estudiante" className="mt-6">
+                <LibrosPorEstudiante 
+                  onNavigateToBook={(libroId) => navigate(`/unatienda/libro/${libroId}`)}
+                />
+              </TabsContent>
+              
+              {/* Tab: All Books Grid */}
+              <TabsContent value="todos" className="mt-6">
+                {/* Students badges */}
+                {catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm text-muted-foreground">Filtrar por estudiante:</span>
+                    {catalogoPrivadoAcceso.estudiantes.map((est) => (
+                      <Badge 
+                        key={est.sync_id} 
+                        variant={selectedGradoPrivado === est.grado ? "default" : "secondary"}
+                        className="cursor-pointer hover:bg-purple-100"
+                        onClick={() => setSelectedGradoPrivado(selectedGradoPrivado === est.grado ? '' : est.grado)}
+                      >
+                        {est.nombre} - {est.grado}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Filters for Private Catalog */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <select
+                    value={selectedGradoPrivado}
+                    onChange={(e) => setSelectedGradoPrivado(e.target.value)}
+                    className="px-3 py-2 border rounded-lg bg-background"
+                  >
+                    <option value="">Todos los grados</option>
+                    {catalogoPrivadoAcceso?.grados?.map(g => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedMateriaPrivado}
+                    onChange={(e) => setSelectedMateriaPrivado(e.target.value)}
+                    className="px-3 py-2 border rounded-lg bg-background"
+                  >
+                    <option value="">Todas las materias</option>
+                    {materias.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                  
+                  {(selectedGradoPrivado || selectedMateriaPrivado) && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedGradoPrivado('');
+                        setSelectedMateriaPrivado('');
+                      }}
                     >
-                      {est.nombre} - {est.grado}
-                    </Badge>
-                  ))}
+                      Limpiar filtros
+                    </Button>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Filters for Private Catalog */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <select
-                value={selectedGradoPrivado}
-                onChange={(e) => setSelectedGradoPrivado(e.target.value)}
-                className="px-3 py-2 border rounded-lg bg-background"
-              >
-                <option value="">Todos los grados</option>
-                {catalogoPrivadoAcceso?.grados?.map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-              <select
-                value={selectedMateriaPrivado}
-                onChange={(e) => setSelectedMateriaPrivado(e.target.value)}
-                className="px-3 py-2 border rounded-lg bg-background"
-              >
-                <option value="">Todas las materias</option>
-                {materias.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
-              
-              {(selectedGradoPrivado || selectedMateriaPrivado) && (
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => {
-                    setSelectedGradoPrivado('');
-                    setSelectedMateriaPrivado('');
-                  }}
-                >
-                  Limpiar filtros
-                </Button>
-              )}
-            </div>
-
-            {/* Private Products Count */}
-            <p className="text-sm text-muted-foreground mb-4">
-              {filteredPrivateProducts.length} libro{filteredPrivateProducts.length !== 1 ? 's' : ''} encontrado{filteredPrivateProducts.length !== 1 ? 's' : ''}
-            </p>
-
-            {/* Private Products Grid */}
-            {loadingPrivado ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : filteredPrivateProducts.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
-                <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-muted-foreground">No se encontraron libros</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Intenta con otros filtros o busca por nombre
+                {/* Private Products Count */}
+                <p className="text-sm text-muted-foreground mb-4">
+                  {filteredPrivateProducts.length} libro{filteredPrivateProducts.length !== 1 ? 's' : ''} encontrado{filteredPrivateProducts.length !== 1 ? 's' : ''}
                 </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredPrivateProducts.map((product) => (
-                  <ProductCard key={product.libro_id} product={product} isPrivate />
-                ))}
-              </div>
-            )}
+
+                {/* Private Products Grid */}
+                {loadingPrivado ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : filteredPrivateProducts.length === 0 ? (
+                  <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                    <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground">No se encontraron libros</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Intenta con otros filtros o busca por nombre
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredPrivateProducts.map((product) => (
+                      <ProductCard key={product.libro_id} product={product} isPrivate />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </>
         ) : (
           <>
