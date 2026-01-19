@@ -280,6 +280,7 @@ function AppRouter() {
       {/* Unatienda Store Routes */}
       <Route path="/unatienda" element={<><Header /><Unatienda /></>} />
       <Route path="/unatienda/producto/:productId" element={<><Header /><ProductDetail /></>} />
+      <Route path="/unatienda/libro/:libroId" element={<><Header /><PrivateBookDetail /></>} />
       <Route path="/unatienda/checkout" element={<><Header /><UnatiendaCheckout /></>} />
       
       {/* Protected Routes */}
