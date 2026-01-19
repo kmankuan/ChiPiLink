@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import {
   Sheet,
   SheetContent,
@@ -19,7 +20,10 @@ import {
   Trash2,
   Book,
   ArrowRight,
-  ShoppingBag
+  ShoppingBag,
+  Lock,
+  AlertCircle,
+  GraduationCap
 } from 'lucide-react';
 
 export default function CartDrawer() {
