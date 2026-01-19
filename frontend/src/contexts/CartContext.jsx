@@ -107,6 +107,13 @@ export function CartProvider({ children }) {
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + (item.precio * item.quantity), 0);
+  
+  // Separate private and public items
+  const privateItems = items.filter(item => item.es_catalogo_privado);
+  const publicItems = items.filter(item => !item.es_catalogo_privado);
+  const hasPrivateItems = privateItems.length > 0;
+  const hasPublicItems = publicItems.length > 0;
+  const hasMixedCart = hasPrivateItems && hasPublicItems;
 
   const value = {
     items,
@@ -119,7 +126,13 @@ export function CartProvider({ children }) {
     clearCart,
     openCart,
     closeCart,
-    toggleCart
+    toggleCart,
+    // New helpers for private catalog
+    privateItems,
+    publicItems,
+    hasPrivateItems,
+    hasPublicItems,
+    hasMixedCart
   };
 
   return (
