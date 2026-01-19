@@ -35,6 +35,7 @@ import PaymentResult from '@/pages/PaymentResult';
 import Unatienda from '@/pages/Unatienda';
 import UnatiendaCheckout from '@/pages/UnatiendaCheckout';
 import ProductDetail from '@/pages/ProductDetail';
+import PrivateBookDetail from '@/pages/PrivateBookDetail';
 import AgentPanel from '@/pages/AgentPanel';
 
 // PinpanClub Module
