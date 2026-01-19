@@ -70,9 +70,33 @@ export function Header() {
   const [hasLinkedStudents, setHasLinkedStudents] = useState(false);
 
   const isUnatiendaPage = location.pathname.startsWith('/unatienda');
+  const isHomePage = location.pathname === '/';
 
   // Helper to determine if user can access admin panel
   const canAccessAdmin = isAdmin || hasAdminAccess;
+
+  // Get current page info for breadcrumb
+  const currentPageInfo = useMemo(() => {
+    const path = location.pathname;
+    
+    // Check exact match first
+    if (ROUTE_CONFIG[path]) {
+      return ROUTE_CONFIG[path];
+    }
+    
+    // Check for partial matches (e.g., /admin#something, /unatienda/producto/123)
+    for (const [route, config] of Object.entries(ROUTE_CONFIG)) {
+      if (route !== '/' && path.startsWith(route)) {
+        return config;
+      }
+    }
+    
+    // Default fallback
+    return { name: 'Página', icon: Home };
+  }, [location.pathname]);
+
+  // Check if we can go back (not on home page and have history)
+  const canGoBack = !isHomePage;
 
   // Check if user has linked students for book orders
   useEffect(() => {
