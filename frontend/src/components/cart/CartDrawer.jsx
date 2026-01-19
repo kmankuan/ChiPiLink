@@ -78,13 +78,30 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Mixed Cart Warning */}
+              {hasMixedCart && (
+                <Card className="p-3 bg-amber-50 dark:bg-amber-900/20 border-amber-200">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                    <p className="text-xs text-amber-700 dark:text-amber-300">
+                      Tu carrito tiene productos públicos y del catálogo privado. 
+                      Se procesarán en pedidos separados.
+                    </p>
+                  </div>
+                </Card>
+              )}
+              
               {items.map((item) => (
                 <div 
                   key={item.libro_id} 
-                  className="flex gap-4 p-3 rounded-lg bg-muted/50"
+                  className={`flex gap-4 p-3 rounded-lg ${
+                    item.es_catalogo_privado 
+                      ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' 
+                      : 'bg-muted/50'
+                  }`}
                 >
                   {/* Product Image */}
-                  <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 relative">
                     {item.imagen_url ? (
                       <img 
                         src={item.imagen_url} 
@@ -94,14 +111,27 @@ export default function CartDrawer() {
                     ) : (
                       <Book className="h-6 w-6 text-muted-foreground/50" />
                     )}
+                    {item.es_catalogo_privado && (
+                      <div className="absolute -top-1 -right-1 bg-purple-500 rounded-full p-1">
+                        <Lock className="h-2.5 w-2.5 text-white" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm truncate">{item.nombre}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      ${item.precio.toFixed(2)}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-sm text-muted-foreground">
+                        ${item.precio.toFixed(2)}
+                      </p>
+                      {item.es_catalogo_privado && item.grado && (
+                        <Badge variant="secondary" className="text-xs py-0 h-5">
+                          <GraduationCap className="h-2.5 w-2.5 mr-1" />
+                          {item.grado}
+                        </Badge>
+                      )}
+                    </div>
                     
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-2">
@@ -121,7 +151,7 @@ export default function CartDrawer() {
                         size="icon"
                         className="h-7 w-7"
                         onClick={() => updateQuantity(item.libro_id, item.quantity + 1)}
-                        disabled={item.quantity >= item.cantidad_inventario}
+                        disabled={!item.es_catalogo_privado && item.quantity >= item.cantidad_inventario}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
