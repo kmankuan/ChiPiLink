@@ -106,9 +106,6 @@ export default function PingPongSpectator() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/pinpanclub')}>
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
               <span className="text-2xl">🏓</span>
               <h1 className="font-bold text-xl">Partido en Vivo</h1>
               {match.estado === 'en_curso' && (
