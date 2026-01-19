@@ -26,10 +26,12 @@ import {
   GraduationCap,
   Lock,
   User,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import CategoryLanding from '@/components/store/CategoryLanding';
+import LibrosPorEstudiante from '@/components/store/LibrosPorEstudiante';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
