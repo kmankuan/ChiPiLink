@@ -281,6 +281,7 @@ export default function Unatienda() {
     
     return (
       <div
+        data-testid={`product-card-${product.libro_id}`}
         className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
         onClick={() => navigate(isPrivate ? `/unatienda/libro/${product.libro_id}` : `/unatienda/producto/${product.libro_id}`)}
       >
