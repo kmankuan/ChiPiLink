@@ -48,13 +48,37 @@ import LanguageSelector from '@/components/common/LanguageSelector';
 const ROUTE_CONFIG = {
   '/': { name: 'Inicio', icon: Home },
   '/unatienda': { name: 'Tienda', icon: Store },
+  '/unatienda/producto': { name: 'Producto', icon: Store },
+  '/unatienda/checkout': { name: 'Checkout', icon: ShoppingCart },
   '/mi-cuenta': { name: 'Mi Cuenta', icon: Wallet },
   '/my-account': { name: 'Mi Cuenta', icon: Wallet },
   '/pedidos': { name: 'Mis Pedidos', icon: ShoppingCart },
+  '/mis-pedidos-libros': { name: 'Mis Libros', icon: BookOpen },
+  '/orden': { name: 'Nueva Orden', icon: ShoppingCart },
+  '/checkout': { name: 'Pago', icon: CreditCard },
+  '/payment': { name: 'Resultado de Pago', icon: CreditCard },
+  // PinpanClub
   '/pinpanclub': { name: 'PinpanClub', icon: Trophy },
+  '/pinpanclub/match': { name: 'Partido', icon: Trophy },
+  '/pinpanclub/arbiter': { name: 'Árbitro', icon: Trophy },
+  '/pinpanclub/spectator': { name: 'Espectador', icon: Trophy },
+  '/pinpanclub/superpin': { name: 'Super Pin', icon: Trophy },
+  '/pinpanclub/rapidpin': { name: 'Rapid Pin', icon: Zap },
+  '/pinpanclub/seasons': { name: 'Temporadas', icon: Calendar },
+  '/pinpanclub/challenges': { name: 'Desafíos', icon: Trophy },
+  '/pinpanclub/analytics': { name: 'Estadísticas', icon: Trophy },
+  '/pinpanclub/sponsors': { name: 'Patrocinadores', icon: Trophy },
+  '/rapidpin': { name: 'Rapid Pin', icon: Zap },
+  '/tv': { name: 'TV', icon: Trophy },
+  // Community
+  '/comunidad': { name: 'Comunidad', icon: Users },
+  '/eventos': { name: 'Eventos', icon: Calendar },
+  '/galeria': { name: 'Galería', icon: Store },
+  // Admin
   '/admin': { name: 'Administración', icon: Settings },
+  // Auth
   '/login': { name: 'Iniciar Sesión', icon: User },
-  '/register': { name: 'Registrarse', icon: User },
+  '/registro': { name: 'Registrarse', icon: User },
 };
 
 export function Header() {
