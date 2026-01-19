@@ -268,13 +268,13 @@ function AppRouter() {
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
       
       {/* Public Checkout Routes */}
-      <Route path="/checkout/:pedidoId" element={<Checkout />} />
-      <Route path="/payment/result" element={<PaymentResult />} />
+      <Route path="/checkout/:pedidoId" element={<><Header /><Checkout /></>} />
+      <Route path="/payment/result" element={<><Header /><PaymentResult /></>} />
       
       {/* Unatienda Store Routes */}
       <Route path="/unatienda" element={<><Header /><Unatienda /></>} />
       <Route path="/unatienda/producto/:productId" element={<><Header /><ProductDetail /></>} />
-      <Route path="/unatienda/checkout" element={<UnatiendaCheckout />} />
+      <Route path="/unatienda/checkout" element={<><Header /><UnatiendaCheckout /></>} />
       
       {/* Protected Routes */}
       {/* Redirect old /dashboard routes to /mi-cuenta */}
