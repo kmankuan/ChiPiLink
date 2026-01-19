@@ -140,20 +140,6 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Header */}
-      <div className="bg-card border-b">
-        <div className="container mx-auto px-4 py-4 max-w-6xl">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/unatienda')}
-            className="gap-2"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Volver a la tienda
-          </Button>
-        </div>
-      </div>
-
       {/* Product Content */}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
