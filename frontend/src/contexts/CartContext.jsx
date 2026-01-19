@@ -39,8 +39,9 @@ export function CartProvider({ children }) {
         const updated = [...prev];
         const newQty = updated[existingIndex].quantity + quantity;
         
-        // Check stock
-        if (newQty > product.cantidad_inventario) {
+        // Check stock (skip for private catalog items)
+        const isPrivate = product.es_catalogo_privado || updated[existingIndex].es_catalogo_privado;
+        if (!isPrivate && newQty > product.cantidad_inventario) {
           toast.error('No hay suficiente stock disponible');
           return prev;
         }
@@ -58,11 +59,15 @@ export function CartProvider({ children }) {
       return [...prev, {
         libro_id: product.libro_id,
         nombre: product.nombre,
-        precio: product.precio,
+        precio: product.precio_oferta || product.precio,
+        precio_original: product.precio,
         imagen_url: product.imagen_url,
         grado: product.grado,
         materia: product.materia,
         cantidad_inventario: product.cantidad_inventario,
+        es_catalogo_privado: product.es_catalogo_privado || false,
+        editorial: product.editorial,
+        codigo: product.codigo,
         quantity
       }];
     });
