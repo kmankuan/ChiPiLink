@@ -130,8 +130,8 @@ function AppRouter() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<><Header /><SuperAppLanding /></>} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Register />} />
+      <Route path="/login" element={<><Header /><Login /></>} />
+      <Route path="/registro" element={<><Header /><Register /></>} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       
       {/* Community Routes - All use SuperAppLanding which handles community content */}
@@ -143,24 +143,24 @@ function AppRouter() {
       <Route path="/galeria" element={<><Header /><SuperAppLanding /></>} />
       
       {/* PinpanClub Routes */}
-      <Route path="/pinpanclub" element={<PingPongDashboard />} />
-      <Route path="/pinpanclub/match/new" element={<PingPongMatch />} />
-      <Route path="/pinpanclub/match/:matchId" element={<PingPongMatch />} />
-      <Route path="/pinpanclub/arbiter/:matchId" element={<PingPongArbiter />} />
-      <Route path="/pinpanclub/spectator/:matchId" element={<PingPongSpectator />} />
-      <Route path="/pinpanclub/sponsors" element={<SponsorsAdmin />} />
-      <Route path="/pinpanclub/monday" element={<PingPongMondayIntegration />} />
+      <Route path="/pinpanclub" element={<><Header /><PingPongDashboard /></>} />
+      <Route path="/pinpanclub/match/new" element={<><Header /><PingPongMatch /></>} />
+      <Route path="/pinpanclub/match/:matchId" element={<><Header /><PingPongMatch /></>} />
+      <Route path="/pinpanclub/arbiter/:matchId" element={<><Header /><PingPongArbiter /></>} />
+      <Route path="/pinpanclub/spectator/:matchId" element={<><Header /><PingPongSpectator /></>} />
+      <Route path="/pinpanclub/sponsors" element={<><Header /><SponsorsAdmin /></>} />
+      <Route path="/pinpanclub/monday" element={<><Header /><PingPongMondayIntegration /></>} />
       
-      {/* PinpanClub TV Display - Public URL for TVs */}
+      {/* PinpanClub TV Display - Public URL for TVs - NO Header for TV mode */}
       <Route path="/tv/pinpanclub" element={<PingPongTV />} />
       <Route path="/tv" element={<PingPongTV />} />
       
-      {/* PinpanClub Canvas - Customizable Widget Layout */}
+      {/* PinpanClub Canvas - Customizable Widget Layout - NO Header for canvas */}
       <Route path="/canvas" element={<PingPongCanvas />} />
       <Route path="/tv/canvas" element={<PingPongCanvas />} />
       
       {/* PinpanClub Mobile Arbiter */}
-      <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<PingPongMobileArbiter />} />
+      <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<><Header /><PingPongMobileArbiter /></>} />
       
       {/* Super Pin Routes */}
       <Route path="/pinpanclub/superpin/admin" element={<SuperPinAdmin />} />
