@@ -129,10 +129,6 @@ export default function Checkout() {
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
-          </Button>
           <h1 className="text-2xl font-bold">Checkout</h1>
           <p className="text-muted-foreground">Completa tu pago de forma segura</p>
         </div>
