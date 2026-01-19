@@ -37,7 +37,9 @@ export default function CartDrawer() {
     closeCart,
     removeItem,
     updateQuantity,
-    clearCart
+    clearCart,
+    hasPrivateItems,
+    hasMixedCart
   } = useCart();
 
   const handleCheckout = () => {
