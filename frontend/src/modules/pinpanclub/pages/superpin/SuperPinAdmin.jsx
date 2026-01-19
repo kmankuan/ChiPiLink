@@ -128,13 +128,6 @@ export default function SuperPinAdmin() {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/pinpanclub')} 
-          className="mb-4 text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Volver a PinpanClub
-        </Button>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">

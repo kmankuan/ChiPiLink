@@ -101,20 +101,11 @@ export default function SuperPinRanking() {
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-white hover:text-gray-300"
-              onClick={() => navigate('/pinpanclub')}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                <Trophy className="h-8 w-8 text-yellow-400" />
-                Super Pin Ranking
-              </h1>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <Trophy className="h-8 w-8 text-yellow-400" />
+              Super Pin Ranking
+            </h1>
           </div>
           <div className="flex gap-2">
             <Button

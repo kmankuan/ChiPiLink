@@ -149,17 +149,12 @@ export default function PlayerComparison() {
       {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate(-1)}>
-              <ArrowLeft className="h-4 w-4 mr-2" /> {t('common.back')}
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <Users className="h-6 w-6 text-green-600" />
-                {t('superpin.comparison.title')}
-              </h1>
-              <p className="text-gray-500">{t('superpin.comparison.subtitle')}</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Users className="h-6 w-6 text-green-600" />
+              {t('superpin.comparison.title')}
+            </h1>
+            <p className="text-gray-500">{t('superpin.comparison.subtitle')}</p>
           </div>
           
           {selectedPlayers.length > 0 && (

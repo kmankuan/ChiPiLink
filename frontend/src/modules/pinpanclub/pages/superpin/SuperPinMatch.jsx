@@ -105,14 +105,7 @@ export default function SuperPinMatch() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <Button
-          variant="ghost"
-          className="text-white hover:text-gray-300"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" /> {t('common.back')}
-        </Button>
+      <div className="flex items-center justify-end mb-6">
         <Badge className={{
           pendiente: 'bg-gray-600',
           en_curso: 'bg-green-600',

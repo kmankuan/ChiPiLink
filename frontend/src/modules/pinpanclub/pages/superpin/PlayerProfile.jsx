@@ -118,10 +118,6 @@ export default function PlayerProfile() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-gray-900 p-6">
       {/* Header */}
       <div className="max-w-6xl mx-auto">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="text-white mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> {t('common.back')}
-        </Button>
-
         {/* Profile Header */}
         <Card className="bg-white/10 border-white/20 mb-6">
           <CardContent className="p-6">
