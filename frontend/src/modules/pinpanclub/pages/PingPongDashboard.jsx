@@ -174,9 +174,6 @@ export default function PingPongDashboard() {
           <div className="container mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Link to="/" className="text-muted-foreground hover:text-foreground">
-                  ← Inicio
-                </Link>
                 <span className="text-2xl">🏓</span>
                 <h1 className="font-bold text-xl">PinpanClub</h1>
               </div>
