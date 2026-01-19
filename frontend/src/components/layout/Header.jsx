@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,9 +37,25 @@ import {
   Wallet,
   QrCode,
   CreditCard,
-  MessageCircle
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  Home
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
+
+// Breadcrumb configuration - maps routes to display names and icons
+const ROUTE_CONFIG = {
+  '/': { name: 'Inicio', icon: Home },
+  '/unatienda': { name: 'Tienda', icon: Store },
+  '/mi-cuenta': { name: 'Mi Cuenta', icon: Wallet },
+  '/my-account': { name: 'Mi Cuenta', icon: Wallet },
+  '/pedidos': { name: 'Mis Pedidos', icon: ShoppingCart },
+  '/pinpanclub': { name: 'PinpanClub', icon: Trophy },
+  '/admin': { name: 'Administración', icon: Settings },
+  '/login': { name: 'Iniciar Sesión', icon: User },
+  '/register': { name: 'Registrarse', icon: User },
+};
 
 export function Header() {
   const { t, i18n } = useTranslation();
