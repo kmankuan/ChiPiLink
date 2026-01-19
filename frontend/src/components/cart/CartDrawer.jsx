@@ -181,6 +181,16 @@ export default function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && (
           <div className="border-t pt-4 space-y-4">
+            {/* Private Items Notice */}
+            {hasPrivateItems && (
+              <div className="flex items-start gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <Lock className="h-4 w-4 text-purple-600 mt-0.5" />
+                <p className="text-xs text-purple-700 dark:text-purple-300">
+                  Los libros del catálogo privado se procesan como pre-orden
+                </p>
+              </div>
+            )}
+            
             {/* Summary */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
