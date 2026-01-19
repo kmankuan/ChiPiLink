@@ -212,6 +212,7 @@ function AppRouter() {
         path="/admin/notifications" 
         element={
           <ProtectedRoute adminOnly>
+            <Header />
             <AdminNotifications />
           </ProtectedRoute>
         } 
@@ -220,6 +221,7 @@ function AppRouter() {
         path="/admin/posts" 
         element={
           <ProtectedRoute adminOnly>
+            <Header />
             <AdminPosts />
           </ProtectedRoute>
         } 
@@ -228,6 +230,7 @@ function AppRouter() {
         path="/admin/memberships" 
         element={
           <ProtectedRoute adminOnly>
+            <Header />
             <AdminMemberships />
           </ProtectedRoute>
         } 
@@ -236,6 +239,7 @@ function AppRouter() {
         path="/admin/book-orders" 
         element={
           <ProtectedRoute adminOnly>
+            <Header />
             <BookOrdersAdmin />
           </ProtectedRoute>
         } 
@@ -244,6 +248,7 @@ function AppRouter() {
         path="/mis-pedidos-libros" 
         element={
           <ProtectedRoute>
+            <Header />
             <MisPedidosLibros />
           </ProtectedRoute>
         } 
@@ -319,9 +324,8 @@ function AppRouter() {
         path="/admin" 
         element={
           <ProtectedRoute adminOnly>
-            
-              <AdminDashboard />
-            
+            <Header />
+            <AdminDashboard />
           </ProtectedRoute>
         } 
       />
@@ -331,6 +335,7 @@ function AppRouter() {
         path="/admin/chat" 
         element={
           <ProtectedRoute adminOnly>
+            <Header />
             <AgentPanel />
           </ProtectedRoute>
         } 
