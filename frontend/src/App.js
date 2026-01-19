@@ -188,8 +188,24 @@ function AppRouter() {
       <Route path="/pinpanclub/seasons/:seasonId" element={<SeasonsPage />} />
       
       {/* Users Module Routes */}
-      <Route path="/mi-cuenta" element={<UsersDashboard />} />
-      <Route path="/my-account" element={<UsersDashboard />} />
+      <Route 
+        path="/mi-cuenta" 
+        element={
+          <ProtectedRoute>
+            <Header />
+            <UsersDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/my-account" 
+        element={
+          <ProtectedRoute>
+            <Header />
+            <UsersDashboard />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Notifications Admin Routes */}
       <Route 
