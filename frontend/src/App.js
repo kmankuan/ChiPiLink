@@ -163,29 +163,29 @@ function AppRouter() {
       <Route path="/pinpanclub/mobile-arbiter/:matchId" element={<><Header /><PingPongMobileArbiter /></>} />
       
       {/* Super Pin Routes */}
-      <Route path="/pinpanclub/superpin/admin" element={<SuperPinAdmin />} />
-      <Route path="/pinpanclub/superpin/league/:ligaId" element={<SuperPinLeagueDetail />} />
-      <Route path="/pinpanclub/superpin/match/:partidoId" element={<SuperPinMatch />} />
-      <Route path="/pinpanclub/superpin/ranking" element={<SuperPinRanking />} />
-      <Route path="/pinpanclub/superpin/ranking/:ligaId" element={<SuperPinRanking />} />
-      <Route path="/pinpanclub/superpin/tournament/:torneoId" element={<SuperPinTournament />} />
-      <Route path="/pinpanclub/superpin/player/:jugadorId" element={<PlayerProfile />} />
-      <Route path="/pinpanclub/superpin/compare" element={<PlayerComparison />} />
+      <Route path="/pinpanclub/superpin/admin" element={<><Header /><SuperPinAdmin /></>} />
+      <Route path="/pinpanclub/superpin/league/:ligaId" element={<><Header /><SuperPinLeagueDetail /></>} />
+      <Route path="/pinpanclub/superpin/match/:partidoId" element={<><Header /><SuperPinMatch /></>} />
+      <Route path="/pinpanclub/superpin/ranking" element={<><Header /><SuperPinRanking /></>} />
+      <Route path="/pinpanclub/superpin/ranking/:ligaId" element={<><Header /><SuperPinRanking /></>} />
+      <Route path="/pinpanclub/superpin/tournament/:torneoId" element={<><Header /><SuperPinTournament /></>} />
+      <Route path="/pinpanclub/superpin/player/:jugadorId" element={<><Header /><PlayerProfile /></>} />
+      <Route path="/pinpanclub/superpin/compare" element={<><Header /><PlayerComparison /></>} />
       
       {/* Rapid Pin Routes */}
       <Route path="/rapidpin" element={<><Header /><RapidPinPublicPage /></>} />
-      <Route path="/pinpanclub/rapidpin" element={<RapidPinDashboard />} />
-      <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<RapidPinSeason />} />
+      <Route path="/pinpanclub/rapidpin" element={<><Header /><RapidPinDashboard /></>} />
+      <Route path="/pinpanclub/rapidpin/season/:seasonId" element={<><Header /><RapidPinSeason /></>} />
       
       {/* Weekly Challenges Route */}
-      <Route path="/pinpanclub/challenges" element={<WeeklyChallengesPage />} />
+      <Route path="/pinpanclub/challenges" element={<><Header /><WeeklyChallengesPage /></>} />
       
       {/* Analytics Dashboard Route */}
-      <Route path="/pinpanclub/analytics" element={<AnalyticsDashboard />} />
+      <Route path="/pinpanclub/analytics" element={<><Header /><AnalyticsDashboard /></>} />
       
       {/* Seasons Page Routes */}
-      <Route path="/pinpanclub/seasons" element={<SeasonsPage />} />
-      <Route path="/pinpanclub/seasons/:seasonId" element={<SeasonsPage />} />
+      <Route path="/pinpanclub/seasons" element={<><Header /><SeasonsPage /></>} />
+      <Route path="/pinpanclub/seasons/:seasonId" element={<><Header /><SeasonsPage /></>} />
       
       {/* Users Module Routes */}
       <Route 
