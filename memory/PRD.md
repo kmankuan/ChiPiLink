@@ -7,7 +7,48 @@ También incluye un sistema unificado de gestión de usuarios basado en "Capacid
 
 ## Latest Update (Enero 19, 2026)
 
-### 🆕 Sistema Global de Breadcrumbs ✅ COMPLETADO
+### 🆕 Flujo de Catálogo Privado de Libros ✅ COMPLETADO
+
+Se implementó el flujo completo para que usuarios con estudiantes vinculados puedan ver y ordenar libros de texto del catálogo privado PCA.
+
+#### Nueva Página de Detalle de Libro Privado
+- **Ruta**: `/unatienda/libro/:libroId`
+- **Información mostrada**: Nombre, grado, materia, editorial, precio, ISBN, código, descripción
+- **Badge "Catálogo Exclusivo PCA"** en la imagen
+- **Selector de cantidad** (máx. 10 por orden)
+- **Información del estudiante** que coincide con el grado del libro
+- **Nota de Pre-orden**: Explica el proceso de compra
+
+#### Integración del Carrito
+- **Badge de candado** en productos del catálogo privado
+- **Badge de grado** (ej: "10mo") en items del carrito
+- **Nota de pre-orden** en el footer del carrito
+- **Aviso de carrito mixto** cuando hay productos públicos y privados
+
+#### Archivos Creados/Modificados
+- `/app/frontend/src/pages/PrivateBookDetail.jsx` - NUEVA página de detalle
+- `/app/frontend/src/contexts/CartContext.jsx` - Soporte para productos privados
+- `/app/frontend/src/components/cart/CartDrawer.jsx` - UI mejorada para productos privados
+- `/app/frontend/src/pages/Unatienda.jsx` - Data-testid en tarjetas de productos
+
+#### Test Results
+- **Backend:** 100% (10/10 tests pasados)
+- **Frontend:** 100% (12/12 tests pasados)
+
+---
+
+### 🔧 Limpieza de Navegación Redundante ✅ COMPLETADO
+
+Se removieron botones de "Volver/Regresar" duplicados de 14 archivos tras la implementación del sistema global de breadcrumbs.
+
+#### Archivos Limpiados
+- SuperPin: `SuperPinRanking.jsx`, `SuperPinAdmin.jsx`, `SuperPinMatch.jsx`, `PlayerProfile.jsx`, `SuperPinLeagueDetail.jsx`, `SuperPinTournament.jsx`, `PlayerComparison.jsx`
+- PinpanClub: `PingPongDashboard.jsx`, `PingPongArbiter.jsx`, `PingPongSpectator.jsx`, `RapidPinDashboard.jsx`
+- Store: `MisPedidosLibros.jsx`, `Checkout.jsx`, `ProductDetail.jsx`
+
+---
+
+### Sistema Global de Breadcrumbs ✅ COMPLETADO
 
 Se implementó un sistema global de navegación con breadcrumbs en todas las páginas de la aplicación.
 
