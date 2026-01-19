@@ -149,29 +149,6 @@ export default function UsersDashboard() {
   return (
     <div className="min-h-screen bg-background" data-testid="users-dashboard">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Navigation Bar */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate(-1)}
-            className="gap-2"
-            data-testid="back-button"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Regresar
-          </Button>
-          <div className="h-4 w-px bg-border" />
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="home-link"
-          >
-            <Home className="h-4 w-4" />
-            Inicio
-          </Link>
-        </div>
-
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
