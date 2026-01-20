@@ -618,17 +618,7 @@ export function Header() {
                 Tienda
               </Link>
 
-              {/* Catalog only for admins */}
-              {isAdmin && (
-                <Link 
-                  to="/catalogo"
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-catalog-link"
-                >
-                  {t('nav.catalog')}
-                </Link>
-              )}
+              {/* Catalog link removed - now in Admin > Unatienda */}
               
               {isAuthenticated && (
                 <>
