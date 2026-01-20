@@ -102,7 +102,7 @@ async def import_estudiantes(
         request.grado_default,
         request.hoja_nombre,
         request.actualizar_existentes,
-        admin.get("cliente_id")
+        admin.get("user_id")
     )
     return result
 
@@ -138,7 +138,7 @@ async def import_libros(
         request.catalogo_id,
         request.grado_default,
         request.actualizar_existentes,
-        admin.get("cliente_id")
+        admin.get("user_id")
     )
     return result
 
