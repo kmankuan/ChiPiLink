@@ -67,19 +67,27 @@ class UserRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, user_data: Dict) -> Dict:
-        """Crear nuevo usuario"""
-        user_data["cliente_id"] = f"cli_{uuid.uuid4().hex[:12]}"
-        user_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
-        user_data["estudiantes"] = []
-        user_data["es_admin"] = user_data.get("es_admin", False)
-        return await self.insert_one(user_data)
+        """Crear nuevo usuario - accepts English field names"""
+        # Map English fields to Spanish for DB storage
+        db_data = map_to_db(user_data)
+        
+        # Ensure Spanish DB fields
+        db_data["cliente_id"] = f"cli_{uuid.uuid4().hex[:12]}"
+        db_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        db_data["estudiantes"] = db_data.get("estudiantes", [])
+        db_data["es_admin"] = db_data.get("es_admin", False)
+        
+        result = await self.insert_one(db_data)
+        # Return with both Spanish and English field names for compatibility
+        return result
     
     async def get_by_id(self, cliente_id: str) -> Optional[Dict]:
         """Obtener usuario por ID (sin password)"""
-        return await self.find_one(
+        result = await self.find_one(
             {self.ID_FIELD: cliente_id},
             exclude_fields=["contrasena_hash"]
         )
+        return result  # Keep Spanish fields for backward compat
     
     async def get_by_email(self, email: str, include_password: bool = False) -> Optional[Dict]:
         """Obtener usuario por email"""
