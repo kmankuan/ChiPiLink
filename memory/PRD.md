@@ -5,7 +5,55 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 19, 2026)
+## Latest Update (Enero 20, 2026)
+
+### 🔄 Refactoring: Spanish to English Field Names - FASE 1 ✅ EN PROGRESO
+
+Se inició la migración de nombres de campos en español a inglés en el código para mejorar la mantenibilidad y seguir buenas prácticas de programación.
+
+#### Estrategia de Migración
+- **Backend**: Los esquemas Pydantic ya usan nombres en inglés (`password`, `name`, `phone`, etc.)
+- **Base de datos**: Mantiene nombres en español (`contrasena_hash`, `nombre`, `telefono`) por compatibilidad con datos existentes
+- **Capa de compatibilidad**: El repositorio mapea automáticamente entre inglés (código) y español (BD)
+- **Frontend**: Actualizado para usar nombres en inglés en formularios y soportar ambos formatos en datos recibidos
+
+#### Cambios Realizados - Fase 1 (Autenticación)
+
+**Backend:**
+- `/app/backend/modules/auth/services/auth_service.py` - Actualizado para usar campos en inglés de los esquemas
+- `/app/backend/modules/auth/repositories/user_repository.py` - Añadida capa de mapeo de campos
+- `/app/backend/modules/auth/models/schemas.py` - Ya estaba en inglés (confirmado)
+
+**Frontend:**
+- `/app/frontend/src/contexts/AuthContext.js` - Login/register usan `password` y `user` en lugar de `contrasena` y `cliente`
+- `/app/frontend/src/pages/Login.jsx` - Formulario usa `password` en lugar de `contrasena`
+- `/app/frontend/src/pages/Register.jsx` - Formulario usa campos en inglés (`name`, `phone`, `address`, `password`)
+- `/app/frontend/src/pages/AuthCallback.jsx` - Soporta ambos formatos de campos
+- `/app/frontend/src/components/layout/Header.jsx` - Soporta ambos `cliente_id` y `user_id`
+
+#### Mapeo de Campos (Código → BD)
+| Inglés (Código) | Español (BD) |
+|-----------------|--------------|
+| user_id | cliente_id |
+| name | nombre |
+| phone | telefono |
+| address | direccion |
+| password | contrasena |
+| password_hash | contrasena_hash |
+| is_admin | es_admin |
+| created_at | fecha_creacion |
+| students | estudiantes |
+
+#### Test Results
+- Login API: ✅ Funciona con `password`
+- Register API: ✅ Funciona con campos en inglés
+- /me endpoint: ✅ Devuelve datos correctamente
+- Admin Dashboard: ✅ Sidebar visible con todos los módulos
+
+#### Bug del Sidebar Admin - APARENTEMENTE RESUELTO ✅
+El bug reportado donde el sidebar del admin desaparecía dejando solo "Unatienda" parece estar resuelto. En las pruebas actuales, el sidebar muestra todos los 10 módulos correctamente después del login.
+
+---
 
 ### 🆕 Flujo de Catálogo Privado de Libros ✅ COMPLETADO
 
