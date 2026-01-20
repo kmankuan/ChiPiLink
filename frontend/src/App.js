@@ -321,12 +321,11 @@ function AppRouter() {
         } 
       />
       
-      {/* Admin Routes */}
+      {/* Admin Routes - AdminDashboard has its own header */}
       <Route 
         path="/admin" 
         element={
           <ProtectedRoute adminOnly>
-            <Header />
             <AdminDashboard />
           </ProtectedRoute>
         } 
