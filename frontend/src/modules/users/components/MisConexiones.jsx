@@ -440,19 +440,19 @@ export default function MisConexiones({ token }) {
                       <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
                         {searchResults.map((user) => (
                           <button
-                            key={user.cliente_id}
+                            key={user.user_id}
                             className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 text-left"
                             onClick={() => setSelectedUser(user)}
                           >
                             <Avatar className="h-8 w-8">
                               <AvatarImage src={user.avatar} />
                               <AvatarFallback>
-                                {user.nombre?.charAt(0) || '?'}
+                                {user.name?.charAt(0) || '?'}
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="font-medium">
-                                {user.nombre} {user.apellido}
+                                {user.name} {user.last_name}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {user.email}
