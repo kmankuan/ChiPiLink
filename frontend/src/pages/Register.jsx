@@ -243,15 +243,15 @@ export default function Register() {
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="nombre">{t('auth.name')} *</Label>
+              <Label htmlFor="name">{t('auth.name')} *</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="nombre"
-                  name="nombre"
+                  id="name"
+                  name="name"
                   type="text"
                   placeholder="Juan Pérez"
-                  value={formData.nombre}
+                  value={formData.name}
                   onChange={handleChange}
                   className="h-12 pl-10 rounded-lg"
                   required
@@ -281,17 +281,17 @@ export default function Register() {
             {/* Phone field - conditionally visible */}
             {isFieldVisible('telefono') && (
               <div className="space-y-2">
-                <Label htmlFor="telefono">
+                <Label htmlFor="phone">
                   {t('auth.phone')}{isFieldRequired('telefono') ? ' *' : ''}
                 </Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="telefono"
-                    name="telefono"
+                    id="phone"
+                    name="phone"
                     type="tel"
                     placeholder="+507 6000-0000"
-                    value={formData.telefono}
+                    value={formData.phone}
                     onChange={handleChange}
                     className="h-12 pl-10 rounded-lg"
                     required={isFieldRequired('telefono')}
@@ -304,17 +304,17 @@ export default function Register() {
             {/* Address field - conditionally visible (usually hidden, auto-captured) */}
             {isFieldVisible('direccion') && (
               <div className="space-y-2">
-                <Label htmlFor="direccion">
+                <Label htmlFor="address">
                   {t('auth.address')}{isFieldRequired('direccion') ? ' *' : ''}
                 </Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="direccion"
-                    name="direccion"
+                    id="address"
+                    name="address"
                     type="text"
                     placeholder="Ciudad de Panamá, Panamá"
-                    value={formData.direccion}
+                    value={formData.address}
                     onChange={handleChange}
                     className="h-12 pl-10 rounded-lg"
                     required={isFieldRequired('direccion')}
@@ -326,15 +326,15 @@ export default function Register() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="contrasena">{t('auth.password')} *</Label>
+                <Label htmlFor="password">{t('auth.password')} *</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="contrasena"
-                    name="contrasena"
+                    id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.contrasena}
+                    value={formData.password}
                     onChange={handleChange}
                     className="h-12 pl-10 pr-10 rounded-lg"
                     required
@@ -353,7 +353,7 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmarContrasena">Confirmar *</Label>
+                <Label htmlFor="confirmPassword">Confirmar *</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
