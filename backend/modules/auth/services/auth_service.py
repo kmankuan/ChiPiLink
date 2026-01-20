@@ -61,9 +61,9 @@ class AuthService(BaseService):
         self.log_info(f"User registered: {cliente_id}")
         
         # Preparar respuesta (sin password hash)
-        cliente_data = {k: v for k, v in result.items() if k not in ["_id", "contrasena_hash"]}
+        user_data = {k: v for k, v in result.items() if k not in ["_id", "contrasena_hash"]}
         
-        return TokenResponse(token=token, cliente=cliente_data)
+        return TokenResponse(token=token, user=user_data)
     
     async def login(self, data: LoginRequest) -> TokenResponse:
         """
@@ -95,9 +95,9 @@ class AuthService(BaseService):
         self.log_info(f"User logged in: {user['cliente_id']}")
         
         # Preparar respuesta (sin password hash)
-        cliente_data = {k: v for k, v in user.items() if k != "contrasena_hash"}
+        user_data = {k: v for k, v in user.items() if k != "contrasena_hash"}
         
-        return TokenResponse(token=token, cliente=cliente_data)
+        return TokenResponse(token=token, user=user_data)
     
     async def oauth_login(
         self,
