@@ -1,6 +1,7 @@
 """
 Auth Module - Authentication Routes
-Endpoints para autenticación usando el Service Layer
+Endpoints for authentication using the Service Layer
+All field names use English conventions
 """
 from fastapi import APIRouter, HTTPException, Depends, Request, Response
 
@@ -13,7 +14,7 @@ router = APIRouter(tags=["Auth - Authentication"])
 
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserCreate):
-    """Registrar nuevo usuario"""
+    """Register new user"""
     try:
         return await auth_service.register(data)
     except ValueError as e:
@@ -22,7 +23,7 @@ async def register(data: UserCreate):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: LoginRequest):
-    """Login con email y contraseña"""
+    """Login with email and password"""
     try:
         return await auth_service.login(data)
     except ValueError as e:
@@ -31,10 +32,10 @@ async def login(data: LoginRequest):
 
 @router.get("/session")
 async def get_oauth_session(request: Request):
-    """Obtener datos de sesión OAuth"""
+    """Get OAuth session data"""
     session_id = request.headers.get("X-Session-ID")
     if not session_id:
-        raise HTTPException(status_code=400, detail="Session ID requerido")
+        raise HTTPException(status_code=400, detail="Session ID required")
     
     try:
         ip_address = request.client.host if request.client else None
@@ -51,12 +52,12 @@ async def get_oauth_session(request: Request):
 
 @router.post("/session")
 async def create_session_cookie(request: Request, response: Response):
-    """Crear cookie de sesión desde token"""
+    """Create session cookie from token"""
     body = await request.json()
     session_token = body.get("session_token")
     
     if not session_token:
-        raise HTTPException(status_code=400, detail="Session token requerido")
+        raise HTTPException(status_code=400, detail="Session token required")
     
     response.set_cookie(
         key="session_token",
@@ -73,13 +74,13 @@ async def create_session_cookie(request: Request, response: Response):
 
 @router.get("/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
-    """Obtener información del usuario actual"""
+    """Get current user information"""
     return current_user
 
 
 @router.post("/logout")
 async def logout(request: Request, response: Response):
-    """Cerrar sesión"""
+    """Logout - close session"""
     session_token = request.cookies.get("session_token")
     
     if session_token:
@@ -94,17 +95,17 @@ async def change_password(
     data: ChangePasswordRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Cambiar contraseña del usuario actual"""
+    """Change current user's password"""
     try:
         success = await auth_service.change_password(
-            cliente_id=current_user["cliente_id"],
+            user_id=current_user["user_id"],
             current_password=data.current_password,
             new_password=data.new_password
         )
         
         if success:
-            return {"success": True, "message": "Contraseña actualizada"}
+            return {"success": True, "message": "Password updated"}
         else:
-            raise HTTPException(status_code=500, detail="Error al actualizar contraseña")
+            raise HTTPException(status_code=500, detail="Error updating password")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
