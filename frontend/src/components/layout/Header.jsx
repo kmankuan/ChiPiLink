@@ -410,16 +410,7 @@ export function Header() {
               </DropdownMenu>
             )}
 
-            {/* Catalog only visible for admins */}
-            {isAdmin && (
-              <Link 
-                to="/catalogo" 
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                data-testid="catalog-nav-link"
-              >
-                {t('nav.catalog')}
-              </Link>
-            )}
+            {/* Catalog link removed - now integrated in Admin > Unatienda */}
             
             {isAuthenticated && (
               <>
