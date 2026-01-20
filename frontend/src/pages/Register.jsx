@@ -357,11 +357,11 @@ export default function Register() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="confirmarContrasena"
-                    name="confirmarContrasena"
+                    id="confirmPassword"
+                    name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.confirmarContrasena}
+                    value={formData.confirmPassword}
                     onChange={handleChange}
                     className="h-12 pl-10 pr-10 rounded-lg"
                     required
