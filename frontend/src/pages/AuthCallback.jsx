@@ -28,8 +28,8 @@ export default function AuthCallback() {
         }
 
         const user = await processGoogleCallback(sessionId);
-        toast.success(`¡Bienvenido, ${user.nombre}!`);
-        navigate(user.es_admin ? '/admin' : '/dashboard', { 
+        toast.success(`¡Bienvenido, ${user.nombre || user.name}!`);
+        navigate((user.es_admin || user.is_admin) ? '/admin' : '/dashboard', { 
           replace: true,
           state: { user }
         });
