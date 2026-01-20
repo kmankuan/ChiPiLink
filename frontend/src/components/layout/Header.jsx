@@ -141,18 +141,18 @@ export function Header() {
         });
         if (response.ok) {
           const data = await response.json();
-          setHasLinkedStudents(data.estudiantes?.length > 0 || data.length > 0);
+          setHasLinkedStudents(data.students?.length > 0 || data.length > 0);
         }
       } catch (error) {
         console.error('Error checking linked students:', error);
       }
     };
 
-    // Support both Spanish and English field names
-    if (isAuthenticated && (user?.cliente_id || user?.user_id)) {
+    // Use English field name user_id
+    if (isAuthenticated && user?.user_id) {
       checkLinkedStudents();
     }
-  }, [isAuthenticated, user?.cliente_id, user?.user_id]);
+  }, [isAuthenticated, user?.user_id]);
 
   const handleLogout = async () => {
     await logout();
