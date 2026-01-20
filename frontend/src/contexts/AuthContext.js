@@ -90,13 +90,13 @@ export function AuthProvider({ children }) {
         headers: { 'X-Session-ID': sessionId }
       });
       
-      const { session_token, cliente } = response.data;
+      const { session_token, user } = response.data;
       
       // Set cookie via backend
       await api.post(AUTH_ENDPOINTS.session, { session_token });
       
-      setUser(cliente);
-      return cliente;
+      setUser(user);
+      return user;
     } catch (error) {
       console.error('Google auth error:', error);
       throw error;
