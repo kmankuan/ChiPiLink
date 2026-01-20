@@ -94,12 +94,12 @@ class AuditLogService:
         
         return await self.collection.count_documents(query)
     
-    async def get_user_activity(self, cliente_id: str, limit: int = 20) -> List[Dict]:
+    async def get_user_activity(self, user_id: str, limit: int = 20) -> List[Dict]:
         """Get audit logs for actions performed by or on a specific user"""
         query = {
             "$or": [
-                {"actor_id": cliente_id},
-                {"target_id": cliente_id, "target_type": "user"}
+                {"actor_id": user_id},
+                {"target_id": user_id, "target_type": "user"}
             ]
         }
         cursor = self.collection.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit)
