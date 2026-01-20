@@ -792,20 +792,20 @@ export default function AdminUsuariosConexiones({ token }) {
                 <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
                   {usuarios.map((user) => (
                     <button
-                      key={user.cliente_id}
+                      key={user.user_id}
                       className={`w-full p-3 flex items-center gap-3 hover:bg-muted/50 text-left transition-colors ${
-                        selectedUsuario?.cliente_id === user.cliente_id ? 'bg-primary/10' : ''
+                        selectedUsuario?.user_id === user.user_id ? 'bg-primary/10' : ''
                       }`}
                       onClick={() => setSelectedUsuario(user)}
                     >
                       <Avatar className="h-8 w-8">
-                        <AvatarFallback>{user.nombre?.charAt(0) || '?'}</AvatarFallback>
+                        <AvatarFallback>{user.name?.charAt(0) || '?'}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">{user.nombre} {user.apellido}</p>
+                        <p className="font-medium">{user.name} {user.last_name}</p>
                         <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
-                      {selectedUsuario?.cliente_id === user.cliente_id && (
+                      {selectedUsuario?.user_id === user.user_id && (
                         <Check className="h-4 w-4 text-primary" />
                       )}
                     </button>
