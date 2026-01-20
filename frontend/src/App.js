@@ -249,6 +249,14 @@ function AppRouter() {
         } 
       />
       <Route 
+        path="/admin/bulk-import-books" 
+        element={
+          <ProtectedRoute adminOnly>
+            <BulkImportBooksPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
         path="/mis-pedidos-libros" 
         element={
           <ProtectedRoute>
