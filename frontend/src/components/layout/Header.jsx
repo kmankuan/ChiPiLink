@@ -58,7 +58,6 @@ const ROUTE_CONFIG = {
   '/checkout': { name: 'Pago', icon: CreditCard },
   '/payment': { name: 'Resultado de Pago', icon: CreditCard },
   '/recibo': { name: 'Recibo', icon: CreditCard },
-  '/catalogo': { name: 'Catálogo', icon: Book },
   // PinpanClub
   '/pinpanclub': { name: 'PinpanClub', icon: Trophy },
   '/pinpanclub/match': { name: 'Partido', icon: Trophy },
