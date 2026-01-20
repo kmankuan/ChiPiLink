@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import {
   Package,
@@ -14,22 +16,30 @@ import {
   Users,
   DollarSign,
   Eye,
-  Loader2
+  Loader2,
+  Bell,
+  ShoppingBag,
+  BookOpen,
+  Trophy,
+  Settings,
+  CreditCard,
+  ArrowRight,
+  BarChart3,
+  Activity
 } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
 export default function DashboardModule() {
-  const { api } = useAuth();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalProducts: 0,
-    pendingOrders: 0,
-    confirmedOrders: 0,
-    lowStockItems: 0,
-    totalRevenue: 0,
-    totalCustomers: 0
+    pedidos: { total: 0, pendientes: 0 },
+    productos: { total: 0, bajo_stock: 0 },
+    usuarios: { total: 0 },
+    notificaciones: { no_leidas: 0 }
   });
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [lowStockAlerts, setLowStockAlerts] = useState([]);
+  const [unatiendaStats, setUnatiendaStats] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -38,56 +48,32 @@ export default function DashboardModule() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [invRes, ordersRes] = await Promise.all([
-        api.get('/admin/inventario'),
-        api.get('/admin/pedidos')
+      
+      // Fetch dashboard stats
+      const [dashboardRes, unatiendaRes] = await Promise.all([
+        fetch(`${API_URL}/api/admin/dashboard/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API_URL}/api/admin/unatienda/stats`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch(() => null)
       ]);
 
-      const inventory = invRes.data;
-      const orders = ordersRes.data;
+      if (dashboardRes.ok) {
+        const data = await dashboardRes.json();
+        setStats(data);
+      }
 
-      // Calculate stats
-      const pendingOrders = orders.filter(o => o.estado === 'pendiente').length;
-      const confirmedOrders = orders.filter(o => o.estado === 'confirmado').length;
-      const totalRevenue = orders
-        .filter(o => o.pago_confirmado)
-        .reduce((sum, o) => sum + (o.total || 0), 0);
-
-      setStats({
-        totalProducts: inventory.total_productos || 0,
-        pendingOrders,
-        confirmedOrders,
-        lowStockItems: inventory.productos_bajo_stock || 0,
-        totalRevenue,
-        totalCustomers: new Set(orders.map(o => o.cliente_id)).size
-      });
-
-      setRecentOrders(orders.slice(0, 5));
-      setLowStockAlerts(inventory.alertas_bajo_stock || []);
+      if (unatiendaRes?.ok) {
+        const data = await unatiendaRes.json();
+        setUnatiendaStats(data);
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      toast.error('Error al cargar datos del dashboard');
+      toast.error('Error al cargar algunos datos del dashboard');
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-PA', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
-
-  const getStatusBadge = (estado) => {
-    const variants = {
-      pendiente: { variant: 'secondary', label: 'Pendiente' },
-      confirmado: { variant: 'default', label: 'Confirmado' },
-      entregado: { variant: 'outline', label: 'Entregado' },
-      cancelado: { variant: 'destructive', label: 'Cancelado' }
-    };
-    const config = variants[estado] || variants.pendiente;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   if (loading) {
@@ -98,158 +84,291 @@ export default function DashboardModule() {
     );
   }
 
+  // Quick access modules
+  const quickAccessModules = [
+    { 
+      id: 'unatienda', 
+      label: 'Unatienda', 
+      icon: ShoppingBag, 
+      color: 'bg-blue-500',
+      description: 'Gestionar productos y catálogo',
+      stats: unatiendaStats ? `${unatiendaStats.productos_publicos || 0} productos` : null
+    },
+    { 
+      id: 'orders', 
+      label: 'Pedidos', 
+      icon: ShoppingCart, 
+      color: 'bg-green-500',
+      description: 'Ver y procesar pedidos',
+      stats: stats.pedidos.pendientes > 0 ? `${stats.pedidos.pendientes} pendientes` : 'Sin pendientes',
+      alert: stats.pedidos.pendientes > 0
+    },
+    { 
+      id: 'customers', 
+      label: 'Usuarios', 
+      icon: Users, 
+      color: 'bg-purple-500',
+      description: 'Gestionar clientes y usuarios',
+      stats: `${stats.usuarios.total} registrados`
+    },
+    { 
+      id: 'memberships', 
+      label: 'Membresías', 
+      icon: CreditCard, 
+      color: 'bg-amber-500',
+      description: 'Planes y suscripciones'
+    },
+    { 
+      id: 'pinpanclub', 
+      label: 'PinpanClub', 
+      icon: Trophy, 
+      color: 'bg-emerald-500',
+      description: 'Torneos y ranking'
+    },
+    { 
+      id: 'roles', 
+      label: 'Roles', 
+      icon: Settings, 
+      color: 'bg-slate-500',
+      description: 'Permisos y accesos'
+    },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <p className="text-muted-foreground">
+          Bienvenido al panel de administración de ChiPi Link
+        </p>
+      </div>
+
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.totalProducts}</p>
-                <p className="text-sm text-muted-foreground">Total Productos</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Productos</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.productos.total}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.productos.bajo_stock > 0 && (
+                <span className="text-amber-600">{stats.productos.bajo_stock} con bajo stock</span>
+              )}
+              {stats.productos.bajo_stock === 0 && 'Stock saludable'}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-yellow-100">
-                <Clock className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.pendingOrders}</p>
-                <p className="text-sm text-muted-foreground">Pedidos Pendientes</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pedidos</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pedidos.total}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.pedidos.pendientes > 0 ? (
+                <span className="text-amber-600">{stats.pedidos.pendientes} pendientes</span>
+              ) : (
+                'Todos procesados'
+              )}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-green-100">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.confirmedOrders}</p>
-                <p className="text-sm text-muted-foreground">Pedidos Confirmados</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Usuarios</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.usuarios.total}</div>
+            <p className="text-xs text-muted-foreground">
+              Usuarios registrados
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-red-100">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.lowStockItems}</p>
-                <p className="text-sm text-muted-foreground">Bajo Stock</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Revenue and Customers */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-emerald-100">
-                <DollarSign className="h-6 w-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</p>
-                <p className="text-sm text-muted-foreground">Ingresos Totales</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-blue-100">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.totalCustomers}</p>
-                <p className="text-sm text-muted-foreground">Clientes Únicos</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Notificaciones</CardTitle>
+            <Bell className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.notificaciones.no_leidas}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.notificaciones.no_leidas > 0 ? 'Sin leer' : 'Todas leídas'}
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Low Stock Alerts */}
-      {lowStockAlerts.length > 0 && (
-        <Card className="border-red-200 bg-red-50">
+      {/* Unatienda Stats */}
+      {unatiendaStats && (
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-800">
-              <AlertTriangle className="h-5 w-5" />
-              Alertas de Bajo Stock
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5" />
+              Resumen de Unatienda
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {lowStockAlerts.slice(0, 6).map((item) => (
-                <div
-                  key={item.libro_id}
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border"
-                >
-                  <div>
-                    <p className="font-medium text-sm">{item.nombre}</p>
-                    <p className="text-xs text-muted-foreground">{item.grado}</p>
-                  </div>
-                  <Badge variant="destructive">Stock: {item.cantidad_inventario}</Badge>
-                </div>
-              ))}
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Productos Públicos</p>
+                <p className="text-2xl font-bold">{unatiendaStats.productos_publicos || 0}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Catálogo Privado PCA</p>
+                <p className="text-2xl font-bold text-purple-600">{unatiendaStats.productos_privados || 0}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Estudiantes Vinculados</p>
+                <p className="text-2xl font-bold">{unatiendaStats.estudiantes_vinculados || 0}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Vinculaciones Pendientes</p>
+                <p className="text-2xl font-bold text-amber-600">{unatiendaStats.vinculaciones_pendientes || 0}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Recent Orders */}
+      {/* Quick Access */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Acceso Rápido</h3>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {quickAccessModules.map((module) => {
+            const Icon = module.icon;
+            return (
+              <Card 
+                key={module.id} 
+                className="cursor-pointer hover:shadow-md transition-shadow group"
+                onClick={() => window.location.hash = module.id}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-lg ${module.color} text-white`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold">{module.label}</h4>
+                        {module.alert && (
+                          <Badge variant="destructive" className="text-xs">!</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {module.description}
+                      </p>
+                      {module.stats && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {module.stats}
+                        </p>
+                      )}
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Alerts Section */}
+      {(stats.productos.bajo_stock > 0 || stats.pedidos.pendientes > 0) && (
+        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <AlertTriangle className="h-5 w-5" />
+              Alertas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {stats.productos.bajo_stock > 0 && (
+              <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Package className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm">{stats.productos.bajo_stock} productos con bajo stock</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.hash = 'unatienda'}
+                >
+                  Ver inventario
+                </Button>
+              </div>
+            )}
+            {stats.pedidos.pendientes > 0 && (
+              <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Clock className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm">{stats.pedidos.pendientes} pedidos pendientes de procesar</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.hash = 'orders'}
+                >
+                  Ver pedidos
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Activity Summary */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            Pedidos Recientes
+            <Activity className="h-5 w-5" />
+            Resumen de Actividad
           </CardTitle>
+          <CardDescription>
+            Estado general del sistema
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {recentOrders.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">No hay pedidos recientes</p>
-          ) : (
-            <div className="space-y-3">
-              {recentOrders.map((order) => (
-                <div
-                  key={order.pedido_id}
-                  className="flex items-center justify-between p-4 bg-muted/50 rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium">{order.pedido_id}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.estudiante_nombre || 'Cliente'}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">{formatCurrency(order.total)}</p>
-                    {getStatusBadge(order.estado)}
-                  </div>
-                </div>
-              ))}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Inventario</span>
+              <div className="flex items-center gap-2">
+                <Progress 
+                  value={stats.productos.bajo_stock > 0 ? 70 : 100} 
+                  className="w-32 h-2" 
+                />
+                <Badge variant={stats.productos.bajo_stock > 0 ? "secondary" : "default"}>
+                  {stats.productos.bajo_stock > 0 ? 'Revisar' : 'OK'}
+                </Badge>
+              </div>
             </div>
-          )}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Pedidos</span>
+              <div className="flex items-center gap-2">
+                <Progress 
+                  value={stats.pedidos.pendientes > 0 ? 60 : 100} 
+                  className="w-32 h-2" 
+                />
+                <Badge variant={stats.pedidos.pendientes > 0 ? "secondary" : "default"}>
+                  {stats.pedidos.pendientes > 0 ? 'Pendientes' : 'OK'}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Sistema</span>
+              <div className="flex items-center gap-2">
+                <Progress value={100} className="w-32 h-2" />
+                <Badge>Operativo</Badge>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
