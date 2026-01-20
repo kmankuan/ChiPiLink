@@ -191,19 +191,19 @@ class Role(RoleBase):
 
 class UserPermissionOverride(BaseModel):
     """Model for individual user permission overrides"""
-    cliente_id: str
-    permisos_adicionales: List[str] = []  # Permisos extra además del rol
-    permisos_removidos: List[str] = []  # Permisos del rol que se quitan
-    notas: Optional[str] = None
+    user_id: str
+    additional_permissions: List[str] = []  # Extra permissions beyond role
+    removed_permissions: List[str] = []  # Role permissions that are removed
+    notes: Optional[str] = None
 
 
 class UserRoleAssignment(BaseModel):
     """Model for assigning role to user"""
-    cliente_id: str
+    user_id: str
     role_id: str
-    asignado_por: Optional[str] = None
-    fecha_asignacion: Optional[str] = None
-    notas: Optional[str] = None
+    assigned_by: Optional[str] = None
+    assigned_at: Optional[str] = None
+    notes: Optional[str] = None
 
 
 # ============== AUDIT LOG MODELS ==============
@@ -226,10 +226,10 @@ class AuditLogEntry(BaseModel):
     action: AuditActionType
     actor_id: str  # Who performed the action
     actor_email: Optional[str] = None
-    actor_nombre: Optional[str] = None
+    actor_name: Optional[str] = None
     target_type: str  # 'role' or 'user'
-    target_id: str  # role_id or cliente_id
-    target_nombre: Optional[str] = None
+    target_id: str  # role_id or user_id
+    target_name: Optional[str] = None
     details: Dict[str, Any] = {}  # Additional details about the action
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
