@@ -218,11 +218,20 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={fetchProductos} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Actualizar
+                {translate('common.refresh', 'Actualizar')}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/admin/bulk-import-books')}
+                className="gap-2"
+                data-testid="bulk-import-button"
+              >
+                <Upload className="h-4 w-4" />
+                {translate('store.bulkImport', 'Importar en Cantidad')}
               </Button>
               <Button onClick={() => handleOpenForm()} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Agregar Libro
+                {translate('store.addBook', 'Agregar Libro')}
               </Button>
             </div>
           </div>
