@@ -1,6 +1,6 @@
 """
 Auth Module - Models/Schemas
-Definición de schemas Pydantic para autenticación
+Pydantic schemas for authentication
 """
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import List, Optional, Dict, Any
@@ -9,39 +9,39 @@ from enum import Enum
 import uuid
 
 
-# ============== USER/CLIENT MODELS ==============
+# ============== USER MODELS ==============
 
 class UserBase(BaseModel):
     """Base user model"""
     email: EmailStr
-    nombre: str
-    telefono: Optional[str] = None
-    direccion: Optional[Any] = None  # Can be str, dict, or None
+    name: str
+    phone: Optional[str] = None
+    address: Optional[Any] = None  # Can be str, dict, or None
 
 
 class UserCreate(UserBase):
     """User creation model with password"""
-    contrasena: str
+    password: str
 
 
 class UserUpdate(BaseModel):
     """User update model"""
-    nombre: Optional[str] = None
-    telefono: Optional[str] = None
-    direccion: Optional[str] = None
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
 
 class User(UserBase):
     """Full user model"""
     model_config = ConfigDict(from_attributes=True)
     
-    cliente_id: str
-    estudiantes: List[Dict] = []
-    es_admin: bool = False
+    user_id: str
+    students: List[Dict] = []
+    is_admin: bool = False
     google_id: Optional[str] = None
-    fecha_creacion: Optional[Any] = None
-    activo: Optional[bool] = True
-    ultimo_login: Optional[str] = None
+    created_at: Optional[Any] = None
+    is_active: Optional[bool] = True
+    last_login: Optional[str] = None
 
 
 # ============== AUTH MODELS ==============
@@ -49,19 +49,19 @@ class User(UserBase):
 class LoginRequest(BaseModel):
     """Login request model"""
     email: EmailStr
-    contrasena: str
+    password: str
 
 
 class TokenResponse(BaseModel):
     """Token response model"""
     token: str
-    cliente: Dict
+    user: Dict
 
 
 class SessionData(BaseModel):
     """Session data model"""
     session_token: str
-    cliente: Dict
+    user: Dict
 
 
 # ============== SESSION MODELS ==============
@@ -71,7 +71,7 @@ class Session(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
     session_id: str
-    cliente_id: str
+    user_id: str
     session_token: str
     expires_at: Any
     created_at: Optional[Any] = None
@@ -96,3 +96,22 @@ class ChangePasswordRequest(BaseModel):
     """Change password request model"""
     current_password: str
     new_password: str
+
+
+# ============== LEGACY COMPATIBILITY ==============
+# These aliases ensure backward compatibility with existing code
+# TODO: Remove after full migration
+
+class LegacyLoginRequest(BaseModel):
+    """Legacy login request with Spanish field names"""
+    email: EmailStr
+    contrasena: str  # Maps to password
+
+
+class LegacyUserCreate(BaseModel):
+    """Legacy user creation with Spanish field names"""
+    email: EmailStr
+    nombre: str  # Maps to name
+    contrasena: str  # Maps to password
+    telefono: Optional[str] = None
+    direccion: Optional[Any] = None
