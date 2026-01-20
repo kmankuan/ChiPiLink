@@ -32,8 +32,8 @@ async def get_available_permissions(admin: dict = Depends(get_admin_user)):
 @router.get("/my-permissions")
 async def get_my_permissions(current_user: dict = Depends(get_current_user)):
     """Get current user's role and permissions"""
-    role = await roles_service.get_user_role(current_user["cliente_id"])
-    permissions = await roles_service.get_user_permissions(current_user["cliente_id"])
+    role = await roles_service.get_user_role(current_user["user_id"])
+    permissions = await roles_service.get_user_permissions(current_user["user_id"])
     
     return {
         "role": role,
@@ -58,15 +58,15 @@ async def create_role(
 ):
     """Create a new custom role"""
     # Check if user has permission
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "roles.create"
         )
         if not has_permission:
             raise HTTPException(status_code=403, detail="No tienes permiso para crear roles")
     
-    role = await roles_service.create_role(role_data, admin["cliente_id"])
+    role = await roles_service.create_role(role_data, admin["user_id"])
     
     # Log the action
     await audit_service.log_action(
