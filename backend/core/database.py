@@ -276,15 +276,15 @@ async def create_indexes():
         await db[StoreCollections.STUDENTS].create_index("estado")
         await db[StoreCollections.STUDENTS].create_index("sync_id", unique=True)
         
-        # Index for auth_users
-        await db[AuthCollections.USERS].create_index("cliente_id", unique=True)
+        # Index for auth_users (using English field names)
+        await db[AuthCollections.USERS].create_index("user_id", unique=True)
         await db[AuthCollections.USERS].create_index("email", unique=True, sparse=True)
         
         # Index for store_orders
-        await db[StoreCollections.ORDERS].create_index("pedido_id", unique=True)
-        await db[StoreCollections.ORDERS].create_index("estado")
-        await db[StoreCollections.ORDERS].create_index("cliente_id")
-        await db[StoreCollections.ORDERS].create_index("fecha_creacion")
+        await db[StoreCollections.ORDERS].create_index("order_id", unique=True)
+        await db[StoreCollections.ORDERS].create_index("status")
+        await db[StoreCollections.ORDERS].create_index("user_id")
+        await db[StoreCollections.ORDERS].create_index("created_at")
         
         # Index for store_products
         await db[StoreCollections.PRODUCTS].create_index("libro_id", unique=True)
