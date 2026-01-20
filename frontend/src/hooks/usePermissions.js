@@ -10,7 +10,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // Cache de permisos para evitar llamadas innecesarias
 let permissionsCache = null;
 let cacheTimestamp = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutos (reducido para mejor UX)
+
+// Función para limpiar el caché (exportada para uso externo)
+export function clearPermissionsCache() {
+  permissionsCache = null;
+  cacheTimestamp = null;
+}
 
 export function usePermissions() {
   const { token, isAuthenticated, user } = useAuth();
