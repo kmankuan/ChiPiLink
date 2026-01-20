@@ -88,7 +88,7 @@ export default function AdminDashboard() {
 
   /**
    * SIMPLIFIED LOGIC:
-   * If user.es_admin is true (from auth context), show ALL modules.
+   * If user.is_admin is true (from auth context), show ALL modules.
    * This is the most reliable check since it comes directly from the login response.
    * The RBAC system is used for more granular permissions within modules.
    */
