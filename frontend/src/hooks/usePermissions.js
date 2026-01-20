@@ -81,6 +81,14 @@ export function usePermissions() {
       permissionsCache = null;
       cacheTimestamp = null;
     }
+    
+    // Listen for logout event to clear cache
+    const handleLogout = () => {
+      permissionsCache = null;
+      cacheTimestamp = null;
+    };
+    window.addEventListener('auth-logout', handleLogout);
+    return () => window.removeEventListener('auth-logout', handleLogout);
   }, [isAuthenticated]);
 
   /**
