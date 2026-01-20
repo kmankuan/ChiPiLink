@@ -110,6 +110,10 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', error);
     }
     localStorage.removeItem('auth_token');
+    // Clear permissions cache on logout
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('auth-logout'));
+    }
     setToken(null);
     setUser(null);
   };
