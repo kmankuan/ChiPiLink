@@ -50,20 +50,20 @@ async def seed_admin_user():
         existing_admin = await db[AuthCollections.USERS].find_one({"email": admin_email})
         
         if not existing_admin:
-            # Create admin user
+            # Create admin user with English field names
             hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
             admin_doc = {
-                "cliente_id": f"admin_{uuid.uuid4().hex[:8]}",
-                "nombre": "Administrador",
-                "apellido": "ChiPi Link",
+                "user_id": f"admin_{uuid.uuid4().hex[:8]}",
+                "name": "Administrador",
+                "last_name": "ChiPi Link",
                 "email": admin_email,
-                "telefono": "",
-                "contrasena_hash": hashed_password,
-                "es_admin": True,
-                "estudiantes": [],
-                "direccion": {},
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "phone": "",
+                "password_hash": hashed_password,
+                "is_admin": True,
+                "students": [],
+                "address": {},
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
             
             await db[AuthCollections.USERS].insert_one(admin_doc)
