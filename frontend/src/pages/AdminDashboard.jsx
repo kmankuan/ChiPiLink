@@ -86,44 +86,54 @@ export default function AdminDashboard() {
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
-  // Determine if user is super admin - check multiple sources
-  const isEffectivelySuperAdmin = useMemo(() => {
-    // If role is explicitly super_admin
-    if (role?.role_id === 'super_admin') return true;
-    // If permissions include wildcard
-    if (permissions?.includes('*')) return true;
-    // If isSuperAdmin flag is set
-    if (isSuperAdmin) return true;
-    return false;
-  }, [role, permissions, isSuperAdmin]);
-
-  // Filter nav items based on permissions
-  // Show all items for admins while loading or if super admin
-  const filteredNavItems = useMemo(() => {
-    return navItems.filter(item => {
-      // While loading permissions, show all items for any admin
-      if (permissionsLoading && isAuthAdmin) return true;
-      // Super admin sees everything
-      if (isEffectivelySuperAdmin) return true;
-      // Auth-level admin without loaded role sees everything (fallback)
-      if (isAuthAdmin && !role && permissionsLoading) return true;
-      // Check permission
-      if (item.permission) {
-        return hasPermission(item.permission);
-      }
-      return true;
+  // Debug logging - remove in production
+  useEffect(() => {
+    console.log('[AdminDashboard] Permissions state:', {
+      permissionsLoading,
+      role: role?.role_id,
+      permissions,
+      isSuperAdmin,
+      isAuthAdmin
     });
-  }, [permissionsLoading, isAuthAdmin, isEffectivelySuperAdmin, role, hasPermission]);
+  }, [permissionsLoading, role, permissions, isSuperAdmin, isAuthAdmin]);
+
+  // Simple check: is user a super admin?
+  // Super admin if: role is super_admin OR has wildcard permission OR es_admin from auth
+  const canSeeAllModules = useMemo(() => {
+    // Check role
+    if (role?.role_id === 'super_admin') return true;
+    // Check wildcard permission
+    if (Array.isArray(permissions) && permissions.includes('*')) return true;
+    // Check isSuperAdmin flag from hook
+    if (isSuperAdmin) return true;
+    // If user is admin from auth context and we're still loading permissions, show all
+    if (isAuthAdmin && permissionsLoading) return true;
+    return false;
+  }, [role, permissions, isSuperAdmin, isAuthAdmin, permissionsLoading]);
+
+  // Filter navigation items
+  const filteredNavItems = useMemo(() => {
+    // If can see all modules, return all items
+    if (canSeeAllModules) {
+      return navItems;
+    }
+    
+    // Otherwise filter by permission
+    return navItems.filter(item => {
+      if (!item.permission) return true;
+      return hasPermission(item.permission);
+    });
+  }, [canSeeAllModules, hasPermission]);
 
   useEffect(() => {
-    if (!isAuthAdmin && !permissionsLoading) {
-      // Check if user has any admin-level permission
+    // Only redirect if not admin and permissions are loaded
+    if (!isAuthAdmin && !permissionsLoading && !canSeeAllModules) {
       const hasAdminAccess = hasPermission('admin.access') || hasPermission('admin.dashboard');
       if (!hasAdminAccess) {
         navigate('/');
       }
     }
-  }, [isAuthAdmin, permissionsLoading, hasPermission, navigate]);
+  }, [isAuthAdmin, permissionsLoading, canSeeAllModules, hasPermission, navigate]);
 
   const handleLogout = async () => {
     await logout();
