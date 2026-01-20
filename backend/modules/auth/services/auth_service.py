@@ -1,6 +1,6 @@
 """
 Auth Module - Auth Service
-Lógica de negocio para autenticación
+Business logic for authentication - All field names in English
 """
 from typing import Optional, Dict
 from datetime import datetime, timezone
@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class AuthService(BaseService):
     """
-    Servicio para autenticación de usuarios.
+    Service for user authentication.
+    Uses English field names throughout.
     """
     
     MODULE_NAME = "auth"
@@ -31,71 +32,71 @@ class AuthService(BaseService):
     
     async def register(self, data: UserCreate) -> TokenResponse:
         """
-        Registrar nuevo usuario.
-        Emite evento: auth.user.registered
+        Register a new user.
+        Emits event: auth.user.registered
         """
-        # Verificar si email existe
+        # Check if email exists
         if await self.user_repository.email_exists(data.email):
-            raise ValueError("Email ya registrado")
+            raise ValueError("Email already registered")
         
-        # Crear usuario - use English field names from schema
+        # Create user with English field names
         user_dict = data.model_dump(exclude={"password"})
-        user_dict["contrasena_hash"] = hash_password(data.password)
+        user_dict["password_hash"] = hash_password(data.password)
         
         result = await self.user_repository.create(user_dict)
-        cliente_id = result["cliente_id"]
+        user_id = result["user_id"]
         
-        # Crear token
-        token = create_token(cliente_id)
+        # Create token
+        token = create_token(user_id)
         
-        # Emitir evento
+        # Emit event
         await self.emit_event(
             AuthEvents.USER_REGISTERED,
             {
-                "cliente_id": cliente_id,
+                "user_id": user_id,
                 "email": data.email,
-                "nombre": data.name
+                "name": data.name
             }
         )
         
-        self.log_info(f"User registered: {cliente_id}")
+        self.log_info(f"User registered: {user_id}")
         
-        # Preparar respuesta (sin password hash)
-        user_data = {k: v for k, v in result.items() if k not in ["_id", "contrasena_hash"]}
+        # Prepare response (without password hash)
+        user_data = {k: v for k, v in result.items() if k not in ["_id", "password_hash"]}
         
         return TokenResponse(token=token, user=user_data)
     
     async def login(self, data: LoginRequest) -> TokenResponse:
         """
-        Login con email y contraseña.
-        Emite evento: auth.user.logged_in
+        Login with email and password.
+        Emits event: auth.user.logged_in
         """
-        # Obtener usuario con password
+        # Get user with password
         user = await self.user_repository.get_by_email(data.email, include_password=True)
         
         if not user:
-            raise ValueError("Credenciales inválidas")
+            raise ValueError("Invalid credentials")
         
-        # Verificar contraseña - use English field name from schema
-        if not verify_password(data.password, user.get("contrasena_hash", "")):
-            raise ValueError("Credenciales inválidas")
+        # Verify password
+        if not verify_password(data.password, user.get("password_hash", "")):
+            raise ValueError("Invalid credentials")
         
-        # Crear token
-        token = create_token(user["cliente_id"], user.get("es_admin", False))
+        # Create token
+        token = create_token(user["user_id"], user.get("is_admin", False))
         
-        # Emitir evento
+        # Emit event
         await self.emit_event(
             AuthEvents.USER_LOGGED_IN,
             {
-                "cliente_id": user["cliente_id"],
+                "user_id": user["user_id"],
                 "email": data.email
             }
         )
         
-        self.log_info(f"User logged in: {user['cliente_id']}")
+        self.log_info(f"User logged in: {user['user_id']}")
         
-        # Preparar respuesta (sin password hash)
-        user_data = {k: v for k, v in user.items() if k != "contrasena_hash"}
+        # Prepare response (without password hash)
+        user_data = {k: v for k, v in user.items() if k != "password_hash"}
         
         return TokenResponse(token=token, user=user_data)
     
@@ -107,7 +108,7 @@ class AuthService(BaseService):
     ) -> SessionData:
         """
         Login via OAuth (Google).
-        Emite evento: auth.user.logged_in o auth.user.registered
+        Emits event: auth.user.logged_in or auth.user.registered
         """
         try:
             async with httpx.AsyncClient() as http_client:
@@ -118,63 +119,63 @@ class AuthService(BaseService):
                 )
                 
                 if response.status_code != 200:
-                    raise ValueError("Sesión inválida")
+                    raise ValueError("Invalid session")
                 
                 data = response.json()
                 
-                # Buscar usuario existente
+                # Find existing user
                 existing_user = await self.user_repository.get_by_email(data["email"])
                 
                 if existing_user:
-                    cliente_id = existing_user["cliente_id"]
-                    # Actualizar info si necesario
-                    await self.user_repository.update_user(cliente_id, {
-                        "nombre": data.get("name", existing_user.get("nombre")),
+                    user_id = existing_user["user_id"]
+                    # Update info if necessary
+                    await self.user_repository.update_user(user_id, {
+                        "name": data.get("name", existing_user.get("name")),
                         "google_id": data.get("id")
                     })
                     
                     await self.emit_event(
                         AuthEvents.USER_LOGGED_IN,
-                        {"cliente_id": cliente_id, "method": "oauth"}
+                        {"user_id": user_id, "method": "oauth"}
                     )
                 else:
-                    # Crear nuevo usuario
+                    # Create new user
                     new_user = {
                         "email": data["email"],
-                        "nombre": data.get("name", ""),
+                        "name": data.get("name", ""),
                         "google_id": data.get("id"),
-                        "telefono": None,
-                        "direccion": None
+                        "phone": None,
+                        "address": None
                     }
                     result = await self.user_repository.create(new_user)
-                    cliente_id = result["cliente_id"]
+                    user_id = result["user_id"]
                     
                     await self.emit_event(
                         AuthEvents.USER_REGISTERED,
-                        {"cliente_id": cliente_id, "method": "oauth"}
+                        {"user_id": user_id, "method": "oauth"}
                     )
                 
-                # Crear sesión
+                # Create session
                 session_token = data.get("session_token", str(uuid.uuid4()))
                 await self.session_repository.create(
-                    cliente_id=cliente_id,
+                    user_id=user_id,
                     session_token=session_token,
                     ip_address=ip_address,
                     user_agent=user_agent
                 )
                 
-                user = await self.user_repository.get_by_id(cliente_id)
+                user = await self.user_repository.get_by_id(user_id)
                 
                 return SessionData(session_token=session_token, user=user)
                 
         except httpx.RequestError as e:
             logger.error(f"Error fetching session: {e}")
-            raise ValueError("Error de autenticación")
+            raise ValueError("Authentication error")
     
     async def logout(self, session_token: str) -> bool:
         """
-        Cerrar sesión.
-        Emite evento: auth.user.logged_out
+        Close session.
+        Emits event: auth.user.logged_out
         """
         session = await self.session_repository.get_by_token(session_token)
         
@@ -183,7 +184,7 @@ class AuthService(BaseService):
             
             await self.emit_event(
                 AuthEvents.USER_LOGGED_OUT,
-                {"cliente_id": session["cliente_id"]}
+                {"user_id": session["user_id"]}
             )
             
             return True
@@ -191,49 +192,49 @@ class AuthService(BaseService):
         return False
     
     async def validate_session(self, session_token: str) -> Optional[Dict]:
-        """Validar sesión y obtener usuario"""
+        """Validate session and get user"""
         session = await self.session_repository.get_valid_session(session_token)
         
         if not session:
             return None
         
-        return await self.user_repository.get_by_id(session["cliente_id"])
+        return await self.user_repository.get_by_id(session["user_id"])
     
     async def change_password(
         self,
-        cliente_id: str,
+        user_id: str,
         current_password: str,
         new_password: str
     ) -> bool:
-        """Cambiar contraseña"""
-        # Obtener usuario con password actual
+        """Change password"""
+        # Get user with current password
         user = await self.user_repository._collection.find_one(
-            {"cliente_id": cliente_id},
+            {"user_id": user_id},
             {"_id": 0}
         )
         
         if not user:
-            raise ValueError("Usuario no encontrado")
+            raise ValueError("User not found")
         
-        # Verificar contraseña actual
-        if not verify_password(current_password, user.get("contrasena_hash", "")):
-            raise ValueError("Contraseña actual incorrecta")
+        # Verify current password
+        if not verify_password(current_password, user.get("password_hash", "")):
+            raise ValueError("Incorrect current password")
         
-        # Actualizar contraseña
+        # Update password
         new_hash = hash_password(new_password)
-        success = await self.user_repository.update_password(cliente_id, new_hash)
+        success = await self.user_repository.update_password(user_id, new_hash)
         
         if success:
-            # Invalidar todas las sesiones del usuario
-            await self.session_repository.delete_user_sessions(cliente_id)
+            # Invalidate all user sessions
+            await self.session_repository.delete_user_sessions(user_id)
             
             await self.emit_event(
                 AuthEvents.USER_UPDATED,
-                {"cliente_id": cliente_id, "field": "password"}
+                {"user_id": user_id, "field": "password"}
             )
         
         return success
 
 
-# Instancia singleton del servicio
+# Singleton service instance
 auth_service = AuthService()
