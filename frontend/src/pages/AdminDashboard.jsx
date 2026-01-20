@@ -76,7 +76,7 @@ const navItems = [
 
 export default function AdminDashboard() {
   const { isAdmin, user, logout } = useAuth();
-  const { hasPermission, loading: permissionsLoading, role, isSuperAdmin, permissions } = usePermissions();
+  const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
