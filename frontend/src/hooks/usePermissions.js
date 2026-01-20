@@ -75,21 +75,18 @@ export function usePermissions() {
     fetchPermissions();
   }, [fetchPermissions]);
 
-  // Clear cache on logout
+  // Clear cache ONLY on explicit logout, not on initial mount
   useEffect(() => {
-    if (!isAuthenticated) {
-      permissionsCache = null;
-      cacheTimestamp = null;
-    }
-    
     // Listen for logout event to clear cache
     const handleLogout = () => {
       permissionsCache = null;
       cacheTimestamp = null;
+      setPermissions([]);
+      setRole(null);
     };
     window.addEventListener('auth-logout', handleLogout);
     return () => window.removeEventListener('auth-logout', handleLogout);
-  }, [isAuthenticated]);
+  }, []);
 
   /**
    * Verifica si el usuario tiene un permiso específico
