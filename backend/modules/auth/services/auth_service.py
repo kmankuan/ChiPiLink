@@ -38,9 +38,9 @@ class AuthService(BaseService):
         if await self.user_repository.email_exists(data.email):
             raise ValueError("Email ya registrado")
         
-        # Crear usuario
-        user_dict = data.model_dump(exclude={"contrasena"})
-        user_dict["contrasena_hash"] = hash_password(data.contrasena)
+        # Crear usuario - use English field names from schema
+        user_dict = data.model_dump(exclude={"password"})
+        user_dict["contrasena_hash"] = hash_password(data.password)
         
         result = await self.user_repository.create(user_dict)
         cliente_id = result["cliente_id"]
@@ -54,7 +54,7 @@ class AuthService(BaseService):
             {
                 "cliente_id": cliente_id,
                 "email": data.email,
-                "nombre": data.nombre
+                "nombre": data.name
             }
         )
         
@@ -76,8 +76,8 @@ class AuthService(BaseService):
         if not user:
             raise ValueError("Credenciales inválidas")
         
-        # Verificar contraseña
-        if not verify_password(data.contrasena, user.get("contrasena_hash", "")):
+        # Verificar contraseña - use English field name from schema
+        if not verify_password(data.password, user.get("contrasena_hash", "")):
             raise ValueError("Credenciales inválidas")
         
         # Crear token
