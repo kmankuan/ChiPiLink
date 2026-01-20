@@ -500,11 +500,11 @@ export default function SuperPinLeagueDetail() {
                   ) : (
                     <div className="max-h-60 overflow-y-auto space-y-2">
                       {registeredUsers.map((user) => {
-                        const isAlreadyPlayer = availablePlayers.some(p => p.email === user.email || p.user_id === user.cliente_id);
+                        const isAlreadyPlayer = availablePlayers.some(p => p.email === user.email || p.user_id === user.user_id);
                         return (
-                          <div key={user.cliente_id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div key={user.user_id} className="flex items-center justify-between p-3 border rounded-lg">
                             <div>
-                              <p className="font-medium">{user.nombre} {user.apellido || ''}</p>
+                              <p className="font-medium">{user.name} {user.last_name || ''}</p>
                               <p className="text-sm text-gray-500">{user.email}</p>
                             </div>
                             {isAlreadyPlayer ? (
