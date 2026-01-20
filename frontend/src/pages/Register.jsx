@@ -19,12 +19,12 @@ export default function Register() {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    nombre: '',
+    name: '',
     email: '',
-    telefono: '',
-    direccion: '',
-    contrasena: '',
-    confirmarContrasena: ''
+    phone: '',
+    address: '',
+    password: '',
+    confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -134,12 +134,12 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.contrasena !== formData.confirmarContrasena) {
+    if (formData.password !== formData.confirmPassword) {
       toast.error('Las contraseñas no coinciden');
       return;
     }
     
-    if (formData.contrasena.length < 6) {
+    if (formData.password.length < 6) {
       toast.error('La contraseña debe tener al menos 6 caracteres');
       return;
     }
@@ -147,7 +147,7 @@ export default function Register() {
     setLoading(true);
     
     try {
-      const { confirmarContrasena, ...registerData } = formData;
+      const { confirmPassword, ...registerData } = formData;
       
       // Add location metadata if captured
       if (locationData) {
