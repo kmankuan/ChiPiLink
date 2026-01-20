@@ -16,6 +16,8 @@ import {
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function CatalogoPrivadoTab({ token, onRefresh }) {
+  const navigate = useNavigate();
+  const { t: translate } = useTranslation();
   const [productos, setProductos] = useState([]);
   const [filtros, setFiltros] = useState({ grados: [], materias: [] });
   const [loading, setLoading] = useState(true);
