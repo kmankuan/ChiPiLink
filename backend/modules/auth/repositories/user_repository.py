@@ -1,6 +1,6 @@
 """
 Auth Module - User Repository
-Acceso a datos de usuarios
+Data access for users - All field names in English
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -10,139 +10,88 @@ from core.base import BaseRepository
 from core.database import db
 from core.constants import AuthCollections
 
-# Field mapping: English (code) -> Spanish (database)
-CODE_TO_DB = {
-    "user_id": "cliente_id",
-    "name": "nombre",
-    "phone": "telefono",
-    "address": "direccion",
-    "password": "contrasena",
-    "password_hash": "contrasena_hash",
-    "is_admin": "es_admin",
-    "created_at": "fecha_creacion",
-    "updated_at": "fecha_actualizacion",
-    "is_active": "activo",
-    "students": "estudiantes",
-    "last_login": "ultimo_login",
-}
-
-# Reverse mapping: Spanish (database) -> English (code)
-DB_TO_CODE = {v: k for k, v in CODE_TO_DB.items()}
-
-
-def map_to_db(data: Dict) -> Dict:
-    """Map English field names to Spanish database field names"""
-    if not data:
-        return data
-    result = {}
-    for key, value in data.items():
-        db_key = CODE_TO_DB.get(key, key)
-        result[db_key] = value
-    return result
-
-
-def map_from_db(data: Dict, exclude_fields: List[str] = None) -> Dict:
-    """Map Spanish database field names to English code field names"""
-    if not data:
-        return data
-    exclude = exclude_fields or []
-    result = {}
-    for key, value in data.items():
-        if key in exclude or key == "_id":
-            continue
-        code_key = DB_TO_CODE.get(key, key)
-        result[code_key] = value
-    return result
-
 
 class UserRepository(BaseRepository):
     """
-    Repository para usuarios/clientes.
+    Repository for users.
+    Uses English field names throughout.
     """
     
     COLLECTION_NAME = AuthCollections.USERS
-    ID_FIELD = "cliente_id"
+    ID_FIELD = "user_id"
     
     def __init__(self):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, user_data: Dict) -> Dict:
-        """Crear nuevo usuario - accepts English field names"""
-        # Map English fields to Spanish for DB storage
-        db_data = map_to_db(user_data)
-        
-        # Ensure Spanish DB fields
-        db_data["cliente_id"] = f"cli_{uuid.uuid4().hex[:12]}"
-        db_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
-        db_data["estudiantes"] = db_data.get("estudiantes", [])
-        db_data["es_admin"] = db_data.get("es_admin", False)
-        
-        result = await self.insert_one(db_data)
-        # Return with both Spanish and English field names for compatibility
-        return result
+        """Create new user with English field names"""
+        user_data["user_id"] = f"cli_{uuid.uuid4().hex[:12]}"
+        user_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        user_data["students"] = user_data.get("students", [])
+        user_data["is_admin"] = user_data.get("is_admin", False)
+        return await self.insert_one(user_data)
     
-    async def get_by_id(self, cliente_id: str) -> Optional[Dict]:
-        """Obtener usuario por ID (sin password)"""
-        result = await self.find_one(
-            {self.ID_FIELD: cliente_id},
-            exclude_fields=["contrasena_hash"]
+    async def get_by_id(self, user_id: str) -> Optional[Dict]:
+        """Get user by ID (without password)"""
+        return await self.find_one(
+            {self.ID_FIELD: user_id},
+            exclude_fields=["password_hash"]
         )
-        return result  # Keep Spanish fields for backward compat
     
     async def get_by_email(self, email: str, include_password: bool = False) -> Optional[Dict]:
-        """Obtener usuario por email"""
-        exclude = [] if include_password else ["contrasena_hash"]
+        """Get user by email"""
+        exclude = [] if include_password else ["password_hash"]
         return await self.find_one({"email": email}, exclude_fields=exclude)
     
     async def get_by_google_id(self, google_id: str) -> Optional[Dict]:
-        """Obtener usuario por Google ID"""
+        """Get user by Google ID"""
         return await self.find_one(
             {"google_id": google_id},
-            exclude_fields=["contrasena_hash"]
+            exclude_fields=["password_hash"]
         )
     
     async def email_exists(self, email: str) -> bool:
-        """Verificar si email ya existe"""
+        """Check if email already exists"""
         user = await self.find_one({"email": email})
         return user is not None
     
-    async def update_user(self, cliente_id: str, data: Dict) -> bool:
-        """Actualizar usuario"""
-        return await self.update_by_id(self.ID_FIELD, cliente_id, data)
+    async def update_user(self, user_id: str, data: Dict) -> bool:
+        """Update user"""
+        return await self.update_by_id(self.ID_FIELD, user_id, data)
     
-    async def update_password(self, cliente_id: str, password_hash: str) -> bool:
-        """Actualizar contraseña"""
-        return await self.update_user(cliente_id, {"contrasena_hash": password_hash})
+    async def update_password(self, user_id: str, password_hash: str) -> bool:
+        """Update password"""
+        return await self.update_user(user_id, {"password_hash": password_hash})
     
-    async def set_google_id(self, cliente_id: str, google_id: str) -> bool:
-        """Establecer Google ID"""
-        return await self.update_user(cliente_id, {"google_id": google_id})
+    async def set_google_id(self, user_id: str, google_id: str) -> bool:
+        """Set Google ID"""
+        return await self.update_user(user_id, {"google_id": google_id})
     
     async def get_all_users(
         self,
         skip: int = 0,
         limit: int = 100,
-        es_admin: Optional[bool] = None
+        is_admin: Optional[bool] = None
     ) -> List[Dict]:
-        """Obtener usuarios con filtros"""
+        """Get users with filters"""
         query = {}
-        if es_admin is not None:
-            query["es_admin"] = es_admin
+        if is_admin is not None:
+            query["is_admin"] = is_admin
         
         return await self.find_many(
             query=query,
             skip=skip,
             limit=limit,
-            exclude_fields=["contrasena_hash"]
+            exclude_fields=["password_hash"]
         )
     
-    async def count_users(self, es_admin: Optional[bool] = None) -> int:
-        """Contar usuarios"""
+    async def count_users(self, is_admin: Optional[bool] = None) -> int:
+        """Count users"""
         query = {}
-        if es_admin is not None:
-            query["es_admin"] = es_admin
+        if is_admin is not None:
+            query["is_admin"] = is_admin
         return await self.count(query)
     
-    async def deactivate(self, cliente_id: str) -> bool:
-        """Desactivar usuario"""
-        return await self.update_user(cliente_id, {"activo": False})
+    async def deactivate(self, user_id: str) -> bool:
+        """Deactivate user"""
+        return await self.update_user(user_id, {"is_active": False})
