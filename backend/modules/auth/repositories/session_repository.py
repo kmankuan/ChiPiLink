@@ -1,6 +1,6 @@
 """
 Auth Module - Session Repository
-Acceso a datos de sesiones
+Data access for user sessions - All field names in English
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone, timedelta
@@ -13,7 +13,8 @@ from core.constants import AuthCollections
 
 class SessionRepository(BaseRepository):
     """
-    Repository para sesiones de usuario.
+    Repository for user sessions.
+    Uses English field names throughout.
     """
     
     COLLECTION_NAME = AuthCollections.SESSIONS
@@ -24,16 +25,16 @@ class SessionRepository(BaseRepository):
     
     async def create(
         self,
-        cliente_id: str,
+        user_id: str,
         session_token: str,
         expires_in_days: int = 7,
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None
     ) -> Dict:
-        """Crear nueva sesión"""
+        """Create new session"""
         session_data = {
             "session_id": f"sess_{uuid.uuid4().hex[:12]}",
-            "cliente_id": cliente_id,
+            "user_id": user_id,
             "session_token": session_token,
             "expires_at": (datetime.now(timezone.utc) + timedelta(days=expires_in_days)).isoformat(),
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -43,11 +44,11 @@ class SessionRepository(BaseRepository):
         return await self.insert_one(session_data)
     
     async def get_by_token(self, session_token: str) -> Optional[Dict]:
-        """Obtener sesión por token"""
+        """Get session by token"""
         return await self.find_one({"session_token": session_token})
     
     async def get_valid_session(self, session_token: str) -> Optional[Dict]:
-        """Obtener sesión válida (no expirada)"""
+        """Get valid (non-expired) session"""
         session = await self.get_by_token(session_token)
         if not session:
             return None
@@ -63,31 +64,31 @@ class SessionRepository(BaseRepository):
         
         return None
     
-    async def get_user_sessions(self, cliente_id: str) -> List[Dict]:
-        """Obtener todas las sesiones de un usuario"""
+    async def get_user_sessions(self, user_id: str) -> List[Dict]:
+        """Get all sessions for a user"""
         return await self.find_many(
-            query={"cliente_id": cliente_id},
+            query={"user_id": user_id},
             sort=[("created_at", -1)]
         )
     
     async def delete_by_token(self, session_token: str) -> bool:
-        """Eliminar sesión por token"""
+        """Delete session by token"""
         result = await self._collection.delete_one({"session_token": session_token})
         return result.deleted_count > 0
     
-    async def delete_user_sessions(self, cliente_id: str) -> int:
-        """Eliminar todas las sesiones de un usuario"""
-        result = await self._collection.delete_many({"cliente_id": cliente_id})
+    async def delete_user_sessions(self, user_id: str) -> int:
+        """Delete all sessions for a user"""
+        result = await self._collection.delete_many({"user_id": user_id})
         return result.deleted_count
     
     async def delete_expired_sessions(self) -> int:
-        """Eliminar sesiones expiradas"""
+        """Delete expired sessions"""
         now = datetime.now(timezone.utc).isoformat()
         result = await self._collection.delete_many({"expires_at": {"$lt": now}})
         return result.deleted_count
     
     async def refresh_session(self, session_token: str, expires_in_days: int = 7) -> bool:
-        """Refrescar expiración de sesión"""
+        """Refresh session expiration"""
         new_expires = (datetime.now(timezone.utc) + timedelta(days=expires_in_days)).isoformat()
         result = await self._collection.update_one(
             {"session_token": session_token},
