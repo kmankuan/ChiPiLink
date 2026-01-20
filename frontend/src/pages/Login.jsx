@@ -70,7 +70,7 @@ export default function Login() {
     
     try {
       const user = await login(formData.email, formData.password);
-      toast.success(`¡Bienvenido, ${user.nombre || user.name}!`);
+      toast.success(`¡Bienvenido, ${user.name}!`);
       
       // Check for redirect parameter in URL
       const params = new URLSearchParams(window.location.search);
@@ -79,7 +79,7 @@ export default function Login() {
       if (redirectTo) {
         // Redirect to the page user was trying to access
         navigate(redirectTo);
-      } else if (user.es_admin || user.is_admin) {
+      } else if (user.is_admin) {
         // Admins go to admin panel
         navigate('/admin');
       } else {
