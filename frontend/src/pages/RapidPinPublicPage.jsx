@@ -503,7 +503,7 @@ export default function RapidPinPublicPage() {
       return;
     }
 
-    const userId = user.cliente_id || user.user_id;
+    const userId = user.user_id;
     if (!userId) {
       toast.error('Error al obtener tu ID de usuario');
       return;
