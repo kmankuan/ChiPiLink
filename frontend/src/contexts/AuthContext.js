@@ -127,7 +127,8 @@ export function AuthProvider({ children }) {
     loading,
     token,
     isAuthenticated: !!user,
-    isAdmin: user?.es_admin || false,
+    // Support both Spanish and English field names for backward compatibility
+    isAdmin: user?.es_admin || user?.is_admin || false,
     login,
     register,
     loginWithGoogle,
