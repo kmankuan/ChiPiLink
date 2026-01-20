@@ -59,22 +59,22 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (email, contrasena) => {
-    const response = await api.post(AUTH_ENDPOINTS.login, { email, contrasena });
-    const { token: newToken, cliente } = response.data;
+  const login = async (email, password) => {
+    const response = await api.post(AUTH_ENDPOINTS.login, { email, password });
+    const { token: newToken, user } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
-    setUser(cliente);
-    return cliente;
+    setUser(user);
+    return user;
   };
 
   const register = async (data) => {
     const response = await api.post(AUTH_ENDPOINTS.register, data);
-    const { token: newToken, cliente } = response.data;
+    const { token: newToken, user } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
-    setUser(cliente);
-    return cliente;
+    setUser(user);
+    return user;
   };
 
   const loginWithGoogle = () => {
