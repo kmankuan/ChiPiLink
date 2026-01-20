@@ -7,62 +7,73 @@ También incluye un sistema unificado de gestión de usuarios basado en "Capacid
 
 ## Latest Update (Enero 20, 2026)
 
-### 🔄 Refactoring: Spanish to English Field Names - FASE 1 ✅ EN PROGRESO
+### 🔄 Refactoring: Spanish to English Field Names - COMPLETO ✅
 
-Se inició la migración de nombres de campos en español a inglés en el código para mejorar la mantenibilidad y seguir buenas prácticas de programación.
+Se completó la migración completa de nombres de campos en español a inglés en todo el código y la base de datos.
 
-#### Estrategia de Migración
-- **Backend**: Los esquemas Pydantic ya usan nombres en inglés (`password`, `name`, `phone`, etc.)
-- **Base de datos**: Mantiene nombres en español (`contrasena_hash`, `nombre`, `telefono`) por compatibilidad con datos existentes
-- **Capa de compatibilidad**: El repositorio mapea automáticamente entre inglés (código) y español (BD)
-- **Frontend**: Actualizado para usar nombres en inglés en formularios y soportar ambos formatos en datos recibidos
+#### ✅ Migración de Base de Datos Completada
+Se ejecutó un script de migración que renombró todos los campos en español a inglés en las colecciones:
+- `auth_users`: 112 campos renombrados
+- `user_roles`: 4 documentos actualizados
+- `auth_sessions`: Migrado
 
-#### Cambios Realizados - Fase 1 (Autenticación)
+#### ✅ Backend Actualizado (100% Inglés)
+- `/app/backend/core/auth.py` - Completamente refactorizado a inglés
+- `/app/backend/core/database.py` - Índices y admin user con campos en inglés
+- `/app/backend/modules/auth/services/auth_service.py` - Usa `user_id`, `name`, `password_hash`, `is_admin`
+- `/app/backend/modules/auth/repositories/user_repository.py` - Usa campos en inglés
+- `/app/backend/modules/auth/repositories/session_repository.py` - Usa campos en inglés
+- `/app/backend/modules/auth/routes/auth.py` - Usa `user_id` en lugar de `cliente_id`
+- `/app/backend/modules/auth/routes/users.py` - Usa `user_id` y `is_admin`
+- `/app/backend/modules/roles/models.py` - Modelos actualizados a inglés
+- `/app/backend/modules/roles/service.py` - Usa `user_id` en lugar de `cliente_id`
+- `/app/backend/modules/roles/routes.py` - Usa campos en inglés
 
-**Backend:**
-- `/app/backend/modules/auth/services/auth_service.py` - Actualizado para usar campos en inglés de los esquemas
-- `/app/backend/modules/auth/repositories/user_repository.py` - Añadida capa de mapeo de campos
-- `/app/backend/modules/auth/models/schemas.py` - Ya estaba en inglés (confirmado)
+#### ✅ Frontend Actualizado (100% Inglés)
+- `/app/frontend/src/contexts/AuthContext.js` - Usa `password`, `user`, `is_admin`
+- `/app/frontend/src/pages/Login.jsx` - Formulario usa `password`, verifica `is_admin`
+- `/app/frontend/src/pages/Register.jsx` - Formulario usa `name`, `phone`, `address`, `password`
+- `/app/frontend/src/pages/AuthCallback.jsx` - Usa `user.name`, `user.is_admin`
+- `/app/frontend/src/pages/AdminDashboard.jsx` - Comentarios actualizados a `is_admin`
+- `/app/frontend/src/pages/RapidPinPublicPage.jsx` - Usa `user.user_id`
+- `/app/frontend/src/components/layout/Header.jsx` - Usa `user.user_id`, `user.students`
+- `/app/frontend/src/modules/admin/RolesModule.jsx` - Usa `user.user_id`, `user.name`
+- `/app/frontend/src/modules/users/components/MisConexiones.jsx` - Usa campos en inglés
+- `/app/frontend/src/modules/users/components/AdminUsuariosConexiones.jsx` - Usa campos en inglés
+- `/app/frontend/src/modules/pinpanclub/pages/superpin/SuperPinLeagueDetail.jsx` - Usa campos en inglés
 
-**Frontend:**
-- `/app/frontend/src/contexts/AuthContext.js` - Login/register usan `password` y `user` en lugar de `contrasena` y `cliente`
-- `/app/frontend/src/pages/Login.jsx` - Formulario usa `password` en lugar de `contrasena`
-- `/app/frontend/src/pages/Register.jsx` - Formulario usa campos en inglés (`name`, `phone`, `address`, `password`)
-- `/app/frontend/src/pages/AuthCallback.jsx` - Soporta ambos formatos de campos
-- `/app/frontend/src/components/layout/Header.jsx` - Soporta ambos `cliente_id` y `user_id`
-
-#### Mapeo de Campos (Código → BD)
-| Inglés (Código) | Español (BD) |
-|-----------------|--------------|
-| user_id | cliente_id |
-| name | nombre |
-| phone | telefono |
-| address | direccion |
-| password | contrasena |
-| password_hash | contrasena_hash |
-| is_admin | es_admin |
-| created_at | fecha_creacion |
-| students | estudiantes |
+#### Mapeo de Campos Final (Código = BD)
+| Campo | Descripción |
+|-------|-------------|
+| user_id | ID único del usuario |
+| name | Nombre del usuario |
+| last_name | Apellido del usuario |
+| phone | Teléfono |
+| address | Dirección |
+| password_hash | Hash de la contraseña |
+| is_admin | Flag de administrador |
+| created_at | Fecha de creación |
+| updated_at | Fecha de actualización |
+| students | Array de estudiantes vinculados |
+| is_active | Estado activo/inactivo |
 
 #### Test Results
-- Login API: ✅ Funciona con `password`
-- Register API: ✅ Funciona con campos en inglés
-- /me endpoint: ✅ Devuelve datos correctamente
-- Admin Dashboard: ✅ Sidebar visible con todos los módulos
-
-#### Bug del Sidebar Admin - APARENTEMENTE RESUELTO ✅
-El bug reportado donde el sidebar del admin desaparecía dejando solo "Unatienda" parece estar resuelto. En las pruebas actuales, el sidebar muestra todos los 10 módulos correctamente después del login.
+- ✅ Login API: Funciona con `password`
+- ✅ Register API: Funciona con campos en inglés
+- ✅ /me endpoint: Devuelve `user_id`, `name`, `is_admin`
+- ✅ /roles/my-permissions: Funciona correctamente
+- ✅ Admin Dashboard: Sidebar visible con 10 módulos
+- ✅ Base de datos: Todos los campos migrados a inglés
 
 ---
 
 ## Tareas Pendientes (Actualizado Enero 20, 2026)
 
-### 🔴 P0 - Crítico
-- ✅ Refactoring Fase 1 (Auth) - COMPLETADO
+### ✅ Completado
+- ✅ Refactoring Completo español → inglés (código + base de datos)
 
 ### 🟠 P1 - Alta Prioridad
 - [ ] Indicador "Ya ordenado" para evitar compras duplicadas de libros
-- [ ] Continuar Refactoring Fase 2 en otros módulos (store, pinpanclub, users)
 
 ### 🟡 P2 - Media Prioridad
 - [ ] Integración Stripe para pagos de membresías
