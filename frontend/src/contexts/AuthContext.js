@@ -61,20 +61,20 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const response = await api.post(AUTH_ENDPOINTS.login, { email, password });
-    const { token: newToken, user } = response.data;
+    const { token: newToken, user: userData } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
-    setUser(user);
-    return user;
+    setUser(userData);
+    return userData;
   };
 
   const register = async (data) => {
     const response = await api.post(AUTH_ENDPOINTS.register, data);
-    const { token: newToken, user } = response.data;
+    const { token: newToken, user: userData } = response.data;
     localStorage.setItem('auth_token', newToken);
     setToken(newToken);
-    setUser(user);
-    return user;
+    setUser(userData);
+    return userData;
   };
 
   const loginWithGoogle = () => {
@@ -90,13 +90,13 @@ export function AuthProvider({ children }) {
         headers: { 'X-Session-ID': sessionId }
       });
       
-      const { session_token, user } = response.data;
+      const { session_token, user: userData } = response.data;
       
       // Set cookie via backend
       await api.post(AUTH_ENDPOINTS.session, { session_token });
       
-      setUser(user);
-      return user;
+      setUser(userData);
+      return userData;
     } catch (error) {
       console.error('Google auth error:', error);
       throw error;
@@ -127,8 +127,8 @@ export function AuthProvider({ children }) {
     loading,
     token,
     isAuthenticated: !!user,
-    // Support both Spanish and English field names for backward compatibility
-    isAdmin: user?.es_admin || user?.is_admin || false,
+    // Use English field name is_admin
+    isAdmin: user?.is_admin || false,
     login,
     register,
     loginWithGoogle,
