@@ -75,7 +75,7 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
-  const { isAdmin, user, logout } = useAuth();
+  const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -93,6 +93,11 @@ export default function AdminDashboard() {
    * The RBAC system is used for more granular permissions within modules.
    */
   const filteredNavItems = useMemo(() => {
+    // If auth is still loading, show all items to prevent flash
+    if (authLoading) {
+      return navItems;
+    }
+    
     // Admin users see all navigation items
     if (isAdmin) {
       return navItems;
@@ -103,14 +108,14 @@ export default function AdminDashboard() {
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
-  }, [isAdmin, hasPermission]);
+  }, [authLoading, isAdmin, hasPermission]);
 
-  // Redirect non-admins away from admin panel
+  // Redirect non-admins away from admin panel (only after auth is loaded)
   useEffect(() => {
-    if (!isAdmin) {
+    if (!authLoading && !isAdmin) {
       navigate('/');
     }
-  }, [isAdmin, navigate]);
+  }, [authLoading, isAdmin, navigate]);
 
   const handleLogout = async () => {
     await logout();
