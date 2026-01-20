@@ -87,9 +87,14 @@ export default function AdminDashboard() {
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
   // Filter nav items based on permissions
+  // Show all items while loading, or if user is super admin
   const filteredNavItems = navItems.filter(item => {
+    // While loading permissions, show all items for admins
+    if (permissionsLoading) return isAdmin;
     // Super admin sees everything
     if (isSuperAdmin) return true;
+    // Admin without specific role also sees everything
+    if (isAdmin && !role) return true;
     // Check permission
     if (item.permission) {
       return hasPermission(item.permission);
