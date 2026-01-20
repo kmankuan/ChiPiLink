@@ -10,6 +10,50 @@ from core.base import BaseRepository
 from core.database import db
 from core.constants import AuthCollections
 
+# Field mapping: English (code) -> Spanish (database)
+CODE_TO_DB = {
+    "user_id": "cliente_id",
+    "name": "nombre",
+    "phone": "telefono",
+    "address": "direccion",
+    "password": "contrasena",
+    "password_hash": "contrasena_hash",
+    "is_admin": "es_admin",
+    "created_at": "fecha_creacion",
+    "updated_at": "fecha_actualizacion",
+    "is_active": "activo",
+    "students": "estudiantes",
+    "last_login": "ultimo_login",
+}
+
+# Reverse mapping: Spanish (database) -> English (code)
+DB_TO_CODE = {v: k for k, v in CODE_TO_DB.items()}
+
+
+def map_to_db(data: Dict) -> Dict:
+    """Map English field names to Spanish database field names"""
+    if not data:
+        return data
+    result = {}
+    for key, value in data.items():
+        db_key = CODE_TO_DB.get(key, key)
+        result[db_key] = value
+    return result
+
+
+def map_from_db(data: Dict, exclude_fields: List[str] = None) -> Dict:
+    """Map Spanish database field names to English code field names"""
+    if not data:
+        return data
+    exclude = exclude_fields or []
+    result = {}
+    for key, value in data.items():
+        if key in exclude or key == "_id":
+            continue
+        code_key = DB_TO_CODE.get(key, key)
+        result[code_key] = value
+    return result
+
 
 class UserRepository(BaseRepository):
     """
