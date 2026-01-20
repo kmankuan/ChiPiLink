@@ -165,7 +165,7 @@ class AuthService(BaseService):
                 
                 user = await self.user_repository.get_by_id(cliente_id)
                 
-                return SessionData(session_token=session_token, cliente=user)
+                return SessionData(session_token=session_token, user=user)
                 
         except httpx.RequestError as e:
             logger.error(f"Error fetching session: {e}")
