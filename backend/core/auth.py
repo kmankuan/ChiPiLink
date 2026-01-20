@@ -1,5 +1,6 @@
 """
 Authentication helpers and dependencies for ChiPi Link
+All field names use English conventions
 """
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -27,11 +28,11 @@ def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
-def create_token(cliente_id: str, es_admin: bool = False) -> str:
+def create_token(user_id: str, is_admin: bool = False) -> str:
     """Create a JWT token for a user"""
     payload = {
-        "sub": cliente_id,
-        "es_admin": es_admin,
+        "sub": user_id,
+        "is_admin": is_admin,
         "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -57,8 +58,8 @@ async def get_current_user(
                 expires_at = expires_at.replace(tzinfo=timezone.utc)
             if expires_at > datetime.now(timezone.utc):
                 user = await db[AuthCollections.USERS].find_one(
-                    {"cliente_id": session["cliente_id"]}, 
-                    {"_id": 0, "contrasena_hash": 0}
+                    {"user_id": session["user_id"]}, 
+                    {"_id": 0, "password_hash": 0}
                 )
                 if user:
                     return user
@@ -68,28 +69,28 @@ async def get_current_user(
         token = credentials.credentials
     
     if not token:
-        raise HTTPException(status_code=401, detail="No autenticado")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        cliente_id = payload.get("sub")
+        user_id = payload.get("sub")
         user = await db[AuthCollections.USERS].find_one(
-            {"cliente_id": cliente_id}, 
-            {"_id": 0, "contrasena_hash": 0}
+            {"user_id": user_id}, 
+            {"_id": 0, "password_hash": 0}
         )
         if not user:
-            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+            raise HTTPException(status_code=401, detail="User not found")
         return user
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expirado")
+        raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Token inválido")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 
 async def get_admin_user(current_user: dict = Depends(get_current_user)) -> dict:
     """Get current user and verify they are an admin"""
-    if not current_user.get("es_admin", False):
-        raise HTTPException(status_code=403, detail="Acceso denegado - Solo administradores")
+    if not current_user.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Access denied - Admins only")
     return current_user
 
 
@@ -106,10 +107,10 @@ async def get_optional_user(
 
 # ============== PERMISSION-BASED AUTH ==============
 
-async def get_user_permissions(cliente_id: str) -> List[str]:
+async def get_user_permissions(user_id: str) -> List[str]:
     """Get all permissions for a user from their role and overrides"""
     # Get user's role assignment
-    user_role = await db.user_roles.find_one({"cliente_id": cliente_id}, {"_id": 0})
+    user_role = await db.user_roles.find_one({"user_id": user_id}, {"_id": 0})
     
     role_id = user_role.get("role_id") if user_role else "user"
     
@@ -119,12 +120,12 @@ async def get_user_permissions(cliente_id: str) -> List[str]:
         # Default to basic user role
         role = await db.roles.find_one({"role_id": "user"}, {"_id": 0})
     
-    role_permissions = role.get("permisos", []) if role else []
+    role_permissions = role.get("permissions", []) if role else []
     
     # Get individual overrides
-    overrides = await db.user_permissions.find_one({"cliente_id": cliente_id}, {"_id": 0})
-    additional = overrides.get("permisos_adicionales", []) if overrides else []
-    removed = overrides.get("permisos_removidos", []) if overrides else []
+    overrides = await db.user_permissions.find_one({"user_id": user_id}, {"_id": 0})
+    additional = overrides.get("additional_permissions", []) if overrides else []
+    removed = overrides.get("removed_permissions", []) if overrides else []
     
     # Combine: role permissions + additional - removed
     all_permissions = set(role_permissions) | set(additional)
@@ -164,17 +165,17 @@ def require_permission(permission: str):
     ) -> dict:
         user = await get_current_user(request, credentials)
         
-        # Super admin always has access (es_admin flag for backward compatibility)
-        if user.get("es_admin"):
+        # Super admin always has access
+        if user.get("is_admin"):
             return user
         
         # Check permissions
-        permissions = await get_user_permissions(user["cliente_id"])
+        permissions = await get_user_permissions(user["user_id"])
         
         if not check_permission_match(permissions, permission):
             raise HTTPException(
                 status_code=403, 
-                detail=f"Acceso denegado - Requiere permiso: {permission}"
+                detail=f"Access denied - Required permission: {permission}"
             )
         
         return user
@@ -194,10 +195,10 @@ def require_any_permission(permissions: List[str]):
         user = await get_current_user(request, credentials)
         
         # Super admin always has access
-        if user.get("es_admin"):
+        if user.get("is_admin"):
             return user
         
-        user_permissions = await get_user_permissions(user["cliente_id"])
+        user_permissions = await get_user_permissions(user["user_id"])
         
         for required_permission in permissions:
             if check_permission_match(user_permissions, required_permission):
@@ -205,7 +206,7 @@ def require_any_permission(permissions: List[str]):
         
         raise HTTPException(
             status_code=403, 
-            detail=f"Acceso denegado - Requiere alguno de: {', '.join(permissions)}"
+            detail=f"Access denied - Required one of: {', '.join(permissions)}"
         )
     
     return permission_checker
@@ -223,16 +224,16 @@ def require_all_permissions(permissions: List[str]):
         user = await get_current_user(request, credentials)
         
         # Super admin always has access
-        if user.get("es_admin"):
+        if user.get("is_admin"):
             return user
         
-        user_permissions = await get_user_permissions(user["cliente_id"])
+        user_permissions = await get_user_permissions(user["user_id"])
         
         for required_permission in permissions:
             if not check_permission_match(user_permissions, required_permission):
                 raise HTTPException(
                     status_code=403, 
-                    detail=f"Acceso denegado - Requiere permiso: {required_permission}"
+                    detail=f"Access denied - Required permission: {required_permission}"
                 )
         
         return user
@@ -252,16 +253,16 @@ def require_role(role_id: str):
         user = await get_current_user(request, credentials)
         
         # Super admin always has access
-        if user.get("es_admin"):
+        if user.get("is_admin"):
             return user
         
         # Get user's role assignment
-        user_role = await db.user_roles.find_one({"cliente_id": user["cliente_id"]}, {"_id": 0})
+        user_role = await db.user_roles.find_one({"user_id": user["user_id"]}, {"_id": 0})
         
         if not user_role or user_role.get("role_id") != role_id:
             raise HTTPException(
                 status_code=403, 
-                detail=f"Acceso denegado - Requiere rol: {role_id}"
+                detail=f"Access denied - Required role: {role_id}"
             )
         
         return user
