@@ -76,6 +76,9 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
 import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 
+// Bulk Import Page
+import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 // CXGenieWidget removed - access via header support button instead
