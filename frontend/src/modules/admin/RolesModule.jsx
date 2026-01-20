@@ -519,7 +519,7 @@ export default function RolesModule() {
                 const userRole = roles.find(r => r.role_id === user.role_id) || roles.find(r => r.role_id === 'user');
                 
                 return (
-                  <Card key={user.usuario_id || user.cliente_id}>
+                  <Card key={user.usuario_id || user.user_id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -527,7 +527,7 @@ export default function RolesModule() {
                             <User className="h-5 w-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="font-medium">{user.nombre || 'Sin nombre'}</p>
+                            <p className="font-medium">{user.name || 'Sin nombre'}</p>
                             <p className="text-sm text-muted-foreground">{user.email}</p>
                           </div>
                         </div>
