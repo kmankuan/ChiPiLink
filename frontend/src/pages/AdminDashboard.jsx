@@ -86,54 +86,43 @@ export default function AdminDashboard() {
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
-  // Debug logging - remove in production
-  useEffect(() => {
-    console.log('[AdminDashboard] Permissions state:', {
-      permissionsLoading,
-      role: role?.role_id,
-      permissions,
-      isSuperAdmin,
-      isAuthAdmin
-    });
-  }, [permissionsLoading, role, permissions, isSuperAdmin, isAuthAdmin]);
-
-  // Simple check: is user a super admin?
-  // Super admin if: role is super_admin OR has wildcard permission OR es_admin from auth
+  /**
+   * Determines if user can see all admin modules
+   * Priority:
+   * 1. If role is super_admin -> show all
+   * 2. If has wildcard permission (*) -> show all
+   * 3. If user.es_admin from auth context -> show all (ultimate fallback)
+   * 4. If isAuthAdmin and permissions still loading -> show all (prevents flash)
+   */
   const canSeeAllModules = useMemo(() => {
-    // Check role
+    // Super admin role
     if (role?.role_id === 'super_admin') return true;
-    // Check wildcard permission
+    // Wildcard permission
     if (Array.isArray(permissions) && permissions.includes('*')) return true;
-    // Check isSuperAdmin flag from hook
+    // Hook's isSuperAdmin
     if (isSuperAdmin) return true;
-    // If user is admin from auth context and we're still loading permissions, show all
-    if (isAuthAdmin && permissionsLoading) return true;
+    // Auth context admin flag (from user.es_admin in token)
+    if (isAuthAdmin) return true;
     return false;
-  }, [role, permissions, isSuperAdmin, isAuthAdmin, permissionsLoading]);
+  }, [role, permissions, isSuperAdmin, isAuthAdmin]);
 
-  // Filter navigation items
+  // Filter navigation items - simplified logic
   const filteredNavItems = useMemo(() => {
-    // If can see all modules, return all items
     if (canSeeAllModules) {
       return navItems;
     }
-    
-    // Otherwise filter by permission
     return navItems.filter(item => {
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
   }, [canSeeAllModules, hasPermission]);
 
+  // Redirect non-admins
   useEffect(() => {
-    // Only redirect if not admin and permissions are loaded
-    if (!isAuthAdmin && !permissionsLoading && !canSeeAllModules) {
-      const hasAdminAccess = hasPermission('admin.access') || hasPermission('admin.dashboard');
-      if (!hasAdminAccess) {
-        navigate('/');
-      }
+    if (!permissionsLoading && !isAuthAdmin && !canSeeAllModules) {
+      navigate('/');
     }
-  }, [isAuthAdmin, permissionsLoading, canSeeAllModules, hasPermission, navigate]);
+  }, [permissionsLoading, isAuthAdmin, canSeeAllModules, navigate]);
 
   const handleLogout = async () => {
     await logout();
