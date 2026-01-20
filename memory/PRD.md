@@ -55,7 +55,26 @@ El bug reportado donde el sidebar del admin desaparecía dejando solo "Unatienda
 
 ---
 
-### 🆕 Flujo de Catálogo Privado de Libros ✅ COMPLETADO
+## Tareas Pendientes (Actualizado Enero 20, 2026)
+
+### 🔴 P0 - Crítico
+- ✅ Refactoring Fase 1 (Auth) - COMPLETADO
+
+### 🟠 P1 - Alta Prioridad
+- [ ] Indicador "Ya ordenado" para evitar compras duplicadas de libros
+- [ ] Continuar Refactoring Fase 2 en otros módulos (store, pinpanclub, users)
+
+### 🟡 P2 - Media Prioridad
+- [ ] Integración Stripe para pagos de membresías
+- [ ] Arreglar Google OAuth (loop infinito)
+- [ ] Error de script de desarrollo (overlay molesto)
+
+### ⚪ P3 - Backlog
+- [ ] Integración Google Sheets API para importación de datos
+- [ ] Sistema de equipos/clanes con recompensas colectivas
+- [ ] Notificaciones por email para asignaciones de roles
+
+---
 
 Se implementó el flujo completo para que usuarios con estudiantes vinculados puedan ver y ordenar libros de texto del catálogo privado PCA.
 
