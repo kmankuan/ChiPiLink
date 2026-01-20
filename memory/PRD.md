@@ -5,7 +5,33 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 20, 2026)
+## Latest Update (Enero 20, 2026) - Segunda Actualización
+
+### 🔧 Correcciones y Mejoras
+
+#### ✅ Header Duplicado en Admin Dashboard - CORREGIDO
+- Eliminado el header duplicado "Vista general de tu tienda" en `/app/frontend/src/modules/dashboard/DashboardModule.jsx`
+- El header correcto "Bienvenido al panel de administración de ChiPi Link" ahora solo aparece una vez desde `AdminDashboard.jsx`
+
+#### ✅ Página de Importación Masiva de Libros - IMPLEMENTADO
+Nueva página completa (no popup) para importar libros al catálogo privado PCA desde hojas de cálculo:
+
+**Archivos creados/modificados:**
+- `/app/frontend/src/pages/BulkImportBooksPage.jsx` - Página completa de importación
+- `/app/frontend/src/App.js` - Agregada ruta `/admin/bulk-import-books`
+- `/app/frontend/src/modules/unatienda/tabs/CatalogoPrivadoTab.jsx` - Botón "Importar en Cantidad"
+- `/app/backend/modules/store/routes/bulk_import.py` - Corregido `cliente_id` → `user_id`
+
+**Características:**
+- ✅ Página completa (no popup)
+- ✅ Multilingüe (español, inglés, chino)
+- ✅ Código en términos inglés
+- ✅ 3 pasos: Pegar datos → Mapear columnas → Previsualizar e importar
+- ✅ Vista previa de datos antes de importar
+- ✅ Manejo de errores
+- ✅ Actualización de libros existentes (opcional)
+
+---
 
 ### 🔄 Refactoring: Spanish to English Field Names - COMPLETO ✅
 
