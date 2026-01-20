@@ -1,14 +1,6 @@
 """
 Migration Script - Rename Spanish field names to English
 Run this ONCE to migrate existing data in MongoDB
-
-This script renames fields from Spanish to English in:
-- auth_users collection
-- auth_sessions collection  
-- user_roles collection
-- user_permissions collection
-
-Usage: python -m scripts.migrate_fields_to_english
 """
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -55,26 +47,29 @@ async def migrate_collection(db, collection_name: str, field_map: dict):
     """Migrate fields in a collection from Spanish to English"""
     collection = db[collection_name]
     
-    # Build rename operations
-    rename_ops = {old: new for old, new in field_map.items()}
+    total_modified = 0
     
-    # Count documents that need migration
-    count = 0
-    for old_field in field_map.keys():
-        count += await collection.count_documents({old_field: {"$exists": True}})
+    # Rename each field individually (more robust)
+    for old_field, new_field in field_map.items():
+        # Only rename if old field exists and new field doesn't
+        query = {old_field: {"$exists": True}}
+        count = await collection.count_documents(query)
+        
+        if count > 0:
+            result = await collection.update_many(
+                query,
+                {"$rename": {old_field: new_field}}
+            )
+            if result.modified_count > 0:
+                print(f"    - {old_field} → {new_field}: {result.modified_count} docs")
+                total_modified += result.modified_count
     
-    if count == 0:
-        print(f"  ✓ {collection_name}: No documents to migrate")
-        return 0
+    if total_modified == 0:
+        print(f"  ✓ {collection_name}: No documents to migrate (already migrated or empty)")
+    else:
+        print(f"  ✓ {collection_name}: Total {total_modified} field renames")
     
-    # Perform the rename
-    result = await collection.update_many(
-        {},
-        {"$rename": rename_ops}
-    )
-    
-    print(f"  ✓ {collection_name}: Migrated {result.modified_count} documents")
-    return result.modified_count
+    return total_modified
 
 
 async def main():
@@ -107,7 +102,7 @@ async def main():
     
     print()
     print("=" * 60)
-    print(f"Migration complete! Total documents modified: {total_migrated}")
+    print(f"Migration complete! Total field renames: {total_migrated}")
     print("=" * 60)
     
     client.close()
