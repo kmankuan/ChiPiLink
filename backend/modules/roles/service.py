@@ -298,32 +298,32 @@ class RolesService:
         
         users = []
         for assignment in assignments:
-            user = await db.clientes.find_one(
-                {"cliente_id": assignment["cliente_id"]},
-                {"_id": 0, "cliente_id": 1, "nombre": 1, "email": 1}
+            user = await db.auth_users.find_one(
+                {"user_id": assignment["user_id"]},
+                {"_id": 0, "user_id": 1, "name": 1, "email": 1}
             )
             if user:
-                user["fecha_asignacion"] = assignment.get("fecha_asignacion")
+                user["assigned_at"] = assignment.get("assigned_at")
                 users.append(user)
         
         return users
     
     # ============== PERMISSION MANAGEMENT ==============
     
-    async def get_user_permissions(self, cliente_id: str) -> List[str]:
+    async def get_user_permissions(self, user_id: str) -> List[str]:
         """Get all permissions for a user (from role + overrides)"""
         # Get role permissions
-        role = await self.get_user_role(cliente_id)
+        role = await self.get_user_role(user_id)
         role_permissions = role.get("permisos", []) if role else []
         
         # Get individual overrides
         overrides = await self.user_permissions_collection.find_one(
-            {"cliente_id": cliente_id},
+            {"user_id": user_id},
             {"_id": 0}
         )
         
-        additional = overrides.get("permisos_adicionales", []) if overrides else []
-        removed = overrides.get("permisos_removidos", []) if overrides else []
+        additional = overrides.get("additional_permissions", []) if overrides else []
+        removed = overrides.get("removed_permissions", []) if overrides else []
         
         # Combine: role permissions + additional - removed
         all_permissions = set(role_permissions) | set(additional)
@@ -331,13 +331,13 @@ class RolesService:
         
         return list(final_permissions)
     
-    async def add_user_permission(self, cliente_id: str, permission: str) -> bool:
+    async def add_user_permission(self, user_id: str, permission: str) -> bool:
         """Add an individual permission to a user"""
         await self.user_permissions_collection.update_one(
-            {"cliente_id": cliente_id},
+            {"user_id": user_id},
             {
-                "$addToSet": {"permisos_adicionales": permission},
-                "$pull": {"permisos_removidos": permission},
+                "$addToSet": {"additional_permissions": permission},
+                "$pull": {"removed_permissions": permission},
                 "$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}
             },
             upsert=True
