@@ -1,82 +1,91 @@
 <analysis>**original_problem_statement:**
-The user's initial goal was to build a textbook pre-ordering system. This has since expanded significantly. The most recent requests include:
-1.  **Unify Store Modules:** Combine the general Tienda (Store) and the private Libros Escolares (School Books) modules into a single, cohesive Unatienda module. This unified module should handle both a public e-commerce catalog and a private catalog visible only to specific users (e.g., parents of students at PCA).
-2.  **Implement Role-Based Access Control (RBAC):** The user reported major inconsistencies in user permissions, where regular users could see admin-level menu items and features. They requested a robust system with user groups (e.g., super_admin, admin, moderator, regular user) to manage privileges and capabilities granularly.
-3.  **Fix Broken User Flows:** Address several broken UI elements reported by a regular user, including a Vincular estudiante button that acts as a dead link and the incorrect appearance of admin-only menu items.
-4.  **Fix Google Sign-Up:** A long-standing issue where the Continue with Google flow is broken and stuck in a loop.
+The user's initial goal was to build a textbook pre-ordering system, which has since evolved into a multi-functional super app. The development has focused on implementing a comprehensive Role-Based Access Control (RBAC) system, an audit log, and significant UI/UX overhauls. Key features completed include a unified Unatienda e-commerce page, a private catalog for exclusive textbook sales to users with linked students, and a view by student feature for easy bulk ordering.
+
+Recent user requests have focused on resolving bugs and improving the admin experience, including fixing a disappearing admin sidebar, creating a super admin user, migrating the database to a production-ready name, and a new request to refactor the codebase to use English naming conventions for variables and database fields.
 
 **User's preferred language**: Spanish
 
 **what currently exists?**
-The application is a full-stack React/FastAPI/MongoDB system. Key functionalities include a landing page editor, Monday.com integration for orders (with subitem support), and a demo data generation system.
-
-Most recently, the Tienda and Libros Escolares modules were successfully merged into a single Unatienda admin module with separate tabs for the public catalog, the private PCA catalog, student management, and configuration (including Yappy and Monday.com settings). The public-facing  page was also revamped to correctly show the public catalog to all visitors and reveal the private Libros PCA catalog to authenticated users with linked students. Bugs preventing the creation of products and categories were fixed, and demo products were added to the public catalog.
-
-The backend foundation for a new Role-Based Access Control (RBAC) system has been created in . The default roles (super_admin, admin, moderator, user) have been seeded, and the main  user has been assigned the  role.
+The application is a full-stack system with a React frontend, FastAPI backend, and MongoDB database (). It features a complete RBAC system, a unified e-commerce store () with both public and private catalogs, and an admin dashboard for management. The private catalog flow is fully functional, allowing users with linked students to view detailed product pages and add exclusive textbooks to their cart. A Libros por Estudiante (Books by Student) feature allows for adding all required books for a student in one click. A super admin user () has been created, and the database has been migrated to .
 
 **Last working item**:
--   **Last item agent was working:** The agent was implementing a comprehensive Role-Based Access Control (RBAC) system to address user-reported permission issues. The backend models, services, and API routes were created, and initial roles were seeded in the database. The agent had just created the placeholder file for the frontend admin panel () and was about to begin its implementation.
+-   **Last item agent was working:** The agent was beginning a large-scale refactoring of the entire codebase, as requested by the user, to change Spanish variable and field names (e.g., , ) to English equivalents (e.g., , ) to adhere to better programming practices. The agent had identified the terms and was about to modify the backend Pydantic schemas.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** Both. The backend API needs testing via  or a backend testing agent. The new frontend admin panel and the resulting permission changes across the UI require a frontend testing agent.
+-   **Which testing method agent to use?** Both. This is a large-scale refactoring. After backend changes, use the backend testing agent to verify all auth and user-related endpoints. After frontend changes, use the frontend testing agent to verify login, registration, admin panel, and user account flows. A full regression test is required.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Complete RBAC System Implementation (P0)**
-    -   **Description:** The user requires a full RBAC system to fix critical access control flaws. The backend foundation is laid, but the frontend UI for management and the enforcement of permissions across the application are missing.
-    -   **Attempted fixes:** Backend modules for roles () have been created and initial data seeded.
+-   **Issue 1: Refactor Spanish Naming to English (P0)**
+    -   **Description:** The user has requested to refactor Spanish variable and field names to English across the entire codebase. This is a high-risk, large-scale task.
+    -   **Attempted fixes:** The agent created a migration plan and was about to start on .
     -   **Next debug checklist:**
-        1.  Build the UI for the  component to allow a super_admin to create/edit roles and assign permissions.
-        2.  Implement UI for assigning roles to users.
-        3.  Create a FastAPI dependency (e.g., ) to protect backend API endpoints based on user roles.
-        4.  Refactor existing backend endpoints to use the new RBAC dependency instead of old checks like .
-        5.  Update frontend components (e.g.,  sidebar, user-facing menus) to conditionally render UI elements based on the user's fetched permissions.
-        6.  Specifically fix the issues reported by the user: prevent regular users from seeing Crear Liga, ensure the sidebar menu is Unatienda, remove Mis Libros Escolares from the regular user view, and fix the Vincular estudiante button on the  page.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a critical security and usability requirement. It will secure the application, prevent regular users from accessing admin functionality, and fix a broken user experience.
+        1.  Systematically replace Spanish terms in backend models (), then services, repositories, and routes.
+        2.  Implement a data migration strategy (either an abstraction layer or a one-time script) to handle existing database documents that use Spanish keys.
+        3.  Run extensive backend tests to validate authentication, user management, and all related flows.
+        4.  Propagate the name changes throughout the frontend codebase (contexts, hooks, components).
+        5.  Run extensive frontend tests to ensure UI functionality is not broken.
+    -   **Why fix this issue and what will be achieved with the fix?** To improve code quality, maintainability, and adhere to standard programming practices as requested by the user.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** Both.
--   **Issue 2: Google Sign-Up Flow is Broken (P1)**
-    -   **Description:** The Continue with Google feature is stuck in a loop. An admin toggle was implemented to hide the button, but the underlying bug remains.
-    -   **Attempted fixes:** None. The focus was on creating a temporary workaround.
+-   **Issue 2: Admin Sidebar Modules Disappear (P1)**
+    -   **Description:** The user reports that after logging in as super admin, all sidebar modules appear for a moment and then vanish, leaving only Unatienda. This blocks all other admin functions.
+    -   **Attempted fixes:** Multiple attempts were made, including simplifying component logic in  to rely only on the  flag from  and showing a loader. While the agent's tests passed, the issue persists for the user, pointing to a race condition or caching problem in the deployed environment.
     -   **Next debug checklist:**
-        1.  Review frontend logic in .
-        2.  Examine the backend Google auth service in .
-        3.  Check browser console logs during the login attempt for API errors.
-        4.  Investigate the Google OAuth Client ID, as it might be a generic platform key causing branding issues.
-    -   **Why fix this issue and what will be achieved with the fix?** To restore a key, user-friendly authentication method.
+        1.  Review  and .
+        2.  Add more robust state management to prevent the sidebar from rendering until both authentication and permission states are fully resolved and stable.
+        3.  Consider adding a  to the main admin layout component in  to force a full re-render when the user logs in.
+        4.  Investigate browser/CDN caching as a potential cause.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a critical bug blocking the super admin from accessing any management modules.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+-   **Issue 3: Google Sign-Up Flow is Broken (P2)**
+    -   **Description:** The Continue with Google feature is stuck in an infinite loop.
     -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
+    -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Both.
+-   **Issue 4: Persistent Development Script Error (P3)**
+    -   **Description:** A recurring runtime error from the external  script overlays the UI, blocking UI verification via screenshots.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend.
 
 **In progress Task List**:
--   **Task 1: Build Frontend for RBAC Management (P0)**
-    -   **Description:** Create the admin UI for managing roles, permissions, and user-role assignments.
-    -   **Where to resume:** The file  has been created but is currently empty. The next step is to populate it with a UI and integrate it into the admin dashboard navigation.
-    -   **What will be achieved with this?** A UI for super_admins to manage the entire RBAC system.
-    -   **Status:** NOT STARTED
-    -   **Blocked on something:** None.
+-   **Task 1: Refactor Spanish Naming to English (P0)**
+    -   **Where to resume:** Begin by overwriting  with English field names, then systematically propagate the changes through the backend services and repositories, ensuring a data mapping/migration strategy is in place.
+    -   **What will be achieved with this?** A more maintainable and professional codebase that follows standard conventions.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Blocked on something:** None, but it's a high-risk task. It may be wise to fix the P1 admin sidebar bug first.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1:** Integrate Stripe for payment processing of memberships.
-    -   **P2:** Create a selector for pre-designed templates for landing page blocks.
+    -   **P1:** Implement a feature to mark books as Already Ordered to prevent users from accidentally re-purchasing the same textbook.
+    -   **P2:** Integrate Stripe for payment processing of memberships.
 -   **Future Tasks:**
     -   Integrate Google Sheets API for direct data import.
+    -   Create a selector for pre-designed templates for landing page blocks.
     -   Implement a system for handling textbook re-purchase requests.
     -   Integrate ChipiPoints as a payment method.
     -   Develop a system of teams/clans with collective rewards.
+    -   Add email notifications for critical role assignments.
 
 **Completed work in this session**
--   **Unified Unatienda Module:** Merged the Tienda and Libros Escolares modules into a single, tabbed Unatienda admin UI, centralizing product management and configuration (including Yappy and Monday.com).
--   **Implemented Public Unatienda View:** Revamped the public  page to display the public catalog to all users and conditionally display the private Libros PCA catalog to logged-in users with linked students.
--   **Added Public Demo Products:** Populated the public store with 34 demo products across 6 categories and fixed backend issues related to product fetching and data models ( collection,  field).
--   **Fixed Store Bugs:** Resolved an issue that prevented the creation of categories and products in the admin store module.
--   **Completed Demo Data Generation & Testing:** Finished the demo data generation script for the private catalog and tested the end-to-end Monday.com order sync, confirming that subitems (products) were created correctly.
+-   **Global Breadcrumb & Navigation Cleanup:** Completed the implementation of the global header across all pages and removed all redundant, page-specific Back buttons.
+-   **Private Catalog Flow:** Implemented the full user journey for the private textbook catalog, including a dedicated product detail page and cart integration.
+-   **Libros por Estudiante Feature:** Built a new UI that groups required textbooks by student and allows for adding all books to the cart with a single click.
+-   **Admin Dashboard Overhaul:**
+    -   Fixed a duplicate header, consolidated product management into the Unatienda module, and resolved a data loading error on the main dashboard page.
+-   **Database & User Management:**
+    -   Successfully diagnosed that the backend was using a .
+    -   Migrated 93 collections to a new  database.
+    -   Updated the  file and restarted the backend to use the new production database.
+    -   Created the super admin user  with the password  and assigned the correct role.
 
 **Earlier issues found/mentioned but not fixed**
--   **CXGenie Widget Script Error:** A persistent, non-blocking script error from an external widget.
--   **Error al cargar matrículas Toast:** A low-priority error toast related to a deprecated system.
+-   A low-priority toast error Error al cargar matrículas related to a deprecated system still appears.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -85,76 +94,87 @@ The backend foundation for a new Role-Based Access Control (RBAC) system has bee
 
 
 **Key Technical Concepts**
--   **Module Unification:** A major refactor that consolidated two separate admin modules into a single, tabbed React component for a streamlined user experience.
--   **Conditional Rendering for Access Control:** The public  page uses the user's auth state and associated data (student links) to conditionally display privileged content (the private catalog). This pattern needs to be expanded using the new RBAC system.
--   **Backend RBAC Foundation:** A new, scalable module was created to manage roles and permissions, including database models and API endpoints. It includes a startup seeding mechanism to ensure default roles are always present.
+-   **Race Condition Debugging:** Investigating a persistent frontend bug where UI elements flicker based on the loading order of asynchronous authentication and permission data.
+-   **Database Migration:** The agent performed a manual migration of all collections from  to  and updated the environment configuration to point to the new database.
+-   **Large-Scale Refactoring:** The ongoing task of changing variable and database field names from Spanish to English across the full stack, requiring careful coordination between backend models, APIs, and frontend components.
 
 **key DB schema**
--   ****: 
--   ****:  (Links users to roles).
--   ****: The primary collection for all products. Contains a boolean  field to distinguish between public and private items.
--   ****: The main user collection. Should be updated to hold a user's role assignments for efficient permission checking.
+-   **DB Name:** 
+-   ****:  (Fields to be renamed)
+-   ****:  (Fields to be renamed)
+-   ****:  (Fields to be renamed)
 
 **changes in tech stack**
--   None.
+-   None. The database instance was changed, but the technology (MongoDB) remains the same.
 
 **All files of reference**
--   **/app/backend/modules/roles/**: The new backend module for the RBAC system.
--   **/app/frontend/src/modules/admin/RolesModule.jsx**: The new (but empty) frontend component for managing roles.
--   **/app/frontend/src/modules/unatienda/UnatiendaModule.jsx**: The unified admin module for the entire store.
--   **/app/frontend/src/pages/Unatienda.jsx**: The revamped public-facing store page that handles both public and private catalogs.
--   **/app/backend/main.py**: Modified to register the new roles router and seeding logic.
+-   **/app/backend/.env**: Defines the production database name .
+-   **/app/frontend/src/pages/AdminDashboard.jsx**: The location of the recurring admin sidebar bug.
+-   **/app/frontend/src/contexts/AuthContext.js**: Manages user session state and the  flag.
+-   **/app/frontend/src/hooks/usePermissions.js**: Handles RBAC checks on the frontend; was a source of bugs.
+-   **/app/frontend/src/pages/Unatienda.jsx**: Contains the recently added Libros por Estudiante feature.
+-   **/app/backend/modules/auth/models/schemas.py**: The first file to be changed in the Spanish-to-English refactoring task.
 
 **Areas that need refactoring**:
--   All authentication and authorization checks (e.g., , ) must be refactored to use the new, more granular RBAC system.
--   The user document in the  collection should be modified to store an array of assigned roles or permissions to make lookups faster and avoid extra database queries.
+-   The entire codebase is undergoing a P0 refactoring task to rename Spanish variables and fields to English.
+-   A global React Error Boundary is still recommended for  to handle third-party script errors.
 
 **key api endpoints**
--   : Assigns a role to a user.
--   : Lists all available roles.
--   : Fetches products for the private catalog.
--   : Fetches products for the public catalog.
+-   : User login endpoint.
+-   : Fetches current user data, including the  field.
+-   : Fetches the current user's role and permissions.
+-   : API for the Books by Student feature.
+-   : Fetches details for a single private catalog book.
 
 **Critical Info for New Agent**
 -   **User Language**: **Spanish**. All communication MUST be in Spanish.
--   **Immediate Task (P0)**: Your highest priority is to **complete the Role-Based Access Control (RBAC) system**. The backend foundation is laid, but you must now build the frontend management UI in  and integrate permission checks throughout the backend (API routes) and frontend (UI components) to fix the access control issues reported by the user.
--   **RBAC Action Items**: Start by building the UI in . Then, create FastAPI dependencies to protect routes. Finally, update the React UI to hide/show elements based on permissions to resolve the user's specific complaints.
+-   **Top Priorities**: The user has two active, high-priority issues.
+    1.  **(P0) Refactoring:** The user explicitly requested a large-scale refactor to change Spanish variable names (, ) to English (, ). This is a high-risk task that will touch the entire codebase and requires a data migration plan.
+    2.  **(P1) Admin Sidebar Bug:** Before or alongside the refactoring, you must fix the critical bug where the admin sidebar modules disappear for the user. The user is blocked from all admin functions. The issue is likely a race condition or caching problem in the deployed environment that was not reproducible in the agent's local tests.
+-   **Database Context**: The application is now using a production-named database: . All schema changes (like renaming fields for the refactoring task) must be handled carefully to avoid data loss.
 
 **documents and test reports created in this job**
 -    (Updated)
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requests a robust user role/group system for managing privileges (regular, moderator, admin, super admin) due to critical permission inconsistencies. (IN PROGRESS)
-2.  **User:** Asks to proceed with the RBAC implementation plan.
-3.  **User:** Approves the plan to add demo products to the public catalog.
-4.  **User:** Asks to implement the public-facing view of the Unatienda store, showing both catalogs conditionally. (DONE)
-5.  **User:** Approves the plan to unify the store modules.
-6.  **User:** Provides detailed requirements for unifying the Tienda and Unatienda modules. (DONE)
-7.  **User:** Reports being unable to create categories or products in the Tienda module. (FIXED)
-8.  **User:** Asks for clarification on how the private Unatienda catalog works for restricted users. (Clarified & Implemented)
-9.  **User:** Points out that there is no UI to add products to the private catalog. (Implemented)
-10. **User:** Asks which Monday.com board was used for a test. (Answered)
+1.  **User:** Requests to refactor Spanish variable names (, ) to English for good practice. (Status: IN PROGRESS)
+2.  **User:** Reports the admin sidebar bug persists after the latest fix. (Status: IN PROGRESS)
+3.  **User:** Requests the database name be changed from  to something production-appropriate. (Status: COMPLETED)
+4.  **User:** Asks for a fix for the disappearing admin sidebar and an error message. (Status: IN PROGRESS)
+5.  **User:** Asks how to manage the private catalog and points out UI issues in the admin panel. (Status: COMPLETED)
+6.  **User:** Approves implementing the view by student enhancement. (Status: COMPLETED)
+7.  **User:** Asks to complete the private catalog flow. (Status: COMPLETED)
+8.  **User:** Reports redundant Back buttons that need removal. (Status: COMPLETED)
+9.  **User:** Approves the plan to build the private book detail page. (Status: COMPLETED)
+10. **User:** Asks for  to be created as a super admin. (Status: COMPLETED)
 
 **Project Health Check:**
--   **Working:** The unified Unatienda module (both admin and public views), demo data generation, Monday.com sync.
--   **Mocked:** OneSignal (Push Notifications).
--   **Broken:** Google Authentication flow; numerous user permission and access control issues across the application.
+-   **Broken:**
+    -   Admin sidebar visibility is critically broken for the user, blocking all management tasks.
+    -   Google Authentication flow remains non-functional.
+-   **Mocked:**
+    -   OneSignal (Push Notifications).
 
 **3rd Party Integrations**
--   **OneSignal**: For Push Notifications.
--   **Monday.com**: For order/chat syncing.
--   **i18next**: For multi-language support.
--   **ipapi.co**: For IP-based geolocation.
+-   **OneSignal**: Push Notifications.
+-   **Monday.com**: Order/chat syncing.
+-   **i18next**: Multi-language support.
+-   **ipapi.co**: IP-based geolocation.
 -   **Yappy Comercial (BG)**: Payment gateway.
+-   **CXGenie / Emergent Platform**: External widget/script causing errors in the dev environment.
 
 **Testing status**
--   **Testing agent used after significant changes**: NO
--   **Test files created**: None.
--   **Known regressions**: Multiple permission-related regressions were introduced after the store unification, where regular users can see admin-only UI elements.
+-   **Testing agent used after significant changes**: YES (for private catalog features).
+-   **Test files created**: 
+-   **Known regressions**: The admin sidebar functionality regressed or was never fully fixed for the user's environment.
 
 **Credentials to test flow:**
--   **Email**: 
--   **Password**: 
+-   **Super Admin Email**: 
+-   **Super Admin Password**: 
 
 **What agent forgot to execute**
--   The agent did not perform regression testing from a regular user's perspective after the major refactoring of the store modules. This caused the user to discover several significant permission bugs, which is the primary driver for the current RBAC task.</analysis>
+-   The agent did not permanently resolve the admin sidebar race condition, which is a P1 blocker for the user. Despite multiple fixes and successful agent-side tests, the problem persists in the user's environment, indicating the root cause was not fully addressed.
+-   The agent has not yet implemented the Already Ordered indicator, which was proposed as a valuable enhancement.
+-   The long-standing issues of the broken Google Sign-Up flow and the persistent development script error have not been addressed.</analysis>
