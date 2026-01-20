@@ -455,19 +455,19 @@ export default function BulkImportBooksPage() {
                 <div className="space-y-2">
                   <Label>{t.defaultGrade}</Label>
                   <Select
-                    value={gradeDefault}
-                    onValueChange={setGradeDefault}
+                    value={gradeDefault || "none"}
+                    onValueChange={(v) => setGradeDefault(v === "none" ? "" : v)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t.defaultGradeDesc} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">-- {t.defaultGradeDesc} --</SelectItem>
+                      <SelectItem value="none">-- {t.defaultGradeDesc} --</SelectItem>
                       {availableGrades.map((g) => (
                         <SelectItem key={g} value={g}>{g}</SelectItem>
                       ))}
                       {['1°', '2°', '3°', '4°', '5°', '6°', '7°', '8°', '9°', '10°', '11°', '12°'].map((g) => (
-                        !availableGrades.includes(g) && <SelectItem key={g} value={g}>{g}</SelectItem>
+                        !availableGrades.includes(g) && <SelectItem key={`default-${g}`} value={g}>{g}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
