@@ -75,8 +75,8 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
-  const { isAdmin, user, logout } = useAuth();
-  const { hasPermission, loading: permissionsLoading, role, isSuperAdmin } = usePermissions();
+  const { isAdmin: isAuthAdmin, user, logout } = useAuth();
+  const { hasPermission, loading: permissionsLoading, role, isSuperAdmin, permissions } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,18 +86,34 @@ export default function AdminDashboard() {
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
-  // Filter nav items based on permissions
-  // Show all items while loading, or if user is super admin
-  const filteredNavItems = navItems.filter(item => {
-    // While loading permissions, show all items for admins
-    if (permissionsLoading) return isAdmin;
-    // Super admin sees everything
+  // Determine if user is super admin - check multiple sources
+  const isEffectivelySuperAdmin = useMemo(() => {
+    // If role is explicitly super_admin
+    if (role?.role_id === 'super_admin') return true;
+    // If permissions include wildcard
+    if (permissions?.includes('*')) return true;
+    // If isSuperAdmin flag is set
     if (isSuperAdmin) return true;
-    // Admin without specific role also sees everything
-    if (isAdmin && !role) return true;
-    // Check permission
-    if (item.permission) {
-      return hasPermission(item.permission);
+    return false;
+  }, [role, permissions, isSuperAdmin]);
+
+  // Filter nav items based on permissions
+  // Show all items for admins while loading or if super admin
+  const filteredNavItems = useMemo(() => {
+    return navItems.filter(item => {
+      // While loading permissions, show all items for any admin
+      if (permissionsLoading && isAuthAdmin) return true;
+      // Super admin sees everything
+      if (isEffectivelySuperAdmin) return true;
+      // Auth-level admin without loaded role sees everything (fallback)
+      if (isAuthAdmin && !role && permissionsLoading) return true;
+      // Check permission
+      if (item.permission) {
+        return hasPermission(item.permission);
+      }
+      return true;
+    });
+  }, [permissionsLoading, isAuthAdmin, isEffectivelySuperAdmin, role, hasPermission]);
     }
     return true;
   });
