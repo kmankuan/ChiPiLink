@@ -259,16 +259,8 @@ function AppRouter() {
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
       <Route path="/tv/pingpong" element={<Navigate to="/tv/pinpanclub" replace />} />
       
-      {/* Catalog - Admin only */}
-      <Route 
-        path="/catalogo" 
-        element={
-          <ProtectedRoute adminOnly>
-            <Header />
-            <Catalog />
-          </ProtectedRoute>
-        } 
-      />
+      {/* Catalog route removed - Now integrated in Admin > Unatienda module */}
+      <Route path="/catalogo" element={<Navigate to="/admin" replace />} />
       
       {/* Embed Route - No header */}
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
