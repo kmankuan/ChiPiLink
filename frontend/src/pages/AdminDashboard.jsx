@@ -114,19 +114,16 @@ export default function AdminDashboard() {
       return true;
     });
   }, [permissionsLoading, isAuthAdmin, isEffectivelySuperAdmin, role, hasPermission]);
-    }
-    return true;
-  });
 
   useEffect(() => {
-    if (!isAdmin && !permissionsLoading) {
+    if (!isAuthAdmin && !permissionsLoading) {
       // Check if user has any admin-level permission
       const hasAdminAccess = hasPermission('admin.access') || hasPermission('admin.dashboard');
       if (!hasAdminAccess) {
         navigate('/');
       }
     }
-  }, [isAdmin, permissionsLoading, hasPermission, navigate]);
+  }, [isAuthAdmin, permissionsLoading, hasPermission, navigate]);
 
   const handleLogout = async () => {
     await logout();
