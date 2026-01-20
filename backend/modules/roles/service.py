@@ -242,7 +242,7 @@ class RolesService:
     
     # ============== USER ROLE MANAGEMENT ==============
     
-    async def assign_role_to_user(self, cliente_id: str, role_id: str, assigned_by: str = None) -> bool:
+    async def assign_role_to_user(self, user_id: str, role_id: str, assigned_by: str = None) -> bool:
         """Assign a role to a user"""
         role = await self.get_role(role_id)
         if not role:
@@ -250,7 +250,7 @@ class RolesService:
         
         # Check if already assigned
         existing = await self.user_roles_collection.find_one({
-            "cliente_id": cliente_id,
+            "user_id": user_id,
             "role_id": role_id
         })
         
@@ -258,28 +258,28 @@ class RolesService:
             return True  # Already assigned
         
         # Remove previous role assignment (user can only have one role)
-        await self.user_roles_collection.delete_many({"cliente_id": cliente_id})
+        await self.user_roles_collection.delete_many({"user_id": user_id})
         
         # Assign new role
         await self.user_roles_collection.insert_one({
-            "cliente_id": cliente_id,
+            "user_id": user_id,
             "role_id": role_id,
-            "asignado_por": assigned_by,
-            "fecha_asignacion": datetime.now(timezone.utc).isoformat()
+            "assigned_by": assigned_by,
+            "assigned_at": datetime.now(timezone.utc).isoformat()
         })
         
         # Update user document
-        await db.clientes.update_one(
-            {"cliente_id": cliente_id},
+        await db.auth_users.update_one(
+            {"user_id": user_id},
             {"$set": {"role_id": role_id, "rol": role["nombre"]}}
         )
         
         return True
     
-    async def get_user_role(self, cliente_id: str) -> Optional[Dict]:
+    async def get_user_role(self, user_id: str) -> Optional[Dict]:
         """Get the role assigned to a user"""
         assignment = await self.user_roles_collection.find_one(
-            {"cliente_id": cliente_id},
+            {"user_id": user_id},
             {"_id": 0}
         )
         
