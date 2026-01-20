@@ -100,16 +100,16 @@ export default function SuperPinLeagueDetail() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          nombre: `${user.nombre} ${user.apellido || ''}`.trim(),
+          nombre: `${user.name} ${user.last_name || ''}`.trim(),
           email: user.email,
-          user_id: user.cliente_id,
+          user_id: user.user_id,
           nivel: 'principiante'
         })
       });
       if (response.ok) {
         const newPlayer = await response.json();
         setAvailablePlayers([...availablePlayers, newPlayer]);
-        alert(t('superpin.players.addedSuccess', { name: user.nombre }));
+        alert(t('superpin.players.addedSuccess', { name: user.name }));
       }
     } catch (error) {
       console.error('Error converting user to player:', error);
