@@ -148,10 +148,11 @@ export function Header() {
       }
     };
 
-    if (isAuthenticated && user?.cliente_id) {
+    // Support both Spanish and English field names
+    if (isAuthenticated && (user?.cliente_id || user?.user_id)) {
       checkLinkedStudents();
     }
-  }, [isAuthenticated, user?.cliente_id]);
+  }, [isAuthenticated, user?.cliente_id, user?.user_id]);
 
   const handleLogout = async () => {
     await logout();
