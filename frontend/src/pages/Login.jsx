@@ -186,7 +186,7 @@ export default function Login() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="contrasena">{t('auth.password')}</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <Link 
                   to="/recuperar-contrasena"
                   className="text-xs text-primary hover:underline"
@@ -197,11 +197,11 @@ export default function Login() {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="contrasena"
-                  name="contrasena"
+                  id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={formData.contrasena}
+                  value={formData.password}
                   onChange={handleChange}
                   className="h-12 pl-10 pr-10 rounded-lg"
                   required
