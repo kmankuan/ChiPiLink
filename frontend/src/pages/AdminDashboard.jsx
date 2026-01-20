@@ -75,7 +75,7 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
-  const { isAdmin: isAuthAdmin, user, logout } = useAuth();
+  const { isAdmin, user, logout } = useAuth();
   const { hasPermission, loading: permissionsLoading, role, isSuperAdmin, permissions } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -87,42 +87,30 @@ export default function AdminDashboard() {
   const activeModule = location.hash.replace('#', '') || 'dashboard';
 
   /**
-   * Determines if user can see all admin modules
-   * Priority:
-   * 1. If role is super_admin -> show all
-   * 2. If has wildcard permission (*) -> show all
-   * 3. If user.es_admin from auth context -> show all (ultimate fallback)
-   * 4. If isAuthAdmin and permissions still loading -> show all (prevents flash)
+   * SIMPLIFIED LOGIC:
+   * If user.es_admin is true (from auth context), show ALL modules.
+   * This is the most reliable check since it comes directly from the login response.
+   * The RBAC system is used for more granular permissions within modules.
    */
-  const canSeeAllModules = useMemo(() => {
-    // Super admin role
-    if (role?.role_id === 'super_admin') return true;
-    // Wildcard permission
-    if (Array.isArray(permissions) && permissions.includes('*')) return true;
-    // Hook's isSuperAdmin
-    if (isSuperAdmin) return true;
-    // Auth context admin flag (from user.es_admin in token)
-    if (isAuthAdmin) return true;
-    return false;
-  }, [role, permissions, isSuperAdmin, isAuthAdmin]);
-
-  // Filter navigation items - simplified logic
   const filteredNavItems = useMemo(() => {
-    if (canSeeAllModules) {
+    // Admin users see all navigation items
+    if (isAdmin) {
       return navItems;
     }
+    
+    // Non-admin users: filter by specific permissions
     return navItems.filter(item => {
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
-  }, [canSeeAllModules, hasPermission]);
+  }, [isAdmin, hasPermission]);
 
-  // Redirect non-admins
+  // Redirect non-admins away from admin panel
   useEffect(() => {
-    if (!permissionsLoading && !isAuthAdmin && !canSeeAllModules) {
+    if (!isAdmin) {
       navigate('/');
     }
-  }, [permissionsLoading, isAuthAdmin, canSeeAllModules, navigate]);
+  }, [isAdmin, navigate]);
 
   const handleLogout = async () => {
     await logout();
