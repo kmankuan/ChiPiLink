@@ -338,28 +338,28 @@ class RolesService:
             {
                 "$addToSet": {"additional_permissions": permission},
                 "$pull": {"removed_permissions": permission},
-                "$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
             },
             upsert=True
         )
         return True
     
-    async def remove_user_permission(self, cliente_id: str, permission: str) -> bool:
+    async def remove_user_permission(self, user_id: str, permission: str) -> bool:
         """Remove a permission from a user"""
         await self.user_permissions_collection.update_one(
-            {"cliente_id": cliente_id},
+            {"user_id": user_id},
             {
-                "$addToSet": {"permisos_removidos": permission},
-                "$pull": {"permisos_adicionales": permission},
-                "$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}
+                "$addToSet": {"removed_permissions": permission},
+                "$pull": {"additional_permissions": permission},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
             },
             upsert=True
         )
         return True
     
-    async def check_permission(self, cliente_id: str, required_permission: str) -> bool:
+    async def check_permission(self, user_id: str, required_permission: str) -> bool:
         """Check if a user has a specific permission"""
-        permissions = await self.get_user_permissions(cliente_id)
+        permissions = await self.get_user_permissions(user_id)
         
         # Check for wildcard permissions
         for perm in permissions:
@@ -376,12 +376,12 @@ class RolesService:
         
         return False
     
-    async def check_permissions(self, cliente_id: str, required_permissions: List[str], require_all: bool = True) -> bool:
+    async def check_permissions(self, user_id: str, required_permissions: List[str], require_all: bool = True) -> bool:
         """Check if a user has multiple permissions"""
         if require_all:
-            return all([await self.check_permission(cliente_id, p) for p in required_permissions])
+            return all([await self.check_permission(user_id, p) for p in required_permissions])
         else:
-            return any([await self.check_permission(cliente_id, p) for p in required_permissions])
+            return any([await self.check_permission(user_id, p) for p in required_permissions])
     
     def get_available_permissions(self) -> Dict[str, Dict[str, str]]:
         """Get all available permissions in the system"""
