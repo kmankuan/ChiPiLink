@@ -112,7 +112,7 @@ export default function UnatiendaModule() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-7 mb-6">
+        <TabsList className="grid w-full grid-cols-8 mb-6">
           <TabsTrigger value="catalogo-publico" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Público</span>
@@ -120,6 +120,10 @@ export default function UnatiendaModule() {
           <TabsTrigger value="catalogo-privado" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
             <span className="hidden md:inline">Privado PCA</span>
+          </TabsTrigger>
+          <TabsTrigger value="solicitudes" className="flex items-center gap-2">
+            <ClipboardList className="h-4 w-4" />
+            <span className="hidden md:inline">Solicitudes</span>
           </TabsTrigger>
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
