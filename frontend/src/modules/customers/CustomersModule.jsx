@@ -142,11 +142,20 @@ export default function CustomersModule() {
             <Users className="h-4 w-4" />
             Clientes
           </TabsTrigger>
+          <TabsTrigger value="form-config" className="gap-2">
+            <Settings2 className="h-4 w-4" />
+            Config. Formularios
+          </TabsTrigger>
         </TabsList>
 
         {/* Sistema de Conexiones y Capacidades */}
         <TabsContent value="conexiones" className="space-y-4">
           <AdminUsuariosConexiones token={localStorage.getItem('auth_token')} />
+        </TabsContent>
+
+        {/* Form Configuration Tab */}
+        <TabsContent value="form-config" className="space-y-4">
+          <FormFieldsConfigTab token={localStorage.getItem('auth_token')} />
         </TabsContent>
 
         {/* Students/Enrollments Tab */}
