@@ -79,6 +79,9 @@ import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 // Bulk Import Page
 import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
 
+// Textbook Access Page
+import TextbookAccessPage from '@/pages/TextbookAccessPage';
+
 // Components
 import CartDrawer from '@/components/cart/CartDrawer';
 // CXGenieWidget removed - access via header support button instead
