@@ -139,12 +139,14 @@ Se ejecutó un script de migración que renombró todos los campos en español a
 
 ---
 
-## Tareas Pendientes (Actualizado Enero 20, 2026)
+## Tareas Pendientes (Actualizado Enero 21, 2026)
 
 ### ✅ Completado
 - ✅ Refactoring Completo español → inglés (código + base de datos)
+- ✅ Sistema de Solicitud de Acceso a Libros de Texto (frontend + backend + admin)
 
 ### 🟠 P1 - Alta Prioridad
+- [ ] Integrar OneSignal para notificaciones push de cambios de estado de solicitudes
 - [ ] Indicador "Ya ordenado" para evitar compras duplicadas de libros
 
 ### 🟡 P2 - Media Prioridad
