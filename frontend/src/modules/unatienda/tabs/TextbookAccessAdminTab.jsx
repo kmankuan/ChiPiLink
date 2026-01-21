@@ -230,8 +230,8 @@ export default function TextbookAccessAdminTab({ token }) {
   const [requests, setRequests] = useState([]);
   const [schools, setSchools] = useState([]);
   const [selectedTab, setSelectedTab] = useState('pending');
-  const [filterSchool, setFilterSchool] = useState('');
-  const [filterYear, setFilterYear] = useState('');
+  const [filterSchool, setFilterSchool] = useState('all');
+  const [filterYear, setFilterYear] = useState('all');
   const [actionDialog, setActionDialog] = useState(null);
   const [actionData, setActionData] = useState({ notes: '', reason: '' });
   const [processing, setProcessing] = useState(false);
