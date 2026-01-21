@@ -8,7 +8,7 @@ import logging
 
 from core.base import BaseService
 from core.database import db
-from .textbook_access_repository import school_repository, student_record_repository
+from ..repositories.textbook_access_repository import school_repository, student_record_repository
 from ..models.textbook_access import (
     RequestStatus, RelationType, SchoolGrade,
     StudentRecordCreate, StudentRecordUpdate, 
