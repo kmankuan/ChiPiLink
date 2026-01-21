@@ -245,8 +245,8 @@ export default function TextbookAccessAdminTab({ token }) {
       if (selectedTab !== 'all') {
         params.append('status', selectedTab === 'pending' ? 'pending' : 'in_review');
       }
-      if (filterSchool) params.append('school_id', filterSchool);
-      if (filterYear) params.append('year', filterYear);
+      if (filterSchool && filterSchool !== 'all') params.append('school_id', filterSchool);
+      if (filterYear && filterYear !== 'all') params.append('year', filterYear);
       
       const res = await fetch(`${API}/api/store/textbook-access/admin/requests?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
