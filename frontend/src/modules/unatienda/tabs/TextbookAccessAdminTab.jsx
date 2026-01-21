@@ -370,7 +370,7 @@ export default function TextbookAccessAdminTab({ token }) {
               <SelectValue placeholder={t.filterSchool} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t.allSchools}</SelectItem>
+              <SelectItem value="all">{t.allSchools}</SelectItem>
               {schools.map((school) => (
                 <SelectItem key={school.school_id} value={school.school_id}>
                   {school.name}
