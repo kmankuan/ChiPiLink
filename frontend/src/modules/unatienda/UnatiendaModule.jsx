@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store } from 'lucide-react';
+import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList } from 'lucide-react';
 
 // Import sub-modules
 import CatalogoPublicoTab from './tabs/CatalogoPublicoTab';
@@ -14,6 +14,7 @@ import VinculacionesTab from './tabs/VinculacionesTab';
 import PedidosTab from './tabs/PedidosTab';
 import ConfiguracionTab from './tabs/ConfiguracionTab';
 import DemoDataTab from './tabs/DemoDataTab';
+import TextbookAccessAdminTab from './tabs/TextbookAccessAdminTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
