@@ -1,6 +1,6 @@
 """
 Store Module - Main Router
-Agrega todos los routers del módulo de tienda
+Includes all store module routers
 """
 from fastapi import APIRouter
 
@@ -16,11 +16,12 @@ from .vinculacion import router as vinculacion_router
 from .pedidos import router as pedidos_router
 from .monday import router as monday_router
 from .catalogo_privado import router as catalogo_privado_router
+from .textbook_access import router as textbook_access_router
 
-# Router principal del módulo Store (refactorizado)
+# Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
 
-# Incluir sub-routers
+# Include sub-routers
 router.include_router(products_router)
 router.include_router(orders_router)
 router.include_router(categories_router)
@@ -33,6 +34,7 @@ router.include_router(vinculacion_router)
 router.include_router(pedidos_router)
 router.include_router(monday_router)
 router.include_router(catalogo_privado_router)
+router.include_router(textbook_access_router)
 
-# Re-exportar para compatibilidad
+# Re-export for compatibility
 store_refactored_router = router
