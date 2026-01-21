@@ -17,6 +17,7 @@ from .pedidos import router as pedidos_router
 from .monday import router as monday_router
 from .catalogo_privado import router as catalogo_privado_router
 from .textbook_access import router as textbook_access_router
+from .form_config import router as form_config_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
