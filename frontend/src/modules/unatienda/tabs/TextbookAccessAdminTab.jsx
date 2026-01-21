@@ -385,7 +385,7 @@ export default function TextbookAccessAdminTab({ token }) {
             <SelectValue placeholder={t.filterYear} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t.allYears}</SelectItem>
+            <SelectItem value="all">{t.allYears}</SelectItem>
             {getAvailableYears().map((year) => (
               <SelectItem key={year} value={String(year)}>{year}</SelectItem>
             ))}
