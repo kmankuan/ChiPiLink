@@ -36,6 +36,7 @@ router.include_router(pedidos_router)
 router.include_router(monday_router)
 router.include_router(catalogo_privado_router)
 router.include_router(textbook_access_router)
+router.include_router(form_config_router)
 
 # Re-export for compatibility
 store_refactored_router = router
