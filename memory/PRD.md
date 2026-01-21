@@ -5,7 +5,53 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 20, 2026) - Segunda Actualización
+## Latest Update (Enero 21, 2026) - Tercera Actualización
+
+### ✅ Sistema de Solicitud de Acceso a Libros de Texto - COMPLETADO
+
+Se implementó un nuevo flujo completo para que los usuarios soliciten acceso al catálogo privado de libros de texto escolares, reemplazando el antiguo sistema donde los administradores manejaban las listas de estudiantes manualmente.
+
+#### Funcionalidades para Usuarios (`/mi-cuenta/textos-escolares`)
+- **Agregar estudiantes**: Formulario con nombre, escuela, grado, año escolar, relación (padre/tutor/abuelo/representante/otro)
+- **Gestionar matrículas**: Ver y editar matrículas por año escolar
+- **Estados visuales**: Badges de colores (Pendiente=amarillo, Aprobado=verde, Rechazado=rojo, En Revisión=azul)
+- **Acceso al catálogo**: Botón "Ver Textos" visible cuando la solicitud está aprobada
+
+#### Funcionalidades para Administradores (`Unatienda > Solicitudes`)
+- **Tabla de solicitudes**: Muestra estudiante, escuela, año, grado, solicitante, relación, estado
+- **Filtros**: Por escuela y por año
+- **Tabs de estado**: Pendientes, En Revisión, Todas
+- **Acciones**: Aprobar, Rechazar (con motivo), Marcar en Revisión, Solicitar Información
+- **Notas internas**: Campo para notas del admin (no visible para el usuario)
+
+#### Archivos Backend Creados
+- `/app/backend/modules/store/models/textbook_access.py` - Modelos Pydantic
+- `/app/backend/modules/store/repositories/textbook_access_repository.py` - Capa de datos
+- `/app/backend/modules/store/services/textbook_access_service.py` - Lógica de negocio
+- `/app/backend/modules/store/routes/textbook_access.py` - API endpoints
+
+#### Archivos Frontend Creados/Modificados
+- `/app/frontend/src/pages/TextbookAccessPage.jsx` - Página de usuario
+- `/app/frontend/src/modules/unatienda/tabs/TextbookAccessAdminTab.jsx` - Tab de admin (fix: value='all' en Select)
+
+#### APIs Implementadas
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/store/textbook-access/config` | GET | Obtener años, grados, tipos de relación |
+| `/api/store/textbook-access/schools` | GET | Listar escuelas disponibles |
+| `/api/store/textbook-access/my-students` | GET | Mis estudiantes (autenticado) |
+| `/api/store/textbook-access/students` | POST | Crear estudiante con matrícula |
+| `/api/store/textbook-access/students/{id}` | PUT/DELETE | Actualizar/eliminar estudiante |
+| `/api/store/textbook-access/admin/requests` | GET | Listar solicitudes (admin) |
+| `/api/store/textbook-access/admin/requests/{id}/{year}/approve` | POST | Aprobar/rechazar |
+
+#### Test Results (iteration_35.json)
+- **Backend**: 100% (12/12 tests pasados)
+- **Frontend**: 100% (15/15 verificaciones UI pasadas)
+
+---
+
+## Previous Update (Enero 20, 2026)
 
 ### 🔧 Correcciones y Mejoras
 
