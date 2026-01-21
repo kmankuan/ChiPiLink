@@ -197,6 +197,7 @@ Se ejecutó un script de migración que renombró todos los campos en español a
 ### ✅ Completado
 - ✅ Refactoring Completo español → inglés (código + base de datos)
 - ✅ Sistema de Solicitud de Acceso a Libros de Texto (frontend + backend + admin)
+- ✅ Sistema de Configuración Dinámica de Formularios (admin puede añadir/modificar/eliminar campos)
 
 ### 🟠 P1 - Alta Prioridad
 - [ ] Integrar OneSignal para notificaciones push de cambios de estado de solicitudes
