@@ -5,7 +5,60 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 21, 2026) - Tercera Actualización
+## Latest Update (Enero 21, 2026) - Cuarta Actualización
+
+### ✅ Sistema de Configuración Dinámica de Formularios - COMPLETADO
+
+Se implementó un sistema para que el administrador pueda configurar dinámicamente los campos del formulario de solicitud de acceso a libros de texto. Esto permite añadir, modificar, eliminar y activar/desactivar campos sin necesidad de cambios en el código.
+
+#### Ubicación
+Administración > Usuarios > Config. Formularios
+
+#### Tipos de Campos Soportados
+- **Texto corto** (text): Input de una línea
+- **Texto largo** (textarea): Input multilínea
+- **Lista desplegable** (select): Dropdown con opciones personalizables
+- **Número** (number): Input numérico con min/max
+- **Archivo** (file): Upload con extensiones y tamaño máximo configurables
+- **Fecha** (date): Selector de fecha
+- **Email** (email): Input de correo electrónico
+- **Teléfono** (phone): Input de teléfono
+
+#### Funcionalidades
+- **Crear campos**: Definir key, tipo, labels multilingües (ES/EN/ZH), placeholders, textos de ayuda
+- **Editar campos**: Modificar propiedades excepto el field_key
+- **Eliminar campos**: Soft delete (desactivar) o hard delete (permanente)
+- **Activar/Desactivar**: Toggle switch para ocultar campos sin eliminarlos
+- **Validación**: Min/max length para texto, min/max value para números
+- **Opciones dinámicas**: Para campos tipo select, agregar/quitar opciones con labels multilingües
+
+#### Archivos Backend Creados
+- `/app/backend/modules/store/models/form_config.py` - Modelos Pydantic
+- `/app/backend/modules/store/repositories/form_config_repository.py` - Capa de datos
+- `/app/backend/modules/store/services/form_config_service.py` - Lógica de negocio
+- `/app/backend/modules/store/routes/form_config.py` - API endpoints
+
+#### Archivos Frontend Creados
+- `/app/frontend/src/modules/customers/components/FormFieldsConfigTab.jsx` - UI de configuración
+
+#### APIs Implementadas
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/store/form-config/{form_type}` | GET | Obtener campos activos (público) |
+| `/api/store/form-config/{form_type}/field-types` | GET | Listar tipos de campos disponibles |
+| `/api/store/form-config/admin/{form_type}` | GET | Obtener todos los campos (admin) |
+| `/api/store/form-config/admin/{form_type}/fields` | POST | Crear nuevo campo |
+| `/api/store/form-config/admin/fields/{field_id}` | PUT | Actualizar campo |
+| `/api/store/form-config/admin/fields/{field_id}` | DELETE | Eliminar campo |
+| `/api/store/form-config/admin/fields/{field_id}/toggle` | PUT | Activar/desactivar campo |
+
+#### Test Results (iteration_36.json)
+- **Backend**: 100% (21/21 tests pasados)
+- **Frontend**: 100% (14/14 verificaciones UI pasadas)
+
+---
+
+## Previous Update (Enero 21, 2026) - Tercera Actualización
 
 ### ✅ Sistema de Solicitud de Acceso a Libros de Texto - COMPLETADO
 
