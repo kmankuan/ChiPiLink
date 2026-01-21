@@ -43,9 +43,11 @@ import {
   Phone,
   RefreshCw,
   Settings,
-  Link2
+  Link2,
+  Settings2
 } from 'lucide-react';
 import AdminUsuariosConexiones from '@/modules/users/components/AdminUsuariosConexiones';
+import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 
 export default function CustomersModule() {
   const { api } = useAuth();
