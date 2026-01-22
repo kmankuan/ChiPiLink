@@ -442,8 +442,8 @@ export default function CompraExclusiva() {
     }
   };
 
-  const getStatusBadge = (estudiante) => {
-    const status = estudiante.estado || estudiante.status || 'pendiente';
+  const getStatusBadge = (student) => {
+    const status = student.estado || student.status || 'pendiente';
     
     switch (status) {
       case 'aprobado':
