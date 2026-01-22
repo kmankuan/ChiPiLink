@@ -135,9 +135,9 @@ export default function CompraExclusiva() {
         })
       ]);
       
-      if (estudiantesRes.ok) {
-        const data = await estudiantesRes.json();
-        setEstudiantes(data.students || []);
+      if (studentsRes.ok) {
+        const data = await studentsRes.json();
+        setStudents(data.students || []);
       }
       
       if (configRes.ok) {
