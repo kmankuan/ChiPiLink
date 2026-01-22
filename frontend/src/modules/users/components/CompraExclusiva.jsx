@@ -180,7 +180,7 @@ export default function CompraExclusiva() {
     notas: ''
   });
 
-  const handleOpenVincular = (programa) => {
+  const handleOpenVincular = async (programa) => {
     setSelectedPrograma(programa);
     const currentYear = String(new Date().getFullYear());
     setFormData({
@@ -195,6 +195,18 @@ export default function CompraExclusiva() {
     setEditingId(null);
     // Initialize with one empty student for multi-add
     setMultipleStudents([createEmptyStudent()]);
+    
+    // Refresh form config to get latest field settings
+    try {
+      const configRes = await fetch(`${API_URL}/api/store/form-config/textbook_access`);
+      if (configRes.ok) {
+        const config = await configRes.json();
+        setFormConfig(config);
+      }
+    } catch (error) {
+      console.error('Error refreshing form config:', error);
+    }
+    
     setShowVincularDialog(true);
   };
 
