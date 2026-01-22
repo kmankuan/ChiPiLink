@@ -5,6 +5,35 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
+---
+
+## 🔴 CODING STANDARDS (MANDATORY)
+
+These rules are **PERMANENT** and must be followed in all future development sessions:
+
+### 1. English-First Code
+- **All code** (variables, functions, classes, comments) MUST use **English** naming
+- Exceptions:
+  - Terms that don't exist in English
+  - Domain-specific terms where the non-English term is more convenient (e.g., "cédula" for ID in Panama)
+- Example: Use `students`, `handleSubmit`, `formData` NOT `estudiantes`, `manejarEnvio`, `datosFormulario`
+
+### 2. Multilingual Support (i18n)
+- All user-facing text must support **three languages** in this priority order:
+  1. **English (en)** - Primary/default
+  2. **Spanish (es)** - Secondary  
+  3. **Chinese (zh)** - Tertiary
+- Use i18next translation keys for all UI text
+- Store labels in format: `{ label_en: "...", label_es: "...", label_zh: "..." }`
+
+### 3. Multi-Service Architecture
+- Backend modules should be designed for potential microservice extraction
+- Use clear module boundaries (`/app/backend/modules/{module_name}/`)
+- Each module should have: `models/`, `services/`, `routes/`, `repositories/`
+- Avoid tight coupling between modules
+
+---
+
 ## Latest Update (Enero 22, 2026) - Quinta Actualización
 
 ### ✅ Formulario de Múltiples Estudiantes - COMPLETADO
