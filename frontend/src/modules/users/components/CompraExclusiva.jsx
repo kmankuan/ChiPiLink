@@ -723,7 +723,7 @@ export default function CompraExclusiva() {
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[55vh] pr-4">
+          <ScrollArea className="max-h-[55vh] pr-4" ref={scrollAreaRef}>
             {editingId ? (
               /* Single student edit form */
               <div className="space-y-4 py-4">
