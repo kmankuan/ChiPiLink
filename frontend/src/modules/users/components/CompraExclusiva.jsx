@@ -237,6 +237,7 @@ export default function CompraExclusiva() {
   const handleEditEstudiante = (estudiante) => {
     setFormData({
       nombre_estudiante: estudiante.nombre || '',
+      school_id: estudiante.school_id || '',
       numero_estudiante: estudiante.numero_estudiante || estudiante.sync_id || '',
       anio: estudiante.anio || String(new Date().getFullYear()),
       grado: estudiante.grado || '',
