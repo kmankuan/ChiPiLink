@@ -265,17 +265,6 @@ function AppRouter() {
           </ProtectedRoute>
         } 
       />
-      <Route 
-        path="/mi-cuenta/textos-escolares" 
-        element={
-          <ProtectedRoute>
-            <Header />
-            <main className="container mx-auto py-6 px-4">
-              <TextbookAccessPage />
-            </main>
-          </ProtectedRoute>
-        } 
-      />
       
       {/* Legacy redirects for backward compatibility */}
       <Route path="/pingpong/*" element={<Navigate to="/pinpanclub" replace />} />
