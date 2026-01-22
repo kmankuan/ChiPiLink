@@ -378,18 +378,18 @@ export default function CompraExclusiva() {
     try {
       for (const student of validStudents) {
         try {
+          // Map frontend field names to backend API format
           const payload = {
-            sync_id: isFieldActive('student_id_number') ? student.numero_estudiante?.trim() : undefined,
-            nombre: student.nombre_estudiante.trim(),
-            school_id: isFieldActive('school_id') ? student.school_id : undefined,
-            anio: student.anio,
-            grado: student.grado || 'Por verificar',
-            relacion: student.relacion === 'other' ? student.relacion_otro : student.relacion,
-            notas: isFieldActive('notes') ? student.notas : undefined,
-            programa: selectedPrograma?.id || 'pca'
+            full_name: student.nombre_estudiante.trim(),
+            school_id: student.school_id || 'sch_default', // Use default if not provided
+            student_number: isFieldActive('student_id_number') ? student.numero_estudiante?.trim() : undefined,
+            relation_type: student.relacion === 'other' ? 'other' : student.relacion,
+            relation_other: student.relacion === 'other' ? student.relacion_otro : undefined,
+            year: parseInt(student.anio),
+            grade: student.grado
           };
 
-          const response = await fetch(`${API_URL}/api/store/vinculacion/solicitar`, {
+          const response = await fetch(`${API_URL}/api/store/textbook-access/students`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -401,9 +401,12 @@ export default function CompraExclusiva() {
           if (response.ok) {
             successCount++;
           } else {
+            const errorData = await response.json();
+            console.error('Error creating student:', errorData);
             errorCount++;
           }
-        } catch {
+        } catch (err) {
+          console.error('Exception creating student:', err);
           errorCount++;
         }
       }
