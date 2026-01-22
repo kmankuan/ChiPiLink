@@ -934,8 +934,8 @@ export default function CompraExclusiva() {
                             Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
                           </Label>
                           <Input
-                            value={student.numero_estudiante}
-                            onChange={(e) => updateStudentRow(student.id, 'numero_estudiante', e.target.value)}
+                            value={student.student_number}
+                            onChange={(e) => updateStudentRow(student.id, 'student_number', e.target.value)}
                             placeholder="Ej: STU-2024-001"
                           />
                         </div>
