@@ -162,6 +162,10 @@ export default function CompraExclusiva() {
   // Helper to check if a field is active in config
   const isFieldActive = (fieldKey) => {
     const field = formConfig.fields?.find(f => f.field_key === fieldKey);
+    // Default to true for essential fields if config not loaded yet
+    if (!field && ['school_id', 'student_name', 'grade', 'relationship'].includes(fieldKey)) {
+      return true;
+    }
     return field ? field.is_active !== false : false;
   };
 
