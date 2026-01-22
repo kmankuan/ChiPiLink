@@ -46,18 +46,6 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Relaciones disponibles con el estudiante
-const RELACIONES = [
-  { value: 'padre', label: 'Padre' },
-  { value: 'madre', label: 'Madre' },
-  { value: 'acudiente', label: 'Acudiente/Tutor' },
-  { value: 'abuelo', label: 'Abuelo/a' },
-  { value: 'tio', label: 'Tío/a' },
-  { value: 'hermano', label: 'Hermano/a Mayor' },
-  { value: 'estudiante', label: 'Soy el Estudiante' },
-  { value: 'otro', label: 'Otro' }
-];
-
 // Programas exclusivos disponibles
 const PROGRAMAS_EXCLUSIVOS = [
   {
@@ -68,7 +56,33 @@ const PROGRAMAS_EXCLUSIVOS = [
     color: 'purple',
     requiere_vinculacion: true
   }
-  // En el futuro se pueden agregar más programas aquí
+];
+
+// Generate available years (current year and next)
+const getAvailableYears = () => {
+  const currentYear = new Date().getFullYear();
+  return [
+    { value: String(currentYear), label: `${currentYear} (Año actual)` },
+    { value: String(currentYear + 1), label: String(currentYear + 1) }
+  ];
+};
+
+// Generate grades
+const GRADOS = [
+  { value: 'PK', label: 'Pre-Kinder' },
+  { value: 'K', label: 'Kinder' },
+  { value: '1', label: '1° Grado' },
+  { value: '2', label: '2° Grado' },
+  { value: '3', label: '3° Grado' },
+  { value: '4', label: '4° Grado' },
+  { value: '5', label: '5° Grado' },
+  { value: '6', label: '6° Grado' },
+  { value: '7', label: '7° Grado' },
+  { value: '8', label: '8° Grado' },
+  { value: '9', label: '9° Grado' },
+  { value: '10', label: '10° Grado' },
+  { value: '11', label: '11° Grado' },
+  { value: '12', label: '12° Grado' }
 ];
 
 export default function CompraExclusiva() {
