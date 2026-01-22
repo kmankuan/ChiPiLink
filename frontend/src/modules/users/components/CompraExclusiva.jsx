@@ -581,106 +581,219 @@ export default function CompraExclusiva() {
 
       {/* Dialog para vincular estudiante */}
       <Dialog open={showVincularDialog} onOpenChange={setShowVincularDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-purple-600" />
-              {editingId ? 'Editar Estudiante' : 'Vincular Estudiante'}
+              {editingId ? 'Editar Estudiante' : 'Vincular Estudiantes'}
             </DialogTitle>
             <DialogDescription>
-              {selectedPrograma?.nombre || 'Programa Exclusivo'} - Completa la información del estudiante
+              {selectedPrograma?.nombre || 'Programa Exclusivo'} - {editingId ? 'Edita la información del estudiante' : 'Puedes agregar uno o más estudiantes a la vez'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            {/* Nombre del acudiente (auto-filled) */}
-            <div className="p-3 bg-muted rounded-lg">
-              <Label className="text-xs text-muted-foreground">Acudiente</Label>
-              <p className="font-medium">{user?.nombre || user?.email}</p>
-            </div>
+          <ScrollArea className="max-h-[55vh] pr-4">
+            {editingId ? (
+              /* Single student edit form */
+              <div className="space-y-4 py-4">
+                {/* Nombre del acudiente (auto-filled) */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-xs text-muted-foreground">Acudiente</Label>
+                  <p className="font-medium">{user?.nombre || user?.email}</p>
+                </div>
 
-            {/* Nombre del estudiante */}
-            <div className="space-y-2">
-              <Label htmlFor="nombre_estudiante">
-                Nombre Completo del Estudiante <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="nombre_estudiante"
-                value={formData.nombre_estudiante}
-                onChange={(e) => setFormData({ ...formData, nombre_estudiante: e.target.value })}
-                placeholder="Ej: Juan Carlos Pérez González"
-              />
-            </div>
+                {/* Nombre del estudiante */}
+                <div className="space-y-2">
+                  <Label htmlFor="nombre_estudiante">
+                    Nombre Completo del Estudiante <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="nombre_estudiante"
+                    value={formData.nombre_estudiante}
+                    onChange={(e) => setFormData({ ...formData, nombre_estudiante: e.target.value })}
+                    placeholder="Ej: Juan Carlos Pérez González"
+                  />
+                </div>
 
-            {/* Número de estudiante */}
-            <div className="space-y-2">
-              <Label htmlFor="numero_estudiante">
-                Número de Estudiante <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="numero_estudiante"
-                value={formData.numero_estudiante}
-                onChange={(e) => setFormData({ ...formData, numero_estudiante: e.target.value })}
-                placeholder="Ej: STU-2024-001"
-              />
-              <p className="text-xs text-muted-foreground">
-                Este número lo encuentra en la credencial del estudiante o documentos escolares
-              </p>
-            </div>
+                {/* Número de estudiante */}
+                <div className="space-y-2">
+                  <Label htmlFor="numero_estudiante">
+                    Número de Estudiante <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="numero_estudiante"
+                    value={formData.numero_estudiante}
+                    onChange={(e) => setFormData({ ...formData, numero_estudiante: e.target.value })}
+                    placeholder="Ej: STU-2024-001"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Este número lo encuentra en la credencial del estudiante o documentos escolares
+                  </p>
+                </div>
 
-            {/* Grado (opcional) */}
-            <div className="space-y-2">
-              <Label htmlFor="grado">Grado Actual</Label>
-              <Input
-                id="grado"
-                value={formData.grado}
-                onChange={(e) => setFormData({ ...formData, grado: e.target.value })}
-                placeholder="Ej: 5to Grado, 9no Grado"
-              />
-            </div>
+                {/* Grado (opcional) */}
+                <div className="space-y-2">
+                  <Label htmlFor="grado">Grado Actual</Label>
+                  <Input
+                    id="grado"
+                    value={formData.grado}
+                    onChange={(e) => setFormData({ ...formData, grado: e.target.value })}
+                    placeholder="Ej: 5to Grado, 9no Grado"
+                  />
+                </div>
 
-            {/* Relación con el estudiante */}
-            <div className="space-y-2">
-              <Label>
-                Relación con el Estudiante <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={formData.relacion}
-                onValueChange={(value) => setFormData({ ...formData, relacion: value })}
+                {/* Relación con el estudiante */}
+                <div className="space-y-2">
+                  <Label>
+                    Relación con el Estudiante <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.relacion}
+                    onValueChange={(value) => setFormData({ ...formData, relacion: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona tu relación" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RELACIONES.map((rel) => (
+                        <SelectItem key={rel.value} value={rel.value}>
+                          {rel.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Notas adicionales */}
+                <div className="space-y-2">
+                  <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
+                  <Input
+                    id="notas"
+                    value={formData.notas}
+                    onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                    placeholder="Información adicional si es necesario"
+                  />
+                </div>
+              </div>
+            ) : (
+              /* Multiple students form */
+              <div className="space-y-4 py-4">
+                {/* Nombre del acudiente (auto-filled) */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-xs text-muted-foreground">Acudiente</Label>
+                  <p className="font-medium">{user?.nombre || user?.email}</p>
+                </div>
+
+                {multipleStudents.map((student, index) => (
+                  <Card key={student.id} className="relative">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <GraduationCap className="h-4 w-4 text-purple-600" />
+                          Estudiante {index + 1}
+                        </CardTitle>
+                        {multipleStudents.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStudentRow(student.id)}
+                            className="text-destructive hover:text-destructive h-8"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Quitar
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Row 1: Name and Student Number */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Nombre Completo <span className="text-destructive">*</span></Label>
+                          <Input
+                            value={student.nombre_estudiante}
+                            onChange={(e) => updateStudentRow(student.id, 'nombre_estudiante', e.target.value)}
+                            placeholder="Ej: Juan Carlos Pérez"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Número de Estudiante <span className="text-destructive">*</span></Label>
+                          <Input
+                            value={student.numero_estudiante}
+                            onChange={(e) => updateStudentRow(student.id, 'numero_estudiante', e.target.value)}
+                            placeholder="Ej: STU-2024-001"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Row 2: Grade and Relation */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Grado Actual</Label>
+                          <Input
+                            value={student.grado}
+                            onChange={(e) => updateStudentRow(student.id, 'grado', e.target.value)}
+                            placeholder="Ej: 5to Grado"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Relación <span className="text-destructive">*</span></Label>
+                          <Select
+                            value={student.relacion}
+                            onValueChange={(v) => updateStudentRow(student.id, 'relacion', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {RELACIONES.map((rel) => (
+                                <SelectItem key={rel.value} value={rel.value}>
+                                  {rel.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {/* Notas (optional) */}
+                      <div className="space-y-2">
+                        <Label>Notas Adicionales (opcional)</Label>
+                        <Input
+                          value={student.notas}
+                          onChange={(e) => updateStudentRow(student.id, 'notas', e.target.value)}
+                          placeholder="Información adicional si es necesario"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            {/* Add Another Button - Only show when creating new students */}
+            {!editingId && (
+              <Button
+                variant="outline"
+                onClick={addStudentRow}
+                className="w-full sm:w-auto sm:mr-auto"
+                type="button"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona tu relación" />
-                </SelectTrigger>
-                <SelectContent>
-                  {RELACIONES.map((rel) => (
-                    <SelectItem key={rel.value} value={rel.value}>
-                      {rel.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Plus className="h-4 w-4 mr-2" />
+                Agregar Otro Estudiante
+              </Button>
+            )}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setShowVincularDialog(false)} className="flex-1 sm:flex-none">
+                Cancelar
+              </Button>
+              <Button onClick={handleSubmitVinculacion} disabled={saving} className="flex-1 sm:flex-none">
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {editingId ? 'Guardar Cambios' : (multipleStudents.length > 1 ? 'Enviar Todas' : 'Enviar Solicitud')}
+              </Button>
             </div>
-
-            {/* Notas adicionales */}
-            <div className="space-y-2">
-              <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
-              <Input
-                id="notas"
-                value={formData.notas}
-                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                placeholder="Información adicional si es necesario"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowVincularDialog(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSubmitVinculacion} disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingId ? 'Guardar Cambios' : 'Enviar Solicitud'}
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
