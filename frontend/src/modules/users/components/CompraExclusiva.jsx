@@ -689,31 +689,62 @@ export default function CompraExclusiva() {
                   />
                 </div>
 
-                {/* Número de estudiante */}
+                {/* Número de estudiante - only if active */}
+                {isFieldActive('student_id_number') && (
+                  <div className="space-y-2">
+                    <Label htmlFor="numero_estudiante">
+                      Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
+                    </Label>
+                    <Input
+                      id="numero_estudiante"
+                      value={formData.numero_estudiante}
+                      onChange={(e) => setFormData({ ...formData, numero_estudiante: e.target.value })}
+                      placeholder="Ej: STU-2024-001"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Este número lo encuentra en la credencial del estudiante o documentos escolares
+                    </p>
+                  </div>
+                )}
+
+                {/* Año */}
                 <div className="space-y-2">
-                  <Label htmlFor="numero_estudiante">
-                    Número de Estudiante <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="numero_estudiante"
-                    value={formData.numero_estudiante}
-                    onChange={(e) => setFormData({ ...formData, numero_estudiante: e.target.value })}
-                    placeholder="Ej: STU-2024-001"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Este número lo encuentra en la credencial del estudiante o documentos escolares
-                  </p>
+                  <Label>Año Escolar <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={formData.anio}
+                    onValueChange={(value) => setFormData({ ...formData, anio: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona el año" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableYears().map((year) => (
+                        <SelectItem key={year.value} value={year.value}>
+                          {year.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Grado (opcional) */}
+                {/* Grado - dropdown */}
                 <div className="space-y-2">
-                  <Label htmlFor="grado">Grado Actual</Label>
-                  <Input
-                    id="grado"
+                  <Label>Grado <span className="text-destructive">*</span></Label>
+                  <Select
                     value={formData.grado}
-                    onChange={(e) => setFormData({ ...formData, grado: e.target.value })}
-                    placeholder="Ej: 5to Grado, 9no Grado"
-                  />
+                    onValueChange={(value) => setFormData({ ...formData, grado: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona el grado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GRADOS.map((grado) => (
+                        <SelectItem key={grado.value} value={grado.value}>
+                          {grado.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Relación con el estudiante */}
@@ -723,31 +754,45 @@ export default function CompraExclusiva() {
                   </Label>
                   <Select
                     value={formData.relacion}
-                    onValueChange={(value) => setFormData({ ...formData, relacion: value })}
+                    onValueChange={(value) => setFormData({ ...formData, relacion: value, relacion_otro: '' })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona tu relación" />
                     </SelectTrigger>
                     <SelectContent>
-                      {RELACIONES.map((rel) => (
+                      {getRelationOptions().map((rel) => (
                         <SelectItem key={rel.value} value={rel.value}>
-                          {rel.label}
+                          {rel.label_es || rel.label_en}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Notas adicionales */}
-                <div className="space-y-2">
-                  <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
-                  <Input
-                    id="notas"
-                    value={formData.notas}
-                    onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                    placeholder="Información adicional si es necesario"
-                  />
-                </div>
+                {/* Campo "Otro" - solo si seleccionó "other" */}
+                {formData.relacion === 'other' && (
+                  <div className="space-y-2">
+                    <Label>Especifica la relación <span className="text-destructive">*</span></Label>
+                    <Input
+                      value={formData.relacion_otro}
+                      onChange={(e) => setFormData({ ...formData, relacion_otro: e.target.value })}
+                      placeholder="Ej: Tío, Padrino, etc."
+                    />
+                  </div>
+                )}
+
+                {/* Notas adicionales - only if active */}
+                {isFieldActive('notes') && (
+                  <div className="space-y-2">
+                    <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
+                    <Input
+                      id="notas"
+                      value={formData.notas}
+                      onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                      placeholder="Información adicional si es necesario"
+                    />
+                  </div>
+                )}
               </div>
             ) : (
               /* Multiple students form */
@@ -780,65 +825,113 @@ export default function CompraExclusiva() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Row 1: Name and Student Number */}
-                      <div className="grid grid-cols-2 gap-4">
+                      {/* Row 1: Name */}
+                      <div className="space-y-2">
+                        <Label>Nombre Completo <span className="text-destructive">*</span></Label>
+                        <Input
+                          value={student.nombre_estudiante}
+                          onChange={(e) => updateStudentRow(student.id, 'nombre_estudiante', e.target.value)}
+                          placeholder="Ej: Juan Carlos Pérez"
+                        />
+                      </div>
+
+                      {/* Student Number - only if active */}
+                      {isFieldActive('student_id_number') && (
                         <div className="space-y-2">
-                          <Label>Nombre Completo <span className="text-destructive">*</span></Label>
-                          <Input
-                            value={student.nombre_estudiante}
-                            onChange={(e) => updateStudentRow(student.id, 'nombre_estudiante', e.target.value)}
-                            placeholder="Ej: Juan Carlos Pérez"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Número de Estudiante <span className="text-destructive">*</span></Label>
+                          <Label>
+                            Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
+                          </Label>
                           <Input
                             value={student.numero_estudiante}
                             onChange={(e) => updateStudentRow(student.id, 'numero_estudiante', e.target.value)}
                             placeholder="Ej: STU-2024-001"
                           />
                         </div>
-                      </div>
+                      )}
                       
-                      {/* Row 2: Grade and Relation */}
+                      {/* Row 2: Year and Grade */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Grado Actual</Label>
-                          <Input
-                            value={student.grado}
-                            onChange={(e) => updateStudentRow(student.id, 'grado', e.target.value)}
-                            placeholder="Ej: 5to Grado"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Relación <span className="text-destructive">*</span></Label>
+                          <Label>Año Escolar <span className="text-destructive">*</span></Label>
                           <Select
-                            value={student.relacion}
-                            onValueChange={(v) => updateStudentRow(student.id, 'relacion', v)}
+                            value={student.anio}
+                            onValueChange={(v) => updateStudentRow(student.id, 'anio', v)}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona" />
                             </SelectTrigger>
                             <SelectContent>
-                              {RELACIONES.map((rel) => (
-                                <SelectItem key={rel.value} value={rel.value}>
-                                  {rel.label}
+                              {getAvailableYears().map((year) => (
+                                <SelectItem key={year.value} value={year.value}>
+                                  {year.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Grado <span className="text-destructive">*</span></Label>
+                          <Select
+                            value={student.grado}
+                            onValueChange={(v) => updateStudentRow(student.id, 'grado', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {GRADOS.map((grado) => (
+                                <SelectItem key={grado.value} value={grado.value}>
+                                  {grado.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
-                      
-                      {/* Notas (optional) */}
+
+                      {/* Row 3: Relation */}
                       <div className="space-y-2">
-                        <Label>Notas Adicionales (opcional)</Label>
-                        <Input
-                          value={student.notas}
-                          onChange={(e) => updateStudentRow(student.id, 'notas', e.target.value)}
-                          placeholder="Información adicional si es necesario"
-                        />
+                        <Label>Relación <span className="text-destructive">*</span></Label>
+                        <Select
+                          value={student.relacion}
+                          onValueChange={(v) => updateStudentRow(student.id, 'relacion', v)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getRelationOptions().map((rel) => (
+                              <SelectItem key={rel.value} value={rel.value}>
+                                {rel.label_es || rel.label_en}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
+
+                      {/* Campo "Otro" - solo si seleccionó "other" */}
+                      {student.relacion === 'other' && (
+                        <div className="space-y-2">
+                          <Label>Especifica la relación <span className="text-destructive">*</span></Label>
+                          <Input
+                            value={student.relacion_otro}
+                            onChange={(e) => updateStudentRow(student.id, 'relacion_otro', e.target.value)}
+                            placeholder="Ej: Tío, Padrino, etc."
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Notas (optional) - only if active */}
+                      {isFieldActive('notes') && (
+                        <div className="space-y-2">
+                          <Label>Notas Adicionales (opcional)</Label>
+                          <Input
+                            value={student.notas}
+                            onChange={(e) => updateStudentRow(student.id, 'notas', e.target.value)}
+                            placeholder="Información adicional si es necesario"
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
