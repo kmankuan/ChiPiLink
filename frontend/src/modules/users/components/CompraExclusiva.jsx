@@ -422,23 +422,23 @@ export default function CompraExclusiva() {
     }
   };
 
-  const handleDeleteEstudiante = async (vinculacionId) => {
-    if (!confirm('¿Estás seguro de eliminar este estudiante vinculado?')) return;
+  const handleDeleteStudent = async (studentId) => {
+    if (!confirm('Are you sure you want to delete this linked student?')) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/store/vinculacion/eliminar/${vinculacionId}`, {
+      const response = await fetch(`${API_URL}/api/store/textbook-access/students/${studentId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.ok) {
-        toast.success('Estudiante eliminado');
-        fetchEstudiantes();
+        toast.success('Student deleted');
+        fetchData();
       } else {
-        toast.error('Error al eliminar');
+        toast.error('Error deleting student');
       }
     } catch (error) {
-      toast.error('Error al eliminar');
+      toast.error('Error deleting student');
     }
   };
 
