@@ -1045,7 +1045,7 @@ export default function CompraExclusiva() {
               </Button>
             )}
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" onClick={() => setShowVincularDialog(false)} className="flex-1 sm:flex-none">
+              <Button variant="outline" onClick={() => setShowLinkDialog(false)} className="flex-1 sm:flex-none">
                 Cancelar
               </Button>
               <Button onClick={handleSubmitLink} disabled={saving} className="flex-1 sm:flex-none">
