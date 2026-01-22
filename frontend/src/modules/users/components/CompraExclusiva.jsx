@@ -821,8 +821,8 @@ export default function CompraExclusiva() {
                     Relación con el Estudiante <span className="text-destructive">*</span>
                   </Label>
                   <Select
-                    value={formData.relacion}
-                    onValueChange={(value) => setFormData({ ...formData, relacion: value, relacion_otro: '' })}
+                    value={formData.relationship}
+                    onValueChange={(value) => setFormData({ ...formData, relationship: value, relationship_other: '' })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona tu relación" />
