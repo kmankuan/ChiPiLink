@@ -799,8 +799,8 @@ export default function CompraExclusiva() {
                 <div className="space-y-2">
                   <Label>Grado <span className="text-destructive">*</span></Label>
                   <Select
-                    value={formData.grado}
-                    onValueChange={(value) => setFormData({ ...formData, grado: value })}
+                    value={formData.grade}
+                    onValueChange={(value) => setFormData({ ...formData, grade: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona el grado" />
