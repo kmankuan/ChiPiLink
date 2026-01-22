@@ -268,27 +268,23 @@ export default function CompraExclusiva() {
     ));
   };
 
-  const handleSubmitVinculacion = async () => {
+  const handleSubmitLink = async () => {
     // If editing, use single form data
     if (editingId) {
-      if (!formData.nombre_estudiante.trim()) {
-        toast.error('Por favor ingresa el nombre del estudiante');
-        return;
-      }
-      if (!formData.numero_estudiante.trim()) {
-        toast.error('Por favor ingresa el número de estudiante');
+      if (!formData.full_name.trim()) {
+        toast.error('Please enter the student name');
         return;
       }
       if (isFieldActive('school_id') && isFieldRequired('school_id') && !formData.school_id) {
-        toast.error('Por favor selecciona el colegio');
+        toast.error('Please select a school');
         return;
       }
-      if (!formData.relacion) {
-        toast.error('Por favor selecciona tu relación con el estudiante');
+      if (!formData.relationship) {
+        toast.error('Please select your relationship with the student');
         return;
       }
-      if (formData.relacion === 'other' && !formData.relacion_otro?.trim()) {
-        toast.error('Por favor especifica la relación');
+      if (formData.relationship === 'other' && !formData.relationship_other?.trim()) {
+        toast.error('Please specify the relationship');
         return;
       }
 
@@ -297,11 +293,11 @@ export default function CompraExclusiva() {
         
         // Map frontend field names to backend API format
         const payload = {
-          full_name: formData.nombre_estudiante.trim(),
+          full_name: formData.full_name.trim(),
           school_id: formData.school_id,
-          student_number: isFieldActive('student_id_number') ? formData.numero_estudiante?.trim() : undefined,
-          relation_type: formData.relacion === 'other' ? 'other' : formData.relacion,
-          relation_other: formData.relacion === 'other' ? formData.relacion_otro : undefined
+          student_number: isFieldActive('student_id_number') ? formData.student_number?.trim() : undefined,
+          relation_type: formData.relationship === 'other' ? 'other' : formData.relationship,
+          relation_other: formData.relationship === 'other' ? formData.relationship_other : undefined
         };
 
         const response = await fetch(`${API_URL}/api/store/textbook-access/students/${editingId}`, {
@@ -316,15 +312,15 @@ export default function CompraExclusiva() {
         const data = await response.json();
 
         if (response.ok) {
-          toast.success('Estudiante actualizado');
-          setShowVincularDialog(false);
+          toast.success('Student updated');
+          setShowLinkDialog(false);
           fetchData();
         } else {
-          toast.error(data.detail || 'Error al procesar solicitud');
+          toast.error(data.detail || 'Error processing request');
         }
       } catch (error) {
         console.error('Error:', error);
-        toast.error('Error al procesar solicitud');
+        toast.error('Error processing request');
       } finally {
         setSaving(false);
       }
@@ -332,10 +328,10 @@ export default function CompraExclusiva() {
     }
 
     // Creating multiple students
-    const validStudents = multipleStudents.filter(s => s.nombre_estudiante.trim());
+    const validStudents = multipleStudents.filter(s => s.full_name.trim());
     
     if (validStudents.length === 0) {
-      toast.error('Por favor ingresa al menos un nombre de estudiante');
+      toast.error('Please enter at least one student name');
       return;
     }
 
@@ -344,27 +340,27 @@ export default function CompraExclusiva() {
       const s = validStudents[i];
       const num = i + 1;
       if (isFieldActive('school_id') && isFieldRequired('school_id') && !s.school_id) {
-        toast.error(`Estudiante ${num}: Por favor selecciona el colegio`);
+        toast.error(`Student ${num}: Please select a school`);
         return;
       }
-      if (isFieldActive('student_id_number') && isFieldRequired('student_id_number') && !s.numero_estudiante?.trim()) {
-        toast.error(`Estudiante ${num}: Por favor ingresa el número de estudiante`);
+      if (isFieldActive('student_id_number') && isFieldRequired('student_id_number') && !s.student_number?.trim()) {
+        toast.error(`Student ${num}: Please enter the student number`);
         return;
       }
-      if (!s.anio) {
-        toast.error(`Estudiante ${num}: Por favor selecciona el año`);
+      if (!s.year) {
+        toast.error(`Student ${num}: Please select the year`);
         return;
       }
-      if (!s.grado) {
-        toast.error(`Estudiante ${num}: Por favor selecciona el grado`);
+      if (!s.grade) {
+        toast.error(`Student ${num}: Please select the grade`);
         return;
       }
-      if (!s.relacion) {
-        toast.error(`Estudiante ${num}: Por favor selecciona la relación`);
+      if (!s.relationship) {
+        toast.error(`Student ${num}: Please select the relationship`);
         return;
       }
-      if (s.relacion === 'other' && !s.relacion_otro?.trim()) {
-        toast.error(`Estudiante ${num}: Por favor especifica la relación`);
+      if (s.relationship === 'other' && !s.relationship_other?.trim()) {
+        toast.error(`Student ${num}: Please specify the relationship`);
         return;
       }
     }
@@ -378,13 +374,13 @@ export default function CompraExclusiva() {
         try {
           // Map frontend field names to backend API format
           const payload = {
-            full_name: student.nombre_estudiante.trim(),
-            school_id: student.school_id || 'sch_default', // Use default if not provided
-            student_number: isFieldActive('student_id_number') ? student.numero_estudiante?.trim() : undefined,
-            relation_type: student.relacion === 'other' ? 'other' : student.relacion,
-            relation_other: student.relacion === 'other' ? student.relacion_otro : undefined,
-            year: parseInt(student.anio),
-            grade: student.grado
+            full_name: student.full_name.trim(),
+            school_id: student.school_id || 'sch_default',
+            student_number: isFieldActive('student_id_number') ? student.student_number?.trim() : undefined,
+            relation_type: student.relationship === 'other' ? 'other' : student.relationship,
+            relation_other: student.relationship === 'other' ? student.relationship_other : undefined,
+            year: parseInt(student.year),
+            grade: student.grade
           };
 
           const response = await fetch(`${API_URL}/api/store/textbook-access/students`, {
