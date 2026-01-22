@@ -746,137 +746,251 @@ export default function TextbookAccessPage() {
 
       {/* Add/Edit Student Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
-              {editingStudent ? t.editStudent : t.addStudent}
+              {editingStudent ? t.editStudent : t.addStudents}
             </DialogTitle>
             <DialogDescription>
               {editingStudent 
                 ? 'Update student information'
-                : 'Add a new student to request textbook access'
+                : 'Add one or more students to request textbook access'
               }
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
-            {/* Full Name */}
-            <div className="space-y-2">
-              <Label htmlFor="full_name">{t.fullName} *</Label>
-              <Input
-                id="full_name"
-                value={formData.full_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
-                placeholder={t.fullNamePlaceholder}
-              />
-            </div>
-            
-            {/* School */}
-            <div className="space-y-2">
-              <Label>{t.school} *</Label>
-              <Select
-                value={formData.school_id}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, school_id: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t.selectSchool} />
-                </SelectTrigger>
-                <SelectContent>
-                  {schools.map((school) => (
-                    <SelectItem key={school.school_id} value={school.school_id}>
-                      {school.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {/* Year & Grade (only for new students) */}
-            {!editingStudent && (
-              <div className="grid grid-cols-2 gap-4">
+          <ScrollArea className="max-h-[60vh] pr-4">
+            {editingStudent ? (
+              /* Single student edit form */
+              <div className="space-y-4 py-4">
+                {/* Full Name */}
                 <div className="space-y-2">
-                  <Label>{t.year} *</Label>
+                  <Label htmlFor="full_name">{t.fullName} *</Label>
+                  <Input
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                    placeholder={t.fullNamePlaceholder}
+                  />
+                </div>
+                
+                {/* School */}
+                <div className="space-y-2">
+                  <Label>{t.school} *</Label>
                   <Select
-                    value={formData.year}
-                    onValueChange={(v) => setFormData(prev => ({ ...prev, year: v }))}
+                    value={formData.school_id}
+                    onValueChange={(v) => setFormData(prev => ({ ...prev, school_id: v }))}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder={t.selectSchool} />
                     </SelectTrigger>
                     <SelectContent>
-                      {config?.available_years?.map((y) => (
-                        <SelectItem key={y.year} value={String(y.year)}>
-                          {y.year} {y.is_current && `(${t.currentYear})`}
+                      {schools.map((school) => (
+                        <SelectItem key={school.school_id} value={school.school_id}>
+                          {school.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Relation */}
                 <div className="space-y-2">
-                  <Label>{t.grade} *</Label>
+                  <Label>{t.relation} *</Label>
                   <Select
-                    value={formData.grade}
-                    onValueChange={(v) => setFormData(prev => ({ ...prev, grade: v }))}
+                    value={formData.relation_type}
+                    onValueChange={(v) => setFormData(prev => ({ ...prev, relation_type: v }))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t.selectGrade} />
+                      <SelectValue placeholder={t.selectRelation} />
                     </SelectTrigger>
                     <SelectContent>
-                      {config?.grades?.map((g) => (
-                        <SelectItem key={g.value} value={g.value}>
-                          {g.label}
+                      {config?.relation_types?.map((r) => (
+                        <SelectItem key={r.value} value={r.value}>
+                          {i18n.language === 'zh' ? r.label_zh : 
+                           i18n.language === 'es' ? r.label_es : r.label_en}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Relation Other */}
+                {formData.relation_type === 'other' && (
+                  <div className="space-y-2">
+                    <Label>{t.relationOther} *</Label>
+                    <Input
+                      value={formData.relation_other}
+                      onChange={(e) => setFormData(prev => ({ ...prev, relation_other: e.target.value }))}
+                      placeholder={t.relationOtherPlaceholder}
+                    />
+                  </div>
+                )}
+                
+                {/* Student Number */}
+                <div className="space-y-2">
+                  <Label>{t.studentNumber}</Label>
+                  <Input
+                    value={formData.student_number}
+                    onChange={(e) => setFormData(prev => ({ ...prev, student_number: e.target.value }))}
+                    placeholder={t.studentNumberPlaceholder}
+                  />
+                  <p className="text-xs text-muted-foreground">{t.studentNumberHelp}</p>
+                </div>
+              </div>
+            ) : (
+              /* Multiple students form */
+              <div className="space-y-4 py-4">
+                {multipleStudents.map((student, index) => (
+                  <Card key={student.id} className="relative">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base">
+                          {t.studentNum} {index + 1}
+                        </CardTitle>
+                        {multipleStudents.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStudentRow(student.id)}
+                            className="text-destructive hover:text-destructive h-8"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            {t.removeStudent}
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* Row 1: Name and School */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>{t.fullName} *</Label>
+                          <Input
+                            value={student.full_name}
+                            onChange={(e) => updateStudentRow(student.id, 'full_name', e.target.value)}
+                            placeholder={t.fullNamePlaceholder}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{t.school} *</Label>
+                          <Select
+                            value={student.school_id}
+                            onValueChange={(v) => updateStudentRow(student.id, 'school_id', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t.selectSchool} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {schools.map((school) => (
+                                <SelectItem key={school.school_id} value={school.school_id}>
+                                  {school.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {/* Row 2: Year and Grade */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>{t.year} *</Label>
+                          <Select
+                            value={student.year}
+                            onValueChange={(v) => updateStudentRow(student.id, 'year', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {config?.available_years?.map((y) => (
+                                <SelectItem key={y.year} value={String(y.year)}>
+                                  {y.year} {y.is_current && `(${t.currentYear})`}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{t.grade} *</Label>
+                          <Select
+                            value={student.grade}
+                            onValueChange={(v) => updateStudentRow(student.id, 'grade', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t.selectGrade} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {config?.grades?.map((g) => (
+                                <SelectItem key={g.value} value={g.value}>
+                                  {g.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {/* Row 3: Relation */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>{t.relation} *</Label>
+                          <Select
+                            value={student.relation_type}
+                            onValueChange={(v) => updateStudentRow(student.id, 'relation_type', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={t.selectRelation} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {config?.relation_types?.map((r) => (
+                                <SelectItem key={r.value} value={r.value}>
+                                  {i18n.language === 'zh' ? r.label_zh : 
+                                   i18n.language === 'es' ? r.label_es : r.label_en}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {student.relation_type === 'other' && (
+                          <div className="space-y-2">
+                            <Label>{t.relationOther} *</Label>
+                            <Input
+                              value={student.relation_other}
+                              onChange={(e) => updateStudentRow(student.id, 'relation_other', e.target.value)}
+                              placeholder={t.relationOtherPlaceholder}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Optional: Student Number */}
+                      <div className="space-y-2">
+                        <Label>{t.studentNumber}</Label>
+                        <Input
+                          value={student.student_number}
+                          onChange={(e) => updateStudentRow(student.id, 'student_number', e.target.value)}
+                          placeholder={t.studentNumberPlaceholder}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {/* Add Another Button */}
+                <Button
+                  variant="outline"
+                  onClick={addStudentRow}
+                  className="w-full"
+                  type="button"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t.addAnother}
+                </Button>
               </div>
             )}
-            
-            {/* Relation */}
-            <div className="space-y-2">
-              <Label>{t.relation} *</Label>
-              <Select
-                value={formData.relation_type}
-                onValueChange={(v) => setFormData(prev => ({ ...prev, relation_type: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t.selectRelation} />
-                </SelectTrigger>
-                <SelectContent>
-                  {config?.relation_types?.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {i18n.language === 'zh' ? r.label_zh : 
-                       i18n.language === 'es' ? r.label_es : r.label_en}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {/* Relation Other */}
-            {formData.relation_type === 'other' && (
-              <div className="space-y-2">
-                <Label>{t.relationOther} *</Label>
-                <Input
-                  value={formData.relation_other}
-                  onChange={(e) => setFormData(prev => ({ ...prev, relation_other: e.target.value }))}
-                  placeholder={t.relationOtherPlaceholder}
-                />
-              </div>
-            )}
-            
-            {/* Student Number */}
-            <div className="space-y-2">
-              <Label>{t.studentNumber}</Label>
-              <Input
-                value={formData.student_number}
-                onChange={(e) => setFormData(prev => ({ ...prev, student_number: e.target.value }))}
-                placeholder={t.studentNumberPlaceholder}
-              />
-              <p className="text-xs text-muted-foreground">{t.studentNumberHelp}</p>
-            </div>
-          </div>
+          </ScrollArea>
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowForm(false)}>
@@ -884,7 +998,7 @@ export default function TextbookAccessPage() {
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {t.save}
+              {editingStudent ? t.save : (multipleStudents.length > 1 ? t.saveAll : t.save)}
             </Button>
           </DialogFooter>
         </DialogContent>
