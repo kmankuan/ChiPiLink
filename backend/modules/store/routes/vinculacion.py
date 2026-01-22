@@ -313,7 +313,7 @@ async def admin_rechazar_vinculacion(
     try:
         result = await vinculacion_service.rechazar_vinculacion(
             vinculacion_id,
-            admin["cliente_id"],
+            admin["user_id"],
             "admin",
             request.motivo
         )
