@@ -149,7 +149,7 @@ async def aceptar_invitacion(
     try:
         result = await vinculacion_service.aceptar_invitacion(
             invitacion_id,
-            current_user["cliente_id"]
+            current_user["user_id"]
         )
         return result
     except ValueError as e:
