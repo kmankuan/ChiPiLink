@@ -207,7 +207,7 @@ async def desvincularme(
     try:
         result = await vinculacion_service.desvincular(
             vinculacion_id,
-            current_user["cliente_id"],
+            current_user["user_id"],
             "self"
         )
         return result
