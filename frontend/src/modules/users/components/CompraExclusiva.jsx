@@ -1018,8 +1018,8 @@ export default function CompraExclusiva() {
                         <div className="space-y-2">
                           <Label>Notas Adicionales (opcional)</Label>
                           <Input
-                            value={student.notas}
-                            onChange={(e) => updateStudentRow(student.id, 'notas', e.target.value)}
+                            value={student.notes}
+                            onChange={(e) => updateStudentRow(student.id, 'notes', e.target.value)}
                             placeholder="Información adicional si es necesario"
                           />
                         </div>
