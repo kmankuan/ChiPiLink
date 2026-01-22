@@ -515,14 +515,14 @@ export default function CompraExclusiva() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Programas Tab */}
-        <TabsContent value="programas" className="space-y-4 mt-4">
+        {/* Programs Tab */}
+        <TabsContent value="programs" className="space-y-4 mt-4">
           <div className="grid gap-4">
-            {PROGRAMAS_EXCLUSIVOS.map((programa) => {
-              const Icon = programa.icono;
-              const hasAccess = estudiantes.some(e => 
+            {EXCLUSIVE_PROGRAMS.map((program) => {
+              const Icon = program.icon;
+              const hasAccess = students.some(e => 
                 (e.estado === 'aprobado' || e.status === 'verified') && 
-                (e.programa === programa.id || !e.programa)
+                (e.programa === program.id || !e.programa)
               );
 
               return (
