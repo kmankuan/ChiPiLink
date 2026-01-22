@@ -175,59 +175,129 @@ export default function CompraExclusiva() {
   };
 
   const handleSubmitVinculacion = async () => {
-    // Validación
-    if (!formData.nombre_estudiante.trim()) {
-      toast.error('Por favor ingresa el nombre del estudiante');
+    // If editing, use single form data
+    if (editingId) {
+      if (!formData.nombre_estudiante.trim()) {
+        toast.error('Por favor ingresa el nombre del estudiante');
+        return;
+      }
+      if (!formData.numero_estudiante.trim()) {
+        toast.error('Por favor ingresa el número de estudiante');
+        return;
+      }
+      if (!formData.relacion) {
+        toast.error('Por favor selecciona tu relación con el estudiante');
+        return;
+      }
+
+      try {
+        setSaving(true);
+        
+        const payload = {
+          sync_id: formData.numero_estudiante.trim(),
+          nombre: formData.nombre_estudiante.trim(),
+          grado: formData.grado || 'Por verificar',
+          relacion: formData.relacion,
+          notas: formData.notas,
+          programa: selectedPrograma?.id || 'pca'
+        };
+
+        const response = await fetch(`${API_URL}/api/store/vinculacion/actualizar/${editingId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          toast.success('Estudiante actualizado');
+          setShowVincularDialog(false);
+          fetchEstudiantes();
+        } else {
+          toast.error(data.detail || 'Error al procesar solicitud');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Error al procesar solicitud');
+      } finally {
+        setSaving(false);
+      }
       return;
     }
-    if (!formData.numero_estudiante.trim()) {
-      toast.error('Por favor ingresa el número de estudiante');
+
+    // Creating multiple students
+    const validStudents = multipleStudents.filter(s => s.nombre_estudiante.trim());
+    
+    if (validStudents.length === 0) {
+      toast.error('Por favor ingresa al menos un nombre de estudiante');
       return;
     }
-    if (!formData.relacion) {
-      toast.error('Por favor selecciona tu relación con el estudiante');
-      return;
+
+    // Validate all students
+    for (let i = 0; i < validStudents.length; i++) {
+      const s = validStudents[i];
+      const num = i + 1;
+      if (!s.numero_estudiante.trim()) {
+        toast.error(`Estudiante ${num}: Por favor ingresa el número de estudiante`);
+        return;
+      }
+      if (!s.relacion) {
+        toast.error(`Estudiante ${num}: Por favor selecciona la relación`);
+        return;
+      }
     }
+
+    setSaving(true);
+    let successCount = 0;
+    let errorCount = 0;
 
     try {
-      setSaving(true);
-      
-      const payload = {
-        sync_id: formData.numero_estudiante.trim(),
-        nombre: formData.nombre_estudiante.trim(),
-        grado: formData.grado || 'Por verificar',
-        relacion: formData.relacion,
-        notas: formData.notas,
-        programa: selectedPrograma?.id || 'pca'
-      };
+      for (const student of validStudents) {
+        try {
+          const payload = {
+            sync_id: student.numero_estudiante.trim(),
+            nombre: student.nombre_estudiante.trim(),
+            grado: student.grado || 'Por verificar',
+            relacion: student.relacion,
+            notas: student.notas,
+            programa: selectedPrograma?.id || 'pca'
+          };
 
-      const url = editingId 
-        ? `${API_URL}/api/store/vinculacion/actualizar/${editingId}`
-        : `${API_URL}/api/store/vinculacion/solicitar`;
-      
-      const method = editingId ? 'PUT' : 'POST';
+          const response = await fetch(`${API_URL}/api/store/vinculacion/solicitar`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(editingId ? 'Estudiante actualizado' : 'Solicitud enviada correctamente');
-        setShowVincularDialog(false);
-        fetchEstudiantes();
-      } else {
-        toast.error(data.detail || 'Error al procesar solicitud');
+          if (response.ok) {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+        } catch {
+          errorCount++;
+        }
       }
+      
+      if (successCount > 0) {
+        toast.success(`${successCount} estudiante${successCount > 1 ? 's' : ''} vinculado${successCount > 1 ? 's' : ''} exitosamente`);
+      }
+      if (errorCount > 0) {
+        toast.error(`${errorCount} estudiante${errorCount > 1 ? 's' : ''} no se pudo${errorCount > 1 ? 'ieron' : ''} vincular`);
+      }
+      
+      setShowVincularDialog(false);
+      fetchEstudiantes();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al procesar solicitud');
+      toast.error('Error al procesar solicitudes');
     } finally {
       setSaving(false);
     }
