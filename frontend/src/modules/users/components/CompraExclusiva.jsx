@@ -771,21 +771,25 @@ export default function CompraExclusiva() {
                     <Label>
                       School {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
                     </Label>
-                    <Select
-                      value={formData.school_id}
-                      onValueChange={(value) => setFormData({ ...formData, school_id: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select school" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {schools.map((school) => (
-                          <SelectItem key={school.school_id} value={school.school_id}>
-                            {school.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {schools.length > 0 ? (
+                      <Select
+                        value={formData.school_id}
+                        onValueChange={(value) => setFormData({ ...formData, school_id: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select school" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {schools.map((school) => (
+                            <SelectItem key={school.school_id} value={school.school_id}>
+                              {school.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Loading schools...</p>
+                    )}
                   </div>
                 )}
 
