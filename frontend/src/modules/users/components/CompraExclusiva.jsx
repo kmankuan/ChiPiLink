@@ -722,13 +722,13 @@ export default function CompraExclusiva() {
 
                 {/* Nombre del estudiante */}
                 <div className="space-y-2">
-                  <Label htmlFor="nombre_estudiante">
+                  <Label htmlFor="full_name">
                     Nombre Completo del Estudiante <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="nombre_estudiante"
-                    value={formData.nombre_estudiante}
-                    onChange={(e) => setFormData({ ...formData, nombre_estudiante: e.target.value })}
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     placeholder="Ej: Juan Carlos Pérez González"
                   />
                 </div>
