@@ -279,6 +279,10 @@ export default function CompraExclusiva() {
         toast.error('Por favor ingresa el número de estudiante');
         return;
       }
+      if (isFieldActive('school_id') && isFieldRequired('school_id') && !formData.school_id) {
+        toast.error('Por favor selecciona el colegio');
+        return;
+      }
       if (!formData.relacion) {
         toast.error('Por favor selecciona tu relación con el estudiante');
         return;
@@ -294,6 +298,7 @@ export default function CompraExclusiva() {
         const payload = {
           sync_id: isFieldActive('student_id_number') ? formData.numero_estudiante?.trim() : undefined,
           nombre: formData.nombre_estudiante.trim(),
+          school_id: isFieldActive('school_id') ? formData.school_id : undefined,
           anio: formData.anio,
           grado: formData.grado || 'Por verificar',
           relacion: formData.relacion === 'other' ? formData.relacion_otro : formData.relacion,
