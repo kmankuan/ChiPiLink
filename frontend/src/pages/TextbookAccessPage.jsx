@@ -977,29 +977,32 @@ export default function TextbookAccessPage() {
                     </CardContent>
                   </Card>
                 ))}
-                
-                {/* Add Another Button */}
-                <Button
-                  variant="outline"
-                  onClick={addStudentRow}
-                  className="w-full"
-                  type="button"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t.addAnother}
-                </Button>
               </div>
             )}
           </ScrollArea>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowForm(false)}>
-              {t.cancel}
-            </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingStudent ? t.save : (multipleStudents.length > 1 ? t.saveAll : t.save)}
-            </Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            {/* Add Another Button - Only show when creating new students */}
+            {!editingStudent && (
+              <Button
+                variant="outline"
+                onClick={addStudentRow}
+                className="w-full sm:w-auto sm:mr-auto"
+                type="button"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t.addAnother}
+              </Button>
+            )}
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={() => setShowForm(false)} className="flex-1 sm:flex-none">
+                {t.cancel}
+              </Button>
+              <Button onClick={handleSave} disabled={saving} className="flex-1 sm:flex-none">
+                {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                {editingStudent ? t.save : (multipleStudents.length > 1 ? t.saveAll : t.save)}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
