@@ -398,7 +398,7 @@ export default function CompraExclusiva() {
           // Map frontend field names to backend API format
           const payload = {
             full_name: student.full_name.trim(),
-            school_id: student.school_id || 'sch_default',
+            school_id: student.school_id,
             student_number: isFieldActive('student_id_number') ? student.student_number?.trim() : undefined,
             relation_type: student.relationship === 'other' ? 'other' : student.relationship,
             relation_other: student.relationship === 'other' ? student.relationship_other : undefined,
