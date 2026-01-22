@@ -941,21 +941,25 @@ export default function CompraExclusiva() {
                           <Label>
                             School {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
                           </Label>
-                          <Select
-                            value={student.school_id}
-                            onValueChange={(v) => updateStudentRow(student.id, 'school_id', v)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select school" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {schools.map((school) => (
-                                <SelectItem key={school.school_id} value={school.school_id}>
-                                  {school.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          {schools.length > 0 ? (
+                            <Select
+                              value={student.school_id}
+                              onValueChange={(v) => updateStudentRow(student.id, 'school_id', v)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select school" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {schools.map((school) => (
+                                  <SelectItem key={school.school_id} value={school.school_id}>
+                                    {school.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Loading schools...</p>
+                          )}
                         </div>
                       )}
 
