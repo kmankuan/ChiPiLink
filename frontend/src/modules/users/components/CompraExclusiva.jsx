@@ -184,6 +184,7 @@ export default function CompraExclusiva() {
   const createEmptyStudent = () => ({
     id: Date.now(),
     nombre_estudiante: '',
+    school_id: '',
     numero_estudiante: '',
     anio: String(new Date().getFullYear()),
     grado: '',
@@ -197,6 +198,7 @@ export default function CompraExclusiva() {
     const currentYear = String(new Date().getFullYear());
     setFormData({
       nombre_estudiante: '',
+      school_id: '',
       numero_estudiante: '',
       anio: currentYear,
       grado: '',
@@ -208,12 +210,22 @@ export default function CompraExclusiva() {
     // Initialize with one empty student for multi-add
     setMultipleStudents([createEmptyStudent()]);
     
-    // Refresh form config to get latest field settings
+    // Refresh form config and schools to get latest settings
     try {
-      const configRes = await fetch(`${API_URL}/api/store/form-config/textbook_access`);
+      const [configRes, schoolsRes] = await Promise.all([
+        fetch(`${API_URL}/api/store/form-config/textbook_access`),
+        fetch(`${API_URL}/api/store/textbook-access/schools`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      
       if (configRes.ok) {
         const config = await configRes.json();
         setFormConfig(config);
+      }
+      if (schoolsRes.ok) {
+        const schoolsData = await schoolsRes.json();
+        setSchools(schoolsData.schools || []);
       }
     } catch (error) {
       console.error('Error refreshing form config:', error);
