@@ -885,7 +885,7 @@ export default function CompraExclusiva() {
                 </div>
 
                 {multipleStudents.map((student, index) => (
-                  <Card key={student.id} className="relative">
+                  <Card key={student.id} data-student-id={student.id} className="relative">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base flex items-center gap-2">
