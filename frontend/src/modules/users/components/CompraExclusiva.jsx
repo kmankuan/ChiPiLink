@@ -971,9 +971,9 @@ export default function CompraExclusiva() {
                               <SelectValue placeholder="Selecciona" />
                             </SelectTrigger>
                             <SelectContent>
-                              {GRADOS.map((grado) => (
-                                <SelectItem key={grado.value} value={grado.value}>
-                                  {grado.label}
+                              {GRADES.map((grade) => (
+                                <SelectItem key={grade.value} value={grade.value}>
+                                  {grade.label}
                                 </SelectItem>
                               ))}
                             </SelectContent>
