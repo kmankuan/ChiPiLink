@@ -124,9 +124,9 @@ export default function CompraExclusiva() {
     try {
       setLoading(true);
       
-      // Fetch estudiantes, form config, and schools
+      // Fetch estudiantes from textbook-access, form config, and schools
       const [estudiantesRes, configRes, schoolsRes] = await Promise.all([
-        fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
+        fetch(`${API_URL}/api/store/textbook-access/my-students`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
         fetch(`${API_URL}/api/store/form-config/textbook_access`),
@@ -137,7 +137,7 @@ export default function CompraExclusiva() {
       
       if (estudiantesRes.ok) {
         const data = await estudiantesRes.json();
-        setEstudiantes(data.estudiantes || data || []);
+        setEstudiantes(data.students || []);
       }
       
       if (configRes.ok) {
