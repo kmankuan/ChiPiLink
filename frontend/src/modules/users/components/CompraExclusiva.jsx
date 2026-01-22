@@ -168,6 +168,18 @@ export default function CompraExclusiva() {
     ];
   };
 
+  // Create empty student object
+  const createEmptyStudent = () => ({
+    id: Date.now(),
+    nombre_estudiante: '',
+    numero_estudiante: '',
+    anio: String(new Date().getFullYear()),
+    grado: '',
+    relacion: '',
+    relacion_otro: '',
+    notas: ''
+  });
+
   const handleOpenVincular = (programa) => {
     setSelectedPrograma(programa);
     const currentYear = String(new Date().getFullYear());
@@ -182,14 +194,7 @@ export default function CompraExclusiva() {
     });
     setEditingId(null);
     // Initialize with one empty student for multi-add
-    setMultipleStudents([{
-      id: Date.now(),
-      nombre_estudiante: '',
-      numero_estudiante: '',
-      grado: '',
-      relacion: '',
-      notas: ''
-    }]);
+    setMultipleStudents([createEmptyStudent()]);
     setShowVincularDialog(true);
   };
 
@@ -197,8 +202,10 @@ export default function CompraExclusiva() {
     setFormData({
       nombre_estudiante: estudiante.nombre || '',
       numero_estudiante: estudiante.numero_estudiante || estudiante.sync_id || '',
+      anio: estudiante.anio || String(new Date().getFullYear()),
       grado: estudiante.grado || '',
       relacion: estudiante.relacion || '',
+      relacion_otro: estudiante.relacion_otro || '',
       notas: estudiante.notas || ''
     });
     setEditingId(estudiante.sync_id || estudiante.vinculacion_id);
@@ -209,14 +216,7 @@ export default function CompraExclusiva() {
 
   // Functions for multiple students
   const addStudentRow = () => {
-    setMultipleStudents(prev => [...prev, {
-      id: Date.now(),
-      nombre_estudiante: '',
-      numero_estudiante: '',
-      grado: '',
-      relacion: '',
-      notas: ''
-    }]);
+    setMultipleStudents(prev => [...prev, createEmptyStudent()]);
   };
 
   const removeStudentRow = (id) => {
