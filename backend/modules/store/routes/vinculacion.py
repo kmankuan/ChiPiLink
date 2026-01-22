@@ -127,7 +127,7 @@ async def invitar_acudiente(
     try:
         result = await vinculacion_service.invitar_acudiente(
             request.estudiante_sync_id,
-            current_user["cliente_id"],
+            current_user["user_id"],
             request.email_invitado,
             request.nombre_invitado,
             request.rol_asignado,
