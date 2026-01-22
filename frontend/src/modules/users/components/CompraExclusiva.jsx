@@ -443,31 +443,29 @@ export default function CompraExclusiva() {
   };
 
   const getStatusBadge = (student) => {
-    const status = student.estado || student.status || 'pendiente';
+    const status = student.status || 'pending';
     
     switch (status) {
-      case 'aprobado':
+      case 'approved':
       case 'verified':
         return (
           <Badge className="bg-green-100 text-green-700 border-green-200">
             <CheckCircle className="h-3 w-3 mr-1" />
-            Verificado
+            Verified
           </Badge>
         );
-      case 'pendiente':
       case 'pending':
         return (
           <Badge className="bg-amber-100 text-amber-700 border-amber-200">
             <Clock className="h-3 w-3 mr-1" />
-            Pendiente
+            Pending
           </Badge>
         );
-      case 'rechazado':
       case 'rejected':
         return (
           <Badge className="bg-red-100 text-red-700 border-red-200">
             <AlertCircle className="h-3 w-3 mr-1" />
-            Rechazado
+            Rejected
           </Badge>
         );
       default:
