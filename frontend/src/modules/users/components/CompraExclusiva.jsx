@@ -94,12 +94,17 @@ export default function CompraExclusiva() {
   const [selectedPrograma, setSelectedPrograma] = useState(null);
   const [activeTab, setActiveTab] = useState('programas');
   
+  // Form configuration from API
+  const [formConfig, setFormConfig] = useState({ fields: [] });
+  
   // Form state for single edit
   const [formData, setFormData] = useState({
     nombre_estudiante: '',
     numero_estudiante: '',
+    anio: String(new Date().getFullYear()),
     grado: '',
     relacion: '',
+    relacion_otro: '',
     notas: ''
   });
   const [editingId, setEditingId] = useState(null);
@@ -108,34 +113,71 @@ export default function CompraExclusiva() {
   const [multipleStudents, setMultipleStudents] = useState([]);
 
   useEffect(() => {
-    fetchEstudiantes();
+    fetchData();
   }, [token]);
 
-  const fetchEstudiantes = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
       
-      if (response.ok) {
-        const data = await response.json();
+      // Fetch both estudiantes and form config
+      const [estudiantesRes, configRes] = await Promise.all([
+        fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API_URL}/api/store/form-config/textbook_access`)
+      ]);
+      
+      if (estudiantesRes.ok) {
+        const data = await estudiantesRes.json();
         setEstudiantes(data.estudiantes || data || []);
       }
+      
+      if (configRes.ok) {
+        const config = await configRes.json();
+        setFormConfig(config);
+      }
     } catch (error) {
-      console.error('Error fetching estudiantes:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper to check if a field is active in config
+  const isFieldActive = (fieldKey) => {
+    const field = formConfig.fields?.find(f => f.field_key === fieldKey);
+    return field ? field.is_active !== false : false;
+  };
+
+  // Helper to check if a field is required
+  const isFieldRequired = (fieldKey) => {
+    const field = formConfig.fields?.find(f => f.field_key === fieldKey);
+    return field ? field.is_required === true : false;
+  };
+
+  // Get relation options from config
+  const getRelationOptions = () => {
+    const field = formConfig.fields?.find(f => f.field_key === 'relationship');
+    return field?.options || [
+      { value: 'parent', label_es: 'Padre/Madre' },
+      { value: 'guardian', label_es: 'Tutor Legal' },
+      { value: 'grandparent', label_es: 'Abuelo/a' },
+      { value: 'representative', label_es: 'Representante' },
+      { value: 'other', label_es: 'Otro' }
+    ];
+  };
+
   const handleOpenVincular = (programa) => {
     setSelectedPrograma(programa);
+    const currentYear = String(new Date().getFullYear());
     setFormData({
       nombre_estudiante: '',
       numero_estudiante: '',
+      anio: currentYear,
       grado: '',
       relacion: '',
+      relacion_otro: '',
       notas: ''
     });
     setEditingId(null);
