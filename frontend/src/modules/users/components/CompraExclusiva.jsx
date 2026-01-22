@@ -703,10 +703,10 @@ export default function CompraExclusiva() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-purple-600" />
-              {editingId ? 'Editar Estudiante' : 'Vincular Estudiantes'}
+              {editingId ? 'Edit Student' : 'Link Students'}
             </DialogTitle>
             <DialogDescription>
-              {selectedPrograma?.nombre || 'Programa Exclusivo'} - {editingId ? 'Edita la información del estudiante' : 'Puedes agregar uno o más estudiantes a la vez'}
+              {selectedProgram?.name || 'Exclusive Program'} - {editingId ? 'Edit student information' : 'You can add one or more students at once'}
             </DialogDescription>
           </DialogHeader>
 
