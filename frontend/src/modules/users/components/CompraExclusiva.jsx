@@ -79,7 +79,7 @@ export default function CompraExclusiva() {
   const [selectedPrograma, setSelectedPrograma] = useState(null);
   const [activeTab, setActiveTab] = useState('programas');
   
-  // Form state
+  // Form state for single edit
   const [formData, setFormData] = useState({
     nombre_estudiante: '',
     numero_estudiante: '',
@@ -88,6 +88,9 @@ export default function CompraExclusiva() {
     notas: ''
   });
   const [editingId, setEditingId] = useState(null);
+  
+  // Multiple students state for new entries
+  const [multipleStudents, setMultipleStudents] = useState([]);
 
   useEffect(() => {
     fetchEstudiantes();
