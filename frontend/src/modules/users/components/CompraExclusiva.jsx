@@ -256,19 +256,27 @@ export default function CompraExclusiva() {
 
   // Functions for multiple students
   const addStudentRow = () => {
-    setMultipleStudents(prev => [...prev, createEmptyStudent()]);
+    const newStudent = createEmptyStudent();
+    setMultipleStudents(prev => [...prev, newStudent]);
     // Auto-scroll to the new student after state update
     setTimeout(() => {
       if (scrollAreaRef.current) {
         const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
         if (scrollContainer) {
-          scrollContainer.scrollTo({
-            top: scrollContainer.scrollHeight,
-            behavior: 'smooth'
-          });
+          // Find the new student card
+          const newStudentCard = scrollContainer.querySelector(`[data-student-id="${newStudent.id}"]`);
+          if (newStudentCard) {
+            newStudentCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            // Fallback: scroll to bottom
+            scrollContainer.scrollTo({
+              top: scrollContainer.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
         }
       }
-    }, 100);
+    }, 150);
   };
 
   const removeStudentRow = (id) => {
