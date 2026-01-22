@@ -110,7 +110,7 @@ async def get_mis_solicitudes_pendientes(
     (como acudiente principal).
     """
     result = await vinculacion_service.obtener_solicitudes_pendientes(
-        acudiente_cliente_id=current_user["cliente_id"],
+        acudiente_cliente_id=current_user["user_id"],
         tipo="principal"
     )
     return {"solicitudes": result}
