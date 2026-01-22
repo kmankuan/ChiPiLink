@@ -335,9 +335,10 @@ export default function CompraExclusiva() {
           const payload = {
             sync_id: isFieldActive('student_id_number') ? student.numero_estudiante?.trim() : undefined,
             nombre: student.nombre_estudiante.trim(),
+            anio: student.anio,
             grado: student.grado || 'Por verificar',
-            relacion: student.relacion,
-            notas: student.notas,
+            relacion: student.relacion === 'other' ? student.relacion_otro : student.relacion,
+            notas: isFieldActive('notes') ? student.notas : undefined,
             programa: selectedPrograma?.id || 'pca'
           };
 
@@ -368,7 +369,7 @@ export default function CompraExclusiva() {
       }
       
       setShowVincularDialog(false);
-      fetchEstudiantes();
+      fetchData();
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error al procesar solicitudes');
