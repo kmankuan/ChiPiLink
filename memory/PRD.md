@@ -34,6 +34,31 @@ These rules are **PERMANENT** and must be followed in all future development ses
 
 ---
 
+## Latest Update (Enero 22, 2026) - Sexta Actualización
+
+### ✅ Refactorización Completa de CompraExclusiva.jsx a Inglés - COMPLETADO
+
+Se completó la refactorización del componente `CompraExclusiva.jsx` para adherirse al estándar de código "English-First".
+
+#### Cambios Realizados
+- **Comentarios**: Todos los comentarios de código ahora están en inglés
+- **Labels de formulario**: "Guardian", "Student Full Name", "School", "Student Number", "School Year", "Grade", "Relationship", "Additional Notes"
+- **Placeholders**: "e.g. John Smith", "Select school", "e.g. STU-2024-001", "Select", etc.
+- **Textos de ayuda**: "You can find this number on the student ID card or school documents"
+- **Instrucciones**: "How does it work?" con 4 pasos en inglés
+- **Botones**: "Link Student", "Add Another Student", "Remove", "Submit Request", "Cancel"
+- **Mensajes de descripción**: "Access exclusive catalogs and products by linking your information"
+
+#### Archivo Modificado
+- `/app/frontend/src/modules/users/components/CompraExclusiva.jsx`
+
+#### Test Results
+- ✅ UI funcional verificada via screenshot
+- ✅ Diálogo de Link Students funcional con todos los campos en inglés
+- ✅ Sin errores de lint críticos
+
+---
+
 ## Latest Update (Enero 22, 2026) - Quinta Actualización
 
 ### ✅ Formulario de Múltiples Estudiantes - COMPLETADO
