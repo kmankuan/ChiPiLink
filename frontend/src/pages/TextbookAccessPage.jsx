@@ -348,8 +348,20 @@ export default function TextbookAccessPage() {
         year: '',
         grade: ''
       });
+      setMultipleStudents([]);
     } else {
       setEditingStudent(null);
+      // Initialize with one empty student row for multi-add
+      setMultipleStudents([{
+        id: Date.now(),
+        full_name: '',
+        school_id: '',
+        student_number: '',
+        relation_type: '',
+        relation_other: '',
+        year: String(config?.current_year || new Date().getFullYear()),
+        grade: ''
+      }]);
       setFormData({
         full_name: '',
         school_id: '',
@@ -361,6 +373,31 @@ export default function TextbookAccessPage() {
       });
     }
     setShowForm(true);
+  };
+
+  const addStudentRow = () => {
+    setMultipleStudents(prev => [...prev, {
+      id: Date.now(),
+      full_name: '',
+      school_id: '',
+      student_number: '',
+      relation_type: '',
+      relation_other: '',
+      year: String(config?.current_year || new Date().getFullYear()),
+      grade: ''
+    }]);
+  };
+
+  const removeStudentRow = (id) => {
+    if (multipleStudents.length > 1) {
+      setMultipleStudents(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
+  const updateStudentRow = (id, field, value) => {
+    setMultipleStudents(prev => prev.map(s => 
+      s.id === id ? { ...s, [field]: value } : s
+    ));
   };
 
   const handleSave = async () => {
