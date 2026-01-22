@@ -838,12 +838,12 @@ export default function CompraExclusiva() {
                 </div>
 
                 {/* Campo "Otro" - solo si seleccionó "other" */}
-                {formData.relacion === 'other' && (
+                {formData.relationship === 'other' && (
                   <div className="space-y-2">
                     <Label>Especifica la relación <span className="text-destructive">*</span></Label>
                     <Input
-                      value={formData.relacion_otro}
-                      onChange={(e) => setFormData({ ...formData, relacion_otro: e.target.value })}
+                      value={formData.relationship_other}
+                      onChange={(e) => setFormData({ ...formData, relationship_other: e.target.value })}
                       placeholder="Ej: Tío, Padrino, etc."
                     />
                   </div>
