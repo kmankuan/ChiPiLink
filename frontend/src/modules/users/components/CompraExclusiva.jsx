@@ -124,6 +124,15 @@ export default function CompraExclusiva() {
       notas: ''
     });
     setEditingId(null);
+    // Initialize with one empty student for multi-add
+    setMultipleStudents([{
+      id: Date.now(),
+      nombre_estudiante: '',
+      numero_estudiante: '',
+      grado: '',
+      relacion: '',
+      notas: ''
+    }]);
     setShowVincularDialog(true);
   };
 
@@ -137,7 +146,32 @@ export default function CompraExclusiva() {
     });
     setEditingId(estudiante.sync_id || estudiante.vinculacion_id);
     setSelectedPrograma(PROGRAMAS_EXCLUSIVOS[0]); // PCA por defecto
+    setMultipleStudents([]); // Clear multiple students when editing
     setShowVincularDialog(true);
+  };
+
+  // Functions for multiple students
+  const addStudentRow = () => {
+    setMultipleStudents(prev => [...prev, {
+      id: Date.now(),
+      nombre_estudiante: '',
+      numero_estudiante: '',
+      grado: '',
+      relacion: '',
+      notas: ''
+    }]);
+  };
+
+  const removeStudentRow = (id) => {
+    if (multipleStudents.length > 1) {
+      setMultipleStudents(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
+  const updateStudentRow = (id, field, value) => {
+    setMultipleStudents(prev => prev.map(s => 
+      s.id === id ? { ...s, [field]: value } : s
+    ));
   };
 
   const handleSubmitVinculacion = async () => {
