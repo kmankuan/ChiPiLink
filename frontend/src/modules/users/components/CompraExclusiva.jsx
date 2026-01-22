@@ -964,8 +964,8 @@ export default function CompraExclusiva() {
                         <div className="space-y-2">
                           <Label>Grado <span className="text-destructive">*</span></Label>
                           <Select
-                            value={student.grado}
-                            onValueChange={(v) => updateStudentRow(student.id, 'grado', v)}
+                            value={student.grade}
+                            onValueChange={(v) => updateStudentRow(student.id, 'grade', v)}
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Selecciona" />
