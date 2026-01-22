@@ -607,19 +607,19 @@ export default function CompraExclusiva() {
           </Card>
         </TabsContent>
 
-        {/* Estudiantes Tab */}
-        <TabsContent value="estudiantes" className="space-y-4 mt-4">
-          {estudiantes.length === 0 ? (
+        {/* Students Tab */}
+        <TabsContent value="students" className="space-y-4 mt-4">
+          {students.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="font-semibold text-lg mb-2">No tienes estudiantes vinculados</h3>
+                <h3 className="font-semibold text-lg mb-2">No linked students</h3>
                 <p className="text-muted-foreground mb-4">
-                  Vincula un estudiante para acceder a catálogos exclusivos
+                  Link a student to access exclusive catalogs
                 </p>
-                <Button onClick={() => handleOpenVincular(PROGRAMAS_EXCLUSIVOS[0])}>
+                <Button onClick={() => handleOpenLink(EXCLUSIVE_PROGRAMS[0])}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Vincular Primer Estudiante
+                  Link First Student
                 </Button>
               </CardContent>
             </Card>
@@ -627,20 +627,20 @@ export default function CompraExclusiva() {
             <>
               <div className="flex justify-between items-center">
                 <p className="text-sm text-muted-foreground">
-                  {estudiantes.length} estudiante{estudiantes.length !== 1 ? 's' : ''} vinculado{estudiantes.length !== 1 ? 's' : ''}
+                  {students.length} linked student{students.length !== 1 ? 's' : ''}
                 </p>
                 <Button 
                   size="sm" 
-                  onClick={() => handleOpenVincular(PROGRAMAS_EXCLUSIVOS[0])}
+                  onClick={() => handleOpenLink(EXCLUSIVE_PROGRAMS[0])}
                   className="gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  Agregar Estudiante
+                  Add Student
                 </Button>
               </div>
 
               <div className="grid gap-3">
-                {estudiantes.map((estudiante) => (
+                {students.map((student) => (
                   <Card key={estudiante.sync_id || estudiante.vinculacion_id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
