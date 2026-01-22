@@ -896,6 +896,30 @@ export default function CompraExclusiva() {
                         />
                       </div>
 
+                      {/* Colegio - only if active */}
+                      {isFieldActive('school_id') && (
+                        <div className="space-y-2">
+                          <Label>
+                            Colegio {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
+                          </Label>
+                          <Select
+                            value={student.school_id}
+                            onValueChange={(v) => updateStudentRow(student.id, 'school_id', v)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecciona el colegio" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {schools.map((school) => (
+                                <SelectItem key={school.school_id} value={school.school_id}>
+                                  {school.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
                       {/* Student Number - only if active */}
                       {isFieldActive('student_id_number') && (
                         <div className="space-y-2">
