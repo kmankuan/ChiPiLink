@@ -335,7 +335,7 @@ async def admin_cambiar_rol(
         result = await vinculacion_service.cambiar_rol(
             vinculacion_id,
             request.nuevo_rol,
-            admin["cliente_id"]
+            admin["user_id"]
         )
         return result
     except ValueError as e:
