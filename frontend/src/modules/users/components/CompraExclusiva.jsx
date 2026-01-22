@@ -1002,12 +1002,12 @@ export default function CompraExclusiva() {
                       </div>
 
                       {/* Campo "Otro" - solo si seleccionó "other" */}
-                      {student.relacion === 'other' && (
+                      {student.relationship === 'other' && (
                         <div className="space-y-2">
                           <Label>Especifica la relación <span className="text-destructive">*</span></Label>
                           <Input
-                            value={student.relacion_otro}
-                            onChange={(e) => updateStudentRow(student.id, 'relacion_otro', e.target.value)}
+                            value={student.relationship_other}
+                            onChange={(e) => updateStudentRow(student.id, 'relationship_other', e.target.value)}
                             placeholder="Ej: Tío, Padrino, etc."
                           />
                         </div>
