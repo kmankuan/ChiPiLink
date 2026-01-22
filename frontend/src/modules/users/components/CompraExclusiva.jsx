@@ -897,8 +897,8 @@ export default function CompraExclusiva() {
                       <div className="space-y-2">
                         <Label>Nombre Completo <span className="text-destructive">*</span></Label>
                         <Input
-                          value={student.nombre_estudiante}
-                          onChange={(e) => updateStudentRow(student.id, 'nombre_estudiante', e.target.value)}
+                          value={student.full_name}
+                          onChange={(e) => updateStudentRow(student.id, 'full_name', e.target.value)}
                           placeholder="Ej: Juan Carlos Pérez"
                         />
                       </div>
