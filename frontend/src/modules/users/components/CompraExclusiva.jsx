@@ -183,28 +183,28 @@ export default function CompraExclusiva() {
   // Create empty student object
   const createEmptyStudent = () => ({
     id: Date.now(),
-    nombre_estudiante: '',
+    full_name: '',
     school_id: '',
-    numero_estudiante: '',
-    anio: String(new Date().getFullYear()),
-    grado: '',
-    relacion: '',
-    relacion_otro: '',
-    notas: ''
+    student_number: '',
+    year: String(new Date().getFullYear()),
+    grade: '',
+    relationship: '',
+    relationship_other: '',
+    notes: ''
   });
 
-  const handleOpenVincular = async (programa) => {
-    setSelectedPrograma(programa);
+  const handleOpenLink = async (program) => {
+    setSelectedProgram(program);
     const currentYear = String(new Date().getFullYear());
     setFormData({
-      nombre_estudiante: '',
+      full_name: '',
       school_id: '',
-      numero_estudiante: '',
-      anio: currentYear,
-      grado: '',
-      relacion: '',
-      relacion_otro: '',
-      notas: ''
+      student_number: '',
+      year: currentYear,
+      grade: '',
+      relationship: '',
+      relationship_other: '',
+      notes: ''
     });
     setEditingId(null);
     // Initialize with one empty student for multi-add
@@ -231,24 +231,24 @@ export default function CompraExclusiva() {
       console.error('Error refreshing form config:', error);
     }
     
-    setShowVincularDialog(true);
+    setShowLinkDialog(true);
   };
 
-  const handleEditEstudiante = (estudiante) => {
+  const handleEditStudent = (student) => {
     setFormData({
-      nombre_estudiante: estudiante.nombre || '',
-      school_id: estudiante.school_id || '',
-      numero_estudiante: estudiante.numero_estudiante || estudiante.sync_id || '',
-      anio: estudiante.anio || String(new Date().getFullYear()),
-      grado: estudiante.grado || '',
-      relacion: estudiante.relacion || '',
-      relacion_otro: estudiante.relacion_otro || '',
-      notas: estudiante.notas || ''
+      full_name: student.full_name || student.nombre || '',
+      school_id: student.school_id || '',
+      student_number: student.student_number || '',
+      year: student.year || String(new Date().getFullYear()),
+      grade: student.grade || '',
+      relationship: student.relation_type || student.relationship || '',
+      relationship_other: student.relation_other || student.relationship_other || '',
+      notes: student.notes || ''
     });
-    setEditingId(estudiante.sync_id || estudiante.vinculacion_id);
-    setSelectedPrograma(PROGRAMAS_EXCLUSIVOS[0]); // PCA por defecto
-    setMultipleStudents([]); // Clear multiple students when editing
-    setShowVincularDialog(true);
+    setEditingId(student.student_id);
+    setSelectedProgram(EXCLUSIVE_PROGRAMS[0]);
+    setMultipleStudents([]);
+    setShowLinkDialog(true);
   };
 
   // Functions for multiple students
