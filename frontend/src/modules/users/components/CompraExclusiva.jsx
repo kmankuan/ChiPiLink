@@ -2,7 +2,7 @@
  * Exclusive Purchase - Component for managing access to exclusive catalogs
  * Allows linking students to access school textbooks
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,6 +115,9 @@ export default function CompraExclusiva() {
   
   // Multiple students state for new entries
   const [multipleStudents, setMultipleStudents] = useState([]);
+  
+  // Ref for scroll area to auto-scroll when adding new student
+  const scrollAreaRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -254,6 +257,18 @@ export default function CompraExclusiva() {
   // Functions for multiple students
   const addStudentRow = () => {
     setMultipleStudents(prev => [...prev, createEmptyStudent()]);
+    // Auto-scroll to the new student after state update
+    setTimeout(() => {
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+          scrollContainer.scrollTo({
+            top: scrollContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }, 100);
   };
 
   const removeStudentRow = (id) => {
