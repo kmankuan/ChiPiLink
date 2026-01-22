@@ -855,8 +855,8 @@ export default function CompraExclusiva() {
                     <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
                     <Input
                       id="notas"
-                      value={formData.notas}
-                      onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="Información adicional si es necesario"
                     />
                   </div>
