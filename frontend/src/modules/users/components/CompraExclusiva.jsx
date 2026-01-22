@@ -124,12 +124,15 @@ export default function CompraExclusiva() {
     try {
       setLoading(true);
       
-      // Fetch both estudiantes and form config
-      const [estudiantesRes, configRes] = await Promise.all([
+      // Fetch estudiantes, form config, and schools
+      const [estudiantesRes, configRes, schoolsRes] = await Promise.all([
         fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(`${API_URL}/api/store/form-config/textbook_access`)
+        fetch(`${API_URL}/api/store/form-config/textbook_access`),
+        fetch(`${API_URL}/api/store/textbook-access/schools`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
       ]);
       
       if (estudiantesRes.ok) {
@@ -140,6 +143,11 @@ export default function CompraExclusiva() {
       if (configRes.ok) {
         const config = await configRes.json();
         setFormConfig(config);
+      }
+      
+      if (schoolsRes.ok) {
+        const schoolsData = await schoolsRes.json();
+        setSchools(schoolsData.schools || []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
