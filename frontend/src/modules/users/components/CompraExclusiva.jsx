@@ -494,7 +494,7 @@ export default function CompraExclusiva() {
           Compra Exclusiva
         </h2>
         <p className="text-muted-foreground mt-1">
-          Accede a catálogos y productos exclusivos vinculando tu información
+          Access exclusive catalogs and products by linking your information
         </p>
       </div>
 
@@ -595,9 +595,9 @@ export default function CompraExclusiva() {
                   <p className="font-medium text-foreground mb-1">How does it work?</p>
                   <ol className="list-decimal list-inside space-y-1">
                     <li>Select the program you want to access</li>
-                    <li>Complete the linking form with the student's information</li>
+                    <li>Complete the linking form with the student information</li>
                     <li>An administrator will verify your request</li>
-                    <li>Once approved, you'll have access to the exclusive catalog</li>
+                    <li>Once approved, you will have access to the exclusive catalog</li>
                   </ol>
                 </div>
               </div>
