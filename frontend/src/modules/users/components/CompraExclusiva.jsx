@@ -502,15 +502,15 @@ export default function CompraExclusiva() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="programas" className="gap-2">
+          <TabsTrigger value="programs" className="gap-2">
             <Lock className="h-4 w-4" />
-            Programas
+            Programs
           </TabsTrigger>
-          <TabsTrigger value="estudiantes" className="gap-2">
+          <TabsTrigger value="students" className="gap-2">
             <Users className="h-4 w-4" />
-            Mis Estudiantes
-            {estudiantes.length > 0 && (
-              <Badge variant="secondary" className="ml-1">{estudiantes.length}</Badge>
+            My Students
+            {students.length > 0 && (
+              <Badge variant="secondary" className="ml-1">{students.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
