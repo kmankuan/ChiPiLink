@@ -293,7 +293,7 @@ async def admin_aprobar_vinculacion(
     try:
         result = await vinculacion_service.aprobar_vinculacion(
             vinculacion_id,
-            admin["cliente_id"],
+            admin["user_id"],
             "admin"
         )
         return result
