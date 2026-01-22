@@ -96,7 +96,7 @@ async def get_mis_estudiantes(
     Incluye información del estudiante, rol, y compras realizadas.
     """
     result = await vinculacion_service.obtener_mis_estudiantes(
-        current_user["cliente_id"]
+        current_user["user_id"]
     )
     return {"estudiantes": result}
 
