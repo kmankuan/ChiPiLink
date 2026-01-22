@@ -5,7 +5,31 @@ Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanCl
 
 También incluye un sistema unificado de gestión de usuarios basado en "Capacidades" (Capacities), "Membresías" (Subscriptions), y "Conexiones" (Relationships), con wallet de usuario y sistema de notificaciones push.
 
-## Latest Update (Enero 21, 2026) - Cuarta Actualización
+## Latest Update (Enero 22, 2026) - Quinta Actualización
+
+### ✅ Formulario de Múltiples Estudiantes - COMPLETADO
+
+Se modificó el formulario de "Vincular Estudiante" para permitir agregar varios estudiantes a la vez, mejorando la experiencia del usuario.
+
+#### Cambios Implementados
+- **Formulario expandido**: Diálogo más amplio (max-w-3xl) con scroll
+- **Múltiples tarjetas**: Cada estudiante en su propia Card con todos los campos
+- **Agregar más**: Botón "Agregar Otro Estudiante" para añadir filas
+- **Quitar**: Botón "Quitar" para remover estudiantes (visible solo si hay más de uno)
+- **Guardado batch**: Guarda todos los estudiantes y reporta cuántos se guardaron exitosamente
+- **Validación**: Valida cada estudiante individualmente antes de guardar
+
+#### Archivo Modificado
+- `/app/frontend/src/pages/TextbookAccessPage.jsx`
+
+#### Traducciones Actualizadas
+- Inglés: "Add Students", "Add Another Student", "Save All", "Remove"
+- Español: "Vincular Estudiantes", "Agregar Otro Estudiante", "Guardar Todos", "Quitar"
+- Chino: "添加学生", "添加另一个学生", "保存全部", "移除"
+
+---
+
+## Previous Update (Enero 21, 2026) - Cuarta Actualización
 
 ### ✅ Sistema de Configuración Dinámica de Formularios - COMPLETADO
 
