@@ -388,7 +388,7 @@ async def test_push_notification(
         title=data.title,
         body=data.body,
         data={"test": True, "from": "ChiPi Link Admin"},
-        action_url="https://unatienda-catalog.preview.emergentagent.com"
+        action_url="https://schoolbooks-portal.preview.emergentagent.com"
     )
     
     return {
