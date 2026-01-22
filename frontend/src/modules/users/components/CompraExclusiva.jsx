@@ -89,10 +89,10 @@ export default function CompraExclusiva() {
   const { token, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [estudiantes, setEstudiantes] = useState([]);
-  const [showVincularDialog, setShowVincularDialog] = useState(false);
-  const [selectedPrograma, setSelectedPrograma] = useState(null);
-  const [activeTab, setActiveTab] = useState('programas');
+  const [students, setStudents] = useState([]);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [activeTab, setActiveTab] = useState('programs');
   
   // Form configuration from API
   const [formConfig, setFormConfig] = useState({ fields: [] });
@@ -102,14 +102,14 @@ export default function CompraExclusiva() {
   
   // Form state for single edit
   const [formData, setFormData] = useState({
-    nombre_estudiante: '',
+    full_name: '',
     school_id: '',
-    numero_estudiante: '',
-    anio: String(new Date().getFullYear()),
-    grado: '',
-    relacion: '',
-    relacion_otro: '',
-    notas: ''
+    student_number: '',
+    year: String(new Date().getFullYear()),
+    grade: '',
+    relationship: '',
+    relationship_other: '',
+    notes: ''
   });
   const [editingId, setEditingId] = useState(null);
   
@@ -124,8 +124,8 @@ export default function CompraExclusiva() {
     try {
       setLoading(true);
       
-      // Fetch estudiantes from textbook-access, form config, and schools
-      const [estudiantesRes, configRes, schoolsRes] = await Promise.all([
+      // Fetch students from textbook-access, form config, and schools
+      const [studentsRes, configRes, schoolsRes] = await Promise.all([
         fetch(`${API_URL}/api/store/textbook-access/my-students`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
