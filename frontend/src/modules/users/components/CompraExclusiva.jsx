@@ -1048,7 +1048,7 @@ export default function CompraExclusiva() {
               <Button variant="outline" onClick={() => setShowVincularDialog(false)} className="flex-1 sm:flex-none">
                 Cancelar
               </Button>
-              <Button onClick={handleSubmitVinculacion} disabled={saving} className="flex-1 sm:flex-none">
+              <Button onClick={handleSubmitLink} disabled={saving} className="flex-1 sm:flex-none">
                 {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {editingId ? 'Guardar Cambios' : (multipleStudents.length > 1 ? 'Enviar Todas' : 'Enviar Solicitud')}
               </Button>
