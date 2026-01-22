@@ -384,7 +384,7 @@ async def admin_vincular_directo(
         raise HTTPException(status_code=404, detail="Estudiante no encontrado")
     
     # Verificar que el cliente existe (usando auth_users que es la colección correcta)
-    cliente = await db.auth_users.find_one({"cliente_id": cliente_id})
+    cliente = await db.auth_users.find_one({"user_id": cliente_id})
     if not cliente:
         # Fallback a colección legacy
         cliente = await db.clientes.find_one({"cliente_id": cliente_id})
