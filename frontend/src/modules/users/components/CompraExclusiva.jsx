@@ -406,17 +406,17 @@ export default function CompraExclusiva() {
       }
       
       if (successCount > 0) {
-        toast.success(`${successCount} estudiante${successCount > 1 ? 's' : ''} vinculado${successCount > 1 ? 's' : ''} exitosamente`);
+        toast.success(`${successCount} student${successCount > 1 ? 's' : ''} linked successfully`);
       }
       if (errorCount > 0) {
-        toast.error(`${errorCount} estudiante${errorCount > 1 ? 's' : ''} no se pudo${errorCount > 1 ? 'ieron' : ''} vincular`);
+        toast.error(`${errorCount} student${errorCount > 1 ? 's' : ''} could not be linked`);
       }
       
-      setShowVincularDialog(false);
+      setShowLinkDialog(false);
       fetchData();
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error al procesar solicitudes');
+      toast.error('Error processing requests');
     } finally {
       setSaving(false);
     }
