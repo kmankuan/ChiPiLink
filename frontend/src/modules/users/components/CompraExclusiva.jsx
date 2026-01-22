@@ -420,6 +420,10 @@ export default function CompraExclusiva() {
           } else {
             const errorData = await response.json();
             console.error('Error creating student:', errorData);
+            // Show specific error message for first error
+            if (errorCount === 0 && errorData.detail) {
+              toast.error(`Error: ${errorData.detail}`);
+            }
             errorCount++;
           }
         } catch (err) {
@@ -431,8 +435,11 @@ export default function CompraExclusiva() {
       if (successCount > 0) {
         toast.success(`${successCount} student${successCount > 1 ? 's' : ''} linked successfully`);
       }
-      if (errorCount > 0) {
-        toast.error(`${errorCount} student${errorCount > 1 ? 's' : ''} could not be linked`);
+      if (errorCount > 0 && successCount === 0) {
+        // Only show generic error if we haven't shown a specific one
+        if (errorCount > 1) {
+          toast.error(`${errorCount} student${errorCount > 1 ? 's' : ''} could not be linked`);
+        }
       }
       
       setShowLinkDialog(false);
