@@ -187,7 +187,7 @@ async def rechazar_vinculacion(
     try:
         result = await vinculacion_service.rechazar_vinculacion(
             vinculacion_id,
-            current_user["cliente_id"],
+            current_user["user_id"],
             "principal",
             request.motivo
         )
