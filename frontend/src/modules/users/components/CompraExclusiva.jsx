@@ -779,8 +779,8 @@ export default function CompraExclusiva() {
                 <div className="space-y-2">
                   <Label>Año Escolar <span className="text-destructive">*</span></Label>
                   <Select
-                    value={formData.anio}
-                    onValueChange={(value) => setFormData({ ...formData, anio: value })}
+                    value={formData.year}
+                    onValueChange={(value) => setFormData({ ...formData, year: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona el año" />
