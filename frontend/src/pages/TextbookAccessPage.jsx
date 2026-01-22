@@ -401,76 +401,133 @@ export default function TextbookAccessPage() {
   };
 
   const handleSave = async () => {
-    // Validation
-    if (!formData.full_name.trim()) {
-      toast.error('Please enter student name');
-      return;
-    }
-    if (!formData.school_id) {
-      toast.error('Please select a school');
-      return;
-    }
-    if (!formData.relation_type) {
-      toast.error('Please select relationship');
-      return;
-    }
-    if (formData.relation_type === 'other' && !formData.relation_other.trim()) {
-      toast.error('Please specify the relationship');
-      return;
-    }
-    
-    if (!editingStudent) {
-      if (!formData.year) {
-        toast.error('Please select year');
+    // If editing, use single form data
+    if (editingStudent) {
+      if (!formData.full_name.trim()) {
+        toast.error('Please enter student name');
         return;
       }
-      if (!formData.grade) {
-        toast.error('Please select grade');
+      if (!formData.school_id) {
+        toast.error('Please select a school');
         return;
       }
-    }
+      if (!formData.relation_type) {
+        toast.error('Please select relationship');
+        return;
+      }
+      if (formData.relation_type === 'other' && !formData.relation_other.trim()) {
+        toast.error('Please specify the relationship');
+        return;
+      }
 
-    setSaving(true);
-    try {
-      const url = editingStudent
-        ? `${API}/api/store/textbook-access/students/${editingStudent.student_id}`
-        : `${API}/api/store/textbook-access/students`;
-      
-      const method = editingStudent ? 'PUT' : 'POST';
-      
-      const body = editingStudent
-        ? {
+      setSaving(true);
+      try {
+        const res = await fetch(`${API}/api/store/textbook-access/students/${editingStudent.student_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
             full_name: formData.full_name,
             school_id: formData.school_id,
             student_number: formData.student_number || null,
             relation_type: formData.relation_type,
             relation_other: formData.relation_type === 'other' ? formData.relation_other : null
+          })
+        });
+        
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || 'Save failed');
+        }
+        
+        toast.success(t.success.saved);
+        setShowForm(false);
+        fetchData();
+      } catch (err) {
+        toast.error(err.message || t.errors.saveFailed);
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
+    // Creating multiple students
+    const validStudents = multipleStudents.filter(s => s.full_name.trim());
+    
+    if (validStudents.length === 0) {
+      toast.error('Please enter at least one student name');
+      return;
+    }
+
+    // Validate all students
+    for (let i = 0; i < validStudents.length; i++) {
+      const s = validStudents[i];
+      const num = i + 1;
+      if (!s.school_id) {
+        toast.error(`Student ${num}: Please select a school`);
+        return;
+      }
+      if (!s.relation_type) {
+        toast.error(`Student ${num}: Please select relationship`);
+        return;
+      }
+      if (s.relation_type === 'other' && !s.relation_other?.trim()) {
+        toast.error(`Student ${num}: Please specify the relationship`);
+        return;
+      }
+      if (!s.year) {
+        toast.error(`Student ${num}: Please select year`);
+        return;
+      }
+      if (!s.grade) {
+        toast.error(`Student ${num}: Please select grade`);
+        return;
+      }
+    }
+
+    setSaving(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      for (const student of validStudents) {
+        try {
+          const res = await fetch(`${API}/api/store/textbook-access/students`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              full_name: student.full_name,
+              school_id: student.school_id,
+              student_number: student.student_number || null,
+              relation_type: student.relation_type,
+              relation_other: student.relation_type === 'other' ? student.relation_other : null,
+              year: parseInt(student.year),
+              grade: student.grade
+            })
+          });
+          
+          if (res.ok) {
+            successCount++;
+          } else {
+            errorCount++;
           }
-        : {
-            full_name: formData.full_name,
-            school_id: formData.school_id,
-            student_number: formData.student_number || null,
-            relation_type: formData.relation_type,
-            relation_other: formData.relation_type === 'other' ? formData.relation_other : null,
-            year: parseInt(formData.year),
-            grade: formData.grade
-          };
-      
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
-      });
-      
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || 'Save failed');
+        } catch {
+          errorCount++;
+        }
       }
       
-      toast.success(t.success.saved);
+      if (successCount > 0) {
+        toast.success(`${successCount} ${successCount === 1 ? 'student' : 'students'} added successfully`);
+      }
+      if (errorCount > 0) {
+        toast.error(`${errorCount} ${errorCount === 1 ? 'student' : 'students'} failed to add`);
+      }
+      
       setShowForm(false);
       fetchData();
     } catch (err) {
