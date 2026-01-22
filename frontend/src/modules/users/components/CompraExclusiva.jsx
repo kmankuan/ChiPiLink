@@ -46,15 +46,15 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Programas exclusivos disponibles
-const PROGRAMAS_EXCLUSIVOS = [
+// Exclusive programs available
+const EXCLUSIVE_PROGRAMS = [
   {
     id: 'pca',
-    nombre: 'Textos de PCA',
-    descripcion: 'Accede al catálogo exclusivo de libros de texto de Panama Christian Academy',
-    icono: GraduationCap,
+    name: 'PCA Textbooks',
+    description: 'Access the exclusive textbook catalog of Panama Christian Academy',
+    icon: GraduationCap,
     color: 'purple',
-    requiere_vinculacion: true
+    requires_linking: true
   }
 ];
 
@@ -62,27 +62,27 @@ const PROGRAMAS_EXCLUSIVOS = [
 const getAvailableYears = () => {
   const currentYear = new Date().getFullYear();
   return [
-    { value: String(currentYear), label: `${currentYear} (Año actual)` },
+    { value: String(currentYear), label: `${currentYear} (Current year)` },
     { value: String(currentYear + 1), label: String(currentYear + 1) }
   ];
 };
 
 // Generate grades
-const GRADOS = [
-  { value: 'PK', label: 'Pre-Kinder' },
-  { value: 'K', label: 'Kinder' },
-  { value: '1', label: '1° Grado' },
-  { value: '2', label: '2° Grado' },
-  { value: '3', label: '3° Grado' },
-  { value: '4', label: '4° Grado' },
-  { value: '5', label: '5° Grado' },
-  { value: '6', label: '6° Grado' },
-  { value: '7', label: '7° Grado' },
-  { value: '8', label: '8° Grado' },
-  { value: '9', label: '9° Grado' },
-  { value: '10', label: '10° Grado' },
-  { value: '11', label: '11° Grado' },
-  { value: '12', label: '12° Grado' }
+const GRADES = [
+  { value: 'PK', label: 'Pre-K' },
+  { value: 'K', label: 'Kindergarten' },
+  { value: '1', label: '1st Grade' },
+  { value: '2', label: '2nd Grade' },
+  { value: '3', label: '3rd Grade' },
+  { value: '4', label: '4th Grade' },
+  { value: '5', label: '5th Grade' },
+  { value: '6', label: '6th Grade' },
+  { value: '7', label: '7th Grade' },
+  { value: '8', label: '8th Grade' },
+  { value: '9', label: '9th Grade' },
+  { value: '10', label: '10th Grade' },
+  { value: '11', label: '11th Grade' },
+  { value: '12', label: '12th Grade' }
 ];
 
 export default function CompraExclusiva() {
