@@ -592,12 +592,12 @@ export default function CompraExclusiva() {
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">¿Cómo funciona?</p>
+                  <p className="font-medium text-foreground mb-1">How does it work?</p>
                   <ol className="list-decimal list-inside space-y-1">
-                    <li>Selecciona el programa al que deseas acceder</li>
-                    <li>Completa el formulario de vinculación con los datos del estudiante</li>
-                    <li>Un administrador verificará tu solicitud</li>
-                    <li>Una vez aprobado, tendrás acceso al catálogo exclusivo</li>
+                    <li>Select the program you want to access</li>
+                    <li>Complete the linking form with the student's information</li>
+                    <li>An administrator will verify your request</li>
+                    <li>Once approved, you'll have access to the exclusive catalog</li>
                   </ol>
                 </div>
               </div>
