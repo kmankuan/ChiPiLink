@@ -295,18 +295,16 @@ export default function CompraExclusiva() {
       try {
         setSaving(true);
         
+        // Map frontend field names to backend API format
         const payload = {
-          sync_id: isFieldActive('student_id_number') ? formData.numero_estudiante?.trim() : undefined,
-          nombre: formData.nombre_estudiante.trim(),
-          school_id: isFieldActive('school_id') ? formData.school_id : undefined,
-          anio: formData.anio,
-          grado: formData.grado || 'Por verificar',
-          relacion: formData.relacion === 'other' ? formData.relacion_otro : formData.relacion,
-          notas: isFieldActive('notes') ? formData.notas : undefined,
-          programa: selectedPrograma?.id || 'pca'
+          full_name: formData.nombre_estudiante.trim(),
+          school_id: formData.school_id,
+          student_number: isFieldActive('student_id_number') ? formData.numero_estudiante?.trim() : undefined,
+          relation_type: formData.relacion === 'other' ? 'other' : formData.relacion,
+          relation_other: formData.relacion === 'other' ? formData.relacion_otro : undefined
         };
 
-        const response = await fetch(`${API_URL}/api/store/vinculacion/actualizar/${editingId}`, {
+        const response = await fetch(`${API_URL}/api/store/textbook-access/students/${editingId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
