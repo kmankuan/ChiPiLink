@@ -77,7 +77,7 @@ async def solicitar_vinculacion(
     try:
         result = await vinculacion_service.solicitar_vinculacion(
             request.numero_estudiante,
-            current_user["cliente_id"],
+            current_user["user_id"],
             request.relacion,
             request.acepto_responsabilidad,
             request.mensaje
