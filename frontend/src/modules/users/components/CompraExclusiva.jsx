@@ -1041,16 +1041,16 @@ export default function CompraExclusiva() {
                 type="button"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Agregar Otro Estudiante
+                Add Another Student
               </Button>
             )}
             <div className="flex gap-2 w-full sm:w-auto">
               <Button variant="outline" onClick={() => setShowLinkDialog(false)} className="flex-1 sm:flex-none">
-                Cancelar
+                Cancel
               </Button>
               <Button onClick={handleSubmitLink} disabled={saving} className="flex-1 sm:flex-none">
                 {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {editingId ? 'Guardar Cambios' : (multipleStudents.length > 1 ? 'Enviar Todas' : 'Enviar Solicitud')}
+                {editingId ? 'Save Changes' : (multipleStudents.length > 1 ? 'Submit All' : 'Submit Request')}
               </Button>
             </div>
           </DialogFooter>
