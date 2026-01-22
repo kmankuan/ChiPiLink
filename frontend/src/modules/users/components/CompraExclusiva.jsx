@@ -641,7 +641,7 @@ export default function CompraExclusiva() {
 
               <div className="grid gap-3">
                 {students.map((student) => (
-                  <Card key={estudiante.sync_id || estudiante.vinculacion_id}>
+                  <Card key={student.sync_id || student.student_id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -650,21 +650,21 @@ export default function CompraExclusiva() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-semibold">{estudiante.nombre}</h4>
-                              {getStatusBadge(estudiante)}
+                              <h4 className="font-semibold">{student.full_name || student.nombre}</h4>
+                              {getStatusBadge(student)}
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                              <span>ID: {estudiante.sync_id || estudiante.numero_estudiante}</span>
-                              {estudiante.grado && (
+                              <span>ID: {student.sync_id || student.student_number}</span>
+                              {student.grade && (
                                 <>
                                   <span>•</span>
-                                  <span>{estudiante.grado}</span>
+                                  <span>{student.grade}</span>
                                 </>
                               )}
-                              {estudiante.relacion && (
+                              {student.relation_type && (
                                 <>
                                   <span>•</span>
-                                  <span className="capitalize">{estudiante.relacion}</span>
+                                  <span className="capitalize">{student.relation_type}</span>
                                 </>
                               )}
                             </div>
@@ -674,7 +674,7 @@ export default function CompraExclusiva() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleEditEstudiante(estudiante)}
+                            onClick={() => handleEditStudent(student)}
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -682,7 +682,7 @@ export default function CompraExclusiva() {
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteEstudiante(estudiante.sync_id || estudiante.vinculacion_id)}
+                            onClick={() => handleDeleteStudent(student.sync_id || student.student_id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
