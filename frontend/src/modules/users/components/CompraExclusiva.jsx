@@ -1,6 +1,6 @@
 /**
- * Compra Exclusiva - Componente para gestionar acceso a catálogos exclusivos
- * Permite vincular estudiantes para acceder a libros de texto escolares
+ * Exclusive Purchase - Component for managing access to exclusive catalogs
+ * Allows linking students to access school textbooks
  */
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -695,7 +695,7 @@ export default function CompraExclusiva() {
         </TabsContent>
       </Tabs>
 
-      {/* Dialog para vincular estudiante */}
+      {/* Dialog to link student */}
       <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
@@ -712,37 +712,37 @@ export default function CompraExclusiva() {
             {editingId ? (
               /* Single student edit form */
               <div className="space-y-4 py-4">
-                {/* Nombre del acudiente (auto-filled) */}
+                {/* Guardian name (auto-filled) */}
                 <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-xs text-muted-foreground">Acudiente</Label>
-                  <p className="font-medium">{user?.nombre || user?.email}</p>
+                  <Label className="text-xs text-muted-foreground">Guardian</Label>
+                  <p className="font-medium">{user?.nombre || user?.name || user?.email}</p>
                 </div>
 
-                {/* Nombre del estudiante */}
+                {/* Student name */}
                 <div className="space-y-2">
                   <Label htmlFor="full_name">
-                    Nombre Completo del Estudiante <span className="text-destructive">*</span>
+                    Student Full Name <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="full_name"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    placeholder="Ej: Juan Carlos Pérez González"
+                    placeholder="e.g. John Smith"
                   />
                 </div>
 
-                {/* Colegio - only if active */}
+                {/* School - only if active */}
                 {isFieldActive('school_id') && (
                   <div className="space-y-2">
                     <Label>
-                      Colegio {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
+                      School {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
                     </Label>
                     <Select
                       value={formData.school_id}
                       onValueChange={(value) => setFormData({ ...formData, school_id: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona el colegio" />
+                        <SelectValue placeholder="Select school" />
                       </SelectTrigger>
                       <SelectContent>
                         {schools.map((school) => (
@@ -755,33 +755,33 @@ export default function CompraExclusiva() {
                   </div>
                 )}
 
-                {/* Número de estudiante - only if active */}
+                {/* Student number - only if active */}
                 {isFieldActive('student_id_number') && (
                   <div className="space-y-2">
                     <Label htmlFor="student_number">
-                      Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
+                      Student Number {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
                     </Label>
                     <Input
                       id="student_number"
                       value={formData.student_number}
                       onChange={(e) => setFormData({ ...formData, student_number: e.target.value })}
-                      placeholder="Ej: STU-2024-001"
+                      placeholder="e.g. STU-2024-001"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Este número lo encuentra en la credencial del estudiante o documentos escolares
+                      You can find this number on the student ID card or school documents
                     </p>
                   </div>
                 )}
 
-                {/* Año */}
+                {/* Year */}
                 <div className="space-y-2">
-                  <Label>Año Escolar <span className="text-destructive">*</span></Label>
+                  <Label>School Year <span className="text-destructive">*</span></Label>
                   <Select
                     value={formData.year}
                     onValueChange={(value) => setFormData({ ...formData, year: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el año" />
+                      <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                     <SelectContent>
                       {getAvailableYears().map((year) => (
@@ -793,15 +793,15 @@ export default function CompraExclusiva() {
                   </Select>
                 </div>
 
-                {/* Grado - dropdown */}
+                {/* Grade - dropdown */}
                 <div className="space-y-2">
-                  <Label>Grado <span className="text-destructive">*</span></Label>
+                  <Label>Grade <span className="text-destructive">*</span></Label>
                   <Select
                     value={formData.grade}
                     onValueChange={(value) => setFormData({ ...formData, grade: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona el grado" />
+                      <SelectValue placeholder="Select grade" />
                     </SelectTrigger>
                     <SelectContent>
                       {GRADES.map((grade) => (
@@ -813,17 +813,17 @@ export default function CompraExclusiva() {
                   </Select>
                 </div>
 
-                {/* Relación con el estudiante */}
+                {/* Relationship with student */}
                 <div className="space-y-2">
                   <Label>
-                    Relación con el Estudiante <span className="text-destructive">*</span>
+                    Relationship with Student <span className="text-destructive">*</span>
                   </Label>
                   <Select
                     value={formData.relationship}
                     onValueChange={(value) => setFormData({ ...formData, relationship: value, relationship_other: '' })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecciona tu relación" />
+                      <SelectValue placeholder="Select relationship" />
                     </SelectTrigger>
                     <SelectContent>
                       {getRelationOptions().map((rel) => (
@@ -835,27 +835,27 @@ export default function CompraExclusiva() {
                   </Select>
                 </div>
 
-                {/* Campo "Otro" - solo si seleccionó "other" */}
+                {/* "Other" field - only if selected "other" */}
                 {formData.relationship === 'other' && (
                   <div className="space-y-2">
-                    <Label>Especifica la relación <span className="text-destructive">*</span></Label>
+                    <Label>Specify relationship <span className="text-destructive">*</span></Label>
                     <Input
                       value={formData.relationship_other}
                       onChange={(e) => setFormData({ ...formData, relationship_other: e.target.value })}
-                      placeholder="Ej: Tío, Padrino, etc."
+                      placeholder="e.g. Uncle, Godparent, etc."
                     />
                   </div>
                 )}
 
-                {/* Notas adicionales - only if active */}
+                {/* Additional notes - only if active */}
                 {isFieldActive('notes') && (
                   <div className="space-y-2">
-                    <Label htmlFor="notas">Notas Adicionales (opcional)</Label>
+                    <Label htmlFor="notes">Additional Notes (optional)</Label>
                     <Input
-                      id="notas"
+                      id="notes"
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="Información adicional si es necesario"
+                      placeholder="Additional information if needed"
                     />
                   </div>
                 )}
@@ -863,10 +863,10 @@ export default function CompraExclusiva() {
             ) : (
               /* Multiple students form */
               <div className="space-y-4 py-4">
-                {/* Nombre del acudiente (auto-filled) */}
+                {/* Guardian name (auto-filled) */}
                 <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-xs text-muted-foreground">Acudiente</Label>
-                  <p className="font-medium">{user?.nombre || user?.email}</p>
+                  <Label className="text-xs text-muted-foreground">Guardian</Label>
+                  <p className="font-medium">{user?.nombre || user?.name || user?.email}</p>
                 </div>
 
                 {multipleStudents.map((student, index) => (
@@ -875,7 +875,7 @@ export default function CompraExclusiva() {
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base flex items-center gap-2">
                           <GraduationCap className="h-4 w-4 text-purple-600" />
-                          Estudiante {index + 1}
+                          Student {index + 1}
                         </CardTitle>
                         {multipleStudents.length > 1 && (
                           <Button
@@ -885,7 +885,7 @@ export default function CompraExclusiva() {
                             className="text-destructive hover:text-destructive h-8"
                           >
                             <Trash2 className="h-4 w-4 mr-1" />
-                            Quitar
+                            Remove
                           </Button>
                         )}
                       </div>
@@ -893,26 +893,26 @@ export default function CompraExclusiva() {
                     <CardContent className="space-y-4">
                       {/* Row 1: Name */}
                       <div className="space-y-2">
-                        <Label>Nombre Completo <span className="text-destructive">*</span></Label>
+                        <Label>Full Name <span className="text-destructive">*</span></Label>
                         <Input
                           value={student.full_name}
                           onChange={(e) => updateStudentRow(student.id, 'full_name', e.target.value)}
-                          placeholder="Ej: Juan Carlos Pérez"
+                          placeholder="e.g. John Smith"
                         />
                       </div>
 
-                      {/* Colegio - only if active */}
+                      {/* School - only if active */}
                       {isFieldActive('school_id') && (
                         <div className="space-y-2">
                           <Label>
-                            Colegio {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
+                            School {isFieldRequired('school_id') && <span className="text-destructive">*</span>}
                           </Label>
                           <Select
                             value={student.school_id}
                             onValueChange={(v) => updateStudentRow(student.id, 'school_id', v)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecciona el colegio" />
+                              <SelectValue placeholder="Select school" />
                             </SelectTrigger>
                             <SelectContent>
                               {schools.map((school) => (
@@ -929,12 +929,12 @@ export default function CompraExclusiva() {
                       {isFieldActive('student_id_number') && (
                         <div className="space-y-2">
                           <Label>
-                            Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
+                            Student Number {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
                           </Label>
                           <Input
                             value={student.student_number}
                             onChange={(e) => updateStudentRow(student.id, 'student_number', e.target.value)}
-                            placeholder="Ej: STU-2024-001"
+                            placeholder="e.g. STU-2024-001"
                           />
                         </div>
                       )}
@@ -942,13 +942,13 @@ export default function CompraExclusiva() {
                       {/* Row 2: Year and Grade */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Año Escolar <span className="text-destructive">*</span></Label>
+                          <Label>School Year <span className="text-destructive">*</span></Label>
                           <Select
                             value={student.year}
                             onValueChange={(v) => updateStudentRow(student.id, 'year', v)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecciona" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
                               {getAvailableYears().map((year) => (
@@ -960,13 +960,13 @@ export default function CompraExclusiva() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Grado <span className="text-destructive">*</span></Label>
+                          <Label>Grade <span className="text-destructive">*</span></Label>
                           <Select
                             value={student.grade}
                             onValueChange={(v) => updateStudentRow(student.id, 'grade', v)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecciona" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
                               {GRADES.map((grade) => (
@@ -981,13 +981,13 @@ export default function CompraExclusiva() {
 
                       {/* Row 3: Relation */}
                       <div className="space-y-2">
-                        <Label>Relación <span className="text-destructive">*</span></Label>
+                        <Label>Relationship <span className="text-destructive">*</span></Label>
                         <Select
                           value={student.relationship}
                           onValueChange={(v) => updateStudentRow(student.id, 'relationship', v)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona" />
+                            <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
                             {getRelationOptions().map((rel) => (
@@ -999,26 +999,26 @@ export default function CompraExclusiva() {
                         </Select>
                       </div>
 
-                      {/* Campo "Otro" - solo si seleccionó "other" */}
+                      {/* "Other" field - only if selected "other" */}
                       {student.relationship === 'other' && (
                         <div className="space-y-2">
-                          <Label>Especifica la relación <span className="text-destructive">*</span></Label>
+                          <Label>Specify relationship <span className="text-destructive">*</span></Label>
                           <Input
                             value={student.relationship_other}
                             onChange={(e) => updateStudentRow(student.id, 'relationship_other', e.target.value)}
-                            placeholder="Ej: Tío, Padrino, etc."
+                            placeholder="e.g. Uncle, Godparent, etc."
                           />
                         </div>
                       )}
                       
-                      {/* Notas (optional) - only if active */}
+                      {/* Notes (optional) - only if active */}
                       {isFieldActive('notes') && (
                         <div className="space-y-2">
-                          <Label>Notas Adicionales (opcional)</Label>
+                          <Label>Additional Notes (optional)</Label>
                           <Input
                             value={student.notes}
                             onChange={(e) => updateStudentRow(student.id, 'notes', e.target.value)}
-                            placeholder="Información adicional si es necesario"
+                            placeholder="Additional information if needed"
                           />
                         </div>
                       )}
