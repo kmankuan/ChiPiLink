@@ -803,22 +803,29 @@ export default function FormFieldsConfigTab({ token }) {
                       <div className="space-y-3 pt-2">
                         {formData.options?.map((option, index) => (
                           <div key={index} className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
-                            <div className="flex-1 grid grid-cols-3 gap-2">
-                              <Input
-                                placeholder={t.optionValue}
-                                value={option.value}
-                                onChange={(e) => updateOption(index, 'value', e.target.value)}
-                              />
-                              <Input
-                                placeholder={t.optionLabelEs}
-                                value={option.label_es}
-                                onChange={(e) => updateOption(index, 'label_es', e.target.value)}
-                              />
-                              <Input
-                                placeholder={t.optionLabelEn}
-                                value={option.label_en}
-                                onChange={(e) => updateOption(index, 'label_en', e.target.value)}
-                              />
+                            <div className="flex-1 space-y-2">
+                              <div className="grid grid-cols-4 gap-2">
+                                <Input
+                                  placeholder={t.optionValue}
+                                  value={option.value}
+                                  onChange={(e) => updateOption(index, 'value', e.target.value)}
+                                />
+                                <Input
+                                  placeholder={t.optionLabelEs}
+                                  value={option.label_es}
+                                  onChange={(e) => updateOption(index, 'label_es', e.target.value)}
+                                />
+                                <Input
+                                  placeholder={t.optionLabelEn}
+                                  value={option.label_en}
+                                  onChange={(e) => updateOption(index, 'label_en', e.target.value)}
+                                />
+                                <Input
+                                  placeholder="Etiqueta (ZH)"
+                                  value={option.label_zh || ''}
+                                  onChange={(e) => updateOption(index, 'label_zh', e.target.value)}
+                                />
+                              </div>
                             </div>
                             <Button
                               variant="ghost"
