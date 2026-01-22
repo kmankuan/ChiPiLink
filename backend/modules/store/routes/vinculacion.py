@@ -354,7 +354,7 @@ async def admin_desvincular(
     try:
         result = await vinculacion_service.desvincular(
             vinculacion_id,
-            admin["cliente_id"],
+            admin["user_id"],
             "admin",
             motivo
         )
