@@ -286,6 +286,9 @@ export default function TextbookAccessPage() {
     year: '',
     grade: ''
   });
+  
+  // Multiple students form state
+  const [multipleStudents, setMultipleStudents] = useState([]);
 
   // Get translations
   const t = translations[i18n.language] || translations.en;
