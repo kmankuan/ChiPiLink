@@ -527,7 +527,7 @@ export default function CompraExclusiva() {
 
               return (
                 <Card 
-                  key={programa.id}
+                  key={program.id}
                   className={`transition-all hover:shadow-md ${
                     hasAccess 
                       ? 'border-green-200 bg-green-50/50 dark:bg-green-900/10' 
@@ -536,21 +536,21 @@ export default function CompraExclusiva() {
                 >
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-xl bg-${programa.color}-100 dark:bg-${programa.color}-900/30`}>
-                        <Icon className={`h-6 w-6 text-${programa.color}-600`} />
+                      <div className={`p-3 rounded-xl bg-${program.color}-100 dark:bg-${program.color}-900/30`}>
+                        <Icon className={`h-6 w-6 text-${program.color}-600`} />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-bold text-lg">{programa.nombre}</h3>
+                          <h3 className="font-bold text-lg">{program.name}</h3>
                           {hasAccess && (
                             <Badge className="bg-green-100 text-green-700">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Acceso Activo
+                              Active Access
                             </Badge>
                           )}
                         </div>
                         <p className="text-muted-foreground text-sm mb-4">
-                          {programa.descripcion}
+                          {program.description}
                         </p>
                         <div className="flex gap-2">
                           {hasAccess ? (
@@ -559,24 +559,24 @@ export default function CompraExclusiva() {
                               className="gap-2"
                             >
                               <BookOpen className="h-4 w-4" />
-                              Ir a la Tienda
+                              Go to Store
                               <ChevronRight className="h-4 w-4" />
                             </Button>
                           ) : (
                             <Button 
-                              onClick={() => handleOpenVincular(programa)}
+                              onClick={() => handleOpenLink(program)}
                               className="gap-2"
                             >
                               <Plus className="h-4 w-4" />
-                              Vincular Estudiante
+                              Link Student
                             </Button>
                           )}
-                          {estudiantes.length > 0 && !hasAccess && (
+                          {students.length > 0 && !hasAccess && (
                             <Button 
                               variant="outline"
-                              onClick={() => setActiveTab('estudiantes')}
+                              onClick={() => setActiveTab('students')}
                             >
-                              Ver Solicitudes
+                              View Requests
                             </Button>
                           )}
                         </div>
