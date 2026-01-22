@@ -97,9 +97,13 @@ export default function CompraExclusiva() {
   // Form configuration from API
   const [formConfig, setFormConfig] = useState({ fields: [] });
   
+  // Schools list
+  const [schools, setSchools] = useState([]);
+  
   // Form state for single edit
   const [formData, setFormData] = useState({
     nombre_estudiante: '',
+    school_id: '',
     numero_estudiante: '',
     anio: String(new Date().getFullYear()),
     grado: '',
