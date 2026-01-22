@@ -246,16 +246,21 @@ export default function CompraExclusiva() {
         toast.error('Por favor selecciona tu relación con el estudiante');
         return;
       }
+      if (formData.relacion === 'other' && !formData.relacion_otro?.trim()) {
+        toast.error('Por favor especifica la relación');
+        return;
+      }
 
       try {
         setSaving(true);
         
         const payload = {
-          sync_id: formData.numero_estudiante.trim(),
+          sync_id: isFieldActive('student_id_number') ? formData.numero_estudiante?.trim() : undefined,
           nombre: formData.nombre_estudiante.trim(),
+          anio: formData.anio,
           grado: formData.grado || 'Por verificar',
-          relacion: formData.relacion,
-          notas: formData.notas,
+          relacion: formData.relacion === 'other' ? formData.relacion_otro : formData.relacion,
+          notas: isFieldActive('notes') ? formData.notas : undefined,
           programa: selectedPrograma?.id || 'pca'
         };
 
@@ -273,7 +278,7 @@ export default function CompraExclusiva() {
         if (response.ok) {
           toast.success('Estudiante actualizado');
           setShowVincularDialog(false);
-          fetchEstudiantes();
+          fetchData();
         } else {
           toast.error(data.detail || 'Error al procesar solicitud');
         }
@@ -298,12 +303,24 @@ export default function CompraExclusiva() {
     for (let i = 0; i < validStudents.length; i++) {
       const s = validStudents[i];
       const num = i + 1;
-      if (!s.numero_estudiante.trim()) {
+      if (isFieldActive('student_id_number') && isFieldRequired('student_id_number') && !s.numero_estudiante?.trim()) {
         toast.error(`Estudiante ${num}: Por favor ingresa el número de estudiante`);
+        return;
+      }
+      if (!s.anio) {
+        toast.error(`Estudiante ${num}: Por favor selecciona el año`);
+        return;
+      }
+      if (!s.grado) {
+        toast.error(`Estudiante ${num}: Por favor selecciona el grado`);
         return;
       }
       if (!s.relacion) {
         toast.error(`Estudiante ${num}: Por favor selecciona la relación`);
+        return;
+      }
+      if (s.relacion === 'other' && !s.relacion_otro?.trim()) {
+        toast.error(`Estudiante ${num}: Por favor especifica la relación`);
         return;
       }
     }
@@ -316,7 +333,7 @@ export default function CompraExclusiva() {
       for (const student of validStudents) {
         try {
           const payload = {
-            sync_id: student.numero_estudiante.trim(),
+            sync_id: isFieldActive('student_id_number') ? student.numero_estudiante?.trim() : undefined,
             nombre: student.nombre_estudiante.trim(),
             grado: student.grado || 'Por verificar',
             relacion: student.relacion,
