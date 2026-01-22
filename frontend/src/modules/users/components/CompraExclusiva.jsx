@@ -698,7 +698,7 @@ export default function CompraExclusiva() {
       </Tabs>
 
       {/* Dialog para vincular estudiante */}
-      <Dialog open={showVincularDialog} onOpenChange={setShowVincularDialog}>
+      <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
