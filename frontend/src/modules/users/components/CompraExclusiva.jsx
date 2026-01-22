@@ -760,13 +760,13 @@ export default function CompraExclusiva() {
                 {/* Número de estudiante - only if active */}
                 {isFieldActive('student_id_number') && (
                   <div className="space-y-2">
-                    <Label htmlFor="numero_estudiante">
+                    <Label htmlFor="student_number">
                       Número de Estudiante {isFieldRequired('student_id_number') && <span className="text-destructive">*</span>}
                     </Label>
                     <Input
-                      id="numero_estudiante"
-                      value={formData.numero_estudiante}
-                      onChange={(e) => setFormData({ ...formData, numero_estudiante: e.target.value })}
+                      id="student_number"
+                      value={formData.student_number}
+                      onChange={(e) => setFormData({ ...formData, student_number: e.target.value })}
                       placeholder="Ej: STU-2024-001"
                     />
                     <p className="text-xs text-muted-foreground">
