@@ -32,6 +32,19 @@ These rules are **PERMANENT** and must be followed in all future development ses
 - Each module should have: `models/`, `services/`, `routes/`, `repositories/`
 - Avoid tight coupling between modules
 
+### 4. Data Source Consistency (NEW)
+- **Single Source of Truth**: Each data entity must have ONE authoritative source
+- **Schools**: Managed ONLY via `schools` collection, NOT via form config options
+  - Admin manages schools in "Escuelas" tab
+  - User form reads from `/api/store/textbook-access/schools` endpoint
+  - Form config `school_id` field should NOT have manual options
+- **Relationships**: Managed via form config options (flexible)
+- **Grades**: Defined as constants in code (stable)
+- When adding new entity types, decide upfront if managed via:
+  - Database collection (for frequently updated data)
+  - Form config options (for admin-customizable lists)
+  - Code constants (for stable, rarely-changed values)
+
 ---
 
 ## Latest Update (Enero 22, 2026) - Sexta Actualización
