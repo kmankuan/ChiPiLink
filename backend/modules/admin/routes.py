@@ -17,6 +17,94 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
+# ============== DATABASE MIGRATION ==============
+
+@router.post("/migrate-database")
+async def migrate_database(admin: dict = Depends(get_admin_user)):
+    """
+    Run database migration to rename collections to new naming standard.
+    Only accessible by admin users.
+    """
+    logger.info(f"Database migration started by admin: {admin.get('email')}")
+    
+    # Migration mappings: old_name -> new_name
+    COLLECTION_RENAMES = {
+        'schools': 'store_schools',
+        'textbook_access_students': 'store_students',
+        'form_field_configs': 'store_form_configs',
+        'users_profiles': 'user_profiles',
+    }
+    
+    # Collections to delete (deprecated)
+    COLLECTIONS_TO_DELETE = [
+        'usuarios',
+        'vinculaciones', 
+        'store_orders',
+    ]
+    
+    renamed = []
+    deleted = []
+    errors = []
+    
+    try:
+        existing_collections = await db.client[db.db_name].list_collection_names()
+        
+        # Rename collections
+        for old_name, new_name in COLLECTION_RENAMES.items():
+            try:
+                if old_name in existing_collections and new_name not in existing_collections:
+                    # Create backup
+                    backup_name = f"_backup_{old_name}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+                    docs = await db.client[db.db_name][old_name].find({}).to_list(None)
+                    if docs:
+                        await db.client[db.db_name][backup_name].insert_many(docs)
+                        logger.info(f"Backed up {len(docs)} docs to {backup_name}")
+                    
+                    # Rename
+                    await db.client[db.db_name][old_name].rename(new_name)
+                    renamed.append({"from": old_name, "to": new_name, "backup": backup_name})
+                    logger.info(f"Renamed {old_name} -> {new_name}")
+                elif new_name in existing_collections:
+                    logger.info(f"Collection {new_name} already exists, skipping {old_name}")
+                else:
+                    logger.info(f"Collection {old_name} does not exist, skipping")
+            except Exception as e:
+                errors.append(f"Error renaming {old_name}: {str(e)}")
+                logger.error(f"Error renaming {old_name}: {e}")
+        
+        # Delete deprecated collections
+        for coll_name in COLLECTIONS_TO_DELETE:
+            try:
+                if coll_name in existing_collections:
+                    count = await db.client[db.db_name][coll_name].count_documents({})
+                    if count > 0:
+                        # Backup first
+                        backup_name = f"_backup_{coll_name}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+                        docs = await db.client[db.db_name][coll_name].find({}).to_list(None)
+                        await db.client[db.db_name][backup_name].insert_many(docs)
+                    
+                    await db.client[db.db_name][coll_name].drop()
+                    deleted.append({"collection": coll_name, "docs": count})
+                    logger.info(f"Deleted {coll_name} ({count} docs)")
+            except Exception as e:
+                errors.append(f"Error deleting {coll_name}: {str(e)}")
+                logger.error(f"Error deleting {coll_name}: {e}")
+        
+        logger.info(f"Migration complete. Renamed: {len(renamed)}, Deleted: {len(deleted)}")
+        
+        return {
+            "success": True,
+            "renamed": renamed,
+            "deleted": deleted,
+            "errors": errors if errors else None,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Migration failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Migration failed: {str(e)}")
+
+
 # ============== SETUP ROUTES ==============
 
 @router.post("/setup")
