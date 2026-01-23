@@ -1,5 +1,10 @@
 # ChiPi Link - Product Requirements Document
 
+> **📚 Related Documents:**
+> - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture, naming standards, folder structure
+> - **[CHANGELOG.md](./CHANGELOG.md)** - History of changes and updates
+> - **[ROADMAP.md](./ROADMAP.md)** - Prioritized backlog and future features
+
 ## Original Problem Statement
 Sistema multi-módulo "Super App" con enfoque principal en el módulo **PinpanClub** para gestión de clubes de ping pong, incluyendo el sistema de ranking **Super Pin** y el nuevo sistema de partidos espontáneos **Rapid Pin**.
 
