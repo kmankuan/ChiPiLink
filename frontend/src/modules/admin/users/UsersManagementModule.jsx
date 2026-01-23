@@ -49,7 +49,7 @@ import {
   ClipboardList,
   UserCheck
 } from 'lucide-react';
-import AdminUsuariosConexiones from '@/modules/users/components/AdminUsuariosConexiones';
+import AdminUsuariosConexiones from './components/AdminUsuariosConexiones';
 import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 import SchoolsManagementTab from './components/SchoolsManagementTab';
 import StudentRequestsTab from './components/StudentRequestsTab';
