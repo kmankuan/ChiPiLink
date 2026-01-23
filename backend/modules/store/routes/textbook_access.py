@@ -203,6 +203,20 @@ async def get_user_students_admin(
     return {"students": students}
 
 
+@router.get("/admin/all-students")
+async def get_all_students_admin(
+    status: Optional[str] = None,
+    school_id: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all student records from all users (admin view)"""
+    students = await textbook_access_service.get_all_students(
+        status=status,
+        school_id=school_id
+    )
+    return {"students": students}
+
+
 @router.put("/admin/students/{student_id}")
 async def update_student_admin(
     student_id: str,
