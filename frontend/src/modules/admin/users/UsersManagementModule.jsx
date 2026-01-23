@@ -55,7 +55,7 @@ import SchoolsManagementTab from './components/SchoolsManagementTab';
 import StudentRequestsTab from './components/StudentRequestsTab';
 import AllStudentsTab from './components/AllStudentsTab';
 
-export default function CustomersModule() {
+export default function UsersManagementModule() {
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [matriculas, setMatriculas] = useState([]);
