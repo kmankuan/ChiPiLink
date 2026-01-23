@@ -12,8 +12,7 @@ import {
   Users,
   Languages,
   Database,
-  Shield,
-  RefreshCw
+  Shield
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
@@ -21,7 +20,6 @@ import FormConfigModule from './FormConfigModule';
 import TranslationsModule from './TranslationsModule';
 import DemoDataModule from './DemoDataModule';
 import AuthMethodsConfig from './AuthMethodsConfig';
-import DatabaseMigrationModule from './DatabaseMigrationModule';
 
 export default function AdminModule() {
   return (
@@ -58,11 +56,6 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Datos Demo</span>
             <span className="sm:hidden">Demo</span>
           </TabsTrigger>
-          <TabsTrigger value="migration" className="gap-2" data-testid="migration-tab">
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden sm:inline">Migración BD</span>
-            <span className="sm:hidden">Migrar</span>
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
@@ -87,10 +80,6 @@ export default function AdminModule() {
 
         <TabsContent value="demo">
           <DemoDataModule />
-        </TabsContent>
-
-        <TabsContent value="migration">
-          <DatabaseMigrationModule />
         </TabsContent>
       </Tabs>
     </div>
