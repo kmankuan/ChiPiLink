@@ -270,6 +270,22 @@ const fieldTypeIcons = {
   phone: Phone
 };
 
+// Fields that have their own data sources (not managed via form config options)
+const SPECIAL_DATA_SOURCE_FIELDS = {
+  school_id: {
+    source: 'schools_collection',
+    message_en: 'Schools are managed in the "Schools" section. Options here are ignored.',
+    message_es: 'Las escuelas se gestionan en la sección "Escuelas". Las opciones aquí se ignoran.',
+    message_zh: '学校在"学校"部分管理。此处的选项将被忽略。'
+  },
+  relationship: {
+    source: 'form_config_options',
+    message_en: 'Relationship options are managed here.',
+    message_es: 'Las opciones de relación se gestionan aquí.',
+    message_zh: '关系选项在此管理。'
+  }
+};
+
 const defaultFormData = {
   field_key: '',
   field_type: 'text',
