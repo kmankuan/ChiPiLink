@@ -1,6 +1,6 @@
 /**
- * Users Dashboard Page - Página principal del módulo de usuarios
- * Incluye: Wallet, Perfil, Membresía, Conexiones, Acudidos, Capacidades, Notificaciones
+ * Account Dashboard Page - Main page for user's personal portal
+ * Includes: Wallet, Profile, Membership, Connections, Dependents, Capacities, Notifications
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,26 +9,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Componentes de usuario
-import ChipiWallet from '../components/ChipiWallet';
-import UserProfile from '../components/UserProfile';
-import MembershipCard from '../components/MembershipCard';
-import MisConexiones from '../components/MisConexiones';
-import MisAcudidos from '../components/MisAcudidos';
-import MisCapacidades from '../components/MisCapacidades';
-import ServiciosSugeridos from '../components/ServiciosSugeridos';
-import TransferenciasDialog from '../components/TransferenciasDialog';
-import AlertasSaldo from '../components/AlertasSaldo';
-import CompraExclusiva from '../components/CompraExclusiva';
+// Account components - new structure
+import ChipiWallet from '../wallet/WalletPage';
+import UserProfile from '../profile/ProfilePage';
+import MembershipCard from '../profile/MembershipCard';
+import MisConexiones from '../connections/ConnectionsPage';
+import MisAcudidos from '../connections/MisAcudidos';
+import MisCapacidades from '../profile/MisCapacidades';
+import ServiciosSugeridos from '../ServiciosSugeridos';
+import TransferenciasDialog from '../wallet/TransferenciasDialog';
+import AlertasSaldo from '../wallet/AlertasSaldo';
+import CompraExclusiva from '../linking/LinkingPage';
 
-// Componentes de notificaciones
+// Notification components
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
 import NotificationHistory from '@/modules/notifications/components/NotificationHistory';
 import PushNotificationSubscribe from '@/components/notifications/PushNotificationSubscribe';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function UsersDashboard() {
+export default function AccountDashboard() {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('wallet');
