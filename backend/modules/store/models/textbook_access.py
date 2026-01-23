@@ -61,6 +61,7 @@ class SchoolCreate(BaseModel):
     name: str
     short_name: Optional[str] = None
     catalog_id: Optional[str] = None
+    is_active: bool = True
 
 
 # ============== STUDENT ENROLLMENT MODELS ==============
