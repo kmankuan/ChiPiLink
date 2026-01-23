@@ -45,7 +45,7 @@ import { cn } from '@/lib/utils';
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
 const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule'));
 const OrdersModule = lazy(() => import('@/modules/store/OrdersModule'));
-const CustomersModule = lazy(() => import('@/modules/customers/CustomersModule'));
+const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
 const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
