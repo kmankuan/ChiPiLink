@@ -50,6 +50,8 @@ import {
 import AdminUsuariosConexiones from '@/modules/users/components/AdminUsuariosConexiones';
 import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 import SchoolsManagementTab from './components/SchoolsManagementTab';
+import StudentRequestsTab from './components/StudentRequestsTab';
+import AllStudentsTab from './components/AllStudentsTab';
 
 export default function CustomersModule() {
   const { api } = useAuth();
