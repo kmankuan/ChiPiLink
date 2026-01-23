@@ -46,6 +46,21 @@ class TextbookAccessService(BaseService):
         }
         return await self.school_repo.create(data)
     
+    async def update_school(self, school_id: str, name: str, short_name: str = None, 
+                           catalog_id: str = None, is_active: bool = True) -> Optional[Dict]:
+        """Update a school"""
+        return await self.school_repo.update(school_id, {
+            "name": name,
+            "short_name": short_name,
+            "catalog_id": catalog_id,
+            "is_active": is_active
+        })
+    
+    async def delete_school(self, school_id: str) -> bool:
+        """Delete (deactivate) a school"""
+        result = await self.school_repo.update(school_id, {"is_active": False})
+        return result is not None
+    
     async def get_school(self, school_id: str) -> Optional[Dict]:
         """Get a school by ID"""
         return await self.school_repo.get_by_id(school_id)
