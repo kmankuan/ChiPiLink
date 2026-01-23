@@ -49,7 +49,7 @@ const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersMana
 const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
-const AdminMemberships = lazy(() => import('@/modules/users/pages/AdminMemberships'));
+const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
 const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
 
 // Loading component for Suspense
