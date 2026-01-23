@@ -33,7 +33,16 @@ export default function DatabaseMigrationModule() {
         }
       });
 
-      const data = await response.json();
+      // Read response text first
+      const text = await response.text();
+      
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Server response: ${text.substring(0, 200)}`);
+      }
 
       if (response.ok) {
         setResult({ success: true, data });
@@ -44,7 +53,7 @@ export default function DatabaseMigrationModule() {
       }
     } catch (err) {
       setResult({ success: false, error: err.message });
-      toast.error('Error de conexión');
+      toast.error('Error: ' + err.message);
     } finally {
       setMigrating(false);
     }
