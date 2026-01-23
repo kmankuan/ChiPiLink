@@ -145,6 +145,30 @@ class TextbookAccessService(BaseService):
         
         return students
     
+    async def get_all_students(self, status: str = None, school_id: str = None) -> List[Dict]:
+        """Get all student records from all users (admin view)"""
+        students = await self.student_repo.get_all(status=status, school_id=school_id)
+        current_year = self.get_current_school_year()
+        
+        # Enrich with computed fields
+        for student in students:
+            # Get school name
+            school = await self.school_repo.get_by_id(student.get("school_id"))
+            student["school_name"] = school.get("name") if school else "Unknown"
+            
+            # Flatten enrollment data
+            enrollments = student.get("enrollments", [])
+            current_enrollment = next(
+                (e for e in enrollments if e.get("year") == current_year),
+                enrollments[0] if enrollments else {}
+            )
+            
+            student["status"] = current_enrollment.get("status", "pending")
+            student["grade"] = current_enrollment.get("grade", "")
+            student["year"] = current_enrollment.get("year", current_year)
+        
+        return students
+    
     async def create_student_record(self, user_id: str, data: StudentRecordCreate) -> Dict:
         """Create a new student record with initial enrollment"""
         # Get school info
