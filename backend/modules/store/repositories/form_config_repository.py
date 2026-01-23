@@ -13,7 +13,7 @@ from core.base import BaseRepository
 class FormConfigRepository(BaseRepository):
     """Repository for form field configurations"""
     
-    COLLECTION_NAME = "form_field_configs"
+    COLLECTION_NAME = "store_form_configs"
     ID_FIELD = "field_id"
     
     def __init__(self):
