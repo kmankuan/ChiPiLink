@@ -58,6 +58,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Datos Demo</span>
             <span className="sm:hidden">Demo</span>
           </TabsTrigger>
+          <TabsTrigger value="migration" className="gap-2" data-testid="migration-tab">
+            <RefreshCw className="h-4 w-4" />
+            <span className="hidden sm:inline">Migración BD</span>
+            <span className="sm:hidden">Migrar</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
@@ -82,6 +87,10 @@ export default function AdminModule() {
 
         <TabsContent value="demo">
           <DemoDataModule />
+        </TabsContent>
+
+        <TabsContent value="migration">
+          <DatabaseMigrationModule />
         </TabsContent>
       </Tabs>
     </div>
