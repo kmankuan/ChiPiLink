@@ -44,7 +44,8 @@ import {
   RefreshCw,
   Settings,
   Link2,
-  Settings2
+  Settings2,
+  School
 } from 'lucide-react';
 import AdminUsuariosConexiones from '@/modules/users/components/AdminUsuariosConexiones';
 import FormFieldsConfigTab from './components/FormFieldsConfigTab';
