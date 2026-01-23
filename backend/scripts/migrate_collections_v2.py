@@ -10,17 +10,17 @@ from datetime import datetime, timezone
 
 # Migration mappings: old_name -> new_name
 COLLECTION_RENAMES = {
-    # 'schools': 'store_schools',  # Add module prefix - SKIP for now as it requires code changes
-    # 'textbook_access_students': 'store_students',  # Simplify name - SKIP for now
-    # 'form_field_configs': 'store_form_configs',  # Add module prefix - SKIP for now
-    # 'users_profiles': 'user_profiles',  # Fix plural - SKIP for now
+    'schools': 'store_schools',
+    'textbook_access_students': 'store_students',
+    'form_field_configs': 'store_form_configs',
+    'users_profiles': 'user_profiles',
 }
 
 # Collections to delete (empty or deprecated)
 COLLECTIONS_TO_DELETE = [
-    # 'usuarios',  # Deprecated Spanish collection
-    # 'vinculaciones',  # Deprecated Spanish collection
-    # 'store_orders',  # Empty
+    'usuarios',  # Deprecated Spanish collection (1 doc)
+    'vinculaciones',  # Deprecated Spanish collection (1 doc)
+    'store_orders',  # Empty
 ]
 
 
