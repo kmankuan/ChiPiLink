@@ -272,6 +272,8 @@ GET    /api/account/wallet
 - [x] Rename `form_field_configs` → `store_form_configs`
 - [x] Delete empty/unused collections (`usuarios`, `vinculaciones`, `store_orders`)
 - [x] Update all backend references
+- [x] Delete backup collections after verification
+- [x] Remove temporary migration tool (UI + API endpoint)
 
 ### Phase 3: Frontend Restructure ✅ (Completed Jan 23, 2026)
 - [x] Create `/modules/admin/` folder
