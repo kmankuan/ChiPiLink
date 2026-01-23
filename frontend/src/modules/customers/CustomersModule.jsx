@@ -164,6 +164,11 @@ export default function CustomersModule() {
           <FormFieldsConfigTab token={localStorage.getItem('auth_token')} />
         </TabsContent>
 
+        {/* Schools Management Tab */}
+        <TabsContent value="schools" className="space-y-4">
+          <SchoolsManagementTab token={localStorage.getItem('auth_token')} />
+        </TabsContent>
+
         {/* Students/Enrollments Tab */}
         <TabsContent value="students" className="space-y-4">
           {/* Stats */}
