@@ -12,7 +12,8 @@ import {
   Users,
   Languages,
   Database,
-  Shield
+  Shield,
+  RefreshCw
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
@@ -20,6 +21,7 @@ import FormConfigModule from './FormConfigModule';
 import TranslationsModule from './TranslationsModule';
 import DemoDataModule from './DemoDataModule';
 import AuthMethodsConfig from './AuthMethodsConfig';
+import DatabaseMigrationModule from './DatabaseMigrationModule';
 
 export default function AdminModule() {
   return (
