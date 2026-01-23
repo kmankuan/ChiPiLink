@@ -32,18 +32,78 @@ These rules are **PERMANENT** and must be followed in all future development ses
 - Each module should have: `models/`, `services/`, `routes/`, `repositories/`
 - Avoid tight coupling between modules
 
-### 4. Data Source Consistency (NEW)
+### 4. Data Source Consistency
 - **Single Source of Truth**: Each data entity must have ONE authoritative source
 - **Schools**: Managed ONLY via `schools` collection, NOT via form config options
-  - Admin manages schools in "Escuelas" tab
-  - User form reads from `/api/store/textbook-access/schools` endpoint
-  - Form config `school_id` field should NOT have manual options
 - **Relationships**: Managed via form config options (flexible)
 - **Grades**: Defined as constants in code (stable)
-- When adding new entity types, decide upfront if managed via:
-  - Database collection (for frequently updated data)
-  - Form config options (for admin-customizable lists)
-  - Code constants (for stable, rarely-changed values)
+
+### 5. Project Structure Standards (NEW - Jan 23, 2026)
+
+**See `/app/memory/ARCHITECTURE.md` for complete details.**
+
+#### Frontend Modules:
+```
+/modules/
+  /admin/          ← All admin/backoffice panels
+    /users/        ← User management (was: customers/)
+  /account/        ← User's personal portal (was: users/)
+    /linking/      ← Student linking (CompraExclusiva)
+    /profile/
+    /wallet/
+    /connections/
+```
+
+#### Backend Modules:
+```
+/modules/
+  /auth/           ← Authentication
+  /users/          ← User management
+  /store/          ← Store & textbook access
+  /wallet/         ← Wallet system
+```
+
+#### Database Collections:
+- Format: `{module}_{entity}` (e.g., `store_schools`, `user_profiles`)
+- DEPRECATED: `usuarios`, `clientes`, `vinculaciones` (Spanish names)
+
+---
+
+## Latest Update (Enero 23, 2026) - Séptima Actualización
+
+### ✅ Reestructuración de Arquitectura - COMPLETADO
+
+Se documentó y comenzó la migración a la nueva estructura de carpetas.
+
+#### Cambios Realizados:
+1. **Documento de arquitectura creado**: `/app/memory/ARCHITECTURE.md`
+   - Define estándares de nomenclatura
+   - Mapea estructura actual → objetivo
+   - Incluye checklist de migración
+
+2. **Nueva estructura de frontend**:
+   - `/modules/admin/users/` ← Panel de gestión de usuarios (antes customers/)
+   - `/modules/account/` ← Portal del usuario (antes users/)
+   - Archivos index.js para exports limpios
+
+3. **AdminDashboard actualizado**:
+   - Ahora usa `UsersManagementModule` en lugar de `CustomersModule`
+
+4. **Script de migración de BD creado**:
+   - `/app/backend/scripts/migrate_collections_v2.py`
+   - Preparado para renombrar colecciones cuando se decida ejecutar
+
+#### Archivos Creados/Modificados:
+- `/app/memory/ARCHITECTURE.md` (NEW)
+- `/app/frontend/src/modules/admin/users/` (NEW)
+- `/app/frontend/src/modules/account/` (NEW)
+- `/app/frontend/src/pages/AdminDashboard.jsx` (MODIFIED)
+
+#### Pendiente:
+- [ ] Migrar componentes de users/ a account/ completamente
+- [ ] Ejecutar migración de BD (renombrar colecciones)
+- [ ] Actualizar todas las importaciones
+- [ ] Eliminar carpetas legacy (customers/, users/)
 
 ---
 
