@@ -123,12 +123,25 @@ class TextbookAccessService(BaseService):
                 for e in enrollments
             )
             
-            # Get current year status
+            # Get current year enrollment and flatten key fields for frontend
             current_enrollment = next(
                 (e for e in enrollments if e.get("year") == current_year),
                 None
             )
-            student["current_year_status"] = current_enrollment.get("status") if current_enrollment else None
+            
+            # Flatten status, grade, and year for easy frontend access
+            if current_enrollment:
+                student["status"] = current_enrollment.get("status", "pending")
+                student["grade"] = current_enrollment.get("grade", "")
+                student["year"] = current_enrollment.get("year")
+            else:
+                # Fallback to first enrollment if no current year
+                first_enrollment = enrollments[0] if enrollments else {}
+                student["status"] = first_enrollment.get("status", "pending")
+                student["grade"] = first_enrollment.get("grade", "")
+                student["year"] = first_enrollment.get("year", current_year)
+            
+            student["current_year_status"] = student["status"]
         
         return students
     
