@@ -1,5 +1,5 @@
 /**
- * ChipiWallet Component - Billetera digital con USD y ChipiPoints
+ * ChipiWallet Component - Digital wallet with USD and ChipiPoints
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import UserQRCode from './UserQRCode';
+import UserQRCode from '../profile/UserQRCode';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
