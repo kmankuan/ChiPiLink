@@ -134,43 +134,57 @@ export default function CustomersModule() {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="conexiones">
-        <TabsList>
+      <Tabs defaultValue="student-requests">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="student-requests" className="gap-2">
+            <ClipboardList className="h-4 w-4" />
+            Solicitudes Vinculación
+          </TabsTrigger>
+          <TabsTrigger value="all-students" className="gap-2">
+            <UserCheck className="h-4 w-4" />
+            Todos los Estudiantes
+          </TabsTrigger>
           <TabsTrigger value="conexiones" className="gap-2">
             <Link2 className="h-4 w-4" />
-            Conexiones y Capacidades
-          </TabsTrigger>
-          <TabsTrigger value="students" className="gap-2">
-            <GraduationCap className="h-4 w-4" />
-            Estudiantes / Matrículas
-          </TabsTrigger>
-          <TabsTrigger value="clients" className="gap-2">
-            <Users className="h-4 w-4" />
-            Clientes
-          </TabsTrigger>
-          <TabsTrigger value="form-config" className="gap-2">
-            <Settings2 className="h-4 w-4" />
-            Config. Formularios
+            Conexiones
           </TabsTrigger>
           <TabsTrigger value="schools" className="gap-2">
             <School className="h-4 w-4" />
             Escuelas
           </TabsTrigger>
+          <TabsTrigger value="form-config" className="gap-2">
+            <Settings2 className="h-4 w-4" />
+            Config. Formularios
+          </TabsTrigger>
+          <TabsTrigger value="students" className="gap-2">
+            <GraduationCap className="h-4 w-4" />
+            Matrículas (Legacy)
+          </TabsTrigger>
         </TabsList>
+
+        {/* Student Link Requests (moved from Unatienda) */}
+        <TabsContent value="student-requests" className="space-y-4">
+          <StudentRequestsTab token={localStorage.getItem('auth_token')} />
+        </TabsContent>
+
+        {/* All Students Table */}
+        <TabsContent value="all-students" className="space-y-4">
+          <AllStudentsTab token={localStorage.getItem('auth_token')} />
+        </TabsContent>
 
         {/* Sistema de Conexiones y Capacidades */}
         <TabsContent value="conexiones" className="space-y-4">
           <AdminUsuariosConexiones token={localStorage.getItem('auth_token')} />
         </TabsContent>
 
-        {/* Form Configuration Tab */}
-        <TabsContent value="form-config" className="space-y-4">
-          <FormFieldsConfigTab token={localStorage.getItem('auth_token')} />
-        </TabsContent>
-
         {/* Schools Management Tab */}
         <TabsContent value="schools" className="space-y-4">
           <SchoolsManagementTab token={localStorage.getItem('auth_token')} />
+        </TabsContent>
+
+        {/* Form Configuration Tab */}
+        <TabsContent value="form-config" className="space-y-4">
+          <FormFieldsConfigTab token={localStorage.getItem('auth_token')} />
         </TabsContent>
 
         {/* Students/Enrollments Tab */}
