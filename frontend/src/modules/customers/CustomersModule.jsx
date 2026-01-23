@@ -148,6 +148,10 @@ export default function CustomersModule() {
             <Settings2 className="h-4 w-4" />
             Config. Formularios
           </TabsTrigger>
+          <TabsTrigger value="schools" className="gap-2">
+            <School className="h-4 w-4" />
+            Escuelas
+          </TabsTrigger>
         </TabsList>
 
         {/* Sistema de Conexiones y Capacidades */}
