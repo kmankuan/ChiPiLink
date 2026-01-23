@@ -81,6 +81,20 @@ class StudentRecordRepository(BaseRepository):
             sort=[("created_at", -1)]
         )
     
+    async def get_all(self, status: str = None, school_id: str = None, include_inactive: bool = False) -> List[Dict]:
+        """Get all student records with optional filters"""
+        query = {}
+        if not include_inactive:
+            query["is_active"] = True
+        if school_id:
+            query["school_id"] = school_id
+        if status:
+            query["enrollments.status"] = status
+        return await self.find_many(
+            query=query,
+            sort=[("created_at", -1)]
+        )
+    
     async def update_student(self, student_id: str, data: Dict) -> bool:
         """Update a student record"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
