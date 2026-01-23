@@ -1,60 +1,64 @@
 <analysis>**original_problem_statement:**
-The user's goal is to build a multi-functional super app for textbook sales. Initial development focused on an e-commerce store (Unatienda), a Role-Based Access Control (RBAC) system, and a private catalog for exclusive textbook sales.
+The user's initial goal was to build a super app. The project has evolved to include an e-commerce store (), a textbook access request system for parents, a ping-pong club management module (), and more.
 
-Recent work involved a massive refactoring of the entire codebase to migrate from Spanish to English naming conventions for variables and database fields, as requested by the user for better maintainability. Additionally, the agent fixed a duplicate header in the admin dashboard and implemented a full-page interface for bulk-importing books, replacing a less user-friendly popup.
+The previous session focused on building the textbook access request flow and a dynamic form management system for admins. However, the agent repeatedly introduced Spanish variable names, violating a core project requirement.
 
-The current primary task, based on the latest user request, is to build a new end-to-end feature for users to request access to the private textbook catalog. This involves creating a form where users can submit their students' details (school, grade, etc.) for approval by an admin or moderator, replacing the old system where admins had to manage student lists manually.
-
-PRODUCT REQUIREMENTS:
-1.  **Codebase Language**: All new code and refactoring must use English naming conventions.
-2.  **Architecture**: Maintain the existing microservice-style structure for backend modules.
-3.  **Multilingual Support**: All user-facing text must support English, Spanish, and Chinese.
+This session's primary goals, driven by user feedback, were:
+1.  **Refactor to English:** Complete the refactoring of all Spanish-named variables, functions, and comments to English.
+2.  **Fix Data Inconsistencies:** Resolve bugs where data updated by an admin (like available schools or student approval status) was not reflected for the user.
+3.  **Major Architecture Refactoring:** Address user confusion about the project structure by reorganizing frontend folders and renaming database collections for clarity and consistency, following an English-first and module-based approach.
+4.  **Enable Production Migration:** Create a mechanism for the user to apply these database schema changes to their production environment.
 
 **User's preferred language**: Spanish
 
 **what currently exists?**
-The application is a full-stack system with a React frontend, FastAPI backend, and a MongoDB database named . The core authentication and roles modules in the backend, along with the main user collection in the database (), have been fully refactored to use English field names (e.g., , ). Key frontend components like  and the Login/Register pages have been updated accordingly.
+The application is a full-stack system with a React frontend, FastAPI backend, and MongoDB. A major architectural refactoring has been completed.
 
-The foundation for the new Textbook Access Request feature has been laid out. This includes:
-*   **Backend**: Pydantic models, repository, service, and API routes for creating and managing access requests.
-*   **Frontend**: Placeholder pages have been created ( for users,  for admins) and linked into the application's routing and admin UI.
+-   **Frontend**: The module structure has been reorganized for clarity. Admin-related UIs are now in , and user-facing account pages are in . Legacy folders (, ) have been deleted.
+-   **Backend**: Database collections have been renamed to be consistent and prefixed by module (e.g.,  is now ). The services and repositories have been updated to use these new collection names.
+-   **Migration Tool**: A temporary Migración BD tab with a button has been added to the admin panel. This allows the user to safely execute a script that renames the collections in the production database to match the new code, preventing data loss.
+-   **Documentation**: The project structure and coding standards are now documented in . The  has been cleaned and split into  (core requirements),  (history), and  (backlog).
 
 **Last working item**:
--   **Last item agent was working:** Implementing the new user-driven workflow for requesting access to the private textbook catalog. The agent successfully created the entire backend structure (models, repository, service, routes) and the initial frontend component files. The API is functional for fetching configuration data like schools and grades. The immediate next step is to build the UI for the user submission form and the admin moderation panel.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** Both. The backend testing agent should be used to verify the entire CRUD lifecycle of access requests. The frontend testing agent should verify the user submission form and the admin moderation UI.
+-   **Last item agent was working:** The user reported an error (body stream already read) when clicking the newly created Execute Migration button in the admin panel. The agent identified and fixed issues in both the frontend component () and the backend API endpoint ().
+-   **Status:** USER VERIFICATION PENDING
+-   **Agent Testing Done:** Y
+-   **Which testing method agent to use?** Manual testing by the user after deployment. The user needs to:
+    1.  Deploy the latest changes to production.
+    2.  Log in as admin ().
+    3.  Navigate to Admin -> Administración -> Migración BD.
+    4.  Click the Ejecutar Migración button and confirm it succeeds.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Admin Sidebar Modules Disappear (P1)**
-    -   **Description:** A recurring critical bug where the admin sidebar modules vanish after login, blocking all admin functions. While it appeared fixed in the agent's recent tests after the refactoring, its intermittent nature means it requires user confirmation.
+-   **Issue 1: Production Database Migration (P0)**
+    -   **Description**: The production database has an old schema (e.g., collection named ), while the newly deployed code expects a new schema (). This breaks functionality in production. The user must use the new Migrate Database button in the admin UI to align the production DB with the code.
     -   **Status:** USER VERIFICATION PENDING
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Frontend.
--   **Issue 2: Google Sign-Up Flow is Broken (P2)**
-    -   **Description:** The Continue with Google feature is stuck in an infinite loop.
+    -   **Is recurring issue?** N
+-   **Issue 2: Admin Sidebar Modules Disappear (P1)**
+    -   **Description**: A recurring critical bug where the admin sidebar modules vanish after login, blocking all admin functions. Its intermittent nature requires careful monitoring.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both.
--   **Issue 3: Persistent Development Script Error (P3)**
-    -   **Description:** A recurring runtime error from an external script () overlays the UI, obstructing visual verification.
+-   **Issue 3: Google Sign-Up Flow is Broken (P2)**
+    -   **Description**: The Continue with Google feature is stuck in an infinite loop. The agent confirmed the user  likely uses Google Auth but doesn't exist in the preview DB.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Frontend.
+-   **Issue 4: Legacy Toast Error Error al cargar matrículas (P3)**
+    -   **Description**: A non-critical toast error related to a deprecated system still appears in the admin panel.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+-   **Issue 5: Persistent Development Script Error (P3)**
+    -   **Description**: A recurring runtime error from an external script () overlays the UI.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
 
 **In progress Task List**:
--   **Task 1: Implement Textbook Access Request Flow (P0)**
-    -   **Where to resume:** Focus on building out the frontend components:
-        1.  In , build the form for users to submit, view, and manage their student access requests.
-        2.  In , build the UI for admins/moderators to review, approve, or reject incoming requests.
-    -   **What will be achieved with this?** This will deliver a complete, user-friendly workflow for gaining access to the private catalog, fulfilling the user's detailed feature request.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both.
+-   None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1:** Implement OneSignal push notifications for textbook access request status changes (approved by user).
+    -   **P0: Remove Migration Tool:** After the production migration is confirmed successful, the temporary UI () and API endpoint () must be removed for security.
+    -   **P1:** Implement OneSignal push notifications for textbook access request status changes.
     -   **P2:** Implement a feature to mark books as Already Ordered.
     -   **P3:** Integrate Stripe for payment processing of memberships.
 -   **Future Tasks:**
@@ -66,114 +70,119 @@ The foundation for the new Textbook Access Request feature has been laid out. Th
     -   Add email notifications for critical role assignments.
 
 **Completed work in this session**
--   **Full Spanish-to-English Refactoring:**
-    -   Systematically refactored the backend auth, core, and roles modules from Spanish to English.
-    -   Executed a database migration to rename fields in the  collection (e.g.,  to ).
-    -   Updated key frontend files (, , , etc.) to use the new English field names.
--   **Admin Dashboard UI Fix:** Removed a duplicate header from the main dashboard module.
--   **Bulk Book Import Feature:** Created a new full-page UI for importing private catalog books, replacing the old popup.
--   **Textbook Access Request Scaffolding:** Built the complete backend foundation (models, repository, service, routes) and created placeholder frontend files for the new feature.
+-   **Major Architecture Refactoring:**
+    -   **Frontend:** Reorganized modules into  and , deleting legacy  and  folders.
+    -   **Backend:** Standardized database collection names (e.g.,  -> ).
+    -   **DB Migration:** Created and deployed a safe, UI-triggered migration tool for the user to run in production.
+-   **Data Consistency & Bug Fixes:**
+    -   Fixed a bug where student  and  were not updating on the frontend by flattening the API response.
+    -   Centralized school management into a new dedicated Escuelas admin tab to resolve inconsistencies.
+    -   Fixed a critical submission bug caused by an invalid fallback .
+-   **Code Quality & Documentation:**
+    -   Completed the full English refactoring of .
+    -   Created  to document the new structure.
+    -   Refactored the monolithic  into , , and  and updated the core problem statement to be accurate.
+-   **Feature Enhancement:**
+    -   Added an auto-scroll feature to the Add Another Student form.
 
 **Earlier issues found/mentioned but not fixed**
--   A low-priority toast error Error al cargar matrículas related to a deprecated system still appears.
+-   None that aren't already listed in the Pending Issues section.
 
 **Known issue recurrence from previous fork**
--   The Admin Sidebar Disappears bug is a known recurring issue that needs careful monitoring.
+-   The Admin Sidebar Disappears, Google Sign-Up, and emergent-main.js errors are all recurring issues from the previous fork that were not addressed in this session.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Full-Stack Refactoring:** Coordinated changes across the database schema, backend API contracts, and frontend data consumption.
--   **Database Migration:** Executed a script using Current Mongosh Log ID:	697055a6e9315452c43f118b
-Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.10
-Using MongoDB:		7.0.28
-Using Mongosh:		2.5.10
-
-For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
-
-
-To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
-You can opt-out by running the disableTelemetry() command.
-
-------
-   The server generated these startup warnings when booting
-   2026-01-21T04:27:16.483+00:00: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem
-   2026-01-21T04:27:17.693+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
-   2026-01-21T04:27:17.693+00:00: You are running this process as the root user, which is not recommended
-   2026-01-21T04:27:17.693+00:00: Soft rlimits for open file descriptors too low
-------
-
-test>  to rename fields and manage indexes in the production database.
--   **Microservice-Oriented Structure:** New features are built with clear separation of concerns on the backend (models, repositories, services, routes).
+-   **Database Migration:** A pattern was implemented to manage breaking schema changes in a live production environment. A Python script handles the logic, and a temporary, admin-protected API endpoint allows the user to trigger it safely from the UI.
+-   **Code Refactoring & Restructuring:** The frontend directory structure was significantly refactored for clarity and scalability, moving from a confusing / split to a more intuitive / structure.
+-   **Data Source Unification:** Resolved data inconsistencies by centralizing the management of schools into a single source of truth (a dedicated collection and admin UI), removing a conflicting data source from the dynamic form configuration.
+-   **Data Flattening:** Backend services were modified to flatten nested data structures () in API responses. This simplified frontend logic and fixed bugs where the UI was not displaying the latest data.
 
 **key DB schema**
 -   **DB Name:** 
--   ****:  (Fields are now in English)
--   ****:  (Fields are now in English)
--   **** (NEW collection): 
+-   ****: Main user identity collection.
+-   **** (was ): Extended user data.
+-   **** (was ): Manages school data.
+-   **** (was ): Manages student linking requests and enrollments.
+-   **** (was ): Dynamic form configurations.
+-   **Deprecated collections to be migrated in prod:** , , , , .
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
--   **/app/frontend/src/pages/TextbookAccessPage.jsx**: User-facing page for the new access request feature.
--   **/app/frontend/src/modules/unatienda/tabs/TextbookAccessAdminTab.jsx**: Admin-facing tab for moderating access requests.
--   **/app/backend/modules/store/services/textbook_access_service.py**: Business logic for the new access request feature.
--   **/app/frontend/src/pages/BulkImportBooksPage.jsx**: The new full-page UI for importing books.
--   **/app/frontend/src/pages/AdminDashboard.jsx**: Location of the fixed duplicate header and the potentially recurring sidebar bug.
--   **/app/backend/scripts/migrate_fields_to_english.py**: The one-time script used to migrate database fields.
+-   **/app/frontend/src/modules/admin/DatabaseMigrationModule.jsx**: **(Highest Importance)** The new UI component for the user to trigger the production DB migration.
+-   **/app/backend/scripts/migrate_collections_v2.py**: The Python script that performs the database migration.
+-   **/app/backend/modules/admin/routes.py**: Contains the temporary  endpoint.
+-   **/app/memory/ARCHITECTURE.md**: Documents the new, refactored project structure.
+-   **/app/memory/PRD.md**: The cleaned-up, high-level product requirements.
+-   **/app/memory/ROADMAP.md**: The prioritized feature backlog.
 
 **Areas that need refactoring**:
--   The core user-centric refactoring is complete. Other modules may still contain Spanish terms for domain-specific models (e.g., product names), but all new code should strictly adhere to English conventions.
+-   The database migration feature ( and its API endpoint) is temporary and should be removed after it has been successfully used in production.
+-   The legacy toast error Error al cargar matrículas points to old code in the  that should be cleaned up or removed.
 
 **key api endpoints**
--   : (NEW) Fetches configuration for the access request form (schools, grades, years).
--   : (NEW) Submits a new access request for a student.
--   : (NEW) Fetches all access requests for the logged-in user.
--   : (NEW) (Admin) Fetches all access requests for moderation.
--   : (NEW) (Admin) Updates the status of an access request.
+-   : **(NEW & Temporary)** Executes the database collection migration. Must be called by an authenticated admin.
+-   : **(NEW)** Fetches all student records from all users for the central admin table.
+-   : **(NEW/UPDATED)** Full CRUD endpoints for managing schools from the new admin UI.
 
 **Critical Info for New Agent**
 -   **User Language**: **Spanish**. All communication must be in Spanish.
--   **Top Priority**: Your primary focus is to build the frontend UI for the Textbook Access Request feature. The backend is already in place. Refer to the user's detailed requirements for the form fields, statuses, and moderation flow.
--   **Database State**: The user has confirmed that it is acceptable to start with a fresh database upon deployment. All code should be written assuming a clean schema with 100% English field names for user data. No backward compatibility is required for old Spanish field names.
--   **Core Principles**: Remember the user's explicit instructions: 1) Use English in all code, 2) Maintain the microservice architecture, and 3) Ensure all UI text is translatable (EN, ES, ZH).
+-   **PRODUCTION MIGRATION IS REQUIRED**: The application is currently **broken in production**. The code has been updated to use new database collection names (e.g., ), but the production database still uses the old names (e.g., ). Your top priority is to guide the user to deploy the latest changes and then use the new Migración BD button in the admin panel to run the migration script. The app will not function correctly until this is done.
+-   **New Architecture**: The project has undergone a significant refactoring. Refer to  for the new standard folder (, ) and DB collection naming conventions. Do not use the old structures.
+-   **New Documentation**: The PRD has been split for clarity. Use  for core requirements,  for the backlog, and  for history.
 
 **documents and test reports created in this job**
--    (Updated)
+-   
+-    (Overwritten/Cleaned)
+-   
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
--   The last several messages from the user detail a comprehensive new feature request for a Textbook Access Request workflow. This is the current highest-priority task.
--   The user provided specific feedback on the proposed flow, requesting modifications to the Relationship and School Year fields, and defining how moderators and admins should handle approvals.
--   The user explicitly approved using OneSignal for push notifications related to this new feature.
--   Before this new feature request, the user asked to fix a duplicate header and implement a better bulk-import UI, both of which have been completed.
--   Crucially, the user gave the green light for a full, breaking refactor from Spanish to English, stating they have no production data to preserve.
+1.  **User**: Asks if deploying with a new database will also clean up old code files.
+2.  **User**: After being told no, confirms they want old/unused code folders deleted for a clean project.
+3.  **User**: Asks to ensure guideline documents are in place for future development.
+4.  **User**: Asks for clarification on the Problem Statement in the PRD.
+5.  **User**: Confirms the agent's proposed Problem Statement is more accurate but notes that  module is missing and asks for verification.
+6.  **User**: Agrees with the new, comprehensive problem statement that includes all discovered modules.
+7.  **User**: After deploying, reports that the new database option wasn't available and observes mixed behavior (admin login works, but school data is missing), indicating an old DB.
+8.  **User**: Agrees to run the migration script in production to fix the inconsistency.
+9.  **User**: Agrees to the agent's proposal to create a button in the admin UI to trigger the migration.
+10. **User**: Reports an error (body stream already read) after using the migration button, which is the last issue the agent worked on.
 
 **Project Health Check:**
--   **Broken:**
+-   **Broken**:
+    -   **Production Environment**: The app is functionally broken in production due to the mismatch between the deployed code's expectations and the database's current schema. This is the top priority to fix via migration.
     -   Google Authentication flow.
--   **Mocked:**
+-   **Needs Refactoring**:
+    -   The temporary database migration feature (UI and API endpoint) must be removed after successful use.
+    -   A legacy toast error points to code that should be cleaned up.
+-   **Mocked**:
     -   OneSignal (Push Notifications).
 
 **3rd Party Integrations**
--   **OneSignal**: Push Notifications (planned for the new access request feature).
+-   **OneSignal**: Push Notifications (planned).
 -   **Monday.com**: Order/chat syncing.
 -   **i18next**: Multi-language support.
 -   **ipapi.co**: IP-based geolocation.
 -   **Yappy Comercial (BG)**: Payment gateway.
--   **CXGenie / Emergent Platform**: External script known to cause development overlay errors.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES
--   **Test files created**:  was updated by the testing agent.
--   **Known regressions**: The admin sidebar bug has been intermittent and should be monitored.
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: None in this session; the agent fixed previous regressions.
 
 **Credentials to test flow:**
 -   **Super Admin Email**: 
 -   **Super Admin Password**: 
+-   **Regular User Email (Production ONLY)**:  | Password: 
+-   **Regular User Email (Preview ONLY)**:  | Password: 
 
 **What agent forgot to execute**
--   The long-standing issues with the broken Google Sign-Up flow and the persistent development script error have not yet been addressed.</analysis>
+-   The agent did not delete the legacy file  after copying its contents to the new location (). This file is now redundant and should be removed.
+-   The long-standing issues with Google Sign-Up, the  script error, and the disappearing admin sidebar were not addressed as the focus was on the major refactoring and migration tasks requested by the user.</analysis>
