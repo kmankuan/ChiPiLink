@@ -192,13 +192,13 @@ function AppRouter() {
       <Route path="/pinpanclub/seasons" element={<><Header /><SeasonsPage /></>} />
       <Route path="/pinpanclub/seasons/:seasonId" element={<><Header /><SeasonsPage /></>} />
       
-      {/* Users Module Routes */}
+      {/* Account Module Routes (User's personal portal) */}
       <Route 
         path="/mi-cuenta" 
         element={
           <ProtectedRoute>
             <Header />
-            <UsersDashboard />
+            <AccountDashboard />
           </ProtectedRoute>
         } 
       />
@@ -207,7 +207,7 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <Header />
-            <UsersDashboard />
+            <AccountDashboard />
           </ProtectedRoute>
         } 
       />
