@@ -245,3 +245,34 @@ async def get_schools_admin(
     """Get all schools (admin view)"""
     schools = await textbook_access_service.get_schools()
     return {"schools": schools}
+
+
+@router.put("/admin/schools/{school_id}")
+async def update_school(
+    school_id: str,
+    data: SchoolCreate,
+    admin: dict = Depends(get_admin_user)
+):
+    """Update a school"""
+    result = await textbook_access_service.update_school(
+        school_id=school_id,
+        name=data.name,
+        short_name=data.short_name,
+        catalog_id=data.catalog_id,
+        is_active=getattr(data, 'is_active', True)
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="School not found")
+    return result
+
+
+@router.delete("/admin/schools/{school_id}")
+async def delete_school(
+    school_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Delete a school"""
+    success = await textbook_access_service.delete_school(school_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="School not found")
+    return {"success": True}
