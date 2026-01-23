@@ -40,6 +40,14 @@ class SchoolRepository(BaseRepository):
     async def get_by_catalog_id(self, catalog_id: str) -> Optional[Dict]:
         """Get school by catalog ID"""
         return await self.find_one({"catalog_id": catalog_id})
+    
+    async def update(self, school_id: str, data: Dict) -> Optional[Dict]:
+        """Update a school"""
+        data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        success = await self.update_by_id(self.ID_FIELD, school_id, data)
+        if success:
+            return await self.get_by_id(school_id)
+        return None
 
 
 class StudentRecordRepository(BaseRepository):
