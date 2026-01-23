@@ -64,9 +64,10 @@ import AnalyticsDashboard from '@/modules/pinpanclub/pages/AnalyticsDashboard';
 // Seasons Page
 import SeasonsPage from '@/modules/pinpanclub/pages/SeasonsPage';
 
-// Users Module
-import UsersDashboard from '@/modules/users/pages/UsersDashboard';
-import AdminMemberships from '@/modules/users/pages/AdminMemberships';
+// Account Module (User's personal portal)
+import AccountDashboard from '@/modules/account/pages/AccountDashboard';
+// Admin Users Module
+import AdminMemberships from '@/modules/admin/users/components/AdminMemberships';
 
 // Notifications Module (Admin)
 import AdminNotifications from '@/modules/notifications/pages/AdminNotifications';
