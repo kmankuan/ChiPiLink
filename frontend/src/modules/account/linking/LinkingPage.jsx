@@ -85,7 +85,7 @@ const GRADES = [
   { value: '12', label: '12th Grade' }
 ];
 
-export default function CompraExclusiva() {
+export default function LinkingPage() {
   const { token, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
