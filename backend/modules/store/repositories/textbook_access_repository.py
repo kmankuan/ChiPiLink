@@ -13,7 +13,7 @@ from core.base import BaseRepository
 class SchoolRepository(BaseRepository):
     """Repository for schools/institutions"""
     
-    COLLECTION_NAME = "schools"
+    COLLECTION_NAME = "store_schools"
     ID_FIELD = "school_id"
     
     def __init__(self):
@@ -53,7 +53,7 @@ class SchoolRepository(BaseRepository):
 class StudentRecordRepository(BaseRepository):
     """Repository for student records"""
     
-    COLLECTION_NAME = "textbook_access_students"
+    COLLECTION_NAME = "store_students"
     ID_FIELD = "student_id"
     
     def __init__(self):
