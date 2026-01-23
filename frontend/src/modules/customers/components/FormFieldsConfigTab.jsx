@@ -817,46 +817,66 @@ export default function FormFieldsConfigTab({ token }) {
                     <AccordionTrigger>{t.options}</AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-3 pt-2">
-                        {formData.options?.map((option, index) => (
-                          <div key={index} className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
-                            <div className="flex-1 space-y-2">
-                              <div className="grid grid-cols-4 gap-2">
-                                <Input
-                                  placeholder={t.optionValue}
-                                  value={option.value}
-                                  onChange={(e) => updateOption(index, 'value', e.target.value)}
-                                />
-                                <Input
-                                  placeholder={t.optionLabelEs}
-                                  value={option.label_es}
-                                  onChange={(e) => updateOption(index, 'label_es', e.target.value)}
-                                />
-                                <Input
-                                  placeholder={t.optionLabelEn}
-                                  value={option.label_en}
-                                  onChange={(e) => updateOption(index, 'label_en', e.target.value)}
-                                />
-                                <Input
-                                  placeholder="Etiqueta (ZH)"
-                                  value={option.label_zh || ''}
-                                  onChange={(e) => updateOption(index, 'label_zh', e.target.value)}
-                                />
-                              </div>
+                        {/* Warning for special fields like school_id */}
+                        {SPECIAL_DATA_SOURCE_FIELDS[formData.field_key]?.source === 'schools_collection' && (
+                          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+                            <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                            <div className="text-sm text-amber-800">
+                              {i18n.language === 'es' 
+                                ? SPECIAL_DATA_SOURCE_FIELDS[formData.field_key].message_es
+                                : i18n.language === 'zh'
+                                  ? SPECIAL_DATA_SOURCE_FIELDS[formData.field_key].message_zh
+                                  : SPECIAL_DATA_SOURCE_FIELDS[formData.field_key].message_en
+                              }
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeOption(index)}
-                              className="text-destructive"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
                           </div>
-                        ))}
-                        <Button variant="outline" onClick={addOption} className="w-full">
-                          <Plus className="h-4 w-4 mr-2" />
-                          {t.addOption}
-                        </Button>
+                        )}
+                        
+                        {/* Only show options editor if NOT a special data source field */}
+                        {SPECIAL_DATA_SOURCE_FIELDS[formData.field_key]?.source !== 'schools_collection' && (
+                          <>
+                            {formData.options?.map((option, index) => (
+                              <div key={index} className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+                                <div className="flex-1 space-y-2">
+                                  <div className="grid grid-cols-4 gap-2">
+                                    <Input
+                                      placeholder={t.optionValue}
+                                      value={option.value}
+                                      onChange={(e) => updateOption(index, 'value', e.target.value)}
+                                    />
+                                    <Input
+                                      placeholder={t.optionLabelEs}
+                                      value={option.label_es}
+                                      onChange={(e) => updateOption(index, 'label_es', e.target.value)}
+                                    />
+                                    <Input
+                                      placeholder={t.optionLabelEn}
+                                      value={option.label_en}
+                                      onChange={(e) => updateOption(index, 'label_en', e.target.value)}
+                                    />
+                                    <Input
+                                      placeholder="Etiqueta (ZH)"
+                                      value={option.label_zh || ''}
+                                      onChange={(e) => updateOption(index, 'label_zh', e.target.value)}
+                                    />
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeOption(index)}
+                                  className="text-destructive"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                            <Button variant="outline" onClick={addOption} className="w-full">
+                              <Plus className="h-4 w-4 mr-2" />
+                              {t.addOption}
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
