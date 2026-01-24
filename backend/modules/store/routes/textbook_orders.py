@@ -108,11 +108,17 @@ async def get_my_orders(
     current_user: dict = Depends(get_current_user)
 ):
     """Get all orders for the current user"""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Getting orders for user_id: {current_user.get('user_id')}")
+    
     orders = await textbook_order_service.get_user_orders(
         user_id=current_user["user_id"],
         year=year
     )
-    return {"orders": orders}
+    
+    logger.info(f"Found {len(orders)} orders for user {current_user.get('user_id')}")
+    return {"orders": orders, "user_id": current_user.get("user_id")}
 
 
 # ============== ADMIN ENDPOINTS ==============
