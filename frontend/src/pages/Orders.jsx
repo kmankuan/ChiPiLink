@@ -28,8 +28,8 @@ export default function Orders() {
 
   const fetchPedidos = async () => {
     try {
-      const response = await api.get('/pedidos');
-      setPedidos(response.data);
+      const response = await api.get('/pedidos/mis-pedidos');
+      setPedidos(response.data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Error al cargar pedidos');
