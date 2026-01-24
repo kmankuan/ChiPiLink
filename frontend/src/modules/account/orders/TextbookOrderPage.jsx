@@ -387,6 +387,7 @@ export default function TextbookOrderPage() {
                     {order.items.map((item) => {
                       const statusConfig = getItemStatusConfig(item.status);
                       const StatusIcon = statusConfig.icon;
+                      // Item can be selected if: available, or reorder_approved with quantity left
                       const isSelectable = item.status === 'available' || 
                                           (item.status === 'reorder_approved' && item.quantity_ordered < item.max_quantity);
                       const isOrdered = item.status === 'ordered';
@@ -396,12 +397,13 @@ export default function TextbookOrderPage() {
                         <div
                           key={item.book_id}
                           className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
+                            isOrdered ? 'bg-blue-50/50 border-blue-200' :
                             item.quantity_ordered > 0 ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'
                           } ${item.status === 'out_of_stock' ? 'opacity-60' : ''}`}
                         >
                           {/* Checkbox */}
                           <div className="flex-shrink-0">
-                            {order.status === 'draft' && isSelectable ? (
+                            {isSelectable ? (
                               <Checkbox
                                 checked={item.quantity_ordered > 0}
                                 onCheckedChange={() => handleToggleItem(item.book_id, item.quantity_ordered)}
@@ -409,9 +411,10 @@ export default function TextbookOrderPage() {
                               />
                             ) : (
                               <div className={`h-5 w-5 rounded flex items-center justify-center ${
+                                isOrdered ? 'bg-blue-500 text-white' : 
                                 item.quantity_ordered > 0 ? 'bg-primary text-white' : 'bg-muted'
                               }`}>
-                                {item.quantity_ordered > 0 && <CheckCircle className="h-4 w-4" />}
+                                {(item.quantity_ordered > 0 || isOrdered) && <CheckCircle className="h-4 w-4" />}
                               </div>
                             )}
                           </div>
