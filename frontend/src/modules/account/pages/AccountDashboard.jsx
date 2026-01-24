@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag } from 'lucide-react';
+import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag, BookOpen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +20,7 @@ import ServiciosSugeridos from '../ServiciosSugeridos';
 import TransferenciasDialog from '../wallet/TransferenciasDialog';
 import AlertasSaldo from '../wallet/AlertasSaldo';
 import CompraExclusiva from '../linking/LinkingPage';
+import TextbookOrderPage from '../orders/TextbookOrderPage';
 
 // Notification components
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
@@ -80,6 +81,7 @@ export default function AccountDashboard() {
       capacities: 'Capacidades',
       notifications: 'Notificaciones',
       exclusive: 'Compra Exclusiva',
+      textbooks: 'Textos',
       loginRequired: 'Debes iniciar sesión para acceder a esta sección',
       login: 'Iniciar Sesión',
       transfer: 'Transferir'
@@ -95,6 +97,7 @@ export default function AccountDashboard() {
       capacities: 'Capacities',
       notifications: 'Notifications',
       exclusive: 'Exclusive Shopping',
+      textbooks: 'Textbooks',
       loginRequired: 'You must log in to access this section',
       login: 'Log In',
       transfer: 'Transfer'
@@ -110,6 +113,7 @@ export default function AccountDashboard() {
       capacities: '能力',
       notifications: '通知',
       exclusive: '专属购物',
+      textbooks: '教科书',
       loginRequired: '您必须登录才能访问此部分',
       login: '登录',
       transfer: '转账'
