@@ -361,7 +361,7 @@ export function Header() {
               data-testid="unatienda-nav-link"
             >
               <Store className="h-4 w-4" />
-              Tienda
+              Unatienda
             </Link>
 
             {/* PinPanClub Quick Access - Solo visible para usuarios con membresía activa o admins */}
