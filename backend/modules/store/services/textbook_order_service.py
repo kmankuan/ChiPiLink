@@ -277,7 +277,9 @@ class TextbookOrderService(BaseService):
         order_id: str,
         notes: Optional[str] = None
     ) -> Dict:
-        """Submit order - locks selected items and sends to Monday.com"""
+        """Submit order - locks selected items and sends to Monday.com
+        Supports partial submissions: user can submit some items now and others later
+        """
         order = await self.order_repo.get_by_id(order_id)
         
         if not order:
@@ -286,22 +288,34 @@ class TextbookOrderService(BaseService):
         if order.get("user_id") != user_id:
             raise ValueError("Access denied")
         
-        if order.get("status") != OrderStatus.DRAFT.value:
-            raise ValueError("Order already submitted")
-        
-        # Get items with quantity > 0
+        # Get items that are newly selected (not yet ordered)
         items = order.get("items", [])
-        selected_items = [item for item in items if item.get("quantity_ordered", 0) > 0]
+        new_selected_items = [
+            item for item in items 
+            if item.get("quantity_ordered", 0) > 0 and item["status"] != OrderItemStatus.ORDERED.value
+        ]
         
-        if not selected_items:
-            raise ValueError("Please select at least one book")
+        if not new_selected_items:
+            raise ValueError("Please select at least one new book to order")
         
-        # Lock selected items
+        # Lock newly selected items
         now = datetime.now(timezone.utc).isoformat()
         for item in items:
             if item.get("quantity_ordered", 0) > 0 and item["status"] != OrderItemStatus.ORDERED.value:
                 item["status"] = OrderItemStatus.ORDERED.value
                 item["ordered_at"] = now
+        
+        # Check if there are still available items that can be ordered later
+        available_items = [
+            item for item in items 
+            if item["status"] == OrderItemStatus.AVAILABLE.value or item["status"] == OrderItemStatus.REORDER_APPROVED.value
+        ]
+        
+        # Calculate total for this submission
+        submission_total = sum(
+            item["price"] * item["quantity_ordered"] 
+            for item in new_selected_items
+        )
         
         # Get user info for Monday.com
         user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0})
@@ -315,9 +329,10 @@ class TextbookOrderService(BaseService):
         try:
             monday_result = await self._send_to_monday(
                 order=order,
-                selected_items=selected_items,
+                selected_items=new_selected_items,
                 user_name=user_name,
-                user_email=user_email
+                user_email=user_email,
+                submission_total=submission_total
             )
             monday_item_id = monday_result.get("item_id")
             monday_subitems = monday_result.get("subitems", [])
@@ -325,25 +340,48 @@ class TextbookOrderService(BaseService):
             logger.error(f"Failed to send to Monday.com: {e}")
             # Continue even if Monday fails - we can retry later
         
+        # Track submission history
+        submissions = order.get("submissions", [])
+        submissions.append({
+            "submitted_at": now,
+            "items": [{"book_id": i["book_id"], "book_name": i["book_name"], "price": i["price"]} for i in new_selected_items],
+            "total": submission_total,
+            "monday_item_id": monday_item_id
+        })
+        
+        # Recalculate overall total (all ordered items)
+        total_amount = sum(
+            item["price"] * item["quantity_ordered"] 
+            for item in items 
+            if item["status"] == OrderItemStatus.ORDERED.value
+        )
+        
+        # Status: "partial" if there are more items available, "submitted" if all items ordered or none left
+        new_status = OrderStatus.DRAFT.value if available_items else OrderStatus.SUBMITTED.value
+        
         # Update order
         await self.order_repo.update_order(order_id, {
             "items": items,
-            "status": OrderStatus.SUBMITTED.value,
-            "submitted_at": now,
+            "status": new_status,
+            "last_submitted_at": now,
+            "submissions": submissions,
             "notes": notes,
-            "monday_item_id": monday_item_id,
-            "monday_subitems": monday_subitems
+            "total_amount": total_amount,
+            "monday_item_ids": order.get("monday_item_ids", []) + ([monday_item_id] if monday_item_id else [])
         })
         
         # Send notification
         await self._notify_order_submitted(order, user_name, user_email)
         
         order["items"] = items
-        order["status"] = OrderStatus.SUBMITTED.value
-        order["submitted_at"] = now
-        order["monday_item_id"] = monday_item_id
+        order["status"] = new_status
+        order["last_submitted_at"] = now
+        order["total_amount"] = total_amount
+        order["submission_total"] = submission_total
+        order["items_ordered_now"] = len(new_selected_items)
+        order["items_available"] = len(available_items)
         
-        self.log_info(f"Order {order_id} submitted by user {user_id}")
+        self.log_info(f"Order {order_id} partial submission by user {user_id}: {len(new_selected_items)} items, ${submission_total:.2f}")
         
         return order
     
