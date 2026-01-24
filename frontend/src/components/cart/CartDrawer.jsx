@@ -73,7 +73,7 @@ export default function CartDrawer() {
               <ShoppingBag className="h-16 w-16 text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground mb-4">No hay productos en tu carrito</p>
               <Button variant="outline" onClick={() => { closeCart(); navigate('/unatienda'); }}>
-                Explorar Tienda
+                Explorar Unatienda
               </Button>
             </div>
           ) : (

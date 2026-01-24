@@ -601,7 +601,7 @@ export default function SuperAppLanding() {
               case 'quickAccess':
                 return (
                   <section key={block.id} data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    <QuickAccessButton icon={Store} label="Tienda" to="/unatienda" />
+                    <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" />
                     <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
                     <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
                     <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
@@ -731,7 +731,7 @@ export default function SuperAppLanding() {
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/unatienda')}>
                   <Store className="h-4 w-4 mr-2" />
-                  Ver Tienda
+                  Ver Unatienda
                 </Button>
               </div>
             </div>

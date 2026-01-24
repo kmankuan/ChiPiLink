@@ -137,7 +137,7 @@ export default function PrivateBookDetail() {
         </p>
         <div className="flex gap-3 justify-center">
           <Button variant="outline" onClick={() => navigate('/unatienda')}>
-            Ir a la Tienda
+            Ir a Unatienda
           </Button>
           <Button onClick={() => navigate('/mi-cuenta')}>
             Vincular Estudiante
