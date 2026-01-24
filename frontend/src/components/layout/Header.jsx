@@ -47,7 +47,7 @@ import LanguageSelector from '@/components/common/LanguageSelector';
 // Breadcrumb configuration - maps routes to display names and icons
 const ROUTE_CONFIG = {
   '/': { name: 'Inicio', icon: Home },
-  '/unatienda': { name: 'Tienda', icon: Store },
+  '/unatienda': { name: 'Unatienda', icon: Store },
   '/unatienda/producto': { name: 'Producto', icon: Store },
   '/unatienda/checkout': { name: 'Checkout', icon: ShoppingCart },
   '/mi-cuenta': { name: 'Mi Cuenta', icon: Wallet },
