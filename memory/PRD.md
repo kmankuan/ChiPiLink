@@ -185,15 +185,30 @@ These rules are **PERMANENT** and must be followed in all future development ses
 - Schools management
 - Dynamic form configuration
 - PinpanClub base structure
+- **📦 Textbook Ordering System** (NEW - Jan 24, 2026)
+  - Full-stack feature for ordering textbooks
+  - User selection → total calculation → Monday.com integration
+  - Admin dashboard with statistics
+  - Partial submission support (order some now, some later)
+- **🔄 Unified Orders Page** (Jan 24, 2026)
+  - Merged legacy orders with textbook orders
+  - Tabbed interface: "Pedidos de Textos" + "Otros Pedidos"
+  - Fixed user confusion from separate order systems
 
 ### 🔄 In Progress
+- **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
 - See **ROADMAP.md** for prioritized tasks
 
 ### ❌ Known Issues
-- Google Sign-Up infinite loop
+- Google Sign-Up infinite loop (recurring)
+- Admin sidebar modules may disappear after login (intermittent)
 - See **ROADMAP.md** for details
+
+### 🗑️ Cleanup Done (Jan 24, 2026)
+- Removed temporary debug endpoint `/api/store/textbook-orders/debug/orders-check`
+- Removed redundant file `/app/frontend/src/modules/unatienda/tabs/TextbookAccessAdminTab.jsx`
 
 ---
 
-*Last Updated: January 23, 2026*
-*Version: 3.0 - Complete Module Documentation*
+*Last Updated: January 24, 2026*
+*Version: 3.1 - Unified Orders Page + Cleanup*
