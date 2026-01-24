@@ -157,7 +157,20 @@
     "title": "Super Pin",
     "admin": "Super Pin - Admin",
     "adminDesc": "Gestiona ligas, rankings y torneos",
-    "ranking": "Super Pin Ranking",
+    "ranking": {
+      "title": "Clasificación",
+      "position": "Posición",
+      "player": "Jugador",
+      "points": "Puntos",
+      "elo": "ELO",
+      "played": "PJ",
+      "won": "PG",
+      "lost": "PP",
+      "winRate": "Win%",
+      "streak": "Racha",
+      "change": "Cambio",
+      "lastUpdated": "Última actualización"
+    },
     "rankingDesc": "Sistema de ranking individual con ligas y temporadas",
     "viewRanking": "Ver Ranking",
     "manage": "Administrar",
@@ -237,20 +250,6 @@
       "matchFinished": "¡Partido terminado!",
       "winner": "Ganador",
       "notFound": "Partido no encontrado"
-    },
-    "ranking": {
-      "title": "Clasificación",
-      "position": "Posición",
-      "player": "Jugador",
-      "points": "Puntos",
-      "elo": "ELO",
-      "played": "PJ",
-      "won": "PG",
-      "lost": "PP",
-      "winRate": "Win%",
-      "streak": "Racha",
-      "change": "Cambio",
-      "lastUpdated": "Última actualización"
     },
     "tournaments": {
       "title": "Torneos",
@@ -807,5 +806,9 @@
     "viewPlans": "Ver planes",
     "subscribe": "Suscribirse",
     "learnMore": "Más información"
+  },
+  "dashboard": {
+    "myOrders": "Mis Pedidos",
+    "noOrders": "No tienes pedidos aún"
   }
 }

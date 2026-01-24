@@ -157,7 +157,20 @@
     "title": "超级排名",
     "admin": "超级排名 - 管理",
     "adminDesc": "管理联赛、排名和锦标赛",
-    "ranking": "超级排名榜",
+    "ranking": {
+      "title": "排行榜",
+      "position": "排名",
+      "player": "选手",
+      "points": "积分",
+      "elo": "ELO分",
+      "played": "场次",
+      "won": "胜",
+      "lost": "负",
+      "winRate": "胜率",
+      "streak": "连胜/连负",
+      "change": "变化",
+      "lastUpdated": "最后更新"
+    },
     "rankingDesc": "个人排名系统，包含联赛和赛季",
     "viewRanking": "查看排名",
     "manage": "管理",
@@ -237,20 +250,6 @@
       "matchFinished": "比赛结束！",
       "winner": "获胜者",
       "notFound": "未找到比赛"
-    },
-    "ranking": {
-      "title": "排行榜",
-      "position": "排名",
-      "player": "选手",
-      "points": "积分",
-      "elo": "ELO分",
-      "played": "场次",
-      "won": "胜",
-      "lost": "负",
-      "winRate": "胜率",
-      "streak": "连胜/连负",
-      "change": "变化",
-      "lastUpdated": "最后更新"
     },
     "tournaments": {
       "title": "锦标赛",
@@ -487,5 +486,9 @@
       "confirmNow": "立即确认",
       "noPending": "没有待确认比赛"
     }
+  },
+  "dashboard": {
+    "myOrders": "我的订单",
+    "noOrders": "您还没有订单"
   }
 }
