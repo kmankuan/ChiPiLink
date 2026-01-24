@@ -216,7 +216,7 @@ class TextbookOrderService(BaseService):
         book_id: str,
         quantity: int
     ) -> Dict:
-        """Update item selection in draft order"""
+        """Update item selection for available or reorder-approved items"""
         order = await self.order_repo.get_by_id(order_id)
         
         if not order:
@@ -224,9 +224,6 @@ class TextbookOrderService(BaseService):
         
         if order.get("user_id") != user_id:
             raise ValueError("Access denied")
-        
-        if order.get("status") != OrderStatus.DRAFT.value:
-            raise ValueError("Cannot modify submitted order")
         
         # Find and update the item
         items = order.get("items", [])
@@ -236,18 +233,33 @@ class TextbookOrderService(BaseService):
             if item["book_id"] == book_id:
                 item_found = True
                 
-                # Check if item can be modified
-                if item["status"] == OrderItemStatus.ORDERED.value:
-                    raise ValueError("This book has already been ordered")
+                # Check if item can be modified based on status
+                item_status = item.get("status", "")
                 
-                if item["status"] == OrderItemStatus.OUT_OF_STOCK.value and quantity > 0:
+                # Items that CANNOT be modified
+                if item_status == OrderItemStatus.ORDERED.value:
+                    raise ValueError("This book has already been ordered. Request a reorder if needed.")
+                
+                if item_status == OrderItemStatus.REORDER_REQUESTED.value:
+                    raise ValueError("Reorder request is pending admin approval")
+                
+                if item_status == OrderItemStatus.OUT_OF_STOCK.value and quantity > 0:
                     raise ValueError("This book is out of stock")
+                
+                # Items that CAN be modified: available, reorder_approved
+                allowed_statuses = [
+                    OrderItemStatus.AVAILABLE.value,
+                    OrderItemStatus.REORDER_APPROVED.value
+                ]
+                
+                if item_status not in allowed_statuses:
+                    raise ValueError(f"Cannot modify item with status: {item_status}")
                 
                 # Validate quantity
                 if quantity < 0:
                     quantity = 0
-                if quantity > item["max_quantity"]:
-                    raise ValueError(f"Maximum quantity allowed is {item['max_quantity']}")
+                if quantity > item.get("max_quantity", 1):
+                    raise ValueError(f"Maximum quantity allowed is {item.get('max_quantity', 1)}")
                 
                 item["quantity_ordered"] = quantity
                 break
