@@ -6,6 +6,24 @@ All future development MUST follow these standards.
 
 ---
 
+## 0. CRITICAL RULES
+
+### Translation/i18n
+- **ALWAYS** use actual text strings, NOT translation keys like `dashboard.myOrders`
+- If i18n is needed, ensure the translation key exists in ALL locale files (`es.json`, `en.json`, `zh.json`)
+- Test the UI to verify text displays correctly before committing
+
+### Integration Configuration
+- **DO NOT** hardcode API keys or board IDs in `.env` for module-specific integrations
+- Use the existing integration configuration stored in the database
+- Example: Monday.com config for textbook orders uses `monday_pedidos_service` not `.env` values
+
+### Data Consistency
+- When a user authenticates via Google Auth, ensure `user_id` is consistent across all related collections
+- Always verify `user_id` matches when querying user-specific data
+
+---
+
 ## 1. DATABASE COLLECTIONS
 
 ### Naming Convention
