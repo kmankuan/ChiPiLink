@@ -390,16 +390,21 @@ class TextbookOrderService(BaseService):
         order: Dict,
         selected_items: List[Dict],
         user_name: str,
-        user_email: str
+        user_email: str,
+        submission_total: float = None
     ) -> Dict:
         """Send order to Monday.com board"""
         board_id = await get_monday_board_id(db)
         
         if not MONDAY_API_KEY or not board_id:
+            logger.warning("Monday.com not configured - MONDAY_API_KEY or MONDAY_BOARD_ID missing")
             raise ValueError("Monday.com not configured")
         
+        # Use submission total if provided, otherwise calculate from order
+        total = submission_total if submission_total is not None else order['total_amount']
+        
         # Create main item with order info
-        item_name = f"{order['student_name']} - {order['grade']} - ${order['total_amount']:.2f}"
+        item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f}"
         
         # Column values (adjust based on your Monday.com board structure)
         column_values = json.dumps({
