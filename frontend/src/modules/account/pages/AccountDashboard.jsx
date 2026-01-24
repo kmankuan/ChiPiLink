@@ -32,7 +32,16 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export default function AccountDashboard() {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('wallet');
+  
+  // Get initial tab from URL query parameter
+  const getInitialTab = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    const validTabs = ['wallet', 'profile', 'membership', 'connections', 'dependents', 'capacities', 'notifications', 'exclusive', 'textbooks'];
+    return validTabs.includes(tabParam) ? tabParam : 'wallet';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [walletBalance, setWalletBalance] = useState(null);
   
   // Estado para dialog de transferencias
