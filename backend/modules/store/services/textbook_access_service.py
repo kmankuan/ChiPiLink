@@ -407,12 +407,22 @@ class TextbookAccessService(BaseService):
             updates["approved_at"] = datetime.now(timezone.utc).isoformat()
             updates["approved_by"] = admin_id
             updates["rejection_reason"] = None
+            updates["is_editable"] = False  # Lock the enrollment once approved
         elif action.status == RequestStatus.REJECTED:
             updates["rejection_reason"] = action.rejection_reason
             updates["approved_at"] = None
             updates["approved_by"] = None
         
         await self.student_repo.update_enrollment(student_id, year, updates)
+        
+        # Auto-lock student record if this is an approval
+        if action.status == RequestStatus.APPROVED:
+            await self.student_repo.update_student(student_id, {
+                "is_locked": True,
+                "locked_at": datetime.now(timezone.utc).isoformat(),
+                "locked_by": "system"
+            })
+            self.log_info(f"Student {student_id} auto-locked after approval")
         
         self.log_info(f"Enrollment {student_id}/{year} updated to {action.status.value} by {admin_id}")
         
