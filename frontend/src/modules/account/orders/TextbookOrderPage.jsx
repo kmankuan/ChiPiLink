@@ -470,52 +470,73 @@ export default function TextbookOrderPage() {
           {/* Order Summary & Submit */}
           <Card className="sticky bottom-4 shadow-lg border-2">
             <CardContent className="py-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Selected Items</p>
-                    <p className="text-xl font-bold">
-                      {order.items.filter(i => i.quantity_ordered > 0).length} / {order.items.length}
-                    </p>
-                  </div>
-                  <Separator orientation="vertical" className="h-10" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Amount</p>
-                    <p className="text-2xl font-bold text-primary flex items-center">
-                      <DollarSign className="h-5 w-5" />
-                      {order.total_amount.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
+              {(() => {
+                const orderedItems = order.items.filter(i => i.status === 'ordered');
+                const newSelectedItems = order.items.filter(i => i.quantity_ordered > 0 && i.status !== 'ordered');
+                const availableItems = order.items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+                const newTotal = newSelectedItems.reduce((sum, i) => sum + (i.price * i.quantity_ordered), 0);
+                const orderedTotal = orderedItems.reduce((sum, i) => sum + (i.price * i.quantity_ordered), 0);
+                
+                return (
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-6 flex-wrap">
+                      {orderedItems.length > 0 && (
+                        <>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Already Ordered</p>
+                            <p className="text-lg font-bold text-blue-600">
+                              {orderedItems.length} items (${orderedTotal.toFixed(2)})
+                            </p>
+                          </div>
+                          <Separator orientation="vertical" className="h-10 hidden sm:block" />
+                        </>
+                      )}
+                      <div>
+                        <p className="text-sm text-muted-foreground">New Selection</p>
+                        <p className="text-xl font-bold">
+                          {newSelectedItems.length} / {availableItems.length} available
+                        </p>
+                      </div>
+                      <Separator orientation="vertical" className="h-10" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">New Total</p>
+                        <p className="text-2xl font-bold text-primary flex items-center">
+                          <DollarSign className="h-5 w-5" />
+                          {newTotal.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
 
-                {order.status === 'draft' && (
-                  <Button
-                    size="lg"
-                    onClick={handleSubmitOrder}
-                    disabled={submitting || order.items.filter(i => i.quantity_ordered > 0).length === 0}
-                    className="gap-2"
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        Submit Order
-                      </>
+                    {availableItems.length > 0 && (
+                      <Button
+                        size="lg"
+                        onClick={handleSubmitOrder}
+                        disabled={submitting || newSelectedItems.length === 0}
+                        className="gap-2"
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4" />
+                            Submit {newSelectedItems.length > 0 ? `(${newSelectedItems.length})` : 'Order'}
+                          </>
+                        )}
+                      </Button>
                     )}
-                  </Button>
-                )}
 
-                {order.status !== 'draft' && (
-                  <Badge className={`${getOrderStatusConfig(order.status).color} text-base py-2 px-4`}>
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Order {getOrderStatusConfig(order.status).label}
-                  </Badge>
-                )}
-              </div>
+                    {availableItems.length === 0 && orderedItems.length > 0 && (
+                      <Badge className="bg-green-100 text-green-700 text-base py-2 px-4">
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        All Items Ordered
+                      </Badge>
+                    )}
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </>
