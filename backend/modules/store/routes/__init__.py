@@ -18,6 +18,7 @@ from .monday import router as monday_router
 from .catalogo_privado import router as catalogo_privado_router
 from .textbook_access import router as textbook_access_router
 from .form_config import router as form_config_router
+from .textbook_orders import router as textbook_orders_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -37,6 +38,7 @@ router.include_router(monday_router)
 router.include_router(catalogo_privado_router)
 router.include_router(textbook_access_router)
 router.include_router(form_config_router)
+router.include_router(textbook_orders_router)
 
 # Re-export for compatibility
 store_refactored_router = router
