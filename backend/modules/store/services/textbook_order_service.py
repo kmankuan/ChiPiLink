@@ -10,10 +10,11 @@ import json
 
 from core.base import BaseService
 from core.database import db
-from core.config import MONDAY_API_KEY, get_monday_board_id
+from core.config import MONDAY_API_KEY
 from ..repositories.textbook_order_repository import textbook_order_repository
 from ..repositories.textbook_access_repository import student_record_repository
 from .textbook_access_service import textbook_access_service
+from .monday_pedidos_service import monday_pedidos_service
 from ..models.textbook_order import (
     OrderStatus, OrderItemStatus, OrderItem,
     SubmitOrderRequest, ReorderRequest
