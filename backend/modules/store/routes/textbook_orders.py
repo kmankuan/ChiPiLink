@@ -110,15 +110,54 @@ async def get_my_orders(
     """Get all orders for the current user"""
     import logging
     logger = logging.getLogger(__name__)
-    logger.info(f"Getting orders for user_id: {current_user.get('user_id')}")
+    
+    user_id = current_user.get("user_id")
+    logger.info(f"Getting orders for user_id: {user_id}")
     
     orders = await textbook_order_service.get_user_orders(
-        user_id=current_user["user_id"],
+        user_id=user_id,
         year=year
     )
     
-    logger.info(f"Found {len(orders)} orders for user {current_user.get('user_id')}")
-    return {"orders": orders, "user_id": current_user.get("user_id")}
+    logger.info(f"Found {len(orders)} orders for user {user_id}")
+    
+    return {
+        "orders": orders, 
+        "user_id": user_id,
+        "total": len(orders)
+    }
+
+
+@router.get("/debug/my-info")
+async def debug_my_info(
+    current_user: dict = Depends(get_current_user)
+):
+    """Debug endpoint to see current user info and their orders"""
+    from core.database import db
+    
+    user_id = current_user.get("user_id")
+    
+    # Get all orders for this user
+    orders = await db.store_textbook_orders.find(
+        {"user_id": user_id},
+        {"_id": 0, "order_id": 1, "student_name": 1, "status": 1, "total_amount": 1}
+    ).to_list(100)
+    
+    # Also check if there are orders with different user_id patterns
+    all_orders_sample = await db.store_textbook_orders.find(
+        {},
+        {"_id": 0, "order_id": 1, "user_id": 1, "student_name": 1}
+    ).to_list(10)
+    
+    return {
+        "current_user": {
+            "user_id": user_id,
+            "email": current_user.get("email"),
+            "name": current_user.get("name")
+        },
+        "my_orders": orders,
+        "sample_all_orders": all_orders_sample
+    }
 
 
 # ============== ADMIN ENDPOINTS ==============
