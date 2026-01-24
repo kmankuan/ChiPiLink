@@ -393,7 +393,7 @@ class TextbookOrderService(BaseService):
         user_email: str,
         submission_total: float = None
     ) -> Dict:
-        """Send order to Monday.com board"""
+        """Send order to Monday.com board with items as subitems and summary as update"""
         board_id = await get_monday_board_id(db)
         
         if not MONDAY_API_KEY or not board_id:
@@ -406,14 +406,25 @@ class TextbookOrderService(BaseService):
         # Create main item with order info
         item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f}"
         
-        # Column values (adjust based on your Monday.com board structure)
+        # Build items list for text column
+        items_text = ", ".join([f"{item['book_name']} (x{item['quantity_ordered']})" for item in selected_items])
+        
+        # Column values matching the actual board structure:
+        # - text_mkzkyx5v: Cliente (text) - Parent/Guardian name
+        # - dropdown_mkwrts6s: Grado (dropdown)
+        # - numeric_mkye5gf8: Qty (numbers)
+        # - text_mkwrs5qv: Artículos (text)
+        # - numeric_mkwrcmvk: Monto del pedido (numbers)
+        # - text_mkwrd2h2: Order ID (text)
+        # - status: Status (status)
         column_values = json.dumps({
-            "text": user_name,           # Parent/Guardian name
-            "email": {"email": user_email, "text": user_email},
-            "text4": order["student_name"],  # Student name
-            "text6": order["grade"],         # Grade
-            "numbers": str(total),  # Total for this submission
-            "status": {"label": "Nuevo"}     # Status
+            "text_mkzkyx5v": f"{user_name} ({user_email})",  # Cliente
+            "dropdown_mkwrts6s": {"labels": [order["grade"]]},  # Grado
+            "numeric_mkye5gf8": len(selected_items),  # Qty
+            "text_mkwrs5qv": items_text[:500],  # Artículos (max 500 chars)
+            "numeric_mkwrcmvk": total,  # Monto del pedido
+            "text_mkwrd2h2": order["order_id"],  # Order ID
+            "status": {"label": "Nuevo"}  # Status
         })
         
         async with httpx.AsyncClient() as client:
@@ -447,6 +458,114 @@ class TextbookOrderService(BaseService):
                 raise ValueError(f"Monday.com error: {result['errors']}")
             
             item_id = result.get("data", {}).get("create_item", {}).get("id")
+            
+            if not item_id:
+                raise ValueError("Failed to create Monday.com item")
+            
+            logger.info(f"Created Monday.com item {item_id} for order {order['order_id']}")
+            
+            # Create Update (comment) with order summary
+            summary_lines = [
+                f"📦 **Nuevo Pedido de Textos**",
+                f"",
+                f"**Estudiante:** {order['student_name']}",
+                f"**Grado:** {order['grade']}",
+                f"**Año Escolar:** {order['year']}",
+                f"",
+                f"**Cliente:** {user_name}",
+                f"**Email:** {user_email}",
+                f"",
+                f"**Libros Solicitados:**",
+            ]
+            
+            for item in selected_items:
+                summary_lines.append(f"• {item['book_name']} - ${item['price']:.2f} x{item['quantity_ordered']}")
+            
+            summary_lines.extend([
+                f"",
+                f"**Total:** ${total:.2f}",
+                f"**Order ID:** {order['order_id']}",
+            ])
+            
+            summary_text = "\\n".join(summary_lines)
+            
+            # Add update to item
+            update_mutation = f'''
+            mutation {{
+                create_update (
+                    item_id: {item_id},
+                    body: "{summary_text}"
+                ) {{
+                    id
+                }}
+            }}
+            '''
+            
+            try:
+                update_response = await client.post(
+                    "https://api.monday.com/v2",
+                    json={"query": update_mutation},
+                    headers={
+                        "Authorization": MONDAY_API_KEY,
+                        "Content-Type": "application/json"
+                    },
+                    timeout=15.0
+                )
+                
+                update_result = update_response.json()
+                if "errors" in update_result:
+                    logger.warning(f"Failed to create update: {update_result['errors']}")
+                else:
+                    logger.info(f"Added update to Monday.com item {item_id}")
+            except Exception as e:
+                logger.warning(f"Failed to add update: {e}")
+            
+            # Create subitems for each book
+            subitems = []
+            for item in selected_items:
+                subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
+                subitem_values = json.dumps({
+                    "numbers": item["price"] * item["quantity_ordered"]
+                })
+                
+                subitem_mutation = f'''
+                mutation {{
+                    create_subitem (
+                        parent_item_id: {item_id},
+                        item_name: "{subitem_name}",
+                        column_values: {json.dumps(subitem_values)}
+                    ) {{
+                        id
+                    }}
+                }}
+                '''
+                
+                try:
+                    sub_response = await client.post(
+                        "https://api.monday.com/v2",
+                        json={"query": subitem_mutation},
+                        headers={
+                            "Authorization": MONDAY_API_KEY,
+                            "Content-Type": "application/json"
+                        },
+                        timeout=10.0
+                    )
+                    
+                    sub_result = sub_response.json()
+                    subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
+                    
+                    if subitem_id:
+                        subitems.append({
+                            "book_id": item["book_id"],
+                            "monday_subitem_id": subitem_id
+                        })
+                except Exception as e:
+                    logger.error(f"Failed to create subitem: {e}")
+            
+            return {
+                "item_id": item_id,
+                "subitems": subitems
+            }
             
             if not item_id:
                 raise ValueError("Failed to create Monday.com item")
