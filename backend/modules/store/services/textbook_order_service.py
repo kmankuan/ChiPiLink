@@ -566,56 +566,6 @@ class TextbookOrderService(BaseService):
                 "item_id": item_id,
                 "subitems": subitems
             }
-            
-            if not item_id:
-                raise ValueError("Failed to create Monday.com item")
-            
-            # Create subitems for each book
-            subitems = []
-            for item in selected_items:
-                subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
-                subitem_values = json.dumps({
-                    "numbers": str(item["price"] * item["quantity_ordered"])
-                })
-                
-                subitem_mutation = f'''
-                mutation {{
-                    create_subitem (
-                        parent_item_id: {item_id},
-                        item_name: "{subitem_name}",
-                        column_values: {json.dumps(subitem_values)}
-                    ) {{
-                        id
-                    }}
-                }}
-                '''
-                
-                try:
-                    sub_response = await client.post(
-                        "https://api.monday.com/v2",
-                        json={"query": subitem_mutation},
-                        headers={
-                            "Authorization": MONDAY_API_KEY,
-                            "Content-Type": "application/json"
-                        },
-                        timeout=10.0
-                    )
-                    
-                    sub_result = sub_response.json()
-                    subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
-                    
-                    if subitem_id:
-                        subitems.append({
-                            "book_id": item["book_id"],
-                            "monday_subitem_id": subitem_id
-                        })
-                except Exception as e:
-                    logger.error(f"Failed to create subitem: {e}")
-            
-            return {
-                "item_id": item_id,
-                "subitems": subitems
-            }
     
     async def request_reorder(
         self,
