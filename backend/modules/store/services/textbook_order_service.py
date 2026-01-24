@@ -438,7 +438,7 @@ class TextbookOrderService(BaseService):
         # - status: Status (status)
         column_values = json.dumps({
             "text_mkzkyx5v": f"{user_name} ({user_email})",  # Cliente
-            "dropdown_mkwrts6s": {"labels": [order["grade"]]},  # Grado
+            "dropdown_mkwrts6s": {"labels": [monday_grade]},  # Grado (mapped)
             "numeric_mkye5gf8": len(selected_items),  # Qty
             "text_mkwrs5qv": items_text[:500],  # Artículos (max 500 chars)
             "numeric_mkwrcmvk": total,  # Monto del pedido
