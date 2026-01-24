@@ -14,7 +14,7 @@ import VinculacionesTab from './tabs/VinculacionesTab';
 import PedidosTab from './tabs/PedidosTab';
 import ConfiguracionTab from './tabs/ConfiguracionTab';
 import DemoDataTab from './tabs/DemoDataTab';
-import TextbookAccessAdminTab from './tabs/TextbookAccessAdminTab';
+import TextbookAccessAdminTab from '@/modules/admin/users/components/StudentRequestsTab';
 import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
