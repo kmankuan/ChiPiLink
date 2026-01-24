@@ -160,33 +160,6 @@ async def debug_my_info(
     }
 
 
-@router.get("/debug/orders-check")
-async def debug_orders_check():
-    """
-    PUBLIC debug endpoint - shows all orders in database (TEMPORARY - remove after debugging)
-    """
-    from core.database import db
-    
-    # Get all orders
-    all_orders = await db.store_textbook_orders.find(
-        {},
-        {"_id": 0, "order_id": 1, "user_id": 1, "student_name": 1, "status": 1, "total_amount": 1}
-    ).to_list(50)
-    
-    # Get all users with their IDs
-    users_sample = await db.auth_users.find(
-        {},
-        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
-    ).to_list(20)
-    
-    return {
-        "total_orders": len(all_orders),
-        "orders": all_orders,
-        "users_in_system": users_sample,
-        "note": "TEMPORARY DEBUG ENDPOINT - Remove after debugging"
-    }
-
-
 # ============== ADMIN ENDPOINTS ==============
 
 @router.get("/admin/all")
