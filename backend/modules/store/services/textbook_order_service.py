@@ -1,0 +1,680 @@
+"""
+Textbook Order Service
+Business logic for textbook ordering system
+"""
+from typing import List, Optional, Dict
+from datetime import datetime, timezone
+import logging
+import httpx
+import json
+
+from core.base import BaseService
+from core.database import db
+from core.config import MONDAY_API_KEY, get_monday_board_id
+from ..repositories.textbook_order_repository import textbook_order_repository
+from ..repositories.textbook_access_repository import student_record_repository
+from .textbook_access_service import textbook_access_service
+from ..models.textbook_order import (
+    OrderStatus, OrderItemStatus, OrderItem,
+    SubmitOrderRequest, ReorderRequest
+)
+
+logger = logging.getLogger(__name__)
+
+
+class TextbookOrderService(BaseService):
+    """Service for managing textbook orders"""
+    
+    MODULE_NAME = "textbook_order"
+    
+    def __init__(self):
+        super().__init__()
+        self.order_repo = textbook_order_repository
+        self.student_repo = student_record_repository
+    
+    def get_current_year(self) -> int:
+        """Get current school year"""
+        return datetime.now(timezone.utc).year
+    
+    async def get_books_for_grade(self, grade: str) -> List[Dict]:
+        """Get all books for a specific grade"""
+        # Handle grade format variations
+        grade_queries = [grade]
+        
+        # Map simple grades to full format
+        grade_mappings = {
+            "1": ["1", "1er Grado", "1ro"],
+            "2": ["2", "2do Grado", "2do"],
+            "3": ["3", "3er Grado", "3ro"],
+            "4": ["4", "4to Grado", "4to"],
+            "5": ["5", "5to Grado", "5to"],
+            "6": ["6", "6to Grado", "6to"],
+            "7": ["7", "7mo Grado", "7mo"],
+            "8": ["8", "8vo Grado", "8vo"],
+            "9": ["9", "9no Grado", "9no"],
+            "10": ["10", "10mo Grado", "10mo"],
+            "11": ["11", "11vo Grado", "11vo"],
+            "12": ["12", "12vo Grado", "12vo"],
+            "K": ["K", "Kinder", "Kindergarten"],
+            "K3": ["K3", "Pre-K3"],
+            "K4": ["K4", "Pre-K4"],
+            "K5": ["K5", "Pre-K5", "Kinder"],
+            "PK": ["PK", "Pre-Kinder", "Pre-K"],
+        }
+        
+        if grade in grade_mappings:
+            grade_queries = grade_mappings[grade]
+        
+        books = await db.libros.find(
+            {
+                "activo": True,
+                "es_catalogo_privado": True,
+                "$or": [
+                    {"grado": {"$in": grade_queries}},
+                    {"grados": {"$in": grade_queries}}
+                ]
+            },
+            {"_id": 0}
+        ).sort("nombre", 1).to_list(200)
+        
+        return books
+    
+    async def get_or_create_order(
+        self, 
+        user_id: str, 
+        student_id: str
+    ) -> Dict:
+        """Get existing order or create a new one for a student"""
+        # Verify student belongs to user and is approved
+        student = await self.student_repo.get_by_id(student_id)
+        if not student:
+            raise ValueError("Student not found")
+        
+        if student.get("user_id") != user_id:
+            raise ValueError("Access denied")
+        
+        # Check if student has approved enrollment for current year
+        current_year = self.get_current_year()
+        enrollments = student.get("enrollments", [])
+        current_enrollment = next(
+            (e for e in enrollments if e.get("year") == current_year and e.get("status") == "approved"),
+            None
+        )
+        
+        if not current_enrollment:
+            raise ValueError("Student must have approved enrollment to order textbooks")
+        
+        grade = current_enrollment.get("grade", "")
+        
+        # Check if order already exists
+        existing_order = await self.order_repo.get_by_student(student_id, current_year)
+        
+        if existing_order:
+            # Refresh items with latest book data
+            return await self._refresh_order_items(existing_order)
+        
+        # Create new order with all books for this grade
+        books = await self.get_books_for_grade(grade)
+        
+        items = []
+        for book in books:
+            inventory = book.get("cantidad_inventario", 0) - book.get("cantidad_reservada", 0)
+            status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
+            
+            items.append({
+                "book_id": book["libro_id"],
+                "book_code": book.get("codigo", ""),
+                "book_name": book["nombre"],
+                "price": float(book.get("precio", 0)),
+                "quantity_ordered": 0,
+                "max_quantity": 1,
+                "status": status,
+                "ordered_at": None,
+                "notes": None
+            })
+        
+        order_data = {
+            "user_id": user_id,
+            "student_id": student_id,
+            "student_name": student.get("full_name", ""),
+            "school_id": student.get("school_id", ""),
+            "grade": grade,
+            "year": current_year,
+            "items": items,
+            "total_amount": 0,
+            "status": OrderStatus.DRAFT.value,
+            "submitted_at": None,
+            "monday_item_id": None,
+            "monday_subitems": []
+        }
+        
+        return await self.order_repo.create(order_data)
+    
+    async def _refresh_order_items(self, order: Dict) -> Dict:
+        """Refresh order items with latest book/inventory data"""
+        grade = order.get("grade", "")
+        books = await self.get_books_for_grade(grade)
+        books_dict = {b["libro_id"]: b for b in books}
+        
+        existing_items = {item["book_id"]: item for item in order.get("items", [])}
+        updated_items = []
+        
+        for book_id, book in books_dict.items():
+            inventory = book.get("cantidad_inventario", 0) - book.get("cantidad_reservada", 0)
+            
+            if book_id in existing_items:
+                item = existing_items[book_id]
+                # Update price and availability
+                item["price"] = float(book.get("precio", 0))
+                item["book_name"] = book["nombre"]
+                
+                # Only update status if not already ordered
+                if item["status"] not in [OrderItemStatus.ORDERED.value]:
+                    if inventory <= 0:
+                        item["status"] = OrderItemStatus.OUT_OF_STOCK.value
+                    elif item["status"] == OrderItemStatus.OUT_OF_STOCK.value:
+                        item["status"] = OrderItemStatus.AVAILABLE.value
+                
+                updated_items.append(item)
+            else:
+                # New book added to catalog
+                status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
+                updated_items.append({
+                    "book_id": book_id,
+                    "book_code": book.get("codigo", ""),
+                    "book_name": book["nombre"],
+                    "price": float(book.get("precio", 0)),
+                    "quantity_ordered": 0,
+                    "max_quantity": 1,
+                    "status": status,
+                    "ordered_at": None,
+                    "notes": None
+                })
+        
+        # Recalculate total
+        total = sum(
+            item["price"] * item["quantity_ordered"] 
+            for item in updated_items 
+            if item["quantity_ordered"] > 0
+        )
+        
+        order["items"] = updated_items
+        order["total_amount"] = total
+        
+        await self.order_repo.update_order(order["order_id"], {
+            "items": updated_items,
+            "total_amount": total
+        })
+        
+        return order
+    
+    async def update_item_selection(
+        self,
+        user_id: str,
+        order_id: str,
+        book_id: str,
+        quantity: int
+    ) -> Dict:
+        """Update item selection in draft order"""
+        order = await self.order_repo.get_by_id(order_id)
+        
+        if not order:
+            raise ValueError("Order not found")
+        
+        if order.get("user_id") != user_id:
+            raise ValueError("Access denied")
+        
+        if order.get("status") != OrderStatus.DRAFT.value:
+            raise ValueError("Cannot modify submitted order")
+        
+        # Find and update the item
+        items = order.get("items", [])
+        item_found = False
+        
+        for item in items:
+            if item["book_id"] == book_id:
+                item_found = True
+                
+                # Check if item can be modified
+                if item["status"] == OrderItemStatus.ORDERED.value:
+                    raise ValueError("This book has already been ordered")
+                
+                if item["status"] == OrderItemStatus.OUT_OF_STOCK.value and quantity > 0:
+                    raise ValueError("This book is out of stock")
+                
+                # Validate quantity
+                if quantity < 0:
+                    quantity = 0
+                if quantity > item["max_quantity"]:
+                    raise ValueError(f"Maximum quantity allowed is {item['max_quantity']}")
+                
+                item["quantity_ordered"] = quantity
+                break
+        
+        if not item_found:
+            raise ValueError("Book not found in order")
+        
+        # Recalculate total
+        total = sum(
+            item["price"] * item["quantity_ordered"] 
+            for item in items 
+            if item["quantity_ordered"] > 0
+        )
+        
+        await self.order_repo.update_order(order_id, {
+            "items": items,
+            "total_amount": total
+        })
+        
+        order["items"] = items
+        order["total_amount"] = total
+        
+        return order
+    
+    async def submit_order(
+        self,
+        user_id: str,
+        order_id: str,
+        notes: Optional[str] = None
+    ) -> Dict:
+        """Submit order - locks selected items and sends to Monday.com"""
+        order = await self.order_repo.get_by_id(order_id)
+        
+        if not order:
+            raise ValueError("Order not found")
+        
+        if order.get("user_id") != user_id:
+            raise ValueError("Access denied")
+        
+        if order.get("status") != OrderStatus.DRAFT.value:
+            raise ValueError("Order already submitted")
+        
+        # Get items with quantity > 0
+        items = order.get("items", [])
+        selected_items = [item for item in items if item.get("quantity_ordered", 0) > 0]
+        
+        if not selected_items:
+            raise ValueError("Please select at least one book")
+        
+        # Lock selected items
+        now = datetime.now(timezone.utc).isoformat()
+        for item in items:
+            if item.get("quantity_ordered", 0) > 0 and item["status"] != OrderItemStatus.ORDERED.value:
+                item["status"] = OrderItemStatus.ORDERED.value
+                item["ordered_at"] = now
+        
+        # Get user info for Monday.com
+        user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0})
+        user_name = user.get("name", "") if user else ""
+        user_email = user.get("email", "") if user else ""
+        
+        # Send to Monday.com
+        monday_item_id = None
+        monday_subitems = []
+        
+        try:
+            monday_result = await self._send_to_monday(
+                order=order,
+                selected_items=selected_items,
+                user_name=user_name,
+                user_email=user_email
+            )
+            monday_item_id = monday_result.get("item_id")
+            monday_subitems = monday_result.get("subitems", [])
+        except Exception as e:
+            logger.error(f"Failed to send to Monday.com: {e}")
+            # Continue even if Monday fails - we can retry later
+        
+        # Update order
+        await self.order_repo.update_order(order_id, {
+            "items": items,
+            "status": OrderStatus.SUBMITTED.value,
+            "submitted_at": now,
+            "notes": notes,
+            "monday_item_id": monday_item_id,
+            "monday_subitems": monday_subitems
+        })
+        
+        # Send notification
+        await self._notify_order_submitted(order, user_name, user_email)
+        
+        order["items"] = items
+        order["status"] = OrderStatus.SUBMITTED.value
+        order["submitted_at"] = now
+        order["monday_item_id"] = monday_item_id
+        
+        self.log_info(f"Order {order_id} submitted by user {user_id}")
+        
+        return order
+    
+    async def _send_to_monday(
+        self,
+        order: Dict,
+        selected_items: List[Dict],
+        user_name: str,
+        user_email: str
+    ) -> Dict:
+        """Send order to Monday.com board"""
+        board_id = await get_monday_board_id(db)
+        
+        if not MONDAY_API_KEY or not board_id:
+            raise ValueError("Monday.com not configured")
+        
+        # Create main item with order info
+        item_name = f"{order['student_name']} - {order['grade']} - ${order['total_amount']:.2f}"
+        
+        # Column values (adjust based on your Monday.com board structure)
+        column_values = json.dumps({
+            "text": user_name,           # Parent/Guardian name
+            "email": {"email": user_email, "text": user_email},
+            "text4": order["student_name"],  # Student name
+            "text6": order["grade"],         # Grade
+            "numbers": str(order["total_amount"]),  # Total
+            "status": {"label": "Nuevo"}     # Status
+        })
+        
+        async with httpx.AsyncClient() as client:
+            # Create main item
+            mutation = f'''
+            mutation {{
+                create_item (
+                    board_id: {board_id},
+                    item_name: "{item_name}",
+                    column_values: {json.dumps(column_values)}
+                ) {{
+                    id
+                }}
+            }}
+            '''
+            
+            response = await client.post(
+                "https://api.monday.com/v2",
+                json={"query": mutation},
+                headers={
+                    "Authorization": MONDAY_API_KEY,
+                    "Content-Type": "application/json"
+                },
+                timeout=30.0
+            )
+            
+            result = response.json()
+            
+            if "errors" in result:
+                logger.error(f"Monday.com error: {result['errors']}")
+                raise ValueError(f"Monday.com error: {result['errors']}")
+            
+            item_id = result.get("data", {}).get("create_item", {}).get("id")
+            
+            if not item_id:
+                raise ValueError("Failed to create Monday.com item")
+            
+            # Create subitems for each book
+            subitems = []
+            for item in selected_items:
+                subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
+                subitem_values = json.dumps({
+                    "numbers": str(item["price"] * item["quantity_ordered"])
+                })
+                
+                subitem_mutation = f'''
+                mutation {{
+                    create_subitem (
+                        parent_item_id: {item_id},
+                        item_name: "{subitem_name}",
+                        column_values: {json.dumps(subitem_values)}
+                    ) {{
+                        id
+                    }}
+                }}
+                '''
+                
+                try:
+                    sub_response = await client.post(
+                        "https://api.monday.com/v2",
+                        json={"query": subitem_mutation},
+                        headers={
+                            "Authorization": MONDAY_API_KEY,
+                            "Content-Type": "application/json"
+                        },
+                        timeout=10.0
+                    )
+                    
+                    sub_result = sub_response.json()
+                    subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
+                    
+                    if subitem_id:
+                        subitems.append({
+                            "book_id": item["book_id"],
+                            "monday_subitem_id": subitem_id
+                        })
+                except Exception as e:
+                    logger.error(f"Failed to create subitem: {e}")
+            
+            return {
+                "item_id": item_id,
+                "subitems": subitems
+            }
+    
+    async def request_reorder(
+        self,
+        user_id: str,
+        order_id: str,
+        book_id: str,
+        reason: str
+    ) -> Dict:
+        """Request to reorder a book that was already ordered"""
+        order = await self.order_repo.get_by_id(order_id)
+        
+        if not order:
+            raise ValueError("Order not found")
+        
+        if order.get("user_id") != user_id:
+            raise ValueError("Access denied")
+        
+        # Find the item
+        items = order.get("items", [])
+        item_found = False
+        
+        for item in items:
+            if item["book_id"] == book_id:
+                item_found = True
+                
+                if item["status"] != OrderItemStatus.ORDERED.value:
+                    raise ValueError("This book has not been ordered yet")
+                
+                if item["quantity_ordered"] >= item["max_quantity"]:
+                    item["status"] = OrderItemStatus.REORDER_REQUESTED.value
+                    item["reorder_reason"] = reason
+                    item["reorder_requested_at"] = datetime.now(timezone.utc).isoformat()
+                else:
+                    raise ValueError("You can still order more of this book")
+                break
+        
+        if not item_found:
+            raise ValueError("Book not found in order")
+        
+        await self.order_repo.update_order(order_id, {"items": items})
+        
+        # Notify admin
+        await self._notify_reorder_request(order, book_id, reason)
+        
+        order["items"] = items
+        return order
+    
+    async def admin_approve_reorder(
+        self,
+        admin_id: str,
+        order_id: str,
+        book_id: str,
+        max_quantity: int,
+        admin_notes: Optional[str] = None
+    ) -> Dict:
+        """Admin approves reorder request"""
+        order = await self.order_repo.get_by_id(order_id)
+        
+        if not order:
+            raise ValueError("Order not found")
+        
+        items = order.get("items", [])
+        item_found = False
+        
+        for item in items:
+            if item["book_id"] == book_id:
+                item_found = True
+                item["max_quantity"] = max_quantity
+                item["status"] = OrderItemStatus.REORDER_APPROVED.value
+                item["reorder_approved_by"] = admin_id
+                item["reorder_approved_at"] = datetime.now(timezone.utc).isoformat()
+                item["admin_notes"] = admin_notes
+                break
+        
+        if not item_found:
+            raise ValueError("Book not found in order")
+        
+        await self.order_repo.update_order(order_id, {"items": items})
+        
+        # Notify user
+        await self._notify_reorder_approved(order, book_id)
+        
+        order["items"] = items
+        return order
+    
+    async def admin_update_order_status(
+        self,
+        admin_id: str,
+        order_id: str,
+        status: OrderStatus
+    ) -> Dict:
+        """Admin updates order status"""
+        order = await self.order_repo.get_by_id(order_id)
+        
+        if not order:
+            raise ValueError("Order not found")
+        
+        await self.order_repo.update_order(order_id, {
+            "status": status.value,
+            "status_updated_by": admin_id,
+            "status_updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        order["status"] = status.value
+        return order
+    
+    async def get_user_orders(self, user_id: str, year: Optional[int] = None) -> List[Dict]:
+        """Get all orders for a user"""
+        return await self.order_repo.get_by_user(user_id, year)
+    
+    async def get_all_orders(
+        self,
+        status: Optional[str] = None,
+        grade: Optional[str] = None,
+        year: Optional[int] = None
+    ) -> List[Dict]:
+        """Get all orders (admin view)"""
+        orders = await self.order_repo.get_all(status, grade, year)
+        
+        # Enrich with user info
+        for order in orders:
+            user = await db.auth_users.find_one(
+                {"user_id": order.get("user_id")},
+                {"_id": 0, "name": 1, "email": 1}
+            )
+            if user:
+                order["user_name"] = user.get("name", "")
+                order["user_email"] = user.get("email", "")
+        
+        return orders
+    
+    async def get_order_stats(self, year: Optional[int] = None) -> Dict:
+        """Get order statistics"""
+        stats = await self.order_repo.get_stats(year)
+        stats["total_orders"] = sum(stats.get("orders_by_status", {}).values())
+        return stats
+    
+    async def get_pending_reorders(self) -> List[Dict]:
+        """Get all pending reorder requests"""
+        reorders = await self.order_repo.get_pending_reorders()
+        
+        # Enrich with user info
+        for reorder in reorders:
+            user = await db.auth_users.find_one(
+                {"user_id": reorder.get("user_id")},
+                {"_id": 0, "name": 1, "email": 1}
+            )
+            if user:
+                reorder["user_name"] = user.get("name", "")
+                reorder["user_email"] = user.get("email", "")
+        
+        return reorders
+    
+    # ============== NOTIFICATIONS ==============
+    
+    async def _notify_order_submitted(self, order: Dict, user_name: str, user_email: str):
+        """Notify about order submission"""
+        try:
+            notification = {
+                "type": "textbook_order_submitted",
+                "title": "Nuevo Pedido de Textos",
+                "message": f"{user_name} ha enviado un pedido para {order['student_name']} ({order['grade']})",
+                "data": {
+                    "order_id": order["order_id"],
+                    "student_name": order["student_name"],
+                    "total": order["total_amount"]
+                },
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.notificaciones.insert_one(notification)
+            logger.info(f"Order submitted notification: {notification['message']}")
+        except Exception as e:
+            logger.error(f"Error sending notification: {e}")
+    
+    async def _notify_reorder_request(self, order: Dict, book_id: str, reason: str):
+        """Notify admin about reorder request"""
+        try:
+            book = next((i for i in order["items"] if i["book_id"] == book_id), None)
+            book_name = book["book_name"] if book else "Unknown"
+            
+            notification = {
+                "type": "textbook_reorder_request",
+                "title": "Solicitud de Recompra",
+                "message": f"Solicitud de recompra para {book_name} - {order['student_name']}",
+                "data": {
+                    "order_id": order["order_id"],
+                    "book_id": book_id,
+                    "reason": reason
+                },
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.notificaciones.insert_one(notification)
+            logger.info(f"Reorder request notification: {notification['message']}")
+        except Exception as e:
+            logger.error(f"Error sending notification: {e}")
+    
+    async def _notify_reorder_approved(self, order: Dict, book_id: str):
+        """Notify user about reorder approval"""
+        try:
+            book = next((i for i in order["items"] if i["book_id"] == book_id), None)
+            book_name = book["book_name"] if book else "Unknown"
+            
+            notification = {
+                "type": "textbook_reorder_approved",
+                "title": "Recompra Aprobada",
+                "message": f"Tu solicitud de recompra para {book_name} ha sido aprobada",
+                "data": {
+                    "order_id": order["order_id"],
+                    "book_id": book_id
+                },
+                "user_id": order["user_id"],
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.core_notifications.insert_one(notification)
+            logger.info(f"Reorder approved notification: {notification['message']}")
+        except Exception as e:
+            logger.error(f"Error sending notification: {e}")
+
+
+# Singleton instance
+textbook_order_service = TextbookOrderService()
