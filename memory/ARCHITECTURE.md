@@ -37,6 +37,7 @@ All future development MUST follow these standards.
 | `store_schools` | Schools for textbook access | `school_id`, `name`, `catalog_id` |
 | `store_students` | Linked students | `student_id`, `user_id`, `school_id` |
 | `store_form_configs` | Dynamic form configurations | `form_type`, `fields` |
+| `store_textbook_orders` | **NEW** Textbook orders | `order_id`, `student_id`, `items[]`, `total_amount`, `status` |
 
 ### Wallet Module Collections
 
