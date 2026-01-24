@@ -443,7 +443,7 @@ class TextbookOrderService(BaseService):
             "text_mkwrs5qv": items_text[:500],  # Artículos (max 500 chars)
             "numeric_mkwrcmvk": total,  # Monto del pedido
             "text_mkwrd2h2": order["order_id"],  # Order ID
-            "status": {"label": "Nuevo"}  # Status
+            "status": {"label": "Working on it"}  # Status - available options: Working on it, Done, Stuck
         })
         
         async with httpx.AsyncClient() as client:
