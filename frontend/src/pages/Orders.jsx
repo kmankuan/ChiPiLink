@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -12,31 +14,51 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Package, Eye, Printer, Loader2, ArrowLeft } from 'lucide-react';
+import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag } from 'lucide-react';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function Orders() {
   const { t } = useTranslation();
-  const { api } = useAuth();
+  const { api, token } = useAuth();
   
   const [pedidos, setPedidos] = useState([]);
+  const [textbookOrders, setTextbookOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingTextbooks, setLoadingTextbooks] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState('textbooks');
 
   useEffect(() => {
     fetchPedidos();
+    fetchTextbookOrders();
   }, []);
 
   const fetchPedidos = async () => {
     try {
       const response = await api.get('/pedidos/mis-pedidos');
-      // Handle both array response and object with 'pedidos' key
       const data = response.data;
       setPedidos(Array.isArray(data) ? data : (data.pedidos || []));
     } catch (error) {
       console.error('Error fetching orders:', error);
-      toast.error('Error al cargar pedidos');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTextbookOrders = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/store/textbook-orders/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTextbookOrders(data.orders || []);
+      }
+    } catch (error) {
+      console.error('Error fetching textbook orders:', error);
+    } finally {
+      setLoadingTextbooks(false);
     }
   };
 
