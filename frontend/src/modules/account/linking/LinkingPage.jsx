@@ -587,16 +587,7 @@ export default function LinkingPage() {
                         <div className="flex gap-2">
                           {hasAccess ? (
                             <Button 
-                              onClick={() => {
-                                // Navigate to textbooks tab in account dashboard
-                                const tabsElement = document.querySelector('[data-testid="textbooks-tab"]');
-                                if (tabsElement) {
-                                  tabsElement.click();
-                                } else {
-                                  // Fallback: set URL hash and reload
-                                  window.location.href = '/mi-cuenta?tab=textbooks';
-                                }
-                              }}
+                              onClick={() => window.location.href = '/mi-cuenta?tab=textbooks'}
                               className="gap-2"
                             >
                               <BookOpen className="h-4 w-4" />
