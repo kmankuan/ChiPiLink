@@ -164,13 +164,20 @@ export default function TextbookOrderPage() {
   const handleSubmitOrder = async () => {
     if (!order) return;
     
-    const selectedItems = order.items.filter(i => i.quantity_ordered > 0);
-    if (selectedItems.length === 0) {
-      toast.error('Please select at least one textbook');
+    // Count only NEW selections (not already ordered)
+    const newSelectedItems = order.items.filter(
+      i => i.quantity_ordered > 0 && i.status !== 'ordered'
+    );
+    
+    if (newSelectedItems.length === 0) {
+      toast.error('Please select at least one new textbook to order');
       return;
     }
     
-    if (!confirm(`Submit order for ${selectedItems.length} textbook(s)?\nTotal: $${order.total_amount.toFixed(2)}\n\nOnce submitted, you cannot modify selected items.`)) {
+    // Calculate total for new items only
+    const newTotal = newSelectedItems.reduce((sum, i) => sum + (i.price * i.quantity_ordered), 0);
+    
+    if (!confirm(`Submit order for ${newSelectedItems.length} textbook(s)?\nTotal: $${newTotal.toFixed(2)}\n\nOnce submitted, these items will be locked. You can still order remaining items later.`)) {
       return;
     }
     
@@ -184,7 +191,13 @@ export default function TextbookOrderPage() {
       if (res.ok) {
         const updatedOrder = await res.json();
         setOrder(updatedOrder);
-        toast.success('Order submitted successfully! We will contact you soon.');
+        
+        const availableCount = updatedOrder.items_available || 0;
+        if (availableCount > 0) {
+          toast.success(`Order submitted! ${availableCount} more items available to order later.`);
+        } else {
+          toast.success('Order submitted successfully! We will contact you soon.');
+        }
       } else {
         const error = await res.json();
         toast.error(error.detail || 'Error submitting order');
