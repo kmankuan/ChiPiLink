@@ -412,7 +412,7 @@ class TextbookOrderService(BaseService):
             "email": {"email": user_email, "text": user_email},
             "text4": order["student_name"],  # Student name
             "text6": order["grade"],         # Grade
-            "numbers": str(order["total_amount"]),  # Total
+            "numbers": str(total),  # Total for this submission
             "status": {"label": "Nuevo"}     # Status
         })
         
