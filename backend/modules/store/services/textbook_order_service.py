@@ -409,6 +409,25 @@ class TextbookOrderService(BaseService):
         # Build items list for text column
         items_text = ", ".join([f"{item['book_name']} (x{item['quantity_ordered']})" for item in selected_items])
         
+        # Map grade to Monday.com dropdown labels
+        grade = order["grade"]
+        grade_mapping = {
+            "K4": "K4", "K5": "K5",
+            "1": "Grado 1", "1er Grado": "Grado 1", "1ro": "Grado 1",
+            "2": "Grado 2", "2do Grado": "Grado 2", "2do": "Grado 2",
+            "3": "Grado 3", "3er Grado": "Grado 3", "3ro": "Grado 3",
+            "4": "Grado 4", "4to Grado": "Grado 4", "4to": "Grado 4",
+            "5": "Grado 5", "5to Grado": "Grado 5", "5to": "Grado 5",
+            "6": "Grado 6", "6to Grado": "Grado 6", "6to": "Grado 6",
+            "7": "Grado 7", "7mo Grado": "Grado 7", "7mo": "Grado 7",
+            "8": "Grado 8", "8vo Grado": "Grado 8", "8vo": "Grado 8",
+            "9": "Grado 9", "9no Grado": "Grado 9", "9no": "Grado 9",
+            "10": "Grado 10", "10mo Grado": "Grado 10", "10mo": "Grado 10",
+            "11": "Grado 11", "11vo Grado": "Grado 11", "11vo": "Grado 11",
+            "12": "Grado 12", "12vo Grado": "Grado 12", "12vo": "Grado 12",
+        }
+        monday_grade = grade_mapping.get(grade, f"Grado {grade}" if grade.isdigit() else grade)
+        
         # Column values matching the actual board structure:
         # - text_mkzkyx5v: Cliente (text) - Parent/Guardian name
         # - dropdown_mkwrts6s: Grado (dropdown)
