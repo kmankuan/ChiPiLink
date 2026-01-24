@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList } from 'lucide-react';
+import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList, Package } from 'lucide-react';
 
 // Import sub-modules
 import CatalogoPublicoTab from './tabs/CatalogoPublicoTab';
@@ -15,6 +15,7 @@ import PedidosTab from './tabs/PedidosTab';
 import ConfiguracionTab from './tabs/ConfiguracionTab';
 import DemoDataTab from './tabs/DemoDataTab';
 import TextbookAccessAdminTab from './tabs/TextbookAccessAdminTab';
+import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -112,7 +113,7 @@ export default function UnatiendaModule() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-8 mb-6">
+        <TabsList className="grid w-full grid-cols-9 mb-6">
           <TabsTrigger value="catalogo-publico" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Público</span>
@@ -124,6 +125,10 @@ export default function UnatiendaModule() {
           <TabsTrigger value="solicitudes" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
             <span className="hidden md:inline">Solicitudes</span>
+          </TabsTrigger>
+          <TabsTrigger value="textbook-orders" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            <span className="hidden md:inline">Pedidos Txt</span>
           </TabsTrigger>
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -157,6 +162,10 @@ export default function UnatiendaModule() {
 
         <TabsContent value="solicitudes">
           <TextbookAccessAdminTab token={token} />
+        </TabsContent>
+
+        <TabsContent value="textbook-orders">
+          <TextbookOrdersAdminTab />
         </TabsContent>
 
         <TabsContent value="estudiantes">
