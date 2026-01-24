@@ -60,7 +60,7 @@ async def get_vista_previa_pedido(
     """
     result = await pedidos_service.obtener_vista_previa_pedido(
         estudiante_sync_id,
-        current_user["cliente_id"],
+        get_user_identifier(current_user),
         ano_escolar
     )
     
@@ -82,7 +82,7 @@ async def crear_pedido(
     try:
         result = await pedidos_service.crear_pedido(
             request.estudiante_sync_id,
-            current_user["cliente_id"],
+            get_user_identifier(current_user),
             request.ano_escolar,
             request.tipo
         )
@@ -107,7 +107,7 @@ async def agregar_item_pedido(
         result = await pedidos_service.agregar_item(
             pedido_id,
             request.libro_id,
-            current_user["cliente_id"],
+            get_user_identifier(current_user),
             request.cantidad,
             request.nota
         )
@@ -129,7 +129,7 @@ async def quitar_item_pedido(
         result = await pedidos_service.quitar_item(
             pedido_id,
             item_id,
-            current_user["cliente_id"]
+            get_user_identifier(current_user)
         )
         return result
     except ValueError as e:
@@ -148,7 +148,7 @@ async def agregar_todos_libros_faltantes(
     try:
         result = await pedidos_service.agregar_todos_libros_faltantes(
             pedido_id,
-            current_user["cliente_id"]
+            get_user_identifier(current_user)
         )
         return result
     except ValueError as e:
@@ -168,7 +168,7 @@ async def confirmar_pedido(
     try:
         result = await pedidos_service.confirmar_pedido(
             pedido_id,
-            current_user["cliente_id"],
+            get_user_identifier(current_user),
             request.acepto_terminos,
             request.notas
         )
@@ -189,7 +189,7 @@ async def get_mis_pedidos(
     Puedo filtrar por estudiante, año escolar y estado.
     """
     result = await pedidos_service.obtener_mis_pedidos(
-        current_user["cliente_id"],
+        get_user_identifier(current_user),
         estudiante_sync_id,
         ano_escolar,
         estado
@@ -207,7 +207,7 @@ async def get_pedido(
     """
     result = await pedidos_service.obtener_pedido(
         pedido_id,
-        current_user["cliente_id"]
+        get_user_identifier(current_user)
     )
     
     if not result:
@@ -228,7 +228,7 @@ async def cancelar_pedido(
     try:
         result = await pedidos_service.cancelar_pedido(
             pedido_id,
-            current_user["cliente_id"],
+            get_user_identifier(current_user),
             request.motivo
         )
         return result
@@ -307,7 +307,7 @@ async def admin_actualizar_estado(
         result = await pedidos_service.admin_actualizar_estado_pedido(
             pedido_id,
             request.nuevo_estado,
-            admin["cliente_id"],
+            get_user_identifier(admin),
             request.notas
         )
         return result
