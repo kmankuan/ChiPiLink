@@ -56,6 +56,7 @@ All future development MUST follow these standards.
 | `store_students` | Linked students | `student_id`, `user_id`, `school_id` |
 | `store_form_configs` | Dynamic form configurations | `form_type`, `fields` |
 | `store_textbook_orders` | **NEW** Textbook orders | `order_id`, `student_id`, `items[]`, `total_amount`, `status` |
+| `store_school_year_config` | **NEW** School year settings | `config_id`, `calendar_type`, `enrollment_start_month` |
 
 ### Wallet Module Collections
 
