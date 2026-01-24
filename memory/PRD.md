@@ -24,6 +24,12 @@
 - Padres/acudientes solicitan acceso al catálogo privado
 - Admin aprueba/rechaza solicitudes
 - Estudiantes vinculados pueden ver libros de su escuela/grado
+- **📦 Pedidos de Textos** (NUEVO)
+  - Lista de libros por grado con precios configurables
+  - Usuario selecciona libros → total en tiempo real
+  - Envío bloquea items + notifica a Monday.com
+  - Sistema de recompra (solicitar → admin aprueba)
+  - Dashboard admin con estadísticas
 
 #### 3. 🏓 PinpanClub (Clubes de Ping Pong)
 - Gestión de clubes y jugadores
