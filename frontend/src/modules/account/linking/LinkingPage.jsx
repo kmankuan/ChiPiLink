@@ -553,7 +553,7 @@ export default function LinkingPage() {
             {EXCLUSIVE_PROGRAMS.map((program) => {
               const Icon = program.icon;
               const hasAccess = students.some(e => 
-                (e.estado === 'aprobado' || e.status === 'verified') && 
+                (e.status === 'approved' || e.status === 'verified' || e.estado === 'aprobado') && 
                 (e.programa === program.id || !e.programa)
               );
 
