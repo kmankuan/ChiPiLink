@@ -394,12 +394,33 @@ class TextbookOrderService(BaseService):
         user_email: str,
         submission_total: float = None
     ) -> Dict:
-        """Send order to Monday.com board with items as subitems and summary as update"""
-        board_id = await get_monday_board_id(db)
+        """Send order to Monday.com board with items as subitems and summary as update
+        Uses configuration from Integrations -> Monday.com -> Pedidos de Libros
+        """
+        # Get Monday.com configuration from the store monday service
+        monday_config = await monday_pedidos_service.get_config()
+        board_id = monday_config.get("board_id")
+        column_mapping = monday_config.get("column_mapping", {})
+        subitems_enabled = monday_config.get("subitems_enabled", False)
+        subitem_mapping = monday_config.get("subitem_column_mapping", {})
         
-        if not MONDAY_API_KEY or not board_id:
-            logger.warning("Monday.com not configured - MONDAY_API_KEY or MONDAY_BOARD_ID missing")
-            raise ValueError("Monday.com not configured")
+        # Get active API key
+        workspaces_config = await monday_pedidos_service.get_workspaces()
+        api_key = None
+        active_workspace_id = workspaces_config.get("active_workspace_id")
+        
+        for ws in workspaces_config.get("workspaces", []):
+            if ws.get("workspace_id") == active_workspace_id and ws.get("api_key"):
+                api_key = ws["api_key"]
+                break
+        
+        # Fallback to env API key if no workspace configured
+        if not api_key:
+            api_key = MONDAY_API_KEY
+        
+        if not api_key or not board_id:
+            logger.warning("Monday.com not configured - go to Admin -> Integraciones -> Monday.com -> Pedidos de Libros")
+            raise ValueError("Monday.com not configured. Please configure in Admin -> Integraciones -> Monday.com")
         
         # Use submission total if provided, otherwise calculate from order
         total = submission_total if submission_total is not None else order['total_amount']
@@ -410,7 +431,7 @@ class TextbookOrderService(BaseService):
         # Build items list for text column
         items_text = ", ".join([f"{item['book_name']} (x{item['quantity_ordered']})" for item in selected_items])
         
-        # Map grade to Monday.com dropdown labels
+        # Map grade to Monday.com dropdown labels (if dropdown is used)
         grade = order["grade"]
         grade_mapping = {
             "K4": "K4", "K5": "K5",
@@ -429,23 +450,30 @@ class TextbookOrderService(BaseService):
         }
         monday_grade = grade_mapping.get(grade, f"Grado {grade}" if grade.isdigit() else grade)
         
-        # Column values matching the actual board structure:
-        # - text_mkzkyx5v: Cliente (text) - Parent/Guardian name
-        # - dropdown_mkwrts6s: Grado (dropdown)
-        # - numeric_mkye5gf8: Qty (numbers)
-        # - text_mkwrs5qv: Artículos (text)
-        # - numeric_mkwrcmvk: Monto del pedido (numbers)
-        # - text_mkwrd2h2: Order ID (text)
-        # - status: Status (status)
-        column_values = json.dumps({
-            "text_mkzkyx5v": f"{user_name} ({user_email})",  # Cliente
-            "dropdown_mkwrts6s": {"labels": [monday_grade]},  # Grado (mapped)
-            "numeric_mkye5gf8": len(selected_items),  # Qty
-            "text_mkwrs5qv": items_text[:500],  # Artículos (max 500 chars)
-            "numeric_mkwrcmvk": total,  # Monto del pedido
-            "text_mkwrd2h2": order["order_id"],  # Order ID
-            "status": {"label": "Working on it"}  # Status - available options: Working on it, Done, Stuck
-        })
+        # Build column values using configured mapping
+        column_values = {}
+        
+        # Map fields based on configuration
+        if column_mapping.get("estudiante"):
+            column_values[column_mapping["estudiante"]] = order["student_name"]
+        if column_mapping.get("acudiente"):
+            column_values[column_mapping["acudiente"]] = f"{user_name} ({user_email})"
+        if column_mapping.get("grado"):
+            # Try dropdown format first, fall back to text
+            col_id = column_mapping["grado"]
+            column_values[col_id] = {"labels": [monday_grade]}
+        if column_mapping.get("libros"):
+            column_values[column_mapping["libros"]] = items_text[:2000]
+        if column_mapping.get("total"):
+            column_values[column_mapping["total"]] = total
+        if column_mapping.get("estado"):
+            column_values[column_mapping["estado"]] = {"label": "Working on it"}
+        if column_mapping.get("pedido_id"):
+            column_values[column_mapping["pedido_id"]] = order["order_id"]
+        if column_mapping.get("fecha"):
+            column_values[column_mapping["fecha"]] = {"date": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
+        
+        column_values_json = json.dumps(column_values)
         
         async with httpx.AsyncClient() as client:
             # Create main item
@@ -454,7 +482,7 @@ class TextbookOrderService(BaseService):
                 create_item (
                     board_id: {board_id},
                     item_name: "{item_name}",
-                    column_values: {json.dumps(column_values)}
+                    column_values: {json.dumps(column_values_json)}
                 ) {{
                     id
                 }}
@@ -465,7 +493,7 @@ class TextbookOrderService(BaseService):
                 "https://api.monday.com/v2",
                 json={"query": mutation},
                 headers={
-                    "Authorization": MONDAY_API_KEY,
+                    "Authorization": api_key,
                     "Content-Type": "application/json"
                 },
                 timeout=30.0
@@ -526,7 +554,7 @@ class TextbookOrderService(BaseService):
                     "https://api.monday.com/v2",
                     json={"query": update_mutation},
                     headers={
-                        "Authorization": MONDAY_API_KEY,
+                        "Authorization": api_key,
                         "Content-Type": "application/json"
                     },
                     timeout=15.0
@@ -540,47 +568,58 @@ class TextbookOrderService(BaseService):
             except Exception as e:
                 logger.warning(f"Failed to add update: {e}")
             
-            # Create subitems for each book
+            # Create subitems for each book if enabled
             subitems = []
-            for item in selected_items:
-                subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
-                subitem_values = json.dumps({
-                    "numbers": item["price"] * item["quantity_ordered"]
-                })
-                
-                subitem_mutation = f'''
-                mutation {{
-                    create_subitem (
-                        parent_item_id: {item_id},
-                        item_name: "{subitem_name}",
-                        column_values: {json.dumps(subitem_values)}
-                    ) {{
-                        id
+            if subitems_enabled:
+                for item in selected_items:
+                    subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
+                    
+                    # Build subitem column values from mapping
+                    subitem_values = {}
+                    if subitem_mapping.get("cantidad"):
+                        subitem_values[subitem_mapping["cantidad"]] = item["quantity_ordered"]
+                    if subitem_mapping.get("precio_unitario"):
+                        subitem_values[subitem_mapping["precio_unitario"]] = item["price"]
+                    if subitem_mapping.get("subtotal"):
+                        subitem_values[subitem_mapping["subtotal"]] = item["price"] * item["quantity_ordered"]
+                    if subitem_mapping.get("codigo"):
+                        subitem_values[subitem_mapping["codigo"]] = item.get("book_code", "")
+                    
+                    subitem_values_json = json.dumps(subitem_values)
+                    
+                    subitem_mutation = f'''
+                    mutation {{
+                        create_subitem (
+                            parent_item_id: {item_id},
+                            item_name: "{subitem_name}",
+                            column_values: {json.dumps(subitem_values_json)}
+                        ) {{
+                            id
+                        }}
                     }}
-                }}
-                '''
-                
-                try:
-                    sub_response = await client.post(
-                        "https://api.monday.com/v2",
-                        json={"query": subitem_mutation},
-                        headers={
-                            "Authorization": MONDAY_API_KEY,
-                            "Content-Type": "application/json"
-                        },
-                        timeout=10.0
-                    )
+                    '''
                     
-                    sub_result = sub_response.json()
-                    subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
-                    
-                    if subitem_id:
-                        subitems.append({
-                            "book_id": item["book_id"],
-                            "monday_subitem_id": subitem_id
-                        })
-                except Exception as e:
-                    logger.error(f"Failed to create subitem: {e}")
+                    try:
+                        sub_response = await client.post(
+                            "https://api.monday.com/v2",
+                            json={"query": subitem_mutation},
+                            headers={
+                                "Authorization": api_key,
+                                "Content-Type": "application/json"
+                            },
+                            timeout=10.0
+                        )
+                        
+                        sub_result = sub_response.json()
+                        subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
+                        
+                        if subitem_id:
+                            subitems.append({
+                                "book_id": item["book_id"],
+                                "monday_subitem_id": subitem_id
+                            })
+                    except Exception as e:
+                        logger.error(f"Failed to create subitem: {e}")
             
             return {
                 "item_id": item_id,
