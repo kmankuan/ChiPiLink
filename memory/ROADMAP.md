@@ -28,13 +28,13 @@
 ## P1 - High Priority
 
 ### 🟠 OneSignal Push Notifications
-- **Description**: Send notifications when student link status changes
+- **Description**: Send notifications when student link status changes or textbook order status updates
 - **Status**: Planned
 - **Dependencies**: OneSignal account setup
 
-### 🟠 "Already Ordered" Indicator
-- **Description**: Mark books as already ordered to avoid duplicates
-- **Status**: Planned
+### ~~🟠 "Already Ordered" Indicator~~ ✅ DONE
+- ~~Mark books as already ordered to avoid duplicates~~
+- Implemented in Textbook Orders system (status: "ordered")
 
 ---
 
