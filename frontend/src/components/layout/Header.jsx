@@ -615,7 +615,7 @@ export function Header() {
                 data-testid="mobile-unatienda-link"
               >
                 <Store className="h-4 w-4" />
-                Tienda
+                Unatienda
               </Link>
 
               {/* Catalog link removed - now in Admin > Unatienda */}
