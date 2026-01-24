@@ -229,6 +229,10 @@ class TextbookAccessService(BaseService):
         if not is_admin and student.get("user_id") != user_id:
             raise ValueError("Access denied")
         
+        # Check if student is locked (users cannot edit, admins can)
+        if student.get("is_locked", False) and not is_admin:
+            raise ValueError("This student record is locked. Contact admin if you need to make changes.")
+        
         update_data = data.model_dump(exclude_unset=True)
         
         # If changing school, get new school name
