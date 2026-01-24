@@ -4,6 +4,18 @@
 
 ---
 
+## ✅ Recently Completed
+
+### ✅ Sistema de Pedidos de Textos (Enero 24, 2026)
+- Lista de libros por grado con selección checkbox
+- Cálculo de total en tiempo real
+- Envío a Monday.com
+- Sistema de recompra con aprobación admin
+- Dashboard admin con estadísticas
+- **21 tests pasados**
+
+---
+
 ## P0 - Critical / In Progress
 
 ### 🔴 Google Sign-Up Fix
