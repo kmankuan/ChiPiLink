@@ -92,6 +92,11 @@ class StudentRecord(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     is_active: bool = True
+    # Lock fields
+    is_locked: bool = False  # True when any enrollment is approved
+    locked_at: Optional[str] = None
+    locked_by: Optional[str] = None  # "system" or admin user_id
+    unlock_reason: Optional[str] = None  # If admin unlocked
 
 
 class StudentRecordCreate(BaseModel):
