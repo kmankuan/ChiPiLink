@@ -539,21 +539,13 @@ export default function Unatienda() {
     }
   }, [isAuthenticated, token]);
 
-  // Fetch private products when access is granted and view changes
-  useEffect(() => {
-    if (activeView === 'private' && catalogoPrivadoAcceso?.tiene_acceso) {
-      fetchPrivateProducts();
-    }
-  }, [activeView, catalogoPrivadoAcceso, selectedGradoPrivado, selectedMateriaPrivado]);
-
   const fetchData = async () => {
     try {
-      const [productsRes, storeRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
+      const [productsRes, storeRes, categoriasRes, gradosRes] = await Promise.all([
         axios.get(`${API_URL}/api/store/products`),
         axios.get(`${API_URL}/api/platform-store`),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
-        axios.get(`${API_URL}/api/store/products/grades`),
-        axios.get(`${API_URL}/api/store/products/subjects`)
+        axios.get(`${API_URL}/api/store/products/grades`)
       ]);
       
       // Filter only public products (not private catalog)
@@ -563,7 +555,6 @@ export default function Unatienda() {
       setStoreInfo(storeRes.data);
       setCategorias(categoriasRes.data || []);
       setGrados(gradosRes.data.grados || []);
-      setMaterias(materiasRes.data.materias || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -580,27 +571,6 @@ export default function Unatienda() {
     } catch (error) {
       console.error('Error checking private catalog access:', error);
       setCatalogoPrivadoAcceso({ tiene_acceso: false, estudiantes: [], grados: [] });
-    }
-  };
-
-  const fetchPrivateProducts = async () => {
-    if (!token) return;
-    
-    setLoadingPrivado(true);
-    try {
-      let url = `${API_URL}/api/store/catalogo-privado/productos?limit=200`;
-      if (selectedGradoPrivado) url += `&grado=${encodeURIComponent(selectedGradoPrivado)}`;
-      if (selectedMateriaPrivado) url += `&materia=${encodeURIComponent(selectedMateriaPrivado)}`;
-      
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setProductosPrivados(response.data.productos || []);
-    } catch (error) {
-      console.error('Error fetching private products:', error);
-      toast.error('Error al cargar catálogo privado');
-    } finally {
-      setLoadingPrivado(false);
     }
   };
 
@@ -621,16 +591,6 @@ export default function Unatienda() {
     }
     
     return matchesSearch && matchesCategoria;
-  });
-
-  // Filter private products
-  const filteredPrivateProducts = productosPrivados.filter(product => {
-    if (!searchTerm) return true;
-    return (
-      product.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.codigo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.editorial?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
   });
 
   // Navigation helpers
