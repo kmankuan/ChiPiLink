@@ -55,18 +55,18 @@ async def verify_private_catalog_access(user_id: str) -> dict:
 
 
 @router.get("/acceso")
-async def verificar_acceso(
+async def check_access(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Verificar si el usuario tiene acceso al catálogo privado.
-    Retorna lista de estudiantes vinculados y grados disponibles.
+    Check if user has access to the private catalog.
+    Returns list of linked students and available grades.
     """
     return await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
 
 
 @router.get("/productos")
-async def get_productos_catalogo_privado(
+async def get_private_catalog_products(
     grado: Optional[str] = None,
     materia: Optional[str] = None,
     search: Optional[str] = None,
