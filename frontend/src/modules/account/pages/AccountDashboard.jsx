@@ -36,7 +36,7 @@ export default function AccountDashboard() {
   const getInitialTab = () => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
-    const validTabs = ['wallet', 'profile', 'membership', 'connections', 'dependents', 'capacities', 'notifications', 'exclusive', 'textbooks'];
+    const validTabs = ['wallet', 'profile', 'membership', 'connections', 'dependents', 'capacities', 'notifications', 'exclusive'];
     return validTabs.includes(tabParam) ? tabParam : 'wallet';
   };
   
