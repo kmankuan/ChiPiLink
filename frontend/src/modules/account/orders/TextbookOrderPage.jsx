@@ -293,22 +293,37 @@ export default function TextbookOrderPage({ embedded = false }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            Textbook Orders
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            Select textbooks for your student
-          </p>
+      {/* Header - simplified when embedded */}
+      {!embedded && (
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <BookOpen className="h-6 w-6 text-primary" />
+              Textbook Orders
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Select textbooks for your student
+            </p>
+          </div>
+          <Button variant="outline" onClick={fetchOrderHistory} className="gap-2">
+            <History className="h-4 w-4" />
+            Order History
+          </Button>
         </div>
-        <Button variant="outline" onClick={fetchOrderHistory} className="gap-2">
-          <History className="h-4 w-4" />
-          Order History
-        </Button>
-      </div>
+      )}
+
+      {/* Embedded header - more compact */}
+      {embedded && (
+        <div className="flex justify-between items-center">
+          <p className="text-muted-foreground">
+            Selecciona los libros para tu estudiante y envía el pedido
+          </p>
+          <Button variant="outline" size="sm" onClick={fetchOrderHistory} className="gap-2">
+            <History className="h-4 w-4" />
+            Historial
+          </Button>
+        </div>
+      )}
 
       {/* Student Selector */}
       {students.length > 1 && (
