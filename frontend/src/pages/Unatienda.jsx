@@ -443,24 +443,49 @@ export default function Unatienda() {
   const StudentsInfo = () => {
     if (!catalogoPrivadoAcceso?.estudiantes?.length) return null;
 
+    const handleStudentClick = (student) => {
+      setSelectedStudentId(student.student_id || student.sync_id);
+      setSelectedGradoPrivado(student.grado);
+      setPrivateTab('orders');
+      setActiveView('private');
+    };
+
     return (
       <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-        <div className="flex items-center gap-2 mb-3">
-          <GraduationCap className="h-5 w-5 text-purple-600" />
-          <span className="font-semibold">Tus Estudiantes Vinculados:</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-purple-600" />
+            <span className="font-semibold">Tus Estudiantes Vinculados:</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setActiveView('private');
+              setPrivateTab('linking');
+            }}
+            className="text-purple-600 hover:text-purple-700 hover:bg-purple-100"
+          >
+            <UserPlus className="h-4 w-4 mr-1" />
+            Vincular más
+          </Button>
         </div>
         <div className="flex flex-wrap gap-2">
           {catalogoPrivadoAcceso.estudiantes.map((est) => (
             <Badge 
-              key={est.sync_id} 
+              key={est.sync_id || est.student_id} 
               variant="secondary"
-              className="cursor-pointer hover:bg-purple-100"
-              onClick={() => setSelectedGradoPrivado(est.grado)}
+              className="cursor-pointer hover:bg-purple-200 transition-colors py-2 px-3"
+              onClick={() => handleStudentClick(est)}
             >
               {est.nombre} - {est.grado}
+              <ChevronRight className="h-3 w-3 ml-1" />
             </Badge>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Haz click en un estudiante para ordenar sus textos
+        </p>
       </div>
     );
   };
