@@ -587,7 +587,7 @@ export default function LinkingPage() {
                         <div className="flex gap-2">
                           {hasAccess ? (
                             <Button 
-                              onClick={() => window.location.href = '/unatienda?tab=privado'}
+                              onClick={() => window.location.href = '/unatienda?tab=private'}
                               className="gap-2"
                             >
                               <BookOpen className="h-4 w-4" />
