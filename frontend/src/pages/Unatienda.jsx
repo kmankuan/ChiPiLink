@@ -549,7 +549,7 @@ export default function Unatienda() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setActiveView('privado')}
+                    onClick={() => setActiveView('private')}
                     className="rounded-full border-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-700"
                   >
                     <GraduationCap className="h-4 w-4 mr-1.5 text-purple-600" />
