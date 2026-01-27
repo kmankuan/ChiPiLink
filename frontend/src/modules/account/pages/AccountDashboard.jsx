@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag, BookOpen } from 'lucide-react';
+import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
