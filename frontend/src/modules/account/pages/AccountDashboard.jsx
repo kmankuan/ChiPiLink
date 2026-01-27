@@ -104,7 +104,6 @@ export default function AccountDashboard() {
       capacities: 'Capacities',
       notifications: 'Notifications',
       exclusive: 'Exclusive Shopping',
-      textbooks: 'Textbooks',
       loginRequired: 'You must log in to access this section',
       login: 'Log In',
       transfer: 'Transfer'
