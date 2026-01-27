@@ -205,10 +205,6 @@ export default function AccountDashboard() {
               <ShoppingBag className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.exclusive}</span>
             </TabsTrigger>
-            <TabsTrigger value="textbooks" data-testid="textbooks-tab" className="gap-1 text-xs sm:text-sm">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.textbooks}</span>
-            </TabsTrigger>
             <TabsTrigger value="membership" data-testid="membership-tab" className="gap-1 text-xs sm:text-sm">
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.membership}</span>
