@@ -86,7 +86,7 @@ export default function Unatienda() {
     
     if (categoria) setSelectedCategoria(categoria);
     if (search) setSearchTerm(decodeURIComponent(search));
-    if (tab === 'private') setActiveView('privado');
+    if (tab === 'private') setActiveView('private');
     
     // Clean up URL
     if (categoria || search || tab) {
