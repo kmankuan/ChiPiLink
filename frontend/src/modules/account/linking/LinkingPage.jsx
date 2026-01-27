@@ -438,6 +438,10 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
       
       if (successCount > 0) {
         toast.success(`${successCount} student${successCount > 1 ? 's' : ''} linked successfully`);
+        // Call callback if provided (for embedded mode)
+        if (onStudentLinked) {
+          onStudentLinked();
+        }
       }
       if (errorCount > 0 && successCount === 0) {
         // Only show generic error if we haven't shown a specific one
