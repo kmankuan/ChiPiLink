@@ -576,7 +576,7 @@ export default function Unatienda() {
         </div>
 
         {/* Content - Public or Private */}
-        {activeView === 'privado' && catalogoPrivadoAcceso?.tiene_acceso ? (
+        {activeView === 'private' && catalogoPrivadoAcceso?.tiene_acceso ? (
           <>
             {/* Private Catalog Header */}
             <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
