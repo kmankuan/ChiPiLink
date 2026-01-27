@@ -213,6 +213,15 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - Fixed Spanish terms in code: `?tab=privado` → `?tab=private`
   - Fixed internal state: `activeView='privado'` → `activeView='private'`
   - Fixed backend: `cliente_id` → `user_id` fallback in catalogo_privado.py
+  - Deleted `/app/backend/_deprecated/` folder (legacy code contamination)
+  - Updated `catalogo_privado.py` to use ONLY `textbook_access` system
+- **📍 Moved Compra Exclusiva to Unatienda** (Jan 27, 2026)
+  - Removed "Compra Exclusiva" tab from "Mi Cuenta"
+  - Added "Ordenar Textos" button in Unatienda header
+  - Added 4-tab interface in Textos Escolares: "Mis Pedidos", "Por Estudiante", "Catálogo", "Vincular"
+  - Student badges now navigate to textbook ordering section
+  - "Vincular más" button to add new students
+  - Full textbook workflow now within Unatienda module
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
