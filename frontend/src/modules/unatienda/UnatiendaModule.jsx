@@ -114,7 +114,7 @@ export default function UnatiendaModule() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-9 mb-6">
+        <TabsList className="grid w-full grid-cols-10 mb-6">
           <TabsTrigger value="catalogo-publico" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Público</span>
@@ -130,6 +130,10 @@ export default function UnatiendaModule() {
           <TabsTrigger value="textbook-orders" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             <span className="hidden md:inline">Pedidos Txt</span>
+          </TabsTrigger>
+          <TabsTrigger value="form-config" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            <span className="hidden md:inline">Formulario</span>
           </TabsTrigger>
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
