@@ -585,7 +585,7 @@ export default function Unatienda() {
               <div className="flex items-center gap-3">
                 <GraduationCap className="h-6 w-6 text-purple-600" />
                 <div>
-                  <h3 className="font-bold">Textos Escolares</h3>
+                  <h3 className="font-bold">Compra Exclusiva</h3>
                   <p className="text-sm text-muted-foreground">
                     {catalogoPrivadoAcceso?.tiene_acceso 
                       ? 'Gestiona los textos de tus estudiantes vinculados'
