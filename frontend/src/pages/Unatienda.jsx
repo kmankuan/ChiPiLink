@@ -560,21 +560,6 @@ export default function Unatienda() {
                     {cat.nombre}
                   </Button>
                 ))}
-                {/* Show "Textos Escolares" category only for users with access */}
-                {catalogoPrivadoAcceso?.tiene_acceso && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setActiveView('private')}
-                    className="rounded-full border-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-700"
-                  >
-                    <GraduationCap className="h-4 w-4 mr-1.5 text-purple-600" />
-                    <span className="text-purple-700 dark:text-purple-300">Textos Escolares</span>
-                    <Badge variant="secondary" className="ml-1.5 text-xs bg-purple-200 dark:bg-purple-800">
-                      {catalogoPrivadoAcceso.estudiantes?.length || 0}
-                    </Badge>
-                  </Button>
-                )}
               </>
             ) : (
               <>
