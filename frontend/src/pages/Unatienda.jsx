@@ -27,11 +27,13 @@ import {
   Lock,
   User,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  ClipboardList
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import CategoryLanding from '@/components/store/CategoryLanding';
 import LibrosPorEstudiante from '@/components/store/LibrosPorEstudiante';
+import TextbookOrderPage from '@/modules/account/orders/TextbookOrderPage';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
