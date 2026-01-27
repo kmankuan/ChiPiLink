@@ -654,142 +654,181 @@ export default function Unatienda() {
         </div>
 
         {/* Content - Public or Private */}
-        {activeView === 'private' && catalogoPrivadoAcceso?.tiene_acceso ? (
+        {activeView === 'private' ? (
           <>
             {/* Private Catalog Header */}
             <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <GraduationCap className="h-6 w-6 text-purple-600" />
-                  <div>
-                    <h3 className="font-bold">Textos Escolares</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Catálogo exclusivo para estudiantes vinculados
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <GraduationCap className="h-6 w-6 text-purple-600" />
+                <div>
+                  <h3 className="font-bold">Textos Escolares</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {catalogoPrivadoAcceso?.tiene_acceso 
+                      ? 'Gestiona los textos de tus estudiantes vinculados'
+                      : 'Vincula un estudiante para acceder al catálogo exclusivo'}
+                  </p>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setActiveView('public')}
-                  className="text-muted-foreground"
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Ver tienda general
-                </Button>
               </div>
             </div>
 
             {/* Private Catalog Tabs */}
-            <Tabs defaultValue="mis-pedidos" className="mb-6">
-              <TabsList className="grid w-full max-w-lg grid-cols-3">
-                <TabsTrigger value="mis-pedidos" className="gap-2">
+            <Tabs value={privateTab} onValueChange={setPrivateTab} className="mb-6">
+              <TabsList className="grid w-full max-w-2xl grid-cols-4">
+                <TabsTrigger value="orders" className="gap-2" disabled={!catalogoPrivadoAcceso?.tiene_acceso}>
                   <ClipboardList className="h-4 w-4" />
                   Mis Pedidos
                 </TabsTrigger>
-                <TabsTrigger value="por-estudiante" className="gap-2">
+                <TabsTrigger value="by-student" className="gap-2" disabled={!catalogoPrivadoAcceso?.tiene_acceso}>
                   <Sparkles className="h-4 w-4" />
                   Por Estudiante
                 </TabsTrigger>
-                <TabsTrigger value="todos" className="gap-2">
+                <TabsTrigger value="catalog" className="gap-2" disabled={!catalogoPrivadoAcceso?.tiene_acceso}>
                   <LayoutGrid className="h-4 w-4" />
                   Catálogo
+                </TabsTrigger>
+                <TabsTrigger value="linking" className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Vincular
                 </TabsTrigger>
               </TabsList>
               
               {/* Tab: My Textbook Orders */}
-              <TabsContent value="mis-pedidos" className="mt-6">
-                <TextbookOrderPage embedded={true} />
+              <TabsContent value="orders" className="mt-6">
+                {catalogoPrivadoAcceso?.tiene_acceso ? (
+                  <TextbookOrderPage embedded={true} />
+                ) : (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <GraduationCap className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        Vincula un estudiante para ordenar textos
+                      </p>
+                      <Button onClick={() => setPrivateTab('linking')}>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Vincular Estudiante
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
               
               {/* Tab: Books by Student */}
-              <TabsContent value="por-estudiante" className="mt-6">
-                <LibrosPorEstudiante 
-                  onNavigateToBook={(libroId) => navigate(`/unatienda/libro/${libroId}`)}
-                />
+              <TabsContent value="by-student" className="mt-6">
+                {catalogoPrivadoAcceso?.tiene_acceso ? (
+                  <LibrosPorEstudiante 
+                    onNavigateToBook={(libroId) => navigate(`/unatienda/libro/${libroId}`)}
+                  />
+                ) : (
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <GraduationCap className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-muted-foreground">Vincula un estudiante primero</p>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
               
-              {/* Tab: All Books Grid */}
-              <TabsContent value="todos" className="mt-6">
-                {/* Students badges */}
-                {catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
-                    <span className="text-sm text-muted-foreground">Filtrar por estudiante:</span>
-                    {catalogoPrivadoAcceso.estudiantes.map((est) => (
-                      <Badge 
-                        key={est.sync_id} 
-                        variant={selectedGradoPrivado === est.grado ? "default" : "secondary"}
-                        className="cursor-pointer hover:bg-purple-100"
-                        onClick={() => setSelectedGradoPrivado(selectedGradoPrivado === est.grado ? '' : est.grado)}
+              {/* Tab: Catalog */}
+              <TabsContent value="catalog" className="mt-6">
+                {catalogoPrivadoAcceso?.tiene_acceso ? (
+                  <>
+                    {/* Students badges */}
+                    {catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
+                        <span className="text-sm text-muted-foreground">Filtrar por estudiante:</span>
+                        {catalogoPrivadoAcceso.estudiantes.map((est) => (
+                          <Badge 
+                            key={est.sync_id || est.student_id} 
+                            variant={selectedGradoPrivado === est.grado ? "default" : "secondary"}
+                            className="cursor-pointer hover:bg-purple-100"
+                            onClick={() => setSelectedGradoPrivado(selectedGradoPrivado === est.grado ? '' : est.grado)}
+                          >
+                            {est.nombre} - {est.grado}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Filters for Private Catalog */}
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <select
+                        value={selectedGradoPrivado}
+                        onChange={(e) => setSelectedGradoPrivado(e.target.value)}
+                        className="px-3 py-2 border rounded-lg bg-background"
                       >
-                        {est.nombre} - {est.grado}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                        <option value="">Todos los grados</option>
+                        {catalogoPrivadoAcceso?.grados?.map(g => (
+                          <option key={g} value={g}>{g}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedMateriaPrivado}
+                        onChange={(e) => setSelectedMateriaPrivado(e.target.value)}
+                        className="px-3 py-2 border rounded-lg bg-background"
+                      >
+                        <option value="">Todas las materias</option>
+                        {materias.map(m => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                      
+                      {(selectedGradoPrivado || selectedMateriaPrivado) && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedGradoPrivado('');
+                            setSelectedMateriaPrivado('');
+                          }}
+                        >
+                          Limpiar filtros
+                        </Button>
+                      )}
+                    </div>
 
-                {/* Filters for Private Catalog */}
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <select
-                    value={selectedGradoPrivado}
-                    onChange={(e) => setSelectedGradoPrivado(e.target.value)}
-                    className="px-3 py-2 border rounded-lg bg-background"
-                  >
-                    <option value="">Todos los grados</option>
-                    {catalogoPrivadoAcceso?.grados?.map(g => (
-                      <option key={g} value={g}>{g}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={selectedMateriaPrivado}
-                    onChange={(e) => setSelectedMateriaPrivado(e.target.value)}
-                    className="px-3 py-2 border rounded-lg bg-background"
-                  >
-                    <option value="">Todas las materias</option>
-                    {materias.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  
-                  {(selectedGradoPrivado || selectedMateriaPrivado) && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setSelectedGradoPrivado('');
-                        setSelectedMateriaPrivado('');
-                      }}
-                    >
-                      Limpiar filtros
-                    </Button>
-                  )}
-                </div>
-
-                {/* Private Products Count */}
-                <p className="text-sm text-muted-foreground mb-4">
-                  {filteredPrivateProducts.length} libro{filteredPrivateProducts.length !== 1 ? 's' : ''} encontrado{filteredPrivateProducts.length !== 1 ? 's' : ''}
-                </p>
-
-                {/* Private Products Grid */}
-                {loadingPrivado ? (
-                  <div className="flex justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : filteredPrivateProducts.length === 0 ? (
-                  <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
-                    <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                    <p className="text-muted-foreground">No se encontraron libros</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Intenta con otros filtros o busca por nombre
+                    {/* Private Products Count */}
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {filteredPrivateProducts.length} libro{filteredPrivateProducts.length !== 1 ? 's' : ''} encontrado{filteredPrivateProducts.length !== 1 ? 's' : ''}
                     </p>
-                  </div>
+
+                    {/* Private Products Grid */}
+                    {loadingPrivado ? (
+                      <div className="flex justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : filteredPrivateProducts.length === 0 ? (
+                      <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                        <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                        <p className="text-muted-foreground">No se encontraron libros</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Intenta con otros filtros o busca por nombre
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredPrivateProducts.map((product) => (
+                          <ProductCard key={product.libro_id} product={product} isPrivate />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredPrivateProducts.map((product) => (
-                      <ProductCard key={product.libro_id} product={product} isPrivate />
-                    ))}
-                  </div>
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <GraduationCap className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-muted-foreground">Vincula un estudiante primero</p>
+                    </CardContent>
+                  </Card>
                 )}
+              </TabsContent>
+              
+              {/* Tab: Link Students */}
+              <TabsContent value="linking" className="mt-6">
+                <CompraExclusiva embedded={true} onStudentLinked={() => {
+                  // Refresh access after linking
+                  checkPrivateCatalogAccess();
+                  setPrivateTab('orders');
+                }} />
               </TabsContent>
             </Tabs>
           </>
