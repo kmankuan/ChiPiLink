@@ -525,16 +525,18 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <ShoppingBag className="h-6 w-6 text-primary" />
-          Compra Exclusiva
-        </h2>
-        <p className="text-muted-foreground mt-1">
-          Access exclusive catalogs and products by linking your information
-        </p>
-      </div>
+      {/* Header - hide when embedded */}
+      {!embedded && (
+        <div>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <ShoppingBag className="h-6 w-6 text-primary" />
+            Compra Exclusiva
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Access exclusive catalogs and products by linking your information
+          </p>
+        </div>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
