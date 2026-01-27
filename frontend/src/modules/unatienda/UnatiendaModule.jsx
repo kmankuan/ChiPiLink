@@ -173,6 +173,10 @@ export default function UnatiendaModule() {
           <TextbookOrdersAdminTab />
         </TabsContent>
 
+        <TabsContent value="form-config">
+          <OrderFormConfigTab />
+        </TabsContent>
+
         <TabsContent value="estudiantes">
           <EstudiantesTab token={token} />
         </TabsContent>
