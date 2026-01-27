@@ -219,23 +219,48 @@ export default function Orders() {
                       </div>
                     </div>
 
-                    {/* Items Preview */}
+                    {/* Items Preview - Expandable */}
                     {order.items && order.items.filter(i => i.quantity_ordered > 0).length > 0 && (
                       <div className="bg-muted rounded-lg p-4">
                         <div className="space-y-2">
-                          {order.items.filter(i => i.quantity_ordered > 0).slice(0, 3).map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-sm">
-                              <span>{item.book_name}</span>
-                              <span className="text-muted-foreground">
-                                {item.quantity_ordered} x ${item.price?.toFixed(2)}
-                              </span>
-                            </div>
-                          ))}
-                          {order.items.filter(i => i.quantity_ordered > 0).length > 3 && (
-                            <p className="text-xs text-muted-foreground">
-                              +{order.items.filter(i => i.quantity_ordered > 0).length - 3} más...
-                            </p>
-                          )}
+                          {(() => {
+                            const filteredItems = order.items.filter(i => i.quantity_ordered > 0);
+                            const isExpanded = expandedOrders[order.order_id];
+                            const itemsToShow = isExpanded ? filteredItems : filteredItems.slice(0, 3);
+                            const hasMoreItems = filteredItems.length > 3;
+                            
+                            return (
+                              <>
+                                {itemsToShow.map((item, idx) => (
+                                  <div key={idx} className="flex justify-between text-sm">
+                                    <span>{item.book_name}</span>
+                                    <span className="text-muted-foreground">
+                                      {item.quantity_ordered} x ${item.price?.toFixed(2)}
+                                    </span>
+                                  </div>
+                                ))}
+                                {hasMoreItems && (
+                                  <button
+                                    onClick={() => toggleOrderExpansion(order.order_id)}
+                                    className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium mt-2 transition-colors cursor-pointer"
+                                    data-testid={`toggle-expand-${order.order_id}`}
+                                  >
+                                    {isExpanded ? (
+                                      <>
+                                        <ChevronUp className="h-4 w-4" />
+                                        Ver menos
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ChevronDown className="h-4 w-4" />
+                                        +{filteredItems.length - 3} más
+                                      </>
+                                    )}
+                                  </button>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
