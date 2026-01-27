@@ -222,6 +222,19 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - Student badges now navigate to textbook ordering section
   - "Vincular más" button to add new students
   - Full textbook workflow now within Unatienda module
+- **🎨 New Student-Centered Design for Compra Exclusiva** (Jan 27, 2026)
+  - Redesigned to show students first, then textbooks
+  - Students view: Shows all linked students with order status
+  - Textbooks view: Shows books for selected student with lock status
+  - Books are locked after ordering (1 per item by default)
+  - Removed tabs "Por Estudiante" and "Catálogo" (redundant)
+- **⚙️ Dynamic Order Form Configuration** (Jan 27, 2026)
+  - Backend: `/api/store/order-form-config/` endpoints
+  - Admin UI: New "Formulario" tab in Admin/Unatienda
+  - Support for field types: text, textarea, number, select, multiselect, checkbox, file, date, email, phone, info
+  - Default fields: Bank transfer info (info type), Payment receipt upload (file type)
+  - Admin can add/edit/delete/reorder fields
+  - Supports multilingual labels (EN, ES)
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
