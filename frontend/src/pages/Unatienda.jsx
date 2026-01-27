@@ -109,7 +109,7 @@ export default function Unatienda() {
 
   // Fetch private products when access is granted and view changes
   useEffect(() => {
-    if (activeView === 'privado' && catalogoPrivadoAcceso?.tiene_acceso) {
+    if (activeView === 'private' && catalogoPrivadoAcceso?.tiene_acceso) {
       fetchPrivateProducts();
     }
   }, [activeView, catalogoPrivadoAcceso, selectedGradoPrivado, selectedMateriaPrivado]);
