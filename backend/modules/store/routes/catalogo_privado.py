@@ -80,7 +80,7 @@ async def get_productos_catalogo_privado(
     Solo accesible para usuarios con estudiantes PCA vinculados.
     """
     # Verificar acceso
-    acceso = await verificar_acceso_catalogo_privado(current_user["cliente_id"])
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -151,7 +151,7 @@ async def get_producto_detalle(
     Obtener detalle de un producto del catálogo privado.
     """
     # Verificar acceso
-    acceso = await verificar_acceso_catalogo_privado(current_user["cliente_id"])
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -180,7 +180,7 @@ async def get_productos_por_grado(
     Útil para mostrar la lista de libros de un estudiante.
     """
     # Verificar acceso
-    acceso = await verificar_acceso_catalogo_privado(current_user["cliente_id"])
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -227,7 +227,7 @@ async def get_resumen_catalogo(
     Muestra productos disponibles para cada estudiante vinculado.
     """
     # Verificar acceso
-    acceso = await verificar_acceso_catalogo_privado(current_user["cliente_id"])
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
