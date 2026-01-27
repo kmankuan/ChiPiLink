@@ -45,6 +45,7 @@ class FieldOption(BaseModel):
     label: str
     label_es: Optional[str] = None
     label_en: Optional[str] = None
+    label_zh: Optional[str] = None
 
 
 class OrderFormField(BaseModel):
@@ -54,12 +55,15 @@ class OrderFormField(BaseModel):
     label: str
     label_es: Optional[str] = None
     label_en: Optional[str] = None
+    label_zh: Optional[str] = None
     placeholder: Optional[str] = None
     placeholder_es: Optional[str] = None
     placeholder_en: Optional[str] = None
+    placeholder_zh: Optional[str] = None
     help_text: Optional[str] = None
     help_text_es: Optional[str] = None
     help_text_en: Optional[str] = None
+    help_text_zh: Optional[str] = None
     required: bool = False
     options: Optional[List[FieldOption]] = None  # For select/multiselect
     default_value: Optional[Any] = None
@@ -74,6 +78,7 @@ class OrderFormField(BaseModel):
     content: Optional[str] = None  # HTML or markdown content to display
     content_es: Optional[str] = None
     content_en: Optional[str] = None
+    content_zh: Optional[str] = None
 
 
 class OrderFormConfig(BaseModel):
