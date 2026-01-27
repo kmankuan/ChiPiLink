@@ -652,6 +652,7 @@ export default function Unatienda() {
             )}
           </div>
         </div>
+        )}
 
         {/* Content - Public or Private */}
         {activeView === 'private' ? (
