@@ -603,17 +603,26 @@ export default function Unatienda() {
             </div>
 
             {/* Private Catalog Tabs */}
-            <Tabs defaultValue="por-estudiante" className="mb-6">
-              <TabsList className="grid w-full max-w-md grid-cols-2">
+            <Tabs defaultValue="mis-pedidos" className="mb-6">
+              <TabsList className="grid w-full max-w-lg grid-cols-3">
+                <TabsTrigger value="mis-pedidos" className="gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  Mis Pedidos
+                </TabsTrigger>
                 <TabsTrigger value="por-estudiante" className="gap-2">
                   <Sparkles className="h-4 w-4" />
                   Por Estudiante
                 </TabsTrigger>
                 <TabsTrigger value="todos" className="gap-2">
                   <LayoutGrid className="h-4 w-4" />
-                  Todos los Libros
+                  Catálogo
                 </TabsTrigger>
               </TabsList>
+              
+              {/* Tab: My Textbook Orders */}
+              <TabsContent value="mis-pedidos" className="mt-6">
+                <TextbookOrderPage embedded={true} />
+              </TabsContent>
               
               {/* Tab: Books by Student */}
               <TabsContent value="por-estudiante" className="mt-6">
