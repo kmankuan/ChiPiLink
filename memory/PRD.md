@@ -201,6 +201,10 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - Removed "Textos" tab from "Mi Cuenta"
   - Added "Mis Pedidos" tab inside Unatienda's "Textos Escolares" section
   - Better UX: users find textbook ordering directly in the store
+- **🧹 Code Standards Fix** (Jan 27, 2026)
+  - Fixed Spanish terms in code: `?tab=privado` → `?tab=private`
+  - Fixed internal state: `activeView='privado'` → `activeView='private'`
+  - Fixed backend: `cliente_id` → `user_id` fallback in catalogo_privado.py
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
