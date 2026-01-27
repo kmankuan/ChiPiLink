@@ -587,11 +587,11 @@ export default function LinkingPage() {
                         <div className="flex gap-2">
                           {hasAccess ? (
                             <Button 
-                              onClick={() => window.location.href = '/mi-cuenta?tab=textbooks'}
+                              onClick={() => window.location.href = '/unatienda?tab=privado'}
                               className="gap-2"
                             >
                               <BookOpen className="h-4 w-4" />
-                              Order Textbooks
+                              Ordenar Textos
                               <ChevronRight className="h-4 w-4" />
                             </Button>
                           ) : (
