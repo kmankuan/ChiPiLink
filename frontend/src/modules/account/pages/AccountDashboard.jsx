@@ -197,10 +197,6 @@ export default function AccountDashboard() {
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.profile}</span>
             </TabsTrigger>
-            <TabsTrigger value="exclusive" data-testid="exclusive-tab" className="gap-1 text-xs sm:text-sm">
-              <ShoppingBag className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.exclusive}</span>
-            </TabsTrigger>
             <TabsTrigger value="membership" data-testid="membership-tab" className="gap-1 text-xs sm:text-sm">
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.membership}</span>
@@ -229,10 +225,6 @@ export default function AccountDashboard() {
 
           <TabsContent value="profile">
             <UserProfile token={token} user={user} />
-          </TabsContent>
-
-          <TabsContent value="exclusive">
-            <CompraExclusiva />
           </TabsContent>
 
           <TabsContent value="membership">
