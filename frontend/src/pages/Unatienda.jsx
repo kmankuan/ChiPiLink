@@ -57,7 +57,8 @@ export default function Unatienda() {
   const { addItem, items, openCart } = useCart();
   
   // Main state
-  const [activeView, setActiveView] = useState('public'); // 'public' or 'private'
+  const [activeView, setActiveView] = useState('public'); // 'public', 'private', or 'linking'
+  const [privateTab, setPrivateTab] = useState('orders'); // 'orders', 'catalog', 'linking'
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [categorias, setCategorias] = useState([]);
@@ -72,6 +73,7 @@ export default function Unatienda() {
   const [loadingPrivado, setLoadingPrivado] = useState(false);
   const [selectedGradoPrivado, setSelectedGradoPrivado] = useState('');
   const [selectedMateriaPrivado, setSelectedMateriaPrivado] = useState('');
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
   const [selectedCategoria, setSelectedCategoria] = useState(null);
