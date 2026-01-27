@@ -194,6 +194,13 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - Merged legacy orders with textbook orders
   - Tabbed interface: "Pedidos de Textos" + "Otros Pedidos"
   - Fixed user confusion from separate order systems
+- **🔧 Bug Fix: Expandable Order Details** (Jan 27, 2026)
+  - Fixed "+X más" button that wasn't clickable
+  - Users can now expand/collapse to see full order items
+- **📍 UX Improvement: Moved Textos to Unatienda** (Jan 27, 2026)
+  - Removed "Textos" tab from "Mi Cuenta"
+  - Added "Mis Pedidos" tab inside Unatienda's "Textos Escolares" section
+  - Better UX: users find textbook ordering directly in the store
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
@@ -210,5 +217,5 @@ These rules are **PERMANENT** and must be followed in all future development ses
 
 ---
 
-*Last Updated: January 24, 2026*
-*Version: 3.1 - Unified Orders Page + Cleanup*
+*Last Updated: January 27, 2026*
+*Version: 3.2 - Expandable Orders + Textos moved to Unatienda*
