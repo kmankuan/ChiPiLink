@@ -89,7 +89,6 @@ export default function AccountDashboard() {
       capacities: 'Capacidades',
       notifications: 'Notificaciones',
       exclusive: 'Compra Exclusiva',
-      textbooks: 'Textos',
       loginRequired: 'Debes iniciar sesión para acceder a esta sección',
       login: 'Iniciar Sesión',
       transfer: 'Transferir'
