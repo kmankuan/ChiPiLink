@@ -127,6 +127,14 @@ These rules are **PERMANENT** and must be followed in all future development ses
   /notifications/  ← Notifications module
 ```
 
+### 7. NO Dual/Legacy Systems ⚠️
+- **NEVER maintain two systems for the same functionality**
+- When a new system replaces an old one, **DELETE the old code completely**
+- Do NOT add fallbacks to legacy systems - this creates confusion and technical debt
+- If migration is needed, do it once and remove the old system
+- **Delete deprecated folders/files** immediately - they contaminate future suggestions
+- Example: Use ONLY `textbook_access` system, NOT both `textbook_access` AND `vinculaciones`
+
 ---
 
 ## Tech Stack
