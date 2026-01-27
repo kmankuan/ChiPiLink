@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send, ShoppingBag } from 'lucide-react';
+import { User, Wallet, CreditCard, Bell, Users, UserPlus, Zap, ChevronRight, Send } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,7 +19,6 @@ import MisCapacidades from '../profile/MisCapacidades';
 import ServiciosSugeridos from '../ServiciosSugeridos';
 import TransferenciasDialog from '../wallet/TransferenciasDialog';
 import AlertasSaldo from '../wallet/AlertasSaldo';
-import CompraExclusiva from '../linking/LinkingPage';
 
 // Notification components
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
@@ -36,7 +35,7 @@ export default function AccountDashboard() {
   const getInitialTab = () => {
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get('tab');
-    const validTabs = ['wallet', 'profile', 'membership', 'connections', 'dependents', 'capacities', 'notifications', 'exclusive'];
+    const validTabs = ['wallet', 'profile', 'membership', 'connections', 'dependents', 'capacities', 'notifications'];
     return validTabs.includes(tabParam) ? tabParam : 'wallet';
   };
   
