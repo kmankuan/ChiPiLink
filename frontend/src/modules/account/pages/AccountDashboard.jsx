@@ -239,10 +239,6 @@ export default function AccountDashboard() {
             <CompraExclusiva />
           </TabsContent>
 
-          <TabsContent value="textbooks">
-            <TextbookOrderPage />
-          </TabsContent>
-
           <TabsContent value="membership">
             <MembershipCard token={token} walletBalance={walletBalance} />
           </TabsContent>
