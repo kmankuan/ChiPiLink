@@ -551,33 +551,48 @@ export default function Unatienda() {
             <div className="relative max-w-xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-              placeholder="Buscar productos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-11"
-            />
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Students Info - Show if user has linked students */}
-        {catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+        {/* Students Info - Show if user has linked students and in public view */}
+        {activeView === 'public' && catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
           <StudentsInfo />
         )}
 
-        {/* Category Navigation - includes private catalog as a category for authorized users */}
-        <div className="mb-6" data-category-nav>
-          <div className="flex gap-2 flex-wrap items-center">
-            <Button
-              variant={!selectedCategoria ? 'default' : 'outline'}
-              size="icon"
-              onClick={handleGoHome}
-              className="h-9 w-9 rounded-full"
-              title="Inicio - Todas las categorías"
-            >
-              <Home className="h-4 w-4" />
-            </Button>
+        {/* Back to Store button - show in private view */}
+        {activeView === 'private' && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveView('public')}
+            className="mb-4 gap-1"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Volver a la tienda
+          </Button>
+        )}
 
-            {(selectedCategoria || selectedSubcategoria) && (
+        {/* Category Navigation - only in public view */}
+        {activeView === 'public' && (
+          <div className="mb-6" data-category-nav>
+            <div className="flex gap-2 flex-wrap items-center">
+              <Button
+                variant={!selectedCategoria ? 'default' : 'outline'}
+                size="icon"
+                onClick={handleGoHome}
+                className="h-9 w-9 rounded-full"
+                title="Inicio - Todas las categorías"
+              >
+                <Home className="h-4 w-4" />
+              </Button>
+
+              {(selectedCategoria || selectedSubcategoria) && (
               <Button
                 variant="ghost"
                 size="sm"
