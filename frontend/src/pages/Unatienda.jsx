@@ -852,10 +852,7 @@ export default function Unatienda() {
             {isAuthenticated && (
               <div className="flex gap-2">
                 <Button
-                  onClick={() => {
-                    setActiveView('private');
-                    setPrivateTab(catalogoPrivadoAcceso?.tiene_acceso ? 'orders' : 'linking');
-                  }}
+                  onClick={() => setActiveView('private')}
                   variant="outline"
                   className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30"
                 >
