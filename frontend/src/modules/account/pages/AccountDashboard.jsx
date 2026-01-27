@@ -119,7 +119,6 @@ export default function AccountDashboard() {
       capacities: '能力',
       notifications: '通知',
       exclusive: '专属购物',
-      textbooks: '教科书',
       loginRequired: '您必须登录才能访问此部分',
       login: '登录',
       transfer: '转账'
