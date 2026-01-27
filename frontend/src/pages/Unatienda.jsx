@@ -495,29 +495,62 @@ export default function Unatienda() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 px-4">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 rounded-2xl bg-primary/10">
-              <Store className="h-8 w-8 text-primary" />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <Store className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="font-serif text-3xl md:text-4xl font-bold">
+                  {storeInfo?.nombre || 'Unatienda'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {storeInfo?.descripcion || 'Tu tienda de confianza'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-serif text-3xl md:text-4xl font-bold">
-                {storeInfo?.nombre || 'Unatienda'}
-              </h1>
-              <p className="text-muted-foreground">
-                {storeInfo?.descripcion || 'Tu tienda de confianza'}
-              </p>
-            </div>
+            
+            {/* Action Buttons */}
+            {isAuthenticated && (
+              <div className="flex gap-2">
+                {catalogoPrivadoAcceso?.tiene_acceso ? (
+                  <Button
+                    onClick={() => {
+                      setActiveView('private');
+                      setPrivateTab('orders');
+                    }}
+                    className="gap-2 bg-purple-600 hover:bg-purple-700"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    Ordenar Textos
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setActiveView('private');
+                      setPrivateTab('linking');
+                    }}
+                    variant="outline"
+                    className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Vincular Estudiante
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative max-w-xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
+        {/* Search Bar - only show in public view */}
+        {activeView === 'public' && (
+          <div className="mb-6">
+            <div className="relative max-w-xl">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
               placeholder="Buscar productos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
