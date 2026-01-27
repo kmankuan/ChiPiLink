@@ -54,7 +54,7 @@ export default function Unatienda() {
   const { addItem, items, openCart } = useCart();
   
   // Main state
-  const [activeView, setActiveView] = useState('publico'); // 'publico' or 'privado'
+  const [activeView, setActiveView] = useState('public'); // 'public' or 'private'
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [categorias, setCategorias] = useState([]);
