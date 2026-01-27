@@ -8,23 +8,67 @@ from datetime import datetime, timezone
 
 from core.auth import get_current_user, get_admin_user, get_optional_user
 from core.database import db
+from ..services.textbook_access_service import textbook_access_service
 
 router = APIRouter(prefix="/catalogo-privado", tags=["Store - Catálogo Privado"])
 
 
-async def verificar_acceso_catalogo_privado(cliente_id: str) -> dict:
+async def verificar_acceso_catalogo_privado(user_id: str) -> dict:
     """
     Verificar si el usuario tiene acceso al catálogo privado.
-    Retorna información de acceso y estudiantes vinculados.
+    Checks both the legacy system (vinculaciones) and new system (textbook_access).
     """
-    # Buscar vinculaciones activas del usuario
-    vinculaciones = await db.vinculaciones.find({
-        "acudiente_cliente_id": cliente_id,
-        "estado": "aprobada",
-        "activo": True
-    }).to_list(50)
+    estudiantes = []
+    grados = set()
     
-    if not vinculaciones:
+    # 1. Check NEW system first (store_textbook_access_students)
+    try:
+        new_students = await textbook_access_service.get_user_students(user_id)
+        for student in new_students:
+            if student.get("has_approved_access") or student.get("status") == "approved":
+                estudiantes.append({
+                    "sync_id": student.get("student_id"),
+                    "nombre": student.get("full_name"),
+                    "grado": student.get("grade"),
+                    "seccion": student.get("section"),
+                    "student_id": student.get("student_id"),
+                    "school_name": student.get("school_name"),
+                    "source": "textbook_access"
+                })
+                if student.get("grade"):
+                    grados.add(student.get("grade"))
+    except Exception as e:
+        # Log but continue to check legacy system
+        print(f"Error checking new textbook access system: {e}")
+    
+    # 2. Check LEGACY system (vinculaciones) if no students found
+    if not estudiantes:
+        vinculaciones = await db.vinculaciones.find({
+            "acudiente_cliente_id": user_id,
+            "estado": "aprobada",
+            "activo": True
+        }).to_list(50)
+        
+        for vinc in vinculaciones:
+            estudiante = await db.estudiantes_sincronizados.find_one(
+                {"sync_id": vinc["estudiante_sync_id"]},
+                {"_id": 0}
+            )
+            if estudiante:
+                estudiantes.append({
+                    "sync_id": estudiante.get("sync_id"),
+                    "nombre": estudiante.get("nombre_completo"),
+                    "grado": estudiante.get("grado"),
+                    "seccion": estudiante.get("seccion"),
+                    "numero": estudiante.get("numero_estudiante"),
+                    "vinculacion_id": vinc["vinculacion_id"],
+                    "rol": vinc.get("rol", "autorizado"),
+                    "source": "legacy"
+                })
+                if estudiante.get("grado"):
+                    grados.add(estudiante.get("grado"))
+    
+    if not estudiantes:
         return {
             "tiene_acceso": False,
             "estudiantes": [],
@@ -32,30 +76,8 @@ async def verificar_acceso_catalogo_privado(cliente_id: str) -> dict:
             "mensaje": "No tienes estudiantes vinculados. Vincula un estudiante de PCA para acceder al catálogo privado."
         }
     
-    # Obtener información de los estudiantes
-    estudiantes = []
-    grados = set()
-    
-    for vinc in vinculaciones:
-        estudiante = await db.estudiantes_sincronizados.find_one(
-            {"sync_id": vinc["estudiante_sync_id"]},
-            {"_id": 0}
-        )
-        if estudiante:
-            estudiantes.append({
-                "sync_id": estudiante.get("sync_id"),
-                "nombre": estudiante.get("nombre_completo"),
-                "grado": estudiante.get("grado"),
-                "seccion": estudiante.get("seccion"),
-                "numero": estudiante.get("numero_estudiante"),
-                "vinculacion_id": vinc["vinculacion_id"],
-                "rol": vinc.get("rol", "autorizado")
-            })
-            if estudiante.get("grado"):
-                grados.add(estudiante.get("grado"))
-    
     return {
-        "tiene_acceso": len(estudiantes) > 0,
+        "tiene_acceso": True,
         "estudiantes": estudiantes,
         "grados": list(grados),
         "mensaje": None
