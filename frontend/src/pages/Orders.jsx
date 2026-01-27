@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag } from 'lucide-react';
+import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
