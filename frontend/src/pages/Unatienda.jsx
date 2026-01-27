@@ -87,16 +87,30 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
   const fetchTextbooksForStudent = async (student) => {
     setLoadingTextbooks(true);
     try {
-      // Fetch textbooks for this student's grade
+      // Get or create order for this student - returns available books
       const response = await axios.get(
-        `${API_URL}/api/store/textbook-orders/available-books/${student.student_id}`,
+        `${API_URL}/api/store/textbook-orders/student/${student.student_id || student.sync_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setTextbooks(response.data.books || []);
+      
+      const order = response.data;
+      const books = order.items || [];
+      
+      // Transform items to book format
+      const transformedBooks = books.map(item => ({
+        book_id: item.book_id,
+        name: item.book_name,
+        book_name: item.book_name,
+        subject: item.subject,
+        price: item.price,
+        already_ordered: item.quantity_ordered > 0 && order.status === 'submitted'
+      }));
+      
+      setTextbooks(transformedBooks);
       
       // Initialize selected books (only those not already ordered)
       const initialSelected = {};
-      (response.data.books || []).forEach(book => {
+      transformedBooks.forEach(book => {
         if (!book.already_ordered) {
           initialSelected[book.book_id] = false;
         }
