@@ -560,11 +560,6 @@ export default function Unatienda() {
           </div>
         )}
 
-        {/* Students Info - Show if user has linked students and in public view */}
-        {activeView === 'public' && catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
-          <StudentsInfo />
-        )}
-
         {/* Back to Store button - show in private view */}
         {activeView === 'private' && (
           <Button
