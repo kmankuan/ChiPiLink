@@ -50,6 +50,445 @@ const categoryIcons = {
   'servicios': '🔧'
 };
 
+// Compra Exclusiva Section Component - Student-centered view
+function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess }) {
+  const { token } = useAuth();
+  const [view, setView] = useState('students'); // 'students', 'textbooks', 'linking'
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentOrders, setStudentOrders] = useState({});
+  const [textbooks, setTextbooks] = useState([]);
+  const [loadingTextbooks, setLoadingTextbooks] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedBooks, setSelectedBooks] = useState({});
+
+  // Fetch orders for all students
+  useEffect(() => {
+    if (catalogoPrivadoAcceso?.estudiantes?.length > 0) {
+      fetchStudentOrders();
+    }
+  }, [catalogoPrivadoAcceso]);
+
+  const fetchStudentOrders = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/store/textbook-orders/my-orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Group orders by student_id
+      const ordersByStudent = {};
+      (response.data.orders || []).forEach(order => {
+        const studentId = order.student_id;
+        if (!ordersByStudent[studentId]) {
+          ordersByStudent[studentId] = [];
+        }
+        ordersByStudent[studentId].push(order);
+      });
+      setStudentOrders(ordersByStudent);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
+
+  const fetchTextbooksForStudent = async (student) => {
+    setLoadingTextbooks(true);
+    try {
+      // Fetch textbooks for this student's grade
+      const response = await axios.get(
+        `${API_URL}/api/store/textbook-orders/available-books/${student.student_id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTextbooks(response.data.books || []);
+      
+      // Initialize selected books (only those not already ordered)
+      const initialSelected = {};
+      (response.data.books || []).forEach(book => {
+        if (!book.already_ordered) {
+          initialSelected[book.book_id] = false;
+        }
+      });
+      setSelectedBooks(initialSelected);
+    } catch (error) {
+      console.error('Error fetching textbooks:', error);
+      toast.error('Error al cargar los libros');
+    } finally {
+      setLoadingTextbooks(false);
+    }
+  };
+
+  const handleViewTextbooks = (student) => {
+    setSelectedStudent(student);
+    fetchTextbooksForStudent(student);
+    setView('textbooks');
+  };
+
+  const handleToggleBook = (bookId) => {
+    setSelectedBooks(prev => ({
+      ...prev,
+      [bookId]: !prev[bookId]
+    }));
+  };
+
+  const handleSubmitOrder = async () => {
+    const selectedBookIds = Object.entries(selectedBooks)
+      .filter(([_, selected]) => selected)
+      .map(([bookId]) => bookId);
+
+    if (selectedBookIds.length === 0) {
+      toast.error('Selecciona al menos un libro');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const orderItems = selectedBookIds.map(bookId => {
+        const book = textbooks.find(b => b.book_id === bookId);
+        return {
+          book_id: bookId,
+          book_name: book?.name || book?.book_name,
+          quantity_ordered: 1,
+          price: book?.price || 0
+        };
+      });
+
+      await axios.post(
+        `${API_URL}/api/store/textbook-orders/submit`,
+        {
+          student_id: selectedStudent.student_id,
+          items: orderItems
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success('Pedido enviado exitosamente');
+      fetchStudentOrders();
+      setView('students');
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      toast.error(error.response?.data?.detail || 'Error al enviar el pedido');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getStudentOrderStatus = (studentId) => {
+    const orders = studentOrders[studentId] || [];
+    if (orders.length === 0) return { status: 'pending', label: 'Pendiente de ordenar', count: 0, total: 0 };
+    
+    const latestOrder = orders[0];
+    const itemCount = latestOrder.items?.filter(i => i.quantity_ordered > 0).length || 0;
+    const total = latestOrder.items?.reduce((sum, i) => sum + (i.quantity_ordered * (i.price || 0)), 0) || 0;
+    
+    return {
+      status: 'ordered',
+      label: `Pedido enviado`,
+      count: itemCount,
+      total: total,
+      order: latestOrder
+    };
+  };
+
+  // Linking View
+  if (view === 'linking') {
+    return (
+      <>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setView('students')}
+          className="mb-4 gap-1"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Volver a estudiantes
+        </Button>
+        <CompraExclusiva embedded={true} onStudentLinked={() => {
+          onRefreshAccess();
+          setView('students');
+        }} />
+      </>
+    );
+  }
+
+  // Textbooks View for selected student
+  if (view === 'textbooks' && selectedStudent) {
+    const orderStatus = getStudentOrderStatus(selectedStudent.student_id);
+    const availableBooks = textbooks.filter(b => !b.already_ordered);
+    const orderedBooks = textbooks.filter(b => b.already_ordered);
+    const selectedCount = Object.values(selectedBooks).filter(Boolean).length;
+    const selectedTotal = textbooks
+      .filter(b => selectedBooks[b.book_id])
+      .reduce((sum, b) => sum + (b.price || 0), 0);
+
+    return (
+      <>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setView('students');
+            setSelectedStudent(null);
+          }}
+          className="mb-4 gap-1"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Volver a estudiantes
+        </Button>
+
+        {/* Student Header */}
+        <Card className="mb-6 border-purple-200 dark:border-purple-800">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                  <User className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">{selectedStudent.nombre}</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Grado {selectedStudent.grado} • {selectedStudent.school_name || 'PCA'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {loadingTextbooks ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            {/* Already Ordered Books */}
+            {orderedBooks.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3 flex items-center gap-2 text-green-700">
+                  <CheckCircle className="h-4 w-4" />
+                  Libros ya ordenados ({orderedBooks.length})
+                </h3>
+                <div className="space-y-2">
+                  {orderedBooks.map(book => (
+                    <div 
+                      key={book.book_id}
+                      className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Lock className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-medium">{book.name || book.book_name}</p>
+                          <p className="text-sm text-muted-foreground">{book.subject}</p>
+                        </div>
+                      </div>
+                      <span className="font-semibold text-green-700">${book.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available Books to Order */}
+            {availableBooks.length > 0 ? (
+              <>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Libros disponibles para ordenar ({availableBooks.length})
+                </h3>
+                <div className="space-y-2 mb-6">
+                  {availableBooks.map(book => (
+                    <div 
+                      key={book.book_id}
+                      onClick={() => handleToggleBook(book.book_id)}
+                      className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedBooks[book.book_id]
+                          ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-700'
+                          : 'bg-card hover:bg-muted/50 border-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          selectedBooks[book.book_id]
+                            ? 'bg-purple-600 border-purple-600'
+                            : 'border-gray-300'
+                        }`}>
+                          {selectedBooks[book.book_id] && (
+                            <Check className="h-3 w-3 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{book.name || book.book_name}</p>
+                          <p className="text-sm text-muted-foreground">{book.subject}</p>
+                        </div>
+                      </div>
+                      <span className="font-semibold">${book.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Submit Button */}
+                <div className="sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedCount} libro{selectedCount !== 1 ? 's' : ''} seleccionado{selectedCount !== 1 ? 's' : ''}
+                      </p>
+                      <p className="font-semibold">Total: ${selectedTotal.toFixed(2)}</p>
+                    </div>
+                    <Button 
+                      onClick={handleSubmitOrder}
+                      disabled={selectedCount === 0 || submitting}
+                      className="gap-2"
+                    >
+                      {submitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ClipboardList className="h-4 w-4" />
+                      )}
+                      Enviar Pedido
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : orderedBooks.length > 0 ? (
+              <Card>
+                <CardContent className="py-8 text-center">
+                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <p className="font-semibold text-green-700">¡Todos los libros han sido ordenados!</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Si necesitas ordenar más, solicita habilitación al administrador.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="py-8 text-center">
+                  <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <p className="text-muted-foreground">No hay libros disponibles para este grado</p>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+      </>
+    );
+  }
+
+  // Main Students View
+  return (
+    <>
+      {/* Header */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <GraduationCap className="h-6 w-6 text-purple-600" />
+            <div>
+              <h3 className="font-bold">Compra Exclusiva</h3>
+              <p className="text-sm text-muted-foreground">
+                Gestiona los textos de tus estudiantes vinculados
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setView('linking')}
+            className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50"
+          >
+            <UserPlus className="h-4 w-4" />
+            Vincular Nuevo
+          </Button>
+        </div>
+      </div>
+
+      {/* Students List */}
+      {catalogoPrivadoAcceso?.estudiantes?.length > 0 ? (
+        <div className="space-y-4">
+          <h3 className="font-semibold flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Mis Estudiantes ({catalogoPrivadoAcceso.estudiantes.length})
+          </h3>
+          
+          {catalogoPrivadoAcceso.estudiantes.map((student) => {
+            const orderStatus = getStudentOrderStatus(student.student_id || student.sync_id);
+            
+            return (
+              <Card 
+                key={student.student_id || student.sync_id}
+                className="border-l-4 border-l-purple-500"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                        <User className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">{student.nombre}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Grado {student.grado} • {student.school_name || 'PCA'} • Año 2026
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      {orderStatus.status === 'ordered' ? (
+                        <>
+                          <div className="text-right">
+                            <Badge className="bg-green-100 text-green-700 border-green-200">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              {orderStatus.label}
+                            </Badge>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {orderStatus.count} libros - ${orderStatus.total.toFixed(2)}
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewTextbooks(student)}
+                          >
+                            Ver Listado
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {orderStatus.label}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            onClick={() => handleViewTextbooks(student)}
+                            className="gap-1"
+                          >
+                            <BookOpen className="h-4 w-4" />
+                            Ver Listado y Ordenar
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <GraduationCap className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-muted-foreground mb-4">
+              No tienes estudiantes vinculados
+            </p>
+            <Button onClick={() => setView('linking')}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Vincular Estudiante
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+}
+
 export default function Unatienda() {
   const { t } = useTranslation();
   const navigate = useNavigate();
