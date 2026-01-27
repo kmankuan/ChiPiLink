@@ -28,6 +28,14 @@ export default function Orders() {
   const [loadingTextbooks, setLoadingTextbooks] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('textbooks');
+  const [expandedOrders, setExpandedOrders] = useState({});
+
+  const toggleOrderExpansion = (orderId) => {
+    setExpandedOrders(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
+  };
 
   useEffect(() => {
     fetchPedidos();
