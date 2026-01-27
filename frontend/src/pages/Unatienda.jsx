@@ -593,7 +593,7 @@ export default function Unatienda() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => setActiveView('publico')}
+                  onClick={() => setActiveView('public')}
                   className="text-muted-foreground"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
