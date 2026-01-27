@@ -70,7 +70,7 @@ async def verificar_acceso(
     Verificar si el usuario tiene acceso al catálogo privado.
     Retorna lista de estudiantes vinculados y grados disponibles.
     """
-    return await verificar_acceso_catalogo_privado(current_user["cliente_id"])
+    return await verificar_acceso_catalogo_privado(current_user.get("user_id") or current_user.get("cliente_id"))
 
 
 @router.get("/productos")
