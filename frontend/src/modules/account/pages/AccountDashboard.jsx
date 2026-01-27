@@ -20,7 +20,6 @@ import ServiciosSugeridos from '../ServiciosSugeridos';
 import TransferenciasDialog from '../wallet/TransferenciasDialog';
 import AlertasSaldo from '../wallet/AlertasSaldo';
 import CompraExclusiva from '../linking/LinkingPage';
-import TextbookOrderPage from '../orders/TextbookOrderPage';
 
 // Notification components
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
