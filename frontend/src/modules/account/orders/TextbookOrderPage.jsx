@@ -62,7 +62,7 @@ const ORDER_STATUS_CONFIG = {
   cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700' },
 };
 
-export default function TextbookOrderPage() {
+export default function TextbookOrderPage({ embedded = false }) {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
