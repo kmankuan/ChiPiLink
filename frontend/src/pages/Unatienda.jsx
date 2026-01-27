@@ -513,30 +513,22 @@ export default function Unatienda() {
             {/* Action Buttons */}
             {isAuthenticated && (
               <div className="flex gap-2">
-                {catalogoPrivadoAcceso?.tiene_acceso ? (
-                  <Button
-                    onClick={() => {
-                      setActiveView('private');
-                      setPrivateTab('orders');
-                    }}
-                    className="gap-2 bg-purple-600 hover:bg-purple-700"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    Ordenar Textos
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => {
-                      setActiveView('private');
-                      setPrivateTab('linking');
-                    }}
-                    variant="outline"
-                    className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    Vincular Estudiante
-                  </Button>
-                )}
+                <Button
+                  onClick={() => {
+                    setActiveView('private');
+                    setPrivateTab(catalogoPrivadoAcceso?.tiene_acceso ? 'orders' : 'linking');
+                  }}
+                  variant="outline"
+                  className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30"
+                >
+                  <GraduationCap className="h-4 w-4" />
+                  Compra Exclusiva
+                  {catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs">
+                      {catalogoPrivadoAcceso.estudiantes.length}
+                    </Badge>
+                  )}
+                </Button>
               </div>
             )}
           </div>
