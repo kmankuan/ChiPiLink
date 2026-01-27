@@ -188,7 +188,7 @@ export default function AccountDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8 h-auto gap-1 p-1">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-8 h-auto gap-1 p-1">
             <TabsTrigger value="wallet" data-testid="wallet-tab" className="gap-1 text-xs sm:text-sm">
               <Wallet className="h-4 w-4" />
               <span className="hidden sm:inline">{txt.wallet}</span>
