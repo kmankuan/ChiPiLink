@@ -137,12 +137,15 @@ class OrderFormConfigService:
             "label": field_data.label,
             "label_es": field_data.label_es,
             "label_en": field_data.label_en,
+            "label_zh": field_data.label_zh,
             "placeholder": field_data.placeholder,
             "placeholder_es": field_data.placeholder_es,
             "placeholder_en": field_data.placeholder_en,
+            "placeholder_zh": field_data.placeholder_zh,
             "help_text": field_data.help_text,
             "help_text_es": field_data.help_text_es,
             "help_text_en": field_data.help_text_en,
+            "help_text_zh": field_data.help_text_zh,
             "required": field_data.required,
             "options": [opt.dict() for opt in field_data.options] if field_data.options else None,
             "default_value": field_data.default_value,
@@ -153,6 +156,7 @@ class OrderFormConfigService:
             "content": field_data.content,
             "content_es": field_data.content_es,
             "content_en": field_data.content_en,
+            "content_zh": field_data.content_zh,
             "order": max_order + 1,
             "active": True
         }
