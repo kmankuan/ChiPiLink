@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -27,7 +29,8 @@ import {
   ClipboardList,
   UserPlus,
   Users,
-  CheckCircle
+  CheckCircle,
+  FileText
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import CategoryLanding from '@/components/store/CategoryLanding';
