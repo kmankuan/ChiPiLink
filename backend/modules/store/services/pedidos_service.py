@@ -8,7 +8,6 @@ import uuid
 import logging
 
 from core.database import db
-from .vinculacion_service import vinculacion_service
 
 logger = logging.getLogger(__name__)
 
