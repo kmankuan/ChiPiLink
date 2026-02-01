@@ -237,6 +237,15 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - **Full trilingual support (EN, ES, ZH)** as per coding standards
   - Dynamic fields integrated in user's order submission form
   - File upload support with validation
+- **🔐 LaoPan.online OAuth 2.0 Integration** (Feb 1, 2026)
+  - Full OAuth 2.0 flow with Invision Community (laopan.online)
+  - Backend: `/api/invision/oauth/config`, `/api/invision/oauth/login`, `/api/invision/oauth/callback`
+  - Primary login button "Iniciar sesión con LaoPan" for regular users
+  - Collapsible "Acceso Administrativo" section for admin email/password login
+  - LaoPan callback page at `/auth/laopan/callback`
+  - JWT token generation upon successful OAuth authentication
+  - User auto-creation or linking on first OAuth login
+  - **Requires user to register redirect_uri in LaoPan OAuth app settings**
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
@@ -253,5 +262,5 @@ These rules are **PERMANENT** and must be followed in all future development ses
 
 ---
 
-*Last Updated: January 27, 2026*
-*Version: 3.6 - Trilingual Dynamic Order Form*
+*Last Updated: February 1, 2026*
+*Version: 3.7 - LaoPan OAuth Integration*
