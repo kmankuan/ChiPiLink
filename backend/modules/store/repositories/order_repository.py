@@ -34,10 +34,10 @@ class OrderRepository(BaseRepository):
         """Obtener pedido por ID"""
         return await self.find_by_id(self.ID_FIELD, pedido_id)
     
-    async def get_by_client(self, cliente_id: str, limit: int = 100) -> List[Dict]:
+    async def get_by_client(self, user_id: str, limit: int = 100) -> List[Dict]:
         """Obtener pedidos de un cliente"""
         return await self.find_many(
-            query={"cliente_id": cliente_id},
+            query={"user_id": cliente_id},
             limit=limit,
             sort=[("fecha_creacion", -1)]
         )

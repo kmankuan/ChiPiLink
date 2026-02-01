@@ -14,7 +14,7 @@ router = APIRouter(prefix="/pedidos", tags=["Store - Pedidos"])
 
 def get_user_identifier(user: dict) -> str:
     """Get user identifier - supports both old cliente_id and new user_id"""
-    return user.get("cliente_id") or user.get("user_id") or user.get("id")
+    return user.get("user_id") or user.get("user_id") or user.get("id")
 
 
 # ============== REQUEST MODELS ==============

@@ -62,7 +62,7 @@ async def check_access(
     Check if user has access to the private catalog.
     Returns list of linked students and available grades.
     """
-    return await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
+    return await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
 
 
 @router.get("/productos")
@@ -80,7 +80,7 @@ async def get_private_catalog_products(
     Solo accesible para usuarios con estudiantes PCA vinculados.
     """
     # Verificar acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -151,7 +151,7 @@ async def get_producto_detalle(
     Obtener detalle de un producto del catálogo privado.
     """
     # Verificar acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -180,7 +180,7 @@ async def get_productos_por_grado(
     Útil para mostrar la lista de libros de un estudiante.
     """
     # Verificar acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
@@ -227,7 +227,7 @@ async def get_resumen_catalogo(
     Muestra productos disponibles para cada estudiante vinculado.
     """
     # Verificar acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("cliente_id"))
+    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(

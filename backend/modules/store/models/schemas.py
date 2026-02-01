@@ -143,7 +143,7 @@ class Order(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
     pedido_id: str
-    cliente_id: Optional[str] = None
+    user_id: Optional[str] = None
     estudiante_id: Optional[str] = None
     estudiante_nombre: str
     items: List[Dict]

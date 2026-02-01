@@ -619,7 +619,7 @@ class MondayPedidosService:
         
         # Obtener acudiente
         acudiente = await db.auth_users.find_one(
-            {"cliente_id": pedido.get("acudiente_cliente_id")},
+            {"user_id": pedido.get("acudiente_cliente_id")},
             {"nombre": 1, "email": 1}
         )
         acudiente_nombre = acudiente.get("nombre", "") if acudiente else ""

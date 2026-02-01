@@ -27,7 +27,7 @@ class OrderService(BaseService):
     async def create_order(
         self,
         data: OrderCreate,
-        cliente_id: str,
+        user_id: str,
         estudiante_info: Dict
     ) -> Order:
         """
@@ -46,7 +46,7 @@ class OrderService(BaseService):
         
         # Crear documento del pedido
         order_dict = {
-            "cliente_id": cliente_id,
+            "user_id": cliente_id,
             "estudiante_id": data.estudiante_id,
             "estudiante_nombre": f"{estudiante_info['nombre']} {estudiante_info.get('apellido', '')}",
             "items": [item.model_dump() for item in data.items],
@@ -69,7 +69,7 @@ class OrderService(BaseService):
             StoreEvents.ORDER_CREATED,
             {
                 "pedido_id": result["pedido_id"],
-                "cliente_id": cliente_id,
+                "user_id": cliente_id,
                 "total": total,
                 "items_count": len(data.items)
             },
@@ -101,7 +101,7 @@ class OrderService(BaseService):
         
         order_dict = {
             "tipo": "publico",
-            "cliente_id": None,
+            "user_id": None,
             "nombre_acudiente": data.nombre_acudiente,
             "telefono_acudiente": data.telefono_acudiente,
             "email_acudiente": data.email_acudiente,
@@ -147,7 +147,7 @@ class OrderService(BaseService):
         result = await self.repository.get_by_id(pedido_id)
         return Order(**result) if result else None
     
-    async def get_client_orders(self, cliente_id: str) -> List[Order]:
+    async def get_client_orders(self, user_id: str) -> List[Order]:
         """Obtener pedidos de un cliente"""
         results = await self.repository.get_by_client(cliente_id)
         return [Order(**r) for r in results]

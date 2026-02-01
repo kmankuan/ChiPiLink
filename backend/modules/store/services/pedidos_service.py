@@ -21,7 +21,7 @@ class PedidosService:
     async def obtener_vista_previa_pedido(
         self,
         estudiante_sync_id: str,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         ano_escolar: str = None
     ) -> Dict:
         """
@@ -153,7 +153,7 @@ class PedidosService:
     async def crear_pedido(
         self,
         estudiante_sync_id: str,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         ano_escolar: str = None,
         tipo: str = "pre_orden"
     ) -> Dict:
@@ -231,7 +231,7 @@ class PedidosService:
         self,
         pedido_id: str,
         libro_id: str,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         cantidad: int = 1,
         nota: str = None
     ) -> Dict:
@@ -328,7 +328,7 @@ class PedidosService:
         self,
         pedido_id: str,
         item_id: str,
-        acudiente_cliente_id: str
+        acudiente_user_id: str
     ) -> Dict:
         """Quitar un item del pedido"""
         
@@ -372,7 +372,7 @@ class PedidosService:
     async def agregar_todos_libros_faltantes(
         self,
         pedido_id: str,
-        acudiente_cliente_id: str
+        acudiente_user_id: str
     ) -> Dict:
         """Agregar todos los libros faltantes del grado al pedido"""
         
@@ -434,7 +434,7 @@ class PedidosService:
     async def confirmar_pedido(
         self,
         pedido_id: str,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         acepto_terminos: bool = True,
         notas: str = None
     ) -> Dict:
@@ -491,7 +491,7 @@ class PedidosService:
     
     async def obtener_mis_pedidos(
         self,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         estudiante_sync_id: str = None,
         ano_escolar: str = None,
         estado: str = None
@@ -513,12 +513,12 @@ class PedidosService:
     async def obtener_pedido(
         self,
         pedido_id: str,
-        acudiente_cliente_id: str = None
+        acudiente_user_id: str = None
     ) -> Dict:
         """Obtener un pedido específico"""
         
         query = {"pedido_id": pedido_id}
-        if acudiente_cliente_id:
+        if acudiente_user_id:
             query["acudiente_cliente_id"] = acudiente_cliente_id
         
         pedido = await db.pedidos_libros.find_one(query, {"_id": 0})
@@ -527,7 +527,7 @@ class PedidosService:
     async def cancelar_pedido(
         self,
         pedido_id: str,
-        acudiente_cliente_id: str,
+        acudiente_user_id: str,
         motivo: str = None
     ) -> Dict:
         """Cancelar un pedido"""
@@ -672,7 +672,7 @@ class PedidosService:
         # Enriquecer con datos del acudiente
         for pedido in pedidos:
             acudiente = await db.clientes.find_one(
-                {"cliente_id": pedido["acudiente_cliente_id"]},
+                {"user_id": pedido["acudiente_cliente_id"]},
                 {"_id": 0, "nombre": 1, "email": 1}
             )
             pedido["acudiente"] = acudiente

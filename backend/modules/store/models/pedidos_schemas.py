@@ -115,7 +115,7 @@ class PedidoResponse(BaseModel):
     estudiante_sync_id: str
     estudiante_nombre: str
     estudiante_grado: str
-    acudiente_cliente_id: str
+    acudiente_user_id: str
     ano_escolar: str
     tipo: TipoPedido
     estado: EstadoPedido

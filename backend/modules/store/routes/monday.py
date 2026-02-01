@@ -405,7 +405,7 @@ async def post_pedido_message(
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     
     # Solo el acudiente del pedido o admins pueden enviar mensajes
-    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("cliente_id")
+    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("user_id")
     is_admin = current_user.get("es_admin", False)
     
     if not is_owner and not is_admin:
@@ -443,7 +443,7 @@ async def get_pedido_messages(
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")
     
-    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("cliente_id")
+    is_owner = pedido.get("acudiente_cliente_id") == current_user.get("user_id")
     is_admin = current_user.get("es_admin", False)
     
     if not is_owner and not is_admin:
