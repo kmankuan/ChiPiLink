@@ -5,7 +5,7 @@ import sys
 import json
 
 class RefactoredEndpointsTester:
-    def __init__(self, base_url="https://multidash.preview.emergentagent.com"):
+    def __init__(self, base_url="https://textbook-super-app.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
