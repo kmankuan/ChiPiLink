@@ -43,7 +43,7 @@ def setup_event_handlers():
         payload = event.payload
         cliente_id = payload.get("user_id")
         
-        await db.clientes.update_one(
+        await db.users.update_one(
             {"user_id": cliente_id},
             {"$set": {"ultimo_login": datetime.now(timezone.utc).isoformat()}}
         )

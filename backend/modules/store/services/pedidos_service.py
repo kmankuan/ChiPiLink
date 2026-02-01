@@ -671,7 +671,7 @@ class PedidosService:
         
         # Enriquecer con datos del acudiente
         for pedido in pedidos:
-            acudiente = await db.clientes.find_one(
+            acudiente = await db.users.find_one(
                 {"user_id": pedido["acudiente_cliente_id"]},
                 {"_id": 0, "nombre": 1, "email": 1}
             )

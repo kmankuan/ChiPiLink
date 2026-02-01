@@ -22,7 +22,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 @router.post("/setup")
 async def setup_admin(admin_data: dict):
     """Initial admin setup - only works if no admin exists"""
-    existing_admin = await db.clientes.find_one({"es_admin": True})
+    existing_admin = await db.users.find_one({"es_admin": True})
     if existing_admin:
         raise HTTPException(status_code=400, detail="Ya existe un administrador")
     
@@ -36,7 +36,7 @@ async def setup_admin(admin_data: dict):
         "fecha_creacion": datetime.now(timezone.utc).isoformat()
     }
     
-    await db.clientes.insert_one(admin_doc)
+    await db.users.insert_one(admin_doc)
     
     return {"success": True, "message": "Administrador creado exitosamente"}
 
@@ -272,7 +272,7 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     })
     
     # Users stats
-    total_usuarios = await db.clientes.count_documents({"es_admin": False})
+    total_usuarios = await db.users.count_documents({"es_admin": False})
     
     # Notifications
     notificaciones_no_leidas = await db.notificaciones.count_documents({"leida": False})

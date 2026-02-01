@@ -212,7 +212,7 @@ async def assign_role_to_user(
     old_role = await roles_service.get_user_role(cliente_id)
     
     # Get target user info
-    target_user = await db.clientes.find_one({"user_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
+    target_user = await db.users.find_one({"user_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
     
     success = await roles_service.assign_role_to_user(
         cliente_id, 
@@ -257,7 +257,7 @@ async def get_user_role_and_permissions(
     permissions = await roles_service.get_user_permissions(cliente_id)
     
     # Get user info
-    user = await db.clientes.find_one(
+    user = await db.users.find_one(
         {"user_id": cliente_id},
         {"_id": 0, "user_id": 1, "nombre": 1, "email": 1}
     )
