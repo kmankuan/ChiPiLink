@@ -249,17 +249,17 @@ class OrderFormConfigService:
     async def get_field_types(self) -> List[Dict]:
         """Get available field types with descriptions"""
         return [
-            {"type": "text", "label": "Text Input", "label_es": "Texto", "description": "Single line text"},
-            {"type": "textarea", "label": "Text Area", "label_es": "Área de Texto", "description": "Multi-line text"},
-            {"type": "number", "label": "Number", "label_es": "Número", "description": "Numeric input"},
-            {"type": "select", "label": "Dropdown", "label_es": "Lista Desplegable", "description": "Single selection"},
-            {"type": "multiselect", "label": "Multi-Select", "label_es": "Selección Múltiple", "description": "Multiple selection"},
-            {"type": "checkbox", "label": "Checkbox", "label_es": "Casilla", "description": "Yes/No option"},
-            {"type": "file", "label": "File Upload", "label_es": "Subir Archivo", "description": "File attachment"},
-            {"type": "date", "label": "Date", "label_es": "Fecha", "description": "Date picker"},
-            {"type": "email", "label": "Email", "label_es": "Correo", "description": "Email address"},
-            {"type": "phone", "label": "Phone", "label_es": "Teléfono", "description": "Phone number"},
-            {"type": "info", "label": "Info Display", "label_es": "Información", "description": "Display-only content (e.g., bank details)"}
+            {"type": "text", "label": "Text Input", "label_es": "Texto", "label_zh": "文本输入", "description": "Single line text"},
+            {"type": "textarea", "label": "Text Area", "label_es": "Área de Texto", "label_zh": "文本区域", "description": "Multi-line text"},
+            {"type": "number", "label": "Number", "label_es": "Número", "label_zh": "数字", "description": "Numeric input"},
+            {"type": "select", "label": "Dropdown", "label_es": "Lista Desplegable", "label_zh": "下拉列表", "description": "Single selection"},
+            {"type": "multiselect", "label": "Multi-Select", "label_es": "Selección Múltiple", "label_zh": "多选", "description": "Multiple selection"},
+            {"type": "checkbox", "label": "Checkbox", "label_es": "Casilla", "label_zh": "复选框", "description": "Yes/No option"},
+            {"type": "file", "label": "File Upload", "label_es": "Subir Archivo", "label_zh": "文件上传", "description": "File attachment"},
+            {"type": "date", "label": "Date", "label_es": "Fecha", "label_zh": "日期", "description": "Date picker"},
+            {"type": "email", "label": "Email", "label_es": "Correo", "label_zh": "电子邮件", "description": "Email address"},
+            {"type": "phone", "label": "Phone", "label_es": "Teléfono", "label_zh": "电话", "description": "Phone number"},
+            {"type": "info", "label": "Info Display", "label_es": "Información", "label_zh": "信息显示", "description": "Display-only content (e.g., bank details)"}
         ]
 
 
