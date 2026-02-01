@@ -247,6 +247,17 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - User auto-creation or linking on first OAuth login
   - **Requires user to register redirect_uri in LaoPan OAuth app settings**
 
+- **🧹 Major Code Refactoring** (Feb 1, 2026)
+  - **Nomenclature Standardization**: Changed `cliente_id` → `user_id` across entire codebase
+  - **Database Collections**: Changed `db.clientes` → `db.users` references
+  - **Legacy File Cleanup**:
+    - Deleted `students.py`, `vinculacion.py`, `orders.py` (routes)
+    - Deleted `vinculacion_service.py`, `vinculacion_notification_service.py` (services)
+    - Deleted `acudientes_schemas.py`, `server_backup.py`, `VinculacionesTab.jsx`
+  - **Fixed Error**: Resolved "Error al cargar matrículas" toast in admin panel
+  - **Unified System**: All student management now uses `textbook_access` system exclusively
+  - **Admin Panel Cleanup**: Removed legacy "Matrículas (Legacy)" tab from Users module
+
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
 - See **ROADMAP.md** for prioritized tasks
@@ -256,11 +267,11 @@ These rules are **PERMANENT** and must be followed in all future development ses
 - Admin sidebar modules may disappear after login (intermittent)
 - See **ROADMAP.md** for details
 
-### 🗑️ Cleanup Done (Jan 24, 2026)
-- Removed temporary debug endpoint `/api/store/textbook-orders/debug/orders-check`
-- Removed redundant file `/app/frontend/src/modules/unatienda/tabs/TextbookAccessAdminTab.jsx`
+### 🗑️ Cleanup Done
+- **Feb 1, 2026**: Major refactoring - removed all legacy vinculacion/students/orders code
+- **Jan 24, 2026**: Removed debug endpoint and redundant TextbookAccessAdminTab.jsx
 
 ---
 
 *Last Updated: February 1, 2026*
-*Version: 3.7 - LaoPan OAuth Integration*
+*Version: 3.8 - Code Refactoring & Cleanup*
