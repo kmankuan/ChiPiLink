@@ -212,7 +212,7 @@ async def assign_role_to_user(
     old_role = await roles_service.get_user_role(target_user_id)
     
     # Get target user info
-    target_user = await db.users.find_one({"user_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
+    target_user = await db.users.find_one({"user_id": target_user_id}, {"_id": 0, "nombre": 1, "email": 1})
     
     success = await roles_service.assign_role_to_user(
         target_user_id, 
@@ -258,7 +258,7 @@ async def get_user_role_and_permissions(
     
     # Get user info
     user = await db.users.find_one(
-        {"user_id": cliente_id},
+        {"user_id": target_user_id},
         {"_id": 0, "user_id": 1, "nombre": 1, "email": 1}
     )
     
@@ -437,5 +437,5 @@ async def get_user_audit_logs(
             raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de usuario")
     
     logs = await audit_service.get_user_activity(target_user_id, limit)
-    return {"logs": logs, "user_id": cliente_id}
+    return {"logs": logs, "user_id": target_user_id}
 

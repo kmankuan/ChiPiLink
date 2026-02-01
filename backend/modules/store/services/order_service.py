@@ -46,7 +46,7 @@ class OrderService(BaseService):
         
         # Crear documento del pedido
         order_dict = {
-            "user_id": cliente_id,
+            "user_id": user_id,
             "estudiante_id": data.estudiante_id,
             "estudiante_nombre": f"{estudiante_info['nombre']} {estudiante_info.get('apellido', '')}",
             "items": [item.model_dump() for item in data.items],
@@ -69,7 +69,7 @@ class OrderService(BaseService):
             StoreEvents.ORDER_CREATED,
             {
                 "pedido_id": result["pedido_id"],
-                "user_id": cliente_id,
+                "user_id": user_id,
                 "total": total,
                 "items_count": len(data.items)
             },
@@ -149,7 +149,7 @@ class OrderService(BaseService):
     
     async def get_client_orders(self, user_id: str) -> List[Order]:
         """Obtener pedidos de un cliente"""
-        results = await self.repository.get_by_client(cliente_id)
+        results = await self.repository.get_by_client(user_id)
         return [Order(**r) for r in results]
     
     async def get_all_orders(

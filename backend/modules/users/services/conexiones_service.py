@@ -554,7 +554,7 @@ class ConexionesService:
         new_user_id = f"user_{uuid.uuid4().hex[:12]}"
         
         acudido = {
-            "user_id": cliente_id,
+            "user_id": new_user_id,
             "nombre": nombre,
             "apellido": apellido,
             "email": email.lower() if email else None,
@@ -599,7 +599,7 @@ class ConexionesService:
         return {
             "success": True,
             "acudido": {
-                "user_id": cliente_id,
+                "user_id": new_user_id,
                 "nombre": nombre,
                 "apellido": apellido,
                 "estado_cuenta": "acudido"

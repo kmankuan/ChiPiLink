@@ -41,14 +41,14 @@ def setup_event_handlers():
         Registrar último login del usuario.
         """
         payload = event.payload
-        cliente_id = payload.get("user_id")
+        user_id = payload.get("user_id")
         
         await db.users.update_one(
-            {"user_id": cliente_id},
+            {"user_id": user_id},
             {"$set": {"ultimo_login": datetime.now(timezone.utc).isoformat()}}
         )
         
-        logger.info(f"User logged in: {cliente_id}")
+        logger.info(f"User logged in: {user_id}")
     
     @event_bus.subscribe("auth.*")
     async def log_all_auth_events(event: Event):
