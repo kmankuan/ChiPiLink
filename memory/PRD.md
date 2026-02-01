@@ -230,11 +230,13 @@ These rules are **PERMANENT** and must be followed in all future development ses
   - Removed tabs "Por Estudiante" and "Catálogo" (redundant)
 - **⚙️ Dynamic Order Form Configuration** (Jan 27, 2026)
   - Backend: `/api/store/order-form-config/` endpoints
-  - Admin UI: New "Formulario" tab in Admin/Unatienda
+  - Admin UI: New "Formulario" tab in Admin → Unatienda
   - Support for field types: text, textarea, number, select, multiselect, checkbox, file, date, email, phone, info
   - Default fields: Bank transfer info (info type), Payment receipt upload (file type)
   - Admin can add/edit/delete/reorder fields
-  - Supports multilingual labels (EN, ES)
+  - **Full trilingual support (EN, ES, ZH)** as per coding standards
+  - Dynamic fields integrated in user's order submission form
+  - File upload support with validation
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
