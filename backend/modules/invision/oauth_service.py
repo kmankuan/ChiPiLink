@@ -1,0 +1,249 @@
+"""
+LaoPan OAuth Service - Invision Community OAuth 2.0 Integration
+Handles OAuth flow for authentication with laopan.online
+"""
+import os
+import uuid
+import httpx
+import logging
+from typing import Optional, Dict
+from datetime import datetime, timezone
+from urllib.parse import urlencode
+
+from core.database import db
+from core.auth import create_token
+
+logger = logging.getLogger(__name__)
+
+# OAuth Configuration from environment
+LAOPAN_CLIENT_ID = os.environ.get("LAOPAN_OAUTH_CLIENT_ID", "")
+LAOPAN_CLIENT_SECRET = os.environ.get("LAOPAN_OAUTH_CLIENT_SECRET", "")
+LAOPAN_BASE_URL = os.environ.get("LAOPAN_OAUTH_BASE_URL", "https://laopan.online")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://textbook-super-app.preview.emergentagent.com")
+
+# OAuth URLs
+AUTHORIZE_URL = f"{LAOPAN_BASE_URL}/oauth/authorize/"
+TOKEN_URL = f"{LAOPAN_BASE_URL}/oauth/token/"
+USERINFO_URL = f"{LAOPAN_BASE_URL}/api/core/me"
+
+# Scopes for Invision Community
+OAUTH_SCOPES = ["profile", "email"]
+
+
+class LaoPanOAuthService:
+    """Service for handling LaoPan OAuth 2.0 authentication"""
+    
+    def __init__(self):
+        self.client_id = LAOPAN_CLIENT_ID
+        self.client_secret = LAOPAN_CLIENT_SECRET
+        self.base_url = LAOPAN_BASE_URL
+        self._states = {}  # In-memory state storage (consider Redis for production)
+    
+    def get_redirect_uri(self) -> str:
+        """Get the OAuth callback URL"""
+        return f"{FRONTEND_URL}/auth/laopan/callback"
+    
+    def generate_auth_url(self, redirect_after: Optional[str] = None) -> Dict:
+        """
+        Generate OAuth authorization URL
+        Returns URL and state for CSRF protection
+        """
+        state = str(uuid.uuid4())
+        
+        # Store state with optional redirect
+        self._states[state] = {
+            "created_at": datetime.now(timezone.utc),
+            "redirect_after": redirect_after
+        }
+        
+        params = {
+            "client_id": self.client_id,
+            "redirect_uri": self.get_redirect_uri(),
+            "response_type": "code",
+            "scope": " ".join(OAUTH_SCOPES),
+            "state": state
+        }
+        
+        auth_url = f"{AUTHORIZE_URL}?{urlencode(params)}"
+        
+        return {
+            "auth_url": auth_url,
+            "state": state
+        }
+    
+    def validate_state(self, state: str) -> Optional[Dict]:
+        """Validate and consume state token"""
+        state_data = self._states.pop(state, None)
+        if not state_data:
+            return None
+        
+        # Check if state is not too old (10 minutes max)
+        created = state_data.get("created_at")
+        if created:
+            age = (datetime.now(timezone.utc) - created).total_seconds()
+            if age > 600:  # 10 minutes
+                return None
+        
+        return state_data
+    
+    async def exchange_code_for_token(self, code: str) -> Optional[Dict]:
+        """
+        Exchange authorization code for access token
+        Returns token data or None on failure
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    TOKEN_URL,
+                    data={
+                        "grant_type": "authorization_code",
+                        "client_id": self.client_id,
+                        "client_secret": self.client_secret,
+                        "code": code,
+                        "redirect_uri": self.get_redirect_uri()
+                    },
+                    headers={
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    timeout=30.0
+                )
+                
+                if response.status_code != 200:
+                    logger.error(f"Token exchange failed: {response.status_code} - {response.text}")
+                    return None
+                
+                return response.json()
+        except Exception as e:
+            logger.error(f"Token exchange error: {e}")
+            return None
+    
+    async def get_user_info(self, access_token: str) -> Optional[Dict]:
+        """
+        Get user information from LaoPan using access token
+        Returns user data or None on failure
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    USERINFO_URL,
+                    headers={
+                        "Authorization": f"Bearer {access_token}"
+                    },
+                    timeout=30.0
+                )
+                
+                if response.status_code != 200:
+                    logger.error(f"User info fetch failed: {response.status_code} - {response.text}")
+                    return None
+                
+                return response.json()
+        except Exception as e:
+            logger.error(f"User info error: {e}")
+            return None
+    
+    async def authenticate_user(self, laopan_user: Dict) -> Dict:
+        """
+        Authenticate or create user from LaoPan data
+        Returns JWT token and user data
+        """
+        laopan_id = str(laopan_user.get("id"))
+        email = laopan_user.get("email", "")
+        name = laopan_user.get("name", laopan_user.get("displayName", "Usuario"))
+        photo_url = laopan_user.get("photoUrl") or laopan_user.get("photoUrlLarge")
+        
+        # Extract additional info
+        primary_group = laopan_user.get("primaryGroup", {})
+        group_name = primary_group.get("name") if primary_group else None
+        
+        # Try to find existing user by laopan_id or email
+        existing_user = await db.users.find_one({
+            "$or": [
+                {"laopan_id": laopan_id},
+                {"email": email}
+            ]
+        }, {"_id": 0})
+        
+        now = datetime.now(timezone.utc).isoformat()
+        
+        if existing_user:
+            # Update existing user with LaoPan data
+            user_id = existing_user["user_id"]
+            
+            update_data = {
+                "laopan_id": laopan_id,
+                "laopan_group": group_name,
+                "laopan_last_login": now,
+                "updated_at": now
+            }
+            
+            # Update photo if available and user doesn't have one
+            if photo_url and not existing_user.get("avatar"):
+                update_data["avatar"] = photo_url
+            
+            # Update name if not set
+            if not existing_user.get("name") and name:
+                update_data["name"] = name
+            
+            await db.users.update_one(
+                {"user_id": user_id},
+                {"$set": update_data}
+            )
+            
+            # Get updated user
+            user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
+        else:
+            # Create new user
+            user_id = f"user_{uuid.uuid4().hex[:12]}"
+            
+            user = {
+                "user_id": user_id,
+                "email": email,
+                "name": name,
+                "avatar": photo_url,
+                "phone": None,
+                "address": None,
+                "is_admin": False,
+                "is_active": True,
+                "laopan_id": laopan_id,
+                "laopan_group": group_name,
+                "laopan_last_login": now,
+                "auth_provider": "laopan",
+                "created_at": now,
+                "updated_at": now
+            }
+            
+            await db.users.insert_one(user)
+            # Remove _id for response
+            user.pop("_id", None)
+        
+        # Create JWT token
+        token = create_token(user_id, user.get("is_admin", False))
+        
+        return {
+            "token": token,
+            "user": user
+        }
+    
+    async def get_oauth_config(self) -> Dict:
+        """Get public OAuth configuration for frontend"""
+        # Check if OAuth is configured
+        if not self.client_id:
+            return {
+                "enabled": False,
+                "provider_name": "LaoPan.online",
+                "message": "OAuth no configurado"
+            }
+        
+        return {
+            "enabled": True,
+            "provider_id": "laopan",
+            "provider_name": "LaoPan.online",
+            "button_text": "Sign in with LaoPan",
+            "button_text_es": "Iniciar sesión con LaoPan",
+            "button_text_zh": "使用LaoPan登录",
+            "button_color": "#4F46E5"
+        }
+
+
+# Singleton instance
+laopan_oauth_service = LaoPanOAuthService()
