@@ -48,6 +48,7 @@ const categoryIcons = {
 // Compra Exclusiva Section Component - Student-centered view
 function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess }) {
   const { token } = useAuth();
+  const { i18n } = useTranslation();
   const [view, setView] = useState('students'); // 'students', 'textbooks', 'linking'
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentOrders, setStudentOrders] = useState({});
@@ -55,6 +56,84 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
   const [loadingTextbooks, setLoadingTextbooks] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState({});
+  
+  // Dynamic form fields
+  const [formFields, setFormFields] = useState([]);
+  const [formData, setFormData] = useState({});
+  const [uploadedFiles, setUploadedFiles] = useState({});
+  const [uploadingFile, setUploadingFile] = useState(null);
+
+  // Get current language
+  const lang = i18n.language || 'es';
+
+  // Fetch form fields configuration
+  useEffect(() => {
+    fetchFormFields();
+  }, []);
+
+  const fetchFormFields = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/store/order-form-config/fields`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFormFields(response.data.fields || []);
+      
+      // Initialize form data with default values
+      const initialData = {};
+      (response.data.fields || []).forEach(field => {
+        if (field.default_value) {
+          initialData[field.field_id] = field.default_value;
+        }
+      });
+      setFormData(initialData);
+    } catch (error) {
+      console.error('Error fetching form fields:', error);
+    }
+  };
+
+  // Get localized text
+  const getLocalizedText = (field, key) => {
+    if (lang === 'zh' && field[`${key}_zh`]) return field[`${key}_zh`];
+    if (lang === 'es' && field[`${key}_es`]) return field[`${key}_es`];
+    return field[key] || field[`${key}_en`] || '';
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (fieldId, file) => {
+    if (!file) return;
+    
+    setUploadingFile(fieldId);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      
+      const response = await axios.post(
+        `${API_URL}/api/store/order-form-config/upload-file`,
+        formDataUpload,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          } 
+        }
+      );
+      
+      setUploadedFiles(prev => ({
+        ...prev,
+        [fieldId]: response.data
+      }));
+      setFormData(prev => ({
+        ...prev,
+        [fieldId]: response.data.filename
+      }));
+      toast.success('Archivo subido correctamente');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error(error.response?.data?.detail || 'Error al subir archivo');
+    } finally {
+      setUploadingFile(null);
+    }
+  };
 
   // Fetch orders for all students
   useEffect(() => {
