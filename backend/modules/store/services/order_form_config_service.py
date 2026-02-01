@@ -40,6 +40,7 @@ class OrderFormConfigService:
                 "label": "Payment Information",
                 "label_es": "Información de Pago",
                 "label_en": "Payment Information",
+                "label_zh": "付款信息",
                 "content": """
 **Bank Transfer Details:**
 - Bank: Banco General
@@ -54,6 +55,20 @@ class OrderFormConfigService:
 - Titular: PCA School
 - Referencia: Usar el nombre del estudiante
                 """,
+                "content_en": """
+**Bank Transfer Details:**
+- Bank: Banco General
+- Account: 00-00-00-000000-0
+- Account Holder: PCA School
+- Reference: Use your student's name
+                """,
+                "content_zh": """
+**银行转账详情:**
+- 银行: Banco General
+- 账户: 00-00-00-000000-0
+- 账户持有人: PCA School
+- 参考: 使用学生姓名
+                """,
                 "required": False,
                 "order": 0,
                 "active": True
@@ -64,10 +79,15 @@ class OrderFormConfigService:
                 "label": "Payment Receipt",
                 "label_es": "Comprobante de Pago",
                 "label_en": "Payment Receipt",
+                "label_zh": "付款收据",
                 "placeholder": "Upload payment receipt",
                 "placeholder_es": "Subir comprobante de pago",
+                "placeholder_en": "Upload payment receipt",
+                "placeholder_zh": "上传付款收据",
                 "help_text": "Upload your bank transfer receipt (PDF, JPG, PNG)",
                 "help_text_es": "Sube tu comprobante de transferencia (PDF, JPG, PNG)",
+                "help_text_en": "Upload your bank transfer receipt (PDF, JPG, PNG)",
+                "help_text_zh": "上传您的银行转账收据 (PDF, JPG, PNG)",
                 "required": True,
                 "allowed_extensions": [".pdf", ".jpg", ".jpeg", ".png"],
                 "max_file_size_mb": 5.0,
