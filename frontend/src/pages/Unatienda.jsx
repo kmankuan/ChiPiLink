@@ -226,6 +226,14 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       return;
     }
 
+    // Validate required form fields
+    for (const field of formFields) {
+      if (field.required && !formData[field.field_id]) {
+        toast.error(`El campo "${getLocalizedText(field, 'label')}" es requerido`);
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const orderItems = selectedBookIds.map(bookId => {
@@ -242,7 +250,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         `${API_URL}/api/store/textbook-orders/submit`,
         {
           student_id: selectedStudent.student_id,
-          items: orderItems
+          items: orderItems,
+          form_data: formData,
+          uploaded_files: uploadedFiles
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -250,6 +260,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       toast.success('Pedido enviado exitosamente');
       fetchStudentOrders();
       setView('students');
+      // Reset form data
+      setFormData({});
+      setUploadedFiles({});
     } catch (error) {
       console.error('Error submitting order:', error);
       toast.error(error.response?.data?.detail || 'Error al enviar el pedido');
