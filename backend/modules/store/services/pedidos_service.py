@@ -33,7 +33,7 @@ class PedidosService:
         # Verificar vinculación
         vinculacion = await db.vinculaciones.find_one({
             "estudiante_sync_id": estudiante_sync_id,
-            "acudiente_cliente_id": acudiente_cliente_id,
+            "user_id": user_id,
             "estado": "aprobada",
             "activo": True
         })
@@ -163,7 +163,7 @@ class PedidosService:
         # Verificar vinculación
         vinculacion = await db.vinculaciones.find_one({
             "estudiante_sync_id": estudiante_sync_id,
-            "acudiente_cliente_id": acudiente_cliente_id,
+            "user_id": user_id,
             "estado": "aprobada",
             "activo": True
         })
@@ -174,7 +174,7 @@ class PedidosService:
         # Verificar que no haya pedido borrador activo
         pedido_existente = await db.pedidos_libros.find_one({
             "estudiante_sync_id": estudiante_sync_id,
-            "acudiente_cliente_id": acudiente_cliente_id,
+            "user_id": user_id,
             "ano_escolar": ano,
             "estado": "borrador"
         })
@@ -205,7 +205,7 @@ class PedidosService:
             "estudiante_nombre": estudiante.get("nombre_completo"),
             "estudiante_grado": estudiante.get("grado"),
             "estudiante_numero": estudiante.get("numero_estudiante"),
-            "acudiente_cliente_id": acudiente_cliente_id,
+            "user_id": user_id,
             "ano_escolar": ano,
             "tipo": tipo,
             "estado": "borrador",
@@ -240,7 +240,7 @@ class PedidosService:
         # Obtener pedido
         pedido = await db.pedidos_libros.find_one({
             "pedido_id": pedido_id,
-            "acudiente_cliente_id": acudiente_cliente_id
+            "user_id": user_id
         })
         
         if not pedido:
@@ -334,7 +334,7 @@ class PedidosService:
         
         pedido = await db.pedidos_libros.find_one({
             "pedido_id": pedido_id,
-            "acudiente_cliente_id": acudiente_cliente_id
+            "user_id": user_id
         })
         
         if not pedido:
@@ -378,7 +378,7 @@ class PedidosService:
         
         pedido = await db.pedidos_libros.find_one({
             "pedido_id": pedido_id,
-            "acudiente_cliente_id": acudiente_cliente_id
+            "user_id": user_id
         })
         
         if not pedido:
@@ -390,7 +390,7 @@ class PedidosService:
         # Obtener vista previa
         preview = await self.obtener_vista_previa_pedido(
             pedido["estudiante_sync_id"],
-            acudiente_cliente_id,
+            user_id,
             pedido["ano_escolar"]
         )
         
@@ -412,7 +412,7 @@ class PedidosService:
                     await self.agregar_item(
                         pedido_id,
                         libro["libro_id"],
-                        acudiente_cliente_id
+                        user_id
                     )
                     agregados += 1
             except ValueError as e:
@@ -442,7 +442,7 @@ class PedidosService:
         
         pedido = await db.pedidos_libros.find_one({
             "pedido_id": pedido_id,
-            "acudiente_cliente_id": acudiente_cliente_id
+            "user_id": user_id
         })
         
         if not pedido:
@@ -498,7 +498,7 @@ class PedidosService:
     ) -> List[Dict]:
         """Obtener pedidos del acudiente"""
         
-        query = {"acudiente_cliente_id": acudiente_cliente_id}
+        query = {"user_id": user_id}
         
         if estudiante_sync_id:
             query["estudiante_sync_id"] = estudiante_sync_id
@@ -519,7 +519,7 @@ class PedidosService:
         
         query = {"pedido_id": pedido_id}
         if acudiente_user_id:
-            query["acudiente_cliente_id"] = acudiente_cliente_id
+            query["user_id"] = user_id
         
         pedido = await db.pedidos_libros.find_one(query, {"_id": 0})
         return pedido
@@ -534,7 +534,7 @@ class PedidosService:
         
         pedido = await db.pedidos_libros.find_one({
             "pedido_id": pedido_id,
-            "acudiente_cliente_id": acudiente_cliente_id
+            "user_id": user_id
         })
         
         if not pedido:
@@ -672,7 +672,7 @@ class PedidosService:
         # Enriquecer con datos del acudiente
         for pedido in pedidos:
             acudiente = await db.users.find_one(
-                {"user_id": pedido["acudiente_cliente_id"]},
+                {"user_id": pedido["user_id"]},
                 {"_id": 0, "nombre": 1, "email": 1}
             )
             pedido["acudiente"] = acudiente
