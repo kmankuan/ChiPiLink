@@ -183,7 +183,7 @@ export default function MisConexiones({ token }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          para_usuario_id: selectedUser.cliente_id,
+          para_usuario_id: selectedUser.user_id,
           tipo: relationshipType,
           subtipo: relationshipSubtype,
           etiqueta: customLabel || null,
