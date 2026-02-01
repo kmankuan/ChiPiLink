@@ -493,7 +493,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Enviar notificación a usuarios por external_id (cliente_id)"""
+        """Enviar notificación a usuarios por external_id (user_id)"""
         if not self.validate_config():
             return {"success": False, "error": "OneSignal not configured"}
         
