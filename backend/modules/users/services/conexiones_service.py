@@ -551,7 +551,7 @@ class ConexionesService:
             if existing:
                 return {"error": "Email ya registrado"}
         
-        cliente_id = f"cli_{uuid.uuid4().hex[:12]}"
+        new_user_id = f"user_{uuid.uuid4().hex[:12]}"
         
         acudido = {
             "user_id": cliente_id,
@@ -586,7 +586,7 @@ class ConexionesService:
         # Crear conexión con acudiente
         await self.crear_conexion(
             user_id=acudiente_id,
-            destino_user_id=cliente_id,
+            destino_user_id=new_user_id,
             tipo="especial",
             subtipo="acudido",
             etiqueta=f"{nombre} {apellido or ''}".strip(),
