@@ -1,79 +1,184 @@
 """
-Invision Routes - Placeholder for Invisionpower Suite integration
+Invision Routes - LaoPan.online OAuth 2.0 Integration
 
-Endpoints to be implemented:
-- GET /invision/status - Check integration status
-- POST /invision/config - Configure API credentials
-- GET /invision/posts - Fetch posts from laopan.online
-- POST /invision/sync - Trigger manual sync
-- GET /invision/auth/login - Initiate SSO login
-- GET /invision/auth/callback - OAuth callback
-- POST /invision/publish - Publish content to laopan.online (optional)
+Endpoints:
+- GET /invision/oauth/config - Get public OAuth configuration
+- GET /invision/oauth/login - Initiate OAuth login flow
+- GET /invision/oauth/callback - Handle OAuth callback
+- GET /invision/status - Check integration status (admin)
+- PUT /invision/config - Update configuration (admin)
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi.responses import RedirectResponse
 from datetime import datetime, timezone
+from typing import Optional
 import logging
 
 from core.database import db
 from core.auth import get_admin_user
 from .models import InvisionConfig
+from .oauth_service import laopan_oauth_service
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/invision", tags=["Invision Integration"])
+router = APIRouter(prefix="/invision", tags=["Invision/LaoPan OAuth"])
 
 
-# ============== STATUS & CONFIG ==============
+# ============== PUBLIC OAUTH ENDPOINTS ==============
+
+@router.get("/oauth/config")
+async def get_oauth_config():
+    """
+    Get public OAuth configuration for frontend
+    No authentication required
+    """
+    return await laopan_oauth_service.get_oauth_config()
+
+
+@router.get("/oauth/login")
+async def initiate_oauth_login(redirect: Optional[str] = Query(None)):
+    """
+    Initiate OAuth login flow with LaoPan.online
+    Returns authorization URL to redirect user to
+    
+    Query params:
+    - redirect: Optional URL to redirect after successful login
+    """
+    config = await laopan_oauth_service.get_oauth_config()
+    
+    if not config.get("enabled"):
+        raise HTTPException(
+            status_code=503,
+            detail="OAuth con LaoPan.online no está configurado"
+        )
+    
+    auth_data = laopan_oauth_service.generate_auth_url(redirect_after=redirect)
+    
+    return {
+        "auth_url": auth_data["auth_url"],
+        "state": auth_data["state"]
+    }
+
+
+@router.get("/oauth/callback")
+async def oauth_callback(
+    code: Optional[str] = Query(None),
+    state: Optional[str] = Query(None),
+    error: Optional[str] = Query(None),
+    error_description: Optional[str] = Query(None)
+):
+    """
+    Handle OAuth callback from LaoPan.online
+    
+    This endpoint receives the authorization code from LaoPan and:
+    1. Exchanges code for access token
+    2. Fetches user info
+    3. Creates/updates user in database
+    4. Returns JWT token
+    
+    Frontend should redirect to this with code and state params
+    """
+    # Handle OAuth errors
+    if error:
+        logger.warning(f"OAuth error: {error} - {error_description}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error de autenticación: {error_description or error}"
+        )
+    
+    # Validate required params
+    if not code:
+        raise HTTPException(status_code=400, detail="Código de autorización no recibido")
+    
+    if not state:
+        raise HTTPException(status_code=400, detail="Estado de sesión no recibido")
+    
+    # Validate state (CSRF protection)
+    state_data = laopan_oauth_service.validate_state(state)
+    if not state_data:
+        raise HTTPException(
+            status_code=400,
+            detail="Estado de sesión inválido o expirado. Por favor, intente de nuevo."
+        )
+    
+    # Exchange code for token
+    token_data = await laopan_oauth_service.exchange_code_for_token(code)
+    if not token_data:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al obtener token de acceso. Por favor, intente de nuevo."
+        )
+    
+    access_token = token_data.get("access_token")
+    if not access_token:
+        raise HTTPException(
+            status_code=500,
+            detail="Token de acceso no recibido"
+        )
+    
+    # Get user info from LaoPan
+    laopan_user = await laopan_oauth_service.get_user_info(access_token)
+    if not laopan_user:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al obtener información del usuario"
+        )
+    
+    # Authenticate/create user
+    auth_result = await laopan_oauth_service.authenticate_user(laopan_user)
+    
+    # Include redirect_after if provided
+    auth_result["redirect_after"] = state_data.get("redirect_after")
+    
+    return auth_result
+
+
+# ============== ADMIN ENDPOINTS ==============
 
 @router.get("/status")
 async def get_invision_status(admin: dict = Depends(get_admin_user)):
-    """Check Invision integration status"""
-    config = await db.app_config.find_one({"config_key": "invision"}, {"_id": 0})
-    
-    if not config or not config.get("value", {}).get("api_url"):
-        return {
-            "configured": False,
-            "connected": False,
-            "status": "not_configured",
-            "message": "Integraci\u00f3n con Invision no configurada. Configure las credenciales para conectar con laopan.online"
-        }
-    
-    value = config.get("value", {})
+    """Check Invision/LaoPan integration status (admin only)"""
+    oauth_config = await laopan_oauth_service.get_oauth_config()
     
     return {
-        "configured": True,
-        "connected": value.get("status") == "active",
-        "status": value.get("status", "unknown"),
-        "api_url": value.get("api_url"),
-        "sync_enabled": value.get("sync_enabled", False),
-        "last_sync": value.get("last_sync"),
-        "message": value.get("error_message") if value.get("status") == "error" else None
+        "oauth": {
+            "enabled": oauth_config.get("enabled", False),
+            "provider": "LaoPan.online (Invision Community)",
+            "configured": bool(laopan_oauth_service.client_id)
+        },
+        "api": {
+            "configured": False,
+            "message": "API integration not yet implemented"
+        }
     }
 
 
 @router.get("/config")
 async def get_invision_config(admin: dict = Depends(get_admin_user)):
     """Get Invision configuration (admin only)"""
+    # Get saved config from DB
     config = await db.app_config.find_one({"config_key": "invision"}, {"_id": 0})
     
-    if not config:
-        return InvisionConfig().model_dump()
+    # Merge with current OAuth status
+    oauth_config = await laopan_oauth_service.get_oauth_config()
     
-    return config.get("value", InvisionConfig().model_dump())
+    base_config = config.get("value", {}) if config else {}
+    
+    return {
+        **base_config,
+        "oauth_enabled": oauth_config.get("enabled", False),
+        "oauth_provider": oauth_config.get("provider_name"),
+        "button_text": oauth_config.get("button_text"),
+        "button_text_es": oauth_config.get("button_text_es"),
+        "button_text_zh": oauth_config.get("button_text_zh")
+    }
 
 
 @router.put("/config")
 async def update_invision_config(config: dict, admin: dict = Depends(get_admin_user)):
-    """Update Invision configuration"""
-    # Validate required fields
-    if config.get("api_url") and not config["api_url"].startswith("http"):
-        raise HTTPException(status_code=400, detail="URL de API inv\u00e1lida")
-    
+    """Update Invision configuration (admin only)"""
     config["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
-    # If credentials are provided, set status to pending
-    if config.get("api_key") or config.get("oauth_client_id"):
-        config["status"] = "pending_test"
+    config["updated_by"] = admin.get("user_id")
     
     await db.app_config.update_one(
         {"config_key": "invision"},
@@ -84,41 +189,11 @@ async def update_invision_config(config: dict, admin: dict = Depends(get_admin_u
         upsert=True
     )
     
-    return {"success": True, "message": "Configuraci\u00f3n guardada. Use /invision/test para probar la conexi\u00f3n."}
+    return {"success": True, "message": "Configuración guardada"}
 
 
-@router.post("/test")
-async def test_invision_connection(admin: dict = Depends(get_admin_user)):
-    """Test connection to Invision API"""
-    config = await db.app_config.find_one({"config_key": "invision"})
-    
-    if not config or not config.get("value", {}).get("api_url"):
-        raise HTTPException(status_code=400, detail="Invision no est\u00e1 configurado")
-    
-    value = config["value"]
-    api_url = value.get("api_url", "").rstrip("/")
-    api_key = value.get("api_key")
-    
-    if not api_key:
-        raise HTTPException(status_code=400, detail="API Key no configurada")
-    
-    # TODO: Implement actual API test when credentials are provided
-    # This is a placeholder that simulates the test
-    
-    # For now, return pending status
-    return {
-        "success": False,
-        "message": "Funci\u00f3n de prueba pendiente de implementaci\u00f3n. Proporcione las credenciales de Invisionpower Suite para continuar.",
-        "next_steps": [
-            "1. Obtenga las credenciales de API de laopan.online",
-            "2. Configure el API URL (ej: https://laopan.online/api/)",
-            "3. Configure el API Key",
-            "4. (Opcional) Configure OAuth para SSO"
-        ]
-    }
-
-
-# ============== POSTS (PLACEHOLDER) ==============
+# ============== LEGACY PLACEHOLDER ENDPOINTS ==============
+# These remain as placeholders for future API integration
 
 @router.get("/posts")
 async def get_invision_posts(
@@ -126,93 +201,17 @@ async def get_invision_posts(
     limit: int = 20,
     admin: dict = Depends(get_admin_user)
 ):
-    """Get cached posts from Invision - Placeholder"""
-    # Check if configured
-    config = await db.app_config.find_one({"config_key": "invision"})
-    if not config or not config.get("value", {}).get("api_url"):
-        return {
-            "posts": [],
-            "message": "Invision no configurado. Los posts aparecer\u00e1n aqu\u00ed cuando la integraci\u00f3n est\u00e9 activa."
-        }
-    
-    # Get cached posts
-    query = {}
-    if forum_id:
-        query["forum_id"] = forum_id
-    
-    posts = await db.invision_posts.find(query, {"_id": 0}).sort(
-        "fecha_publicacion", -1
-    ).to_list(limit)
-    
+    """Get cached posts from Invision - Placeholder for future API integration"""
     return {
-        "posts": posts,
-        "total": len(posts),
-        "source": "cache"
+        "posts": [],
+        "message": "API integration pending. OAuth authentication is now available."
     }
 
 
 @router.post("/sync")
 async def sync_invision_posts(admin: dict = Depends(get_admin_user)):
     """Trigger manual sync from Invision - Placeholder"""
-    config = await db.app_config.find_one({"config_key": "invision"})
-    
-    if not config or not config.get("value", {}).get("api_url"):
-        raise HTTPException(status_code=400, detail="Invision no est\u00e1 configurado")
-    
-    # TODO: Implement actual sync when credentials are provided
     return {
         "success": False,
-        "message": "Sincronizaci\u00f3n pendiente de implementaci\u00f3n. Configure las credenciales primero."
-    }
-
-
-# ============== SSO/OAUTH (PLACEHOLDER) ==============
-
-@router.get("/auth/login")
-async def invision_sso_login():
-    """Initiate SSO login with Invision - Placeholder"""
-    config = await db.app_config.find_one({"config_key": "invision"})
-    
-    if not config or not config.get("value", {}).get("oauth_client_id"):
-        raise HTTPException(
-            status_code=400, 
-            detail="OAuth no configurado. Configure las credenciales de OAuth para habilitar SSO."
-        )
-    
-    # TODO: Implement actual OAuth flow
-    return {
-        "message": "SSO con Invision pendiente de implementaci\u00f3n.",
-        "next_steps": [
-            "1. Configure OAuth Client ID y Secret en /invision/config",
-            "2. Configure el Redirect URI",
-            "3. Active SSO en la configuraci\u00f3n de Invision"
-        ]
-    }
-
-
-@router.get("/auth/callback")
-async def invision_sso_callback(code: str = None, state: str = None):
-    """OAuth callback from Invision - Placeholder"""
-    # TODO: Implement actual OAuth callback
-    return {"message": "Callback pendiente de implementaci\u00f3n"}
-
-
-# ============== PUBLISH (PLACEHOLDER) ==============
-
-@router.post("/publish")
-async def publish_to_invision(post: dict, admin: dict = Depends(get_admin_user)):
-    """Publish content from ChiPi Link to laopan.online - Placeholder"""
-    config = await db.app_config.find_one({"config_key": "invision"})
-    
-    if not config or not config.get("value", {}).get("api_key"):
-        raise HTTPException(status_code=400, detail="Invision no est\u00e1 configurado")
-    
-    # TODO: Implement actual publishing
-    return {
-        "success": False,
-        "message": "Publicaci\u00f3n a Invision pendiente de implementaci\u00f3n.",
-        "post_data_received": {
-            "titulo": post.get("titulo"),
-            "contenido_length": len(post.get("contenido", ""))
-        }
+        "message": "API sync not yet implemented. Use OAuth for user authentication."
     }
