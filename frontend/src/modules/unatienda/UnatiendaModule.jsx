@@ -10,7 +10,6 @@ import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, D
 import CatalogoPublicoTab from './tabs/CatalogoPublicoTab';
 import CatalogoPrivadoTab from './tabs/CatalogoPrivadoTab';
 import EstudiantesTab from './tabs/EstudiantesTab';
-import VinculacionesTab from './tabs/VinculacionesTab';
 import PedidosTab from './tabs/PedidosTab';
 import ConfiguracionTab from './tabs/ConfiguracionTab';
 import DemoDataTab from './tabs/DemoDataTab';
