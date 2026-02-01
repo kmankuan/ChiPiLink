@@ -424,6 +424,141 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   ))}
                 </div>
 
+                {/* Dynamic Form Fields */}
+                {formFields.length > 0 && (
+                  <div className="mt-6 space-y-4 p-4 bg-muted/50 rounded-lg border">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Información Adicional
+                    </h4>
+                    {formFields.map(field => (
+                      <div key={field.field_id} className="space-y-2">
+                        {/* Info field - display only */}
+                        {field.field_type === 'info' && (
+                          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <p className="font-medium text-blue-700 dark:text-blue-300 mb-2">
+                              {getLocalizedText(field, 'label')}
+                            </p>
+                            <div className="text-sm whitespace-pre-line">
+                              {getLocalizedText(field, 'content')}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Text input */}
+                        {field.field_type === 'text' && (
+                          <div>
+                            <Label>
+                              {getLocalizedText(field, 'label')}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            <Input
+                              value={formData[field.field_id] || ''}
+                              onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
+                              placeholder={getLocalizedText(field, 'placeholder')}
+                            />
+                            {field.help_text && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {getLocalizedText(field, 'help_text')}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Textarea */}
+                        {field.field_type === 'textarea' && (
+                          <div>
+                            <Label>
+                              {getLocalizedText(field, 'label')}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            <Textarea
+                              value={formData[field.field_id] || ''}
+                              onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
+                              placeholder={getLocalizedText(field, 'placeholder')}
+                              rows={3}
+                            />
+                          </div>
+                        )}
+
+                        {/* File upload */}
+                        {field.field_type === 'file' && (
+                          <div>
+                            <Label>
+                              {getLocalizedText(field, 'label')}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="file"
+                                accept={field.allowed_extensions?.join(',')}
+                                onChange={(e) => handleFileUpload(field.field_id, e.target.files?.[0])}
+                                disabled={uploadingFile === field.field_id}
+                                className="flex-1"
+                              />
+                              {uploadingFile === field.field_id && (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              )}
+                              {uploadedFiles[field.field_id] && (
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              )}
+                            </div>
+                            {field.help_text && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {getLocalizedText(field, 'help_text')}
+                              </p>
+                            )}
+                            {uploadedFiles[field.field_id] && (
+                              <p className="text-xs text-green-600 mt-1">
+                                ✓ {uploadedFiles[field.field_id].original_name}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Checkbox */}
+                        {field.field_type === 'checkbox' && (
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={formData[field.field_id] || false}
+                              onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.checked }))}
+                              className="h-4 w-4"
+                            />
+                            <Label>
+                              {getLocalizedText(field, 'label')}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                          </div>
+                        )}
+
+                        {/* Select */}
+                        {field.field_type === 'select' && field.options && (
+                          <div>
+                            <Label>
+                              {getLocalizedText(field, 'label')}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            <select
+                              value={formData[field.field_id] || ''}
+                              onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
+                              className="w-full px-3 py-2 border rounded-lg bg-background"
+                            >
+                              <option value="">-- Seleccionar --</option>
+                              {field.options.map(opt => (
+                                <option key={opt.value} value={opt.value}>
+                                  {lang === 'zh' && opt.label_zh ? opt.label_zh : 
+                                   lang === 'es' && opt.label_es ? opt.label_es : opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Submit Button */}
                 <div className="sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t">
                   <div className="flex items-center justify-between">
