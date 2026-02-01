@@ -724,16 +724,8 @@ class PedidosService:
         
         # Enviar notificación push si el estado cambió
         if estado_anterior != nuevo_estado:
-            try:
-                from .vinculacion_notification_service import vinculacion_notification_service
-                await vinculacion_notification_service.notificar_cambio_estado_pedido(
-                    pedido_id=pedido_id,
-                    acudiente_id=pedido["acudiente_cliente_id"],
-                    estudiante_nombre=pedido.get("estudiante_nombre", ""),
-                    nuevo_estado=nuevo_estado
-                )
-            except Exception as e:
-                logger.warning(f"No se pudo enviar notificación de cambio de estado: {e}")
+            # TODO: Implement push notification service
+            logger.info(f"Estado de pedido {pedido_id} cambió de {estado_anterior} a {nuevo_estado}")
             
             # Sincronizar con Monday.com si está configurado
             try:
