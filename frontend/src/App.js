@@ -23,6 +23,7 @@ import RapidPinPublicPage from '@/pages/RapidPinPublicPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AuthCallback from '@/pages/AuthCallback';
+import LaoPanCallback from '@/pages/LaoPanCallback';
 import Dashboard from '@/pages/Dashboard';
 import Catalog from '@/pages/Catalog';
 import OrderForm from '@/pages/OrderForm';
