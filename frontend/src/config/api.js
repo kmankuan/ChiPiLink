@@ -26,6 +26,11 @@ export const AUTH_ENDPOINTS = {
   session: '/auth/session', // OAuth session (same for both)
   changePassword: USE_NEW_ENDPOINTS ? '/auth-v2/change-password' : '/auth/change-password',
   
+  // LaoPan OAuth endpoints
+  laopanConfig: '/invision/oauth/config',
+  laopanLogin: '/invision/oauth/login',
+  laopanCallback: '/invision/oauth/callback',
+  
   // Admin endpoints
   users: USE_NEW_ENDPOINTS ? '/auth-v2/users' : '/admin/users',
   userStats: USE_NEW_ENDPOINTS ? '/auth-v2/users/stats' : '/admin/users/stats',
