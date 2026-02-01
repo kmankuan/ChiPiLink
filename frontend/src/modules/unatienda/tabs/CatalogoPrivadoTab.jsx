@@ -221,15 +221,13 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 {translate('common.refresh', 'Actualizar')}
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/admin/bulk-import-books')}
-                className="gap-2"
-                data-testid="bulk-import-button"
-              >
-                <Upload className="h-4 w-4" />
-                {translate('store.bulkImport', 'Importar en Cantidad')}
-              </Button>
+              <InventoryImport 
+                token={token} 
+                onImportComplete={() => {
+                  fetchProductos();
+                  onRefresh?.();
+                }}
+              />
               <Button onClick={() => handleOpenForm()} className="gap-2">
                 <Plus className="h-4 w-4" />
                 {translate('store.addBook', 'Agregar Libro')}
