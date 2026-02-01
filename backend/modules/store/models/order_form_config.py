@@ -98,12 +98,15 @@ class CreateFieldRequest(BaseModel):
     label: str
     label_es: Optional[str] = None
     label_en: Optional[str] = None
+    label_zh: Optional[str] = None
     placeholder: Optional[str] = None
     placeholder_es: Optional[str] = None
     placeholder_en: Optional[str] = None
+    placeholder_zh: Optional[str] = None
     help_text: Optional[str] = None
     help_text_es: Optional[str] = None
     help_text_en: Optional[str] = None
+    help_text_zh: Optional[str] = None
     required: bool = False
     options: Optional[List[FieldOption]] = None
     default_value: Optional[Any] = None
@@ -114,6 +117,7 @@ class CreateFieldRequest(BaseModel):
     content: Optional[str] = None
     content_es: Optional[str] = None
     content_en: Optional[str] = None
+    content_zh: Optional[str] = None
 
 
 class UpdateFieldRequest(BaseModel):
@@ -121,12 +125,15 @@ class UpdateFieldRequest(BaseModel):
     label: Optional[str] = None
     label_es: Optional[str] = None
     label_en: Optional[str] = None
+    label_zh: Optional[str] = None
     placeholder: Optional[str] = None
     placeholder_es: Optional[str] = None
     placeholder_en: Optional[str] = None
+    placeholder_zh: Optional[str] = None
     help_text: Optional[str] = None
     help_text_es: Optional[str] = None
     help_text_en: Optional[str] = None
+    help_text_zh: Optional[str] = None
     required: Optional[bool] = None
     options: Optional[List[FieldOption]] = None
     default_value: Optional[Any] = None
@@ -139,3 +146,4 @@ class UpdateFieldRequest(BaseModel):
     content: Optional[str] = None
     content_es: Optional[str] = None
     content_en: Optional[str] = None
+    content_zh: Optional[str] = None
