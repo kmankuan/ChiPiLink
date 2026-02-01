@@ -240,7 +240,7 @@ export default function MisConexiones({ token }) {
       if (data.existe) {
         // Usuario ya registrado, ofrecer conectar directamente
         toast.info('Este usuario ya está registrado. Puedes enviarle una solicitud de conexión.');
-        setSelectedUser({ cliente_id: data.user_id, email: inviteEmail });
+        setSelectedUser({ user_id: data.user_id, email: inviteEmail });
         setShowInviteDialog(false);
         return;
       }
