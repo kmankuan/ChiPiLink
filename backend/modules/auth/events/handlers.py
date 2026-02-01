@@ -33,7 +33,7 @@ def setup_event_handlers():
         }
         
         await db.notificaciones.insert_one(notificacion)
-        logger.info(f"User registered notification created: {payload.get('cliente_id')}")
+        logger.info(f"User registered notification created: {payload.get('user_id')}")
     
     @event_bus.subscribe(AuthEvents.USER_LOGGED_IN)
     async def on_user_logged_in(event: Event):
@@ -41,10 +41,10 @@ def setup_event_handlers():
         Registrar último login del usuario.
         """
         payload = event.payload
-        cliente_id = payload.get("cliente_id")
+        cliente_id = payload.get("user_id")
         
         await db.clientes.update_one(
-            {"cliente_id": cliente_id},
+            {"user_id": cliente_id},
             {"$set": {"ultimo_login": datetime.now(timezone.utc).isoformat()}}
         )
         

@@ -58,7 +58,7 @@ async def add_comment(
 ):
     """Agregar comentario a un post"""
     try:
-        usuario_id = user.get("cliente_id") if user else None
+        usuario_id = user.get("user_id") if user else None
         if user and not data.nombre_usuario:
             data.nombre_usuario = user.get("nombre", "Anónimo")
         return await post_service.add_comment(post_id, data, usuario_id)
@@ -83,7 +83,7 @@ async def create_post(
     admin: dict = Depends(get_admin_user)
 ):
     """Crear nuevo post (admin)"""
-    return await post_service.create_post(data, creado_por=admin.get("cliente_id"))
+    return await post_service.create_post(data, creado_por=admin.get("user_id"))
 
 
 @router.put("/admin/{post_id}", response_model=Post)

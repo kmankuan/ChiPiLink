@@ -51,7 +51,7 @@ class InvisionPost(BaseModel):
 class InvisionUser(BaseModel):
     """Linked Invision user"""
     model_config = ConfigDict(extra="ignore")
-    cliente_id: str  # ChiPi Link user ID
+    user_id: str  # ChiPi Link user ID
     invision_user_id: str  # Invision user ID
     invision_username: Optional[str] = None
     invision_email: Optional[str] = None

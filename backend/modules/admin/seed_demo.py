@@ -491,7 +491,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
             ],
             "category_id": post["category_id"],
             "status": "sent",
-            "author_id": admin.get("cliente_id", "admin"),
+            "author_id": admin.get("user_id", "admin"),
             "views": random.randint(10, 100),
             "likes": random.randint(5, 30),
             "created_at": (now - timedelta(days=random.randint(1, 14))).isoformat(),

@@ -99,7 +99,7 @@ async def like_post(
     user=Depends(get_current_user)
 ):
     """Dar like a un post"""
-    post = await post_service.like_post(post_id, user["cliente_id"])
+    post = await post_service.like_post(post_id, user["user_id"])
     
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -146,7 +146,7 @@ async def create_post(
         title=data.title,
         summary=data.summary,
         content_blocks=blocks,
-        author_id=admin["cliente_id"],
+        author_id=admin["user_id"],
         category_id=data.category_id,
         cover_image=data.cover_image,
         tags=data.tags,
@@ -226,7 +226,7 @@ async def get_media_library(
     """Obtener biblioteca de media (admin)"""
     media = await post_service.get_media_library(
         file_type=file_type,
-        uploaded_by=admin["cliente_id"],
+        uploaded_by=admin["user_id"],
         limit=limit,
         offset=offset
     )
@@ -253,7 +253,7 @@ async def register_media(
         file_type=file_type,
         file_name=file_name,
         file_size=file_size,
-        uploaded_by=admin["cliente_id"],
+        uploaded_by=admin["user_id"],
         post_id=post_id
     )
     
@@ -292,7 +292,7 @@ async def import_from_monday(
     result = await post_service.import_from_monday(
         board_id=board_id,
         item_id=item_id,
-        author_id=admin["cliente_id"]
+        author_id=admin["user_id"]
     )
     return result
 
@@ -305,7 +305,7 @@ async def import_from_fusebase(
     """[PLACEHOLDER] Importar desde Fusebase (admin)"""
     result = await post_service.import_from_fusebase(
         document_id=document_id,
-        author_id=admin["cliente_id"]
+        author_id=admin["user_id"]
     )
     return result
 

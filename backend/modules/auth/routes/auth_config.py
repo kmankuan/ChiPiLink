@@ -95,7 +95,7 @@ async def update_auth_config(
                 "config_type": AUTH_CONFIG_KEY,
                 "value": config_data,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-                "updated_by": admin.get("cliente_id")
+                "updated_by": admin.get("user_id")
             }
         },
         upsert=True
@@ -190,7 +190,7 @@ async def toggle_auth_method(
                 "config_type": AUTH_CONFIG_KEY,
                 "value": current_value,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-                "updated_by": admin.get("cliente_id")
+                "updated_by": admin.get("user_id")
             }
         },
         upsert=True

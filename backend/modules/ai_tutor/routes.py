@@ -90,7 +90,7 @@ async def create_tutor_session(session_data: dict, user: dict = Depends(get_curr
     """Create a new tutoring session - PLACEHOLDER"""
     session = {
         "session_id": f"tutor_{uuid.uuid4().hex[:12]}",
-        "estudiante_id": user.get("cliente_id"),
+        "estudiante_id": user.get("user_id"),
         "estudiante_nombre": user.get("nombre"),
         "tema": session_data.get("tema", "vocabulario_ingles"),
         "subtema": session_data.get("subtema"),
@@ -118,7 +118,7 @@ async def create_tutor_session(session_data: dict, user: dict = Depends(get_curr
 async def get_my_sessions(user: dict = Depends(get_current_user)):
     """Get user's tutoring sessions"""
     sessions = await db.tutor_sessions.find(
-        {"estudiante_id": user.get("cliente_id")},
+        {"estudiante_id": user.get("user_id")},
         {"_id": 0}
     ).sort("fecha_inicio", -1).to_list(50)
     
@@ -196,13 +196,13 @@ async def evaluate_pronunciation(data: dict, user: dict = Depends(get_current_us
 async def get_my_progress(user: dict = Depends(get_current_user)):
     """Get current user's learning progress"""
     progress = await db.student_progress.find_one(
-        {"estudiante_id": user.get("cliente_id")},
+        {"estudiante_id": user.get("user_id")},
         {"_id": 0}
     )
     
     if not progress:
         progress = {
-            "estudiante_id": user.get("cliente_id"),
+            "estudiante_id": user.get("user_id"),
             "total_sesiones": 0,
             "total_minutos": 0,
             "palabras_aprendidas": 0,

@@ -93,11 +93,11 @@ async def upload_image(
             "url": file_url,
             "size": len(content),
             "content_type": file.content_type,
-            "uploaded_by": user.get("cliente_id"),
+            "uploaded_by": user.get("user_id"),
             "created_at": datetime.now(timezone.utc).isoformat()
         })
         
-        logger.info(f"File uploaded: {file_url} by user {user.get('cliente_id')}")
+        logger.info(f"File uploaded: {file_url} by user {user.get('user_id')}")
         
         return {
             "success": True,
@@ -187,7 +187,7 @@ async def upload_image_base64(
             "url": file_url,
             "size": len(content),
             "content_type": f"image/{ext[1:]}",
-            "uploaded_by": user.get("cliente_id"),
+            "uploaded_by": user.get("user_id"),
             "created_at": datetime.now(timezone.utc).isoformat()
         })
         

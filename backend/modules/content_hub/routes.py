@@ -162,7 +162,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
         "idioma": item.get("idioma"),
         "publicado": item.get("publicado", True),
         "destacado": item.get("destacado", False),
-        "curado_por": admin.get("cliente_id"),
+        "curado_por": admin.get("user_id"),
         "vistas": 0,
         "likes": 0,
         "fecha_creacion": datetime.now(timezone.utc)

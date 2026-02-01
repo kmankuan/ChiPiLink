@@ -71,7 +71,7 @@ async def create_role(
     # Log the action
     await audit_service.log_action(
         action=AuditActionType.ROLE_CREATED,
-        actor_id=admin["cliente_id"],
+        actor_id=admin["user_id"],
         target_type="role",
         target_id=role["role_id"],
         target_nombre=role["nombre"],
@@ -94,7 +94,7 @@ async def update_role(
     """Update a role"""
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "roles.edit"
         )
         if not has_permission:
@@ -123,7 +123,7 @@ async def update_role(
     
     await audit_service.log_action(
         action=AuditActionType.ROLE_UPDATED if not updates.permisos else AuditActionType.PERMISSIONS_UPDATED,
-        actor_id=admin["cliente_id"],
+        actor_id=admin["user_id"],
         target_type="role",
         target_id=role_id,
         target_nombre=role.get("nombre"),
@@ -141,7 +141,7 @@ async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_
     """Delete a custom role"""
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "roles.delete"
         )
         if not has_permission:
@@ -160,7 +160,7 @@ async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_
     # Log the action
     await audit_service.log_action(
         action=AuditActionType.ROLE_DELETED,
-        actor_id=admin["cliente_id"],
+        actor_id=admin["user_id"],
         target_type="role",
         target_id=role_id,
         target_nombre=role.get("nombre") if role else role_id,
@@ -184,7 +184,7 @@ async def get_role_users(role_id: str, admin: dict = Depends(get_admin_user)):
 
 @router.post("/assign")
 async def assign_role_to_user(
-    cliente_id: str,
+    user_id: str,
     role_id: str,
     request: Request,
     admin: dict = Depends(get_admin_user)
@@ -193,7 +193,7 @@ async def assign_role_to_user(
     # Allow if user is legacy admin (es_admin=true) or has permission
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "users.assign_roles"
         )
         if not has_permission:
@@ -201,7 +201,7 @@ async def assign_role_to_user(
     
     # Prevent assigning super_admin unless current user is super_admin or legacy admin
     if role_id == "super_admin" and not admin.get("es_admin"):
-        current_role = await roles_service.get_user_role(admin["cliente_id"])
+        current_role = await roles_service.get_user_role(admin["user_id"])
         if current_role.get("role_id") != "super_admin":
             raise HTTPException(
                 status_code=403, 
@@ -212,12 +212,12 @@ async def assign_role_to_user(
     old_role = await roles_service.get_user_role(cliente_id)
     
     # Get target user info
-    target_user = await db.clientes.find_one({"cliente_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
+    target_user = await db.clientes.find_one({"user_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
     
     success = await roles_service.assign_role_to_user(
         cliente_id, 
         role_id, 
-        admin["cliente_id"]
+        admin["user_id"]
     )
     if not success:
         raise HTTPException(status_code=400, detail="No se pudo asignar el rol")
@@ -228,7 +228,7 @@ async def assign_role_to_user(
     # Log the action
     await audit_service.log_action(
         action=AuditActionType.ROLE_ASSIGNED,
-        actor_id=admin["cliente_id"],
+        actor_id=admin["user_id"],
         target_type="user",
         target_id=cliente_id,
         target_nombre=target_user.get("nombre") if target_user else cliente_id,
@@ -249,7 +249,7 @@ async def assign_role_to_user(
 
 @router.get("/user/{cliente_id}")
 async def get_user_role_and_permissions(
-    cliente_id: str,
+    user_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Get a user's role and permissions"""
@@ -258,8 +258,8 @@ async def get_user_role_and_permissions(
     
     # Get user info
     user = await db.clientes.find_one(
-        {"cliente_id": cliente_id},
-        {"_id": 0, "cliente_id": 1, "nombre": 1, "email": 1}
+        {"user_id": cliente_id},
+        {"_id": 0, "user_id": 1, "nombre": 1, "email": 1}
     )
     
     return {
@@ -273,13 +273,13 @@ async def get_user_role_and_permissions(
 
 @router.post("/user/{cliente_id}/permissions/add")
 async def add_user_permission(
-    cliente_id: str,
+    user_id: str,
     permission: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Add an individual permission to a user"""
     has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
+        admin["user_id"], 
         "roles.assign_permissions"
     )
     if not has_permission:
@@ -291,13 +291,13 @@ async def add_user_permission(
 
 @router.post("/user/{cliente_id}/permissions/remove")
 async def remove_user_permission(
-    cliente_id: str,
+    user_id: str,
     permission: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Remove a permission from a user"""
     has_permission = await roles_service.check_permission(
-        admin["cliente_id"], 
+        admin["user_id"], 
         "roles.assign_permissions"
     )
     if not has_permission:
@@ -316,7 +316,7 @@ async def check_current_user_permission(
 ):
     """Check if current user has a specific permission"""
     has_perm = await roles_service.check_permission(
-        current_user["cliente_id"], 
+        current_user["user_id"], 
         permission
     )
     return {"has_permission": has_perm, "permission": permission}
@@ -332,7 +332,7 @@ async def check_multiple_permissions(
     results = {}
     for perm in permissions:
         results[perm] = await roles_service.check_permission(
-            current_user["cliente_id"], 
+            current_user["user_id"], 
             perm
         )
     
@@ -364,7 +364,7 @@ async def get_audit_logs(
     # Check permission
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "roles.view"
         )
         if not has_permission:
@@ -395,7 +395,7 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
     """Get audit log statistics"""
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "roles.view"
         )
         if not has_permission:
@@ -423,19 +423,19 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
 
 @router.get("/audit/user/{cliente_id}")
 async def get_user_audit_logs(
-    cliente_id: str,
+    user_id: str,
     limit: int = Query(20, ge=1, le=100),
     admin: dict = Depends(get_admin_user)
 ):
     """Get audit logs related to a specific user"""
     if not admin.get("es_admin"):
         has_permission = await roles_service.check_permission(
-            admin["cliente_id"], 
+            admin["user_id"], 
             "users.view"
         )
         if not has_permission:
             raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de usuario")
     
     logs = await audit_service.get_user_activity(cliente_id, limit)
-    return {"logs": logs, "cliente_id": cliente_id}
+    return {"logs": logs, "user_id": cliente_id}
 

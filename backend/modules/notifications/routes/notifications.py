@@ -81,7 +81,7 @@ async def register_device(
 ):
     """Registrar dispositivo para recibir push notifications"""
     device = await push_notification_service.register_device(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         device_token=data.device_token,
         provider=data.provider,
         device_info=data.device_info
@@ -93,7 +93,7 @@ async def register_device(
 @router.get("/devices")
 async def get_my_devices(user=Depends(get_current_user)):
     """Obtener mis dispositivos registrados"""
-    devices = await push_notification_service.get_user_devices(user["cliente_id"])
+    devices = await push_notification_service.get_user_devices(user["user_id"])
     return {"success": True, "devices": devices, "count": len(devices)}
 
 
@@ -110,7 +110,7 @@ async def remove_device(
 @router.get("/preferences")
 async def get_my_preferences(user=Depends(get_current_user)):
     """Obtener mis preferencias de notificación"""
-    prefs = await push_notification_service.get_user_preferences(user["cliente_id"])
+    prefs = await push_notification_service.get_user_preferences(user["user_id"])
     return {"success": True, "preferences": prefs}
 
 
@@ -126,7 +126,7 @@ async def update_my_preferences(
         raise HTTPException(status_code=400, detail="No updates provided")
     
     prefs = await push_notification_service.update_user_preferences(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         updates=updates
     )
     
@@ -141,7 +141,7 @@ async def update_category_preference(
 ):
     """Actualizar preferencia de una categoría específica"""
     prefs = await push_notification_service.update_category_preference(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         category_id=category_id,
         enabled=data.enabled,
         push=data.push,
@@ -159,7 +159,7 @@ async def get_my_notification_history(
 ):
     """Obtener historial de notificaciones recibidas"""
     logs = await push_notification_service.get_notification_logs(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         limit=limit,
         offset=offset
     )

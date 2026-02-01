@@ -27,7 +27,7 @@ async def setup_admin(admin_data: dict):
         raise HTTPException(status_code=400, detail="Ya existe un administrador")
     
     admin_doc = {
-        "cliente_id": f"admin_{uuid.uuid4().hex[:8]}",
+        "user_id": f"admin_{uuid.uuid4().hex[:8]}",
         "email": admin_data.get("email"),
         "nombre": admin_data.get("nombre", "Administrador"),
         "contrasena_hash": hash_password(admin_data.get("contrasena")),
@@ -323,7 +323,7 @@ async def update_landing_page_config(data: dict, admin: dict = Depends(get_admin
                 "config_type": "landing_page_blocks",
                 "blocks": blocks,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-                "updated_by": admin.get("cliente_id")
+                "updated_by": admin.get("user_id")
             }
         },
         upsert=True

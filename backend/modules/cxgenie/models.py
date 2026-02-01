@@ -34,7 +34,7 @@ class ChatConversation(BaseModel):
     conversation_id: str = Field(default_factory=lambda: f"conv_{uuid.uuid4().hex[:12]}")
     cxgenie_conversation_id: Optional[str] = None  # ID en CXGenie
     # Participantes
-    cliente_id: Optional[str] = None
+    user_id: Optional[str] = None
     cliente_nombre: Optional[str] = None
     cliente_email: Optional[str] = None
     agente_id: Optional[str] = None
