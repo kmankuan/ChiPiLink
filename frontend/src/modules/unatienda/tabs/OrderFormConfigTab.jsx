@@ -451,8 +451,8 @@ export default function OrderFormConfigTab() {
               </Select>
             </div>
 
-            {/* Labels */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Labels - 3 languages */}
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Nombre (EN) *</Label>
                 <Input
@@ -469,11 +469,19 @@ export default function OrderFormConfigTab() {
                   placeholder="Nombre del campo"
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Nombre (ZH)</Label>
+                <Input
+                  value={fieldForm.label_zh}
+                  onChange={(e) => setFieldForm(prev => ({ ...prev, label_zh: e.target.value }))}
+                  placeholder="字段名称"
+                />
+              </div>
             </div>
 
             {/* Placeholder (for input fields) */}
             {['text', 'textarea', 'number', 'email', 'phone', 'date'].includes(fieldForm.field_type) && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Placeholder (EN)</Label>
                   <Input
@@ -490,17 +498,25 @@ export default function OrderFormConfigTab() {
                     placeholder="Ingrese valor..."
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>Placeholder (ZH)</Label>
+                  <Input
+                    value={fieldForm.placeholder_zh}
+                    onChange={(e) => setFieldForm(prev => ({ ...prev, placeholder_zh: e.target.value }))}
+                    placeholder="输入值..."
+                  />
+                </div>
               </div>
             )}
 
-            {/* Help Text */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Help Text - 3 languages */}
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Texto de Ayuda (EN)</Label>
                 <Input
                   value={fieldForm.help_text}
                   onChange={(e) => setFieldForm(prev => ({ ...prev, help_text: e.target.value }))}
-                  placeholder="Help text for the user"
+                  placeholder="Help text"
                 />
               </div>
               <div className="space-y-2">
@@ -508,12 +524,20 @@ export default function OrderFormConfigTab() {
                 <Input
                   value={fieldForm.help_text_es}
                   onChange={(e) => setFieldForm(prev => ({ ...prev, help_text_es: e.target.value }))}
-                  placeholder="Texto de ayuda para el usuario"
+                  placeholder="Texto de ayuda"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Texto de Ayuda (ZH)</Label>
+                <Input
+                  value={fieldForm.help_text_zh}
+                  onChange={(e) => setFieldForm(prev => ({ ...prev, help_text_zh: e.target.value }))}
+                  placeholder="帮助文本"
                 />
               </div>
             </div>
 
-            {/* Content (for info fields) */}
+            {/* Content (for info fields) - 3 languages */}
             {fieldForm.field_type === 'info' && (
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -522,7 +546,7 @@ export default function OrderFormConfigTab() {
                     value={fieldForm.content}
                     onChange={(e) => setFieldForm(prev => ({ ...prev, content: e.target.value }))}
                     placeholder="**Bold text**, *italic*, - list items..."
-                    rows={5}
+                    rows={4}
                   />
                 </div>
                 <div className="space-y-2">
@@ -531,7 +555,16 @@ export default function OrderFormConfigTab() {
                     value={fieldForm.content_es}
                     onChange={(e) => setFieldForm(prev => ({ ...prev, content_es: e.target.value }))}
                     placeholder="**Texto en negrita**, *cursiva*, - elementos de lista..."
-                    rows={5}
+                    rows={4}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Contenido (ZH) - Markdown</Label>
+                  <Textarea
+                    value={fieldForm.content_zh}
+                    onChange={(e) => setFieldForm(prev => ({ ...prev, content_zh: e.target.value }))}
+                    placeholder="**粗体文本**, *斜体*, - 列表项..."
+                    rows={4}
                   />
                 </div>
               </div>
