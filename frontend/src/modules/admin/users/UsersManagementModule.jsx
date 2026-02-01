@@ -36,16 +36,6 @@ export default function UsersManagementModule() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Usuarios</h1>
-          <p className="text-muted-foreground">
-            Gestiona usuarios, sus solicitudes de acceso exclusivo y vinculaciones
-          </p>
-        </div>
-      </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap">
           <TabsTrigger value="student-requests" className="gap-2">
