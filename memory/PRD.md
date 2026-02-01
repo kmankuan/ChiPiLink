@@ -254,9 +254,12 @@ These rules are **PERMANENT** and must be followed in all future development ses
     - Deleted `students.py`, `vinculacion.py`, `orders.py` (routes)
     - Deleted `vinculacion_service.py`, `vinculacion_notification_service.py` (services)
     - Deleted `acudientes_schemas.py`, `server_backup.py`, `VinculacionesTab.jsx`
+    - Deleted `field_mapping.py`, `migrate_fields_to_english.py`
+  - **Complete Cleanup**: Changed `acudiente_cliente_id` → `user_id` in pedidos system
   - **Fixed Error**: Resolved "Error al cargar matrículas" toast in admin panel
   - **Unified System**: All student management now uses `textbook_access` system exclusively
   - **Admin Panel Cleanup**: Removed legacy "Matrículas (Legacy)" tab from Users module
+  - **🎯 Result: 0 Spanish naming references in code** (100% English nomenclature)
 
 ### 🔄 In Progress
 - **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
