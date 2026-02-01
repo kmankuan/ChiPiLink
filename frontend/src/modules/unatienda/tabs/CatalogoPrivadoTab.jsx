@@ -10,8 +10,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import {
-  BookOpen, Plus, Search, Loader2, RefreshCw, Settings, Trash2, CheckCircle2, AlertCircle, Upload
+  BookOpen, Plus, Search, Loader2, RefreshCw, Settings, Trash2, CheckCircle2, AlertCircle, Upload, Download
 } from 'lucide-react';
+import InventoryImport from '../components/InventoryImport';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
