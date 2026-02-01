@@ -10,6 +10,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
+  const [laopanConfig, setLaopanConfig] = useState(null);
 
   // Create API instance with dynamic token using interceptors
   const api = useMemo(() => {
@@ -28,6 +29,17 @@ export function AuthProvider({ children }) {
 
     return instance;
   }, []);
+
+  // Fetch LaoPan OAuth configuration
+  const fetchLaopanConfig = useCallback(async () => {
+    try {
+      const response = await api.get(AUTH_ENDPOINTS.laopanConfig);
+      setLaopanConfig(response.data);
+    } catch (error) {
+      console.error('LaoPan config fetch error:', error);
+      setLaopanConfig({ enabled: false });
+    }
+  }, [api]);
 
   const checkAuth = useCallback(async () => {
     const currentToken = localStorage.getItem('auth_token');
@@ -57,7 +69,8 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+    fetchLaopanConfig();
+  }, [checkAuth, fetchLaopanConfig]);
 
   const login = async (email, password) => {
     const response = await api.post(AUTH_ENDPOINTS.login, { email, password });
@@ -81,6 +94,43 @@ export function AuthProvider({ children }) {
     // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     const redirectUrl = window.location.origin + '/auth/callback';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  };
+
+  // LaoPan OAuth login
+  const loginWithLaoPan = async (redirectAfter = null) => {
+    try {
+      const params = redirectAfter ? `?redirect=${encodeURIComponent(redirectAfter)}` : '';
+      const response = await api.get(`${AUTH_ENDPOINTS.laopanLogin}${params}`);
+      const { auth_url } = response.data;
+      
+      if (auth_url) {
+        // Redirect to LaoPan OAuth
+        window.location.href = auth_url;
+      }
+    } catch (error) {
+      console.error('LaoPan login error:', error);
+      throw error;
+    }
+  };
+
+  // Process LaoPan OAuth callback
+  const processLaoPanCallback = async (code, state) => {
+    try {
+      const response = await api.get(AUTH_ENDPOINTS.laopanCallback, {
+        params: { code, state }
+      });
+      
+      const { token: newToken, user: userData, redirect_after } = response.data;
+      
+      localStorage.setItem('auth_token', newToken);
+      setToken(newToken);
+      setUser(userData);
+      
+      return { user: userData, redirectAfter: redirect_after };
+    } catch (error) {
+      console.error('LaoPan callback error:', error);
+      throw error;
+    }
   };
 
   const processGoogleCallback = async (sessionId) => {
@@ -132,10 +182,13 @@ export function AuthProvider({ children }) {
     login,
     register,
     loginWithGoogle,
+    loginWithLaoPan,
+    processLaoPanCallback,
     processGoogleCallback,
     logout,
     updateUser,
     checkAuth,
+    laopanConfig,
     api
   };
 
