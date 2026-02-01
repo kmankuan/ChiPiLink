@@ -209,13 +209,13 @@ async def assign_role_to_user(
             )
     
     # Get previous role for logging
-    old_role = await roles_service.get_user_role(cliente_id)
+    old_role = await roles_service.get_user_role(target_user_id)
     
     # Get target user info
     target_user = await db.users.find_one({"user_id": cliente_id}, {"_id": 0, "nombre": 1, "email": 1})
     
     success = await roles_service.assign_role_to_user(
-        cliente_id, 
+        target_user_id, 
         role_id, 
         admin["user_id"]
     )
@@ -230,8 +230,8 @@ async def assign_role_to_user(
         action=AuditActionType.ROLE_ASSIGNED,
         actor_id=admin["user_id"],
         target_type="user",
-        target_id=cliente_id,
-        target_nombre=target_user.get("nombre") if target_user else cliente_id,
+        target_id=target_user_id,
+        target_nombre=target_user.get("nombre") if target_user else target_user_id,
         details={
             "rol_anterior": old_role.get("nombre") if old_role else None,
             "rol_anterior_id": old_role.get("role_id") if old_role else None,
@@ -247,14 +247,14 @@ async def assign_role_to_user(
     return {"success": True, "message": "Rol asignado correctamente"}
 
 
-@router.get("/user/{cliente_id}")
+@router.get("/user/{user_id}")
 async def get_user_role_and_permissions(
     user_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Get a user's role and permissions"""
-    role = await roles_service.get_user_role(cliente_id)
-    permissions = await roles_service.get_user_permissions(cliente_id)
+    role = await roles_service.get_user_role(target_user_id)
+    permissions = await roles_service.get_user_permissions(target_user_id)
     
     # Get user info
     user = await db.users.find_one(
@@ -271,7 +271,7 @@ async def get_user_role_and_permissions(
 
 # ============== INDIVIDUAL PERMISSION OVERRIDES ==============
 
-@router.post("/user/{cliente_id}/permissions/add")
+@router.post("/user/{user_id}/permissions/add")
 async def add_user_permission(
     user_id: str,
     permission: str,
@@ -285,11 +285,11 @@ async def add_user_permission(
     if not has_permission:
         raise HTTPException(status_code=403, detail="No tienes permiso para modificar permisos")
     
-    await roles_service.add_user_permission(cliente_id, permission)
+    await roles_service.add_user_permission(target_user_id, permission)
     return {"success": True, "message": "Permiso agregado"}
 
 
-@router.post("/user/{cliente_id}/permissions/remove")
+@router.post("/user/{user_id}/permissions/remove")
 async def remove_user_permission(
     user_id: str,
     permission: str,
@@ -303,7 +303,7 @@ async def remove_user_permission(
     if not has_permission:
         raise HTTPException(status_code=403, detail="No tienes permiso para modificar permisos")
     
-    await roles_service.remove_user_permission(cliente_id, permission)
+    await roles_service.remove_user_permission(target_user_id, permission)
     return {"success": True, "message": "Permiso removido"}
 
 
@@ -421,7 +421,7 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
     }
 
 
-@router.get("/audit/user/{cliente_id}")
+@router.get("/audit/user/{user_id}")
 async def get_user_audit_logs(
     user_id: str,
     limit: int = Query(20, ge=1, le=100),
@@ -436,6 +436,6 @@ async def get_user_audit_logs(
         if not has_permission:
             raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de usuario")
     
-    logs = await audit_service.get_user_activity(cliente_id, limit)
+    logs = await audit_service.get_user_activity(target_user_id, limit)
     return {"logs": logs, "user_id": cliente_id}
 
