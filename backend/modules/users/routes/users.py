@@ -189,7 +189,7 @@ async def initialize_profile_fields(admin=Depends(get_admin_user)):
 @router.get("/profile/me")
 async def get_my_profile(user=Depends(get_current_user)):
     """Obtener mi perfil"""
-    profile = await user_profile_service.get_profile(user["cliente_id"])
+    profile = await user_profile_service.get_profile(user["user_id"])
     
     if not profile:
         return {
@@ -209,12 +209,12 @@ async def create_profile(
     """Crear mi perfil"""
     try:
         # Verificar si ya existe
-        existing = await user_profile_service.get_profile(user["cliente_id"])
+        existing = await user_profile_service.get_profile(user["user_id"])
         if existing:
             raise HTTPException(status_code=400, detail="Profile already exists")
         
         profile = await user_profile_service.create_profile(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             user_type_id=data.user_type_id,
             display_name=data.display_name or user.get("nombre"),
             custom_fields=data.custom_fields
@@ -231,7 +231,7 @@ async def create_profile(
                 updates["language"] = data.language
             
             profile = await user_profile_service.update_profile(
-                user["cliente_id"],
+                user["user_id"],
                 updates
             )
         
@@ -253,7 +253,7 @@ async def update_my_profile(
     if not updates:
         raise HTTPException(status_code=400, detail="No updates provided")
     
-    profile = await user_profile_service.update_profile(user["cliente_id"], updates)
+    profile = await user_profile_service.update_profile(user["user_id"], updates)
     
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
@@ -302,21 +302,21 @@ async def search_profiles(
 @router.get("/relationships")
 async def get_my_relationships(user=Depends(get_current_user)):
     """Obtener mis relaciones"""
-    relationships = await user_profile_service.get_user_relationships(user["cliente_id"])
+    relationships = await user_profile_service.get_user_relationships(user["user_id"])
     return {"success": True, "relationships": relationships, "count": len(relationships)}
 
 
 @router.get("/relationships/dependents")
 async def get_my_dependents(user=Depends(get_current_user)):
     """Obtener mis dependientes (hijos, etc.)"""
-    dependents = await user_profile_service.get_dependents(user["cliente_id"])
+    dependents = await user_profile_service.get_dependents(user["user_id"])
     return {"success": True, "dependents": dependents, "count": len(dependents)}
 
 
 @router.get("/relationships/guardian")
 async def get_my_guardian(user=Depends(get_current_user)):
     """Obtener mi acudiente"""
-    guardian = await user_profile_service.get_guardian(user["cliente_id"])
+    guardian = await user_profile_service.get_guardian(user["user_id"])
     return {"success": True, "guardian": guardian}
 
 
@@ -340,7 +340,7 @@ async def create_relationship(
     }
     
     relationship = await user_profile_service.create_relationship(
-        user_id_1=user["cliente_id"],
+        user_id_1=user["user_id"],
         user_id_2=data.user_id_2,
         relationship_type=rel_type,
         role_1=data.role_1,

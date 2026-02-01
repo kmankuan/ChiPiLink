@@ -66,11 +66,11 @@ class UpdateConfigRequest(BaseModel):
 @router.get("/me")
 async def get_my_wallet(user=Depends(get_current_user)):
     """Obtener mi billetera"""
-    wallet = await wallet_service.get_wallet(user["cliente_id"])
+    wallet = await wallet_service.get_wallet(user["user_id"])
     
     if not wallet:
         # Crear billetera automáticamente
-        wallet = await wallet_service.create_wallet(user["cliente_id"])
+        wallet = await wallet_service.create_wallet(user["user_id"])
     
     return {
         "success": True,
@@ -81,12 +81,12 @@ async def get_my_wallet(user=Depends(get_current_user)):
 @router.get("/summary")
 async def get_wallet_summary(user=Depends(get_current_user)):
     """Obtener resumen de mi billetera con estadísticas"""
-    wallet = await wallet_service.get_or_create_wallet(user["cliente_id"])
+    wallet = await wallet_service.get_or_create_wallet(user["user_id"])
     config = await wallet_service.get_config()
     
     # Obtener últimas transacciones
     transactions = await wallet_service.get_transactions(
-        user["cliente_id"],
+        user["user_id"],
         limit=10
     )
     
@@ -144,7 +144,7 @@ async def get_my_transactions(
 ):
     """Obtener mis transacciones"""
     transactions = await wallet_service.get_transactions(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         limit=limit,
         offset=offset,
         transaction_type=transaction_type,
@@ -167,7 +167,7 @@ async def get_transaction(
     from core.database import db
     
     transaction = await db.chipi_transactions.find_one(
-        {"transaction_id": transaction_id, "user_id": user["cliente_id"]},
+        {"transaction_id": transaction_id, "user_id": user["user_id"]},
         {"_id": 0}
     )
     
@@ -196,7 +196,7 @@ async def deposit(
     
     try:
         transaction = await wallet_service.deposit(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             amount=data.amount,
             currency=currency,
             payment_method=payment_method,
@@ -252,7 +252,7 @@ async def charge(
     
     try:
         transaction = await wallet_service.charge(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             amount=data.amount,
             currency=currency,
             description=data.description,
@@ -278,7 +278,7 @@ async def transfer(
     except ValueError:
         raise HTTPException(status_code=400, detail=f"Invalid currency: {data.currency}")
     
-    if data.to_user_id == user["cliente_id"]:
+    if data.to_user_id == user["user_id"]:
         raise HTTPException(status_code=400, detail="Cannot transfer to yourself")
     
     if data.amount <= 0:
@@ -286,7 +286,7 @@ async def transfer(
     
     try:
         out_txn, in_txn = await wallet_service.transfer(
-            from_user_id=user["cliente_id"],
+            from_user_id=user["user_id"],
             to_user_id=data.to_user_id,
             amount=data.amount,
             currency=currency,
@@ -344,7 +344,7 @@ async def convert_points(
     
     try:
         result = await wallet_service.convert_points_to_usd(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             points=data.points
         )
         
@@ -363,7 +363,7 @@ async def get_points_history(
     from core.database import db
     
     cursor = db.chipi_points_history.find(
-        {"user_id": user["cliente_id"]},
+        {"user_id": user["user_id"]},
         {"_id": 0}
     ).sort("created_at", -1).skip(offset).limit(limit)
     
@@ -418,7 +418,7 @@ async def initialize_config(admin=Depends(get_admin_user)):
 @router.get("/pending")
 async def get_pending_balances(user=Depends(get_current_user)):
     """Obtener saldos pendientes de mis dependientes"""
-    balances = await wallet_service.get_pending_balances(user["cliente_id"])
+    balances = await wallet_service.get_pending_balances(user["user_id"])
     
     total = sum(b.get("amount", 0) for b in balances)
     

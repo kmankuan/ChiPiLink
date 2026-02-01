@@ -98,7 +98,7 @@ class CapacidadCreateRequest(BaseModel):
 @router.get("/mis-conexiones")
 async def get_mis_conexiones(user: dict = Depends(get_current_user)):
     """Obtener mis conexiones"""
-    conexiones = await conexiones_service.get_conexiones(user["cliente_id"])
+    conexiones = await conexiones_service.get_conexiones(user["user_id"])
     return {"conexiones": conexiones}
 
 
@@ -109,7 +109,7 @@ async def crear_solicitud_conexion(
 ):
     """Crear solicitud de conexión a otro usuario"""
     result = await conexiones_service.crear_solicitud(
-        de_usuario_id=user["cliente_id"],
+        de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
         tipo=request.tipo,
         subtipo=request.subtipo,
@@ -126,14 +126,14 @@ async def crear_solicitud_conexion(
 @router.get("/solicitudes/recibidas")
 async def get_solicitudes_recibidas(user: dict = Depends(get_current_user)):
     """Obtener solicitudes de conexión recibidas"""
-    solicitudes = await conexiones_service.get_solicitudes_pendientes(user["cliente_id"])
+    solicitudes = await conexiones_service.get_solicitudes_pendientes(user["user_id"])
     return {"solicitudes": solicitudes}
 
 
 @router.get("/solicitudes/enviadas")
 async def get_solicitudes_enviadas(user: dict = Depends(get_current_user)):
     """Obtener solicitudes de conexión enviadas"""
-    solicitudes = await conexiones_service.get_solicitudes_enviadas(user["cliente_id"])
+    solicitudes = await conexiones_service.get_solicitudes_enviadas(user["user_id"])
     return {"solicitudes": solicitudes}
 
 
@@ -147,7 +147,7 @@ async def responder_solicitud(
     result = await conexiones_service.responder_solicitud(
         solicitud_id=solicitud_id,
         aceptar=request.aceptar,
-        respondido_por=user["cliente_id"]
+        respondido_por=user["user_id"]
     )
     
     if result.get("error"):
@@ -162,7 +162,7 @@ async def eliminar_conexion(
     user: dict = Depends(get_current_user)
 ):
     """Eliminar una conexión"""
-    result = await conexiones_service.eliminar_conexion(user["cliente_id"], conexion_id)
+    result = await conexiones_service.eliminar_conexion(user["user_id"], conexion_id)
     
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
@@ -179,7 +179,7 @@ async def crear_invitacion(
 ):
     """Invitar a usuario no registrado"""
     result = await conexiones_service.crear_invitacion(
-        invitado_por_id=user["cliente_id"],
+        invitado_por_id=user["user_id"],
         email=request.email,
         nombre=request.nombre,
         mensaje=request.mensaje,
@@ -202,7 +202,7 @@ async def crear_invitacion(
 @router.get("/mis-acudidos")
 async def get_mis_acudidos(user: dict = Depends(get_current_user)):
     """Obtener mis usuarios acudidos"""
-    conexiones = await conexiones_service.get_conexiones(user["cliente_id"])
+    conexiones = await conexiones_service.get_conexiones(user["user_id"])
     acudidos = [c for c in conexiones if c.get("subtipo") == "acudido"]
     return {"acudidos": acudidos}
 
@@ -214,7 +214,7 @@ async def crear_acudido(
 ):
     """Crear usuario acudido (cuenta gestionada)"""
     result = await conexiones_service.crear_acudido(
-        acudiente_id=user["cliente_id"],
+        acudiente_id=user["user_id"],
         nombre=request.nombre,
         apellido=request.apellido,
         email=request.email,
@@ -238,7 +238,7 @@ async def transferir_wallet(
 ):
     """Transferir saldo a otro usuario"""
     result = await conexiones_service.transferir_wallet(
-        de_usuario_id=user["cliente_id"],
+        de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
         monto=request.monto,
         mensaje=request.mensaje
@@ -262,7 +262,7 @@ async def get_capacidades_disponibles():
 @router.get("/mis-capacidades")
 async def get_mis_capacidades(user: dict = Depends(get_current_user)):
     """Obtener mis capacidades activas"""
-    capacidades = await conexiones_service.get_capacidades_usuario(user["cliente_id"])
+    capacidades = await conexiones_service.get_capacidades_usuario(user["user_id"])
     return {"capacidades": capacidades}
 
 
@@ -271,7 +271,7 @@ async def get_mis_capacidades(user: dict = Depends(get_current_user)):
 @router.get("/servicios-sugeridos")
 async def get_servicios_sugeridos(user: dict = Depends(get_current_user)):
     """Obtener servicios/membresías sugeridos para el usuario"""
-    servicios = await conexiones_service.get_servicios_sugeridos(user["cliente_id"])
+    servicios = await conexiones_service.get_servicios_sugeridos(user["user_id"])
     return {"servicios": servicios}
 
 
@@ -288,7 +288,7 @@ async def buscar_usuarios(
     
     usuarios = await conexiones_service.buscar_usuarios(
         query=q,
-        excluir_user_id=user["cliente_id"]
+        excluir_user_id=user["user_id"]
     )
     return {"usuarios": usuarios}
 
@@ -305,7 +305,7 @@ async def admin_responder_solicitud(
     result = await conexiones_service.responder_solicitud(
         solicitud_id=solicitud_id,
         aceptar=request.aceptar,
-        respondido_por=admin["cliente_id"],
+        respondido_por=admin["user_id"],
         es_admin=True
     )
     
@@ -331,7 +331,7 @@ async def admin_crear_acudido(
         genero=request.genero,
         notas=request.notas,
         creado_por_admin=True,
-        admin_id=admin["cliente_id"]
+        admin_id=admin["user_id"]
     )
     
     if result.get("error"):
@@ -349,7 +349,7 @@ async def admin_otorgar_capacidad(
     result = await conexiones_service.otorgar_capacidad(
         user_id=request.user_id,
         capacidad_id=request.capacidad_id,
-        otorgado_por=admin["cliente_id"],
+        otorgado_por=admin["user_id"],
         motivo=request.motivo
     )
     
@@ -407,7 +407,7 @@ async def crear_alerta_saldo(
     saldo_actual = wallet.get("USD", 0)
     
     result = await conexiones_service.crear_alerta_saldo_insuficiente(
-        usuario_id=user["cliente_id"],
+        usuario_id=user["user_id"],
         monto_requerido=request.monto_requerido,
         saldo_actual=saldo_actual,
         descripcion=request.descripcion
@@ -423,13 +423,13 @@ async def get_mis_alertas(user: dict = Depends(get_current_user)):
     
     # Alertas donde soy el usuario afectado
     mis_alertas = await db.alertas_wallet.find(
-        {"usuario_id": user["cliente_id"], "estado": {"$ne": "resuelta"}},
+        {"usuario_id": user["user_id"], "estado": {"$ne": "resuelta"}},
         {"_id": 0}
     ).sort("creado_en", -1).to_list(length=50)
     
     # Alertas donde soy acudiente
     alertas_acudidos = await db.alertas_wallet.find(
-        {"acudientes_ids": user["cliente_id"], "estado": {"$ne": "resuelta"}},
+        {"acudientes_ids": user["user_id"], "estado": {"$ne": "resuelta"}},
         {"_id": 0}
     ).sort("creado_en", -1).to_list(length=50)
     
@@ -459,13 +459,13 @@ async def resolver_alerta(
         {
             "alerta_id": alerta_id,
             "$or": [
-                {"usuario_id": user["cliente_id"]},
-                {"acudientes_ids": user["cliente_id"]}
+                {"usuario_id": user["user_id"]},
+                {"acudientes_ids": user["user_id"]}
             ]
         },
         {"$set": {
             "estado": "resuelta",
-            "resuelto_por": user["cliente_id"],
+            "resuelto_por": user["user_id"],
             "resuelto_en": datetime.now(timezone.utc).isoformat()
         }}
     )
@@ -510,7 +510,7 @@ async def admin_update_permisos_relacion(
         {
             "$set": {
                 "permisos": permisos,
-                "actualizado_por": admin["cliente_id"],
+                "actualizado_por": admin["user_id"],
                 "actualizado_en": datetime.now(timezone.utc).isoformat()
             }
         },
@@ -545,7 +545,7 @@ async def admin_crear_capacidad(
         "requiere_aprobacion": request.requiere_aprobacion,
         "activa": request.activa,
         "orden": 99,
-        "creado_por": admin["cliente_id"],
+        "creado_por": admin["user_id"],
         "creado_en": datetime.now(timezone.utc).isoformat()
     }
     
@@ -578,7 +578,7 @@ async def admin_actualizar_capacidad(
         "membresia_requerida": request.membresia_requerida,
         "requiere_aprobacion": request.requiere_aprobacion,
         "activa": request.activa,
-        "actualizado_por": admin["cliente_id"],
+        "actualizado_por": admin["user_id"],
         "actualizado_en": datetime.now(timezone.utc).isoformat()
     }
     
@@ -603,7 +603,7 @@ async def admin_eliminar_capacidad(
         {"capacidad_id": capacidad_id},
         {"$set": {
             "activa": False,
-            "desactivado_por": admin["cliente_id"],
+            "desactivado_por": admin["user_id"],
             "desactivado_en": datetime.now(timezone.utc).isoformat()
         }}
     )

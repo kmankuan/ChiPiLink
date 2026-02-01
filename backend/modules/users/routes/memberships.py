@@ -141,7 +141,7 @@ async def get_my_memberships(
 ):
     """Obtener mis membresías"""
     memberships = await membership_service.get_user_memberships(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         active_only=active_only
     )
     
@@ -155,7 +155,7 @@ async def get_my_memberships(
 @router.get("/me/active")
 async def get_my_active_membership(user=Depends(get_current_user)):
     """Obtener mi membresía activa"""
-    membership = await membership_service.get_active_membership(user["cliente_id"])
+    membership = await membership_service.get_active_membership(user["user_id"])
     
     return {
         "success": True,
@@ -172,7 +172,7 @@ async def purchase_membership(
     """Comprar una membresía"""
     try:
         membership = await membership_service.purchase_membership(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             plan_id=data.plan_id,
             paid_with_points=data.pay_with_points
         )
@@ -194,7 +194,7 @@ async def get_membership(
         raise HTTPException(status_code=404, detail="Membership not found")
     
     # Verificar que pertenece al usuario
-    if membership["user_id"] != user["cliente_id"]:
+    if membership["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not your membership")
     
     # Obtener plan
@@ -216,7 +216,7 @@ async def cancel_membership(
     if not membership:
         raise HTTPException(status_code=404, detail="Membership not found")
     
-    if membership["user_id"] != user["cliente_id"]:
+    if membership["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not your membership")
     
     success = await membership_service.cancel_membership(membership_id, reason)
@@ -255,7 +255,7 @@ async def check_in(
 ):
     """Registrar entrada al club"""
     result = await membership_service.check_in(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         check_in_method=data.check_in_method,
         latitude=data.latitude,
         longitude=data.longitude
@@ -275,7 +275,7 @@ async def check_out(
     """Registrar salida del club"""
     try:
         visit = await membership_service.check_out(
-            user_id=user["cliente_id"],
+            user_id=user["user_id"],
             notes=notes
         )
         
@@ -292,7 +292,7 @@ async def get_my_visits(
 ):
     """Obtener mi historial de visitas"""
     visits = await membership_service.get_user_visits(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         limit=limit,
         offset=offset
     )
@@ -307,7 +307,7 @@ async def get_my_visits(
 @router.get("/visits/stats")
 async def get_my_visit_stats(user=Depends(get_current_user)):
     """Obtener estadísticas de mis visitas"""
-    stats = await membership_service.get_visit_stats(user["cliente_id"])
+    stats = await membership_service.get_visit_stats(user["user_id"])
     return {"success": True, "stats": stats}
 
 
@@ -357,7 +357,7 @@ async def admin_grant_membership(
         membership = await membership_service.purchase_membership(
             user_id=user_id,
             plan_id=plan_id,
-            sponsored_by=sponsored_by or admin["cliente_id"],
+            sponsored_by=sponsored_by or admin["user_id"],
             sponsor_note=sponsor_note
         )
         
@@ -396,7 +396,7 @@ async def admin_check_in(
     result = await membership_service.check_in(
         user_id=user_id,
         check_in_method="manual",
-        registered_by=registered_by or admin["cliente_id"]
+        registered_by=registered_by or admin["user_id"]
     )
     
     if "error" in result:

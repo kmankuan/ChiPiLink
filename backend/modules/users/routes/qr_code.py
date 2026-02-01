@@ -37,7 +37,7 @@ class CreatePaymentSessionRequest(BaseModel):
 async def get_my_qr(user=Depends(get_current_user)):
     """Obtener mi código QR"""
     qr = await qr_code_service.get_or_create_user_qr(
-        user_id=user["cliente_id"]
+        user_id=user["user_id"]
     )
     
     return {
@@ -50,7 +50,7 @@ async def get_my_qr(user=Depends(get_current_user)):
 async def regenerate_my_qr(user=Depends(get_current_user)):
     """Regenerar mi código QR (invalida el anterior)"""
     qr = await qr_code_service.regenerate_user_qr(
-        user_id=user["cliente_id"]
+        user_id=user["user_id"]
     )
     
     return {
@@ -73,7 +73,7 @@ async def get_my_qr_transactions(
 ):
     """Obtener mis transacciones por QR"""
     transactions = await qr_code_service.get_qr_transactions(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         action=action,
         limit=limit,
         offset=offset
@@ -131,7 +131,7 @@ async def process_qr_action(
         action=data.action,
         amount=data.amount,
         description=data.description,
-        processed_by=admin["cliente_id"]
+        processed_by=admin["user_id"]
     )
     
     if not result.get("success"):
@@ -149,7 +149,7 @@ async def qr_checkin(
     result = await qr_code_service.process_qr_action(
         qr_string=data.qr_string,
         action="checkin",
-        processed_by=admin["cliente_id"]
+        processed_by=admin["user_id"]
     )
     
     if not result.get("success"):
@@ -176,7 +176,7 @@ async def qr_payment(
         action=data.action,
         amount=data.amount,
         description=data.description,
-        processed_by=admin["cliente_id"]
+        processed_by=admin["user_id"]
     )
     
     if not result.get("success"):
@@ -201,7 +201,7 @@ async def create_payment_session(
         raise HTTPException(status_code=400, detail="Amount must be positive")
     
     session = await qr_code_service.create_payment_session(
-        user_id=user["cliente_id"],
+        user_id=user["user_id"],
         amount=data.amount,
         currency=data.currency,
         description=data.description,
@@ -222,7 +222,7 @@ async def confirm_payment_session(
     """Confirmar y procesar sesión de pago"""
     result = await qr_code_service.confirm_payment_session(
         session_id=session_id,
-        processed_by=admin["cliente_id"]
+        processed_by=admin["user_id"]
     )
     
     if not result.get("success"):

@@ -54,7 +54,7 @@ class ConexionesService:
     async def get_conexiones(self, user_id: str) -> List[Dict]:
         """Obtener todas las conexiones de un usuario"""
         user = await db.auth_users.find_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"conexiones": 1}
         )
         
@@ -66,7 +66,7 @@ class ConexionesService:
         # Enriquecer con datos del usuario conectado
         for con in conexiones:
             connected_user = await db.auth_users.find_one(
-                {"cliente_id": con["user_id"]},
+                {"user_id": con["user_id"]},
                 {"_id": 0, "nombre": 1, "apellido": 1, "email": 1, "estado_cuenta": 1, "avatar": 1}
             )
             if connected_user:
@@ -100,13 +100,13 @@ class ConexionesService:
         Si requiere_solicitud=True, crea solicitud en lugar de conexión directa.
         """
         # Verificar que destino existe
-        destino = await db.auth_users.find_one({"cliente_id": destino_user_id})
+        destino = await db.auth_users.find_one({"user_id": destino_user_id})
         if not destino:
             return {"error": "Usuario destino no encontrado"}
         
         # Verificar que no existe conexión
         existing = await db.auth_users.find_one({
-            "cliente_id": user_id,
+            "user_id": user_id,
             "conexiones.user_id": destino_user_id
         })
         if existing:
@@ -146,7 +146,7 @@ class ConexionesService:
         
         # Agregar conexión al usuario
         await db.auth_users.update_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"$push": {"conexiones": conexion}}
         )
         
@@ -163,7 +163,7 @@ class ConexionesService:
         }
         
         await db.auth_users.update_one(
-            {"cliente_id": destino_user_id},
+            {"user_id": destino_user_id},
             {"$push": {"conexiones": conexion_reciproca}}
         )
         
@@ -211,7 +211,7 @@ class ConexionesService:
     ) -> Dict:
         """Actualizar una conexión existente"""
         result = await db.auth_users.update_one(
-            {"cliente_id": user_id, "conexiones.conexion_id": conexion_id},
+            {"user_id": user_id, "conexiones.conexion_id": conexion_id},
             {"$set": {f"conexiones.$.{k}": v for k, v in updates.items()}}
         )
         
@@ -231,12 +231,12 @@ class ConexionesService:
         
         # Eliminar de ambos usuarios
         await db.auth_users.update_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"$pull": {"conexiones": {"conexion_id": conexion_id}}}
         )
         
         await db.auth_users.update_one(
-            {"cliente_id": destino_user_id},
+            {"user_id": destino_user_id},
             {"$pull": {"conexiones": {"user_id": user_id}}}
         )
         
@@ -256,7 +256,7 @@ class ConexionesService:
         """Crear solicitud de conexión"""
         # Verificar que no existe conexión ni solicitud pendiente
         existing_conexion = await db.auth_users.find_one({
-            "cliente_id": de_usuario_id,
+            "user_id": de_usuario_id,
             "conexiones.user_id": para_usuario_id
         })
         if existing_conexion:
@@ -271,8 +271,8 @@ class ConexionesService:
             return {"error": "Ya existe una solicitud pendiente"}
         
         # Obtener nombres
-        de_usuario = await db.auth_users.find_one({"cliente_id": de_usuario_id}, {"nombre": 1, "apellido": 1})
-        para_usuario = await db.auth_users.find_one({"cliente_id": para_usuario_id}, {"nombre": 1, "apellido": 1})
+        de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id}, {"nombre": 1, "apellido": 1})
+        para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id}, {"nombre": 1, "apellido": 1})
         
         if not para_usuario:
             return {"error": "Usuario destino no encontrado"}
@@ -448,7 +448,7 @@ class ConexionesService:
         # Verificar que email no está registrado
         existing = await db.auth_users.find_one({"email": email.lower()})
         if existing:
-            return {"error": "Este email ya está registrado", "user_id": existing.get("cliente_id")}
+            return {"error": "Este email ya está registrado", "user_id": existing.get("user_id")}
         
         # Verificar invitación pendiente
         existing_inv = await db.invitaciones.find_one({
@@ -459,7 +459,7 @@ class ConexionesService:
             return {"error": "Ya existe una invitación pendiente para este email"}
         
         # Obtener nombre del invitador
-        invitador = await db.auth_users.find_one({"cliente_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
+        invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
         
         invitacion = {
             "invitacion_id": f"inv_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
@@ -554,7 +554,7 @@ class ConexionesService:
         cliente_id = f"cli_{uuid.uuid4().hex[:12]}"
         
         acudido = {
-            "cliente_id": cliente_id,
+            "user_id": cliente_id,
             "nombre": nombre,
             "apellido": apellido,
             "email": email.lower() if email else None,
@@ -599,7 +599,7 @@ class ConexionesService:
         return {
             "success": True,
             "acudido": {
-                "cliente_id": cliente_id,
+                "user_id": cliente_id,
                 "nombre": nombre,
                 "apellido": apellido,
                 "estado_cuenta": "acudido"
@@ -609,7 +609,7 @@ class ConexionesService:
     async def activar_cuenta_acudido(self, acudido_id: str, email: str, contrasena_hash: str) -> Dict:
         """Activar cuenta de acudido (darle credenciales)"""
         result = await db.auth_users.update_one(
-            {"cliente_id": acudido_id, "estado_cuenta": "acudido"},
+            {"user_id": acudido_id, "estado_cuenta": "acudido"},
             {"$set": {
                 "estado_cuenta": "activo",
                 "email": email.lower(),
@@ -638,8 +638,8 @@ class ConexionesService:
         
         # Verificar conexión y permisos
         conexion = None
-        de_usuario = await db.auth_users.find_one({"cliente_id": de_usuario_id})
-        para_usuario = await db.auth_users.find_one({"cliente_id": para_usuario_id})
+        de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id})
+        para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id})
         
         if not de_usuario:
             return {"error": "Usuario origen no encontrado"}
@@ -685,12 +685,12 @@ class ConexionesService:
         
         # Ejecutar transferencia
         await db.auth_users.update_one(
-            {"cliente_id": de_usuario_id},
+            {"user_id": de_usuario_id},
             {"$inc": {"wallet.USD": -monto}}
         )
         
         await db.auth_users.update_one(
-            {"cliente_id": para_usuario_id},
+            {"user_id": para_usuario_id},
             {"$inc": {"wallet.USD": monto}}
         )
         
@@ -764,7 +764,7 @@ class ConexionesService:
         from modules.notifications.services.push_service import push_notification_service
         
         # Obtener usuario
-        usuario = await db.auth_users.find_one({"cliente_id": usuario_id})
+        usuario = await db.auth_users.find_one({"user_id": usuario_id})
         if not usuario:
             return {"error": "Usuario no encontrado"}
         
@@ -848,13 +848,13 @@ class ConexionesService:
     
     async def get_capacidades_usuario(self, user_id: str) -> List[Dict]:
         """Obtener capacidades de un usuario"""
-        user = await db.auth_users.find_one({"cliente_id": user_id}, {"capacidades": 1})
+        user = await db.auth_users.find_one({"user_id": user_id}, {"capacidades": 1})
         return user.get("capacidades", []) if user else []
     
     async def _asegurar_capacidad(self, user_id: str, capacidad_id: str) -> bool:
         """Asegurar que usuario tenga una capacidad"""
         existing = await db.auth_users.find_one({
-            "cliente_id": user_id,
+            "user_id": user_id,
             "capacidades.capacidad_id": capacidad_id
         })
         
@@ -873,7 +873,7 @@ class ConexionesService:
         }
         
         await db.auth_users.update_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"$push": {"capacidades": nueva_capacidad}}
         )
         
@@ -895,7 +895,7 @@ class ConexionesService:
         
         # Verificar que usuario no la tiene
         existing = await db.auth_users.find_one({
-            "cliente_id": user_id,
+            "user_id": user_id,
             "capacidades.capacidad_id": capacidad_id,
             "capacidades.activa": True
         })
@@ -912,7 +912,7 @@ class ConexionesService:
         }
         
         await db.auth_users.update_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"$push": {"capacidades": nueva_capacidad}}
         )
         
@@ -921,7 +921,7 @@ class ConexionesService:
     async def revocar_capacidad(self, user_id: str, capacidad_id: str) -> Dict:
         """Revocar capacidad de un usuario"""
         result = await db.auth_users.update_one(
-            {"cliente_id": user_id, "capacidades.capacidad_id": capacidad_id},
+            {"user_id": user_id, "capacidades.capacidad_id": capacidad_id},
             {"$set": {"capacidades.$.activa": False}}
         )
         
@@ -934,7 +934,7 @@ class ConexionesService:
     
     async def get_servicios_sugeridos(self, user_id: str) -> List[Dict]:
         """Obtener servicios sugeridos para un usuario"""
-        user = await db.auth_users.find_one({"cliente_id": user_id}, {"marketing": 1, "capacidades": 1})
+        user = await db.auth_users.find_one({"user_id": user_id}, {"marketing": 1, "capacidades": 1})
         if not user:
             return []
         
@@ -986,7 +986,7 @@ class ConexionesService:
             update["marketing.servicios_excluidos"] = servicios_excluidos
         
         await db.auth_users.update_one(
-            {"cliente_id": user_id},
+            {"user_id": user_id},
             {"$set": update}
         )
         
@@ -1010,11 +1010,11 @@ class ConexionesService:
         }
         
         if excluir_user_id:
-            search_query["cliente_id"] = {"$ne": excluir_user_id}
+            search_query["user_id"] = {"$ne": excluir_user_id}
         
         cursor = db.auth_users.find(
             search_query,
-            {"_id": 0, "cliente_id": 1, "nombre": 1, "apellido": 1, "email": 1, "avatar": 1, "estado_cuenta": 1}
+            {"_id": 0, "user_id": 1, "nombre": 1, "apellido": 1, "email": 1, "avatar": 1, "estado_cuenta": 1}
         ).limit(limit)
         
         return await cursor.to_list(length=limit)
