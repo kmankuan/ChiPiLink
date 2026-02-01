@@ -139,6 +139,7 @@ function AppRouter() {
       <Route path="/login" element={<><Header /><Login /></>} />
       <Route path="/registro" element={<><Header /><Register /></>} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/auth/laopan/callback" element={<LaoPanCallback />} />
       
       {/* Community Routes - All use SuperAppLanding which handles community content */}
       <Route path="/comunidad" element={<><Header /><SuperAppLanding /></>} />
