@@ -1,5 +1,5 @@
 /**
- * AdminMemberships - Panel de administración de membresías
+ * AdminMemberships - Membership administration panel
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AdminMemberships() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isAdmin, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('plans');
   const [plans, setPlans] = useState([]);
