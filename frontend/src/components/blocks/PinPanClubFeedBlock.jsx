@@ -290,11 +290,11 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                   <TabsList className="grid w-full grid-cols-2 mb-4">
                     <TabsTrigger value="superpin" className="gap-2">
                       <Trophy className="h-4 w-4 text-yellow-500" />
-                      {txt.superPinMatches}
+                      {t('pinpanclub.superPinMatches')}
                     </TabsTrigger>
                     <TabsTrigger value="rapidpin" className="gap-2">
                       <Zap className="h-4 w-4 text-orange-500" />
-                      {txt.rapidPinMatches}
+                      {t('pinpanclub.rapidPinMatches')}
                     </TabsTrigger>
                   </TabsList>
                   
@@ -342,12 +342,12 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                           className="w-full mt-2"
                           onClick={() => navigate('/pinpanclub/superpin/ranking')}
                         >
-                          {txt.viewAll} Super Pin
+                          {t('pinpanclub.viewAll')} Super Pin
                           <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
                       </div>
                     ) : (
-                      <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                      <p className="text-center py-8 text-muted-foreground">{t('pinpanclub.noData')}</p>
                     )}
                   </TabsContent>
                   
@@ -395,12 +395,12 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                           className="w-full mt-2"
                           onClick={() => navigate('/pinpanclub/rapidpin')}
                         >
-                          {txt.viewAll} Rapid Pin
+                          {t('pinpanclub.viewAll')} Rapid Pin
                           <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
                       </div>
                     ) : (
-                      <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                      <p className="text-center py-8 text-muted-foreground">{t('pinpanclub.noData')}</p>
                     )}
                   </TabsContent>
                 </Tabs>
@@ -415,14 +415,14 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-primary" />
-                  {L(sections.active_challenges?.title) || txt.activeChallenges}
+                  {L(sections.active_challenges?.title) || t('pinpanclub.activeChallenges')}
                 </CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={() => navigate('/pinpanclub/challenges')}
                 >
-                  {txt.viewAll}
+                  {t('pinpanclub.viewAll')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </CardHeader>
@@ -443,7 +443,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                               <Badge className={difficultyColors[challenge.difficulty] || difficultyColors.normal}>
                                 {challenge.difficulty}
                               </Badge>
-                              <Badge variant="outline">+{challenge.points} {txt.points}</Badge>
+                              <Badge variant="outline">+{challenge.points} {t('pinpanclub.points')}</Badge>
                             </div>
                           </div>
                         </div>
@@ -451,7 +451,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                  <p className="text-center py-8 text-muted-foreground">{t('pinpanclub.noData')}</p>
                 )}
               </CardContent>
             </Card>
@@ -467,7 +467,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-yellow-500" />
-                  {L(sections.leaderboard?.title) || txt.leaderboard}
+                  {L(sections.leaderboard?.title) || t('pinpanclub.leaderboard')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -492,7 +492,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                             {player.nickname || player.name}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {player.wins}{txt.wins} - {player.losses}{txt.losses}
+                            {player.wins}{t('pinpanclub.wins')} - {player.losses}{t('pinpanclub.losses')}
                           </p>
                         </div>
                         <div className="font-bold text-primary">
@@ -502,7 +502,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                  <p className="text-center py-8 text-muted-foreground">{t('pinpanclub.noData')}</p>
                 )}
               </CardContent>
             </Card>
@@ -515,7 +515,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Medal className="h-5 w-5 text-purple-500" />
-                  {L(sections.recent_achievements?.title) || txt.recentAchievements}
+                  {L(sections.recent_achievements?.title) || t('pinpanclub.recentAchievements')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -543,7 +543,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center py-8 text-muted-foreground">{txt.noData}</p>
+                  <p className="text-center py-8 text-muted-foreground">{t('pinpanclub.noData')}</p>
                 )}
               </CardContent>
             </Card>
@@ -557,7 +557,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-blue-500" />
-                  {L(sections.upcoming_tournaments?.title) || txt.upcomingTournaments}
+                  {L(sections.upcoming_tournaments?.title) || t('pinpanclub.upcomingTournaments')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -572,7 +572,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                         <Badge variant="outline">{tournament.status}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {tournament.current_participants}/{tournament.max_participants} {txt.participants}
+                        {tournament.current_participants}/{tournament.max_participants} {t('pinpanclub.participants')}
                       </p>
                     </div>
                   ))}
@@ -591,7 +591,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
             onClick={() => navigate(config?.style?.cta_url || '/pinpanclub/superpin/ranking')}
             className="rounded-full px-8"
           >
-            {L(config?.style?.cta_text) || txt.viewAll}
+            {L(config?.style?.cta_text) || t('pinpanclub.viewAll')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
