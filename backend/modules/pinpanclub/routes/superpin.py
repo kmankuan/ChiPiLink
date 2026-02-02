@@ -101,7 +101,7 @@ async def check_in(
         if not is_valid:
             raise HTTPException(
                 status_code=400,
-                detail="Ubicación fuera del rango permitido"
+                detail="Location fuera del rango permitido"
             )
     
     data = PlayerCheckInCreate(

@@ -58,7 +58,7 @@ class ChessGame(ChessGameBase):
     ganador_id: Optional[str] = None
     razon_fin: Optional[str] = None  # jaque_mate, abandono, tiempo, tablas_acuerdo, etc.
     # Moves in algebraic notation
-    pgn: Optional[str] = None  # Notación PGN completa
+    pgn: Optional[str] = None  # Notation PGN completa
     movimientos: List[str] = []  # List of movimientos
     posicion_actual: Optional[str] = None  # Current position FEN
     # Tiempos

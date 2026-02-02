@@ -253,7 +253,7 @@ class OrderFormConfigService:
             {"type": "textarea", "label": "Text Area", "label_es": "Area de Texto", "label_zh": "文本区域", "description": "Multi-line text"},
             {"type": "number", "label": "Number", "label_es": "Number", "label_zh": "数字", "description": "Numeric input"},
             {"type": "select", "label": "Dropdown", "label_es": "Lista Desplegable", "label_zh": "下拉列表", "description": "Single selection"},
-            {"type": "multiselect", "label": "Multi-Select", "label_es": "Selection Múltiple", "label_zh": "多选", "description": "Multiple selection"},
+            {"type": "multiselect", "label": "Multi-Select", "label_es": "Selection Multiple", "label_zh": "多选", "description": "Multiple selection"},
             {"type": "checkbox", "label": "Checkbox", "label_es": "Casilla", "label_zh": "复选框", "description": "Yes/No option"},
             {"type": "file", "label": "File Upload", "label_es": "Subir Archivo", "label_zh": "文件上传", "description": "File attachment"},
             {"type": "date", "label": "Date", "label_es": "Fecha", "label_zh": "日期", "description": "Date picker"},

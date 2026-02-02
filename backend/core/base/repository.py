@@ -17,7 +17,7 @@ class BaseRepository(ABC, Generic[T]):
     Clase base para repositorios.
     Abstrae el acceso a la base de datos para facilitar:
     - Testing con mocks
-    - Migración a diferentes bases de datos
+    - Migration a diferentes bases de datos
     - Separation en microservicios
     
     Cada module implementa su propio repository heredando de esta clase.

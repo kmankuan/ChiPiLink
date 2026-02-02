@@ -89,7 +89,7 @@ class BulkImportService:
             grado_default: Grado by default si no is en los datos
         
         Returns:
-            Previsualización con validaciones
+            Preview con validaciones
         """
         parsed = self.parse_tsv(raw_text, has_headers=True)
         

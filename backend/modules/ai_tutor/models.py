@@ -58,7 +58,7 @@ class VocabularyItem(BaseModel):
     item_id: str = Field(default_factory=lambda: f"vocab_{uuid.uuid4().hex[:12]}")
     # Contenido
     palabra: str  # Palabra en idioma objetivo
-    traduccion: str  # Traducción
+    traduccion: str  # Translation
     pronunciacion_fonetica: Optional[str] = None  # Guía fonética
     audio_url: Optional[str] = None  # Audio de pronunciation correcta
     imagen_url: Optional[str] = None  # Imagen ilustrativa

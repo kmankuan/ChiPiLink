@@ -383,7 +383,7 @@ def get_default_notification_templates() -> List[Dict]:
                 "zh": "您的会员资格即将到期"
             },
             "body": {
-                "es": "Tu membership vence en {{days}} days. Renuévala para seguir disfrutando.",
+                "es": "Tu membership vence en {{days}} days. Renew it para seguir disfrutando.",
                 "en": "Your membership expires in {{days}} days. Renew to keep enjoying.",
                 "zh": "您的会员资格将在{{days}}天后到期。续订以继续享受。"
             },

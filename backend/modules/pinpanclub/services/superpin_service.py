@@ -1144,7 +1144,7 @@ class SuperPinService(BaseService):
             } for m in matches[:10]]
         }
     
-    # ============== QUICK TOURNAMENT (TORNEO RELÁMPAGO) ==============
+    # ============== QUICK TOURNAMENT (TORNEO LIGHTNING) ==============
     
     async def create_quick_tournament(
         self,
@@ -1251,7 +1251,7 @@ class SuperPinService(BaseService):
         
         # Generate tournament name
         if not nombre:
-            nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
+            nombre = f"Torneo Lightning {datetime.now(timezone.utc).strftime('%H:%M')}"
         
         quick_tournament = {
             "quick_tournament_id": f"qt_{uuid.uuid4().hex[:12]}",

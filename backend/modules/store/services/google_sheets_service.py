@@ -27,7 +27,7 @@ class GoogleSheetsService:
         """
         Inicializar el servicio con credenciales.
         Las credenciales pueden venir de:
-        1. Parámetro directo (dict del JSON)
+        1. Parameter directo (dict del JSON)
         2. Variable de entorno GOOGLE_SHEETS_CREDENTIALS
         3. Base de datos (encriptadas)
         """

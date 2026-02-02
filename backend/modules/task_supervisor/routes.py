@@ -44,7 +44,7 @@ async def get_supervisor_status():
             "Comandos de voz para marcar tareas completadas",
             "Recordatorios automatics inteligentes",
             "Gamification con puntos y logros",
-            "Supervisión para childs en casa y estudiantes",
+            "Supervision para childs en casa y estudiantes",
             "Synchronization bidireccional con Monday.com",
             "Reportes de productividad para padres/maestros"
         ],

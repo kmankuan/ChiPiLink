@@ -1,5 +1,5 @@
 """
-Achievements Service - Lógica de logros automatics
+Achievements Service - Logic de logros automatics
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone

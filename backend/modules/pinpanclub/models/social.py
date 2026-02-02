@@ -173,7 +173,7 @@ class NotificationType(str, Enum):
 
 
 class Notification(BaseModel):
-    """Notificación para usuario"""
+    """Notification para usuario"""
     notification_id: str = Field(default_factory=lambda: f"notif_{uuid.uuid4().hex[:8]}")
     user_id: str
     type: NotificationType

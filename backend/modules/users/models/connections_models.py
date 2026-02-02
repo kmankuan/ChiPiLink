@@ -243,7 +243,7 @@ class AcudidoCreate(BaseModel):
     fecha_nacimiento: Optional[str] = None
     genero: Optional[str] = None
     notas: Optional[str] = None
-    # Suscripción inicial opcional
+    # Subscription inicial opcional
     membresia_id: Optional[str] = None
     plan_id: Optional[str] = None
 
@@ -285,7 +285,7 @@ class AlertaWallet(BaseModel):
     resuelta_en: Optional[str] = None
 
 
-# ============== CONFIGURATION DE PERMISOS POR RELACIÓN ==============
+# ============== CONFIGURATION DE PERMISOS POR RELATIONSHIP ==============
 
 class ConfigPermisosRelacion(BaseModel):
     """Configuration de permisos by default para un tipo de relationship"""

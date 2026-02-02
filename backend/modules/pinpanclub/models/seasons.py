@@ -11,7 +11,7 @@ import uuid
 
 class SeasonStatus(str, Enum):
     """Estado de una temporada"""
-    UPCOMING = "upcoming"      # Próxima temporada
+    UPCOMING = "upcoming"      # Next temporada
     ACTIVE = "active"          # Season actual activa
     CLOSING = "closing"        # In closing process
     COMPLETED = "completed"    # Season finalizada
@@ -205,7 +205,7 @@ def get_season_themes() -> List[Dict]:
         },
         {
             "id": "autumn",
-            "name": {"es": "Otoño", "en": "Autumn", "zh": "秋季"},
+            "name": {"es": "Autumn", "en": "Autumn", "zh": "秋季"},
             "colors": {"primary": "#f97316", "secondary": "#fdba74"},
             "icon": "🍂"
         },

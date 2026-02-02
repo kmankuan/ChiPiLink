@@ -6,7 +6,7 @@ Features:
 - Categorys de notification configurables
 - Preferencias de usuario por category
 - Editor avanzado de posts con bloques
-- Programación de contenido
+- Programming de contenido
 - Integration con CRM (placeholders para Monday.com y Fusebase)
 """
 from .routes import router as notifications_router

@@ -105,7 +105,7 @@ async def get_subjects():
             {"id": "sociales", "nombre": "Estudios Sociales"},
             {"id": "ingles", "nombre": "English"},
             {"id": "arte", "nombre": "Arte"},
-            {"id": "musica", "nombre": "Música"},
+            {"id": "musica", "nombre": "Music"},
             {"id": "educacion_fisica", "nombre": "Educación Physics"},
             {"id": "tecnologia", "nombre": "Technology"},
             {"id": "religion", "nombre": "Religion"},

@@ -132,7 +132,7 @@ class PointsEarnRule(BaseModel):
     # Condiciones
     min_purchase_amount: Optional[float] = None
     max_points_per_day: Optional[int] = None
-    applicable_user_types: List[str] = []  # Vacío = todos
+    applicable_user_types: List[str] = []  # Empty = todos
     
     # Vigencia
     start_date: Optional[str] = None

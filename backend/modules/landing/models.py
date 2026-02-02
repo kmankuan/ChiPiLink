@@ -65,7 +65,7 @@ class ReorderBlocksRequest(BaseModel):
 BLOCK_TEMPLATES = {
     "hero": {
         "nombre": "Hero Principal",
-        "descripcion": "Sección principal con imagen de fondo",
+        "descripcion": "Section principal con imagen de fondo",
         "config_default": {
             "titulo": "Bienvenido a nuestra tienda",
             "subtitulo": "Encuentra todo lo que necesitas en un solo lugar",
@@ -86,7 +86,7 @@ BLOCK_TEMPLATES = {
             "subtitulo": "",
             "items": [
                 {"icono": "shield", "titulo": "Seguro", "descripcion": "Compras 100% seguras"},
-                {"icono": "truck", "titulo": "Envío Rápido", "descripcion": "Entrega en 24-48h"},
+                {"icono": "truck", "titulo": "Envío Fast", "descripcion": "Entrega en 24-48h"},
                 {"icono": "headphones", "titulo": "Soporte", "descripcion": "Atención personalizada"}
             ],
             "columnas": 3
@@ -153,7 +153,7 @@ BLOCK_TEMPLATES = {
         "nombre": "Banner",
         "descripcion": "Banner con texto e imagen",
         "config_default": {
-            "titulo": "Promoción Especial",
+            "titulo": "Promotion Especial",
             "subtitulo": "Aprovecha nuestras ofertas",
             "imagen_url": "",
             "fondo_color": "#f0fdf4",
@@ -181,7 +181,7 @@ BLOCK_TEMPLATES = {
     },
     "divider": {
         "nombre": "Divisor",
-        "descripcion": "Línea divisoria",
+        "descripcion": "Line divisoria",
         "config_default": {
             "estilo": "solid",
             "color": "#e5e7eb",
@@ -281,7 +281,7 @@ BLOCK_TEMPLATES = {
                 "upcoming_tournaments": {
                     "enabled": True,
                     "limit": 3,
-                    "title": {"es": "Próximos Torneos", "en": "Upcoming Tournaments", "zh": "即将举行的比赛"},
+                    "title": {"es": "Next Torneos", "en": "Upcoming Tournaments", "zh": "即将举行的比赛"},
                     "visibility": {
                         "public": True,
                         "registered": True,

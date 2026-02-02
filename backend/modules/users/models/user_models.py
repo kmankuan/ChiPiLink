@@ -132,7 +132,7 @@ class ProfileFieldConfig(BaseModel):
     field_type: ProfileFieldType
     
     # Options for select/multiselect
-    options: List[Dict[str, str]] = []  # [{"value": "opt1", "label": {"es": "Opción 1"}}]
+    options: List[Dict[str, str]] = []  # [{"value": "opt1", "label": {"es": "Option 1"}}]
     
     # Validations
     is_required: bool = False
@@ -534,7 +534,7 @@ def get_default_profile_fields() -> List[Dict]:
             "applicable_user_types": ["utype_member_child"],
             "sort_order": 11
         },
-        # Médico
+        # Medical
         {
             "field_id": "field_allergies",
             "field_key": "allergies",
@@ -546,7 +546,7 @@ def get_default_profile_fields() -> List[Dict]:
         {
             "field_id": "field_medical_conditions",
             "field_key": "medical_conditions",
-            "label": {"es": "Condiciones Médicas", "en": "Medical Conditions", "zh": "医疗状况"},
+            "label": {"es": "Condiciones Medical", "en": "Medical Conditions", "zh": "医疗状况"},
             "field_type": "textarea",
             "section": "medical",
             "sort_order": 21

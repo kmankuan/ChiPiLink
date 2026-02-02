@@ -26,16 +26,16 @@ GRADOS_PCA = [
 
 # Materias por nivel
 MATERIAS_PRIMARIA = ["Espyearl", "Mathematics", "Ciencias Naturales", "Ciencias Sociales", "English", "Religion"]
-MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Physics", "Química", "Biología", "Historia", "Geografía", "English", "Religion", "Technology"]
+MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Physics", "Chemistry", "Biología", "Historia", "Geografía", "English", "Religion", "Technology"]
 
 # Editoriales
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
 
 # Nombres panameños de ejemplo
-NOMBRES = ["Maria", "José", "Ana", "Carlos", "Sofía", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
-           "Camila", "Andrés", "Lucía", "Juan", "Emma", "Diego", "Gabriela", "Sebastián", "Victoria", "Alejandro"]
-APELLIDOS = ["Gonzalez", "Rodriguez", "Martinez", "Lopez", "Garcia", "Hernández", "Perez", "Sanchez", "Ramírez", "Torres",
-             "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Ortega", "Vargas", "Castro", "Jiménez"]
+NOMBRES = ["Maria", "Jose", "Ana", "Carlos", "Sofia", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
+           "Camila", "Andrés", "Lucia", "Juan", "Emma", "Diego", "Gabriela", "Sebastian", "Victoria", "Alejandro"]
+APELLIDOS = ["Gonzalez", "Rodriguez", "Martinez", "Lopez", "Garcia", "Hernández", "Perez", "Sanchez", "Ramirez", "Torres",
+             "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Ortega", "Vargas", "Castro", "Jimenez"]
 
 
 def generate_isbn():

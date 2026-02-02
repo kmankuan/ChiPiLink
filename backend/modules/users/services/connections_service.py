@@ -330,7 +330,7 @@ class ConexionesService:
             "padre": "Padre/Madre",
             "hijo": "Hijo/a",
             "hermano": "Hermano/a",
-            "tio": "Tío/Tía",
+            "tio": "Uncle/Aunt",
             "abuelo": "Abuelo/a",
             "primo": "Primo/a",
             "amigo": "Amigo",
