@@ -1,6 +1,6 @@
 /**
- * MisAcudidos - Componente para gestionar usuarios acudidos (dependientes)
- * Permite crear, ver y gestionar cuentas de menores/dependientes
+ * MyDependents - Component to manage dependent users (children, family members in charge)
+ * Allows creating, viewing, and managing minor/dependent accounts
  */
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,12 +42,12 @@ import {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-export default function MisAcudidos({ token, onTransfer }) {
+export default function MyDependents({ token, onTransfer }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [acudidos, setAcudidos] = useState([]);
+  const [dependents, setDependents] = useState([]);
   
-  // Estado para crear acudido
+  // State for creating dependent
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creating, setCreating] = useState(false);
   const [formData, setFormData] = useState({
@@ -60,10 +60,10 @@ export default function MisAcudidos({ token, onTransfer }) {
   });
 
   useEffect(() => {
-    loadAcudidos();
+    loadDependents();
   }, []);
 
-  const loadAcudidos = async () => {
+  const loadDependents = async () => {
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/conexiones/mis-acudidos`, {
@@ -71,10 +71,10 @@ export default function MisAcudidos({ token, onTransfer }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setAcudidos(data.acudidos || []);
+        setDependents(data.acudidos || []);
       }
     } catch (err) {
-      console.error('Error loading acudidos:', err);
+      console.error('Error loading dependents:', err);
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function MisAcudidos({ token, onTransfer }) {
 
   const handleCreate = async () => {
     if (!formData.nombre.trim()) {
-      toast.error('El nombre es requerido');
+      toast.error(t('dependents.nameRequired'));
       return;
     }
     
@@ -117,7 +117,7 @@ export default function MisAcudidos({ token, onTransfer }) {
         genero: '',
         notas: ''
       });
-      loadAcudidos();
+      loadDependents();
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -167,7 +167,7 @@ export default function MisAcudidos({ token, onTransfer }) {
             <DialogHeader>
               <DialogTitle>{t('acudidos.createAccount')}</DialogTitle>
               <DialogDescription>
-                Crea una cuenta para tu dependiente (hijo, familiar a cargo, etc.)
+                {t('dependents.createAccountDesc')}
               </DialogDescription>
             </DialogHeader>
             
@@ -178,7 +178,7 @@ export default function MisAcudidos({ token, onTransfer }) {
                   <Input
                     value={formData.nombre}
                     onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                    placeholder="Nombre"
+                    placeholder={t('dependents.namePlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -186,21 +186,21 @@ export default function MisAcudidos({ token, onTransfer }) {
                   <Input
                     value={formData.apellido}
                     onChange={(e) => setFormData({...formData, apellido: e.target.value})}
-                    placeholder="Apellido"
+                    placeholder={t('dependents.lastNamePlaceholder')}
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label>Correo (opcional)</Label>
+                <Label>{t('dependents.emailOptional')}</Label>
                 <Input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  placeholder="correo@ejemplo.com"
+                  placeholder={t('dependents.emailPlaceholder')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se usará cuando el acudido active su cuenta
+                  {t('dependents.emailHelper')}
                 </p>
               </div>
               
@@ -220,7 +220,7 @@ export default function MisAcudidos({ token, onTransfer }) {
                     onValueChange={(v) => setFormData({...formData, genero: v})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar..." />
+                      <SelectValue placeholder={t('dependents.selectPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">{t('acudidos.genderOptions.male')}</SelectItem>
@@ -236,7 +236,7 @@ export default function MisAcudidos({ token, onTransfer }) {
                 <Textarea
                   value={formData.notas}
                   onChange={(e) => setFormData({...formData, notas: e.target.value})}
-                  placeholder="Notas adicionales..."
+                  placeholder={t('dependents.notesPlaceholder')}
                   rows={2}
                 />
               </div>
@@ -251,14 +251,14 @@ export default function MisAcudidos({ token, onTransfer }) {
                 ) : (
                   <UserPlus className="h-4 w-4 mr-2" />
                 )}
-                Crear cuenta acudida
+                {t('dependents.createDependentAccount')}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {acudidos.length === 0 ? (
+      {dependents.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -274,22 +274,22 @@ export default function MisAcudidos({ token, onTransfer }) {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {acudidos.map((acudido) => {
-            const age = calculateAge(acudido.fecha_nacimiento);
+          {dependents.map((dependent) => {
+            const age = calculateAge(dependent.fecha_nacimiento);
             
             return (
-              <Card key={acudido.user_id} className="overflow-hidden">
+              <Card key={dependent.user_id} className="overflow-hidden">
                 <CardHeader className="pb-2">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-14 w-14">
-                      <AvatarImage src={acudido.usuario_avatar} />
+                      <AvatarImage src={dependent.usuario_avatar} />
                       <AvatarFallback className="text-lg">
-                        {acudido.usuario_nombre?.charAt(0) || '?'}
+                        {dependent.usuario_nombre?.charAt(0) || '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <CardTitle className="flex items-center gap-2">
-                        {acudido.usuario_nombre}
+                        {dependent.usuario_nombre}
                         <Badge variant="secondary" className="text-xs font-normal">
                           {t('acudidos.accountStatus.acudido')}
                         </Badge>
@@ -298,13 +298,13 @@ export default function MisAcudidos({ token, onTransfer }) {
                         {age !== null && (
                           <>
                             <Calendar className="h-3 w-3" />
-                            <span>{age} años</span>
+                            <span>{age} {t('dependents.yearsOld')}</span>
                           </>
                         )}
-                        {acudido.etiqueta && (
+                        {dependent.etiqueta && (
                           <>
                             <span>•</span>
-                            <span>{acudido.etiqueta}</span>
+                            <span>{dependent.etiqueta}</span>
                           </>
                         )}
                       </CardDescription>
@@ -312,7 +312,7 @@ export default function MisAcudidos({ token, onTransfer }) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Wallet del acudido */}
+                  {/* Dependent's wallet */}
                   <div className="bg-muted/50 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -320,18 +320,18 @@ export default function MisAcudidos({ token, onTransfer }) {
                         <span className="text-sm text-muted-foreground">{t('acudidos.wallet')}</span>
                       </div>
                       <span className="text-2xl font-bold">
-                        ${acudido.wallet?.USD?.toFixed(2) || '0.00'}
+                        ${dependent.wallet?.USD?.toFixed(2) || '0.00'}
                       </span>
                     </div>
                   </div>
                   
-                  {/* Acciones */}
+                  {/* Actions */}
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => onTransfer && onTransfer(acudido)}
+                      onClick={() => onTransfer && onTransfer(dependent)}
                     >
                       <Send className="h-4 w-4 mr-2" />
                       {t('acudidos.transfer')}
@@ -340,8 +340,7 @@ export default function MisAcudidos({ token, onTransfer }) {
                       variant="ghost" 
                       size="sm"
                       onClick={() => {
-                        // TODO: Mostrar historial de transacciones
-                        toast.info('Historial próximamente');
+                        toast.info(t('dependents.historyComingSoon'));
                       }}
                     >
                       <History className="h-4 w-4 mr-2" />
@@ -357,3 +356,6 @@ export default function MisAcudidos({ token, onTransfer }) {
     </div>
   );
 }
+
+// Keep backward compatibility with old name
+export { MyDependents as MisAcudidos };
