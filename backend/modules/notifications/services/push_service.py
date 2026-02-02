@@ -307,7 +307,7 @@ class PushNotificationService:
         if prefs:
             return prefs
         
-        # Crear preferencias por defecto
+        # Create preferencias por defecto
         categories = await self.get_categories()
         default_prefs = {
             "user_id": user_id,
@@ -437,7 +437,7 @@ class PushNotificationService:
         variables: Dict = None
     ) -> Dict:
         """Send notificación a un usuario"""
-        # Verificar preferencias of the user
+        # Verify preferencias of the user
         prefs = await self.get_user_preferences(user_id)
         
         if not prefs.get("push_enabled", True):
@@ -447,16 +447,16 @@ class PushNotificationService:
         if not cat_prefs.get("enabled", True) or not cat_prefs.get("push", True):
             return {"success": False, "reason": "Category disabled by user"}
         
-        # Verificar quiet hours
+        # Verify quiet hours
         if prefs.get("quiet_hours", {}).get("enabled"):
             # TODO: Implementar verificación de quiet hours
             pass
         
-        # Obtener categoría para determinar proveedor
+        # Get categoría para determinar proveedor
         category = await self.get_category(category_id)
         category_provider = category.get("default_provider") if category else None
         
-        # Obtener dispositivos of the user
+        # Get dispositivos of the user
         devices = await self.get_user_devices(user_id)
         
         if not devices:
@@ -607,7 +607,7 @@ class PushNotificationService:
         action_url: str = None
     ) -> Dict:
         """Send notificación a todos the users con dispositivos registrados"""
-        # Obtener todos the users con dispositivos
+        # Get todos the users con dispositivos
         pipeline = [
             {"$match": {"is_active": True}},
             {"$group": {"_id": "$user_id"}}

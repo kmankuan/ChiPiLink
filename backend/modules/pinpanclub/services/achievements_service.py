@@ -65,21 +65,21 @@ class AchievementsService(BaseService):
         """
         awarded = []
         
-        # Obtener estadísticas of the player
+        # Get estadísticas of the player
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
-        # Obtener logros que the player aún does not have
+        # Get logros que the player aún does not have
         player_achievements = await self.get_player_achievements(jugador_id)
         earned_ids = {pa["achievement_id"] for pa in player_achievements}
         
-        # Obtener all achievements activos
+        # Get all achievements activos
         all_achievements = await self.get_all_achievements()
         
         for achievement in all_achievements:
             if achievement["achievement_id"] in earned_ids:
                 continue
             
-            # Verificar si cumple el requisito
+            # Verify si cumple el requisito
             if self._check_requirement(achievement, player_stats):
                 # Otorgar logro
                 new_achievement = await self._award_achievement(jugador_id, achievement)
@@ -130,7 +130,7 @@ class AchievementsService(BaseService):
             if item["_id"]:
                 by_difficulty[item["_id"]] = item["count"]
         
-        # Verificar semana completa
+        # Verify semana completa
         week_complete = await self._check_weekly_complete(jugador_id)
         
         return {
@@ -143,7 +143,7 @@ class AchievementsService(BaseService):
     
     async def _check_weekly_complete(self, jugador_id: str) -> bool:
         """Verify si the player completó all challenges de la semana actual"""
-        # Obtener semana actual
+        # Get semana actual
         week = await db.pinpanclub_challenges_weekly.find_one(
             {"is_active": True},
             {"_id": 0}
@@ -189,7 +189,7 @@ class AchievementsService(BaseService):
         """Otorgar un logro al jugador"""
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener info of the player
+        # Get info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}
@@ -225,7 +225,7 @@ class AchievementsService(BaseService):
                 upsert=True
             )
         
-        # Crear notificación
+        # Create notificación
         try:
             from .social_service import social_service
             await social_service.create_notification(NotificationCreate(
@@ -240,7 +240,7 @@ class AchievementsService(BaseService):
                 action_url="/pinpanclub/challenges"
             ))
             
-            # Crear actividad en feed
+            # Create actividad en feed
             await social_service.create_activity(ActivityFeedCreate(
                 jugador_id=jugador_id,
                 activity_type=ActivityType.BADGE_EARNED,

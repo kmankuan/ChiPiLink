@@ -126,13 +126,13 @@ class BulkImportService:
                     errores.append({"fila": idx + 2, "error": "Grado vacío"})
                     continue
                 
-                # Verificar duplicados en esta importación
+                # Verify duplicados en esta importación
                 if numero in numeros_vistos:
                     duplicados.append({"fila": idx + 2, "numero": numero})
                     continue
                 numeros_vistos.add(numero)
                 
-                # Verificar si already exists en DB
+                # Verify si already exists en DB
                 existente = await db.estudiantes_sincronizados.find_one(
                     {"numero_estudiante": numero}
                 )
@@ -354,13 +354,13 @@ class BulkImportService:
                     errores.append({"fila": idx + 2, "error": f"Precio inválido: {precio_str}"})
                     continue
                 
-                # Verificar duplicados
+                # Verify duplicados
                 if codigo in codigos_vistos:
                     errores.append({"fila": idx + 2, "error": f"Código duplicado: {codigo}"})
                     continue
                 codigos_vistos.add(codigo)
                 
-                # Verificar si already exists
+                # Verify si already exists
                 existente = await db.libros.find_one({"codigo": codigo})
                 
                 preview.append({

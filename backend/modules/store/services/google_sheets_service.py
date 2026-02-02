@@ -77,7 +77,7 @@ class GoogleSheetsService:
         )
         
         if not config:
-            # Crear configuración por defecto
+            # Create configuración por defecto
             config = {
                 "config_id": "google_sheets_sync_config",
                 "service_account_email": None,
@@ -126,7 +126,7 @@ class GoogleSheetsService:
         """
         config = await self.get_sync_config()
         
-        # Buscar si already exists este sheet
+        # Search si already exists este sheet
         sheets = config.get("sheets", [])
         existing_idx = next(
             (i for i, s in enumerate(sheets) if s["sheet_id"] == sheet_id),
@@ -163,7 +163,7 @@ class GoogleSheetsService:
                 spreadsheetId=sheet_id
             ).execute()
             
-            # Obtener nombres de las hojas
+            # Get nombres de las hojas
             hojas = [
                 {
                     "nombre": sheet["properties"]["title"],
@@ -314,7 +314,7 @@ class GoogleSheetsService:
                             nombre = partes_nombre[0] if partes_nombre else ""
                             apellido = partes_nombre[1] if len(partes_nombre) > 1 else ""
                             
-                            # Buscar si already exists
+                            # Search si already exists
                             existente = await db.estudiantes_sincronizados.find_one({
                                 "numero_estudiante": numero,
                                 "sheet_id": sheet_cfg["sheet_id"]
@@ -344,7 +344,7 @@ class GoogleSheetsService:
                                 estudiante_data["datos_extra"] = datos_extra
                             
                             if existente:
-                                # Verificar si tiene override
+                                # Verify si tiene override
                                 if existente.get("override_local") and not forzar:
                                     resultados["estudiantes_override"] += 1
                                     continue
@@ -356,7 +356,7 @@ class GoogleSheetsService:
                                 )
                                 resultados["estudiantes_actualizados"] += 1
                             else:
-                                # Crear nuevo
+                                # Create nuevo
                                 import uuid
                                 estudiante_data["sync_id"] = f"sync_{uuid.uuid4().hex[:12]}"
                                 estudiante_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()

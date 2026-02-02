@@ -44,7 +44,7 @@ class OrderService(BaseService):
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario
         
-        # Crear documento dthe order
+        # Create documento dthe order
         order_dict = {
             "user_id": user_id,
             "estudiante_id": data.estudiante_id,

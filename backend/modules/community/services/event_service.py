@@ -110,14 +110,14 @@ class EventService(BaseService):
         if not event.get("requiere_inscripcion"):
             raise ValueError("Este evento no requiere inscripción")
         
-        # Verificar capacidad
+        # Verify capacidad
         inscripciones = event.get("inscripciones", [])
         max_participantes = event.get("max_participantes")
         
         if max_participantes and len(inscripciones) >= max_participantes:
             raise ValueError("Evento completo")
         
-        # Verificar si ya está inscrito
+        # Verify si ya está inscrito
         if any(i.get("usuario_id") == usuario_id for i in inscripciones):
             raise ValueError("Ya está inscrito en este evento")
         

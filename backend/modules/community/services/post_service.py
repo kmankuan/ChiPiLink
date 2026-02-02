@@ -105,7 +105,7 @@ class PostService(BaseService):
         success = await self.repository.delete_post(post_id)
         
         if success:
-            # Eliminar comentarios asociados
+            # Delete comentarios asociados
             await self.comment_repository.delete_post_comments(post_id)
             
             await self.emit_event(
@@ -129,7 +129,7 @@ class PostService(BaseService):
         usuario_id: Optional[str] = None
     ) -> Comment:
         """Agregar comentario a un post"""
-        # Verificar que el post existe y permite comentarios
+        # Verify que el post existe y permite comentarios
         post = await self.repository.get_by_id(post_id)
         if not post:
             raise ValueError("Post not found")

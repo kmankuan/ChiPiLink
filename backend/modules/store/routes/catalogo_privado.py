@@ -323,7 +323,7 @@ async def admin_crear_producto_catalogo_privado(
     """
     import uuid
     
-    # Asegurar que sea catálogo privado
+    # Ensure que sea catálogo privado
     producto["es_catalogo_privado"] = True
     producto["libro_id"] = producto.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
     producto["activo"] = producto.get("activo", True)
@@ -344,7 +344,7 @@ async def admin_actualizar_producto_catalogo_privado(
     """
     Admin: Actualizar producto del catálogo privado.
     """
-    # Asegurar that does not se pueda cambiar es_catalogo_privado
+    # Ensure that does not se pueda cambiar es_catalogo_privado
     updates["es_catalogo_privado"] = True
     updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
     

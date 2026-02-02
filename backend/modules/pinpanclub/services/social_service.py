@@ -44,7 +44,7 @@ class SocialService(BaseService):
         if follower_id == following_id:
             raise ValueError("No puedes seguirte a ti mismo")
         
-        # Verificar si ya sigue
+        # Verify si ya sigue
         existing = await self.follow_repo.find_follow(follower_id, following_id)
         if existing:
             raise ValueError("Ya sigues a este jugador")
@@ -62,7 +62,7 @@ class SocialService(BaseService):
         
         result = await self.follow_repo.create(follow_data)
         
-        # Crear notificación para el seguido
+        # Create notificación para el seguido
         await self.create_notification(NotificationCreate(
             user_id=following_id,
             type=NotificationType.NEW_FOLLOWER,
@@ -72,7 +72,7 @@ class SocialService(BaseService):
             action_url=f"/pinpanclub/superpin/player/{follower_id}"
         ))
         
-        # Crear actividad en feed
+        # Create actividad en feed
         await self.create_activity(ActivityFeedCreate(
             jugador_id=follower_id,
             activity_type=ActivityType.NEW_FOLLOWER,
@@ -162,7 +162,7 @@ class SocialService(BaseService):
     
     async def add_reaction(self, data: ReactionCreate) -> Reaction:
         """Añadir reacción"""
-        # Verificar si ya reaccionó
+        # Verify si ya reaccionó
         existing = await self.reaction_repo.find_user_reaction(
             data.user_id, data.target_id, data.target_type
         )
@@ -230,7 +230,7 @@ class SocialService(BaseService):
     
     async def get_following_feed(self, jugador_id: str, limit: int = 50) -> List[ActivityFeedItem]:
         """Get feed de jugadores seguidos"""
-        # Obtener IDs de jugadores que sigue
+        # Get IDs de jugadores que sigue
         following = await self.follow_repo.get_following(jugador_id, limit=100)
         following_ids = [f["following_id"] for f in following]
         
@@ -320,7 +320,7 @@ class SocialService(BaseService):
             upsert=True
         )
         
-        # Obtener nuevo conteo
+        # Get nuevo conteo
         return await self.get_user_warnings(user_id)
     
     async def report_comment(self, comment_id: str, reporter_id: str, reason: str) -> bool:

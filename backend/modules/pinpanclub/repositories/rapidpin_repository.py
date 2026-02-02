@@ -243,7 +243,7 @@ class RapidPinRankingRepository(BaseRepository):
         if existing:
             return existing
         
-        # Crear nueva entrada
+        # Create nueva entrada
         ranking_data = {
             "season_id": season_id,
             "jugador_id": jugador_id,
@@ -346,7 +346,7 @@ class RapidPinRankingRepository(BaseRepository):
     
     async def recalculate_positions(self, season_id: str) -> bool:
         """Recalcular posiciones from ranking"""
-        # Obtener todos los rankings ordenados
+        # Get todos los rankings ordenados
         rankings = await self.get_season_ranking(season_id)
         
         # Update posiciones

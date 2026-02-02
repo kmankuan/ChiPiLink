@@ -241,14 +241,14 @@ class RapidPinService(BaseService):
         if season.estado != RapidPinSeasonStatus.ACTIVE:
             raise ValueError("La temporada ya está cerrada")
         
-        # Obtener rankings finales
+        # Get rankings finales
         player_ranking = await self.ranking_repo.get_season_ranking(season_id)
         referee_ranking = await self.ranking_repo.get_referee_ranking(season_id)
         
         # Prepare player results
         player_results = []
         for idx, entry in enumerate(player_ranking, start=1):
-            # Buscar premio correspondiente
+            # Search premio correspondiente
             prize = None
             for p in season.player_prizes:
                 if p.position == idx:
@@ -563,14 +563,14 @@ class RapidPinService(BaseService):
         if challenger_id == opponent_id:
             raise ValueError("No puedes desafiarte a ti mismo")
         
-        # Verificar temporada activa
+        # Verify temporada activa
         season = await self.season_repo.get_by_id(season_id)
         if not season:
             raise ValueError("Temporada no encontrada")
         if season.get("estado") != "active":
             raise ValueError("La temporada no está activa")
         
-        # Verificar that does not haya ya un desafío pendiente entre estos jugadores
+        # Verify that does not haya ya un desafío pendiente entre estos jugadores
         db = await self.get_db()
         existing = await db["rapidpin_queue"].find_one({
             "season_id": season_id,
@@ -646,7 +646,7 @@ class RapidPinService(BaseService):
         if player1_id == player2_id:
             raise ValueError("Los jugadores deben ser diferentes")
         
-        # Verificar temporada activa
+        # Verify temporada activa
         season = await self.season_repo.get_by_id(season_id)
         if not season:
             raise ValueError("Temporada no encontrada")
@@ -728,7 +728,7 @@ class RapidPinService(BaseService):
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este desafío ya fue procesado")
         
-        # Verificar permisos: solo player2 o admin/mod
+        # Verify permisos: solo player2 o admin/mod
         is_opponent = user_id == queue_entry["player2_id"]
         is_privileged = user_role in ["admin", "moderator"]
         
@@ -870,7 +870,7 @@ class RapidPinService(BaseService):
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("El árbitro no puede ser uno de the players")
         
-        # Obtener info of the árbitro
+        # Get info of the árbitro
         referee_info = await self.player_repo.get_by_id(referee_id)
         
         update_data = {
@@ -1003,7 +1003,7 @@ class RapidPinService(BaseService):
         """Get feed público de Rapid Pin"""
         db = await self.get_db()
         
-        # Obtener temporada activa
+        # Get temporada activa
         active_seasons = await self.get_active_seasons()
         active_season = active_seasons[0] if active_seasons else None
         
@@ -1091,7 +1091,7 @@ class RapidPinService(BaseService):
         if challenger_id == opponent_id:
             raise ValueError("No puedes desafiarte a ti mismo")
         
-        # Verificar that does not exista un desafío activo entre estos jugadores
+        # Verify that does not exista un desafío activo entre estos jugadores
         existing = await db["rapidpin_queue"].find_one({
             "$or": [
                 {"player1_id": challenger_id, "player2_id": opponent_id},
@@ -1109,7 +1109,7 @@ class RapidPinService(BaseService):
         
         now = datetime.now(timezone.utc).isoformat()
         
-        # Crear historial de fecha inicial
+        # Create historial de fecha inicial
         date_history = [{
             "proposed_date": proposed_date,
             "proposed_by_id": challenger_id,
@@ -1192,18 +1192,18 @@ class RapidPinService(BaseService):
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
             raise ValueError("Este reto no está en fase de negociación de fecha")
         
-        # Verificar que sea uno de the players
+        # Verify que sea uno de the players
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden responder")
         
-        # Verificar that does not sea la misma persona que propuso
+        # Verify that does not sea la misma persona que propuso
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
             raise ValueError("Debes esperar la respuesta del otro jugador")
         
         now = datetime.now(timezone.utc).isoformat()
         other_player_id = queue_entry["player2_id"] if user_id == queue_entry["player1_id"] else queue_entry["player1_id"]
         
-        # Obtener info of the user
+        # Get info of the user
         user_info = await self.player_repo.get_by_id(user_id)
         user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
         
@@ -1331,7 +1331,7 @@ class RapidPinService(BaseService):
         )
         
         if not config:
-            # Crear configuración por defecto
+            # Create configuración por defecto
             config = {
                 "config_id": "comment_config",
                 "max_comment_length": 280,
@@ -1363,12 +1363,12 @@ class RapidPinService(BaseService):
         """Dar o quitar like a un reto"""
         db = await self.get_db()
         
-        # Verificar que the challenge existe
+        # Verify que the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
         
-        # Verificar si already exists el like
+        # Verify si already exists el like
         existing = await db["rapidpin_reactions"].find_one({
             "queue_id": queue_id,
             "user_id": user_id,
@@ -1439,12 +1439,12 @@ class RapidPinService(BaseService):
         """Agregar comentario a un reto"""
         db = await self.get_db()
         
-        # Verificar que the challenge existe
+        # Verify que the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
         
-        # Obtener config
+        # Get config
         config = await self.get_comment_config()
         max_length = config.get("max_comment_length", 280)
         
@@ -1452,7 +1452,7 @@ class RapidPinService(BaseService):
         if len(content) > max_length:
             raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
         
-        # Verificar si the user está flaggeado (tiene sanciones)
+        # Verify si the user está flaggeado (tiene sanciones)
         user_moderation = await db["user_moderations"].find_one({
             "user_id": user_id,
             "status": {"$in": ["warning", "sanctioned"]}

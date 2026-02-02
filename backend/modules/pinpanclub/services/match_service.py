@@ -146,7 +146,7 @@ class MatchService(BaseService):
             puntos_a = 0
             puntos_b = 0
         
-        # Verificar si se completó el set
+        # Verify si se completó el set
         puntos_para_ganar = match.puntos_por_set
         set_completado = False
         ganador_set = None
@@ -207,7 +207,7 @@ class MatchService(BaseService):
                 }
             )
         
-        # Verificar si terminó the match
+        # Verify si terminó the match
         sets_para_ganar = (match.mejor_de // 2) + 1
         if sets_a >= sets_para_ganar or sets_b >= sets_para_ganar:
             ganador_id = match.jugador_a_id if sets_a > sets_b else match.jugador_b_id

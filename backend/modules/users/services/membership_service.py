@@ -290,7 +290,7 @@ class MembershipService:
             plan = await self.get_plan(membership.get("plan_id"))
             membership["plan_info"] = plan
             
-            # Verificar si ha expirado
+            # Verify si ha expirado
             if membership.get("end_date") and membership["end_date"] < now:
                 await self._expire_membership(membership["membership_id"])
                 membership["status"] = "expired"
@@ -403,7 +403,7 @@ class MembershipService:
         
         plan = await self.get_plan(membership.get("plan_id"))
         
-        # Verificar tipo de membresía
+        # Verify tipo de membresía
         if plan and plan.get("membership_type") == MembershipType.VISITS.value:
             visits_remaining = membership.get("visits_remaining", 0)
             
@@ -540,7 +540,7 @@ class MembershipService:
         """Register entrada de un usuario"""
         now = datetime.now(timezone.utc).isoformat()
         
-        # Verificar si ya hay un check-in activo
+        # Verify si ya hay un check-in activo
         active_visit = await db[self.collection_visits].find_one(
             {
                 "user_id": user_id,
@@ -604,7 +604,7 @@ class MembershipService:
         check_in_time = datetime.fromisoformat(visit["check_in_time"].replace('Z', '+00:00'))
         duration_minutes = int((now - check_in_time).total_seconds() / 60)
         
-        # Obtener configuración
+        # Get configuración
         config = await self.get_visit_config()
         min_duration = config.get("min_duration_minutes", 30)
         quick_max = config.get("quick_visit_max_minutes", 15)

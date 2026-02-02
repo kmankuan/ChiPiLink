@@ -250,7 +250,7 @@ class RankingRepository(BaseRepository):
         if existing:
             return existing
         
-        # Obtener última posición
+        # Get última posición
         count = await self.count({"liga_id": liga_id})
         
         new_entry = {
@@ -295,7 +295,7 @@ class RankingRepository(BaseRepository):
     
     async def recalculate_positions(self, liga_id: str, scoring_system: str = "simple") -> bool:
         """Recalcular posiciones from ranking"""
-        # Obtener todos los rankings of the league
+        # Get todos los rankings of the league
         rankings = await self.find_many(
             query={"liga_id": liga_id},
             limit=1000

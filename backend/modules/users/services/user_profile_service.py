@@ -199,7 +199,7 @@ class UserProfileService(BaseService):
         
         await db.chipi_user_profiles.insert_one(profile)
         
-        # Obtener info of the tipo
+        # Get info of the tipo
         profile["user_type_info"] = await self.get_user_type(user_type_id)
         
         profile.pop("_id", None)
@@ -281,7 +281,7 @@ class UserProfileService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Verificar that does not exista ya
+        # Verify that does not exista ya
         existing = await db.chipi_user_relationships.find_one({
             "$or": [
                 {"user_id_1": user_id_1, "user_id_2": user_id_2},

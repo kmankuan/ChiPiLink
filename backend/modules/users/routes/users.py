@@ -208,7 +208,7 @@ async def create_profile(
 ):
     """Create mi perfil"""
     try:
-        # Verificar si already exists
+        # Verify si already exists
         existing = await user_profile_service.get_profile(user["user_id"])
         if existing:
             raise HTTPException(status_code=400, detail="Profile already exists")

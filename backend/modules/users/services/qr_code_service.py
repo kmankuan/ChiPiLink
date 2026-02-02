@@ -26,7 +26,7 @@ class QRCodeService:
     
     def generate_user_qr_data(self, user_id: str, profile_id: str = None) -> Dict:
         """Generar datos para QR code de usuario"""
-        # Crear un código único basado en user_id y timestamp
+        # Create un código único basado en user_id y timestamp
         timestamp = datetime.now(timezone.utc).isoformat()
         raw_data = f"{user_id}:{profile_id or ''}:{timestamp}"
         
@@ -46,7 +46,7 @@ class QRCodeService:
     
     async def get_or_create_user_qr(self, user_id: str, profile_id: str = None) -> Dict:
         """Get o crear QR code para un usuario"""
-        # Buscar QR existente
+        # Search QR existente
         existing = await db[self.collection_qr_codes].find_one(
             {"user_id": user_id, "is_active": True},
             {"_id": 0}
@@ -55,7 +55,7 @@ class QRCodeService:
         if existing:
             return existing
         
-        # Crear nuevo QR
+        # Create nuevo QR
         qr_data = self.generate_user_qr_data(user_id, profile_id)
         
         qr_record = {
@@ -98,7 +98,7 @@ class QRCodeService:
             {"$set": {"is_active": False}}
         )
         
-        # Crear nuevo QR
+        # Create nuevo QR
         qr_data = self.generate_user_qr_data(user_id, profile_id)
         
         qr_record = {
@@ -129,11 +129,11 @@ class QRCodeService:
         if not qr_data:
             return {"valid": False, "error": "Invalid QR code format"}
         
-        # Verificar tipo
+        # Verify tipo
         if qr_data.get("type") != "chipi_user":
             return {"valid": False, "error": "Unknown QR type"}
         
-        # Buscar in database
+        # Search in database
         qr_record = await db[self.collection_qr_codes].find_one(
             {"qr_id": qr_data.get("qr_id"), "is_active": True},
             {"_id": 0}
@@ -142,22 +142,22 @@ class QRCodeService:
         if not qr_record:
             return {"valid": False, "error": "QR code not found or inactive"}
         
-        # Obtener información of the user
+        # Get información of the user
         user_id = qr_record["user_id"]
         
-        # Obtener wallet
+        # Get wallet
         wallet = await db.chipi_wallets.find_one(
             {"user_id": user_id},
             {"_id": 0}
         )
         
-        # Obtener perfil
+        # Get perfil
         profile = await db.chipi_user_profiles.find_one(
             {"user_id": user_id},
             {"_id": 0}
         )
         
-        # Obtener membresía activa
+        # Get membresía activa
         now = datetime.now(timezone.utc).isoformat()
         membership = await db.chipi_user_memberships.find_one(
             {
@@ -350,7 +350,7 @@ class QRCodeService:
                     "required": amount
                 }
             
-            # Crear transacción usando la firma correcta
+            # Create transacción usando la firma correcta
             transaction = await wallet_service.create_transaction(
                 user_id=user_id,
                 transaction_type=TransactionType.PURCHASE,
@@ -408,7 +408,7 @@ class QRCodeService:
                     "required": points
                 }
             
-            # Crear transacción usando la firma correcta
+            # Create transacción usando la firma correcta
             transaction = await wallet_service.create_transaction(
                 user_id=user_id,
                 transaction_type=TransactionType.PURCHASE,

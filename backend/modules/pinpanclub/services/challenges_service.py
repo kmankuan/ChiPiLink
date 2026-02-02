@@ -90,7 +90,7 @@ class ChallengeService(BaseService):
         week_number = now.isocalendar()[1]
         year = now.year
         
-        # Verificar si already exists
+        # Verify si already exists
         existing = await self.weekly_repo.get_by_week_year(week_number, year)
         if existing:
             return WeeklyChallengeSet(**existing)
@@ -102,7 +102,7 @@ class ChallengeService(BaseService):
         
         # Generate o usar retos proporcionados
         if auto_generate and not challenge_ids:
-            # Crear retos automáticos
+            # Create retos automáticos
             auto_challenges = select_weekly_challenges()
             challenge_ids = []
             
@@ -130,7 +130,7 @@ class ChallengeService(BaseService):
         """Get retos de la semana actual"""
         week = await self.get_current_week()
         if not week:
-            # Crear semana automáticamente
+            # Create semana automáticamente
             week = await self.create_weekly_set(auto_generate=True)
         
         challenges = []
@@ -149,7 +149,7 @@ class ChallengeService(BaseService):
         challenge_id: str
     ) -> PlayerChallenge:
         """Iniciar un reto para un jugador"""
-        # Verificar si ya tiene the challenge activo
+        # Verify si ya tiene the challenge activo
         existing = await self.player_challenge_repo.find_player_challenge(jugador_id, challenge_id)
         if existing:
             return PlayerChallenge(**existing)
@@ -203,7 +203,7 @@ class ChallengeService(BaseService):
         """
         updated = []
         
-        # Obtener retos activos of the player
+        # Get retos activos of the player
         active = await self.player_challenge_repo.get_active_challenges(jugador_id)
         
         for progress in active:
@@ -211,7 +211,7 @@ class ChallengeService(BaseService):
             if not challenge:
                 continue
             
-            # Verificar si el tipo de reto coincide
+            # Verify si el tipo de reto coincide
             if challenge.get("type") != challenge_type:
                 continue
             
@@ -263,7 +263,7 @@ class ChallengeService(BaseService):
         if week and challenge["challenge_id"] in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, completions=1)
         
-        # Crear notificación
+        # Create notificación
         await social_service.create_notification(NotificationCreate(
             user_id=jugador_id,
             type=NotificationType.CHALLENGE_COMPLETED,
@@ -276,7 +276,7 @@ class ChallengeService(BaseService):
             action_url="/pinpanclub/challenges"
         ))
         
-        # Crear actividad en feed
+        # Create actividad en feed
         await social_service.create_activity(ActivityFeedCreate(
             jugador_id=jugador_id,
             activity_type=ActivityType.CHALLENGE_COMPLETED,

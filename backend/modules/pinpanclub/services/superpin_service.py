@@ -125,14 +125,14 @@ class SuperPinService(BaseService):
         data: PlayerCheckInCreate
     ) -> PlayerCheckIn:
         """Register check-in de jugador"""
-        # Verificar si ya tiene check-in activo
+        # Verify si ya tiene check-in activo
         existing = await self.checkin_repo.get_player_checkin(
             data.liga_id, data.jugador_id
         )
         if existing:
             return PlayerCheckIn(**existing)
         
-        # Obtener info of the player
+        # Get info of the player
         player = await self.player_repo.get_by_id(data.jugador_id)
         
         checkin_dict = data.model_dump()
@@ -224,7 +224,7 @@ class SuperPinService(BaseService):
         match_dict["set_actual"] = 1
         match_dict["historial_sets"] = []
         
-        # Obtener ELO actual de the players
+        # Get ELO actual de the players
         ranking_a = await self.ranking_repo.get_or_create(
             data.liga_id, data.jugador_a_id, player_a
         )
@@ -285,7 +285,7 @@ class SuperPinService(BaseService):
         ganador_set = None
         ganador_partido = None
         
-        # Verificar si se ganó el set
+        # Verify si se ganó el set
         if puntos_a >= puntos_set or puntos_b >= puntos_set:
             if abs(puntos_a - puntos_b) >= 2:
                 set_ganado = True
@@ -305,7 +305,7 @@ class SuperPinService(BaseService):
                 else:
                     match["sets_jugador_b"] += 1
                 
-                # Verificar si se ganó the match
+                # Verify si se ganó the match
                 sets_para_ganar = (match["mejor_de"] // 2) + 1
                 if match["sets_jugador_a"] >= sets_para_ganar:
                     partido_terminado = True
@@ -353,7 +353,7 @@ class SuperPinService(BaseService):
         """Update ranking después de un partido"""
         liga_id = match["liga_id"]
         
-        # Obtener configuración of the league
+        # Get configuración of the league
         league = await self.league_repo.get_by_id(liga_id)
         if not league:
             return
@@ -364,7 +364,7 @@ class SuperPinService(BaseService):
         ganador_id = match["ganador_id"]
         perdedor_id = match["jugador_b_id"] if ganador_id == match["jugador_a_id"] else match["jugador_a_id"]
         
-        # Obtener rankings
+        # Get rankings
         ranking_ganador = await self.ranking_repo.get_player_ranking(liga_id, ganador_id)
         ranking_perdedor = await self.ranking_repo.get_player_ranking(liga_id, perdedor_id)
         
@@ -503,7 +503,7 @@ class SuperPinService(BaseService):
         if not league:
             raise ValueError("Liga no encontrada")
         
-        # Obtener participantes según configuración
+        # Get participantes según configuración
         ranking = await self.get_ranking(data.liga_id)
         tournament_config = league.tournament_config
         
@@ -654,7 +654,7 @@ class SuperPinService(BaseService):
         current_round = 0
         match_position = 0
         
-        # Buscar y actualizar the match
+        # Search y actualizar the match
         for bracket in brackets:
             for match in bracket["matches"]:
                 if match["match_id"] == match_id:
@@ -693,7 +693,7 @@ class SuperPinService(BaseService):
         # Update brackets en DB
         await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
-        # Verificar si the tournament terminó
+        # Verify si the tournament terminó
         final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
         if final_bracket:
             final_match = final_bracket["matches"][0]
@@ -743,7 +743,7 @@ class SuperPinService(BaseService):
     ) -> Optional[Dict]:
         """Otorgar un badge a un jugador"""
         
-        # Verificar si ya tiene el badge (si no se permiten duplicados)
+        # Verify si ya tiene el badge (si no se permiten duplicados)
         if not allow_duplicates:
             existing = await self.badge_repo.get_badge_by_type(
                 jugador_id, badge_type,
@@ -753,7 +753,7 @@ class SuperPinService(BaseService):
             if existing:
                 return None  # Ya tiene este badge
         
-        # Obtener definición del badge
+        # Get definición del badge
         badge_def = BADGE_DEFINITIONS.get(badge_type, {})
         
         badge_data = {
@@ -786,7 +786,7 @@ class SuperPinService(BaseService):
         liga_id = tournament.get("liga_id")
         temporada = None
         
-        # Obtener temporada of the league
+        # Get temporada of the league
         league = await self.league_repo.get_by_id(liga_id)
         if league:
             temporada = league.get("temporada")
@@ -842,7 +842,7 @@ class SuperPinService(BaseService):
         """Verify y otorgar badges basados en estadísticas de partido"""
         awarded_badges = []
         
-        # Obtener ranking of the player
+        # Get ranking of the player
         ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
         if not ranking:
             return awarded_badges
@@ -977,12 +977,12 @@ class SuperPinService(BaseService):
         if not player:
             return None
         
-        # Obtener rankings de all leagues o una específica
+        # Get rankings de all leagues o una específica
         if liga_id:
             rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
             rankings = [r for r in rankings if r]
         else:
-            # Buscar en all leagues activas
+            # Search en all leagues activas
             leagues = await self.league_repo.get_all_leagues()
             rankings = []
             for league in leagues:
@@ -1029,7 +1029,7 @@ class SuperPinService(BaseService):
                 "elo_change": match.get("elo_change_a") if is_player_a else match.get("elo_change_b")
             })
         
-        # Obtener badges
+        # Get badges
         badges = await self.get_player_badges(jugador_id)
         
         # Calculatesr estadísticas agregadas
@@ -1165,13 +1165,13 @@ class SuperPinService(BaseService):
         import random
         from datetime import datetime, timezone
         
-        # Obtener jugadores con check-in activo
+        # Get jugadores con check-in activo
         available_players = await self.get_available_players(liga_id)
         
         if len(available_players) < 2:
             raise ValueError("Se necesitan al menos 2 jugadores con check-in activo")
         
-        # Obtener info de ranking para cada jugador
+        # Get info de ranking para cada jugador
         players_with_ranking = []
         for checkin in available_players:
             jugador_id = checkin.get("jugador_id")
@@ -1199,7 +1199,7 @@ class SuperPinService(BaseService):
             # Random
             random.shuffle(players_with_ranking)
         
-        # Crear emparejamientos
+        # Create emparejamientos
         pairings = []
         used_players = set()
         
@@ -1224,7 +1224,7 @@ class SuperPinService(BaseService):
         if len(players_with_ranking) % 2 == 1:
             bye_player = players_with_ranking[-1]
         
-        # Crear the matches
+        # Create the matches
         created_matches = []
         mejor_de = 1 if match_format == "best_of_1" else 3
         
@@ -1273,7 +1273,7 @@ class SuperPinService(BaseService):
     
     async def get_quick_tournament_status(self, liga_id: str) -> Dict:
         """Get estado de partidos rápidos activos en una liga"""
-        # Buscar partidos tipo 'quick' en curso
+        # Search partidos tipo 'quick' en curso
         active_matches = await self.match_repo.find_many(
             query={
                 "liga_id": liga_id,
@@ -1313,14 +1313,14 @@ class SuperPinService(BaseService):
         Predice el resultado de un partido entre dos jugadores.
         Usa ELO rating, historial de enfrentamientos y racha actual.
         """
-        # Obtener estadísticas de ambos jugadores
+        # Get estadísticas de ambos jugadores
         stats_a = await self.get_player_statistics(jugador_a_id)
         stats_b = await self.get_player_statistics(jugador_b_id)
         
         if not stats_a or not stats_b:
             return {"error": "Jugador not found"}
         
-        # Obtener historial head-to-head
+        # Get historial head-to-head
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
         
         # Calculatesr probabilidad basada en ELO

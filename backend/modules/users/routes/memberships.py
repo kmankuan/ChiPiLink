@@ -193,11 +193,11 @@ async def get_membership(
     if not membership:
         raise HTTPException(status_code=404, detail="Membership not found")
     
-    # Verificar que pertenece al usuario
+    # Verify que pertenece al usuario
     if membership["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not your membership")
     
-    # Obtener plan
+    # Get plan
     plan = await membership_service.get_plan(membership["plan_id"])
     membership["plan_info"] = plan
     

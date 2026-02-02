@@ -75,7 +75,7 @@ class PrizeService(BaseService):
         if existing:
             return PrizeCatalog(**existing)
         
-        # Crear premios por defecto
+        # Create premios por defecto
         default_prizes = get_default_prize_catalog()
         prize_defs = []
         
@@ -83,7 +83,7 @@ class PrizeService(BaseService):
             created = await self.definition_repo.create(prize_data)
             prize_defs.append(PrizeDefinition(**created))
         
-        # Crear catálogo
+        # Create catálogo
         catalog_data = {
             "name": "Catálogo Principal",
             "description": "Premios estándar para temporadas",
@@ -116,7 +116,7 @@ class PrizeService(BaseService):
         
         player = await self.player_repo.get_by_id(jugador_id)
         
-        # Verificar límite de ganadores
+        # Verify límite de ganadores
         if prize.get("max_winners"):
             current_winners = await self.awarded_repo.count_prize_winners(prize_id)
             if current_winners >= prize["max_winners"]:
@@ -158,7 +158,7 @@ class PrizeService(BaseService):
             action_url="/pinpanclub/prizes"
         ))
         
-        # Crear actividad en feed
+        # Create actividad en feed
         await social_service.create_activity(ActivityFeedCreate(
             jugador_id=jugador_id,
             activity_type=ActivityType.PRIZE_WON,
@@ -187,7 +187,7 @@ class PrizeService(BaseService):
         """
         awarded = []
         
-        # Obtener catálogo de premios
+        # Get catálogo de premios
         catalog = await self.get_or_create_default_catalog()
         
         for prize_data in catalog.prizes:
@@ -198,7 +198,7 @@ class PrizeService(BaseService):
             
             for idx, ranking in enumerate(rankings, start=1):
                 if self._check_conditions(prize.conditions, ranking, idx):
-                    # Verificar límite
+                    # Verify límite
                     if prize.max_winners:
                         current = await self.awarded_repo.count_prize_winners(prize.prize_id)
                         if current >= prize.max_winners:

@@ -69,7 +69,7 @@ async def get_my_wallet(user=Depends(get_current_user)):
     wallet = await wallet_service.get_wallet(user["user_id"])
     
     if not wallet:
-        # Crear billetera automáticamente
+        # Create billetera automáticamente
         wallet = await wallet_service.create_wallet(user["user_id"])
     
     return {
@@ -84,7 +84,7 @@ async def get_wallet_summary(user=Depends(get_current_user)):
     wallet = await wallet_service.get_or_create_wallet(user["user_id"])
     config = await wallet_service.get_config()
     
-    # Obtener últimas transacciones
+    # Get últimas transacciones
     transactions = await wallet_service.get_transactions(
         user["user_id"],
         limit=10

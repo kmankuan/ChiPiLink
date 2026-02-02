@@ -88,7 +88,7 @@ class WalletService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Verificar si already exists
+        # Verify si already exists
         existing = await self.get_wallet(user_id)
         if existing:
             return existing
@@ -143,7 +143,7 @@ class WalletService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener billetera
+        # Get billetera
         wallet = await self.get_or_create_wallet(user_id)
         
         # Calculate saldo antes
@@ -165,7 +165,7 @@ class WalletService(BaseService):
         else:
             balance_after = balance_before - amount
             
-            # Verificar saldo suficiente
+            # Verify saldo suficiente
             if balance_after < 0:
                 raise ValueError(f"Saldo insuficiente. Disponible: {balance_before}")
         
@@ -197,7 +197,7 @@ class WalletService(BaseService):
         """Completar una transacción pendiente"""
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener transacción
+        # Get transacción
         transaction = await db.chipi_transactions.find_one(
             {"transaction_id": transaction_id}
         )
@@ -243,7 +243,7 @@ class WalletService(BaseService):
             }
         )
         
-        # Marcar transacción como completada
+        # Mark transacción como completada
         result = await db.chipi_transactions.find_one_and_update(
             {"transaction_id": transaction_id},
             {"$set": {
@@ -320,7 +320,7 @@ class WalletService(BaseService):
         if not wallet:
             raise ValueError("Usuario sin billetera")
         
-        # Verificar saldo
+        # Verify saldo
         balance = wallet["balance_usd"] if currency == Currency.USD else wallet["balance_points"]
         if balance < amount:
             raise ValueError(f"Saldo insuficiente. Disponible: {balance}, Requerido: {amount}")
@@ -354,7 +354,7 @@ class WalletService(BaseService):
         
         wallet = await self.get_or_create_wallet(user_id)
         
-        # Crear transacción
+        # Create transacción
         transaction = await self.create_transaction(
             user_id=user_id,
             transaction_type=TransactionType.REWARD,
@@ -474,14 +474,14 @@ class WalletService(BaseService):
         description: str = None
     ) -> Tuple[Dict, Dict]:
         """Transferir fondos entre usuarios"""
-        # Verificar billeteras
+        # Verify billeteras
         from_wallet = await self.get_wallet(from_user_id)
         to_wallet = await self.get_or_create_wallet(to_user_id)
         
         if not from_wallet:
             raise ValueError("Billetera origen no encontrada")
         
-        # Verificar saldo
+        # Verify saldo
         balance = from_wallet["balance_usd"] if currency == Currency.USD else from_wallet["balance_points"]
         if balance < amount:
             raise ValueError(f"Saldo insuficiente. Disponible: {balance}")
@@ -528,7 +528,7 @@ class WalletService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Buscar pending existente
+        # Search pending existente
         existing = await db.chipi_pending_balances.find_one({
             "user_id": user_id,
             "guardian_user_id": guardian_user_id,
@@ -557,7 +557,7 @@ class WalletService(BaseService):
             existing.pop("_id", None)
             return existing
         
-        # Crear nuevo
+        # Create nuevo
         pending = {
             "pending_id": f"pend_{uuid.uuid4().hex[:8]}",
             "user_id": user_id,
@@ -604,7 +604,7 @@ class WalletService(BaseService):
             reference_id=pending_id
         )
         
-        # Marcar como pagado
+        # Mark como pagado
         await db.chipi_pending_balances.update_one(
             {"pending_id": pending_id},
             {"$set": {

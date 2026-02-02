@@ -181,7 +181,7 @@ class RankRewardsService(BaseService):
         # ¡Hubo promoción!
         self.log_info(f"Rank promotion: {jugador_id} from {old_rank['id']} to {new_rank['id']}")
         
-        # Verificar si ya recibió esta recompensa
+        # Verify si ya recibió esta recompensa
         existing_reward = await db.pinpanclub_rank_rewards.find_one({
             "jugador_id": jugador_id,
             "rank_id": new_rank["id"]
@@ -206,14 +206,14 @@ class RankRewardsService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         reward = rank.get("reward")
         
-        # Obtener info of the player
+        # Get info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}
         )
         player_name = player.get("apodo") or player.get("nombre", "Jugador") if player else "Jugador"
         
-        # Obtener nombre localizado del rango
+        # Get nombre localizado del rango
         rank_name = rank["name"].get(lang, rank["name"].get("es", rank["id"]))
         
         # Registrar la recompensa
@@ -285,7 +285,7 @@ class RankRewardsService(BaseService):
                     {"$set": {"special_title": title, "title_rank": rank["id"]}}
                 )
         
-        # Crear notificación de promoción
+        # Create notificación de promoción
         notification_title = {
             "es": f"¡Subiste a {rank_name}!",
             "en": f"You reached {rank_name}!",

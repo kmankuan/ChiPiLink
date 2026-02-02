@@ -42,7 +42,7 @@ class RankingSeasonsService(BaseService):
         )
         season_number = (last_season.get("season_number", 0) if last_season else 0) + 1
         
-        # Obtener tema
+        # Get tema
         themes = get_season_themes()
         theme = next((t for t in themes if t["id"] == theme_id), themes[0]) if theme_id else None
         
@@ -140,7 +140,7 @@ class RankingSeasonsService(BaseService):
         """
         now = datetime.now(timezone.utc)
         
-        # Obtener temporada
+        # Get temporada
         season = await self.get_season_by_id(season_id)
         if not season:
             raise ValueError(f"Season not found: {season_id}")
@@ -148,7 +148,7 @@ class RankingSeasonsService(BaseService):
         if season["status"] == SeasonStatus.COMPLETED.value:
             raise ValueError("Season already completed")
         
-        # Marcar como cerrando
+        # Mark como cerrando
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {"$set": {"status": SeasonStatus.CLOSING.value}}
@@ -156,7 +156,7 @@ class RankingSeasonsService(BaseService):
         
         self.log_info(f"Closing season: {season_id}")
         
-        # Obtener ranking final
+        # Get ranking final
         final_standings = await self.get_season_leaderboard(season_id, limit=100)
         
         # Filtrar participantes calificados
@@ -230,7 +230,7 @@ class RankingSeasonsService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         jugador_id = participant["jugador_id"]
         
-        # Verificar si ya recibió recompensa de esta temporada
+        # Verify si ya recibió recompensa de esta temporada
         existing = await db.pinpanclub_season_rewards.find_one({
             "season_id": season["season_id"],
             "jugador_id": jugador_id
@@ -252,7 +252,7 @@ class RankingSeasonsService(BaseService):
                 "season_id": season["season_id"]
             }
             
-            # Crear badge en colección de badges
+            # Create badge en colección de badges
             await db.pinpanclub_superpin_badges.insert_one({
                 "badge_id": f"season_{season['season_id']}_{jugador_id[:8]}",
                 "jugador_id": jugador_id,
@@ -291,7 +291,7 @@ class RankingSeasonsService(BaseService):
                 upsert=True
             )
         
-        # Crear registro de recompensa
+        # Create registro de recompensa
         reward = {
             "reward_id": f"sr_{season['season_id']}_{jugador_id[:8]}",
             "season_id": season["season_id"],
@@ -313,7 +313,7 @@ class RankingSeasonsService(BaseService):
         
         await db.pinpanclub_season_rewards.insert_one(reward)
         
-        # Crear notificación
+        # Create notificación
         try:
             from .social_service import social_service
             
@@ -393,7 +393,7 @@ class RankingSeasonsService(BaseService):
         if not participant:
             return None
         
-        # Obtener posición actual
+        # Get posición actual
         higher_count = await db.pinpanclub_season_participants.count_documents({
             "season_id": season_id,
             "season_points": {"$gt": participant.get("season_points", 0)}
@@ -419,7 +419,7 @@ class RankingSeasonsService(BaseService):
         
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener info of the player
+        # Get info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}
@@ -484,10 +484,10 @@ class RankingSeasonsService(BaseService):
         
         # Calculatesr fechas del próximo mes
         if now.day <= 15:
-            # Crear para este mes si aún no empezó
+            # Create para este mes si aún no empezó
             start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         else:
-            # Crear para el próximo mes
+            # Create para el próximo mes
             start_date = (now.replace(day=1) + relativedelta(months=1)).replace(
                 hour=0, minute=0, second=0, microsecond=0
             )
@@ -543,7 +543,7 @@ class RankingSeasonsService(BaseService):
         if current:
             return current
         
-        # Verificar si hay una temporada próxima que debería activarse
+        # Verify si hay una temporada próxima que debería activarse
         now = datetime.now(timezone.utc)
         upcoming = await db.pinpanclub_ranking_seasons.find_one({
             "status": SeasonStatus.UPCOMING.value,
@@ -554,7 +554,7 @@ class RankingSeasonsService(BaseService):
             await self.activate_season(upcoming["season_id"])
             return await self.get_season_by_id(upcoming["season_id"])
         
-        # Crear new season mensual
+        # Create new season mensual
         self.log_info("No active season found, creating new monthly season")
         new_season = await self.create_next_monthly_season()
         

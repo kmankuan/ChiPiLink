@@ -62,7 +62,7 @@ class CategoryService(BaseService):
         Eliminar categoría (soft delete).
         Verifica that does not tenga productos activos.
         """
-        # Verificar productos
+        # Verify productos
         product_count = await self.repository.count_products(categoria_id)
         if product_count > 0:
             raise ValueError(f"No se puede eliminar. Hay {product_count} productos en esta categoría.")
@@ -73,7 +73,7 @@ class CategoryService(BaseService):
         """Get datos completos para landing de categoría"""
         category = await self.get_category(categoria_id)
         
-        # Obtener productos
+        # Get productos
         featured = await self.product_repository.get_featured(categoria_id)
         promotions = await self.product_repository.get_promotions(categoria_id)
         newest = await self.product_repository.get_newest(categoria_id)

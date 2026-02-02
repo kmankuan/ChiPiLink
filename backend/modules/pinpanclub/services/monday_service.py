@@ -274,7 +274,7 @@ class MondayService(BaseService):
         if not match:
             return None
         
-        # Obtener nombres de jugadores
+        # Get nombres de jugadores
         player_a = match.get("jugador_a_info", {})
         player_b = match.get("jugador_b_info", {})
         
@@ -309,7 +309,7 @@ class MondayService(BaseService):
             )
             return match["monday_item_id"]
         else:
-            # Crear nuevo
+            # Create nuevo
             monday_id = await self.create_item(
                 config.matches_board_id,
                 item_name,
