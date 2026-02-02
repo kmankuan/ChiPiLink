@@ -95,7 +95,7 @@ async def test_connection(admin: dict = Depends(get_admin_user)):
 
 @router.post("/sync/players")
 async def sync_players(admin: dict = Depends(get_admin_user)):
-    """Sincronizar todos los jugadores pendientes"""
+    """Sincronizar todos players pendientes"""
     config = await monday_service.get_config()
     if not config.players_board_id:
         raise HTTPException(status_code=400, detail="Board of players no configurado")
@@ -111,7 +111,7 @@ async def sync_players(admin: dict = Depends(get_admin_user)):
 
 @router.post("/sync/matches/active")
 async def sync_active_matches(admin: dict = Depends(get_admin_user)):
-    """Sincronizar todos los partidos activos"""
+    """Sincronizar todos matches active"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
         raise HTTPException(status_code=400, detail="Board of matches no configurado")
@@ -130,7 +130,7 @@ async def sync_single_match(
     partido_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Sincronizar un partido específico"""
+    """Sincronizar a match específico"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
         raise HTTPException(status_code=400, detail="Board of matches no configurado")

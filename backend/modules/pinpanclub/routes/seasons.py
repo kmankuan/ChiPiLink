@@ -20,7 +20,7 @@ async def get_current_season(lang: str = Query("es")):
     season = await seasons_service.get_current_season()
     
     if not season:
-        # Intentar crear/activar una temporada
+        # Intentar crear/activar a season
         season = await seasons_service.ensure_active_season()
     
     if not season:
@@ -38,7 +38,7 @@ async def get_all_seasons(
     limit: int = Query(20, ge=1, le=50),
     lang: str = Query("es")
 ):
-    """Get todas las temporadas"""
+    """Get todas seasons"""
     seasons = await seasons_service.get_all_seasons(limit)
     
     # Localizar nombres
@@ -70,7 +70,7 @@ async def get_past_seasons(
 
 @router.get("/{season_id}")
 async def get_season_by_id(season_id: str, lang: str = Query("es")):
-    """Get detalles de una temporada específica"""
+    """Get detalles de a season específica"""
     season = await seasons_service.get_season_by_id(season_id)
     
     if not season:
@@ -113,7 +113,7 @@ async def get_season_leaderboard(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Get leaderboard de una temporada"""
+    """Get leaderboard de a season"""
     leaderboard = await seasons_service.get_season_leaderboard(season_id, limit, offset)
     
     return {
@@ -152,7 +152,7 @@ async def get_player_current_season_stats(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats/{season_id}")
 async def get_player_season_stats(jugador_id: str, season_id: str):
-    """Get estadísticas del jugador en una temporada específica"""
+    """Get estadísticas del jugador en a season específica"""
     stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
     
     if not stats:
@@ -171,7 +171,7 @@ async def get_player_season_stats(jugador_id: str, season_id: str):
 
 @router.get("/player/{jugador_id}/rewards")
 async def get_player_season_rewards(jugador_id: str):
-    """Get todas las recompensas de temporada de un jugador"""
+    """Get todas las recompensas de temporada de a player"""
     rewards = await seasons_service.get_player_season_rewards(jugador_id)
     
     return {
@@ -222,7 +222,7 @@ async def create_monthly_season(lang: str = Query("es")):
 
 @router.post("/{season_id}/activate")
 async def activate_season(season_id: str):
-    """Activar una temporada (admin)"""
+    """Activar a season (admin)"""
     success = await seasons_service.activate_season(season_id)
     
     if not success:
@@ -233,7 +233,7 @@ async def activate_season(season_id: str):
 
 @router.post("/{season_id}/close")
 async def close_season(season_id: str, lang: str = Query("es")):
-    """Cerrar una temporada y otorgar recompensas (admin)"""
+    """Cerrar a season y otorgar recompensas (admin)"""
     try:
         result = await seasons_service.close_season(season_id, lang)
         return {
@@ -246,7 +246,7 @@ async def close_season(season_id: str, lang: str = Query("es")):
 
 @router.post("/ensure-active")
 async def ensure_active_season():
-    """Asegurar que existe una temporada activa (admin/cron)"""
+    """Asegurar que existe a season activa (admin/cron)"""
     season = await seasons_service.ensure_active_season()
     
     if season:

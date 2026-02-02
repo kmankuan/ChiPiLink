@@ -23,7 +23,7 @@ router = APIRouter(prefix="/superpin", tags=["Super Pin Ranking"])
 
 @router.get("/leagues", response_model=List[SuperPinLeague])
 async def get_leagues(active_only: bool = False):
-    """Get todas las ligas o solo las activas"""
+    """Get todas leagues or only active ones"""
     if active_only:
         return await superpin_service.get_active_leagues()
     return await superpin_service.get_all_leagues()
@@ -181,7 +181,7 @@ async def get_league_matches(
     estado: Optional[str] = None,
     limit: int = Query(50, ge=1, le=200)
 ):
-    """Get partidos de una liga"""
+    """Get partidos de a league"""
     matches = await superpin_service.match_repo.get_league_matches(liga_id, estado, limit)
     return matches
 
@@ -190,7 +190,7 @@ async def get_league_matches(
 
 @router.get("/leagues/{liga_id}/ranking", response_model=RankingTable)
 async def get_ranking(liga_id: str):
-    """Get tabla de ranking de una liga"""
+    """Get tabla de ranking de a league"""
     try:
         return await superpin_service.get_ranking(liga_id)
     except ValueError as e:
@@ -199,7 +199,7 @@ async def get_ranking(liga_id: str):
 
 @router.get("/leagues/{liga_id}/ranking/{jugador_id}")
 async def get_player_stats(liga_id: str, jugador_id: str):
-    """Get estadísticas de un jugador en una liga"""
+    """Get estadísticas de a player en a league"""
     stats = await superpin_service.get_player_stats(liga_id, jugador_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador no encontrado en esta liga")
@@ -245,7 +245,7 @@ async def create_tournament(
 
 @router.get("/leagues/{liga_id}/tournaments")
 async def get_league_tournaments(liga_id: str):
-    """Get torneos de una liga"""
+    """Get torneos de a league"""
     return await superpin_service.tournament_repo.get_league_tournaments(liga_id)
 
 
@@ -277,7 +277,7 @@ async def update_match_result(
     score_b: int = 0,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update resultado de un partido del torneo"""
+    """Update resultado de a match del torneo"""
     try:
         result = await superpin_service.update_tournament_match(
             torneo_id, match_id, winner_id, score_a, score_b
@@ -319,7 +319,7 @@ async def get_badge_leaderboard(liga_id: str = None, limit: int = 10):
 
 @router.get("/players/{jugador_id}/badges")
 async def get_player_badges(jugador_id: str):
-    """Get todos los badges de un jugador"""
+    """Get todos los badges de a player"""
     badges = await superpin_service.get_player_badges(jugador_id)
     return {"jugador_id": jugador_id, "badges": badges, "total": len(badges)}
 
@@ -342,7 +342,7 @@ async def get_badge_definitions():
 
 @router.get("/players/{jugador_id}/statistics")
 async def get_player_statistics(jugador_id: str, liga_id: str = None):
-    """Get estadísticas detalladas de un jugador"""
+    """Get estadísticas detalladas de a player"""
     stats = await superpin_service.get_player_statistics(jugador_id, liga_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
@@ -358,7 +358,7 @@ async def get_head_to_head(jugador_a_id: str, jugador_b_id: str):
 @router.get("/predict-match")
 async def predict_match(jugador_a_id: str, jugador_b_id: str):
     """
-    Predice el resultado de un partido entre dos jugadores.
+    Predice el resultado de a match entre dos jugadores.
     Retorna probabilidades basadas en ELO, historial H2H y racha actual.
     """
     return await superpin_service.predict_match(jugador_a_id, jugador_b_id)

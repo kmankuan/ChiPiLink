@@ -25,13 +25,13 @@ async def get_matches(
 
 @router.get("/active", response_model=List[Match])
 async def get_active_matches():
-    """Get partidos activos (en curso o pausados)"""
+    """Get partidos active (en curso o pausados)"""
     return await match_service.get_active_matches()
 
 
 @router.get("/active/all")
 async def get_all_active_matches():
-    """Get todos los partidos activos para TV/Canvas"""
+    """Get todos matches active para TV/Canvas"""
     matches = await match_service.get_active_matches()
     return [m.model_dump() for m in matches]
 

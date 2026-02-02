@@ -21,7 +21,7 @@ router = APIRouter(prefix="/social", tags=["Social"])
 
 @router.post("/follow", response_model=Follow)
 async def follow_player(data: FollowCreate):
-    """Seguir a un jugador"""
+    """Seguir a a player"""
     try:
         return await social_service.follow_player(data.follower_id, data.following_id)
     except ValueError as e:
@@ -30,21 +30,21 @@ async def follow_player(data: FollowCreate):
 
 @router.delete("/follow")
 async def unfollow_player(follower_id: str, following_id: str):
-    """Dejar de seguir a un jugador"""
+    """Dejar de seguir a a player"""
     success = await social_service.unfollow_player(follower_id, following_id)
     return {"success": success}
 
 
 @router.get("/followers/{jugador_id}")
 async def get_followers(jugador_id: str, limit: int = 50):
-    """Get seguidores de un jugador"""
+    """Get seguidores de a player"""
     followers = await social_service.get_followers(jugador_id, limit)
     return {"jugador_id": jugador_id, "followers": followers, "total": len(followers)}
 
 
 @router.get("/following/{jugador_id}")
 async def get_following(jugador_id: str, limit: int = 50):
-    """Get a quiénes sigue un jugador"""
+    """Get a quiénes sigue a player"""
     following = await social_service.get_following(jugador_id, limit)
     return {"jugador_id": jugador_id, "following": following, "total": len(following)}
 
@@ -57,7 +57,7 @@ async def get_follow_stats(jugador_id: str):
 
 @router.get("/is-following")
 async def is_following(follower_id: str, following_id: str):
-    """Verify si un jugador sigue a otro"""
+    """Verify si a player sigue a otro"""
     result = await social_service.is_following(follower_id, following_id)
     return {"is_following": result}
 
@@ -126,7 +126,7 @@ async def get_user_reaction(target_type: str, target_id: str, user_id: str):
 
 @router.get("/feed/{jugador_id}")
 async def get_player_feed(jugador_id: str, limit: int = Query(20, ge=1, le=100)):
-    """Get feed de actividad de un jugador"""
+    """Get feed de actividad de a player"""
     feed = await social_service.get_player_feed(jugador_id, limit)
     return {"jugador_id": jugador_id, "feed": feed}
 

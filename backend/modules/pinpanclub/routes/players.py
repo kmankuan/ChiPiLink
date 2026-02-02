@@ -18,7 +18,7 @@ async def get_players(
     limit: int = Query(100, ge=1, le=500),
     search: Optional[str] = None
 ):
-    """Get lista of players activos"""
+    """Get lista of players active"""
     if search:
         return await player_service.search_players(search)
     return await player_service.get_all_players(skip=skip, limit=limit)

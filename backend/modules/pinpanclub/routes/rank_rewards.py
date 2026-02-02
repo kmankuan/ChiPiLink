@@ -26,7 +26,7 @@ async def get_rank_rewards_info(lang: str = Query("es", description="Language co
 
 @router.get("/player/{jugador_id}/history")
 async def get_player_rank_history(jugador_id: str):
-    """Get historial de rangos y recompensas de un jugador"""
+    """Get historial de rangos y recompensas de a player"""
     history = await rank_rewards_service.get_player_rank_history(jugador_id)
     return {
         "jugador_id": jugador_id,
@@ -67,7 +67,7 @@ async def get_current_rank_info(
     jugador_id: str,
     lang: str = Query("es", description="Language code")
 ):
-    """Get información del rango actual de un jugador"""
+    """Get información del rango actual de a player"""
     from core.database import db
     
     # Get puntos actuales

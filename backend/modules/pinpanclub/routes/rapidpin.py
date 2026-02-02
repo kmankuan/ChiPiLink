@@ -21,7 +21,7 @@ router = APIRouter(prefix="/rapidpin", tags=["Rapid Pin"])
 
 @router.get("/seasons", response_model=List[RapidPinSeason])
 async def get_seasons(active_only: bool = False):
-    """Get todas las temporadas o solo las activas"""
+    """Get todas seasons or only active ones"""
     if active_only:
         return await rapidpin_service.get_active_seasons()
     return await rapidpin_service.get_all_seasons()
@@ -90,7 +90,7 @@ async def confirm_match(
     confirmado_por_id: str
 ):
     """
-    Confirmar un partido pendiente.
+    Confirmar a match pendiente.
     Solo puede confirmar un participante diferente al que lo registró.
     """
     try:
@@ -114,7 +114,7 @@ async def get_season_matches(
     estado: Optional[str] = None,
     limit: int = Query(50, ge=1, le=200)
 ):
-    """Get partidos de una temporada"""
+    """Get partidos de a season"""
     return await rapidpin_service.get_season_matches(season_id, estado, limit)
 
 
@@ -138,8 +138,8 @@ async def get_pending_confirmations(
 @router.get("/pending/{user_id}")
 async def get_all_pending_confirmations(user_id: str):
     """
-    Obtener TODOS los partidos pendientes de confirmación para un usuario.
-    Retorna partidos de todas las temporadas donde el usuario participa pero no fue quien lo registró.
+    Obtener TODOS matches pendientes de confirmación para un usuario.
+    Retorna partidos de todas seasons donde el usuario participa pero no fue quien lo registró.
     """
     matches = await rapidpin_service.get_all_pending_confirmations(user_id)
     return {
@@ -168,7 +168,7 @@ async def get_referee_ranking(season_id: str):
 
 @router.get("/seasons/{season_id}/players/{jugador_id}/stats")
 async def get_player_stats(season_id: str, jugador_id: str):
-    """Get estadísticas de un jugador en una temporada"""
+    """Get estadísticas de a player en a season"""
     stats = await rapidpin_service.get_player_stats(season_id, jugador_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador no encontrado en esta temporada")
@@ -283,7 +283,7 @@ async def get_queue_matches(
 ):
     """
     Obtener partidos en cola/desafíos.
-    - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos activos)
+    - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos active)
     - player_id: filtrar por jugador involucrado
     """
     return await rapidpin_service.get_queue_matches(season_id, status, player_id)
@@ -331,7 +331,7 @@ async def assign_referee(
     assigned_by_role: str = "player"
 ):
     """
-    Asignarse como árbitro de un partido en cola.
+    Asignarse como árbitro de a match en cola.
     - Cualquier usuario logueado puede asignarse (referee_id = su ID)
     - Admin/Mod pueden asignar a cualquiera
     """
@@ -454,7 +454,7 @@ async def resume_challenge_from_queue(
     message: Optional[str] = None
 ):
     """
-    Retomar un reto de la cola proponiendo nueva fecha.
+    Retomar a challenge de la cola proponiendo nueva fecha.
     """
     try:
         return await rapidpin_service.resume_from_queue(
@@ -501,7 +501,7 @@ async def toggle_challenge_like(
     user_name: Optional[str] = None
 ):
     """
-    Dar o quitar like a un reto.
+    Dar o quitar like a a challenge.
     Requiere usuario autenticado.
     Emite evento WebSocket en tiempo real.
     """
@@ -516,7 +516,7 @@ async def check_user_liked_challenge(
     queue_id: str,
     user_id: str
 ):
-    """Verify si un usuario ya dio like a un reto"""
+    """Verify si un usuario ya dio like a a challenge"""
     liked = await rapidpin_service.check_user_liked(queue_id, user_id)
     return {"liked": liked}
 
@@ -530,7 +530,7 @@ async def add_challenge_comment(
     user_avatar: Optional[str] = None
 ):
     """
-    Agregar comentario a un reto.
+    Agregar comentario a a challenge.
     Requiere usuario autenticado.
     Si el usuario tiene sanciones, el comentario irá a moderación.
     """
@@ -556,7 +556,7 @@ async def get_challenge_comments(
     queue_id: str,
     limit: int = 50
 ):
-    """Get comentarios de un reto"""
+    """Get comentarios de a challenge"""
     return await rapidpin_service.get_comments(queue_id, limit=limit)
 
 

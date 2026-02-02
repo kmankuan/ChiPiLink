@@ -21,13 +21,13 @@ router = APIRouter(prefix="/prizes", tags=["Prizes"])
 
 @router.get("/definitions", response_model=List[PrizeDefinition])
 async def get_all_prizes():
-    """Get todos los premios"""
+    """Get todos prizes"""
     return await prize_service.get_all_prizes()
 
 
 @router.get("/definitions/{prize_id}", response_model=PrizeDefinition)
 async def get_prize(prize_id: str):
-    """Get definición de un premio"""
+    """Get definición de a prize"""
     prize = await prize_service.get_prize(prize_id)
     if not prize:
         raise HTTPException(status_code=404, detail="Premio no encontrado")
@@ -39,7 +39,7 @@ async def create_prize(
     data: PrizeDefinitionCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create un premio (solo admin)"""
+    """Create a prize (solo admin)"""
     return await prize_service.create_prize(data)
 
 
@@ -49,7 +49,7 @@ async def update_prize(
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update un premio (solo admin)"""
+    """Update a prize (solo admin)"""
     prize = await prize_service.update_prize(prize_id, data)
     if not prize:
         raise HTTPException(status_code=404, detail="Premio no encontrado")
@@ -74,7 +74,7 @@ async def get_prize_catalog():
 
 @router.get("/catalog/season/{season_id}")
 async def get_season_catalog(season_id: str):
-    """Get catálogo de una temporada"""
+    """Get catálogo de a season"""
     catalog = await prize_service.get_season_catalog(season_id)
     if not catalog:
         # Retornar catálogo por defecto
@@ -93,7 +93,7 @@ async def award_prize(
     season_id: Optional[str] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Otorgar premio a un jugador (solo admin)"""
+    """Otorgar premio a a player (solo admin)"""
     try:
         award = await prize_service.award_prize(
             prize_id=prize_id,
@@ -130,14 +130,14 @@ async def get_player_prizes(
     jugador_id: str,
     status: Optional[str] = None
 ):
-    """Get premios de un jugador"""
+    """Get premios de a player"""
     prizes = await prize_service.get_player_prizes(jugador_id, status)
     return {"jugador_id": jugador_id, "prizes": prizes, "total": len(prizes)}
 
 
 @router.get("/season/{season_id}")
 async def get_season_prizes(season_id: str):
-    """Get premios otorgados en una temporada"""
+    """Get premios otorgados en a season"""
     prizes = await prize_service.get_season_awarded_prizes(season_id)
     return {"season_id": season_id, "prizes": prizes, "total": len(prizes)}
 
@@ -148,7 +148,7 @@ async def update_prize_status(
     status: PrizeStatus,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update estado de un premio otorgado (solo admin)"""
+    """Update estado de a prize otorgado (solo admin)"""
     success = await prize_service.update_prize_status(award_id, status)
     return {"success": success, "new_status": status}
 

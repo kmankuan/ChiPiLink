@@ -390,7 +390,7 @@ async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceCon
 async def obtener_sponsors_para_tv():
     """
     Endpoint optimizado para la pantalla TV
-    Retorna todos los patrocinadores activos organizados por posición
+    Retorna todos los patrocinadores active organizados por posición
     """
     from main import db
     

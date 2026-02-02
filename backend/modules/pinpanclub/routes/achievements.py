@@ -19,7 +19,7 @@ async def get_all_achievements():
 
 @router.get("/player/{jugador_id}")
 async def get_player_achievements(jugador_id: str):
-    """Get logros de un jugador"""
+    """Get logros de a player"""
     achievements = await achievements_service.get_player_achievements(jugador_id)
     return {
         "jugador_id": jugador_id,
@@ -31,7 +31,7 @@ async def get_player_achievements(jugador_id: str):
 @router.post("/check/{jugador_id}")
 async def check_achievements(jugador_id: str):
     """
-    Verificar y otorgar logros pendientes para un jugador.
+    Verificar y otorgar logros pendientes para a player.
     Llamar después de completar retos.
     """
     awarded = await achievements_service.check_and_award_achievements(jugador_id)

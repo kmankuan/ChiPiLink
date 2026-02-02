@@ -20,13 +20,13 @@ router = APIRouter(prefix="/challenges", tags=["Challenges"])
 
 @router.get("/definitions", response_model=List[ChallengeDefinition])
 async def get_all_challenges():
-    """Get todos los retos activos"""
+    """Get todos challenges active"""
     return await challenge_service.get_all_challenges()
 
 
 @router.get("/definitions/{challenge_id}", response_model=ChallengeDefinition)
 async def get_challenge(challenge_id: str):
-    """Get definición de un reto"""
+    """Get definición de a challenge"""
     challenge = await challenge_service.get_challenge(challenge_id)
     if not challenge:
         raise HTTPException(status_code=404, detail="Reto no encontrado")
@@ -38,7 +38,7 @@ async def create_challenge(
     data: ChallengeDefinitionCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create un reto personalizado (solo admin)"""
+    """Create a challenge personalizado (solo admin)"""
     return await challenge_service.create_challenge(data)
 
 
@@ -48,7 +48,7 @@ async def update_challenge(
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update un reto (solo admin)"""
+    """Update a challenge (solo admin)"""
     challenge = await challenge_service.update_challenge(challenge_id, data)
     if not challenge:
         raise HTTPException(status_code=404, detail="Reto no encontrado")
@@ -60,7 +60,7 @@ async def deactivate_challenge(
     challenge_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Desactivar un reto (solo admin)"""
+    """Desactivar a challenge (solo admin)"""
     success = await challenge_service.deactivate_challenge(challenge_id)
     return {"success": success}
 
@@ -95,7 +95,7 @@ async def generate_weekly_challenges(admin: dict = Depends(get_admin_user)):
 
 @router.post("/start/{challenge_id}", response_model=PlayerChallenge)
 async def start_challenge(challenge_id: str, jugador_id: str):
-    """Iniciar un reto para un jugador"""
+    """Iniciar a challenge para a player"""
     try:
         return await challenge_service.start_challenge(jugador_id, challenge_id)
     except ValueError as e:
@@ -107,7 +107,7 @@ async def get_player_challenges(
     jugador_id: str,
     status: Optional[str] = None
 ):
-    """Get retos de un jugador"""
+    """Get retos de a player"""
     challenges = await challenge_service.get_player_challenges(jugador_id, status)
     stats = await challenge_service.get_player_stats(jugador_id)
     
@@ -120,7 +120,7 @@ async def get_player_challenges(
 
 @router.get("/player/{jugador_id}/active")
 async def get_active_challenges(jugador_id: str):
-    """Get retos activos de un jugador"""
+    """Get retos active de a player"""
     challenges = await challenge_service.get_player_challenges(jugador_id, "in_progress")
     return {"jugador_id": jugador_id, "active_challenges": challenges}
 
@@ -157,7 +157,7 @@ async def get_leaderboard(
 
 @router.get("/player/{jugador_id}/rank")
 async def get_player_rank(jugador_id: str):
-    """Get información de rango de un jugador"""
+    """Get información de rango de a player"""
     from core.database import db
     
     # Get entrada del leaderboard
