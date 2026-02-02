@@ -3,14 +3,58 @@
 ## Original Problem Statement
 Build a "super app" for ChiPi Link - a full-stack system (React, FastAPI, MongoDB) with multiple modules including store management (Unatienda), user management, textbook ordering, student linking, and integrations with Monday.com, Yappy payments, and LaoPan.online OAuth.
 
+---
+
+## Development Principles
+
+### 1. Language Standards
+- **Code and technical terms**: ALWAYS in English, even when instructions are given in Spanish or Chinese
+- **Variable names, function names, comments**: English only
+- **Special names/titles**: Ask for confirmation if user provides non-English names that might be intentional (brand names, proper nouns)
+
+### 2. Internationalization (i18n)
+- **ALWAYS use the i18n system** for user-facing text - NO hardcoded strings
+- Supported languages: English (en), Spanish (es), Chinese (zh)
+- Translation files location: `/app/frontend/src/i18n/locales/`
+- Use `t('key.path')` pattern for all UI text
+- Add translations to ALL THREE language files when adding new text
+
+### 3. Communication Style
+- Agent acts as a professional coder/engineer using English terminology
+- When user's explanation or terms are incorrect, proactively suggest the correct technical version
+- Ask for confirmation on terminology corrections
+
+### 4. Backend Configuration
+- ALL new features MUST include admin configuration options
+- Create backend endpoints for admin customization
+- Store configurations in database for runtime changes
+
+### 5. Scalable Architecture
+- Design for future growth
+- Use modular, reusable components
+- Follow DRY (Don't Repeat Yourself) principles
+- Proper separation of concerns
+
+### 6. Efficiency & Proactivity
+- Always provide alternative solutions for user to choose
+- Optimize for credit consumption and development time
+- Suggest the most efficient approach
+
+### 7. Quality Assurance
+- Proactively detect flaws or improvement opportunities in user instructions
+- Suggest corrections and improvements before implementation
+- Validate requirements before coding
+
+---
+
 ## Current Session Focus
-Complete Spanish to English refactoring of the entire codebase to ensure consistency and professionalism.
+Complete Spanish to English refactoring using the i18n system for multi-language support.
 
 ---
 
 ## What's Been Implemented
 
-### December 2025 - Spanish to English Refactoring - Session 2
+### December 2025 - Spanish to English Refactoring
 
 **Progress: ~94% Complete** (from ~2870 instances to ~159 remaining)
 
@@ -47,13 +91,12 @@ Complete Spanish to English refactoring of the entire codebase to ensure consist
 
 ## Remaining Work
 
-### P0 - Spanish to English Refactoring (Remaining ~159 UI instances)
-Files still requiring translation:
-- `/app/frontend/src/modules/account/profile/` - Some UI labels
+### P0 - i18n Migration (Remaining ~159 UI instances)
+Files requiring i18n integration:
+- `/app/frontend/src/modules/account/profile/` - Profile UI labels
 - `/app/frontend/src/modules/account/wallet/` - Wallet management
 - `/app/frontend/src/modules/pinpanclub/` - Ping pong club features
 - `/app/frontend/src/pages/SuperAppLanding.jsx` - Landing page content
-- Backend services (variable names in code comments)
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
@@ -80,40 +123,35 @@ Files still requiring translation:
 /app/
 ├── backend/
 │   ├── modules/
-│   │   ├── admin/routes.py (stats endpoints refactored)
+│   │   ├── admin/routes.py
 │   │   ├── store/services/
 │   │   └── auth/
 │   └── core/
 └── frontend/
     └── src/
-        ├── pages/AdminDashboard.jsx (refactored)
+        ├── i18n/
+        │   ├── index.js
+        │   └── locales/
+        │       ├── en.json (English)
+        │       ├── es.json (Spanish)
+        │       └── zh.json (Chinese)
+        ├── pages/
         ├── modules/
-        │   ├── dashboard/DashboardModule.jsx (refactored)
-        │   ├── unatienda/ (fully refactored)
-        │   ├── monday/MondayModule.jsx (refactored)
-        │   ├── admin/RolesModule.jsx (refactored)
-        │   └── account/connections/ (refactored)
         └── components/
 ```
 
 ---
 
-## Key Database Collections
-- `users` - User accounts
-- `store_textbook_orders` - Textbook orders
-- `store_textbook_access_requests` - Student link requests
-- `private_catalog_products` - Inventory items
-- `libros` - Products/books
-- `notificaciones` - Notifications
-
----
-
-## Third-Party Integrations
-- **Monday.com** - Order fulfillment sync
-- **i18next** - Multi-language support
-- **Yappy Commercial** - Payment processing
-- **LaoPan.online** - OAuth 2.0
-- **OneSignal** - Push notifications (planned)
+## i18n Key Structure
+```
+{
+  "common": { "save", "cancel", "delete", "edit", "search", ... },
+  "admin": { "dashboard", "sidebar", "settings", ... },
+  "unatienda": { "catalog", "orders", "inventory", ... },
+  "auth": { "login", "logout", "welcome", ... },
+  "errors": { "required", "invalid", "notFound", ... }
+}
+```
 
 ---
 
@@ -124,7 +162,6 @@ Files still requiring translation:
 ---
 
 ## Notes
-- User preferred language for communication: **Spanish**
-- Code and UI should be in **English**
-- Backend field names in MongoDB remain in Spanish for backward compatibility with existing data
-- Role names in database (e.g., "Super Administrador") need to be updated in database directly
+- User communicates in Spanish, agent responds professionally in English for technical matters
+- All UI text must use i18n system for multi-language support
+- Database field names remain in current state for backward compatibility
