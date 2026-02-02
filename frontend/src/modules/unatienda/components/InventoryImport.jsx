@@ -47,9 +47,9 @@ export default function InventoryImport({ token, onImportComplete }) {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       
-      toast.success('Template descargado');
+      toast.success('Template downloaded');
     } catch (error) {
-      toast.error('Error al descargar template');
+      toast.error('Error downloading template');
     }
   };
 
@@ -57,7 +57,7 @@ export default function InventoryImport({ token, onImportComplete }) {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.name.endsWith('.csv')) {
-        toast.error('Solo se permiten archivos CSV');
+        toast.error('Only CSV files are allowed');
         return;
       }
       setSelectedFile(file);
@@ -67,7 +67,7 @@ export default function InventoryImport({ token, onImportComplete }) {
 
   const handlePreview = async () => {
     if (!selectedFile) {
-      toast.error('Selecciona un archivo primero');
+      toast.error('Select a file first');
       return;
     }
 
@@ -86,12 +86,12 @@ export default function InventoryImport({ token, onImportComplete }) {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.detail || 'Error en preview');
+        throw new Error(data.detail || 'Preview error');
       }
 
       setPreviewData(data);
     } catch (error) {
-      toast.error(error.message || 'Error al previsualizar');
+      toast.error(error.message || 'Error previewing');
     } finally {
       setLoading(false);
     }
@@ -115,7 +115,7 @@ export default function InventoryImport({ token, onImportComplete }) {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.detail || 'Error en importación');
+        throw new Error(data.detail || 'Import error');
       }
 
       toast.success(data.message);
@@ -124,7 +124,7 @@ export default function InventoryImport({ token, onImportComplete }) {
       setSelectedFile(null);
       onImportComplete?.();
     } catch (error) {
-      toast.error(error.message || 'Error al importar');
+      toast.error(error.message || 'Error importing');
     } finally {
       setImporting(false);
     }
@@ -142,11 +142,11 @@ export default function InventoryImport({ token, onImportComplete }) {
   const getActionBadge = (action) => {
     switch (action) {
       case 'create':
-        return <Badge className="bg-green-500">Nuevo</Badge>;
+        return <Badge className="bg-green-500">New</Badge>;
       case 'update_add':
-        return <Badge className="bg-blue-500">Agregar</Badge>;
+        return <Badge className="bg-blue-500">Add</Badge>;
       case 'update_replace':
-        return <Badge className="bg-orange-500">Reemplazar</Badge>;
+        return <Badge className="bg-orange-500">Replace</Badge>;
       case 'skip':
         return <Badge variant="secondary">Omitir</Badge>;
       default:
