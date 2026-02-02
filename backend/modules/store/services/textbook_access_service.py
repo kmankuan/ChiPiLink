@@ -495,7 +495,7 @@ class TextbookAccessService(BaseService):
             status_messages = {
                 RequestStatus.APPROVED: "aprobada",
                 RequestStatus.REJECTED: "rechazada",
-                RequestStatus.IN_REVIEW: "en revisión",
+                RequestStatus.IN_REVIEW: "en review",
                 RequestStatus.INFO_REQUIRED: "requiere information adicional"
             }
             

@@ -162,7 +162,7 @@ class SocialService(BaseService):
     
     async def add_reaction(self, data: ReactionCreate) -> Reaction:
         """Add reaction"""
-        # Verify si ya reaccionó
+        # Verify si ya reacted
         existing = await self.reaction_repo.find_user_reaction(
             data.user_id, data.target_id, data.target_type
         )

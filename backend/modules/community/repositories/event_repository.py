@@ -34,7 +34,7 @@ class EventRepository(BaseRepository):
         return await self.find_one({self.ID_FIELD: evento_id})
     
     async def get_upcoming_events(self, limit: int = 10) -> List[Dict]:
-        """Get eventos próximos"""
+        """Get eventos next"""
         now = datetime.now(timezone.utc).isoformat()
         return await self.find_many(
             query={

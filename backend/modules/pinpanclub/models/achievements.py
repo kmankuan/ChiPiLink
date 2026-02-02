@@ -72,7 +72,7 @@ class PlayerAchievement(BaseModel):
     is_notified: bool = False
 
 
-# ============== DEFINICIONES DE LOGROS AUTOMÁTICOS ==============
+# ============== DEFINICIONES DE LOGROS AUTOMATIC ==============
 
 def get_challenge_achievements() -> List[Dict]:
     """Logros relacionados con retos"""

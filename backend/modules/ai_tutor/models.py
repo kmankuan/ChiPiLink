@@ -25,7 +25,7 @@ class TutorConfig(BaseModel):
     # Settings
     activo: bool = False
     max_intentos_pronunciacion: int = 3
-    umbral_pronunciacion_correcta: float = 0.8  # 80% de precisión
+    umbral_pronunciacion_correcta: float = 0.8  # 80% de precision
 
 
 class TutorSession(BaseModel):
@@ -59,7 +59,7 @@ class VocabularyItem(BaseModel):
     # Contenido
     palabra: str  # Palabra en idioma objetivo
     traduccion: str  # Translation
-    pronunciacion_fonetica: Optional[str] = None  # Guide fonética
+    pronunciacion_fonetica: Optional[str] = None  # Guide phonetics
     audio_url: Optional[str] = None  # Audio de pronunciation correcta
     imagen_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
@@ -80,7 +80,7 @@ class PronunciationAttempt(BaseModel):
     # Audio del estudiante
     audio_estudiante_url: Optional[str] = None
     texto_esperado: str
-    texto_reconocido: Optional[str] = None  # Lo que el STT reconoció
+    texto_reconocido: Optional[str] = None  # Lo que el STT recognized
     # Evaluation
     score: float = 0.0  # 0.0 a 1.0
     es_correcto: bool = False

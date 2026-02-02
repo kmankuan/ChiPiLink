@@ -498,7 +498,7 @@ class MembershipService:
         config = {
             "config_id": "visit_config",
             "min_duration_minutes": 30,  # Minimum para contar como visita regular
-            "quick_visit_max_minutes": 15,  # Maximum para visita rápida (no consume)
+            "quick_visit_max_minutes": 15,  # Maximum para visita fast (no consume)
             "check_in_methods": ["qr", "pin", "geolocation", "manual"],
             "require_checkout": True,
             "auto_checkout_hours": 8,  # Auto checkout after de 8 horas

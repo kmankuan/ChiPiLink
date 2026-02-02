@@ -32,7 +32,7 @@ class GoogleSheetsService:
         3. Base de datos (encriptadas)
         """
         try:
-            # Intentar importar las librerías de Google
+            # Intentar importar las libraries de Google
             from google.oauth2.service_account import Credentials
             from googleapiclient.discovery import build
             
@@ -197,7 +197,7 @@ class GoogleSheetsService:
         
         Args:
             sheet_id: ID of the Google Sheet
-            hoja_nombre: Nombre de la pestaña
+            hoja_nombre: Nombre de la tab
             rango: Rango a leer (ej: "A1:F100"). Si es None, lee toda la hoja.
         """
         if not self._initialized:

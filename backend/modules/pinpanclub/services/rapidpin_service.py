@@ -52,7 +52,7 @@ async def send_challenge_notification(
             },
             "referee_assigned": {
                 "title": "🎮 ¡Tu partido is listo!",
-                "body": f"{challenger_name} será el referee de tu partido. ¡A jugar!"
+                "body": f"{challenger_name} will be el referee de tu partido. ¡A jugar!"
             },
             "date_proposed": {
                 "title": "📅 Nueva propuesta de fecha",

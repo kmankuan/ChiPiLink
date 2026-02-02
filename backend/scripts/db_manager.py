@@ -1,6 +1,6 @@
 """
 Database Management Utilities
-Scripts para management y migración de la base de datos por module
+Scripts para management y migration de la base de datos por module
 
 Uso:
     python scripts/db_manager.py --action list

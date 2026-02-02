@@ -168,6 +168,6 @@ async def get_integration_info():
         "setup_steps": [
             "1. Obtener URL de embed o API key de FuseBase",
             "2. Configurar en /api/fusebase/config",
-            "3. Los documentos estarán disponibles en la app"
+            "3. Los documentos will be disponibles en la app"
         ]
     }

@@ -319,7 +319,7 @@ async def get_integration_info():
             "agent_panel": "Cargar la URL del panel en un iframe para administradores"
         },
         "mobile_implementation": {
-            "widget": "El widget funciona en WebView móvil",
+            "widget": "El widget funciona en WebView mobile",
             "agent_panel": "Cargar en react-native-webview para experiencia nativa"
         }
     }

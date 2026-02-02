@@ -145,7 +145,7 @@ async def qr_checkin(
     data: ScanQRRequest,
     admin=Depends(get_admin_user)
 ):
-    """Check-in rápido via QR"""
+    """Check-in fast via QR"""
     result = await qr_code_service.process_qr_action(
         qr_string=data.qr_string,
         action="checkin",

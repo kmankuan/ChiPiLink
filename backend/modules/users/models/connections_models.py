@@ -171,7 +171,7 @@ class Invitacion(BaseModel):
     mensaje: Optional[str] = None
     tipo_relacion_propuesta: Optional[TipoRelacion] = None
     subtipo_propuesto: Optional[str] = None
-    monto_transferir: Optional[float] = None  # Si quería transferir al invitarlo
+    monto_transferir: Optional[float] = None  # Si wanted transferir al invitarlo
     estado: EstadoInvitacion = EstadoInvitacion.PENDIENTE
     token: str = Field(default_factory=lambda: uuid.uuid4().hex)
     creado_en: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -275,7 +275,7 @@ class TransferenciaCreate(BaseModel):
 class AlertaWallet(BaseModel):
     """Alerta de saldo insuficiente"""
     alerta_id: str = Field(default_factory=lambda: f"alrt_{uuid.uuid4().hex[:12]}")
-    usuario_id: str                     # User que intentó comprar
+    usuario_id: str                     # User que tried comprar
     acudientes_ids: List[str] = []      # Acudientes a notificar
     monto_requerido: float
     saldo_actual: float

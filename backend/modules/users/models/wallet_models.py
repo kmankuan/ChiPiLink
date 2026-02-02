@@ -161,7 +161,7 @@ class Wallet(BaseModel):
     # Points pendientes (por compras no confirmadas, etc.)
     pending_points: int = 0
     
-    # Totales históricos
+    # Totales historical
     total_deposited: float = 0.0
     total_spent: float = 0.0
     total_points_earned: int = 0
@@ -405,7 +405,7 @@ def get_default_earn_rules() -> List[Dict]:
             "name": {"es": "Puntos por Compra", "en": "Purchase Points", "zh": "购物积分"},
             "description": {"es": "Gana 10 puntos por cada $1 gastado", "en": "Earn 10 points per $1 spent", "zh": "每消费1美元获得10积分"},
             "earn_type": "purchase",
-            "points_percentage": 10,  # 10 puntos por dólar
+            "points_percentage": 10,  # 10 puntos por dollar
             "is_active": True
         },
         {

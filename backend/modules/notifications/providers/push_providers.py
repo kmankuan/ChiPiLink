@@ -85,7 +85,7 @@ class FCMProvider(PushProvider):
     async def _get_access_token(self) -> str:
         """Get access token para FCM v1 API"""
         # For simplificar, usamos la API key legacy
-        # In producción real, we would use OAuth2 con service account
+        # In production real, we would use OAuth2 con service account
         return self.api_key
     
     async def send_notification(

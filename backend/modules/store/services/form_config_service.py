@@ -172,7 +172,7 @@ class FormConfigService(BaseService):
                 "label_es": "Texto Corto",
                 "label_zh": "短文本",
                 "description_en": "Single line text input",
-                "description_es": "Entrada de texto de una línea",
+                "description_es": "Entrada de texto de una line",
                 "icon": "type"
             },
             {
@@ -181,7 +181,7 @@ class FormConfigService(BaseService):
                 "label_es": "Texto Largo",
                 "label_zh": "长文本",
                 "description_en": "Multi-line text input",
-                "description_es": "Entrada de texto multilínea",
+                "description_es": "Entrada de texto multiline",
                 "icon": "align-left"
             },
             {
@@ -199,7 +199,7 @@ class FormConfigService(BaseService):
                 "label_es": "Number",
                 "label_zh": "数字",
                 "description_en": "Numeric input",
-                "description_es": "Entrada numérica",
+                "description_es": "Entrada numeric",
                 "icon": "hash"
             },
             {
@@ -208,7 +208,7 @@ class FormConfigService(BaseService):
                 "label_es": "Subir Archivo",
                 "label_zh": "文件上传",
                 "description_en": "Upload documents or images",
-                "description_es": "Subir documentos o imágenes",
+                "description_es": "Subir documentos o images",
                 "icon": "upload"
             },
             {

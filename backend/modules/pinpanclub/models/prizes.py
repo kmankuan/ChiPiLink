@@ -120,7 +120,7 @@ class AwardedPrize(BaseModel):
     status: PrizeStatus = PrizeStatus.CLAIMED
     
     # Award details
-    awarded_for: str  # Description of por what se otorgó
+    awarded_for: str  # Description of por what se granted
     position: Optional[int] = None  # Si fue por position
     
     # Timestamps

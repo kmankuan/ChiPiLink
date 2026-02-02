@@ -218,7 +218,7 @@ async def emit_like_event(
                 "name": user_name
             },
             "text": {
-                "es": f"{user_name} {'dio like' if action == 'liked' else 'quitó su like'} al reto",
+                "es": f"{user_name} {'dio like' if action == 'liked' else 'removed su like'} al reto",
                 "en": f"{user_name} {'liked' if action == 'liked' else 'unliked'} the challenge",
                 "zh": f"{user_name} {'点赞了' if action == 'liked' else '取消点赞'} 挑战"
             }

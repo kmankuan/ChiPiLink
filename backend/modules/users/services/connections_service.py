@@ -187,7 +187,7 @@ class ConexionesService:
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
         """Get reciprocal permissions (generally more limited)"""
-        # By defecto, el recíproco tiene permisos minimums
+        # By defecto, el reciprocal tiene permisos minimums
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
             # The dependent has no permissions sobre el acudiente
             return {

@@ -532,7 +532,7 @@ async def add_challenge_comment(
     """
     Agregar comentario a a challenge.
     Requiere authenticated user.
-    Si the user has sanctions, el comentario irá a moderation.
+    Si the user has sanctions, el comentario will go a moderation.
     """
     try:
         user_info = {

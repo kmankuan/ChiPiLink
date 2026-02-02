@@ -471,7 +471,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
         },
         {
             "title": {"es": "Mantenimiento Programado", "en": "Scheduled Maintenance", "zh": "计划维护"},
-            "summary": {"es": "El club estará cerrado el domingo", "en": "Club closed on Sunday", "zh": "周日俱乐部关闭"},
+            "summary": {"es": "El club will be cerrado el domingo", "en": "Club closed on Sunday", "zh": "周日俱乐部关闭"},
             "category_id": "cat_announcements"
         },
         {

@@ -168,7 +168,7 @@ class RankRewardsService(BaseService):
         lang: str = "es"
     ) -> Optional[Dict]:
         """
-        Verificar si the player subió de rango y otorgar recompensas.
+        Verificar si the player uploaded de rango y otorgar recompensas.
         Retorna information de la promotion si hubo una.
         """
         old_rank = self.get_rank_by_points(old_points)
@@ -181,7 +181,7 @@ class RankRewardsService(BaseService):
         # ¡Hubo promotion!
         self.log_info(f"Rank promotion: {jugador_id} from {old_rank['id']} to {new_rank['id']}")
         
-        # Verify si ya recibió esta recompensa
+        # Verify si ya received esta recompensa
         existing_reward = await db.pinpanclub_rank_rewards.find_one({
             "jugador_id": jugador_id,
             "rank_id": new_rank["id"]

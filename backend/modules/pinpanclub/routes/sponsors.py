@@ -59,7 +59,7 @@ class SponsorCreate(BaseModel):
     
     # Rotation (para banners rotativos)
     duracion_display: int = Field(default=10, description="Segundos que se muestra")
-    orden: int = Field(default=0, description="Orden en la rotación")
+    orden: int = Field(default=0, description="Orden en la rotation")
     
     # Status
     activo: bool = True

@@ -31,7 +31,7 @@ MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Physics", "Chemistry", "Biolo
 # Editoriales
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
 
-# Nombres panameños de ejemplo
+# Nombres panamanians de ejemplo
 NOMBRES = ["Maria", "Jose", "Ana", "Carlos", "Sofia", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
            "Camila", "Andres", "Lucia", "Juan", "Emma", "Diego", "Gabriela", "Sebastian", "Victoria", "Alejandro"]
 APELLIDOS = ["Gonzalez", "Rodriguez", "Martinez", "Lopez", "Garcia", "Hernandez", "Perez", "Sanchez", "Ramirez", "Torres",

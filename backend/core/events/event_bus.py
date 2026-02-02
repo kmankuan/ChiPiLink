@@ -104,7 +104,7 @@ class EventBus:
         return decorator
     
     def subscribe_handler(self, event_pattern: str, handler: Callable):
-        """Suscribir un handler programáticamente"""
+        """Suscribir un handler programmatically"""
         if event_pattern not in self._subscribers:
             self._subscribers[event_pattern] = []
         self._subscribers[event_pattern].append(handler)
@@ -170,7 +170,7 @@ class EventBus:
             asyncio.run(self.publish(event))
     
     def _matches_pattern(self, event_type: str, pattern: str) -> bool:
-        """Verificar si un evento coincide con un patrón (soporta wildcards)"""
+        """Verificar si un evento coincide con un pattern (soporta wildcards)"""
         if pattern == '*':
             return True
         
