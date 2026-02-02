@@ -1,8 +1,8 @@
 /**
- * SuperAppLanding - Página principal unificada de la Super App
- * Combina:
- * - Sistema de bloques editables (antes en Landing.jsx)
- * - Contenido de comunidad: noticias, eventos, galería (antes en CommunityLanding.jsx)
+ * SuperAppLanding - Main unified landing page for the Super App
+ * Combines:
+ * - Editable block system (previously in Landing.jsx)
+ * - Community content: news, events, gallery (previously in CommunityLanding.jsx)
  * - Hero section, Quick Access, PinPanClub feed
  */
 import { useState, useEffect, createContext, useContext } from 'react';
