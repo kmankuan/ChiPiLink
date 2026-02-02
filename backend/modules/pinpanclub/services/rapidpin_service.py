@@ -638,7 +638,7 @@ class RapidPinService(BaseService):
         notes: Optional[str] = None
     ) -> Dict:
         """
-        Crear partido directamente en cola (admin/mod).
+        Crear partido directamente in queue (admin/mod).
         Salta la fase de desafío, va directo a WAITING_REFEREE.
         """
         import uuid
@@ -817,7 +817,7 @@ class RapidPinService(BaseService):
         status: Optional[str] = None,
         player_id: Optional[str] = None
     ) -> List[Dict]:
-        """Get partidos en cola con filtros"""
+        """Get partidos in queue con filtros"""
         db = await self.get_db()
         
         query = {}
@@ -849,7 +849,7 @@ class RapidPinService(BaseService):
         assigned_by_role: str = "player"
     ) -> Dict:
         """
-        Asignar árbitro a partido en cola.
+        Asignar árbitro a partido in queue.
         - Cualquier usuario logueado puede asignarse
         - Admin/Mod pueden asignar a cualquiera
         """
@@ -861,7 +861,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido not found en cola")
+            raise ValueError("Partido not found in queue")
         
         if queue_entry["status"] != "waiting":
             raise ValueError("Este partido no está esperando árbitro")
@@ -923,7 +923,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido not found en cola")
+            raise ValueError("Partido not found in queue")
         
         if queue_entry["status"] != "assigned":
             raise ValueError("El partido debe tener árbitro asignado to completese")
@@ -970,7 +970,7 @@ class RapidPinService(BaseService):
         }
     
     async def cancel_queue_match(self, queue_id: str, cancelled_by_id: str) -> Dict:
-        """Cancelar partido en cola"""
+        """Cancelar partido in queue"""
         db = await self.get_db()
         
         queue_entry = await db["rapidpin_queue"].find_one(
@@ -979,7 +979,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido not found en cola")
+            raise ValueError("Partido not found in queue")
         
         if queue_entry["status"] in ["completed", "cancelled"]:
             raise ValueError("No se puede cancelar un partido ya completado o cancelado")
@@ -1032,13 +1032,13 @@ class RapidPinService(BaseService):
             ).sort("puntos_totales", -1).limit(10)
             top_players = await ranking_cursor.to_list(length=10)
         
-        # Matchs en cola esperando árbitro
+        # Matchs in queue esperando árbitro
         waiting_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="waiting"
         )
         
-        # Matchs en progreso (con árbitro asignado)
+        # Matchs in progress (con árbitro asignado)
         in_progress_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="assigned"
@@ -1177,7 +1177,7 @@ class RapidPinService(BaseService):
         Responder a una propuesta de fecha.
         - accept: Acepta la fecha propuesta -> pasa a waiting
         - counter: Propone otra fecha -> sigue en date_negotiation
-        - queue: Poner en cola para retomar después -> pasa a queued
+        - queue: Poner in queue para retomar después -> pasa a queued
         """
         db = await self.get_db()
         
@@ -1271,7 +1271,7 @@ class RapidPinService(BaseService):
             )
             
         elif action == "queue":
-            # Poner en cola para retomar después
+            # Poner in queue para retomar después
             update_data["status"] = "queued"
             
         await db["rapidpin_queue"].update_one(
@@ -1305,7 +1305,7 @@ class RapidPinService(BaseService):
             raise ValueError("Reto not found")
         
         if queue_entry["status"] != "queued":
-            raise ValueError("Este reto no está en cola")
+            raise ValueError("Este reto no está in queue")
         
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden retomarlo")

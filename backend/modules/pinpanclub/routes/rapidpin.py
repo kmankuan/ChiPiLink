@@ -259,7 +259,7 @@ async def create_queue_match(
     notes: Optional[str] = None
 ):
     """
-    Crear partido directamente en cola (admin/mod).
+    Crear partido directamente in queue (admin/mod).
     Salta la fase de desafío, va directo a esperar árbitro.
     """
     try:
@@ -282,7 +282,7 @@ async def get_queue_matches(
     player_id: Optional[str] = None
 ):
     """
-    Obtener partidos en cola/desafíos.
+    Obtener partidos in queue/desafíos.
     - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos active)
     - player_id: filtrar by player involucrado
     """
@@ -331,7 +331,7 @@ async def assign_referee(
     assigned_by_role: str = "player"
 ):
     """
-    Asignarse como árbitro de a match en cola.
+    Asignarse como árbitro de a match in queue.
     - Cualquier usuario logueado puede asignarse (referee_id = su ID)
     - Admin/Mod pueden asignar a cualquiera
     """
@@ -374,7 +374,7 @@ async def cancel_queue_match(
     cancelled_by_id: str
 ):
     """
-    Cancelar partido en cola.
+    Cancelar partido in queue.
     Solo puede cancelar quien lo creó o un admin.
     """
     try:
@@ -432,7 +432,7 @@ async def respond_to_date_proposal(
     Responder a propuesta de fecha.
     - accept: Acepta la fecha -> pasa a waiting
     - counter: Propone otra fecha -> sigue negociando
-    - queue: Poner en cola para retomar después
+    - queue: Poner in queue para retomar después
     """
     try:
         return await rapidpin_service.respond_to_date(
