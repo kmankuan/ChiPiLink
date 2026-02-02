@@ -1,5 +1,5 @@
 /**
- * MisCapacidades - Componente para ver capacidades/habilidades del usuario
+ * UserCapabilities - Component to view user capabilities/abilities
  */
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,18 +31,18 @@ import {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-export default function MisCapacidades({ token }) {
+export default function UserCapabilities({ token }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || 'es';
   
   const [loading, setLoading] = useState(true);
-  const [misCapacidades, setMisCapacidades] = useState([]);
-  const [todasCapacidades, setTodasCapacidades] = useState([]);
+  const [myCapabilities, setMyCapabilities] = useState([]);
+  const [allCapabilities, setAllCapabilities] = useState([]);
   
-  // Estado para solicitar capacidad
+  // State for requesting capability
   const [showRequestDialog, setShowRequestDialog] = useState(false);
-  const [selectedCapacidad, setSelectedCapacidad] = useState(null);
-  const [requestMotivo, setRequestMotivo] = useState('');
+  const [selectedCapability, setSelectedCapability] = useState(null);
+  const [requestReason, setRequestReason] = useState('');
   const [sendingRequest, setSendingRequest] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function MisCapacidades({ token }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [misRes, todasRes] = await Promise.all([
+      const [myRes, allRes] = await Promise.all([
         fetch(`${API}/api/conexiones/mis-capacidades`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
@@ -61,29 +61,29 @@ export default function MisCapacidades({ token }) {
         })
       ]);
 
-      if (misRes.ok) {
-        const data = await misRes.json();
-        setMisCapacidades(data.capacidades || []);
+      if (myRes.ok) {
+        const data = await myRes.json();
+        setMyCapabilities(data.capacidades || []);
       }
-      if (todasRes.ok) {
-        const data = await todasRes.json();
-        setTodasCapacidades(data.capacidades || []);
+      if (allRes.ok) {
+        const data = await allRes.json();
+        setAllCapabilities(data.capacidades || []);
       }
     } catch (err) {
-      console.error('Error loading capacidades:', err);
+      console.error('Error loading capabilities:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const getTipoLabel = (tipo) => {
-    const key = `capacidades.types.${tipo}`;
+  const getTypeLabel = (type) => {
+    const key = `capacidades.types.${type}`;
     const translated = t(key);
-    return translated !== key ? translated : tipo;
+    return translated !== key ? translated : type;
   };
 
-  const getTipoIcon = (tipo) => {
-    switch (tipo) {
+  const getTypeIcon = (type) => {
+    switch (type) {
       case 'predeterminada': return CheckCircle2;
       case 'por_suscripcion': return Star;
       case 'beneficio_extendido': return Gift;
@@ -92,8 +92,8 @@ export default function MisCapacidades({ token }) {
     }
   };
 
-  const getTipoBadgeVariant = (tipo) => {
-    switch (tipo) {
+  const getTypeBadgeVariant = (type) => {
+    switch (type) {
       case 'predeterminada': return 'secondary';
       case 'por_suscripcion': return 'default';
       case 'beneficio_extendido': return 'outline';
@@ -102,17 +102,17 @@ export default function MisCapacidades({ token }) {
     }
   };
 
-  const handleRequestCapacidad = async () => {
-    if (!selectedCapacidad) return;
+  const handleRequestCapability = async () => {
+    if (!selectedCapability) return;
 
     setSendingRequest(true);
     try {
-      // Este endpoint necesitaría ser implementado en el backend
-      // Por ahora mostramos un mensaje informativo
-      toast.info('Funcionalidad de solicitud próximamente disponible');
+      // This endpoint would need to be implemented on the backend
+      // For now, show informational message
+      toast.info(t('capabilities.featureComingSoon'));
       setShowRequestDialog(false);
-      setSelectedCapacidad(null);
-      setRequestMotivo('');
+      setSelectedCapability(null);
+      setRequestReason('');
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -120,24 +120,24 @@ export default function MisCapacidades({ token }) {
     }
   };
 
-  const getCapacidadNombre = (cap) => {
+  const getCapabilityName = (cap) => {
     if (cap.nombre && typeof cap.nombre === 'object') {
       return cap.nombre[lang] || cap.nombre['es'] || Object.values(cap.nombre)[0];
     }
     return cap.nombre || cap.capacidad_id;
   };
 
-  const getCapacidadDescripcion = (cap) => {
+  const getCapabilityDescription = (cap) => {
     if (cap.descripcion && typeof cap.descripcion === 'object') {
       return cap.descripcion[lang] || cap.descripcion['es'] || '';
     }
     return cap.descripcion || '';
   };
 
-  // Filtrar capacidades disponibles (que no tengo)
-  const misCapacidadIds = new Set(misCapacidades.map(c => c.capacidad_id));
-  const capacidadesDisponibles = todasCapacidades.filter(
-    c => !misCapacidadIds.has(c.capacidad_id) && c.activa
+  // Filter available capabilities (ones I don't have)
+  const myCapabilityIds = new Set(myCapabilities.map(c => c.capacidad_id));
+  const availableCapabilities = allCapabilities.filter(
+    c => !myCapabilityIds.has(c.capacidad_id) && c.activa
   );
 
   if (loading) {
@@ -158,33 +158,33 @@ export default function MisCapacidades({ token }) {
         <p className="text-muted-foreground">{t('capacidades.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue="activas">
+      <Tabs defaultValue="active">
         <TabsList>
-          <TabsTrigger value="activas">
-            {t('capacidades.active')} ({misCapacidades.length})
+          <TabsTrigger value="active">
+            {t('capacidades.active')} ({myCapabilities.length})
           </TabsTrigger>
-          <TabsTrigger value="disponibles">
-            {t('capacidades.available')} ({capacidadesDisponibles.length})
+          <TabsTrigger value="available">
+            {t('capacidades.available')} ({availableCapabilities.length})
           </TabsTrigger>
         </TabsList>
 
-        {/* Mis capacidades activas */}
-        <TabsContent value="activas" className="mt-4">
-          {misCapacidades.length === 0 ? (
+        {/* My active capabilities */}
+        <TabsContent value="active" className="mt-4">
+          {myCapabilities.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <Zap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  No tienes capacidades activas aún
+                  {t('capabilities.noActiveCapabilities')}
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              {misCapacidades.map((cap) => {
-                const Icon = getTipoIcon(cap.tipo);
-                // Buscar la config completa
-                const configCompleta = todasCapacidades.find(
+              {myCapabilities.map((cap) => {
+                const Icon = getTypeIcon(cap.tipo);
+                // Find complete config
+                const fullConfig = allCapabilities.find(
                   c => c.capacidad_id === cap.capacidad_id
                 );
 
@@ -194,40 +194,40 @@ export default function MisCapacidades({ token }) {
                       <div className="flex items-start gap-3">
                         <div 
                           className="p-2 rounded-lg text-2xl"
-                          style={{ backgroundColor: `${configCompleta?.color || '#6366f1'}20` }}
+                          style={{ backgroundColor: `${fullConfig?.color || '#6366f1'}20` }}
                         >
-                          {configCompleta?.icono || '⚡'}
+                          {fullConfig?.icono || '⚡'}
                         </div>
                         <div className="flex-1">
                           <CardTitle className="flex items-center gap-2 text-lg">
-                            {getCapacidadNombre(configCompleta || cap)}
+                            {getCapabilityName(fullConfig || cap)}
                           </CardTitle>
                           <CardDescription className="mt-1">
-                            {getCapacidadDescripcion(configCompleta || cap)}
+                            {getCapabilityDescription(fullConfig || cap)}
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-between">
-                        <Badge variant={getTipoBadgeVariant(cap.tipo)}>
+                        <Badge variant={getTypeBadgeVariant(cap.tipo)}>
                           <Icon className="h-3 w-3 mr-1" />
-                          {getTipoLabel(cap.tipo)}
+                          {getTypeLabel(cap.tipo)}
                         </Badge>
                         {cap.activa ? (
                           <span className="text-xs text-green-600 flex items-center gap-1">
                             <CheckCircle2 className="h-3 w-3" />
-                            Activa
+                            {t('capabilities.active')}
                           </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">
-                            Inactiva
+                            {t('capabilities.inactive')}
                           </span>
                         )}
                       </div>
                       {cap.origen && (
                         <p className="text-xs text-muted-foreground mt-2">
-                          Origen: {cap.origen}
+                          {t('capabilities.origin')}: {cap.origen}
                         </p>
                       )}
                     </CardContent>
@@ -238,21 +238,21 @@ export default function MisCapacidades({ token }) {
           )}
         </TabsContent>
 
-        {/* Capacidades disponibles para solicitar */}
-        <TabsContent value="disponibles" className="mt-4">
-          {capacidadesDisponibles.length === 0 ? (
+        {/* Available capabilities to request */}
+        <TabsContent value="available" className="mt-4">
+          {availableCapabilities.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
                 <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  Ya tienes todas las capacidades disponibles
+                  {t('capabilities.allCapabilitiesOwned')}
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              {capacidadesDisponibles.map((cap) => {
-                const Icon = getTipoIcon(cap.tipo);
+              {availableCapabilities.map((cap) => {
+                const Icon = getTypeIcon(cap.tipo);
                 const canRequest = cap.tipo === 'solicitada';
                 const needsSubscription = cap.tipo === 'por_suscripcion';
 
@@ -268,19 +268,19 @@ export default function MisCapacidades({ token }) {
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-lg">
-                            {getCapacidadNombre(cap)}
+                            {getCapabilityName(cap)}
                           </CardTitle>
                           <CardDescription className="mt-1">
-                            {getCapacidadDescripcion(cap)}
+                            {getCapabilityDescription(cap)}
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-between">
-                        <Badge variant={getTipoBadgeVariant(cap.tipo)}>
+                        <Badge variant={getTypeBadgeVariant(cap.tipo)}>
                           <Icon className="h-3 w-3 mr-1" />
-                          {getTipoLabel(cap.tipo)}
+                          {getTypeLabel(cap.tipo)}
                         </Badge>
                         
                         {canRequest && (
@@ -288,7 +288,7 @@ export default function MisCapacidades({ token }) {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedCapacidad(cap);
+                              setSelectedCapability(cap);
                               setShowRequestDialog(true);
                             }}
                           >
@@ -299,7 +299,7 @@ export default function MisCapacidades({ token }) {
                         
                         {needsSubscription && cap.membresia_requerida && (
                           <span className="text-xs text-muted-foreground">
-                            Requiere membresía
+                            {t('capabilities.requiresMembership')}
                           </span>
                         )}
                       </div>
@@ -312,25 +312,25 @@ export default function MisCapacidades({ token }) {
         </TabsContent>
       </Tabs>
 
-      {/* Dialog para solicitar capacidad */}
+      {/* Dialog to request capability */}
       <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Solicitar: {selectedCapacidad && getCapacidadNombre(selectedCapacidad)}
+              {t('capabilities.requestDialogTitle')}: {selectedCapability && getCapabilityName(selectedCapability)}
             </DialogTitle>
             <DialogDescription>
-              Tu solicitud será revisada por un administrador
+              {t('capabilities.requestDialogDesc')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>¿Por qué deseas esta capacidad?</Label>
+              <Label>{t('capabilities.requestReason')}</Label>
               <Textarea
-                value={requestMotivo}
-                onChange={(e) => setRequestMotivo(e.target.value)}
-                placeholder="Describe brevemente por qué necesitas esta capacidad..."
+                value={requestReason}
+                onChange={(e) => setRequestReason(e.target.value)}
+                placeholder={t('capabilities.requestPlaceholder')}
                 rows={3}
               />
             </div>
@@ -341,10 +341,10 @@ export default function MisCapacidades({ token }) {
                 onClick={() => setShowRequestDialog(false)}
                 className="flex-1"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
-                onClick={handleRequestCapacidad}
+                onClick={handleRequestCapability}
                 disabled={sendingRequest}
                 className="flex-1"
               >
@@ -353,7 +353,7 @@ export default function MisCapacidades({ token }) {
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Enviar solicitud
+                    {t('capabilities.sendRequest')}
                   </>
                 )}
               </Button>
@@ -364,3 +364,6 @@ export default function MisCapacidades({ token }) {
     </div>
   );
 }
+
+// Keep backward compatibility with old name
+export { UserCapabilities as MisCapacidades };
