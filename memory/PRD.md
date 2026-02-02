@@ -54,7 +54,31 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## What's Been Implemented
 
-### December 2025 - Spanish to English Refactoring
+### February 2026 - i18n Integration (Current Session)
+
+**Progress: ~97% Complete** - Major account/wallet/profile components now use i18n system
+
+#### New i18n Keys Added (en.json now has 916 lines):
+- `wallet.*` - Complete wallet UI translations
+- `profile.*` - Profile management translations
+- `membershipCard.*` - Membership card translations
+- `capabilities.*` - User capabilities translations
+- `dependents.*` - Dependent management translations
+- `transfers.*` - Transfer dialog translations
+- `qrCode.*` - QR code component translations
+- `account.*` - Account dashboard translations
+
+#### Components Refactored to Use i18n:
+- **WalletPage.jsx** - Now uses `t()` function ✅
+- **MembershipCard.jsx** - Full i18n integration ✅
+- **ProfilePage.jsx** - Uses i18n with locale detection ✅
+- **MisCapacidades.jsx** - Renamed to UserCapabilities, uses i18n ✅
+- **MisAcudidos.jsx** - Renamed to MyDependents, uses i18n ✅
+- **TransferenciasDialog.jsx** - Renamed to TransfersDialog, uses i18n ✅
+- **UserQRCode.jsx** - Uses i18n with all languages ✅
+- **AccountDashboard.jsx** - Uses i18n for all labels ✅
+
+### December 2025 - Spanish to English Refactoring (Previous Session)
 
 **Progress: ~94% Complete** (from ~2870 instances to ~159 remaining)
 
