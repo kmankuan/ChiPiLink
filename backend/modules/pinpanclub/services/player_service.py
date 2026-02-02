@@ -31,7 +31,7 @@ class PlayerService(BaseService):
         player_dict = data.model_dump()
         result = await self.repository.create(player_dict)
         
-        # Emitir evento
+        # Emit evento
         await self.emit_event(
             PinpanClubEvents.PLAYER_CREATED,
             {
@@ -111,7 +111,7 @@ class PlayerService(BaseService):
         # Update en repository
         await self.repository.update_stats(jugador_id, won, elo_change)
         
-        # Emitir evento de cambio de ELO
+        # Emit evento de cambio de ELO
         await self.emit_event(
             PinpanClubEvents.PLAYER_ELO_CHANGED,
             {

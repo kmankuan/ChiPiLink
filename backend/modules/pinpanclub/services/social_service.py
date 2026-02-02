@@ -122,7 +122,7 @@ class SocialService(BaseService):
         
         result = await self.comment_repo.create(comment_data)
         
-        # Notificar al dueño del perfil
+        # Notify al dueño del perfil
         if data.target_type == "player" and data.target_id != data.author_id:
             target = await self.player_repo.get_by_id(data.target_id)
             await self.create_notification(NotificationCreate(

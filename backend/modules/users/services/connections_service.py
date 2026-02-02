@@ -296,7 +296,7 @@ class ConexionesService:
         # Remove MongoDB _id before returning
         solicitud.pop("_id", None)
         
-        # Enviar notificación push al destinatario
+        # Send notificación push al destinatario
         push_result = None
         try:
             from modules.notifications.services.push_service import push_notification_service
@@ -395,7 +395,7 @@ class ConexionesService:
             if result.get("error"):
                 return result
         
-        # Enviar notificación push al solicitante original
+        # Send notificación push al solicitante original
         push_result = None
         try:
             from modules.notifications.services.push_service import push_notification_service
@@ -710,14 +710,14 @@ class ConexionesService:
         await db.transferencias_wallet.insert_one(transferencia)
         transferencia.pop("_id", None)
         
-        # Enviar notificaciones push
+        # Send notificaciones push
         try:
             from modules.notifications.services.push_service import push_notification_service
             
             de_nombre = f"{de_usuario.get('nombre', '')} {de_usuario.get('apellido', '')}".strip() or "Alguien"
             para_nombre = f"{para_usuario.get('nombre', '')} {para_usuario.get('apellido', '')}".strip() or "Usuario"
             
-            # Notificar al remitente
+            # Notify al remitente
             await push_notification_service.send_notification(
                 user_id=de_usuario_id,
                 category_id="wallet_alerts",
@@ -731,7 +731,7 @@ class ConexionesService:
                 action_url="/mi-cuenta?tab=wallet"
             )
             
-            # Notificar al destinatario
+            # Notify al destinatario
             await push_notification_service.send_notification(
                 user_id=para_usuario_id,
                 category_id="wallet_alerts",
@@ -791,11 +791,11 @@ class ConexionesService:
         await db.alertas_wallet.insert_one(alerta)
         alerta.pop("_id", None)
         
-        # Enviar notificaciones push
+        # Send notificaciones push
         push_results = {"usuario": None, "acudientes": []}
         
         try:
-            # Notificar al usuario
+            # Notify al usuario
             push_results["usuario"] = await push_notification_service.send_notification(
                 user_id=usuario_id,
                 category_id="wallet_alerts",
@@ -809,7 +809,7 @@ class ConexionesService:
                 action_url="/mi-cuenta?tab=wallet"
             )
             
-            # Notificar a acudientes
+            # Notify a acudientes
             for acudiente_id in acudientes_ids:
                 result = await push_notification_service.send_notification(
                     user_id=acudiente_id,

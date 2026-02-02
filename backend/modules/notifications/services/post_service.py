@@ -139,7 +139,7 @@ class PostService:
         })
         
         if post and send_notification:
-            # Enviar notificación
+            # Send notificación
             from modules.notifications.services.push_service import push_notification_service
             
             # Obtener título y resumen en español como default

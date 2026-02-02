@@ -10,7 +10,7 @@ class NotificationProvider(str, Enum):
     """Proveedores de push notifications"""
     FCM = "fcm"
     ONESIGNAL = "onesignal"
-    BOTH = "both"  # Enviar a ambos
+    BOTH = "both"  # Send a ambos
     AUTO = "auto"  # Selección automática basada en carga/disponibilidad
 
 

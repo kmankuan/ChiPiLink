@@ -64,7 +64,7 @@ class OrderService(BaseService):
         for item in data.items:
             await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
         
-        # Emitir evento
+        # Emit evento
         await self.emit_event(
             StoreEvents.ORDER_CREATED,
             {
@@ -127,7 +127,7 @@ class OrderService(BaseService):
         for item in data.items:
             await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
         
-        # Emitir evento
+        # Emit evento
         await self.emit_event(
             StoreEvents.ORDER_CREATED,
             {
@@ -175,7 +175,7 @@ class OrderService(BaseService):
         if success:
             order = await self.get_order(pedido_id)
             
-            # Emitir eventos según el estado
+            # Emit eventos según el estado
             if estado == OrderStatus.ENVIADO:
                 await self.emit_event(
                     StoreEvents.ORDER_SHIPPED,

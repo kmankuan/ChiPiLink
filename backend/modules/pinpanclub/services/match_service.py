@@ -55,7 +55,7 @@ class MatchService(BaseService):
         
         result = await self.repository.create(match_dict)
         
-        # Emitir evento
+        # Emit evento
         await self.emit_event(
             PinpanClubEvents.MATCH_CREATED,
             {
@@ -180,7 +180,7 @@ class MatchService(BaseService):
             sets_a, sets_b, set_actual, historial
         )
         
-        # Emitir evento de score actualizado
+        # Emit evento de score actualizado
         await self.emit_event(
             PinpanClubEvents.MATCH_SCORE_UPDATED,
             {
@@ -213,7 +213,7 @@ class MatchService(BaseService):
             ganador_id = match.jugador_a_id if sets_a > sets_b else match.jugador_b_id
             await self._finish_match(partido_id, ganador_id, match)
         
-        # Notificar WebSockets
+        # Notify WebSockets
         await self._broadcast_to_match(partido_id)
         
         return await self.get_match(partido_id)
@@ -228,7 +228,7 @@ class MatchService(BaseService):
         fecha_fin = datetime.now(timezone.utc).isoformat()
         await self.repository.finish_match(partido_id, ganador_id, fecha_fin)
         
-        # Emitir evento de partido finalizado
+        # Emit evento de partido finalizado
         await self.emit_event(
             PinpanClubEvents.MATCH_FINISHED,
             {

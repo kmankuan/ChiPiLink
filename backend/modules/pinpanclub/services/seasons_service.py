@@ -116,13 +116,13 @@ class RankingSeasonsService(BaseService):
     
     async def activate_season(self, season_id: str) -> bool:
         """Activar una temporada (cambiar a ACTIVE)"""
-        # Desactivar temporada actual si existe
+        # Deactivate temporada actual si existe
         await db.pinpanclub_ranking_seasons.update_many(
             {"status": SeasonStatus.ACTIVE.value},
             {"$set": {"status": SeasonStatus.UPCOMING.value}}
         )
         
-        # Activar la new season
+        # Activate la new season
         result = await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {"$set": {"status": SeasonStatus.ACTIVE.value}}

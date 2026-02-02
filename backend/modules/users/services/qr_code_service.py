@@ -92,7 +92,7 @@ class QRCodeService:
     
     async def regenerate_user_qr(self, user_id: str, profile_id: str = None) -> Dict:
         """Regenerar QR code de un usuario (invalida el anterior)"""
-        # Desactivar QR anterior
+        # Deactivate QR anterior
         await db[self.collection_qr_codes].update_many(
             {"user_id": user_id},
             {"$set": {"is_active": False}}

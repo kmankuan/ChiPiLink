@@ -1155,7 +1155,7 @@ class RapidPinService(BaseService):
         
         queue_entry.pop("_id", None)
         
-        # Notificar al oponente
+        # Notify al oponente
         challenger_name = challenger_info.get("apodo") or challenger_info.get("nombre", "Un jugador") if challenger_info else "Un jugador"
         await send_challenge_notification(
             recipient_id=opponent_id,
@@ -1225,7 +1225,7 @@ class RapidPinService(BaseService):
             update_data["accepted_at"] = now
             update_data["accepted_by_id"] = user_id
             
-            # Notificar al otro jugador
+            # Notify al otro jugador
             await send_challenge_notification(
                 recipient_id=other_player_id,
                 challenger_name=user_name,
@@ -1263,7 +1263,7 @@ class RapidPinService(BaseService):
             update_data["date_history"] = date_history
             update_data["status"] = "date_negotiation"
             
-            # Notificar al otro jugador
+            # Notify al otro jugador
             await send_challenge_notification(
                 recipient_id=other_player_id,
                 challenger_name=user_name,

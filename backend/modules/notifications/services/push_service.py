@@ -498,9 +498,9 @@ class PushNotificationService:
                 devices_by_provider[p] = []
             devices_by_provider[p].append(device["device_token"])
         
-        # Enviar según estrategia
+        # Send según estrategia
         if selected_provider == "both":
-            # Enviar a todos los proveedores
+            # Send a todos los proveedores
             for provider_name, tokens in devices_by_provider.items():
                 if provider_name in self._providers:
                     result = await self._providers[provider_name].send_notification(
@@ -515,7 +515,7 @@ class PushNotificationService:
                     results["sent"] += result.get("sent", 0)
                     results["failed"] += result.get("failed", 0)
         else:
-            # Enviar al proveedor seleccionado
+            # Send al proveedor seleccionado
             tokens = []
             for provider_name, device_tokens in devices_by_provider.items():
                 if selected_provider in ["auto", provider_name]:

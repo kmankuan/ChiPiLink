@@ -144,7 +144,7 @@ class PrizeService(BaseService):
         
         result = await self.awarded_repo.create(award_data)
         
-        # Notificar al jugador
+        # Notify al jugador
         await social_service.create_notification(NotificationCreate(
             user_id=jugador_id,
             type=NotificationType.PRIZE_WON,

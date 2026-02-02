@@ -195,7 +195,7 @@ async def get_config(admin=Depends(get_admin_user)):
     """Get configuración de proveedores (admin)"""
     config = await push_notification_service.get_config()
     
-    # Ocultar API keys en respuesta
+    # Hide API keys en respuesta
     safe_config = config.copy()
     for provider in ["fcm", "onesignal"]:
         if provider in safe_config:
