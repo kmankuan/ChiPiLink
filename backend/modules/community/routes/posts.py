@@ -31,7 +31,7 @@ async def get_post(post_id: str):
     """Get post by ID (incrementa vistas)"""
     post = await post_service.get_post(post_id, increment_views=True)
     if not post:
-        raise HTTPException(status_code=404, detail="Post no encontrado")
+        raise HTTPException(status_code=404, detail="Post not found")
     return post
 
 
@@ -40,7 +40,7 @@ async def like_post(post_id: str):
     """Dar like a un post"""
     success = await post_service.like_post(post_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Post no encontrado")
+        raise HTTPException(status_code=404, detail="Post not found")
     return {"success": True}
 
 
@@ -95,7 +95,7 @@ async def update_post(
     """Update post (admin)"""
     post = await post_service.update_post(post_id, data)
     if not post:
-        raise HTTPException(status_code=404, detail="Post no encontrado")
+        raise HTTPException(status_code=404, detail="Post not found")
     return post
 
 
@@ -107,5 +107,5 @@ async def delete_post(
     """Delete post (admin)"""
     success = await post_service.delete_post(post_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Post no encontrado")
+        raise HTTPException(status_code=404, detail="Post not found")
     return {"success": True}

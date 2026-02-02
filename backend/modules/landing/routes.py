@@ -110,7 +110,7 @@ async def add_block(
 ):
     """Add a new block to landing page"""
     if tipo not in BLOCK_TEMPLATES:
-        raise HTTPException(status_code=400, detail=f"Tipo de bloque '{tipo}' no válido")
+        raise HTTPException(status_code=400, detail=f"Tipo de bloque '{tipo}' invalid")
     
     template = BLOCK_TEMPLATES[tipo]
     
@@ -191,7 +191,7 @@ async def update_block(
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Bloque no encontrado")
+        raise HTTPException(status_code=404, detail="Bloque not found")
     
     return {"success": True}
 
@@ -208,7 +208,7 @@ async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = De
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Bloque no encontrado")
+        raise HTTPException(status_code=404, detail="Bloque not found")
     
     return {"success": True, "publicado": publicado}
 
@@ -225,7 +225,7 @@ async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
     )
     
     if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Bloque no encontrado")
+        raise HTTPException(status_code=404, detail="Bloque not found")
     
     return {"success": True}
 

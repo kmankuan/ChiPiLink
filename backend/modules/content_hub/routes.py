@@ -133,7 +133,7 @@ async def get_content_item(content_id: str):
     """Get single content item - PLACEHOLDER"""
     item = await db.content_items.find_one({"content_id": content_id}, {"_id": 0})
     if not item:
-        raise HTTPException(status_code=404, detail="Contenido no encontrado")
+        raise HTTPException(status_code=404, detail="Contenido not found")
     
     # Increment views
     await db.content_items.update_one(

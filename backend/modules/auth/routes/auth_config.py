@@ -166,7 +166,7 @@ async def toggle_auth_method(
     Quick toggle for enabling/disabling an auth method
     """
     if method_id not in ["email_password", "google", "facebook", "apple"]:
-        raise HTTPException(status_code=400, detail="Método no válido")
+        raise HTTPException(status_code=400, detail="Método invalid")
     
     config = await db.site_config.find_one(
         {"config_type": AUTH_CONFIG_KEY},

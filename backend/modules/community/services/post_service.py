@@ -132,7 +132,7 @@ class PostService(BaseService):
         # Verificar que el post existe y permite comentarios
         post = await self.repository.get_by_id(post_id)
         if not post:
-            raise ValueError("Post no encontrado")
+            raise ValueError("Post not found")
         if not post.get("permite_comentarios", True):
             raise ValueError("Este post no permite comentarios")
         

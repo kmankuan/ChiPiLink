@@ -26,7 +26,7 @@ async def get_event(evento_id: str):
     """Get evento by ID"""
     event = await event_service.get_event(evento_id)
     if not event:
-        raise HTTPException(status_code=404, detail="Evento no encontrado")
+        raise HTTPException(status_code=404, detail="Evento not found")
     return event
 
 
@@ -76,7 +76,7 @@ async def update_event(
     """Update evento (admin)"""
     event = await event_service.update_event(evento_id, data)
     if not event:
-        raise HTTPException(status_code=404, detail="Evento no encontrado")
+        raise HTTPException(status_code=404, detail="Evento not found")
     return event
 
 
@@ -88,5 +88,5 @@ async def delete_event(
     """Delete evento (admin)"""
     success = await event_service.delete_event(evento_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Evento no encontrado")
+        raise HTTPException(status_code=404, detail="Evento not found")
     return {"success": True}

@@ -99,12 +99,12 @@ class ConexionesService:
         Crear una conexión entre usuarios.
         Si requiere_solicitud=True, crea solicitud en lugar de conexión directa.
         """
-        # Verificar que destino existe
+        # Verificar que destidoes not exist
         destino = await db.auth_users.find_one({"user_id": destino_user_id})
         if not destino:
-            return {"error": "Usuario destino no encontrado"}
+            return {"error": "Usuario destino not found"}
         
-        # Verificar que no existe conexión
+        # Verificar que does not exist conexión
         existing = await db.auth_users.find_one({
             "user_id": user_id,
             "conexiones.user_id": destino_user_id
@@ -254,7 +254,7 @@ class ConexionesService:
         mensaje: Optional[str] = None
     ) -> Dict:
         """Create solicitud de conexión"""
-        # Verificar que no existe conexión ni solicitud pendiente
+        # Verificar que does not exist conexión ni solicitud pendiente
         existing_conexion = await db.auth_users.find_one({
             "user_id": de_usuario_id,
             "conexiones.user_id": para_usuario_id
@@ -275,7 +275,7 @@ class ConexionesService:
         para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id}, {"nombre": 1, "apellido": 1})
         
         if not para_usuario:
-            return {"error": "Usuario destino no encontrado"}
+            return {"error": "Usuario destino not found"}
         
         solicitud = {
             "solicitud_id": f"sol_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{de_usuario_id[:8]}",
@@ -619,7 +619,7 @@ class ConexionesService:
         )
         
         if result.modified_count == 0:
-            return {"error": "Usuario no encontrado o ya activo"}
+            return {"error": "Usuario not found o ya activo"}
         
         return {"success": True}
     
@@ -642,9 +642,9 @@ class ConexionesService:
         para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id})
         
         if not de_usuario:
-            return {"error": "Usuario origen no encontrado"}
+            return {"error": "Usuario origen not found"}
         if not para_usuario:
-            return {"error": "Usuario destino no encontrado"}
+            return {"error": "Usuario destino not found"}
             
         for con in de_usuario.get("conexiones", []):
             if con["user_id"] == para_usuario_id:
@@ -766,7 +766,7 @@ class ConexionesService:
         # Obtener usuario
         usuario = await db.auth_users.find_one({"user_id": usuario_id})
         if not usuario:
-            return {"error": "Usuario no encontrado"}
+            return {"error": "Usuario not found"}
         
         usuario_nombre = f"{usuario.get('nombre', '')} {usuario.get('apellido', '')}".strip() or "Usuario"
         

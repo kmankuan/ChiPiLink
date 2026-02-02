@@ -88,7 +88,7 @@ class WalletService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Verificar si ya existe
+        # Verificar si already exists
         existing = await self.get_wallet(user_id)
         if existing:
             return existing
@@ -589,7 +589,7 @@ class WalletService(BaseService):
         
         pending = await db.chipi_pending_balances.find_one({"pending_id": pending_id})
         if not pending:
-            raise ValueError("Saldo pendiente no encontrado")
+            raise ValueError("Saldo pendiente not found")
         
         if pending["status"] != "pending":
             raise ValueError("Saldo ya pagado o cancelado")

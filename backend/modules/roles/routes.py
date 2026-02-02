@@ -46,7 +46,7 @@ async def get_role(role_id: str, admin: dict = Depends(get_admin_user)):
     """Get a specific role"""
     role = await roles_service.get_role(role_id)
     if not role:
-        raise HTTPException(status_code=404, detail="Rol no encontrado")
+        raise HTTPException(status_code=404, detail="Rol not found")
     return role
 
 
@@ -105,7 +105,7 @@ async def update_role(
     
     role = await roles_service.update_role(role_id, updates)
     if not role:
-        raise HTTPException(status_code=404, detail="Rol no encontrado")
+        raise HTTPException(status_code=404, detail="Rol not found")
     
     # Log the action
     changes = {}
@@ -154,7 +154,7 @@ async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_
     if not success:
         raise HTTPException(
             status_code=400, 
-            detail="No se puede eliminar este rol (es un rol de sistema o no existe)"
+            detail="No se puede eliminar este rol (es un rol de sistema o does not exist)"
         )
     
     # Log the action

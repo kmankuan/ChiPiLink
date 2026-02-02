@@ -105,7 +105,7 @@ class EventService(BaseService):
         event = await self.repository.get_by_id(evento_id)
         
         if not event:
-            raise ValueError("Evento no encontrado")
+            raise ValueError("Evento not found")
         
         if not event.get("requiere_inscripcion"):
             raise ValueError("Este evento no requiere inscripción")

@@ -706,7 +706,7 @@ class SuperPinService(BaseService):
                      else final_match["player_b"]["jugador_id"]}
                 ]
                 
-                # Add 3er lugar si existe
+                # Add 3er lugar if exists
                 third_bracket = next((b for b in brackets if b["name"] == "Tercer Lugar"), None)
                 if third_bracket and third_bracket["matches"][0].get("estado") == "finalizado":
                     resultados.append({

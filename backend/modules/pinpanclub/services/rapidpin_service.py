@@ -161,7 +161,7 @@ class RapidPinService(BaseService):
         """Create new season Rapid Pin"""
         season_dict = data.model_dump()
         
-        # Set premios por defecto si no se proporcionan
+        # Set premios por defecto if not provided
         if not season_dict.get("player_prizes"):
             season_dict["player_prizes"] = [p.model_dump() for p in get_default_player_prizes()]
         else:
