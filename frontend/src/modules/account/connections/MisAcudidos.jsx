@@ -66,7 +66,7 @@ export default function MyDependents({ token, onTransfer }) {
   const loadDependents = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/mis-acudidos`, {
+      const res = await fetch(`${API}/api/connections/my-dependents`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -88,7 +88,7 @@ export default function MyDependents({ token, onTransfer }) {
     
     setCreating(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/crear-acudido`, {
+      const res = await fetch(`${API}/api/connections/create-dependent`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
