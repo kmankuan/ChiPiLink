@@ -349,15 +349,15 @@ export default function DashboardModule() {
                   className="w-32 h-2" 
                 />
                 <Badge variant={(stats.orders?.pending || 0) > 0 ? "secondary" : "default"}>
-                  {(stats.orders?.pending || 0) > 0 ? 'Pendientes' : 'OK'}
+                  {(stats.orders?.pending || 0) > 0 ? 'Pending' : 'OK'}
                 </Badge>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm">Sistema</span>
+              <span className="text-sm">System</span>
               <div className="flex items-center gap-2">
                 <Progress value={100} className="w-32 h-2" />
-                <Badge>Operativo</Badge>
+                <Badge>Operational</Badge>
               </div>
             </div>
           </div>
