@@ -844,7 +844,7 @@ export default function MondayModule() {
                       >
                         <Button variant="outline">
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          Ver Board en Monday.com
+                          View Board on Monday.com
                         </Button>
                       </a>
                     )}
@@ -870,12 +870,12 @@ export default function MondayModule() {
                   {legacyStatus?.api_key_configured ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Configurada</span>
+                      <span className="font-medium text-green-600">Configured</span>
                     </>
                   ) : (
                     <>
                       <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-red-600">No configurada</span>
+                      <span className="font-medium text-red-600">Not configured</span>
                     </>
                   )}
                 </div>
@@ -885,7 +885,7 @@ export default function MondayModule() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Board ID General
+                  General Board ID
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -893,12 +893,12 @@ export default function MondayModule() {
                   {legacyStatus?.board_id_configured ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Configurado</span>
+                      <span className="font-medium text-green-600">Configured</span>
                     </>
                   ) : (
                     <>
                       <AlertCircle className="h-5 w-5 text-yellow-500" />
-                      <span className="font-medium text-yellow-600">Pendiente</span>
+                      <span className="font-medium text-yellow-600">Pending</span>
                     </>
                   )}
                 </div>
@@ -913,7 +913,7 @@ export default function MondayModule() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Conexión
+                  Connection
                 </CardTitle>
               </CardHeader>
               <CardContent>
