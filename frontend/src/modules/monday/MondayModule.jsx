@@ -613,9 +613,9 @@ export default function MondayModule() {
                 <div className="flex items-center gap-3">
                   <AlertCircle className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="font-medium text-yellow-800">Conexión requerida</p>
+                    <p className="font-medium text-yellow-800">Connection required</p>
                     <p className="text-sm text-yellow-700">
-                      Primero configura un workspace en la pestaña &quot;Workspaces&quot; para poder configurar los pedidos de libros.
+                      First configure a workspace in the &quot;Workspaces&quot; tab to configure book orders.
                     </p>
                   </div>
                 </div>
@@ -623,27 +623,27 @@ export default function MondayModule() {
             </Card>
           ) : (
             <>
-              {/* Selección de Board */}
+              {/* Board Selection */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
-                    Board de Pedidos de Libros
+                    Book Orders Board
                   </CardTitle>
                   <CardDescription>
-                    Selecciona el tablero donde se sincronizarán los pedidos de libros escolares (Books de Light).
+                    Select the board where school book orders (Books de Light) will be synced.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Board de Pedidos</Label>
+                      <Label>Orders Board</Label>
                       <Select 
                         value={storeConfig.board_id || ''} 
                         onValueChange={(v) => setStoreConfig(prev => ({...prev, board_id: v}))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecciona un board" />
+                          <SelectValue placeholder="Select a board" />
                         </SelectTrigger>
                         <SelectContent>
                           {boards.map((board) => (
@@ -657,16 +657,16 @@ export default function MondayModule() {
                     
                     {groups.length > 0 && (
                       <div className="space-y-2">
-                        <Label>Grupo (opcional)</Label>
+                        <Label>Group (optional)</Label>
                         <Select 
                           value={storeConfig.group_id || 'none'} 
                           onValueChange={(v) => setStoreConfig(prev => ({...prev, group_id: v === 'none' ? '' : v}))}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecciona un grupo" />
+                            <SelectValue placeholder="Select a group" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="none">Sin grupo específico</SelectItem>
+                            <SelectItem value="none">No specific group</SelectItem>
                             {groups.map((group) => (
                               <SelectItem key={group.id} value={group.id}>
                                 {group.title}
@@ -684,18 +684,18 @@ export default function MondayModule() {
                       checked={storeConfig.auto_sync}
                       onCheckedChange={(checked) => setStoreConfig(prev => ({...prev, auto_sync: checked}))}
                     />
-                    <Label htmlFor="auto-sync-libros">Sincronizar automáticamente al cambiar estado de pedidos</Label>
+                    <Label htmlFor="auto-sync-libros">Auto-sync when order status changes</Label>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Mapeo de columnas */}
+              {/* Column Mapping */}
               {storeConfig.board_id && columns.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Mapeo de Columnas</CardTitle>
+                    <CardTitle>Column Mapping</CardTitle>
                     <CardDescription>
-                      Asocia cada campo del pedido con una columna de Monday.com
+                      Associate each order field with a Monday.com column
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -714,10 +714,10 @@ export default function MondayModule() {
                             }))}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Columna" />
+                              <SelectValue placeholder="Column" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="none">No mapear</SelectItem>
+                              <SelectItem value="none">Don't map</SelectItem>
                               {columns.map((col) => (
                                 <SelectItem key={col.id} value={col.id}>
                                   {col.title} ({col.type})
