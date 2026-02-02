@@ -1,5 +1,5 @@
 /**
- * NotificationHistory - Historial de notificaciones del usuario
+ * NotificationHistory - User notification history
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,40 +12,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function NotificationHistory({ token }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const lang = i18n.language || 'es';
-
-  const texts = {
-    es: {
-      title: 'Historial de Notificaciones',
-      subtitle: 'Tus notificaciones recientes',
-      noNotifications: 'No hay notificaciones',
-      viewMore: 'Ver más',
-      sent: 'Enviada',
-      failed: 'Fallida'
-    },
-    en: {
-      title: 'Notification History',
-      subtitle: 'Your recent notifications',
-      noNotifications: 'No notifications',
-      viewMore: 'View more',
-      sent: 'Sent',
-      failed: 'Failed'
-    },
-    zh: {
-      title: '通知历史',
-      subtitle: '您最近的通知',
-      noNotifications: '没有通知',
-      viewMore: '查看更多',
-      sent: '已发送',
-      failed: '失败'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
 
   useEffect(() => {
     fetchHistory();
@@ -81,6 +52,12 @@ export default function NotificationHistory({ token }) {
     });
   };
 
+  const getLocalizedText = (obj) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || obj.es || obj.en || '';
+  };
+
   if (loading) {
     return (
       <Card>
@@ -96,46 +73,69 @@ export default function NotificationHistory({ token }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          {txt.title}
+          {t('notifications.history')}
         </CardTitle>
-        <CardDescription>{txt.subtitle}</CardDescription>
+        <CardDescription>{t('notifications.subtitle')}</CardDescription>
       </CardHeader>
       <CardContent>
         {notifications.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
-            <p>{txt.noNotifications}</p>
-          </div>
+          <p className="text-center text-muted-foreground py-8">
+            {t('notifications.noNotifications')}
+          </p>
         ) : (
           <ScrollArea className="h-[400px]">
-            <div className="space-y-3 pr-4">
+            <div className="space-y-3">
               {notifications.map((notif) => (
                 <div 
-                  key={notif.log_id}
-                  className="p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors"
+                  key={notif.notification_id}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">{notif.title}</h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{notif.body}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(notif.created_at)}
-                        </span>
+                  <span className="text-2xl">{notif.icon || '🔔'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">
+                      {getLocalizedText(notif.title)}
+                    </p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {getLocalizedText(notif.body)}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(notif.sent_at || notif.created_at)}
+                      </span>
+                      {notif.status && (
                         <Badge 
-                          variant={notif.results?.success ? 'outline' : 'destructive'}
+                          variant={notif.status === 'sent' ? 'default' : 'destructive'}
                           className="text-xs"
                         >
-                          {notif.results?.success ? txt.sent : txt.failed}
+                          {notif.status === 'sent' ? t('notifications.sent') : t('notifications.failed')}
                         </Badge>
-                      </div>
+                      )}
                     </div>
                   </div>
+                  {notif.action_url && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => window.open(notif.action_url, '_blank')}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
           </ScrollArea>
+        )}
+        
+        {notifications.length > 0 && (
+          <Button 
+            variant="ghost" 
+            className="w-full mt-4"
+            onClick={fetchHistory}
+          >
+            {t('notifications.loadMore')}
+          </Button>
         )}
       </CardContent>
     </Card>
