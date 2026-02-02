@@ -79,11 +79,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.es_catalogo_privado);
       setProductos(publicProducts);
       setCategorias(Array.isArray(categoriasData) ? categoriasData : []);
-      setGrados(gradosData.grados || []);
-      setMaterias(materiasData.materias || []);
+      setGrados(gradosData.grades || gradosData.grados || []);
+      setMaterias(materiasData.subjects || materiasData.materias || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Error al cargar datos');
+      toast.error('Error loading data');
     } finally {
       setLoading(false);
     }
@@ -125,7 +125,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
 
   const handleSaveCategory = async () => {
     if (!categoryForm.nombre.trim()) {
-      toast.error('El nombre es requerido');
+      toast.error('Name is required');
       return;
     }
     setSavingCategory(true);
@@ -145,35 +145,35 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       });
       
       if (response.ok) {
-        toast.success(editingCategory ? 'Categoría actualizada' : 'Categoría creada');
+        toast.success(editingCategory ? 'Category updated' : 'Category created');
         setCategoryDialog(false);
         fetchData();
       } else {
-        toast.error('Error al guardar categoría');
+        toast.error('Error saving category');
       }
     } catch (error) {
-      toast.error('Error al guardar categoría');
+      toast.error('Error saving category');
     } finally {
       setSavingCategory(false);
     }
   };
 
   const handleDeleteCategory = async (categoriaId) => {
-    if (!confirm('¿Eliminar esta categoría?')) return;
+    if (!confirm('Delete this category?')) return;
     try {
       const response = await fetch(`${API}/api/store/categories/${categoriaId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
-        toast.success('Categoría eliminada');
+        toast.success('Category deleted');
         fetchData();
       } else {
         const data = await response.json();
-        toast.error(data.detail || 'Error al eliminar');
+        toast.error(data.detail || 'Error deleting');
       }
     } catch (error) {
-      toast.error('Error al eliminar');
+      toast.error('Error deleting');
     }
   };
 
