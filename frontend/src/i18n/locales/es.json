@@ -414,7 +414,92 @@
     "error": "Error al enviar desafío",
     "loginRequired": "Debes iniciar sesión para desafiar",
     "cantChallengeSelf": "No puedes desafiarte a ti mismo",
-    "points": "pts"
+    "points": "pts",
+    "subtitle": "Partidos rápidos con validación flexible",
+    "viewSeason": "Ver Temporada",
+    "info": {
+      "participants": "2 jugadores + 1 árbitro",
+      "playersAndReferee": "Jugadores y Árbitro",
+      "scoring": "Puntuación",
+      "scoringDesc": "Ganador: 3 pts, Perdedor: 1 pt, Árbitro: 2 pts",
+      "validation": "Validación",
+      "validationDesc": "Requiere confirmación de 2 de 3 participantes",
+      "oneConfirmation": "Una confirmación"
+    },
+    "seasons": {
+      "title": "Temporadas",
+      "create": "Crear Temporada",
+      "createFirst": "Crear Primera Temporada",
+      "created": "Temporada creada exitosamente",
+      "noSeasons": "Sin temporadas aún",
+      "noSeasonsDesc": "Crea tu primera temporada para empezar a registrar partidos",
+      "name": "Nombre de Temporada",
+      "namePlaceholder": "Ingresa nombre de temporada...",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingresa descripción...",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Fin",
+      "fieldsRequired": "Todos los campos son requeridos",
+      "notFound": "Temporada no encontrada",
+      "status": {
+        "active": "Activa",
+        "closed": "Cerrada"
+      }
+    },
+    "matches": {
+      "title": "Partidos",
+      "recent": "Partidos Recientes",
+      "register": "Registrar Partido",
+      "registerDesc": "Registrar un nuevo resultado de partido",
+      "registered": "Partido registrado exitosamente",
+      "noMatches": "Sin partidos aún",
+      "playerA": "Jugador A",
+      "playerB": "Jugador B",
+      "referee": "Árbitro",
+      "selectPlayer": "Seleccionar jugador",
+      "selectReferee": "Seleccionar árbitro",
+      "winner": "Ganador",
+      "selectWinner": "Seleccionar ganador",
+      "winnerScore": "Puntuación Ganador",
+      "loserScore": "Puntuación Perdedor",
+      "differentParticipants": "Todos los participantes deben ser diferentes",
+      "winnerMustBePlayer": "El ganador debe ser uno de los jugadores",
+      "fieldsRequired": "Todos los campos son requeridos",
+      "pendingConfirmations": "Confirmaciones Pendientes",
+      "pendingNote": "Esperando confirmación",
+      "confirm": "Confirmar",
+      "confirmed": "Confirmado"
+    },
+    "ranking": {
+      "title": "Ranking",
+      "players": "Jugadores",
+      "playersDesc": "Ordenados por puntos totales",
+      "referees": "Árbitros",
+      "refereesDesc": "Ordenados por puntos de árbitro",
+      "player": "Jugador",
+      "referee": "Árbitro",
+      "points": "Puntos",
+      "refPoints": "Pts Árb",
+      "played": "Jugados",
+      "won": "Ganados",
+      "refereed": "Arbitrados"
+    },
+    "stats": {
+      "matches": "Partidos",
+      "pending": "Pendientes",
+      "players": "Jugadores",
+      "referees": "Árbitros"
+    },
+    "closeSeason": {
+      "title": "Cerrar Temporada",
+      "confirmDesc": "¿Estás seguro de que quieres cerrar esta temporada?",
+      "results": "Resultados",
+      "playerResults": "Resultados de Jugadores",
+      "refereeResults": "Resultados de Árbitros",
+      "close": "Cerrar Temporada",
+      "cancel": "Cancelar",
+      "success": "Temporada cerrada exitosamente"
+    }
   },
   "analytics": {
     "title": "Analytics Dashboard",
