@@ -75,7 +75,8 @@ import AdminNotifications from '@/modules/notifications/pages/AdminNotifications
 import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 
 // Book Orders Module (Admin)
-import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
+// BookOrdersAdmin removed - functionality moved to Unatienda module
+// import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
 import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 
 // Bulk Import Page
