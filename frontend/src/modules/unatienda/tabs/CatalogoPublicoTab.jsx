@@ -481,11 +481,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       <Dialog open={editDialog} onOpenChange={setEditDialog}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingProduct ? 'Editar Producto' : 'Nuevo Producto'}</DialogTitle>
+            <DialogTitle>{editingProduct ? 'Edit Product' : 'New Product'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nombre *</Label>
+              <Label>Name *</Label>
               <Input
                 value={editForm.nombre}
                 onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
@@ -493,9 +493,9 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             </div>
 
             <div>
-              <Label>Categoría *</Label>
+              <Label>Category *</Label>
               <Select value={editForm.categoria} onValueChange={(v) => setEditForm({...editForm, categoria: v})}>
-                <SelectTrigger><SelectValue placeholder="Seleccionar categoría" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
@@ -510,7 +510,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Precio *</Label>
+                <Label>Price *</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -529,7 +529,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             </div>
 
             <div>
-              <Label>Descripción</Label>
+              <Label>Description</Label>
               <Textarea
                 value={editForm.descripcion}
                 onChange={(e) => setEditForm({...editForm, descripcion: e.target.value})}
@@ -537,7 +537,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             </div>
 
             <div>
-              <Label>URL de Imagen</Label>
+              <Label>Image URL</Label>
               <Input
                 value={editForm.imagen_url}
                 onChange={(e) => setEditForm({...editForm, imagen_url: e.target.value})}
@@ -549,10 +549,10 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               <div className="space-y-0.5">
                 <Label className="text-base flex items-center gap-2">
                   <Clock className="h-4 w-4 text-orange-500" />
-                  Requiere Preparación
+                  Requires Preparation
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  Activa si necesita tiempo de preparación
+                  Enable if product needs preparation time
                 </p>
               </div>
               <Switch
@@ -563,7 +563,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
 
             <Button onClick={handleSaveProduct} disabled={saving} className="w-full gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Guardar
+              Save
             </Button>
           </div>
         </DialogContent>
@@ -573,28 +573,28 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       <Dialog open={categoryDialog} onOpenChange={setCategoryDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}</DialogTitle>
+            <DialogTitle>{editingCategory ? 'Edit Category' : 'New Category'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nombre *</Label>
+              <Label>Name *</Label>
               <Input
                 value={categoryForm.nombre}
                 onChange={(e) => setCategoryForm({...categoryForm, nombre: e.target.value})}
-                placeholder="Ej: Bebidas"
+                placeholder="Ex: Beverages"
               />
             </div>
             <div>
-              <Label>Icono (emoji)</Label>
+              <Label>Icon (emoji)</Label>
               <Input
                 value={categoryForm.icono}
                 onChange={(e) => setCategoryForm({...categoryForm, icono: e.target.value})}
-                placeholder="Ej: 🥤"
+                placeholder="Ex: 🥤"
                 className="text-2xl"
               />
             </div>
             <div>
-              <Label>Orden</Label>
+              <Label>Order</Label>
               <Input
                 type="number"
                 value={categoryForm.orden}
