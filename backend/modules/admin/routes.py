@@ -260,9 +260,9 @@ async def get_public_form_config(form_id: str):
 @router.get("/dashboard/stats")
 async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     """Get dashboard statistics"""
-    # Orders stats
-    total_pedidos = await db.pedidos.count_documents({})
-    pedidos_pendientes = await db.pedidos.count_documents({"estado": "pendiente"})
+    # Orders stats (using new textbook_orders collection)
+    total_orders = await db.textbook_orders.count_documents({})
+    pending_orders = await db.textbook_orders.count_documents({"status": "pending"})
     
     # Products stats
     total_productos = await db.libros.count_documents({"activo": True})
@@ -272,25 +272,25 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     })
     
     # Users stats
-    total_usuarios = await db.users.count_documents({"es_admin": False})
+    total_usuarios = await db.users.count_documents({"is_admin": False})
     
     # Notifications
     notificaciones_no_leidas = await db.notificaciones.count_documents({"leida": False})
     
     return {
-        "pedidos": {
-            "total": total_pedidos,
-            "pendientes": pedidos_pendientes
+        "orders": {
+            "total": total_orders,
+            "pending": pending_orders
         },
-        "productos": {
+        "products": {
             "total": total_productos,
-            "bajo_stock": productos_bajo_stock
+            "low_stock": productos_bajo_stock
         },
-        "usuarios": {
+        "users": {
             "total": total_usuarios
         },
-        "notificaciones": {
-            "no_leidas": notificaciones_no_leidas
+        "notifications": {
+            "unread": notificaciones_no_leidas
         }
     }
 
