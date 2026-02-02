@@ -29,7 +29,7 @@ async def get_seasons(active_only: bool = False):
 
 @router.get("/seasons/{season_id}", response_model=RapidPinSeason)
 async def get_season(season_id: str):
-    """Get temporada by ID"""
+    """Get season by ID"""
     season = await rapidpin_service.get_season(season_id)
     if not season:
         raise HTTPException(status_code=404, detail="Temporada not found")
@@ -51,7 +51,7 @@ async def update_season(
     data: RapidPinSeasonUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update temporada (solo admin)"""
+    """Update season (solo admin)"""
     season = await rapidpin_service.update_season(season_id, data)
     if not season:
         raise HTTPException(status_code=404, detail="Temporada not found")
@@ -63,7 +63,7 @@ async def close_season(
     season_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Cerrar temporada y calcular resultados finales (solo admin)"""
+    """Close season y calculate final results (solo admin)"""
     try:
         return await rapidpin_service.close_season(season_id)
     except ValueError as e:
@@ -104,7 +104,7 @@ async def get_match(match_id: str):
     """Get partido by ID"""
     match = await rapidpin_service.get_match(match_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido not found")
+        raise HTTPException(status_code=404, detail="Match not found")
     return match
 
 

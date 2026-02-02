@@ -269,7 +269,7 @@ class ChallengeLeaderboardRepository(BaseRepository):
         )
     
     async def recalculate_ranks(self) -> bool:
-        """Recalcular posiciones del leaderboard"""
+        """Recalculate positions del leaderboard"""
         leaderboard = await self.get_leaderboard(limit=1000)
         
         for idx, entry in enumerate(leaderboard, start=1):

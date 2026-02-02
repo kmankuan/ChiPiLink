@@ -28,16 +28,16 @@ class RapidPinSeasonRepository(BaseRepository):
         return await self.insert_one(season_data)
     
     async def get_by_id(self, season_id: str) -> Optional[Dict]:
-        """Get temporada by ID"""
+        """Get season by ID"""
         return await self.find_one({self.ID_FIELD: season_id})
     
     async def update(self, season_id: str, data: Dict) -> bool:
-        """Update temporada"""
+        """Update season"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, season_id, data)
     
     async def get_active_seasons(self) -> List[Dict]:
-        """Get temporadas activas"""
+        """Get active seasons"""
         return await self.find_many(
             query={"estado": "active"},
             sort=[("fecha_inicio", -1)]
@@ -51,7 +51,7 @@ class RapidPinSeasonRepository(BaseRepository):
         )
     
     async def close_season(self, season_id: str, final_results: Dict) -> bool:
-        """Cerrar temporada y guardar resultados"""
+        """Close season y guardar resultados"""
         return await self.update(
             season_id,
             {
@@ -188,7 +188,7 @@ class RapidPinMatchRepository(BaseRepository):
         match_id: str,
         confirmado_por_id: str
     ) -> bool:
-        """Confirmar un partido pendiente"""
+        """Confirm a pending match"""
         result = await self._collection.update_one(
             {
                 self.ID_FIELD: match_id,
@@ -345,7 +345,7 @@ class RapidPinRankingRepository(BaseRepository):
         return result.modified_count > 0
     
     async def recalculate_positions(self, season_id: str) -> bool:
-        """Recalcular posiciones from ranking"""
+        """Recalculate positions from ranking"""
         # Get all sorted rankings
         rankings = await self.get_season_ranking(season_id)
         

@@ -710,7 +710,7 @@ class ConexionesService:
         await db.transferencias_wallet.insert_one(transferencia)
         transferencia.pop("_id", None)
         
-        # Send notificaciones push
+        # Send push notifications
         try:
             from modules.notifications.services.push_service import push_notification_service
             
@@ -791,7 +791,7 @@ class ConexionesService:
         await db.alertas_wallet.insert_one(alerta)
         alerta.pop("_id", None)
         
-        # Send notificaciones push
+        # Send push notifications
         push_results = {"usuario": None, "acudientes": []}
         
         try:

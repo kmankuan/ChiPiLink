@@ -136,7 +136,7 @@ async def get_match(partido_id: str):
     """Get partido by ID"""
     match = await superpin_service.get_match(partido_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido not found")
+        raise HTTPException(status_code=404, detail="Match not found")
     return match
 
 
@@ -145,7 +145,7 @@ async def start_match(partido_id: str):
     """Iniciar partido"""
     match = await superpin_service.start_match(partido_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido not found")
+        raise HTTPException(status_code=404, detail="Match not found")
     return match
 
 

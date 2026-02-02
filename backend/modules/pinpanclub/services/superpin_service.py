@@ -430,7 +430,7 @@ class SuperPinService(BaseService):
             "elo_change_b": elo_change if ganador_id == match["jugador_b_id"] else -elo_change
         })
         
-        # Recalcular posiciones
+        # Recalculate positions
         await self.ranking_repo.recalculate_positions(liga_id, scoring_system)
     
     def _calculate_elo(
@@ -668,7 +668,7 @@ class SuperPinService(BaseService):
                     break
         
         if not match_found:
-            raise ValueError("Partido not found")
+            raise ValueError("Match not found")
         
         # Advance winner to next round
         next_round = current_round + 1

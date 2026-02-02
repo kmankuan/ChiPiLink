@@ -190,7 +190,7 @@ class RankingSeasonsService(BaseService):
         total_challenges = sum(p.get("challenges_completed", 0) for p in final_standings)
         total_points = sum(p.get("season_points", 0) for p in final_standings)
         
-        # Update temporada como completada
+        # Update season como completada
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {

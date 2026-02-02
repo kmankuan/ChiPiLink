@@ -365,7 +365,7 @@ async def test_push_notification(
     data: TestPushRequest,
     admin=Depends(get_admin_user)
 ):
-    """Send notificación push de prueba a un segmento de OneSignal (admin)"""
+    """Send push notification de prueba a un segmento de OneSignal (admin)"""
     from modules.notifications.providers.push_providers import OneSignalProvider
     import os
     
