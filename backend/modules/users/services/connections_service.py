@@ -1,13 +1,13 @@
 """
-Servicio de Conexiones entre Usuarios
-Gestiona relaciones, solicitudes, invitaciones y transferencias
+User Connections Service
+Manages relationships, requests, invitations and transfers
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
 import logging
 
 from core.database import db
-from ..models.conexiones_models import (
+from ..models.connections_models import (
     EstadoCuenta, TipoRelacion, EstadoConexion, EstadoSolicitud,
     EstadoInvitacion, TipoCapacidad, PermisosConexion,
     get_default_permisos_por_relacion, get_default_capacidades, get_default_membresias
@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 class ConexionesService:
-    """Servicio para gestión de conexiones entre usuarios"""
+    """Service for managing connections between users"""
     
-    # ============== INICIALIZACIÓN ==============
+    # ============== INITIALIZATION ==============
     
     async def initialize_defaults(self):
-        """Inicializar configuraciones por defecto"""
-        # Permisos por relación
+        """Initialize default configurations"""
+        # Permissions by relationship
         permisos = get_default_permisos_por_relacion()
         for perm in permisos:
             existing = await db.config_permisos_relacion.find_one({
