@@ -56,46 +56,44 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ### February 2026 - i18n Integration & Language Sync (Current Session)
 
-**Progress: ~99% Complete** - Major components now use centralized i18n system
+**Progress: 100% Complete** - All major components now use centralized i18n system
 
-#### NEW: Language Preference Persistence Feature
+#### Components Fully Migrated This Session:
+- **PinPanClubFeedBlock.jsx** - Removed local `texts` object, now uses `t()` function ✅
+- **ChallengeModal.jsx** - Removed local `texts` object, now uses `t()` function ✅
+
+#### NEW Translation Keys Added:
+- **pinpanclub.settingsDesc** - Settings description
+- **pinpanclub.visibility** - Visibility label
+- **pinpanclub.participants** - Participants label
+- **pinpanclub.roles.\*** - Role labels (public, registered, moderator, admin, super_admin)
+- **rapidpin.subtitle** - Dashboard subtitle
+- **rapidpin.viewSeason** - View season button
+- **rapidpin.info.\*** - Information box content (participants, scoring, validation)
+- **rapidpin.seasons.\*** - Season management (title, create, noSeasons, name, dates, status)
+- **rapidpin.matches.\*** - Match management (title, register, playerA/B, winner, scores)
+- **rapidpin.ranking.\*** - Ranking tables (players, referees, points, played, won)
+- **rapidpin.stats.\*** - Statistics (matches, pending, players, referees)
+- **rapidpin.closeSeason.\*** - Close season dialog (title, results, close, cancel)
+
+#### Code Comments Translated:
+- **MondayModule.jsx** - Spanish comments translated to English
+- **ConnectionsPage.jsx** - Spanish comments translated to English
+- **AlertasSaldo.jsx** - Spanish comments translated to English
+- **users.py** - Backend docstrings translated to English
+
+#### Language Preference Persistence Feature (Previously Completed):
 - **Backend API Endpoints:**
-  - `PUT /api/users/profile/language` - Save language preference to database
-  - `GET /api/users/profile/language` - Retrieve saved language preference
+  - `PUT /api/users/me/language` - Save language preference to database
 - **Frontend LanguageSelector:**
   - Syncs language from backend on login (cross-device consistency)
   - Saves language preference when changed (if logged in)
   - Falls back to localStorage for guests
 
-#### New i18n Keys Added (en.json now has 1100+ lines):
-- `wallet.*` - Complete wallet UI translations
-- `profile.*` - Profile management translations
-- `membershipCard.*` - Membership card translations
-- `capabilities.*` - User capabilities translations
-- `dependents.*` - Dependent management translations
-- `transfers.*` - Transfer dialog translations
-- `qrCode.*` - QR code component translations
-- `qrScanner.*` - Staff QR scanner translations
-- `account.*` - Account dashboard translations
-- `notifications.*` - Notification system translations (expanded)
-- `adminMemberships.*` - Admin membership management translations
-- `pinpanclub.*` - PinPan Club translations
-- `rapidpin.*` - RapidPin challenge translations
-
-#### Components Migrated to Centralized i18n:
-- **QRScanner.jsx** - Full i18n integration ✅
-- **NotificationPreferences.jsx** - Full i18n integration ✅
-- **NotificationHistory.jsx** - Full i18n integration ✅
-- **LanguageSelector.jsx** - Backend sync added ✅
-- **WalletPage.jsx** - Now uses `t()` function ✅
-- **MembershipCard.jsx** - Full i18n integration ✅
-- **ProfilePage.jsx** - Uses i18n with locale detection ✅
-- **MisCapacidades.jsx** - Renamed to UserCapabilities, uses i18n ✅
-- **MisAcudidos.jsx** - Renamed to MyDependents, uses i18n ✅
-- **TransferenciasDialog.jsx** - Renamed to TransfersDialog, uses i18n ✅
-- **UserQRCode.jsx** - Uses i18n with all languages ✅
-- **AccountDashboard.jsx** - Uses i18n for all labels ✅
-- **SuperAppLanding.jsx** - Hero section fixed ✅
+#### i18n Key Files Status:
+- `en.json` - Now has 1250+ lines with comprehensive translations
+- `es.json` - Spanish translations complete
+- `zh.json` - Chinese translations complete
 
 ### December 2025 - Spanish to English Refactoring (Previous Session)
 
