@@ -328,7 +328,7 @@ class UserProfileService(BaseService):
         
         relationships = await cursor.to_list(length=50)
         
-        # Enriquecer con info de los usuarios relacionados
+        # Enriquecer con info de the users relacionados
         for rel in relationships:
             other_user_id = rel["user_id_2"] if rel["user_id_1"] == user_id else rel["user_id_1"]
             other_profile = await self.get_profile(other_user_id)

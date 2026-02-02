@@ -224,7 +224,7 @@ class SuperPinService(BaseService):
         match_dict["set_actual"] = 1
         match_dict["historial_sets"] = []
         
-        # Obtener ELO actual de los jugadores
+        # Obtener ELO actual de the players
         ranking_a = await self.ranking_repo.get_or_create(
             data.liga_id, data.jugador_a_id, player_a
         )
@@ -1224,7 +1224,7 @@ class SuperPinService(BaseService):
         if len(players_with_ranking) % 2 == 1:
             bye_player = players_with_ranking[-1]
         
-        # Crear los partidos
+        # Crear the matches
         created_matches = []
         mejor_de = 1 if match_format == "best_of_1" else 3
         

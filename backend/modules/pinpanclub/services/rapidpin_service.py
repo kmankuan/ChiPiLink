@@ -90,8 +90,8 @@ async def send_referee_needed_broadcast(
     exclude_player_ids: list = None
 ) -> bool:
     """
-    Enviar notificación broadcast a todos los usuarios cuando hay un partido esperando árbitro.
-    Excluye a los jugadores involucrados en the match.
+    Enviar notificación broadcast a todos the users cuando hay un partido esperando árbitro.
+    Excluye a the players involucrados en the match.
     """
     try:
         from modules.notifications.services.push_service import push_notification_service
@@ -322,9 +322,9 @@ class RapidPinService(BaseService):
         if len(participants) != 3:
             raise ValueError("Los 3 participantes deben ser personas diferentes")
         
-        # Validate que el ganador es uno de los jugadores
+        # Validate que el ganador es uno de the players
         if data.ganador_id not in [data.jugador_a_id, data.jugador_b_id]:
-            raise ValueError("El ganador debe ser uno de los jugadores")
+            raise ValueError("El ganador debe ser uno de the players")
         
         # Validate que quien registra es uno de los participantes
         if data.registrado_por_id not in participants:
@@ -486,7 +486,7 @@ class RapidPinService(BaseService):
         return [RapidPinMatch(**r) for r in results]
     
     async def get_all_pending_confirmations(self, user_id: str) -> List[RapidPinMatch]:
-        """Get TODOS los partidos pendientes de confirmación para un usuario (all seasons)"""
+        """Get TODOS the matches pendientes de confirmación para un usuario (all seasons)"""
         results = await self.match_repo.get_all_pending_matches_for_user(user_id)
         return [RapidPinMatch(**r) for r in results]
     
@@ -866,9 +866,9 @@ class RapidPinService(BaseService):
         if queue_entry["status"] != "waiting":
             raise ValueError("Este partido no está esperando árbitro")
         
-        # Verificar que el árbitro no sea uno de los jugadores
+        # Verificar que el árbitro no sea uno de the players
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("El árbitro no puede ser uno de los jugadores")
+            raise ValueError("El árbitro no puede ser uno de the players")
         
         # Obtener info of the árbitro
         referee_info = await self.player_repo.get_by_id(referee_id)
@@ -928,9 +928,9 @@ class RapidPinService(BaseService):
         if queue_entry["status"] != "assigned":
             raise ValueError("El partido debe tener árbitro asignado para completarse")
         
-        # Verificar que el ganador sea uno de los jugadores
+        # Verificar que el ganador sea uno de the players
         if ganador_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("El ganador debe ser uno de los jugadores")
+            raise ValueError("El ganador debe ser uno de the players")
         
         # Determinar perdedor
         perdedor_id = queue_entry["player2_id"] if ganador_id == queue_entry["player1_id"] else queue_entry["player1_id"]
@@ -1192,9 +1192,9 @@ class RapidPinService(BaseService):
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
             raise ValueError("Este reto no está en fase de negociación de fecha")
         
-        # Verificar que sea uno de los jugadores
+        # Verificar que sea uno de the players
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo los jugadores dthe challenge pueden responder")
+            raise ValueError("Solo the players dthe challenge pueden responder")
         
         # Verificar que no sea la misma persona que propuso
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
@@ -1308,7 +1308,7 @@ class RapidPinService(BaseService):
             raise ValueError("Este reto no está en cola")
         
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo los jugadores dthe challenge pueden retomarlo")
+            raise ValueError("Solo the players dthe challenge pueden retomarlo")
         
         # Usar respond_to_date con action=counter para proponer nueva fecha
         return await self.respond_to_date(

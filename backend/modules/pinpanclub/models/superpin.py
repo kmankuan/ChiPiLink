@@ -43,7 +43,7 @@ class LeagueStatus(str, Enum):
 class TournamentType(str, Enum):
     """Tipo de torneo final"""
     TOP_N = "top_n"            # Only los mejores N jugadores
-    ALL_PLAYERS = "all_players"  # All los jugadores
+    ALL_PLAYERS = "all_players"  # All the players
     BY_CATEGORY = "by_category"  # By categorías según ranking
 
 

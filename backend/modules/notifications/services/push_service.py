@@ -606,8 +606,8 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a todos los usuarios con dispositivos registrados"""
-        # Obtener todos los usuarios con dispositivos
+        """Send notificación a todos the users con dispositivos registrados"""
+        # Obtener todos the users con dispositivos
         pipeline = [
             {"$match": {"is_active": True}},
             {"$group": {"_id": "$user_id"}}
