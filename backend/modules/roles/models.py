@@ -16,7 +16,7 @@ class DefaultRoles(str, Enum):
     USER = "user"
 
 
-# Permisos disponibles en el sistema organizados por módulo
+# Permissions disponibles en el sistema organizados por módulo
 AVAILABLE_PERMISSIONS = {
     # Administración general
     "admin": {
@@ -72,7 +72,7 @@ AVAILABLE_PERMISSIONS = {
         "admin_panel": "Panel de administración PinpanClub",
     },
     
-    # Membresías
+    # Memberships
     "memberships": {
         "view": "Ver membresías",
         "create_plans": "Crear planes",
@@ -108,7 +108,7 @@ AVAILABLE_PERMISSIONS = {
 }
 
 
-# Permisos por defecto para cada rol
+# Permissions por defecto para cada rol
 DEFAULT_ROLE_PERMISSIONS = {
     DefaultRoles.SUPER_ADMIN: ["*"],  # Todos los permisos
     

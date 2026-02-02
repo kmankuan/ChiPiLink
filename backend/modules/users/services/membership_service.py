@@ -680,7 +680,7 @@ class MembershipService:
             {"user_id": user_id, "consumed_visit": True}
         )
         
-        # Visitas este mes
+        # Visits este mes
         now = datetime.now(timezone.utc)
         first_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
@@ -710,7 +710,7 @@ class MembershipService:
             avg_duration = round(result[0].get("avg_duration", 0), 1)
             total_time = result[0].get("total_time", 0)
         
-        # Membresía activa
+        # Membership activa
         membership = await self.get_active_membership(user_id)
         
         return {

@@ -33,14 +33,14 @@ class ConexionesService:
             if not existing:
                 await db.config_permisos_relacion.insert_one(perm)
         
-        # Capacidades
+        # Capabilityes
         capacidades = get_default_capacidades()
         for cap in capacidades:
             existing = await db.capacidades_config.find_one({"capacidad_id": cap["capacidad_id"]})
             if not existing:
                 await db.capacidades_config.insert_one(cap)
         
-        # Membresías
+        # Memberships
         membresias = get_default_membresias()
         for mem in membresias:
             existing = await db.membresias_config.find_one({"membresia_id": mem["membresia_id"]})
@@ -119,7 +119,7 @@ class ConexionesService:
                 # The acudiente tiene permisos sobre el acudido
                 config = await db.config_permisos_relacion.find_one({
                     "tipo": "especial",
-                    "subtipo": "acudiente"  # Permisos del acudiente
+                    "subtipo": "acudiente"  # Permissions del acudiente
                 })
             else:
                 config = await db.config_permisos_relacion.find_one({

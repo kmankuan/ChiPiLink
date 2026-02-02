@@ -258,7 +258,7 @@ class TransferenciaWallet(BaseModel):
     monto: float
     moneda: str = "USD"
     mensaje: Optional[str] = None
-    tipo_relacion: Optional[str] = None     # Relación entre usuarios
+    tipo_relacion: Optional[str] = None     # Relationship entre usuarios
     estado: str = "completada"
     creado_en: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
