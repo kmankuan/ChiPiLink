@@ -1,6 +1,6 @@
 /**
- * PinPanClubFeedBlock - Bloque de actividades del club para Landing Page
- * Muestra partidos, ranking, retos, logros y torneos
+ * PinPanClubFeedBlock - Club activity block for Landing Page
+ * Shows matches, ranking, challenges, achievements, and tournaments
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,37 +81,8 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
   const lang = ['es', 'en', 'zh'].includes(detectedLang) ? detectedLang : 'es';
   const L = (value) => getLocalizedText(value, lang);
 
-  // Use centralized i18n translations
-  const txt = {
-    loading: t('pinpanclub.loading'),
-    recentMatches: t('pinpanclub.recentMatches'),
-    superPinMatches: t('pinpanclub.superPinMatches'),
-    rapidPinMatches: t('pinpanclub.rapidPinMatches'),
-    leaderboard: t('pinpanclub.leaderboard'),
-    activeChallenges: t('pinpanclub.activeChallenges'),
-    recentAchievements: t('pinpanclub.recentAchievements'),
-    activePlayers: t('pinpanclub.activePlayers'),
-    upcomingTournaments: t('pinpanclub.upcomingTournaments'),
-    viewAll: t('pinpanclub.viewAll'),
-    join: t('pinpanclub.join'),
-    noData: t('pinpanclub.noData'),
-    superpin: t('pinpanclub.superpin'),
-    rapidpin: t('pinpanclub.rapidpin'),
-    points: t('pinpanclub.points'),
-    games: t('pinpanclub.games'),
-    won: t('pinpanclub.won'),
-    matchesPlayed: t('pinpanclub.matchesPlayed'),
-    streak: t('pinpanclub.streak'),
-    today: t('pinpanclub.today'),
-    level: t('pinpanclub.level'),
-    wins: t('pinpanclub.wins'),
-    losses: t('pinpanclub.losses'),
-    difficulty: t('pinpanclub.difficulty'),
-    easy: t('pinpanclub.easy'),
-    normal: t('pinpanclub.normal'),
-    hard: t('pinpanclub.hard'),
-    extreme: t('pinpanclub.extreme')
-  };
+  // Use centralized i18n translations directly via t() function
+  // No intermediate txt object needed - use t() calls inline for cleaner code
 
   useEffect(() => {
     fetchFeedData();
