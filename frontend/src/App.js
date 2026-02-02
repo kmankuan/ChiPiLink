@@ -253,12 +253,7 @@ function AppRouter() {
       />
       <Route 
         path="/mis-pedidos-libros" 
-        element={
-          <ProtectedRoute>
-            <Header />
-            <MisPedidosLibros />
-          </ProtectedRoute>
-        } 
+        element={<Navigate to="/unatienda?tab=private" replace />}
       />
       
       {/* Legacy redirects for backward compatibility */}
