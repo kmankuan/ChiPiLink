@@ -103,7 +103,7 @@ export default function UnatiendaModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.orders_pending || 0}</p>
-                <p className="text-xs text-muted-foreground">Pedidos Pendientes</p>
+                <p className="text-xs text-muted-foreground">Pending Orders</p>
               </div>
             </div>
           </CardContent>
@@ -115,27 +115,27 @@ export default function UnatiendaModule() {
         <TabsList className="grid w-full grid-cols-10 mb-6">
           <TabsTrigger value="catalogo-publico" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
-            <span className="hidden md:inline">Público</span>
+            <span className="hidden md:inline">Public</span>
           </TabsTrigger>
           <TabsTrigger value="catalogo-privado" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            <span className="hidden md:inline">Privado PCA</span>
+            <span className="hidden md:inline">Private PCA</span>
           </TabsTrigger>
           <TabsTrigger value="solicitudes" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
-            <span className="hidden md:inline">Solicitudes</span>
+            <span className="hidden md:inline">Requests</span>
           </TabsTrigger>
           <TabsTrigger value="textbook-orders" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
-            <span className="hidden md:inline">Pedidos Txt</span>
+            <span className="hidden md:inline">Txt Orders</span>
           </TabsTrigger>
           <TabsTrigger value="form-config" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            <span className="hidden md:inline">Formulario</span>
+            <span className="hidden md:inline">Form</span>
           </TabsTrigger>
           <TabsTrigger value="estudiantes" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            <span className="hidden md:inline">Estudiantes</span>
+            <span className="hidden md:inline">Students</span>
           </TabsTrigger>
           <TabsTrigger value="configuracion" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
