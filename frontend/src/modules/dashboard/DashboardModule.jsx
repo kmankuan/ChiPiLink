@@ -144,12 +144,12 @@ export default function DashboardModule() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.productos.total}</div>
+            <div className="text-2xl font-bold">{stats.products?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.productos.bajo_stock > 0 && (
-                <span className="text-amber-600">{stats.productos.bajo_stock} con bajo stock</span>
+              {stats.products?.low_stock > 0 && (
+                <span className="text-amber-600">{stats.products.low_stock} con bajo stock</span>
               )}
-              {stats.productos.bajo_stock === 0 && 'Stock saludable'}
+              {(stats.products?.low_stock || 0) === 0 && 'Stock saludable'}
             </p>
           </CardContent>
         </Card>
@@ -160,10 +160,10 @@ export default function DashboardModule() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.pedidos.total}</div>
+            <div className="text-2xl font-bold">{stats.orders?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.pedidos.pendientes > 0 ? (
-                <span className="text-amber-600">{stats.pedidos.pendientes} pendientes</span>
+              {stats.orders?.pending > 0 ? (
+                <span className="text-amber-600">{stats.orders.pending} pendientes</span>
               ) : (
                 'Todos procesados'
               )}
@@ -177,7 +177,7 @@ export default function DashboardModule() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.usuarios.total}</div>
+            <div className="text-2xl font-bold">{stats.users?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               Usuarios registrados
             </p>
@@ -190,9 +190,9 @@ export default function DashboardModule() {
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.notificaciones.no_leidas}</div>
+            <div className="text-2xl font-bold">{stats.notifications?.unread || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {stats.notificaciones.no_leidas > 0 ? 'Sin leer' : 'Todas leídas'}
+              {(stats.notifications?.unread || 0) > 0 ? 'Sin leer' : 'Todas leídas'}
             </p>
           </CardContent>
         </Card>
