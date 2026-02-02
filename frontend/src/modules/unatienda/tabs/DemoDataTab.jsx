@@ -56,15 +56,15 @@ export default function DemoDataTab({ token, onRefresh }) {
       
       if (data.success) {
         setLastResult(data.data);
-        toast.success('¡Datos de demo generados exitosamente!');
+        toast.success('Demo data generated successfully!');
         fetchStats();
         onRefresh?.();
       } else {
-        toast.error(data.detail || 'Error al generar datos');
+        toast.error(data.detail || 'Error generating data');
       }
     } catch (error) {
       console.error('Error generating demo data:', error);
-      toast.error('Error al generar datos de demo');
+      toast.error('Error generating demo data');
     } finally {
       setGenerating(false);
     }
@@ -82,16 +82,16 @@ export default function DemoDataTab({ token, onRefresh }) {
       const data = await response.json();
       
       if (data.success) {
-        toast.success('Datos de demo eliminados');
+        toast.success('Demo data deleted');
         setLastResult(null);
         fetchStats();
         onRefresh?.();
       } else {
-        toast.error('Error al eliminar datos');
+        toast.error('Error deleting data');
       }
     } catch (error) {
       console.error('Error clearing demo data:', error);
-      toast.error('Error al eliminar datos de demo');
+      toast.error('Error deleting demo data');
     } finally {
       setClearing(false);
     }
@@ -133,9 +133,9 @@ export default function DemoDataTab({ token, onRefresh }) {
                 <Database className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Datos de Demostración</CardTitle>
+                <CardTitle>Demo Data</CardTitle>
                 <CardDescription>
-                  Genera datos ficticios para probar el catálogo privado PCA
+                  Generate fictitious data to test the private PCA catalog
                 </CardDescription>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function DemoDataTab({ token, onRefresh }) {
               disabled={loading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Actualizar
+              Refresh
             </Button>
           </div>
         </CardHeader>
@@ -160,12 +160,12 @@ export default function DemoDataTab({ token, onRefresh }) {
               {generating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generando datos...
+                  Generating data...
                 </>
               ) : (
                 <>
                   <Play className="h-4 w-4 mr-2" />
-                  Generar Datos Demo
+                  Generate Demo Data
                 </>
               )}
             </Button>
@@ -173,17 +173,17 @@ export default function DemoDataTab({ token, onRefresh }) {
             <Button
               variant="destructive"
               onClick={() => setShowClearDialog(true)}
-              disabled={generating || clearing || !stats?.productos}
+              disabled={generating || clearing || !stats?.products}
             >
               {clearing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Eliminando...
+                  Deleting...
                 </>
               ) : (
                 <>
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Limpiar Datos Demo
+                  Clear Demo Data
                 </>
               )}
             </Button>
@@ -196,12 +196,12 @@ export default function DemoDataTab({ token, onRefresh }) {
         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
             <CheckCircle2 className="h-5 w-5" />
-            <span className="font-medium">Datos creados exitosamente:</span>
+            <span className="font-medium">Data created successfully:</span>
           </div>
           <ul className="mt-2 text-sm text-green-600 dark:text-green-400 space-y-1">
-            <li>• {lastResult.productos} libros de texto para todos los grados</li>
-            <li>• {lastResult.estudiantes} estudiantes distribuidos por grado</li>
-            <li>• {lastResult.orders} pedidos de ejemplo para probar el flujo</li>
+            <li>• {lastResult.products} textbooks for all grades</li>
+            <li>• {lastResult.students} students distributed by grade</li>
+            <li>• {lastResult.orders} sample orders to test the flow</li>
           </ul>
         </div>
       )}
@@ -210,22 +210,22 @@ export default function DemoDataTab({ token, onRefresh }) {
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard 
           icon={BookOpen} 
-          title="Libros Catálogo Privado" 
-          value={stats?.productos_total || 0}
-          demoValue={stats?.productos || 0}
+          title="Private Catalog Books" 
+          value={stats?.total_products || 0}
+          demoValue={stats?.products || 0}
           color="bg-blue-500"
         />
         <StatCard 
           icon={Users} 
-          title="Estudiantes PCA" 
-          value={stats?.estudiantes_total || 0}
-          demoValue={stats?.estudiantes || 0}
+          title="PCA Students" 
+          value={stats?.total_students || 0}
+          demoValue={stats?.students || 0}
           color="bg-green-500"
         />
         <StatCard 
           icon={ShoppingCart} 
-          title="Pedidos de Libros" 
-          value={stats?.orders_total || 0}
+          title="Book Orders" 
+          value={stats?.total_orders || 0}
           demoValue={stats?.orders || 0}
           color="bg-purple-500"
         />
@@ -236,16 +236,16 @@ export default function DemoDataTab({ token, onRefresh }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-blue-500" />
-            ¿Qué datos se generan?
+            What data is generated?
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>• <strong>~100 libros</strong> de texto para Pre-Kinder hasta 12vo grado</p>
-          <p>• <strong>~110 estudiantes</strong> por grado con datos completos (nombre, número, sección)</p>
-          <p>• <strong>10 pedidos</strong> de ejemplo con múltiples libros cada uno</p>
-          <p>• Los datos incluyen editoriales, precios, materias y códigos realistas</p>
+          <p>• <strong>~100 textbooks</strong> for Pre-K through 12th grade</p>
+          <p>• <strong>~110 students</strong> per grade with complete data (name, number, section)</p>
+          <p>• <strong>10 sample orders</strong> with multiple books each</p>
+          <p>• Data includes publishers, prices, subjects, and realistic codes</p>
           <p className="text-orange-600 dark:text-orange-400 font-medium">
-            ⚠️ Los pedidos generados pueden sincronizarse con Monday.com si está configurado
+            Warning: Generated orders may sync with Monday.com if configured
           </p>
         </CardContent>
       </Card>
@@ -256,19 +256,19 @@ export default function DemoDataTab({ token, onRefresh }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <Trash2 className="h-5 w-5" />
-              Confirmar Eliminación
+              Confirm Deletion
             </DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que deseas eliminar todos los datos de demostración?
-              Esta acción eliminará {stats?.productos || 0} libros, {stats?.estudiantes || 0} estudiantes y {stats?.orders || 0} pedidos marcados como demo.
+              Are you sure you want to delete all demo data?
+              This action will delete {stats?.products || 0} books, {stats?.students || 0} students and {stats?.orders || 0} orders marked as demo.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowClearDialog(false)}>
-              Cancelar
+              Cancel
             </Button>
             <Button variant="destructive" onClick={handleClearData}>
-              Sí, Eliminar
+              Yes, Delete
             </Button>
           </DialogFooter>
         </DialogContent>
