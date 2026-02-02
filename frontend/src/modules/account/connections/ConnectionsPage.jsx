@@ -275,16 +275,16 @@ export default function MisConexiones({ token }) {
         throw new Error(data.detail || 'Error');
       }
       
-      // Mensaje con indicador de notificación
+      // Message with notification indicator
       const pushSent = data.push_notification?.success;
       if (accept) {
         toast.success(pushSent 
-          ? 'Solicitud aceptada 🔔 Se notificó al usuario' 
-          : 'Solicitud aceptada');
+          ? 'Request accepted. User was notified.' 
+          : 'Request accepted');
       } else {
         toast.success(pushSent 
-          ? 'Solicitud rechazada 🔔 Se notificó al usuario'
-          : 'Solicitud rechazada');
+          ? 'Request rejected. User was notified.'
+          : 'Request rejected');
       }
       loadData();
     } catch (err) {
@@ -293,7 +293,7 @@ export default function MisConexiones({ token }) {
   };
 
   const handleRemoveConnection = async (conexionId) => {
-    if (!confirm('¿Eliminar esta conexión?')) return;
+    if (!confirm('Delete this connection?')) return;
     
     try {
       const res = await fetch(`${API}/api/conexiones/${conexionId}`, {
@@ -301,9 +301,9 @@ export default function MisConexiones({ token }) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!res.ok) throw new Error('Error eliminando conexión');
+      if (!res.ok) throw new Error('Error deleting connection');
       
-      toast.success('Conexión eliminada');
+      toast.success('Connection deleted');
       loadData();
     } catch (err) {
       toast.error(err.message);
@@ -356,25 +356,25 @@ export default function MisConexiones({ token }) {
               <DialogHeader>
                 <DialogTitle>{t('conexiones.inviteUser')}</DialogTitle>
                 <DialogDescription>
-                  Invita a alguien a registrarse en ChiPiLink
+                  Invite someone to register on ChiPiLink
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Correo electrónico *</Label>
+                  <Label>Email *</Label>
                   <Input
                     type="email"
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="correo@ejemplo.com"
+                    placeholder="email@example.com"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Nombre (opcional)</Label>
+                  <Label>Name (optional)</Label>
                   <Input
                     value={inviteName}
                     onChange={(e) => setInviteName(e.target.value)}
-                    placeholder="Nombre de la persona"
+                    placeholder="Person's name"
                   />
                 </div>
                 <div className="space-y-2">
