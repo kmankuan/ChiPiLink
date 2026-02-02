@@ -414,7 +414,92 @@
     "error": "Error sending challenge",
     "loginRequired": "You must log in to challenge",
     "cantChallengeSelf": "You cannot challenge yourself",
-    "points": "pts"
+    "points": "pts",
+    "subtitle": "Quick matches with flexible validation",
+    "viewSeason": "View Season",
+    "info": {
+      "participants": "2 players + 1 referee",
+      "playersAndReferee": "Players and Referee",
+      "scoring": "Scoring",
+      "scoringDesc": "Winner: 3 pts, Loser: 1 pt, Referee: 2 pts",
+      "validation": "Validation",
+      "validationDesc": "Requires confirmation from 2 of 3 participants",
+      "oneConfirmation": "One confirmation"
+    },
+    "seasons": {
+      "title": "Seasons",
+      "create": "Create Season",
+      "createFirst": "Create First Season",
+      "created": "Season created successfully",
+      "noSeasons": "No seasons yet",
+      "noSeasonsDesc": "Create your first season to start tracking matches",
+      "name": "Season Name",
+      "namePlaceholder": "Enter season name...",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description...",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "fieldsRequired": "All fields are required",
+      "notFound": "Season not found",
+      "status": {
+        "active": "Active",
+        "closed": "Closed"
+      }
+    },
+    "matches": {
+      "title": "Matches",
+      "recent": "Recent Matches",
+      "register": "Register Match",
+      "registerDesc": "Register a new match result",
+      "registered": "Match registered successfully",
+      "noMatches": "No matches yet",
+      "playerA": "Player A",
+      "playerB": "Player B",
+      "referee": "Referee",
+      "selectPlayer": "Select player",
+      "selectReferee": "Select referee",
+      "winner": "Winner",
+      "selectWinner": "Select winner",
+      "winnerScore": "Winner Score",
+      "loserScore": "Loser Score",
+      "differentParticipants": "All participants must be different",
+      "winnerMustBePlayer": "Winner must be one of the players",
+      "fieldsRequired": "All fields are required",
+      "pendingConfirmations": "Pending Confirmations",
+      "pendingNote": "Waiting for confirmation",
+      "confirm": "Confirm",
+      "confirmed": "Confirmed"
+    },
+    "ranking": {
+      "title": "Ranking",
+      "players": "Players",
+      "playersDesc": "Ranked by total points",
+      "referees": "Referees",
+      "refereesDesc": "Ranked by referee points",
+      "player": "Player",
+      "referee": "Referee",
+      "points": "Points",
+      "refPoints": "Ref Pts",
+      "played": "Played",
+      "won": "Won",
+      "refereed": "Refereed"
+    },
+    "stats": {
+      "matches": "Matches",
+      "pending": "Pending",
+      "players": "Players",
+      "referees": "Referees"
+    },
+    "closeSeason": {
+      "title": "Close Season",
+      "confirmDesc": "Are you sure you want to close this season?",
+      "results": "Results",
+      "playerResults": "Player Results",
+      "refereeResults": "Referee Results",
+      "close": "Close Season",
+      "cancel": "Cancel",
+      "success": "Season closed successfully"
+    }
   },
   "analytics": {
     "title": "Analytics Dashboard",
