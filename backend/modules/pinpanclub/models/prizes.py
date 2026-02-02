@@ -1,6 +1,6 @@
 """
 System for Premios Avanzado - Modelos
-Premios configurables more allá de badges: physical, descuentos, privilegios
+Premios configurables more there de badges: physical, descuentos, privilegios
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any

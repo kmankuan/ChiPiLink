@@ -38,7 +38,7 @@ class TutorSession(BaseModel):
     tema: str  # "vocabulario_ingles", "pronunciacion", "gramatica", etc.
     subtema: Optional[str] = None  # "colores", "numbers", etc.
     nivel: str = "basico"  # basico, intermedio, avanzado
-    idioma_objetivo: str = "en"  # Idioma that istá aprendiendo
+    idioma_objetivo: str = "en"  # Idioma that is aprendiendo
     # Estado
     estado: str = "activa"  # activa, pausada, completada
     progreso: int = 0  # 0-100%

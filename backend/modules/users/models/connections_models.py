@@ -478,7 +478,7 @@ def get_default_membresias() -> List[Dict]:
         {
             "membresia_id": "tutoria_integral",
             "nombre": {"es": "Tutoring Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
-            "descripcion": {"es": "Programa de apoyo académico", "en": "Academic support program"},
+            "descripcion": {"es": "Programa de apoyo academic", "en": "Academic support program"},
             "icono": "📚",
             "color": "#ec4899",
             "planes": [

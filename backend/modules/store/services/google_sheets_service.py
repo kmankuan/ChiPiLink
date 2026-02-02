@@ -1,6 +1,6 @@
 """
 Store Module - Servicio de Synchronization con Google Sheets
-Sincroniza estudiantes desde hojas de cálculo de Google
+Sincroniza estudiantes desde hojas de calculation de Google
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone

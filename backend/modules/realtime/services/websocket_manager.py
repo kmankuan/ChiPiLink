@@ -267,7 +267,7 @@ async def emit_challenge_event(
     """Emit challenge-related events to rapidpin room"""
     messages = {
         "challenge_created": {
-            "es": f"{player1_name} desafió a {player2_name}",
+            "es": f"{player1_name} challenged a {player2_name}",
             "en": f"{player1_name} challenged {player2_name}",
             "zh": f"{player1_name} 挑战了 {player2_name}"
         },

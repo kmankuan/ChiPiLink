@@ -251,7 +251,7 @@ class PrizeService(BaseService):
             if actual_value is None:
                 continue
             
-            # Evaluar comparación
+            # Evaluar comparison
             if comparison == "eq" and actual_value != value:
                 return False
             elif comparison == "gte" and actual_value < value:

@@ -301,7 +301,7 @@ class SocialService(BaseService):
         return user_mod.get("warnings", 0) if user_mod else 0
     
     async def add_user_warning(self, user_id: str, reason: str) -> int:
-        """Add una amonestación al usuario"""
+        """Add una warning al usuario"""
         from core.database import db
         from datetime import datetime, timezone
         

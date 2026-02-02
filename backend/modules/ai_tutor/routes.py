@@ -147,10 +147,10 @@ async def get_vocabulary(
     if not items:
         items = [
             {"palabra": "hello", "traduccion": "hola", "categoria": "saludos", "nivel": "basico"},
-            {"palabra": "goodbye", "traduccion": "adiós", "categoria": "saludos", "nivel": "basico"},
+            {"palabra": "goodbye", "traduccion": "goodbye", "categoria": "saludos", "nivel": "basico"},
             {"palabra": "thank you", "traduccion": "gracias", "categoria": "expresiones", "nivel": "basico"},
             {"palabra": "please", "traduccion": "por favor", "categoria": "expresiones", "nivel": "basico"},
-            {"palabra": "yes", "traduccion": "sí", "categoria": "basico", "nivel": "basico"},
+            {"palabra": "yes", "traduccion": "yes", "categoria": "basico", "nivel": "basico"},
             {"palabra": "no", "traduccion": "no", "categoria": "basico", "nivel": "basico"},
         ]
     

@@ -72,7 +72,7 @@ class ContentItem(ContentItemBase):
     likes: int = 0
     compartidos: int = 0
     # Curation
-    curado_por: Optional[str] = None  # admin que lo agregó
+    curado_por: Optional[str] = None  # admin que lo added
     notas_curador: Optional[str] = None  # Notas internas
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     fecha_actualizacion: Optional[datetime] = None

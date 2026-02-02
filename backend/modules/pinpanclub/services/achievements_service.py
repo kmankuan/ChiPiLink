@@ -68,7 +68,7 @@ class AchievementsService(BaseService):
         # Get statistics of the player
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
-        # Get logros que the player aún does not have
+        # Get logros que the player still does not have
         player_achievements = await self.get_player_achievements(jugador_id)
         earned_ids = {pa["achievement_id"] for pa in player_achievements}
         

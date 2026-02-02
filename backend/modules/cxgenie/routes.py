@@ -299,7 +299,7 @@ async def get_integration_info():
     """Get information about CXGenie integration"""
     return {
         "module": "cxgenie",
-        "description": "Integration con CXGenie para atención al cliente",
+        "description": "Integration con CXGenie para attention al cliente",
         "status": "implemented",
         "features": {
             "widget_chat": {

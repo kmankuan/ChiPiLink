@@ -165,7 +165,7 @@ class YappyService:
         """Get human-readable status description"""
         statuses = {
             "E": "Ejecutado - Pago completado exitosamente",
-            "R": "Rechazado - El cliente no confirmó el pago",
+            "R": "Rechazado - El cliente no confirmed el pago",
             "C": "Cancelado - El cliente cancelled el pago",
             "X": "Expirado - La request de pago expired"
         }
@@ -180,7 +180,7 @@ class YappyService:
             "E006": "Algo exited mal. Intenta nuevamente.",
             "E007": "El pedido ya ha sido registrado.",
             "E008": "Algo exited mal. Intenta nuevamente.",
-            "E009": "ID de la orden mayor a 15 dígitos.",
+            "E009": "ID de la orden mayor a 15 digits.",
             "E010": "El valor de los montos no es el correcto.",
             "E011": "Error en los campos de URL.",
             "E012": "Algo exited mal. Intenta nuevamente.",

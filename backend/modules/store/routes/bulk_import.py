@@ -78,7 +78,7 @@ async def preview_estudiantes(
 ):
     """
     Previsualizar import de estudiantes antes de ejecutarla.
-    Muestra what registros se crearán, actualizarán, y cualquier error.
+    Muestra what registros se will create, will update, y cualquier error.
     """
     result = await bulk_import_service.preview_estudiantes(
         request.raw_text,

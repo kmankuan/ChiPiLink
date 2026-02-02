@@ -345,7 +345,7 @@ class PostService:
         url: str,
         style: str = "primary"
     ) -> Dict:
-        """Create bloque de botón"""
+        """Create bloque de button"""
         return {
             "type": ContentBlockType.BUTTON.value,
             "text": text,

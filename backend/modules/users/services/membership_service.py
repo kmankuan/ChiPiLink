@@ -600,7 +600,7 @@ class MembershipService:
         now = datetime.now(timezone.utc)
         now_str = now.isoformat()
         
-        # Calculate duración
+        # Calculate duration
         check_in_time = datetime.fromisoformat(visit["check_in_time"].replace('Z', '+00:00'))
         duration_minutes = int((now - check_in_time).total_seconds() / 60)
         

@@ -271,7 +271,7 @@ class MatchService(BaseService):
             self._websocket_connections[partido_id].discard(websocket)
     
     async def _broadcast_to_match(self, partido_id: str) -> None:
-        """Send actualización a todos los WebSockets de un partido"""
+        """Send update a todos los WebSockets de un partido"""
         if partido_id not in self._websocket_connections:
             return
         

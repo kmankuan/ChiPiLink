@@ -198,7 +198,7 @@ async def update_block(
 
 @router.put("/admin/landing-page/blocks/{bloque_id}/publish")
 async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = Depends(get_admin_user)):
-    """Toggle block publish status (Publicado/En construcción)"""
+    """Toggle block publish status (Publicado/En construction)"""
     result = await db.paginas.update_one(
         {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
         {"$set": {

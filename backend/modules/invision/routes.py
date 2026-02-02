@@ -88,7 +88,7 @@ async def oauth_callback(
     
     # Validate required params
     if not code:
-        raise HTTPException(status_code=400, detail="Code de autorización no recibido")
+        raise HTTPException(status_code=400, detail="Code de authorization no recibido")
     
     if not state:
         raise HTTPException(status_code=400, detail="Estado de session no recibido")

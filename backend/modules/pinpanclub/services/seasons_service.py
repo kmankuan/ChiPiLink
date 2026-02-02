@@ -543,7 +543,7 @@ class RankingSeasonsService(BaseService):
         if current:
             return current
         
-        # Verify si hay una temporada next que debería activarse
+        # Verify si hay una temporada next que should activarse
         now = datetime.now(timezone.utc)
         upcoming = await db.pinpanclub_ranking_seasons.find_one({
             "status": SeasonStatus.UPCOMING.value,

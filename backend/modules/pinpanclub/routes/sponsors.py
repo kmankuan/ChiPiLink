@@ -1,6 +1,6 @@
 """
 Ping Pong Sponsors Module - Management of patrocinadores para pantallas TV
-Permite configurar espacios publicitarios, logos, diseños y more
+Permite configurar espacios publicitarios, logos, designs y more
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
