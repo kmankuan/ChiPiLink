@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                 <DropdownMenuItem asChild>
                   <Link to="/" className="flex items-center gap-2">
                     <Home className="h-4 w-4" />
-                    Ir al Inicio
+                    Go to Home
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                   className="text-destructive focus:text-destructive"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Cerrar Sesión
+                  Log Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
