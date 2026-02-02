@@ -128,82 +128,82 @@ class ProfileFieldConfig(BaseModel):
     placeholder: Dict[str, str] = {}
     help_text: Dict[str, str] = {}
     
-    # Tipo de campo
+    # Field type
     field_type: ProfileFieldType
     
-    # Opciones para select/multiselect
+    # Options for select/multiselect
     options: List[Dict[str, str]] = []  # [{"value": "opt1", "label": {"es": "Opción 1"}}]
     
-    # Validaciones
+    # Validations
     is_required: bool = False
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     min_value: Optional[float] = None
     max_value: Optional[float] = None
-    pattern: Optional[str] = None  # Regex para validación
+    pattern: Optional[str] = None  # Regex for validation
     
-    # Visibilidad
-    is_public: bool = False         # Visible para otros usuarios
-    is_searchable: bool = False     # Indexado para búsqueda
-    show_in_list: bool = False      # Mostrar en listados
-    show_in_card: bool = True       # Mostrar en tarjeta de perfil
+    # Visibility
+    is_public: bool = False         # Visible to other users
+    is_searchable: bool = False     # Indexed for search
+    show_in_list: bool = False      # Show in listings
+    show_in_card: bool = True       # Show in profile card
     
-    # Aplicable a qué tipos de usuario
-    applicable_user_types: List[str] = []  # Vacío = todos
+    # Applicable to which user types
+    applicable_user_types: List[str] = []  # Empty = all
     
-    # Sección/grupo
+    # Section/group
     section: str = "general"  # general, contact, medical, preferences, etc.
     
-    # Ordenamiento
+    # Sort order
     sort_order: int = 0
     
-    # Estado
+    # Status
     is_active: bool = True
     
     created_at: Optional[str] = None
 
 
-# ============== PERFIL DE USUARIO ==============
+# ============== USER PROFILE ==============
 
 class UserProfile(BaseModel):
-    """Perfil extendido de usuario"""
+    """Extended user profile"""
     profile_id: str = Field(default_factory=lambda: f"profile_{uuid.uuid4().hex[:8]}")
     
-    # Enlace al usuario de auth
-    user_id: str  # cliente_id del sistema de auth
+    # Link to auth user
+    user_id: str  # cliente_id from auth system
     
-    # Tipo de usuario
+    # User type
     user_type_id: str
-    user_type_info: Optional[Dict] = None  # Cache de info del tipo
+    user_type_info: Optional[Dict] = None  # Cache of type info
     
-    # Datos básicos (siempre presentes)
-    display_name: Optional[str] = None     # Nombre para mostrar/apodo
+    # Basic data (always present)
+    display_name: Optional[str] = None     # Display name/nickname
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     
-    # Fecha de nacimiento (para calcular edad)
+    # Birth date (for age calculation)
     birth_date: Optional[str] = None       # ISO format
     
-    # Campos dinámicos (los valores de ProfileFieldConfig)
+    # Dynamic fields (values from ProfileFieldConfig)
     custom_fields: Dict[str, Any] = {}     # {"emergency_contact": "...", "school_name": "..."}
     
-    # Preferencias
+    # Preferences
     language: str = "es"
     timezone: str = "America/Panama"
     notifications_enabled: bool = True
     notification_preferences: Dict[str, bool] = {}
     
-    # Etiquetas/tags para categorización
+    # Tags for categorization
     tags: List[str] = []
     
-    # Notas internas (solo admin)
+    # Internal notes (admin only)
     internal_notes: Optional[str] = None
     
-    # Estado
+    # Status
     is_verified: bool = False
     is_active: bool = True
     
-    # Estadísticas
+    # Statistics
     total_visits: int = 0
     total_purchases: int = 0
     total_points_earned: int = 0
@@ -215,19 +215,19 @@ class UserProfile(BaseModel):
     last_activity: Optional[str] = None
 
 
-# ============== RELACIONES ENTRE USUARIOS ==============
+# ============== USER RELATIONSHIPS ==============
 
 class UserRelationship(BaseModel):
-    """Relación entre dos usuarios"""
+    """Relationship between two users"""
     relationship_id: str = Field(default_factory=lambda: f"rel_{uuid.uuid4().hex[:8]}")
     
-    # Usuarios involucrados
-    user_id_1: str          # Usuario principal (ej: padre)
-    user_id_2: str          # Usuario secundario (ej: hijo)
+    # Users involved
+    user_id_1: str          # Primary user (e.g., parent)
+    user_id_2: str          # Secondary user (e.g., child)
     
-    # Tipo de relación
+    # Relationship type
     relationship_type: RelationshipType
-    custom_type_name: Optional[Dict[str, str]] = None  # Para tipo CUSTOM
+    custom_type_name: Optional[Dict[str, str]] = None  # For CUSTOM type
     
     # Roles en la relación
     role_1: Dict[str, str] = {}  # {"es": "Padre", "en": "Father"}
