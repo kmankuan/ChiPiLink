@@ -239,7 +239,7 @@ class QRCodeService:
         metadata: Dict = None
     ) -> Dict:
         """Procesar una acción desde QR code"""
-        # Validar QR
+        # Validate QR
         scan_result = await self.scan_qr_code(qr_string)
         
         if not scan_result.get("valid"):

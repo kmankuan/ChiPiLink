@@ -246,7 +246,7 @@ class SuperPinMatch(BaseModel):
     jugador_b_id: str
     arbitro_id: Optional[str] = None
     
-    # Configuración
+    # Configuration
     mejor_de: int = 3
     puntos_por_set: int = 11
     
@@ -351,7 +351,7 @@ class SeasonTournament(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
     
-    # Configuración (heredada de la liga)
+    # Configuration (heredada de la liga)
     tournament_config: TournamentConfig
     prizes: List[PrizeConfig] = []
     

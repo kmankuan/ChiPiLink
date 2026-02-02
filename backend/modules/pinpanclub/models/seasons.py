@@ -52,7 +52,7 @@ class RankingSeason(BaseModel):
     # Estado
     status: SeasonStatus = SeasonStatus.UPCOMING
     
-    # Configuración
+    # Configuration
     min_challenges_to_qualify: int = 5  # Mínimo de retos para calificar
     min_points_to_qualify: int = 50     # Mínimo de puntos para calificar
     

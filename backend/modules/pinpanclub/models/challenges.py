@@ -59,7 +59,7 @@ class ChallengeDefinition(BaseModel):
     badge_id: Optional[str] = None
     prize_id: Optional[str] = None
     
-    # Configuración
+    # Configuration
     is_automatic: bool = True  # Si es generado automáticamente
     is_active: bool = True
     is_repeatable: bool = False  # Si se puede completar múltiples veces

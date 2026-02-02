@@ -34,7 +34,7 @@ class OrderService(BaseService):
         Crear pedido autenticado.
         Emite evento: store.order.created
         """
-        # Validar y calcular total
+        # Validate y calcular total
         total = 0
         for item in data.items:
             product = await self.product_repository.get_by_id(item.libro_id)
@@ -84,7 +84,7 @@ class OrderService(BaseService):
         Crear pedido público (sin autenticación).
         Emite evento: store.order.created
         """
-        # Validar y calcular total
+        # Validate y calcular total
         total = 0
         items_validados = []
         

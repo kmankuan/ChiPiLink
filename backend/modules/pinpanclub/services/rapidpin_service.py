@@ -317,16 +317,16 @@ class RapidPinService(BaseService):
         if season.estado != RapidPinSeasonStatus.ACTIVE:
             raise ValueError("La temporada no está activa")
         
-        # Validar que los 3 participantes son diferentes
+        # Validate que los 3 participantes son diferentes
         participants = {data.jugador_a_id, data.jugador_b_id, data.arbitro_id}
         if len(participants) != 3:
             raise ValueError("Los 3 participantes deben ser personas diferentes")
         
-        # Validar que el ganador es uno de los jugadores
+        # Validate que el ganador es uno de los jugadores
         if data.ganador_id not in [data.jugador_a_id, data.jugador_b_id]:
             raise ValueError("El ganador debe ser uno de los jugadores")
         
-        # Validar que quien registra es uno de los participantes
+        # Validate que quien registra es uno de los participantes
         if data.registrado_por_id not in participants:
             raise ValueError("Solo un participante puede registrar el partido")
         
@@ -379,7 +379,7 @@ class RapidPinService(BaseService):
         if match["estado"] != RapidPinMatchStatus.PENDING:
             raise ValueError("El partido ya fue procesado")
         
-        # Validar que quien confirma es un participante diferente al que registró
+        # Validate que quien confirma es un participante diferente al que registró
         participants = {match["jugador_a_id"], match["jugador_b_id"], match["arbitro_id"]}
         if confirmado_por_id not in participants:
             raise ValueError("Solo un participante puede confirmar el partido")
@@ -1448,7 +1448,7 @@ class RapidPinService(BaseService):
         config = await self.get_comment_config()
         max_length = config.get("max_comment_length", 280)
         
-        # Validar longitud
+        # Validate longitud
         if len(content) > max_length:
             raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
         

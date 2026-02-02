@@ -10,7 +10,7 @@ Arquitectura Microservices-Ready:
 ├── services/         # Lógica de negocio
 ├── events/           # Event handlers y tipos de eventos
 ├── routes/           # API endpoints (FastAPI routers)
-└── __init__.py       # Inicialización del módulo
+└── __init__.py       # Initialization del módulo
 
 Beneficios de esta arquitectura:
 1. Separación clara de responsabilidades
