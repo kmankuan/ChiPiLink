@@ -179,7 +179,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
 
   const handleSaveProduct = async () => {
     if (!editForm.nombre || !editForm.precio) {
-      toast.error('Nombre y precio son requeridos');
+      toast.error('Name and price are required');
       return;
     }
     
@@ -207,34 +207,34 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       });
       
       if (response.ok) {
-        toast.success(editingProduct ? 'Producto actualizado' : 'Producto creado');
+        toast.success(editingProduct ? 'Product updated' : 'Product created');
         setEditDialog(false);
         fetchData();
         onRefresh?.();
       } else {
-        toast.error('Error al guardar producto');
+        toast.error('Error saving product');
       }
     } catch (error) {
-      toast.error('Error al guardar producto');
+      toast.error('Error saving product');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteProduct = async (libroId) => {
-    if (!confirm('¿Eliminar este producto?')) return;
+    if (!confirm('Delete this product?')) return;
     try {
       const response = await fetch(`${API}/api/store/products/${libroId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
-        toast.success('Producto eliminado');
+        toast.success('Product deleted');
         fetchData();
         onRefresh?.();
       }
     } catch (error) {
-      toast.error('Error al eliminar');
+      toast.error('Error deleting');
     }
   };
 
@@ -257,15 +257,15 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                 <Store className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Catálogo Público</CardTitle>
+                <CardTitle>Public Catalog</CardTitle>
                 <CardDescription>
-                  Productos visibles para todos los usuarios en Unatienda
+                  Products visible to all users in Unatienda
                 </CardDescription>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Actualizar
+              Refresh
             </Button>
           </div>
         </CardHeader>
@@ -276,7 +276,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         <TabsList>
           <TabsTrigger value="productos" className="gap-2">
             <Package className="h-4 w-4" />
-            Productos
+            Products
           </TabsTrigger>
           <TabsTrigger value="categorias" className="gap-2">
             <Tags className="h-4 w-4" />
