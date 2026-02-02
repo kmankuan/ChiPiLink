@@ -137,10 +137,6 @@ export default function UnatiendaModule() {
             <Users className="h-4 w-4" />
             <span className="hidden md:inline">Estudiantes</span>
           </TabsTrigger>
-          <TabsTrigger value="pedidos" className="flex items-center gap-2">
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden md:inline">Pedidos</span>
-          </TabsTrigger>
           <TabsTrigger value="configuracion" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden md:inline">Config</span>
