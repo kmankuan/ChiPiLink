@@ -41,7 +41,7 @@ async def create_season(
     data: RapidPinSeasonCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nueva temporada (solo admin)"""
+    """Create new season (solo admin)"""
     return await rapidpin_service.create_season(data)
 
 
@@ -75,7 +75,7 @@ async def close_season(
 @router.post("/matches", response_model=RapidPinMatch)
 async def register_match(data: RapidPinMatchCreate):
     """
-    Registrar un nuevo partido Rapid Pin.
+    Registrar un new match Rapid Pin.
     El partido queda en estado 'pending' hasta que otro participante lo confirme.
     """
     try:

@@ -32,7 +32,7 @@ class RankingSeasonsService(BaseService):
         theme_id: str = None,
         custom_rewards: List[Dict] = None
     ) -> Dict:
-        """Create una nueva temporada"""
+        """Create una new season"""
         now = datetime.now(timezone.utc)
         
         # Determinar número de temporada
@@ -122,7 +122,7 @@ class RankingSeasonsService(BaseService):
             {"$set": {"status": SeasonStatus.UPCOMING.value}}
         )
         
-        # Activar la nueva temporada
+        # Activar la new season
         result = await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {"$set": {"status": SeasonStatus.ACTIVE.value}}
@@ -554,7 +554,7 @@ class RankingSeasonsService(BaseService):
             await self.activate_season(upcoming["season_id"])
             return await self.get_season_by_id(upcoming["season_id"])
         
-        # Crear nueva temporada mensual
+        # Crear new season mensual
         self.log_info("No active season found, creating new monthly season")
         new_season = await self.create_next_monthly_season()
         

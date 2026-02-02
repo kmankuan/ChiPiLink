@@ -23,7 +23,7 @@ class SuperPinLeagueRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, league_data: Dict) -> Dict:
-        """Create nueva liga"""
+        """Create new league"""
         league_data["liga_id"] = f"liga_{uuid.uuid4().hex[:12]}"
         league_data["created_at"] = datetime.now(timezone.utc).isoformat()
         league_data["updated_at"] = league_data["created_at"]
@@ -152,7 +152,7 @@ class SuperPinMatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Create nuevo partido"""
+        """Create new match"""
         match_data["partido_id"] = f"spm_{uuid.uuid4().hex[:12]}"
         match_data["created_at"] = datetime.now(timezone.utc).isoformat()
         match_data["updated_at"] = match_data["created_at"]
@@ -341,7 +341,7 @@ class SeasonTournamentRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, tournament_data: Dict) -> Dict:
-        """Create nuevo torneo de temporada"""
+        """Create new tournament de temporada"""
         tournament_data["torneo_id"] = f"torneo_{uuid.uuid4().hex[:12]}"
         tournament_data["created_at"] = datetime.now(timezone.utc).isoformat()
         tournament_data["updated_at"] = tournament_data["created_at"]

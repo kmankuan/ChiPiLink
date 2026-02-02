@@ -46,7 +46,7 @@ async def create_player(
     data: PlayerCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nuevo jugador (solo admin)"""
+    """Create new player (solo admin)"""
     return await player_service.create_player(data)
 
 

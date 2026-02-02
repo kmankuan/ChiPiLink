@@ -22,7 +22,7 @@ class PlayerRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, player_data: Dict) -> Dict:
-        """Create nuevo jugador"""
+        """Create new player"""
         player_data["jugador_id"] = str(uuid.uuid4())
         player_data["elo_rating"] = player_data.get("elo_rating", 1000)
         player_data["partidos_jugados"] = 0

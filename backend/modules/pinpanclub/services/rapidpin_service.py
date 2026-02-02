@@ -158,7 +158,7 @@ class RapidPinService(BaseService):
     # ============== SEASON MANAGEMENT ==============
     
     async def create_season(self, data: RapidPinSeasonCreate) -> RapidPinSeason:
-        """Create nueva temporada Rapid Pin"""
+        """Create new season Rapid Pin"""
         season_dict = data.model_dump()
         
         # Establecer premios por defecto si no se proporcionan
@@ -308,7 +308,7 @@ class RapidPinService(BaseService):
     # ============== MATCH MANAGEMENT ==============
     
     async def register_match(self, data: RapidPinMatchCreate) -> RapidPinMatch:
-        """Register un nuevo partido Rapid Pin"""
+        """Register un new match Rapid Pin"""
         # Validaciones
         season = await self.get_season(data.season_id)
         if not season:

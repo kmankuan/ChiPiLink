@@ -43,7 +43,7 @@ async def create_league(
     data: SuperPinLeagueCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nueva liga (solo admin)"""
+    """Create new league (solo admin)"""
     return await superpin_service.create_league(data)
 
 
@@ -127,7 +127,7 @@ async def check_out(liga_id: str, jugador_id: str):
 
 @router.post("/matches", response_model=SuperPinMatch)
 async def create_match(data: SuperPinMatchCreate):
-    """Create nuevo partido Super Pin"""
+    """Create new match Super Pin"""
     return await superpin_service.create_match(data)
 
 

@@ -194,7 +194,7 @@ async def create_season(
     season_type: str = Query("monthly"),
     theme_id: Optional[str] = Query(None)
 ):
-    """Create una nueva temporada (admin)"""
+    """Create una new season (admin)"""
     try:
         start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))

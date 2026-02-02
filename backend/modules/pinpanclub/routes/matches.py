@@ -56,7 +56,7 @@ async def create_match(
     data: MatchCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nuevo partido (solo admin)"""
+    """Create new match (solo admin)"""
     return await match_service.create_match(data)
 
 

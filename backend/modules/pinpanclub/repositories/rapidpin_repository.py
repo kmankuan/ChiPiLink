@@ -21,7 +21,7 @@ class RapidPinSeasonRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, season_data: Dict) -> Dict:
-        """Create nueva temporada"""
+        """Create new season"""
         season_data["season_id"] = f"rps_{uuid.uuid4().hex[:12]}"
         season_data["created_at"] = datetime.now(timezone.utc).isoformat()
         season_data["updated_at"] = season_data["created_at"]
@@ -97,7 +97,7 @@ class RapidPinMatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Create nuevo partido"""
+        """Create new match"""
         match_data["match_id"] = f"rpm_{uuid.uuid4().hex[:12]}"
         match_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(match_data)

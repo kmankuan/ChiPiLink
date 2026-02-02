@@ -25,7 +25,7 @@ class PlayerService(BaseService):
     
     async def create_player(self, data: PlayerCreate) -> Player:
         """
-        Crear nuevo jugador.
+        Crear new player.
         Emite evento: pinpanclub.player.created
         """
         player_dict = data.model_dump()

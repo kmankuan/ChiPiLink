@@ -22,7 +22,7 @@ class MatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Create nuevo partido"""
+        """Create new match"""
         match_data["partido_id"] = str(uuid.uuid4())
         match_data["estado"] = "pendiente"
         match_data["puntos_jugador_a"] = 0

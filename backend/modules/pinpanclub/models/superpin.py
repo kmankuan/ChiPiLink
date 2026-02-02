@@ -138,7 +138,7 @@ class SuperPinLeagueBase(BaseModel):
 
 
 class SuperPinLeagueCreate(SuperPinLeagueBase):
-    """Create nueva liga"""
+    """Create new league"""
     scoring_config: Optional[ScoringConfig] = None
     checkin_config: Optional[CheckInConfig] = None
     stats_config: Optional[StatsConfig] = None

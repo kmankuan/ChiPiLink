@@ -28,7 +28,7 @@ class MatchService(BaseService):
     
     async def create_match(self, data: MatchCreate) -> Match:
         """
-        Crear nuevo partido.
+        Crear new match.
         Emite evento: pinpanclub.match.created
         """
         match_dict = data.model_dump()

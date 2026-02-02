@@ -46,7 +46,7 @@ class PlayerBase(BaseModel):
 
 
 class PlayerCreate(PlayerBase):
-    """Create nuevo jugador"""
+    """Create new player"""
     pass
 
 
@@ -90,7 +90,7 @@ class MatchBase(BaseModel):
 
 
 class MatchCreate(MatchBase):
-    """Create nuevo partido"""
+    """Create new match"""
     pass
 
 
@@ -134,7 +134,7 @@ class TournamentBase(BaseModel):
 
 
 class TournamentCreate(TournamentBase):
-    """Create nuevo torneo"""
+    """Create new tournament"""
     pass
 
 

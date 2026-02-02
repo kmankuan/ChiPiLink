@@ -23,7 +23,7 @@ class OrderRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, order_data: Dict) -> Dict:
-        """Create nuevo pedido"""
+        """Create new order"""
         if "pedido_id" not in order_data:
             order_data["pedido_id"] = f"ped_{uuid.uuid4().hex[:12]}"
         order_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
