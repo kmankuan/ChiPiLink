@@ -59,9 +59,9 @@ export function NotificationBar() {
       const response = await api.get('/admin/notificaciones', {
         params: { limite: 20, solo_no_leidas: true }
       });
-      setNotifications(response.data?.notificaciones || []);
-      setTotalUnread(response.data?.total_no_leidas || 0);
-      setCountByType(response.data?.conteo_por_tipo || {});
+      setNotifications(response.data?.notifications || response.data?.notificaciones || []);
+      setTotalUnread(response.data?.total_unread || response.data?.total_no_leidas || 0);
+      setCountByType(response.data?.count_by_type || response.data?.conteo_por_tipo || {});
     } catch (error) {
       console.error('Error fetching notifications:', error);
       // Reset to safe defaults on error
