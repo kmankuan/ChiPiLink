@@ -134,16 +134,16 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## Remaining Work
 
-### P0 - i18n Migration (Remaining ~3% - 13 files with local texts pattern)
-Files with `const texts = {}` pattern (working correctly but could be migrated):
-- `/app/frontend/src/modules/account/wallet/QRScanner.jsx` - Staff QR scanner
-- `/app/frontend/src/modules/admin/users/components/AdminMemberships.jsx` - Admin memberships
-- `/app/frontend/src/modules/notifications/components/*` - Notification UI (7 files)
-- `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx` - Social feed
-- `/app/frontend/src/components/rapidpin/ChallengeModal.jsx` - Challenge modal
-
-### P0.5 - Spanish Comments (~60 files)
-These files have Spanish comments that should be translated to English for full compliance with development principles.
+### P0.5 - Remaining Local Texts Pattern (8 files - Working but not centralized)
+These files use inline `const texts = {}` pattern with es/en/zh translations - functional but not using central JSON files:
+- `/app/frontend/src/modules/notifications/components/CategoryManager.jsx`
+- `/app/frontend/src/modules/notifications/components/NotificationCategories.jsx`
+- `/app/frontend/src/modules/notifications/components/PostEditor.jsx`
+- `/app/frontend/src/modules/notifications/components/ProviderConfig.jsx`
+- `/app/frontend/src/modules/notifications/components/SendNotification.jsx`
+- `/app/frontend/src/modules/admin/users/components/AdminMemberships.jsx`
+- `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx`
+- `/app/frontend/src/components/rapidpin/ChallengeModal.jsx`
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
