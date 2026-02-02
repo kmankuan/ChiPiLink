@@ -1,6 +1,6 @@
 """
 Analytics - API Routes
-Endpoints para el dashboard de analytics
+Endpoints for analytics dashboard
 """
 from fastapi import APIRouter
 from typing import Optional
@@ -13,12 +13,12 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 @router.get("/dashboard")
 async def get_analytics_dashboard():
-    """Obtener datos del dashboard de analytics"""
+    """Get analytics dashboard data"""
     now = datetime.now(timezone.utc)
     week_ago = now - timedelta(days=7)
     two_weeks_ago = now - timedelta(days=14)
     
-    # Total active players (jugadores con partidos en última semana)
+    # Total active players (players with matches in the last week)
     active_players = await db.pingpong_players.count_documents({})
     
     # Matches this week (Super Pin)
@@ -115,7 +115,7 @@ async def get_analytics_dashboard():
         recent_achievements.append({
             "name": badge.get("name"),
             "icon": badge.get("icon"),
-            "player_name": player.get("apodo") or player.get("nombre") if player else "Desconocido"
+            "player_name": player.get("apodo") or player.get("nombre") if player else "Unknown"
         })
     
     # Challenge leaderboard
@@ -222,7 +222,7 @@ async def get_analytics_dashboard():
 
 @router.get("/summary")
 async def get_analytics_summary():
-    """Obtener resumen de analytics para el dashboard principal"""
+    """Get analytics summary for the main dashboard"""
     now = datetime.now(timezone.utc)
     week_ago = now - timedelta(days=7)
     
