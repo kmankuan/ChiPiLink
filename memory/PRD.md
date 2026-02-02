@@ -54,11 +54,20 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## What's Been Implemented
 
-### February 2026 - i18n Integration (Current Session)
+### February 2026 - i18n Integration & Language Sync (Current Session)
 
-**Progress: ~97% Complete** - Major account/wallet/profile components now use i18n system
+**Progress: ~99% Complete** - Major components now use centralized i18n system
 
-#### New i18n Keys Added (en.json now has 916 lines):
+#### NEW: Language Preference Persistence Feature
+- **Backend API Endpoints:**
+  - `PUT /api/users/profile/language` - Save language preference to database
+  - `GET /api/users/profile/language` - Retrieve saved language preference
+- **Frontend LanguageSelector:**
+  - Syncs language from backend on login (cross-device consistency)
+  - Saves language preference when changed (if logged in)
+  - Falls back to localStorage for guests
+
+#### New i18n Keys Added (en.json now has 1100+ lines):
 - `wallet.*` - Complete wallet UI translations
 - `profile.*` - Profile management translations
 - `membershipCard.*` - Membership card translations
@@ -66,9 +75,18 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 - `dependents.*` - Dependent management translations
 - `transfers.*` - Transfer dialog translations
 - `qrCode.*` - QR code component translations
+- `qrScanner.*` - Staff QR scanner translations
 - `account.*` - Account dashboard translations
+- `notifications.*` - Notification system translations (expanded)
+- `adminMemberships.*` - Admin membership management translations
+- `pinpanclub.*` - PinPan Club translations
+- `rapidpin.*` - RapidPin challenge translations
 
-#### Components Refactored to Use i18n:
+#### Components Migrated to Centralized i18n:
+- **QRScanner.jsx** - Full i18n integration ✅
+- **NotificationPreferences.jsx** - Full i18n integration ✅
+- **NotificationHistory.jsx** - Full i18n integration ✅
+- **LanguageSelector.jsx** - Backend sync added ✅
 - **WalletPage.jsx** - Now uses `t()` function ✅
 - **MembershipCard.jsx** - Full i18n integration ✅
 - **ProfilePage.jsx** - Uses i18n with locale detection ✅
@@ -77,6 +95,7 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 - **TransferenciasDialog.jsx** - Renamed to TransfersDialog, uses i18n ✅
 - **UserQRCode.jsx** - Uses i18n with all languages ✅
 - **AccountDashboard.jsx** - Uses i18n for all labels ✅
+- **SuperAppLanding.jsx** - Hero section fixed ✅
 
 ### December 2025 - Spanish to English Refactoring (Previous Session)
 
