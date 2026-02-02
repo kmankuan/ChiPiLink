@@ -77,7 +77,6 @@ import AdminPosts from '@/modules/notifications/pages/AdminPosts';
 // Book Orders Module (Admin)
 // MisPedidosLibros removed - redirected to /unatienda?tab=private
 // import BookOrdersAdmin from '@/modules/store/BookOrdersAdmin';
-import MisPedidosLibros from '@/modules/store/MisPedidosLibros';
 
 // Bulk Import Page
 import BulkImportBooksPage from '@/pages/BulkImportBooksPage';
