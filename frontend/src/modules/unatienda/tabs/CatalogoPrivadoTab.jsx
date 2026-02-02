@@ -518,11 +518,11 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               </div>
               
               <div className="col-span-2">
-                <label className="text-sm font-medium">Descripción</label>
+                <label className="text-sm font-medium">Description</label>
                 <Input
-                  value={formData.descripcion}
-                  onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                  placeholder="Descripción breve del libro"
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="Brief description of the book"
                 />
               </div>
               
@@ -530,20 +530,20 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={formData.activo}
-                    onChange={(e) => setFormData({...formData, activo: e.target.checked})}
+                    checked={formData.active}
+                    onChange={(e) => setFormData({...formData, active: e.target.checked})}
                     className="w-4 h-4 rounded"
                   />
-                  <span className="text-sm">Activo</span>
+                  <span className="text-sm">Active</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={formData.destacado}
-                    onChange={(e) => setFormData({...formData, destacado: e.target.checked})}
+                    checked={formData.featured}
+                    onChange={(e) => setFormData({...formData, featured: e.target.checked})}
                     className="w-4 h-4 rounded"
                   />
-                  <span className="text-sm">Destacado</span>
+                  <span className="text-sm">Featured</span>
                 </label>
               </div>
             </div>
@@ -551,11 +551,11 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowForm(false)}>
-              Cancelar
+              Cancel
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingProduct ? 'Guardar Cambios' : 'Crear Libro'}
+              {editingProduct ? 'Save Changes' : 'Create Book'}
             </Button>
           </DialogFooter>
         </DialogContent>
