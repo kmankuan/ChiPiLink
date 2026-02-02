@@ -91,46 +91,46 @@ export default function DashboardModule() {
       label: 'Unatienda', 
       icon: ShoppingBag, 
       color: 'bg-blue-500',
-      description: 'Gestionar productos y catálogo',
-      stats: unatiendaStats ? `${unatiendaStats.productos_publicos || 0} productos` : null
+      description: 'Manage products and catalog',
+      stats: unatiendaStats ? `${unatiendaStats.public_products || 0} products` : null
     },
     { 
       id: 'orders', 
-      label: 'Pedidos', 
+      label: 'Orders', 
       icon: ShoppingCart, 
       color: 'bg-green-500',
-      description: 'Ver y procesar pedidos',
-      stats: stats.orders?.pending > 0 ? `${stats.orders.pending} pendientes` : 'Sin pendientes',
+      description: 'View and process orders',
+      stats: stats.orders?.pending > 0 ? `${stats.orders.pending} pending` : 'No pending',
       alert: stats.orders?.pending > 0
     },
     { 
       id: 'customers', 
-      label: 'Usuarios', 
+      label: 'Users', 
       icon: Users, 
       color: 'bg-purple-500',
-      description: 'Gestionar clientes y usuarios',
-      stats: `${stats.users?.total || 0} registrados`
+      description: 'Manage customers and users',
+      stats: `${stats.users?.total || 0} registered`
     },
     { 
       id: 'memberships', 
-      label: 'Membresías', 
+      label: 'Memberships', 
       icon: CreditCard, 
       color: 'bg-amber-500',
-      description: 'Planes y suscripciones'
+      description: 'Plans and subscriptions'
     },
     { 
       id: 'pinpanclub', 
       label: 'PinpanClub', 
       icon: Trophy, 
       color: 'bg-emerald-500',
-      description: 'Torneos y ranking'
+      description: 'Tournaments and ranking'
     },
     { 
       id: 'roles', 
       label: 'Roles', 
       icon: Settings, 
       color: 'bg-slate-500',
-      description: 'Permisos y accesos'
+      description: 'Permissions and access'
     },
   ];
 
