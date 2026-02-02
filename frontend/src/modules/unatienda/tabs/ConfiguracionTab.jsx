@@ -280,7 +280,7 @@ export default function ConfiguracionTab({ token }) {
 
               <Button onClick={saveYappyConfig} disabled={saving} className="gap-2">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Guardar Configuración Yappy
+                Save Yappy Configuration
               </Button>
             </CardContent>
           </Card>
@@ -295,13 +295,13 @@ export default function ConfiguracionTab({ token }) {
                 Monday.com
               </CardTitle>
               <CardDescription>
-                Sincroniza pedidos de libros con Monday.com
+                Sync textbook orders with Monday.com
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  La configuración de Monday.com para sincronización de pedidos se encuentra en el módulo de Integraciones.
+                  Monday.com configuration for order synchronization is located in the Integrations module.
                 </p>
                 <Button 
                   variant="outline" 
@@ -309,7 +309,7 @@ export default function ConfiguracionTab({ token }) {
                   className="gap-2"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Ir a Integraciones
+                  Go to Integrations
                 </Button>
               </div>
             </CardContent>
