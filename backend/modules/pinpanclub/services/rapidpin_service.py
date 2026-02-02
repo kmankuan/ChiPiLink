@@ -870,7 +870,7 @@ class RapidPinService(BaseService):
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("El árbitro no puede ser uno de los jugadores")
         
-        # Obtener info del árbitro
+        # Obtener info of the árbitro
         referee_info = await self.player_repo.get_by_id(referee_id)
         
         update_data = {

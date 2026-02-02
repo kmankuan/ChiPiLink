@@ -53,7 +53,7 @@ class OrderFormConfigService:
 - Banco: Banco General
 - Cuenta: 00-00-00-000000-0
 - Titular: PCA School
-- Referencia: Usar el nombre del estudiante
+- Referencia: Usar el name of the estudiante
                 """,
                 "content_en": """
 **Bank Transfer Details:**

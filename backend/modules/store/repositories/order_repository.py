@@ -67,7 +67,7 @@ class OrderRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, pedido_id, data)
     
     async def update_status(self, pedido_id: str, estado: str) -> bool:
-        """Update estado del pedido"""
+        """Update status of the pedido"""
         return await self.update_order(pedido_id, {"estado": estado})
     
     async def confirm_payment(self, pedido_id: str) -> bool:

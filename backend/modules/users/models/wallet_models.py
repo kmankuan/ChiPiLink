@@ -235,7 +235,7 @@ class Transaction(BaseModel):
     metadata: Dict[str, Any] = {}
     
     # Procesado por
-    processed_by: Optional[str] = None          # user_id del admin (si manual)
+    processed_by: Optional[str] = None          # user_ID of the admin (si manual)
     
     # Timestamps
     created_at: Optional[str] = None

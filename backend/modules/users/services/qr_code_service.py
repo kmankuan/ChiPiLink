@@ -77,7 +77,7 @@ class QRCodeService:
         return qr_record
     
     def _encode_qr_data(self, qr_data: Dict) -> str:
-        """Codificar datos del QR a string"""
+        """Codificar data of the QR a string"""
         json_str = json.dumps(qr_data, separators=(',', ':'))
         return base64.b64encode(json_str.encode()).decode()
     

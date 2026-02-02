@@ -119,7 +119,7 @@ class GoogleSheetsService:
         Configurar un Google Sheet para sincronización.
         
         Args:
-            sheet_id: ID del Google Sheet
+            sheet_id: ID of the Google Sheet
             nombre_sheet: Nombre descriptivo
             hojas: Lista de hojas/pestañas con su configuración
                    [{"nombre": "1er Grado", "grado": "1", "columnas": {...}}]
@@ -196,7 +196,7 @@ class GoogleSheetsService:
         Leer datos de una hoja específica.
         
         Args:
-            sheet_id: ID del Google Sheet
+            sheet_id: ID of the Google Sheet
             hoja_nombre: Nombre de la pestaña
             rango: Rango a leer (ej: "A1:F100"). Si es None, lee toda la hoja.
         """

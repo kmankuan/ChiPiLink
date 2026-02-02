@@ -1249,7 +1249,7 @@ class SuperPinService(BaseService):
                 "estado": "en_curso"
             })
         
-        # Generate nombre del torneo
+        # Generate name of the torneo
         if not nombre:
             nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
         

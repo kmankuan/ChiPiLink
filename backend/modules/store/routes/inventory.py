@@ -14,7 +14,7 @@ router = APIRouter(prefix="/inventory", tags=["Store - Inventory"])
 
 @router.get("")
 async def get_inventory(admin: dict = Depends(get_admin_user)):
-    """Get estado del inventario (admin)"""
+    """Get status of the inventario (admin)"""
     return await product_service.get_inventory_stats()
 
 

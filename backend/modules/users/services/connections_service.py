@@ -458,7 +458,7 @@ class ConexionesService:
         if existing_inv:
             return {"error": "Ya existe una invitación pendiente para este email"}
         
-        # Obtener nombre del invitador
+        # Obtener name of the invitador
         invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
         
         invitacion = {

@@ -199,7 +199,7 @@ class UserProfileService(BaseService):
         
         await db.chipi_user_profiles.insert_one(profile)
         
-        # Obtener info del tipo
+        # Obtener info of the tipo
         profile["user_type_info"] = await self.get_user_type(user_type_id)
         
         profile.pop("_id", None)

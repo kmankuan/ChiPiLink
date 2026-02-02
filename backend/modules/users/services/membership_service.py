@@ -263,7 +263,7 @@ class MembershipService:
         
         memberships = await cursor.to_list(length=20)
         
-        # Enriquecer con info del plan
+        # Enriquecer con info of the plan
         for memb in memberships:
             plan = await self.get_plan(memb.get("plan_id"))
             memb["plan_info"] = plan
@@ -345,7 +345,7 @@ class MembershipService:
         await db[self.collection_memberships].insert_one(membership)
         membership.pop("_id", None)
         
-        # Add info del plan
+        # Add info of the plan
         membership["plan_info"] = plan
         
         self.log_info(f"Created membership {membership['membership_id']} for user {user_id}")

@@ -166,7 +166,7 @@ class OrderService(BaseService):
         pedido_id: str,
         estado: OrderStatus
     ) -> Optional[Order]:
-        """Update estado del pedido"""
+        """Update status of the pedido"""
         success = await self.repository.update_status(
             pedido_id,
             estado.value if hasattr(estado, 'value') else estado
