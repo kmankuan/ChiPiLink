@@ -153,7 +153,7 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
     if not config.matches_board_id:
         raise HTTPException(status_code=400, detail="Board de partidos no configurado")
     
-    # Obtener partidos finalizados con monday_item_id
+    # Get partidos finalizados con monday_item_id
     match_repo = MatchRepository()
     matches = await match_repo.get_finished_with_monday_id()
     

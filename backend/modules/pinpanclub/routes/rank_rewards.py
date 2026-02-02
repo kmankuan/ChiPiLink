@@ -70,7 +70,7 @@ async def get_current_rank_info(
     """Get información del rango actual de un jugador"""
     from core.database import db
     
-    # Obtener puntos actuales
+    # Get puntos actuales
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
         {"jugador_id": jugador_id},
         {"_id": 0}
@@ -78,10 +78,10 @@ async def get_current_rank_info(
     
     total_points = entry.get("total_points", 0) if entry else 0
     
-    # Obtener rango actual
+    # Get rango actual
     current_rank = rank_rewards_service.get_rank_by_points(total_points)
     
-    # Obtener recompensas ya recibidas
+    # Get recompensas ya recibidas
     history = await rank_rewards_service.get_player_rank_history(jugador_id)
     earned_ranks = [h["rank_id"] for h in history]
     

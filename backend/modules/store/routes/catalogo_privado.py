@@ -79,7 +79,7 @@ async def get_private_catalog_products(
     Obtener productos del catálogo privado.
     Solo accesible para usuarios con estudiantes PCA vinculados.
     """
-    # Verificar acceso
+    # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
@@ -94,7 +94,7 @@ async def get_private_catalog_products(
         "activo": True
     }
     
-    # Filtrar por grado (si no se especifica, mostrar todos los grados del usuario)
+    # Filter por grado (si no se especifica, mostrar todos los grados del usuario)
     if grado:
         query["$or"] = [
             {"grado": grado},
@@ -115,7 +115,7 @@ async def get_private_catalog_products(
             {"editorial": {"$regex": search, "$options": "i"}}
         ]
     
-    # Obtener productos
+    # Get productos
     productos = await db.libros.find(
         query,
         {"_id": 0}
@@ -124,7 +124,7 @@ async def get_private_catalog_products(
     # Contar total
     total = await db.libros.count_documents(query)
     
-    # Obtener grados y materias disponibles para filtros
+    # Get grados y materias disponibles para filtros
     grados_disponibles = await db.libros.distinct("grado", {"es_catalogo_privado": True, "activo": True})
     materias_disponibles = await db.libros.distinct("materia", {"es_catalogo_privado": True, "activo": True})
     
@@ -150,7 +150,7 @@ async def get_producto_detalle(
     """
     Obtener detalle de un producto del catálogo privado.
     """
-    # Verificar acceso
+    # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
@@ -179,7 +179,7 @@ async def get_productos_por_grado(
     Obtener todos los productos de un grado específico.
     Útil para mostrar la lista de libros de un estudiante.
     """
-    # Verificar acceso
+    # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
@@ -226,7 +226,7 @@ async def get_resumen_catalogo(
     Obtener resumen del catálogo privado para el usuario.
     Muestra productos disponibles para cada estudiante vinculado.
     """
-    # Verificar acceso
+    # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:

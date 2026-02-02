@@ -19,7 +19,7 @@ async def get_public_products(grado: Optional[str] = None):
     """Get productos para formulario público - sin autenticación"""
     products = await product_service.get_all_products(grado=grado)
     
-    # Filtrar solo productos con stock > 0
+    # Filter solo productos con stock > 0
     productos_disponibles = [
         p for p in products
         if p.cantidad_inventario > 0

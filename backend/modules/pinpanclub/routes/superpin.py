@@ -90,7 +90,7 @@ async def check_in(
     qr_code: Optional[str] = None
 ):
     """Register check-in de jugador"""
-    # Validar geolocalización si es el método
+    # Validate geolocalización si es el método
     if method == CheckInMethod.GEOLOCATION:
         if not latitude or not longitude:
             raise HTTPException(

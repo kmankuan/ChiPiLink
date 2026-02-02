@@ -61,7 +61,7 @@ class SponsorCreate(BaseModel):
     duracion_display: int = Field(default=10, description="Segundos que se muestra")
     orden: int = Field(default=0, description="Orden en la rotación")
     
-    # Estado
+    # Status
     activo: bool = True
     fecha_inicio: Optional[datetime] = None
     fecha_fin: Optional[datetime] = None

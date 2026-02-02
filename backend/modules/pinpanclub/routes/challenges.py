@@ -160,7 +160,7 @@ async def get_player_rank(jugador_id: str):
     """Get información de rango de un jugador"""
     from core.database import db
     
-    # Obtener entrada del leaderboard
+    # Get entrada del leaderboard
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
         {"jugador_id": jugador_id},
         {"_id": 0}
