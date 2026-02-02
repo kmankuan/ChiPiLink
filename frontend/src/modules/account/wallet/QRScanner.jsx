@@ -1,5 +1,5 @@
 /**
- * QR Scanner Component - Scanner para staff (check-in y pagos)
+ * QR Scanner Component - Staff scanner for check-in and payments
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,14 +12,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function QRScanner({ token }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [scanning, setScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [scanResult, setScanResult] = useState(null);
@@ -30,8 +29,6 @@ export default function QRScanner({ token }) {
   const [selectedAction, setSelectedAction] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
-
-  const lang = i18n.language || 'es';
 
   const stopCamera = () => {
     if (streamRef.current) {
@@ -53,7 +50,7 @@ export default function QRScanner({ token }) {
       setScanning(true);
     } catch (error) {
       console.error('Error accessing camera:', error);
-      toast.error(texts[lang].cameraError);
+      toast.error(t('qrScanner.cameraError'));
     }
   };
 
@@ -80,13 +77,13 @@ export default function QRScanner({ token }) {
       if (res.ok && data.success) {
         setScanResult(data.scan_result);
         stopCamera();
-        toast.success(texts[lang].scanSuccess);
+        toast.success(t('qrScanner.scanSuccess'));
       } else {
-        toast.error(data.detail || texts[lang].scanError);
+        toast.error(data.detail || t('qrScanner.scanError'));
       }
     } catch (error) {
       console.error('Error scanning QR:', error);
-      toast.error(texts[lang].scanError);
+      toast.error(t('qrScanner.scanError'));
     } finally {
       setLoading(false);
     }
@@ -95,10 +92,10 @@ export default function QRScanner({ token }) {
   const processAction = async (action) => {
     if (!scanResult) return;
 
-    // Validar para pagos
+    // Validate for payments
     if (action === 'pay_usd' || action === 'pay_points') {
       if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
-        toast.error(texts[lang].invalidAmount);
+        toast.error(t('qrScanner.invalidAmount'));
         return;
       }
     }
@@ -122,9 +119,9 @@ export default function QRScanner({ token }) {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        toast.success(data.result?.message?.[lang] || texts[lang].actionSuccess);
+        toast.success(t('qrScanner.actionSuccess'));
         
-        // Actualizar resultado con nuevos balances
+        // Update result with new balances
         if (data.user_info?.wallet) {
           setScanResult(prev => ({
             ...prev,
@@ -136,11 +133,11 @@ export default function QRScanner({ token }) {
         setPaymentAmount('');
         setPaymentDescription('');
       } else {
-        toast.error(data.detail || texts[lang].actionError);
+        toast.error(data.detail || t('qrScanner.actionError'));
       }
     } catch (error) {
       console.error('Error processing action:', error);
-      toast.error(texts[lang].actionError);
+      toast.error(t('qrScanner.actionError'));
     } finally {
       setProcessing(false);
     }
@@ -154,107 +151,6 @@ export default function QRScanner({ token }) {
     setPaymentDescription('');
   };
 
-  const texts = {
-    es: {
-      title: 'Escáner QR',
-      subtitle: 'Escanea códigos QR de clientes para check-in y pagos',
-      startCamera: 'Iniciar Cámara',
-      stopCamera: 'Detener Cámara',
-      manualEntry: 'Entrada Manual',
-      placeholder: 'Pega el código QR aquí...',
-      scan: 'Escanear',
-      scanning: 'Escaneando...',
-      scanSuccess: 'QR escaneado correctamente',
-      scanError: 'Error al escanear QR',
-      cameraError: 'Error al acceder a la cámara',
-      userInfo: 'Información del Cliente',
-      balance: 'Saldo',
-      membership: 'Membresía',
-      visitsLeft: 'visitas restantes',
-      actions: 'Acciones Disponibles',
-      checkin: 'Check-in',
-      payUSD: 'Cobrar USD',
-      payPoints: 'Cobrar ChipiPoints',
-      amount: 'Monto',
-      description: 'Descripción (opcional)',
-      confirm: 'Confirmar',
-      cancel: 'Cancelar',
-      processing: 'Procesando...',
-      actionSuccess: 'Acción completada',
-      actionError: 'Error al procesar acción',
-      invalidAmount: 'Ingresa un monto válido',
-      insufficientBalance: 'Saldo insuficiente',
-      newScan: 'Nuevo Escaneo',
-      noMembership: 'Sin membresía activa'
-    },
-    en: {
-      title: 'QR Scanner',
-      subtitle: 'Scan customer QR codes for check-in and payments',
-      startCamera: 'Start Camera',
-      stopCamera: 'Stop Camera',
-      manualEntry: 'Manual Entry',
-      placeholder: 'Paste QR code here...',
-      scan: 'Scan',
-      scanning: 'Scanning...',
-      scanSuccess: 'QR scanned successfully',
-      scanError: 'Error scanning QR',
-      cameraError: 'Error accessing camera',
-      userInfo: 'Customer Information',
-      balance: 'Balance',
-      membership: 'Membership',
-      visitsLeft: 'visits left',
-      actions: 'Available Actions',
-      checkin: 'Check-in',
-      payUSD: 'Charge USD',
-      payPoints: 'Charge ChipiPoints',
-      amount: 'Amount',
-      description: 'Description (optional)',
-      confirm: 'Confirm',
-      cancel: 'Cancel',
-      processing: 'Processing...',
-      actionSuccess: 'Action completed',
-      actionError: 'Error processing action',
-      invalidAmount: 'Enter a valid amount',
-      insufficientBalance: 'Insufficient balance',
-      newScan: 'New Scan',
-      noMembership: 'No active membership'
-    },
-    zh: {
-      title: '二维码扫描器',
-      subtitle: '扫描客户二维码进行签到和支付',
-      startCamera: '启动相机',
-      stopCamera: '停止相机',
-      manualEntry: '手动输入',
-      placeholder: '在此粘贴二维码...',
-      scan: '扫描',
-      scanning: '扫描中...',
-      scanSuccess: '二维码扫描成功',
-      scanError: '扫描二维码时出错',
-      cameraError: '访问相机时出错',
-      userInfo: '客户信息',
-      balance: '余额',
-      membership: '会员资格',
-      visitsLeft: '剩余访问次数',
-      actions: '可用操作',
-      checkin: '签到',
-      payUSD: '收取美元',
-      payPoints: '收取积分',
-      amount: '金额',
-      description: '描述（可选）',
-      confirm: '确认',
-      cancel: '取消',
-      processing: '处理中...',
-      actionSuccess: '操作完成',
-      actionError: '处理操作时出错',
-      invalidAmount: '请输入有效金额',
-      insufficientBalance: '余额不足',
-      newScan: '新扫描',
-      noMembership: '无有效会员资格'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
-
   return (
     <div className="space-y-4" data-testid="qr-scanner">
       {/* Scanner Card */}
@@ -262,9 +158,9 @@ export default function QRScanner({ token }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <QrCode className="h-5 w-5" />
-            {txt.title}
+            {t('qrScanner.title')}
           </CardTitle>
-          <CardDescription>{txt.subtitle}</CardDescription>
+          <CardDescription>{t('qrScanner.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Camera View */}
@@ -292,17 +188,17 @@ export default function QRScanner({ token }) {
           {!scanning && !scanResult && (
             <Button onClick={startCamera} className="w-full" data-testid="start-camera-btn">
               <Camera className="h-4 w-4 mr-2" />
-              {txt.startCamera}
+              {t('qrScanner.startCamera')}
             </Button>
           )}
 
           {/* Manual Entry */}
           {!scanResult && (
             <div className="space-y-2">
-              <Label>{txt.manualEntry}</Label>
+              <Label>{t('qrScanner.manualEntry')}</Label>
               <div className="flex gap-2">
                 <Input
-                  placeholder={txt.placeholder}
+                  placeholder={t('qrScanner.placeholder')}
                   value={manualInput}
                   onChange={(e) => setManualInput(e.target.value)}
                   data-testid="qr-input"
@@ -315,7 +211,7 @@ export default function QRScanner({ token }) {
                   {loading ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                   ) : (
-                    txt.scan
+                    t('qrScanner.scan')
                   )}
                 </Button>
               </div>
@@ -331,10 +227,10 @@ export default function QRScanner({ token }) {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Check className="h-5 w-5 text-green-500" />
-                {txt.userInfo}
+                {t('qrScanner.userInfo')}
               </CardTitle>
               <Button variant="ghost" size="sm" onClick={resetScanner}>
-                {txt.newScan}
+                {t('qrScanner.newScan')}
               </Button>
             </div>
           </CardHeader>
@@ -348,7 +244,7 @@ export default function QRScanner({ token }) {
               </Avatar>
               <div>
                 <h3 className="font-semibold text-lg">
-                  {scanResult.profile?.display_name || 'Usuario'}
+                  {scanResult.profile?.display_name || t('profile.user')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   ID: {scanResult.user_id?.slice(-8)}
@@ -379,22 +275,22 @@ export default function QRScanner({ token }) {
               <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium">{txt.membership}</span>
+                  <span className="font-medium">{t('qrScanner.membership')}</span>
                 </div>
                 <Badge variant="secondary">
-                  {scanResult.membership.visits_remaining} {txt.visitsLeft}
+                  {scanResult.membership.visits_remaining} {t('qrScanner.visitsLeft')}
                 </Badge>
               </div>
             ) : (
               <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg text-amber-800 dark:text-amber-200">
                 <AlertCircle className="h-5 w-5" />
-                <span>{txt.noMembership}</span>
+                <span>{t('qrScanner.noMembership')}</span>
               </div>
             )}
 
             {/* Actions */}
             <div className="space-y-2">
-              <p className="font-medium">{txt.actions}</p>
+              <p className="font-medium">{t('qrScanner.actions')}</p>
               <div className="grid grid-cols-3 gap-2">
                 {/* Check-in Button */}
                 {scanResult.membership?.membership_id && (
@@ -405,7 +301,7 @@ export default function QRScanner({ token }) {
                     data-testid="action-checkin"
                   >
                     <LogIn className="h-5 w-5 mb-1" />
-                    <span className="text-xs">{txt.checkin}</span>
+                    <span className="text-xs">{t('qrScanner.checkin')}</span>
                   </Button>
                 )}
 
@@ -418,7 +314,7 @@ export default function QRScanner({ token }) {
                     data-testid="action-pay-usd"
                   >
                     <DollarSign className="h-5 w-5 mb-1 text-green-600" />
-                    <span className="text-xs">{txt.payUSD}</span>
+                    <span className="text-xs">{t('qrScanner.payUSD')}</span>
                   </Button>
                 )}
 
@@ -431,7 +327,7 @@ export default function QRScanner({ token }) {
                     data-testid="action-pay-points"
                   >
                     <Wallet className="h-5 w-5 mb-1 text-purple-600" />
-                    <span className="text-xs">{txt.payPoints}</span>
+                    <span className="text-xs">{t('qrScanner.payPoints')}</span>
                   </Button>
                 )}
               </div>
@@ -443,7 +339,7 @@ export default function QRScanner({ token }) {
                 {selectedAction !== 'checkin' && (
                   <>
                     <div>
-                      <Label>{txt.amount}</Label>
+                      <Label>{t('qrScanner.amount')}</Label>
                       <Input
                         type="number"
                         placeholder={selectedAction === 'pay_usd' ? '0.00' : '0'}
@@ -459,9 +355,9 @@ export default function QRScanner({ token }) {
                       </p>
                     </div>
                     <div>
-                      <Label>{txt.description}</Label>
+                      <Label>{t('qrScanner.description')}</Label>
                       <Input
-                        placeholder="Compra en tienda..."
+                        placeholder={t('qrScanner.description')}
                         value={paymentDescription}
                         onChange={(e) => setPaymentDescription(e.target.value)}
                         data-testid="description-input"
@@ -476,7 +372,7 @@ export default function QRScanner({ token }) {
                     className="flex-1"
                     onClick={() => setSelectedAction(null)}
                   >
-                    {txt.cancel}
+                    {t('qrScanner.cancel')}
                   </Button>
                   <Button
                     className="flex-1"
@@ -487,12 +383,12 @@ export default function QRScanner({ token }) {
                     {processing ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        {txt.processing}
+                        {t('qrScanner.processing')}
                       </>
                     ) : (
                       <>
                         <Check className="h-4 w-4 mr-2" />
-                        {txt.confirm}
+                        {t('qrScanner.confirm')}
                       </>
                     )}
                   </Button>
