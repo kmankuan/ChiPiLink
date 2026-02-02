@@ -19,69 +19,69 @@ const API = process.env.REACT_APP_BACKEND_URL;
 export default function CatalogoPrivadoTab({ token, onRefresh }) {
   const navigate = useNavigate();
   const { t: translate } = useTranslation();
-  const [productos, setProductos] = useState([]);
-  const [filtros, setFiltros] = useState({ grados: [], materias: [] });
+  const [products, setProducts] = useState([]);
+  const [filters, setFilters] = useState({ grades: [], subjects: [] });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGrado, setSelectedGrado] = useState('');
-  const [selectedMateria, setSelectedMateria] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    nombre: '',
-    codigo: '',
+    name: '',
+    code: '',
     isbn: '',
-    editorial: '',
-    grado: '',
-    materia: '',
-    precio: '',
-    precio_oferta: '',
-    descripcion: '',
-    imagen_url: '',
-    activo: true,
-    destacado: false
+    publisher: '',
+    grade: '',
+    subject: '',
+    price: '',
+    sale_price: '',
+    description: '',
+    image_url: '',
+    active: true,
+    featured: false
   });
 
-  const fetchProductos = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
       let url = `${API}/api/store/catalogo-privado/admin/productos?limit=200`;
-      if (selectedGrado) url += `&grado=${encodeURIComponent(selectedGrado)}`;
-      if (selectedMateria) url += `&materia=${encodeURIComponent(selectedMateria)}`;
+      if (selectedGrade) url += `&grado=${encodeURIComponent(selectedGrade)}`;
+      if (selectedSubject) url += `&materia=${encodeURIComponent(selectedSubject)}`;
       
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setProductos(data.productos || []);
+      setProducts(data.productos || data.products || []);
       
-      const allProductos = data.productos || [];
-      const grados = [...new Set(allProductos.map(p => p.grado).filter(Boolean))].sort();
-      const materias = [...new Set(allProductos.map(p => p.materia).filter(Boolean))].sort();
-      setFiltros({ grados, materias });
+      const allProducts = data.productos || data.products || [];
+      const grades = [...new Set(allProducts.map(p => p.grado || p.grade).filter(Boolean))].sort();
+      const subjects = [...new Set(allProducts.map(p => p.materia || p.subject).filter(Boolean))].sort();
+      setFilters({ grades, subjects });
       
     } catch (error) {
-      console.error('Error fetching productos:', error);
-      toast.error('Error al cargar el catálogo');
+      console.error('Error fetching products:', error);
+      toast.error('Error loading catalog');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProductos();
-  }, [token, selectedGrado, selectedMateria]);
+    fetchProducts();
+  }, [token, selectedGrade, selectedSubject]);
 
-  const filteredProductos = productos.filter(p => {
+  const filteredProducts = products.filter(p => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      p.nombre?.toLowerCase().includes(term) ||
-      p.codigo?.toLowerCase().includes(term) ||
-      p.editorial?.toLowerCase().includes(term) ||
-      p.materia?.toLowerCase().includes(term)
+      (p.nombre || p.name || '')?.toLowerCase().includes(term) ||
+      (p.codigo || p.code || '')?.toLowerCase().includes(term) ||
+      (p.editorial || p.publisher || '')?.toLowerCase().includes(term) ||
+      (p.materia || p.subject || '')?.toLowerCase().includes(term)
     );
   });
 
