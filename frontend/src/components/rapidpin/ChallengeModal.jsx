@@ -81,7 +81,7 @@ export default function ChallengeModal({
       const response = await fetch(`${API_BASE}/api/pinpanclub/players`);
       if (response.ok) {
         const data = await response.json();
-        // Filtrar el usuario actual de la lista
+        // Filter current user from the list
         const available = (data.players || data || []).filter(
           p => p.player_id !== currentUserId
         );
@@ -97,7 +97,7 @@ export default function ChallengeModal({
 
   const handleOpenChallenge = () => {
     if (!isAuthenticated) {
-      toast.error(txt.loginRequired);
+      toast.error(t('rapidpin.loginRequired'));
       navigate('/login');
       return;
     }
@@ -106,7 +106,7 @@ export default function ChallengeModal({
 
   const handleSelectOpponent = (player) => {
     if (player.player_id === currentUserId) {
-      toast.error(txt.cantChallengeSelf);
+      toast.error(t('rapidpin.cantChallengeSelf'));
       return;
     }
     setSelectedOpponent(player);
@@ -125,17 +125,17 @@ export default function ChallengeModal({
       );
 
       if (response.ok) {
-        toast.success(txt.success, { description: txt.successDesc });
+        toast.success(t('rapidpin.success'), { description: t('rapidpin.successDesc') });
         setConfirmOpen(false);
         setIsOpen(false);
         setSelectedOpponent(null);
         onChallengeCreated?.();
       } else {
         const error = await response.json();
-        toast.error(error.detail || txt.error);
+        toast.error(error.detail || t('rapidpin.error'));
       }
     } catch (error) {
-      toast.error(txt.error);
+      toast.error(t('rapidpin.error'));
     } finally {
       setSending(false);
     }
