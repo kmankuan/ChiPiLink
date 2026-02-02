@@ -79,12 +79,12 @@ export default function ConfiguracionTab({ token }) {
         body: JSON.stringify({ unatienda: generalConfig })
       });
       if (response.ok) {
-        toast.success('Configuración guardada');
+        toast.success('Configuration saved');
       } else {
-        toast.error('Error al guardar');
+        toast.error('Error saving');
       }
     } catch (error) {
-      toast.error('Error al guardar configuración');
+      toast.error('Error saving configuration');
     } finally {
       setSaving(false);
     }
@@ -102,12 +102,12 @@ export default function ConfiguracionTab({ token }) {
         body: JSON.stringify(yappyConfig)
       });
       if (response.ok) {
-        toast.success('Configuración de Yappy guardada');
+        toast.success('Yappy configuration saved');
       } else {
-        toast.error('Error al guardar');
+        toast.error('Error saving');
       }
     } catch (error) {
-      toast.error('Error al guardar configuración de Yappy');
+      toast.error('Error saving Yappy configuration');
     } finally {
       setSaving(false);
     }
@@ -130,9 +130,9 @@ export default function ConfiguracionTab({ token }) {
               <Settings className="h-5 w-5 text-white" />
             </div>
             <div>
-              <CardTitle>Configuración de Unatienda</CardTitle>
+              <CardTitle>Unatienda Configuration</CardTitle>
               <CardDescription>
-                Configura la información general y métodos de pago de la tienda
+                Configure general information and payment methods for the store
               </CardDescription>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function ConfiguracionTab({ token }) {
           </TabsTrigger>
           <TabsTrigger value="yappy" className="gap-2">
             <CreditCard className="h-4 w-4" />
-            Yappy Comercial
+            Yappy Commercial
           </TabsTrigger>
           <TabsTrigger value="monday" className="gap-2">
             <Plug className="h-4 w-4" />
@@ -159,13 +159,13 @@ export default function ConfiguracionTab({ token }) {
         <TabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Información General</CardTitle>
-              <CardDescription>Datos básicos de Unatienda</CardDescription>
+              <CardTitle className="text-lg">General Information</CardTitle>
+              <CardDescription>Basic Unatienda data</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Nombre de la Tienda</Label>
+                  <Label>Store Name</Label>
                   <Input
                     value={generalConfig.nombre_tienda}
                     onChange={(e) => setGeneralConfig({...generalConfig, nombre_tienda: e.target.value})}
