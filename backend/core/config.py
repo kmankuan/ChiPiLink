@@ -23,8 +23,8 @@ MONDAY_BOARD_ID_ENV = os.environ.get('MONDAY_BOARD_ID', '')
 # CORS Configuration
 CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
 
-# Frontend URL (for embed codes)
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://your-domain.com')
+# Frontend URL (for embed codes) - must be set in environment for production
+FRONTEND_URL = os.environ.get('FRONTEND_URL', '')
 
 
 class Settings(BaseModel):
