@@ -118,6 +118,7 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => {
 const HeroCarousel = ({ posts }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!posts || posts.length <= 1) return;
@@ -131,8 +132,8 @@ const HeroCarousel = ({ posts }) => {
     return (
       <div className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
         <div className="text-center p-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Bienvenido a ChiPi Link</h1>
-          <p className="text-muted-foreground">Tu Super App de comunidad y servicios</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('landing.hero.title')}</h1>
+          <p className="text-muted-foreground">{t('landing.hero.subtitle')}</p>
         </div>
       </div>
     );
