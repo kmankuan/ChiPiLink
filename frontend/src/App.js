@@ -243,16 +243,6 @@ function AppRouter() {
           </ProtectedRoute>
         } 
       />
-      {/* BookOrdersAdmin route removed - functionality moved to Unatienda module */}
-      {/* <Route 
-        path="/admin/book-orders" 
-        element={
-          <ProtectedRoute adminOnly>
-            <Header />
-            <BookOrdersAdmin />
-          </ProtectedRoute>
-        } 
-      /> */}
       <Route 
         path="/admin/bulk-import-books" 
         element={
