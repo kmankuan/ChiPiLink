@@ -148,7 +148,7 @@ export default function InventoryImport({ token, onImportComplete }) {
       case 'update_replace':
         return <Badge className="bg-orange-500">Replace</Badge>;
       case 'skip':
-        return <Badge variant="secondary">Omitir</Badge>;
+        return <Badge variant="secondary">Skip</Badge>;
       default:
         return <Badge variant="outline">{action}</Badge>;
     }
@@ -163,7 +163,7 @@ export default function InventoryImport({ token, onImportComplete }) {
         className="gap-2"
       >
         <Upload className="h-4 w-4" />
-        Importar CSV
+        Import CSV
       </Button>
 
       {/* Import Dialog */}
@@ -172,10 +172,10 @@ export default function InventoryImport({ token, onImportComplete }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileSpreadsheet className="h-5 w-5" />
-              Importar Inventario desde CSV
+              Import Inventory from CSV
             </DialogTitle>
             <DialogDescription>
-              Descarga el template, completa la información y sube el archivo para agregar productos al inventario.
+              Download the template, fill in the information and upload the file to add products to inventory.
             </DialogDescription>
           </DialogHeader>
 
@@ -185,16 +185,16 @@ export default function InventoryImport({ token, onImportComplete }) {
               <CardHeader className="py-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs">1</span>
-                  Descargar Template
+                  Download Template
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <Button variant="outline" onClick={handleDownloadTemplate} className="gap-2">
                   <Download className="h-4 w-4" />
-                  Descargar Template CSV
+                  Download CSV Template
                 </Button>
                 <p className="text-xs text-muted-foreground mt-2">
-                  El template incluye las columnas: codigo, nombre, grado, cantidad, precio, materia, editorial, isbn, descripcion
+                  The template includes columns: code, name, grade, quantity, price, subject, publisher, isbn, description
                 </p>
               </CardContent>
             </Card>
@@ -204,7 +204,7 @@ export default function InventoryImport({ token, onImportComplete }) {
               <CardHeader className="py-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs">2</span>
-                  ¿Qué hacer con códigos existentes?
+                  What to do with existing codes?
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -212,22 +212,22 @@ export default function InventoryImport({ token, onImportComplete }) {
                   <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50">
                     <RadioGroupItem value="add" id="add" />
                     <Label htmlFor="add" className="flex-1 cursor-pointer">
-                      <span className="font-medium">Agregar cantidad</span>
-                      <p className="text-xs text-muted-foreground">Suma la cantidad del CSV a la existente. Ej: 10 existentes + 5 del CSV = 15</p>
+                      <span className="font-medium">Add quantity</span>
+                      <p className="text-xs text-muted-foreground">Adds CSV quantity to existing. Ex: 10 existing + 5 from CSV = 15</p>
                     </Label>
                   </div>
                   <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50">
                     <RadioGroupItem value="replace" id="replace" />
                     <Label htmlFor="replace" className="flex-1 cursor-pointer">
-                      <span className="font-medium">Reemplazar cantidad</span>
-                      <p className="text-xs text-muted-foreground">Sobrescribe la cantidad existente con la del CSV. Ej: 10 existentes → 5 del CSV = 5</p>
+                      <span className="font-medium">Replace quantity</span>
+                      <p className="text-xs text-muted-foreground">Overwrites existing quantity with CSV. Ex: 10 existing → 5 from CSV = 5</p>
                     </Label>
                   </div>
                   <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50">
                     <RadioGroupItem value="skip" id="skip" />
                     <Label htmlFor="skip" className="flex-1 cursor-pointer">
-                      <span className="font-medium">Omitir existentes</span>
-                      <p className="text-xs text-muted-foreground">Solo importa productos nuevos, ignora los que ya existen</p>
+                      <span className="font-medium">Skip existing</span>
+                      <p className="text-xs text-muted-foreground">Only imports new products, ignores existing ones</p>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -239,7 +239,7 @@ export default function InventoryImport({ token, onImportComplete }) {
               <CardHeader className="py-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs">3</span>
-                  Subir Archivo CSV
+                  Upload CSV File
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
