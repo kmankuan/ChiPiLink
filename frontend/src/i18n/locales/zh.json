@@ -141,7 +141,11 @@
     "all": "全部",
     "none": "无",
     "select": "选择",
-    "noResults": "无结果"
+    "noResults": "无结果",
+    "readMore": "阅读更多",
+    "viewAll": "查看全部",
+    "showMore": "显示更多",
+    "showLess": "显示更少"
   },
   "status": {
     "pending": "待处理",
