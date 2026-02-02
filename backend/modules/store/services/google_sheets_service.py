@@ -70,7 +70,7 @@ class GoogleSheetsService:
             return False
     
     async def get_sync_config(self) -> Dict:
-        """Obtener configuración de sincronización"""
+        """Get configuración de sincronización"""
         config = await db.sync_config.find_one(
             {"config_id": "google_sheets_sync_config"},
             {"_id": 0}
@@ -98,7 +98,7 @@ class GoogleSheetsService:
         return config
     
     async def update_sync_config(self, updates: Dict) -> Dict:
-        """Actualizar configuración de sincronización"""
+        """Update configuración de sincronización"""
         updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
         
         await db.sync_config.update_one(
@@ -389,7 +389,7 @@ class GoogleSheetsService:
         limit: int = 100,
         skip: int = 0
     ) -> Dict:
-        """Obtener estudiantes sincronizados con filtros"""
+        """Get estudiantes sincronizados con filtros"""
         query = {}
         
         if grado:
@@ -419,7 +419,7 @@ class GoogleSheetsService:
         }
     
     async def buscar_estudiante_por_numero(self, numero: str) -> Optional[Dict]:
-        """Buscar estudiante por número"""
+        """Search estudiante por número"""
         return await db.estudiantes_sincronizados.find_one(
             {"numero_estudiante": numero, "estado": "activo"},
             {"_id": 0}
@@ -441,7 +441,7 @@ class GoogleSheetsService:
         return {"success": True, "override_local": override}
     
     async def get_stats(self) -> Dict:
-        """Obtener estadísticas de sincronización"""
+        """Get estadísticas de sincronización"""
         config = await self.get_sync_config()
         
         # Contar por grado

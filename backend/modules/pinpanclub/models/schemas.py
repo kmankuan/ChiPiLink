@@ -46,12 +46,12 @@ class PlayerBase(BaseModel):
 
 
 class PlayerCreate(PlayerBase):
-    """Crear nuevo jugador"""
+    """Create nuevo jugador"""
     pass
 
 
 class PlayerUpdate(BaseModel):
-    """Actualizar jugador"""
+    """Update jugador"""
     nombre: Optional[str] = None
     apellido: Optional[str] = None
     apodo: Optional[str] = None
@@ -90,12 +90,12 @@ class MatchBase(BaseModel):
 
 
 class MatchCreate(MatchBase):
-    """Crear nuevo partido"""
+    """Create nuevo partido"""
     pass
 
 
 class MatchScoreUpdate(BaseModel):
-    """Actualizar puntuación"""
+    """Update puntuación"""
     accion: str  # 'punto_a', 'punto_b', 'undo', 'reset_set'
 
 
@@ -134,7 +134,7 @@ class TournamentBase(BaseModel):
 
 
 class TournamentCreate(TournamentBase):
-    """Crear nuevo torneo"""
+    """Create nuevo torneo"""
     pass
 
 
@@ -163,7 +163,7 @@ class SponsorBase(BaseModel):
 
 
 class SponsorCreate(SponsorBase):
-    """Crear nuevo patrocinador"""
+    """Create nuevo patrocinador"""
     pass
 
 

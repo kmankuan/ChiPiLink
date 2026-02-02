@@ -143,12 +143,12 @@ class OrderService(BaseService):
         return Order(**result)
     
     async def get_order(self, pedido_id: str) -> Optional[Order]:
-        """Obtener pedido por ID"""
+        """Get pedido por ID"""
         result = await self.repository.get_by_id(pedido_id)
         return Order(**result) if result else None
     
     async def get_client_orders(self, user_id: str) -> List[Order]:
-        """Obtener pedidos de un cliente"""
+        """Get pedidos de un cliente"""
         results = await self.repository.get_by_client(user_id)
         return [Order(**r) for r in results]
     
@@ -157,7 +157,7 @@ class OrderService(BaseService):
         estado: Optional[str] = None,
         limit: int = 500
     ) -> List[Order]:
-        """Obtener todos los pedidos (admin)"""
+        """Get todos los pedidos (admin)"""
         results = await self.repository.get_all(estado, limit)
         return [Order(**r) for r in results]
     
@@ -166,7 +166,7 @@ class OrderService(BaseService):
         pedido_id: str,
         estado: OrderStatus
     ) -> Optional[Order]:
-        """Actualizar estado del pedido"""
+        """Update estado del pedido"""
         success = await self.repository.update_status(
             pedido_id,
             estado.value if hasattr(estado, 'value') else estado
@@ -218,7 +218,7 @@ class OrderService(BaseService):
         return await self.repository.set_monday_item_id(pedido_id, monday_id)
     
     async def get_stats(self) -> Dict:
-        """Obtener estadísticas de pedidos"""
+        """Get estadísticas de pedidos"""
         by_status = await self.repository.count_by_status()
         total_sales = await self.repository.get_total_sales()
         

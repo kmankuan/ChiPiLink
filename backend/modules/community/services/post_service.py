@@ -28,7 +28,7 @@ class PostService(BaseService):
         destacado: Optional[bool] = None,
         limit: int = 20
     ) -> List[Post]:
-        """Obtener posts publicados"""
+        """Get posts publicados"""
         results = await self.repository.get_published_posts(
             tipo=tipo,
             destacado=destacado,
@@ -37,7 +37,7 @@ class PostService(BaseService):
         return [Post(**r) for r in results]
     
     async def get_post(self, post_id: str, increment_views: bool = False) -> Optional[Post]:
-        """Obtener post por ID"""
+        """Get post por ID"""
         result = await self.repository.get_by_id(post_id)
         if result and increment_views:
             await self.repository.increment_views(post_id)
@@ -45,7 +45,7 @@ class PostService(BaseService):
         return Post(**result) if result else None
     
     async def get_all_posts(self, limit: int = 100) -> List[Post]:
-        """Obtener todos los posts (admin)"""
+        """Get todos los posts (admin)"""
         results = await self.repository.get_all_posts(limit=limit)
         return [Post(**r) for r in results]
     
@@ -118,7 +118,7 @@ class PostService(BaseService):
     # ============== COMMENTS ==============
     
     async def get_post_comments(self, post_id: str) -> List[Comment]:
-        """Obtener comentarios de un post"""
+        """Get comentarios de un post"""
         results = await self.comment_repository.get_post_comments(post_id)
         return [Comment(**r) for r in results]
     

@@ -80,7 +80,7 @@ async def register_device(
     data: RegisterDeviceRequest,
     user=Depends(get_current_user)
 ):
-    """Registrar dispositivo para recibir push notifications"""
+    """Register dispositivo para recibir push notifications"""
     device = await push_notification_service.register_device(
         user_id=user["user_id"],
         device_token=data.device_token,
@@ -93,7 +93,7 @@ async def register_device(
 
 @router.get("/devices")
 async def get_my_devices(user=Depends(get_current_user)):
-    """Obtener mis dispositivos registrados"""
+    """Get mis dispositivos registrados"""
     devices = await push_notification_service.get_user_devices(user["user_id"])
     return {"success": True, "devices": devices, "count": len(devices)}
 
@@ -103,14 +103,14 @@ async def remove_device(
     device_token: str,
     user=Depends(get_current_user)
 ):
-    """Eliminar un dispositivo"""
+    """Delete un dispositivo"""
     success = await push_notification_service.deactivate_device(device_token)
     return {"success": success}
 
 
 @router.get("/preferences")
 async def get_my_preferences(user=Depends(get_current_user)):
-    """Obtener mis preferencias de notificación"""
+    """Get mis preferencias de notificación"""
     prefs = await push_notification_service.get_user_preferences(user["user_id"])
     return {"success": True, "preferences": prefs}
 
@@ -120,7 +120,7 @@ async def update_my_preferences(
     data: UpdatePreferencesRequest,
     user=Depends(get_current_user)
 ):
-    """Actualizar mis preferencias de notificación"""
+    """Update mis preferencias de notificación"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:
@@ -140,7 +140,7 @@ async def update_category_preference(
     data: UpdateCategoryPreferenceRequest,
     user=Depends(get_current_user)
 ):
-    """Actualizar preferencia de una categoría específica"""
+    """Update preferencia de una categoría específica"""
     prefs = await push_notification_service.update_category_preference(
         user_id=user["user_id"],
         category_id=category_id,
@@ -158,7 +158,7 @@ async def get_my_notification_history(
     offset: int = Query(0, ge=0),
     user=Depends(get_current_user)
 ):
-    """Obtener historial de notificaciones recibidas"""
+    """Get historial de notificaciones recibidas"""
     logs = await push_notification_service.get_notification_logs(
         user_id=user["user_id"],
         limit=limit,
@@ -172,14 +172,14 @@ async def get_my_notification_history(
 
 @router.get("/categories")
 async def get_categories(active_only: bool = Query(True)):
-    """Obtener categorías de notificación"""
+    """Get categorías de notificación"""
     categories = await push_notification_service.get_categories(active_only=active_only)
     return {"success": True, "categories": categories, "count": len(categories)}
 
 
 @router.get("/categories/{category_id}")
 async def get_category(category_id: str):
-    """Obtener una categoría específica"""
+    """Get una categoría específica"""
     category = await push_notification_service.get_category(category_id)
     
     if not category:
@@ -192,7 +192,7 @@ async def get_category(category_id: str):
 
 @router.get("/admin/config")
 async def get_config(admin=Depends(get_admin_user)):
-    """Obtener configuración de proveedores (admin)"""
+    """Get configuración de proveedores (admin)"""
     config = await push_notification_service.get_config()
     
     # Ocultar API keys en respuesta
@@ -211,7 +211,7 @@ async def update_provider_config(
     data: UpdateProviderConfigRequest,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar configuración de un proveedor (admin)"""
+    """Update configuración de un proveedor (admin)"""
     if provider not in ["fcm", "onesignal"]:
         raise HTTPException(status_code=400, detail="Invalid provider")
     
@@ -230,7 +230,7 @@ async def create_category(
     data: CreateCategoryRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear nueva categoría de notificación (admin)"""
+    """Create nueva categoría de notificación (admin)"""
     category = await push_notification_service.create_category(data.model_dump())
     return {"success": True, "category": category}
 
@@ -241,7 +241,7 @@ async def update_category(
     updates: dict,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar categoría (admin)"""
+    """Update categoría (admin)"""
     category = await push_notification_service.update_category(category_id, updates)
     
     if not category:
@@ -255,7 +255,7 @@ async def delete_category(
     category_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Eliminar categoría (admin)"""
+    """Delete categoría (admin)"""
     success = await push_notification_service.delete_category(category_id)
     
     if not success:
@@ -269,7 +269,7 @@ async def send_notification(
     data: SendNotificationRequest,
     admin=Depends(get_admin_user)
 ):
-    """Enviar notificación a un usuario (admin)"""
+    """Send notificación a un usuario (admin)"""
     result = await push_notification_service.send_notification(
         user_id=data.user_id,
         category_id=data.category_id,
@@ -288,7 +288,7 @@ async def send_bulk_notification(
     data: SendBulkNotificationRequest,
     admin=Depends(get_admin_user)
 ):
-    """Enviar notificación masiva (admin)"""
+    """Send notificación masiva (admin)"""
     if data.send_to_all:
         result = await push_notification_service.send_to_all(
             category_id=data.category_id,
@@ -322,7 +322,7 @@ async def get_notification_logs(
     offset: int = Query(0, ge=0),
     admin=Depends(get_admin_user)
 ):
-    """Obtener logs de notificaciones (admin)"""
+    """Get logs de notificaciones (admin)"""
     logs = await push_notification_service.get_notification_logs(
         user_id=user_id,
         category_id=category_id,
@@ -338,7 +338,7 @@ async def get_templates(
     category_id: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Obtener plantillas de notificación (admin)"""
+    """Get plantillas de notificación (admin)"""
     templates = await push_notification_service.get_templates(category_id=category_id)
     return {"success": True, "templates": templates, "count": len(templates)}
 
@@ -365,7 +365,7 @@ async def test_push_notification(
     data: TestPushRequest,
     admin=Depends(get_admin_user)
 ):
-    """Enviar notificación push de prueba a un segmento de OneSignal (admin)"""
+    """Send notificación push de prueba a un segmento de OneSignal (admin)"""
     from modules.notifications.providers.push_providers import OneSignalProvider
     import os
     

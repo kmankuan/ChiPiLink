@@ -80,17 +80,17 @@ class SuperPinService(BaseService):
         ]
     
     async def get_league(self, liga_id: str) -> Optional[SuperPinLeague]:
-        """Obtener liga por ID"""
+        """Get liga por ID"""
         result = await self.league_repo.get_by_id(liga_id)
         return SuperPinLeague(**result) if result else None
     
     async def get_active_leagues(self) -> List[SuperPinLeague]:
-        """Obtener ligas activas"""
+        """Get ligas activas"""
         results = await self.league_repo.get_active_leagues()
         return [SuperPinLeague(**r) for r in results]
     
     async def get_all_leagues(self) -> List[SuperPinLeague]:
-        """Obtener todas las ligas"""
+        """Get todas las ligas"""
         results = await self.league_repo.get_all_leagues()
         return [SuperPinLeague(**r) for r in results]
     
@@ -99,7 +99,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         data: SuperPinLeagueUpdate
     ) -> Optional[SuperPinLeague]:
-        """Actualizar liga"""
+        """Update liga"""
         update_data = data.model_dump(exclude_unset=True)
         
         if not update_data:
@@ -124,7 +124,7 @@ class SuperPinService(BaseService):
         self,
         data: PlayerCheckInCreate
     ) -> PlayerCheckIn:
-        """Registrar check-in de jugador"""
+        """Register check-in de jugador"""
         # Verificar si ya tiene check-in activo
         existing = await self.checkin_repo.get_player_checkin(
             data.liga_id, data.jugador_id
@@ -148,11 +148,11 @@ class SuperPinService(BaseService):
         return PlayerCheckIn(**result)
     
     async def check_out_player(self, liga_id: str, jugador_id: str) -> bool:
-        """Registrar check-out de jugador"""
+        """Register check-out de jugador"""
         return await self.checkin_repo.checkout_by_player(liga_id, jugador_id)
     
     async def get_available_players(self, liga_id: str) -> List[PlayerCheckIn]:
-        """Obtener jugadores disponibles (con check-in activo)"""
+        """Get jugadores disponibles (con check-in activo)"""
         results = await self.checkin_repo.get_active_checkins(liga_id)
         return [PlayerCheckIn(**r) for r in results]
     
@@ -162,7 +162,7 @@ class SuperPinService(BaseService):
         latitude: float,
         longitude: float
     ) -> bool:
-        """Validar ubicación para check-in por geolocalización"""
+        """Validate ubicación para check-in por geolocalización"""
         league = await self.get_league(liga_id)
         if not league:
             return False
@@ -184,7 +184,7 @@ class SuperPinService(BaseService):
         lat1: float, lon1: float,
         lat2: float, lon2: float
     ) -> float:
-        """Calcular distancia en metros entre dos puntos GPS"""
+        """Calculate distancia en metros entre dos puntos GPS"""
         R = 6371000  # Radio de la Tierra en metros
         
         phi1 = math.radians(lat1)
@@ -205,7 +205,7 @@ class SuperPinService(BaseService):
         self,
         data: SuperPinMatchCreate
     ) -> SuperPinMatch:
-        """Crear partido Super Pin"""
+        """Create partido Super Pin"""
         # Obtener info de jugadores
         player_a = await self.player_repo.get_by_id(data.jugador_a_id)
         player_b = await self.player_repo.get_by_id(data.jugador_b_id)
@@ -242,7 +242,7 @@ class SuperPinService(BaseService):
         return SuperPinMatch(**result)
     
     async def get_match(self, partido_id: str) -> Optional[SuperPinMatch]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         result = await self.match_repo.get_by_id(partido_id)
         return SuperPinMatch(**result) if result else None
     
@@ -265,7 +265,7 @@ class SuperPinService(BaseService):
         jugador: str,  # 'a' o 'b'
         stats: Optional[Dict] = None
     ) -> Dict:
-        """Registrar punto"""
+        """Register punto"""
         match = await self.match_repo.get_by_id(partido_id)
         if not match or match["estado"] != "en_curso":
             raise ValueError("Partido no está en curso")
@@ -350,7 +350,7 @@ class SuperPinService(BaseService):
         }
     
     async def _update_ranking_after_match(self, match: Dict):
-        """Actualizar ranking después de un partido"""
+        """Update ranking después de un partido"""
         liga_id = match["liga_id"]
         
         # Obtener configuración de la liga
@@ -439,7 +439,7 @@ class SuperPinService(BaseService):
         elo_perdedor: int,
         k_factor: int = 32
     ) -> tuple:
-        """Calcular cambio de ELO"""
+        """Calculate cambio de ELO"""
         # Probabilidad esperada de victoria
         expected_winner = 1 / (1 + 10 ** ((elo_perdedor - elo_ganador) / 400))
         expected_loser = 1 - expected_winner
@@ -456,7 +456,7 @@ class SuperPinService(BaseService):
     # ============== RANKING ==============
     
     async def get_ranking(self, liga_id: str) -> RankingTable:
-        """Obtener tabla de ranking"""
+        """Get tabla de ranking"""
         league = await self.get_league(liga_id)
         if not league:
             raise ValueError("Liga no encontrada")
@@ -479,7 +479,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         jugador_id: str
     ) -> Dict:
-        """Obtener estadísticas de un jugador en una liga"""
+        """Get estadísticas de un jugador en una liga"""
         ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
         if not ranking:
             return None
@@ -498,7 +498,7 @@ class SuperPinService(BaseService):
         self,
         data: SeasonTournamentCreate
     ) -> SeasonTournament:
-        """Crear torneo de fin de temporada"""
+        """Create torneo de fin de temporada"""
         league = await self.get_league(data.liga_id)
         if not league:
             raise ValueError("Liga no encontrada")
@@ -644,7 +644,7 @@ class SuperPinService(BaseService):
         score_a: int = 0,
         score_b: int = 0
     ) -> dict:
-        """Actualizar resultado de un partido del torneo"""
+        """Update resultado de un partido del torneo"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
             raise ValueError("Torneo not found")
@@ -722,7 +722,7 @@ class SuperPinService(BaseService):
         return {"success": True, "brackets": brackets}
     
     async def get_tournament_with_brackets(self, torneo_id: str) -> dict:
-        """Obtener torneo con información completa de brackets"""
+        """Get torneo con información completa de brackets"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
             return None
@@ -839,7 +839,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         partido_id: str
     ) -> List[Dict]:
-        """Verificar y otorgar badges basados en estadísticas de partido"""
+        """Verify y otorgar badges basados en estadísticas de partido"""
         awarded_badges = []
         
         # Obtener ranking del jugador
@@ -903,7 +903,7 @@ class SuperPinService(BaseService):
         return awarded_badges
     
     async def get_player_badges(self, jugador_id: str) -> List[Dict]:
-        """Obtener todos los badges de un jugador"""
+        """Get todos los badges de un jugador"""
         badges = await self.badge_repo.get_player_badges(jugador_id)
         
         # Enriquecer con definiciones
@@ -914,7 +914,7 @@ class SuperPinService(BaseService):
         return badges
     
     async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
-        """Obtener jugadores con más badges"""
+        """Get jugadores con más badges"""
         # This requiere agregación en MongoDB
         pipeline = [
             {"$group": {
@@ -951,7 +951,7 @@ class SuperPinService(BaseService):
         return results
     
     async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
-        """Obtener badges más recientes (para feed)"""
+        """Get badges más recientes (para feed)"""
         badges = await self.badge_repo.get_recent_badges(limit)
         
         # Enriquecer con info del jugador
@@ -970,7 +970,7 @@ class SuperPinService(BaseService):
     # ============== PLAYER STATISTICS ==============
     
     async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
-        """Obtener estadísticas detalladas de un jugador"""
+        """Get estadísticas detalladas de un jugador"""
         
         # Info básica del jugador
         player = await self.player_repo.get_by_id(jugador_id)
@@ -1084,7 +1084,7 @@ class SuperPinService(BaseService):
         }
     
     async def get_head_to_head(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
-        """Obtener estadísticas de enfrentamientos directos entre dos jugadores"""
+        """Get estadísticas de enfrentamientos directos entre dos jugadores"""
         
         matches = await self.match_repo.find_many(
             query={
@@ -1272,7 +1272,7 @@ class SuperPinService(BaseService):
         return quick_tournament
     
     async def get_quick_tournament_status(self, liga_id: str) -> Dict:
-        """Obtener estado de partidos rápidos activos en una liga"""
+        """Get estado de partidos rápidos activos en una liga"""
         # Buscar partidos tipo 'quick' en curso
         active_matches = await self.match_repo.find_many(
             query={

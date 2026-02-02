@@ -41,7 +41,7 @@ class AchievementsService(BaseService):
         return created
     
     async def get_all_achievements(self) -> List[Dict]:
-        """Obtener todos los logros activos"""
+        """Get todos los logros activos"""
         cursor = db.pinpanclub_achievements.find(
             {},  # Get all achievements (not filtering by is_active since some may not have it)
             {"_id": 0}
@@ -51,7 +51,7 @@ class AchievementsService(BaseService):
         return [a for a in results if a.get("is_active", True)]
     
     async def get_player_achievements(self, jugador_id: str) -> List[Dict]:
-        """Obtener logros de un jugador"""
+        """Get logros de un jugador"""
         cursor = db.pinpanclub_player_achievements.find(
             {"jugador_id": jugador_id},
             {"_id": 0}
@@ -89,7 +89,7 @@ class AchievementsService(BaseService):
         return awarded
     
     async def _get_player_challenge_stats(self, jugador_id: str) -> Dict:
-        """Obtener estadísticas de retos del jugador"""
+        """Get estadísticas de retos del jugador"""
         # Challenges completados total
         completed_total = await db.pinpanclub_challenges_progress.count_documents({
             "jugador_id": jugador_id,
@@ -142,7 +142,7 @@ class AchievementsService(BaseService):
         }
     
     async def _check_weekly_complete(self, jugador_id: str) -> bool:
-        """Verificar si el jugador completó todos los retos de la semana actual"""
+        """Verify si el jugador completó todos los retos de la semana actual"""
         # Obtener semana actual
         week = await db.pinpanclub_challenges_weekly.find_one(
             {"is_active": True},
@@ -162,7 +162,7 @@ class AchievementsService(BaseService):
         return completed >= len(week["challenges"])
     
     def _check_requirement(self, achievement: Dict, stats: Dict) -> bool:
-        """Verificar si el jugador cumple el requisito del logro"""
+        """Verify si el jugador cumple el requisito del logro"""
         req_type = achievement.get("requirement_type")
         req_value = achievement.get("requirement_value", 0)
         req_difficulty = achievement.get("requirement_difficulty")

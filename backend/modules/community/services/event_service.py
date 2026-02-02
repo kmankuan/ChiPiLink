@@ -27,7 +27,7 @@ class EventService(BaseService):
         upcoming: bool = True,
         limit: int = 10
     ) -> List[Event]:
-        """Obtener eventos"""
+        """Get eventos"""
         if upcoming:
             results = await self.repository.get_upcoming_events(limit=limit)
         else:
@@ -35,12 +35,12 @@ class EventService(BaseService):
         return [Event(**r) for r in results]
     
     async def get_event(self, evento_id: str) -> Optional[Event]:
-        """Obtener evento por ID"""
+        """Get evento por ID"""
         result = await self.repository.get_by_id(evento_id)
         return Event(**result) if result else None
     
     async def get_all_events(self, limit: int = 100) -> List[Event]:
-        """Obtener todos los eventos (admin)"""
+        """Get todos los eventos (admin)"""
         results = await self.repository.get_all_events(limit=limit)
         return [Event(**r) for r in results]
     
@@ -101,7 +101,7 @@ class EventService(BaseService):
         usuario_id: str,
         nombre: str
     ) -> bool:
-        """Registrar usuario para evento"""
+        """Register usuario para evento"""
         event = await self.repository.get_by_id(evento_id)
         
         if not event:

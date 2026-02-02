@@ -22,7 +22,7 @@ class MatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Crear nuevo partido"""
+        """Create nuevo partido"""
         match_data["partido_id"] = str(uuid.uuid4())
         match_data["estado"] = "pendiente"
         match_data["puntos_jugador_a"] = 0
@@ -35,18 +35,18 @@ class MatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         return await self.find_by_id(self.ID_FIELD, partido_id)
     
     async def get_active_matches(self) -> List[Dict]:
-        """Obtener partidos activos (en curso o pausados)"""
+        """Get partidos activos (en curso o pausados)"""
         return await self.find_many(
             query={"estado": {"$in": ["en_curso", "pausado"]}},
             sort=[("created_at", -1)]
         )
     
     async def get_by_state(self, estado: str, limit: int = 50) -> List[Dict]:
-        """Obtener partidos por estado"""
+        """Get partidos por estado"""
         return await self.find_many(
             query={"estado": estado},
             limit=limit,
@@ -54,7 +54,7 @@ class MatchRepository(BaseRepository):
         )
     
     async def get_by_player(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Obtener partidos de un jugador"""
+        """Get partidos de un jugador"""
         return await self.find_many(
             query={
                 "$or": [
@@ -67,14 +67,14 @@ class MatchRepository(BaseRepository):
         )
     
     async def get_by_tournament(self, torneo_id: str) -> List[Dict]:
-        """Obtener partidos de un torneo"""
+        """Get partidos de un torneo"""
         return await self.find_many(
             query={"torneo_id": torneo_id},
             sort=[("ronda", 1), ("created_at", 1)]
         )
     
     async def update_match(self, partido_id: str, data: Dict) -> bool:
-        """Actualizar datos de partido"""
+        """Update datos de partido"""
         return await self.update_by_id(self.ID_FIELD, partido_id, data)
     
     async def update_score(
@@ -87,7 +87,7 @@ class MatchRepository(BaseRepository):
         set_actual: int,
         historial: List[Dict]
     ) -> bool:
-        """Actualizar puntuación del partido"""
+        """Update puntuación del partido"""
         return await self.update_match(partido_id, {
             "puntos_jugador_a": puntos_a,
             "puntos_jugador_b": puntos_b,
@@ -122,7 +122,7 @@ class MatchRepository(BaseRepository):
         return await self.update_match(partido_id, {"estado": "cancelado"})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
-        """Obtener partidos no sincronizados con Monday.com"""
+        """Get partidos no sincronizados con Monday.com"""
         return await self.find_many(
             query={
                 "estado": {"$in": ["pendiente", "en_curso", "pausado"]},
@@ -134,7 +134,7 @@ class MatchRepository(BaseRepository):
         )
     
     async def get_finished_with_monday_id(self) -> List[Dict]:
-        """Obtener partidos finalizados que tienen monday_item_id"""
+        """Get partidos finalizados que tienen monday_item_id"""
         return await self.find_many(
             query={
                 "estado": "finalizado",

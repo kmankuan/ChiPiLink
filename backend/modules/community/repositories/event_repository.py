@@ -22,7 +22,7 @@ class EventRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, event_data: Dict) -> Dict:
-        """Crear nuevo evento"""
+        """Create nuevo evento"""
         event_data["evento_id"] = f"evento_{uuid.uuid4().hex[:12]}"
         event_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         event_data["estado"] = event_data.get("estado", "programado")
@@ -30,11 +30,11 @@ class EventRepository(BaseRepository):
         return await self.insert_one(event_data)
     
     async def get_by_id(self, evento_id: str) -> Optional[Dict]:
-        """Obtener evento por ID"""
+        """Get evento por ID"""
         return await self.find_one({self.ID_FIELD: evento_id})
     
     async def get_upcoming_events(self, limit: int = 10) -> List[Dict]:
-        """Obtener eventos próximos"""
+        """Get eventos próximos"""
         now = datetime.now(timezone.utc).isoformat()
         return await self.find_many(
             query={
@@ -46,7 +46,7 @@ class EventRepository(BaseRepository):
         )
     
     async def get_past_events(self, limit: int = 10) -> List[Dict]:
-        """Obtener eventos pasados"""
+        """Get eventos pasados"""
         now = datetime.now(timezone.utc).isoformat()
         return await self.find_many(
             query={
@@ -58,7 +58,7 @@ class EventRepository(BaseRepository):
         )
     
     async def get_all_events(self, limit: int = 100) -> List[Dict]:
-        """Obtener todos los eventos (admin)"""
+        """Get todos los eventos (admin)"""
         return await self.find_many(
             query={},
             limit=limit,
@@ -66,7 +66,7 @@ class EventRepository(BaseRepository):
         )
     
     async def update_event(self, evento_id: str, data: Dict) -> bool:
-        """Actualizar evento"""
+        """Update evento"""
         return await self.update_by_id(self.ID_FIELD, evento_id, data)
     
     async def add_inscription(self, evento_id: str, inscription: Dict) -> bool:
@@ -78,5 +78,5 @@ class EventRepository(BaseRepository):
         return result.modified_count > 0
     
     async def delete_event(self, evento_id: str) -> bool:
-        """Eliminar evento"""
+        """Delete evento"""
         return await self.delete_by_id(self.ID_FIELD, evento_id)

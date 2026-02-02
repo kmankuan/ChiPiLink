@@ -87,15 +87,15 @@ class SocialService(BaseService):
         return await self.follow_repo.delete_follow(follower_id, following_id)
     
     async def get_followers(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Obtener seguidores de un jugador"""
+        """Get seguidores de un jugador"""
         return await self.follow_repo.get_followers(jugador_id, limit)
     
     async def get_following(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Obtener a quiénes sigue un jugador"""
+        """Get a quiénes sigue un jugador"""
         return await self.follow_repo.get_following(jugador_id, limit)
     
     async def get_follow_stats(self, jugador_id: str) -> FollowStats:
-        """Obtener estadísticas de seguidores"""
+        """Get estadísticas de seguidores"""
         followers = await self.follow_repo.count_followers(jugador_id)
         following = await self.follow_repo.count_following(jugador_id)
         return FollowStats(
@@ -105,13 +105,13 @@ class SocialService(BaseService):
         )
     
     async def is_following(self, follower_id: str, following_id: str) -> bool:
-        """Verificar si un jugador sigue a otro"""
+        """Verify si un jugador sigue a otro"""
         return await self.follow_repo.is_following(follower_id, following_id)
     
     # ============== COMMENTS ==============
     
     async def create_comment(self, data: CommentCreate) -> Comment:
-        """Crear un comentario"""
+        """Create un comentario"""
         author = await self.player_repo.get_by_id(data.author_id)
         
         comment_data = data.model_dump()
@@ -142,12 +142,12 @@ class SocialService(BaseService):
         target_type: str = "player",
         limit: int = 50
     ) -> List[Comment]:
-        """Obtener comentarios de un target"""
+        """Get comentarios de un target"""
         results = await self.comment_repo.get_comments_for_target(target_id, target_type, limit)
         return [Comment(**r) for r in results]
     
     async def update_comment(self, comment_id: str, content: str) -> Optional[Comment]:
-        """Actualizar comentario"""
+        """Update comentario"""
         success = await self.comment_repo.update(comment_id, {"content": content})
         if success:
             result = await self.comment_repo.get_by_id(comment_id)
@@ -155,7 +155,7 @@ class SocialService(BaseService):
         return None
     
     async def delete_comment(self, comment_id: str) -> bool:
-        """Eliminar comentario (soft delete)"""
+        """Delete comentario (soft delete)"""
         return await self.comment_repo.soft_delete(comment_id)
     
     # ============== REACTIONS ==============
@@ -194,7 +194,7 @@ class SocialService(BaseService):
         return Reaction(**result)
     
     async def get_reactions(self, target_id: str, target_type: str) -> ReactionSummary:
-        """Obtener resumen de reacciones"""
+        """Get resumen de reacciones"""
         summary = await self.reaction_repo.get_reaction_summary(target_id, target_type)
         return ReactionSummary(**summary)
     
@@ -204,14 +204,14 @@ class SocialService(BaseService):
         target_id: str, 
         target_type: str
     ) -> Optional[str]:
-        """Obtener tipo de reacción del usuario"""
+        """Get tipo de reacción del usuario"""
         reaction = await self.reaction_repo.find_user_reaction(user_id, target_id, target_type)
         return reaction["reaction_type"] if reaction else None
     
     # ============== ACTIVITY FEED ==============
     
     async def create_activity(self, data: ActivityFeedCreate) -> ActivityFeedItem:
-        """Crear actividad en el feed"""
+        """Create actividad en el feed"""
         player = await self.player_repo.get_by_id(data.jugador_id)
         
         activity_data = data.model_dump()
@@ -224,12 +224,12 @@ class SocialService(BaseService):
         return ActivityFeedItem(**result)
     
     async def get_player_feed(self, jugador_id: str, limit: int = 20) -> List[ActivityFeedItem]:
-        """Obtener feed de un jugador"""
+        """Get feed de un jugador"""
         results = await self.feed_repo.get_player_feed(jugador_id, limit)
         return [ActivityFeedItem(**r) for r in results]
     
     async def get_following_feed(self, jugador_id: str, limit: int = 50) -> List[ActivityFeedItem]:
-        """Obtener feed de jugadores seguidos"""
+        """Get feed de jugadores seguidos"""
         # Obtener IDs de jugadores que sigue
         following = await self.follow_repo.get_following(jugador_id, limit=100)
         following_ids = [f["following_id"] for f in following]
@@ -243,7 +243,7 @@ class SocialService(BaseService):
     # ============== NOTIFICATIONS ==============
     
     async def create_notification(self, data: NotificationCreate) -> Notification:
-        """Crear notificación y enviar en tiempo real si el usuario está conectado"""
+        """Create notificación y enviar en tiempo real si el usuario está conectado"""
         result = await self.notification_repo.create(data.model_dump())
         notification = Notification(**result)
         
@@ -263,12 +263,12 @@ class SocialService(BaseService):
         unread_only: bool = False,
         limit: int = 50
     ) -> List[Notification]:
-        """Obtener notificaciones de un usuario"""
+        """Get notificaciones de un usuario"""
         results = await self.notification_repo.get_user_notifications(user_id, unread_only, limit)
         return [Notification(**r) for r in results]
     
     async def get_unread_count(self, user_id: str) -> int:
-        """Obtener cantidad de notificaciones no leídas"""
+        """Get cantidad de notificaciones no leídas"""
         return await self.notification_repo.count_unread(user_id)
     
     async def mark_notification_read(self, notification_id: str) -> bool:
@@ -280,7 +280,7 @@ class SocialService(BaseService):
         return await self.notification_repo.mark_all_as_read(user_id)
     
     async def get_unpushed_notifications(self, limit: int = 100) -> List[Notification]:
-        """Obtener notificaciones no enviadas por WebSocket"""
+        """Get notificaciones no enviadas por WebSocket"""
         results = await self.notification_repo.get_unpushed(limit)
         return [Notification(**r) for r in results]
     
@@ -291,7 +291,7 @@ class SocialService(BaseService):
     # ============== USER WARNINGS (MODERATION) ==============
     
     async def get_user_warnings(self, user_id: str) -> int:
-        """Obtener cantidad de amonestaciones de un usuario"""
+        """Get cantidad de amonestaciones de un usuario"""
         from core.database import db
         
         user_mod = await db.pinpanclub_user_moderation.find_one(

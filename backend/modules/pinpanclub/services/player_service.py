@@ -45,7 +45,7 @@ class PlayerService(BaseService):
         return Player(**result)
     
     async def get_player(self, jugador_id: str) -> Optional[Player]:
-        """Obtener jugador por ID"""
+        """Get jugador por ID"""
         result = await self.repository.get_by_id(jugador_id)
         return Player(**result) if result else None
     
@@ -54,12 +54,12 @@ class PlayerService(BaseService):
         skip: int = 0,
         limit: int = 100
     ) -> List[Player]:
-        """Obtener todos los jugadores activos"""
+        """Get todos los jugadores activos"""
         results = await self.repository.get_all_active(skip, limit)
         return [Player(**r) for r in results]
     
     async def get_rankings(self, limit: int = 50) -> List[Player]:
-        """Obtener ranking de jugadores"""
+        """Get ranking de jugadores"""
         results = await self.repository.get_rankings(limit)
         return [Player(**r) for r in results]
     
@@ -127,7 +127,7 @@ class PlayerService(BaseService):
         return await self.get_player(jugador_id)
     
     async def search_players(self, query: str) -> List[Player]:
-        """Buscar jugadores"""
+        """Search jugadores"""
         results = await self.repository.search(query)
         return [Player(**r) for r in results]
     
@@ -136,7 +136,7 @@ class PlayerService(BaseService):
         return await self.repository.deactivate(jugador_id)
     
     async def get_players_not_synced(self) -> List[Player]:
-        """Obtener jugadores no sincronizados con Monday.com"""
+        """Get jugadores no sincronizados con Monday.com"""
         results = await self.repository.get_not_synced_to_monday()
         return [Player(**r) for r in results]
     

@@ -22,7 +22,7 @@ class CommentRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, comment_data: Dict) -> Dict:
-        """Crear nuevo comentario"""
+        """Create nuevo comentario"""
         comment_data["comment_id"] = f"comment_{uuid.uuid4().hex[:12]}"
         comment_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         comment_data["aprobado"] = comment_data.get("aprobado", True)
@@ -30,7 +30,7 @@ class CommentRepository(BaseRepository):
         return await self.insert_one(comment_data)
     
     async def get_post_comments(self, post_id: str, limit: int = 100) -> List[Dict]:
-        """Obtener comentarios de un post"""
+        """Get comentarios de un post"""
         return await self.find_many(
             query={"post_id": post_id, "aprobado": True},
             limit=limit,
@@ -38,7 +38,7 @@ class CommentRepository(BaseRepository):
         )
     
     async def delete_post_comments(self, post_id: str) -> int:
-        """Eliminar todos los comentarios de un post"""
+        """Delete todos los comentarios de un post"""
         result = await self._collection.delete_many({"post_id": post_id})
         return result.deleted_count
     

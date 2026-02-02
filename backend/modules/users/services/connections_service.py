@@ -52,7 +52,7 @@ class ConexionesService:
     # ============== GESTIÓN DE CONEXIONES ==============
     
     async def get_conexiones(self, user_id: str) -> List[Dict]:
-        """Obtener todas las conexiones de un usuario"""
+        """Get todas las conexiones de un usuario"""
         user = await db.auth_users.find_one(
             {"user_id": user_id},
             {"conexiones": 1}
@@ -78,7 +78,7 @@ class ConexionesService:
         return conexiones
     
     async def get_conexion(self, user_id: str, conexion_id: str) -> Optional[Dict]:
-        """Obtener una conexión específica"""
+        """Get una conexión específica"""
         conexiones = await self.get_conexiones(user_id)
         for con in conexiones:
             if con.get("conexion_id") == conexion_id:
@@ -170,7 +170,7 @@ class ConexionesService:
         return {"success": True, "conexion": conexion}
     
     def _get_subtipo_reciproco(self, subtipo: str) -> str:
-        """Obtener el subtipo recíproco de una relación"""
+        """Get el subtipo recíproco de una relación"""
         reciprocos = {
             "acudiente": "acudido",
             "acudido": "acudiente",
@@ -186,7 +186,7 @@ class ConexionesService:
         return reciprocos.get(subtipo, subtipo)
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
-        """Obtener permisos recíprocos (generalmente más limitados)"""
+        """Get permisos recíprocos (generalmente más limitados)"""
         # By defecto, el recíproco tiene permisos mínimos
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
             # The dependiente no tiene permisos sobre el acudiente
@@ -209,7 +209,7 @@ class ConexionesService:
         conexion_id: str,
         updates: Dict
     ) -> Dict:
-        """Actualizar una conexión existente"""
+        """Update una conexión existente"""
         result = await db.auth_users.update_one(
             {"user_id": user_id, "conexiones.conexion_id": conexion_id},
             {"$set": {f"conexiones.$.{k}": v for k, v in updates.items()}}
@@ -221,7 +221,7 @@ class ConexionesService:
         return {"success": True}
     
     async def eliminar_conexion(self, user_id: str, conexion_id: str) -> Dict:
-        """Eliminar una conexión"""
+        """Delete una conexión"""
         # Obtener conexión para saber el user_id destino
         conexion = await self.get_conexion(user_id, conexion_id)
         if not conexion:
@@ -253,7 +253,7 @@ class ConexionesService:
         etiqueta: Optional[str] = None,
         mensaje: Optional[str] = None
     ) -> Dict:
-        """Crear solicitud de conexión"""
+        """Create solicitud de conexión"""
         # Verificar que no existe conexión ni solicitud pendiente
         existing_conexion = await db.auth_users.find_one({
             "user_id": de_usuario_id,
@@ -323,7 +323,7 @@ class ConexionesService:
         return {"success": True, "solicitud": solicitud, "push_notification": push_result}
     
     def _get_subtipo_label(self, subtipo: str) -> str:
-        """Obtener etiqueta legible para subtipo de relación"""
+        """Get etiqueta legible para subtipo de relación"""
         labels = {
             "acudiente": "Acudiente",
             "acudido": "Acudido",
@@ -341,7 +341,7 @@ class ConexionesService:
         return labels.get(subtipo, subtipo)
     
     async def get_solicitudes_pendientes(self, user_id: str) -> List[Dict]:
-        """Obtener solicitudes pendientes para un usuario"""
+        """Get solicitudes pendientes para un usuario"""
         cursor = db.solicitudes_conexion.find(
             {"para_usuario_id": user_id, "estado": "pendiente"},
             {"_id": 0}
@@ -349,7 +349,7 @@ class ConexionesService:
         return await cursor.to_list(length=50)
     
     async def get_solicitudes_enviadas(self, user_id: str) -> List[Dict]:
-        """Obtener solicitudes enviadas por un usuario"""
+        """Get solicitudes enviadas por un usuario"""
         cursor = db.solicitudes_conexion.find(
             {"de_usuario_id": user_id},
             {"_id": 0}
@@ -442,7 +442,7 @@ class ConexionesService:
         subtipo: Optional[str] = None,
         monto_transferir: Optional[float] = None
     ) -> Dict:
-        """Crear invitación para usuario no registrado"""
+        """Create invitación para usuario no registrado"""
         import uuid
         
         # Verificar que email no está registrado
@@ -492,7 +492,7 @@ class ConexionesService:
         }
     
     async def procesar_invitacion(self, token: str, nuevo_user_id: str) -> Dict:
-        """Procesar invitación cuando usuario se registra"""
+        """Process invitación cuando usuario se registra"""
         invitacion = await db.invitaciones.find_one({"token": token, "estado": "pendiente"})
         if not invitacion:
             return {"error": "Invitación no válida o expirada"}
@@ -542,7 +542,7 @@ class ConexionesService:
         creado_por_admin: bool = False,
         admin_id: Optional[str] = None
     ) -> Dict:
-        """Crear usuario acudido (cuenta gestionada)"""
+        """Create usuario acudido (cuenta gestionada)"""
         import uuid
         
         # Verificar email único si se proporciona
@@ -760,7 +760,7 @@ class ConexionesService:
         saldo_actual: float,
         descripcion: str
     ) -> Dict:
-        """Crear alerta de saldo insuficiente (envía a usuario y acudientes)"""
+        """Create alerta de saldo insuficiente (envía a usuario y acudientes)"""
         from modules.notifications.services.push_service import push_notification_service
         
         # Obtener usuario
@@ -842,12 +842,12 @@ class ConexionesService:
     # ============== CAPACIDADES ==============
     
     async def get_capacidades_config(self) -> List[Dict]:
-        """Obtener todas las capacidades configuradas"""
+        """Get todas las capacidades configuradas"""
         cursor = db.capacidades_config.find({"activa": True}, {"_id": 0}).sort("orden", 1)
         return await cursor.to_list(length=100)
     
     async def get_capacidades_usuario(self, user_id: str) -> List[Dict]:
-        """Obtener capacidades de un usuario"""
+        """Get capacidades de un usuario"""
         user = await db.auth_users.find_one({"user_id": user_id}, {"capacidades": 1})
         return user.get("capacidades", []) if user else []
     
@@ -933,7 +933,7 @@ class ConexionesService:
     # ============== MARKETING ==============
     
     async def get_servicios_sugeridos(self, user_id: str) -> List[Dict]:
-        """Obtener servicios sugeridos para un usuario"""
+        """Get servicios sugeridos para un usuario"""
         user = await db.auth_users.find_one({"user_id": user_id}, {"marketing": 1, "capacidades": 1})
         if not user:
             return []
@@ -1000,7 +1000,7 @@ class ConexionesService:
         excluir_user_id: Optional[str] = None,
         limit: int = 10
     ) -> List[Dict]:
-        """Buscar usuarios por nombre o email"""
+        """Search usuarios por nombre o email"""
         search_query = {
             "$or": [
                 {"nombre": {"$regex": query, "$options": "i"}},

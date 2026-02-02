@@ -35,7 +35,7 @@ class CreatePaymentSessionRequest(BaseModel):
 
 @router.get("/me")
 async def get_my_qr(user=Depends(get_current_user)):
-    """Obtener mi código QR"""
+    """Get mi código QR"""
     qr = await qr_code_service.get_or_create_user_qr(
         user_id=user["user_id"]
     )
@@ -71,7 +71,7 @@ async def get_my_qr_transactions(
     action: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Obtener mis transacciones por QR"""
+    """Get mis transacciones por QR"""
     transactions = await qr_code_service.get_qr_transactions(
         user_id=user["user_id"],
         action=action,
@@ -110,7 +110,7 @@ async def process_qr_action(
     data: ProcessQRActionRequest,
     admin=Depends(get_admin_user)
 ):
-    """Procesar una acción desde QR (check-in o pago)"""
+    """Process una acción desde QR (check-in o pago)"""
     if data.action not in ["checkin", "pay_usd", "pay_points"]:
         raise HTTPException(
             status_code=400, 
@@ -164,7 +164,7 @@ async def qr_payment(
     data: ProcessQRActionRequest,
     admin=Depends(get_admin_user)
 ):
-    """Procesar pago vía QR"""
+    """Process pago vía QR"""
     if data.action not in ["pay_usd", "pay_points"]:
         raise HTTPException(status_code=400, detail="Action must be 'pay_usd' or 'pay_points'")
     
@@ -193,7 +193,7 @@ async def create_payment_session(
     data: CreatePaymentSessionRequest,
     user=Depends(get_current_user)
 ):
-    """Crear sesión de pago (para montos grandes que requieren confirmación)"""
+    """Create sesión de pago (para montos grandes que requieren confirmación)"""
     if data.currency not in ["USD", "CHIPIPOINTS"]:
         raise HTTPException(status_code=400, detail="Currency must be 'USD' or 'CHIPIPOINTS'")
     
@@ -241,7 +241,7 @@ async def admin_get_transactions(
     offset: int = Query(0, ge=0),
     admin=Depends(get_admin_user)
 ):
-    """Obtener todas las transacciones QR (admin)"""
+    """Get todas las transacciones QR (admin)"""
     transactions = await qr_code_service.get_qr_transactions(
         user_id=user_id,
         action=action,
@@ -261,7 +261,7 @@ async def admin_get_user_qr(
     user_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Obtener QR de un usuario específico (admin)"""
+    """Get QR de un usuario específico (admin)"""
     qr = await qr_code_service.get_or_create_user_qr(user_id=user_id)
     
     return {

@@ -14,13 +14,13 @@ router = APIRouter(prefix="/gallery", tags=["Community - Gallery"])
 
 @router.get("", response_model=List[Album])
 async def get_albums():
-    """Obtener álbumes activos"""
+    """Get álbumes activos"""
     return await album_service.get_active_albums()
 
 
 @router.get("/{album_id}", response_model=Album)
 async def get_album(album_id: str):
-    """Obtener álbum por ID"""
+    """Get álbum por ID"""
     album = await album_service.get_album(album_id)
     if not album:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")
@@ -34,7 +34,7 @@ async def get_all_albums(
     limit: int = Query(100, ge=1, le=500),
     admin: dict = Depends(get_admin_user)
 ):
-    """Obtener todos los álbumes (admin)"""
+    """Get todos los álbumes (admin)"""
     return await album_service.get_all_albums(limit=limit)
 
 
@@ -43,7 +43,7 @@ async def create_album(
     data: AlbumCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nuevo álbum (admin)"""
+    """Create nuevo álbum (admin)"""
     return await album_service.create_album(data)
 
 
@@ -53,7 +53,7 @@ async def update_album(
     data: AlbumUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar álbum (admin)"""
+    """Update álbum (admin)"""
     album = await album_service.update_album(album_id, data)
     if not album:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")
@@ -65,7 +65,7 @@ async def delete_album(
     album_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Eliminar álbum (admin)"""
+    """Delete álbum (admin)"""
     success = await album_service.delete_album(album_id)
     if not success:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")

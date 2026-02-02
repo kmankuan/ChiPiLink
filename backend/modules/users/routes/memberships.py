@@ -54,7 +54,7 @@ async def get_plans(
     active_only: bool = Query(True),
     lang: str = Query("es")
 ):
-    """Obtener planes de membresía disponibles"""
+    """Get planes de membresía disponibles"""
     plans = await membership_service.get_plans(
         active_only=active_only,
         user_type_id=user_type_id
@@ -69,7 +69,7 @@ async def get_plans(
 
 @router.get("/plans/{plan_id}")
 async def get_plan(plan_id: str):
-    """Obtener detalle de un plan"""
+    """Get detalle de un plan"""
     plan = await membership_service.get_plan(plan_id)
     
     if not plan:
@@ -83,7 +83,7 @@ async def create_plan(
     data: CreatePlanRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear un nuevo plan de membresía (admin)"""
+    """Create un nuevo plan de membresía (admin)"""
     try:
         MembershipType(data.membership_type)
     except ValueError:
@@ -102,7 +102,7 @@ async def update_plan(
     updates: dict,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar un plan (admin)"""
+    """Update un plan (admin)"""
     plan = await membership_service.update_plan(plan_id, updates)
     
     if not plan:
@@ -139,7 +139,7 @@ async def get_my_memberships(
     active_only: bool = Query(True),
     user=Depends(get_current_user)
 ):
-    """Obtener mis membresías"""
+    """Get mis membresías"""
     memberships = await membership_service.get_user_memberships(
         user_id=user["user_id"],
         active_only=active_only
@@ -154,7 +154,7 @@ async def get_my_memberships(
 
 @router.get("/me/active")
 async def get_my_active_membership(user=Depends(get_current_user)):
-    """Obtener mi membresía activa"""
+    """Get mi membresía activa"""
     membership = await membership_service.get_active_membership(user["user_id"])
     
     return {
@@ -187,7 +187,7 @@ async def get_membership(
     membership_id: str,
     user=Depends(get_current_user)
 ):
-    """Obtener detalle de una membresía"""
+    """Get detalle de una membresía"""
     membership = await membership_service.get_membership(membership_id)
     
     if not membership:
@@ -228,7 +228,7 @@ async def cancel_membership(
 
 @router.get("/visits/config")
 async def get_visit_config():
-    """Obtener configuración de visitas"""
+    """Get configuración de visitas"""
     config = await membership_service.get_visit_config()
     return {"success": True, "config": config}
 
@@ -238,7 +238,7 @@ async def update_visit_config(
     data: UpdateVisitConfigRequest,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar configuración de visitas (admin)"""
+    """Update configuración de visitas (admin)"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:
@@ -253,7 +253,7 @@ async def check_in(
     data: CheckInRequest,
     user=Depends(get_current_user)
 ):
-    """Registrar entrada al club"""
+    """Register entrada al club"""
     result = await membership_service.check_in(
         user_id=user["user_id"],
         check_in_method=data.check_in_method,
@@ -272,7 +272,7 @@ async def check_out(
     notes: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Registrar salida del club"""
+    """Register salida del club"""
     try:
         visit = await membership_service.check_out(
             user_id=user["user_id"],
@@ -290,7 +290,7 @@ async def get_my_visits(
     offset: int = Query(0, ge=0),
     user=Depends(get_current_user)
 ):
-    """Obtener mi historial de visitas"""
+    """Get mi historial de visitas"""
     visits = await membership_service.get_user_visits(
         user_id=user["user_id"],
         limit=limit,
@@ -306,14 +306,14 @@ async def get_my_visits(
 
 @router.get("/visits/stats")
 async def get_my_visit_stats(user=Depends(get_current_user)):
-    """Obtener estadísticas de mis visitas"""
+    """Get estadísticas de mis visitas"""
     stats = await membership_service.get_visit_stats(user["user_id"])
     return {"success": True, "stats": stats}
 
 
 @router.get("/visits/current")
 async def get_current_visitors(admin=Depends(get_admin_user)):
-    """Obtener usuarios actualmente en el club (admin)"""
+    """Get usuarios actualmente en el club (admin)"""
     visitors = await membership_service.get_current_visitors()
     
     return {
@@ -331,7 +331,7 @@ async def admin_get_user_memberships(
     active_only: bool = Query(False),
     admin=Depends(get_admin_user)
 ):
-    """Obtener membresías de un usuario (admin)"""
+    """Get membresías de un usuario (admin)"""
     memberships = await membership_service.get_user_memberships(
         user_id=user_id,
         active_only=active_only
@@ -392,7 +392,7 @@ async def admin_check_in(
     registered_by: str = Query(None),
     admin=Depends(get_admin_user)
 ):
-    """Registrar entrada de un usuario (admin)"""
+    """Register entrada de un usuario (admin)"""
     result = await membership_service.check_in(
         user_id=user_id,
         check_in_method="manual",
@@ -411,7 +411,7 @@ async def admin_check_out(
     notes: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Registrar salida de un usuario (admin)"""
+    """Register salida de un usuario (admin)"""
     try:
         visit = await membership_service.check_out(
             user_id=user_id,

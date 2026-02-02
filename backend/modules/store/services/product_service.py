@@ -43,7 +43,7 @@ class ProductService(BaseService):
         return Product(**result)
     
     async def get_product(self, libro_id: str) -> Optional[Product]:
-        """Obtener producto por ID"""
+        """Get producto por ID"""
         result = await self.repository.get_by_id(libro_id)
         return Product(**result) if result else None
     
@@ -55,7 +55,7 @@ class ProductService(BaseService):
         skip: int = 0,
         limit: int = 500
     ) -> List[Product]:
-        """Obtener productos activos"""
+        """Get productos activos"""
         results = await self.repository.get_all_active(
             categoria=categoria,
             grado=grado,
@@ -70,7 +70,7 @@ class ProductService(BaseService):
         categoria: Optional[str] = None,
         limit: int = 10
     ) -> List[Product]:
-        """Obtener productos destacados"""
+        """Get productos destacados"""
         results = await self.repository.get_featured(categoria, limit)
         return [Product(**r) for r in results]
     
@@ -79,7 +79,7 @@ class ProductService(BaseService):
         categoria: Optional[str] = None,
         limit: int = 10
     ) -> List[Product]:
-        """Obtener productos en promoción"""
+        """Get productos en promoción"""
         results = await self.repository.get_promotions(categoria, limit)
         return [Product(**r) for r in results]
     
@@ -88,12 +88,12 @@ class ProductService(BaseService):
         categoria: Optional[str] = None,
         limit: int = 8
     ) -> List[Product]:
-        """Obtener productos más nuevos"""
+        """Get productos más nuevos"""
         results = await self.repository.get_newest(categoria, limit)
         return [Product(**r) for r in results]
     
     async def search_products(self, query: str) -> List[Product]:
-        """Buscar productos"""
+        """Search productos"""
         results = await self.repository.search(query)
         return [Product(**r) for r in results]
     
@@ -127,7 +127,7 @@ class ProductService(BaseService):
         libro_id: str,
         cantidad: int
     ) -> Optional[Product]:
-        """Actualizar inventario del producto"""
+        """Update inventario del producto"""
         success = await self.repository.update_inventory(libro_id, cantidad)
         
         if success:
@@ -169,7 +169,7 @@ class ProductService(BaseService):
         return success
     
     async def get_low_stock_products(self, threshold: int = 10) -> List[Product]:
-        """Obtener productos con bajo stock"""
+        """Get productos con bajo stock"""
         results = await self.repository.get_low_stock(threshold)
         return [Product(**r) for r in results]
     
@@ -178,7 +178,7 @@ class ProductService(BaseService):
         return await self.repository.deactivate(libro_id)
     
     async def get_inventory_stats(self) -> Dict:
-        """Obtener estadísticas de inventario"""
+        """Get estadísticas de inventario"""
         products = await self.repository.get_all_active()
         low_stock = await self.repository.get_low_stock()
         

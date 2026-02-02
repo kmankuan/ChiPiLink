@@ -18,7 +18,7 @@ async def get_posts(
     destacado: Optional[bool] = None,
     limit: int = Query(20, ge=1, le=100)
 ):
-    """Obtener posts publicados"""
+    """Get posts publicados"""
     return await post_service.get_published_posts(
         tipo=tipo,
         destacado=destacado,
@@ -28,7 +28,7 @@ async def get_posts(
 
 @router.get("/{post_id}", response_model=Post)
 async def get_post(post_id: str):
-    """Obtener post por ID (incrementa vistas)"""
+    """Get post por ID (incrementa vistas)"""
     post = await post_service.get_post(post_id, increment_views=True)
     if not post:
         raise HTTPException(status_code=404, detail="Post no encontrado")
@@ -46,7 +46,7 @@ async def like_post(post_id: str):
 
 @router.get("/{post_id}/comments", response_model=List[Comment])
 async def get_post_comments(post_id: str):
-    """Obtener comentarios de un post"""
+    """Get comentarios de un post"""
     return await post_service.get_post_comments(post_id)
 
 
@@ -73,7 +73,7 @@ async def get_all_posts(
     limit: int = Query(100, ge=1, le=500),
     admin: dict = Depends(get_admin_user)
 ):
-    """Obtener todos los posts (admin)"""
+    """Get todos los posts (admin)"""
     return await post_service.get_all_posts(limit=limit)
 
 
@@ -82,7 +82,7 @@ async def create_post(
     data: PostCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nuevo post (admin)"""
+    """Create nuevo post (admin)"""
     return await post_service.create_post(data, creado_por=admin.get("user_id"))
 
 
@@ -92,7 +92,7 @@ async def update_post(
     data: PostUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar post (admin)"""
+    """Update post (admin)"""
     post = await post_service.update_post(post_id, data)
     if not post:
         raise HTTPException(status_code=404, detail="Post no encontrado")
@@ -104,7 +104,7 @@ async def delete_post(
     post_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Eliminar post (admin)"""
+    """Delete post (admin)"""
     success = await post_service.delete_post(post_id)
     if not success:
         raise HTTPException(status_code=404, detail="Post no encontrado")

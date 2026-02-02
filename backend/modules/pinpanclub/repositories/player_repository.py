@@ -22,7 +22,7 @@ class PlayerRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, player_data: Dict) -> Dict:
-        """Crear nuevo jugador"""
+        """Create nuevo jugador"""
         player_data["jugador_id"] = str(uuid.uuid4())
         player_data["elo_rating"] = player_data.get("elo_rating", 1000)
         player_data["partidos_jugados"] = 0
@@ -33,11 +33,11 @@ class PlayerRepository(BaseRepository):
         return await self.insert_one(player_data)
     
     async def get_by_id(self, jugador_id: str) -> Optional[Dict]:
-        """Obtener jugador por ID"""
+        """Get jugador por ID"""
         return await self.find_by_id(self.ID_FIELD, jugador_id)
     
     async def get_all_active(self, skip: int = 0, limit: int = 100) -> List[Dict]:
-        """Obtener todos los jugadores activos"""
+        """Get todos los jugadores activos"""
         return await self.find_many(
             query={"activo": True},
             skip=skip,
@@ -46,7 +46,7 @@ class PlayerRepository(BaseRepository):
         )
     
     async def get_rankings(self, limit: int = 50) -> List[Dict]:
-        """Obtener ranking de jugadores por ELO"""
+        """Get ranking de jugadores por ELO"""
         return await self.find_many(
             query={"activo": True, "partidos_jugados": {"$gt": 0}},
             limit=limit,
@@ -54,7 +54,7 @@ class PlayerRepository(BaseRepository):
         )
     
     async def update_player(self, jugador_id: str, data: Dict) -> bool:
-        """Actualizar datos de jugador"""
+        """Update datos de jugador"""
         return await self.update_by_id(self.ID_FIELD, jugador_id, data)
     
     async def update_stats(
@@ -63,7 +63,7 @@ class PlayerRepository(BaseRepository):
         won: bool,
         elo_change: int
     ) -> bool:
-        """Actualizar estadísticas después de un partido"""
+        """Update estadísticas después de un partido"""
         update = {
             "$inc": {
                 "partidos_jugados": 1,
@@ -80,7 +80,7 @@ class PlayerRepository(BaseRepository):
         return result.modified_count > 0
     
     async def search(self, query: str, limit: int = 20) -> List[Dict]:
-        """Buscar jugadores por nombre o apodo"""
+        """Search jugadores por nombre o apodo"""
         search_filter = {
             "$or": [
                 {"nombre": {"$regex": query, "$options": "i"}},
@@ -96,7 +96,7 @@ class PlayerRepository(BaseRepository):
         return await self.update_player(jugador_id, {"activo": False})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
-        """Obtener jugadores no sincronizados con Monday.com"""
+        """Get jugadores no sincronizados con Monday.com"""
         return await self.find_many(
             query={
                 "activo": True,

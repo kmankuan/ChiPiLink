@@ -61,7 +61,7 @@ async def get_posts(
     limit: int = Query(20, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Obtener posts publicados"""
+    """Get posts publicados"""
     tag_list = tags.split(",") if tags else None
     
     posts = await post_service.get_posts(
@@ -81,7 +81,7 @@ async def get_posts(
 
 @router.get("/{post_id}")
 async def get_post(post_id: str):
-    """Obtener un post específico"""
+    """Get un post específico"""
     post = await post_service.get_post(post_id)
     
     if not post:
@@ -118,7 +118,7 @@ async def admin_get_all_posts(
     offset: int = Query(0, ge=0),
     admin=Depends(get_admin_user)
 ):
-    """Obtener todos los posts (admin)"""
+    """Get todos los posts (admin)"""
     posts = await post_service.get_posts(
         status=status,
         category_id=category_id,
@@ -139,7 +139,7 @@ async def create_post(
     data: CreatePostRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear un nuevo post (admin)"""
+    """Create un nuevo post (admin)"""
     blocks = [b.model_dump() for b in data.content_blocks]
     
     post = await post_service.create_post(
@@ -165,7 +165,7 @@ async def update_post(
     data: UpdatePostRequest,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar un post (admin)"""
+    """Update un post (admin)"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if "content_blocks" in updates:
@@ -205,7 +205,7 @@ async def delete_post(
     post_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Eliminar un post (admin)"""
+    """Delete un post (admin)"""
     success = await post_service.delete_post(post_id)
     
     if not success:
@@ -223,7 +223,7 @@ async def get_media_library(
     offset: int = Query(0, ge=0),
     admin=Depends(get_admin_user)
 ):
-    """Obtener biblioteca de media (admin)"""
+    """Get biblioteca de media (admin)"""
     media = await post_service.get_media_library(
         file_type=file_type,
         uploaded_by=admin["user_id"],
@@ -247,7 +247,7 @@ async def register_media(
     post_id: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Registrar media subido (admin)"""
+    """Register media subido (admin)"""
     media = await post_service.upload_media(
         file_url=file_url,
         file_type=file_type,
@@ -264,7 +264,7 @@ async def register_media(
 
 @router.get("/admin/scheduled")
 async def get_scheduled_posts(admin=Depends(get_admin_user)):
-    """Obtener posts programados (admin)"""
+    """Get posts programados (admin)"""
     posts = await post_service.get_posts(status="scheduled")
     return {
         "success": True,
@@ -275,7 +275,7 @@ async def get_scheduled_posts(admin=Depends(get_admin_user)):
 
 @router.post("/admin/scheduled/process")
 async def process_scheduled_posts(admin=Depends(get_admin_user)):
-    """Procesar posts programados pendientes (admin)"""
+    """Process posts programados pendientes (admin)"""
     result = await post_service.process_scheduled_posts()
     return {"success": True, "result": result}
 

@@ -84,7 +84,7 @@ class PrizeDefinition(BaseModel):
 
 
 class PrizeDefinitionCreate(BaseModel):
-    """Crear definición de premio"""
+    """Create definición de premio"""
     name: str
     description: Optional[str] = None
     type: PrizeType = PrizeType.BADGE

@@ -39,7 +39,7 @@ class PostService:
         scheduled_at: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Crear un nuevo post"""
+        """Create un nuevo post"""
         now = datetime.now(timezone.utc).isoformat()
         
         post = {
@@ -72,7 +72,7 @@ class PostService:
         return post
     
     async def get_post(self, post_id: str) -> Optional[Dict]:
-        """Obtener un post"""
+        """Get un post"""
         post = await db[self.collection_posts].find_one(
             {"post_id": post_id},
             {"_id": 0}
@@ -89,7 +89,7 @@ class PostService:
         offset: int = 0,
         published_only: bool = False
     ) -> List[Dict]:
-        """Obtener posts con filtros"""
+        """Get posts con filtros"""
         query = {}
         
         if status:
@@ -111,7 +111,7 @@ class PostService:
         return await cursor.to_list(length=limit)
     
     async def update_post(self, post_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar un post"""
+        """Update un post"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_posts].find_one_and_update(
@@ -173,7 +173,7 @@ class PostService:
         return post
     
     async def delete_post(self, post_id: str) -> bool:
-        """Eliminar un post (soft delete)"""
+        """Delete un post (soft delete)"""
         result = await db[self.collection_posts].update_one(
             {"post_id": post_id},
             {
@@ -219,7 +219,7 @@ class PostService:
         post_id: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Registrar media subido"""
+        """Register media subido"""
         now = datetime.now(timezone.utc).isoformat()
         
         media = {
@@ -246,7 +246,7 @@ class PostService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Obtener biblioteca de media"""
+        """Get biblioteca de media"""
         query = {}
         if file_type:
             query["file_type"] = file_type
@@ -263,7 +263,7 @@ class PostService:
     # ============== CONTENT BLOCKS ==============
     
     def create_paragraph_block(self, content: str, style: Dict = None) -> Dict:
-        """Crear bloque de párrafo"""
+        """Create bloque de párrafo"""
         return {
             "type": ContentBlockType.PARAGRAPH.value,
             "content": content,
@@ -271,7 +271,7 @@ class PostService:
         }
     
     def create_heading_block(self, content: str, level: int = 1) -> Dict:
-        """Crear bloque de encabezado"""
+        """Create bloque de encabezado"""
         type_map = {
             1: ContentBlockType.HEADING_1.value,
             2: ContentBlockType.HEADING_2.value,
@@ -288,7 +288,7 @@ class PostService:
         caption: Dict[str, str] = None,
         alt: str = None
     ) -> Dict:
-        """Crear bloque de imagen"""
+        """Create bloque de imagen"""
         return {
             "type": ContentBlockType.IMAGE.value,
             "url": url,
@@ -302,7 +302,7 @@ class PostService:
         caption: Dict[str, str] = None,
         thumbnail: str = None
     ) -> Dict:
-        """Crear bloque de video"""
+        """Create bloque de video"""
         return {
             "type": ContentBlockType.VIDEO.value,
             "url": url,
@@ -311,14 +311,14 @@ class PostService:
         }
     
     def create_list_block(self, items: List[str], ordered: bool = False) -> Dict:
-        """Crear bloque de lista"""
+        """Create bloque de lista"""
         return {
             "type": ContentBlockType.NUMBERED_LIST.value if ordered else ContentBlockType.BULLET_LIST.value,
             "items": items
         }
     
     def create_quote_block(self, content: str, author: str = None) -> Dict:
-        """Crear bloque de cita"""
+        """Create bloque de cita"""
         return {
             "type": ContentBlockType.QUOTE.value,
             "content": content,
@@ -331,7 +331,7 @@ class PostService:
         icon: str = "💡",
         style: str = "info"
     ) -> Dict:
-        """Crear bloque de callout"""
+        """Create bloque de callout"""
         return {
             "type": ContentBlockType.CALLOUT.value,
             "content": content,
@@ -345,7 +345,7 @@ class PostService:
         url: str,
         style: str = "primary"
     ) -> Dict:
-        """Crear bloque de botón"""
+        """Create bloque de botón"""
         return {
             "type": ContentBlockType.BUTTON.value,
             "text": text,
@@ -354,7 +354,7 @@ class PostService:
         }
     
     def create_embed_block(self, url: str, provider: str = None) -> Dict:
-        """Crear bloque de embed"""
+        """Create bloque de embed"""
         return {
             "type": ContentBlockType.EMBED.value,
             "url": url,
@@ -362,13 +362,13 @@ class PostService:
         }
     
     def create_divider_block(self) -> Dict:
-        """Crear bloque separador"""
+        """Create bloque separador"""
         return {"type": ContentBlockType.DIVIDER.value}
     
     # ============== SCHEDULED POSTS ==============
     
     async def get_pending_scheduled_posts(self) -> List[Dict]:
-        """Obtener posts programados pendientes de publicar"""
+        """Get posts programados pendientes de publicar"""
         now = datetime.now(timezone.utc).isoformat()
         
         cursor = db[self.collection_posts].find(
@@ -382,7 +382,7 @@ class PostService:
         return await cursor.to_list(length=100)
     
     async def process_scheduled_posts(self) -> Dict:
-        """Procesar posts programados (ejecutar en cron/scheduler)"""
+        """Process posts programados (ejecutar en cron/scheduler)"""
         pending = await self.get_pending_scheduled_posts()
         
         results = {

@@ -54,7 +54,7 @@ class WalletService(BaseService):
         return created
     
     async def get_config(self) -> Dict:
-        """Obtener configuración de ChipiPoints"""
+        """Get configuración de ChipiPoints"""
         config = await db.chipi_wallet_config.find_one(
             {"config_id": "chipipoints_config"},
             {"_id": 0}
@@ -62,7 +62,7 @@ class WalletService(BaseService):
         return config or get_default_points_config()
     
     async def update_config(self, updates: Dict) -> Dict:
-        """Actualizar configuración de ChipiPoints"""
+        """Update configuración de ChipiPoints"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db.chipi_wallet_config.find_one_and_update(
@@ -77,14 +77,14 @@ class WalletService(BaseService):
     # ============== WALLET MANAGEMENT ==============
     
     async def get_wallet(self, user_id: str) -> Optional[Dict]:
-        """Obtener billetera de un usuario"""
+        """Get billetera de un usuario"""
         return await db.chipi_wallets.find_one(
             {"user_id": user_id},
             {"_id": 0}
         )
     
     async def create_wallet(self, user_id: str, profile_id: str = None) -> Dict:
-        """Crear billetera para un usuario"""
+        """Create billetera para un usuario"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -118,7 +118,7 @@ class WalletService(BaseService):
         return wallet
     
     async def get_or_create_wallet(self, user_id: str, profile_id: str = None) -> Dict:
-        """Obtener o crear billetera"""
+        """Get o crear billetera"""
         wallet = await self.get_wallet(user_id)
         if not wallet:
             wallet = await self.create_wallet(user_id, profile_id)
@@ -139,7 +139,7 @@ class WalletService(BaseService):
         related_user_id: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Crear una transacción"""
+        """Create una transacción"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -265,7 +265,7 @@ class WalletService(BaseService):
         transaction_type: str = None,
         currency: str = None
     ) -> List[Dict]:
-        """Obtener transacciones de un usuario"""
+        """Get transacciones de un usuario"""
         query = {"user_id": user_id}
         
         if transaction_type:
@@ -524,7 +524,7 @@ class WalletService(BaseService):
         reference_type: str = None,
         reference_id: str = None
     ) -> Dict:
-        """Crear saldo pendiente para que pague el acudiente"""
+        """Create saldo pendiente para que pague el acudiente"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -576,7 +576,7 @@ class WalletService(BaseService):
         return pending
     
     async def get_pending_balances(self, guardian_user_id: str) -> List[Dict]:
-        """Obtener saldos pendientes de un acudiente"""
+        """Get saldos pendientes de un acudiente"""
         cursor = db.chipi_pending_balances.find(
             {"guardian_user_id": guardian_user_id, "status": "pending"},
             {"_id": 0}

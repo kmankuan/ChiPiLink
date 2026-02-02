@@ -46,7 +46,7 @@ class Follow(BaseModel):
 
 
 class FollowCreate(BaseModel):
-    """Crear seguimiento"""
+    """Create seguimiento"""
     follower_id: str
     following_id: str
 
@@ -83,7 +83,7 @@ class Comment(BaseModel):
 
 
 class CommentCreate(BaseModel):
-    """Crear comentario"""
+    """Create comentario"""
     author_id: str
     target_id: str
     target_type: str = "player"
@@ -91,7 +91,7 @@ class CommentCreate(BaseModel):
 
 
 class CommentUpdate(BaseModel):
-    """Actualizar comentario"""
+    """Update comentario"""
     content: str
 
 
@@ -109,7 +109,7 @@ class Reaction(BaseModel):
 
 
 class ReactionCreate(BaseModel):
-    """Crear reacción"""
+    """Create reacción"""
     user_id: str
     target_id: str
     target_type: str
@@ -148,7 +148,7 @@ class ActivityFeedItem(BaseModel):
 
 
 class ActivityFeedCreate(BaseModel):
-    """Crear actividad en feed"""
+    """Create actividad en feed"""
     jugador_id: str
     activity_type: ActivityType
     data: Dict = {}
@@ -195,7 +195,7 @@ class Notification(BaseModel):
 
 
 class NotificationCreate(BaseModel):
-    """Crear notificación"""
+    """Create notificación"""
     user_id: str
     type: NotificationType
     title: str

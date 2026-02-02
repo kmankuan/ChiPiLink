@@ -21,29 +21,29 @@ class AlbumService(BaseService):
         self.repository = AlbumRepository()
     
     async def get_active_albums(self, limit: int = 50) -> List[Album]:
-        """Obtener álbumes activos"""
+        """Get álbumes activos"""
         results = await self.repository.get_active_albums(limit=limit)
         return [Album(**r) for r in results]
     
     async def get_album(self, album_id: str) -> Optional[Album]:
-        """Obtener álbum por ID"""
+        """Get álbum por ID"""
         result = await self.repository.get_by_id(album_id)
         return Album(**result) if result else None
     
     async def get_all_albums(self, limit: int = 100) -> List[Album]:
-        """Obtener todos los álbumes (admin)"""
+        """Get todos los álbumes (admin)"""
         results = await self.repository.get_all_albums(limit=limit)
         return [Album(**r) for r in results]
     
     async def create_album(self, data: AlbumCreate) -> Album:
-        """Crear nuevo álbum"""
+        """Create nuevo álbum"""
         album_dict = data.model_dump()
         result = await self.repository.create(album_dict)
         self.log_info(f"Album created: {result['album_id']}")
         return Album(**result)
     
     async def update_album(self, album_id: str, data: AlbumUpdate) -> Optional[Album]:
-        """Actualizar álbum"""
+        """Update álbum"""
         update_data = data.model_dump(exclude_unset=True)
         
         if not update_data:
@@ -57,7 +57,7 @@ class AlbumService(BaseService):
         return None
     
     async def delete_album(self, album_id: str) -> bool:
-        """Eliminar álbum"""
+        """Delete álbum"""
         return await self.repository.delete_album(album_id)
 
 

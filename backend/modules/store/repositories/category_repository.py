@@ -33,18 +33,18 @@ class CategoryRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, category_data: Dict) -> Dict:
-        """Crear nueva categoría"""
+        """Create nueva categoría"""
         if not category_data.get("categoria_id"):
             category_data["categoria_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         category_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(category_data)
     
     async def get_by_id(self, categoria_id: str) -> Optional[Dict]:
-        """Obtener categoría por ID"""
+        """Get categoría por ID"""
         return await self.find_by_id(self.ID_FIELD, categoria_id)
     
     async def get_all_active(self) -> List[Dict]:
-        """Obtener todas las categorías activas"""
+        """Get todas las categorías activas"""
         categories = await self.find_many(
             query={"activo": True},
             sort=[("orden", 1)]
@@ -55,7 +55,7 @@ class CategoryRepository(BaseRepository):
         return categories
     
     async def update_category(self, categoria_id: str, data: Dict) -> bool:
-        """Actualizar categoría"""
+        """Update categoría"""
         return await self.update_by_id(self.ID_FIELD, categoria_id, data)
     
     async def deactivate(self, categoria_id: str) -> bool:

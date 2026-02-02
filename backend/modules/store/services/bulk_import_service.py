@@ -528,7 +528,7 @@ class BulkImportService:
         return resultados
     
     async def get_import_history(self, tipo: str = None, limit: int = 20) -> List[Dict]:
-        """Obtener historial de importaciones"""
+        """Get historial de importaciones"""
         query = {}
         if tipo:
             query["tipo"] = tipo
@@ -541,7 +541,7 @@ class BulkImportService:
         return await cursor.to_list(length=limit)
     
     async def get_grados_disponibles(self) -> List[str]:
-        """Obtener lista de grados únicos de estudiantes importados"""
+        """Get lista de grados únicos de estudiantes importados"""
         pipeline = [
             {"$match": {"estado": "activo"}},
             {"$group": {"_id": "$grado"}},
@@ -551,7 +551,7 @@ class BulkImportService:
         return [r["_id"] for r in result if r["_id"]]
     
     def _get_cell(self, row: List[str], index: Optional[int]) -> Optional[str]:
-        """Obtener celda de una fila de forma segura"""
+        """Get celda de una fila de forma segura"""
         if index is None or index < 0:
             return None
         if index >= len(row):

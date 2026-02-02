@@ -152,13 +152,13 @@ class RapidPinService(BaseService):
         self.player_repo = PlayerRepository()
     
     async def get_db(self):
-        """Obtener conexión a la base de datos"""
+        """Get conexión a la base de datos"""
         return get_database()
     
     # ============== SEASON MANAGEMENT ==============
     
     async def create_season(self, data: RapidPinSeasonCreate) -> RapidPinSeason:
-        """Crear nueva temporada Rapid Pin"""
+        """Create nueva temporada Rapid Pin"""
         season_dict = data.model_dump()
         
         # Establecer premios por defecto si no se proporcionan
@@ -189,17 +189,17 @@ class RapidPinService(BaseService):
         return RapidPinSeason(**result)
     
     async def get_season(self, season_id: str) -> Optional[RapidPinSeason]:
-        """Obtener temporada por ID"""
+        """Get temporada por ID"""
         result = await self.season_repo.get_by_id(season_id)
         return RapidPinSeason(**result) if result else None
     
     async def get_active_seasons(self) -> List[RapidPinSeason]:
-        """Obtener temporadas activas"""
+        """Get temporadas activas"""
         results = await self.season_repo.get_active_seasons()
         return [RapidPinSeason(**r) for r in results]
     
     async def get_all_seasons(self) -> List[RapidPinSeason]:
-        """Obtener todas las temporadas"""
+        """Get todas las temporadas"""
         results = await self.season_repo.get_all_seasons()
         return [RapidPinSeason(**r) for r in results]
     
@@ -208,7 +208,7 @@ class RapidPinService(BaseService):
         season_id: str,
         data: RapidPinSeasonUpdate
     ) -> Optional[RapidPinSeason]:
-        """Actualizar temporada"""
+        """Update temporada"""
         update_data = data.model_dump(exclude_unset=True)
         
         # Convertir premios a dict si es necesario
@@ -308,7 +308,7 @@ class RapidPinService(BaseService):
     # ============== MATCH MANAGEMENT ==============
     
     async def register_match(self, data: RapidPinMatchCreate) -> RapidPinMatch:
-        """Registrar un nuevo partido Rapid Pin"""
+        """Register un nuevo partido Rapid Pin"""
         # Validaciones
         season = await self.get_season(data.season_id)
         if not season:
@@ -462,7 +462,7 @@ class RapidPinService(BaseService):
             })
     
     async def get_match(self, match_id: str) -> Optional[RapidPinMatch]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         result = await self.match_repo.get_by_id(match_id)
         return RapidPinMatch(**result) if result else None
     
@@ -472,7 +472,7 @@ class RapidPinService(BaseService):
         estado: Optional[str] = None,
         limit: int = 50
     ) -> List[RapidPinMatch]:
-        """Obtener partidos de una temporada"""
+        """Get partidos de una temporada"""
         results = await self.match_repo.get_season_matches(season_id, estado, limit)
         return [RapidPinMatch(**r) for r in results]
     
@@ -481,19 +481,19 @@ class RapidPinService(BaseService):
         season_id: str,
         user_id: str
     ) -> List[RapidPinMatch]:
-        """Obtener partidos pendientes de confirmación para un usuario"""
+        """Get partidos pendientes de confirmación para un usuario"""
         results = await self.match_repo.get_pending_matches_for_user(season_id, user_id)
         return [RapidPinMatch(**r) for r in results]
     
     async def get_all_pending_confirmations(self, user_id: str) -> List[RapidPinMatch]:
-        """Obtener TODOS los partidos pendientes de confirmación para un usuario (todas las temporadas)"""
+        """Get TODOS los partidos pendientes de confirmación para un usuario (todas las temporadas)"""
         results = await self.match_repo.get_all_pending_matches_for_user(user_id)
         return [RapidPinMatch(**r) for r in results]
     
     # ============== RANKING ==============
     
     async def get_ranking(self, season_id: str) -> RapidPinRankingTable:
-        """Obtener tabla de ranking completa"""
+        """Get tabla de ranking completa"""
         season = await self.get_season(season_id)
         if not season:
             raise ValueError("Temporada no encontrada")
@@ -512,7 +512,7 @@ class RapidPinService(BaseService):
         )
     
     async def get_referee_ranking(self, season_id: str) -> List[RapidPinRankingEntry]:
-        """Obtener ranking de árbitros"""
+        """Get ranking de árbitros"""
         results = await self.ranking_repo.get_referee_ranking(season_id)
         return [RapidPinRankingEntry(**r) for r in results]
     
@@ -521,7 +521,7 @@ class RapidPinService(BaseService):
         season_id: str,
         jugador_id: str
     ) -> Optional[Dict]:
-        """Obtener estadísticas de un jugador en una temporada"""
+        """Get estadísticas de un jugador en una temporada"""
         ranking = await self.ranking_repo.get_player_ranking(season_id, jugador_id)
         if not ranking:
             return None
@@ -817,7 +817,7 @@ class RapidPinService(BaseService):
         status: Optional[str] = None,
         player_id: Optional[str] = None
     ) -> List[Dict]:
-        """Obtener partidos en cola con filtros"""
+        """Get partidos en cola con filtros"""
         db = await self.get_db()
         
         query = {}
@@ -1000,7 +1000,7 @@ class RapidPinService(BaseService):
     # ============== PUBLIC FEED ==============
     
     async def get_public_feed(self) -> Dict:
-        """Obtener feed público de Rapid Pin"""
+        """Get feed público de Rapid Pin"""
         db = await self.get_db()
         
         # Obtener temporada activa
@@ -1322,7 +1322,7 @@ class RapidPinService(BaseService):
     # ============== LIKES & COMMENTS METHODS ==============
     
     async def get_comment_config(self) -> Dict:
-        """Obtener configuración de comentarios"""
+        """Get configuración de comentarios"""
         db = await self.get_db()
         
         config = await db["rapidpin_config"].find_one(
@@ -1348,7 +1348,7 @@ class RapidPinService(BaseService):
         return config
     
     async def update_comment_config(self, updates: Dict) -> Dict:
-        """Actualizar configuración de comentarios (admin)"""
+        """Update configuración de comentarios (admin)"""
         db = await self.get_db()
         
         await db["rapidpin_config"].update_one(
@@ -1418,7 +1418,7 @@ class RapidPinService(BaseService):
         return {"action": action, "likes_count": new_count}
     
     async def check_user_liked(self, queue_id: str, user_id: str) -> bool:
-        """Verificar si un usuario ya dio like"""
+        """Verify si un usuario ya dio like"""
         db = await self.get_db()
         
         existing = await db["rapidpin_reactions"].find_one({
@@ -1521,7 +1521,7 @@ class RapidPinService(BaseService):
         include_hidden: bool = False,
         limit: int = 50
     ) -> List[Dict]:
-        """Obtener comentarios de un reto"""
+        """Get comentarios de un reto"""
         db = await self.get_db()
         
         query = {"queue_id": queue_id, "is_approved": True}
@@ -1593,7 +1593,7 @@ class RapidPinService(BaseService):
         return await db["rapidpin_comments"].find_one({"comment_id": comment_id}, {"_id": 0})
     
     async def get_pending_comments(self, limit: int = 50) -> List[Dict]:
-        """Obtener comentarios pendientes de moderación"""
+        """Get comentarios pendientes de moderación"""
         db = await self.get_db()
         
         cursor = db["rapidpin_comments"].find(

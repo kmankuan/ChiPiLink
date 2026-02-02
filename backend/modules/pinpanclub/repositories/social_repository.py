@@ -28,14 +28,14 @@ class FollowRepository(BaseRepository):
         return await self.find_one({self.ID_FIELD: follow_id})
     
     async def find_follow(self, follower_id: str, following_id: str) -> Optional[Dict]:
-        """Buscar si already exists el seguimiento"""
+        """Search si already exists el seguimiento"""
         return await self.find_one({
             "follower_id": follower_id,
             "following_id": following_id
         })
     
     async def delete_follow(self, follower_id: str, following_id: str) -> bool:
-        """Eliminar seguimiento"""
+        """Delete seguimiento"""
         result = await self._collection.delete_one({
             "follower_id": follower_id,
             "following_id": following_id
@@ -43,7 +43,7 @@ class FollowRepository(BaseRepository):
         return result.deleted_count > 0
     
     async def get_followers(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Obtener seguidores de un jugador"""
+        """Get seguidores de un jugador"""
         return await self.find_many(
             query={"following_id": jugador_id},
             sort=[("created_at", -1)],
@@ -51,7 +51,7 @@ class FollowRepository(BaseRepository):
         )
     
     async def get_following(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Obtener a quiénes sigue un jugador"""
+        """Get a quiénes sigue un jugador"""
         return await self.find_many(
             query={"follower_id": jugador_id},
             sort=[("created_at", -1)],
@@ -168,7 +168,7 @@ class ReactionRepository(BaseRepository):
         return result.deleted_count > 0
     
     async def get_reaction_summary(self, target_id: str, target_type: str) -> Dict:
-        """Obtener resumen de reacciones para un target"""
+        """Get resumen de reacciones para un target"""
         pipeline = [
             {"$match": {"target_id": target_id, "target_type": target_type}},
             {"$group": {
@@ -201,7 +201,7 @@ class ActivityFeedRepository(BaseRepository):
         return await self.insert_one(data)
     
     async def get_player_feed(self, jugador_id: str, limit: int = 20) -> List[Dict]:
-        """Obtener actividad de un jugador"""
+        """Get actividad de un jugador"""
         return await self.find_many(
             query={"jugador_id": jugador_id},
             sort=[("created_at", -1)],
@@ -213,7 +213,7 @@ class ActivityFeedRepository(BaseRepository):
         following_ids: List[str], 
         limit: int = 50
     ) -> List[Dict]:
-        """Obtener feed de jugadores seguidos"""
+        """Get feed de jugadores seguidos"""
         return await self.find_many(
             query={"jugador_id": {"$in": following_ids}},
             sort=[("created_at", -1)],
@@ -273,7 +273,7 @@ class NotificationRepository(BaseRepository):
         return result.modified_count
     
     async def get_unpushed(self, limit: int = 100) -> List[Dict]:
-        """Obtener notificaciones no enviadas por WebSocket"""
+        """Get notificaciones no enviadas por WebSocket"""
         return await self.find_many(
             query={"is_pushed": False},
             sort=[("created_at", 1)],

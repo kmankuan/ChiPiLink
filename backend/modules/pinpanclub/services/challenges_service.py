@@ -41,19 +41,19 @@ class ChallengeService(BaseService):
     # ============== CHALLENGE DEFINITIONS ==============
     
     async def create_challenge(self, data: ChallengeDefinitionCreate) -> ChallengeDefinition:
-        """Crear definición de reto (por admin)"""
+        """Create definición de reto (por admin)"""
         challenge_data = data.model_dump()
         challenge_data["is_automatic"] = False
         result = await self.definition_repo.create(challenge_data)
         return ChallengeDefinition(**result)
     
     async def get_challenge(self, challenge_id: str) -> Optional[ChallengeDefinition]:
-        """Obtener definición de reto"""
+        """Get definición de reto"""
         result = await self.definition_repo.get_by_id(challenge_id)
         return ChallengeDefinition(**result) if result else None
     
     async def get_all_challenges(self) -> List[ChallengeDefinition]:
-        """Obtener todos los retos activos"""
+        """Get todos los retos activos"""
         results = await self.definition_repo.get_active_challenges()
         return [ChallengeDefinition(**r) for r in results]
     
@@ -62,7 +62,7 @@ class ChallengeService(BaseService):
         challenge_id: str, 
         data: Dict
     ) -> Optional[ChallengeDefinition]:
-        """Actualizar definición de reto"""
+        """Update definición de reto"""
         success = await self.definition_repo.update(challenge_id, data)
         if success:
             result = await self.definition_repo.get_by_id(challenge_id)
@@ -76,7 +76,7 @@ class ChallengeService(BaseService):
     # ============== WEEKLY CHALLENGE SETS ==============
     
     async def get_current_week(self) -> Optional[WeeklyChallengeSet]:
-        """Obtener conjunto de retos de la semana actual"""
+        """Get conjunto de retos de la semana actual"""
         result = await self.weekly_repo.get_current_week()
         return WeeklyChallengeSet(**result) if result else None
     
@@ -85,7 +85,7 @@ class ChallengeService(BaseService):
         challenge_ids: List[str] = None,
         auto_generate: bool = True
     ) -> WeeklyChallengeSet:
-        """Crear conjunto de retos para la semana"""
+        """Create conjunto de retos para la semana"""
         now = datetime.now(timezone.utc)
         week_number = now.isocalendar()[1]
         year = now.year
@@ -127,7 +127,7 @@ class ChallengeService(BaseService):
         return WeeklyChallengeSet(**result)
     
     async def get_weekly_challenges(self) -> List[ChallengeDefinition]:
-        """Obtener retos de la semana actual"""
+        """Get retos de la semana actual"""
         week = await self.get_current_week()
         if not week:
             # Crear semana automáticamente
@@ -244,7 +244,7 @@ class ChallengeService(BaseService):
         progress: Dict, 
         challenge: Dict
     ):
-        """Procesar completación de reto"""
+        """Process completación de reto"""
         # Actualizar leaderboard
         player = await self.player_repo.get_by_id(jugador_id)
         lb_entry = await self.leaderboard_repo.get_or_create(
@@ -339,12 +339,12 @@ class ChallengeService(BaseService):
         jugador_id: str,
         status: str = None
     ) -> List[PlayerChallenge]:
-        """Obtener retos de un jugador"""
+        """Get retos de un jugador"""
         results = await self.player_challenge_repo.get_player_challenges(jugador_id, status)
         return [PlayerChallenge(**r) for r in results]
     
     async def get_player_stats(self, jugador_id: str) -> Dict:
-        """Obtener estadísticas de retos del jugador"""
+        """Get estadísticas de retos del jugador"""
         completed = await self.player_challenge_repo.get_completed_count(jugador_id)
         total_points = await self.player_challenge_repo.get_total_points(jugador_id)
         active = await self.player_challenge_repo.get_active_challenges(jugador_id)
@@ -358,7 +358,7 @@ class ChallengeService(BaseService):
     # ============== LEADERBOARD ==============
     
     async def get_leaderboard(self, limit: int = 50) -> ChallengeLeaderboard:
-        """Obtener leaderboard de retos"""
+        """Get leaderboard de retos"""
         await self.leaderboard_repo.recalculate_ranks()
         entries = await self.leaderboard_repo.get_leaderboard(limit)
         
@@ -369,7 +369,7 @@ class ChallengeService(BaseService):
         )
     
     async def get_player_rank(self, jugador_id: str) -> Optional[int]:
-        """Obtener posición de un jugador en el leaderboard"""
+        """Get posición de un jugador en el leaderboard"""
         entry = await self.leaderboard_repo.find_one({"jugador_id": jugador_id})
         return entry.get("rank") if entry else None
 

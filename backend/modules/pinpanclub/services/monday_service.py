@@ -56,12 +56,12 @@ class MondayService(BaseService):
                 await self.sync_player(event.payload["jugador_id"])
     
     async def get_config(self) -> MondayConfig:
-        """Obtener configuración de Monday.com"""
+        """Get configuración de Monday.com"""
         config_dict = await self.config_repository.get_monday_config()
         return MondayConfig(**config_dict)
     
     async def save_config(self, config: MondayConfig) -> bool:
-        """Guardar configuración de Monday.com"""
+        """Save configuración de Monday.com"""
         return await self.config_repository.set_monday_config(config.model_dump())
     
     async def _graphql_request(self, query: str) -> Dict:
@@ -103,7 +103,7 @@ class MondayService(BaseService):
         }
     
     async def get_boards(self) -> List[Dict]:
-        """Obtener lista de boards"""
+        """Get lista de boards"""
         query = '''
         query {
             boards(limit: 50) {
@@ -119,7 +119,7 @@ class MondayService(BaseService):
         return result.get("data", {}).get("boards", [])
     
     async def get_board_items(self, board_id: str) -> List[Dict]:
-        """Obtener items de un board específico (jugadores)"""
+        """Get items de un board específico (jugadores)"""
         query = f'''
         query {{
             boards(ids: [{board_id}]) {{
@@ -170,7 +170,7 @@ class MondayService(BaseService):
         return players
     
     async def get_players_from_monday(self) -> List[Dict]:
-        """Obtener jugadores desde el board configurado de Monday.com"""
+        """Get jugadores desde el board configurado de Monday.com"""
         config = await self.get_config()
         if not config.players_board_id:
             return []
@@ -183,7 +183,7 @@ class MondayService(BaseService):
         item_name: str,
         column_values: Dict
     ) -> Optional[str]:
-        """Crear item en Monday.com"""
+        """Create item en Monday.com"""
         column_values_json = json.dumps(column_values).replace('"', '\\"')
         
         mutation = f'''
@@ -209,7 +209,7 @@ class MondayService(BaseService):
         item_id: str,
         column_values: Dict
     ) -> bool:
-        """Actualizar item en Monday.com"""
+        """Update item en Monday.com"""
         column_values_json = json.dumps(column_values).replace('"', '\\"')
         
         mutation = f'''
@@ -323,7 +323,7 @@ class MondayService(BaseService):
             return monday_id
     
     async def sync_match_result(self, partido_id: str) -> bool:
-        """Actualizar resultado del partido en Monday.com"""
+        """Update resultado del partido en Monday.com"""
         config = await self.get_config()
         if not config.matches_board_id:
             return False

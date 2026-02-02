@@ -117,7 +117,7 @@ class PlayerChallengeRepository(BaseRepository):
         )
     
     async def get_active_challenges(self, jugador_id: str) -> List[Dict]:
-        """Obtener retos activos del jugador"""
+        """Get retos activos del jugador"""
         return await self.find_many(
             query={
                 "jugador_id": jugador_id,
@@ -133,7 +133,7 @@ class PlayerChallengeRepository(BaseRepository):
         })
     
     async def get_total_points(self, jugador_id: str) -> int:
-        """Obtener total de puntos ganados por retos"""
+        """Get total de puntos ganados por retos"""
         pipeline = [
             {"$match": {"jugador_id": jugador_id, "status": "completed"}},
             {"$lookup": {
@@ -174,7 +174,7 @@ class WeeklyChallengeSetRepository(BaseRepository):
         return await self.find_one({self.ID_FIELD: week_id})
     
     async def get_current_week(self) -> Optional[Dict]:
-        """Obtener la semana activa actual"""
+        """Get la semana activa actual"""
         now = datetime.now(timezone.utc).isoformat()
         return await self.find_one({
             "is_active": True,

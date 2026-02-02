@@ -23,7 +23,7 @@ class SuperPinLeagueRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, league_data: Dict) -> Dict:
-        """Crear nueva liga"""
+        """Create nueva liga"""
         league_data["liga_id"] = f"liga_{uuid.uuid4().hex[:12]}"
         league_data["created_at"] = datetime.now(timezone.utc).isoformat()
         league_data["updated_at"] = league_data["created_at"]
@@ -32,18 +32,18 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.insert_one(league_data)
     
     async def get_by_id(self, liga_id: str) -> Optional[Dict]:
-        """Obtener liga por ID"""
+        """Get liga por ID"""
         return await self.find_one({self.ID_FIELD: liga_id})
     
     async def get_active_leagues(self) -> List[Dict]:
-        """Obtener ligas activas"""
+        """Get ligas activas"""
         return await self.find_many(
             query={"estado": "active"},
             sort=[("created_at", -1)]
         )
     
     async def get_all_leagues(self, limit: int = 50) -> List[Dict]:
-        """Obtener todas las ligas"""
+        """Get todas las ligas"""
         return await self.find_many(
             query={},
             limit=limit,
@@ -51,7 +51,7 @@ class SuperPinLeagueRepository(BaseRepository):
         )
     
     async def update_league(self, liga_id: str, data: Dict) -> bool:
-        """Actualizar liga"""
+        """Update liga"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, liga_id, data)
     
@@ -84,21 +84,21 @@ class PlayerCheckInRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, checkin_data: Dict) -> Dict:
-        """Crear nuevo check-in"""
+        """Create nuevo check-in"""
         checkin_data["checkin_id"] = f"checkin_{uuid.uuid4().hex[:12]}"
         checkin_data["check_in_time"] = datetime.now(timezone.utc).isoformat()
         checkin_data["is_active"] = True
         return await self.insert_one(checkin_data)
     
     async def get_active_checkins(self, liga_id: str) -> List[Dict]:
-        """Obtener jugadores actualmente en el club"""
+        """Get jugadores actualmente en el club"""
         return await self.find_many(
             query={"liga_id": liga_id, "is_active": True},
             sort=[("check_in_time", -1)]
         )
     
     async def get_player_checkin(self, liga_id: str, jugador_id: str) -> Optional[Dict]:
-        """Obtener check-in activo de un jugador"""
+        """Get check-in activo de un jugador"""
         return await self.find_one({
             "liga_id": liga_id,
             "jugador_id": jugador_id,
@@ -152,7 +152,7 @@ class SuperPinMatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Crear nuevo partido"""
+        """Create nuevo partido"""
         match_data["partido_id"] = f"spm_{uuid.uuid4().hex[:12]}"
         match_data["created_at"] = datetime.now(timezone.utc).isoformat()
         match_data["updated_at"] = match_data["created_at"]
@@ -160,7 +160,7 @@ class SuperPinMatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         return await self.find_one({self.ID_FIELD: partido_id})
     
     async def get_league_matches(
@@ -169,7 +169,7 @@ class SuperPinMatchRepository(BaseRepository):
         estado: Optional[str] = None,
         limit: int = 50
     ) -> List[Dict]:
-        """Obtener partidos de una liga"""
+        """Get partidos de una liga"""
         query = {"liga_id": liga_id}
         if estado:
             query["estado"] = estado
@@ -186,7 +186,7 @@ class SuperPinMatchRepository(BaseRepository):
         jugador_id: str,
         limit: int = 50
     ) -> List[Dict]:
-        """Obtener partidos de un jugador en una liga"""
+        """Get partidos de un jugador en una liga"""
         return await self.find_many(
             query={
                 "liga_id": liga_id,
@@ -200,7 +200,7 @@ class SuperPinMatchRepository(BaseRepository):
         )
     
     async def update_match(self, partido_id: str, data: Dict) -> bool:
-        """Actualizar partido"""
+        """Update partido"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, partido_id, data)
     
@@ -210,7 +210,7 @@ class SuperPinMatchRepository(BaseRepository):
         jugador_a_id: str,
         jugador_b_id: str
     ) -> List[Dict]:
-        """Obtener historial entre dos jugadores"""
+        """Get historial entre dos jugadores"""
         return await self.find_many(
             query={
                 "liga_id": liga_id,
@@ -241,7 +241,7 @@ class RankingRepository(BaseRepository):
         jugador_id: str,
         jugador_info: Optional[Dict] = None
     ) -> Dict:
-        """Obtener o crear entrada de ranking"""
+        """Get o crear entrada de ranking"""
         existing = await self.find_one({
             "liga_id": liga_id,
             "jugador_id": jugador_id
@@ -274,7 +274,7 @@ class RankingRepository(BaseRepository):
         return await self.insert_one(new_entry)
     
     async def get_league_ranking(self, liga_id: str, limit: int = 100) -> List[Dict]:
-        """Obtener ranking completo de una liga"""
+        """Get ranking completo de una liga"""
         return await self.find_many(
             query={"liga_id": liga_id},
             limit=limit,
@@ -282,14 +282,14 @@ class RankingRepository(BaseRepository):
         )
     
     async def get_player_ranking(self, liga_id: str, jugador_id: str) -> Optional[Dict]:
-        """Obtener posición de un jugador"""
+        """Get posición de un jugador"""
         return await self.find_one({
             "liga_id": liga_id,
             "jugador_id": jugador_id
         })
     
     async def update_ranking(self, ranking_id: str, data: Dict) -> bool:
-        """Actualizar entrada de ranking"""
+        """Update entrada de ranking"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, ranking_id, data)
     
@@ -341,7 +341,7 @@ class SeasonTournamentRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, tournament_data: Dict) -> Dict:
-        """Crear nuevo torneo de temporada"""
+        """Create nuevo torneo de temporada"""
         tournament_data["torneo_id"] = f"torneo_{uuid.uuid4().hex[:12]}"
         tournament_data["created_at"] = datetime.now(timezone.utc).isoformat()
         tournament_data["updated_at"] = tournament_data["created_at"]
@@ -349,18 +349,18 @@ class SeasonTournamentRepository(BaseRepository):
         return await self.insert_one(tournament_data)
     
     async def get_by_id(self, torneo_id: str) -> Optional[Dict]:
-        """Obtener torneo por ID"""
+        """Get torneo por ID"""
         return await self.find_one({self.ID_FIELD: torneo_id})
     
     async def get_league_tournaments(self, liga_id: str) -> List[Dict]:
-        """Obtener torneos de una liga"""
+        """Get torneos de una liga"""
         return await self.find_many(
             query={"liga_id": liga_id},
             sort=[("created_at", -1)]
         )
     
     async def update_tournament(self, torneo_id: str, data: Dict) -> bool:
-        """Actualizar torneo"""
+        """Update torneo"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, torneo_id, data)
 
@@ -377,24 +377,24 @@ class PlayerBadgeRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, badge_data: Dict) -> Dict:
-        """Crear nuevo badge"""
+        """Create nuevo badge"""
         badge_data["badge_id"] = f"badge_{uuid.uuid4().hex[:12]}"
         badge_data["earned_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(badge_data)
     
     async def get_by_id(self, badge_id: str) -> Optional[Dict]:
-        """Obtener badge por ID"""
+        """Get badge por ID"""
         return await self.find_one({self.ID_FIELD: badge_id})
     
     async def get_player_badges(self, jugador_id: str) -> List[Dict]:
-        """Obtener todos los badges de un jugador"""
+        """Get todos los badges de un jugador"""
         return await self.find_many(
             query={"jugador_id": jugador_id},
             sort=[("earned_at", -1)]
         )
     
     async def get_badge_by_type(self, jugador_id: str, badge_type: str, **filters) -> Optional[Dict]:
-        """Verificar si un jugador ya tiene un badge específico"""
+        """Verify si un jugador ya tiene un badge específico"""
         query = {"jugador_id": jugador_id, "badge_type": badge_type}
         query.update(filters)
         return await self.find_one(query)
@@ -404,7 +404,7 @@ class PlayerBadgeRepository(BaseRepository):
         return await self.count({"jugador_id": jugador_id, "badge_type": badge_type})
     
     async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
-        """Obtener badges más recientes (para feed)"""
+        """Get badges más recientes (para feed)"""
         return await self.find_many(
             query={},
             limit=limit,
@@ -412,7 +412,7 @@ class PlayerBadgeRepository(BaseRepository):
         )
     
     async def get_league_badges(self, liga_id: str) -> List[Dict]:
-        """Obtener todos los badges de una liga"""
+        """Get todos los badges de una liga"""
         return await self.find_many(
             query={"liga_id": liga_id},
             sort=[("earned_at", -1)]

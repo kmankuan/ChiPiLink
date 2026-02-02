@@ -22,12 +22,12 @@ class ConfigRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def get_config(self, config_key: str) -> Optional[Dict]:
-        """Obtener configuración por clave"""
+        """Get configuración por clave"""
         doc = await self.find_one({"config_key": config_key})
         return doc.get("value") if doc else None
     
     async def set_config(self, config_key: str, value: Any) -> bool:
-        """Guardar configuración"""
+        """Save configuración"""
         return await self.update_one(
             {"config_key": config_key},
             {"$set": {"config_key": config_key, "value": value}},
@@ -35,7 +35,7 @@ class ConfigRepository(BaseRepository):
         )
     
     async def get_monday_config(self) -> Dict:
-        """Obtener configuración de Monday.com"""
+        """Get configuración de Monday.com"""
         config = await self.get_config("monday_integration")
         return config or {
             "players_board_id": None,
@@ -47,7 +47,7 @@ class ConfigRepository(BaseRepository):
         }
     
     async def set_monday_config(self, config: Dict) -> bool:
-        """Guardar configuración de Monday.com"""
+        """Save configuración de Monday.com"""
         return await self.set_config("monday_integration", config)
 
 
@@ -63,20 +63,20 @@ class LayoutRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, layout_data: Dict) -> Dict:
-        """Crear nuevo layout"""
+        """Create nuevo layout"""
         layout_data["layout_id"] = str(uuid.uuid4())
         return await self.insert_one(layout_data)
     
     async def get_by_id(self, layout_id: str) -> Optional[Dict]:
-        """Obtener layout por ID"""
+        """Get layout por ID"""
         return await self.find_by_id(self.ID_FIELD, layout_id)
     
     async def get_default(self) -> Optional[Dict]:
-        """Obtener layout por defecto"""
+        """Get layout por defecto"""
         return await self.find_one({"is_default": True})
     
     async def update_layout(self, layout_id: str, data: Dict) -> bool:
-        """Actualizar layout"""
+        """Update layout"""
         return await self.update_by_id(self.ID_FIELD, layout_id, data)
     
     async def set_default(self, layout_id: str) -> bool:

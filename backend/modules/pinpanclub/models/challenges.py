@@ -76,7 +76,7 @@ class ChallengeDefinition(BaseModel):
 
 
 class ChallengeDefinitionCreate(BaseModel):
-    """Crear definición de reto"""
+    """Create definición de reto"""
     name: str
     description: str
     type: ChallengeType
@@ -120,7 +120,7 @@ class PlayerChallenge(BaseModel):
 
 
 class PlayerChallengeUpdate(BaseModel):
-    """Actualizar progreso de reto"""
+    """Update progreso de reto"""
     current_value: int
     status: Optional[ChallengeStatus] = None
 

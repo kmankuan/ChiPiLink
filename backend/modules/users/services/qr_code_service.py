@@ -45,7 +45,7 @@ class QRCodeService:
         return qr_data
     
     async def get_or_create_user_qr(self, user_id: str, profile_id: str = None) -> Dict:
-        """Obtener o crear QR code para un usuario"""
+        """Get o crear QR code para un usuario"""
         # Buscar QR existente
         existing = await db[self.collection_qr_codes].find_one(
             {"user_id": user_id, "is_active": True},
@@ -238,7 +238,7 @@ class QRCodeService:
         processed_by: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Procesar una acción desde QR code"""
+        """Process una acción desde QR code"""
         # Validate QR
         scan_result = await self.scan_qr_code(qr_string)
         
@@ -294,7 +294,7 @@ class QRCodeService:
         }
     
     async def _process_checkin(self, user_id: str, processed_by: str = None) -> Dict:
-        """Procesar check-in desde QR"""
+        """Process check-in desde QR"""
         from modules.users.services.membership_service import membership_service
         
         try:
@@ -326,7 +326,7 @@ class QRCodeService:
         description: str = None,
         processed_by: str = None
     ) -> Dict:
-        """Procesar pago en USD desde QR"""
+        """Process pago en USD desde QR"""
         from modules.users.services.wallet_service import wallet_service
         from modules.users.models.wallet_models import Currency, TransactionType
         
@@ -384,7 +384,7 @@ class QRCodeService:
         description: str = None,
         processed_by: str = None
     ) -> Dict:
-        """Procesar pago en ChipiPoints desde QR"""
+        """Process pago en ChipiPoints desde QR"""
         from modules.users.services.wallet_service import wallet_service
         from modules.users.models.wallet_models import Currency, TransactionType
         
@@ -445,7 +445,7 @@ class QRCodeService:
         limit: int = 50,
         offset: int = 0
     ) -> list:
-        """Obtener historial de transacciones QR"""
+        """Get historial de transacciones QR"""
         query = {}
         
         if user_id:
@@ -472,7 +472,7 @@ class QRCodeService:
         description: str,
         expires_minutes: int = 5
     ) -> Dict:
-        """Crear sesión de pago para montos grandes (requiere confirmación)"""
+        """Create sesión de pago para montos grandes (requiere confirmación)"""
         now = datetime.now(timezone.utc)
         expires_at = (now + timedelta(minutes=expires_minutes)).isoformat()
         

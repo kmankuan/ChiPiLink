@@ -138,7 +138,7 @@ class SuperPinLeagueBase(BaseModel):
 
 
 class SuperPinLeagueCreate(SuperPinLeagueBase):
-    """Crear nueva liga"""
+    """Create nueva liga"""
     scoring_config: Optional[ScoringConfig] = None
     checkin_config: Optional[CheckInConfig] = None
     stats_config: Optional[StatsConfig] = None
@@ -147,7 +147,7 @@ class SuperPinLeagueCreate(SuperPinLeagueBase):
 
 
 class SuperPinLeagueUpdate(BaseModel):
-    """Actualizar liga"""
+    """Update liga"""
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
     temporada: Optional[str] = None
@@ -182,7 +182,7 @@ class SuperPinLeague(SuperPinLeagueBase):
 # ============== PLAYER CHECK-IN MODEL ==============
 
 class PlayerCheckInCreate(BaseModel):
-    """Crear check-in de jugador"""
+    """Create check-in de jugador"""
     jugador_id: str
     liga_id: str
     method: CheckInMethod = CheckInMethod.MANUAL
@@ -210,7 +210,7 @@ class PlayerCheckIn(BaseModel):
 # ============== SUPER PIN MATCH MODEL ==============
 
 class SuperPinMatchCreate(BaseModel):
-    """Crear partido Super Pin"""
+    """Create partido Super Pin"""
     liga_id: str
     jugador_a_id: str
     jugador_b_id: str
@@ -334,7 +334,7 @@ class RankingTable(BaseModel):
 # ============== SEASON TOURNAMENT MODEL ==============
 
 class SeasonTournamentCreate(BaseModel):
-    """Crear torneo de temporada"""
+    """Create torneo de temporada"""
     liga_id: str
     nombre: str
     descripcion: Optional[str] = None
@@ -427,7 +427,7 @@ class PlayerBadge(BaseModel):
 
 
 class PlayerBadgeCreate(BaseModel):
-    """Crear badge para jugador"""
+    """Create badge para jugador"""
     jugador_id: str
     badge_type: str
     liga_id: Optional[str] = None

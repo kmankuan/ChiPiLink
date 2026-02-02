@@ -21,30 +21,30 @@ class RapidPinSeasonRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, season_data: Dict) -> Dict:
-        """Crear nueva temporada"""
+        """Create nueva temporada"""
         season_data["season_id"] = f"rps_{uuid.uuid4().hex[:12]}"
         season_data["created_at"] = datetime.now(timezone.utc).isoformat()
         season_data["updated_at"] = season_data["created_at"]
         return await self.insert_one(season_data)
     
     async def get_by_id(self, season_id: str) -> Optional[Dict]:
-        """Obtener temporada por ID"""
+        """Get temporada por ID"""
         return await self.find_one({self.ID_FIELD: season_id})
     
     async def update(self, season_id: str, data: Dict) -> bool:
-        """Actualizar temporada"""
+        """Update temporada"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, season_id, data)
     
     async def get_active_seasons(self) -> List[Dict]:
-        """Obtener temporadas activas"""
+        """Get temporadas activas"""
         return await self.find_many(
             query={"estado": "active"},
             sort=[("fecha_inicio", -1)]
         )
     
     async def get_all_seasons(self) -> List[Dict]:
-        """Obtener todas las temporadas"""
+        """Get todas las temporadas"""
         return await self.find_many(
             query={},
             sort=[("created_at", -1)]
@@ -97,17 +97,17 @@ class RapidPinMatchRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, match_data: Dict) -> Dict:
-        """Crear nuevo partido"""
+        """Create nuevo partido"""
         match_data["match_id"] = f"rpm_{uuid.uuid4().hex[:12]}"
         match_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(match_data)
     
     async def get_by_id(self, match_id: str) -> Optional[Dict]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         return await self.find_one({self.ID_FIELD: match_id})
     
     async def update(self, match_id: str, data: Dict) -> bool:
-        """Actualizar partido"""
+        """Update partido"""
         return await self.update_by_id(self.ID_FIELD, match_id, data)
     
     async def get_season_matches(
@@ -116,7 +116,7 @@ class RapidPinMatchRepository(BaseRepository):
         estado: Optional[str] = None,
         limit: int = 50
     ) -> List[Dict]:
-        """Obtener partidos de una temporada"""
+        """Get partidos de una temporada"""
         query = {"season_id": season_id}
         if estado:
             query["estado"] = estado
@@ -132,7 +132,7 @@ class RapidPinMatchRepository(BaseRepository):
         season_id: str,
         user_id: str
     ) -> List[Dict]:
-        """Obtener partidos pendientes de confirmación donde el usuario participa"""
+        """Get partidos pendientes de confirmación donde el usuario participa"""
         return await self.find_many(
             query={
                 "season_id": season_id,
@@ -148,7 +148,7 @@ class RapidPinMatchRepository(BaseRepository):
         )
     
     async def get_all_pending_matches_for_user(self, user_id: str) -> List[Dict]:
-        """Obtener TODOS los partidos pendientes de confirmación donde el usuario participa (todas las temporadas)"""
+        """Get TODOS los partidos pendientes de confirmación donde el usuario participa (todas las temporadas)"""
         return await self.find_many(
             query={
                 "estado": "pending",
@@ -168,7 +168,7 @@ class RapidPinMatchRepository(BaseRepository):
         jugador_id: str,
         limit: int = 20
     ) -> List[Dict]:
-        """Obtener partidos de un jugador (como jugador o árbitro)"""
+        """Get partidos de un jugador (como jugador o árbitro)"""
         return await self.find_many(
             query={
                 "season_id": season_id,
@@ -222,7 +222,7 @@ class RapidPinRankingRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, ranking_data: Dict) -> Dict:
-        """Crear nueva entrada de ranking"""
+        """Create nueva entrada de ranking"""
         ranking_data["ranking_id"] = f"rpr_{uuid.uuid4().hex[:12]}"
         ranking_data["created_at"] = datetime.now(timezone.utc).isoformat()
         ranking_data["updated_at"] = ranking_data["created_at"]
@@ -234,7 +234,7 @@ class RapidPinRankingRepository(BaseRepository):
         jugador_id: str,
         jugador_info: Dict = None
     ) -> Dict:
-        """Obtener o crear entrada de ranking para un jugador"""
+        """Get o crear entrada de ranking para un jugador"""
         existing = await self.find_one({
             "season_id": season_id,
             "jugador_id": jugador_id
@@ -265,7 +265,7 @@ class RapidPinRankingRepository(BaseRepository):
         season_id: str,
         jugador_id: str
     ) -> Optional[Dict]:
-        """Obtener ranking de un jugador específico"""
+        """Get ranking de un jugador específico"""
         return await self.find_one({
             "season_id": season_id,
             "jugador_id": jugador_id
@@ -276,14 +276,14 @@ class RapidPinRankingRepository(BaseRepository):
         season_id: str,
         sort_by: str = "puntos_totales"
     ) -> List[Dict]:
-        """Obtener ranking completo de una temporada"""
+        """Get ranking completo de una temporada"""
         return await self.find_many(
             query={"season_id": season_id},
             sort=[(sort_by, -1), ("partidos_jugados", -1)]
         )
     
     async def get_referee_ranking(self, season_id: str) -> List[Dict]:
-        """Obtener ranking de árbitros (por partidos arbitrados)"""
+        """Get ranking de árbitros (por partidos arbitrados)"""
         return await self.find_many(
             query={
                 "season_id": season_id,
@@ -298,7 +298,7 @@ class RapidPinRankingRepository(BaseRepository):
         is_winner: bool,
         points: int
     ) -> bool:
-        """Actualizar estadísticas de jugador después de un partido"""
+        """Update estadísticas de jugador después de un partido"""
         inc_data = {
             "puntos_totales": points,
             "puntos_como_jugador": points,
@@ -327,7 +327,7 @@ class RapidPinRankingRepository(BaseRepository):
         ranking_id: str,
         points: int
     ) -> bool:
-        """Actualizar estadísticas de árbitro"""
+        """Update estadísticas de árbitro"""
         result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
             {
@@ -359,7 +359,7 @@ class RapidPinRankingRepository(BaseRepository):
         return True
     
     async def get_season_participants_count(self, season_id: str) -> Dict:
-        """Obtener conteo de participantes únicos"""
+        """Get conteo de participantes únicos"""
         players = await self._collection.count_documents({
             "season_id": season_id,
             "partidos_jugados": {"$gt": 0}

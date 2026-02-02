@@ -17,13 +17,13 @@ async def get_events(
     upcoming: bool = True,
     limit: int = Query(10, ge=1, le=50)
 ):
-    """Obtener eventos"""
+    """Get eventos"""
     return await event_service.get_events(upcoming=upcoming, limit=limit)
 
 
 @router.get("/{evento_id}", response_model=Event)
 async def get_event(evento_id: str):
-    """Obtener evento por ID"""
+    """Get evento por ID"""
     event = await event_service.get_event(evento_id)
     if not event:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
@@ -54,7 +54,7 @@ async def get_all_events(
     limit: int = Query(100, ge=1, le=500),
     admin: dict = Depends(get_admin_user)
 ):
-    """Obtener todos los eventos (admin)"""
+    """Get todos los eventos (admin)"""
     return await event_service.get_all_events(limit=limit)
 
 
@@ -63,7 +63,7 @@ async def create_event(
     data: EventCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nuevo evento (admin)"""
+    """Create nuevo evento (admin)"""
     return await event_service.create_event(data)
 
 
@@ -73,7 +73,7 @@ async def update_event(
     data: EventUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar evento (admin)"""
+    """Update evento (admin)"""
     event = await event_service.update_event(evento_id, data)
     if not event:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
@@ -85,7 +85,7 @@ async def delete_event(
     evento_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Eliminar evento (admin)"""
+    """Delete evento (admin)"""
     success = await event_service.delete_event(evento_id)
     if not success:
         raise HTTPException(status_code=404, detail="Evento no encontrado")

@@ -32,7 +32,7 @@ class RankingSeasonsService(BaseService):
         theme_id: str = None,
         custom_rewards: List[Dict] = None
     ) -> Dict:
-        """Crear una nueva temporada"""
+        """Create una nueva temporada"""
         now = datetime.now(timezone.utc)
         
         # Determinar número de temporada
@@ -80,7 +80,7 @@ class RankingSeasonsService(BaseService):
         return season
     
     async def get_current_season(self) -> Optional[Dict]:
-        """Obtener la temporada activa actual"""
+        """Get la temporada activa actual"""
         season = await db.pinpanclub_ranking_seasons.find_one(
             {"status": SeasonStatus.ACTIVE.value},
             {"_id": 0}
@@ -88,14 +88,14 @@ class RankingSeasonsService(BaseService):
         return season
     
     async def get_season_by_id(self, season_id: str) -> Optional[Dict]:
-        """Obtener una temporada por ID"""
+        """Get una temporada por ID"""
         return await db.pinpanclub_ranking_seasons.find_one(
             {"season_id": season_id},
             {"_id": 0}
         )
     
     async def get_all_seasons(self, limit: int = 20) -> List[Dict]:
-        """Obtener todas las temporadas"""
+        """Get todas las temporadas"""
         cursor = db.pinpanclub_ranking_seasons.find(
             {},
             {"_id": 0}
@@ -104,7 +104,7 @@ class RankingSeasonsService(BaseService):
         return await cursor.to_list(length=limit)
     
     async def get_past_seasons(self, limit: int = 10) -> List[Dict]:
-        """Obtener temporadas pasadas completadas"""
+        """Get temporadas pasadas completadas"""
         cursor = db.pinpanclub_ranking_seasons.find(
             {"status": SeasonStatus.COMPLETED.value},
             {"_id": 0}
@@ -359,7 +359,7 @@ class RankingSeasonsService(BaseService):
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Obtener leaderboard de una temporada"""
+        """Get leaderboard de una temporada"""
         cursor = db.pinpanclub_season_participants.find(
             {"season_id": season_id},
             {"_id": 0}
@@ -378,7 +378,7 @@ class RankingSeasonsService(BaseService):
         jugador_id: str,
         season_id: str = None
     ) -> Optional[Dict]:
-        """Obtener estadísticas de un jugador en una temporada"""
+        """Get estadísticas de un jugador en una temporada"""
         if not season_id:
             season = await self.get_current_season()
             if not season:
@@ -468,7 +468,7 @@ class RankingSeasonsService(BaseService):
     # ============== PLAYER REWARDS ==============
     
     async def get_player_season_rewards(self, jugador_id: str) -> List[Dict]:
-        """Obtener todas las recompensas de temporada de un jugador"""
+        """Get todas las recompensas de temporada de un jugador"""
         cursor = db.pinpanclub_season_rewards.find(
             {"jugador_id": jugador_id},
             {"_id": 0}
@@ -479,7 +479,7 @@ class RankingSeasonsService(BaseService):
     # ============== AUTO-CREATION ==============
     
     async def create_next_monthly_season(self, lang: str = "es") -> Dict:
-        """Crear automáticamente la siguiente temporada mensual"""
+        """Create automáticamente la siguiente temporada mensual"""
         now = datetime.now(timezone.utc)
         
         # Calculatesr fechas del próximo mes

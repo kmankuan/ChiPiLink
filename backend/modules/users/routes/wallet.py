@@ -65,7 +65,7 @@ class UpdateConfigRequest(BaseModel):
 
 @router.get("/me")
 async def get_my_wallet(user=Depends(get_current_user)):
-    """Obtener mi billetera"""
+    """Get mi billetera"""
     wallet = await wallet_service.get_wallet(user["user_id"])
     
     if not wallet:
@@ -80,7 +80,7 @@ async def get_my_wallet(user=Depends(get_current_user)):
 
 @router.get("/summary")
 async def get_wallet_summary(user=Depends(get_current_user)):
-    """Obtener resumen de mi billetera con estadísticas"""
+    """Get resumen de mi billetera con estadísticas"""
     wallet = await wallet_service.get_or_create_wallet(user["user_id"])
     config = await wallet_service.get_config()
     
@@ -123,7 +123,7 @@ async def get_user_wallet(
     user_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Obtener billetera de un usuario (admin)"""
+    """Get billetera de un usuario (admin)"""
     wallet = await wallet_service.get_wallet(user_id)
     
     if not wallet:
@@ -142,7 +142,7 @@ async def get_my_transactions(
     currency: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Obtener mis transacciones"""
+    """Get mis transacciones"""
     transactions = await wallet_service.get_transactions(
         user_id=user["user_id"],
         limit=limit,
@@ -163,7 +163,7 @@ async def get_transaction(
     transaction_id: str,
     user=Depends(get_current_user)
 ):
-    """Obtener detalle de una transacción"""
+    """Get detalle de una transacción"""
     from core.database import db
     
     transaction = await db.chipi_transactions.find_one(
@@ -359,7 +359,7 @@ async def get_points_history(
     offset: int = Query(0, ge=0),
     user=Depends(get_current_user)
 ):
-    """Obtener historial de ChipiPoints"""
+    """Get historial de ChipiPoints"""
     from core.database import db
     
     cursor = db.chipi_points_history.find(
@@ -380,7 +380,7 @@ async def get_points_history(
 
 @router.get("/config")
 async def get_points_config():
-    """Obtener configuración de ChipiPoints"""
+    """Get configuración de ChipiPoints"""
     config = await wallet_service.get_config()
     return {"success": True, "config": config}
 
@@ -390,7 +390,7 @@ async def update_points_config(
     data: UpdateConfigRequest,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar configuración de ChipiPoints (admin)"""
+    """Update configuración de ChipiPoints (admin)"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:
@@ -417,7 +417,7 @@ async def initialize_config(admin=Depends(get_admin_user)):
 
 @router.get("/pending")
 async def get_pending_balances(user=Depends(get_current_user)):
-    """Obtener saldos pendientes de mis dependientes"""
+    """Get saldos pendientes de mis dependientes"""
     balances = await wallet_service.get_pending_balances(user["user_id"])
     
     total = sum(b.get("amount", 0) for b in balances)

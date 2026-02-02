@@ -70,12 +70,12 @@ class MatchService(BaseService):
         return Match(**result)
     
     async def get_match(self, partido_id: str) -> Optional[Match]:
-        """Obtener partido por ID"""
+        """Get partido por ID"""
         result = await self.repository.get_by_id(partido_id)
         return Match(**result) if result else None
     
     async def get_active_matches(self) -> List[Match]:
-        """Obtener partidos activos"""
+        """Get partidos activos"""
         results = await self.repository.get_active_matches()
         return [Match(**r) for r in results]
     
@@ -84,7 +84,7 @@ class MatchService(BaseService):
         estado: MatchState,
         limit: int = 50
     ) -> List[Match]:
-        """Obtener partidos por estado"""
+        """Get partidos por estado"""
         results = await self.repository.get_by_state(estado.value, limit)
         return [Match(**r) for r in results]
     
@@ -260,7 +260,7 @@ class MatchService(BaseService):
     
     # WebSocket management
     def register_websocket(self, partido_id: str, websocket) -> None:
-        """Registrar conexión WebSocket para un partido"""
+        """Register conexión WebSocket para un partido"""
         if partido_id not in self._websocket_connections:
             self._websocket_connections[partido_id] = set()
         self._websocket_connections[partido_id].add(websocket)
@@ -271,7 +271,7 @@ class MatchService(BaseService):
             self._websocket_connections[partido_id].discard(websocket)
     
     async def _broadcast_to_match(self, partido_id: str) -> None:
-        """Enviar actualización a todos los WebSockets de un partido"""
+        """Send actualización a todos los WebSockets de un partido"""
         if partido_id not in self._websocket_connections:
             return
         
@@ -293,7 +293,7 @@ class MatchService(BaseService):
             self._websocket_connections[partido_id].discard(ws)
     
     async def get_stats(self) -> Dict:
-        """Obtener estadísticas de partidos"""
+        """Get estadísticas de partidos"""
         by_state = await self.repository.count_by_state()
         total = sum(by_state.values())
         

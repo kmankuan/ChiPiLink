@@ -22,7 +22,7 @@ class PostRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, post_data: Dict) -> Dict:
-        """Crear nuevo post"""
+        """Create nuevo post"""
         post_data["post_id"] = f"post_{uuid.uuid4().hex[:12]}"
         post_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         post_data["vistas"] = 0
@@ -34,7 +34,7 @@ class PostRepository(BaseRepository):
         return await self.insert_one(post_data)
     
     async def get_by_id(self, post_id: str) -> Optional[Dict]:
-        """Obtener post por ID"""
+        """Get post por ID"""
         return await self.find_one({self.ID_FIELD: post_id})
     
     async def get_published_posts(
@@ -43,7 +43,7 @@ class PostRepository(BaseRepository):
         destacado: Optional[bool] = None,
         limit: int = 20
     ) -> List[Dict]:
-        """Obtener posts publicados"""
+        """Get posts publicados"""
         now = datetime.now(timezone.utc).isoformat()
         query = {
             "publicado": True,
@@ -64,7 +64,7 @@ class PostRepository(BaseRepository):
         )
     
     async def get_all_posts(self, limit: int = 100) -> List[Dict]:
-        """Obtener todos los posts (admin)"""
+        """Get todos los posts (admin)"""
         return await self.find_many(
             query={},
             limit=limit,
@@ -72,7 +72,7 @@ class PostRepository(BaseRepository):
         )
     
     async def update_post(self, post_id: str, data: Dict) -> bool:
-        """Actualizar post"""
+        """Update post"""
         # Si se publica por primera vez, establecer fecha
         if data.get("publicado"):
             existing = await self.get_by_id(post_id)
@@ -98,5 +98,5 @@ class PostRepository(BaseRepository):
         return result.modified_count > 0
     
     async def delete_post(self, post_id: str) -> bool:
-        """Eliminar post"""
+        """Delete post"""
         return await self.delete_by_id(self.ID_FIELD, post_id)

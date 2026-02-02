@@ -70,7 +70,7 @@ class PushNotificationService:
         return config
     
     async def get_config(self) -> Dict:
-        """Obtener configuración"""
+        """Get configuración"""
         if self._config:
             return self._config
         
@@ -86,7 +86,7 @@ class PushNotificationService:
         return config
     
     async def update_config(self, updates: Dict) -> Dict:
-        """Actualizar configuración de proveedores"""
+        """Update configuración de proveedores"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_config].find_one_and_update(
@@ -103,7 +103,7 @@ class PushNotificationService:
         return result
     
     async def update_provider_config(self, provider: str, settings: Dict) -> Dict:
-        """Actualizar configuración de un proveedor específico"""
+        """Update configuración de un proveedor específico"""
         update_key = f"{provider}"
         
         # Merge con configuración existente
@@ -114,7 +114,7 @@ class PushNotificationService:
         return await self.update_config({provider: current})
     
     async def _load_providers(self):
-        """Cargar instancias de proveedores"""
+        """Load instancias de proveedores"""
         config = await self.get_config()
         
         self._providers = {}
@@ -205,7 +205,7 @@ class PushNotificationService:
         return created
     
     async def get_categories(self, active_only: bool = True) -> List[Dict]:
-        """Obtener categorías de notificación"""
+        """Get categorías de notificación"""
         query = {}
         if active_only:
             query["is_active"] = True
@@ -218,14 +218,14 @@ class PushNotificationService:
         return await cursor.to_list(length=100)
     
     async def get_category(self, category_id: str) -> Optional[Dict]:
-        """Obtener una categoría específica"""
+        """Get una categoría específica"""
         return await db[self.collection_categories].find_one(
             {"category_id": category_id},
             {"_id": 0}
         )
     
     async def create_category(self, data: Dict) -> Dict:
-        """Crear nueva categoría"""
+        """Create nueva categoría"""
         if "category_id" not in data:
             data["category_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         
@@ -239,7 +239,7 @@ class PushNotificationService:
         return data
     
     async def update_category(self, category_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar categoría"""
+        """Update categoría"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_categories].find_one_and_update(
@@ -280,7 +280,7 @@ class PushNotificationService:
         return created
     
     async def get_templates(self, category_id: str = None) -> List[Dict]:
-        """Obtener plantillas"""
+        """Get plantillas"""
         query = {"is_active": True}
         if category_id:
             query["category_id"] = category_id
@@ -289,7 +289,7 @@ class PushNotificationService:
         return await cursor.to_list(length=100)
     
     async def get_template(self, template_id: str) -> Optional[Dict]:
-        """Obtener una plantilla"""
+        """Get una plantilla"""
         return await db[self.collection_templates].find_one(
             {"template_id": template_id},
             {"_id": 0}
@@ -298,7 +298,7 @@ class PushNotificationService:
     # ============== USER PREFERENCES ==============
     
     async def get_user_preferences(self, user_id: str) -> Dict:
-        """Obtener preferencias de notificación del usuario"""
+        """Get preferencias de notificación del usuario"""
         prefs = await db[self.collection_user_prefs].find_one(
             {"user_id": user_id},
             {"_id": 0}
@@ -335,7 +335,7 @@ class PushNotificationService:
         return default_prefs
     
     async def update_user_preferences(self, user_id: str, updates: Dict) -> Dict:
-        """Actualizar preferencias del usuario"""
+        """Update preferencias del usuario"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_user_prefs].find_one_and_update(
@@ -357,7 +357,7 @@ class PushNotificationService:
         push: bool = None,
         email: bool = None
     ) -> Dict:
-        """Actualizar preferencia de una categoría específica"""
+        """Update preferencia de una categoría específica"""
         updates = {}
         
         if enabled is not None:
@@ -381,7 +381,7 @@ class PushNotificationService:
         provider: str,
         device_info: Dict = None
     ) -> Dict:
-        """Registrar dispositivo para push"""
+        """Register dispositivo para push"""
         now = datetime.now(timezone.utc).isoformat()
         
         device = {
@@ -406,7 +406,7 @@ class PushNotificationService:
         return device
     
     async def get_user_devices(self, user_id: str, active_only: bool = True) -> List[Dict]:
-        """Obtener dispositivos de un usuario"""
+        """Get dispositivos de un usuario"""
         query = {"user_id": user_id}
         if active_only:
             query["is_active"] = True
@@ -436,7 +436,7 @@ class PushNotificationService:
         template_id: str = None,
         variables: Dict = None
     ) -> Dict:
-        """Enviar notificación a un usuario"""
+        """Send notificación a un usuario"""
         # Verificar preferencias del usuario
         prefs = await self.get_user_preferences(user_id)
         
@@ -568,7 +568,7 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Enviar notificación a múltiples usuarios"""
+        """Send notificación a múltiples usuarios"""
         results = {
             "success": True,
             "total_users": len(user_ids),
@@ -606,7 +606,7 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Enviar notificación a todos los usuarios con dispositivos registrados"""
+        """Send notificación a todos los usuarios con dispositivos registrados"""
         # Obtener todos los usuarios con dispositivos
         pipeline = [
             {"$match": {"is_active": True}},
@@ -637,7 +637,7 @@ class PushNotificationService:
         body: str,
         results: Dict
     ):
-        """Registrar log de notificación"""
+        """Register log de notificación"""
         log = {
             "log_id": f"nlog_{uuid.uuid4().hex[:8]}",
             "user_id": user_id,
@@ -657,7 +657,7 @@ class PushNotificationService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Obtener logs de notificaciones"""
+        """Get logs de notificaciones"""
         query = {}
         if user_id:
             query["user_id"] = user_id

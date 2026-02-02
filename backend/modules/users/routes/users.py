@@ -80,7 +80,7 @@ async def get_user_types(
     active_only: bool = Query(True),
     lang: str = Query("es")
 ):
-    """Obtener todos los tipos de usuario"""
+    """Get todos los tipos de usuario"""
     try:
         types = await user_profile_service.get_user_types(active_only=active_only)
         return {
@@ -94,7 +94,7 @@ async def get_user_types(
 
 @router.get("/types/{type_id}")
 async def get_user_type(type_id: str):
-    """Obtener un tipo de usuario específico"""
+    """Get un tipo de usuario específico"""
     type_data = await user_profile_service.get_user_type(type_id)
     if not type_data:
         raise HTTPException(status_code=404, detail="User type not found")
@@ -106,7 +106,7 @@ async def create_user_type(
     data: CreateUserTypeRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear un nuevo tipo de usuario (admin)"""
+    """Create un nuevo tipo de usuario (admin)"""
     try:
         result = await user_profile_service.create_user_type(data.model_dump())
         return {"success": True, "type": result}
@@ -120,7 +120,7 @@ async def update_user_type(
     updates: dict,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar un tipo de usuario (admin)"""
+    """Update un tipo de usuario (admin)"""
     result = await user_profile_service.update_user_type(type_id, updates)
     if not result:
         raise HTTPException(status_code=404, detail="User type not found")
@@ -142,7 +142,7 @@ async def get_profile_fields(
     section: Optional[str] = None,
     active_only: bool = Query(True)
 ):
-    """Obtener campos de perfil configurados"""
+    """Get campos de perfil configurados"""
     fields = await user_profile_service.get_profile_fields(
         user_type_id=user_type_id,
         section=section,
@@ -156,7 +156,7 @@ async def create_profile_field(
     data: CreateProfileFieldRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear un nuevo campo de perfil (admin)"""
+    """Create un nuevo campo de perfil (admin)"""
     try:
         result = await user_profile_service.create_profile_field(data.model_dump())
         return {"success": True, "field": result}
@@ -170,7 +170,7 @@ async def update_profile_field(
     updates: dict,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar un campo de perfil (admin)"""
+    """Update un campo de perfil (admin)"""
     result = await user_profile_service.update_profile_field(field_id, updates)
     if not result:
         raise HTTPException(status_code=404, detail="Field not found")
@@ -188,7 +188,7 @@ async def initialize_profile_fields(admin=Depends(get_admin_user)):
 
 @router.get("/profile/me")
 async def get_my_profile(user=Depends(get_current_user)):
-    """Obtener mi perfil"""
+    """Get mi perfil"""
     profile = await user_profile_service.get_profile(user["user_id"])
     
     if not profile:
@@ -206,7 +206,7 @@ async def create_profile(
     data: CreateProfileRequest,
     user=Depends(get_current_user)
 ):
-    """Crear mi perfil"""
+    """Create mi perfil"""
     try:
         # Verificar si ya existe
         existing = await user_profile_service.get_profile(user["user_id"])
@@ -247,7 +247,7 @@ async def update_my_profile(
     data: UpdateProfileRequest,
     user=Depends(get_current_user)
 ):
-    """Actualizar mi perfil"""
+    """Update mi perfil"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:
@@ -326,7 +326,7 @@ async def get_language_preference(user=Depends(get_current_user)):
 
 @router.get("/profile/{user_id}")
 async def get_user_profile(user_id: str):
-    """Obtener perfil de un usuario (público)"""
+    """Get perfil de un usuario (público)"""
     profile = await user_profile_service.get_profile(user_id)
     
     if not profile:
@@ -346,7 +346,7 @@ async def search_profiles(
     limit: int = Query(50, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Buscar perfiles"""
+    """Search perfiles"""
     tag_list = tags.split(",") if tags else None
     
     profiles = await user_profile_service.search_profiles(
@@ -364,21 +364,21 @@ async def search_profiles(
 
 @router.get("/relationships")
 async def get_my_relationships(user=Depends(get_current_user)):
-    """Obtener mis relaciones"""
+    """Get mis relaciones"""
     relationships = await user_profile_service.get_user_relationships(user["user_id"])
     return {"success": True, "relationships": relationships, "count": len(relationships)}
 
 
 @router.get("/relationships/dependents")
 async def get_my_dependents(user=Depends(get_current_user)):
-    """Obtener mis dependientes (hijos, etc.)"""
+    """Get mis dependientes (hijos, etc.)"""
     dependents = await user_profile_service.get_dependents(user["user_id"])
     return {"success": True, "dependents": dependents, "count": len(dependents)}
 
 
 @router.get("/relationships/guardian")
 async def get_my_guardian(user=Depends(get_current_user)):
-    """Obtener mi acudiente"""
+    """Get mi acudiente"""
     guardian = await user_profile_service.get_guardian(user["user_id"])
     return {"success": True, "guardian": guardian}
 
@@ -388,7 +388,7 @@ async def create_relationship(
     data: CreateRelationshipRequest,
     user=Depends(get_current_user)
 ):
-    """Crear una relación con otro usuario"""
+    """Create una relación con otro usuario"""
     try:
         rel_type = RelationshipType(data.relationship_type)
     except ValueError:
@@ -420,7 +420,7 @@ async def update_relationship(
     updates: dict,
     user=Depends(get_current_user)
 ):
-    """Actualizar una relación"""
+    """Update una relación"""
     result = await user_profile_service.update_relationship(relationship_id, updates)
     if not result:
         raise HTTPException(status_code=404, detail="Relationship not found")
@@ -447,7 +447,7 @@ async def admin_create_profile(
     data: CreateProfileRequest,
     admin=Depends(get_admin_user)
 ):
-    """Crear perfil para un usuario (admin)"""
+    """Create perfil para un usuario (admin)"""
     try:
         profile = await user_profile_service.create_profile(
             user_id=user_id,
@@ -466,7 +466,7 @@ async def admin_update_profile(
     updates: dict,
     admin=Depends(get_admin_user)
 ):
-    """Actualizar perfil de un usuario (admin)"""
+    """Update perfil de un usuario (admin)"""
     profile = await user_profile_service.update_profile(user_id, updates)
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")

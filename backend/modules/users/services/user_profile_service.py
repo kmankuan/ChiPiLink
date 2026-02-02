@@ -38,7 +38,7 @@ class UserProfileService(BaseService):
         return created
     
     async def get_user_types(self, active_only: bool = True) -> List[Dict]:
-        """Obtener todos los tipos de usuario"""
+        """Get todos los tipos de usuario"""
         query = {}
         if active_only:
             query["$or"] = [{"is_active": True}, {"is_active": {"$exists": False}}]
@@ -46,14 +46,14 @@ class UserProfileService(BaseService):
         return await cursor.to_list(length=50)
     
     async def get_user_type(self, type_id: str) -> Optional[Dict]:
-        """Obtener un tipo de usuario por ID"""
+        """Get un tipo de usuario por ID"""
         return await db.chipi_user_types.find_one(
             {"type_id": type_id},
             {"_id": 0}
         )
     
     async def create_user_type(self, type_data: Dict) -> Dict:
-        """Crear un nuevo tipo de usuario"""
+        """Create un nuevo tipo de usuario"""
         now = datetime.now(timezone.utc).isoformat()
         type_data["created_at"] = now
         type_data["updated_at"] = now
@@ -67,7 +67,7 @@ class UserProfileService(BaseService):
         return type_data
     
     async def update_user_type(self, type_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar un tipo de usuario"""
+        """Update un tipo de usuario"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db.chipi_user_types.find_one_and_update(
@@ -106,7 +106,7 @@ class UserProfileService(BaseService):
         section: Optional[str] = None,
         active_only: bool = True
     ) -> List[Dict]:
-        """Obtener campos de perfil"""
+        """Get campos de perfil"""
         query = {}
         if active_only:
             query["is_active"] = True
@@ -126,7 +126,7 @@ class UserProfileService(BaseService):
         return fields
     
     async def create_profile_field(self, field_data: Dict) -> Dict:
-        """Crear un nuevo campo de perfil"""
+        """Create un nuevo campo de perfil"""
         now = datetime.now(timezone.utc).isoformat()
         field_data["created_at"] = now
         
@@ -139,7 +139,7 @@ class UserProfileService(BaseService):
         return field_data
     
     async def update_profile_field(self, field_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar un campo de perfil"""
+        """Update un campo de perfil"""
         result = await db.chipi_profile_fields.find_one_and_update(
             {"field_id": field_id},
             {"$set": updates},
@@ -152,7 +152,7 @@ class UserProfileService(BaseService):
     # ============== USER PROFILES ==============
     
     async def get_profile(self, user_id: str) -> Optional[Dict]:
-        """Obtener perfil de usuario"""
+        """Get perfil de usuario"""
         profile = await db.chipi_user_profiles.find_one(
             {"user_id": user_id},
             {"_id": 0}
@@ -164,7 +164,7 @@ class UserProfileService(BaseService):
         return profile
     
     async def get_profile_by_id(self, profile_id: str) -> Optional[Dict]:
-        """Obtener perfil por profile_id"""
+        """Get perfil por profile_id"""
         profile = await db.chipi_user_profiles.find_one(
             {"profile_id": profile_id},
             {"_id": 0}
@@ -182,7 +182,7 @@ class UserProfileService(BaseService):
         display_name: Optional[str] = None,
         custom_fields: Dict = None
     ) -> Dict:
-        """Crear perfil para un usuario"""
+        """Create perfil para un usuario"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -207,7 +207,7 @@ class UserProfileService(BaseService):
         return profile
     
     async def update_profile(self, user_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar perfil de usuario"""
+        """Update perfil de usuario"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db.chipi_user_profiles.find_one_and_update(
@@ -224,7 +224,7 @@ class UserProfileService(BaseService):
         return result
     
     async def update_custom_field(self, user_id: str, field_key: str, value: Any) -> bool:
-        """Actualizar un campo personalizado específico"""
+        """Update un campo personalizado específico"""
         result = await db.chipi_user_profiles.update_one(
             {"user_id": user_id},
             {
@@ -244,7 +244,7 @@ class UserProfileService(BaseService):
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Buscar perfiles"""
+        """Search perfiles"""
         filter_query = {"is_active": True}
         
         if user_type_id:
@@ -277,7 +277,7 @@ class UserProfileService(BaseService):
         role_2: Dict[str, str] = None,
         permissions: Dict = None
     ) -> Dict:
-        """Crear relación entre usuarios"""
+        """Create relación entre usuarios"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -314,7 +314,7 @@ class UserProfileService(BaseService):
         return relationship
     
     async def get_user_relationships(self, user_id: str) -> List[Dict]:
-        """Obtener todas las relaciones de un usuario"""
+        """Get todas las relaciones de un usuario"""
         cursor = db.chipi_user_relationships.find(
             {
                 "$or": [
@@ -338,7 +338,7 @@ class UserProfileService(BaseService):
         return relationships
     
     async def get_dependents(self, guardian_user_id: str) -> List[Dict]:
-        """Obtener dependientes de un acudiente"""
+        """Get dependientes de un acudiente"""
         cursor = db.chipi_user_relationships.find(
             {
                 "user_id_1": guardian_user_id,
@@ -364,7 +364,7 @@ class UserProfileService(BaseService):
         return dependents
     
     async def get_guardian(self, dependent_user_id: str) -> Optional[Dict]:
-        """Obtener acudiente de un dependiente"""
+        """Get acudiente de un dependiente"""
         relationship = await db.chipi_user_relationships.find_one(
             {
                 "user_id_2": dependent_user_id,
@@ -387,7 +387,7 @@ class UserProfileService(BaseService):
         return None
     
     async def update_relationship(self, relationship_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar una relación"""
+        """Update una relación"""
         result = await db.chipi_user_relationships.find_one_and_update(
             {"relationship_id": relationship_id},
             {"$set": updates},

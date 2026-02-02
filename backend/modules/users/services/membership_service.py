@@ -162,7 +162,7 @@ class MembershipService:
         active_only: bool = True,
         user_type_id: str = None
     ) -> List[Dict]:
-        """Obtener planes de membresía"""
+        """Get planes de membresía"""
         query = {}
         if active_only:
             query["is_active"] = True
@@ -184,7 +184,7 @@ class MembershipService:
         return plans
     
     async def get_plan(self, plan_id: str) -> Optional[Dict]:
-        """Obtener un plan específico"""
+        """Get un plan específico"""
         plan = await db[self.collection_plans].find_one(
             {"plan_id": plan_id},
             {"_id": 0}
@@ -192,7 +192,7 @@ class MembershipService:
         return plan
     
     async def create_plan(self, plan_data: Dict) -> Dict:
-        """Crear un nuevo plan de membresía"""
+        """Create un nuevo plan de membresía"""
         now = datetime.now(timezone.utc).isoformat()
         
         if "plan_id" not in plan_data:
@@ -209,7 +209,7 @@ class MembershipService:
         return plan_data
     
     async def update_plan(self, plan_id: str, updates: Dict) -> Optional[Dict]:
-        """Actualizar un plan"""
+        """Update un plan"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_plans].find_one_and_update(
@@ -238,7 +238,7 @@ class MembershipService:
     # ============== USER MEMBERSHIPS ==============
     
     async def get_membership(self, membership_id: str) -> Optional[Dict]:
-        """Obtener membresía por ID"""
+        """Get membresía por ID"""
         membership = await db[self.collection_memberships].find_one(
             {"membership_id": membership_id},
             {"_id": 0}
@@ -250,7 +250,7 @@ class MembershipService:
         user_id: str,
         active_only: bool = True
     ) -> List[Dict]:
-        """Obtener membresías de un usuario"""
+        """Get membresías de un usuario"""
         query = {"user_id": user_id}
         
         if active_only:
@@ -271,7 +271,7 @@ class MembershipService:
         return memberships
     
     async def get_active_membership(self, user_id: str) -> Optional[Dict]:
-        """Obtener membresía activa de un usuario"""
+        """Get membresía activa de un usuario"""
         now = datetime.now(timezone.utc).isoformat()
         
         membership = await db[self.collection_memberships].find_one(
@@ -482,7 +482,7 @@ class MembershipService:
     # ============== VISIT TRACKING ==============
     
     async def get_visit_config(self) -> Dict:
-        """Obtener configuración de visitas"""
+        """Get configuración de visitas"""
         config = await db[self.collection_visit_config].find_one(
             {"config_id": "visit_config"},
             {"_id": 0}
@@ -515,7 +515,7 @@ class MembershipService:
         return config
     
     async def update_visit_config(self, updates: Dict) -> Dict:
-        """Actualizar configuración de visitas"""
+        """Update configuración de visitas"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_visit_config].find_one_and_update(
@@ -537,7 +537,7 @@ class MembershipService:
         longitude: float = None,
         registered_by: str = None
     ) -> Dict:
-        """Registrar entrada de un usuario"""
+        """Register entrada de un usuario"""
         now = datetime.now(timezone.utc).isoformat()
         
         # Verificar si ya hay un check-in activo
@@ -584,7 +584,7 @@ class MembershipService:
         visit_id: str = None,
         notes: str = None
     ) -> Dict:
-        """Registrar salida de un usuario"""
+        """Register salida de un usuario"""
         query = {}
         if visit_id:
             query["visit_id"] = visit_id
@@ -656,7 +656,7 @@ class MembershipService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Obtener historial de visitas de un usuario"""
+        """Get historial de visitas de un usuario"""
         cursor = db[self.collection_visits].find(
             {"user_id": user_id},
             {"_id": 0}
@@ -665,7 +665,7 @@ class MembershipService:
         return await cursor.to_list(length=limit)
     
     async def get_current_visitors(self) -> List[Dict]:
-        """Obtener usuarios actualmente en el club"""
+        """Get usuarios actualmente en el club"""
         cursor = db[self.collection_visits].find(
             {"check_out_time": None},
             {"_id": 0}
@@ -674,7 +674,7 @@ class MembershipService:
         return await cursor.to_list(length=100)
     
     async def get_visit_stats(self, user_id: str) -> Dict:
-        """Obtener estadísticas de visitas de un usuario"""
+        """Get estadísticas de visitas de un usuario"""
         # Total de visitas
         total_visits = await db[self.collection_visits].count_documents(
             {"user_id": user_id, "consumed_visit": True}

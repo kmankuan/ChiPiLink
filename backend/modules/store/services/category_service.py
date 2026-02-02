@@ -22,19 +22,19 @@ class CategoryService(BaseService):
         self.product_repository = ProductRepository()
     
     async def create_category(self, data: CategoryCreate) -> Category:
-        """Crear nueva categoría"""
+        """Create nueva categoría"""
         category_dict = data.model_dump()
         result = await self.repository.create(category_dict)
         self.log_info(f"Category created: {result['categoria_id']}")
         return Category(**result)
     
     async def get_category(self, categoria_id: str) -> Optional[Category]:
-        """Obtener categoría por ID"""
+        """Get categoría por ID"""
         result = await self.repository.get_by_id(categoria_id)
         return Category(**result) if result else None
     
     async def get_all_categories(self) -> List[Category]:
-        """Obtener todas las categorías activas"""
+        """Get todas las categorías activas"""
         results = await self.repository.get_all_active()
         return [Category(**r) for r in results]
     
@@ -43,7 +43,7 @@ class CategoryService(BaseService):
         categoria_id: str,
         data: Dict
     ) -> Optional[Category]:
-        """Actualizar categoría"""
+        """Update categoría"""
         # Remove campos nulos
         update_data = {k: v for k, v in data.items() if v is not None}
         
@@ -70,7 +70,7 @@ class CategoryService(BaseService):
         return await self.repository.deactivate(categoria_id)
     
     async def get_category_landing(self, categoria_id: str) -> Dict:
-        """Obtener datos completos para landing de categoría"""
+        """Get datos completos para landing de categoría"""
         category = await self.get_category(categoria_id)
         
         # Obtener productos

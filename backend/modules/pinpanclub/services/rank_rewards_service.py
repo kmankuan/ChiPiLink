@@ -147,14 +147,14 @@ class RankRewardsService(BaseService):
     MODULE_NAME = "pinpanclub"
     
     def get_rank_by_points(self, points: int) -> Dict:
-        """Obtener rango actual basado en puntos"""
+        """Get rango actual basado en puntos"""
         for i in range(len(RANK_DEFINITIONS) - 1, -1, -1):
             if points >= RANK_DEFINITIONS[i]["min_points"]:
                 return {**RANK_DEFINITIONS[i], "index": i}
         return {**RANK_DEFINITIONS[0], "index": 0}
     
     def get_rank_by_id(self, rank_id: str) -> Optional[Dict]:
-        """Obtener definición de rango por ID"""
+        """Get definición de rango por ID"""
         for i, rank in enumerate(RANK_DEFINITIONS):
             if rank["id"] == rank_id:
                 return {**rank, "index": i}
@@ -360,7 +360,7 @@ class RankRewardsService(BaseService):
         }
     
     async def get_player_rank_history(self, jugador_id: str) -> List[Dict]:
-        """Obtener historial de rangos alcanzados por un jugador"""
+        """Get historial de rangos alcanzados por un jugador"""
         cursor = db.pinpanclub_rank_rewards.find(
             {"jugador_id": jugador_id},
             {"_id": 0}
@@ -369,7 +369,7 @@ class RankRewardsService(BaseService):
         return await cursor.to_list(length=20)
     
     async def get_rank_rewards_info(self, lang: str = "es") -> List[Dict]:
-        """Obtener información de recompensas por rango (para mostrar en UI)"""
+        """Get información de recompensas por rango (para mostrar en UI)"""
         result = []
         
         for rank in RANK_DEFINITIONS:

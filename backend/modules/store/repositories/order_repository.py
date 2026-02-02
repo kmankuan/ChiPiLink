@@ -23,7 +23,7 @@ class OrderRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, order_data: Dict) -> Dict:
-        """Crear nuevo pedido"""
+        """Create nuevo pedido"""
         if "pedido_id" not in order_data:
             order_data["pedido_id"] = f"ped_{uuid.uuid4().hex[:12]}"
         order_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
@@ -31,11 +31,11 @@ class OrderRepository(BaseRepository):
         return await self.insert_one(order_data)
     
     async def get_by_id(self, pedido_id: str) -> Optional[Dict]:
-        """Obtener pedido por ID"""
+        """Get pedido por ID"""
         return await self.find_by_id(self.ID_FIELD, pedido_id)
     
     async def get_by_client(self, user_id: str, limit: int = 100) -> List[Dict]:
-        """Obtener pedidos de un cliente"""
+        """Get pedidos de un cliente"""
         return await self.find_many(
             query={"user_id": user_id},
             limit=limit,
@@ -43,7 +43,7 @@ class OrderRepository(BaseRepository):
         )
     
     async def get_by_status(self, estado: str, limit: int = 500) -> List[Dict]:
-        """Obtener pedidos por estado"""
+        """Get pedidos por estado"""
         return await self.find_many(
             query={"estado": estado},
             limit=limit,
@@ -51,7 +51,7 @@ class OrderRepository(BaseRepository):
         )
     
     async def get_all(self, estado: Optional[str] = None, limit: int = 500) -> List[Dict]:
-        """Obtener todos los pedidos"""
+        """Get todos los pedidos"""
         query = {}
         if estado:
             query["estado"] = estado
@@ -62,12 +62,12 @@ class OrderRepository(BaseRepository):
         )
     
     async def update_order(self, pedido_id: str, data: Dict) -> bool:
-        """Actualizar pedido"""
+        """Update pedido"""
         data["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, pedido_id, data)
     
     async def update_status(self, pedido_id: str, estado: str) -> bool:
-        """Actualizar estado del pedido"""
+        """Update estado del pedido"""
         return await self.update_order(pedido_id, {"estado": estado})
     
     async def confirm_payment(self, pedido_id: str) -> bool:
@@ -91,7 +91,7 @@ class OrderRepository(BaseRepository):
         return {r["_id"]: r["count"] for r in results}
     
     async def get_total_sales(self, fecha_inicio: Optional[str] = None) -> float:
-        """Obtener total de ventas"""
+        """Get total de ventas"""
         query = {"pago_confirmado": True}
         if fecha_inicio:
             query["fecha_creacion"] = {"$gte": fecha_inicio}

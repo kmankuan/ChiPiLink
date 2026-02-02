@@ -424,7 +424,7 @@ class DateProposal(BaseModel):
 
 
 class DateProposalCreate(BaseModel):
-    """Crear propuesta de fecha"""
+    """Create propuesta de fecha"""
     proposed_date: str  # ISO format (YYYY-MM-DDTHH:MM)
     message: Optional[str] = None
 
@@ -464,7 +464,7 @@ class ChallengeComment(BaseModel):
 
 
 class ChallengeCommentCreate(BaseModel):
-    """Crear comentario"""
+    """Create comentario"""
     content: str = Field(..., max_length=500)  # Se validará con límite configurable
 
 

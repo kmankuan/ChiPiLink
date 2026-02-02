@@ -38,24 +38,24 @@ class PrizeService(BaseService):
     # ============== PRIZE DEFINITIONS ==============
     
     async def create_prize(self, data: PrizeDefinitionCreate) -> PrizeDefinition:
-        """Crear definición de premio"""
+        """Create definición de premio"""
         # Convertir conditions a lista de dicts
         prize_data = data.model_dump()
         result = await self.definition_repo.create(prize_data)
         return PrizeDefinition(**result)
     
     async def get_prize(self, prize_id: str) -> Optional[PrizeDefinition]:
-        """Obtener definición de premio"""
+        """Get definición de premio"""
         result = await self.definition_repo.get_by_id(prize_id)
         return PrizeDefinition(**result) if result else None
     
     async def get_all_prizes(self) -> List[PrizeDefinition]:
-        """Obtener todos los premios"""
+        """Get todos los premios"""
         results = await self.definition_repo.get_all_prizes()
         return [PrizeDefinition(**r) for r in results]
     
     async def update_prize(self, prize_id: str, data: Dict) -> Optional[PrizeDefinition]:
-        """Actualizar premio"""
+        """Update premio"""
         success = await self.definition_repo.update(prize_id, data)
         if success:
             result = await self.definition_repo.get_by_id(prize_id)
@@ -63,14 +63,14 @@ class PrizeService(BaseService):
         return None
     
     async def get_prizes_by_type(self, prize_type: PrizeType) -> List[PrizeDefinition]:
-        """Obtener premios por tipo"""
+        """Get premios por tipo"""
         results = await self.definition_repo.get_prizes_by_type(prize_type.value)
         return [PrizeDefinition(**r) for r in results]
     
     # ============== PRIZE CATALOG ==============
     
     async def get_or_create_default_catalog(self) -> PrizeCatalog:
-        """Obtener o crear catálogo por defecto"""
+        """Get o crear catálogo por defecto"""
         existing = await self.catalog_repo.get_active_catalog()
         if existing:
             return PrizeCatalog(**existing)
@@ -94,7 +94,7 @@ class PrizeService(BaseService):
         return PrizeCatalog(**result)
     
     async def get_season_catalog(self, season_id: str) -> Optional[PrizeCatalog]:
-        """Obtener catálogo de una temporada"""
+        """Get catálogo de una temporada"""
         result = await self.catalog_repo.get_season_catalog(season_id)
         return PrizeCatalog(**result) if result else None
     
@@ -224,7 +224,7 @@ class PrizeService(BaseService):
         ranking: Dict,
         position: int
     ) -> bool:
-        """Verificar si se cumplen las condiciones de un premio"""
+        """Verify si se cumplen las condiciones de un premio"""
         if not conditions:
             return True
         
@@ -268,12 +268,12 @@ class PrizeService(BaseService):
         jugador_id: str,
         status: str = None
     ) -> List[AwardedPrize]:
-        """Obtener premios de un jugador"""
+        """Get premios de un jugador"""
         results = await self.awarded_repo.get_player_prizes(jugador_id, status)
         return [AwardedPrize(**r) for r in results]
     
     async def get_season_awarded_prizes(self, season_id: str) -> List[AwardedPrize]:
-        """Obtener premios otorgados en una temporada"""
+        """Get premios otorgados en una temporada"""
         results = await self.awarded_repo.get_season_prizes(season_id)
         return [AwardedPrize(**r) for r in results]
     
@@ -282,7 +282,7 @@ class PrizeService(BaseService):
         award_id: str,
         status: PrizeStatus
     ) -> bool:
-        """Actualizar estado de un premio otorgado"""
+        """Update estado de un premio otorgado"""
         return await self.awarded_repo.update_status(award_id, status.value)
     
     async def mark_prize_delivered(self, award_id: str) -> bool:
