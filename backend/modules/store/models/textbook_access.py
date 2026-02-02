@@ -52,7 +52,7 @@ class School(BaseModel):
     school_id: str
     name: str
     short_name: Optional[str] = None
-    catalog_id: Optional[str] = None  # Links to private catalog
+    catalog_id: Optional[str] = None  # Link to private catalog
     is_active: bool = True
 
 

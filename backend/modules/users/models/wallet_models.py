@@ -219,7 +219,7 @@ class Transaction(BaseModel):
     related_user_id: Optional[str] = None       # User relacionado (transferencias)
     related_transaction_id: Optional[str] = None # Transaction relacionada
     
-    # Referencia a compra/servicio
+    # Reference to compra/servicio
     reference_type: Optional[str] = None        # "purchase", "membership", "service"
     reference_id: Optional[str] = None
     
