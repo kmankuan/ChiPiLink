@@ -1,6 +1,6 @@
 """
-ChiPi Users Module - Modelos para sistema de usuarios avanzado
-Sistema altamente configurable con tipos de usuario, perfiles dinámicos y relaciones
+ChiPi Users Module - Models for advanced user system
+Highly configurable system with user types, dynamic profiles, and relationships
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -12,29 +12,29 @@ import uuid
 # ============== ENUMS ==============
 
 class UserTypeCategory(str, Enum):
-    """Categorías base de tipos de usuario"""
-    CUSTOMER = "customer"           # Cliente regular (compra en tienda)
-    MEMBER = "member"               # Miembro del club
-    GUARDIAN = "guardian"           # Acudiente/Padre
-    DEPENDENT = "dependent"         # Dependiente (niño, etc.)
-    STAFF = "staff"                 # Personal del club
-    PARTNER = "partner"             # Socio/Partner
-    SPECIAL = "special"             # Cortesía/Especial
+    """Base categories for user types"""
+    CUSTOMER = "customer"           # Regular customer (shop purchases)
+    MEMBER = "member"               # Club member
+    GUARDIAN = "guardian"           # Guardian/Parent
+    DEPENDENT = "dependent"         # Dependent (child, etc.)
+    STAFF = "staff"                 # Club staff
+    PARTNER = "partner"             # Business partner
+    SPECIAL = "special"             # Courtesy/Special
 
 
 class RelationshipType(str, Enum):
-    """Tipos de relación entre usuarios"""
-    PARENT_CHILD = "parent_child"           # Padre ↔ Hijo
-    GUARDIAN_DEPENDENT = "guardian_dependent"  # Acudiente ↔ Dependiente
-    TUTOR_STUDENT = "tutor_student"         # Tutor ↔ Estudiante
-    SPONSOR_BENEFICIARY = "sponsor_beneficiary"  # Patrocinador ↔ Beneficiario
-    CAREGIVER_WARD = "caregiver_ward"       # Cuidador ↔ A cargo
-    FAMILY = "family"                        # Familia general
-    CUSTOM = "custom"                        # Personalizado
+    """Types of relationships between users"""
+    PARENT_CHILD = "parent_child"           # Parent ↔ Child
+    GUARDIAN_DEPENDENT = "guardian_dependent"  # Guardian ↔ Dependent
+    TUTOR_STUDENT = "tutor_student"         # Tutor ↔ Student
+    SPONSOR_BENEFICIARY = "sponsor_beneficiary"  # Sponsor ↔ Beneficiary
+    CAREGIVER_WARD = "caregiver_ward"       # Caregiver ↔ Ward
+    FAMILY = "family"                        # General family
+    CUSTOM = "custom"                        # Custom
 
 
 class ProfileFieldType(str, Enum):
-    """Tipos de campo para perfiles dinámicos"""
+    """Field types for dynamic profiles"""
     TEXT = "text"
     TEXTAREA = "textarea"
     NUMBER = "number"
@@ -53,60 +53,60 @@ class ProfileFieldType(str, Enum):
 
 
 class MembershipType(str, Enum):
-    """Tipos de membresía"""
-    VISITS = "visits"           # Por visitas (ej: 12 visitas)
-    UNLIMITED = "unlimited"     # Ilimitado por tiempo
-    CREDITS = "credits"         # Por créditos/puntos
-    COURTESY = "courtesy"       # Cortesía/Regalo
-    TRIAL = "trial"             # Prueba
+    """Membership types"""
+    VISITS = "visits"           # By visits (e.g., 12 visits)
+    UNLIMITED = "unlimited"     # Unlimited by time
+    CREDITS = "credits"         # By credits/points
+    COURTESY = "courtesy"       # Courtesy/Gift
+    TRIAL = "trial"             # Trial
 
 
-# ============== CONFIGURACIÓN DE TIPOS DE USUARIO ==============
+# ============== USER TYPE CONFIGURATION ==============
 
 class UserTypeConfig(BaseModel):
-    """Configuración de un tipo de usuario"""
+    """User type configuration"""
     type_id: str = Field(default_factory=lambda: f"utype_{uuid.uuid4().hex[:8]}")
     
-    # Nombres multi-idioma
+    # Multi-language names
     name: Dict[str, str]  # {"es": "Cliente", "en": "Customer", "zh": "客户"}
     description: Dict[str, str] = {}
     
-    # Categoría base
+    # Base category
     category: UserTypeCategory
     
-    # Icono y color para UI
+    # Icon and color for UI
     icon: str = "👤"
-    color: str = "#6366f1"  # Indigo por defecto
+    color: str = "#6366f1"  # Indigo by default
     
-    # Permisos y acceso
-    can_purchase: bool = True              # Puede comprar
-    can_have_wallet: bool = True           # Tiene billetera
-    can_have_membership: bool = False      # Puede tener membresía
-    can_be_guardian: bool = False          # Puede ser acudiente
-    can_have_guardian: bool = False        # Puede tener acudiente
-    can_earn_points: bool = True           # Puede ganar ChipiPoints
-    can_transfer_points: bool = True       # Puede transferir puntos
+    # Permissions and access
+    can_purchase: bool = True              # Can make purchases
+    can_have_wallet: bool = True           # Has wallet
+    can_have_membership: bool = False      # Can have membership
+    can_be_guardian: bool = False          # Can be a guardian
+    can_have_guardian: bool = False        # Can have a guardian
+    can_earn_points: bool = True           # Can earn ChipiPoints
+    can_transfer_points: bool = True       # Can transfer points
     
-    # Módulos accesibles
+    # Accessible modules
     accessible_modules: List[str] = []     # ["store", "pinpanclub", "community", etc.]
     
-    # Campos de perfil requeridos para este tipo
+    # Profile fields required for this type
     required_profile_fields: List[str] = []
     optional_profile_fields: List[str] = []
     
-    # Si los consumos se cargan a otro usuario
+    # If charges are billed to another user
     charges_to_guardian: bool = False
     
-    # Restricciones
+    # Restrictions
     min_age: Optional[int] = None
     max_age: Optional[int] = None
     requires_guardian: bool = False
     
-    # Estado
+    # Status
     is_active: bool = True
-    is_default: bool = False  # Tipo por defecto para nuevos usuarios
+    is_default: bool = False  # Default type for new users
     
-    # Ordenamiento
+    # Sort order
     sort_order: int = 0
     
     # Metadata
@@ -114,16 +114,16 @@ class UserTypeConfig(BaseModel):
     updated_at: Optional[str] = None
 
 
-# ============== CAMPOS DE PERFIL DINÁMICOS ==============
+# ============== DYNAMIC PROFILE FIELDS ==============
 
 class ProfileFieldConfig(BaseModel):
-    """Configuración de un campo de perfil"""
+    """Profile field configuration"""
     field_id: str = Field(default_factory=lambda: f"field_{uuid.uuid4().hex[:8]}")
     
-    # Identificador del campo (snake_case)
-    field_key: str  # Ej: "emergency_contact", "school_name"
+    # Field identifier (snake_case)
+    field_key: str  # E.g., "emergency_contact", "school_name"
     
-    # Nombres multi-idioma
+    # Multi-language names
     label: Dict[str, str]  # {"es": "Contacto de Emergencia", ...}
     placeholder: Dict[str, str] = {}
     help_text: Dict[str, str] = {}
