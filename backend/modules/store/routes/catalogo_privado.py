@@ -43,7 +43,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
             "tiene_acceso": False,
             "estudiantes": [],
             "grados": [],
-            "mensaje": "No tienes estudiantes vinculados. Vincula un estudiante de PCA para acceder al catálogo privado."
+            "mensaje": "No linked students. Link a PCA student to access the private catalog."
         }
     
     return {
@@ -76,25 +76,25 @@ async def get_private_catalog_products(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener productos del catálogo privado.
-    Solo accesible para usuarios con estudiantes PCA vinculados.
+    Get products from the private catalog.
+    Only accessible to users with linked PCA students.
     """
-    # Verify acceso
+    # Verify access
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail=acceso["mensaje"] or "No tienes acceso al catálogo privado"
+            detail=acceso["mensaje"] or "No access to private catalog"
         )
     
-    # Construir query
+    # Build query
     query = {
         "es_catalogo_privado": True,
         "activo": True
     }
     
-    # Filter por grado (si no se especifica, mostrar todos los grados del usuario)
+    # Filter by grade (if not specified, show all user's grades)
     if grado:
         query["$or"] = [
             {"grado": grado},
@@ -115,7 +115,7 @@ async def get_private_catalog_products(
             {"editorial": {"$regex": search, "$options": "i"}}
         ]
     
-    # Get productos
+    # Get products
     productos = await db.libros.find(
         query,
         {"_id": 0}
