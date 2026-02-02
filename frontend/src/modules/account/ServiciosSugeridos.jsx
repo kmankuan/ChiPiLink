@@ -34,7 +34,7 @@ export default function ServiciosSugeridos({ token }) {
   const loadServicios = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/servicios-sugeridos`, {
+      const res = await fetch(`${API}/api/connections/suggested-services`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
