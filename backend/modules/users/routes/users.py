@@ -1,5 +1,5 @@
 """
-Users API Routes - Gestión de perfiles de usuario
+Users API Routes - User profile management
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
