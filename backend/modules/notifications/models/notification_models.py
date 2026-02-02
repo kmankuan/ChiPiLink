@@ -61,7 +61,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "二维码支付"
             },
             "description": {
-                "es": "Confirmación de pagos y cobros via QR",
+                "es": "Confirmation de pagos y cobros via QR",
                 "en": "QR payment and charge confirmations",
                 "zh": "二维码支付和收费确认"
             },

@@ -137,7 +137,7 @@ async def get_document_categories():
         # Default categories
         categories = [
             {"category_id": "general", "nombre": "General", "icono": "📄", "orden": 1},
-            {"category_id": "guias", "nombre": "Guías y Tutoriales", "icono": "📖", "orden": 2},
+            {"category_id": "guias", "nombre": "Guides y Tutoriales", "icono": "📖", "orden": 2},
             {"category_id": "politicas", "nombre": "Policies y Procedimientos", "icono": "📋", "orden": 3},
             {"category_id": "recursos", "nombre": "Recursos", "icono": "📦", "orden": 4},
         ]
@@ -162,7 +162,7 @@ async def get_integration_info():
             "api": {
                 "description": "Sincronizar documentos via API",
                 "required": ["api_url", "api_key"],
-                "features": ["Lista de documentos", "Búsqueda", "Organization personalizada"]
+                "features": ["Lista de documentos", "Search", "Organization personalizada"]
             }
         },
         "setup_steps": [

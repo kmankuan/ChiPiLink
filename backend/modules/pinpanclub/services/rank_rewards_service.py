@@ -321,7 +321,7 @@ class RankRewardsService(BaseService):
             
             # Feed activity
             activity_desc = {
-                "es": f"Ascendió al rango {rank_name}",
+                "es": f"Ascended al rango {rank_name}",
                 "en": f"Promoted to {rank_name} rank",
                 "zh": f"晋升到{rank_name}级别"
             }.get(lang)

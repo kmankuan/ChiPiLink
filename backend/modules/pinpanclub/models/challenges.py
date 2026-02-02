@@ -13,7 +13,7 @@ class ChallengeDifficulty(str, Enum):
     """Dificultad dthe challenge"""
     EASY = "easy"           # Easy
     MEDIUM = "medium"       # Medio
-    HARD = "hard"           # Difícil
+    HARD = "hard"           # Difficult
     EXTREME = "extreme"     # Extremo
 
 
@@ -67,7 +67,7 @@ class ChallengeDefinition(BaseModel):
     # Vigencia
     valid_from: Optional[str] = None
     valid_until: Optional[str] = None
-    duration_days: int = 7  # Duración by default: 1 semana
+    duration_days: int = 7  # Duration by default: 1 semana
     
     # Metadata
     created_by: Optional[str] = None  # Admin que lo created (si es manual)

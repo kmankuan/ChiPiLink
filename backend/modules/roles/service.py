@@ -134,7 +134,7 @@ class RolesService:
             {
                 "role_id": DefaultRoles.ADMIN.value,
                 "nombre": "Administrador",
-                "descripcion": "Gestión completa de la plataforma",
+                "descripcion": "Management completa de la plataforma",
                 "color": "#ea580c",
                 "icono": "ShieldCheck",
                 "es_sistema": True,

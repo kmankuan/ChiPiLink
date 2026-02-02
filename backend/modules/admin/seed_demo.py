@@ -94,7 +94,7 @@ DEMO_ACHIEVEMENTS = [
     },
     {
         "achievement_id": "ach_10_wins",
-        "name_es": "Decálogo",
+        "name_es": "Decalogue",
         "name_en": "Decalogue",
         "description_es": "Acumula 10 victorias",
         "description_en": "Accumulate 10 wins",

@@ -298,7 +298,7 @@ class WalletService(BaseService):
             currency=currency,
             amount=amount,
             payment_method=payment_method,
-            description=description or f"Depósito de {amount} {currency.value}",
+            description=description or f"Deposit de {amount} {currency.value}",
             metadata={"payment_reference": reference}
         )
         

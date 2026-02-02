@@ -315,7 +315,7 @@ async def sync_with_monday(admin: dict = Depends(get_admin_user)):
     
     return {
         "success": False,
-        "message": "Synchronization con Monday.com - Placeholder. Implementación pendiente.",
+        "message": "Synchronization con Monday.com - Placeholder. Implementation pendiente.",
         "steps": [
             "1. Configurar monday_board_id en Task Supervisor config",
             "2. Obtener items del board via Monday.com API",

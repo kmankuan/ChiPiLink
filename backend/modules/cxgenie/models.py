@@ -29,7 +29,7 @@ class CXGenieConfig(BaseModel):
 
 
 class ChatConversation(BaseModel):
-    """Conversación de chat (cache local)"""
+    """Conversation de chat (cache local)"""
     model_config = ConfigDict(extra="ignore")
     conversation_id: str = Field(default_factory=lambda: f"conv_{uuid.uuid4().hex[:12]}")
     cxgenie_conversation_id: Optional[str] = None  # ID en CXGenie

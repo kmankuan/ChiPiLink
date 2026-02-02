@@ -86,8 +86,8 @@ BLOCK_TEMPLATES = {
             "subtitulo": "",
             "items": [
                 {"icono": "shield", "titulo": "Seguro", "descripcion": "Compras 100% seguras"},
-                {"icono": "truck", "titulo": "Envío Fast", "descripcion": "Entrega en 24-48h"},
-                {"icono": "headphones", "titulo": "Soporte", "descripcion": "Atención personalizada"}
+                {"icono": "truck", "titulo": "Shipping Fast", "descripcion": "Entrega en 24-48h"},
+                {"icono": "headphones", "titulo": "Soporte", "descripcion": "Attention personalizada"}
             ],
             "columnas": 3
         }
@@ -115,7 +115,7 @@ BLOCK_TEMPLATES = {
     },
     "cta": {
         "nombre": "Llamada a la Action",
-        "descripcion": "Botón destacado con mensaje",
+        "descripcion": "Button destacado con mensaje",
         "config_default": {
             "titulo": "¿Listo para comenzar?",
             "subtitulo": "Join a miles de clientes satisfechos",

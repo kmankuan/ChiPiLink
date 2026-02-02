@@ -73,7 +73,7 @@ class SupervisedTask(BaseModel):
     instrucciones_voz: Optional[str] = None  # Text for TTS
     icono: Optional[str] = None
     color: Optional[str] = None
-    # Asignación
+    # Assignment
     asignado_a: Optional[str] = None  # person_id
     asignado_nombre: Optional[str] = None
     # Tiempo

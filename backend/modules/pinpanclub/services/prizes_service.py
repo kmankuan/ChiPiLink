@@ -168,7 +168,7 @@ class PrizeService(BaseService):
                 "prize_type": prize.get("type"),
                 "position": position
             },
-            description=f"Ganó the prize '{prize.get('name')}'"
+            description=f"Won the prize '{prize.get('name')}'"
         ))
         
         self.log_info(f"Prize awarded: {prize.get('name')} to {jugador_id}")
@@ -183,7 +183,7 @@ class PrizeService(BaseService):
     ) -> List[AwardedPrize]:
         """
         Otorgar premios automaticmente al cerrar una temporada.
-        Evalúa las conditions de cada premio.
+        Evaluate las conditions de cada premio.
         """
         awarded = []
         

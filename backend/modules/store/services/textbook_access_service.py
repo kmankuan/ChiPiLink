@@ -501,7 +501,7 @@ class TextbookAccessService(BaseService):
             
             notification = {
                 "type": "textbook_access_status",
-                "title": "Actualización de request de textos",
+                "title": "Update de request de textos",
                 "message": f"Tu request para {student['full_name']} ha sido {status_messages.get(status, status.value)}",
                 "data": {
                     "student_id": student["student_id"],

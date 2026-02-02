@@ -285,7 +285,7 @@ class ChallengeService(BaseService):
                 "challenge_icon": challenge.get("icon"),
                 "points": challenge.get("points_reward", 0)
             },
-            description=f"Completó the challenge '{challenge.get('name')}'"
+            description=f"Completed the challenge '{challenge.get('name')}'"
         ))
         
         self.log_info(f"Challenge completed: {jugador_id} - {challenge.get('name')}")

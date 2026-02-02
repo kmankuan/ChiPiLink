@@ -18,7 +18,7 @@ class DefaultRoles(str, Enum):
 
 # System permissions organized by module
 AVAILABLE_PERMISSIONS = {
-    # Administración general
+    # Administration general
     "admin": {
         "access": "Acceder al panel de administration",
         "dashboard": "Ver dashboard de administration",

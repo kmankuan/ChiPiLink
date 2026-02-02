@@ -49,7 +49,7 @@ class ConexionesService:
         
         logger.info("Configuraciones by default inicializadas")
     
-    # ============== GESTIÓN DE CONEXIONES ==============
+    # ============== MANAGEMENT DE CONEXIONES ==============
     
     async def get_connections(self, user_id: str) -> List[Dict]:
         """Get all user connections"""
@@ -335,7 +335,7 @@ class ConexionesService:
             "primo": "Primo/a",
             "amigo": "Amigo",
             "conocido": "Conocido",
-            "companero": "Compañero",
+            "companero": "Partner",
             "otro": "Otro"
         }
         return labels.get(subtipo, subtipo)
@@ -992,7 +992,7 @@ class ConexionesService:
         
         return {"success": True}
     
-    # ============== BÚSQUEDA ==============
+    # ============== SEARCH ==============
     
     async def buscar_usuarios(
         self,

@@ -59,7 +59,7 @@ class VocabularyItem(BaseModel):
     # Contenido
     palabra: str  # Palabra en idioma objetivo
     traduccion: str  # Translation
-    pronunciacion_fonetica: Optional[str] = None  # Guía fonética
+    pronunciacion_fonetica: Optional[str] = None  # Guide fonética
     audio_url: Optional[str] = None  # Audio de pronunciation correcta
     imagen_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None

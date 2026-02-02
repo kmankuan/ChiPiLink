@@ -62,7 +62,7 @@ class PlayerAchievement(BaseModel):
     achievement_info: Optional[Dict] = None
     jugador_info: Optional[Dict] = None
     
-    # Cuándo se obtuvo
+    # When se obtuvo
     earned_at: Optional[Any] = None
     
     # If the logro tiene niveles (bronce, plata, oro)
@@ -185,7 +185,7 @@ def get_challenge_achievements() -> List[Dict]:
             "points_reward": 100
         },
         {
-            "name": "Intrépido",
+            "name": "Intrepid",
             "description": "Completa 3 retos extremos",
             "type": "difficulty_master",
             "rarity": "epic",

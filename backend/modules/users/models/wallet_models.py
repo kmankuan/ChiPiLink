@@ -99,7 +99,7 @@ class ChipiPointsConfig(BaseModel):
     
     # Expiration
     points_expire: bool = False
-    expiration_days: Optional[int] = None  # Días hasta vencimiento
+    expiration_days: Optional[int] = None  # Days hasta vencimiento
     
     # Limits
     max_points_per_transaction: Optional[int] = None

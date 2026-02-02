@@ -45,7 +45,7 @@ class SponsorCreate(BaseModel):
     website_url: Optional[str] = None
     descripcion: Optional[str] = None
     
-    # Diseño y estilo
+    # Design y estilo
     color_fondo: str = Field(default="#000000")
     color_texto: str = Field(default="#FFFFFF")
     color_acento: Optional[str] = None
@@ -53,7 +53,7 @@ class SponsorCreate(BaseModel):
     borde: Optional[str] = None  # "border-2 border-white"
     sombra: bool = False
     
-    # Animación
+    # Animation
     animacion: DisplayAnimation = Field(default=DisplayAnimation.NONE)
     duracion_animacion: int = Field(default=1000, description="ms")
     

@@ -159,7 +159,7 @@ class SolicitudCreate(BaseModel):
     mensaje: Optional[str] = None
 
 
-# ============== MODELOS DE INVITACIÓN ==============
+# ============== MODELOS DE INVITATION ==============
 
 class Invitacion(BaseModel):
     """Invitation a usuario no registrado"""
