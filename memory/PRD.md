@@ -132,11 +132,17 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## Remaining Work
 
-### P0 - Spanish Code Comments Translation (Partial Progress)
-Many backend files still contain Spanish comments. Key files needing translation:
-- `/app/backend/modules/pinpanclub/*` - PinPan Club services and models
-- `/app/backend/modules/users/*` - User services and models
-- `/app/backend/modules/store/*` - Store services and models
+### P0 - Spanish Code Comments Translation (Significant Progress)
+**Completed in this session:**
+- `/app/backend/modules/users/models/user_models.py` - 100+ comments translated ✅
+- `/app/backend/modules/users/models/wallet_models.py` - 30+ comments translated ✅
+- `/app/backend/modules/users/models/conexiones_models.py` - 40+ comments translated ✅
+- `/app/backend/modules/pinpanclub/models/rapidpin.py` - 50+ comments translated ✅
+
+**Still needs translation:**
+- `/app/backend/modules/pinpanclub/routes/*` - Route handlers
+- `/app/backend/modules/store/*` - Store services
+- Some frontend files with Spanish comments
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
