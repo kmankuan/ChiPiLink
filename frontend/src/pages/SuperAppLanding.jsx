@@ -164,7 +164,7 @@ const HeroCarousel = ({ posts }) => {
           onClick={() => navigate(`/comunidad/post/${currentPost.post_id}`)}
           className="gap-2"
         >
-          Leer más <ChevronRight className="h-4 w-4" />
+          {t('common.readMore')} <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
