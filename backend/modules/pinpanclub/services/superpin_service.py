@@ -1,6 +1,6 @@
 """
 Super Pin Ranking - Service Layer
-Lógica de negocio para el sistema de ranking
+Business logic for the ranking system
 """
 import math
 from typing import List, Optional, Dict, Any
@@ -30,7 +30,7 @@ from ..models.superpin import (
 
 class SuperPinService(BaseService):
     """
-    Servicio principal para Super Pin Ranking.
+    Main service for Super Pin Ranking.
     """
     
     MODULE_NAME = "pinpanclub"
@@ -48,10 +48,10 @@ class SuperPinService(BaseService):
     # ============== LEAGUE MANAGEMENT ==============
     
     async def create_league(self, data: SuperPinLeagueCreate) -> SuperPinLeague:
-        """Crear nueva liga Super Pin"""
+        """Create new Super Pin league"""
         league_dict = data.model_dump()
         
-        # Establecer configuraciones por defecto si no se proporcionan
+        # Set default configurations if not provided
         if not league_dict.get("scoring_config"):
             league_dict["scoring_config"] = {}
         if not league_dict.get("checkin_config"):
