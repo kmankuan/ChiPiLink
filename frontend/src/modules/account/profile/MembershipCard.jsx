@@ -1,5 +1,5 @@
 /**
- * Membership Card Component - Tarjeta de membresía con pases de visita
+ * Membership Card Component - Displays membership passes and visits
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -107,15 +107,15 @@ export default function MembershipCard({ token, walletBalance }) {
       if (res.ok) {
         setCheckedIn(true);
         setCurrentVisitDuration(0);
-        toast.success(txt.checkInSuccess || 'Check-in registrado');
+        toast.success(t('membershipCard.checkInSuccess'));
         fetchData();
       } else {
         const error = await res.json();
-        toast.error(error.detail || 'Error al registrar entrada');
+        toast.error(error.detail || t('membershipCard.errorCheckIn'));
       }
     } catch (error) {
       console.error('Error checking in:', error);
-      toast.error('Error al registrar entrada');
+      toast.error(t('membershipCard.errorCheckIn'));
     }
   };
 
@@ -132,15 +132,15 @@ export default function MembershipCard({ token, walletBalance }) {
       if (res.ok) {
         setCheckedIn(false);
         setCurrentVisitDuration(0);
-        toast.success(txt.checkOutSuccess || 'Check-out registrado');
+        toast.success(t('membershipCard.checkOutSuccess'));
         fetchData();
       } else {
         const error = await res.json();
-        toast.error(error.detail || 'Error al registrar salida');
+        toast.error(error.detail || t('membershipCard.errorCheckOut'));
       }
     } catch (error) {
       console.error('Error checking out:', error);
-      toast.error('Error al registrar salida');
+      toast.error(t('membershipCard.errorCheckOut'));
     }
   };
 
@@ -160,17 +160,17 @@ export default function MembershipCard({ token, walletBalance }) {
       });
 
       if (res.ok) {
-        toast.success(txt.purchaseSuccess || 'Membresía adquirida');
+        toast.success(t('membershipCard.purchaseSuccess'));
         setIsPlansOpen(false);
         setSelectedPlan(null);
         fetchData();
       } else {
         const error = await res.json();
-        toast.error(error.detail || 'Error al comprar membresía');
+        toast.error(error.detail || t('membershipCard.errorPurchase'));
       }
     } catch (error) {
       console.error('Error purchasing membership:', error);
-      toast.error('Error al comprar membresía');
+      toast.error(t('membershipCard.errorPurchase'));
     } finally {
       setPurchasing(false);
     }
@@ -188,7 +188,6 @@ export default function MembershipCard({ token, walletBalance }) {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    // Use proper locale codes to avoid RangeError with invalid language tags
     const locale = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
     return new Date(dateStr).toLocaleDateString(locale, { 
       month: 'short', 
@@ -199,141 +198,12 @@ export default function MembershipCard({ token, walletBalance }) {
 
   const formatTime = (dateStr) => {
     if (!dateStr) return '';
-    // Use proper locale codes to avoid RangeError with invalid language tags
     const locale = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
     return new Date(dateStr).toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit'
     });
   };
-
-  const texts = {
-    es: {
-      title: 'Mi Membresía',
-      subtitle: 'Gestiona tus pases y visitas',
-      noMembership: 'Sin membresía activa',
-      getMembership: 'Obtener Membresía',
-      visitsRemaining: 'Visitas restantes',
-      validUntil: 'Válido hasta',
-      checkIn: 'Registrar Entrada',
-      checkOut: 'Registrar Salida',
-      currentlyIn: 'Actualmente en el club',
-      recentVisits: 'Visitas Recientes',
-      statistics: 'Estadísticas',
-      totalVisits: 'Total de visitas',
-      thisMonth: 'Este mes',
-      avgDuration: 'Duración promedio',
-      minutes: 'min',
-      selectPlan: 'Seleccionar Plan',
-      availablePlans: 'Planes Disponibles',
-      featured: 'Destacado',
-      bonus: 'Bonus',
-      points: 'puntos',
-      perVisit: 'por visita',
-      unlimited: 'Ilimitado',
-      trial: 'Prueba',
-      buy: 'Comprar',
-      payWithPoints: 'Pagar con ChipiPoints',
-      payWithCash: 'Pagar en efectivo/tarjeta',
-      youHave: 'Tienes',
-      notEnoughPoints: 'Puntos insuficientes',
-      confirm: 'Confirmar Compra',
-      cancel: 'Cancelar',
-      checkInSuccess: 'Entrada registrada',
-      checkOutSuccess: 'Salida registrada',
-      purchaseSuccess: 'Membresía adquirida con éxito',
-      duration: 'Duración',
-      daysValid: 'días de validez',
-      noVisits: 'Sin visitas registradas',
-      visitHistory: 'Historial de Visitas',
-      viewAll: 'Ver todo',
-      timeInClub: 'Tiempo en el club'
-    },
-    en: {
-      title: 'My Membership',
-      subtitle: 'Manage your passes and visits',
-      noMembership: 'No active membership',
-      getMembership: 'Get Membership',
-      visitsRemaining: 'Visits remaining',
-      validUntil: 'Valid until',
-      checkIn: 'Check In',
-      checkOut: 'Check Out',
-      currentlyIn: 'Currently at the club',
-      recentVisits: 'Recent Visits',
-      statistics: 'Statistics',
-      totalVisits: 'Total visits',
-      thisMonth: 'This month',
-      avgDuration: 'Average duration',
-      minutes: 'min',
-      selectPlan: 'Select Plan',
-      availablePlans: 'Available Plans',
-      featured: 'Featured',
-      bonus: 'Bonus',
-      points: 'points',
-      perVisit: 'per visit',
-      unlimited: 'Unlimited',
-      trial: 'Trial',
-      buy: 'Buy',
-      payWithPoints: 'Pay with ChipiPoints',
-      payWithCash: 'Pay with cash/card',
-      youHave: 'You have',
-      notEnoughPoints: 'Not enough points',
-      confirm: 'Confirm Purchase',
-      cancel: 'Cancel',
-      checkInSuccess: 'Check-in registered',
-      checkOutSuccess: 'Check-out registered',
-      purchaseSuccess: 'Membership acquired successfully',
-      duration: 'Duration',
-      daysValid: 'days valid',
-      noVisits: 'No visits recorded',
-      visitHistory: 'Visit History',
-      viewAll: 'View all',
-      timeInClub: 'Time at club'
-    },
-    zh: {
-      title: '我的会员资格',
-      subtitle: '管理您的通行证和访问',
-      noMembership: '无有效会员资格',
-      getMembership: '获取会员资格',
-      visitsRemaining: '剩余访问次数',
-      validUntil: '有效期至',
-      checkIn: '签到',
-      checkOut: '签退',
-      currentlyIn: '目前在俱乐部',
-      recentVisits: '最近访问',
-      statistics: '统计',
-      totalVisits: '总访问次数',
-      thisMonth: '本月',
-      avgDuration: '平均时长',
-      minutes: '分钟',
-      selectPlan: '选择计划',
-      availablePlans: '可用计划',
-      featured: '推荐',
-      bonus: '奖励',
-      points: '积分',
-      perVisit: '每次访问',
-      unlimited: '无限',
-      trial: '试用',
-      buy: '购买',
-      payWithPoints: '使用ChipiPoints支付',
-      payWithCash: '现金/卡支付',
-      youHave: '您有',
-      notEnoughPoints: '积分不足',
-      confirm: '确认购买',
-      cancel: '取消',
-      checkInSuccess: '签到成功',
-      checkOutSuccess: '签退成功',
-      purchaseSuccess: '会员资格获取成功',
-      duration: '时长',
-      daysValid: '天有效',
-      noVisits: '无访问记录',
-      visitHistory: '访问历史',
-      viewAll: '查看全部',
-      timeInClub: '在俱乐部时间'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
 
   if (loading) {
     return (
@@ -352,10 +222,10 @@ export default function MembershipCard({ token, walletBalance }) {
             <div>
               <CardTitle className={`flex items-center gap-2 ${membership ? 'text-white' : ''}`}>
                 <CreditCard className="h-5 w-5" />
-                {txt.title}
+                {t('membershipCard.title')}
               </CardTitle>
               <CardDescription className={membership ? 'text-indigo-100' : ''}>
-                {txt.subtitle}
+                {t('membershipCard.subtitle')}
               </CardDescription>
             </div>
             {membership && (
@@ -382,7 +252,7 @@ export default function MembershipCard({ token, walletBalance }) {
               {membership.visits_remaining !== null && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>{txt.visitsRemaining}</span>
+                    <span>{t('membershipCard.visitsRemaining')}</span>
                     <span className="font-bold">
                       {membership.visits_remaining} / {membership.plan_info?.total_visits || membership.visits_remaining}
                     </span>
@@ -397,7 +267,7 @@ export default function MembershipCard({ token, walletBalance }) {
               {/* Validity */}
               <div className="flex items-center gap-2 text-sm text-indigo-100">
                 <Calendar className="h-4 w-4" />
-                {txt.validUntil}: {formatDate(membership.end_date)}
+                {t('membershipCard.validUntil')}: {formatDate(membership.end_date)}
               </div>
 
               {/* Check-in/out Button */}
@@ -407,11 +277,11 @@ export default function MembershipCard({ token, walletBalance }) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-green-300">
                         <MapPin className="h-4 w-4 animate-pulse" />
-                        {txt.currentlyIn}
+                        {t('membershipCard.currentlyIn')}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-indigo-100">
                         <Timer className="h-4 w-4" />
-                        {currentVisitDuration} {txt.minutes}
+                        {currentVisitDuration} {t('membershipCard.minutes')}
                       </div>
                     </div>
                     <Button 
@@ -421,7 +291,7 @@ export default function MembershipCard({ token, walletBalance }) {
                       data-testid="checkout-btn"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      {txt.checkOut}
+                      {t('membershipCard.checkOut')}
                     </Button>
                   </div>
                 ) : (
@@ -432,7 +302,7 @@ export default function MembershipCard({ token, walletBalance }) {
                     data-testid="checkin-btn"
                   >
                     <LogIn className="h-4 w-4 mr-2" />
-                    {txt.checkIn}
+                    {t('membershipCard.checkIn')}
                   </Button>
                 )}
               </div>
@@ -440,18 +310,18 @@ export default function MembershipCard({ token, walletBalance }) {
           ) : (
             <div className="text-center py-6">
               <CreditCard className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">{txt.noMembership}</p>
+              <p className="text-muted-foreground mb-4">{t('membershipCard.noMembership')}</p>
               <Dialog open={isPlansOpen} onOpenChange={setIsPlansOpen}>
                 <DialogTrigger asChild>
                   <Button data-testid="get-membership-btn">
                     <Award className="h-4 w-4 mr-2" />
-                    {txt.getMembership}
+                    {t('membershipCard.getMembership')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>{txt.availablePlans}</DialogTitle>
-                    <DialogDescription>{txt.selectPlan}</DialogDescription>
+                    <DialogTitle>{t('membershipCard.availablePlans')}</DialogTitle>
+                    <DialogDescription>{t('membershipCard.selectPlan')}</DialogDescription>
                   </DialogHeader>
                   
                   {/* Selected Plan Purchase Dialog */}
@@ -468,9 +338,9 @@ export default function MembershipCard({ token, walletBalance }) {
                           
                           <div className="mt-4 space-y-2 text-sm">
                             {selectedPlan.total_visits && (
-                              <p>• {selectedPlan.total_visits} visitas incluidas</p>
+                              <p>• {selectedPlan.total_visits} {t('membershipCard.visitsIncluded')}</p>
                             )}
-                            <p>• {selectedPlan.duration_days} {txt.daysValid}</p>
+                            <p>• {selectedPlan.duration_days} {t('membershipCard.daysValid')}</p>
                             {selectedPlan.bonus_points > 0 && (
                               <p className="text-purple-600">• +{selectedPlan.bonus_points} ChipiPoints bonus</p>
                             )}
@@ -480,7 +350,7 @@ export default function MembershipCard({ token, walletBalance }) {
 
                       {/* Payment Options */}
                       <div className="space-y-4">
-                        <Label className="font-semibold">Método de Pago</Label>
+                        <Label className="font-semibold">{t('membershipCard.paymentMethod')}</Label>
                         
                         {/* Pay with Points option */}
                         {selectedPlan.price_in_points > 0 && (
@@ -494,9 +364,9 @@ export default function MembershipCard({ token, walletBalance }) {
                               <div className="flex items-center gap-3">
                                 <Sparkles className="h-5 w-5 text-purple-600" />
                                 <div>
-                                  <p className="font-medium">{txt.payWithPoints}</p>
+                                  <p className="font-medium">{t('membershipCard.payWithPoints')}</p>
                                   <p className="text-sm text-muted-foreground">
-                                    {txt.youHave}: {walletBalance?.chipipoints || 0} ChipiPoints
+                                    {t('membershipCard.youHave')}: {walletBalance?.chipipoints || 0} ChipiPoints
                                   </p>
                                 </div>
                               </div>
@@ -505,7 +375,7 @@ export default function MembershipCard({ token, walletBalance }) {
                                   {selectedPlan.price_in_points} pts
                                 </p>
                                 {(walletBalance?.chipipoints || 0) < selectedPlan.price_in_points && (
-                                  <p className="text-xs text-red-500">{txt.notEnoughPoints}</p>
+                                  <p className="text-xs text-red-500">{t('membershipCard.notEnoughPoints')}</p>
                                 )}
                               </div>
                             </div>
@@ -523,8 +393,8 @@ export default function MembershipCard({ token, walletBalance }) {
                             <div className="flex items-center gap-3">
                               <Wallet className="h-5 w-5 text-green-600" />
                               <div>
-                                <p className="font-medium">{txt.payWithCash}</p>
-                                <p className="text-sm text-muted-foreground">Efectivo o tarjeta en el club</p>
+                                <p className="font-medium">{t('membershipCard.payWithCash')}</p>
+                                <p className="text-sm text-muted-foreground">{t('membershipCard.cashOrCardAtClub')}</p>
                               </div>
                             </div>
                             <p className="text-xl font-bold text-green-600">${selectedPlan.price}</p>
@@ -534,7 +404,7 @@ export default function MembershipCard({ token, walletBalance }) {
 
                       <DialogFooter className="gap-2">
                         <Button variant="outline" onClick={() => setSelectedPlan(null)}>
-                          {txt.cancel}
+                          {t('common.cancel')}
                         </Button>
                         <Button 
                           onClick={() => purchaseMembership(selectedPlan.plan_id, payWithPoints)}
@@ -545,7 +415,7 @@ export default function MembershipCard({ token, walletBalance }) {
                           ) : (
                             <CheckCircle className="h-4 w-4 mr-2" />
                           )}
-                          {txt.confirm}
+                          {t('membershipCard.confirmPurchase')}
                         </Button>
                       </DialogFooter>
                     </div>
@@ -563,7 +433,7 @@ export default function MembershipCard({ token, walletBalance }) {
                         >
                           <CardContent className="pt-6">
                             {plan.is_featured && (
-                              <Badge className="mb-2">{txt.featured}</Badge>
+                              <Badge className="mb-2">{t('membershipCard.featured')}</Badge>
                             )}
                             <h3 className="font-semibold text-lg">
                               {getLocalizedText(plan.name)}
@@ -576,24 +446,24 @@ export default function MembershipCard({ token, walletBalance }) {
                               {plan.total_visits && (
                                 <div className="flex items-center gap-2 text-sm">
                                   <CreditCard className="h-4 w-4" />
-                                  {plan.total_visits} {txt.visitsRemaining.toLowerCase()}
+                                  {plan.total_visits} {t('membershipCard.visitsRemaining').toLowerCase()}
                                 </div>
                               )}
                               {plan.membership_type === 'unlimited' && (
                                 <div className="flex items-center gap-2 text-sm">
                                   <RefreshCw className="h-4 w-4" />
-                                  {txt.unlimited}
+                                  {t('membershipCard.unlimited')}
                                 </div>
                               )}
                               {plan.bonus_points > 0 && (
                                 <div className="flex items-center gap-2 text-sm text-purple-600">
                                   <Award className="h-4 w-4" />
-                                  +{plan.bonus_points} {txt.bonus} {txt.points}
+                                  +{plan.bonus_points} {t('membershipCard.bonus')} {t('membership.planTypes.credits10') ? 'points' : 'points'}
                                 </div>
                               )}
                               <div className="flex items-center gap-2 text-sm">
                                 <Calendar className="h-4 w-4" />
-                                {plan.duration_days} {txt.daysValid}
+                                {plan.duration_days} {t('membershipCard.daysValid')}
                               </div>
                             </div>
 
@@ -610,7 +480,7 @@ export default function MembershipCard({ token, walletBalance }) {
                                 size="sm"
                                 data-testid={`buy-${plan.plan_id}`}
                               >
-                                {txt.buy}
+                                {t('membershipCard.buy')}
                                 <ChevronRight className="h-4 w-4 ml-1" />
                               </Button>
                             </div>
@@ -631,11 +501,11 @@ export default function MembershipCard({ token, walletBalance }) {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="stats" data-testid="stats-tab">
             <Award className="h-4 w-4 mr-2" />
-            {txt.statistics}
+            {t('membershipCard.statistics')}
           </TabsTrigger>
           <TabsTrigger value="history" data-testid="history-tab">
             <History className="h-4 w-4 mr-2" />
-            {txt.recentVisits}
+            {t('membershipCard.recentVisits')}
           </TabsTrigger>
         </TabsList>
 
@@ -645,18 +515,18 @@ export default function MembershipCard({ token, walletBalance }) {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-3xl font-bold text-primary">{stats?.total_visits || 0}</p>
-                  <p className="text-sm text-muted-foreground">{txt.totalVisits}</p>
+                  <p className="text-sm text-muted-foreground">{t('membershipCard.totalVisits')}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-primary">{stats?.visits_this_month || 0}</p>
-                  <p className="text-sm text-muted-foreground">{txt.thisMonth}</p>
+                  <p className="text-sm text-muted-foreground">{t('membershipCard.thisMonth')}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-primary">
                     {stats?.avg_duration_minutes || 0}
-                    <span className="text-lg">{txt.minutes}</span>
+                    <span className="text-lg">{t('membershipCard.minutes')}</span>
                   </p>
-                  <p className="text-sm text-muted-foreground">{txt.avgDuration}</p>
+                  <p className="text-sm text-muted-foreground">{t('membershipCard.avgDuration')}</p>
                 </div>
               </div>
             </CardContent>
@@ -668,7 +538,7 @@ export default function MembershipCard({ token, walletBalance }) {
             <CardContent className="pt-6">
               {visits.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  {txt.noMembership}
+                  {t('membershipCard.noVisits')}
                 </p>
               ) : (
                 <div className="space-y-3" data-testid="visits-list">
@@ -696,7 +566,7 @@ export default function MembershipCard({ token, walletBalance }) {
                       <div className="text-right">
                         {visit.duration_minutes && (
                           <p className="text-sm font-medium">
-                            {visit.duration_minutes} {txt.minutes}
+                            {visit.duration_minutes} {t('membershipCard.minutes')}
                           </p>
                         )}
                         <Badge variant={visit.consumed_visit ? 'default' : 'secondary'} className="text-xs">
