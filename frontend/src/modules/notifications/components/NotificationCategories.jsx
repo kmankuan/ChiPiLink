@@ -1,5 +1,5 @@
 /**
- * NotificationCategories - Vista pública de categorías de notificación
+ * NotificationCategories - Public view of notification categories
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,31 +10,11 @@ import { Badge } from '@/components/ui/badge';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function NotificationCategories({ token }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const lang = i18n.language || 'es';
-
-  const texts = {
-    es: {
-      title: 'Categorías de Notificación',
-      subtitle: 'Tipos de notificaciones disponibles',
-      noCategories: 'No hay categorías'
-    },
-    en: {
-      title: 'Notification Categories',
-      subtitle: 'Available notification types',
-      noCategories: 'No categories'
-    },
-    zh: {
-      title: '通知分类',
-      subtitle: '可用的通知类型',
-      noCategories: '没有分类'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
 
   useEffect(() => {
     fetchCategories();
@@ -56,6 +36,11 @@ export default function NotificationCategories({ token }) {
     }
   };
 
+  const getLocalizedText = (obj) => {
+    if (!obj) return '';
+    return obj[lang] || obj.es || obj.en || '';
+  };
+
   if (loading) {
     return (
       <Card>
@@ -71,37 +56,30 @@ export default function NotificationCategories({ token }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          {txt.title}
+          {t('notifications.categories')}
         </CardTitle>
-        <CardDescription>{txt.subtitle}</CardDescription>
+        <CardDescription>{t('notifications.categoriesDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         {categories.length === 0 ? (
-          <p className="text-center py-4 text-muted-foreground">{txt.noCategories}</p>
+          <p className="text-center py-4 text-muted-foreground">
+            {t('notifications.categoryManager.noCategories')}
+          </p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {categories.map((cat) => (
-              <div 
-                key={cat.category_id}
-                className="p-3 rounded-lg border text-center hover:shadow-md transition-shadow"
-                style={{ borderColor: `${cat.color}40` }}
+          <div className="grid gap-3 md:grid-cols-2">
+            {categories.map((category) => (
+              <div
+                key={category.category_id}
+                className="flex items-center gap-3 p-3 rounded-lg border"
+                style={{ borderLeftColor: category.color, borderLeftWidth: '4px' }}
               >
-                <span 
-                  className="text-2xl block mb-2 p-2 rounded-lg mx-auto w-fit"
-                  style={{ backgroundColor: `${cat.color}20` }}
-                >
-                  {cat.icon}
-                </span>
-                <p className="font-medium text-sm">
-                  {cat.name?.[lang] || cat.name?.es}
-                </p>
-                <Badge 
-                  variant="outline" 
-                  className="mt-2 text-xs"
-                  style={{ borderColor: cat.color, color: cat.color }}
-                >
-                  {cat.module}
-                </Badge>
+                <span className="text-2xl">{category.icon}</span>
+                <div>
+                  <p className="font-medium">{getLocalizedText(category.name)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {getLocalizedText(category.description)}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
