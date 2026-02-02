@@ -89,42 +89,51 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (product) {
       setEditingProduct(product);
       setFormData({
-        nombre: product.nombre || '',
-        codigo: product.codigo || '',
+        name: product.nombre || product.name || '',
+        code: product.codigo || product.code || '',
         isbn: product.isbn || '',
-        editorial: product.editorial || '',
-        grado: product.grado || '',
-        materia: product.materia || '',
-        precio: product.precio?.toString() || '',
-        precio_oferta: product.precio_oferta?.toString() || '',
-        descripcion: product.descripcion || '',
-        imagen_url: product.imagen_url || '',
-        activo: product.activo !== false,
-        destacado: product.destacado || false
+        publisher: product.editorial || product.publisher || '',
+        grade: product.grado || product.grade || '',
+        subject: product.materia || product.subject || '',
+        price: (product.precio || product.price)?.toString() || '',
+        sale_price: (product.precio_oferta || product.sale_price)?.toString() || '',
+        description: product.descripcion || product.description || '',
+        image_url: product.imagen_url || product.image_url || '',
+        active: product.activo !== false && product.active !== false,
+        featured: product.destacado || product.featured || false
       });
     } else {
       setEditingProduct(null);
       setFormData({
-        nombre: '', codigo: '', isbn: '', editorial: '', grado: '', materia: '',
-        precio: '', precio_oferta: '', descripcion: '', imagen_url: '',
-        activo: true, destacado: false
+        name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
+        price: '', sale_price: '', description: '', image_url: '',
+        active: true, featured: false
       });
     }
     setShowForm(true);
   };
 
   const handleSave = async () => {
-    if (!formData.nombre || !formData.grado || !formData.precio) {
-      toast.error('Nombre, grado y precio son obligatorios');
+    if (!formData.name || !formData.grade || !formData.price) {
+      toast.error('Name, grade and price are required');
       return;
     }
 
     setSaving(true);
     try {
       const payload = {
-        ...formData,
-        precio: parseFloat(formData.precio),
-        precio_oferta: formData.precio_oferta ? parseFloat(formData.precio_oferta) : null
+        nombre: formData.name,
+        codigo: formData.code,
+        isbn: formData.isbn,
+        editorial: formData.publisher,
+        grado: formData.grade,
+        materia: formData.subject,
+        precio: parseFloat(formData.price),
+        precio_oferta: formData.sale_price ? parseFloat(formData.sale_price) : null,
+        descripcion: formData.description,
+        imagen_url: formData.image_url,
+        activo: formData.active,
+        destacado: formData.featured
       };
 
       let url = `${API}/api/store/catalogo-privado/admin/productos`;
@@ -147,23 +156,23 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       const data = await response.json();
       
       if (data.success) {
-        toast.success(editingProduct ? 'Producto actualizado' : 'Producto creado');
+        toast.success(editingProduct ? 'Product updated' : 'Product created');
         setShowForm(false);
-        fetchProductos();
+        fetchProducts();
         onRefresh?.();
       } else {
-        toast.error(data.detail || 'Error al guardar');
+        toast.error(data.detail || 'Error saving');
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      toast.error('Error al guardar el producto');
+      toast.error('Error saving product');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (libro_id) => {
-    if (!confirm('¿Estás seguro de desactivar este producto?')) return;
+    if (!confirm('Are you sure you want to deactivate this product?')) return;
     
     try {
       const response = await fetch(`${API}/api/store/catalogo-privado/admin/productos/${libro_id}`, {
@@ -172,12 +181,12 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       });
       
       if (response.ok) {
-        toast.success('Producto desactivado');
-        fetchProductos();
+        toast.success('Product deactivated');
+        fetchProducts();
         onRefresh?.();
       }
     } catch (error) {
-      toast.error('Error al eliminar');
+      toast.error('Error deleting');
     }
   };
 
