@@ -921,12 +921,12 @@ export default function MondayModule() {
                   {legacyStatus?.connected ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Conectado</span>
+                      <span className="font-medium text-green-600">Connected</span>
                     </>
                   ) : (
                     <>
                       <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-red-600">Desconectado</span>
+                      <span className="font-medium text-red-600">Disconnected</span>
                     </>
                   )}
                 </div>
@@ -938,9 +938,9 @@ export default function MondayModule() {
           {legacyStatus?.connected && legacyStatus?.boards?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Tableros Disponibles</CardTitle>
+                <CardTitle>Available Boards</CardTitle>
                 <CardDescription>
-                  Selecciona un tablero como destino general para integraciones
+                  Select a board as general destination for integrations
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -960,7 +960,7 @@ export default function MondayModule() {
                         ID: {board.id}
                       </p>
                       {legacyStatus.board_id === board.id && (
-                        <Badge variant="default" className="mt-2">Activo</Badge>
+                        <Badge variant="default" className="mt-2">Active</Badge>
                       )}
                     </button>
                   ))}
@@ -972,9 +972,9 @@ export default function MondayModule() {
           {/* Manual Board ID Input */}
           <Card>
             <CardHeader>
-              <CardTitle>Configuración Manual</CardTitle>
+              <CardTitle>Manual Configuration</CardTitle>
               <CardDescription>
-                Ingresa el Board ID manualmente si no aparece en la lista
+                Enter the Board ID manually if it doesn't appear in the list
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -982,7 +982,7 @@ export default function MondayModule() {
                 <Input
                   value={legacyBoardId}
                   onChange={(e) => setLegacyBoardId(e.target.value)}
-                  placeholder="Board ID (ej: 1234567890)"
+                  placeholder="Board ID (e.g. 1234567890)"
                   className="font-mono"
                 />
                 <Button onClick={handleSaveLegacyBoard} disabled={savingLegacy}>
@@ -1008,11 +1008,11 @@ export default function MondayModule() {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              Probar Integración
+              Test Integration
             </Button>
             <Button variant="outline" onClick={loadLegacyStatus} className="gap-2">
               <RefreshCw className="h-4 w-4" />
-              Actualizar
+              Refresh
             </Button>
             <a 
               href="https://monday.com" 
