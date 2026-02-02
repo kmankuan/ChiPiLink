@@ -6,11 +6,11 @@ Arquitectura Microservices-Ready:
 
 /modules/store/
 ├── models/           # Pydantic schemas (data contracts)
-├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
+├── repositories/     # Data access layer (only touch DB here)
 ├── services/         # Business logic
-├── events/           # Event handlers y tipos de eventos
+├── events/           # Event handlers and event types
 ├── routes/           # API endpoints (FastAPI routers)
-└── __init__.py       # Initialization del módulo
+└── __init__.py       # Module initialization
 
 Beneficios de esta arquitectura:
 1. Separación clara de responsabilidades

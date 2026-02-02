@@ -12,12 +12,12 @@ class TaskSupervisorConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
     config_id: str = "task_supervisor_main"
     # Monday.com Integration
-    monday_board_id: Optional[str] = None  # Board específico para tareas
+    monday_board_id: Optional[str] = None  # Specific board for tasks
     monday_group_id: Optional[str] = None  # Grupo específico (opcional)
     # Voice Configuration
     tts_enabled: bool = True
     tts_provider: str = "openai"  # openai, elevenlabs, browser
-    tts_voice: str = "nova"  # Voz amigable para niños
+    tts_voice: str = "nova"  # Child-friendly voice
     tts_language: str = "es"  # Idioma principal
     volumen: int = 80  # 0-100
     # Reminder Configuration
@@ -27,7 +27,7 @@ class TaskSupervisorConfig(BaseModel):
     # Gamification
     gamificacion_activa: bool = True
     puntos_por_tarea: int = 10
-    puntos_bonus_tiempo: int = 5  # Si termina antes de tiempo
+    puntos_bonus_tiempo: int = 5  # If finished before time
     # Display Configuration
     modo_pantalla: str = "kiosk"  # kiosk, normal, minimal
     mostrar_reloj: bool = True
@@ -41,7 +41,7 @@ class SupervisedPerson(BaseModel):
     model_config = ConfigDict(extra="ignore")
     person_id: str = Field(default_factory=lambda: f"person_{uuid.uuid4().hex[:12]}")
     nombre: str
-    apodo: Optional[str] = None  # Nombre corto para anuncios
+    apodo: Optional[str] = None  # Short name for announcements
     foto_url: Optional[str] = None
     tipo: str = "nino"  # nino, estudiante
     edad: Optional[int] = None
@@ -70,7 +70,7 @@ class SupervisedTask(BaseModel):
     # Info
     titulo: str
     descripcion: Optional[str] = None
-    instrucciones_voz: Optional[str] = None  # Texto para TTS
+    instrucciones_voz: Optional[str] = None  # Text for TTS
     icono: Optional[str] = None
     color: Optional[str] = None
     # Asignación
@@ -135,4 +135,4 @@ class DailyProgress(BaseModel):
     # Points
     puntos_ganados: int = 0
     # Detalle
-    tareas_ids: List[str] = []  # IDs de tareas del día
+    tareas_ids: List[str] = []  # Daily task IDs

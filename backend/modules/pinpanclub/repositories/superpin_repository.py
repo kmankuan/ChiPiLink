@@ -301,7 +301,7 @@ class RankingRepository(BaseRepository):
             limit=1000
         )
         
-        # Ordenar según el system for puntuación
+        # Sort according to scoring system
         if scoring_system == "elo":
             rankings.sort(key=lambda x: x.get("elo_rating", 0), reverse=True)
         else:

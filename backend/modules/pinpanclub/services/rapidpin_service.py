@@ -1271,7 +1271,7 @@ class RapidPinService(BaseService):
             )
             
         elif action == "queue":
-            # Poner in queue para retomar después
+            # Put in queue to resume later
             update_data["status"] = "queued"
             
         await db["rapidpin_queue"].update_one(
@@ -1310,7 +1310,7 @@ class RapidPinService(BaseService):
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden retomarlo")
         
-        # Usar respond_to_date con action=counter para proponer nueva fecha
+        # Use respond_to_date with action=counter to propose new date
         return await self.respond_to_date(
             queue_id=queue_id,
             user_id=user_id,

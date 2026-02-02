@@ -383,7 +383,7 @@ class SuperPinService(BaseService):
             puntos_perdedor = scoring_config.get("points_loss", 1)
             elo_change = 0
         
-        # Determinar sets ganados/perdidos para cada jugador
+        # Determine sets won/lost for each player
         if ganador_id == match["jugador_a_id"]:
             sets_ganador = match["sets_jugador_a"]
             sets_perdedor = match["sets_jugador_b"]

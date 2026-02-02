@@ -169,7 +169,7 @@ class MatchService(BaseService):
                     "ganador": ganador_set
                 })
                 
-                # Reset puntos para nuevo set
+                # Reset points for new set
                 puntos_a = 0
                 puntos_b = 0
                 set_actual += 1

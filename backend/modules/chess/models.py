@@ -30,7 +30,7 @@ class ChessPlayer(ChessPlayerBase):
     partidas_ganadas: int = 0
     partidas_perdidas: int = 0
     partidas_tablas: int = 0
-    elo_rating: int = 1200  # Rating ELO estándar de ajedrez
+    elo_rating: int = 1200  # Standard chess ELO rating
     elo_maximo: int = 1200
     racha_actual: int = 0
     mejor_racha: int = 0
@@ -60,7 +60,7 @@ class ChessGame(ChessGameBase):
     # Movimientos en notación algebraica
     pgn: Optional[str] = None  # Notación PGN completa
     movimientos: List[str] = []  # List of movimientos
-    posicion_actual: Optional[str] = None  # FEN de posición actual
+    posicion_actual: Optional[str] = None  # Current position FEN
     # Tiempos
     tiempo_blancas_ms: int = 600000  # Tiempo restante en milisegundos
     tiempo_negras_ms: int = 600000
@@ -102,7 +102,7 @@ class ChessPuzzle(BaseModel):
     solucion: List[str]  # Movimientos correctos
     dificultad: str = "medio"  # facil, medio, dificil, experto
     tema: Optional[str] = None  # mate_en_2, tactica, final, etc.
-    rating: int = 1500  # Rating del puzzle
+    rating: int = 1500  # Puzzle rating
     intentos: int = 0
     resueltos: int = 0
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

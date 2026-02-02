@@ -484,7 +484,7 @@ class RankingSeasonsService(BaseService):
         
         # Calculate next month dates
         if now.day <= 15:
-            # Create para este mes si aún no empezó
+            # Create for this month if not started yet
             start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         else:
             # Create for next month

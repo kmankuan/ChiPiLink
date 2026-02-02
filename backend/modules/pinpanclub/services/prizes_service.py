@@ -193,7 +193,7 @@ class PrizeService(BaseService):
         for prize_data in catalog.prizes:
             prize = PrizeDefinition(**prize_data) if isinstance(prize_data, dict) else prize_data
             
-            # Evaluar condiciones para cada jugador
+            # Evaluate conditions for each player
             rankings = player_rankings if prize.for_players else (referee_rankings or [])
             
             for idx, ranking in enumerate(rankings, start=1):

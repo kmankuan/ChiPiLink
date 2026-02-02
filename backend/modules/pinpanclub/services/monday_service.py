@@ -31,7 +31,7 @@ class MondayService(BaseService):
         self.player_repository = PlayerRepository()
         self.match_repository = MatchRepository()
         
-        # Suscribirse a eventos para sincronización automática
+        # Subscribe to events for auto sync
         self._setup_event_listeners()
     
     def _setup_event_listeners(self):

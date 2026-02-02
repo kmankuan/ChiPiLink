@@ -31,7 +31,7 @@ def setup_event_handlers():
         
         perdedor_id = jugador_b_id if ganador_id == jugador_a_id else jugador_a_id
         
-        # Get ELOs para cálculo
+        # Get ELOs for calculation
         ganador = await player_service.get_player(ganador_id)
         perdedor = await player_service.get_player(perdedor_id)
         

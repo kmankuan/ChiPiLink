@@ -12,7 +12,7 @@ class ContentSource(BaseModel):
     source_id: str
     nombre: str  # YouTube, Instagram, TikTok, WeChat, Xiaohongshu, etc.
     icono: Optional[str] = None
-    color: Optional[str] = None  # Color de la marca
+    color: Optional[str] = None  # Brand color
     activo: bool = True
 
 
@@ -20,7 +20,7 @@ class ContentCategory(BaseModel):
     """Categoría de contenido por audiencia"""
     model_config = ConfigDict(extra="ignore")
     category_id: str = Field(default_factory=lambda: f"cat_{uuid.uuid4().hex[:8]}")
-    nombre: str  # Niños, Padres de Familia, Cultura Local, Cultura China, etc.
+    nombre: str  # Kids, Parents, Local Culture, Chinese Culture, etc.
     nombre_en: Optional[str] = None
     nombre_zh: Optional[str] = None
     descripcion: Optional[str] = None
@@ -44,7 +44,7 @@ class ContentItemBase(BaseModel):
     descripcion: Optional[str] = None
     # Fuente original
     source: str  # youtube, instagram, tiktok, wechat, xiaohongshu, telegram, facebook
-    url_original: str  # URL del contenido original
+    url_original: str  # Original content URL
     # Contenido embebido
     embed_url: Optional[str] = None  # URL para embed (si aplica)
     embed_code: Optional[str] = None  # Código HTML de embed
