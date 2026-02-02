@@ -252,7 +252,7 @@ export default function ChallengeModal({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Swords className="h-5 w-5 text-orange-500" />
-              {txt.confirmTitle}
+              {t('rapidpin.confirmTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50 dark:bg-orange-950/30">
@@ -266,16 +266,16 @@ export default function ChallengeModal({
                   <p className="text-lg font-bold text-foreground">
                     {selectedOpponent?.nickname || selectedOpponent?.nombre}
                   </p>
-                  <p className="text-sm">{txt.confirmDesc}</p>
+                  <p className="text-sm">{t('rapidpin.confirmDesc')}</p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                {txt.confirmNote}
+                {t('rapidpin.confirmNote')}
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={sending}>{txt.cancel}</AlertDialogCancel>
+            <AlertDialogCancel disabled={sending}>{t('rapidpin.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmChallenge}
               disabled={sending}
@@ -284,12 +284,12 @@ export default function ChallengeModal({
               {sending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {txt.sending}
+                  {t('rapidpin.sending')}
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="h-4 w-4 mr-2" />
-                  {txt.confirm}
+                  {t('rapidpin.confirm')}
                 </>
               )}
             </AlertDialogAction>
