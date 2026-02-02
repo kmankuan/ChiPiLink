@@ -112,9 +112,9 @@ export default function EstudiantesTab({ token }) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {estudiantes.filter(e => e.tiene_vinculacion).length}
+              {estudiantes.filter(e => e.has_access).length}
             </div>
-            <p className="text-xs text-muted-foreground">Con Acudiente Vinculado</p>
+            <p className="text-xs text-muted-foreground">Con Acceso Aprobado</p>
           </CardContent>
         </Card>
       </div>
@@ -150,8 +150,8 @@ export default function EstudiantesTab({ token }) {
                       </TableCell>
                       <TableCell>{e.seccion || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant={e.tiene_vinculacion ? 'default' : 'outline'}>
-                          {e.tiene_vinculacion ? 'Vinculado' : 'Sin vincular'}
+                        <Badge variant={e.has_access ? 'default' : 'outline'}>
+                          {e.has_access ? 'Con Acceso' : 'Sin Acceso'}
                         </Badge>
                       </TableCell>
                     </TableRow>
