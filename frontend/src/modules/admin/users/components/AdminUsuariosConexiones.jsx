@@ -107,13 +107,13 @@ export default function AdminUsuariosConexiones({ token }) {
     setLoading(true);
     try {
       const [capRes, permRes, solRes] = await Promise.all([
-        fetch(`${API}/api/conexiones/capacidades`, {
+        fetch(`${API}/api/connections/capabilities`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API}/api/conexiones/admin/permisos-relacion`, {
+        fetch(`${API}/api/connections/admin/relationship-permissions`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API}/api/conexiones/admin/solicitudes-pendientes`, {
+        fetch(`${API}/api/connections/admin/pending-requests`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -145,7 +145,7 @@ export default function AdminUsuariosConexiones({ token }) {
     }
     
     try {
-      const res = await fetch(`${API}/api/conexiones/buscar?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API}/api/connections/search?q=${encodeURIComponent(query)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -159,7 +159,7 @@ export default function AdminUsuariosConexiones({ token }) {
 
   const handleRespondSolicitud = async (solicitudId, aceptar) => {
     try {
-      const res = await fetch(`${API}/api/conexiones/admin/solicitudes/${solicitudId}/responder`, {
+      const res = await fetch(`${API}/api/connections/admin/requests/${solicitudId}/respond`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -173,7 +173,7 @@ export default function AdminUsuariosConexiones({ token }) {
         throw new Error(data.detail || 'Error');
       }
       
-      toast.success(aceptar ? 'Solicitud aprobada' : 'Solicitud rechazada');
+      toast.success(aceptar ? 'Request approved' : 'Request rejected');
       loadData();
     } catch (err) {
       toast.error(err.message);
