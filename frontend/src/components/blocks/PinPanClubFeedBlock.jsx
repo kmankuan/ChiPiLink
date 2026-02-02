@@ -154,7 +154,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
       <section className="px-4 md:px-8 lg:px-12 py-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-3 text-muted-foreground">{txt.loading}</span>
+          <span className="ml-3 text-muted-foreground">{t('pinpanclub.loading')}</span>
         </div>
       </section>
     );
@@ -185,13 +185,13 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
-                  {txt.settings}
+                  {t('admin.settings')}
                 </Button>
               </SheetTrigger>
               <SheetContent className="overflow-y-auto">
               <SheetHeader>
-                <SheetTitle>{txt.settings}</SheetTitle>
-                <SheetDescription>{txt.settingsDesc}</SheetDescription>
+                <SheetTitle>{t('admin.settings')}</SheetTitle>
+                <SheetDescription>{t('pinpanclub.settingsDesc')}</SheetDescription>
               </SheetHeader>
               <div className="space-y-6 py-6">
                 {Object.entries(sections).map(([key, section]) => (
@@ -208,7 +208,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                     
                     {section.enabled !== false && (
                       <div className="space-y-3 pl-4 border-l-2 border-muted">
-                        <p className="text-sm font-medium text-muted-foreground">{txt.visibility}</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t('pinpanclub.visibility')}</p>
                         <div className="grid grid-cols-2 gap-2">
                           {['public', 'registered', 'moderator', 'admin', 'super_admin'].map((role) => (
                             <div key={role} className="flex items-center gap-2">
@@ -219,7 +219,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
                                 className="scale-75"
                               />
                               <Label htmlFor={`${key}-${role}`} className="text-xs">
-                                {txt[role] || role}
+                                {t(`pinpanclub.roles.${role}`, role)}
                               </Label>
                             </div>
                           ))}
@@ -244,21 +244,21 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
             <CardContent className="pt-4 text-center">
               <Users className="h-8 w-8 mx-auto mb-2 text-green-600" />
               <p className="text-3xl font-bold text-green-700">{feedData.stats.active_players}</p>
-              <p className="text-sm text-green-600">{txt.activePlayers}</p>
+              <p className="text-sm text-green-600">{t('pinpanclub.activePlayers')}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 border-blue-200">
             <CardContent className="pt-4 text-center">
               <Swords className="h-8 w-8 mx-auto mb-2 text-blue-600" />
               <p className="text-3xl font-bold text-blue-700">{feedData.stats.superpin_matches}</p>
-              <p className="text-sm text-blue-600">{txt.superpin}</p>
+              <p className="text-sm text-blue-600">{t('pinpanclub.superpin')}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 border-orange-200">
             <CardContent className="pt-4 text-center">
               <Flame className="h-8 w-8 mx-auto mb-2 text-orange-600" />
               <p className="text-3xl font-bold text-orange-700">{feedData.stats.rapidpin_matches}</p>
-              <p className="text-sm text-orange-600">{txt.rapidpin}</p>
+              <p className="text-sm text-orange-600">{t('pinpanclub.rapidpin')}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 border-purple-200">
@@ -282,7 +282,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
                   <Swords className="h-5 w-5 text-primary" />
-                  {L(sections.recent_matches?.title) || txt.recentMatches}
+                  {L(sections.recent_matches?.title) || t('pinpanclub.recentMatches')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
