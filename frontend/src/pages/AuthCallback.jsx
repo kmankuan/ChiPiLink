@@ -28,7 +28,7 @@ export default function AuthCallback() {
         }
 
         const user = await processGoogleCallback(sessionId);
-        toast.success(`¡Bienvenido, ${user.name}!`);
+        toast.success(`Welcome, ${user.name}!`);
         navigate(user.is_admin ? '/admin' : '/dashboard', { 
           replace: true,
           state: { user }

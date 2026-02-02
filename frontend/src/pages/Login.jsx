@@ -63,7 +63,7 @@ export default function Login() {
     
     try {
       const user = await login(formData.email, formData.password);
-      toast.success(`¡Bienvenido, ${user.name}!`);
+      toast.success(`Welcome, ${user.name}!`);
       
       // Check for redirect parameter in URL
       const params = new URLSearchParams(window.location.search);
