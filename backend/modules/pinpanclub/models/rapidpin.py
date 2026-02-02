@@ -1,7 +1,7 @@
 """
-Rapid Pin - Modelos
-Sistema de partidos espontáneos sin organización
-2 jugadores + 1 árbitro = Partido válido
+Rapid Pin - Models
+System for spontaneous matches without organization
+2 players + 1 referee = Valid match
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
@@ -13,61 +13,61 @@ import uuid
 # ============== ENUMS ==============
 
 class RapidPinMatchStatus(str, Enum):
-    """Estado del partido Rapid Pin"""
-    PENDING = "pending"          # Registrado, esperando confirmación
-    VALIDATED = "validated"      # Confirmado por otra persona
-    DISPUTED = "disputed"        # En disputa
-    CANCELLED = "cancelled"      # Cancelado
+    """Rapid Pin match status"""
+    PENDING = "pending"          # Registered, waiting for confirmation
+    VALIDATED = "validated"      # Confirmed by another person
+    DISPUTED = "disputed"        # In dispute
+    CANCELLED = "cancelled"      # Cancelled
 
 
 class RapidPinSeasonStatus(str, Enum):
-    """Estado de la temporada"""
-    ACTIVE = "active"            # Temporada activa
-    CLOSED = "closed"            # Temporada cerrada (ranking fijo)
-    ARCHIVED = "archived"        # Archivada
+    """Season status"""
+    ACTIVE = "active"            # Active season
+    CLOSED = "closed"            # Closed season (fixed ranking)
+    ARCHIVED = "archived"        # Archived
 
 
 class RapidPinRole(str, Enum):
-    """Rol en un partido Rapid Pin"""
-    PLAYER = "player"            # Jugador
-    REFEREE = "referee"          # Árbitro
+    """Role in a Rapid Pin match"""
+    PLAYER = "player"            # Player
+    REFEREE = "referee"          # Referee
 
 
 class RapidPinQueueStatus(str, Enum):
-    """Estado de la cola de partidos"""
-    CHALLENGE_PENDING = "challenge_pending"  # Desafío enviado, esperando aceptación
-    DATE_NEGOTIATION = "date_negotiation"    # Negociando fecha del partido
-    QUEUED = "queued"                        # Reto en cola (sin fecha acordada)
-    WAITING_REFEREE = "waiting"              # Fecha acordada, esperando árbitro
-    ASSIGNED = "assigned"                    # Árbitro asignado, partido en curso
-    COMPLETED = "completed"                  # Partido completado
-    CANCELLED = "cancelled"                  # Cancelado
-    DECLINED = "declined"                    # Desafío rechazado
+    """Match queue status"""
+    CHALLENGE_PENDING = "challenge_pending"  # Challenge sent, waiting for acceptance
+    DATE_NEGOTIATION = "date_negotiation"    # Negotiating match date
+    QUEUED = "queued"                        # Challenge queued (no agreed date)
+    WAITING_REFEREE = "waiting"              # Date agreed, waiting for referee
+    ASSIGNED = "assigned"                    # Referee assigned, match in progress
+    COMPLETED = "completed"                  # Match completed
+    CANCELLED = "cancelled"                  # Cancelled
+    DECLINED = "declined"                    # Challenge declined
 
 
 class DateProposalStatus(str, Enum):
-    """Estado de propuesta de fecha"""
-    PENDING = "pending"      # Esperando respuesta
-    ACCEPTED = "accepted"    # Aceptada
-    COUNTERED = "countered"  # Contrapropuesta enviada
+    """Date proposal status"""
+    PENDING = "pending"      # Waiting for response
+    ACCEPTED = "accepted"    # Accepted
+    COUNTERED = "countered"  # Counter-proposal sent
 
 
 # ============== SCORING CONSTANTS ==============
 
 RAPID_PIN_SCORING = {
-    "victory": 3,    # Puntos por victoria
-    "defeat": 1,     # Puntos por derrota
-    "referee": 2     # Puntos por arbitrar
+    "victory": 3,    # Points for victory
+    "defeat": 1,     # Points for defeat
+    "referee": 2     # Points for refereeing
 }
 
 
 # ============== PRIZE CONFIGURATION ==============
 
 class RapidPinPrize(BaseModel):
-    """Premio configurable para Rapid Pin"""
+    """Configurable prize for Rapid Pin"""
     prize_id: str = Field(default_factory=lambda: f"prize_{uuid.uuid4().hex[:8]}")
-    position: Optional[int] = None  # 1, 2, 3... o None para premios especiales
-    role: str = "player"            # "player" o "referee"
+    position: Optional[int] = None  # 1, 2, 3... or None for special prizes
+    role: str = "player"            # "player" or "referee"
     name: str
     description: Optional[str] = None
     icon: str = "🏆"
@@ -77,19 +77,19 @@ class RapidPinPrize(BaseModel):
 # ============== SEASON MODEL ==============
 
 class RapidPinSeasonCreate(BaseModel):
-    """Crear temporada Rapid Pin"""
+    """Create Rapid Pin season"""
     nombre: str
     descripcion: Optional[str] = None
     fecha_inicio: str  # ISO format
-    fecha_fin: str     # ISO format - fecha tope para cerrar ranking
+    fecha_fin: str     # ISO format - deadline to close ranking
     
-    # Premios configurables
+    # Configurable prizes
     player_prizes: Optional[List[RapidPinPrize]] = None
     referee_prizes: Optional[List[RapidPinPrize]] = None
 
 
 class RapidPinSeasonUpdate(BaseModel):
-    """Actualizar temporada"""
+    """Update season"""
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
     fecha_fin: Optional[str] = None
