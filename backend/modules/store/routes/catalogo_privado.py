@@ -344,7 +344,7 @@ async def admin_actualizar_producto_catalogo_privado(
     """
     Admin: Actualizar producto del catálogo privado.
     """
-    # Asegurar que no se pueda cambiar es_catalogo_privado
+    # Asegurar that does not se pueda cambiar es_catalogo_privado
     updates["es_catalogo_privado"] = True
     updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
     

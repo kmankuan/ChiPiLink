@@ -59,7 +59,7 @@ async def fetch_sheet_data(sheet_id: str, gid: str = "0") -> List[List[str]]:
         if response.status_code != 200:
             raise HTTPException(
                 status_code=400,
-                detail="No se pudo acceder a la hoja. Aseg\u00farese de que est\u00e9 publicada."
+                detail="No se pudo acceder a la hoja. Aseg\u00farese de that ist\u00e9 publicada."
             )
         
         # Parse CSV

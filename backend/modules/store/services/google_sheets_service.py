@@ -426,7 +426,7 @@ class GoogleSheetsService:
         )
     
     async def set_override_local(self, sync_id: str, override: bool) -> Dict:
-        """Marcar/desmarcar un estudiante para que no se actualice desde el Sheet"""
+        """Marcar/desmarcar un estudiante para that does not se actualice desde el Sheet"""
         result = await db.estudiantes_sincronizados.update_one(
             {"sync_id": sync_id},
             {"$set": {

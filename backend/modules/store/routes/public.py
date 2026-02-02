@@ -1,6 +1,6 @@
 """
 Store Module - Public Routes
-Endpoints públicos que no requieren autenticación
+Endpoints públicos that does not requieren autenticación
 """
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, List

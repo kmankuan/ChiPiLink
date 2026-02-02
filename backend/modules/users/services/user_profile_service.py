@@ -281,7 +281,7 @@ class UserProfileService(BaseService):
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
-        # Verificar que no exista ya
+        # Verificar that does not exista ya
         existing = await db.chipi_user_relationships.find_one({
             "$or": [
                 {"user_id_1": user_id_1, "user_id_2": user_id_2},

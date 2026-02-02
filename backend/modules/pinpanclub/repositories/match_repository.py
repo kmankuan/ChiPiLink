@@ -134,7 +134,7 @@ class MatchRepository(BaseRepository):
         )
     
     async def get_finished_with_monday_id(self) -> List[Dict]:
-        """Get partidos finalizados que tienen monday_item_id"""
+        """Get partidos finalizados that hasn monday_item_id"""
         return await self.find_many(
             query={
                 "estado": "finalizado",

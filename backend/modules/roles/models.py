@@ -161,7 +161,7 @@ class RoleBase(BaseModel):
     descripcion: Optional[str] = None
     color: Optional[str] = "#6366f1"  # Color para UI
     icono: Optional[str] = "Shield"  # Icono lucide
-    es_sistema: bool = False  # True para roles que no se pueden eliminar
+    es_sistema: bool = False  # True para roles that does not se pueden eliminar
     nivel: int = 0  # Nivel jerárquico (mayor = más privilegios)
 
 

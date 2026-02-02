@@ -570,7 +570,7 @@ class RapidPinService(BaseService):
         if season.get("estado") != "active":
             raise ValueError("La temporada no está activa")
         
-        # Verificar que no haya ya un desafío pendiente entre estos jugadores
+        # Verificar that does not haya ya un desafío pendiente entre estos jugadores
         db = await self.get_db()
         existing = await db["rapidpin_queue"].find_one({
             "season_id": season_id,
@@ -1091,7 +1091,7 @@ class RapidPinService(BaseService):
         if challenger_id == opponent_id:
             raise ValueError("No puedes desafiarte a ti mismo")
         
-        # Verificar que no exista un desafío activo entre estos jugadores
+        # Verificar that does not exista un desafío activo entre estos jugadores
         existing = await db["rapidpin_queue"].find_one({
             "$or": [
                 {"player1_id": challenger_id, "player2_id": opponent_id},
@@ -1196,7 +1196,7 @@ class RapidPinService(BaseService):
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden responder")
         
-        # Verificar que no sea la misma persona que propuso
+        # Verificar that does not sea la misma persona que propuso
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
             raise ValueError("Debes esperar la respuesta del otro jugador")
         

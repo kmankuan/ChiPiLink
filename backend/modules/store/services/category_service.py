@@ -60,7 +60,7 @@ class CategoryService(BaseService):
     async def delete_category(self, categoria_id: str) -> bool:
         """
         Eliminar categoría (soft delete).
-        Verifica que no tenga productos activos.
+        Verifica that does not tenga productos activos.
         """
         # Verificar productos
         product_count = await self.repository.count_products(categoria_id)

@@ -1155,7 +1155,7 @@ class SuperPinService(BaseService):
         points_per_set: int = 11
     ) -> Dict:
         """
-        Crear torneo relámpago con jugadores que tienen check-in activo.
+        Crear torneo relámpago con jugadores that hasn check-in activo.
         
         pairing_mode:
         - random: Emparejar aleatoriamente
