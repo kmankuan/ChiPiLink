@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 LAOPAN_CLIENT_ID = os.environ.get("LAOPAN_OAUTH_CLIENT_ID", "")
 LAOPAN_CLIENT_SECRET = os.environ.get("LAOPAN_OAUTH_CLIENT_SECRET", "")
 LAOPAN_BASE_URL = os.environ.get("LAOPAN_OAUTH_BASE_URL", "https://laopan.online")
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://textbook-super-app.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://textflow-103.preview.emergentagent.com")
 
 # OAuth URLs
 AUTHORIZE_URL = f"{LAOPAN_BASE_URL}/oauth/authorize/"
