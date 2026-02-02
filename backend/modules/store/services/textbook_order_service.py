@@ -14,7 +14,7 @@ from core.config import MONDAY_API_KEY
 from ..repositories.textbook_order_repository import textbook_order_repository
 from ..repositories.textbook_access_repository import student_record_repository
 from .textbook_access_service import textbook_access_service
-from .monday_pedidos_service import monday_pedidos_service
+from .monday_config_service import monday_config_service
 from ..models.textbook_order import (
     OrderStatus, OrderItemStatus, OrderItem,
     SubmitOrderRequest, ReorderRequest
@@ -409,15 +409,15 @@ class TextbookOrderService(BaseService):
         """Send order to Monday.com board with items as subitems and summary as update
         Uses configuration from Integrations -> Monday.com -> Pedidos de Libros
         """
-        # Get Monday.com configuration from the store monday service
-        monday_config = await monday_pedidos_service.get_config()
+        # Get Monday.com configuration from the store config service
+        monday_config = await monday_config_service.get_config()
         board_id = monday_config.get("board_id")
         column_mapping = monday_config.get("column_mapping", {})
         subitems_enabled = monday_config.get("subitems_enabled", False)
         subitem_mapping = monday_config.get("subitem_column_mapping", {})
         
         # Get active API key
-        workspaces_config = await monday_pedidos_service.get_workspaces()
+        workspaces_config = await monday_config_service.get_workspaces()
         api_key = None
         active_workspace_id = workspaces_config.get("active_workspace_id")
         
