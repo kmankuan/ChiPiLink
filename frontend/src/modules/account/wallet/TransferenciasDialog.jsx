@@ -1,5 +1,5 @@
 /**
- * TransferenciasDialog - Dialog para transferir fondos entre conexiones
+ * TransfersDialog - Dialog for transferring funds between connections
  */
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,7 @@ import {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-export default function TransferenciasDialog({ 
+export default function TransfersDialog({ 
   open, 
   onOpenChange, 
   token, 
@@ -44,13 +44,13 @@ export default function TransferenciasDialog({
 }) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [conexiones, setConexiones] = useState([]);
+  const [connections, setConnections] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   
-  // Para invitar usuarios no registrados
+  // For inviting unregistered users
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteName, setInviteName] = useState('');
@@ -58,7 +58,7 @@ export default function TransferenciasDialog({
 
   useEffect(() => {
     if (open) {
-      loadConexiones();
+      loadConnections();
       if (preselectedUser) {
         setSelectedUser(preselectedUser);
       }
@@ -67,7 +67,7 @@ export default function TransferenciasDialog({
     }
   }, [open, preselectedUser]);
 
-  const loadConexiones = async () => {
+  const loadConnections = async () => {
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/conexiones/mis-conexiones`, {
@@ -75,14 +75,14 @@ export default function TransferenciasDialog({
       });
       if (res.ok) {
         const data = await res.json();
-        // Filtrar solo las conexiones que permiten transferir
-        const transferibles = (data.conexiones || []).filter(
+        // Filter only connections that allow transfers
+        const transferable = (data.conexiones || []).filter(
           c => c.permisos?.transferir_wallet
         );
-        setConexiones(transferibles);
+        setConnections(transferable);
       }
     } catch (err) {
-      console.error('Error loading conexiones:', err);
+      console.error('Error loading connections:', err);
     } finally {
       setLoading(false);
     }
@@ -99,7 +99,7 @@ export default function TransferenciasDialog({
 
   const handleTransfer = async () => {
     if (!selectedUser || !amount || parseFloat(amount) <= 0) {
-      toast.error('Selecciona un destinatario y monto válido');
+      toast.error(t('transfers.selectValidRecipient'));
       return;
     }
 
@@ -125,7 +125,7 @@ export default function TransferenciasDialog({
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Error en transferencia');
+      if (!res.ok) throw new Error(data.detail || 'Error in transfer');
 
       toast.success(t('transferencias.success'));
       onOpenChange(false);
@@ -138,7 +138,7 @@ export default function TransferenciasDialog({
 
   const handleInvite = async () => {
     if (!inviteEmail) {
-      toast.error('Ingresa un correo electrónico');
+      toast.error(t('transfers.enterEmail'));
       return;
     }
 
@@ -153,7 +153,7 @@ export default function TransferenciasDialog({
         body: JSON.stringify({
           email: inviteEmail,
           nombre: inviteName || null,
-          mensaje: `Te invito a registrarte en ChiPiLink para transferirte fondos.`,
+          mensaje: `I'm inviting you to register on ChiPiLink to transfer funds to you.`,
           monto_transferir: parseFloat(amount) || null
         })
       });
@@ -161,13 +161,13 @@ export default function TransferenciasDialog({
       const data = await res.json();
       
       if (data.existe) {
-        toast.info('Este usuario ya está registrado. Agrégalo a tus conexiones primero.');
+        toast.info(t('transfers.userAlreadyRegistered'));
         return;
       }
       
       if (!res.ok) throw new Error(data.detail || 'Error');
 
-      toast.success('Invitación enviada. Cuando se registre, podrás transferirle fondos.');
+      toast.success(t('transfers.invitationSent'));
       setShowInvite(false);
       setInviteEmail('');
       setInviteName('');
@@ -178,10 +178,10 @@ export default function TransferenciasDialog({
     }
   };
 
-  const getSubtypeLabel = (subtipo) => {
-    const key = `conexiones.subtypes.${subtipo}`;
+  const getSubtypeLabel = (subtype) => {
+    const key = `conexiones.subtypes.${subtype}`;
     const translated = t(key);
-    return translated !== key ? translated : subtipo;
+    return translated !== key ? translated : subtype;
   };
 
   return (
@@ -202,7 +202,7 @@ export default function TransferenciasDialog({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : showInvite ? (
-          // Formulario de invitación
+          // Invitation form
           <div className="space-y-4">
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
@@ -211,21 +211,21 @@ export default function TransferenciasDialog({
             </div>
 
             <div className="space-y-2">
-              <Label>Correo electrónico *</Label>
+              <Label>{t('transfers.emailRequired')}</Label>
               <Input
                 type="email"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="correo@ejemplo.com"
+                placeholder={t('dependents.emailPlaceholder')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Nombre (opcional)</Label>
+              <Label>{t('transfers.nameOptional')}</Label>
               <Input
                 value={inviteName}
                 onChange={(e) => setInviteName(e.target.value)}
-                placeholder="Nombre de la persona"
+                placeholder={t('transfers.personName')}
               />
             </div>
 
@@ -235,7 +235,7 @@ export default function TransferenciasDialog({
                 onClick={() => setShowInvite(false)}
                 className="flex-1"
               >
-                Volver
+                {t('transfers.back')}
               </Button>
               <Button
                 onClick={handleInvite}
@@ -247,16 +247,16 @@ export default function TransferenciasDialog({
                 ) : (
                   <>
                     <Mail className="h-4 w-4 mr-2" />
-                    Enviar invitación
+                    {t('transfers.sendInvitation')}
                   </>
                 )}
               </Button>
             </div>
           </div>
         ) : (
-          // Formulario de transferencia
+          // Transfer form
           <div className="space-y-4">
-            {/* Saldo disponible */}
+            {/* Available balance */}
             <div className="p-4 bg-primary/10 rounded-lg flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-primary" />
@@ -267,15 +267,15 @@ export default function TransferenciasDialog({
               </span>
             </div>
 
-            {/* Selección de destinatario */}
+            {/* Recipient selection */}
             {!selectedUser ? (
               <div className="space-y-2">
                 <Label>{t('transferencias.selectRecipient')}</Label>
-                {conexiones.length === 0 ? (
+                {connections.length === 0 ? (
                   <div className="text-center py-6 border rounded-lg">
                     <Users className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">
-                      No tienes conexiones con permiso de transferencia
+                      {t('transfers.noTransferPermission')}
                     </p>
                     <Button
                       variant="link"
@@ -287,7 +287,7 @@ export default function TransferenciasDialog({
                   </div>
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {conexiones.map((con) => (
+                    {connections.map((con) => (
                       <button
                         key={con.conexion_id}
                         className="w-full p-3 flex items-center gap-3 rounded-lg border hover:bg-muted/50 text-left transition-colors"
@@ -307,7 +307,7 @@ export default function TransferenciasDialog({
                         </div>
                         {con.usuario_estado === 'acudido' && (
                           <Badge variant="secondary" className="text-xs">
-                            Acudido
+                            {t('acudidos.accountStatus.acudido')}
                           </Badge>
                         )}
                       </button>
@@ -315,7 +315,7 @@ export default function TransferenciasDialog({
                   </div>
                 )}
 
-                {conexiones.length > 0 && (
+                {connections.length > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -329,7 +329,7 @@ export default function TransferenciasDialog({
               </div>
             ) : (
               <>
-                {/* Usuario seleccionado */}
+                {/* Selected user */}
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Avatar>
                     <AvatarImage src={selectedUser.usuario_avatar} />
@@ -348,11 +348,11 @@ export default function TransferenciasDialog({
                     size="sm"
                     onClick={() => setSelectedUser(null)}
                   >
-                    Cambiar
+                    {t('transfers.change')}
                   </Button>
                 </div>
 
-                {/* Monto */}
+                {/* Amount */}
                 <div className="space-y-2">
                   <Label>{t('transferencias.amount')} *</Label>
                   <div className="relative">
@@ -379,7 +379,7 @@ export default function TransferenciasDialog({
                   )}
                 </div>
 
-                {/* Mensaje */}
+                {/* Message */}
                 <div className="space-y-2">
                   <Label>{t('transferencias.message')}</Label>
                   <Input
@@ -389,12 +389,12 @@ export default function TransferenciasDialog({
                   />
                 </div>
 
-                {/* Resumen */}
+                {/* Summary */}
                 {amount && parseFloat(amount) > 0 && (
                   <div className="p-4 border rounded-lg bg-muted/30">
                     <div className="flex items-center justify-center gap-4">
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Tú</p>
+                        <p className="text-sm text-muted-foreground">{t('transfers.you')}</p>
                         <p className="font-bold">-${parseFloat(amount).toFixed(2)}</p>
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground" />
@@ -410,7 +410,7 @@ export default function TransferenciasDialog({
                   </div>
                 )}
 
-                {/* Botón de transferir */}
+                {/* Transfer button */}
                 <Button
                   onClick={handleTransfer}
                   disabled={sending || !amount || parseFloat(amount) <= 0}
@@ -433,3 +433,6 @@ export default function TransferenciasDialog({
     </Dialog>
   );
 }
+
+// Keep backward compatibility with old name
+export { TransfersDialog as TransferenciasDialog };
