@@ -603,7 +603,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             </div>
             <Button onClick={handleSaveCategory} disabled={savingCategory} className="w-full gap-2">
               {savingCategory ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Guardar Categoría
+              Save Category
             </Button>
           </div>
         </DialogContent>
