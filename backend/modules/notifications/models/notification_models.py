@@ -96,7 +96,7 @@ def get_default_notification_categories() -> List[Dict]:
         {
             "category_id": "cat_membership",
             "name": {
-                "es": "Membresías",
+                "es": "Memberships",
                 "en": "Memberships",
                 "zh": "会员资格"
             },

@@ -513,7 +513,7 @@ class WalletService(BaseService):
         self.log_info(f"Transfer {amount} {currency.value} from {from_user_id} to {to_user_id}")
         return out_result, in_result
     
-    # ============== PENDING BALANCES (NIÑOS) ==============
+    # ============== PENDING BALANCES (CHILDREN) ==============
     
     async def create_pending_balance(
         self,

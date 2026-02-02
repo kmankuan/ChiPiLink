@@ -114,7 +114,7 @@ BLOCK_TEMPLATES = {
         }
     },
     "cta": {
-        "nombre": "Llamada a la Acción",
+        "nombre": "Llamada a la Action",
         "descripcion": "Botón destacado con mensaje",
         "config_default": {
             "titulo": "¿Listo para comenzar?",

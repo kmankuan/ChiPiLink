@@ -35,7 +35,7 @@ CONTENT_SOURCES = [
 
 # Categorys por audiencia predefinidas
 DEFAULT_CATEGORIES = [
-    {"category_id": "ninos", "nombre": "Para Niños", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
+    {"category_id": "ninos", "nombre": "Para Childs", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
     {"category_id": "padres", "nombre": "Padres de Familia", "nombre_en": "For Parents", "nombre_zh": "家长内容", "icono": "👨‍👩‍👧", "orden": 2},
     {"category_id": "cultura_local", "nombre": "Cultura Local", "nombre_en": "Local Culture", "nombre_zh": "当地文化", "icono": "🌴", "orden": 3},
     {"category_id": "cultura_china", "nombre": "Cultura China", "nombre_en": "Chinese Culture", "nombre_zh": "中国文化", "icono": "🏮", "orden": 4},
@@ -56,7 +56,7 @@ async def get_content_hub_status():
         "message": "Content Hub - Curation de Contenido Multimedia",
         "planned_features": [
             "Importar videos/posts de multiple redes sociales",
-            "Categorización por audiencia (childs, padres, etc.)",
+            "Categorization por audiencia (childs, padres, etc.)",
             "Embed de videos (YouTube, Instagram, etc.)",
             "Playlists y collections",
             "Feed personalizado por category",

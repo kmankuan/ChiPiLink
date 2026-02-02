@@ -225,7 +225,7 @@ async def accept_challenge(
     """
     Aceptar challenge.
     - El oponente (player2) puede aceptar
-    - Admin/Mod pueden forzar aceptación
+    - Admin/Mod pueden forzar acceptance
     """
     try:
         return await rapidpin_service.accept_challenge(queue_id, user_id, user_role)

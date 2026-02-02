@@ -242,7 +242,7 @@ class ConexionesService:
         
         return {"success": True}
     
-    # ============== SOLICITUDES DE CONEXIÓN ==============
+    # ============== SOLICITUDES DE CONNECTION ==============
     
     async def crear_request(
         self,
@@ -495,7 +495,7 @@ class ConexionesService:
         """Process invitation cuando usuario se registra"""
         invitacion = await db.invitaciones.find_one({"token": token, "estado": "pendiente"})
         if not invitacion:
-            return {"error": "Invitación no valid o expirada"}
+            return {"error": "Invitation no valid o expirada"}
         
         # Mark como aceptada
         await db.invitaciones.update_one(

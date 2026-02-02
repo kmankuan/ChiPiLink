@@ -140,7 +140,7 @@ class PostService(BaseService):
         comment_dict["post_id"] = post_id
         comment_dict["usuario_id"] = usuario_id
         if not comment_dict.get("nombre_usuario"):
-            comment_dict["nombre_usuario"] = "Anónimo"
+            comment_dict["nombre_usuario"] = "Anonymous"
         
         result = await self.comment_repository.create(comment_dict)
         return Comment(**result)

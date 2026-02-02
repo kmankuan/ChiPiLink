@@ -70,7 +70,7 @@ async def get_auth_config(admin: dict = Depends(get_admin_user)):
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Address"},
-                "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
+                "contrasena": {"required": True, "visible": True, "label": "Password"}
             },
             "auto_capture_location": True
         }
@@ -127,7 +127,7 @@ async def get_public_auth_config():
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Address"},
-                "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
+                "contrasena": {"required": True, "visible": True, "label": "Password"}
             },
             "auto_capture_location": True
         }

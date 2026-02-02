@@ -124,8 +124,8 @@ async def seed_landing_page():
                 "publicado": True,
                 "config": {
                     "titulo": "Bienvenido a ChiPi Link",
-                    "subtitulo": "Tu comunidad china en Panamá, conectada",
-                    "descripcion": "La super app que conecta a la comunidad china en Panamá con servicios, comercio y entretenimiento.",
+                    "subtitulo": "Tu comunidad china en Panama, conectada",
+                    "descripcion": "La super app que conecta a la comunidad china en Panama con servicios, comercio y entretenimiento.",
                     "cta_texto": "Explorar",
                     "cta_link": "/unatienda",
                     "imagen_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",

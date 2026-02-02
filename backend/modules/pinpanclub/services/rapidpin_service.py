@@ -713,7 +713,7 @@ class RapidPinService(BaseService):
         """
         Aceptar challenge.
         - El oponente (player2) puede aceptar
-        - Admin/Mod pueden forzar aceptación
+        - Admin/Mod pueden forzar acceptance
         """
         db = await self.get_db()
         

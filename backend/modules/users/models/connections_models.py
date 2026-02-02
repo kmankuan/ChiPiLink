@@ -100,7 +100,7 @@ class PermisosConexion(BaseModel):
     limite_transferencia_diario: Optional[float] = None
 
 
-# ============== MODELOS DE CONEXIÓN ==============
+# ============== MODELOS DE CONNECTION ==============
 
 class Conexion(BaseModel):
     """Connection entre dos usuarios"""
@@ -162,7 +162,7 @@ class SolicitudCreate(BaseModel):
 # ============== MODELOS DE INVITACIÓN ==============
 
 class Invitacion(BaseModel):
-    """Invitación a usuario no registrado"""
+    """Invitation a usuario no registrado"""
     invitacion_id: str = Field(default_factory=lambda: f"inv_{uuid.uuid4().hex[:12]}")
     invitado_por_id: str
     invitado_por_nombre: Optional[str] = None
@@ -285,7 +285,7 @@ class AlertaWallet(BaseModel):
     resuelta_en: Optional[str] = None
 
 
-# ============== CONFIGURACIÓN DE PERMISOS POR RELACIÓN ==============
+# ============== CONFIGURATION DE PERMISOS POR RELACIÓN ==============
 
 class ConfigPermisosRelacion(BaseModel):
     """Configuration de permisos by default para un tipo de relationship"""
@@ -295,7 +295,7 @@ class ConfigPermisosRelacion(BaseModel):
     descripcion: Optional[str] = None
 
 
-# ============== CONFIGURACIÓN DE MARKETING ==============
+# ============== CONFIGURATION DE MARKETING ==============
 
 class MarketingConfig(BaseModel):
     """Configuration de marketing para un usuario"""
@@ -470,7 +470,7 @@ def get_default_membresias() -> List[Dict]:
                 {"plan_id": "pase_12", "nombre": "Pase 12 Visitas", "precio": 300, "tipo": "visits", "visitas": 12, "dias_validez": 90},
                 {"plan_id": "ilimitado_mensual", "nombre": "Ilimitado Mensual", "precio": 150, "tipo": "unlimited", "dias_validez": 30},
                 {"plan_id": "prueba", "nombre": "Prueba Gratis", "precio": 0, "tipo": "trial", "visitas": 2, "dias_validez": 14},
-                {"plan_id": "cortesia", "nombre": "Cortesía", "precio": 0, "tipo": "courtesy", "dias_validez": 365}
+                {"plan_id": "cortesia", "nombre": "Courtesy", "precio": 0, "tipo": "courtesy", "dias_validez": 365}
             ],
             "activa": True,
             "orden": 1

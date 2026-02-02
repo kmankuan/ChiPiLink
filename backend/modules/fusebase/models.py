@@ -37,7 +37,7 @@ class FuseBaseDocument(BaseModel):
     tipo: str = "documento"  # documento, wiki, nota, tarea
     url_embed: Optional[str] = None
     url_directo: Optional[str] = None
-    # Clasificación local
+    # Classification local
     categoria: Optional[str] = None
     tags: List[str] = []
     publico: bool = False  # Visible para todos o solo admin

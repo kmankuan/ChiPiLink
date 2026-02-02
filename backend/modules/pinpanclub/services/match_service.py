@@ -194,7 +194,7 @@ class MatchService(BaseService):
             priority=EventPriority.HIGH
         )
         
-        # Si se completó set, emitir evento
+        # Si se completed set, emitir evento
         if set_completado:
             await self.emit_event(
                 PinpanClubEvents.MATCH_SET_COMPLETED,

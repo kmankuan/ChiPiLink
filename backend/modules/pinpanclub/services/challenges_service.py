@@ -222,7 +222,7 @@ class ChallengeService(BaseService):
             status = None
             if new_value >= target:
                 status = "completed"
-                # Procesar completación
+                # Procesar completion
                 await self._on_challenge_completed(jugador_id, progress, challenge)
             
             await self.player_challenge_repo.update_progress(
@@ -244,7 +244,7 @@ class ChallengeService(BaseService):
         progress: Dict, 
         challenge: Dict
     ):
-        """Process completación de reto"""
+        """Process completion de reto"""
         # Update leaderboard
         player = await self.player_repo.get_by_id(jugador_id)
         lb_entry = await self.leaderboard_repo.get_or_create(

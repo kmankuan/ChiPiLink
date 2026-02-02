@@ -123,6 +123,6 @@ class BaseRepository(ABC, Generic[T]):
         return doc is not None
     
     async def aggregate(self, pipeline: List[Dict]) -> List[Dict]:
-        """Ejecutar pipeline de agregación"""
+        """Ejecutar pipeline de aggregation"""
         cursor = self._collection.aggregate(pipeline)
         return await cursor.to_list(length=None)

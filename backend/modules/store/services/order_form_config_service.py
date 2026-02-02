@@ -250,7 +250,7 @@ class OrderFormConfigService:
         """Get available field types with descriptions"""
         return [
             {"type": "text", "label": "Text Input", "label_es": "Texto", "label_zh": "文本输入", "description": "Single line text"},
-            {"type": "textarea", "label": "Text Area", "label_es": "Área de Texto", "label_zh": "文本区域", "description": "Multi-line text"},
+            {"type": "textarea", "label": "Text Area", "label_es": "Area de Texto", "label_zh": "文本区域", "description": "Multi-line text"},
             {"type": "number", "label": "Number", "label_es": "Number", "label_zh": "数字", "description": "Numeric input"},
             {"type": "select", "label": "Dropdown", "label_es": "Lista Desplegable", "label_zh": "下拉列表", "description": "Single selection"},
             {"type": "multiselect", "label": "Multi-Select", "label_es": "Selection Múltiple", "label_zh": "多选", "description": "Multiple selection"},

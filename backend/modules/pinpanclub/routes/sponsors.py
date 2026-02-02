@@ -19,7 +19,7 @@ class SponsorType(str, Enum):
     PRIMARY = "primary"       # Banner horizontal grande
     SPECIAL = "special"       # Square spaces in header
     SECONDARY = "secondary"   # Others espacios
-    ROTATING = "rotating"     # Rotación automatic
+    ROTATING = "rotating"     # Rotation automatic
 
 class SponsorPosition(str, Enum):
     HEADER_LEFT = "header_left"
@@ -57,7 +57,7 @@ class SponsorCreate(BaseModel):
     animacion: DisplayAnimation = Field(default=DisplayAnimation.NONE)
     duracion_animacion: int = Field(default=1000, description="ms")
     
-    # Rotación (para banners rotativos)
+    # Rotation (para banners rotativos)
     duracion_display: int = Field(default=10, description="Segundos que se muestra")
     orden: int = Field(default=0, description="Orden en la rotación")
     

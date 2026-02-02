@@ -277,13 +277,13 @@ class PointsConversion(BaseModel):
     created_at: Optional[str] = None
 
 
-# ============== SALDO PENDIENTE (NIÑOS) ==============
+# ============== SALDO PENDIENTE (CHILDREN) ==============
 
 class PendingBalance(BaseModel):
     """Saldo pendiente de un usuario (cargado a acudiente)"""
     pending_id: str = Field(default_factory=lambda: f"pend_{uuid.uuid4().hex[:8]}")
     
-    # User que consumió
+    # User que consumed
     user_id: str
     profile_id: Optional[str] = None
     
@@ -357,7 +357,7 @@ class PointsHistory(BaseModel):
     wallet_id: str
     user_id: str
     
-    # Acción
+    # Action
     action: str  # earned, spent, converted, expired, adjusted
     earn_type: Optional[PointsEarnType] = None
     

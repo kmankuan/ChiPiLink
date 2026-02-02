@@ -157,7 +157,7 @@ async def get_integration_info():
             "embed": {
                 "description": "Embeber workspace completo de FuseBase",
                 "required": ["embed_url"],
-                "features": ["Wiki completa", "Documentos", "Navegación integrada"]
+                "features": ["Wiki completa", "Documentos", "Navigation integrada"]
             },
             "api": {
                 "description": "Sincronizar documentos via API",

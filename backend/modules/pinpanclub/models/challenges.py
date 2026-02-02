@@ -232,7 +232,7 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 100
         },
         {
-            "name": "Remontada Épica",
+            "name": "Remontada Epic",
             "description": "Gana un partido after de perder el primer set",
             "type": "comeback",
             "difficulty": "hard",

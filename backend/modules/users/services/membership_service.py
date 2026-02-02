@@ -55,7 +55,7 @@ class MembershipService:
                     "zh": "12次访问通行证"
                 },
                 "description": {
-                    "es": "Pase de 12 visitas al club. Válido por 3 meses.",
+                    "es": "Pase de 12 visitas al club. Valid por 3 meses.",
                     "en": "12 visits pass to the club. Valid for 3 months.",
                     "zh": "俱乐部12次访问通行证。3个月内有效。"
                 },
@@ -78,7 +78,7 @@ class MembershipService:
                     "zh": "6次访问通行证"
                 },
                 "description": {
-                    "es": "Pase de 6 visitas al club. Válido por 2 meses.",
+                    "es": "Pase de 6 visitas al club. Valid por 2 meses.",
                     "en": "6 visits pass to the club. Valid for 2 months.",
                     "zh": "俱乐部6次访问通行证。2个月内有效。"
                 },
@@ -139,12 +139,12 @@ class MembershipService:
             {
                 "plan_id": "plan_courtesy",
                 "name": {
-                    "es": "Cortesía",
+                    "es": "Courtesy",
                     "en": "Courtesy",
                     "zh": "礼遇"
                 },
                 "description": {
-                    "es": "Membresía de courtesy otorgada por el club.",
+                    "es": "Membership de courtesy otorgada por el club.",
                     "en": "Courtesy membership granted by the club.",
                     "zh": "俱乐部授予的礼遇会员资格。"
                 },
@@ -498,7 +498,7 @@ class MembershipService:
         config = {
             "config_id": "visit_config",
             "min_duration_minutes": 30,  # Minimum para contar como visita regular
-            "quick_visit_max_minutes": 15,  # Máximo para visita rápida (no consume)
+            "quick_visit_max_minutes": 15,  # Maximum para visita rápida (no consume)
             "check_in_methods": ["qr", "pin", "geolocation", "manual"],
             "require_checkout": True,
             "auto_checkout_hours": 8,  # Auto checkout after de 8 horas
@@ -631,7 +631,7 @@ class MembershipService:
             }
         )
         
-        # Si consumió visita, descontar de membership
+        # Si consumed visita, descontar de membership
         if consumed_visit:
             membership = await self.get_active_membership(visit["user_id"])
             if membership and membership.get("visits_remaining") is not None:

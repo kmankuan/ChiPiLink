@@ -289,7 +289,7 @@ class FormConfigService(BaseService):
                         "field": key,
                         "error": "max_length",
                         "message_en": f"Maximum {field['max_length']} characters allowed",
-                        "message_es": f"Máximo {field['max_length']} characters permitidos"
+                        "message_es": f"Maximum {field['max_length']} characters permitidos"
                     })
             
             elif field_type == "number":

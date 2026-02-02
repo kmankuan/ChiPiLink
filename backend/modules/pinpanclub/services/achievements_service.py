@@ -142,7 +142,7 @@ class AchievementsService(BaseService):
         }
     
     async def _check_weekly_complete(self, jugador_id: str) -> bool:
-        """Verify si the player completó all challenges de la semana actual"""
+        """Verify si the player completed all challenges de la semana actual"""
         # Get semana actual
         week = await db.pinpanclub_challenges_weekly.find_one(
             {"is_active": True},

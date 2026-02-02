@@ -15,15 +15,15 @@ router = APIRouter(prefix="/seed", tags=["Demo Data"])
 # Demo Players for PinPanClub
 DEMO_PLAYERS = [
     {"nombre": "Carlos Mendoza", "apodo": "El Rayo", "email": "carlos@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos"},
-    {"nombre": "María González", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
+    {"nombre": "Maria Gonzalez", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
     {"nombre": "Juan Perez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
-    {"nombre": "Ana López", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
-    {"nombre": "Pedro Sánchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
-    {"nombre": "Laura Martínez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},
+    {"nombre": "Ana Lopez", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
+    {"nombre": "Pedro Sanchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
+    {"nombre": "Laura Martinez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},
     {"nombre": "Roberto Chen", "apodo": "Dragon", "email": "roberto@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=roberto"},
     {"nombre": "Sofia Wang", "apodo": "Phoenix", "email": "sofia@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=sofia"},
     {"nombre": "Miguel Torres", "apodo": "El Maestro", "email": "miguel@demo.com", "nivel": "profesional", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=miguel"},
-    {"nombre": "Isabella Rodríguez", "apodo": "La Reina", "email": "isabella@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=isabella"},
+    {"nombre": "Isabella Rodriguez", "apodo": "La Reina", "email": "isabella@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=isabella"},
     {"nombre": "David Kim", "apodo": "Samurai", "email": "david@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=david"},
     {"nombre": "Valentina Cruz", "apodo": "Valkyrie", "email": "valentina@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=valentina"},
 ]
@@ -347,7 +347,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
     demo_users = [
         {"nombre": "Demo Usuario", "email": "demo@chipilink.com", "tipo": "regular"},
         {"nombre": "Demo Padre", "email": "padre@chipilink.com", "tipo": "parent"},
-        {"nombre": "Demo Niño", "email": "nino@chipilink.com", "tipo": "child"},
+        {"nombre": "Demo Child", "email": "nino@chipilink.com", "tipo": "child"},
     ]
     
     user_ids_created = []

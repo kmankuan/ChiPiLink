@@ -103,7 +103,7 @@ class FormConfigRepository(BaseRepository):
                     "label_es": "Nombre Completo del Estudiante",
                     "label_zh": "学生全名",
                     "placeholder_en": "e.g., John Smith",
-                    "placeholder_es": "ej: Juan Perez García",
+                    "placeholder_es": "ej: Juan Perez Garcia",
                     "placeholder_zh": "例如：张三",
                     "min_length": 2,
                     "max_length": 100
@@ -151,7 +151,7 @@ class FormConfigRepository(BaseRepository):
                     "is_required": True,
                     "order": 4,
                     "label_en": "Relationship to Student",
-                    "label_es": "Relación con el Estudiante",
+                    "label_es": "Relationship con el Estudiante",
                     "label_zh": "与学生的关系",
                     "options": [
                         {"value": "parent", "label_en": "Parent", "label_es": "Padre/Madre", "label_zh": "父母"},

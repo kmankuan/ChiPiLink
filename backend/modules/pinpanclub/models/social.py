@@ -33,7 +33,7 @@ class ActivityType(str, Enum):
 # ============== FOLLOW ==============
 
 class Follow(BaseModel):
-    """Relación de seguimiento entre jugadores"""
+    """Relationship de seguimiento entre jugadores"""
     follow_id: str = Field(default_factory=lambda: f"follow_{uuid.uuid4().hex[:8]}")
     follower_id: str      # Who follows
     following_id: str     # Who is followed
@@ -187,7 +187,7 @@ class Notification(BaseModel):
     is_read: bool = False
     is_pushed: bool = False  # Si ya se sent por WebSocket
     
-    # Navegación
+    # Navigation
     action_url: Optional[str] = None
     
     created_at: Optional[Any] = None

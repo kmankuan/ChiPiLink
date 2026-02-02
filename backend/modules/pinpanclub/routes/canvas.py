@@ -235,7 +235,7 @@ async def obtener_presets():
         },
         {
             "preset_id": "single",
-            "name": "Partido Único",
+            "name": "Partido Unique",
             "description": "Una sola mesa en pantalla completa",
             "layout": [
                 {"i": "main", "x": 0, "y": 0, "w": 12, "h": 6, "minW": 6, "minH": 4},

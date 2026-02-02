@@ -419,7 +419,7 @@ def get_default_user_types() -> List[Dict]:
         {
             "type_id": "utype_member_child",
             "name": {"es": "Miembro Infantil", "en": "Child Member", "zh": "儿童会员"},
-            "description": {"es": "Niño miembro del club", "en": "Child club member", "zh": "俱乐部儿童会员"},
+            "description": {"es": "Child miembro del club", "en": "Child club member", "zh": "俱乐部儿童会员"},
             "category": "dependent",
             "icon": "🏓",
             "color": "#f59e0b",
@@ -468,7 +468,7 @@ def get_default_user_types() -> List[Dict]:
         {
             "type_id": "utype_special",
             "name": {"es": "Miembro Especial", "en": "Special Member", "zh": "特殊会员"},
-            "description": {"es": "Membresía de courtesy", "en": "Courtesy membership", "zh": "礼遇会员"},
+            "description": {"es": "Membership de courtesy", "en": "Courtesy membership", "zh": "礼遇会员"},
             "category": "special",
             "icon": "⭐",
             "color": "#ec4899",

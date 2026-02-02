@@ -1,5 +1,5 @@
 """
-Event Bus - Sistema de eventos interno para comunicación entre modules
+Event Bus - Sistema de eventos interno para communication entre modules
 Preparado para escalar a Redis/RabbitMQ en el futuro
 """
 import asyncio
@@ -49,7 +49,7 @@ class Event:
 
 class EventBus:
     """
-    Event Bus interno para comunicación entre modules.
+    Event Bus interno para communication entre modules.
     
     Features:
     - Pub/Sub like thisncrono

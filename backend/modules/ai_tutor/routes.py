@@ -38,13 +38,13 @@ async def get_tutor_status():
         "configured": config is not None,
         "message": "AI Tutor - Tutor Inteligente para Estudiantes",
         "planned_features": [
-            "Práctica de vocabulario con voz",
+            "Practice de vocabulario con voz",
             "Evaluation de pronunciation en tiempo real",
             "Feedback personalizado del tutor",
             "Planes de lesson adaptativos",
             "Seguimiento de progreso",
             "Múltiples idiomas (English, Chino, Espyearl)",
-            "Gamificación con logros y rachas"
+            "Gamification con logros y rachas"
         ],
         "required_integrations": [
             "LLM (OpenAI/Anthropic/Google) - Para el tutor inteligente",
@@ -110,7 +110,7 @@ async def create_tutor_session(session_data: dict, user: dict = Depends(get_curr
     return {
         "success": True,
         "session": session,
-        "message": "Sesión creada - Placeholder. Requiere integration LLM para funcionalidad completa."
+        "message": "Session creada - Placeholder. Requiere integration LLM para funcionalidad completa."
     }
 
 

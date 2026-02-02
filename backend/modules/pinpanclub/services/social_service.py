@@ -129,7 +129,7 @@ class SocialService(BaseService):
                 user_id=data.target_id,
                 type=NotificationType.NEW_COMMENT,
                 title="Nuevo comentario",
-                message=f"{author.get('apodo') or author.get('nombre', 'Alguien')} comentó en tu perfil",
+                message=f"{author.get('apodo') or author.get('nombre', 'Alguien')} commented en tu perfil",
                 data={"comment_id": result["comment_id"], "author_id": data.author_id},
                 action_url=f"/pinpanclub/superpin/player/{data.target_id}"
             ))

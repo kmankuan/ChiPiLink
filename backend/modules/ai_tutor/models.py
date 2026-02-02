@@ -29,7 +29,7 @@ class TutorConfig(BaseModel):
 
 
 class TutorSession(BaseModel):
-    """Sesión de tutoring"""
+    """Session de tutoring"""
     model_config = ConfigDict(extra="ignore")
     session_id: str = Field(default_factory=lambda: f"tutor_{uuid.uuid4().hex[:12]}")
     estudiante_id: str
@@ -63,7 +63,7 @@ class VocabularyItem(BaseModel):
     audio_url: Optional[str] = None  # Audio de pronunciation correcta
     imagen_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
-    # Categorización
+    # Categorization
     categoria: Optional[str] = None  # colores, animales, numbers, etc.
     nivel: str = "basico"
     idioma_origen: str = "es"

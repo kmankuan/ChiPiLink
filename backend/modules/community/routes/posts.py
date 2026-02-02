@@ -60,7 +60,7 @@ async def add_comment(
     try:
         usuario_id = user.get("user_id") if user else None
         if user and not data.nombre_usuario:
-            data.nombre_usuario = user.get("nombre", "Anónimo")
+            data.nombre_usuario = user.get("nombre", "Anonymous")
         return await post_service.add_comment(post_id, data, usuario_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -934,7 +934,7 @@ class SuperPinService(BaseService):
         if liga_id:
             pipeline.insert(0, {"$match": {"liga_id": liga_id}})
         
-        # Ejecutar agregación
+        # Ejecutar aggregation
         collection = self.badge_repo.collection
         cursor = collection.aggregate(pipeline)
         results = await cursor.to_list(length=limit)

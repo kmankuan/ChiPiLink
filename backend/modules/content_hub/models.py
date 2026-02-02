@@ -49,7 +49,7 @@ class ContentItemBase(BaseModel):
     embed_url: Optional[str] = None  # URL for embed (if applicable)
     embed_code: Optional[str] = None  # HTML embed code
     thumbnail_url: Optional[str] = None  # Preview image
-    # Clasificación
+    # Classification
     categorias: List[str] = []  # Category IDs (audiences)
     tags: List[str] = []  # Etiquetas adicionales
     # Original content metadata

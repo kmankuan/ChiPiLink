@@ -43,7 +43,7 @@ async def get_supervisor_status():
             "Anuncios por voz (TTS) para recordar tareas",
             "Comandos de voz para marcar tareas completadas",
             "Recordatorios automatics inteligentes",
-            "Gamificación con puntos y logros",
+            "Gamification con puntos y logros",
             "Supervisión para childs en casa y estudiantes",
             "Synchronization bidireccional con Monday.com",
             "Reportes de productividad para padres/maestros"
