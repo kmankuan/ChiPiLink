@@ -413,30 +413,30 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingProduct ? 'Editar Libro' : 'Nuevo Libro'}
+              {editingProduct ? 'Edit Book' : 'New Book'}
             </DialogTitle>
             <DialogDescription>
-              {editingProduct ? 'Modifica los datos del libro' : 'Agrega un nuevo libro al catálogo privado PCA'}
+              {editingProduct ? 'Modify the book data' : 'Add a new book to the private PCA catalog'}
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <label className="text-sm font-medium">Nombre *</label>
+                <label className="text-sm font-medium">Name *</label>
                 <Input
-                  value={formData.nombre}
-                  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                  placeholder="Ej: Matemáticas 5to Grado - Pearson"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  placeholder="Ex: Mathematics 5th Grade - Pearson"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Código</label>
+                <label className="text-sm font-medium">Code</label>
                 <Input
-                  value={formData.codigo}
-                  onChange={(e) => setFormData({...formData, codigo: e.target.value})}
-                  placeholder="Ej: MAT-5-2026"
+                  value={formData.code}
+                  onChange={(e) => setFormData({...formData, code: e.target.value})}
+                  placeholder="Ex: MAT-5-2026"
                 />
               </div>
               
@@ -445,74 +445,74 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                 <Input
                   value={formData.isbn}
                   onChange={(e) => setFormData({...formData, isbn: e.target.value})}
-                  placeholder="Ej: 978-607-32-4583-2"
+                  placeholder="Ex: 978-607-32-4583-2"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Grado *</label>
+                <label className="text-sm font-medium">Grade *</label>
                 <select
-                  value={formData.grado}
-                  onChange={(e) => setFormData({...formData, grado: e.target.value})}
+                  value={formData.grade}
+                  onChange={(e) => setFormData({...formData, grade: e.target.value})}
                   className="w-full px-3 py-2 border rounded-md bg-background"
                 >
-                  <option value="">Seleccionar grado</option>
-                  {GRADOS_OPCIONES.map(g => (
+                  <option value="">Select grade</option>
+                  {GRADE_OPTIONS.map(g => (
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
               </div>
               
               <div>
-                <label className="text-sm font-medium">Materia</label>
+                <label className="text-sm font-medium">Subject</label>
                 <select
-                  value={formData.materia}
-                  onChange={(e) => setFormData({...formData, materia: e.target.value})}
+                  value={formData.subject}
+                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
                   className="w-full px-3 py-2 border rounded-md bg-background"
                 >
-                  <option value="">Seleccionar materia</option>
-                  {MATERIAS_OPCIONES.map(m => (
+                  <option value="">Select subject</option>
+                  {SUBJECT_OPTIONS.map(m => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
               </div>
               
               <div>
-                <label className="text-sm font-medium">Editorial</label>
+                <label className="text-sm font-medium">Publisher</label>
                 <Input
-                  value={formData.editorial}
-                  onChange={(e) => setFormData({...formData, editorial: e.target.value})}
-                  placeholder="Ej: Pearson, SM, Norma..."
+                  value={formData.publisher}
+                  onChange={(e) => setFormData({...formData, publisher: e.target.value})}
+                  placeholder="Ex: Pearson, SM, Norma..."
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Precio *</label>
+                <label className="text-sm font-medium">Price *</label>
                 <Input
                   type="number"
                   step="0.01"
-                  value={formData.precio}
-                  onChange={(e) => setFormData({...formData, precio: e.target.value})}
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
                   placeholder="0.00"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Precio Oferta</label>
+                <label className="text-sm font-medium">Sale Price</label>
                 <Input
                   type="number"
                   step="0.01"
-                  value={formData.precio_oferta}
-                  onChange={(e) => setFormData({...formData, precio_oferta: e.target.value})}
-                  placeholder="Dejar vacío si no hay oferta"
+                  value={formData.sale_price}
+                  onChange={(e) => setFormData({...formData, sale_price: e.target.value})}
+                  placeholder="Leave empty if no sale"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">URL de Imagen</label>
+                <label className="text-sm font-medium">Image URL</label>
                 <Input
-                  value={formData.imagen_url}
-                  onChange={(e) => setFormData({...formData, imagen_url: e.target.value})}
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
                   placeholder="https://..."
                 />
               </div>
