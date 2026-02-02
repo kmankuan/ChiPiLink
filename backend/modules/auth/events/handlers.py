@@ -38,7 +38,7 @@ def setup_event_handlers():
     @event_bus.subscribe(AuthEvents.USER_LOGGED_IN)
     async def on_user_logged_in(event: Event):
         """
-        Registrar último login del usuario.
+        Registrar último login of the user.
         """
         payload = event.payload
         user_id = payload.get("user_id")

@@ -245,7 +245,7 @@ async def listar_patrocinadores(
 
 @router.get("/{sponsor_id}", response_model=dict)
 async def obtener_patrocinador(sponsor_id: str):
-    """Get un patrocinador por ID"""
+    """Get un patrocinador by ID"""
     from main import db
     
     sponsor = await db.pingpong_sponsors.find_one(

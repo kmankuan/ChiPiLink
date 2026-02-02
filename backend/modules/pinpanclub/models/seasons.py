@@ -68,7 +68,7 @@ class RankingSeason(BaseModel):
     # Metadata
     created_at: Optional[str] = None
     closed_at: Optional[str] = None
-    theme: Optional[Dict] = None  # Tema visual de la temporada
+    theme: Optional[Dict] = None  # Tema visual of the season
 
 
 class SeasonParticipant(BaseModel):
@@ -77,10 +77,10 @@ class SeasonParticipant(BaseModel):
     season_id: str
     jugador_id: str
     
-    # Info del jugador (cached)
+    # Info of the player (cached)
     jugador_info: Optional[Dict] = None
     
-    # Points de la temporada (se reinician cada temporada)
+    # Points of the season (se reinician cada temporada)
     season_points: int = 0
     challenges_completed: int = 0
     current_streak: int = 0

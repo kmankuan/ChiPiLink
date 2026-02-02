@@ -89,7 +89,7 @@ async def get_current_season_leaderboard(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Get leaderboard de la temporada actual"""
+    """Get leaderboard of the season actual"""
     season = await seasons_service.get_current_season()
     
     if not season:
@@ -129,7 +129,7 @@ async def get_season_leaderboard(
 
 @router.get("/player/{jugador_id}/current")
 async def get_player_current_season_stats(jugador_id: str):
-    """Get estadísticas del jugador en la temporada actual"""
+    """Get estadísticas of the player en la temporada actual"""
     stats = await seasons_service.get_player_season_stats(jugador_id)
     
     if not stats:
@@ -152,7 +152,7 @@ async def get_player_current_season_stats(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats/{season_id}")
 async def get_player_season_stats(jugador_id: str, season_id: str):
-    """Get estadísticas del jugador en a season específica"""
+    """Get estadísticas of the player en a season específica"""
     stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
     
     if not stats:

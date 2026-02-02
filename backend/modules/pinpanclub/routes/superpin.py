@@ -31,7 +31,7 @@ async def get_leagues(active_only: bool = False):
 
 @router.get("/leagues/{liga_id}", response_model=SuperPinLeague)
 async def get_league(liga_id: str):
-    """Get liga por ID"""
+    """Get liga by ID"""
     league = await superpin_service.get_league(liga_id)
     if not league:
         raise HTTPException(status_code=404, detail="Liga no encontrada")
@@ -133,7 +133,7 @@ async def create_match(data: SuperPinMatchCreate):
 
 @router.get("/matches/{partido_id}", response_model=SuperPinMatch)
 async def get_match(partido_id: str):
-    """Get partido por ID"""
+    """Get partido by ID"""
     match = await superpin_service.get_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Partido not found")
@@ -251,7 +251,7 @@ async def get_league_tournaments(liga_id: str):
 
 @router.get("/tournaments/{torneo_id}", response_model=SeasonTournament)
 async def get_tournament(torneo_id: str):
-    """Get torneo por ID"""
+    """Get torneo by ID"""
     tournament = await superpin_service.tournament_repo.get_by_id(torneo_id)
     if not tournament:
         raise HTTPException(status_code=404, detail="Torneo not found")

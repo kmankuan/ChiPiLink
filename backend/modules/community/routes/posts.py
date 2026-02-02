@@ -28,7 +28,7 @@ async def get_posts(
 
 @router.get("/{post_id}", response_model=Post)
 async def get_post(post_id: str):
-    """Get post por ID (incrementa vistas)"""
+    """Get post by ID (incrementa vistas)"""
     post = await post_service.get_post(post_id, increment_views=True)
     if not post:
         raise HTTPException(status_code=404, detail="Post no encontrado")

@@ -29,7 +29,7 @@ class ProductRepository(BaseRepository):
         return await self.insert_one(product_data)
     
     async def get_by_id(self, libro_id: str) -> Optional[Dict]:
-        """Get producto por ID"""
+        """Get producto by ID"""
         return await self.find_by_id(self.ID_FIELD, libro_id)
     
     async def get_all_active(

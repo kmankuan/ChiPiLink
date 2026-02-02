@@ -88,7 +88,7 @@ class RankingSeasonsService(BaseService):
         return season
     
     async def get_season_by_id(self, season_id: str) -> Optional[Dict]:
-        """Get una temporada por ID"""
+        """Get una temporada by ID"""
         return await db.pinpanclub_ranking_seasons.find_one(
             {"season_id": season_id},
             {"_id": 0}
@@ -410,7 +410,7 @@ class RankingSeasonsService(BaseService):
         challenge_completed: bool = True
     ):
         """
-        Actualizar estadísticas del jugador en la temporada actual.
+        Actualizar estadísticas of the player en la temporada actual.
         Llamar después de completar un reto.
         """
         season = await self.get_current_season()
@@ -419,7 +419,7 @@ class RankingSeasonsService(BaseService):
         
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener info del jugador
+        # Obtener info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}
@@ -454,7 +454,7 @@ class RankingSeasonsService(BaseService):
             upsert=True
         )
         
-        # Actualizar estadísticas de la temporada
+        # Actualizar estadísticas of the season
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season["season_id"]},
             {

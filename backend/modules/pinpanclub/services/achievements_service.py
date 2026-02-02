@@ -65,7 +65,7 @@ class AchievementsService(BaseService):
         """
         awarded = []
         
-        # Obtener estadísticas del jugador
+        # Obtener estadísticas of the player
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
         # Obtener logros que el jugador aún does not have
@@ -89,7 +89,7 @@ class AchievementsService(BaseService):
         return awarded
     
     async def _get_player_challenge_stats(self, jugador_id: str) -> Dict:
-        """Get estadísticas de retos del jugador"""
+        """Get estadísticas de retos of the player"""
         # Challenges completados total
         completed_total = await db.pinpanclub_challenges_progress.count_documents({
             "jugador_id": jugador_id,
@@ -189,7 +189,7 @@ class AchievementsService(BaseService):
         """Otorgar un logro al jugador"""
         now = datetime.now(timezone.utc).isoformat()
         
-        # Obtener info del jugador
+        # Obtener info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}

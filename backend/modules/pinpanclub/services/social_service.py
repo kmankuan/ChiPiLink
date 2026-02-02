@@ -204,7 +204,7 @@ class SocialService(BaseService):
         target_id: str, 
         target_type: str
     ) -> Optional[str]:
-        """Get tipo de reacción del usuario"""
+        """Get tipo de reacción of the user"""
         reaction = await self.reaction_repo.find_user_reaction(user_id, target_id, target_type)
         return reaction["reaction_type"] if reaction else None
     

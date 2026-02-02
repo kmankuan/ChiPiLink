@@ -29,7 +29,7 @@ async def get_seasons(active_only: bool = False):
 
 @router.get("/seasons/{season_id}", response_model=RapidPinSeason)
 async def get_season(season_id: str):
-    """Get temporada por ID"""
+    """Get temporada by ID"""
     season = await rapidpin_service.get_season(season_id)
     if not season:
         raise HTTPException(status_code=404, detail="Temporada no encontrada")
@@ -101,7 +101,7 @@ async def confirm_match(
 
 @router.get("/matches/{match_id}", response_model=RapidPinMatch)
 async def get_match(match_id: str):
-    """Get partido por ID"""
+    """Get partido by ID"""
     match = await rapidpin_service.get_match(match_id)
     if not match:
         raise HTTPException(status_code=404, detail="Partido not found")
@@ -284,7 +284,7 @@ async def get_queue_matches(
     """
     Obtener partidos en cola/desafíos.
     - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos active)
-    - player_id: filtrar por jugador involucrado
+    - player_id: filtrar by player involucrado
     """
     return await rapidpin_service.get_queue_matches(season_id, status, player_id)
 

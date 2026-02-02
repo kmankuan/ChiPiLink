@@ -34,7 +34,7 @@ async def get_rankings(
 
 @router.get("/{jugador_id}", response_model=Player)
 async def get_player(jugador_id: str):
-    """Get jugador por ID"""
+    """Get jugador by ID"""
     player = await player_service.get_player(jugador_id)
     if not player:
         raise HTTPException(status_code=404, detail="Jugador not found")

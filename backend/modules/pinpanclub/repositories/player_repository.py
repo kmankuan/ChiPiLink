@@ -33,7 +33,7 @@ class PlayerRepository(BaseRepository):
         return await self.insert_one(player_data)
     
     async def get_by_id(self, jugador_id: str) -> Optional[Dict]:
-        """Get jugador por ID"""
+        """Get jugador by ID"""
         return await self.find_by_id(self.ID_FIELD, jugador_id)
     
     async def get_all_active(self, skip: int = 0, limit: int = 100) -> List[Dict]:
@@ -80,7 +80,7 @@ class PlayerRepository(BaseRepository):
         return result.modified_count > 0
     
     async def search(self, query: str, limit: int = 20) -> List[Dict]:
-        """Search jugadores por nombre o apodo"""
+        """Search jugadores by name o apodo"""
         search_filter = {
             "$or": [
                 {"nombre": {"$regex": query, "$options": "i"}},

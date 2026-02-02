@@ -33,7 +33,7 @@ class StatsLevel(str, Enum):
 
 
 class LeagueStatus(str, Enum):
-    """Estado de la liga"""
+    """Estado of the league"""
     DRAFT = "draft"            # In configuración
     ACTIVE = "active"          # Activa
     PAUSED = "paused"          # Pausada
@@ -351,7 +351,7 @@ class SeasonTournament(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
     
-    # Configuration (heredada de la liga)
+    # Configuration (heredada of the league)
     tournament_config: TournamentConfig
     prizes: List[PrizeConfig] = []
     
@@ -382,7 +382,7 @@ class SpecialPrizeTypes:
     MEJOR_PROGRESO = "mejor_progreso"  # Mayor subida en ranking
     MAS_PARTIDOS = "mas_partidos"  # More partidos jugados
     MEJOR_RACHA = "mejor_racha"  # Mejor racha de victorias
-    MEJOR_DEPORTIVIDAD = "mejor_deportividad"  # Votado por jugadores
+    MEJOR_DEPORTIVIDAD = "mejor_deportividad"  # Votado by playeres
     MEJOR_COMEBACK = "mejor_comeback"  # Mejor remontada
     ROOKIE_DEL_ANO = "rookie_del_ano"  # Mejor jugador nuevo
 
@@ -468,7 +468,7 @@ BADGE_DEFINITIONS = {
         "name_en": "Season MVP",
         "name_zh": "赛季MVP",
         "icon": "⭐",
-        "description": "Jugador más valioso de la temporada",
+        "description": "Jugador más valioso of the season",
         "rarity": "legendary"
     },
     BadgeType.WIN_STREAK_5: {

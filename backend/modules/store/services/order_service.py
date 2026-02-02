@@ -143,7 +143,7 @@ class OrderService(BaseService):
         return Order(**result)
     
     async def get_order(self, pedido_id: str) -> Optional[Order]:
-        """Get pedido por ID"""
+        """Get pedido by ID"""
         result = await self.repository.get_by_id(pedido_id)
         return Order(**result) if result else None
     

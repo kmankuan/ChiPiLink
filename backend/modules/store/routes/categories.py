@@ -20,7 +20,7 @@ async def get_categories():
 
 @router.get("/{categoria_id}", response_model=Category)
 async def get_category(categoria_id: str):
-    """Get categoría por ID"""
+    """Get categoría by ID"""
     category = await category_service.get_category(categoria_id)
     if not category:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")

@@ -80,7 +80,7 @@ class SuperPinService(BaseService):
         ]
     
     async def get_league(self, liga_id: str) -> Optional[SuperPinLeague]:
-        """Get liga por ID"""
+        """Get liga by ID"""
         result = await self.league_repo.get_by_id(liga_id)
         return SuperPinLeague(**result) if result else None
     
@@ -132,7 +132,7 @@ class SuperPinService(BaseService):
         if existing:
             return PlayerCheckIn(**existing)
         
-        # Obtener info del jugador
+        # Obtener info of the player
         player = await self.player_repo.get_by_id(data.jugador_id)
         
         checkin_dict = data.model_dump()
@@ -242,7 +242,7 @@ class SuperPinService(BaseService):
         return SuperPinMatch(**result)
     
     async def get_match(self, partido_id: str) -> Optional[SuperPinMatch]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         result = await self.match_repo.get_by_id(partido_id)
         return SuperPinMatch(**result) if result else None
     
@@ -353,7 +353,7 @@ class SuperPinService(BaseService):
         """Update ranking después de un partido"""
         liga_id = match["liga_id"]
         
-        # Obtener configuración de la liga
+        # Obtener configuración of the league
         league = await self.league_repo.get_by_id(liga_id)
         if not league:
             return
@@ -786,7 +786,7 @@ class SuperPinService(BaseService):
         liga_id = tournament.get("liga_id")
         temporada = None
         
-        # Obtener temporada de la liga
+        # Obtener temporada of the league
         league = await self.league_repo.get_by_id(liga_id)
         if league:
             temporada = league.get("temporada")
@@ -842,7 +842,7 @@ class SuperPinService(BaseService):
         """Verify y otorgar badges basados en estadísticas de partido"""
         awarded_badges = []
         
-        # Obtener ranking del jugador
+        # Obtener ranking of the player
         ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
         if not ranking:
             return awarded_badges
@@ -939,7 +939,7 @@ class SuperPinService(BaseService):
         cursor = collection.aggregate(pipeline)
         results = await cursor.to_list(length=limit)
         
-        # Enriquecer con info del jugador
+        # Enriquecer con info of the player
         for entry in results:
             player = await self.player_repo.get_by_id(entry["_id"])
             if player:
@@ -954,7 +954,7 @@ class SuperPinService(BaseService):
         """Get badges más recientes (para feed)"""
         badges = await self.badge_repo.get_recent_badges(limit)
         
-        # Enriquecer con info del jugador
+        # Enriquecer con info of the player
         for badge in badges:
             player = await self.player_repo.get_by_id(badge.get("jugador_id"))
             if player:
@@ -972,7 +972,7 @@ class SuperPinService(BaseService):
     async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
         """Get estadísticas detalladas de un jugador"""
         
-        # Info básica del jugador
+        # Info básica of the player
         player = await self.player_repo.get_by_id(jugador_id)
         if not player:
             return None

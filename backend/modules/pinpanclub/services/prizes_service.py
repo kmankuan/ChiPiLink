@@ -63,7 +63,7 @@ class PrizeService(BaseService):
         return None
     
     async def get_prizes_by_type(self, prize_type: PrizeType) -> List[PrizeDefinition]:
-        """Get premios por tipo"""
+        """Get premios by type"""
         results = await self.definition_repo.get_prizes_by_type(prize_type.value)
         return [PrizeDefinition(**r) for r in results]
     

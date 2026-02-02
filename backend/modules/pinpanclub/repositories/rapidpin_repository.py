@@ -28,7 +28,7 @@ class RapidPinSeasonRepository(BaseRepository):
         return await self.insert_one(season_data)
     
     async def get_by_id(self, season_id: str) -> Optional[Dict]:
-        """Get temporada por ID"""
+        """Get temporada by ID"""
         return await self.find_one({self.ID_FIELD: season_id})
     
     async def update(self, season_id: str, data: Dict) -> bool:
@@ -68,7 +68,7 @@ class RapidPinSeasonRepository(BaseRepository):
         players: int = 0,
         referees: int = 0
     ) -> bool:
-        """Incrementar estadísticas de la temporada"""
+        """Incrementar estadísticas of the season"""
         update = {}
         if matches:
             update["total_matches"] = matches
@@ -103,7 +103,7 @@ class RapidPinMatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, match_id: str) -> Optional[Dict]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         return await self.find_one({self.ID_FIELD: match_id})
     
     async def update(self, match_id: str, data: Dict) -> bool:

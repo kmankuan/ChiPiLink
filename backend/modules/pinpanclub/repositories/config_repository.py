@@ -68,7 +68,7 @@ class LayoutRepository(BaseRepository):
         return await self.insert_one(layout_data)
     
     async def get_by_id(self, layout_id: str) -> Optional[Dict]:
-        """Get layout por ID"""
+        """Get layout by ID"""
         return await self.find_by_id(self.ID_FIELD, layout_id)
     
     async def get_default(self) -> Optional[Dict]:

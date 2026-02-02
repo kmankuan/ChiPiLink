@@ -127,7 +127,7 @@ async def get_active_challenges(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats")
 async def get_player_challenge_stats(jugador_id: str):
-    """Get estadísticas of challenges del jugador"""
+    """Get estadísticas of challenges of the player"""
     stats = await challenge_service.get_player_stats(jugador_id)
     rank = await challenge_service.get_player_rank(jugador_id)
     return {

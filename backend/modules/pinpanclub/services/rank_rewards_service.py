@@ -154,7 +154,7 @@ class RankRewardsService(BaseService):
         return {**RANK_DEFINITIONS[0], "index": 0}
     
     def get_rank_by_id(self, rank_id: str) -> Optional[Dict]:
-        """Get definición de rango por ID"""
+        """Get definición de rango by ID"""
         for i, rank in enumerate(RANK_DEFINITIONS):
             if rank["id"] == rank_id:
                 return {**rank, "index": i}
@@ -206,7 +206,7 @@ class RankRewardsService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         reward = rank.get("reward")
         
-        # Obtener info del jugador
+        # Obtener info of the player
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}

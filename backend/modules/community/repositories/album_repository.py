@@ -29,7 +29,7 @@ class AlbumRepository(BaseRepository):
         return await self.insert_one(album_data)
     
     async def get_by_id(self, album_id: str) -> Optional[Dict]:
-        """Get álbum por ID"""
+        """Get álbum by ID"""
         return await self.find_one({self.ID_FIELD: album_id})
     
     async def get_active_albums(self, limit: int = 50) -> List[Dict]:

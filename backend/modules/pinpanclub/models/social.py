@@ -132,7 +132,7 @@ class ActivityFeedItem(BaseModel):
     jugador_id: str
     activity_type: ActivityType
     
-    # Info del jugador
+    # Info of the player
     jugador_info: Optional[Dict] = None
     
     # Data específicos de la actividad

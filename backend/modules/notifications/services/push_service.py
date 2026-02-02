@@ -298,7 +298,7 @@ class PushNotificationService:
     # ============== USER PREFERENCES ==============
     
     async def get_user_preferences(self, user_id: str) -> Dict:
-        """Get preferencias de notificación del usuario"""
+        """Get preferencias de notificación of the user"""
         prefs = await db[self.collection_user_prefs].find_one(
             {"user_id": user_id},
             {"_id": 0}
@@ -335,7 +335,7 @@ class PushNotificationService:
         return default_prefs
     
     async def update_user_preferences(self, user_id: str, updates: Dict) -> Dict:
-        """Update preferencias del usuario"""
+        """Update preferencias of the user"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_user_prefs].find_one_and_update(
@@ -437,7 +437,7 @@ class PushNotificationService:
         variables: Dict = None
     ) -> Dict:
         """Send notificación a un usuario"""
-        # Verificar preferencias del usuario
+        # Verificar preferencias of the user
         prefs = await self.get_user_preferences(user_id)
         
         if not prefs.get("push_enabled", True):
@@ -456,7 +456,7 @@ class PushNotificationService:
         category = await self.get_category(category_id)
         category_provider = category.get("default_provider") if category else None
         
-        # Obtener dispositivos del usuario
+        # Obtener dispositivos of the user
         devices = await self.get_user_devices(user_id)
         
         if not devices:

@@ -63,7 +63,7 @@ class ConexionesService:
         
         conexiones = user.get("conexiones", [])
         
-        # Enriquecer con datos del usuario conectado
+        # Enriquecer con datos of the user conectado
         for con in conexiones:
             connected_user = await db.auth_users.find_one(
                 {"user_id": con["user_id"]},
@@ -942,7 +942,7 @@ class ConexionesService:
         if not marketing.get("mostrar_servicios", True):
             return []
         
-        # Obtener membresías activas del usuario
+        # Obtener membresías activas of the user
         suscripciones = await db.suscripciones_usuarios.find(
             {"user_id": user_id, "estado": "activo"},
             {"membresia_id": 1}
@@ -1000,7 +1000,7 @@ class ConexionesService:
         excluir_user_id: Optional[str] = None,
         limit: int = 10
     ) -> List[Dict]:
-        """Search usuarios por nombre o email"""
+        """Search usuarios by name o email"""
         search_query = {
             "$or": [
                 {"nombre": {"$regex": query, "$options": "i"}},

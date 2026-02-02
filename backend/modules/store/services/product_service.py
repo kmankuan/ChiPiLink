@@ -43,7 +43,7 @@ class ProductService(BaseService):
         return Product(**result)
     
     async def get_product(self, libro_id: str) -> Optional[Product]:
-        """Get producto por ID"""
+        """Get producto by ID"""
         result = await self.repository.get_by_id(libro_id)
         return Product(**result) if result else None
     

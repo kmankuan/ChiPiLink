@@ -198,12 +198,12 @@ class ChallengeService(BaseService):
         extra_data: Dict = None
     ) -> List[PlayerChallenge]:
         """
-        Actualizar progreso de retos del jugador basándose en tipo.
+        Actualizar progreso de retos of the player basándose en tipo.
         Llamar esto después de cada partido, victoria, etc.
         """
         updated = []
         
-        # Obtener retos activos del jugador
+        # Obtener retos activos of the player
         active = await self.player_challenge_repo.get_active_challenges(jugador_id)
         
         for progress in active:
@@ -344,7 +344,7 @@ class ChallengeService(BaseService):
         return [PlayerChallenge(**r) for r in results]
     
     async def get_player_stats(self, jugador_id: str) -> Dict:
-        """Get estadísticas de retos del jugador"""
+        """Get estadísticas de retos of the player"""
         completed = await self.player_challenge_repo.get_completed_count(jugador_id)
         total_points = await self.player_challenge_repo.get_total_points(jugador_id)
         active = await self.player_challenge_repo.get_active_challenges(jugador_id)

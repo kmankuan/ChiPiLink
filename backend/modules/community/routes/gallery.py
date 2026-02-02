@@ -20,7 +20,7 @@ async def get_albums():
 
 @router.get("/{album_id}", response_model=Album)
 async def get_album(album_id: str):
-    """Get álbum por ID"""
+    """Get álbum by ID"""
     album = await album_service.get_album(album_id)
     if not album:
         raise HTTPException(status_code=404, detail="Álbum no encontrado")

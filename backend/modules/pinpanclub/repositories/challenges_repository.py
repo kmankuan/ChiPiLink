@@ -117,7 +117,7 @@ class PlayerChallengeRepository(BaseRepository):
         )
     
     async def get_active_challenges(self, jugador_id: str) -> List[Dict]:
-        """Get retos activos del jugador"""
+        """Get retos activos of the player"""
         return await self.find_many(
             query={
                 "jugador_id": jugador_id,

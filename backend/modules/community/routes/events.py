@@ -23,7 +23,7 @@ async def get_events(
 
 @router.get("/{evento_id}", response_model=Event)
 async def get_event(evento_id: str):
-    """Get evento por ID"""
+    """Get evento by ID"""
     event = await event_service.get_event(evento_id)
     if not event:
         raise HTTPException(status_code=404, detail="Evento no encontrado")

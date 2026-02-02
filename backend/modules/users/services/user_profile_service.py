@@ -46,7 +46,7 @@ class UserProfileService(BaseService):
         return await cursor.to_list(length=50)
     
     async def get_user_type(self, type_id: str) -> Optional[Dict]:
-        """Get un tipo de usuario por ID"""
+        """Get un tipo de usuario by ID"""
         return await db.chipi_user_types.find_one(
             {"type_id": type_id},
             {"_id": 0}
@@ -116,7 +116,7 @@ class UserProfileService(BaseService):
         cursor = db.chipi_profile_fields.find(query, {"_id": 0}).sort("sort_order", 1)
         fields = await cursor.to_list(length=100)
         
-        # Filtrar por tipo de usuario si se especifica
+        # Filtrar by type de usuario si se especifica
         if user_type_id:
             fields = [
                 f for f in fields 

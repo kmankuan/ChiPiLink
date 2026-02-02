@@ -32,7 +32,7 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.insert_one(league_data)
     
     async def get_by_id(self, liga_id: str) -> Optional[Dict]:
-        """Get liga por ID"""
+        """Get liga by ID"""
         return await self.find_one({self.ID_FIELD: liga_id})
     
     async def get_active_leagues(self) -> List[Dict]:
@@ -56,7 +56,7 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, liga_id, data)
     
     async def increment_stats(self, liga_id: str, partidos: int = 0, jugadores: int = 0) -> bool:
-        """Incrementar estadísticas de la liga"""
+        """Incrementar estadísticas of the league"""
         update = {}
         if partidos:
             update["total_partidos"] = partidos
@@ -117,7 +117,7 @@ class PlayerCheckInRepository(BaseRepository):
         return result.modified_count > 0
     
     async def checkout_by_player(self, liga_id: str, jugador_id: str) -> bool:
-        """Hacer checkout por jugador"""
+        """Hacer checkout by player"""
         result = await self._collection.update_many(
             {"liga_id": liga_id, "jugador_id": jugador_id, "is_active": True},
             {"$set": {
@@ -160,7 +160,7 @@ class SuperPinMatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         return await self.find_one({self.ID_FIELD: partido_id})
     
     async def get_league_matches(
@@ -295,7 +295,7 @@ class RankingRepository(BaseRepository):
     
     async def recalculate_positions(self, liga_id: str, scoring_system: str = "simple") -> bool:
         """Recalcular posiciones del ranking"""
-        # Obtener todos los rankings de la liga
+        # Obtener todos los rankings of the league
         rankings = await self.find_many(
             query={"liga_id": liga_id},
             limit=1000
@@ -349,7 +349,7 @@ class SeasonTournamentRepository(BaseRepository):
         return await self.insert_one(tournament_data)
     
     async def get_by_id(self, torneo_id: str) -> Optional[Dict]:
-        """Get torneo por ID"""
+        """Get torneo by ID"""
         return await self.find_one({self.ID_FIELD: torneo_id})
     
     async def get_league_tournaments(self, liga_id: str) -> List[Dict]:
@@ -383,7 +383,7 @@ class PlayerBadgeRepository(BaseRepository):
         return await self.insert_one(badge_data)
     
     async def get_by_id(self, badge_id: str) -> Optional[Dict]:
-        """Get badge por ID"""
+        """Get badge by ID"""
         return await self.find_one({self.ID_FIELD: badge_id})
     
     async def get_player_badges(self, jugador_id: str) -> List[Dict]:

@@ -26,7 +26,7 @@ class AlbumService(BaseService):
         return [Album(**r) for r in results]
     
     async def get_album(self, album_id: str) -> Optional[Album]:
-        """Get álbum por ID"""
+        """Get álbum by ID"""
         result = await self.repository.get_by_id(album_id)
         return Album(**result) if result else None
     

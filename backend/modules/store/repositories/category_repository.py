@@ -40,7 +40,7 @@ class CategoryRepository(BaseRepository):
         return await self.insert_one(category_data)
     
     async def get_by_id(self, categoria_id: str) -> Optional[Dict]:
-        """Get categoría por ID"""
+        """Get categoría by ID"""
         return await self.find_by_id(self.ID_FIELD, categoria_id)
     
     async def get_all_active(self) -> List[Dict]:

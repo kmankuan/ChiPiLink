@@ -35,7 +35,7 @@ class EventService(BaseService):
         return [Event(**r) for r in results]
     
     async def get_event(self, evento_id: str) -> Optional[Event]:
-        """Get evento por ID"""
+        """Get evento by ID"""
         result = await self.repository.get_by_id(evento_id)
         return Event(**result) if result else None
     

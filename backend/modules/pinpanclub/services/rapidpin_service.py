@@ -189,7 +189,7 @@ class RapidPinService(BaseService):
         return RapidPinSeason(**result)
     
     async def get_season(self, season_id: str) -> Optional[RapidPinSeason]:
-        """Get temporada por ID"""
+        """Get temporada by ID"""
         result = await self.season_repo.get_by_id(season_id)
         return RapidPinSeason(**result) if result else None
     
@@ -402,7 +402,7 @@ class RapidPinService(BaseService):
             "puntos_arbitro": RAPID_PIN_SCORING["referee"]
         })
         
-        # Incrementar contador de partidos de la temporada
+        # Incrementar contador de partidos of the season
         await self.season_repo.increment_stats(match["season_id"], matches=1)
         
         # Recalcular posiciones
@@ -462,7 +462,7 @@ class RapidPinService(BaseService):
             })
     
     async def get_match(self, match_id: str) -> Optional[RapidPinMatch]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         result = await self.match_repo.get_by_id(match_id)
         return RapidPinMatch(**result) if result else None
     
@@ -537,7 +537,7 @@ class RapidPinService(BaseService):
     # ============== CHALLENGE & QUEUE SYSTEM ==============
     
     def _get_player_info(self, player_data: Optional[Dict]) -> Optional[Dict]:
-        """Extraer info relevante del jugador"""
+        """Extraer info relevante of the player"""
         if not player_data:
             return None
         return {
@@ -1023,7 +1023,7 @@ class RapidPinService(BaseService):
             ).sort("fecha_confirmacion", -1).limit(10)
             recent_matches = await matches_cursor.to_list(length=10)
         
-        # Top jugadores de la temporada activa
+        # Top jugadores of the season activa
         top_players = []
         if active_season:
             ranking_cursor = db["rapidpin_ranking"].find(
@@ -1203,7 +1203,7 @@ class RapidPinService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         other_player_id = queue_entry["player2_id"] if user_id == queue_entry["player1_id"] else queue_entry["player1_id"]
         
-        # Obtener info del usuario
+        # Obtener info of the user
         user_info = await self.player_repo.get_by_id(user_id)
         user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
         

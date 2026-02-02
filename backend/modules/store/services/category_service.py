@@ -29,7 +29,7 @@ class CategoryService(BaseService):
         return Category(**result)
     
     async def get_category(self, categoria_id: str) -> Optional[Category]:
-        """Get categoría por ID"""
+        """Get categoría by ID"""
         result = await self.repository.get_by_id(categoria_id)
         return Category(**result) if result else None
     

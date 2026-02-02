@@ -34,7 +34,7 @@ class PostRepository(BaseRepository):
         return await self.insert_one(post_data)
     
     async def get_by_id(self, post_id: str) -> Optional[Dict]:
-        """Get post por ID"""
+        """Get post by ID"""
         return await self.find_one({self.ID_FIELD: post_id})
     
     async def get_published_posts(

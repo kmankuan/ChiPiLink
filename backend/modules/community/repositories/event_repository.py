@@ -30,7 +30,7 @@ class EventRepository(BaseRepository):
         return await self.insert_one(event_data)
     
     async def get_by_id(self, evento_id: str) -> Optional[Dict]:
-        """Get evento por ID"""
+        """Get evento by ID"""
         return await self.find_one({self.ID_FIELD: evento_id})
     
     async def get_upcoming_events(self, limit: int = 10) -> List[Dict]:

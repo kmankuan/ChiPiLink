@@ -93,7 +93,7 @@ async def scan_qr(
     data: ScanQRRequest,
     admin=Depends(get_admin_user)
 ):
-    """Escanear un código QR y obtener información del usuario"""
+    """Escanear un código QR y obtener información of the user"""
     result = await qr_code_service.scan_qr_code(data.qr_string)
     
     if not result.get("valid"):

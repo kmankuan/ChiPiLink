@@ -45,7 +45,7 @@ class PlayerService(BaseService):
         return Player(**result)
     
     async def get_player(self, jugador_id: str) -> Optional[Player]:
-        """Get jugador por ID"""
+        """Get jugador by ID"""
         result = await self.repository.get_by_id(jugador_id)
         return Player(**result) if result else None
     
@@ -95,7 +95,7 @@ class PlayerService(BaseService):
         opponent_elo: int
     ) -> Optional[Player]:
         """
-        Actualizar estadísticas del jugador después de un partido.
+        Actualizar estadísticas of the player después de un partido.
         Calcula cambio de ELO y emite evento.
         """
         player = await self.get_player(jugador_id)

@@ -44,7 +44,7 @@ async def get_match_stats():
 
 @router.get("/{partido_id}", response_model=Match)
 async def get_match(partido_id: str):
-    """Get partido por ID"""
+    """Get partido by ID"""
     match = await match_service.get_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Partido not found")

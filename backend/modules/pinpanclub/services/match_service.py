@@ -70,7 +70,7 @@ class MatchService(BaseService):
         return Match(**result)
     
     async def get_match(self, partido_id: str) -> Optional[Match]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         result = await self.repository.get_by_id(partido_id)
         return Match(**result) if result else None
     
@@ -84,7 +84,7 @@ class MatchService(BaseService):
         estado: MatchState,
         limit: int = 50
     ) -> List[Match]:
-        """Get partidos por estado"""
+        """Get partidos by status"""
         results = await self.repository.get_by_state(estado.value, limit)
         return [Match(**r) for r in results]
     

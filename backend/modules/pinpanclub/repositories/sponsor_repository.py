@@ -27,7 +27,7 @@ class SponsorRepository(BaseRepository):
         return await self.insert_one(sponsor_data)
     
     async def get_by_id(self, sponsor_id: str) -> Optional[Dict]:
-        """Get patrocinador por ID"""
+        """Get patrocinador by ID"""
         return await self.find_by_id(self.ID_FIELD, sponsor_id)
     
     async def get_all_active(self) -> List[Dict]:

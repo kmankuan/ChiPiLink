@@ -37,7 +37,7 @@ class PostService(BaseService):
         return [Post(**r) for r in results]
     
     async def get_post(self, post_id: str, increment_views: bool = False) -> Optional[Post]:
-        """Get post por ID"""
+        """Get post by ID"""
         result = await self.repository.get_by_id(post_id)
         if result and increment_views:
             await self.repository.increment_views(post_id)

@@ -35,7 +35,7 @@ class MatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Get partido por ID"""
+        """Get partido by ID"""
         return await self.find_by_id(self.ID_FIELD, partido_id)
     
     async def get_active_matches(self) -> List[Dict]:
@@ -46,7 +46,7 @@ class MatchRepository(BaseRepository):
         )
     
     async def get_by_state(self, estado: str, limit: int = 50) -> List[Dict]:
-        """Get partidos por estado"""
+        """Get partidos by status"""
         return await self.find_many(
             query={"estado": estado},
             limit=limit,
@@ -147,7 +147,7 @@ class MatchRepository(BaseRepository):
         return await self.update_match(partido_id, {"monday_item_id": monday_item_id})
     
     async def count_by_state(self) -> Dict[str, int]:
-        """Contar partidos por estado"""
+        """Contar partidos by status"""
         pipeline = [
             {"$group": {"_id": "$estado", "count": {"$sum": 1}}}
         ]

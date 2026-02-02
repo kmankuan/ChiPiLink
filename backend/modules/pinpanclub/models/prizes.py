@@ -22,7 +22,7 @@ class PrizeType(str, Enum):
 class PrizeStatus(str, Enum):
     """Estado del premio"""
     AVAILABLE = "available"      # Disponible para ganar
-    CLAIMED = "claimed"          # Reclamado por jugador
+    CLAIMED = "claimed"          # Reclamado by player
     DELIVERED = "delivered"      # Entregado
     EXPIRED = "expired"          # Expirado
 

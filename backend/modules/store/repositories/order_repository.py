@@ -31,7 +31,7 @@ class OrderRepository(BaseRepository):
         return await self.insert_one(order_data)
     
     async def get_by_id(self, pedido_id: str) -> Optional[Dict]:
-        """Get pedido por ID"""
+        """Get pedido by ID"""
         return await self.find_by_id(self.ID_FIELD, pedido_id)
     
     async def get_by_client(self, user_id: str, limit: int = 100) -> List[Dict]:
@@ -43,7 +43,7 @@ class OrderRepository(BaseRepository):
         )
     
     async def get_by_status(self, estado: str, limit: int = 500) -> List[Dict]:
-        """Get pedidos por estado"""
+        """Get pedidos by status"""
         return await self.find_many(
             query={"estado": estado},
             limit=limit,
@@ -83,7 +83,7 @@ class OrderRepository(BaseRepository):
         return await self.update_order(pedido_id, {"monday_item_id": monday_id})
     
     async def count_by_status(self) -> Dict[str, int]:
-        """Contar pedidos por estado"""
+        """Contar pedidos by status"""
         pipeline = [
             {"$group": {"_id": "$estado", "count": {"$sum": 1}}}
         ]

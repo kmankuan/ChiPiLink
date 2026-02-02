@@ -142,7 +142,7 @@ class QRCodeService:
         if not qr_record:
             return {"valid": False, "error": "QR code not found or inactive"}
         
-        # Obtener información del usuario
+        # Obtener información of the user
         user_id = qr_record["user_id"]
         
         # Obtener wallet

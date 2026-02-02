@@ -153,7 +153,7 @@ async def get_import_history(
     Obtener historial de importaciones.
     
     Args:
-        tipo: Filtrar por tipo ("estudiantes" o "libros")
+        tipo: Filtrar by type ("estudiantes" o "libros")
         limit: Número máximo de registros
     """
     result = await bulk_import_service.get_import_history(tipo, limit)

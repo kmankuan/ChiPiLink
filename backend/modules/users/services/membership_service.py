@@ -174,7 +174,7 @@ class MembershipService:
         
         plans = await cursor.to_list(length=50)
         
-        # Filtrar por tipo de usuario
+        # Filtrar by type de usuario
         if user_type_id:
             plans = [
                 p for p in plans
@@ -238,7 +238,7 @@ class MembershipService:
     # ============== USER MEMBERSHIPS ==============
     
     async def get_membership(self, membership_id: str) -> Optional[Dict]:
-        """Get membresía por ID"""
+        """Get membresía by ID"""
         membership = await db[self.collection_memberships].find_one(
             {"membership_id": membership_id},
             {"_id": 0}

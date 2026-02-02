@@ -60,7 +60,7 @@ async def get_newest_products(
 
 @router.get("/search")
 async def search_products(q: str = Query(..., min_length=2)):
-    """Search productos por nombre o descripción"""
+    """Search productos by name o descripción"""
     return await product_service.search_products(q)
 
 
@@ -80,7 +80,7 @@ async def get_available_subjects():
 
 @router.get("/{libro_id}", response_model=Product)
 async def get_product(libro_id: str):
-    """Get producto por ID"""
+    """Get producto by ID"""
     product = await product_service.get_product(libro_id)
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")

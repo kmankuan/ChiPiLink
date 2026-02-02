@@ -58,7 +58,7 @@ async def update_prize(
 
 @router.get("/definitions/type/{prize_type}")
 async def get_prizes_by_type(prize_type: PrizeType):
-    """Get premios por tipo"""
+    """Get premios by type"""
     prizes = await prize_service.get_prizes_by_type(prize_type)
     return {"type": prize_type, "prizes": prizes}
 
