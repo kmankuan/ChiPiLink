@@ -294,7 +294,7 @@ class RankingRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, ranking_id, data)
     
     async def recalculate_positions(self, liga_id: str, scoring_system: str = "simple") -> bool:
-        """Recalcular posiciones del ranking"""
+        """Recalcular posiciones from ranking"""
         # Obtener todos los rankings of the league
         rankings = await self.find_many(
             query={"liga_id": liga_id},

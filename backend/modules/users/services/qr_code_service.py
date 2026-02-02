@@ -133,7 +133,7 @@ class QRCodeService:
         if qr_data.get("type") != "chipi_user":
             return {"valid": False, "error": "Unknown QR type"}
         
-        # Buscar en base de datos
+        # Buscar in database
         qr_record = await db[self.collection_qr_codes].find_one(
             {"qr_id": qr_data.get("qr_id"), "is_active": True},
             {"_id": 0}

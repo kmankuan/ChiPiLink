@@ -454,7 +454,7 @@ async def resume_challenge_from_queue(
     message: Optional[str] = None
 ):
     """
-    Retomar a challenge de la cola proponiendo nueva fecha.
+    Retomar a challenge from queue proponiendo nueva fecha.
     """
     try:
         return await rapidpin_service.resume_from_queue(

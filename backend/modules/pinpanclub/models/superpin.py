@@ -286,7 +286,7 @@ class SuperPinMatch(BaseModel):
 # ============== RANKING MODEL ==============
 
 class RankingEntry(BaseModel):
-    """Entrada en el ranking"""
+    """Entrada in ranking"""
     model_config = ConfigDict(from_attributes=True)
     
     ranking_id: str

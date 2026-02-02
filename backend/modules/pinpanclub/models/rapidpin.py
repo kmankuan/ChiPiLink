@@ -402,7 +402,7 @@ class RapidPinQueueAssign(BaseModel):
 
 
 class RapidPinQueueComplete(BaseModel):
-    """Completar partido de la cola con resultado"""
+    """Completar partido from queue con resultado"""
     ganador_id: str
     score_ganador: int = 11
     score_perdedor: int = 0

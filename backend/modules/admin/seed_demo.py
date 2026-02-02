@@ -116,7 +116,7 @@ DEMO_ACHIEVEMENTS = [
         "achievement_id": "ach_legend",
         "name_es": "Leyenda",
         "name_en": "Legend",
-        "description_es": "Alcanza el top 3 del ranking",
+        "description_es": "Alcanza el top 3 from ranking",
         "description_en": "Reach the top 3 ranking",
         "icon": "👑",
         "rarity": "legendary",

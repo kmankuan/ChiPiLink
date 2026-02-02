@@ -152,7 +152,7 @@ class RapidPinService(BaseService):
         self.player_repo = PlayerRepository()
     
     async def get_db(self):
-        """Get conexión a la base de datos"""
+        """Get conexión to database"""
         return get_database()
     
     # ============== SEASON MANAGEMENT ==============
@@ -914,7 +914,7 @@ class RapidPinService(BaseService):
         score_ganador: int = 11,
         score_perdedor: int = 0
     ) -> Dict:
-        """Completar partido de la cola y registrarlo como partido oficial"""
+        """Completar partido from queue y registrarlo como partido oficial"""
         db = await self.get_db()
         
         queue_entry = await db["rapidpin_queue"].find_one(
@@ -1292,7 +1292,7 @@ class RapidPinService(BaseService):
         message: str = None
     ) -> Dict:
         """
-        Retomar un reto de la cola proponiendo nueva fecha.
+        Retomar un reto from queue proponiendo nueva fecha.
         """
         db = await self.get_db()
         

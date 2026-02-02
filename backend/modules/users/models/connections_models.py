@@ -400,7 +400,7 @@ def get_default_capacidades() -> List[Dict]:
         {
             "capacidad_id": "jugador_ranking",
             "nombre": {"es": "Jugador en Ranking", "en": "Ranked Player", "zh": "排名玩家"},
-            "descripcion": {"es": "Aparece en el ranking oficial de PinpanClub", "en": "Appears in official PinpanClub ranking"},
+            "descripcion": {"es": "Aparece in ranking oficial de PinpanClub", "en": "Appears in official PinpanClub ranking"},
             "icono": "🏓",
             "color": "#f59e0b",
             "tipo": "por_suscripcion",

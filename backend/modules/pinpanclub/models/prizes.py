@@ -150,7 +150,7 @@ def get_default_prize_catalog() -> List[Dict]:
     return [
         {
             "name": "Campeón de Temporada",
-            "description": "Premio al primer lugar del ranking",
+            "description": "Premio al primer lugar from ranking",
             "type": "physical",
             "icon": "🥇",
             "value": "Trofeo dorado + Camiseta personalizada",
