@@ -176,7 +176,7 @@ export default function MondayModule() {
 
   const handleAddWorkspace = async () => {
     if (!apiKeyInput.trim()) {
-      toast.error('Ingresa una API Key válida');
+      toast.error('Enter a valid API Key');
       return;
     }
     
@@ -193,11 +193,11 @@ export default function MondayModule() {
       
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.detail || 'Error agregando workspace');
+        throw new Error(errData.detail || 'Error adding workspace');
       }
       
       const data = await res.json();
-      toast.success(`Workspace "${data.workspace_name}" agregado`);
+      toast.success(`Workspace "${data.workspace_name}" added`);
       setApiKeyInput('');
       setShowApiKeyInput(false);
       await loadWorkspaces();
@@ -216,9 +216,9 @@ export default function MondayModule() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!res.ok) throw new Error('Error activando workspace');
+      if (!res.ok) throw new Error('Error activating workspace');
       
-      toast.success('Workspace activado');
+      toast.success('Workspace activated');
       await loadWorkspaces();
       await testConnection();
     } catch (err) {
@@ -227,7 +227,7 @@ export default function MondayModule() {
   };
 
   const handleRemoveWorkspace = async (workspaceId) => {
-    if (!confirm('¿Estás seguro de eliminar este workspace?')) return;
+    if (!confirm('Are you sure you want to delete this workspace?')) return;
     
     try {
       const res = await fetch(`${API}/api/store/monday/workspaces/${workspaceId}`, {
@@ -235,9 +235,9 @@ export default function MondayModule() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!res.ok) throw new Error('Error eliminando workspace');
+      if (!res.ok) throw new Error('Error deleting workspace');
       
-      toast.success('Workspace eliminado');
+      toast.success('Workspace deleted');
       await loadWorkspaces();
     } catch (err) {
       toast.error(err.message);
