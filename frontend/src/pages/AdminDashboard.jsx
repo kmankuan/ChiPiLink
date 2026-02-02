@@ -64,13 +64,13 @@ const ModuleLoader = () => (
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
   { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
-  { id: 'orders', label: 'Pedidos', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
-  { id: 'customers', label: 'Usuarios', icon: Users, permission: 'users.view' },
-  { id: 'memberships', label: 'Membresías', icon: CreditCard, permission: 'memberships.view' },
+  { id: 'orders', label: 'Orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+  { id: 'customers', label: 'Users', icon: Users, permission: 'users.view' },
+  { id: 'memberships', label: 'Memberships', icon: CreditCard, permission: 'memberships.view' },
   { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
-  { id: 'roles', label: 'Roles y Permisos', icon: Shield, permission: 'roles.view' },
-  { id: 'admin', label: 'Administración', icon: Settings, permission: 'admin.site_config' },
-  { id: 'integrations', label: 'Integraciones', icon: Plug, permission: 'integrations.access' },
+  { id: 'roles', label: 'Roles & Permissions', icon: Shield, permission: 'roles.view' },
+  { id: 'admin', label: 'Administration', icon: Settings, permission: 'admin.site_config' },
+  { id: 'integrations', label: 'Integrations', icon: Plug, permission: 'integrations.access' },
   { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
 ];
 
