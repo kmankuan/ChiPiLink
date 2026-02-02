@@ -44,7 +44,7 @@ class RapidPinSeasonRepository(BaseRepository):
         )
     
     async def get_all_seasons(self) -> List[Dict]:
-        """Get todas las temporadas"""
+        """Get all seasons"""
         return await self.find_many(
             query={},
             sort=[("created_at", -1)]
@@ -148,7 +148,7 @@ class RapidPinMatchRepository(BaseRepository):
         )
     
     async def get_all_pending_matches_for_user(self, user_id: str) -> List[Dict]:
-        """Get TODOS los partidos pendientes de confirmación donde el usuario participa (todas las temporadas)"""
+        """Get TODOS los partidos pendientes de confirmación donde el usuario participa (all seasons)"""
         return await self.find_many(
             query={
                 "estado": "pending",

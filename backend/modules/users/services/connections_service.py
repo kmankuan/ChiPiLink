@@ -52,7 +52,7 @@ class ConexionesService:
     # ============== GESTIÓN DE CONEXIONES ==============
     
     async def get_conexiones(self, user_id: str) -> List[Dict]:
-        """Get todas las conexiones de un usuario"""
+        """Get all connections de un usuario"""
         user = await db.auth_users.find_one(
             {"user_id": user_id},
             {"conexiones": 1}

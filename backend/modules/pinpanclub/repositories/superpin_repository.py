@@ -43,7 +43,7 @@ class SuperPinLeagueRepository(BaseRepository):
         )
     
     async def get_all_leagues(self, limit: int = 50) -> List[Dict]:
-        """Get todas las ligas"""
+        """Get all leagues"""
         return await self.find_many(
             query={},
             limit=limit,

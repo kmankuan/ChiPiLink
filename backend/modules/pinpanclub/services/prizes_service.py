@@ -50,7 +50,7 @@ class PrizeService(BaseService):
         return PrizeDefinition(**result) if result else None
     
     async def get_all_prizes(self) -> List[PrizeDefinition]:
-        """Get todos los premios"""
+        """Get all prizes"""
         results = await self.definition_repo.get_all_prizes()
         return [PrizeDefinition(**r) for r in results]
     

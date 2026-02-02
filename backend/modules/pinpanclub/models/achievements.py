@@ -12,7 +12,7 @@ import uuid
 class AchievementType(str, Enum):
     """Tipos de logro"""
     CHALLENGE_MASTER = "challenge_master"     # Completar X retos
-    WEEKLY_CHAMPION = "weekly_champion"       # Completar todos los retos de una semana
+    WEEKLY_CHAMPION = "weekly_champion"       # Completar all challenges de una semana
     STREAK_KEEPER = "streak_keeper"           # Completar retos X semanas seguidas
     POINTS_MILESTONE = "points_milestone"     # Alcanzar X puntos de retos
     DIFFICULTY_MASTER = "difficulty_master"   # Completar X retos de cierta dificultad
@@ -122,7 +122,7 @@ def get_challenge_achievements() -> List[Dict]:
         # Semana perfecta
         {
             "name": "Semana Perfecta",
-            "description": "Completa todos los retos de una semana",
+            "description": "Completa all challenges de una semana",
             "type": "weekly_champion",
             "rarity": "epic",
             "icon": "⭐",

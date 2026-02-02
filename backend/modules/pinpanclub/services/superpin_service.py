@@ -90,7 +90,7 @@ class SuperPinService(BaseService):
         return [SuperPinLeague(**r) for r in results]
     
     async def get_all_leagues(self) -> List[SuperPinLeague]:
-        """Get todas las ligas"""
+        """Get all leagues"""
         results = await self.league_repo.get_all_leagues()
         return [SuperPinLeague(**r) for r in results]
     
@@ -977,12 +977,12 @@ class SuperPinService(BaseService):
         if not player:
             return None
         
-        # Obtener rankings de todas las ligas o una específica
+        # Obtener rankings de all leagues o una específica
         if liga_id:
             rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
             rankings = [r for r in rankings if r]
         else:
-            # Buscar en todas las ligas activas
+            # Buscar en all leagues activas
             leagues = await self.league_repo.get_all_leagues()
             rankings = []
             for league in leagues:

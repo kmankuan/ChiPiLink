@@ -241,7 +241,7 @@ async def admin_get_transactions(
     offset: int = Query(0, ge=0),
     admin=Depends(get_admin_user)
 ):
-    """Get todas las transacciones QR (admin)"""
+    """Get all transactions QR (admin)"""
     transactions = await qr_code_service.get_qr_transactions(
         user_id=user_id,
         action=action,

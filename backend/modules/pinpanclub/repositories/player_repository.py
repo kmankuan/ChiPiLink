@@ -37,7 +37,7 @@ class PlayerRepository(BaseRepository):
         return await self.find_by_id(self.ID_FIELD, jugador_id)
     
     async def get_all_active(self, skip: int = 0, limit: int = 100) -> List[Dict]:
-        """Get todos los jugadores activos"""
+        """Get all players activos"""
         return await self.find_many(
             query={"activo": True},
             skip=skip,

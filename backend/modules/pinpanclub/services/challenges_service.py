@@ -53,7 +53,7 @@ class ChallengeService(BaseService):
         return ChallengeDefinition(**result) if result else None
     
     async def get_all_challenges(self) -> List[ChallengeDefinition]:
-        """Get todos los retos activos"""
+        """Get all challenges activos"""
         results = await self.definition_repo.get_active_challenges()
         return [ChallengeDefinition(**r) for r in results]
     

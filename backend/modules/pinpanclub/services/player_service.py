@@ -54,7 +54,7 @@ class PlayerService(BaseService):
         skip: int = 0,
         limit: int = 100
     ) -> List[Player]:
-        """Get todos los jugadores activos"""
+        """Get all players activos"""
         results = await self.repository.get_all_active(skip, limit)
         return [Player(**r) for r in results]
     

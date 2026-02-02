@@ -157,7 +157,7 @@ class OrderService(BaseService):
         estado: Optional[str] = None,
         limit: int = 500
     ) -> List[Order]:
-        """Get todos los pedidos (admin)"""
+        """Get all orders (admin)"""
         results = await self.repository.get_all(estado, limit)
         return [Order(**r) for r in results]
     

@@ -95,7 +95,7 @@ class RankingSeasonsService(BaseService):
         )
     
     async def get_all_seasons(self, limit: int = 20) -> List[Dict]:
-        """Get todas las temporadas"""
+        """Get all seasons"""
         cursor = db.pinpanclub_ranking_seasons.find(
             {},
             {"_id": 0}

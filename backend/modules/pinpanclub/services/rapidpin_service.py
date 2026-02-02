@@ -199,7 +199,7 @@ class RapidPinService(BaseService):
         return [RapidPinSeason(**r) for r in results]
     
     async def get_all_seasons(self) -> List[RapidPinSeason]:
-        """Get todas las temporadas"""
+        """Get all seasons"""
         results = await self.season_repo.get_all_seasons()
         return [RapidPinSeason(**r) for r in results]
     
@@ -486,7 +486,7 @@ class RapidPinService(BaseService):
         return [RapidPinMatch(**r) for r in results]
     
     async def get_all_pending_confirmations(self, user_id: str) -> List[RapidPinMatch]:
-        """Get TODOS los partidos pendientes de confirmación para un usuario (todas las temporadas)"""
+        """Get TODOS los partidos pendientes de confirmación para un usuario (all seasons)"""
         results = await self.match_repo.get_all_pending_matches_for_user(user_id)
         return [RapidPinMatch(**r) for r in results]
     

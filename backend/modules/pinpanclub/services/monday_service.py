@@ -360,7 +360,7 @@ class MondayService(BaseService):
         return success
     
     async def sync_all_players(self) -> Dict:
-        """Sincronizar todos los jugadores pendientes"""
+        """Sincronizar all players pendientes"""
         players = await self.player_repository.get_not_synced_to_monday()
         
         synced = 0
@@ -380,7 +380,7 @@ class MondayService(BaseService):
         return {"synced": synced, "failed": failed}
     
     async def sync_all_active_matches(self) -> Dict:
-        """Sincronizar todos los partidos activos"""
+        """Sincronizar all matches activos"""
         matches = await self.match_repository.get_not_synced_to_monday()
         
         synced = 0

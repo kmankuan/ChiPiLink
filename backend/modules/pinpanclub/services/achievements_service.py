@@ -41,7 +41,7 @@ class AchievementsService(BaseService):
         return created
     
     async def get_all_achievements(self) -> List[Dict]:
-        """Get todos los logros activos"""
+        """Get all achievements activos"""
         cursor = db.pinpanclub_achievements.find(
             {},  # Get all achievements (not filtering by is_active since some may not have it)
             {"_id": 0}
@@ -72,7 +72,7 @@ class AchievementsService(BaseService):
         player_achievements = await self.get_player_achievements(jugador_id)
         earned_ids = {pa["achievement_id"] for pa in player_achievements}
         
-        # Obtener todos los logros activos
+        # Obtener all achievements activos
         all_achievements = await self.get_all_achievements()
         
         for achievement in all_achievements:
@@ -142,7 +142,7 @@ class AchievementsService(BaseService):
         }
     
     async def _check_weekly_complete(self, jugador_id: str) -> bool:
-        """Verify si el jugador completó todos los retos de la semana actual"""
+        """Verify si el jugador completó all challenges de la semana actual"""
         # Obtener semana actual
         week = await db.pinpanclub_challenges_weekly.find_one(
             {"is_active": True},

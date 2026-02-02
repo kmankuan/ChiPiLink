@@ -51,7 +51,7 @@ class OrderRepository(BaseRepository):
         )
     
     async def get_all(self, estado: Optional[str] = None, limit: int = 500) -> List[Dict]:
-        """Get todos los pedidos"""
+        """Get all orders"""
         query = {}
         if estado:
             query["estado"] = estado
