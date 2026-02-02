@@ -152,7 +152,7 @@ export default function AdminMemberships() {
       });
 
       if (res.ok) {
-        toast.success(editingPlan ? txt.planUpdated : txt.planCreated);
+        toast.success(editingPlan ? t('adminMemberships.planUpdated') : t('adminMemberships.planCreated'));
         setIsPlanDialogOpen(false);
         resetPlanForm();
         fetchData();
@@ -163,7 +163,7 @@ export default function AdminMemberships() {
   };
 
   const handleDeletePlan = async (planId) => {
-    if (!confirm(txt.confirmDelete)) return;
+    if (!confirm(t('adminMemberships.confirmDelete'))) return;
 
     try {
       const res = await fetch(`${API_URL}/api/memberships/plans/${planId}`, {
@@ -172,7 +172,7 @@ export default function AdminMemberships() {
       });
 
       if (res.ok) {
-        toast.success(txt.planDeleted);
+        toast.success(t('adminMemberships.planDeleted'));
         fetchData();
       }
     } catch (error) {
@@ -188,7 +188,7 @@ export default function AdminMemberships() {
       });
 
       if (res.ok) {
-        toast.success(txt.initialized);
+        toast.success(t('adminMemberships.initialize')d);
         fetchData();
       }
     } catch (error) {
@@ -212,7 +212,7 @@ export default function AdminMemberships() {
       );
 
       if (res.ok) {
-        toast.success(txt.membershipGranted);
+        toast.success(t('adminMemberships.membershipGranted'));
         setIsGrantDialogOpen(false);
         setGrantForm({ user_id: '', plan_id: '', sponsor_note: '' });
       }
@@ -229,7 +229,7 @@ export default function AdminMemberships() {
       });
 
       if (res.ok) {
-        toast.success(txt.checkoutSuccess);
+        toast.success(t('adminMemberships.checkOutSuccess'));
         fetchData();
       }
     } catch (error) {
@@ -270,7 +270,7 @@ export default function AdminMemberships() {
             <h2 className="text-2xl font-bold">Acceso denegado</h2>
             <Button onClick={() => window.history.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {txt.back}
+              {t('common.back')}
             </Button>
           </div>
         </div>
@@ -288,22 +288,22 @@ export default function AdminMemberships() {
             <div>
               <Button variant="ghost" className="mb-4" onClick={() => window.history.back()}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {txt.back}
+                {t('common.back')}
               </Button>
               <h1 className="text-3xl font-bold flex items-center gap-3">
                 <CreditCard className="h-8 w-8" />
-                {txt.title}
+                {t('adminMemberships.title')}
               </h1>
-              <p className="text-muted-foreground">{txt.subtitle}</p>
+              <p className="text-muted-foreground">{t('adminMemberships.subtitle')}</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setIsGrantDialogOpen(true)}>
                 <Gift className="h-4 w-4 mr-2" />
-                {txt.grantMembership}
+                {t('adminMemberships.grantMembership')}
               </Button>
               <Button onClick={() => openPlanDialog()}>
                 <Plus className="h-4 w-4 mr-2" />
-                {txt.newPlan}
+                {t('adminMemberships.newPlan')}
               </Button>
             </div>
           </div>
@@ -313,11 +313,11 @@ export default function AdminMemberships() {
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="plans" data-testid="plans-tab">
                 <Ticket className="h-4 w-4 mr-2" />
-                {txt.plans}
+                {t('adminMemberships.plans')}
               </TabsTrigger>
               <TabsTrigger value="visitors" data-testid="visitors-tab">
                 <MapPin className="h-4 w-4 mr-2" />
-                {txt.currentVisitors} ({visitors.length})
+                {t('adminMemberships.visitors')} ({visitors.length})
               </TabsTrigger>
             </TabsList>
 
@@ -335,11 +335,11 @@ export default function AdminMemberships() {
                     <p className="text-muted-foreground mb-4">Crea tu primer plan o inicializa los planes por defecto</p>
                     <div className="flex gap-2 justify-center">
                       <Button variant="outline" onClick={handleInitializePlans}>
-                        {txt.initialize}
+                        {t('adminMemberships.initialize')}
                       </Button>
                       <Button onClick={() => openPlanDialog()}>
                         <Plus className="h-4 w-4 mr-2" />
-                        {txt.newPlan}
+                        {t('adminMemberships.newPlan')}
                       </Button>
                     </div>
                   </CardContent>
@@ -373,7 +373,7 @@ export default function AdminMemberships() {
                               {plan.membership_type}
                             </Badge>
                             <Badge variant={plan.is_active ? 'default' : 'secondary'}>
-                              {plan.is_active ? txt.active : txt.inactive}
+                              {plan.is_active ? t('adminMemberships.active') : t('adminMemberships.inactive')}
                             </Badge>
                           </div>
                           
@@ -408,7 +408,7 @@ export default function AdminMemberships() {
                               onClick={() => openPlanDialog(plan)}
                             >
                               <Edit2 className="h-3 w-3 mr-1" />
-                              {txt.editPlan}
+                              {t('adminMemberships.editPlan')}
                             </Button>
                             <Button 
                               variant="outline" 
@@ -437,7 +437,7 @@ export default function AdminMemberships() {
                 <Card>
                   <CardContent className="pt-12 pb-12 text-center">
                     <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-20" />
-                    <h3 className="text-lg font-medium">{txt.noVisitors}</h3>
+                    <h3 className="text-lg font-medium">{t('adminMemberships.noCurrentVisitors')}</h3>
                   </CardContent>
                 </Card>
               ) : (
@@ -468,7 +468,7 @@ export default function AdminMemberships() {
                               variant="outline"
                               onClick={() => handleCheckOutVisitor(visitor.user_id)}
                             >
-                              {txt.checkOutUser}
+                              {t('adminMemberships.checkOutUser')}
                             </Button>
                           </div>
                         </div>
@@ -485,16 +485,16 @@ export default function AdminMemberships() {
         <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingPlan ? txt.editPlan : txt.newPlan}</DialogTitle>
+              <DialogTitle>{editingPlan ? t('adminMemberships.editPlan') : t('adminMemberships.newPlan')}</DialogTitle>
             </DialogHeader>
             
             <div className="space-y-6 py-4">
               {/* Names */}
               <div className="space-y-3">
-                <Label className="font-semibold">{txt.planName}</Label>
+                <Label className="font-semibold">{t('adminMemberships.planName')}</Label>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">{txt.spanish}</Label>
+                    <Label className="text-xs text-muted-foreground">{t('adminMemberships.spanish')}</Label>
                     <Input
                       value={planForm.name.es}
                       onChange={(e) => setPlanForm(prev => ({
@@ -505,7 +505,7 @@ export default function AdminMemberships() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">{txt.english}</Label>
+                    <Label className="text-xs text-muted-foreground">{t('adminMemberships.english')}</Label>
                     <Input
                       value={planForm.name.en}
                       onChange={(e) => setPlanForm(prev => ({
@@ -516,7 +516,7 @@ export default function AdminMemberships() {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">{txt.chinese}</Label>
+                    <Label className="text-xs text-muted-foreground">{t('adminMemberships.chinese')}</Label>
                     <Input
                       value={planForm.name.zh}
                       onChange={(e) => setPlanForm(prev => ({
@@ -531,7 +531,7 @@ export default function AdminMemberships() {
 
               {/* Descriptions */}
               <div className="space-y-3">
-                <Label className="font-semibold">{txt.description}</Label>
+                <Label className="font-semibold">{t('adminMemberships.description')}</Label>
                 <div className="grid grid-cols-3 gap-3">
                   <Textarea
                     value={planForm.description.es}
@@ -565,7 +565,7 @@ export default function AdminMemberships() {
 
               {/* Type */}
               <div className="space-y-2">
-                <Label>{txt.type}</Label>
+                <Label>{t('adminMemberships.type')}</Label>
                 <Select 
                   value={planForm.membership_type}
                   onValueChange={(v) => setPlanForm(prev => ({ ...prev, membership_type: v }))}
@@ -574,10 +574,10 @@ export default function AdminMemberships() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="visits">{txt.visits}</SelectItem>
-                    <SelectItem value="unlimited">{txt.unlimited}</SelectItem>
-                    <SelectItem value="trial">{txt.trial}</SelectItem>
-                    <SelectItem value="courtesy">{txt.courtesy}</SelectItem>
+                    <SelectItem value="visits">{t('adminMemberships.visits')}</SelectItem>
+                    <SelectItem value="unlimited">{t('adminMemberships.unlimited')}</SelectItem>
+                    <SelectItem value="trial">{t('adminMemberships.trial')}</SelectItem>
+                    <SelectItem value="courtesy">{t('adminMemberships.courtesy')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -585,7 +585,7 @@ export default function AdminMemberships() {
               {/* Price & Points */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>{txt.price} (USD)</Label>
+                  <Label>{t('adminMemberships.price')} (USD)</Label>
                   <Input
                     type="number"
                     value={planForm.price}
@@ -593,7 +593,7 @@ export default function AdminMemberships() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{txt.priceInPoints}</Label>
+                  <Label>{t('adminMemberships.price')InPoints}</Label>
                   <Input
                     type="number"
                     value={planForm.price_in_points}
@@ -606,7 +606,7 @@ export default function AdminMemberships() {
               <div className="grid grid-cols-2 gap-4">
                 {planForm.membership_type === 'visits' && (
                   <div className="space-y-2">
-                    <Label>{txt.totalVisits}</Label>
+                    <Label>{t('adminMemberships.totalVisits')}</Label>
                     <Input
                       type="number"
                       value={planForm.total_visits || ''}
@@ -615,7 +615,7 @@ export default function AdminMemberships() {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label>{txt.durationDays}</Label>
+                  <Label>{t('adminMemberships.durationDays')}</Label>
                   <Input
                     type="number"
                     value={planForm.duration_days}
@@ -626,7 +626,7 @@ export default function AdminMemberships() {
 
               {/* Bonus Points */}
               <div className="space-y-2">
-                <Label>{txt.bonusPoints}</Label>
+                <Label>{t('adminMemberships.bonusPoints')}</Label>
                 <Input
                   type="number"
                   value={planForm.bonus_points}
@@ -641,24 +641,24 @@ export default function AdminMemberships() {
                     checked={planForm.is_featured}
                     onCheckedChange={(v) => setPlanForm(prev => ({ ...prev, is_featured: v }))}
                   />
-                  <Label>{txt.featured}</Label>
+                  <Label>{t('adminMemberships.featured')}</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={planForm.auto_renew}
                     onCheckedChange={(v) => setPlanForm(prev => ({ ...prev, auto_renew: v }))}
                   />
-                  <Label>{txt.autoRenew}</Label>
+                  <Label>{t('adminMemberships.autoRenew')}</Label>
                 </div>
               </div>
             </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsPlanDialogOpen(false)}>
-                {txt.cancel}
+                {t('common.cancel')}
               </Button>
               <Button onClick={handleSavePlan}>
-                {txt.save}
+                {t('common.save')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -668,13 +668,13 @@ export default function AdminMemberships() {
         <Dialog open={isGrantDialogOpen} onOpenChange={setIsGrantDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{txt.grantMembership}</DialogTitle>
+              <DialogTitle>{t('adminMemberships.grantMembership')}</DialogTitle>
               <DialogDescription>Otorgar membresía de cortesía a un usuario</DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>{txt.userId}</Label>
+                <Label>{t('adminMemberships.userId')}</Label>
                 <Input
                   value={grantForm.user_id}
                   onChange={(e) => setGrantForm(prev => ({ ...prev, user_id: e.target.value }))}
@@ -683,13 +683,13 @@ export default function AdminMemberships() {
               </div>
               
               <div className="space-y-2">
-                <Label>{txt.selectPlan}</Label>
+                <Label>{t('adminMemberships.selectPlan')}</Label>
                 <Select 
                   value={grantForm.plan_id}
                   onValueChange={(v) => setGrantForm(prev => ({ ...prev, plan_id: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={txt.selectPlan} />
+                    <SelectValue placeholder={t('adminMemberships.selectPlan')} />
                   </SelectTrigger>
                   <SelectContent>
                     {plans.filter(p => p.is_active).map((plan) => (
@@ -702,7 +702,7 @@ export default function AdminMemberships() {
               </div>
               
               <div className="space-y-2">
-                <Label>{txt.note}</Label>
+                <Label>{t('adminMemberships.note')}</Label>
                 <Textarea
                   value={grantForm.sponsor_note}
                   onChange={(e) => setGrantForm(prev => ({ ...prev, sponsor_note: e.target.value }))}
@@ -714,11 +714,11 @@ export default function AdminMemberships() {
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsGrantDialogOpen(false)}>
-                {txt.cancel}
+                {t('common.cancel')}
               </Button>
               <Button onClick={handleGrantMembership}>
                 <Gift className="h-4 w-4 mr-2" />
-                {txt.grant}
+                {t('adminMemberships.grant')}
               </Button>
             </DialogFooter>
           </DialogContent>
