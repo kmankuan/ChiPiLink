@@ -378,118 +378,23 @@
     }
   },
   "rapidpin": {
-    "title": "Rapid Pin",
-    "subtitle": "Spontaneous matches - 2 players + 1 referee!",
-    "viewSeason": "View Season",
-    "info": {
-      "participants": "Participants",
-      "playersAndReferee": "2 Players + 1 Referee",
-      "scoring": "Scoring",
-      "scoringDesc": "Win / Loss / Referee",
-      "validation": "Validation",
-      "oneConfirmation": "1 Confirmation",
-      "validationDesc": "Another participant must confirm"
-    },
-    "seasons": {
-      "title": "Seasons",
-      "create": "New Season",
-      "created": "Season created successfully",
-      "name": "Season Name",
-      "namePlaceholder": "E.g.: December 2025",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description...",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "fieldsRequired": "Name and end date are required",
-      "noSeasons": "No seasons",
-      "noSeasonsDesc": "Create your first Rapid Pin season to get started",
-      "createFirst": "Create First Season",
-      "notFound": "Season not found",
-      "status": {
-        "active": "Active",
-        "closed": "Closed",
-        "archived": "Archived"
-      }
-    },
-    "matches": {
-      "title": "Matches",
-      "register": "Register Match",
-      "registerDesc": "Register a match between 2 players with 1 referee",
-      "registered": "Match registered. Waiting for confirmation.",
-      "confirmed": "Match confirmed and points applied",
-      "playerA": "Player A",
-      "playerB": "Player B",
-      "referee": "Referee",
-      "winner": "Winner",
-      "selectPlayer": "Select player",
-      "selectReferee": "Select referee",
-      "selectWinner": "Select winner",
-      "winnerScore": "Winner Score",
-      "loserScore": "Loser Score",
-      "fieldsRequired": "All fields are required",
-      "differentParticipants": "All 3 participants must be different",
-      "winnerMustBePlayer": "The winner must be one of the players",
-      "pendingNote": "The match will be pending until another participant confirms it",
-      "pendingConfirmations": "Pending Confirmations",
-      "confirm": "Confirm",
-      "recent": "Recent Matches",
-      "noMatches": "No matches registered",
-      "status": {
-        "pending": "Pending",
-        "validated": "Validated",
-        "disputed": "Disputed",
-        "cancelled": "Cancelled"
-      }
-    },
-    "ranking": {
-      "title": "Ranking",
-      "players": "Player Ranking",
-      "playersDesc": "Standings by total points (wins + losses + refereeing)",
-      "referees": "Referee Ranking",
-      "refereesDesc": "Standings by matches refereed",
-      "player": "Player",
-      "referee": "Referee",
-      "points": "Points",
-      "played": "GP",
-      "won": "W",
-      "lost": "L",
-      "refereed": "Ref",
-      "matchesRefereed": "Matches Refereed",
-      "refPoints": "Points",
-      "noPlayers": "No players in the ranking yet",
-      "noReferees": "No referees registered yet"
-    },
-    "stats": {
-      "matches": "Matches",
-      "players": "Players",
-      "referees": "Referees",
-      "pending": "Pending"
-    },
-    "prizes": {
-      "title": "Prizes",
-      "player": "Player Prizes",
-      "referee": "Referee Prizes"
-    },
-    "closeSeason": {
-      "title": "Close Season",
-      "confirm": "Are you sure you want to close this season?",
-      "confirmDesc": "This action will fix the final ranking and assign prizes. No more matches can be registered.",
-      "close": "Close Season",
-      "cancel": "Cancel",
-      "success": "Season closed successfully",
-      "results": "Final Results",
-      "playerResults": "Player Results",
-      "refereeResults": "Referee Results",
-      "prize": "Prize",
-      "position": "Position",
-      "points": "Points"
-    },
-    "notifications": {
-      "pendingTitle": "Pending Matches",
-      "pendingDesc": "You have matches waiting for your confirmation",
-      "confirmNow": "Confirm Now",
-      "noPending": "No pending matches"
-    }
+    "challenge": "Challenge",
+    "challengePlayer": "Challenge Player",
+    "acceptChallenge": "Accept Challenge",
+    "declineChallenge": "Decline Challenge",
+    "pendingChallenges": "Pending Challenges",
+    "noChallenges": "No pending challenges",
+    "challengeSent": "Challenge sent",
+    "challengeAccepted": "Challenge accepted",
+    "challengeDeclined": "Challenge declined",
+    "from": "From",
+    "to": "To",
+    "status": "Status",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "completed": "Completed",
+    "expired": "Expired"
   },
   "analytics": {
     "title": "Analytics Dashboard",
@@ -953,7 +858,7 @@
   "notifications": {
     "title": "Notifications",
     "subtitle": "Manage your notification preferences",
-    "preferences": "Preferences",
+    "preferences": "Notification Preferences",
     "history": "History",
     "categories": "Categories",
     "providers": "Providers",
@@ -1010,7 +915,20 @@
     "preview": "Preview",
     "sent": "Sent",
     "pending": "Pending",
-    "failed": "Failed"
+    "failed": "Failed",
+    "preferencesSubtitle": "Configure how and when to receive notifications",
+    "globalSettings": "Global Settings",
+    "pushEnabled": "Push Notifications",
+    "pushEnabledDesc": "Receive notifications on your device",
+    "emailEnabled": "Email Notifications",
+    "emailEnabledDesc": "Receive email summaries",
+    "quietHours": "Quiet Hours",
+    "quietHoursDesc": "Do not receive notifications during these hours",
+    "quietFrom": "From",
+    "quietTo": "To",
+    "categoriesDesc": "Choose which types of notifications you want to receive",
+    "saved": "Preferences saved",
+    "saving": "Saving..."
   },
   "adminMemberships": {
     "title": "Membership Plans",
@@ -1068,24 +986,5 @@
     "submit": "Submit",
     "matchRecorded": "Match recorded successfully",
     "error": "Error recording match"
-  },
-  "rapidpin": {
-    "challenge": "Challenge",
-    "challengePlayer": "Challenge Player",
-    "acceptChallenge": "Accept Challenge",
-    "declineChallenge": "Decline Challenge",
-    "pendingChallenges": "Pending Challenges",
-    "noChallenges": "No pending challenges",
-    "challengeSent": "Challenge sent",
-    "challengeAccepted": "Challenge accepted",
-    "challengeDeclined": "Challenge declined",
-    "from": "From",
-    "to": "To",
-    "status": "Status",
-    "pending": "Pending",
-    "accepted": "Accepted",
-    "declined": "Declined",
-    "completed": "Completed",
-    "expired": "Expired"
   }
 }
