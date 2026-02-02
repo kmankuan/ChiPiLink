@@ -379,12 +379,12 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
     """Get statistics for Unatienda demo data"""
     try:
         stats = {
-            "productos": await db.libros.count_documents({"es_demo": True}),
-            "estudiantes": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
+            "products": await db.libros.count_documents({"es_demo": True}),
+            "students": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
             "orders": await db.textbook_orders.count_documents({"es_demo": True}),
-            "productos_total": await db.libros.count_documents({"es_catalogo_privado": True}),
-            "estudiantes_total": await db.estudiantes_sincronizados.count_documents({}),
-            "orders_total": await db.textbook_orders.count_documents({})
+            "total_products": await db.libros.count_documents({"es_catalogo_privado": True}),
+            "total_students": await db.estudiantes_sincronizados.count_documents({}),
+            "total_orders": await db.textbook_orders.count_documents({})
         }
         
         return {
@@ -392,7 +392,7 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
             "stats": stats
         }
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas de Unatienda: {e}")
+        logger.error(f"Error getting Unatienda stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -401,15 +401,15 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
     """Get overall statistics for Unatienda module"""
     try:
         stats = {
-            "productos_publicos": await db.libros.count_documents({
+            "public_products": await db.libros.count_documents({
                 "activo": True,
                 "$or": [{"es_catalogo_privado": {"$exists": False}}, {"es_catalogo_privado": False}]
             }),
-            "productos_privados": await db.libros.count_documents({
+            "private_products": await db.libros.count_documents({
                 "es_catalogo_privado": True,
                 "activo": True
             }),
-            "estudiantes": await db.estudiantes_sincronizados.count_documents({}),
+            "students": await db.estudiantes_sincronizados.count_documents({}),
             "orders_pending": await db.textbook_orders.count_documents({"status": "pending"}),
             "student_requests_approved": await db.store_textbook_access_students.count_documents({"status": "approved"}),
             "student_requests_pending": await db.store_textbook_access_requests.count_documents({"status": "pending"})
@@ -417,5 +417,5 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
         
         return stats
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas de Unatienda: {e}")
+        logger.error(f"Error getting Unatienda stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
