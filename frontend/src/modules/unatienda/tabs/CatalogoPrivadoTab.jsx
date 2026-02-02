@@ -190,14 +190,14 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     }
   };
 
-  const GRADOS_OPCIONES = [
-    'Pre-Kinder', 'Kinder', '1ro', '2do', '3ro', '4to', '5to', '6to',
-    '7mo', '8vo', '9no', '10mo', '11vo', '12vo'
+  const GRADE_OPTIONS = [
+    'Pre-Kinder', 'Kinder', '1st', '2nd', '3rd', '4th', '5th', '6th',
+    '7th', '8th', '9th', '10th', '11th', '12th'
   ];
 
-  const MATERIAS_OPCIONES = [
-    'Matemáticas', 'Español', 'Inglés', 'Ciencias Naturales', 'Ciencias Sociales',
-    'Religión', 'Arte', 'Música', 'Educación Física', 'Tecnología', 'Otros'
+  const SUBJECT_OPTIONS = [
+    'Mathematics', 'Spanish', 'English', 'Natural Sciences', 'Social Sciences',
+    'Religion', 'Art', 'Music', 'Physical Education', 'Technology', 'Others'
   ];
 
   if (loading) {
