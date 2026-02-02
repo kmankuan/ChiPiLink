@@ -1,6 +1,6 @@
 """
 Prizes - API Routes
-Sistema de premios avanzado
+System for premios avanzado
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -67,7 +67,7 @@ async def get_prizes_by_type(prize_type: PrizeType):
 
 @router.get("/catalog")
 async def get_prize_catalog():
-    """Get catálogo de premios"""
+    """Get catálogo of prizes"""
     catalog = await prize_service.get_or_create_default_catalog()
     return catalog
 

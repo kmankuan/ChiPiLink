@@ -1,6 +1,6 @@
 """
 Store Module - Category Routes
-Endpoints para gestión de categorías usando el Service Layer
+Endpoints for gestión de categorías usando el Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List

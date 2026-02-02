@@ -1,6 +1,6 @@
 """
 Store Module - Product Routes
-Endpoints para gestión de productos usando el Service Layer
+Endpoints for gestión de productos usando el Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional

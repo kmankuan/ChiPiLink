@@ -127,7 +127,7 @@ async def get_active_challenges(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats")
 async def get_player_challenge_stats(jugador_id: str):
-    """Get estadísticas de retos del jugador"""
+    """Get estadísticas of challenges del jugador"""
     stats = await challenge_service.get_player_stats(jugador_id)
     rank = await challenge_service.get_player_rank(jugador_id)
     return {
@@ -145,7 +145,7 @@ async def get_leaderboard(
     offset: int = 0,
     jugador_id: Optional[str] = None
 ):
-    """Get leaderboard de retos"""
+    """Get leaderboard of challenges"""
     leaderboard = await challenge_service.get_leaderboard(limit, offset)
     return {
         "leaderboard": leaderboard,

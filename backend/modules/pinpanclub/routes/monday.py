@@ -1,6 +1,6 @@
 """
 PinpanClub - Monday.com Integration Routes
-Endpoints para integración con Monday.com
+Endpoints for integración con Monday.com
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, List
@@ -98,7 +98,7 @@ async def sync_players(admin: dict = Depends(get_admin_user)):
     """Sincronizar todos los jugadores pendientes"""
     config = await monday_service.get_config()
     if not config.players_board_id:
-        raise HTTPException(status_code=400, detail="Board de jugadores no configurado")
+        raise HTTPException(status_code=400, detail="Board of players no configurado")
     
     result = await monday_service.sync_all_players()
     return {
@@ -114,7 +114,7 @@ async def sync_active_matches(admin: dict = Depends(get_admin_user)):
     """Sincronizar todos los partidos activos"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
-        raise HTTPException(status_code=400, detail="Board de partidos no configurado")
+        raise HTTPException(status_code=400, detail="Board of matches no configurado")
     
     result = await monday_service.sync_all_active_matches()
     return {
@@ -133,7 +133,7 @@ async def sync_single_match(
     """Sincronizar un partido específico"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
-        raise HTTPException(status_code=400, detail="Board de partidos no configurado")
+        raise HTTPException(status_code=400, detail="Board of matches no configurado")
     
     monday_id = await monday_service.sync_match(partido_id)
     if not monday_id:
@@ -148,10 +148,10 @@ async def sync_single_match(
 
 @router.post("/sync/results")
 async def sync_completed_results(admin: dict = Depends(get_admin_user)):
-    """Sincronizar resultados de partidos finalizados"""
+    """Sincronizar resultados of matches finalizados"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
-        raise HTTPException(status_code=400, detail="Board de partidos no configurado")
+        raise HTTPException(status_code=400, detail="Board of matches no configurado")
     
     # Get partidos finalizados con monday_item_id
     match_repo = MatchRepository()
@@ -183,7 +183,7 @@ async def get_monday_players(admin: dict = Depends(get_admin_user)):
     """Get jugadores desde Monday.com (para selección en partidos)"""
     config = await monday_service.get_config()
     if not config.players_board_id:
-        return {"players": [], "message": "Board de jugadores no configurado en Monday.com"}
+        return {"players": [], "message": "Board of players no configurado en Monday.com"}
     
     if not MONDAY_API_KEY:
         return {"players": [], "message": "API Key de Monday.com no configurada"}

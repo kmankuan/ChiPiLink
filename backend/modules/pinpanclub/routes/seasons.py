@@ -1,6 +1,6 @@
 """
 Ranking Seasons - API Routes
-Endpoints para sistema de temporadas de ranking
+Endpoints for sistema of seasons de ranking
 """
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional

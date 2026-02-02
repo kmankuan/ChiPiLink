@@ -1,5 +1,5 @@
 """
-Ping Pong Sponsors Module - Gestión de patrocinadores para pantallas TV
+Ping Pong Sponsors Module - Management of patrocinadores para pantallas TV
 Permite configurar espacios publicitarios, logos, diseños y más
 """
 

@@ -1,6 +1,6 @@
 """
 Rapid Pin - API Routes
-Endpoints para el sistema de partidos espontáneos
+Endpoints for el sistema of matches espontáneos
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -153,7 +153,7 @@ async def get_all_pending_confirmations(user_id: str):
 
 @router.get("/seasons/{season_id}/ranking", response_model=RapidPinRankingTable)
 async def get_ranking(season_id: str):
-    """Get tabla de ranking de jugadores"""
+    """Get tabla de ranking of players"""
     try:
         return await rapidpin_service.get_ranking(season_id)
     except ValueError as e:
@@ -389,7 +389,7 @@ async def cancel_queue_match(
 async def get_rapid_pin_public_feed():
     """
     Feed público de Rapid Pin.
-    Incluye estadísticas, partidos recientes, ranking y cola de partidos.
+    Incluye estadísticas, partidos recientes, ranking y cola of matches.
     """
     return await rapidpin_service.get_public_feed()
 

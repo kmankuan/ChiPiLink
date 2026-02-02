@@ -1,6 +1,6 @@
 """
 Store Module - Category Landing Routes
-Endpoints para páginas de landing de categorías y banners
+Endpoints for páginas de landing de categorías y banners
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List

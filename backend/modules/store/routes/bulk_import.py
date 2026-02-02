@@ -1,6 +1,6 @@
 """
 Store Module - Bulk Import Routes
-Endpoints para importación masiva desde datos copiados de Google Sheets
+Endpoints for importación masiva desde datos copiados de Google Sheets
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Dict, Optional, List

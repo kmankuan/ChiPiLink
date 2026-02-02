@@ -1,6 +1,6 @@
 """
 Rank Rewards - API Routes
-Endpoints para sistema de recompensas por rango
+Endpoints for sistema de recompensas por rango
 """
 from fastapi import APIRouter, Query
 from typing import Optional

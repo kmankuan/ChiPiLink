@@ -1,6 +1,6 @@
 """
 Super Pin Ranking - API Routes
-Endpoints para el sistema de ranking
+Endpoints for el sistema de ranking
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -313,7 +313,7 @@ async def get_recent_badges(limit: int = 20):
 
 @router.get("/badges/leaderboard")
 async def get_badge_leaderboard(liga_id: str = None, limit: int = 10):
-    """Get ranking de jugadores por badges"""
+    """Get ranking of players por badges"""
     return await superpin_service.get_badge_leaderboard(liga_id, limit)
 
 

@@ -133,7 +133,7 @@ async def get_player_feed(jugador_id: str, limit: int = Query(20, ge=1, le=100))
 
 @router.get("/feed/{jugador_id}/following")
 async def get_following_feed(jugador_id: str, limit: int = Query(50, ge=1, le=100)):
-    """Get feed de jugadores que sigue"""
+    """Get feed of players que sigue"""
     feed = await social_service.get_following_feed(jugador_id, limit)
     return {"jugador_id": jugador_id, "feed": feed}
 

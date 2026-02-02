@@ -1,6 +1,6 @@
 """
 PinpanClub - Match Routes
-Endpoints para gestión de partidos
+Endpoints for gestión of matches
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -17,7 +17,7 @@ async def get_matches(
     estado: Optional[MatchState] = None,
     limit: int = Query(50, ge=1, le=200)
 ):
-    """Get lista de partidos"""
+    """Get lista of matches"""
     if estado:
         return await match_service.get_matches_by_state(estado, limit)
     return await match_service.get_active_matches()
@@ -38,7 +38,7 @@ async def get_all_active_matches():
 
 @router.get("/stats")
 async def get_match_stats():
-    """Get estadísticas de partidos"""
+    """Get estadísticas of matches"""
     return await match_service.get_stats()
 
 

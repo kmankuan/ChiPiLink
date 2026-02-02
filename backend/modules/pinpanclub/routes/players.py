@@ -1,6 +1,6 @@
 """
 PinpanClub - Player Routes
-Endpoints para gestión de jugadores
+Endpoints for gestión of players
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -18,7 +18,7 @@ async def get_players(
     limit: int = Query(100, ge=1, le=500),
     search: Optional[str] = None
 ):
-    """Get lista de jugadores activos"""
+    """Get lista of players activos"""
     if search:
         return await player_service.search_players(search)
     return await player_service.get_all_players(skip=skip, limit=limit)
@@ -28,7 +28,7 @@ async def get_players(
 async def get_rankings(
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Get ranking de jugadores por ELO"""
+    """Get ranking of players por ELO"""
     return await player_service.get_rankings(limit=limit)
 
 
