@@ -61,7 +61,7 @@ export default function PingPongDashboard() {
   const [rapidPinPendingCount, setRapidPinPendingCount] = useState(0);
   
   // Get current user ID from auth context
-  const currentUserId = user?.cliente_id || user?.user_id || null;
+  const currentUserId = user?.user_id || null;
   
   // Check if user is admin or moderator
   const canManage = isAdmin || user?.role === 'moderator' || user?.rol === 'moderator';

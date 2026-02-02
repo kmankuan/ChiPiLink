@@ -12,7 +12,7 @@ import WeeklyChallenges from '../components/WeeklyChallenges';
 export default function WeeklyChallengesPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const currentUserId = user?.cliente_id || user?.user_id || null;
+  const currentUserId = user?.user_id || null;
 
   return (
     <div className="min-h-screen bg-background">

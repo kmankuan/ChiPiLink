@@ -72,7 +72,7 @@ export default function RapidPinPublicPage() {
   const [likedChallenges, setLikedChallenges] = useState({});
 
   // Get current user's player ID
-  const currentPlayerId = user?.cliente_id || user?.user_id;
+  const currentPlayerId = user?.user_id;
 
   // WebSocket for real-time updates
   const handleWebSocketMessage = useCallback((message) => {

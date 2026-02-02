@@ -191,7 +191,7 @@ export default function AdminUsuariosConexiones({ token }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          user_id: selectedUsuario.cliente_id,
+          user_id: selectedUsuario.user_id,
           capacidad_id: capacidadId,
           motivo: motivo || null
         })

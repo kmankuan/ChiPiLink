@@ -126,7 +126,7 @@ export default function ChallengeModal({
   const [sending, setSending] = useState(false);
 
   const txt = texts[lang] || texts.es;
-  const currentUserId = user?.cliente_id || user?.user_id;
+  const currentUserId = user?.user_id;
 
   useEffect(() => {
     if (isOpen) {

@@ -237,7 +237,7 @@ export default function RolesModule() {
     if (!selectedUserForRole || !selectedRole) return;
     
     try {
-      const response = await fetch(`${API}/api/roles/assign?cliente_id=${selectedUserForRole.usuario_id || selectedUserForRole.cliente_id}&role_id=${selectedRole.role_id}`, {
+      const response = await fetch(`${API}/api/roles/assign?user_id=${selectedUserForRole.user_id}&role_id=${selectedRole.role_id}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

@@ -35,7 +35,7 @@ export default function SeasonsPage() {
   const [loading, setLoading] = useState(true);
   
   const lang = i18n.language || 'es';
-  const currentUserId = user?.cliente_id || user?.user_id || null;
+  const currentUserId = user?.user_id || null;
   
   useEffect(() => {
     fetchSeasonData();

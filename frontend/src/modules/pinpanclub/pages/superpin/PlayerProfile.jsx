@@ -35,7 +35,7 @@ export default function PlayerProfile() {
   const [followStats, setFollowStats] = useState({ followers_count: 0, following_count: 0 });
   
   // Current user ID for social features
-  const currentUserId = user?.cliente_id || user?.user_id || null;
+  const currentUserId = user?.user_id || null;
 
   useEffect(() => {
     if (jugadorId) {
