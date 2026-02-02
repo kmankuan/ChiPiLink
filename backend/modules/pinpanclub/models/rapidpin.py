@@ -200,20 +200,20 @@ class RapidPinRankingEntry(BaseModel):
     # Position
     posicion: int = 0
     
-    # Puntos totales (victorias + derrotas + arbitrajes)
+    # Total points (victories + defeats + refereeing)
     puntos_totales: int = 0
     
-    # Estadísticas como jugador
+    # Statistics as player
     partidos_jugados: int = 0
     partidos_ganados: int = 0
     partidos_perdidos: int = 0
-    puntos_como_jugador: int = 0  # Solo victorias + derrotas
+    puntos_como_jugador: int = 0  # Only victories + defeats
     
-    # Estadísticas como árbitro
+    # Statistics as referee
     partidos_arbitrados: int = 0
     puntos_como_arbitro: int = 0
     
-    # Info del jugador
+    # Player info
     jugador_info: Optional[Dict] = None
     
     # Timestamps
@@ -222,7 +222,7 @@ class RapidPinRankingEntry(BaseModel):
 
 
 class RapidPinRankingTable(BaseModel):
-    """Tabla de ranking completa"""
+    """Complete ranking table"""
     season_id: str
     season_nombre: str
     estado: RapidPinSeasonStatus
@@ -236,17 +236,17 @@ class RapidPinRankingTable(BaseModel):
 # ============== SEASON RESULTS ==============
 
 class RapidPinSeasonResult(BaseModel):
-    """Resultado final de temporada"""
+    """Final season result"""
     jugador_id: str
     jugador_info: Optional[Dict] = None
     posicion_final: int
     puntos_finales: int
-    role: str  # "player" o "referee"
+    role: str  # "player" or "referee"
     prize: Optional[RapidPinPrize] = None
 
 
 class RapidPinSeasonFinalResults(BaseModel):
-    """Resultados finales de una temporada cerrada"""
+    """Final results of a closed season"""
     season_id: str
     season_nombre: str
     fecha_cierre: str
@@ -258,34 +258,34 @@ class RapidPinSeasonFinalResults(BaseModel):
 # ============== DEFAULT PRIZES ==============
 
 def get_default_player_prizes() -> List[RapidPinPrize]:
-    """Premios por defecto para jugadores"""
+    """Default prizes for players"""
     return [
         RapidPinPrize(
             position=1,
             role="player",
-            name="Campeón Rapid Pin",
-            description="Primer lugar en el ranking de jugadores",
+            name="Rapid Pin Champion",
+            description="First place in player ranking",
             icon="🥇"
         ),
         RapidPinPrize(
             position=2,
             role="player",
-            name="Subcampeón Rapid Pin",
-            description="Segundo lugar en el ranking de jugadores",
+            name="Rapid Pin Runner-up",
+            description="Second place in player ranking",
             icon="🥈"
         ),
         RapidPinPrize(
             position=3,
             role="player",
-            name="Tercer Lugar",
-            description="Tercer lugar en el ranking de jugadores",
+            name="Third Place",
+            description="Third place in player ranking",
             icon="🥉"
         ),
         RapidPinPrize(
             position=None,
             role="player",
-            name="Participante Rapid Pin",
-            description="Premio por participación",
+            name="Rapid Pin Participant",
+            description="Participation award",
             icon="🏓",
             special_type="participation"
         )
@@ -293,7 +293,7 @@ def get_default_player_prizes() -> List[RapidPinPrize]:
 
 
 def get_default_referee_prizes() -> List[RapidPinPrize]:
-    """Premios por defecto para árbitros"""
+    """Default prizes for referees"""
     return [
         RapidPinPrize(
             position=1,
