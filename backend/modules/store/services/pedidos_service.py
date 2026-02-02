@@ -31,17 +31,17 @@ class PedidosService:
         ano = ano_escolar or self.ano_escolar_actual
         
         # Verificar vinculación
-        vinculacion = await db.vinculaciones.find_one({
+        vinculacion = await db.store_textbook_access_students.find_one({
             "estudiante_sync_id": estudiante_sync_id,
             "user_id": user_id,
-            "estado": "aprobada",
+            "status": "approved",
             "activo": True
         })
         
         if not vinculacion:
             return {
                 "success": False,
-                "error": "No tienes vinculación aprobada con este estudiante"
+                "error": "No tienes acceso aprobado con este estudiante"
             }
         
         # Obtener datos del estudiante
@@ -161,15 +161,15 @@ class PedidosService:
         ano = ano_escolar or self.ano_escolar_actual
         
         # Verificar vinculación
-        vinculacion = await db.vinculaciones.find_one({
+        vinculacion = await db.store_textbook_access_students.find_one({
             "estudiante_sync_id": estudiante_sync_id,
             "user_id": user_id,
-            "estado": "aprobada",
+            "status": "approved",
             "activo": True
         })
         
         if not vinculacion:
-            raise ValueError("No tienes vinculación aprobada con este estudiante")
+            raise ValueError("No tienes acceso aprobado con este estudiante")
         
         # Verificar que no haya pedido borrador activo
         pedido_existente = await db.pedidos_libros.find_one({
