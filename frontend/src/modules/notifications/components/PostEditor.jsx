@@ -1,5 +1,5 @@
 /**
- * PostEditor - Editor avanzado de posts con bloques (Admin)
+ * PostEditor - Advanced block-based post editor (Admin)
  */
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,19 +24,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const BLOCK_TYPES = [
-  { type: 'paragraph', icon: Type, label: { es: 'Párrafo', en: 'Paragraph', zh: '段落' } },
-  { type: 'heading_1', icon: Heading1, label: { es: 'Título 1', en: 'Heading 1', zh: '标题1' } },
-  { type: 'heading_2', icon: Heading2, label: { es: 'Título 2', en: 'Heading 2', zh: '标题2' } },
-  { type: 'heading_3', icon: Heading3, label: { es: 'Título 3', en: 'Heading 3', zh: '标题3' } },
-  { type: 'bullet_list', icon: List, label: { es: 'Lista', en: 'Bullet List', zh: '列表' } },
-  { type: 'numbered_list', icon: ListOrdered, label: { es: 'Lista numerada', en: 'Numbered List', zh: '编号列表' } },
-  { type: 'image', icon: Image, label: { es: 'Imagen', en: 'Image', zh: '图片' } },
-  { type: 'video', icon: Video, label: { es: 'Video', en: 'Video', zh: '视频' } },
-  { type: 'quote', icon: Quote, label: { es: 'Cita', en: 'Quote', zh: '引用' } },
-  { type: 'callout', icon: AlertCircle, label: { es: 'Callout', en: 'Callout', zh: '提示框' } },
-  { type: 'button', icon: Link2, label: { es: 'Botón', en: 'Button', zh: '按钮' } },
-  { type: 'divider', icon: Minus, label: { es: 'Separador', en: 'Divider', zh: '分隔线' } },
-  { type: 'embed', icon: Play, label: { es: 'Embed', en: 'Embed', zh: '嵌入' } },
+  { type: 'paragraph', icon: Type, labelKey: 'paragraph' },
+  { type: 'heading_1', icon: Heading1, labelKey: 'heading1' },
+  { type: 'heading_2', icon: Heading2, labelKey: 'heading2' },
+  { type: 'heading_3', icon: Heading3, labelKey: 'heading3' },
+  { type: 'bullet_list', icon: List, labelKey: 'bulletList' },
+  { type: 'numbered_list', icon: ListOrdered, labelKey: 'numberedList' },
+  { type: 'image', icon: Image, labelKey: 'image' },
+  { type: 'video', icon: Video, labelKey: 'video' },
+  { type: 'quote', icon: Quote, labelKey: 'quote' },
+  { type: 'callout', icon: AlertCircle, labelKey: 'callout' },
+  { type: 'button', icon: Link2, labelKey: 'button' },
+  { type: 'divider', icon: Minus, labelKey: 'divider' },
+  { type: 'embed', icon: Play, labelKey: 'embed' },
 ];
 
 const CALLOUT_STYLES = ['info', 'warning', 'success', 'error'];
@@ -48,88 +48,30 @@ const CALLOUT_ICONS = {
 };
 
 export default function PostEditor({ blocks = [], onChange, lang = 'es' }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentLang = lang || i18n.language || 'es';
 
-  const texts = {
-    es: {
-      addBlock: 'Agregar bloque',
-      placeholder: 'Escribe aquí...',
-      urlPlaceholder: 'URL de la imagen o video',
-      captionPlaceholder: 'Descripción (opcional)',
-      authorPlaceholder: 'Autor (opcional)',
-      buttonText: 'Texto del botón',
-      buttonUrl: 'URL del botón',
-      listItem: 'Elemento de lista',
-      addItem: 'Agregar elemento',
-      embedUrl: 'URL para embeber (YouTube, Twitter, etc.)',
-      calloutStyle: 'Estilo'
-    },
-    en: {
-      addBlock: 'Add block',
-      placeholder: 'Write here...',
-      urlPlaceholder: 'Image or video URL',
-      captionPlaceholder: 'Caption (optional)',
-      authorPlaceholder: 'Author (optional)',
-      buttonText: 'Button text',
-      buttonUrl: 'Button URL',
-      listItem: 'List item',
-      addItem: 'Add item',
-      embedUrl: 'Embed URL (YouTube, Twitter, etc.)',
-      calloutStyle: 'Style'
-    },
-    zh: {
-      addBlock: '添加块',
-      placeholder: '在此输入...',
-      urlPlaceholder: '图片或视频URL',
-      captionPlaceholder: '说明（可选）',
-      authorPlaceholder: '作者（可选）',
-      buttonText: '按钮文本',
-      buttonUrl: '按钮URL',
-      listItem: '列表项',
-      addItem: '添加项',
-      embedUrl: '嵌入URL（YouTube、Twitter等）',
-      calloutStyle: '样式'
+  const getBlockLabel = (labelKey) => {
+    const key = `postEditor.blocks.${labelKey}`;
+    const translated = t(key);
+    // Fallback if key doesn't exist
+    if (translated === key) {
+      return labelKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     }
+    return translated;
   };
 
-  const txt = texts[currentLang] || texts.es;
+  const addBlock = (type, index) => {
+    const newBlock = {
+      id: `block_${Date.now()}`,
+      type,
+      content: type === 'callout' ? { style: 'info', text: '' } : '',
+      meta: {}
+    };
 
-  const addBlock = (type, afterIndex = blocks.length - 1) => {
-    const newBlock = createEmptyBlock(type);
     const newBlocks = [...blocks];
-    newBlocks.splice(afterIndex + 1, 0, newBlock);
+    newBlocks.splice(index + 1, 0, newBlock);
     onChange(newBlocks);
-  };
-
-  const createEmptyBlock = (type) => {
-    const base = { type, id: `block_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` };
-    
-    switch (type) {
-      case 'paragraph':
-      case 'heading_1':
-      case 'heading_2':
-      case 'heading_3':
-      case 'code':
-        return { ...base, content: '' };
-      case 'bullet_list':
-      case 'numbered_list':
-        return { ...base, items: [''] };
-      case 'image':
-      case 'video':
-        return { ...base, url: '', caption: { es: '', en: '', zh: '' }, alt: '' };
-      case 'quote':
-        return { ...base, content: '', author: '' };
-      case 'callout':
-        return { ...base, content: '', icon: '💡', style: 'info' };
-      case 'button':
-        return { ...base, text: { es: '', en: '', zh: '' }, url: '', style: 'primary' };
-      case 'embed':
-        return { ...base, url: '', provider: '' };
-      case 'divider':
-      default:
-        return base;
-    }
   };
 
   const updateBlock = (index, updates) => {
@@ -138,309 +80,269 @@ export default function PostEditor({ blocks = [], onChange, lang = 'es' }) {
     onChange(newBlocks);
   };
 
-  const removeBlock = (index) => {
+  const deleteBlock = (index) => {
     const newBlocks = blocks.filter((_, i) => i !== index);
     onChange(newBlocks);
   };
 
   const moveBlock = (index, direction) => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= blocks.length) return;
-    
+
     const newBlocks = [...blocks];
-    [newBlocks[index], newBlocks[newIndex]] = [newBlocks[newIndex], newBlocks[index]];
+    const [removed] = newBlocks.splice(index, 1);
+    newBlocks.splice(newIndex, 0, removed);
     onChange(newBlocks);
   };
 
   const renderBlockContent = (block, index) => {
     switch (block.type) {
       case 'paragraph':
-        return (
-          <Textarea
-            value={block.content || ''}
-            onChange={(e) => updateBlock(index, { content: e.target.value })}
-            placeholder={txt.placeholder}
-            className="min-h-[80px] resize-none"
-          />
-        );
-      
       case 'heading_1':
       case 'heading_2':
       case 'heading_3':
         return (
-          <Input
+          <Textarea
             value={block.content || ''}
             onChange={(e) => updateBlock(index, { content: e.target.value })}
-            placeholder={txt.placeholder}
-            className={`font-bold ${
-              block.type === 'heading_1' ? 'text-2xl' : 
-              block.type === 'heading_2' ? 'text-xl' : 'text-lg'
+            placeholder={t('postEditor.placeholder')}
+            className={`min-h-[60px] resize-none ${
+              block.type === 'heading_1' ? 'text-2xl font-bold' :
+              block.type === 'heading_2' ? 'text-xl font-semibold' :
+              block.type === 'heading_3' ? 'text-lg font-medium' : ''
             }`}
           />
         );
-      
+
       case 'bullet_list':
       case 'numbered_list':
         return (
-          <div className="space-y-2">
-            {(block.items || []).map((item, itemIndex) => (
-              <div key={itemIndex} className="flex items-center gap-2">
-                <span className="text-muted-foreground w-6 text-center">
-                  {block.type === 'numbered_list' ? `${itemIndex + 1}.` : '•'}
-                </span>
-                <Input
-                  value={item}
-                  onChange={(e) => {
-                    const newItems = [...(block.items || [])];
-                    newItems[itemIndex] = e.target.value;
-                    updateBlock(index, { items: newItems });
-                  }}
-                  placeholder={txt.listItem}
-                  className="flex-1"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    const newItems = block.items.filter((_, i) => i !== itemIndex);
-                    updateBlock(index, { items: newItems.length ? newItems : [''] });
-                  }}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => updateBlock(index, { items: [...(block.items || []), ''] })}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              {txt.addItem}
-            </Button>
-          </div>
+          <Textarea
+            value={block.content || ''}
+            onChange={(e) => updateBlock(index, { content: e.target.value })}
+            placeholder={t('postEditor.listPlaceholder')}
+            className="min-h-[80px] resize-none"
+          />
         );
-      
+
       case 'image':
       case 'video':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Input
-              value={block.url || ''}
-              onChange={(e) => updateBlock(index, { url: e.target.value })}
-              placeholder={txt.urlPlaceholder}
+              value={block.content || ''}
+              onChange={(e) => updateBlock(index, { content: e.target.value })}
+              placeholder={t('postEditor.urlPlaceholder')}
             />
-            {block.url && block.type === 'image' && (
-              <img src={block.url} alt={block.alt} className="max-h-48 rounded-lg object-cover" />
-            )}
-            {block.url && block.type === 'video' && (
-              <video src={block.url} controls className="max-h-48 rounded-lg" />
-            )}
             <Input
-              value={block.caption?.[currentLang] || ''}
-              onChange={(e) => updateBlock(index, { 
-                caption: { ...block.caption, [currentLang]: e.target.value } 
-              })}
-              placeholder={txt.captionPlaceholder}
+              value={block.meta?.caption || ''}
+              onChange={(e) => updateBlock(index, { meta: { ...block.meta, caption: e.target.value } })}
+              placeholder={t('postEditor.captionPlaceholder')}
             />
+            {block.content && block.type === 'image' && (
+              <img 
+                src={block.content} 
+                alt={block.meta?.caption || ''} 
+                className="max-h-40 rounded-lg object-cover"
+              />
+            )}
           </div>
         );
-      
+
       case 'quote':
         return (
-          <div className="space-y-2 pl-4 border-l-4 border-primary">
+          <div className="space-y-2 border-l-4 border-primary pl-4">
             <Textarea
               value={block.content || ''}
               onChange={(e) => updateBlock(index, { content: e.target.value })}
-              placeholder={txt.placeholder}
+              placeholder={t('postEditor.quotePlaceholder')}
               className="italic"
             />
             <Input
-              value={block.author || ''}
-              onChange={(e) => updateBlock(index, { author: e.target.value })}
-              placeholder={txt.authorPlaceholder}
+              value={block.meta?.author || ''}
+              onChange={(e) => updateBlock(index, { meta: { ...block.meta, author: e.target.value } })}
+              placeholder={t('postEditor.authorPlaceholder')}
               className="text-sm"
             />
           </div>
         );
-      
+
       case 'callout':
+        const calloutContent = typeof block.content === 'object' ? block.content : { style: 'info', text: block.content || '' };
         return (
-          <div 
-            className={`p-4 rounded-lg space-y-2 ${
-              block.style === 'warning' ? 'bg-amber-50 dark:bg-amber-950/20' :
-              block.style === 'success' ? 'bg-green-50 dark:bg-green-950/20' :
-              block.style === 'error' ? 'bg-red-50 dark:bg-red-950/20' :
-              'bg-blue-50 dark:bg-blue-950/20'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{CALLOUT_ICONS[block.style] || '💡'}</span>
-              <Select 
-                value={block.style || 'info'}
-                onValueChange={(v) => updateBlock(index, { style: v, icon: CALLOUT_ICONS[v] })}
-              >
-                <SelectTrigger className="w-32 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CALLOUT_STYLES.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="space-y-2">
+            <Select
+              value={calloutContent.style || 'info'}
+              onValueChange={(v) => updateBlock(index, { content: { ...calloutContent, style: v } })}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CALLOUT_STYLES.map(style => (
+                  <SelectItem key={style} value={style}>
+                    {CALLOUT_ICONS[style]} {style}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className={`p-3 rounded-lg ${
+              calloutContent.style === 'info' ? 'bg-blue-50 dark:bg-blue-950/30' :
+              calloutContent.style === 'warning' ? 'bg-amber-50 dark:bg-amber-950/30' :
+              calloutContent.style === 'success' ? 'bg-green-50 dark:bg-green-950/30' :
+              'bg-red-50 dark:bg-red-950/30'
+            }`}>
+              <Textarea
+                value={calloutContent.text || ''}
+                onChange={(e) => updateBlock(index, { content: { ...calloutContent, text: e.target.value } })}
+                placeholder={t('postEditor.calloutPlaceholder')}
+                className="bg-transparent border-0 resize-none"
+              />
             </div>
-            <Textarea
-              value={block.content || ''}
-              onChange={(e) => updateBlock(index, { content: e.target.value })}
-              placeholder={txt.placeholder}
-              className="bg-transparent"
-            />
           </div>
         );
-      
+
       case 'button':
         return (
           <div className="space-y-2">
-            <div className="grid grid-cols-3 gap-2">
-              <Input
-                value={block.text?.es || ''}
-                onChange={(e) => updateBlock(index, { text: { ...block.text, es: e.target.value } })}
-                placeholder="ES"
-              />
-              <Input
-                value={block.text?.en || ''}
-                onChange={(e) => updateBlock(index, { text: { ...block.text, en: e.target.value } })}
-                placeholder="EN"
-              />
-              <Input
-                value={block.text?.zh || ''}
-                onChange={(e) => updateBlock(index, { text: { ...block.text, zh: e.target.value } })}
-                placeholder="ZH"
-              />
-            </div>
             <Input
-              value={block.url || ''}
-              onChange={(e) => updateBlock(index, { url: e.target.value })}
-              placeholder={txt.buttonUrl}
+              value={block.content || ''}
+              onChange={(e) => updateBlock(index, { content: e.target.value })}
+              placeholder={t('postEditor.buttonText')}
             />
-            <div className="flex gap-2">
-              {['primary', 'secondary', 'outline'].map((style) => (
-                <Button
-                  key={style}
-                  variant={block.style === style ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => updateBlock(index, { style })}
-                >
-                  {style}
-                </Button>
-              ))}
-            </div>
+            <Input
+              value={block.meta?.url || ''}
+              onChange={(e) => updateBlock(index, { meta: { ...block.meta, url: e.target.value } })}
+              placeholder={t('postEditor.buttonUrl')}
+            />
           </div>
         );
-      
+
       case 'embed':
         return (
           <Input
-            value={block.url || ''}
-            onChange={(e) => updateBlock(index, { url: e.target.value })}
-            placeholder={txt.embedUrl}
+            value={block.content || ''}
+            onChange={(e) => updateBlock(index, { content: e.target.value })}
+            placeholder={t('postEditor.embedPlaceholder')}
           />
         );
-      
+
       case 'divider':
-        return <hr className="my-2" />;
-      
+        return <hr className="border-t-2 border-muted" />;
+
       default:
-        return <p className="text-muted-foreground">Bloque no soportado: {block.type}</p>;
+        return null;
     }
   };
 
   return (
-    <div className="space-y-3" data-testid="post-editor">
-      {blocks.map((block, index) => {
-        const blockType = BLOCK_TYPES.find(b => b.type === block.type);
-        const Icon = blockType?.icon || Type;
-        
-        return (
-          <Card 
-            key={block.id || index} 
-            className="group relative"
-            data-testid={`block-${index}`}
-          >
-            <CardContent className="pt-4">
-              {/* Block header */}
-              <div className="flex items-center gap-2 mb-3 opacity-60 group-hover:opacity-100 transition-opacity">
-                <GripVertical className="h-4 w-4 cursor-grab text-muted-foreground" />
-                <Badge variant="outline" className="text-xs gap-1">
-                  <Icon className="h-3 w-3" />
-                  {blockType?.label?.[currentLang] || block.type}
-                </Badge>
-                <div className="flex-1" />
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => moveBlock(index, 'up')}
+    <div className="space-y-2" data-testid="post-editor">
+      {blocks.length === 0 && (
+        <div className="text-center py-8 border-2 border-dashed rounded-lg">
+          <p className="text-muted-foreground mb-4">{t('postEditor.empty')}</p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                {t('postEditor.addBlock')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              {BLOCK_TYPES.map((blockType) => {
+                const Icon = blockType.icon;
+                return (
+                  <DropdownMenuItem
+                    key={blockType.type}
+                    onClick={() => addBlock(blockType.type, -1)}
+                    className="cursor-pointer"
+                  >
+                    <Icon className="h-4 w-4 mr-2" />
+                    {getBlockLabel(blockType.labelKey)}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+
+      {blocks.map((block, index) => (
+        <Card key={block.id || index} className="relative group">
+          <CardContent className="pt-4">
+            <div className="flex gap-2">
+              {/* Drag handle and controls */}
+              <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => moveBlock(index, -1)}
                   disabled={index === 0}
                 >
                   <ChevronUp className="h-3 w-3" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => moveBlock(index, 'down')}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => moveBlock(index, 1)}
                   disabled={index === blocks.length - 1}
                 >
                   <ChevronDown className="h-3 w-3" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => removeBlock(index)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
               </div>
-              
-              {/* Block content */}
-              {renderBlockContent(block, index)}
-            </CardContent>
-          </Card>
-        );
-      })}
 
-      {/* Add block button */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full border-dashed" data-testid="add-block-btn">
-            <Plus className="h-4 w-4 mr-2" />
-            {txt.addBlock}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          {BLOCK_TYPES.map((blockType, index) => {
-            const Icon = blockType.icon;
-            if (index > 0 && index % 4 === 0) {
-              return (
-                <React.Fragment key={blockType.type}>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => addBlock(blockType.type)}>
-                    <Icon className="h-4 w-4 mr-2" />
-                    {blockType.label[currentLang]}
-                  </DropdownMenuItem>
-                </React.Fragment>
-              );
-            }
-            return (
-              <DropdownMenuItem key={blockType.type} onClick={() => addBlock(blockType.type)}>
-                <Icon className="h-4 w-4 mr-2" />
-                {blockType.label[currentLang]}
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              {/* Block content */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="text-xs">
+                    {getBlockLabel(BLOCK_TYPES.find(b => b.type === block.type)?.labelKey || block.type)}
+                  </Badge>
+                </div>
+                {renderBlockContent(block, index)}
+              </div>
+
+              {/* Delete button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+                onClick={() => deleteBlock(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Add block button */}
+            <div className="mt-2 -mb-2 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs">
+                    <Plus className="h-3 w-3 mr-1" />
+                    {t('postEditor.addBlock')}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48">
+                  {BLOCK_TYPES.map((blockType) => {
+                    const Icon = blockType.icon;
+                    return (
+                      <DropdownMenuItem
+                        key={blockType.type}
+                        onClick={() => addBlock(blockType.type, index)}
+                        className="cursor-pointer"
+                      >
+                        <Icon className="h-4 w-4 mr-2" />
+                        {getBlockLabel(blockType.labelKey)}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
