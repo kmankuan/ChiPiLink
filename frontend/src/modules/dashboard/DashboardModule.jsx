@@ -140,32 +140,32 @@ export default function DashboardModule() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Productos</CardTitle>
+            <CardTitle className="text-sm font-medium">Products</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.products?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               {stats.products?.low_stock > 0 && (
-                <span className="text-amber-600">{stats.products.low_stock} con bajo stock</span>
+                <span className="text-amber-600">{stats.products.low_stock} low stock</span>
               )}
-              {(stats.products?.low_stock || 0) === 0 && 'Stock saludable'}
+              {(stats.products?.low_stock || 0) === 0 && 'Healthy stock'}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pedidos</CardTitle>
+            <CardTitle className="text-sm font-medium">Orders</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.orders?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
               {stats.orders?.pending > 0 ? (
-                <span className="text-amber-600">{stats.orders.pending} pendientes</span>
+                <span className="text-amber-600">{stats.orders.pending} pending</span>
               ) : (
-                'Todos procesados'
+                'All processed'
               )}
             </p>
           </CardContent>
@@ -173,26 +173,26 @@ export default function DashboardModule() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuarios</CardTitle>
+            <CardTitle className="text-sm font-medium">Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.users?.total || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Usuarios registrados
+              Registered users
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notificaciones</CardTitle>
+            <CardTitle className="text-sm font-medium">Notifications</CardTitle>
             <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.notifications?.unread || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {(stats.notifications?.unread || 0) > 0 ? 'Sin leer' : 'Todas leídas'}
+              {(stats.notifications?.unread || 0) > 0 ? 'Unread' : 'All read'}
             </p>
           </CardContent>
         </Card>
@@ -204,7 +204,7 @@ export default function DashboardModule() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShoppingBag className="h-5 w-5" />
-              Resumen de Unatienda
+              Unatienda Summary
             </CardTitle>
           </CardHeader>
           <CardContent>
