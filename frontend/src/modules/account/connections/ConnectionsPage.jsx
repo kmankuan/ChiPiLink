@@ -382,7 +382,7 @@ export default function MisConexiones({ token }) {
                   <Input
                     value={inviteMessage}
                     onChange={(e) => setInviteMessage(e.target.value)}
-                    placeholder="Hola, te invito a unirte..."
+                    placeholder="Hello, I invite you to join..."
                   />
                 </div>
                 <Button 
@@ -395,7 +395,7 @@ export default function MisConexiones({ token }) {
                   ) : (
                     <Send className="h-4 w-4 mr-2" />
                   )}
-                  Enviar invitación
+                  Send Invitation
                 </Button>
               </div>
             </DialogContent>
@@ -416,7 +416,7 @@ export default function MisConexiones({ token }) {
                 <DialogTitle>{t('conexiones.addConnection')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                {/* Búsqueda de usuario */}
+                {/* User Search */}
                 {!selectedUser ? (
                   <div className="space-y-2">
                     <Label>{t('conexiones.searchUser')}</Label>
@@ -465,7 +465,7 @@ export default function MisConexiones({ token }) {
                     
                     {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
                       <div className="text-center py-4 text-muted-foreground">
-                        <p>No se encontraron usuarios</p>
+                        <p>No users found</p>
                         <Button 
                           variant="link" 
                           onClick={() => {
@@ -474,7 +474,7 @@ export default function MisConexiones({ token }) {
                             setInviteEmail(searchQuery.includes('@') ? searchQuery : '');
                           }}
                         >
-                          ¿Invitar por correo?
+                          Invite by email?
                         </Button>
                       </div>
                     )}
