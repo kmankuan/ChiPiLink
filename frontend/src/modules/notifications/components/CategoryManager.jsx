@@ -1,5 +1,5 @@
 /**
- * CategoryManager - Gestión de categorías de notificaciones (Admin)
+ * CategoryManager - Admin notification categories management
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -22,7 +22,7 @@ const MODULE_OPTIONS = ['wallet', 'membership', 'pinpanclub', 'social', 'admin',
 const PRIORITY_OPTIONS = ['low', 'normal', 'high', 'urgent'];
 
 export default function CategoryManager({ token }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -39,80 +39,6 @@ export default function CategoryManager({ token }) {
 
   const lang = i18n.language || 'es';
 
-  const texts = {
-    es: {
-      title: 'Categorías de Notificación',
-      subtitle: 'Gestiona las categorías para organizar notificaciones',
-      newCategory: 'Nueva Categoría',
-      edit: 'Editar',
-      delete: 'Eliminar',
-      name: 'Nombre',
-      description: 'Descripción',
-      icon: 'Icono',
-      color: 'Color',
-      module: 'Módulo',
-      priority: 'Prioridad',
-      defaultEnabled: 'Activo por defecto',
-      save: 'Guardar',
-      cancel: 'Cancelar',
-      created: 'Categoría creada',
-      updated: 'Categoría actualizada',
-      deleted: 'Categoría eliminada',
-      confirmDelete: '¿Eliminar esta categoría?',
-      spanish: 'Español',
-      english: 'Inglés',
-      chinese: 'Chino'
-    },
-    en: {
-      title: 'Notification Categories',
-      subtitle: 'Manage categories to organize notifications',
-      newCategory: 'New Category',
-      edit: 'Edit',
-      delete: 'Delete',
-      name: 'Name',
-      description: 'Description',
-      icon: 'Icon',
-      color: 'Color',
-      module: 'Module',
-      priority: 'Priority',
-      defaultEnabled: 'Enabled by default',
-      save: 'Save',
-      cancel: 'Cancel',
-      created: 'Category created',
-      updated: 'Category updated',
-      deleted: 'Category deleted',
-      confirmDelete: 'Delete this category?',
-      spanish: 'Spanish',
-      english: 'English',
-      chinese: 'Chinese'
-    },
-    zh: {
-      title: '通知分类',
-      subtitle: '管理分类以组织通知',
-      newCategory: '新建分类',
-      edit: '编辑',
-      delete: '删除',
-      name: '名称',
-      description: '描述',
-      icon: '图标',
-      color: '颜色',
-      module: '模块',
-      priority: '优先级',
-      defaultEnabled: '默认启用',
-      save: '保存',
-      cancel: '取消',
-      created: '分类已创建',
-      updated: '分类已更新',
-      deleted: '分类已删除',
-      confirmDelete: '删除此分类？',
-      spanish: '西班牙语',
-      english: '英语',
-      chinese: '中文'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
-
   useEffect(() => {
     fetchCategories();
   }, [token]);
@@ -120,10 +46,9 @@ export default function CategoryManager({ token }) {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/notifications/categories?active_only=false`, {
+      const res = await fetch(`${API_URL}/api/notifications/categories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-
       if (res.ok) {
         const data = await res.json();
         setCategories(data.categories || []);
@@ -135,53 +60,41 @@ export default function CategoryManager({ token }) {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: { es: '', en: '', zh: '' },
-      description: { es: '', en: '', zh: '' },
-      icon: '🔔',
-      color: '#6366f1',
-      module: 'general',
-      priority: 'normal',
-      default_enabled: true
-    });
-    setEditingCategory(null);
-  };
-
-  const openCreateDialog = () => {
-    resetForm();
-    setIsDialogOpen(true);
-  };
-
-  const openEditDialog = (category) => {
-    setEditingCategory(category);
-    setFormData({
-      name: category.name || { es: '', en: '', zh: '' },
-      description: category.description || { es: '', en: '', zh: '' },
-      icon: category.icon || '🔔',
-      color: category.color || '#6366f1',
-      module: category.module || 'general',
-      priority: category.priority || 'normal',
-      default_enabled: category.default_enabled ?? true
-    });
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = async () => {
-    if (!formData.name.es) {
-      toast.error('El nombre en español es requerido');
-      return;
+  const openDialog = (category = null) => {
+    if (category) {
+      setEditingCategory(category);
+      setFormData({
+        name: category.name || { es: '', en: '', zh: '' },
+        description: category.description || { es: '', en: '', zh: '' },
+        icon: category.icon || '🔔',
+        color: category.color || '#6366f1',
+        module: category.module || 'general',
+        priority: category.priority || 'normal',
+        default_enabled: category.default_enabled !== false
+      });
+    } else {
+      setEditingCategory(null);
+      setFormData({
+        name: { es: '', en: '', zh: '' },
+        description: { es: '', en: '', zh: '' },
+        icon: '🔔',
+        color: '#6366f1',
+        module: 'general',
+        priority: 'normal',
+        default_enabled: true
+      });
     }
+    setIsDialogOpen(true);
+  };
 
+  const saveCategory = async () => {
     try {
       const url = editingCategory
-        ? `${API_URL}/api/notifications/admin/categories/${editingCategory.category_id}`
-        : `${API_URL}/api/notifications/admin/categories`;
-      
-      const method = editingCategory ? 'PUT' : 'POST';
+        ? `${API_URL}/api/notifications/categories/${editingCategory.category_id}`
+        : `${API_URL}/api/notifications/categories`;
 
       const res = await fetch(url, {
-        method,
+        method: editingCategory ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -190,32 +103,39 @@ export default function CategoryManager({ token }) {
       });
 
       if (res.ok) {
-        toast.success(editingCategory ? txt.updated : txt.created);
+        toast.success(editingCategory 
+          ? t('notifications.categoryManager.updated') 
+          : t('notifications.categoryManager.created')
+        );
         setIsDialogOpen(false);
-        resetForm();
         fetchCategories();
       }
     } catch (error) {
-      toast.error('Error saving category');
+      toast.error(t('notifications.error'));
     }
   };
 
-  const handleDelete = async (categoryId) => {
-    if (!confirm(txt.confirmDelete)) return;
+  const deleteCategory = async (categoryId) => {
+    if (!window.confirm(t('notifications.categoryManager.confirmDelete'))) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/notifications/admin/categories/${categoryId}`, {
+      const res = await fetch(`${API_URL}/api/notifications/categories/${categoryId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (res.ok) {
-        toast.success(txt.deleted);
+        toast.success(t('notifications.categoryManager.deleted'));
         fetchCategories();
       }
     } catch (error) {
-      toast.error('Error deleting category');
+      toast.error(t('notifications.error'));
     }
+  };
+
+  const getLocalizedText = (obj) => {
+    if (!obj) return '';
+    return obj[lang] || obj.es || obj.en || '';
   };
 
   if (loading) {
@@ -229,176 +149,176 @@ export default function CategoryManager({ token }) {
   }
 
   return (
-    <div className="space-y-6" data-testid="category-manager">
+    <div className="space-y-4" data-testid="category-manager">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Tags className="h-5 w-5" />
-              {txt.title}
-            </CardTitle>
-            <CardDescription>{txt.subtitle}</CardDescription>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Tags className="h-5 w-5" />
+                {t('notifications.categoryManager.title')}
+              </CardTitle>
+              <CardDescription>{t('notifications.categoryManager.subtitle')}</CardDescription>
+            </div>
+            <Button onClick={() => openDialog()} data-testid="new-category-btn">
+              <Plus className="h-4 w-4 mr-2" />
+              {t('notifications.categoryManager.newCategory')}
+            </Button>
           </div>
-          <Button onClick={openCreateDialog} data-testid="new-category-btn">
-            <Plus className="h-4 w-4 mr-2" />
-            {txt.newCategory}
-          </Button>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {categories.map((category) => (
-              <div 
-                key={category.category_id}
-                className={`p-4 rounded-lg border flex items-center justify-between ${
-                  !category.is_active ? 'opacity-50 bg-muted/30' : ''
-                }`}
-                data-testid={`category-item-${category.category_id}`}
-              >
-                <div className="flex items-center gap-3">
-                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                  <span 
-                    className="text-2xl p-2 rounded-lg"
-                    style={{ backgroundColor: `${category.color}20` }}
-                  >
-                    {category.icon}
-                  </span>
-                  <div>
-                    <p className="font-medium">
-                      {category.name?.[lang] || category.name?.es || category.category_id}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                      {category.description?.[lang] || category.description?.es || ''}
-                    </p>
-                    <div className="flex gap-2 mt-1">
-                      <Badge variant="outline" style={{ borderColor: category.color }}>
-                        {category.module}
-                      </Badge>
-                      <Badge variant={category.priority === 'high' || category.priority === 'urgent' ? 'destructive' : 'secondary'}>
-                        {category.priority}
-                      </Badge>
+          {categories.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              {t('notifications.categoryManager.noCategories')}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {categories.map((category) => (
+                <div
+                  key={category.category_id}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                      style={{ backgroundColor: `${category.color}20` }}
+                    >
+                      {category.icon}
+                    </div>
+                    <div>
+                      <p className="font-medium">{getLocalizedText(category.name)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {getLocalizedText(category.description)}
+                      </p>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{category.module}</Badge>
+                    <Badge 
+                      variant={category.priority === 'high' || category.priority === 'urgent' ? 'destructive' : 'secondary'}
+                    >
+                      {category.priority}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => openDialog(category)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => deleteCategory(category.category_id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => openEditDialog(category)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => handleDelete(category.category_id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Create/Edit Dialog */}
+      {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {editingCategory ? txt.edit : txt.newCategory}
+              {editingCategory 
+                ? t('notifications.edit') 
+                : t('notifications.categoryManager.newCategory')
+              }
             </DialogTitle>
           </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* Names */}
-            <div className="space-y-3">
-              <Label className="font-semibold">{txt.name}</Label>
-              <div className="grid grid-cols-3 gap-3">
+
+          <div className="space-y-4 py-4">
+            {/* Name in all languages */}
+            <div className="space-y-2">
+              <Label>{t('notifications.categoryManager.name')}</Label>
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <Label className="text-xs text-muted-foreground">{txt.spanish}</Label>
+                  <span className="text-xs text-muted-foreground">{t('notifications.categoryManager.spanish')}</span>
                   <Input
                     value={formData.name.es}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      name: { ...prev.name, es: e.target.value }
-                    }))}
-                    placeholder="Nombre en español"
-                    data-testid="category-name-es"
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      name: { ...formData.name, es: e.target.value }
+                    })}
+                    placeholder="Nombre"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">{txt.english}</Label>
+                  <span className="text-xs text-muted-foreground">{t('notifications.categoryManager.english')}</span>
                   <Input
                     value={formData.name.en}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      name: { ...prev.name, en: e.target.value }
-                    }))}
-                    placeholder="English name"
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      name: { ...formData.name, en: e.target.value }
+                    })}
+                    placeholder="Name"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">{txt.chinese}</Label>
+                  <span className="text-xs text-muted-foreground">{t('notifications.categoryManager.chinese')}</span>
                   <Input
                     value={formData.name.zh}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      name: { ...prev.name, zh: e.target.value }
-                    }))}
-                    placeholder="中文名称"
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      name: { ...formData.name, zh: e.target.value }
+                    })}
+                    placeholder="名称"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Descriptions */}
-            <div className="space-y-3">
-              <Label className="font-semibold">{txt.description}</Label>
-              <div className="grid grid-cols-3 gap-3">
+            {/* Description */}
+            <div className="space-y-2">
+              <Label>{t('notifications.categoryManager.description')}</Label>
+              <div className="grid grid-cols-3 gap-2">
                 <Input
                   value={formData.description.es}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    description: { ...prev.description, es: e.target.value }
-                  }))}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    description: { ...formData.description, es: e.target.value }
+                  })}
                   placeholder="Descripción"
                 />
                 <Input
                   value={formData.description.en}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    description: { ...prev.description, en: e.target.value }
-                  }))}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    description: { ...formData.description, en: e.target.value }
+                  })}
                   placeholder="Description"
                 />
                 <Input
                   value={formData.description.zh}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    description: { ...prev.description, zh: e.target.value }
-                  }))}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    description: { ...formData.description, zh: e.target.value }
+                  })}
                   placeholder="描述"
                 />
               </div>
             </div>
 
-            {/* Icon & Color */}
+            {/* Icon and Color */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>{txt.icon}</Label>
+                <Label>{t('notifications.categoryManager.icon')}</Label>
                 <div className="flex flex-wrap gap-2">
                   {EMOJI_OPTIONS.map((emoji) => (
                     <button
                       key={emoji}
                       type="button"
-                      className={`text-2xl p-2 rounded-lg border transition-all ${
-                        formData.icon === emoji 
-                          ? 'border-primary bg-primary/10 scale-110' 
-                          : 'border-transparent hover:bg-muted'
+                      className={`w-10 h-10 rounded-lg text-xl hover:bg-muted transition-colors ${
+                        formData.icon === emoji ? 'ring-2 ring-primary bg-muted' : ''
                       }`}
-                      onClick={() => setFormData(prev => ({ ...prev, icon: emoji }))}
+                      onClick={() => setFormData({ ...formData, icon: emoji })}
                     >
                       {emoji}
                     </button>
@@ -406,48 +326,46 @@ export default function CategoryManager({ token }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>{txt.color}</Label>
+                <Label>{t('notifications.categoryManager.color')}</Label>
                 <div className="flex flex-wrap gap-2">
                   {COLOR_OPTIONS.map((color) => (
                     <button
                       key={color}
                       type="button"
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${
-                        formData.color === color 
-                          ? 'border-primary scale-110 ring-2 ring-offset-2' 
-                          : 'border-transparent hover:scale-105'
+                      className={`w-10 h-10 rounded-lg transition-transform ${
+                        formData.color === color ? 'ring-2 ring-primary scale-110' : ''
                       }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => setFormData(prev => ({ ...prev, color }))}
+                      onClick={() => setFormData({ ...formData, color })}
                     />
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Module & Priority */}
+            {/* Module and Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>{txt.module}</Label>
+                <Label>{t('notifications.categoryManager.module')}</Label>
                 <Select 
-                  value={formData.module}
-                  onValueChange={(v) => setFormData(prev => ({ ...prev, module: v }))}
+                  value={formData.module} 
+                  onValueChange={(v) => setFormData({ ...formData, module: v })}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {MODULE_OPTIONS.map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    {MODULE_OPTIONS.map((mod) => (
+                      <SelectItem key={mod} value={mod}>{mod}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>{txt.priority}</Label>
+                <Label>{t('notifications.categoryManager.priority')}</Label>
                 <Select 
-                  value={formData.priority}
-                  onValueChange={(v) => setFormData(prev => ({ ...prev, priority: v }))}
+                  value={formData.priority} 
+                  onValueChange={(v) => setFormData({ ...formData, priority: v })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -462,21 +380,22 @@ export default function CategoryManager({ token }) {
             </div>
 
             {/* Default Enabled */}
-            <div className="flex items-center justify-between">
-              <Label>{txt.defaultEnabled}</Label>
+            <div className="flex items-center justify-between p-3 rounded-lg border">
+              <Label>{t('notifications.categoryManager.defaultEnabled')}</Label>
               <Switch
                 checked={formData.default_enabled}
-                onCheckedChange={(v) => setFormData(prev => ({ ...prev, default_enabled: v }))}
+                onCheckedChange={(checked) => setFormData({ ...formData, default_enabled: checked })}
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              {txt.cancel}
+              {t('common.cancel')}
             </Button>
-            <Button onClick={handleSave} data-testid="save-category-btn">
-              {txt.save}
+            <Button onClick={saveCategory}>
+              <Check className="h-4 w-4 mr-2" />
+              {t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
