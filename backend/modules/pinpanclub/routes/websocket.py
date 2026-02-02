@@ -408,7 +408,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
             puntos_a = 0
             puntos_b = 0
     
-    # Calculate serve change
+    # Calculateste serve change
     total_puntos_set = puntos_a + puntos_b
     cambio_saque_cada = 2
     if puntos_a >= 10 and puntos_b >= 10:

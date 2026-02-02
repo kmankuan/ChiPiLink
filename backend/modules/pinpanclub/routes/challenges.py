@@ -170,7 +170,7 @@ async def get_player_rank(jugador_id: str):
     challenges_completed = entry.get("challenges_completed", 0) if entry else 0
     current_streak = entry.get("current_streak", 0) if entry else 0
     
-    # Calcular rank basado en puntos
+    # Calculatesr rank basado en puntos
     ranks = [
         {"id": "bronze", "name": "Bronce", "min": 0, "max": 99, "icon": "🥉"},
         {"id": "silver", "name": "Plata", "min": 100, "max": 299, "icon": "🥈"},
@@ -189,7 +189,7 @@ async def get_player_rank(jugador_id: str):
             current_rank = rank
             next_rank = ranks[i + 1] if i + 1 < len(ranks) else None
     
-    # Calcular progreso
+    # Calculatesr progreso
     progress = 0
     points_to_next = 0
     if next_rank:

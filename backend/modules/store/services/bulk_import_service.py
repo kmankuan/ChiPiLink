@@ -564,7 +564,7 @@ class BulkImportService:
         if not precio_str:
             return 0.0
         
-        # Remover símbolos de moneda y espacios
+        # Remove símbolos de moneda y espacios
         clean = re.sub(r'[^\d.,]', '', str(precio_str))
         
         if not clean:

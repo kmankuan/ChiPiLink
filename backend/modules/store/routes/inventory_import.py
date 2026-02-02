@@ -264,7 +264,7 @@ async def execute_csv_import(
                         skipped += 1
                         continue
                     
-                    # Calculate new quantity
+                    # Calculateste new quantity
                     if duplicate_mode == DuplicateMode.REPLACE:
                         new_cantidad = cantidad
                     else:  # ADD

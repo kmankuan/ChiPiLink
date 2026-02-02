@@ -256,7 +256,7 @@ class AchievementsService(BaseService):
         
         self.log_info(f"Achievement awarded: {jugador_id} - {achievement['name']}")
         
-        # Retornar sin _id
+        # Returnsr sin _id
         player_achievement.pop("_id", None)
         return player_achievement
 

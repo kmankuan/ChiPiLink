@@ -77,7 +77,7 @@ async def get_season_catalog(season_id: str):
     """Get catálogo de a season"""
     catalog = await prize_service.get_season_catalog(season_id)
     if not catalog:
-        # Retornar catálogo por defecto
+        # Returnsr catálogo por defecto
         catalog = await prize_service.get_or_create_default_catalog()
     return catalog
 

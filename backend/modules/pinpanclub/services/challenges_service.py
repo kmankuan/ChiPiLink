@@ -95,7 +95,7 @@ class ChallengeService(BaseService):
         if existing:
             return WeeklyChallengeSet(**existing)
         
-        # Calcular fechas
+        # Calculatesr fechas
         start_of_week = now - timedelta(days=now.weekday())
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_week = start_of_week + timedelta(days=6, hours=23, minutes=59, seconds=59)
@@ -160,7 +160,7 @@ class ChallengeService(BaseService):
         
         player = await self.player_repo.get_by_id(jugador_id)
         
-        # Calcular fecha de expiración
+        # Calculatesr fecha de expiración
         expires_at = datetime.now(timezone.utc) + timedelta(days=challenge.get("duration_days", 7))
         
         progress_data = {
@@ -310,7 +310,7 @@ class ChallengeService(BaseService):
             )
             new_total_points = updated_entry.get("total_points", 0) if updated_entry else 0
             
-            # Calculate old points (before this challenge)
+            # Calculateste old points (before this challenge)
             old_points = new_total_points - challenge.get("points_reward", 0)
             
             # Check promotion

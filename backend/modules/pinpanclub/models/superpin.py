@@ -27,7 +27,7 @@ class CheckInMethod(str, Enum):
 
 class StatsLevel(str, Enum):
     """Nivel de estadísticas"""
-    BASIC = "basic"            # Solo sets ganados/perdidos
+    BASIC = "basic"            # Only sets ganados/perdidos
     STANDARD = "standard"      # Puntos por set
     ADVANCED = "advanced"      # Estadísticas completas (aces, errores, etc.)
 
@@ -42,8 +42,8 @@ class LeagueStatus(str, Enum):
 
 class TournamentType(str, Enum):
     """Tipo de torneo final"""
-    TOP_N = "top_n"            # Solo los mejores N jugadores
-    ALL_PLAYERS = "all_players"  # Todos los jugadores
+    TOP_N = "top_n"            # Only los mejores N jugadores
+    ALL_PLAYERS = "all_players"  # All los jugadores
     BY_CATEGORY = "by_category"  # Por categorías según ranking
 
 

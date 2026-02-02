@@ -324,7 +324,7 @@ class TextbookOrderService(BaseService):
             if item["status"] == OrderItemStatus.AVAILABLE.value or item["status"] == OrderItemStatus.REORDER_APPROVED.value
         ]
         
-        # Calculate total for this submission
+        # Calculateste total for this submission
         submission_total = sum(
             item["price"] * item["quantity_ordered"] 
             for item in new_selected_items

@@ -171,7 +171,7 @@ class SuperPinService(BaseService):
         if not config.club_latitude or not config.club_longitude:
             return True  # Sin ubicación configurada, permitir
         
-        # Calcular distancia usando fórmula de Haversine
+        # Calculatesr distancia usando fórmula de Haversine
         distance = self._haversine_distance(
             config.club_latitude, config.club_longitude,
             latitude, longitude
@@ -332,7 +332,7 @@ class SuperPinService(BaseService):
             match["estado"] = "finalizado"
             match["fecha_fin"] = datetime.now(timezone.utc).isoformat()
             
-            # Calcular y actualizar ranking
+            # Calculatesr y actualizar ranking
             await self._update_ranking_after_match(match)
             
             # Incrementar contador de partidos
@@ -371,7 +371,7 @@ class SuperPinService(BaseService):
         if not ranking_ganador or not ranking_perdedor:
             return
         
-        # Calcular puntos según el sistema
+        # Calculatesr puntos según el sistema
         if scoring_system == "elo":
             puntos_ganador, puntos_perdedor, elo_change = self._calculate_elo(
                 ranking_ganador.get("elo_rating", 1000),
@@ -552,7 +552,7 @@ class SuperPinService(BaseService):
         if num_players < 2:
             raise ValueError("Se necesitan al menos 2 participantes")
         
-        # Calcular rondas necesarias
+        # Calculatesr rondas necesarias
         import math
         num_rounds = math.ceil(math.log2(num_players))
         bracket_size = 2 ** num_rounds
@@ -608,7 +608,7 @@ class SuperPinService(BaseService):
             ]
             brackets.append({"round": r, "name": round_name, "matches": round_matches})
         
-        # Agregar partido por 3er lugar si está configurado
+        # Add partido por 3er lugar si está configurado
         config = tournament.get("tournament_config", {})
         if config.get("third_place_match", True) and num_rounds >= 2:
             brackets.append({
@@ -706,7 +706,7 @@ class SuperPinService(BaseService):
                      else final_match["player_b"]["jugador_id"]}
                 ]
                 
-                # Agregar 3er lugar si existe
+                # Add 3er lugar si existe
                 third_bracket = next((b for b in brackets if b["name"] == "Tercer Lugar"), None)
                 if third_bracket and third_bracket["matches"][0].get("estado") == "finalizado":
                     resultados.append({
@@ -1032,7 +1032,7 @@ class SuperPinService(BaseService):
         # Obtener badges
         badges = await self.get_player_badges(jugador_id)
         
-        # Calcular estadísticas agregadas
+        # Calculatesr estadísticas agregadas
         total_matches = sum(r.get("partidos_jugados", 0) for r in rankings)
         total_wins = sum(r.get("partidos_ganados", 0) for r in rankings)
         total_losses = sum(r.get("partidos_perdidos", 0) for r in rankings)
@@ -1323,7 +1323,7 @@ class SuperPinService(BaseService):
         # Obtener historial head-to-head
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
         
-        # Calcular probabilidad basada en ELO
+        # Calculatesr probabilidad basada en ELO
         elo_a = stats_a.get("player_info", {}).get("elo_rating", 1200)
         elo_b = stats_b.get("player_info", {}).get("elo_rating", 1200)
         
@@ -1368,7 +1368,7 @@ class SuperPinService(BaseService):
             favorite = "draw"
             confidence = "low"
         
-        # Calcular ventajas por categoría
+        # Calculatesr ventajas por categoría
         advantages = []
         
         # ELO

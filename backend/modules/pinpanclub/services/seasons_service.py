@@ -185,7 +185,7 @@ class RankingSeasonsService(BaseService):
                 if reward:
                     rewards_granted.append(reward)
         
-        # Calcular estadísticas finales
+        # Calculatesr estadísticas finales
         total_participants = len(final_standings)
         total_challenges = sum(p.get("challenges_completed", 0) for p in final_standings)
         total_points = sum(p.get("season_points", 0) for p in final_standings)
@@ -367,7 +367,7 @@ class RankingSeasonsService(BaseService):
         
         participants = await cursor.to_list(length=limit)
         
-        # Añadir posición
+        # Add posición
         for i, p in enumerate(participants, offset + 1):
             p["position"] = i
         
@@ -482,7 +482,7 @@ class RankingSeasonsService(BaseService):
         """Crear automáticamente la siguiente temporada mensual"""
         now = datetime.now(timezone.utc)
         
-        # Calcular fechas del próximo mes
+        # Calculatesr fechas del próximo mes
         if now.day <= 15:
             # Crear para este mes si aún no empezó
             start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)

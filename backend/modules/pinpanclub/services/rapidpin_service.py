@@ -410,7 +410,7 @@ class RapidPinService(BaseService):
         
         self.log_info(f"Rapid Pin match confirmed: {match_id}")
         
-        # Retornar partido actualizado
+        # Returnsr partido actualizado
         updated_match = await self.match_repo.get_by_id(match_id)
         return RapidPinMatch(**updated_match)
     
@@ -791,7 +791,7 @@ class RapidPinService(BaseService):
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este desafío ya fue procesado")
         
-        # Solo player2 puede rechazar
+        # Only player2 puede rechazar
         if user_id != queue_entry["player2_id"]:
             raise ValueError("Solo el oponente puede rechazar el desafío")
         
@@ -1248,7 +1248,7 @@ class RapidPinService(BaseService):
             if not counter_date:
                 raise ValueError("Debes proponer una fecha alternativa")
             
-            # Agregar nueva propuesta al historial
+            # Add nueva propuesta al historial
             date_history.append({
                 "proposed_date": counter_date,
                 "proposed_by_id": user_id,
@@ -1483,7 +1483,7 @@ class RapidPinService(BaseService):
         
         await db["rapidpin_comments"].insert_one(comment)
         
-        # Solo incrementar contador si está aprobado
+        # Only incrementar contador si está aprobado
         new_count = queue_entry.get("comments_count", 0)
         if is_approved:
             await db["rapidpin_queue"].update_one(

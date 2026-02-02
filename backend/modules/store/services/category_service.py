@@ -44,7 +44,7 @@ class CategoryService(BaseService):
         data: Dict
     ) -> Optional[Category]:
         """Actualizar categoría"""
-        # Remover campos nulos
+        # Remove campos nulos
         update_data = {k: v for k, v in data.items() if v is not None}
         
         if not update_data:

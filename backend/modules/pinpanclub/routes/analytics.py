@@ -51,7 +51,7 @@ async def get_analytics_dashboard():
         "completed_at": {"$gte": two_weeks_ago.isoformat(), "$lt": week_ago.isoformat()}
     })
     
-    # Calculate changes
+    # Calculateste changes
     def calc_change(current, previous):
         if previous == 0:
             return 100 if current > 0 else 0

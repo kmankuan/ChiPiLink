@@ -248,7 +248,7 @@ async def get_resumen_catalogo(
                 "$or": [{"grado": grado}, {"grados": grado}]
             })
             
-            # Calcular total estimado
+            # Calculatesr total estimado
             productos = await db.libros.find(
                 {
                     "es_catalogo_privado": True,

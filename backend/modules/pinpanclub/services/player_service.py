@@ -102,7 +102,7 @@ class PlayerService(BaseService):
         if not player:
             return None
         
-        # Calcular cambio de ELO (sistema ELO simplificado)
+        # Calculatesr cambio de ELO (sistema ELO simplificado)
         k_factor = 32
         expected = 1 / (1 + 10 ** ((opponent_elo - player.elo_rating) / 400))
         actual = 1 if won else 0

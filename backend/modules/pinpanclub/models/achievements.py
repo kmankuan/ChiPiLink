@@ -65,7 +65,7 @@ class PlayerAchievement(BaseModel):
     # Cuándo se obtuvo
     earned_at: Optional[Any] = None
     
-    # Si el logro tiene niveles (bronce, plata, oro)
+    # If the logro tiene niveles (bronce, plata, oro)
     level: int = 1
     
     # Si ya fue notificado

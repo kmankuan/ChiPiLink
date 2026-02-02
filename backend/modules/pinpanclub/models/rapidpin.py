@@ -432,7 +432,7 @@ class DateProposalCreate(BaseModel):
 class DateProposalResponse(BaseModel):
     """Responder a propuesta de fecha"""
     action: str  # "accept", "counter", "queue" (poner en cola)
-    counter_date: Optional[str] = None  # Solo si action = "counter"
+    counter_date: Optional[str] = None  # Only si action = "counter"
     message: Optional[str] = None
 
 
