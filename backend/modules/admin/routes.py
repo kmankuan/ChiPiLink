@@ -411,8 +411,8 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
             }),
             "estudiantes": await db.estudiantes_sincronizados.count_documents({}),
             "pedidos_pendientes": await db.pedidos_libros.count_documents({"estado": "pendiente"}),
-            "vinculaciones_activas": await db.vinculaciones.count_documents({"estado": "aprobada", "activo": True}),
-            "vinculaciones_pendientes": await db.vinculaciones.count_documents({"estado": "pendiente"})
+            "student_requests_approved": 0,  # Legacy vinculaciones removed
+            "student_requests_pending": 0  # Legacy vinculaciones removed
         }
         
         return stats
