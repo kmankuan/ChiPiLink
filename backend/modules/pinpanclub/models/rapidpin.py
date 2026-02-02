@@ -99,7 +99,7 @@ class RapidPinSeasonUpdate(BaseModel):
 
 
 class RapidPinSeason(BaseModel):
-    """Temporada Rapid Pin completa"""
+    """Complete Rapid Pin season"""
     model_config = ConfigDict(from_attributes=True)
     
     season_id: str
@@ -109,11 +109,11 @@ class RapidPinSeason(BaseModel):
     fecha_fin: str
     estado: RapidPinSeasonStatus = RapidPinSeasonStatus.ACTIVE
     
-    # Premios
+    # Prizes
     player_prizes: List[RapidPinPrize] = []
     referee_prizes: List[RapidPinPrize] = []
     
-    # Estadísticas
+    # Statistics
     total_matches: int = 0
     total_players: int = 0
     total_referees: int = 0
@@ -127,58 +127,58 @@ class RapidPinSeason(BaseModel):
 # ============== MATCH MODEL ==============
 
 class RapidPinMatchCreate(BaseModel):
-    """Registrar partido Rapid Pin"""
+    """Register Rapid Pin match"""
     season_id: str
     jugador_a_id: str
     jugador_b_id: str
     arbitro_id: str
     
-    # Resultado
-    ganador_id: str  # ID del ganador (jugador_a o jugador_b)
-    score_ganador: int = 11  # Puntos del ganador
-    score_perdedor: int = 0  # Puntos del perdedor
+    # Result
+    ganador_id: str  # Winner ID (jugador_a or jugador_b)
+    score_ganador: int = 11  # Winner's score
+    score_perdedor: int = 0  # Loser's score
     
-    # Quién registra el partido
-    registrado_por_id: str  # Uno de los 3 participantes
+    # Who registers the match
+    registrado_por_id: str  # One of the 3 participants
     
-    # Notas opcionales
+    # Optional notes
     notas: Optional[str] = None
 
 
 class RapidPinMatch(BaseModel):
-    """Partido Rapid Pin completo"""
+    """Complete Rapid Pin match"""
     model_config = ConfigDict(from_attributes=True)
     
     match_id: str
     season_id: str
     
-    # Participantes
+    # Participants
     jugador_a_id: str
     jugador_b_id: str
     arbitro_id: str
     
-    # Info de participantes (cached)
+    # Participant info (cached)
     jugador_a_info: Optional[Dict] = None
     jugador_b_info: Optional[Dict] = None
     arbitro_info: Optional[Dict] = None
     
-    # Resultado
+    # Result
     ganador_id: str
     perdedor_id: str
     score_ganador: int
     score_perdedor: int
     
-    # Estado de validación
+    # Validation status
     estado: RapidPinMatchStatus = RapidPinMatchStatus.PENDING
     registrado_por_id: str
-    confirmado_por_id: Optional[str] = None  # Segunda persona que confirma
+    confirmado_por_id: Optional[str] = None  # Second person who confirms
     
-    # Puntos otorgados (solo cuando está validado)
+    # Points awarded (only when validated)
     puntos_ganador: int = 0
     puntos_perdedor: int = 0
     puntos_arbitro: int = 0
     
-    # Notas
+    # Notes
     notas: Optional[str] = None
     
     # Timestamps
@@ -190,14 +190,14 @@ class RapidPinMatch(BaseModel):
 # ============== RANKING MODEL ==============
 
 class RapidPinRankingEntry(BaseModel):
-    """Entrada en el ranking Rapid Pin"""
+    """Rapid Pin ranking entry"""
     model_config = ConfigDict(from_attributes=True)
     
     ranking_id: str
     season_id: str
     jugador_id: str
     
-    # Posición
+    # Position
     posicion: int = 0
     
     # Puntos totales (victorias + derrotas + arbitrajes)
