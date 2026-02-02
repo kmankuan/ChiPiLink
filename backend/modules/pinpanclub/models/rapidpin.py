@@ -455,8 +455,8 @@ class ChallengeComment(BaseModel):
     user_id: str
     user_info: Optional[Dict] = None
     content: str
-    is_moderated: bool = False        # Si está en moderación
-    is_approved: bool = True          # Si fue aprobado (default: True para publicación directa)
+    is_moderated: bool = False        # If under moderation
+    is_approved: bool = True          # If approved (default: True for direct publication)
     is_hidden: bool = False           # Si fue ocultado por moderador
     moderation_reason: Optional[str] = None
     created_at: Optional[Any] = None
@@ -465,7 +465,7 @@ class ChallengeComment(BaseModel):
 
 class ChallengeCommentCreate(BaseModel):
     """Create comentario"""
-    content: str = Field(..., max_length=500)  # Se validará con límite configurable
+    content: str = Field(..., max_length=500)  # Will be validated with configurable limit
 
 
 class ChallengeCommentModerationConfig(BaseModel):

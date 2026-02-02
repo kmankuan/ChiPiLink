@@ -35,8 +35,8 @@ class ActivityType(str, Enum):
 class Follow(BaseModel):
     """Relación de seguimiento entre jugadores"""
     follow_id: str = Field(default_factory=lambda: f"follow_{uuid.uuid4().hex[:8]}")
-    follower_id: str      # Quien sigue
-    following_id: str     # A quien sigue
+    follower_id: str      # Who follows
+    following_id: str     # Who is followed
     
     # Info (cached)
     follower_info: Optional[Dict] = None
@@ -121,7 +121,7 @@ class ReactionSummary(BaseModel):
     target_id: str
     total: int = 0
     by_type: Dict[str, int] = {}  # {"clap": 10, "fire": 5}
-    user_reacted: Optional[str] = None  # Type of reacción del current user
+    user_reacted: Optional[str] = None  # Current user reaction type
 
 
 # ============== ACTIVITY FEED ==============

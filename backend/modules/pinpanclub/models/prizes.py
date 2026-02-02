@@ -13,7 +13,7 @@ class PrizeType(str, Enum):
     """Tipos de premio"""
     BADGE = "badge"              # Badge digital
     PHYSICAL = "physical"        # Prize físico (trofeo, medalla, etc.)
-    DISCOUNT = "discount"        # Descuento en tienda/servicios
+    DISCOUNT = "discount"        # Store/service discount
     PRIVILEGE = "privilege"      # Privilegio especial (acceso VIP, etc.)
     POINTS = "points"            # Points canjeables
     CUSTOM = "custom"            # Prize personalizado
@@ -21,7 +21,7 @@ class PrizeType(str, Enum):
 
 class PrizeStatus(str, Enum):
     """Estado dthe prize"""
-    AVAILABLE = "available"      # Disponible para ganar
+    AVAILABLE = "available"      # Available to win
     CLAIMED = "claimed"          # Reclamado by player
     DELIVERED = "delivered"      # Entregado
     EXPIRED = "expired"          # Expirado
@@ -29,7 +29,7 @@ class PrizeStatus(str, Enum):
 
 class PrizeConditionType(str, Enum):
     """Tipos de condición para ganar premio"""
-    POSITION = "position"        # By posición en ranking (1°, 2°, 3°...)
+    POSITION = "position"        # By ranking position (1°, 2°, 3°...)
     PARTICIPATION = "participation"  # By participar
     MATCHES_PLAYED = "matches_played"  # By number of matches played
     MATCHES_WON = "matches_won"  # By number of wins
@@ -57,9 +57,9 @@ class PrizeDefinition(BaseModel):
     
     # Value dthe prize
     value: Optional[str] = None  # Description ofl valor (ej: "20% descuento")
-    points_value: int = 0        # Value en puntos si aplica
+    points_value: int = 0        # Points value if applicable
     
-    # Condiciones para ganar
+    # Conditions to win
     conditions: List[PrizeCondition] = []
     
     # Aplicable a

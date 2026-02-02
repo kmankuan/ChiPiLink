@@ -160,7 +160,7 @@ async def get_player_rank(jugador_id: str):
     """Get información de rango de a player"""
     from core.database import db
     
-    # Get entrada del leaderboard
+    # Get leaderboard entry
     entry = await db.pinpanclub_challenges_leaderboard.find_one(
         {"jugador_id": jugador_id},
         {"_id": 0}
@@ -170,7 +170,7 @@ async def get_player_rank(jugador_id: str):
     challenges_completed = entry.get("challenges_completed", 0) if entry else 0
     current_streak = entry.get("current_streak", 0) if entry else 0
     
-    # Calculatesr rank basado en puntos
+    # Calculate rank based on points
     ranks = [
         {"id": "bronze", "name": "Bronce", "min": 0, "max": 99, "icon": "🥉"},
         {"id": "silver", "name": "Plata", "min": 100, "max": 299, "icon": "🥈"},
