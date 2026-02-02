@@ -1,6 +1,6 @@
 """
 Store Module - Category Landing Routes
-Endpoints for páginas de landing de categorías y banners
+Endpoints for páginas de landing de categorys y banners
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -16,13 +16,13 @@ router = APIRouter(prefix="/landing", tags=["Store - Landing"])
 
 @router.get("/category/{categoria}")
 async def get_category_landing_data(categoria: str):
-    """Get todos los datos para landing de categoría"""
+    """Get todos los datos para landing de category"""
     return await category_service.get_category_landing(categoria)
 
 
 @router.get("/banners/{categoria}")
 async def get_category_banners(categoria: str):
-    """Get banners activos de una categoría"""
+    """Get banners activos de una category"""
     now = datetime.now(timezone.utc)
     query = {
         "categoria": categoria,
@@ -40,19 +40,19 @@ async def get_category_banners(categoria: str):
 
 @router.get("/featured/{categoria}")
 async def get_category_featured(categoria: str, limit: int = Query(10, ge=1, le=50)):
-    """Get productos destacados de una categoría"""
+    """Get productos destacados de una category"""
     return await product_service.get_featured_products(categoria, limit)
 
 
 @router.get("/promotions/{categoria}")
 async def get_category_promotions(categoria: str, limit: int = Query(10, ge=1, le=50)):
-    """Get productos en promoción de una categoría"""
+    """Get productos en promoción de una category"""
     return await product_service.get_promotional_products(categoria, limit)
 
 
 @router.get("/newest/{categoria}")
 async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)):
-    """Get productos más nuevos de una categoría"""
+    """Get productos más nuevos de una category"""
     return await product_service.get_newest_products(categoria, limit)
 
 

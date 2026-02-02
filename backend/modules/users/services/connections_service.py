@@ -51,20 +51,20 @@ class ConexionesService:
     
     # ============== GESTIÓN DE CONEXIONES ==============
     
-    async def get_conexiones(self, user_id: str) -> List[Dict]:
+    async def get_connections(self, user_id: str) -> List[Dict]:
         """Get all user connections"""
         user = await db.auth_users.find_one(
             {"user_id": user_id},
-            {"conexiones": 1}
+            {"connections": 1}
         )
         
-        if not user or "conexiones" not in user:
+        if not user or "connections" not in user:
             return []
         
-        conexiones = user.get("conexiones", [])
+        connections = user.get("connections", [])
         
         # Enrich with data of the user conectado
-        for con in conexiones:
+        for con in connections:
             connected_user = await db.auth_users.find_one(
                 {"user_id": con["user_id"]},
                 {"_id": 0, "nombre": 1, "apellido": 1, "email": 1, "estado_cuenta": 1, "avatar": 1}
@@ -75,12 +75,12 @@ class ConexionesService:
                 con["usuario_estado"] = connected_user.get("estado_cuenta", "activo")
                 con["usuario_avatar"] = connected_user.get("avatar")
         
-        return conexiones
+        return connections
     
     async def get_conexion(self, user_id: str, conexion_id: str) -> Optional[Dict]:
         """Get a specific connection"""
-        conexiones = await self.get_conexiones(user_id)
-        for con in conexiones:
+        connections = await self.get_connections(user_id)
+        for con in connections:
             if con.get("conexion_id") == conexion_id:
                 return con
         return None
@@ -93,7 +93,7 @@ class ConexionesService:
         subtipo: str,
         etiqueta: Optional[str] = None,
         permisos: Optional[Dict] = None,
-        requiere_solicitud: bool = True
+        requiere_request: bool = True
     ) -> Dict:
         """
         Create connection between users.
@@ -107,10 +107,10 @@ class ConexionesService:
         # Verify connection does not exist
         existing = await db.auth_users.find_one({
             "user_id": user_id,
-            "conexiones.user_id": destino_user_id
+            "connections.user_id": destino_user_id
         })
         if existing:
-            return {"error": "Already exists una conexión con este usuario"}
+            return {"error": "Already exists una connection con este usuario"}
         
         # Get default permissions si no se especifican
         if not permisos:
@@ -147,7 +147,7 @@ class ConexionesService:
         # Add connection to user
         await db.auth_users.update_one(
             {"user_id": user_id},
-            {"$push": {"conexiones": conexion}}
+            {"$push": {"connections": conexion}}
         )
         
         # Create reciprocal connection (con permisos inversos si aplica)
@@ -164,13 +164,13 @@ class ConexionesService:
         
         await db.auth_users.update_one(
             {"user_id": destino_user_id},
-            {"$push": {"conexiones": conexion_reciproca}}
+            {"$push": {"connections": conexion_reciproca}}
         )
         
         return {"success": True, "conexion": conexion}
     
     def _get_subtipo_reciproco(self, subtipo: str) -> str:
-        """Get the reciprocal subtype de una relación"""
+        """Get the reciprocal subtype de una relationship"""
         reciprocos = {
             "acudiente": "acudido",
             "acudido": "acudiente",
@@ -211,8 +211,8 @@ class ConexionesService:
     ) -> Dict:
         """Update an existing connection"""
         result = await db.auth_users.update_one(
-            {"user_id": user_id, "conexiones.conexion_id": conexion_id},
-            {"$set": {f"conexiones.$.{k}": v for k, v in updates.items()}}
+            {"user_id": user_id, "connections.conexion_id": conexion_id},
+            {"$set": {f"connections.$.{k}": v for k, v in updates.items()}}
         )
         
         if result.modified_count == 0:
@@ -232,19 +232,19 @@ class ConexionesService:
         # Delete from both users
         await db.auth_users.update_one(
             {"user_id": user_id},
-            {"$pull": {"conexiones": {"conexion_id": conexion_id}}}
+            {"$pull": {"connections": {"conexion_id": conexion_id}}}
         )
         
         await db.auth_users.update_one(
             {"user_id": destino_user_id},
-            {"$pull": {"conexiones": {"user_id": user_id}}}
+            {"$pull": {"connections": {"user_id": user_id}}}
         )
         
         return {"success": True}
     
     # ============== SOLICITUDES DE CONEXIÓN ==============
     
-    async def crear_solicitud(
+    async def crear_request(
         self,
         de_usuario_id: str,
         para_usuario_id: str,
@@ -254,21 +254,21 @@ class ConexionesService:
         mensaje: Optional[str] = None
     ) -> Dict:
         """Create connection request"""
-        # Verify connection does not exist ni solicitud pendiente
+        # Verify connection does not exist ni request pendiente
         existing_conexion = await db.auth_users.find_one({
             "user_id": de_usuario_id,
-            "conexiones.user_id": para_usuario_id
+            "connections.user_id": para_usuario_id
         })
         if existing_conexion:
-            return {"error": "Already exists una conexión con este usuario"}
+            return {"error": "Already exists una connection con este usuario"}
         
-        existing_solicitud = await db.solicitudes_conexion.find_one({
+        existing_request = await db.requestes_conexion.find_one({
             "de_usuario_id": de_usuario_id,
             "para_usuario_id": para_usuario_id,
             "estado": "pendiente"
         })
-        if existing_solicitud:
-            return {"error": "Already exists una solicitud pendiente"}
+        if existing_request:
+            return {"error": "Already exists una request pendiente"}
         
         # Get names
         de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id}, {"nombre": 1, "apellido": 1})
@@ -277,8 +277,8 @@ class ConexionesService:
         if not para_usuario:
             return {"error": "Usuario destino not found"}
         
-        solicitud = {
-            "solicitud_id": f"sol_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{de_usuario_id[:8]}",
+        request = {
+            "request_id": f"sol_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{de_usuario_id[:8]}",
             "de_usuario_id": de_usuario_id,
             "de_usuario_nombre": f"{de_usuario.get('nombre', '')} {de_usuario.get('apellido', '')}".strip() if de_usuario else None,
             "para_usuario_id": para_usuario_id,
@@ -291,17 +291,17 @@ class ConexionesService:
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
         
-        await db.solicitudes_conexion.insert_one(solicitud)
+        await db.requestes_conexion.insert_one(request)
         
         # Remove MongoDB _id before returning
-        solicitud.pop("_id", None)
+        request.pop("_id", None)
         
         # Send push notification al destinatario
         push_result = None
         try:
             from modules.notifications.services.push_service import push_notification_service
             
-            de_nombre = solicitud["de_usuario_nombre"] or "Alguien"
+            de_nombre = request["de_usuario_nombre"] or "Alguien"
             subtipo_label = self._get_subtipo_label(subtipo)
             
             push_result = await push_notification_service.send_notification(
@@ -311,19 +311,19 @@ class ConexionesService:
                 body=f"{de_nombre} quiere conectarse contigo como {subtipo_label}",
                 data={
                     "type": "connection_request",
-                    "solicitud_id": solicitud["solicitud_id"],
+                    "request_id": request["request_id"],
                     "de_usuario_id": de_usuario_id,
                     "action": "view_requests"
                 },
-                action_url="/mi-cuenta?tab=conexiones"
+                action_url="/mi-cuenta?tab=connections"
             )
         except Exception as e:
-            logger.error(f"Error enviando push notification para solicitud: {e}")
+            logger.error(f"Error enviando push notification para request: {e}")
         
-        return {"success": True, "solicitud": solicitud, "push_notification": push_result}
+        return {"success": True, "request": request, "push_notification": push_result}
     
     def _get_subtipo_label(self, subtipo: str) -> str:
-        """Get etiqueta legible para subtipo de relación"""
+        """Get etiqueta legible para subtipo de relationship"""
         labels = {
             "acudiente": "Acudiente",
             "acudido": "Acudido",
@@ -340,41 +340,41 @@ class ConexionesService:
         }
         return labels.get(subtipo, subtipo)
     
-    async def get_solicitudes_pendientes(self, user_id: str) -> List[Dict]:
-        """Get solicitudes pendientes para un usuario"""
-        cursor = db.solicitudes_conexion.find(
+    async def get_requestes_pendientes(self, user_id: str) -> List[Dict]:
+        """Get requestes pendientes para un usuario"""
+        cursor = db.requestes_conexion.find(
             {"para_usuario_id": user_id, "estado": "pendiente"},
             {"_id": 0}
         ).sort("creado_en", -1)
         return await cursor.to_list(length=50)
     
-    async def get_solicitudes_enviadas(self, user_id: str) -> List[Dict]:
-        """Get solicitudes enviadas por un usuario"""
-        cursor = db.solicitudes_conexion.find(
+    async def get_requestes_enviadas(self, user_id: str) -> List[Dict]:
+        """Get requestes enviadas por un usuario"""
+        cursor = db.requestes_conexion.find(
             {"de_usuario_id": user_id},
             {"_id": 0}
         ).sort("creado_en", -1)
         return await cursor.to_list(length=50)
     
-    async def responder_solicitud(
+    async def responder_request(
         self,
-        solicitud_id: str,
+        request_id: str,
         aceptar: bool,
         respondido_por: str,
         es_admin: bool = False
     ) -> Dict:
-        """Responder a una solicitud de conexión"""
-        solicitud = await db.solicitudes_conexion.find_one({"solicitud_id": solicitud_id})
-        if not solicitud:
+        """Responder a una request de connection"""
+        request = await db.requestes_conexion.find_one({"request_id": request_id})
+        if not request:
             return {"error": "Request not found"}
         
-        if solicitud["estado"] != "pendiente":
+        if request["estado"] != "pendiente":
             return {"error": "Solicitud ya fue respondida"}
         
         nuevo_estado = "aceptada" if aceptar else "rechazada"
         
-        await db.solicitudes_conexion.update_one(
-            {"solicitud_id": solicitud_id},
+        await db.requestes_conexion.update_one(
+            {"request_id": request_id},
             {"$set": {
                 "estado": nuevo_estado,
                 "respondido_en": datetime.now(timezone.utc).isoformat(),
@@ -385,12 +385,12 @@ class ConexionesService:
         if aceptar:
             # Create the connection
             result = await self.crear_conexion(
-                user_id=solicitud["de_usuario_id"],
-                destino_user_id=solicitud["para_usuario_id"],
-                tipo=solicitud["tipo"],
-                subtipo=solicitud["subtipo"],
-                etiqueta=solicitud.get("etiqueta"),
-                requiere_solicitud=False
+                user_id=request["de_usuario_id"],
+                destino_user_id=request["para_usuario_id"],
+                tipo=request["tipo"],
+                subtipo=request["subtipo"],
+                etiqueta=request.get("etiqueta"),
+                requiere_request=False
             )
             if result.get("error"):
                 return result
@@ -400,33 +400,33 @@ class ConexionesService:
         try:
             from modules.notifications.services.push_service import push_notification_service
             
-            para_nombre = solicitud.get("para_usuario_nombre") or "Un usuario"
-            subtipo_label = self._get_subtipo_label(solicitud.get("subtipo", ""))
+            para_nombre = request.get("para_usuario_nombre") or "Un usuario"
+            subtipo_label = self._get_subtipo_label(request.get("subtipo", ""))
             
             if aceptar:
                 title = "✅ Conexión Aceptada"
-                body = f"{para_nombre} aceptó tu solicitud de conexión como {subtipo_label}"
+                body = f"{para_nombre} aceptó tu request de connection como {subtipo_label}"
                 notification_type = "connection_accepted"
             else:
                 title = "❌ Conexión Rechazada"
-                body = f"{para_nombre} rechazó tu solicitud de conexión"
+                body = f"{para_nombre} rechazó tu request de connection"
                 notification_type = "connection_rejected"
             
             push_result = await push_notification_service.send_notification(
-                user_id=solicitud["de_usuario_id"],
+                user_id=request["de_usuario_id"],
                 category_id="connections",
                 title=title,
                 body=body,
                 data={
                     "type": notification_type,
-                    "solicitud_id": solicitud_id,
-                    "para_usuario_id": solicitud["para_usuario_id"],
+                    "request_id": request_id,
+                    "para_usuario_id": request["para_usuario_id"],
                     "action": "view_connections" if aceptar else "view_requests"
                 },
-                action_url="/mi-cuenta?tab=conexiones"
+                action_url="/mi-cuenta?tab=connections"
             )
         except Exception as e:
-            logger.error(f"Error enviando push notification para respuesta solicitud: {e}")
+            logger.error(f"Error enviando push notification para respuesta request: {e}")
         
         return {"success": True, "estado": nuevo_estado, "push_notification": push_result}
     
@@ -514,7 +514,7 @@ class ConexionesService:
                 destino_user_id=nuevo_user_id,
                 tipo=invitacion["tipo_relacion_propuesta"],
                 subtipo=invitacion.get("subtipo_propuesto", "amigo"),
-                requiere_solicitud=False
+                requiere_request=False
             )
         
         # Transferir si se especificó monto
@@ -566,7 +566,7 @@ class ConexionesService:
             "creado_por": f"admin:{admin_id}" if creado_por_admin else f"acudiente:{acudiente_id}",
             "creado_en": datetime.now(timezone.utc).isoformat(),
             "wallet": {"USD": 0},
-            "conexiones": [],
+            "connections": [],
             "capacidades": [
                 {
                     "capacidad_id": "cliente",
@@ -590,7 +590,7 @@ class ConexionesService:
             tipo="especial",
             subtipo="acudido",
             etiqueta=f"{nombre} {apellido or ''}".strip(),
-            requiere_solicitud=False
+            requiere_request=False
         )
         
         # Add capacidad de acudiente si no la tiene
@@ -636,7 +636,7 @@ class ConexionesService:
         if monto <= 0:
             return {"error": "Monto debe ser positivo"}
         
-        # Verify conexión y permisos
+        # Verify connection y permisos
         conexion = None
         de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id})
         para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id})
@@ -646,13 +646,13 @@ class ConexionesService:
         if not para_usuario:
             return {"error": "Usuario destino not found"}
             
-        for con in de_usuario.get("conexiones", []):
+        for con in de_usuario.get("connections", []):
             if con["user_id"] == para_usuario_id:
                 conexion = con
                 break
         
         if not conexion:
-            return {"error": "Debes tener conexión con the user para transferir"}
+            return {"error": "Debes tener connection con the user para transferir"}
         
         if not conexion.get("permisos", {}).get("transferir_wallet", False):
             return {"error": "No tienes permiso para transferir a este usuario"}
@@ -772,7 +772,7 @@ class ConexionesService:
         
         # Get acudientes con permiso de alertas
         acudientes_ids = []
-        for con in usuario.get("conexiones", []):
+        for con in usuario.get("connections", []):
             if con.get("subtipo") == "acudiente" and con.get("permisos", {}).get("recibir_alertas"):
                 acudientes_ids.append(con["user_id"])
         
@@ -943,11 +943,11 @@ class ConexionesService:
             return []
         
         # Get active memberships of the user
-        suscripciones = await db.suscripciones_usuarios.find(
+        subscriptions = await db.subscriptions_usuarios.find(
             {"user_id": user_id, "estado": "activo"},
             {"membresia_id": 1}
         ).to_list(length=50)
-        membresias_activas = [s["membresia_id"] for s in suscripciones]
+        membresias_activas = [s["membresia_id"] for s in subscriptions]
         
         # Get all membresías
         query = {"activa": True}
@@ -1021,4 +1021,4 @@ class ConexionesService:
 
 
 # Global instance
-conexiones_service = ConexionesService()
+connections_service = ConexionesService()

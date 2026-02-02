@@ -1331,7 +1331,7 @@ class RapidPinService(BaseService):
         )
         
         if not config:
-            # Create configuración by default
+            # Create configuration by default
             config = {
                 "config_id": "comment_config",
                 "max_comment_length": 280,

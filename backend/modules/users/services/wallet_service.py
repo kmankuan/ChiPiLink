@@ -13,14 +13,14 @@ from ..models.wallet_models import (
 
 
 class WalletService(BaseService):
-    """Service for management of billeteras y transacciones"""
+    """Service for management of billeteras y transactions"""
     
     MODULE_NAME = "users"
     
     # ============== INITIALIZATION ==============
     
     async def initialize_config(self) -> Dict:
-        """Inicializar configuración de ChipiPoints"""
+        """Inicializar configuration de ChipiPoints"""
         existing = await db.chipi_wallet_config.find_one(
             {"config_id": "chipipoints_config"}
         )
@@ -54,7 +54,7 @@ class WalletService(BaseService):
         return created
     
     async def get_config(self) -> Dict:
-        """Get configuración de ChipiPoints"""
+        """Get configuration de ChipiPoints"""
         config = await db.chipi_wallet_config.find_one(
             {"config_id": "chipipoints_config"},
             {"_id": 0}
@@ -62,7 +62,7 @@ class WalletService(BaseService):
         return config or get_default_points_config()
     
     async def update_config(self, updates: Dict) -> Dict:
-        """Update configuración de ChipiPoints"""
+        """Update configuration de ChipiPoints"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db.chipi_wallet_config.find_one_and_update(
@@ -139,7 +139,7 @@ class WalletService(BaseService):
         related_user_id: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Create una transacción"""
+        """Create una transaction"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -194,19 +194,19 @@ class WalletService(BaseService):
         return transaction
     
     async def complete_transaction(self, transaction_id: str) -> Dict:
-        """Completar una transacción pendiente"""
+        """Completar una transaction pendiente"""
         now = datetime.now(timezone.utc).isoformat()
         
-        # Get transacción
+        # Get transaction
         transaction = await db.chipi_transactions.find_one(
             {"transaction_id": transaction_id}
         )
         
         if not transaction:
-            raise ValueError("Transacción not found")
+            raise ValueError("Transaction not found")
         
         if transaction["status"] != TransactionStatus.PENDING.value:
-            raise ValueError(f"Transacción ya procesada: {transaction['status']}")
+            raise ValueError(f"Transaction ya procesada: {transaction['status']}")
         
         # Update saldo de billetera
         currency = transaction["currency"]
@@ -243,7 +243,7 @@ class WalletService(BaseService):
             }
         )
         
-        # Mark transacción como completada
+        # Mark transaction como completada
         result = await db.chipi_transactions.find_one_and_update(
             {"transaction_id": transaction_id},
             {"$set": {
@@ -265,7 +265,7 @@ class WalletService(BaseService):
         transaction_type: str = None,
         currency: str = None
     ) -> List[Dict]:
-        """Get transacciones de un usuario"""
+        """Get transactions de un usuario"""
         query = {"user_id": user_id}
         
         if transaction_type:
@@ -354,7 +354,7 @@ class WalletService(BaseService):
         
         wallet = await self.get_or_create_wallet(user_id)
         
-        # Create transacción
+        # Create transaction
         transaction = await self.create_transaction(
             user_id=user_id,
             transaction_type=TransactionType.REWARD,

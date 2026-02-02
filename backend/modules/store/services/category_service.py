@@ -1,6 +1,6 @@
 """
 Store Module - Category Service
-Business logic para categorías
+Business logic para categorys
 """
 from typing import List, Optional, Dict
 
@@ -11,7 +11,7 @@ from ..models import CategoryCreate, Category
 
 class CategoryService(BaseService):
     """
-    Service for management of categorías.
+    Service for management of categorys.
     """
     
     MODULE_NAME = "store"
@@ -22,19 +22,19 @@ class CategoryService(BaseService):
         self.product_repository = ProductRepository()
     
     async def create_category(self, data: CategoryCreate) -> Category:
-        """Create nueva categoría"""
+        """Create nueva category"""
         category_dict = data.model_dump()
         result = await self.repository.create(category_dict)
         self.log_info(f"Category created: {result['categoria_id']}")
         return Category(**result)
     
     async def get_category(self, categoria_id: str) -> Optional[Category]:
-        """Get categoría by ID"""
+        """Get category by ID"""
         result = await self.repository.get_by_id(categoria_id)
         return Category(**result) if result else None
     
     async def get_all_categories(self) -> List[Category]:
-        """Get all categorías activas"""
+        """Get all categorys activas"""
         results = await self.repository.get_all_active()
         return [Category(**r) for r in results]
     
@@ -43,7 +43,7 @@ class CategoryService(BaseService):
         categoria_id: str,
         data: Dict
     ) -> Optional[Category]:
-        """Update categoría"""
+        """Update category"""
         # Remove campos nulos
         update_data = {k: v for k, v in data.items() if v is not None}
         
@@ -59,18 +59,18 @@ class CategoryService(BaseService):
     
     async def delete_category(self, categoria_id: str) -> bool:
         """
-        Eliminar categoría (soft delete).
+        Eliminar category (soft delete).
         Verifica that does not tenga productos activos.
         """
         # Verify productos
         product_count = await self.repository.count_products(categoria_id)
         if product_count > 0:
-            raise ValueError(f"No se puede eliminar. Hay {product_count} productos en esta categoría.")
+            raise ValueError(f"No se puede eliminar. Hay {product_count} productos en esta category.")
         
         return await self.repository.deactivate(categoria_id)
     
     async def get_category_landing(self, categoria_id: str) -> Dict:
-        """Get datos completos para landing de categoría"""
+        """Get datos completos para landing de category"""
         category = await self.get_category(categoria_id)
         
         # Get productos

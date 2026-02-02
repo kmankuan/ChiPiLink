@@ -76,7 +76,7 @@ class FCMProvider(PushProvider):
         return "fcm"
     
     def validate_config(self) -> bool:
-        """Validate configuración FCM"""
+        """Validate configuration FCM"""
         return all([
             self.project_id,
             self.api_key or self.service_account
@@ -97,7 +97,7 @@ class FCMProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a dispositivos específicos"""
+        """Send notification a dispositivos específicos"""
         if not self.validate_config():
             return {
                 "success": False,
@@ -177,7 +177,7 @@ class FCMProvider(PushProvider):
         body: str,
         data: Dict = None
     ) -> Dict:
-        """Send notificación a un topic"""
+        """Send notification a un topic"""
         if not self.validate_config():
             return {"success": False, "error": "FCM not configured"}
         
@@ -293,7 +293,7 @@ class OneSignalProvider(PushProvider):
         return "onesignal"
     
     def validate_config(self) -> bool:
-        """Validate configuración OneSignal"""
+        """Validate configuration OneSignal"""
         return all([self.app_id, self.api_key])
     
     def _get_headers(self) -> Dict[str, str]:
@@ -312,7 +312,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a dispositivos específicos (por subscription_id)"""
+        """Send notification a dispositivos específicos (por subscription_id)"""
         if not self.validate_config():
             return {
                 "success": False,
@@ -383,7 +383,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a segmentos de OneSignal"""
+        """Send notification a segmentos de OneSignal"""
         if not self.validate_config():
             return {"success": False, "error": "OneSignal not configured"}
         
@@ -432,7 +432,7 @@ class OneSignalProvider(PushProvider):
         body: str,
         data: Dict = None
     ) -> Dict:
-        """Send notificación usando filtros de tags"""
+        """Send notification usando filtros de tags"""
         if not self.validate_config():
             return {"success": False, "error": "OneSignal not configured"}
         
@@ -474,7 +474,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a todos los suscriptores"""
+        """Send notification a todos los suscriptores"""
         return await self.send_to_segment(
             segments=["Subscribed Users"],
             title=title,
@@ -493,7 +493,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a usuarios por external_id (user_id)"""
+        """Send notification a usuarios por external_id (user_id)"""
         if not self.validate_config():
             return {"success": False, "error": "OneSignal not configured"}
         

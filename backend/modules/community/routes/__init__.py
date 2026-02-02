@@ -1,6 +1,6 @@
 """
 Community Module - Main Router
-Agrega todos los routers del módulo de comunidad
+Agrega todos los routers del module de comunidad
 """
 from fastapi import APIRouter
 

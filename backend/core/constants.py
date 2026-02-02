@@ -67,7 +67,7 @@ class CommunityCollections:
 class CoreCollections:
     APP_CONFIG = "core_app_config"          # Previously: app_config
     SITE_CONFIG = "core_site_config"        # Previously: site_config
-    NOTIFICATIONS = "core_notifications"    # Previously: notificaciones
+    NOTIFICATIONS = "core_notifications"    # Previously: notifications
     TRANSLATIONS = "core_translations"      # Previously: translations
     PAGES = "core_pages"                    # Previously: paginas
 
@@ -99,7 +99,7 @@ LEGACY_TO_NEW = {
     # Core
     "app_config": CoreCollections.APP_CONFIG,
     "site_config": CoreCollections.SITE_CONFIG,
-    "notificaciones": CoreCollections.NOTIFICATIONS,
+    "notifications": CoreCollections.NOTIFICATIONS,
     "translations": CoreCollections.TRANSLATIONS,
     "paginas": CoreCollections.PAGES,
 }

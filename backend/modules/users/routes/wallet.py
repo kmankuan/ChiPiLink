@@ -1,5 +1,5 @@
 """
-Wallet API Routes - ChipiWallet y transacciones
+Wallet API Routes - ChipiWallet y transactions
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional
@@ -84,7 +84,7 @@ async def get_wallet_summary(user=Depends(get_current_user)):
     wallet = await wallet_service.get_or_create_wallet(user["user_id"])
     config = await wallet_service.get_config()
     
-    # Get últimas transacciones
+    # Get últimas transactions
     transactions = await wallet_service.get_transactions(
         user["user_id"],
         limit=10
@@ -142,7 +142,7 @@ async def get_my_transactions(
     currency: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Get mis transacciones"""
+    """Get mis transactions"""
     transactions = await wallet_service.get_transactions(
         user_id=user["user_id"],
         limit=limit,
@@ -163,7 +163,7 @@ async def get_transaction(
     transaction_id: str,
     user=Depends(get_current_user)
 ):
-    """Get detalle de una transacción"""
+    """Get detalle de una transaction"""
     from core.database import db
     
     transaction = await db.chipi_transactions.find_one(
@@ -380,7 +380,7 @@ async def get_points_history(
 
 @router.get("/config")
 async def get_points_config():
-    """Get configuración de ChipiPoints"""
+    """Get configuration de ChipiPoints"""
     config = await wallet_service.get_config()
     return {"success": True, "config": config}
 
@@ -390,7 +390,7 @@ async def update_points_config(
     data: UpdateConfigRequest,
     admin=Depends(get_admin_user)
 ):
-    """Update configuración de ChipiPoints (admin)"""
+    """Update configuration de ChipiPoints (admin)"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:
@@ -402,7 +402,7 @@ async def update_points_config(
 
 @router.post("/config/initialize")
 async def initialize_config(admin=Depends(get_admin_user)):
-    """Inicializar configuración de ChipiPoints (admin)"""
+    """Inicializar configuration de ChipiPoints (admin)"""
     config = await wallet_service.initialize_config()
     rules_count = await wallet_service.initialize_earn_rules()
     

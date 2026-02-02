@@ -1,6 +1,6 @@
 """
 Social Features - Modelos
-Seguir jugadores, comentarios, reacciones
+Seguir jugadores, comentarios, reactions
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -10,7 +10,7 @@ import uuid
 
 
 class ReactionType(str, Enum):
-    """Tipos de reacción"""
+    """Tipos de reaction"""
     CLAP = "clap"           # 👏
     FIRE = "fire"           # 🔥
     TROPHY = "trophy"       # 🏆
@@ -71,7 +71,7 @@ class Comment(BaseModel):
     # Info ofl autor (cached)
     author_info: Optional[Dict] = None
     
-    # Reacciones al comentario
+    # Reactions al comentario
     reactions: Dict[str, int] = {}  # {"clap": 5, "fire": 2}
     
     # Estado
@@ -98,7 +98,7 @@ class CommentUpdate(BaseModel):
 # ============== REACTION ==============
 
 class Reaction(BaseModel):
-    """Reacción a un partido o comentario"""
+    """Reaction a un partido o comentario"""
     reaction_id: str = Field(default_factory=lambda: f"reaction_{uuid.uuid4().hex[:8]}")
     user_id: str
     target_id: str        # Match o Comment ID
@@ -109,7 +109,7 @@ class Reaction(BaseModel):
 
 
 class ReactionCreate(BaseModel):
-    """Create reacción"""
+    """Create reaction"""
     user_id: str
     target_id: str
     target_type: str
@@ -117,7 +117,7 @@ class ReactionCreate(BaseModel):
 
 
 class ReactionSummary(BaseModel):
-    """Resumen de reacciones"""
+    """Resumen de reactions"""
     target_id: str
     total: int = 0
     by_type: Dict[str, int] = {}  # {"clap": 10, "fire": 5}
@@ -141,7 +141,7 @@ class ActivityFeedItem(BaseModel):
     # Descripción generada
     description: str = ""
     
-    # Reacciones
+    # Reactions
     reactions: Dict[str, int] = {}
     
     created_at: Optional[Any] = None
@@ -158,7 +158,7 @@ class ActivityFeedCreate(BaseModel):
 # ============== NOTIFICATION ==============
 
 class NotificationType(str, Enum):
-    """Tipos de notificación"""
+    """Tipos de notification"""
     MATCH_PENDING = "match_pending"
     MATCH_CONFIRMED = "match_confirmed"
     NEW_FOLLOWER = "new_follower"
@@ -195,7 +195,7 @@ class Notification(BaseModel):
 
 
 class NotificationCreate(BaseModel):
-    """Create notificación"""
+    """Create notification"""
     user_id: str
     type: NotificationType
     title: str

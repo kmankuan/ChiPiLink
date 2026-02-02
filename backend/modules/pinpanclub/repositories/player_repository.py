@@ -12,7 +12,7 @@ import uuid
 class PlayerRepository(BaseRepository):
     """
     Repository para jugadores de PinpanClub.
-    Maneja todas las operaciones de base de datos para jugadores.
+    Maneja todas las operations de base de datos para jugadores.
     """
     
     COLLECTION_NAME = PinpanClubCollections.PLAYERS

@@ -179,7 +179,7 @@ async def get_player_stats(season_id: str, jugador_id: str):
 
 @router.get("/scoring")
 async def get_scoring_config():
-    """Get configuración de puntuación de Rapid Pin"""
+    """Get configuration de score de Rapid Pin"""
     return {
         "scoring": RAPID_PIN_SCORING,
         "rules": {

@@ -1,6 +1,6 @@
 """
 Community Module - Event Handlers
-Manejadores de eventos para el módulo de comunidad
+Manejadores de eventos para el module de comunidad
 """
 import logging
 from datetime import datetime, timezone
@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 
 def setup_event_handlers():
     """
-    Configurar handlers de eventos del módulo Community.
+    Configurar handlers de eventos del module Community.
     """
     
     @event_bus.subscribe(CommunityEvents.POST_CREATED)
     async def on_post_created(event: Event):
         """
-        Crear notificación cuando se crea un post destacado.
+        Crear notification cuando se crea un post destacado.
         """
         payload = event.payload
         
@@ -32,14 +32,14 @@ def setup_event_handlers():
                 "leida": False,
                 "fecha_creacion": datetime.now(timezone.utc).isoformat()
             }
-            await db.notificaciones.insert_one(notificacion)
+            await db.notifications.insert_one(notificacion)
         
         logger.info(f"Post created: {payload.get('post_id')}")
     
     @event_bus.subscribe(CommunityEvents.EVENT_CREATED)
     async def on_event_created(event: Event):
         """
-        Crear notificación cuando se crea un evento.
+        Crear notification cuando se crea un evento.
         """
         payload = event.payload
         
@@ -52,14 +52,14 @@ def setup_event_handlers():
             "leida": False,
             "fecha_creacion": datetime.now(timezone.utc).isoformat()
         }
-        await db.notificaciones.insert_one(notificacion)
+        await db.notifications.insert_one(notificacion)
         
         logger.info(f"Event created: {payload.get('evento_id')}")
     
     @event_bus.subscribe("community.*")
     async def log_all_community_events(event: Event):
         """
-        Log de todos los eventos del módulo Community.
+        Log de todos los eventos del module Community.
         """
         logger.debug(f"[COMMUNITY EVENT] {event.event_type}: {event.payload}")
     

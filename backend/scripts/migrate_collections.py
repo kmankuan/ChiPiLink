@@ -1,7 +1,7 @@
 """
 Database Migration Script - Phase 2
 ====================================
-Migra las colecciones a nombres con prefijo de módulo.
+Migra las collections a nombres con prefijo de module.
 
 Uso:
     python scripts/migrate_collections.py --action preview
@@ -53,7 +53,7 @@ COLLECTION_MIGRATIONS = {
     # Shared/Core - rename for clarity
     "app_config": "core_app_config",
     "site_config": "core_site_config",
-    "notificaciones": "core_notifications",
+    "notifications": "core_notifications",
     "translations": "core_translations",
     "paginas": "core_pages",
 }

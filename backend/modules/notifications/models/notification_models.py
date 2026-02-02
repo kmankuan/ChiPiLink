@@ -1,5 +1,5 @@
 """
-Push Notification Models - Modelos para el system for notificaciones
+Push Notification Models - Modelos para el system for notifications
 """
 from enum import Enum
 from typing import Dict, List, Optional
@@ -15,7 +15,7 @@ class NotificationProvider(str, Enum):
 
 
 class NotificationPriority(str, Enum):
-    """Prioridad de notificaciones"""
+    """Prioridad de notifications"""
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
@@ -23,7 +23,7 @@ class NotificationPriority(str, Enum):
 
 
 class NotificationStatus(str, Enum):
-    """Estado de notificaciones"""
+    """Estado de notifications"""
     DRAFT = "draft"
     SCHEDULED = "scheduled"
     SENDING = "sending"
@@ -51,7 +51,7 @@ class ContentBlockType(str, Enum):
 
 
 def get_default_notification_categories() -> List[Dict]:
-    """Categorías de notificación by default"""
+    """Categorías de notification by default"""
     return [
         {
             "category_id": "cat_qr_payments",
@@ -261,7 +261,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "连接"
             },
             "description": {
-                "es": "Solicitudes de conexión, aprobaciones, nuevos acudidos",
+                "es": "Solicitudes de connection, aprobaciones, nuevos acudidos",
                 "en": "Connection requests, approvals, new dependents",
                 "zh": "连接请求、批准、新的受抚养人"
             },
@@ -314,7 +314,7 @@ def get_default_provider_config() -> Dict:
 
 
 def get_default_notification_templates() -> List[Dict]:
-    """Plantillas de notificación by default"""
+    """Plantillas de notification by default"""
     return [
         {
             "template_id": "tpl_qr_payment_received",

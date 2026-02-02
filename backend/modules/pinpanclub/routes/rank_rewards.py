@@ -13,7 +13,7 @@ router = APIRouter(prefix="/rank-rewards", tags=["Rank Rewards"])
 @router.get("/info")
 async def get_rank_rewards_info(lang: str = Query("es", description="Language code (es, en, zh)")):
     """
-    Obtener información de todos los rangos y sus recompensas.
+    Obtener information de todos los rangos y sus recompensas.
     Útil para mostrar en la UI qué recompensas hay disponibles.
     """
     rewards_info = await rank_rewards_service.get_rank_rewards_info(lang)
@@ -67,7 +67,7 @@ async def get_current_rank_info(
     jugador_id: str,
     lang: str = Query("es", description="Language code")
 ):
-    """Get información del rango actual de a player"""
+    """Get information del rango actual de a player"""
     from core.database import db
     
     # Get puntos actuales

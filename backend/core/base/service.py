@@ -1,6 +1,6 @@
 """
 Base Service - Capa de lógica de negocio
-Cada módulo tendrá sus propios servicios que heredan de esta clase base
+Cada module tendrá sus propios servicios que heredan de esta clase base
 """
 from typing import Optional, Dict, Any
 import logging
@@ -20,10 +20,10 @@ class BaseService(ABC):
     - Logging integrado
     - Manejo de errores estandarizado
     
-    Cada módulo implementa sus servicios heredando de esta clase.
+    Cada module implementa sus servicios heredando de esta clase.
     """
     
-    MODULE_NAME: str = "base"  # Override en cada módulo
+    MODULE_NAME: str = "base"  # Override en cada module
     
     def __init__(self):
         self.logger = logging.getLogger(f"{self.MODULE_NAME}.service")
@@ -57,16 +57,16 @@ class BaseService(ABC):
         self.logger.debug(f"Event emitted: {event_type}")
     
     def log_info(self, message: str, **kwargs):
-        """Log info con contexto del módulo"""
+        """Log info con contexto del module"""
         self.logger.info(f"[{self.MODULE_NAME}] {message}", extra=kwargs)
     
     def log_error(self, message: str, error: Optional[Exception] = None, **kwargs):
-        """Log error con contexto del módulo"""
+        """Log error con contexto del module"""
         if error:
             self.logger.error(f"[{self.MODULE_NAME}] {message}: {error}", exc_info=True, extra=kwargs)
         else:
             self.logger.error(f"[{self.MODULE_NAME}] {message}", extra=kwargs)
     
     def log_warning(self, message: str, **kwargs):
-        """Log warning con contexto del módulo"""
+        """Log warning con contexto del module"""
         self.logger.warning(f"[{self.MODULE_NAME}] {message}", extra=kwargs)

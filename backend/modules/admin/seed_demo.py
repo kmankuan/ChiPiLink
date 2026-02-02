@@ -1,6 +1,6 @@
 """
 Demo Data Seed Script
-Puebla todos los módulos con datos de demostración realistas
+Puebla todos los modules con datos de demostración realistas
 """
 from fastapi import APIRouter, Depends
 from datetime import datetime, timezone, timedelta
@@ -128,7 +128,7 @@ DEMO_ACHIEVEMENTS = [
 @router.post("/demo-data")
 async def seed_demo_data(admin: dict = Depends(get_admin_user)):
     """
-    Puebla todos los módulos con datos de demostración
+    Puebla todos los modules con datos de demostración
     """
     results = {
         "pinpanclub": {},
@@ -364,7 +364,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
             "activo": True,
             "preferencias": {
                 "idioma": "es",
-                "notificaciones": True
+                "notifications": True
             }
         }
         await db.users_profiles.update_one(

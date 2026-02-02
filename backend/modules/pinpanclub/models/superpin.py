@@ -11,7 +11,7 @@ from enum import Enum
 # ============== ENUMS ==============
 
 class ScoringSystem(str, Enum):
-    """System for puntuación"""
+    """System for score"""
     SIMPLE = "simple"          # +3 victoria, +1 derrota
     ELO = "elo"                # Sistema ELO (como ajedrez)
     CUSTOM = "custom"          # Personalizado
@@ -34,7 +34,7 @@ class StatsLevel(str, Enum):
 
 class LeagueStatus(str, Enum):
     """Estado of the league"""
-    DRAFT = "draft"            # In configuración
+    DRAFT = "draft"            # In configuration
     ACTIVE = "active"          # Activa
     PAUSED = "paused"          # Pausada
     FINISHED = "finished"      # Finalizada
@@ -44,7 +44,7 @@ class TournamentType(str, Enum):
     """Tipo de torneo final"""
     TOP_N = "top_n"            # Only top N players
     ALL_PLAYERS = "all_players"  # All the players
-    BY_CATEGORY = "by_category"  # By categorías según ranking
+    BY_CATEGORY = "by_category"  # By categorys según ranking
 
 
 class MatchType(str, Enum):
@@ -57,7 +57,7 @@ class MatchType(str, Enum):
 # ============== CONFIGURATION MODELS ==============
 
 class ScoringConfig(BaseModel):
-    """Configuración del system for puntuación"""
+    """Configuración del system for score"""
     system: ScoringSystem = ScoringSystem.SIMPLE
     
     # Simple scoring

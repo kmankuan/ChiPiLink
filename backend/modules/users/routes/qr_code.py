@@ -71,7 +71,7 @@ async def get_my_qr_transactions(
     action: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Get mis transacciones por QR"""
+    """Get mis transactions por QR"""
     transactions = await qr_code_service.get_qr_transactions(
         user_id=user["user_id"],
         action=action,
@@ -93,7 +93,7 @@ async def scan_qr(
     data: ScanQRRequest,
     admin=Depends(get_admin_user)
 ):
-    """Escanear un código QR y obtener información of the user"""
+    """Escanear un código QR y obtener information of the user"""
     result = await qr_code_service.scan_qr_code(data.qr_string)
     
     if not result.get("valid"):
@@ -110,7 +110,7 @@ async def process_qr_action(
     data: ProcessQRActionRequest,
     admin=Depends(get_admin_user)
 ):
-    """Process una acción desde QR (check-in o pago)"""
+    """Process una action desde QR (check-in o pago)"""
     if data.action not in ["checkin", "pay_usd", "pay_points"]:
         raise HTTPException(
             status_code=400, 

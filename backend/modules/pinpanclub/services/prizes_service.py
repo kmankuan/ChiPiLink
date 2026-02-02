@@ -183,7 +183,7 @@ class PrizeService(BaseService):
     ) -> List[AwardedPrize]:
         """
         Otorgar premios automáticamente al cerrar una temporada.
-        Evalúa las condiciones de cada premio.
+        Evalúa las conditions de cada premio.
         """
         awarded = []
         
@@ -224,7 +224,7 @@ class PrizeService(BaseService):
         ranking: Dict,
         position: int
     ) -> bool:
-        """Verify si se cumplen las condiciones de un premio"""
+        """Verify si se cumplen las conditions de un premio"""
         if not conditions:
             return True
         

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class MondayService(BaseService):
     """
     Service for integración con Monday.com.
-    Escucha eventos del módulo y sincroniza automáticamente.
+    Escucha eventos del module y sincroniza automáticamente.
     """
     
     MODULE_NAME = "pinpanclub"
@@ -56,12 +56,12 @@ class MondayService(BaseService):
                 await self.sync_player(event.payload["jugador_id"])
     
     async def get_config(self) -> MondayConfig:
-        """Get configuración de Monday.com"""
+        """Get configuration de Monday.com"""
         config_dict = await self.config_repository.get_monday_config()
         return MondayConfig(**config_dict)
     
     async def save_config(self, config: MondayConfig) -> bool:
-        """Save configuración de Monday.com"""
+        """Save configuration de Monday.com"""
         return await self.config_repository.set_monday_config(config.model_dump())
     
     async def _graphql_request(self, query: str) -> Dict:
@@ -88,7 +88,7 @@ class MondayService(BaseService):
             return result
     
     async def test_connection(self) -> Dict:
-        """Probar conexión con Monday.com"""
+        """Probar connection con Monday.com"""
         query = '''
         query {
             me { name email }

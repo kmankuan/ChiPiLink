@@ -1,6 +1,6 @@
 """
 Social Features - Service Layer
-Seguimientos, comentarios, reacciones, notificaciones
+Seguimientos, comentarios, reactions, notifications
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -161,7 +161,7 @@ class SocialService(BaseService):
     # ============== REACTIONS ==============
     
     async def add_reaction(self, data: ReactionCreate) -> Reaction:
-        """Añadir reacción"""
+        """Añadir reaction"""
         # Verify si ya reaccionó
         existing = await self.reaction_repo.find_user_reaction(
             data.user_id, data.target_id, data.target_type
@@ -176,7 +176,7 @@ class SocialService(BaseService):
                 # Update counter on target
                 if data.target_type == "comment":
                     await self.comment_repo.remove_reaction(data.target_id, data.reaction_type)
-                raise ValueError("Reacción eliminada")
+                raise ValueError("Reaction eliminada")
             else:
                 # Change reaction type
                 await self.reaction_repo.delete_reaction(
@@ -194,7 +194,7 @@ class SocialService(BaseService):
         return Reaction(**result)
     
     async def get_reactions(self, target_id: str, target_type: str) -> ReactionSummary:
-        """Get resumen de reacciones"""
+        """Get resumen de reactions"""
         summary = await self.reaction_repo.get_reaction_summary(target_id, target_type)
         return ReactionSummary(**summary)
     
@@ -204,7 +204,7 @@ class SocialService(BaseService):
         target_id: str, 
         target_type: str
     ) -> Optional[str]:
-        """Get tipo de reacción of the user"""
+        """Get tipo de reaction of the user"""
         reaction = await self.reaction_repo.find_user_reaction(user_id, target_id, target_type)
         return reaction["reaction_type"] if reaction else None
     
@@ -243,7 +243,7 @@ class SocialService(BaseService):
     # ============== NOTIFICATIONS ==============
     
     async def create_notification(self, data: NotificationCreate) -> Notification:
-        """Create notificación y enviar en tiempo real si the user está conectado"""
+        """Create notification y enviar en tiempo real si the user está conectado"""
         result = await self.notification_repo.create(data.model_dump())
         notification = Notification(**result)
         
@@ -263,29 +263,29 @@ class SocialService(BaseService):
         unread_only: bool = False,
         limit: int = 50
     ) -> List[Notification]:
-        """Get notificaciones de un usuario"""
+        """Get notifications de un usuario"""
         results = await self.notification_repo.get_user_notifications(user_id, unread_only, limit)
         return [Notification(**r) for r in results]
     
     async def get_unread_count(self, user_id: str) -> int:
-        """Get cantidad de notificaciones no leídas"""
+        """Get cantidad de notifications no leídas"""
         return await self.notification_repo.count_unread(user_id)
     
     async def mark_notification_read(self, notification_id: str) -> bool:
-        """Marcar notificación como leída"""
+        """Marcar notification como leída"""
         return await self.notification_repo.mark_as_read(notification_id)
     
     async def mark_all_notifications_read(self, user_id: str) -> int:
-        """Marcar todas las notificaciones como leídas"""
+        """Marcar todas las notifications como leídas"""
         return await self.notification_repo.mark_all_as_read(user_id)
     
     async def get_unpushed_notifications(self, limit: int = 100) -> List[Notification]:
-        """Get notificaciones no enviadas por WebSocket"""
+        """Get notifications no enviadas por WebSocket"""
         results = await self.notification_repo.get_unpushed(limit)
         return [Notification(**r) for r in results]
     
     async def mark_notifications_pushed(self, notification_ids: List[str]) -> int:
-        """Marcar notificaciones como enviadas"""
+        """Marcar notifications como enviadas"""
         return await self.notification_repo.mark_as_pushed(notification_ids)
     
     # ============== USER WARNINGS (MODERATION) ==============

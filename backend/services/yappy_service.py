@@ -167,7 +167,7 @@ class YappyService:
             "E": "Ejecutado - Pago completado exitosamente",
             "R": "Rechazado - El cliente no confirmó el pago",
             "C": "Cancelado - El cliente canceló el pago",
-            "X": "Expirado - La solicitud de pago expiró"
+            "X": "Expirado - La request de pago expiró"
         }
         return statuses.get(status_code, f"Estado desconocido: {status_code}")
     

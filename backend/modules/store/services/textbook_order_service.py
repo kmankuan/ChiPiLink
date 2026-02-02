@@ -807,7 +807,7 @@ class TextbookOrderService(BaseService):
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
-            await db.notificaciones.insert_one(notification)
+            await db.notifications.insert_one(notification)
             logger.info(f"Order submitted notification: {notification['message']}")
         except Exception as e:
             logger.error(f"Error sending notification: {e}")
@@ -830,7 +830,7 @@ class TextbookOrderService(BaseService):
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             
-            await db.notificaciones.insert_one(notification)
+            await db.notifications.insert_one(notification)
             logger.info(f"Reorder request notification: {notification['message']}")
         except Exception as e:
             logger.error(f"Error sending notification: {e}")
@@ -844,7 +844,7 @@ class TextbookOrderService(BaseService):
             notification = {
                 "type": "textbook_reorder_approved",
                 "title": "Recompra Aprobada",
-                "message": f"Tu solicitud de recompra para {book_name} ha sido aprobada",
+                "message": f"Tu request de recompra para {book_name} ha sido aprobada",
                 "data": {
                     "order_id": order["order_id"],
                     "book_id": book_id

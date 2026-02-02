@@ -53,8 +53,8 @@ from .events import setup_event_handlers, CommunityEvents
 
 def init_module():
     """
-    Inicializar el módulo Community.
-    Llamar esta función al iniciar la aplicación.
+    Inicializar el module Community.
+    Llamar esta function al iniciar la application.
     """
     # Configurar event handlers
     setup_event_handlers()

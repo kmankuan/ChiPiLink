@@ -116,7 +116,7 @@ class Conexion(BaseModel):
 
 
 class ConexionCreate(BaseModel):
-    """Request to create conexión"""
+    """Request to create connection"""
     user_id_destino: str
     tipo: TipoRelacion
     subtipo: str
@@ -125,7 +125,7 @@ class ConexionCreate(BaseModel):
 
 
 class ConexionUpdate(BaseModel):
-    """Request to update conexión"""
+    """Request to update connection"""
     etiqueta: Optional[str] = None
     permisos: Optional[PermisosConexion] = None
     notas: Optional[str] = None
@@ -134,8 +134,8 @@ class ConexionUpdate(BaseModel):
 # ============== MODELOS DE SOLICITUD ==============
 
 class SolicitudConexion(BaseModel):
-    """Solicitud de conexión entre usuarios"""
-    solicitud_id: str = Field(default_factory=lambda: f"sol_{uuid.uuid4().hex[:12]}")
+    """Solicitud de connection entre usuarios"""
+    request_id: str = Field(default_factory=lambda: f"sol_{uuid.uuid4().hex[:12]}")
     de_usuario_id: str
     de_usuario_nombre: Optional[str] = None
     para_usuario_id: str
@@ -151,7 +151,7 @@ class SolicitudConexion(BaseModel):
 
 
 class SolicitudCreate(BaseModel):
-    """Request to create solicitud de conexión"""
+    """Request to create request de connection"""
     para_usuario_id: str
     tipo: TipoRelacion
     subtipo: str
@@ -222,7 +222,7 @@ class CapacidadConfig(BaseModel):
 
 class CapacidadSolicitud(BaseModel):
     """Solicitud de usuario para obtener una capacidad"""
-    solicitud_id: str = Field(default_factory=lambda: f"capsol_{uuid.uuid4().hex[:12]}")
+    request_id: str = Field(default_factory=lambda: f"capsol_{uuid.uuid4().hex[:12]}")
     user_id: str
     capacidad_id: str
     motivo: Optional[str] = None
@@ -288,7 +288,7 @@ class AlertaWallet(BaseModel):
 # ============== CONFIGURACIÓN DE PERMISOS POR RELACIÓN ==============
 
 class ConfigPermisosRelacion(BaseModel):
-    """Configuración de permisos by default para un tipo de relación"""
+    """Configuración de permisos by default para un tipo de relationship"""
     tipo: TipoRelacion
     subtipo: str
     permisos_default: PermisosConexion
@@ -307,7 +307,7 @@ class MarketingConfig(BaseModel):
 # ============== FUNCIONES HELPER ==============
 
 def get_default_permisos_por_relacion() -> List[Dict]:
-    """Retorna configuración by default de permisos por relación"""
+    """Retorna configuration by default de permisos por relationship"""
     return [
         {
             "tipo": "especial",

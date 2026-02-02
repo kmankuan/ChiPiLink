@@ -2,7 +2,7 @@
 Task Supervisor Routes - Endpoints para el Supervisor de Tareas
 
 PLACEHOLDER - Endpoints a implementar:
-- GET /task-supervisor/status - Estado del módulo
+- GET /task-supervisor/status - Estado del module
 - GET/PUT /task-supervisor/config - Configuración
 - GET /task-supervisor/display - Datos para pantalla grande
 - GET/POST /task-supervisor/people - Personas supervisadas

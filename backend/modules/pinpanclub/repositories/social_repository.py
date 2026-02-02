@@ -1,6 +1,6 @@
 """
 Social Features - Repository Layer
-Seguimientos, comentarios, reacciones, notificaciones y feed de actividad
+Seguimientos, comentarios, reactions, notifications y feed de actividad
 """
 import uuid
 from datetime import datetime, timezone
@@ -129,7 +129,7 @@ class CommentRepository(BaseRepository):
 
 
 class ReactionRepository(BaseRepository):
-    """Repository for reacciones"""
+    """Repository for reactions"""
     
     COLLECTION_NAME = "pinpanclub_reactions"
     ID_FIELD = "reaction_id"
@@ -168,7 +168,7 @@ class ReactionRepository(BaseRepository):
         return result.deleted_count > 0
     
     async def get_reaction_summary(self, target_id: str, target_type: str) -> Dict:
-        """Get resumen de reacciones para un target"""
+        """Get resumen de reactions para un target"""
         pipeline = [
             {"$match": {"target_id": target_id, "target_type": target_type}},
             {"$group": {
@@ -222,7 +222,7 @@ class ActivityFeedRepository(BaseRepository):
 
 
 class NotificationRepository(BaseRepository):
-    """Repository for notificaciones"""
+    """Repository for notifications"""
     
     COLLECTION_NAME = "pinpanclub_notifications"
     ID_FIELD = "notification_id"
@@ -273,7 +273,7 @@ class NotificationRepository(BaseRepository):
         return result.modified_count
     
     async def get_unpushed(self, limit: int = 100) -> List[Dict]:
-        """Get notificaciones no enviadas por WebSocket"""
+        """Get notifications no enviadas por WebSocket"""
         return await self.find_many(
             query={"is_pushed": False},
             sort=[("created_at", 1)],

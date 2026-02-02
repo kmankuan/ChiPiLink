@@ -42,7 +42,7 @@ class SyncResult(BaseModel):
 # ============== HELPER FUNCTIONS ==============
 
 async def get_pingpong_monday_config():
-    """Obtener configuración de Monday.com para Ping Pong"""
+    """Obtener configuration de Monday.com para Ping Pong"""
     config = await db.app_config.find_one({"config_key": "pingpong_monday_config"})
     if config:
         return MondayConfig(**config.get("value", {}))
@@ -50,7 +50,7 @@ async def get_pingpong_monday_config():
 
 
 async def save_pingpong_monday_config(config: MondayConfig):
-    """Guardar configuración de Monday.com para Ping Pong"""
+    """Guardar configuration de Monday.com para Ping Pong"""
     await db.app_config.update_one(
         {"config_key": "pingpong_monday_config"},
         {
@@ -94,7 +94,7 @@ async def monday_graphql_request(query: str) -> Dict:
             return result
         except httpx.RequestError as e:
             logger.error(f"Monday.com request error: {e}")
-            raise HTTPException(status_code=500, detail=f"Error de conexión: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error de connection: {str(e)}")
 
 
 async def create_monday_item(board_id: str, item_name: str, column_values: Dict, group_id: str = None) -> Dict:
@@ -173,7 +173,7 @@ async def get_board_columns(board_id: str) -> List[Dict]:
 
 @router.get("/config")
 async def get_config(admin: dict = Depends(get_admin_user)):
-    """Obtener configuración de integración Monday.com para Ping Pong"""
+    """Obtener configuration de integración Monday.com para Ping Pong"""
     config = await get_pingpong_monday_config()
     
     # Verificar si hay API key configurada
@@ -187,7 +187,7 @@ async def get_config(admin: dict = Depends(get_admin_user)):
 
 @router.put("/config")
 async def update_config(config: MondayConfig, admin: dict = Depends(get_admin_user)):
-    """Actualizar configuración de integración"""
+    """Actualizar configuration de integración"""
     await save_pingpong_monday_config(config)
     return {"success": True, "message": "Configuración guardada"}
 
@@ -344,7 +344,7 @@ async def sync_match_to_monday(
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
     
-    # Obtener información de jugadores
+    # Obtener information de jugadores
     player_a = await db.pingpong_players.find_one(
         {"jugador_id": match["jugador_a_id"]},
         {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1}
@@ -551,7 +551,7 @@ async def get_integration_status(admin: dict = Depends(get_admin_user)):
         "connection_status": "unknown"
     }
     
-    # Verificar conexión
+    # Verificar connection
     if MONDAY_API_KEY:
         try:
             query = "query { me { name } }"
@@ -572,7 +572,7 @@ async def get_integration_status(admin: dict = Depends(get_admin_user)):
 
 @router.post("/test")
 async def test_monday_connection(admin: dict = Depends(get_admin_user)):
-    """Probar conexión con Monday.com"""
+    """Probar connection con Monday.com"""
     if not MONDAY_API_KEY:
         raise HTTPException(status_code=400, detail="API Key de Monday.com no configurada")
     

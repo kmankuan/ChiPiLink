@@ -60,7 +60,7 @@ async def get_newest_products(
 
 @router.get("/search")
 async def search_products(q: str = Query(..., min_length=2)):
-    """Search productos by name o descripción"""
+    """Search productos by name o description"""
     return await product_service.search_products(q)
 
 

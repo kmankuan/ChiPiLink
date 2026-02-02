@@ -313,7 +313,7 @@ class RankingSeasonsService(BaseService):
         
         await db.pinpanclub_season_rewards.insert_one(reward)
         
-        # Create notificación
+        # Create notification
         try:
             from .social_service import social_service
             

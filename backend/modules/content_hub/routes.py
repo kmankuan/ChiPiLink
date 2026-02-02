@@ -5,7 +5,7 @@ PLACEHOLDER - Endpoints a implementar:
 - GET/POST /content-hub/items - Contenido curado
 - GET/POST /content-hub/categories - Categorías por audiencia
 - GET/POST /content-hub/playlists - Colecciones de contenido
-- GET /content-hub/feed/{category} - Feed por categoría
+- GET /content-hub/feed/{category} - Feed por category
 - POST /content-hub/import - Importar desde URL
 """
 from fastapi import APIRouter, HTTPException, Depends
@@ -58,8 +58,8 @@ async def get_content_hub_status():
             "Importar videos/posts de múltiples redes sociales",
             "Categorización por audiencia (niños, padres, etc.)",
             "Embed de videos (YouTube, Instagram, etc.)",
-            "Playlists y colecciones",
-            "Feed personalizado por categoría",
+            "Playlists y collections",
+            "Feed personalizado por category",
             "Preview con thumbnails"
         ],
         "supported_sources": CONTENT_SOURCES

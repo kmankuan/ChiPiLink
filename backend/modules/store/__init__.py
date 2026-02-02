@@ -54,8 +54,8 @@ from .events import setup_event_handlers, StoreEvents
 
 def init_module():
     """
-    Inicializar el módulo Store.
-    Llamar esta función al iniciar la aplicación.
+    Inicializar el module Store.
+    Llamar esta function al iniciar la application.
     """
     # Configurar event handlers
     setup_event_handlers()

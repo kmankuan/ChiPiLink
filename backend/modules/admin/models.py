@@ -39,7 +39,7 @@ class CampoFormulario(BaseModel):
     etiqueta: str
     placeholder: Optional[str] = None
     obligatorio: bool = False
-    opciones: Optional[List[str]] = None  # For select fields
+    options: Optional[List[str]] = None  # For select fields
     validacion: Optional[str] = None  # Regex pattern
     orden: int = 0
     activo: bool = True

@@ -1,6 +1,6 @@
 """
 PinpanClub - Config Repository
-Acceso a datos de configuración
+Acceso a datos de configuration
 """
 from typing import Optional, Dict, Any
 from core.base import BaseRepository
@@ -11,7 +11,7 @@ import uuid
 
 class ConfigRepository(BaseRepository):
     """
-    Repository para configuración de PinpanClub.
+    Repository para configuration de PinpanClub.
     Maneja configuraciones de Monday.com, layouts, etc.
     """
     
@@ -22,12 +22,12 @@ class ConfigRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def get_config(self, config_key: str) -> Optional[Dict]:
-        """Get configuración por clave"""
+        """Get configuration por clave"""
         doc = await self.find_one({"config_key": config_key})
         return doc.get("value") if doc else None
     
     async def set_config(self, config_key: str, value: Any) -> bool:
-        """Save configuración"""
+        """Save configuration"""
         return await self.update_one(
             {"config_key": config_key},
             {"$set": {"config_key": config_key, "value": value}},
@@ -35,7 +35,7 @@ class ConfigRepository(BaseRepository):
         )
     
     async def get_monday_config(self) -> Dict:
-        """Get configuración de Monday.com"""
+        """Get configuration de Monday.com"""
         config = await self.get_config("monday_integration")
         return config or {
             "players_board_id": None,
@@ -47,7 +47,7 @@ class ConfigRepository(BaseRepository):
         }
     
     async def set_monday_config(self, config: Dict) -> bool:
-        """Save configuración de Monday.com"""
+        """Save configuration de Monday.com"""
         return await self.set_config("monday_integration", config)
 
 

@@ -97,8 +97,8 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
 
 # ============== NOTIFICATIONS ROUTES ==============
 
-@router.get("/notificaciones")
-async def get_notificaciones(
+@router.get("/notifications")
+async def get_notifications(
     leidas: Optional[bool] = None,
     tipo: Optional[str] = None,
     limite: int = 50,
@@ -111,23 +111,23 @@ async def get_notificaciones(
     if tipo:
         query["tipo"] = tipo
     
-    notificaciones = await db.notificaciones.find(query, {"_id": 0}).sort(
+    notifications = await db.notifications.find(query, {"_id": 0}).sort(
         "fecha_creacion", -1
     ).to_list(limite)
     
     # Count unread
-    no_leidas = await db.notificaciones.count_documents({"leida": False})
+    no_leidas = await db.notifications.count_documents({"leida": False})
     
     return {
-        "notificaciones": notificaciones,
+        "notifications": notifications,
         "no_leidas": no_leidas
     }
 
 
-@router.put("/notificaciones/{notificacion_id}/leer")
+@router.put("/notifications/{notificacion_id}/leer")
 async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_user)):
     """Mark notification as read"""
-    result = await db.notificaciones.update_one(
+    result = await db.notifications.update_one(
         {"notificacion_id": notificacion_id},
         {"$set": {"leida": True}}
     )
@@ -136,44 +136,44 @@ async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_use
     return {"success": True}
 
 
-@router.put("/notificaciones/leer-todas")
+@router.put("/notifications/leer-todas")
 async def marcar_todas_leidas(admin: dict = Depends(get_admin_user)):
     """Mark all notifications as read"""
-    await db.notificaciones.update_many(
+    await db.notifications.update_many(
         {"leida": False},
         {"$set": {"leida": True}}
     )
     return {"success": True}
 
 
-@router.delete("/notificaciones/{notificacion_id}")
+@router.delete("/notifications/{notificacion_id}")
 async def delete_notificacion(notificacion_id: str, admin: dict = Depends(get_admin_user)):
     """Delete a notification"""
-    result = await db.notificaciones.delete_one({"notificacion_id": notificacion_id})
+    result = await db.notifications.delete_one({"notificacion_id": notificacion_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Notificaci\u00f3n not found")
     return {"success": True}
 
 
-@router.get("/notificaciones/config")
-async def get_notificaciones_config(admin: dict = Depends(get_admin_user)):
+@router.get("/notifications/config")
+async def get_notifications_config(admin: dict = Depends(get_admin_user)):
     """Get notification preferences"""
-    config = await db.app_config.find_one({"config_key": "notificaciones"}, {"_id": 0})
+    config = await db.app_config.find_one({"config_key": "notifications"}, {"_id": 0})
     if not config:
         return ConfiguracionNotificaciones().model_dump()
     return config.get("value", ConfiguracionNotificaciones().model_dump())
 
 
-@router.put("/notificaciones/config")
-async def update_notificaciones_config(
+@router.put("/notifications/config")
+async def update_notifications_config(
     config: ConfiguracionNotificaciones,
     admin: dict = Depends(get_admin_user)
 ):
     """Update notification preferences"""
     await db.app_config.update_one(
-        {"config_key": "notificaciones"},
+        {"config_key": "notifications"},
         {"$set": {
-            "config_key": "notificaciones",
+            "config_key": "notifications",
             "value": config.model_dump(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         }},
@@ -275,7 +275,7 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     total_users = await db.users.count_documents({"is_admin": False})
     
     # Notifications stats
-    unread_notifications = await db.notificaciones.count_documents({"leida": False})
+    unread_notifications = await db.notifications.count_documents({"leida": False})
     
     return {
         "orders": {

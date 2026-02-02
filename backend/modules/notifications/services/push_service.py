@@ -1,5 +1,5 @@
 """
-Push Notification Service - Servicio principal de notificaciones
+Push Notification Service - Servicio principal de notifications
 Soporta múltiples proveedores (FCM, OneSignal) con failover y balanceo de carga
 """
 from typing import Dict, List, Optional, Any
@@ -40,7 +40,7 @@ class PushNotificationService:
     # ============== CONFIGURATION ==============
     
     async def initialize(self):
-        """Inicializar servicio y configuración"""
+        """Inicializar servicio y configuration"""
         await self.initialize_config()
         await self.initialize_categories()
         await self.initialize_templates()
@@ -48,7 +48,7 @@ class PushNotificationService:
         self.log_info("Service initialized")
     
     async def initialize_config(self) -> Dict:
-        """Inicializar configuración de proveedores"""
+        """Inicializar configuration de proveedores"""
         existing = await db[self.collection_config].find_one(
             {"config_id": "push_providers_config"},
             {"_id": 0}
@@ -70,7 +70,7 @@ class PushNotificationService:
         return config
     
     async def get_config(self) -> Dict:
-        """Get configuración"""
+        """Get configuration"""
         if self._config:
             return self._config
         
@@ -86,7 +86,7 @@ class PushNotificationService:
         return config
     
     async def update_config(self, updates: Dict) -> Dict:
-        """Update configuración de proveedores"""
+        """Update configuration de proveedores"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_config].find_one_and_update(
@@ -103,10 +103,10 @@ class PushNotificationService:
         return result
     
     async def update_provider_config(self, provider: str, settings: Dict) -> Dict:
-        """Update configuración de un proveedor específico"""
+        """Update configuration de un proveedor específico"""
         update_key = f"{provider}"
         
-        # Merge con configuración existente
+        # Merge con configuration existente
         config = await self.get_config()
         current = config.get(provider, {})
         current.update(settings)
@@ -187,7 +187,7 @@ class PushNotificationService:
     # ============== CATEGORIES ==============
     
     async def initialize_categories(self) -> int:
-        """Inicializar categorías by default"""
+        """Inicializar categorys by default"""
         defaults = get_default_notification_categories()
         created = 0
         
@@ -205,7 +205,7 @@ class PushNotificationService:
         return created
     
     async def get_categories(self, active_only: bool = True) -> List[Dict]:
-        """Get categorías de notificación"""
+        """Get categorys de notification"""
         query = {}
         if active_only:
             query["is_active"] = True
@@ -218,14 +218,14 @@ class PushNotificationService:
         return await cursor.to_list(length=100)
     
     async def get_category(self, category_id: str) -> Optional[Dict]:
-        """Get una categoría específica"""
+        """Get una category específica"""
         return await db[self.collection_categories].find_one(
             {"category_id": category_id},
             {"_id": 0}
         )
     
     async def create_category(self, data: Dict) -> Dict:
-        """Create nueva categoría"""
+        """Create nueva category"""
         if "category_id" not in data:
             data["category_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         
@@ -239,7 +239,7 @@ class PushNotificationService:
         return data
     
     async def update_category(self, category_id: str, updates: Dict) -> Optional[Dict]:
-        """Update categoría"""
+        """Update category"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_categories].find_one_and_update(
@@ -253,7 +253,7 @@ class PushNotificationService:
         return result
     
     async def delete_category(self, category_id: str) -> bool:
-        """Desactivar categoría (soft delete)"""
+        """Desactivar category (soft delete)"""
         result = await db[self.collection_categories].update_one(
             {"category_id": category_id},
             {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
@@ -298,7 +298,7 @@ class PushNotificationService:
     # ============== USER PREFERENCES ==============
     
     async def get_user_preferences(self, user_id: str) -> Dict:
-        """Get preferencias de notificación of the user"""
+        """Get preferencias de notification of the user"""
         prefs = await db[self.collection_user_prefs].find_one(
             {"user_id": user_id},
             {"_id": 0}
@@ -357,7 +357,7 @@ class PushNotificationService:
         push: bool = None,
         email: bool = None
     ) -> Dict:
-        """Update preferencia de una categoría específica"""
+        """Update preferencia de una category específica"""
         updates = {}
         
         if enabled is not None:
@@ -436,7 +436,7 @@ class PushNotificationService:
         template_id: str = None,
         variables: Dict = None
     ) -> Dict:
-        """Send notificación a un usuario"""
+        """Send notification a un usuario"""
         # Verify preferencias of the user
         prefs = await self.get_user_preferences(user_id)
         
@@ -452,7 +452,7 @@ class PushNotificationService:
             # TODO: Implementar verificación de quiet hours
             pass
         
-        # Get categoría para determinar proveedor
+        # Get category para determinar proveedor
         category = await self.get_category(category_id)
         category_provider = category.get("default_provider") if category else None
         
@@ -568,7 +568,7 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a múltiples usuarios"""
+        """Send notification a múltiples usuarios"""
         results = {
             "success": True,
             "total_users": len(user_ids),
@@ -606,7 +606,7 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notificación a todos the users con dispositivos registrados"""
+        """Send notification a todos the users con dispositivos registrados"""
         # Get todos the users con dispositivos
         pipeline = [
             {"$match": {"is_active": True}},
@@ -637,7 +637,7 @@ class PushNotificationService:
         body: str,
         results: Dict
     ):
-        """Register log de notificación"""
+        """Register log de notification"""
         log = {
             "log_id": f"nlog_{uuid.uuid4().hex[:8]}",
             "user_id": user_id,
@@ -657,7 +657,7 @@ class PushNotificationService:
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict]:
-        """Get logs de notificaciones"""
+        """Get logs de notifications"""
         query = {}
         if user_id:
             query["user_id"] = user_id

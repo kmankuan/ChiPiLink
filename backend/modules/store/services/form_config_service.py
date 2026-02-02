@@ -190,7 +190,7 @@ class FormConfigService(BaseService):
                 "label_es": "Lista Desplegable",
                 "label_zh": "下拉选择",
                 "description_en": "Select from predefined options",
-                "description_es": "Seleccionar de opciones predefinidas",
+                "description_es": "Seleccionar de options predefinidas",
                 "icon": "chevron-down"
             },
             {

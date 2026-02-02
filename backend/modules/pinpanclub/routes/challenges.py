@@ -157,7 +157,7 @@ async def get_leaderboard(
 
 @router.get("/player/{jugador_id}/rank")
 async def get_player_rank(jugador_id: str):
-    """Get información de rango de a player"""
+    """Get information de rango de a player"""
     from core.database import db
     
     # Get leaderboard entry

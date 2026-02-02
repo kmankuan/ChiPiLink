@@ -70,14 +70,14 @@ class GoogleSheetsService:
             return False
     
     async def get_sync_config(self) -> Dict:
-        """Get configuración de sincronización"""
+        """Get configuration de sincronización"""
         config = await db.sync_config.find_one(
             {"config_id": "google_sheets_sync_config"},
             {"_id": 0}
         )
         
         if not config:
-            # Create configuración by default
+            # Create configuration by default
             config = {
                 "config_id": "google_sheets_sync_config",
                 "service_account_email": None,
@@ -98,7 +98,7 @@ class GoogleSheetsService:
         return config
     
     async def update_sync_config(self, updates: Dict) -> Dict:
-        """Update configuración de sincronización"""
+        """Update configuration de sincronización"""
         updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
         
         await db.sync_config.update_one(
@@ -121,7 +121,7 @@ class GoogleSheetsService:
         Args:
             sheet_id: ID of the Google Sheet
             nombre_sheet: Nombre descriptivo
-            hojas: Lista de hojas/pestañas con su configuración
+            hojas: Lista de hojas/pestañas con su configuration
                    [{"nombre": "1er Grado", "grado": "1", "columnas": {...}}]
         """
         config = await self.get_sync_config()
@@ -150,7 +150,7 @@ class GoogleSheetsService:
         return sheet_config
     
     async def test_connection(self, sheet_id: str) -> Dict:
-        """Probar conexión a un Google Sheet"""
+        """Probar connection a un Google Sheet"""
         if not self._initialized:
             return {
                 "success": False,

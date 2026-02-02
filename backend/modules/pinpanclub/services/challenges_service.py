@@ -263,7 +263,7 @@ class ChallengeService(BaseService):
         if week and challenge["challenge_id"] in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, completions=1)
         
-        # Create notificación
+        # Create notification
         await social_service.create_notification(NotificationCreate(
             user_id=jugador_id,
             type=NotificationType.CHALLENGE_COMPLETED,

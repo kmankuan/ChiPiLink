@@ -2,7 +2,7 @@
 AI Tutor Routes - Endpoints para el Tutor Inteligente
 
 PLACEHOLDER - Endpoints a implementar:
-- GET /ai-tutor/status - Estado del módulo
+- GET /ai-tutor/status - Estado del module
 - GET/PUT /ai-tutor/config - Configuración del tutor
 - POST /ai-tutor/sessions - Iniciar sesión de tutoría
 - POST /ai-tutor/speak - Generar audio TTS

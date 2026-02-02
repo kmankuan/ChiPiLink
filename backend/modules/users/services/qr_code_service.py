@@ -142,7 +142,7 @@ class QRCodeService:
         if not qr_record:
             return {"valid": False, "error": "QR code not found or inactive"}
         
-        # Get información of the user
+        # Get information of the user
         user_id = qr_record["user_id"]
         
         # Get wallet
@@ -198,7 +198,7 @@ class QRCodeService:
         }
     
     def _get_available_actions(self, wallet: Dict, membership: Dict) -> list:
-        """Determinar acciones disponibles basadas en wallet y membresía"""
+        """Determinar actions disponibles basadas en wallet y membresía"""
         actions = []
         
         if membership:
@@ -238,7 +238,7 @@ class QRCodeService:
         processed_by: str = None,
         metadata: Dict = None
     ) -> Dict:
-        """Process una acción desde QR code"""
+        """Process una action desde QR code"""
         # Validate QR
         scan_result = await self.scan_qr_code(qr_string)
         
@@ -247,7 +247,7 @@ class QRCodeService:
         
         user_id = scan_result["user_id"]
         
-        # Registrar transacción
+        # Registrar transaction
         now = datetime.now(timezone.utc).isoformat()
         
         qr_transaction = {
@@ -263,7 +263,7 @@ class QRCodeService:
             "created_at": now
         }
         
-        # Procesar según acción
+        # Procesar según action
         if action == "checkin":
             result = await self._process_checkin(user_id, processed_by)
         elif action == "pay_usd":
@@ -273,7 +273,7 @@ class QRCodeService:
         else:
             result = {"success": False, "error": f"Unknown action: {action}"}
         
-        # Update transacción
+        # Update transaction
         qr_transaction["status"] = "completed" if result.get("success") else "failed"
         qr_transaction["result"] = result
         qr_transaction["completed_at"] = datetime.now(timezone.utc).isoformat()
@@ -350,7 +350,7 @@ class QRCodeService:
                     "required": amount
                 }
             
-            # Create transacción usando la firma correcta
+            # Create transaction usando la firma correcta
             transaction = await wallet_service.create_transaction(
                 user_id=user_id,
                 transaction_type=TransactionType.PURCHASE,
@@ -361,7 +361,7 @@ class QRCodeService:
                 metadata={"processed_by": processed_by}
             )
             
-            # Complete transacción
+            # Complete transaction
             completed = await wallet_service.complete_transaction(transaction["transaction_id"])
             
             return {
@@ -408,7 +408,7 @@ class QRCodeService:
                     "required": points
                 }
             
-            # Create transacción usando la firma correcta
+            # Create transaction usando la firma correcta
             transaction = await wallet_service.create_transaction(
                 user_id=user_id,
                 transaction_type=TransactionType.PURCHASE,
@@ -419,7 +419,7 @@ class QRCodeService:
                 metadata={"processed_by": processed_by}
             )
             
-            # Complete transacción
+            # Complete transaction
             completed = await wallet_service.complete_transaction(transaction["transaction_id"])
             
             return {
@@ -445,7 +445,7 @@ class QRCodeService:
         limit: int = 50,
         offset: int = 0
     ) -> list:
-        """Get historial de transacciones QR"""
+        """Get historial de transactions QR"""
         query = {}
         
         if user_id:

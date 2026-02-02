@@ -49,8 +49,8 @@ from .events import setup_event_handlers, AuthEvents
 
 def init_module():
     """
-    Inicializar el módulo Auth.
-    Llamar esta función al iniciar la aplicación.
+    Inicializar el module Auth.
+    Llamar esta function al iniciar la application.
     """
     # Configurar event handlers
     setup_event_handlers()

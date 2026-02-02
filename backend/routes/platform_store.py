@@ -352,4 +352,4 @@ async def test_platform_yappy(admin: dict = Depends(lambda: get_admin_user)):
             "ambiente": yappy_service.ambiente
         }
     
-    raise HTTPException(status_code=400, detail=f"Error de conexión: {result.get('error')}")
+    raise HTTPException(status_code=400, detail=f"Error de connection: {result.get('error')}")

@@ -12,7 +12,7 @@ import uuid
 class MatchRepository(BaseRepository):
     """
     Repository para partidos de PinpanClub.
-    Maneja todas las operaciones de base de datos para partidos.
+    Maneja todas las operations de base de datos para partidos.
     """
     
     COLLECTION_NAME = PinpanClubCollections.MATCHES
@@ -87,7 +87,7 @@ class MatchRepository(BaseRepository):
         set_actual: int,
         historial: List[Dict]
     ) -> bool:
-        """Update puntuación dthe match"""
+        """Update score dthe match"""
         return await self.update_match(partido_id, {
             "puntos_jugador_a": puntos_a,
             "puntos_jugador_b": puntos_b,

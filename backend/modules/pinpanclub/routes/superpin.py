@@ -260,7 +260,7 @@ async def get_tournament(torneo_id: str):
 
 @router.post("/tournaments/{torneo_id}/generate-brackets")
 async def generate_brackets(torneo_id: str, admin: dict = Depends(get_admin_user)):
-    """Generar brackets para torneo de eliminación"""
+    """Generar brackets para torneo de deletion"""
     try:
         result = await superpin_service.generate_tournament_brackets(torneo_id)
         return result

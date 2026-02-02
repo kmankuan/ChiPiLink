@@ -48,7 +48,7 @@ async def get_integration_status(admin: dict = Depends(get_admin_user)):
 
 @router.get("/config")
 async def get_config(admin: dict = Depends(get_admin_user)):
-    """Get configuración de Monday.com"""
+    """Get configuration de Monday.com"""
     config = await monday_service.get_config()
     return {
         "has_api_key": bool(MONDAY_API_KEY),
@@ -61,7 +61,7 @@ async def update_config(
     config: MondayConfig,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update configuración de Monday.com"""
+    """Update configuration de Monday.com"""
     await monday_service.save_config(config)
     return {"success": True, "message": "Configuración guardada"}
 
@@ -78,7 +78,7 @@ async def get_available_boards(admin: dict = Depends(get_admin_user)):
 
 @router.post("/test")
 async def test_connection(admin: dict = Depends(get_admin_user)):
-    """Probar conexión con Monday.com"""
+    """Probar connection con Monday.com"""
     if not MONDAY_API_KEY:
         raise HTTPException(status_code=400, detail="API Key no configurada")
     

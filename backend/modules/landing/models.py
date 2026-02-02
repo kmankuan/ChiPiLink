@@ -104,7 +104,7 @@ BLOCK_TEMPLATES = {
     },
     "image": {
         "nombre": "Imagen",
-        "descripcion": "Imagen con descripción opcional",
+        "descripcion": "Imagen con description opcional",
         "config_default": {
             "imagen_url": "",
             "alt": "",
@@ -132,7 +132,7 @@ BLOCK_TEMPLATES = {
             "items": [
                 {"numero": "1000+", "label": "Clientes"},
                 {"numero": "500+", "label": "Productos"},
-                {"numero": "99%", "label": "Satisfacción"}
+                {"numero": "99%", "label": "Satisfaction"}
             ]
         }
     },

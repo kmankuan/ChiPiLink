@@ -51,7 +51,7 @@ AVAILABLE_PERMISSIONS = {
         "view_public_catalog": "Ver catálogo público",
         "view_private_catalog": "Ver catálogo privado PCA",
         "manage_products": "Gestionar productos",
-        "manage_categories": "Gestionar categorías",
+        "manage_categories": "Gestionar categorys",
         "manage_orders": "Gestionar pedidos",
         "manage_students": "Gestionar estudiantes",
         "manage_vinculaciones": "Gestionar vinculaciones",
@@ -76,7 +76,7 @@ AVAILABLE_PERMISSIONS = {
     "memberships": {
         "view": "Ver membresías",
         "create_plans": "Crear planes",
-        "manage_subscriptions": "Gestionar suscripciones",
+        "manage_subscriptions": "Gestionar subscriptions",
         "view_visits": "Ver visitas",
         "manage_qr": "Gestionar códigos QR",
     },
@@ -87,7 +87,7 @@ AVAILABLE_PERMISSIONS = {
         "monday": "Configurar Monday.com",
         "google_sheets": "Configurar Google Sheets",
         "yappy": "Configurar Yappy",
-        "notifications": "Configurar notificaciones",
+        "notifications": "Configurar notifications",
     },
     
     # Clientes

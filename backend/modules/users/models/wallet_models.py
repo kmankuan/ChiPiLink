@@ -116,11 +116,11 @@ class PointsEarnRule(BaseModel):
     """Regla to win ChipiPoints"""
     rule_id: str = Field(default_factory=lambda: f"rule_{uuid.uuid4().hex[:8]}")
     
-    # Nombre y descripción
+    # Nombre y description
     name: Dict[str, str]
     description: Dict[str, str] = {}
     
-    # Type of acción que otorga puntos
+    # Type of action que otorga puntos
     earn_type: PointsEarnType
     
     # Points a otorgar
@@ -188,7 +188,7 @@ class Wallet(BaseModel):
 # ============== TRANSACCIONES ==============
 
 class Transaction(BaseModel):
-    """Transacción en la billetera"""
+    """Transaction en la billetera"""
     transaction_id: str = Field(default_factory=lambda: f"txn_{uuid.uuid4().hex[:8]}")
     
     # Wallet
@@ -207,7 +207,7 @@ class Transaction(BaseModel):
     balance_before: float = 0
     balance_after: float = 0
     
-    # For transacciones mixtas (USD + Puntos)
+    # For transactions mixtas (USD + Puntos)
     usd_amount: Optional[float] = None
     points_amount: Optional[int] = None
     

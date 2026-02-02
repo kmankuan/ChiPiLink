@@ -300,7 +300,7 @@ async def eliminar_patrocinador(sponsor_id: str):
 
 @router.get("/config/layout", response_model=dict)
 async def obtener_layout_config():
-    """Get configuración del layout de TV"""
+    """Get configuration del layout de TV"""
     from main import db
     
     config = await db.pingpong_config.find_one(
@@ -327,7 +327,7 @@ async def obtener_layout_config():
 
 @router.put("/config/layout", response_model=dict)
 async def actualizar_layout_config(config: TVLayoutConfig):
-    """Update configuración del layout de TV"""
+    """Update configuration del layout de TV"""
     from main import db
     
     config_doc = {
@@ -347,7 +347,7 @@ async def actualizar_layout_config(config: TVLayoutConfig):
 
 @router.put("/config/space/{space_id}", response_model=dict)
 async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceConfig):
-    """Update configuración de un espacio específico"""
+    """Update configuration de un espacio específico"""
     from main import db
     
     # Get current config

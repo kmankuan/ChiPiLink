@@ -26,7 +26,7 @@ async def get_current_season(lang: str = Query("es")):
     if not season:
         return {"season": None, "message": "No active season"}
     
-    # Localizar nombre y descripción
+    # Localizar nombre y description
     season["localized_name"] = season["name"].get(lang, season["name"].get("es"))
     season["localized_description"] = season["description"].get(lang, season["description"].get("es"))
     

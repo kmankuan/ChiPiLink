@@ -277,7 +277,7 @@ class UserProfileService(BaseService):
         role_2: Dict[str, str] = None,
         permissions: Dict = None
     ) -> Dict:
-        """Create relación entre usuarios"""
+        """Create relationship entre usuarios"""
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
@@ -314,7 +314,7 @@ class UserProfileService(BaseService):
         return relationship
     
     async def get_user_relationships(self, user_id: str) -> List[Dict]:
-        """Get all relaciones de un usuario"""
+        """Get all relationships de un usuario"""
         cursor = db.chipi_user_relationships.find(
             {
                 "$or": [
@@ -387,7 +387,7 @@ class UserProfileService(BaseService):
         return None
     
     async def update_relationship(self, relationship_id: str, updates: Dict) -> Optional[Dict]:
-        """Update una relación"""
+        """Update una relationship"""
         result = await db.chipi_user_relationships.find_one_and_update(
             {"relationship_id": relationship_id},
             {"$set": updates},
@@ -398,7 +398,7 @@ class UserProfileService(BaseService):
         return result
     
     async def deactivate_relationship(self, relationship_id: str) -> bool:
-        """Desactivar una relación"""
+        """Desactivar una relationship"""
         result = await db.chipi_user_relationships.update_one(
             {"relationship_id": relationship_id},
             {"$set": {"is_active": False}}

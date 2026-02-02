@@ -6,7 +6,7 @@ from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 
 from core.auth import get_current_user, get_admin_user
-from ..services.connections_service import conexiones_service
+from ..services.connections_service import connections_service
 
 router = APIRouter(prefix="/connections", tags=["Connections"])
 
@@ -98,8 +98,8 @@ class CapabilityCreateRequest(BaseModel):
 @router.get("/my-connections")
 async def get_my_connections(user: dict = Depends(get_current_user)):
     """Get my connections"""
-    conexiones = await conexiones_service.get_conexiones(user["user_id"])
-    return {"conexiones": conexiones}
+    connections = await connections_service.get_connections(user["user_id"])
+    return {"connections": connections}
 
 
 @router.post("/request")
@@ -108,7 +108,7 @@ async def create_connection_request(
     user: dict = Depends(get_current_user)
 ):
     """Create a connection request to another user"""
-    result = await conexiones_service.crear_solicitud(
+    result = await connections_service.crear_request(
         de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
         tipo=request.tipo,
@@ -126,15 +126,15 @@ async def create_connection_request(
 @router.get("/requests/received")
 async def get_received_requests(user: dict = Depends(get_current_user)):
     """Get received connection requests"""
-    solicitudes = await conexiones_service.get_solicitudes_pendientes(user["user_id"])
-    return {"solicitudes": solicitudes}
+    requestes = await connections_service.get_requestes_pendientes(user["user_id"])
+    return {"requestes": requestes}
 
 
 @router.get("/requests/sent")
 async def get_sent_requests(user: dict = Depends(get_current_user)):
     """Get sent connection requests"""
-    solicitudes = await conexiones_service.get_solicitudes_enviadas(user["user_id"])
-    return {"solicitudes": solicitudes}
+    requestes = await connections_service.get_requestes_enviadas(user["user_id"])
+    return {"requestes": requestes}
 
 
 @router.post("/requests/{request_id}/respond")
@@ -144,8 +144,8 @@ async def respond_to_request(
     user: dict = Depends(get_current_user)
 ):
     """Respond to a connection request"""
-    result = await conexiones_service.responder_solicitud(
-        solicitud_id=request_id,
+    result = await connections_service.responder_request(
+        request_id=request_id,
         aceptar=request.aceptar,
         respondido_por=user["user_id"]
     )
@@ -162,7 +162,7 @@ async def delete_connection(
     user: dict = Depends(get_current_user)
 ):
     """Delete a connection"""
-    result = await conexiones_service.eliminar_conexion(user["user_id"], connection_id)
+    result = await connections_service.eliminar_conexion(user["user_id"], connection_id)
     
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
@@ -178,7 +178,7 @@ async def create_invitation(
     user: dict = Depends(get_current_user)
 ):
     """Invite an unregistered user"""
-    result = await conexiones_service.crear_invitacion(
+    result = await connections_service.crear_invitacion(
         invitado_por_id=user["user_id"],
         email=request.email,
         nombre=request.nombre,
@@ -202,8 +202,8 @@ async def create_invitation(
 @router.get("/my-dependents")
 async def get_my_dependents(user: dict = Depends(get_current_user)):
     """Get my dependent users"""
-    conexiones = await conexiones_service.get_conexiones(user["user_id"])
-    acudidos = [c for c in conexiones if c.get("subtipo") == "acudido"]
+    connections = await connections_service.get_connections(user["user_id"])
+    acudidos = [c for c in connections if c.get("subtipo") == "acudido"]
     return {"acudidos": acudidos}
 
 
@@ -213,7 +213,7 @@ async def create_dependent(
     user: dict = Depends(get_current_user)
 ):
     """Create a dependent user (managed account)"""
-    result = await conexiones_service.crear_acudido(
+    result = await connections_service.crear_acudido(
         acudiente_id=user["user_id"],
         nombre=request.nombre,
         apellido=request.apellido,
@@ -237,7 +237,7 @@ async def transfer_wallet(
     user: dict = Depends(get_current_user)
 ):
     """Transfer balance to another user"""
-    result = await conexiones_service.transferir_wallet(
+    result = await connections_service.transferir_wallet(
         de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
         monto=request.monto,
@@ -255,14 +255,14 @@ async def transfer_wallet(
 @router.get("/capabilities")
 async def get_available_capabilities():
     """Get all configured capabilities"""
-    capacidades = await conexiones_service.get_capacidades_config()
+    capacidades = await connections_service.get_capacidades_config()
     return {"capacidades": capacidades}
 
 
 @router.get("/my-capabilities")
 async def get_my_capabilities(user: dict = Depends(get_current_user)):
     """Get my active capabilities"""
-    capacidades = await conexiones_service.get_capacidades_usuario(user["user_id"])
+    capacidades = await connections_service.get_capacidades_usuario(user["user_id"])
     return {"capacidades": capacidades}
 
 
@@ -271,7 +271,7 @@ async def get_my_capabilities(user: dict = Depends(get_current_user)):
 @router.get("/suggested-services")
 async def get_suggested_services(user: dict = Depends(get_current_user)):
     """Get suggested services/memberships for the user"""
-    servicios = await conexiones_service.get_servicios_sugeridos(user["user_id"])
+    servicios = await connections_service.get_servicios_sugeridos(user["user_id"])
     return {"servicios": servicios}
 
 
@@ -286,7 +286,7 @@ async def search_users(
     if len(q) < 2:
         return {"usuarios": []}
     
-    usuarios = await conexiones_service.buscar_usuarios(
+    usuarios = await connections_service.buscar_usuarios(
         query=q,
         excluir_user_id=user["user_id"]
     )
@@ -302,8 +302,8 @@ async def admin_respond_to_request(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: Respond to connection request on behalf of user"""
-    result = await conexiones_service.responder_solicitud(
-        solicitud_id=request_id,
+    result = await connections_service.responder_request(
+        request_id=request_id,
         aceptar=request.aceptar,
         respondido_por=admin["user_id"],
         es_admin=True
@@ -322,7 +322,7 @@ async def admin_create_dependent(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: Create dependent user for a guardian"""
-    result = await conexiones_service.crear_acudido(
+    result = await connections_service.crear_acudido(
         acudiente_id=acudiente_id,
         nombre=request.nombre,
         apellido=request.apellido,
@@ -346,7 +346,7 @@ async def admin_grant_capability(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: Grant capability to a user"""
-    result = await conexiones_service.otorgar_capacidad(
+    result = await connections_service.otorgar_capacidad(
         user_id=request.user_id,
         capacidad_id=request.capacidad_id,
         otorgado_por=admin["user_id"],
@@ -366,7 +366,7 @@ async def admin_configure_marketing(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: Configure marketing for a user"""
-    result = await conexiones_service.configurar_marketing_usuario(
+    result = await connections_service.configurar_marketing_usuario(
         user_id=user_id,
         mostrar_servicios=request.mostrar_servicios,
         servicios_sugeridos=request.servicios_sugeridos,
@@ -382,12 +382,12 @@ async def admin_get_pending_requests(
 ):
     """Admin: Get all pending connection requests"""
     from core.database import db
-    cursor = db.solicitudes_conexion.find(
+    cursor = db.requestes_conexion.find(
         {"estado": "pendiente"},
         {"_id": 0}
     ).sort("creado_en", -1)
-    solicitudes = await cursor.to_list(length=100)
-    return {"solicitudes": solicitudes}
+    requestes = await cursor.to_list(length=100)
+    return {"requestes": requestes}
 
 
 # ============== ALERT ENDPOINTS ==============
@@ -406,7 +406,7 @@ async def create_balance_alert(
     wallet = user.get("wallet", {})
     saldo_actual = wallet.get("USD", 0)
     
-    result = await conexiones_service.crear_alerta_saldo_insuficiente(
+    result = await connections_service.crear_alerta_saldo_insuficiente(
         usuario_id=user["user_id"],
         monto_requerido=request.monto_requerido,
         saldo_actual=saldo_actual,

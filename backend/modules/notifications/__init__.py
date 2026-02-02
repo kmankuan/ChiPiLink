@@ -3,8 +3,8 @@ Notifications Module - System for push notifications y posts
 
 Características:
 - Soporte multi-proveedor (FCM + OneSignal) con failover
-- Categorías de notificación configurables
-- Preferencias de usuario por categoría
+- Categorías de notification configurables
+- Preferencias de usuario por category
 - Editor avanzado de posts con bloques
 - Programación de contenido
 - Integración con CRM (placeholders para Monday.com y Fusebase)
@@ -15,7 +15,7 @@ from .services.post_service import post_service
 
 
 async def init_module():
-    """Inicializar módulo de notificaciones"""
+    """Inicializar module de notifications"""
     print("[Notifications Module] Initializing...")
     await push_notification_service.initialize()
     print("[Notifications Module] Initialized successfully")

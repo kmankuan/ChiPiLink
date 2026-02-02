@@ -169,7 +169,7 @@ class RankRewardsService(BaseService):
     ) -> Optional[Dict]:
         """
         Verificar si the player subió de rango y otorgar recompensas.
-        Retorna información de la promoción si hubo una.
+        Retorna information de la promoción si hubo una.
         """
         old_rank = self.get_rank_by_points(old_points)
         new_rank = self.get_rank_by_points(new_points)
@@ -369,7 +369,7 @@ class RankRewardsService(BaseService):
         return await cursor.to_list(length=20)
     
     async def get_rank_rewards_info(self, lang: str = "es") -> List[Dict]:
-        """Get información de recompensas por rango (para mostrar en UI)"""
+        """Get information de recompensas por rango (para mostrar en UI)"""
         result = []
         
         for rank in RANK_DEFINITIONS:

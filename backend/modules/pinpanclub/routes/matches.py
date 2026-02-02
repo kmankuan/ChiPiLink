@@ -78,7 +78,7 @@ async def update_score(
     data: MatchScoreUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update puntuación dthe match"""
+    """Update score dthe match"""
     match = await match_service.update_score(partido_id, data.accion)
     if not match:
         raise HTTPException(status_code=400, detail="No se puede actualizar the match")

@@ -228,7 +228,7 @@ async def cancel_membership(
 
 @router.get("/visits/config")
 async def get_visit_config():
-    """Get configuración de visitas"""
+    """Get configuration de visitas"""
     config = await membership_service.get_visit_config()
     return {"success": True, "config": config}
 
@@ -238,7 +238,7 @@ async def update_visit_config(
     data: UpdateVisitConfigRequest,
     admin=Depends(get_admin_user)
 ):
-    """Update configuración de visitas (admin)"""
+    """Update configuration de visitas (admin)"""
     updates = {k: v for k, v in data.model_dump().items() if v is not None}
     
     if not updates:

@@ -1,6 +1,6 @@
 """
 PinpanClub - Modelos Pydantic
-Definición de schemas para el módulo
+Definición de schemas para el module
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
@@ -95,7 +95,7 @@ class MatchCreate(MatchBase):
 
 
 class MatchScoreUpdate(BaseModel):
-    """Update puntuación"""
+    """Update score"""
     accion: str  # 'punto_a', 'punto_b', 'undo', 'reset_set'
 
 

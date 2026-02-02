@@ -71,7 +71,7 @@ class ConnectionManager:
             "type": "connected",
             "room": room,
             "message": {
-                "es": "Conectado al canal de notificaciones",
+                "es": "Conectado al canal de notifications",
                 "en": "Connected to notification channel",
                 "zh": "已连接到通知频道"
             }

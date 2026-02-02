@@ -52,8 +52,8 @@ from .events import setup_event_handlers, PinpanClubEvents
 
 def init_module():
     """
-    Inicializar el módulo PinpanClub.
-    Llamar esta función al iniciar la aplicación.
+    Inicializar el module PinpanClub.
+    Llamar esta function al iniciar la application.
     """
     # Configurar event handlers
     setup_event_handlers()

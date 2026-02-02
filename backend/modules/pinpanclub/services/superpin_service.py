@@ -503,7 +503,7 @@ class SuperPinService(BaseService):
         if not league:
             raise ValueError("Liga not found")
         
-        # Get participantes según configuración
+        # Get participantes según configuration
         ranking = await self.get_ranking(data.liga_id)
         tournament_config = league.tournament_config
         
@@ -513,7 +513,7 @@ class SuperPinService(BaseService):
                 for e in ranking.entries[:tournament_config.top_n_players]
             ]
         elif tournament_config.tournament_type == "by_category":
-            # By categorías
+            # By categorys
             participantes = []
             for cat in tournament_config.categories:
                 cat_players = [
@@ -541,7 +541,7 @@ class SuperPinService(BaseService):
         return SeasonTournament(**result)
     
     async def generate_tournament_brackets(self, torneo_id: str) -> dict:
-        """Generar brackets para torneo de eliminación simple"""
+        """Generar brackets para torneo de deletion simple"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
             raise ValueError("Torneo not found")
@@ -722,7 +722,7 @@ class SuperPinService(BaseService):
         return {"success": True, "brackets": brackets}
     
     async def get_tournament_with_brackets(self, torneo_id: str) -> dict:
-        """Get torneo con información completa de brackets"""
+        """Get torneo con information completa de brackets"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
             return None

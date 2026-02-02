@@ -114,7 +114,7 @@ class MatchService(BaseService):
         accion: str
     ) -> Optional[Match]:
         """
-        Actualizar puntuación dthe match.
+        Actualizar score dthe match.
         Maneja lógica de sets y determina ganador.
         Emite eventos: score_updated, set_completed, match_finished
         """
@@ -134,7 +134,7 @@ class MatchService(BaseService):
         set_actual = match.set_actual
         historial = match.historial_sets.copy() if match.historial_sets else []
         
-        # Procesar acción
+        # Procesar action
         if accion == "punto_a":
             puntos_a += 1
         elif accion == "punto_b":
@@ -260,13 +260,13 @@ class MatchService(BaseService):
     
     # WebSocket management
     def register_websocket(self, partido_id: str, websocket) -> None:
-        """Register conexión WebSocket para un partido"""
+        """Register connection WebSocket para un partido"""
         if partido_id not in self._websocket_connections:
             self._websocket_connections[partido_id] = set()
         self._websocket_connections[partido_id].add(websocket)
     
     def unregister_websocket(self, partido_id: str, websocket) -> None:
-        """Desregistrar conexión WebSocket"""
+        """Desregistrar connection WebSocket"""
         if partido_id in self._websocket_connections:
             self._websocket_connections[partido_id].discard(websocket)
     
@@ -288,7 +288,7 @@ class MatchService(BaseService):
             except Exception:
                 dead_connections.add(ws)
         
-        # Clean conexiones muertas
+        # Clean connections muertas
         for ws in dead_connections:
             self._websocket_connections[partido_id].discard(ws)
     

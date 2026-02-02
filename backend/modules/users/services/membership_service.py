@@ -482,7 +482,7 @@ class MembershipService:
     # ============== VISIT TRACKING ==============
     
     async def get_visit_config(self) -> Dict:
-        """Get configuración de visitas"""
+        """Get configuration de visitas"""
         config = await db[self.collection_visit_config].find_one(
             {"config_id": "visit_config"},
             {"_id": 0}
@@ -494,7 +494,7 @@ class MembershipService:
         return config
     
     async def _initialize_visit_config(self) -> Dict:
-        """Inicializar configuración de visitas"""
+        """Inicializar configuration de visitas"""
         config = {
             "config_id": "visit_config",
             "min_duration_minutes": 30,  # Mínimo para contar como visita regular
@@ -515,7 +515,7 @@ class MembershipService:
         return config
     
     async def update_visit_config(self, updates: Dict) -> Dict:
-        """Update configuración de visitas"""
+        """Update configuration de visitas"""
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_visit_config].find_one_and_update(
@@ -604,7 +604,7 @@ class MembershipService:
         check_in_time = datetime.fromisoformat(visit["check_in_time"].replace('Z', '+00:00'))
         duration_minutes = int((now - check_in_time).total_seconds() / 60)
         
-        # Get configuración
+        # Get configuration
         config = await self.get_visit_config()
         min_duration = config.get("min_duration_minutes", 30)
         quick_max = config.get("quick_visit_max_minutes", 15)

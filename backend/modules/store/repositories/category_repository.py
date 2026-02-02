@@ -1,6 +1,6 @@
 """
 Store Module - Category Repository
-Acceso a datos de categorías
+Acceso a datos de categorys
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from core.constants import StoreCollections
 
 class CategoryRepository(BaseRepository):
     """
-    Repository para categorías de productos.
+    Repository para categorys de productos.
     """
     
     COLLECTION_NAME = StoreCollections.CATEGORIES
@@ -33,18 +33,18 @@ class CategoryRepository(BaseRepository):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, category_data: Dict) -> Dict:
-        """Create nueva categoría"""
+        """Create nueva category"""
         if not category_data.get("categoria_id"):
             category_data["categoria_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         category_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(category_data)
     
     async def get_by_id(self, categoria_id: str) -> Optional[Dict]:
-        """Get categoría by ID"""
+        """Get category by ID"""
         return await self.find_by_id(self.ID_FIELD, categoria_id)
     
     async def get_all_active(self) -> List[Dict]:
-        """Get all categorías activas"""
+        """Get all categorys activas"""
         categories = await self.find_many(
             query={"activo": True},
             sort=[("orden", 1)]
@@ -55,15 +55,15 @@ class CategoryRepository(BaseRepository):
         return categories
     
     async def update_category(self, categoria_id: str, data: Dict) -> bool:
-        """Update categoría"""
+        """Update category"""
         return await self.update_by_id(self.ID_FIELD, categoria_id, data)
     
     async def deactivate(self, categoria_id: str) -> bool:
-        """Desactivar categoría"""
+        """Desactivar category"""
         return await self.update_category(categoria_id, {"activo": False})
     
     async def count_products(self, categoria_id: str) -> int:
-        """Contar productos en una categoría"""
+        """Contar productos en una category"""
         return await db[StoreCollections.PRODUCTS].count_documents({
             "categoria": categoria_id,
             "activo": True

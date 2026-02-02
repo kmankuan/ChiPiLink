@@ -1,6 +1,6 @@
 """
 Store Module - Category Routes
-Endpoints for management of categorías usando el Service Layer
+Endpoints for management of categorys usando el Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
@@ -14,13 +14,13 @@ router = APIRouter(prefix="/categories", tags=["Store - Categories"])
 
 @router.get("", response_model=List[Category])
 async def get_categories():
-    """Get all categorías activas"""
+    """Get all categorys activas"""
     return await category_service.get_all_categories()
 
 
 @router.get("/{categoria_id}", response_model=Category)
 async def get_category(categoria_id: str):
-    """Get categoría by ID"""
+    """Get category by ID"""
     category = await category_service.get_category(categoria_id)
     if not category:
         raise HTTPException(status_code=404, detail="Categoría not found")
@@ -29,7 +29,7 @@ async def get_category(categoria_id: str):
 
 @router.get("/{categoria_id}/landing")
 async def get_category_landing(categoria_id: str):
-    """Get datos completos para landing de categoría"""
+    """Get datos completos para landing de category"""
     return await category_service.get_category_landing(categoria_id)
 
 
@@ -38,7 +38,7 @@ async def create_category(
     data: CategoryCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nueva categoría (solo admin)"""
+    """Create nueva category (solo admin)"""
     return await category_service.create_category(data)
 
 
@@ -48,7 +48,7 @@ async def update_category(
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update categoría (solo admin)"""
+    """Update category (solo admin)"""
     category = await category_service.update_category(categoria_id, data)
     if not category:
         raise HTTPException(status_code=404, detail="Categoría not found")
@@ -60,7 +60,7 @@ async def delete_category(
     categoria_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Delete categoría - soft delete (solo admin)"""
+    """Delete category - soft delete (solo admin)"""
     try:
         success = await category_service.delete_category(categoria_id)
         if not success:

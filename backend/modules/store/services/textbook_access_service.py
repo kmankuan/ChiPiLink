@@ -474,7 +474,7 @@ class TextbookAccessService(BaseService):
             # Create notification for admins
             notification = {
                 "type": "textbook_access_request",
-                "title": "Nueva solicitud de acceso a textos",
+                "title": "Nueva request de acceso a textos",
                 "message": f"{user.get('name', 'Usuario')} solicita acceso para {student['full_name']} ({enrollment['grade']}, {enrollment['year']})",
                 "data": {
                     "student_id": student["student_id"],
@@ -496,13 +496,13 @@ class TextbookAccessService(BaseService):
                 RequestStatus.APPROVED: "aprobada",
                 RequestStatus.REJECTED: "rechazada",
                 RequestStatus.IN_REVIEW: "en revisión",
-                RequestStatus.INFO_REQUIRED: "requiere información adicional"
+                RequestStatus.INFO_REQUIRED: "requiere information adicional"
             }
             
             notification = {
                 "type": "textbook_access_status",
-                "title": "Actualización de solicitud de textos",
-                "message": f"Tu solicitud para {student['full_name']} ha sido {status_messages.get(status, status.value)}",
+                "title": "Actualización de request de textos",
+                "message": f"Tu request para {student['full_name']} ha sido {status_messages.get(status, status.value)}",
                 "data": {
                     "student_id": student["student_id"],
                     "year": year,

@@ -364,7 +364,7 @@ async def search_profiles(
 
 @router.get("/relationships")
 async def get_my_relationships(user=Depends(get_current_user)):
-    """Get mis relaciones"""
+    """Get mis relationships"""
     relationships = await user_profile_service.get_user_relationships(user["user_id"])
     return {"success": True, "relationships": relationships, "count": len(relationships)}
 
@@ -388,7 +388,7 @@ async def create_relationship(
     data: CreateRelationshipRequest,
     user=Depends(get_current_user)
 ):
-    """Create una relación con otro usuario"""
+    """Create una relationship con otro usuario"""
     try:
         rel_type = RelationshipType(data.relationship_type)
     except ValueError:
@@ -420,7 +420,7 @@ async def update_relationship(
     updates: dict,
     user=Depends(get_current_user)
 ):
-    """Update una relación"""
+    """Update una relationship"""
     result = await user_profile_service.update_relationship(relationship_id, updates)
     if not result:
         raise HTTPException(status_code=404, detail="Relationship not found")
@@ -432,7 +432,7 @@ async def deactivate_relationship(
     relationship_id: str,
     user=Depends(get_current_user)
 ):
-    """Desactivar una relación"""
+    """Desactivar una relationship"""
     success = await user_profile_service.deactivate_relationship(relationship_id)
     if not success:
         raise HTTPException(status_code=404, detail="Relationship not found")

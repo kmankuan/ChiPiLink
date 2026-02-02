@@ -225,7 +225,7 @@ class AchievementsService(BaseService):
                 upsert=True
             )
         
-        # Create notificación
+        # Create notification
         try:
             from .social_service import social_service
             await social_service.create_notification(NotificationCreate(

@@ -55,7 +55,7 @@ class ProductRepository(BaseRepository):
         return await self.find_many(query=query, skip=skip, limit=limit)
     
     async def get_by_category(self, categoria: str, limit: int = 100) -> List[Dict]:
-        """Get productos por categoría"""
+        """Get productos por category"""
         return await self.find_many(
             query={"categoria": categoria, "activo": True},
             limit=limit

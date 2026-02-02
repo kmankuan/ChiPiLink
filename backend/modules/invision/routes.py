@@ -121,7 +121,7 @@ async def oauth_callback(
     if not laopan_user:
         raise HTTPException(
             status_code=500,
-            detail="Error al obtener información of the user"
+            detail="Error al obtener information of the user"
         )
     
     # Authenticate/create user

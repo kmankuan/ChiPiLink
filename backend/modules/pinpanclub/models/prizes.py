@@ -28,7 +28,7 @@ class PrizeStatus(str, Enum):
 
 
 class PrizeConditionType(str, Enum):
-    """Tipos de condición to win premio"""
+    """Tipos de condition to win premio"""
     POSITION = "position"        # By ranking position (1°, 2°, 3°...)
     PARTICIPATION = "participation"  # By participar
     MATCHES_PLAYED = "matches_played"  # By number of matches played

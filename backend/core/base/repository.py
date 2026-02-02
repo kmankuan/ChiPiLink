@@ -1,6 +1,6 @@
 """
 Base Repository - Capa de acceso a datos
-Cada módulo tendrá su propio repository que hereda de esta clase base
+Cada module tendrá su propio repository que hereda de esta clase base
 """
 from typing import Dict, List, Optional, Any, TypeVar, Generic
 from datetime import datetime, timezone
@@ -20,7 +20,7 @@ class BaseRepository(ABC, Generic[T]):
     - Migración a diferentes bases de datos
     - Separación en microservicios
     
-    Cada módulo implementa su propio repository heredando de esta clase.
+    Cada module implementa su propio repository heredando de esta clase.
     """
     
     def __init__(self, db, collection_name: str):

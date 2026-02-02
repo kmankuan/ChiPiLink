@@ -27,7 +27,7 @@ class ChallengeType(str, Enum):
     DAILY_PLAY = "daily_play"              # Jugar X días diferentes
     COMEBACK = "comeback"                  # Win while behind on score
     PERFECT_GAME = "perfect_game"          # Ganar sin perder puntos (11-0)
-    SOCIAL = "social"                      # Interacciones sociales
+    SOCIAL = "social"                      # Interactions sociales
     CUSTOM = "custom"                      # Personalizado
 
 

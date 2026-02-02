@@ -1,6 +1,6 @@
 """
 PinpanClub - Event Handlers
-Manejadores de eventos para integración entre módulos
+Manejadores de eventos para integración entre modules
 """
 import logging
 from core.events import event_bus, Event, PinpanClubEvents
@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 def setup_event_handlers():
     """
-    Configurar handlers de eventos del módulo PinpanClub.
-    Llamar esta función al iniciar la aplicación.
+    Configurar handlers de eventos del module PinpanClub.
+    Llamar esta function al iniciar la application.
     """
     
     @event_bus.subscribe(PinpanClubEvents.MATCH_FINISHED)
@@ -57,7 +57,7 @@ def setup_event_handlers():
     @event_bus.subscribe("pinpanclub.*")
     async def log_all_pinpanclub_events(event: Event):
         """
-        Log de todos los eventos del módulo (para debugging/auditoría).
+        Log de todos los eventos del module (para debugging/auditoría).
         """
         logger.debug(
             f"[PINPANCLUB EVENT] {event.event_type}: {event.payload}"

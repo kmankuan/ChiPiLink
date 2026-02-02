@@ -1,6 +1,6 @@
 """
 Social Features - API Routes
-Seguimientos, comentarios, reacciones, notificaciones
+Seguimientos, comentarios, reactions, notifications
 """
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
@@ -101,23 +101,23 @@ async def delete_comment(comment_id: str):
 
 @router.post("/reactions", response_model=Reaction)
 async def add_reaction(data: ReactionCreate):
-    """Añadir o cambiar reacción"""
+    """Añadir o cambiar reaction"""
     try:
         return await social_service.add_reaction(data)
     except ValueError as e:
-        # Reacción eliminada
+        # Reaction eliminada
         return {"message": str(e), "removed": True}
 
 
 @router.get("/reactions/{target_type}/{target_id}", response_model=ReactionSummary)
 async def get_reactions(target_type: str, target_id: str):
-    """Get resumen de reacciones"""
+    """Get resumen de reactions"""
     return await social_service.get_reactions(target_id, target_type)
 
 
 @router.get("/reactions/{target_type}/{target_id}/user/{user_id}")
 async def get_user_reaction(target_type: str, target_id: str, user_id: str):
-    """Get reacción de un usuario específico"""
+    """Get reaction de un usuario específico"""
     reaction = await social_service.get_user_reaction(user_id, target_id, target_type)
     return {"user_id": user_id, "reaction_type": reaction}
 
@@ -146,7 +146,7 @@ async def get_notifications(
     unread_only: bool = False,
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Get notificaciones de un usuario"""
+    """Get notifications de un usuario"""
     notifications = await social_service.get_notifications(user_id, unread_only, limit)
     unread_count = await social_service.get_unread_count(user_id)
     return {
@@ -158,21 +158,21 @@ async def get_notifications(
 
 @router.get("/notifications/{user_id}/unread-count")
 async def get_unread_count(user_id: str):
-    """Get cantidad de notificaciones no leídas"""
+    """Get cantidad de notifications no leídas"""
     count = await social_service.get_unread_count(user_id)
     return {"user_id": user_id, "unread_count": count}
 
 
 @router.post("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str):
-    """Marcar notificación como leída"""
+    """Marcar notification como leída"""
     success = await social_service.mark_notification_read(notification_id)
     return {"success": success}
 
 
 @router.post("/notifications/{user_id}/read-all")
 async def mark_all_notifications_read(user_id: str):
-    """Marcar todas las notificaciones como leídas"""
+    """Marcar todas las notifications como leídas"""
     count = await social_service.mark_all_notifications_read(user_id)
     return {"user_id": user_id, "marked_count": count}
 

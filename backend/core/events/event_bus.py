@@ -1,5 +1,5 @@
 """
-Event Bus - Sistema de eventos interno para comunicación entre módulos
+Event Bus - Sistema de eventos interno para comunicación entre modules
 Preparado para escalar a Redis/RabbitMQ en el futuro
 """
 import asyncio
@@ -49,7 +49,7 @@ class Event:
 
 class EventBus:
     """
-    Event Bus interno para comunicación entre módulos.
+    Event Bus interno para comunicación entre modules.
     
     Características:
     - Pub/Sub asíncrono
@@ -218,7 +218,7 @@ event_bus = EventBus()
 
 # === Event Types Constants ===
 class PinpanClubEvents:
-    """Tipos de eventos del módulo PinpanClub"""
+    """Tipos de eventos del module PinpanClub"""
     # Matches
     MATCH_CREATED = "pinpanclub.match.created"
     MATCH_STARTED = "pinpanclub.match.started"
@@ -243,7 +243,7 @@ class PinpanClubEvents:
 
 
 class StoreEvents:
-    """Tipos de eventos del módulo Store"""
+    """Tipos de eventos del module Store"""
     ORDER_CREATED = "store.order.created"
     ORDER_PAID = "store.order.paid"
     ORDER_SHIPPED = "store.order.shipped"
@@ -256,7 +256,7 @@ class StoreEvents:
 
 
 class AuthEvents:
-    """Tipos de eventos del módulo Auth"""
+    """Tipos de eventos del module Auth"""
     USER_REGISTERED = "auth.user.registered"
     USER_LOGGED_IN = "auth.user.logged_in"
     USER_LOGGED_OUT = "auth.user.logged_out"
@@ -264,7 +264,7 @@ class AuthEvents:
 
 
 class CommunityEvents:
-    """Tipos de eventos del módulo Community"""
+    """Tipos de eventos del module Community"""
     POST_CREATED = "community.post.created"
     POST_UPDATED = "community.post.updated"
     POST_DELETED = "community.post.deleted"

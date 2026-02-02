@@ -1,6 +1,6 @@
 """
 Auth Module - Event Handlers
-Manejadores de eventos para el módulo de autenticación
+Manejadores de eventos para el module de autenticación
 """
 import logging
 from datetime import datetime, timezone
@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 
 def setup_event_handlers():
     """
-    Configurar handlers de eventos del módulo Auth.
+    Configurar handlers de eventos del module Auth.
     """
     
     @event_bus.subscribe(AuthEvents.USER_REGISTERED)
     async def on_user_registered(event: Event):
         """
-        Crear notificación cuando se registra un usuario.
+        Crear notification cuando se registra un usuario.
         """
         payload = event.payload
         
@@ -32,7 +32,7 @@ def setup_event_handlers():
             "fecha_creacion": datetime.now(timezone.utc).isoformat()
         }
         
-        await db.notificaciones.insert_one(notificacion)
+        await db.notifications.insert_one(notificacion)
         logger.info(f"User registered notification created: {payload.get('user_id')}")
     
     @event_bus.subscribe(AuthEvents.USER_LOGGED_IN)
@@ -53,7 +53,7 @@ def setup_event_handlers():
     @event_bus.subscribe("auth.*")
     async def log_all_auth_events(event: Event):
         """
-        Log de todos los eventos del módulo Auth.
+        Log de todos los eventos del module Auth.
         """
         logger.debug(f"[AUTH EVENT] {event.event_type}: {event.payload}")
     
