@@ -1,9 +1,10 @@
 /**
- * Challenge Modal - Seleccionar oponente para desafiar
- * 我要挑战 - Quiero desafiar
+ * Challenge Modal - Select opponent to challenge
+ * 我要挑战 - I want to challenge
  */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Dialog,
@@ -36,84 +37,11 @@ import { toast } from 'sonner';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
 
-// Textos multi-idioma
-const texts = {
-  es: {
-    challengeBtn: '我要挑战',
-    challengeSubtitle: 'Quiero desafiar',
-    selectOpponent: 'Seleccionar Oponente',
-    selectOpponentDesc: 'Elige a quién quieres desafiar',
-    searchPlaceholder: 'Buscar jugador...',
-    noPlayers: 'No hay jugadores disponibles',
-    challenge: 'Desafiar',
-    wins: 'V',
-    losses: 'D',
-    confirmTitle: '¿Confirmar desafío?',
-    confirmDesc: 'Vas a desafiar a',
-    confirmNote: 'El jugador recibirá una notificación y deberá aceptar el desafío.',
-    cancel: 'Cancelar',
-    confirm: 'Confirmar Desafío',
-    sending: 'Enviando...',
-    success: '¡Desafío enviado!',
-    successDesc: 'Esperando respuesta del oponente',
-    error: 'Error al enviar desafío',
-    loginRequired: 'Debes iniciar sesión para desafiar',
-    cantChallengeSelf: 'No puedes desafiarte a ti mismo',
-    points: 'pts'
-  },
-  en: {
-    challengeBtn: '我要挑战',
-    challengeSubtitle: 'I want to challenge',
-    selectOpponent: 'Select Opponent',
-    selectOpponentDesc: 'Choose who you want to challenge',
-    searchPlaceholder: 'Search player...',
-    noPlayers: 'No players available',
-    challenge: 'Challenge',
-    wins: 'W',
-    losses: 'L',
-    confirmTitle: 'Confirm challenge?',
-    confirmDesc: 'You are about to challenge',
-    confirmNote: 'The player will receive a notification and must accept the challenge.',
-    cancel: 'Cancel',
-    confirm: 'Confirm Challenge',
-    sending: 'Sending...',
-    success: 'Challenge sent!',
-    successDesc: 'Waiting for opponent response',
-    error: 'Error sending challenge',
-    loginRequired: 'You must log in to challenge',
-    cantChallengeSelf: 'You cannot challenge yourself',
-    points: 'pts'
-  },
-  zh: {
-    challengeBtn: '我要挑战',
-    challengeSubtitle: '选择对手',
-    selectOpponent: '选择对手',
-    selectOpponentDesc: '选择你要挑战的人',
-    searchPlaceholder: '搜索玩家...',
-    noPlayers: '没有可用的玩家',
-    challenge: '挑战',
-    wins: '胜',
-    losses: '负',
-    confirmTitle: '确认挑战？',
-    confirmDesc: '你将要挑战',
-    confirmNote: '玩家将收到通知并必须接受挑战。',
-    cancel: '取消',
-    confirm: '确认挑战',
-    sending: '发送中...',
-    success: '挑战已发送！',
-    successDesc: '等待对手回应',
-    error: '发送挑战时出错',
-    loginRequired: '你必须登录才能挑战',
-    cantChallengeSelf: '你不能挑战自己',
-    points: '分'
-  }
-};
-
 export default function ChallengeModal({ 
   seasonId, 
-  onChallengeCreated,
-  lang = 'es' 
+  onChallengeCreated
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -125,7 +53,6 @@ export default function ChallengeModal({
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
 
-  const txt = texts[lang] || texts.es;
   const currentUserId = user?.user_id;
 
   useEffect(() => {
