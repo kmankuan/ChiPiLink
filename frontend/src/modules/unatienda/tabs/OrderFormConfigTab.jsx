@@ -203,21 +203,21 @@ export default function OrderFormConfigTab() {
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        toast.success('Campo actualizado');
+        toast.success('Field updated');
       } else {
         await axios.post(
           `${API_URL}/api/store/order-form-config/admin/fields`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        toast.success('Campo creado');
+        toast.success('Field created');
       }
 
       setShowFieldDialog(false);
       fetchData();
     } catch (error) {
       console.error('Error saving field:', error);
-      toast.error('Error al guardar campo');
+      toast.error('Error saving field');
     } finally {
       setSaving(false);
     }
@@ -230,25 +230,25 @@ export default function OrderFormConfigTab() {
         { active: !field.active },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success(field.active ? 'Campo desactivado' : 'Campo activado');
+      toast.success(field.active ? 'Field deactivated' : 'Field activated');
       fetchData();
     } catch (error) {
-      toast.error('Error al cambiar estado');
+      toast.error('Error changing status');
     }
   };
 
   const handleDeleteField = async (field) => {
-    if (!confirm(`¿Eliminar permanentemente el campo "${field.label}"?`)) return;
+    if (!confirm(`Permanently delete field "${field.label}"?`)) return;
 
     try {
       await axios.delete(
         `${API_URL}/api/store/order-form-config/admin/fields/${field.field_id}?hard_delete=true`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Campo eliminado');
+      toast.success('Field deleted');
       fetchData();
     } catch (error) {
-      toast.error('Error al eliminar campo');
+      toast.error('Error deleting field');
     }
   };
 
@@ -277,7 +277,7 @@ export default function OrderFormConfigTab() {
 
   const getFieldTypeLabel = (type) => {
     const ft = fieldTypes.find(t => t.type === type);
-    return ft?.label_es || ft?.label || type;
+    return ft?.label || ft?.label_es || type;
   };
 
   if (loading) {

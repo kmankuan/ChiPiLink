@@ -440,7 +440,7 @@ export default function RolesModule() {
                           <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                             <p className="text-red-700 dark:text-red-300 font-medium flex items-center gap-2">
                               <Crown className="h-4 w-4" />
-                              Acceso Total - Todos los permisos del sistema
+                              Full Access - All system permissions
                             </p>
                           </div>
                         ) : (
@@ -460,7 +460,7 @@ export default function RolesModule() {
                                     <h5 className="font-medium capitalize mb-2">{module}</h5>
                                     <div className="flex flex-wrap gap-2">
                                       {selectedRole.permisos?.includes(`${module}.*`) ? (
-                                        <Badge variant="default">Todos los permisos</Badge>
+                                        <Badge variant="default">All permissions</Badge>
                                       ) : (
                                         modulePerms.filter(p => selectedRole.permisos?.includes(p)).map(p => (
                                           <Badge key={p} variant="secondary" className="text-xs">
@@ -483,7 +483,7 @@ export default function RolesModule() {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Selecciona un rol para ver sus detalles</p>
+                    <p className="text-muted-foreground">Select a role to view its details</p>
                   </CardContent>
                 </Card>
               )}
@@ -497,7 +497,7 @@ export default function RolesModule() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar usuarios..."
+                placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
