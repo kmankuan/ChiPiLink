@@ -110,7 +110,7 @@ AVAILABLE_PERMISSIONS = {
 
 # Permissions por defecto para cada rol
 DEFAULT_ROLE_PERMISSIONS = {
-    DefaultRoles.SUPER_ADMIN: ["*"],  # Todos los permisos
+    DefaultRoles.SUPER_ADMIN: ["*"],  # All los permisos
     
     DefaultRoles.ADMIN: [
         "admin.*",
