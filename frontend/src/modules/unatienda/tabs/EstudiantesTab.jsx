@@ -11,37 +11,40 @@ import { Users, Search, Loader2, RefreshCw, Upload, GraduationCap } from 'lucide
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function EstudiantesTab({ token }) {
-  const [estudiantes, setEstudiantes] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchEstudiantes();
+    fetchStudents();
   }, []);
 
-  const fetchEstudiantes = async () => {
+  const fetchStudents = async () => {
     setLoading(true);
     try {
       const response = await fetch(`${API}/api/store/students/sincronizados`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setEstudiantes(data.estudiantes || []);
+      setStudents(data.students || data.estudiantes || []);
     } catch (error) {
-      console.error('Error fetching estudiantes:', error);
-      toast.error('Error al cargar estudiantes');
+      console.error('Error fetching students:', error);
+      toast.error('Error loading students');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredEstudiantes = estudiantes.filter(e => {
+  const filteredStudents = students.filter(e => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
       e.nombre_completo?.toLowerCase().includes(term) ||
+      e.full_name?.toLowerCase().includes(term) ||
       e.numero_estudiante?.toLowerCase().includes(term) ||
-      e.grado?.toLowerCase().includes(term)
+      e.student_number?.toLowerCase().includes(term) ||
+      e.grado?.toLowerCase().includes(term) ||
+      e.grade?.toLowerCase().includes(term)
     );
   });
 
@@ -63,20 +66,20 @@ export default function EstudiantesTab({ token }) {
                 <GraduationCap className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Estudiantes PCA</CardTitle>
+                <CardTitle>PCA Students</CardTitle>
                 <CardDescription>
-                  Estudiantes de Panama Christian Academy sincronizados en el sistema
+                  Panama Christian Academy students synchronized in the system
                 </CardDescription>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={fetchEstudiantes}>
+              <Button variant="outline" size="sm" onClick={fetchStudents}>
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Actualizar
+                Refresh
               </Button>
               <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin/book-orders'}>
                 <Upload className="h-4 w-4 mr-2" />
-                Importar
+                Import
               </Button>
             </div>
           </div>
@@ -85,7 +88,7 @@ export default function EstudiantesTab({ token }) {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nombre, número o grado..."
+              placeholder="Search by name, number or grade..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -97,33 +100,33 @@ export default function EstudiantesTab({ token }) {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{estudiantes.length}</div>
-            <p className="text-xs text-muted-foreground">Total Estudiantes</p>
+            <div className="text-2xl font-bold">{students.length}</div>
+            <p className="text-xs text-muted-foreground">Total Students</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {[...new Set(estudiantes.map(e => e.grado).filter(Boolean))].length}
+              {[...new Set(students.map(e => e.grado || e.grade).filter(Boolean))].length}
             </div>
-            <p className="text-xs text-muted-foreground">Grados</p>
+            <p className="text-xs text-muted-foreground">Grades</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {estudiantes.filter(e => e.has_access).length}
+              {students.filter(e => e.has_access).length}
             </div>
-            <p className="text-xs text-muted-foreground">Con Acceso Aprobado</p>
+            <p className="text-xs text-muted-foreground">With Approved Access</p>
           </CardContent>
         </Card>
       </div>
 
-      {filteredEstudiantes.length === 0 ? (
+      {filteredStudents.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No hay estudiantes registrados</p>
+            <p className="text-muted-foreground">No students registered</p>
           </CardContent>
         </Card>
       ) : (
@@ -133,25 +136,25 @@ export default function EstudiantesTab({ token }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Número</TableHead>
-                    <TableHead>Nombre</TableHead>
-                    <TableHead>Grado</TableHead>
-                    <TableHead>Sección</TableHead>
-                    <TableHead>Estado</TableHead>
+                    <TableHead>Number</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead>Section</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredEstudiantes.map((e) => (
+                  {filteredStudents.map((e) => (
                     <TableRow key={e.sync_id}>
-                      <TableCell className="font-mono">{e.numero_estudiante}</TableCell>
-                      <TableCell className="font-medium">{e.nombre_completo}</TableCell>
+                      <TableCell className="font-mono">{e.numero_estudiante || e.student_number}</TableCell>
+                      <TableCell className="font-medium">{e.nombre_completo || e.full_name}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{e.grado}</Badge>
+                        <Badge variant="secondary">{e.grado || e.grade}</Badge>
                       </TableCell>
-                      <TableCell>{e.seccion || '-'}</TableCell>
+                      <TableCell>{e.seccion || e.section || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={e.has_access ? 'default' : 'outline'}>
-                          {e.has_access ? 'Con Acceso' : 'Sin Acceso'}
+                          {e.has_access ? 'With Access' : 'No Access'}
                         </Badge>
                       </TableCell>
                     </TableRow>
