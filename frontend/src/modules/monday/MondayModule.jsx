@@ -807,14 +807,14 @@ export default function MondayModule() {
                     </div>
                     
                     <p className="text-xs text-muted-foreground">
-                      💡 El nombre del producto se usa automáticamente como nombre del subitem.
-                      Si no conoces los IDs de las columnas, puedes verlos en la configuración del board de Monday.com.
+                      The product name is automatically used as the subitem name.
+                      If you don't know the column IDs, you can view them in Monday.com board settings.
                     </p>
                   </CardContent>
                 )}
               </Card>
 
-              {/* Acciones */}
+              {/* Actions */}
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex gap-4 flex-wrap">
@@ -824,7 +824,7 @@ export default function MondayModule() {
                       ) : (
                         <Save className="h-4 w-4 mr-2" />
                       )}
-                      Guardar Configuración
+                      Save Configuration
                     </Button>
                     
                     <Button variant="outline" onClick={handleSyncAllOrders} disabled={syncingAll || !storeConfig.board_id}>
@@ -833,7 +833,7 @@ export default function MondayModule() {
                       ) : (
                         <RefreshCw className="h-4 w-4 mr-2" />
                       )}
-                      Sincronizar Todos los Pedidos
+                      Sync All Orders
                     </Button>
                     
                     {storeConfig.board_id && (
