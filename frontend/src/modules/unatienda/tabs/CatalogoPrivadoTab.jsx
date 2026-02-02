@@ -219,27 +219,27 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                 <BookOpen className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Catálogo Privado - PCA</CardTitle>
+                <CardTitle>Private Catalog - PCA</CardTitle>
                 <CardDescription>
-                  Libros de texto para estudiantes de Panama Christian Academy vinculados
+                  Textbooks for linked Panama Christian Academy students
                 </CardDescription>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={fetchProductos} disabled={loading}>
+              <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                {translate('common.refresh', 'Actualizar')}
+                {translate('common.refresh', 'Refresh')}
               </Button>
               <InventoryImport 
                 token={token} 
                 onImportComplete={() => {
-                  fetchProductos();
+                  fetchProducts();
                   onRefresh?.();
                 }}
               />
               <Button onClick={() => handleOpenForm()} className="gap-2">
                 <Plus className="h-4 w-4" />
-                {translate('store.addBook', 'Agregar Libro')}
+                {translate('store.addBook', 'Add Book')}
               </Button>
             </div>
           </div>
@@ -250,7 +250,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nombre, código, editorial..."
+                  placeholder="Search by name, code, publisher..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"
@@ -258,22 +258,22 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               </div>
             </div>
             <select
-              value={selectedGrado}
-              onChange={(e) => setSelectedGrado(e.target.value)}
+              value={selectedGrade}
+              onChange={(e) => setSelectedGrade(e.target.value)}
               className="px-3 py-2 border rounded-md bg-background"
             >
-              <option value="">Todos los grados</option>
-              {filtros.grados.map(g => (
+              <option value="">All grades</option>
+              {filters.grades.map(g => (
                 <option key={g} value={g}>{g}</option>
               ))}
             </select>
             <select
-              value={selectedMateria}
-              onChange={(e) => setSelectedMateria(e.target.value)}
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
               className="px-3 py-2 border rounded-md bg-background"
             >
-              <option value="">Todas las materias</option>
-              {filtros.materias.map(m => (
+              <option value="">All subjects</option>
+              {filters.subjects.map(m => (
                 <option key={m} value={m}>{m}</option>
               ))}
             </select>
@@ -285,14 +285,14 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{productos.length}</div>
-            <p className="text-xs text-muted-foreground">Total libros</p>
+            <div className="text-2xl font-bold">{products.length}</div>
+            <p className="text-xs text-muted-foreground">Total books</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{productos.filter(p => p.activo !== false).length}</div>
-            <p className="text-xs text-muted-foreground">Activos</p>
+            <div className="text-2xl font-bold">{products.filter(p => p.activo !== false).length}</div>
+            <p className="text-xs text-muted-foreground">Active</p>
           </CardContent>
         </Card>
         <Card>
