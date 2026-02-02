@@ -53,10 +53,10 @@ export default function UserCapabilities({ token }) {
     setLoading(true);
     try {
       const [myRes, allRes] = await Promise.all([
-        fetch(`${API}/api/conexiones/mis-capacidades`, {
+        fetch(`${API}/api/connections/my-capabilities`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API}/api/conexiones/capacidades`, {
+        fetch(`${API}/api/connections/capabilities`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
