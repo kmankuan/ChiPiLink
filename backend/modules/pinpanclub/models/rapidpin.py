@@ -439,7 +439,7 @@ class DateProposalResponse(BaseModel):
 # ============== LIKES & COMMENTS MODELS ==============
 
 class ChallengeReaction(BaseModel):
-    """Like/reacción a un reto"""
+    """Like/reacción on a challenge"""
     reaction_id: str = Field(default_factory=lambda: f"react_{uuid.uuid4().hex[:8]}")
     queue_id: str
     user_id: str

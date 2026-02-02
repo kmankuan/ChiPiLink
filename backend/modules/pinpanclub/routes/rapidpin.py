@@ -430,9 +430,9 @@ async def respond_to_date_proposal(
 ):
     """
     Responder a propuesta de fecha.
-    - accept: Acepta la fecha -> pasa a waiting
-    - counter: Propone otra fecha -> sigue negociando
-    - queue: Poner in queue para retomar después
+    - accept: Acepta la fecha -> goes to waiting
+    - counter: Proposes another date -> sigue negociando
+    - queue: Put in queue to resume later
     """
     try:
         return await rapidpin_service.respond_to_date(
@@ -454,7 +454,7 @@ async def resume_challenge_from_queue(
     message: Optional[str] = None
 ):
     """
-    Retomar a challenge from queue proponiendo nueva fecha.
+    Retomar a challenge from queue proposing new date.
     """
     try:
         return await rapidpin_service.resume_from_queue(
@@ -471,7 +471,7 @@ async def resume_challenge_from_queue(
 
 @router.get("/comment-config")
 async def get_comment_configuration():
-    """Get configuración de comentarios"""
+    """Get comment configuration"""
     return await rapidpin_service.get_comment_config()
 
 
@@ -481,7 +481,7 @@ async def update_comment_configuration(
     require_approval_for_flagged_users: Optional[bool] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update configuración de comentarios (admin)"""
+    """Update comment configuration (admin)"""
     updates = {}
     if max_comment_length is not None:
         updates["max_comment_length"] = max_comment_length
@@ -501,7 +501,7 @@ async def toggle_challenge_like(
     user_name: Optional[str] = None
 ):
     """
-    Dar o quitar like a a challenge.
+    Toggle like a a challenge.
     Requiere authenticated user.
     Emite evento WebSocket en tiempo real.
     """

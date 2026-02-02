@@ -1174,10 +1174,10 @@ class RapidPinService(BaseService):
         message: str = None
     ) -> Dict:
         """
-        Responder a una propuesta de fecha.
-        - accept: Acepta la fecha propuesta -> pasa a waiting
-        - counter: Propone otra fecha -> sigue en date_negotiation
-        - queue: Poner in queue para retomar después -> pasa a queued
+        Respond to a date proposal.
+        - accept: Accepts the proposed date -> goes to waiting
+        - counter: Proposes another date -> continues in date_negotiation
+        - queue: Put in queue to resume later -> goes to queued
         """
         db = await self.get_db()
         
@@ -1190,20 +1190,20 @@ class RapidPinService(BaseService):
             raise ValueError("Challenge not found")
         
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
-            raise ValueError("Este reto no está en fase de negociación de fecha")
+            raise ValueError("This challenge is not in negotiation phase de fecha")
         
         # Verify is one of the players
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo the players dthe challenge pueden responder")
+            raise ValueError("Only challenge players can respond")
         
         # Verify is not the same person who proposed
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
-            raise ValueError("Debes esperar la respuesta del otro jugador")
+            raise ValueError("You must wait for the other player response")
         
         now = datetime.now(timezone.utc).isoformat()
         other_player_id = queue_entry["player2_id"] if user_id == queue_entry["player1_id"] else queue_entry["player1_id"]
         
-        # Get info of the user
+        # Get user info
         user_info = await self.player_repo.get_by_id(user_id)
         user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
         
@@ -1219,20 +1219,20 @@ class RapidPinService(BaseService):
         }
         
         if action == "accept":
-            # Aceptar fecha - pasar a waiting
+            # Accept date - move to waiting
             update_data["status"] = "waiting"
             update_data["agreed_date"] = queue_entry.get("proposed_date")
             update_data["accepted_at"] = now
             update_data["accepted_by_id"] = user_id
             
-            # Notify al otro jugador
+            # Notify the other player
             await send_challenge_notification(
                 recipient_id=other_player_id,
                 challenger_name=user_name,
                 notification_type="date_accepted"
             )
             
-            # Broadcast to search árbitro
+            # Broadcast to find referee
             player1_info = queue_entry.get("player1_info") or {}
             player2_info = queue_entry.get("player2_info") or {}
             player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")
@@ -1246,9 +1246,9 @@ class RapidPinService(BaseService):
             
         elif action == "counter":
             if not counter_date:
-                raise ValueError("Debes proponer una fecha alternativa")
+                raise ValueError("You must propose an alternative date")
             
-            # Add nueva propuesta al historial
+            # Add new proposal to history
             date_history.append({
                 "proposed_date": counter_date,
                 "proposed_by_id": user_id,
@@ -1263,7 +1263,7 @@ class RapidPinService(BaseService):
             update_data["date_history"] = date_history
             update_data["status"] = "date_negotiation"
             
-            # Notify al otro jugador
+            # Notify the other player
             await send_challenge_notification(
                 recipient_id=other_player_id,
                 challenger_name=user_name,
@@ -1292,7 +1292,7 @@ class RapidPinService(BaseService):
         message: str = None
     ) -> Dict:
         """
-        Retomar un reto from queue proponiendo nueva fecha.
+        Resume a challenge from queue proposing new date.
         """
         db = await self.get_db()
         
@@ -1305,10 +1305,10 @@ class RapidPinService(BaseService):
             raise ValueError("Challenge not found")
         
         if queue_entry["status"] != "queued":
-            raise ValueError("Este reto no está in queue")
+            raise ValueError("This challenge is not in queue")
         
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo the players dthe challenge pueden retomarlo")
+            raise ValueError("Only challenge players can resume it")
         
         # Use respond_to_date with action=counter to propose new date
         return await self.respond_to_date(
@@ -1322,7 +1322,7 @@ class RapidPinService(BaseService):
     # ============== LIKES & COMMENTS METHODS ==============
     
     async def get_comment_config(self) -> Dict:
-        """Get configuración de comentarios"""
+        """Get comment configuration"""
         db = await self.get_db()
         
         config = await db["rapidpin_config"].find_one(
@@ -1348,7 +1348,7 @@ class RapidPinService(BaseService):
         return config
     
     async def update_comment_config(self, updates: Dict) -> Dict:
-        """Update configuración de comentarios (admin)"""
+        """Update comment configuration (admin)"""
         db = await self.get_db()
         
         await db["rapidpin_config"].update_one(
@@ -1360,7 +1360,7 @@ class RapidPinService(BaseService):
         return await self.get_comment_config()
     
     async def toggle_like(self, queue_id: str, user_id: str, user_name: str = None) -> Dict:
-        """Dar o quitar like a un reto"""
+        """Toggle like on a challenge"""
         db = await self.get_db()
         
         # Verify that the challenge existe
@@ -1436,7 +1436,7 @@ class RapidPinService(BaseService):
         content: str,
         user_info: Dict = None
     ) -> Dict:
-        """Agregar comentario a un reto"""
+        """Agregar comentario on a challenge"""
         db = await self.get_db()
         
         # Verify that the challenge existe
