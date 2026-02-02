@@ -184,7 +184,7 @@ export default function AdminUsuariosConexiones({ token }) {
     if (!selectedUsuario) return;
     
     try {
-      const res = await fetch(`${API}/api/conexiones/admin/otorgar-capacidad`, {
+      const res = await fetch(`${API}/api/connections/admin/grant-capability`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -200,20 +200,20 @@ export default function AdminUsuariosConexiones({ token }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Error');
       
-      toast.success('Capacidad otorgada exitosamente');
+      toast.success('Capability granted successfully');
       setSelectedUsuario(null);
     } catch (err) {
       toast.error(err.message);
     }
   };
 
-  // ============== PERMISOS ==============
+  // ============== PERMISSIONS ==============
   
   const handleUpdatePermiso = async (tipo, subtipo, field, value) => {
     const key = `${tipo}-${subtipo}`;
     setSavingPermisos(prev => ({ ...prev, [key]: true }));
     
-    // Encontrar el permiso actual
+    // Find current permission
     const current = permisosRelacion.find(p => p.tipo === tipo && p.subtipo === subtipo);
     const currentPermisos = current?.permisos || {};
     
@@ -229,7 +229,7 @@ export default function AdminUsuariosConexiones({ token }) {
     };
     
     try {
-      const res = await fetch(`${API}/api/conexiones/admin/permisos-relacion`, {
+      const res = await fetch(`${API}/api/connections/admin/relationship-permissions`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -238,9 +238,9 @@ export default function AdminUsuariosConexiones({ token }) {
         body: JSON.stringify(updatedPermisos)
       });
       
-      if (!res.ok) throw new Error('Error al guardar');
+      if (!res.ok) throw new Error('Error saving');
       
-      // Actualizar estado local
+      // Update local state
       setPermisosRelacion(prev => {
         const idx = prev.findIndex(p => p.tipo === tipo && p.subtipo === subtipo);
         if (idx >= 0) {
@@ -251,7 +251,7 @@ export default function AdminUsuariosConexiones({ token }) {
         return [...prev, { tipo, subtipo, permisos: { [field]: value } }];
       });
       
-      toast.success('Permiso actualizado');
+      toast.success('Permission updated');
     } catch (err) {
       toast.error(err.message);
     } finally {
