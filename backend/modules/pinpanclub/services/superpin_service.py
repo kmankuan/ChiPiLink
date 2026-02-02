@@ -335,7 +335,7 @@ class SuperPinService(BaseService):
             # Calculatesr y actualizar ranking
             await self._update_ranking_after_match(match)
             
-            # Increment contador de partidos
+            # Increment match counter
             await self.league_repo.increment_stats(match["liga_id"], partidos=1)
         
         await self.match_repo.update_match(partido_id, match)
@@ -391,7 +391,7 @@ class SuperPinService(BaseService):
             sets_ganador = match["sets_jugador_b"]
             sets_perdedor = match["sets_jugador_a"]
         
-        # Update ranking del ganador
+        # Update winner ranking
         racha_ganador = ranking_ganador.get("racha_actual", 0)
         nueva_racha_ganador = racha_ganador + 1 if racha_ganador >= 0 else 1
         
@@ -407,7 +407,7 @@ class SuperPinService(BaseService):
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
-        # Update ranking del perdedor
+        # Update loser ranking
         racha_perdedor = ranking_perdedor.get("racha_actual", 0)
         nueva_racha_perdedor = racha_perdedor - 1 if racha_perdedor <= 0 else -1
         
@@ -440,14 +440,14 @@ class SuperPinService(BaseService):
         k_factor: int = 32
     ) -> tuple:
         """Calculate cambio de ELO"""
-        # Probabilidad esperada de victoria
+        # Expected win probability
         expected_winner = 1 / (1 + 10 ** ((elo_perdedor - elo_ganador) / 400))
         expected_loser = 1 - expected_winner
         
-        # Cambio de ELO
+        # ELO change
         change = round(k_factor * (1 - expected_winner))
         
-        # Points (para el system for puntos, además del ELO)
+        # Points (for points system, in addition to ELO)
         points_winner = 3
         points_loser = 1
         
@@ -557,7 +557,7 @@ class SuperPinService(BaseService):
         num_rounds = math.ceil(math.log2(num_players))
         bracket_size = 2 ** num_rounds
         
-        # Generate estructura de brackets
+        # Generate bracket structure
         brackets = []
         
         # Primera ronda - emparejar según ranking (1 vs último, 2 vs penúltimo, etc.)
@@ -753,7 +753,7 @@ class SuperPinService(BaseService):
             if existing:
                 return None  # Ya tiene este badge
         
-        # Get definición del badge
+        # Get badge definition
         badge_def = BADGE_DEFINITIONS.get(badge_type, {})
         
         badge_data = {
@@ -858,7 +858,7 @@ class SuperPinService(BaseService):
             if badge:
                 awarded_badges.append(badge)
         
-        # Badge: Racha de 5 victorias
+        # Badge: 5 win streak
         if ranking.get("racha_actual", 0) >= 5:
             badge = await self.award_badge(
                 jugador_id=jugador_id,
@@ -869,7 +869,7 @@ class SuperPinService(BaseService):
             if badge:
                 awarded_badges.append(badge)
         
-        # Badge: Racha de 10 victorias
+        # Badge: 10 win streak
         if ranking.get("racha_actual", 0) >= 10:
             badge = await self.award_badge(
                 jugador_id=jugador_id,
@@ -977,7 +977,7 @@ class SuperPinService(BaseService):
         if not player:
             return None
         
-        # Get rankings de all leagues o una específica
+        # Get rankings from all leagues or specific one
         if liga_id:
             rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
             rankings = [r for r in rankings if r]
@@ -1004,7 +1004,7 @@ class SuperPinService(BaseService):
             limit=20
         )
         
-        # Enriquecer partidos con info de oponente
+        # Enrich matches with opponent info
         match_history = []
         for match in matches:
             is_player_a = match.get("jugador_a_id") == jugador_id
@@ -1043,7 +1043,7 @@ class SuperPinService(BaseService):
         win_rate = (total_wins / total_matches * 100) if total_matches > 0 else 0
         set_win_rate = (total_sets_won / (total_sets_won + total_sets_lost) * 100) if (total_sets_won + total_sets_lost) > 0 else 0
         
-        # Racha de forma (últimos 10 partidos)
+        # Form streak (last 10 matches)
         recent_form = []
         for m in match_history[:10]:
             recent_form.append("W" if m["is_winner"] else "L")
@@ -1171,7 +1171,7 @@ class SuperPinService(BaseService):
         if len(available_players) < 2:
             raise ValueError("Se necesitan al menos 2 jugadores con check-in activo")
         
-        # Get info de ranking para cada jugador
+        # Get ranking info for each player
         players_with_ranking = []
         for checkin in available_players:
             jugador_id = checkin.get("jugador_id")
@@ -1211,7 +1211,7 @@ class SuperPinService(BaseService):
                 player_b = players_with_ranking[n - 1 - i]
                 pairings.append((player_a, player_b))
         elif pairing_mode == "swiss":
-            # Playeres de nivel similar
+            # Players of similar level
             for i in range(0, len(players_with_ranking) - 1, 2):
                 pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
         else:
@@ -1293,7 +1293,7 @@ class SuperPinService(BaseService):
             limit=20
         )
         
-        # Enriquecer con info de jugadores
+        # Enrich with player info
         for match in active_matches + finished_today:
             player_a = await self.player_repo.get_by_id(match.get("jugador_a_id"))
             player_b = await self.player_repo.get_by_id(match.get("jugador_b_id"))
@@ -1313,7 +1313,7 @@ class SuperPinService(BaseService):
         Predice el resultado de un partido entre dos jugadores.
         Usa ELO rating, historial de enfrentamientos y racha actual.
         """
-        # Get estadísticas de ambos jugadores
+        # Get stats for both players
         stats_a = await self.get_player_statistics(jugador_a_id)
         stats_b = await self.get_player_statistics(jugador_b_id)
         
@@ -1327,7 +1327,7 @@ class SuperPinService(BaseService):
         elo_a = stats_a.get("player_info", {}).get("elo_rating", 1200)
         elo_b = stats_b.get("player_info", {}).get("elo_rating", 1200)
         
-        # Fórmula ELO de probabilidad esperada
+        # ELO expected probability formula
         expected_a = 1 / (1 + math.pow(10, (elo_b - elo_a) / 400))
         expected_b = 1 - expected_a
         
@@ -1338,7 +1338,7 @@ class SuperPinService(BaseService):
             wins_b = h2h.get("player_b_wins", 0)
             total = wins_a + wins_b
             if total > 0:
-                # Factor de ajuste basado en H2H (máx ±10%)
+                # Adjustment factor based on H2H (máx ±10%)
                 h2h_ratio = (wins_a - wins_b) / total
                 h2h_adjustment = h2h_ratio * 0.10
         

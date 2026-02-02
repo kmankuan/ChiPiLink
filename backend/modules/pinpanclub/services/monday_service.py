@@ -144,7 +144,7 @@ class MondayService(BaseService):
         
         items = boards[0].get("items_page", {}).get("items", [])
         
-        # Transforma formato de jugadores
+        # Transform player format
         players = []
         for item in items:
             player = {
