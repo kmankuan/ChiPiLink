@@ -593,7 +593,7 @@ export default function AdminMemberships() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{t('adminMemberships.price')InPoints}</Label>
+                  <Label>{t('adminMemberships.priceInPoints')}</Label>
                   <Input
                     type="number"
                     value={planForm.price_in_points}
