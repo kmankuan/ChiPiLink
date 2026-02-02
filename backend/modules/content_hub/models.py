@@ -47,12 +47,12 @@ class ContentItemBase(BaseModel):
     url_original: str  # Original content URL
     # Contenido embebido
     embed_url: Optional[str] = None  # URL for embed (if applicable)
-    embed_code: Optional[str] = None  # Código HTML de embed
-    thumbnail_url: Optional[str] = None  # Imagen de preview
+    embed_code: Optional[str] = None  # HTML embed code
+    thumbnail_url: Optional[str] = None  # Preview image
     # Clasificación
-    categorias: List[str] = []  # IDs de categorías (audiencias)
+    categorias: List[str] = []  # Category IDs (audiences)
     tags: List[str] = []  # Etiquetas adicionales
-    # Metadata del contenido original
+    # Original content metadata
     autor_original: Optional[str] = None
     fecha_publicacion_original: Optional[datetime] = None
     duracion_segundos: Optional[int] = None  # For videos

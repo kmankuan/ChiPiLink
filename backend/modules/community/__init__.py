@@ -62,7 +62,7 @@ def init_module():
     print("🏘️ Community module initialized")
 
 
-# Alias para compatibilidad
+# Alias for compatibility
 router = community_refactored_router
 
 __all__ = [

@@ -628,7 +628,7 @@ class SuperPinService(BaseService):
                 }]
             })
         
-        # Update torneo con brackets
+        # Update tournament with brackets
         await self.tournament_repo.update_tournament(torneo_id, {
             "brackets": brackets,
             "estado": "en_curso"
@@ -906,7 +906,7 @@ class SuperPinService(BaseService):
         """Get todos los badges de un jugador"""
         badges = await self.badge_repo.get_player_badges(jugador_id)
         
-        # Enriquecer con definiciones
+        # Enrich with definitions
         for badge in badges:
             badge_def = BADGE_DEFINITIONS.get(badge.get("badge_type"), {})
             badge["rarity"] = badge_def.get("rarity", "common")
@@ -939,7 +939,7 @@ class SuperPinService(BaseService):
         cursor = collection.aggregate(pipeline)
         results = await cursor.to_list(length=limit)
         
-        # Enriquecer con info of the player
+        # Enrich with player info
         for entry in results:
             player = await self.player_repo.get_by_id(entry["_id"])
             if player:
@@ -954,7 +954,7 @@ class SuperPinService(BaseService):
         """Get badges más recientes (para feed)"""
         badges = await self.badge_repo.get_recent_badges(limit)
         
-        # Enriquecer con info of the player
+        # Enrich with player info
         for badge in badges:
             player = await self.player_repo.get_by_id(badge.get("jugador_id"))
             if player:
@@ -1165,7 +1165,7 @@ class SuperPinService(BaseService):
         import random
         from datetime import datetime, timezone
         
-        # Get jugadores con check-in activo
+        # Get players with active check-in
         available_players = await self.get_available_players(liga_id)
         
         if len(available_players) < 2:

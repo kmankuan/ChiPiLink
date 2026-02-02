@@ -346,7 +346,7 @@ class RapidPinRankingRepository(BaseRepository):
     
     async def recalculate_positions(self, season_id: str) -> bool:
         """Recalcular posiciones from ranking"""
-        # Get todos los rankings ordenados
+        # Get all sorted rankings
         rankings = await self.get_season_ranking(season_id)
         
         # Update posiciones

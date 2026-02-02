@@ -63,7 +63,7 @@ def init_module():
     print("🛒 Store module initialized")
 
 
-# Alias para compatibilidad
+# Alias for compatibility
 router = store_refactored_router
 
 __all__ = [

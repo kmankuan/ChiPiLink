@@ -105,7 +105,7 @@ class VoiceAnnouncement(BaseModel):
     # Contenido
     tipo: str  # tarea_nueva, recordatorio, felicitacion, alerta
     texto: str
-    texto_ssml: Optional[str] = None  # Texto con marcado SSML
+    texto_ssml: Optional[str] = None  # Text with SSML markup
     audio_url: Optional[str] = None  # Audio generado
     # Target
     para_persona_id: Optional[str] = None  # None = todos

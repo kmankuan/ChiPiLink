@@ -121,7 +121,7 @@ class ConexionCreate(BaseModel):
     tipo: TipoRelacion
     subtipo: str
     etiqueta: Optional[str] = None
-    mensaje: Optional[str] = None   # Message para solicitud
+    mensaje: Optional[str] = None   # Message for request
 
 
 class ConexionUpdate(BaseModel):
@@ -198,8 +198,8 @@ class CapacidadUsuario(BaseModel):
     tipo: TipoCapacidad
     activa: bool = True
     origen: Optional[str] = None            # ej: "suscripcion_pinpanclub"
-    otorgado_por: Optional[str] = None      # user_id de admin si fue manual
-    motivo: Optional[str] = None            # Razón del otorgamiento
+    otorgado_por: Optional[str] = None      # admin user_id if manual
+    motivo: Optional[str] = None            # Reason for granting
     fecha_activacion: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     fecha_expiracion: Optional[str] = None
 
@@ -238,7 +238,7 @@ class AcudidoCreate(BaseModel):
     """Request to create usuario acudido"""
     nombre: str
     apellido: Optional[str] = None
-    email: Optional[EmailStr] = None        # Opcional para menores
+    email: Optional[EmailStr] = None        # Optional for minors
     telefono: Optional[str] = None
     fecha_nacimiento: Optional[str] = None
     genero: Optional[str] = None

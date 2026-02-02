@@ -58,7 +58,7 @@ def init_module():
     print("🔐 Auth module initialized")
 
 
-# Alias para compatibilidad
+# Alias for compatibility
 router = auth_refactored_router
 
 __all__ = [

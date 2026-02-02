@@ -126,8 +126,8 @@ class PointsEarnRule(BaseModel):
     # Points a otorgar
     points_amount: int
     
-    # O porcentaje del valor
-    points_percentage: Optional[float] = None  # Ej: 5% del valor de compra
+    # Or percentage of value
+    points_percentage: Optional[float] = None  # E.g. 5% of purchase value
     
     # Condiciones
     min_purchase_amount: Optional[float] = None
@@ -177,7 +177,7 @@ class Wallet(BaseModel):
     is_locked: bool = False
     lock_reason: Optional[str] = None
     
-    # PIN de seguridad (hash)
+    # Security PIN (hash)
     security_pin_hash: Optional[str] = None
     
     # Timestamps

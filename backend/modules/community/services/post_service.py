@@ -129,7 +129,7 @@ class PostService(BaseService):
         usuario_id: Optional[str] = None
     ) -> Comment:
         """Agregar comentario a un post"""
-        # Verify que el post existe y permite comentarios
+        # Verify post exists and allows comments
         post = await self.repository.get_by_id(post_id)
         if not post:
             raise ValueError("Post not found")

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/content-hub", tags=["Content Hub"])
 
-# Fuentes de contenido soportadas
+# Supported content sources
 CONTENT_SOURCES = [
     {"source_id": "youtube", "nombre": "YouTube", "icono": "🎬", "color": "#FF0000"},
     {"source_id": "instagram", "nombre": "Instagram", "icono": "📸", "color": "#E4405F"},

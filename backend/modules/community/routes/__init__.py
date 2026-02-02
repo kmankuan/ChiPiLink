@@ -9,7 +9,7 @@ from .events import router as events_router
 from .gallery import router as gallery_router
 from .landing import router as landing_router
 
-# Router principal del módulo Community (refactorizado)
+# Main router for Community module (refactored)
 router = APIRouter(prefix="/community-v2", tags=["Community"])
 
 # Include sub-routers
@@ -18,5 +18,5 @@ router.include_router(events_router)
 router.include_router(gallery_router)
 router.include_router(landing_router)
 
-# Re-exportar para compatibilidad
+# Re-export for compatibility
 community_refactored_router = router

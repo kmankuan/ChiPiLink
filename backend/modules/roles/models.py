@@ -16,7 +16,7 @@ class DefaultRoles(str, Enum):
     USER = "user"
 
 
-# Permissions disponibles en el sistema organizados por módulo
+# System permissions organized by module
 AVAILABLE_PERMISSIONS = {
     # Administración general
     "admin": {
@@ -108,9 +108,9 @@ AVAILABLE_PERMISSIONS = {
 }
 
 
-# Permissions por defecto para cada rol
+# Default permissions for each role
 DEFAULT_ROLE_PERMISSIONS = {
-    DefaultRoles.SUPER_ADMIN: ["*"],  # All los permisos
+    DefaultRoles.SUPER_ADMIN: ["*"],  # All permissions
     
     DefaultRoles.ADMIN: [
         "admin.*",
@@ -159,9 +159,9 @@ class RoleBase(BaseModel):
     """Base model for roles"""
     nombre: str = Field(..., min_length=2, max_length=50)
     descripcion: Optional[str] = None
-    color: Optional[str] = "#6366f1"  # Color para UI
+    color: Optional[str] = "#6366f1"  # Color for UI
     icono: Optional[str] = "Shield"  # Icono lucide
-    es_sistema: bool = False  # True para roles that does not se pueden eliminar
+    es_sistema: bool = False  # True for system roles that cannot be deleted
     nivel: int = 0  # Nivel jerárquico (mayor = más privilegios)
 
 
