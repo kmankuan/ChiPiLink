@@ -34,10 +34,10 @@ export default function DashboardModule() {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    pedidos: { total: 0, pendientes: 0 },
-    productos: { total: 0, bajo_stock: 0 },
-    usuarios: { total: 0 },
-    notificaciones: { no_leidas: 0 }
+    orders: { total: 0, pending: 0 },
+    products: { total: 0, low_stock: 0 },
+    users: { total: 0 },
+    notifications: { unread: 0 }
   });
   const [unatiendaStats, setUnatiendaStats] = useState(null);
 
@@ -100,8 +100,8 @@ export default function DashboardModule() {
       icon: ShoppingCart, 
       color: 'bg-green-500',
       description: 'Ver y procesar pedidos',
-      stats: stats.pedidos.pendientes > 0 ? `${stats.pedidos.pendientes} pendientes` : 'Sin pendientes',
-      alert: stats.pedidos.pendientes > 0
+      stats: stats.orders?.pending > 0 ? `${stats.orders.pending} pendientes` : 'Sin pendientes',
+      alert: stats.orders?.pending > 0
     },
     { 
       id: 'customers', 
