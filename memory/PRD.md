@@ -115,12 +115,16 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## Remaining Work
 
-### P0 - i18n Migration (Remaining ~159 UI instances)
-Files requiring i18n integration:
-- `/app/frontend/src/modules/account/profile/` - Profile UI labels
-- `/app/frontend/src/modules/account/wallet/` - Wallet management
-- `/app/frontend/src/modules/pinpanclub/` - Ping pong club features
-- `/app/frontend/src/pages/SuperAppLanding.jsx` - Landing page content
+### P0 - i18n Migration (Remaining ~3% - 13 files with local texts pattern)
+Files with `const texts = {}` pattern (working correctly but could be migrated):
+- `/app/frontend/src/modules/account/wallet/QRScanner.jsx` - Staff QR scanner
+- `/app/frontend/src/modules/admin/users/components/AdminMemberships.jsx` - Admin memberships
+- `/app/frontend/src/modules/notifications/components/*` - Notification UI (7 files)
+- `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx` - Social feed
+- `/app/frontend/src/components/rapidpin/ChallengeModal.jsx` - Challenge modal
+
+### P0.5 - Spanish Comments (~65 files)
+These files have Spanish comments that should be translated to English for full compliance with development principles.
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
