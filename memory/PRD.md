@@ -1,280 +1,57 @@
 # ChiPi Link - Product Requirements Document
 
-> **📚 Related Documents:**
-> - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture, naming standards, folder structure
-> - **[CHANGELOG.md](./CHANGELOG.md)** - History of changes and updates
-> - **[ROADMAP.md](./ROADMAP.md)** - Prioritized backlog and future features
-
----
-
 ## Original Problem Statement
+Build a "super app" for managing textbook orders, student linking, and school administration. The application integrates with LaoPan.online for OAuth authentication and Monday.com for order fulfillment.
 
-**ChipiLink** es una Super App multi-módulo diseñada para gestionar múltiples servicios integrados bajo una sola plataforma.
+## Current State (December 2025)
 
-### Módulos Principales:
+### ✅ Completed Features
+- **OAuth 2.0 Integration** - LaoPan.online login flow fully implemented
+- **CSV Inventory Import** - Bulk inventory management via CSV for private catalog
+- **Student Linking Flow** - Users can submit link requests, admins can approve
+- **Massive Codebase Refactoring** - All legacy Spanish naming conventions removed (`cliente_id` → `user_id`, `db.clientes` → `db.users`)
+- **Deployment Fixes** - Hardcoded URLs removed from production code
 
-#### 1. 🛒 Unatienda (Tienda Principal)
-- **Catálogo Público** - Productos disponibles para todos
-- **Catálogo Privado** - Libros escolares exclusivos (requiere vinculación)
-- **Pedidos** - Gestión de órdenes y entregas
-- **Configuración** - Ajustes de la tienda
+### 🔴 Known Issues (Priority)
+1. **P1: Admin Sidebar Disappears** - Navigation modules vanish after login (RECURRING)
+2. **P2: Google Sign-Up Loop** - OAuth flow stuck in infinite loop (RECURRING)
+3. **P3: emergent-main.js Error** - External script error overlays UI
 
-#### 2. 📚 Textbook Access (Acceso a Libros Escolares)
-- Vinculación de estudiantes a escuelas
-- Padres/acudientes solicitan acceso al catálogo privado
-- Admin aprueba/rechaza solicitudes
-- Estudiantes vinculados pueden ver libros de su escuela/grado
-- **📦 Pedidos de Textos** (NUEVO)
-  - Lista de libros por grado con precios configurables
-  - Usuario selecciona libros → total en tiempo real
-  - Envío bloquea items + notifica a Monday.com
-  - Sistema de recompra (solicitar → admin aprueba)
-  - Dashboard admin con estadísticas
+### 🟡 Pending Tasks
+- Frontend for student locking & school year config
+- Reflect student lock state in UI
+- OneSignal push notifications integration
+- Stripe payment integration
 
-#### 3. 🏓 PinpanClub (Clubes de Ping Pong)
-- Gestión de clubes y jugadores
-- **Super Pin** - Sistema de ranking
-- **Rapid Pin** - Partidos espontáneos
-- Torneos y temporadas
+### 📦 Technical Debt
+- Legacy `pedidos`/`pedidos_service.py` system still exists (needs user confirmation to remove)
 
-#### 4. 👤 User Management (Gestión de Usuarios)
-- **Capacidades** (Capacities) - Habilidades/permisos del usuario
-- **Membresías** (Subscriptions) - Planes de suscripción
-- **Conexiones** (Relationships) - Red de contactos
-- **Acudidos** (Dependents) - Personas a cargo
+## Architecture
 
-#### 5. 💰 ChipiWallet (Billetera Digital)
-- Balance en USD
-- ChipiPoints (puntos de fidelidad)
-- Transferencias entre usuarios
-- Historial de transacciones
+### Tech Stack
+- **Frontend:** React 18 + Craco + TailwindCSS + Shadcn/UI
+- **Backend:** FastAPI + Motor (async MongoDB)
+- **Database:** MongoDB (Atlas in production)
+- **Auth:** JWT + LaoPan OAuth 2.0
 
-#### 6. 🔐 Roles & Permissions (RBAC)
-- Roles personalizables
-- Permisos granulares por módulo
-- Asignación de roles a usuarios
+### Key Collections
+- `users` - All user data (formerly `clientes`)
+- `store_textbook_access_students` - Approved student profiles
+- `store_textbook_access_requests` - Pending link requests
+- `private_catalog_products` - Private textbook inventory
 
-#### 7. 🔔 Notifications (Notificaciones)
-- Push notifications (OneSignal - pendiente)
-- Historial de notificaciones
-- Preferencias por usuario
+## 3rd Party Integrations
+- Monday.com (order fulfillment)
+- i18next (multi-language)
+- ipapi.co (geolocation)
+- Yappy Comercial (payments)
+- LaoPan.online (OAuth) ✅
+- OneSignal (planned)
+- Stripe (planned)
 
-#### 8. 🔌 Integrations (Integraciones)
-- Monday.com - Sincronización de pedidos
-- Yappy - Pagos (Panamá)
-- i18next - Multilenguaje
+## Credentials
+- Super Admin: `teck@koh.one` / `Acdb##0897`
+- Test User: `testuser_regular@test.com` / `Test123!`
 
-#### 9. 📊 Dashboard (Panel de Control)
-- Estadísticas generales
-- Métricas por módulo
-
-#### 10. 🎓 Módulos Adicionales (En desarrollo)
-- **AI Tutor** - Tutor con inteligencia artificial
-- **Chess** - Módulo de ajedrez
-- **Community** - Comunidad de usuarios
-- **Content Hub** - Hub de contenido
-- **Landing Editor** - Editor de landing pages
-
----
-
-## 🔴 CODING STANDARDS (MANDATORY)
-
-These rules are **PERMANENT** and must be followed in all future development sessions:
-
-### 1. English-First Code
-- **All code** (variables, functions, classes, comments) MUST use **English** naming
-- Exceptions:
-  - Terms that don't exist in English
-  - Domain-specific terms where the non-English term is more convenient (e.g., "cédula" for ID in Panama)
-- Example: Use `students`, `handleSubmit`, `formData` NOT `estudiantes`, `manejarEnvio`, `datosFormulario`
-
-### 2. Multilingual Support (i18n)
-- All user-facing text must support **three languages** in this priority order:
-  1. **English (en)** - Primary/default
-  2. **Spanish (es)** - Secondary  
-  3. **Chinese (zh)** - Tertiary
-- Use i18next translation keys for all UI text
-- Store labels in format: `{ label_en: "...", label_es: "...", label_zh: "..." }`
-
-### 3. Multi-Service Architecture
-- Backend modules should be designed for potential microservice extraction
-- Use clear module boundaries (`/app/backend/modules/{module_name}/`)
-- Each module should have: `models/`, `services/`, `routes/`, `repositories/`
-- Avoid tight coupling between modules
-
-### 4. Data Source Consistency
-- **Single Source of Truth**: Each data entity must have ONE authoritative source
-- **Schools**: Managed via `store_schools` collection, NOT via form config options
-- **Form Options**: Use form config for flexible lists (relationships, etc.)
-- **Constants**: Use code constants for stable values (grades, etc.)
-
-### 5. Database Naming Convention
-- Format: `{module}_{entity}` (e.g., `store_schools`, `user_profiles`)
-- See **ARCHITECTURE.md** for complete list
-
-### 6. Frontend Structure
-```
-/modules/
-  /admin/          ← All admin/backoffice panels
-    /users/        ← User management
-  /account/        ← User's personal portal
-    /linking/      ← Student linking (Compra Exclusiva)
-    /profile/
-    /wallet/
-    /connections/
-  /unatienda/      ← Store module
-  /pinpanclub/     ← Ping pong module
-  /notifications/  ← Notifications module
-```
-
-### 7. NO Dual/Legacy Systems ⚠️
-- **NEVER maintain two systems for the same functionality**
-- When a new system replaces an old one, **DELETE the old code completely**
-- Do NOT add fallbacks to legacy systems - this creates confusion and technical debt
-- If migration is needed, do it once and remove the old system
-- **Delete deprecated folders/files** immediately - they contaminate future suggestions
-- Example: Use ONLY `textbook_access` system, NOT both `textbook_access` AND `vinculaciones`
-
----
-
-## Tech Stack
-
-### Frontend
-- **React 18** with hooks
-- **Tailwind CSS** + **shadcn/ui** components
-- **i18next** for internationalization
-- **React Router** for navigation
-
-### Backend
-- **FastAPI** (Python)
-- **MongoDB** with Motor (async)
-- **JWT** authentication
-- **RBAC** permission system
-
-### Infrastructure
-- Kubernetes deployment
-- Supervisor for process management
-- Hot reload enabled
-
----
-
-## Key Personas
-
-### 1. Super Admin
-- Full access to all modules
-- Manages roles and permissions
-- System configuration
-
-### 2. Store Admin
-- Manages Unatienda (products, orders)
-- Approves student link requests
-- Manages schools
-
-### 3. Parent/Guardian (User)
-- Links students to schools
-- Access private catalog for their students
-- Uses ChipiWallet
-
-### 4. Student (User)
-- Views assigned textbooks
-- Uses platform features
-
----
-
-## Current Status
-
-### ✅ Completed
-- User authentication (JWT + Google OAuth partial)
-- RBAC system
-- Unatienda (store) base functionality
-- Student linking flow (Textbook Access)
-- ChipiWallet
-- Admin user management
-- Schools management
-- Dynamic form configuration
-- PinpanClub base structure
-- **📦 Textbook Ordering System** (NEW - Jan 24, 2026)
-  - Full-stack feature for ordering textbooks
-  - User selection → total calculation → Monday.com integration
-  - Admin dashboard with statistics
-  - Partial submission support (order some now, some later)
-- **🔄 Unified Orders Page** (Jan 24, 2026)
-  - Merged legacy orders with textbook orders
-  - Tabbed interface: "Pedidos de Textos" + "Otros Pedidos"
-  - Fixed user confusion from separate order systems
-- **🔧 Bug Fix: Expandable Order Details** (Jan 27, 2026)
-  - Fixed "+X más" button that wasn't clickable
-  - Users can now expand/collapse to see full order items
-- **📍 UX Improvement: Moved Textos to Unatienda** (Jan 27, 2026)
-  - Removed "Textos" tab from "Mi Cuenta"
-  - Added "Mis Pedidos" tab inside Unatienda's "Textos Escolares" section
-  - Better UX: users find textbook ordering directly in the store
-- **🧹 Code Standards Fix** (Jan 27, 2026)
-  - Fixed Spanish terms in code: `?tab=privado` → `?tab=private`
-  - Fixed internal state: `activeView='privado'` → `activeView='private'`
-  - Fixed backend: `cliente_id` → `user_id` fallback in catalogo_privado.py
-  - Deleted `/app/backend/_deprecated/` folder (legacy code contamination)
-  - Updated `catalogo_privado.py` to use ONLY `textbook_access` system
-- **📍 Moved Compra Exclusiva to Unatienda** (Jan 27, 2026)
-  - Removed "Compra Exclusiva" tab from "Mi Cuenta"
-  - Added "Ordenar Textos" button in Unatienda header
-  - Added 4-tab interface in Textos Escolares: "Mis Pedidos", "Por Estudiante", "Catálogo", "Vincular"
-  - Student badges now navigate to textbook ordering section
-  - "Vincular más" button to add new students
-  - Full textbook workflow now within Unatienda module
-- **🎨 New Student-Centered Design for Compra Exclusiva** (Jan 27, 2026)
-  - Redesigned to show students first, then textbooks
-  - Students view: Shows all linked students with order status
-  - Textbooks view: Shows books for selected student with lock status
-  - Books are locked after ordering (1 per item by default)
-  - Removed tabs "Por Estudiante" and "Catálogo" (redundant)
-- **⚙️ Dynamic Order Form Configuration** (Jan 27, 2026)
-  - Backend: `/api/store/order-form-config/` endpoints
-  - Admin UI: New "Formulario" tab in Admin → Unatienda
-  - Support for field types: text, textarea, number, select, multiselect, checkbox, file, date, email, phone, info
-  - Default fields: Bank transfer info (info type), Payment receipt upload (file type)
-  - Admin can add/edit/delete/reorder fields
-  - **Full trilingual support (EN, ES, ZH)** as per coding standards
-  - Dynamic fields integrated in user's order submission form
-  - File upload support with validation
-- **🔐 LaoPan.online OAuth 2.0 Integration** (Feb 1, 2026)
-  - Full OAuth 2.0 flow with Invision Community (laopan.online)
-  - Backend: `/api/invision/oauth/config`, `/api/invision/oauth/login`, `/api/invision/oauth/callback`
-  - Primary login button "Iniciar sesión con LaoPan" for regular users
-  - Collapsible "Acceso Administrativo" section for admin email/password login
-  - LaoPan callback page at `/auth/laopan/callback`
-  - JWT token generation upon successful OAuth authentication
-  - User auto-creation or linking on first OAuth login
-  - **Requires user to register redirect_uri in LaoPan OAuth app settings**
-
-- **🧹 Major Code Refactoring** (Feb 1, 2026)
-  - **Nomenclature Standardization**: Changed `cliente_id` → `user_id` across entire codebase
-  - **Database Collections**: Changed `db.clientes` → `db.users` references
-  - **Legacy File Cleanup**:
-    - Deleted `students.py`, `vinculacion.py`, `orders.py` (routes)
-    - Deleted `vinculacion_service.py`, `vinculacion_notification_service.py` (services)
-    - Deleted `acudientes_schemas.py`, `server_backup.py`, `VinculacionesTab.jsx`
-    - Deleted `field_mapping.py`, `migrate_fields_to_english.py`
-  - **Complete Cleanup**: Changed `acudiente_cliente_id` → `user_id` in pedidos system
-  - **Fixed Error**: Resolved "Error al cargar matrículas" toast in admin panel
-  - **Unified System**: All student management now uses `textbook_access` system exclusively
-  - **Admin Panel Cleanup**: Removed legacy "Matrículas (Legacy)" tab from Users module
-  - **🎯 Result: 0 Spanish naming references in code** (100% English nomenclature)
-
-### 🔄 In Progress
-- **Frontend for Student Profile Locking & School Year Config** - Backend ready, UI pending
-- See **ROADMAP.md** for prioritized tasks
-
-### ❌ Known Issues
-- Google Sign-Up infinite loop (recurring)
-- Admin sidebar modules may disappear after login (intermittent)
-- See **ROADMAP.md** for details
-
-### 🗑️ Cleanup Done
-- **Feb 1, 2026**: Major refactoring - removed all legacy vinculacion/students/orders code
-- **Jan 24, 2026**: Removed debug endpoint and redundant TextbookAccessAdminTab.jsx
-
----
-
-*Last Updated: February 1, 2026*
-*Version: 3.8 - Code Refactoring & Cleanup*
+## Last Updated
+December 2025 - Deployment fixes applied
