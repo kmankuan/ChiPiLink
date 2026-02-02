@@ -152,8 +152,8 @@ export default function ChallengeModal({
       >
         <Target className="h-6 w-6 mr-3" />
         <div className="flex flex-col items-start">
-          <span className="text-2xl">{txt.challengeBtn}</span>
-          <span className="text-xs opacity-80 font-normal">{txt.challengeSubtitle}</span>
+          <span className="text-2xl">{t('rapidpin.challengeBtn')}</span>
+          <span className="text-xs opacity-80 font-normal">{t('rapidpin.challengeSubtitle')}</span>
         </div>
       </Button>
 
@@ -163,16 +163,16 @@ export default function ChallengeModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <Swords className="h-6 w-6 text-orange-500" />
-              {txt.selectOpponent}
+              {t('rapidpin.selectOpponent')}
             </DialogTitle>
-            <DialogDescription>{txt.selectOpponentDesc}</DialogDescription>
+            <DialogDescription>{t('rapidpin.selectOpponentDesc')}</DialogDescription>
           </DialogHeader>
 
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={txt.searchPlaceholder}
+              placeholder={t('rapidpin.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -210,16 +210,16 @@ export default function ChallengeModal({
                           {player.stats && (
                             <>
                               <Badge variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
-                                {player.stats.wins || 0} {txt.wins}
+                                {player.stats.wins || 0} {t('rapidpin.wins')}
                               </Badge>
                               <Badge variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
-                                {player.stats.losses || 0} {txt.losses}
+                                {player.stats.losses || 0} {t('rapidpin.losses')}
                               </Badge>
                             </>
                           )}
                           {player.puntos_totales !== undefined && (
                             <Badge variant="secondary" className="text-xs">
-                              {player.puntos_totales} {txt.points}
+                              {player.puntos_totales} {t('rapidpin.points')}
                             </Badge>
                           )}
                         </div>
@@ -231,7 +231,7 @@ export default function ChallengeModal({
                       className="bg-orange-500 hover:bg-orange-600"
                     >
                       <Swords className="h-4 w-4 mr-1" />
-                      {txt.challenge}
+                      {t('rapidpin.challenge')}
                     </Button>
                   </div>
                 ))}
@@ -239,7 +239,7 @@ export default function ChallengeModal({
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <AlertCircle className="h-12 w-12 mb-3 opacity-50" />
-                <p>{txt.noPlayers}</p>
+                <p>{t('rapidpin.noPlayers')}</p>
               </div>
             )}
           </ScrollArea>
