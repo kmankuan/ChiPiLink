@@ -378,118 +378,23 @@
     }
   },
   "rapidpin": {
-    "title": "快速比赛",
-    "subtitle": "即兴比赛 - 2名选手 + 1名裁判！",
-    "viewSeason": "查看赛季",
-    "info": {
-      "participants": "参与者",
-      "playersAndReferee": "2名选手 + 1名裁判",
-      "scoring": "计分",
-      "scoringDesc": "胜利 / 失败 / 裁判",
-      "validation": "验证",
-      "oneConfirmation": "1次确认",
-      "validationDesc": "另一位参与者必须确认"
-    },
-    "seasons": {
-      "title": "赛季",
-      "create": "新赛季",
-      "created": "赛季创建成功",
-      "name": "赛季名称",
-      "namePlaceholder": "例如：2025年12月",
-      "description": "描述",
-      "descriptionPlaceholder": "可选描述...",
-      "startDate": "开始日期",
-      "endDate": "结束日期",
-      "fieldsRequired": "名称和结束日期为必填项",
-      "noSeasons": "暂无赛季",
-      "noSeasonsDesc": "创建您的第一个快速比赛赛季以开始",
-      "createFirst": "创建第一个赛季",
-      "notFound": "未找到赛季",
-      "status": {
-        "active": "进行中",
-        "closed": "已结束",
-        "archived": "已归档"
-      }
-    },
-    "matches": {
-      "title": "比赛",
-      "register": "登记比赛",
-      "registerDesc": "登记2名选手和1名裁判的比赛",
-      "registered": "比赛已登记，等待确认。",
-      "confirmed": "比赛已确认，积分已计入",
-      "playerA": "选手A",
-      "playerB": "选手B",
-      "referee": "裁判",
-      "winner": "获胜者",
-      "selectPlayer": "选择选手",
-      "selectReferee": "选择裁判",
-      "selectWinner": "选择获胜者",
-      "winnerScore": "获胜者得分",
-      "loserScore": "失败者得分",
-      "fieldsRequired": "所有字段为必填项",
-      "differentParticipants": "3位参与者必须不同",
-      "winnerMustBePlayer": "获胜者必须是选手之一",
-      "pendingNote": "比赛将处于待确认状态，直到另一位参与者确认",
-      "pendingConfirmations": "待确认比赛",
-      "confirm": "确认",
-      "recent": "最近比赛",
-      "noMatches": "暂无比赛记录",
-      "status": {
-        "pending": "待确认",
-        "validated": "已验证",
-        "disputed": "有争议",
-        "cancelled": "已取消"
-      }
-    },
-    "ranking": {
-      "title": "排名",
-      "players": "选手排名",
-      "playersDesc": "按总积分排名（胜利 + 失败 + 裁判）",
-      "referees": "裁判排名",
-      "refereesDesc": "按执裁比赛数排名",
-      "player": "选手",
-      "referee": "裁判",
-      "points": "积分",
-      "played": "场次",
-      "won": "胜",
-      "lost": "负",
-      "refereed": "执裁",
-      "matchesRefereed": "执裁比赛",
-      "refPoints": "积分",
-      "noPlayers": "排名中暂无选手",
-      "noReferees": "暂无裁判记录"
-    },
-    "stats": {
-      "matches": "比赛",
-      "players": "选手",
-      "referees": "裁判",
-      "pending": "待确认"
-    },
-    "prizes": {
-      "title": "奖品",
-      "player": "选手奖品",
-      "referee": "裁判奖品"
-    },
-    "closeSeason": {
-      "title": "关闭赛季",
-      "confirm": "确定要关闭此赛季吗？",
-      "confirmDesc": "此操作将确定最终排名并分配奖品。之后无法再登记比赛。",
-      "close": "关闭赛季",
-      "cancel": "取消",
-      "success": "赛季已成功关闭",
-      "results": "最终结果",
-      "playerResults": "选手结果",
-      "refereeResults": "裁判结果",
-      "prize": "奖品",
-      "position": "名次",
-      "points": "积分"
-    },
-    "notifications": {
-      "pendingTitle": "待确认比赛",
-      "pendingDesc": "您有比赛等待确认",
-      "confirmNow": "立即确认",
-      "noPending": "没有待确认比赛"
-    }
+    "challenge": "挑战",
+    "challengePlayer": "挑战选手",
+    "acceptChallenge": "接受挑战",
+    "declineChallenge": "拒绝挑战",
+    "pendingChallenges": "待处理挑战",
+    "noChallenges": "暂无待处理挑战",
+    "challengeSent": "挑战已发送",
+    "challengeAccepted": "挑战已接受",
+    "challengeDeclined": "挑战已拒绝",
+    "from": "来自",
+    "to": "发给",
+    "status": "状态",
+    "pending": "待处理",
+    "accepted": "已接受",
+    "declined": "已拒绝",
+    "completed": "已完成",
+    "expired": "已过期"
   },
   "dashboard": {
     "myOrders": "我的订单",
@@ -721,7 +626,7 @@
   "notifications": {
     "title": "通知",
     "subtitle": "管理您的通知偏好设置",
-    "preferences": "偏好设置",
+    "preferences": "通知偏好设置",
     "history": "历史记录",
     "categories": "类别",
     "providers": "提供商",
@@ -778,7 +683,20 @@
     "preview": "预览",
     "sent": "已发送",
     "pending": "待处理",
-    "failed": "失败"
+    "failed": "失败",
+    "preferencesSubtitle": "配置如何以及何时接收通知",
+    "globalSettings": "全局设置",
+    "pushEnabled": "推送通知",
+    "pushEnabledDesc": "在您的设备上接收通知",
+    "emailEnabled": "电子邮件通知",
+    "emailEnabledDesc": "通过电子邮件接收摘要",
+    "quietHours": "静音时段",
+    "quietHoursDesc": "在此时段不接收通知",
+    "quietFrom": "从",
+    "quietTo": "到",
+    "categoriesDesc": "选择您想要接收的通知类型",
+    "saved": "偏好设置已保存",
+    "saving": "保存中..."
   },
   "adminMemberships": {
     "title": "会员计划",
@@ -836,24 +754,5 @@
     "submit": "提交",
     "matchRecorded": "比赛记录成功",
     "error": "记录比赛出错"
-  },
-  "rapidpin": {
-    "challenge": "挑战",
-    "challengePlayer": "挑战选手",
-    "acceptChallenge": "接受挑战",
-    "declineChallenge": "拒绝挑战",
-    "pendingChallenges": "待处理挑战",
-    "noChallenges": "暂无待处理挑战",
-    "challengeSent": "挑战已发送",
-    "challengeAccepted": "挑战已接受",
-    "challengeDeclined": "挑战已拒绝",
-    "from": "来自",
-    "to": "发给",
-    "status": "状态",
-    "pending": "待处理",
-    "accepted": "已接受",
-    "declined": "已拒绝",
-    "completed": "已完成",
-    "expired": "已过期"
   }
 }
