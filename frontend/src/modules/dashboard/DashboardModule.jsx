@@ -333,11 +333,11 @@ export default function DashboardModule() {
               <span className="text-sm">Inventario</span>
               <div className="flex items-center gap-2">
                 <Progress 
-                  value={stats.productos.bajo_stock > 0 ? 70 : 100} 
+                  value={(stats.products?.low_stock || 0) > 0 ? 70 : 100} 
                   className="w-32 h-2" 
                 />
-                <Badge variant={stats.productos.bajo_stock > 0 ? "secondary" : "default"}>
-                  {stats.productos.bajo_stock > 0 ? 'Revisar' : 'OK'}
+                <Badge variant={(stats.products?.low_stock || 0) > 0 ? "secondary" : "default"}>
+                  {(stats.products?.low_stock || 0) > 0 ? 'Revisar' : 'OK'}
                 </Badge>
               </div>
             </div>
@@ -345,11 +345,11 @@ export default function DashboardModule() {
               <span className="text-sm">Pedidos</span>
               <div className="flex items-center gap-2">
                 <Progress 
-                  value={stats.pedidos.pendientes > 0 ? 60 : 100} 
+                  value={(stats.orders?.pending || 0) > 0 ? 60 : 100} 
                   className="w-32 h-2" 
                 />
-                <Badge variant={stats.pedidos.pendientes > 0 ? "secondary" : "default"}>
-                  {stats.pedidos.pendientes > 0 ? 'Pendientes' : 'OK'}
+                <Badge variant={(stats.orders?.pending || 0) > 0 ? "secondary" : "default"}>
+                  {(stats.orders?.pending || 0) > 0 ? 'Pendientes' : 'OK'}
                 </Badge>
               </div>
             </div>
