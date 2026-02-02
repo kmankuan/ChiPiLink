@@ -31,10 +31,10 @@ class PrizeConditionType(str, Enum):
     """Tipos de condición para ganar premio"""
     POSITION = "position"        # By posición en ranking (1°, 2°, 3°...)
     PARTICIPATION = "participation"  # By participar
-    MATCHES_PLAYED = "matches_played"  # By cantidad de partidos jugados
-    MATCHES_WON = "matches_won"  # By cantidad de victorias
+    MATCHES_PLAYED = "matches_played"  # By number of matches played
+    MATCHES_WON = "matches_won"  # By number of wins
     MATCHES_REFEREED = "matches_refereed"  # By arbitrajes
-    STREAK = "streak"            # By racha de victorias
+    STREAK = "streak"            # By win streak
     CHALLENGE = "challenge"      # By completar un reto
 
 
@@ -119,7 +119,7 @@ class AwardedPrize(BaseModel):
     # Estado
     status: PrizeStatus = PrizeStatus.CLAIMED
     
-    # Detalles de otorgamiento
+    # Award details
     awarded_for: str  # Description of por qué se otorgó
     position: Optional[int] = None  # Si fue por posición
     
@@ -137,7 +137,7 @@ class PrizeCatalog(BaseModel):
     catalog_id: str
     name: str
     description: Optional[str] = None
-    season_id: Optional[str] = None  # Si es específico de temporada
+    season_id: Optional[str] = None  # If specific to season
     prizes: List[PrizeDefinition] = []
     is_active: bool = True
     created_at: Optional[Any] = None

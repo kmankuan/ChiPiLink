@@ -12,10 +12,10 @@ import uuid
 class AchievementType(str, Enum):
     """Tipos de logro"""
     CHALLENGE_MASTER = "challenge_master"     # Complete X retos
-    WEEKLY_CHAMPION = "weekly_champion"       # Complete all challenges de una semana
+    WEEKLY_CHAMPION = "weekly_champion"       # Complete all challenges in a week
     STREAK_KEEPER = "streak_keeper"           # Complete retos X semanas seguidas
-    POINTS_MILESTONE = "points_milestone"     # Alcanzar X puntos de retos
-    DIFFICULTY_MASTER = "difficulty_master"   # Complete X retos de cierta dificultad
+    POINTS_MILESTONE = "points_milestone"     # Reach X challenge points
+    DIFFICULTY_MASTER = "difficulty_master"   # Complete X challenges of certain difficulty
     FIRST_CHALLENGE = "first_challenge"       # Complete el primer reto
     SOCIAL_BUTTERFLY = "social_butterfly"     # Achievements sociales
 
@@ -40,7 +40,7 @@ class Achievement(BaseModel):
     # Requisitos
     requirement_type: str  # "challenges_completed", "points_reached", "streak_weeks", etc.
     requirement_value: int
-    requirement_difficulty: Optional[str] = None  # Si es específico de dificultad
+    requirement_difficulty: Optional[str] = None  # If specific to difficulty
     
     # Recompensas
     points_reward: int = 0

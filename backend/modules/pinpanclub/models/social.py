@@ -135,7 +135,7 @@ class ActivityFeedItem(BaseModel):
     # Info of the player
     jugador_info: Optional[Dict] = None
     
-    # Data específicos de la actividad
+    # Activity-specific data
     data: Dict = {}  # Ej: {"match_id": "...", "opponent": "...", "score": "11-5"}
     
     # Descripción generada

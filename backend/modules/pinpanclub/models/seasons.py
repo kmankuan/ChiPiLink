@@ -13,7 +13,7 @@ class SeasonStatus(str, Enum):
     """Estado de una temporada"""
     UPCOMING = "upcoming"      # Próxima temporada
     ACTIVE = "active"          # Season actual activa
-    CLOSING = "closing"        # In proceso de cierre
+    CLOSING = "closing"        # In closing process
     COMPLETED = "completed"    # Season finalizada
 
 
@@ -53,8 +53,8 @@ class RankingSeason(BaseModel):
     status: SeasonStatus = SeasonStatus.UPCOMING
     
     # Configuration
-    min_challenges_to_qualify: int = 5  # Mínimo de retos para calificar
-    min_points_to_qualify: int = 50     # Mínimo de puntos para calificar
+    min_challenges_to_qualify: int = 5  # Minimum challenges to qualify
+    min_points_to_qualify: int = 50     # Minimum points to qualify
     
     # Recompensas por posición
     reward_tiers: List[Dict] = []

@@ -245,7 +245,7 @@ class RapidPinService(BaseService):
         player_ranking = await self.ranking_repo.get_season_ranking(season_id)
         referee_ranking = await self.ranking_repo.get_referee_ranking(season_id)
         
-        # Prepare resultados de jugadores
+        # Prepare player results
         player_results = []
         for idx, entry in enumerate(player_ranking, start=1):
             # Buscar premio correspondiente
