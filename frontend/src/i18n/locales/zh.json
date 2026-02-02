@@ -414,7 +414,92 @@
     "error": "发送挑战时出错",
     "loginRequired": "你必须登录才能挑战",
     "cantChallengeSelf": "你不能挑战自己",
-    "points": "分"
+    "points": "分",
+    "subtitle": "灵活验证的快速比赛",
+    "viewSeason": "查看赛季",
+    "info": {
+      "participants": "2名选手 + 1名裁判",
+      "playersAndReferee": "选手和裁判",
+      "scoring": "计分",
+      "scoringDesc": "胜者：3分，负者：1分，裁判：2分",
+      "validation": "验证",
+      "validationDesc": "需要3名参与者中2人确认",
+      "oneConfirmation": "一次确认"
+    },
+    "seasons": {
+      "title": "赛季",
+      "create": "创建赛季",
+      "createFirst": "创建第一个赛季",
+      "created": "赛季创建成功",
+      "noSeasons": "暂无赛季",
+      "noSeasonsDesc": "创建您的第一个赛季以开始记录比赛",
+      "name": "赛季名称",
+      "namePlaceholder": "输入赛季名称...",
+      "description": "描述",
+      "descriptionPlaceholder": "输入描述...",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "fieldsRequired": "所有字段为必填",
+      "notFound": "未找到赛季",
+      "status": {
+        "active": "进行中",
+        "closed": "已结束"
+      }
+    },
+    "matches": {
+      "title": "比赛",
+      "recent": "最近比赛",
+      "register": "登记比赛",
+      "registerDesc": "登记新的比赛结果",
+      "registered": "比赛登记成功",
+      "noMatches": "暂无比赛",
+      "playerA": "选手A",
+      "playerB": "选手B",
+      "referee": "裁判",
+      "selectPlayer": "选择选手",
+      "selectReferee": "选择裁判",
+      "winner": "胜者",
+      "selectWinner": "选择胜者",
+      "winnerScore": "胜者得分",
+      "loserScore": "负者得分",
+      "differentParticipants": "所有参与者必须不同",
+      "winnerMustBePlayer": "胜者必须是选手之一",
+      "fieldsRequired": "所有字段为必填",
+      "pendingConfirmations": "待确认",
+      "pendingNote": "等待确认",
+      "confirm": "确认",
+      "confirmed": "已确认"
+    },
+    "ranking": {
+      "title": "排名",
+      "players": "选手",
+      "playersDesc": "按总积分排序",
+      "referees": "裁判",
+      "refereesDesc": "按裁判积分排序",
+      "player": "选手",
+      "referee": "裁判",
+      "points": "积分",
+      "refPoints": "裁判分",
+      "played": "场次",
+      "won": "胜场",
+      "refereed": "执裁"
+    },
+    "stats": {
+      "matches": "比赛",
+      "pending": "待确认",
+      "players": "选手",
+      "referees": "裁判"
+    },
+    "closeSeason": {
+      "title": "结束赛季",
+      "confirmDesc": "确定要结束这个赛季吗？",
+      "results": "结果",
+      "playerResults": "选手结果",
+      "refereeResults": "裁判结果",
+      "close": "结束赛季",
+      "cancel": "取消",
+      "success": "赛季已成功结束"
+    }
   },
   "dashboard": {
     "myOrders": "我的订单",
