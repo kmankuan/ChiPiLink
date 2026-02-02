@@ -374,7 +374,7 @@ export default function RolesModule() {
                         <div>
                           <h4 className="font-semibold">{role.nombre}</h4>
                           <p className="text-xs text-muted-foreground">
-                            Nivel {role.nivel} • {role.usuarios_count} usuarios
+                            Level {role.nivel} • {role.users_count || role.usuarios_count} users
                           </p>
                         </div>
                       </div>
@@ -389,7 +389,7 @@ export default function RolesModule() {
                         </div>
                       )}
                       {role.es_sistema && (
-                        <Badge variant="secondary" className="text-xs">Sistema</Badge>
+                        <Badge variant="secondary" className="text-xs">System</Badge>
                       )}
                     </div>
                   </CardContent>
@@ -418,7 +418,7 @@ export default function RolesModule() {
                       {selectedRole.es_sistema && (
                         <Button variant="outline" size="sm" onClick={() => handleOpenRoleForm(selectedRole)}>
                           <Edit2 className="h-4 w-4 mr-2" />
-                          Editar Permisos
+                          Edit Permissions
                         </Button>
                       )}
                     </div>
@@ -426,14 +426,14 @@ export default function RolesModule() {
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>Nivel: <strong>{selectedRole.nivel}</strong></span>
-                        <span>Usuarios: <strong>{selectedRole.usuarios_count}</strong></span>
+                        <span>Level: <strong>{selectedRole.nivel}</strong></span>
+                        <span>Users: <strong>{selectedRole.users_count || selectedRole.usuarios_count}</strong></span>
                       </div>
                       
                       <div>
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
                           <Key className="h-4 w-4" />
-                          Permisos ({selectedRole.permisos?.length || 0})
+                          Permissions ({selectedRole.permisos?.length || 0})
                         </h4>
                         
                         {selectedRole.permisos?.includes('*') ? (
