@@ -261,6 +261,69 @@ async def update_my_profile(
     return {"success": True, "profile": profile}
 
 
+class UpdateLanguageRequest(BaseModel):
+    language: str  # "en", "es", "zh"
+
+
+@router.put("/profile/language")
+async def update_language_preference(
+    data: UpdateLanguageRequest,
+    user=Depends(get_current_user)
+):
+    """Update user's language preference - synced across devices"""
+    valid_languages = ["en", "es", "zh"]
+    if data.language not in valid_languages:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid language. Must be one of: {', '.join(valid_languages)}"
+        )
+    
+    profile = await user_profile_service.update_profile(
+        user["user_id"], 
+        {"language": data.language}
+    )
+    
+    if not profile:
+        # If no profile exists, try to update the user document directly
+        from core.database import db
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {"language": data.language}}
+        )
+        return {
+            "success": True, 
+            "language": data.language,
+            "message": "Language preference saved"
+        }
+    
+    return {
+        "success": True, 
+        "language": profile.get("language", data.language),
+        "profile": profile
+    }
+
+
+@router.get("/profile/language")
+async def get_language_preference(user=Depends(get_current_user)):
+    """Get user's language preference"""
+    profile = await user_profile_service.get_profile(user["user_id"])
+    
+    if profile and profile.get("language"):
+        return {"success": True, "language": profile["language"]}
+    
+    # Check user document as fallback
+    from core.database import db
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "language": 1}
+    )
+    
+    return {
+        "success": True, 
+        "language": user_doc.get("language", "es") if user_doc else "es"
+    }
+
+
 @router.get("/profile/{user_id}")
 async def get_user_profile(user_id: str):
     """Obtener perfil de un usuario (público)"""
