@@ -194,10 +194,10 @@ export default function MisConexiones({ token }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Error');
       
-      // Mensaje de éxito con info de notificación
+      // Success message with notification info
       const pushSent = data.push_notification?.success;
       if (pushSent) {
-        toast.success(`${t('conexiones.requestSent')} 🔔 Se notificó al usuario`);
+        toast.success(`${t('conexiones.requestSent')} User was notified`);
       } else {
         toast.success(t('conexiones.requestSent'));
       }
@@ -214,7 +214,7 @@ export default function MisConexiones({ token }) {
 
   const handleSendInvite = async () => {
     if (!inviteEmail) {
-      toast.error('Ingresa un correo electrónico');
+      toast.error('Enter an email address');
       return;
     }
     
@@ -238,8 +238,8 @@ export default function MisConexiones({ token }) {
       const data = await res.json();
       
       if (data.existe) {
-        // Usuario ya registrado, ofrecer conectar directamente
-        toast.info('Este usuario ya está registrado. Puedes enviarle una solicitud de conexión.');
+        // User already registered, offer to connect directly
+        toast.info('This user is already registered. You can send them a connection request.');
         setSelectedUser({ user_id: data.user_id, email: inviteEmail });
         setShowInviteDialog(false);
         return;
