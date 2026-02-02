@@ -109,7 +109,7 @@ export default function DashboardModule() {
       icon: Users, 
       color: 'bg-purple-500',
       description: 'Gestionar clientes y usuarios',
-      stats: `${stats.usuarios.total} registrados`
+      stats: `${stats.users?.total || 0} registrados`
     },
     { 
       id: 'memberships', 
