@@ -280,11 +280,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
           </TabsTrigger>
           <TabsTrigger value="categorias" className="gap-2">
             <Tags className="h-4 w-4" />
-            Categorías
+            Categories
           </TabsTrigger>
           <TabsTrigger value="inventario" className="gap-2">
             <Box className="h-4 w-4" />
-            Inventario
+            Inventory
           </TabsTrigger>
         </TabsList>
 
@@ -295,7 +295,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar productos..."
+                  placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -303,10 +303,10 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               </div>
               <Select value={filterCategoria} onValueChange={setFilterCategoria}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Categoría" />
+                  <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas las categorías</SelectItem>
+                  <SelectItem value="all">All categories</SelectItem>
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
                       <span className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             </div>
             <Button onClick={() => openEditDialog()} className="gap-2">
               <Plus className="h-4 w-4" />
-              Agregar Producto
+              Add Product
             </Button>
           </div>
 
@@ -327,7 +327,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <Card>
               <CardContent className="py-12 text-center">
                 <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No hay productos en el catálogo público</p>
+                <p className="text-muted-foreground">No products in the public catalog</p>
               </CardContent>
             </Card>
           ) : (
@@ -337,11 +337,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Producto</TableHead>
-                        <TableHead>Categoría</TableHead>
-                        <TableHead className="text-right">Precio</TableHead>
+                        <TableHead>Product</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
                         <TableHead className="text-right">Stock</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -363,7 +363,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                                   {libro.requiere_preparacion && (
                                     <Badge variant="outline" className="text-orange-600 text-xs">
                                       <Clock className="h-3 w-3 mr-1" />
-                                      Preparación
+                                      Preparation
                                     </Badge>
                                   )}
                                 </div>
