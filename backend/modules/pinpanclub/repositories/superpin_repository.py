@@ -160,7 +160,7 @@ class SuperPinMatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Get partido by ID"""
+        """Get match by ID"""
         return await self.find_one({self.ID_FIELD: partido_id})
     
     async def get_league_matches(

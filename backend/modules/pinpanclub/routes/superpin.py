@@ -133,7 +133,7 @@ async def create_match(data: SuperPinMatchCreate):
 
 @router.get("/matches/{partido_id}", response_model=SuperPinMatch)
 async def get_match(partido_id: str):
-    """Get partido by ID"""
+    """Get match by ID"""
     match = await superpin_service.get_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
@@ -142,7 +142,7 @@ async def get_match(partido_id: str):
 
 @router.post("/matches/{partido_id}/start", response_model=SuperPinMatch)
 async def start_match(partido_id: str):
-    """Iniciar partido"""
+    """Start match"""
     match = await superpin_service.start_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
@@ -157,7 +157,7 @@ async def record_point(
     error_forzado: bool = False,
     punto_saque: bool = False
 ):
-    """Register punto en the match"""
+    """Register point en the match"""
     if jugador not in ['a', 'b']:
         raise HTTPException(status_code=400, detail="Jugador debe ser 'a' o 'b'")
     

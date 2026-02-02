@@ -70,7 +70,7 @@ class MatchService(BaseService):
         return Match(**result)
     
     async def get_match(self, partido_id: str) -> Optional[Match]:
-        """Get partido by ID"""
+        """Get match by ID"""
         result = await self.repository.get_by_id(partido_id)
         return Match(**result) if result else None
     
@@ -90,7 +90,7 @@ class MatchService(BaseService):
     
     async def start_match(self, partido_id: str) -> Optional[Match]:
         """
-        Iniciar partido.
+        Start match.
         Emite evento: pinpanclub.match.started
         """
         match = await self.get_match(partido_id)

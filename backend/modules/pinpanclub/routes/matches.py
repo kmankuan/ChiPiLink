@@ -44,7 +44,7 @@ async def get_match_stats():
 
 @router.get("/{partido_id}", response_model=Match)
 async def get_match(partido_id: str):
-    """Get partido by ID"""
+    """Get match by ID"""
     match = await match_service.get_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
@@ -65,7 +65,7 @@ async def start_match(
     partido_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Iniciar partido"""
+    """Start match"""
     match = await match_service.start_match(partido_id)
     if not match:
         raise HTTPException(status_code=400, detail="No se puede iniciar the match")

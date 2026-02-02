@@ -205,7 +205,7 @@ class SuperPinService(BaseService):
         self,
         data: SuperPinMatchCreate
     ) -> SuperPinMatch:
-        """Create partido Super Pin"""
+        """Create Super Pin match"""
         # Get player info
         player_a = await self.player_repo.get_by_id(data.jugador_a_id)
         player_b = await self.player_repo.get_by_id(data.jugador_b_id)
@@ -242,12 +242,12 @@ class SuperPinService(BaseService):
         return SuperPinMatch(**result)
     
     async def get_match(self, partido_id: str) -> Optional[SuperPinMatch]:
-        """Get partido by ID"""
+        """Get match by ID"""
         result = await self.match_repo.get_by_id(partido_id)
         return SuperPinMatch(**result) if result else None
     
     async def start_match(self, partido_id: str) -> Optional[SuperPinMatch]:
-        """Iniciar partido"""
+        """Start match"""
         match = await self.match_repo.get_by_id(partido_id)
         if not match:
             return None
@@ -265,12 +265,12 @@ class SuperPinService(BaseService):
         jugador: str,  # 'a' o 'b'
         stats: Optional[Dict] = None
     ) -> Dict:
-        """Register punto"""
+        """Register point"""
         match = await self.match_repo.get_by_id(partido_id)
         if not match or match["estado"] != "en_curso":
-            raise ValueError("Partido no está en curso")
+            raise ValueError("Match is not in progress")
         
-        # Update puntos
+        # Update points
         if jugador == 'a':
             match["puntos_jugador_a"] += 1
         else:
@@ -285,7 +285,7 @@ class SuperPinService(BaseService):
         ganador_set = None
         ganador_partido = None
         
-        # Verify if set was won
+        # Check if set was won
         if puntos_a >= puntos_set or puntos_b >= puntos_set:
             if abs(puntos_a - puntos_b) >= 2:
                 set_ganado = True
@@ -305,7 +305,7 @@ class SuperPinService(BaseService):
                 else:
                     match["sets_jugador_b"] += 1
                 
-                # Verify si se ganó the match
+                # Check if match was won
                 sets_para_ganar = (match["mejor_de"] // 2) + 1
                 if match["sets_jugador_a"] >= sets_para_ganar:
                     partido_terminado = True
@@ -316,7 +316,7 @@ class SuperPinService(BaseService):
                     ganador_partido = 'b'
                     match["ganador_id"] = match["jugador_b_id"]
                 else:
-                    # Siguiente set
+                    # Next set
                     match["set_actual"] += 1
                     match["puntos_jugador_a"] = 0
                     match["puntos_jugador_b"] = 0
@@ -327,12 +327,12 @@ class SuperPinService(BaseService):
                 match["stats"] = {}
             match["stats"].update(stats)
         
-        # Finalize partido si terminó
+        # Finalize match if ended
         if partido_terminado:
             match["estado"] = "finalizado"
             match["fecha_fin"] = datetime.now(timezone.utc).isoformat()
             
-            # Calculatesr y actualizar ranking
+            # Calculate and update ranking
             await self._update_ranking_after_match(match)
             
             # Increment match counter
@@ -350,10 +350,10 @@ class SuperPinService(BaseService):
         }
     
     async def _update_ranking_after_match(self, match: Dict):
-        """Update ranking después de un partido"""
+        """Update ranking after a match"""
         liga_id = match["liga_id"]
         
-        # Get configuración of the league
+        # Get league configuration
         league = await self.league_repo.get_by_id(liga_id)
         if not league:
             return
@@ -371,7 +371,7 @@ class SuperPinService(BaseService):
         if not ranking_ganador or not ranking_perdedor:
             return
         
-        # Calculate points according to system
+        # Calculate points by system
         if scoring_system == "elo":
             puntos_ganador, puntos_perdedor, elo_change = self._calculate_elo(
                 ranking_ganador.get("elo_rating", 1000),

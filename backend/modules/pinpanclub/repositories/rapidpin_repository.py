@@ -103,7 +103,7 @@ class RapidPinMatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, match_id: str) -> Optional[Dict]:
-        """Get partido by ID"""
+        """Get match by ID"""
         return await self.find_one({self.ID_FIELD: match_id})
     
     async def update(self, match_id: str, data: Dict) -> bool:

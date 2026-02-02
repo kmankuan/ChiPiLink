@@ -35,7 +35,7 @@ class MatchRepository(BaseRepository):
         return await self.insert_one(match_data)
     
     async def get_by_id(self, partido_id: str) -> Optional[Dict]:
-        """Get partido by ID"""
+        """Get match by ID"""
         return await self.find_by_id(self.ID_FIELD, partido_id)
     
     async def get_active_matches(self) -> List[Dict]:
@@ -98,7 +98,7 @@ class MatchRepository(BaseRepository):
         })
     
     async def start_match(self, partido_id: str, fecha_inicio: str) -> bool:
-        """Iniciar partido"""
+        """Start match"""
         return await self.update_match(partido_id, {
             "estado": "en_curso",
             "fecha_inicio": fecha_inicio

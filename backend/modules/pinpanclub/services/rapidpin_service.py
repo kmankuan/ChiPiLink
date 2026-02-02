@@ -462,7 +462,7 @@ class RapidPinService(BaseService):
             })
     
     async def get_match(self, match_id: str) -> Optional[RapidPinMatch]:
-        """Get partido by ID"""
+        """Get match by ID"""
         result = await self.match_repo.get_by_id(match_id)
         return RapidPinMatch(**result) if result else None
     

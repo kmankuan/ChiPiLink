@@ -210,7 +210,7 @@ class PlayerCheckIn(BaseModel):
 # ============== SUPER PIN MATCH MODEL ==============
 
 class SuperPinMatchCreate(BaseModel):
-    """Create partido Super Pin"""
+    """Create Super Pin match"""
     liga_id: str
     jugador_a_id: str
     jugador_b_id: str

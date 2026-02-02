@@ -101,7 +101,7 @@ async def confirm_match(
 
 @router.get("/matches/{match_id}", response_model=RapidPinMatch)
 async def get_match(match_id: str):
-    """Get partido by ID"""
+    """Get match by ID"""
     match = await rapidpin_service.get_match(match_id)
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
