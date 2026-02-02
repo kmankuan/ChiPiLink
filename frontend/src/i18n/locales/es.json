@@ -141,7 +141,11 @@
     "all": "Todos",
     "none": "Ninguno",
     "select": "Seleccionar",
-    "noResults": "Sin resultados"
+    "noResults": "Sin resultados",
+    "readMore": "Leer más",
+    "viewAll": "Ver todo",
+    "showMore": "Ver más",
+    "showLess": "Ver menos"
   },
   "status": {
     "pending": "Pendiente",
