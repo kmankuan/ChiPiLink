@@ -171,10 +171,6 @@ export default function UnatiendaModule() {
           <EstudiantesTab token={token} />
         </TabsContent>
 
-        <TabsContent value="pedidos">
-          <PedidosTab token={token} />
-        </TabsContent>
-
         <TabsContent value="configuracion">
           <ConfiguracionTab token={token} />
         </TabsContent>
