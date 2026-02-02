@@ -1,14 +1,14 @@
 """
-Rutas para Sistema de Conexiones entre Usuarios
+Routes for User Connections System
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 
 from core.auth import get_current_user, get_admin_user
-from ..services.conexiones_service import conexiones_service
+from ..services.connections_service import conexiones_service
 
-router = APIRouter(prefix="/conexiones", tags=["Conexiones"])
+router = APIRouter(prefix="/conexiones", tags=["Connections"])
 
 
 # ============== REQUEST MODELS ==============
