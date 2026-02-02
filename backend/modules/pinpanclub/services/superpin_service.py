@@ -206,7 +206,7 @@ class SuperPinService(BaseService):
         data: SuperPinMatchCreate
     ) -> SuperPinMatch:
         """Create partido Super Pin"""
-        # Obtener info de jugadores
+        # Get player info
         player_a = await self.player_repo.get_by_id(data.jugador_a_id)
         player_b = await self.player_repo.get_by_id(data.jugador_b_id)
         arbitro = None
@@ -484,7 +484,7 @@ class SuperPinService(BaseService):
         if not ranking:
             return None
         
-        # Obtener historial de partidos
+        # Get match history
         matches = await self.match_repo.get_player_matches(liga_id, jugador_id, limit=20)
         
         return {
@@ -991,7 +991,7 @@ class SuperPinService(BaseService):
                     ranking["liga_nombre"] = league.get("nombre")
                     rankings.append(ranking)
         
-        # Obtener historial de partidos
+        # Get match history
         matches = await self.match_repo.find_many(
             query={
                 "$or": [

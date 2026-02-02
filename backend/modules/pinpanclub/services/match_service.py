@@ -33,7 +33,7 @@ class MatchService(BaseService):
         """
         match_dict = data.model_dump()
         
-        # Obtener info de jugadores
+        # Get player info
         player_a = await self.player_repository.get_by_id(data.jugador_a_id)
         player_b = await self.player_repository.get_by_id(data.jugador_b_id)
         

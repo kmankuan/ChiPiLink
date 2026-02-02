@@ -16,7 +16,7 @@ class AchievementType(str, Enum):
     STREAK_KEEPER = "streak_keeper"           # Complete retos X semanas seguidas
     POINTS_MILESTONE = "points_milestone"     # Reach X challenge points
     DIFFICULTY_MASTER = "difficulty_master"   # Complete X challenges of certain difficulty
-    FIRST_CHALLENGE = "first_challenge"       # Complete el primer reto
+    FIRST_CHALLENGE = "first_challenge"       # Complete the first challenge
     SOCIAL_BUTTERFLY = "social_butterfly"     # Achievements sociales
 
 

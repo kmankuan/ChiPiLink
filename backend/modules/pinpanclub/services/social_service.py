@@ -49,7 +49,7 @@ class SocialService(BaseService):
         if existing:
             raise ValueError("Ya sigues a este jugador")
         
-        # Obtener info de jugadores
+        # Get player info
         follower = await self.player_repo.get_by_id(follower_id)
         following = await self.player_repo.get_by_id(following_id)
         
