@@ -1035,7 +1035,7 @@
     "noMembership": "Sin membresía activa"
   },
   "adminMemberships": {
-    "title": "Planes de Membresía",
+    "title": "Gestión de Membresías",
     "subtitle": "Gestiona planes de membresía y membresías de usuarios",
     "plans": "Planes",
     "userMemberships": "Membresías de Usuarios",
@@ -1061,7 +1061,24 @@
     "membershipType": "Tipo de Membresía",
     "visits": "Por visitas",
     "time": "Por tiempo",
-    "trial": "Prueba"
+    "trial": "Prueba",
+    "visitors": "Visitantes Actuales",
+    "noCurrentVisitors": "Sin visitantes actuales",
+    "checkOutUser": "Registrar Salida",
+    "name": "Nombre",
+    "checkInTime": "Hora de Entrada",
+    "timeInClub": "Tiempo en el Club",
+    "stats": "Estadísticas",
+    "today": "Hoy",
+    "week": "Esta Semana",
+    "month": "Este Mes",
+    "checkins": "Entradas",
+    "avgDuration": "Duración Promedio",
+    "activeMemberships": "Membresías Activas",
+    "pendingCheckout": "Salidas Pendientes",
+    "action": "Acción",
+    "minutes": "min",
+    "checkOutSuccess": "Salida registrada"
   },
   "pinpanclub": {
     "title": "PinPan Club",

@@ -799,7 +799,7 @@
     }
   },
   "adminMemberships": {
-    "title": "会员计划",
+    "title": "会员管理",
     "subtitle": "管理会员计划和用户会员资格",
     "plans": "计划",
     "userMemberships": "用户会员资格",
@@ -825,7 +825,24 @@
     "membershipType": "会员类型",
     "visits": "按次数",
     "time": "按时间",
-    "trial": "试用"
+    "trial": "试用",
+    "visitors": "当前访客",
+    "noCurrentVisitors": "暂无当前访客",
+    "checkOutUser": "签退",
+    "name": "姓名",
+    "checkInTime": "签到时间",
+    "timeInClub": "在俱乐部时间",
+    "stats": "统计",
+    "today": "今天",
+    "week": "本周",
+    "month": "本月",
+    "checkins": "签到",
+    "avgDuration": "平均时长",
+    "activeMemberships": "活跃会员",
+    "pendingCheckout": "待签退",
+    "action": "操作",
+    "minutes": "分钟",
+    "checkOutSuccess": "签退成功"
   },
   "pinpanclub": {
     "title": "PinPan俱乐部",

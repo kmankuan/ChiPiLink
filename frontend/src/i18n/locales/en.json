@@ -1031,7 +1031,7 @@
     }
   },
   "adminMemberships": {
-    "title": "Membership Plans",
+    "title": "Membership Management",
     "subtitle": "Manage membership plans and user memberships",
     "plans": "Plans",
     "userMemberships": "User Memberships",
@@ -1057,7 +1057,24 @@
     "membershipType": "Membership Type",
     "visits": "Visit-based",
     "time": "Time-based",
-    "trial": "Trial"
+    "trial": "Trial",
+    "visitors": "Current Visitors",
+    "noCurrentVisitors": "No current visitors",
+    "checkOutUser": "Check Out User",
+    "name": "Name",
+    "checkInTime": "Check-in Time",
+    "timeInClub": "Time at Club",
+    "stats": "Statistics",
+    "today": "Today",
+    "week": "This Week",
+    "month": "This Month",
+    "checkins": "Check-ins",
+    "avgDuration": "Avg Duration",
+    "activeMemberships": "Active Memberships",
+    "pendingCheckout": "Pending Checkout",
+    "action": "Action",
+    "minutes": "min",
+    "checkOutSuccess": "Check-out successful"
   },
   "pinpanclub": {
     "title": "PinPan Club",
