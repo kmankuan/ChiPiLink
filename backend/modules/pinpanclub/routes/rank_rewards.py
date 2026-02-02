@@ -44,7 +44,7 @@ async def check_rank_promotion(
 ):
     """
     Verificar si hubo promoción de rango y otorgar recompensas.
-    Normalmente llamado internamente después de completar retos.
+    Normalmente llamado internamente after de completar retos.
     """
     result = await rank_rewards_service.check_rank_promotion(
         jugador_id, old_points, new_points, lang

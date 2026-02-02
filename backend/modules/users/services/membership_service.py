@@ -1,5 +1,5 @@
 """
-Membership Service - Management of membresías y pases de visita
+Membership Service - Management of memberships y pases de visita
 Sistema configurable con diferentes tipos de planes y tracking de uso
 """
 from typing import Dict, List, Optional, Any
@@ -13,7 +13,7 @@ from modules.users.models.user_models import (
 
 
 class MembershipService:
-    """Service for management of membresías y visitas"""
+    """Service for management of memberships y visitas"""
     
     def __init__(self):
         self.collection_plans = "chipi_membership_plans"
@@ -27,7 +27,7 @@ class MembershipService:
     # ============== PLAN CONFIGURATION ==============
     
     async def initialize_default_plans(self) -> int:
-        """Inicializar planes de membresía by default"""
+        """Inicializar planes de membership by default"""
         defaults = self._get_default_plans()
         created = 0
         
@@ -162,7 +162,7 @@ class MembershipService:
         active_only: bool = True,
         user_type_id: str = None
     ) -> List[Dict]:
-        """Get planes de membresía"""
+        """Get planes de membership"""
         query = {}
         if active_only:
             query["is_active"] = True
@@ -192,7 +192,7 @@ class MembershipService:
         return plan
     
     async def create_plan(self, plan_data: Dict) -> Dict:
-        """Create un nuevo plan de membresía"""
+        """Create un nuevo plan de membership"""
         now = datetime.now(timezone.utc).isoformat()
         
         if "plan_id" not in plan_data:
@@ -238,7 +238,7 @@ class MembershipService:
     # ============== USER MEMBERSHIPS ==============
     
     async def get_membership(self, membership_id: str) -> Optional[Dict]:
-        """Get membresía by ID"""
+        """Get membership by ID"""
         membership = await db[self.collection_memberships].find_one(
             {"membership_id": membership_id},
             {"_id": 0}
@@ -250,7 +250,7 @@ class MembershipService:
         user_id: str,
         active_only: bool = True
     ) -> List[Dict]:
-        """Get membresías de un usuario"""
+        """Get memberships de un usuario"""
         query = {"user_id": user_id}
         
         if active_only:
@@ -271,7 +271,7 @@ class MembershipService:
         return memberships
     
     async def get_active_membership(self, user_id: str) -> Optional[Dict]:
-        """Get membresía activa de un usuario"""
+        """Get membership activa de un usuario"""
         now = datetime.now(timezone.utc).isoformat()
         
         membership = await db[self.collection_memberships].find_one(
@@ -306,7 +306,7 @@ class MembershipService:
         sponsored_by: str = None,
         sponsor_note: str = None
     ) -> Dict:
-        """Comprar una membresía"""
+        """Comprar una membership"""
         plan = await self.get_plan(plan_id)
         if not plan:
             raise ValueError(f"Plan {plan_id} not found")
@@ -352,7 +352,7 @@ class MembershipService:
         return membership
     
     async def _expire_membership(self, membership_id: str) -> bool:
-        """Marcar membresía como expirada"""
+        """Marcar membership como expirada"""
         result = await db[self.collection_memberships].update_one(
             {"membership_id": membership_id},
             {
@@ -369,7 +369,7 @@ class MembershipService:
         membership_id: str,
         reason: str = None
     ) -> bool:
-        """Cancelar una membresía"""
+        """Cancelar una membership"""
         result = await db[self.collection_memberships].update_one(
             {"membership_id": membership_id},
             {
@@ -393,7 +393,7 @@ class MembershipService:
         visit_type: VisitType = VisitType.REGULAR,
         notes: str = None
     ) -> Dict:
-        """Usar una visita de la membresía"""
+        """Usar una visita de la membership"""
         membership = await self.get_membership(membership_id)
         if not membership:
             raise ValueError("Membership not found")
@@ -403,7 +403,7 @@ class MembershipService:
         
         plan = await self.get_plan(membership.get("plan_id"))
         
-        # Verify tipo de membresía
+        # Verify tipo de membership
         if plan and plan.get("membership_type") == MembershipType.VISITS.value:
             visits_remaining = membership.get("visits_remaining", 0)
             
@@ -426,7 +426,7 @@ class MembershipService:
             "consumed": visit_type == VisitType.REGULAR
         }
         
-        # Update membresía
+        # Update membership
         result = await db[self.collection_memberships].find_one_and_update(
             {"membership_id": membership_id},
             {
@@ -452,7 +452,7 @@ class MembershipService:
         visits: int,
         reason: str = None
     ) -> Dict:
-        """Agregar visitas a una membresía"""
+        """Agregar visitas a una membership"""
         now = datetime.now(timezone.utc).isoformat()
         
         result = await db[self.collection_memberships].find_one_and_update(
@@ -501,7 +501,7 @@ class MembershipService:
             "quick_visit_max_minutes": 15,  # Máximo para visita rápida (no consume)
             "check_in_methods": ["qr", "pin", "geolocation", "manual"],
             "require_checkout": True,
-            "auto_checkout_hours": 8,  # Auto checkout después de 8 horas
+            "auto_checkout_hours": 8,  # Auto checkout after de 8 horas
             "club_location": {
                 "latitude": 9.0,
                 "longitude": -79.5,
@@ -631,7 +631,7 @@ class MembershipService:
             }
         )
         
-        # Si consumió visita, descontar de membresía
+        # Si consumió visita, descontar de membership
         if consumed_visit:
             membership = await self.get_active_membership(visit["user_id"])
             if membership and membership.get("visits_remaining") is not None:

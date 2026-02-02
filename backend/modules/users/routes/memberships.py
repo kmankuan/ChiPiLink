@@ -1,5 +1,5 @@
 """
-Membership API Routes - Management of membresías y visitas
+Membership API Routes - Management of memberships y visitas
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -54,7 +54,7 @@ async def get_plans(
     active_only: bool = Query(True),
     lang: str = Query("es")
 ):
-    """Get planes de membresía disponibles"""
+    """Get planes de membership disponibles"""
     plans = await membership_service.get_plans(
         active_only=active_only,
         user_type_id=user_type_id
@@ -83,7 +83,7 @@ async def create_plan(
     data: CreatePlanRequest,
     admin=Depends(get_admin_user)
 ):
-    """Create un nuevo plan de membresía (admin)"""
+    """Create un nuevo plan de membership (admin)"""
     try:
         MembershipType(data.membership_type)
     except ValueError:
@@ -139,7 +139,7 @@ async def get_my_memberships(
     active_only: bool = Query(True),
     user=Depends(get_current_user)
 ):
-    """Get mis membresías"""
+    """Get mis memberships"""
     memberships = await membership_service.get_user_memberships(
         user_id=user["user_id"],
         active_only=active_only
@@ -154,7 +154,7 @@ async def get_my_memberships(
 
 @router.get("/me/active")
 async def get_my_active_membership(user=Depends(get_current_user)):
-    """Get mi membresía activa"""
+    """Get mi membership activa"""
     membership = await membership_service.get_active_membership(user["user_id"])
     
     return {
@@ -169,7 +169,7 @@ async def purchase_membership(
     data: PurchaseMembershipRequest,
     user=Depends(get_current_user)
 ):
-    """Comprar una membresía"""
+    """Comprar una membership"""
     try:
         membership = await membership_service.purchase_membership(
             user_id=user["user_id"],
@@ -187,7 +187,7 @@ async def get_membership(
     membership_id: str,
     user=Depends(get_current_user)
 ):
-    """Get detalle de una membresía"""
+    """Get detalle de una membership"""
     membership = await membership_service.get_membership(membership_id)
     
     if not membership:
@@ -210,7 +210,7 @@ async def cancel_membership(
     reason: Optional[str] = None,
     user=Depends(get_current_user)
 ):
-    """Cancelar una membresía"""
+    """Cancelar una membership"""
     membership = await membership_service.get_membership(membership_id)
     
     if not membership:
@@ -331,7 +331,7 @@ async def admin_get_user_memberships(
     active_only: bool = Query(False),
     admin=Depends(get_admin_user)
 ):
-    """Get membresías de un usuario (admin)"""
+    """Get memberships de un usuario (admin)"""
     memberships = await membership_service.get_user_memberships(
         user_id=user_id,
         active_only=active_only
@@ -352,7 +352,7 @@ async def admin_grant_membership(
     sponsor_note: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Otorgar membresía a un usuario (admin/cortesía)"""
+    """Otorgar membership a un usuario (admin/cortesía)"""
     try:
         membership = await membership_service.purchase_membership(
             user_id=user_id,
@@ -373,7 +373,7 @@ async def admin_add_visits(
     reason: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Agregar visitas a una membresía (admin)"""
+    """Agregar visitas a una membership (admin)"""
     membership = await membership_service.add_visits(
         membership_id=membership_id,
         visits=visits,

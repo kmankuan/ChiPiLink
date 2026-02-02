@@ -226,7 +226,7 @@ class FormConfigService(BaseService):
                 "label_es": "Correo Electrónico",
                 "label_zh": "电子邮件",
                 "description_en": "Email address input",
-                "description_es": "Entrada de correo electrónico",
+                "description_es": "Entrada de correo electronic",
                 "icon": "mail"
             },
             {

@@ -52,7 +52,7 @@ async def get_category_promotions(categoria: str, limit: int = Query(10, ge=1, l
 
 @router.get("/newest/{categoria}")
 async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)):
-    """Get productos más nuevos de una category"""
+    """Get productos more nuevos de una category"""
     return await product_service.get_newest_products(categoria, limit)
 
 

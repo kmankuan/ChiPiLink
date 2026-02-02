@@ -282,12 +282,12 @@ async def emit_challenge_event(
             "zh": f"日期已确认！{player1_name} vs {player2_name}"
         },
         "referee_assigned": {
-            "es": f"Árbitro asignado para {player1_name} vs {player2_name}",
+            "es": f"Referee asignado para {player1_name} vs {player2_name}",
             "en": f"Referee assigned for {player1_name} vs {player2_name}",
             "zh": f"{player1_name} vs {player2_name} 已分配裁判"
         },
         "waiting_referee": {
-            "es": f"{player1_name} vs {player2_name} esperan árbitro",
+            "es": f"{player1_name} vs {player2_name} esperan referee",
             "en": f"{player1_name} vs {player2_name} waiting for referee",
             "zh": f"{player1_name} vs {player2_name} 等待裁判"
         }

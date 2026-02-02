@@ -59,7 +59,7 @@ class BaseRepository(ABC, Generic[T]):
         sort: List[tuple] = None,
         exclude_fields: List[str] = None
     ) -> List[Dict]:
-        """Buscar múltiples documentos"""
+        """Buscar multiple documentos"""
         query = query or {}
         projection = {"_id": 0}
         if exclude_fields:

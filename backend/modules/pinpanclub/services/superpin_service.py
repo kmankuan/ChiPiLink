@@ -503,7 +503,7 @@ class SuperPinService(BaseService):
         if not league:
             raise ValueError("Liga not found")
         
-        # Get participantes según configuration
+        # Get participantes according to configuration
         ranking = await self.get_ranking(data.liga_id)
         tournament_config = league.tournament_config
         
@@ -560,7 +560,7 @@ class SuperPinService(BaseService):
         # Generate bracket structure
         brackets = []
         
-        # Primera ronda - emparejar según ranking (1 vs last, 2 vs penlast, etc.)
+        # Primera ronda - emparejar according to ranking (1 vs last, 2 vs penlast, etc.)
         round_1_matches = []
         for i in range(bracket_size // 2):
             match = {
@@ -914,7 +914,7 @@ class SuperPinService(BaseService):
         return badges
     
     async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
-        """Get jugadores con más badges"""
+        """Get jugadores con more badges"""
         # This requires MongoDB aggregation
         pipeline = [
             {"$group": {
@@ -951,7 +951,7 @@ class SuperPinService(BaseService):
         return results
     
     async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
-        """Get badges más recientes (para feed)"""
+        """Get badges more recientes (para feed)"""
         badges = await self.badge_repo.get_recent_badges(limit)
         
         # Enrich with player info

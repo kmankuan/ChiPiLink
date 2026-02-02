@@ -1,6 +1,6 @@
 """
 System for Premios Avanzado - Modelos
-Premios configurables más allá de badges: físicos, descuentos, privilegios
+Premios configurables more allá de badges: físicos, descuentos, privilegios
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -188,8 +188,8 @@ def get_default_prize_catalog() -> List[Dict]:
             "for_players": True
         },
         {
-            "name": "Mejor Árbitro",
-            "description": "Árbitro con más partidos dirigidos",
+            "name": "Mejor Referee",
+            "description": "Referee con more partidos dirigidos",
             "type": "privilege",
             "icon": "⚖️",
             "value": "Acceso VIP a torneos",

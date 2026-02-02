@@ -61,7 +61,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "二维码支付"
             },
             "description": {
-                "es": "Confirmación de pagos y cobros vía QR",
+                "es": "Confirmación de pagos y cobros via QR",
                 "en": "QR payment and charge confirmations",
                 "zh": "二维码支付和收费确认"
             },
@@ -161,7 +161,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "快速对决挑战"
             },
             "description": {
-                "es": "Nuevos desafíos, aceptaciones, partidos esperando árbitro",
+                "es": "Nuevos desafíos, aceptaciones, partidos esperando referee",
                 "en": "New challenges, acceptances, matches waiting for referee",
                 "zh": "新挑战、接受、等待裁判的比赛"
             },
@@ -378,12 +378,12 @@ def get_default_notification_templates() -> List[Dict]:
             "category_id": "cat_membership",
             "name": "Membership Expiring",
             "title": {
-                "es": "Tu membresía vence pronto",
+                "es": "Tu membership vence pronto",
                 "en": "Your membership is expiring soon",
                 "zh": "您的会员资格即将到期"
             },
             "body": {
-                "es": "Tu membresía vence en {{days}} días. Renuévala para seguir disfrutando.",
+                "es": "Tu membership vence en {{days}} days. Renuévala para seguir disfrutando.",
                 "en": "Your membership expires in {{days}} days. Renew to keep enjoying.",
                 "zh": "您的会员资格将在{{days}}天后到期。续订以继续享受。"
             },

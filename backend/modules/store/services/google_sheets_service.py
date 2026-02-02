@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class GoogleSheetsService:
     """
     Service for sincronizar estudiantes desde Google Sheets.
-    Soporta múltiples hojas (pestañas) por grado.
+    Soporta multiple hojas (pestañas) por grado.
     """
     
     def __init__(self):
@@ -283,7 +283,7 @@ class GoogleSheetsService:
                     headers = [h.lower().strip() for h in datos[0]]
                     columnas = hoja_cfg.get("columnas", config)
                     
-                    # Mapear índices de columnas
+                    # Mapear indexs de columnas
                     col_idx = {}
                     for key in ["columna_numero", "columna_nombre", "columna_grado", "columna_seccion", "columna_estado"]:
                         col_name = columnas.get(key, config.get(key, "")).lower()
@@ -293,7 +293,7 @@ class GoogleSheetsService:
                     # Procesar cada fila (desde la 2)
                     for fila_num, fila in enumerate(datos[1:], start=2):
                         try:
-                            # Extract datos con los índices mapeados
+                            # Extract datos con los indexs mapeados
                             def get_val(key):
                                 idx = col_idx.get(key)
                                 if idx is not None and idx < len(fila):

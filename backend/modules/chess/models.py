@@ -15,7 +15,7 @@ class ChessPlayerBase(BaseModel):
     foto_url: Optional[str] = None
     nivel: str = "principiante"  # principiante, intermedio, avanzado, maestro
     estilo_juego: Optional[str] = None  # agresivo, posicional, tactico, defensivo
-    aperturas_favoritas: Optional[List[str]] = None  # Siciliana, Española, etc.
+    aperturas_favoritas: Optional[List[str]] = None  # Siciliana, Espyearla, etc.
     email: Optional[str] = None
     telefono: Optional[str] = None
     activo: bool = True

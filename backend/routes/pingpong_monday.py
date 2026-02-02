@@ -98,7 +98,7 @@ async def monday_graphql_request(query: str) -> Dict:
 
 
 async def create_monday_item(board_id: str, item_name: str, column_values: Dict, group_id: str = None) -> Dict:
-    """Crear un ítem en Monday.com"""
+    """Crear un item en Monday.com"""
     # Escapar comillas dobles en el JSON
     column_values_json = json.dumps(column_values)
     escaped_json = column_values_json.replace('"', '\\"')
@@ -122,7 +122,7 @@ async def create_monday_item(board_id: str, item_name: str, column_values: Dict,
 
 
 async def update_monday_item(board_id: str, item_id: str, column_values: Dict) -> Dict:
-    """Actualizar un ítem en Monday.com"""
+    """Actualizar un item en Monday.com"""
     column_values_json = json.dumps(column_values)
     escaped_json = column_values_json.replace('"', '\\"')
     
@@ -283,7 +283,7 @@ async def sync_players_to_monday(
                 "status": {"label": player.get("nivel", "principiante")}  # Nivel
             }
             
-            # Crear ítem en Monday.com
+            # Crear item en Monday.com
             result = await create_monday_item(
                 board_id=config.players_board_id,
                 item_name=nombre_completo,
@@ -357,7 +357,7 @@ async def sync_match_to_monday(
     nombre_a = player_a.get("apodo") or player_a.get("nombre", "Jugador A") if player_a else "Jugador A"
     nombre_b = player_b.get("apodo") or player_b.get("nombre", "Jugador B") if player_b else "Jugador B"
     
-    # Preparar nombre del ítem
+    # Preparar nombre del item
     item_name = f"{nombre_a} vs {nombre_b}"
     
     # Mapear estado
@@ -387,7 +387,7 @@ async def sync_match_to_monday(
     
     try:
         if match.get("monday_item_id"):
-            # Actualizar ítem existente
+            # Actualizar item existente
             result = await update_monday_item(
                 board_id=config.matches_board_id,
                 item_id=match["monday_item_id"],
@@ -395,7 +395,7 @@ async def sync_match_to_monday(
             )
             action = "updated"
         else:
-            # Crear nuevo ítem
+            # Crear nuevo item
             result = await create_monday_item(
                 board_id=config.matches_board_id,
                 item_name=item_name,

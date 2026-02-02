@@ -157,7 +157,7 @@ class QRCodeService:
             {"_id": 0}
         )
         
-        # Get membresía activa
+        # Get membership activa
         now = datetime.now(timezone.utc).isoformat()
         membership = await db.chipi_user_memberships.find_one(
             {
@@ -198,7 +198,7 @@ class QRCodeService:
         }
     
     def _get_available_actions(self, wallet: Dict, membership: Dict) -> list:
-        """Determinar actions disponibles basadas en wallet y membresía"""
+        """Determinar actions disponibles basadas en wallet y membership"""
         actions = []
         
         if membership:
@@ -263,7 +263,7 @@ class QRCodeService:
             "created_at": now
         }
         
-        # Procesar según action
+        # Procesar according to action
         if action == "checkin":
             result = await self._process_checkin(user_id, processed_by)
         elif action == "pay_usd":

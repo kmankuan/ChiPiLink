@@ -88,7 +88,7 @@ class ProductService(BaseService):
         categoria: Optional[str] = None,
         limit: int = 8
     ) -> List[Product]:
-        """Get productos más nuevos"""
+        """Get productos more nuevos"""
         results = await self.repository.get_newest(categoria, limit)
         return [Product(**r) for r in results]
     

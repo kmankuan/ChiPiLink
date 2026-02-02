@@ -63,7 +63,7 @@ class PlayerRepository(BaseRepository):
         won: bool,
         elo_change: int
     ) -> bool:
-        """Update statistics después de un partido"""
+        """Update statistics after de un partido"""
         update = {
             "$inc": {
                 "partidos_jugados": 1,

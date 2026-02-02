@@ -1,6 +1,6 @@
 """
 Ping Pong Sponsors Module - Management of patrocinadores para pantallas TV
-Permite configurar espacios publicitarios, logos, diseños y más
+Permite configurar espacios publicitarios, logos, diseños y more
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
@@ -503,7 +503,7 @@ async def reordenar_patrocinadores(ordenes: Dict[str, int]):
 
 @router.post("/bulk/toggle")
 async def toggle_patrocinadores(sponsor_ids: List[str], activo: bool):
-    """Activar/desactivar múltiples patrocinadores"""
+    """Activar/desactivar multiple patrocinadores"""
     from main import db
     
     result = await db.pingpong_sponsors.update_many(

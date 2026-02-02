@@ -67,7 +67,7 @@ async def get_auth_config(admin: dict = Depends(get_admin_user)):
             "apple": {"enabled": False, "visible": False, "label": None, "order": 4},
             "registration_fields": {
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
-                "email": {"required": True, "visible": True, "label": "Correo electrónico"},
+                "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Teléfono"},
                 "direccion": {"required": False, "visible": False, "label": "Dirección"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
@@ -124,7 +124,7 @@ async def get_public_auth_config():
             ],
             "registration_fields": {
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
-                "email": {"required": True, "visible": True, "label": "Correo electrónico"},
+                "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Teléfono"},
                 "direccion": {"required": False, "visible": False, "label": "Dirección"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}

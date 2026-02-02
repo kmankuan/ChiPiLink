@@ -162,7 +162,7 @@ async def get_ranking(season_id: str):
 
 @router.get("/seasons/{season_id}/ranking/referees", response_model=List[RapidPinRankingEntry])
 async def get_referee_ranking(season_id: str):
-    """Get ranking de árbitros"""
+    """Get ranking de referees"""
     return await rapidpin_service.get_referee_ranking(season_id)
 
 
@@ -183,7 +183,7 @@ async def get_scoring_config():
     return {
         "scoring": RAPID_PIN_SCORING,
         "rules": {
-            "participants": "2 jugadores + 1 árbitro",
+            "participants": "2 jugadores + 1 referee",
             "validation": "Requiere confirmación de 1 participante adicional",
             "points_victory": RAPID_PIN_SCORING["victory"],
             "points_defeat": RAPID_PIN_SCORING["defeat"],
@@ -203,7 +203,7 @@ async def create_challenge(
 ):
     """
     Crear desafío de jugador a jugador.
-    El oponente debe aceptar antes de que se busque árbitro.
+    El oponente debe aceptar antes de que se busque referee.
     """
     try:
         return await rapidpin_service.create_challenge(
@@ -260,7 +260,7 @@ async def create_queue_match(
 ):
     """
     Crear partido directamente in queue (admin/mod).
-    Salta la fase de desafío, va directo a esperar árbitro.
+    Salta la fase de desafío, va directo a esperar referee.
     """
     try:
         return await rapidpin_service.create_queue_match(
@@ -331,7 +331,7 @@ async def assign_referee(
     assigned_by_role: str = "player"
 ):
     """
-    Asignarse como árbitro de a match in queue.
+    Asignarse como referee de a match in queue.
     - Cualquier usuario logueado puede asignarse (referee_id = su ID)
     - Admin/Mod pueden asignar a cualquiera
     """
@@ -355,7 +355,7 @@ async def complete_queue_match(
 ):
     """
     Completar partido con resultado.
-    Solo el árbitro asignado puede completarlo.
+    Solo el referee asignado puede completarlo.
     """
     try:
         return await rapidpin_service.complete_queue_match(

@@ -100,7 +100,7 @@ async def get_subjects():
     return {
         "materias": [
             {"id": "matematicas", "nombre": "Matemáticas"},
-            {"id": "espanol", "nombre": "Español"},
+            {"id": "espanol", "nombre": "Espyearl"},
             {"id": "ciencias", "nombre": "Ciencias"},
             {"id": "sociales", "nombre": "Estudios Sociales"},
             {"id": "ingles", "nombre": "Inglés"},

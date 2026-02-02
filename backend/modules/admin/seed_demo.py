@@ -70,7 +70,7 @@ DEMO_CHALLENGES = [
         "challenge_id": "ch_comeback_king",
         "name_es": "Rey del Comeback",
         "name_en": "Comeback King",
-        "description_es": "Gana un partido después de ir perdiendo 0-2",
+        "description_es": "Gana un partido after de ir perdiendo 0-2",
         "description_en": "Win a match after being down 0-2",
         "icon": "👑",
         "type": "special",

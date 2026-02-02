@@ -24,7 +24,7 @@ class ChallengeType(str, Enum):
     MATCHES_REFEREED = "matches_refereed"  # Arbitrar X partidos
     WIN_STREAK = "win_streak"              # X win streak
     PLAY_DIFFERENT = "play_different"      # Jugar contra X oponentes diferentes
-    DAILY_PLAY = "daily_play"              # Jugar X días diferentes
+    DAILY_PLAY = "daily_play"              # Jugar X days diferentes
     COMEBACK = "comeback"                  # Win while behind on score
     PERFECT_GAME = "perfect_game"          # Ganar sin perder puntos (11-0)
     SOCIAL = "social"                      # Interactions sociales
@@ -224,7 +224,7 @@ def get_auto_challenges() -> List[Dict]:
         },
         {
             "name": "Constancia",
-            "description": "Juega al menos un partido 4 días diferentes",
+            "description": "Juega al menos un partido 4 days diferentes",
             "type": "daily_play",
             "difficulty": "medium",
             "icon": "📅",
@@ -233,7 +233,7 @@ def get_auto_challenges() -> List[Dict]:
         },
         {
             "name": "Remontada Épica",
-            "description": "Gana un partido después de perder el primer set",
+            "description": "Gana un partido after de perder el primer set",
             "type": "comeback",
             "difficulty": "hard",
             "icon": "💪",

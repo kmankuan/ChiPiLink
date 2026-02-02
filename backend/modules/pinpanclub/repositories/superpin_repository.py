@@ -404,7 +404,7 @@ class PlayerBadgeRepository(BaseRepository):
         return await self.count({"jugador_id": jugador_id, "badge_type": badge_type})
     
     async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
-        """Get badges más recientes (para feed)"""
+        """Get badges more recientes (para feed)"""
         return await self.find_many(
             query={},
             limit=limit,

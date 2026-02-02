@@ -54,7 +54,7 @@ async def get_newest_products(
     categoria: Optional[str] = None,
     limit: int = Query(8, ge=1, le=50)
 ):
-    """Get productos más nuevos"""
+    """Get productos more nuevos"""
     return await product_service.get_newest_products(categoria, limit)
 
 

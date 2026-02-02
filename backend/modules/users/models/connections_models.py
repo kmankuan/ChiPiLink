@@ -207,12 +207,12 @@ class CapacidadUsuario(BaseModel):
 class CapacidadConfig(BaseModel):
     """Configuración de una capacidad (admin configurable)"""
     capacidad_id: str = Field(default_factory=lambda: f"cap_{uuid.uuid4().hex[:8]}")
-    nombre: Dict[str, str]          # {"es": "Árbitro", "en": "Referee"}
+    nombre: Dict[str, str]          # {"es": "Referee", "en": "Referee"}
     descripcion: Dict[str, str] = {}
     icono: str = "⚡"
     color: str = "#6366f1"
     tipo: TipoCapacidad
-    membresia_requerida: Optional[str] = None   # ID of membresía si requiere
+    membresia_requerida: Optional[str] = None   # ID of membership si requiere
     auto_asignar_a: List[str] = []              # ["suscriptor", "acudido"]
     puede_extender_a: List[str] = []            # ["acudiente"] - admin puede extender
     requiere_aprobacion: bool = False
@@ -413,7 +413,7 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "arbitro",
-            "nombre": {"es": "Árbitro", "en": "Referee", "zh": "裁判"},
+            "nombre": {"es": "Referee", "en": "Referee", "zh": "裁判"},
             "descripcion": {"es": "Puede arbitrar partidos oficiales", "en": "Can referee official matches"},
             "icono": "🏅",
             "color": "#8b5cf6",
@@ -457,7 +457,7 @@ def get_default_capacidades() -> List[Dict]:
 
 
 def get_default_membresias() -> List[Dict]:
-    """Retorna membresías (productos) by default del sistema"""
+    """Retorna memberships (productos) by default del sistema"""
     return [
         {
             "membresia_id": "pinpanclub",

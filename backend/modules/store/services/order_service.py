@@ -175,7 +175,7 @@ class OrderService(BaseService):
         if success:
             order = await self.get_order(pedido_id)
             
-            # Emit eventos según el estado
+            # Emit eventos according to el estado
             if estado == OrderStatus.ENVIADO:
                 await self.emit_event(
                     StoreEvents.ORDER_SHIPPED,

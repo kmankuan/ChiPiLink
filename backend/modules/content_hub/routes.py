@@ -55,8 +55,8 @@ async def get_content_hub_status():
         "status": "placeholder",
         "message": "Content Hub - Curación de Contenido Multimedia",
         "planned_features": [
-            "Importar videos/posts de múltiples redes sociales",
-            "Categorización por audiencia (niños, padres, etc.)",
+            "Importar videos/posts de multiple redes sociales",
+            "Categorización por audiencia (childs, padres, etc.)",
             "Embed de videos (YouTube, Instagram, etc.)",
             "Playlists y collections",
             "Feed personalizado por category",

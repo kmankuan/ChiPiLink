@@ -22,7 +22,7 @@ class ConfiguracionSitio(BaseModel):
     nombre_sitio: str = "Mi Tienda"
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
-    descripcion: str = "Plataforma de comercio electrónico"
+    descripcion: str = "Plataforma de comercio electronic"
     color_primario: str = "#16a34a"
     color_secundario: str = "#0f766e"
     email_contacto: Optional[str] = None
@@ -97,7 +97,7 @@ BLOCK_TEMPLATES = {
         "descripcion": "Bloque de texto con title",
         "config_default": {
             "titulo": "",
-            "contenido": "Escribe tu contenido aquí...",
+            "contenido": "Escribe tu contenido here...",
             "alineacion": "center",
             "ancho_max": "800px"
         }
@@ -297,7 +297,7 @@ BLOCK_TEMPLATES = {
                 "background": "transparent",
                 "card_style": "default",  # default, compact, expanded
                 "show_cta": True,
-                "cta_text": {"es": "Ver más en PinPanClub", "en": "See more in PinPanClub", "zh": "在PinPanClub查看更多"},
+                "cta_text": {"es": "Ver more en PinPanClub", "en": "See more in PinPanClub", "zh": "在PinPanClub查看更多"},
                 "cta_url": "/pinpanclub"
             }
         }

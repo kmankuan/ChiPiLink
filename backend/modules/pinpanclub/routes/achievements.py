@@ -32,7 +32,7 @@ async def get_player_achievements(jugador_id: str):
 async def check_achievements(jugador_id: str):
     """
     Verificar y otorgar logros pendientes para a player.
-    Llamar después de completar retos.
+    Llamar after de completar retos.
     """
     awarded = await achievements_service.check_and_award_achievements(jugador_id)
     return {

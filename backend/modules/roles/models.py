@@ -33,7 +33,7 @@ AVAILABLE_PERMISSIONS = {
         "edit": "Editar usuarios",
         "delete": "Eliminar usuarios",
         "assign_roles": "Asignar roles a usuarios",
-        "manage_memberships": "Gestionar membresías",
+        "manage_memberships": "Gestionar memberships",
     },
     
     # Roles y permisos
@@ -74,7 +74,7 @@ AVAILABLE_PERMISSIONS = {
     
     # Memberships
     "memberships": {
-        "view": "Ver membresías",
+        "view": "Ver memberships",
         "create_plans": "Crear planes",
         "manage_subscriptions": "Gestionar subscriptions",
         "view_visits": "Ver visitas",
@@ -162,7 +162,7 @@ class RoleBase(BaseModel):
     color: Optional[str] = "#6366f1"  # Color for UI
     icono: Optional[str] = "Shield"  # Icono lucide
     es_sistema: bool = False  # True for system roles that cannot be deleted
-    nivel: int = 0  # Nivel jerárquico (mayor = más privilegios)
+    nivel: int = 0  # Nivel jerárquico (mayor = more privilegios)
 
 
 class RoleCreate(RoleBase):

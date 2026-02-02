@@ -84,7 +84,7 @@ class ProductRepository(BaseRepository):
         return await self.find_many(query=query, limit=limit)
     
     async def get_newest(self, categoria: Optional[str] = None, limit: int = 8) -> List[Dict]:
-        """Get productos más nuevos"""
+        """Get productos more nuevos"""
         query = {"activo": True}
         if categoria:
             query["categoria"] = categoria

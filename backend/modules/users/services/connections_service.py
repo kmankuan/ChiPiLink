@@ -660,7 +660,7 @@ class ConexionesService:
         # Verify limit diario
         limite = conexion.get("permisos", {}).get("limite_transferencia_diario")
         if limite:
-            # Calculate transferencias del día
+            # Calculate transferencias del day
             hoy = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
             transferencias_hoy = await db.transferencias_wallet.aggregate([
                 {
@@ -760,7 +760,7 @@ class ConexionesService:
         saldo_actual: float,
         descripcion: str
     ) -> Dict:
-        """Create alerta de saldo insuficiente (envía a usuario y acudientes)"""
+        """Create alerta de saldo insuficiente (envia a usuario y acudientes)"""
         from modules.notifications.services.push_service import push_notification_service
         
         # Get usuario
@@ -949,7 +949,7 @@ class ConexionesService:
         ).to_list(length=50)
         membresias_activas = [s["membresia_id"] for s in subscriptions]
         
-        # Get all membresías
+        # Get all memberships
         query = {"activa": True}
         servicios_sugeridos = marketing.get("servicios_sugeridos")
         servicios_excluidos = marketing.get("servicios_excluidos", [])

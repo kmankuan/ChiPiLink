@@ -1,6 +1,6 @@
 """
 Push Notification Service - Servicio principal de notifications
-Soporta múltiples proveedores (FCM, OneSignal) con failover y balanceo de carga
+Soporta multiple proveedores (FCM, OneSignal) con failover y balanceo de carga
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
@@ -137,7 +137,7 @@ class PushNotificationService:
             self.log_info("Mock provider loaded (no providers configured)")
     
     def _select_provider(self, category_provider: str = None) -> str:
-        """Seleccionar proveedor según estrategia"""
+        """Seleccionar proveedor according to estrategia"""
         if not self._providers:
             return "mock"
         
@@ -498,7 +498,7 @@ class PushNotificationService:
                 devices_by_provider[p] = []
             devices_by_provider[p].append(device["device_token"])
         
-        # Send según estrategia
+        # Send according to estrategia
         if selected_provider == "both":
             # Send a todos los proveedores
             for provider_name, tokens in devices_by_provider.items():
@@ -568,7 +568,7 @@ class PushNotificationService:
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notification a múltiples usuarios"""
+        """Send notification a multiple usuarios"""
         results = {
             "success": True,
             "total_users": len(user_ids),

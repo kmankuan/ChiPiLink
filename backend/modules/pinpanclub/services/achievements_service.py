@@ -61,7 +61,7 @@ class AchievementsService(BaseService):
     async def check_and_award_achievements(self, jugador_id: str) -> List[Dict]:
         """
         Verificar y otorgar logros al jugador basándose en su progreso.
-        Llamar después de completar un reto.
+        Llamar after de completar un reto.
         """
         awarded = []
         

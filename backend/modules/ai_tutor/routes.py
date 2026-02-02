@@ -43,7 +43,7 @@ async def get_tutor_status():
             "Feedback personalizado del tutor",
             "Planes de lección adaptativos",
             "Seguimiento de progreso",
-            "Múltiples idiomas (Inglés, Chino, Español)",
+            "Múltiples idiomas (Inglés, Chino, Espyearl)",
             "Gamificación con logros y rachas"
         ],
         "required_integrations": [

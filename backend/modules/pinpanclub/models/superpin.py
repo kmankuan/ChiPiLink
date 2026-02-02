@@ -22,7 +22,7 @@ class CheckInMethod(str, Enum):
     MANUAL = "manual"          # Record manual
     QR_CODE = "qr_code"        # QR code scan
     GEOLOCATION = "geolocation"  # GPS/ubicación
-    ANY = "any"                # Cualquier método
+    ANY = "any"                # Cualquier method
 
 
 class StatsLevel(str, Enum):
@@ -44,7 +44,7 @@ class TournamentType(str, Enum):
     """Tipo de torneo final"""
     TOP_N = "top_n"            # Only top N players
     ALL_PLAYERS = "all_players"  # All the players
-    BY_CATEGORY = "by_category"  # By categorys según ranking
+    BY_CATEGORY = "by_category"  # By categorys according to ranking
 
 
 class MatchType(str, Enum):
@@ -77,8 +77,8 @@ class ScoringConfig(BaseModel):
 class CheckInConfig(BaseModel):
     """Configuración de check-in"""
     method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - keep for compatibility
-    methods: List[str] = ["manual"]  # List of métodos permitidos
-    require_referee: bool = False  # Requiere árbitro/testigo
+    methods: List[str] = ["manual"]  # List of methods permitidos
+    require_referee: bool = False  # Requiere referee/testigo
     referee_can_be_player: bool = True  # Another player can be referee
     
     # Geolocation config
@@ -468,7 +468,7 @@ BADGE_DEFINITIONS = {
         "name_en": "Season MVP",
         "name_zh": "赛季MVP",
         "icon": "⭐",
-        "description": "Jugador más valioso of the season",
+        "description": "Jugador more valioso of the season",
         "rarity": "legendary"
     },
     BadgeType.WIN_STREAK_5: {

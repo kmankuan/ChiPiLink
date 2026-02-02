@@ -307,7 +307,7 @@ async def get_tournament_brackets(torneo_id: str):
 
 @router.get("/badges/recent")
 async def get_recent_badges(limit: int = 20):
-    """Get badges más recientes (feed)"""
+    """Get badges more recientes (feed)"""
     return await superpin_service.get_recent_badges(limit)
 
 

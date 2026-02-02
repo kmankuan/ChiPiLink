@@ -168,7 +168,7 @@ class RapidPinMatchRepository(BaseRepository):
         jugador_id: str,
         limit: int = 20
     ) -> List[Dict]:
-        """Get partidos de un jugador (como jugador o árbitro)"""
+        """Get partidos de un jugador (como jugador o referee)"""
         return await self.find_many(
             query={
                 "season_id": season_id,
@@ -283,7 +283,7 @@ class RapidPinRankingRepository(BaseRepository):
         )
     
     async def get_referee_ranking(self, season_id: str) -> List[Dict]:
-        """Get ranking de árbitros (por partidos arbitrados)"""
+        """Get ranking de referees (por partidos arbitrados)"""
         return await self.find_many(
             query={
                 "season_id": season_id,
@@ -298,7 +298,7 @@ class RapidPinRankingRepository(BaseRepository):
         is_winner: bool,
         points: int
     ) -> bool:
-        """Update statistics de jugador después de un partido"""
+        """Update statistics de jugador after de un partido"""
         inc_data = {
             "puntos_totales": points,
             "puntos_como_jugador": points,
@@ -327,7 +327,7 @@ class RapidPinRankingRepository(BaseRepository):
         ranking_id: str,
         points: int
     ) -> bool:
-        """Update statistics de árbitro"""
+        """Update statistics de referee"""
         result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
             {

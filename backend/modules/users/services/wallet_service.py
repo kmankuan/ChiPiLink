@@ -220,7 +220,7 @@ class WalletService(BaseService):
         
         update_amount = transaction["amount"] if is_credit else -transaction["amount"]
         
-        # Update totales según tipo
+        # Update totales according to tipo
         totals_update = {}
         if transaction["transaction_type"] == TransactionType.DEPOSIT.value:
             totals_update["total_deposited"] = transaction["amount"]

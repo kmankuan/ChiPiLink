@@ -411,7 +411,7 @@ class RankingSeasonsService(BaseService):
     ):
         """
         Actualizar statistics of the player en the season actual.
-        Llamar después de completar un reto.
+        Llamar after de completar un reto.
         """
         season = await self.get_current_season()
         if not season:

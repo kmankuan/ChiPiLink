@@ -25,8 +25,8 @@ GRADOS_PCA = [
 ]
 
 # Materias por nivel
-MATERIAS_PRIMARIA = ["Español", "Matemáticas", "Ciencias Naturales", "Ciencias Sociales", "Inglés", "Religión"]
-MATERIAS_SECUNDARIA = ["Español", "Matemáticas", "Física", "Química", "Biología", "Historia", "Geografía", "Inglés", "Religión", "Tecnología"]
+MATERIAS_PRIMARIA = ["Espyearl", "Matemáticas", "Ciencias Naturales", "Ciencias Sociales", "Inglés", "Religión"]
+MATERIAS_SECUNDARIA = ["Espyearl", "Matemáticas", "Física", "Química", "Biología", "Historia", "Geografía", "Inglés", "Religión", "Tecnología"]
 
 # Editoriales
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]

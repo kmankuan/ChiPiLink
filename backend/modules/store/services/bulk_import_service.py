@@ -79,7 +79,7 @@ class BulkImportService:
         
         Args:
             raw_text: Texto pegado desde Google Sheets
-            column_mapping: Mapeo de campos a índices de columna
+            column_mapping: Mapeo de campos a indexs de columna
                 {
                     "numero_estudiante": 0,  # Columna A
                     "nombre_completo": 1,    # Columna B
@@ -107,7 +107,7 @@ class BulkImportService:
         
         for idx, row in enumerate(parsed["rows"]):
             try:
-                # Extract datos según mapeo
+                # Extract datos according to mapeo
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
                 grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
@@ -305,7 +305,7 @@ class BulkImportService:
         
         Args:
             raw_text: Texto pegado desde Google Sheets
-            column_mapping: Mapeo de campos a índices de columna
+            column_mapping: Mapeo de campos a indexs de columna
                 {
                     "codigo": 0,           # Código del libro
                     "nombre": 1,           # Name ofl libro

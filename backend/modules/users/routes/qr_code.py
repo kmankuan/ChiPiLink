@@ -145,7 +145,7 @@ async def qr_checkin(
     data: ScanQRRequest,
     admin=Depends(get_admin_user)
 ):
-    """Check-in rápido vía QR"""
+    """Check-in rápido via QR"""
     result = await qr_code_service.process_qr_action(
         qr_string=data.qr_string,
         action="checkin",
@@ -164,7 +164,7 @@ async def qr_payment(
     data: ProcessQRActionRequest,
     admin=Depends(get_admin_user)
 ):
-    """Process pago vía QR"""
+    """Process pago via QR"""
     if data.action not in ["pay_usd", "pay_points"]:
         raise HTTPException(status_code=400, detail="Action must be 'pay_usd' or 'pay_points'")
     

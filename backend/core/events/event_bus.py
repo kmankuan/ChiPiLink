@@ -52,7 +52,7 @@ class EventBus:
     Event Bus interno para comunicación entre modules.
     
     Características:
-    - Pub/Sub asíncrono
+    - Pub/Sub like thisncrono
     - Soporte para wildcards (ej: 'pinpanclub.*')
     - Cola de eventos con prioridad
     - Preparado para migrar a Redis/RabbitMQ
@@ -120,7 +120,7 @@ class EventBus:
     async def publish(self, event: Event) -> None:
         """
         Publicar un evento a todos los suscriptores.
-        Los handlers se ejecutan de forma asíncrona.
+        Los handlers se ejecutan de forma like thisncrona.
         """
         if not self._running:
             logger.warning("EventBus is not running, event not published")
@@ -140,7 +140,7 @@ class EventBus:
             if self._matches_pattern(event.event_type, pattern):
                 matching_handlers.extend(handlers)
         
-        # Ejecutar handlers de forma asíncrona
+        # Ejecutar handlers de forma like thisncrona
         if matching_handlers:
             tasks = []
             for handler in matching_handlers:

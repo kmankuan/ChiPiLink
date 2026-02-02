@@ -44,15 +44,15 @@ async def send_challenge_notification(
             },
             "challenge_accepted": {
                 "title": "✅ ¡Desafío Aceptado!",
-                "body": f"{challenger_name} aceptó tu desafío. ¡A buscar árbitro!"
+                "body": f"{challenger_name} aceptó tu desafío. ¡A buscar referee!"
             },
             "referee_needed": {
-                "title": "🏓 ¡Partido esperando árbitro!",
-                "body": f"El partido entre {challenger_name} está esperando un árbitro"
+                "title": "🏓 ¡Partido esperando referee!",
+                "body": f"El partido entre {challenger_name} está esperando un referee"
             },
             "referee_assigned": {
                 "title": "🎮 ¡Tu partido está listo!",
-                "body": f"{challenger_name} será el árbitro de tu partido. ¡A jugar!"
+                "body": f"{challenger_name} será el referee de tu partido. ¡A jugar!"
             },
             "date_proposed": {
                 "title": "📅 Nueva propuesta de fecha",
@@ -90,7 +90,7 @@ async def send_referee_needed_broadcast(
     exclude_player_ids: list = None
 ) -> bool:
     """
-    Send notification broadcast a todos the users cuando hay un partido esperando árbitro.
+    Send notification broadcast a todos the users cuando hay un partido esperando referee.
     Excluye a the players involucrados en the match.
     """
     try:
@@ -114,8 +114,8 @@ async def send_referee_needed_broadcast(
             print("[RapidPin] No users to notify for referee needed")
             return False
         
-        title = "⚖️ ¡Se busca árbitro!"
-        body = f"{player1_name} vs {player2_name} esperan un árbitro. ¡Gana +2 puntos!"
+        title = "⚖️ ¡Se busca referee!"
+        body = f"{player1_name} vs {player2_name} esperan un referee. ¡Gana +2 puntos!"
         
         result = await push_notification_service.send_to_users(
             user_ids=user_ids,
@@ -139,7 +139,7 @@ async def send_referee_needed_broadcast(
 class RapidPinService(BaseService):
     """
     Servicio principal para Rapid Pin.
-    System for partidos espontáneos: 2 jugadores + 1 árbitro
+    System for partidos espontáneos: 2 jugadores + 1 referee
     """
     
     MODULE_NAME = "pinpanclub"
@@ -415,7 +415,7 @@ class RapidPinService(BaseService):
         return RapidPinMatch(**updated_match)
     
     async def _apply_match_points(self, match: Dict):
-        """Apply points después de confirmar un partido"""
+        """Apply points after de confirmar un partido"""
         season_id = match["season_id"]
         ganador_id = match["ganador_id"]
         perdedor_id = match["perdedor_id"]
@@ -512,7 +512,7 @@ class RapidPinService(BaseService):
         )
     
     async def get_referee_ranking(self, season_id: str) -> List[RapidPinRankingEntry]:
-        """Get ranking de árbitros"""
+        """Get ranking de referees"""
         results = await self.ranking_repo.get_referee_ranking(season_id)
         return [RapidPinRankingEntry(**r) for r in results]
     
@@ -668,7 +668,7 @@ class RapidPinService(BaseService):
             "player2_info": self._get_player_info(player2_info),
             "referee_id": None,
             "referee_info": None,
-            "status": "waiting",  # Directo a esperando árbitro
+            "status": "waiting",  # Directo a esperando referee
             "created_at": datetime.now(timezone.utc).isoformat(),
             "created_by_id": created_by_id,
             "created_by_role": created_by_role,
@@ -849,7 +849,7 @@ class RapidPinService(BaseService):
         assigned_by_role: str = "player"
     ) -> Dict:
         """
-        Asignar árbitro a partido in queue.
+        Asignar referee a partido in queue.
         - Cualquier usuario logueado puede asignarse
         - Admin/Mod pueden asignar a cualquiera
         """
@@ -864,13 +864,13 @@ class RapidPinService(BaseService):
             raise ValueError("Match not found in queue")
         
         if queue_entry["status"] != "waiting":
-            raise ValueError("Este partido no está esperando árbitro")
+            raise ValueError("Este partido no está esperando referee")
         
         # Verify referee is not one of the players
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("El árbitro no puede ser uno de the players")
+            raise ValueError("El referee no puede ser uno de the players")
         
-        # Get info of the árbitro
+        # Get info of the referee
         referee_info = await self.player_repo.get_by_id(referee_id)
         
         update_data = {
@@ -889,7 +889,7 @@ class RapidPinService(BaseService):
         self.log_info(f"Referee {referee_id} assigned to queue {queue_id} by {assigned_by_id or referee_id}")
         
         # Notify both players that referee is assigned
-        referee_name = referee_info.get("apodo") or referee_info.get("nombre", "Un árbitro") if referee_info else "Un árbitro"
+        referee_name = referee_info.get("apodo") or referee_info.get("nombre", "Un referee") if referee_info else "Un referee"
         await send_challenge_notification(
             recipient_id=queue_entry["player1_id"],
             challenger_name=referee_name,
@@ -926,7 +926,7 @@ class RapidPinService(BaseService):
             raise ValueError("Match not found in queue")
         
         if queue_entry["status"] != "assigned":
-            raise ValueError("El partido debe tener árbitro asignado to completese")
+            raise ValueError("El partido debe tener referee asignado to completese")
         
         # Verify winner is one of the players
         if ganador_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
@@ -1032,13 +1032,13 @@ class RapidPinService(BaseService):
             ).sort("puntos_totales", -1).limit(10)
             top_players = await ranking_cursor.to_list(length=10)
         
-        # Matchs in queue esperando árbitro
+        # Matchs in queue esperando referee
         waiting_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="waiting"
         )
         
-        # Matchs in progress (con árbitro asignado)
+        # Matchs in progress (con referee asignado)
         in_progress_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="assigned"

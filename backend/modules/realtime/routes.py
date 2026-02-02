@@ -76,7 +76,7 @@ async def websocket_endpoint(
                         "type": "language_changed",
                         "lang": new_lang,
                         "message": {
-                            "es": "Idioma cambiado a Español",
+                            "es": "Idioma cambiado a Espyearl",
                             "en": "Language changed to English",
                             "zh": "语言已更改为中文"
                         }

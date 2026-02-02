@@ -37,7 +37,7 @@ class TaskSupervisorConfig(BaseModel):
 
 
 class SupervisedPerson(BaseModel):
-    """Persona supervisada (niño/estudiante)"""
+    """Persona supervisada (child/estudiante)"""
     model_config = ConfigDict(extra="ignore")
     person_id: str = Field(default_factory=lambda: f"person_{uuid.uuid4().hex[:12]}")
     nombre: str
