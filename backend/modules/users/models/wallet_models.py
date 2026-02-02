@@ -229,7 +229,7 @@ class Transaction(BaseModel):
     
     # Notas
     notes: Optional[str] = None
-    internal_notes: Optional[str] = None        # Solo visible para admin
+    internal_notes: Optional[str] = None        # Only visible para admin
     
     # Metadata
     metadata: Dict[str, Any] = {}

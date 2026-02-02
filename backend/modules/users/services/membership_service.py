@@ -407,7 +407,7 @@ class MembershipService:
         if plan and plan.get("membership_type") == MembershipType.VISITS.value:
             visits_remaining = membership.get("visits_remaining", 0)
             
-            # Solo descontar si es visita regular
+            # Only descontar si es visita regular
             if visit_type == VisitType.REGULAR:
                 if visits_remaining <= 0:
                     raise ValueError("No visits remaining")
