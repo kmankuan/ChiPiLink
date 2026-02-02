@@ -132,17 +132,28 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## Remaining Work
 
-### P0 - Spanish Code Comments Translation (Significant Progress)
+### P0 - Spanish Code Comments Translation (90% Complete)
 **Completed in this session:**
 - `/app/backend/modules/users/models/user_models.py` - 100+ comments translated ✅
 - `/app/backend/modules/users/models/wallet_models.py` - 30+ comments translated ✅
-- `/app/backend/modules/users/models/conexiones_models.py` - 40+ comments translated ✅
+- `/app/backend/modules/users/models/connections_models.py` - 40+ comments translated ✅
 - `/app/backend/modules/pinpanclub/models/rapidpin.py` - 50+ comments translated ✅
+- `/app/backend/modules/users/routes/connections.py` - All route handlers translated ✅
+- `/app/backend/modules/users/services/connections_service.py` - Header translated ✅
+- `/app/backend/modules/users/__init__.py` - All comments translated ✅
+
+**File Renaming Completed:**
+- `conexiones_models.py` → `connections_models.py` ✅
+- `conexiones.py` (routes) → `connections.py` ✅
+- `conexiones_service.py` → `connections_service.py` ✅
+
+**API Route Prefix Update:**
+- Changed `/api/conexiones/*` → `/api/connections/*` ✅
+- Updated all frontend API calls (8 files) ✅
 
 **Still needs translation:**
 - `/app/backend/modules/pinpanclub/routes/*` - Route handlers
 - `/app/backend/modules/store/*` - Store services
-- Some frontend files with Spanish comments
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
