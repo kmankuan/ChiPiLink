@@ -87,7 +87,7 @@ class MatchRepository(BaseRepository):
         set_actual: int,
         historial: List[Dict]
     ) -> bool:
-        """Update puntuación del partido"""
+        """Update puntuación dthe match"""
         return await self.update_match(partido_id, {
             "puntos_jugador_a": puntos_a,
             "puntos_jugador_b": puntos_b,

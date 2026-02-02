@@ -201,7 +201,7 @@ class Transaction(BaseModel):
     
     # Moneda y monto
     currency: Currency
-    amount: float               # Monto de la transacción
+    amount: float               # Monto de the transaction
     
     # Balances resultantes
     balance_before: float = 0

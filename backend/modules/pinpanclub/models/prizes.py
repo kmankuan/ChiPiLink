@@ -20,7 +20,7 @@ class PrizeType(str, Enum):
 
 
 class PrizeStatus(str, Enum):
-    """Estado del premio"""
+    """Estado dthe prize"""
     AVAILABLE = "available"      # Disponible para ganar
     CLAIMED = "claimed"          # Reclamado by player
     DELIVERED = "delivered"      # Entregado
@@ -55,7 +55,7 @@ class PrizeDefinition(BaseModel):
     type: PrizeType = PrizeType.BADGE
     icon: str = "🏆"
     
-    # Value del premio
+    # Value dthe prize
     value: Optional[str] = None  # Description ofl valor (ej: "20% descuento")
     points_value: int = 0        # Value en puntos si aplica
     
@@ -181,7 +181,7 @@ def get_default_prize_catalog() -> List[Dict]:
         },
         {
             "name": "Jugador Activo",
-            "description": "Por jugar 10+ partidos en la temporada",
+            "description": "Por jugar 10+ partidos en the season",
             "type": "badge",
             "icon": "🏓",
             "conditions": [{"type": "matches_played", "value": 10, "comparison": "gte"}],

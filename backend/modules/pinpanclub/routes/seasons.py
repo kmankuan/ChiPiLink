@@ -16,7 +16,7 @@ router = APIRouter(prefix="/seasons", tags=["Ranking Seasons"])
 
 @router.get("/current")
 async def get_current_season(lang: str = Query("es")):
-    """Get la temporada activa actual"""
+    """Get the season activa actual"""
     season = await seasons_service.get_current_season()
     
     if not season:
@@ -129,7 +129,7 @@ async def get_season_leaderboard(
 
 @router.get("/player/{jugador_id}/current")
 async def get_player_current_season_stats(jugador_id: str):
-    """Get estadísticas of the player en la temporada actual"""
+    """Get estadísticas of the player en the season actual"""
     stats = await seasons_service.get_player_season_stats(jugador_id)
     
     if not stats:

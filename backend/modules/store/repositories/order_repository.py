@@ -71,7 +71,7 @@ class OrderRepository(BaseRepository):
         return await self.update_order(pedido_id, {"estado": estado})
     
     async def confirm_payment(self, pedido_id: str) -> bool:
-        """Confirmar pago del pedido"""
+        """Confirmar pago dthe order"""
         return await self.update_order(pedido_id, {
             "pago_confirmado": True,
             "estado": "confirmado",

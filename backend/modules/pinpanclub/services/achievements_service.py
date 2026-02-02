@@ -68,7 +68,7 @@ class AchievementsService(BaseService):
         # Obtener estadísticas of the player
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
-        # Obtener logros que el jugador aún does not have
+        # Obtener logros que the player aún does not have
         player_achievements = await self.get_player_achievements(jugador_id)
         earned_ids = {pa["achievement_id"] for pa in player_achievements}
         
@@ -142,7 +142,7 @@ class AchievementsService(BaseService):
         }
     
     async def _check_weekly_complete(self, jugador_id: str) -> bool:
-        """Verify si el jugador completó all challenges de la semana actual"""
+        """Verify si the player completó all challenges de la semana actual"""
         # Obtener semana actual
         week = await db.pinpanclub_challenges_weekly.find_one(
             {"is_active": True},
@@ -162,7 +162,7 @@ class AchievementsService(BaseService):
         return completed >= len(week["challenges"])
     
     def _check_requirement(self, achievement: Dict, stats: Dict) -> bool:
-        """Verify si el jugador cumple el requisito del logro"""
+        """Verify si the player cumple el requisito dthe achievement"""
         req_type = achievement.get("requirement_type")
         req_value = achievement.get("requirement_value", 0)
         req_difficulty = achievement.get("requirement_difficulty")
@@ -249,7 +249,7 @@ class AchievementsService(BaseService):
                     "achievement_icon": achievement["icon"],
                     "rarity": achievement["rarity"]
                 },
-                description=f"Obtuvo el logro '{achievement['name']}'"
+                description=f"Obtuvo the achievement '{achievement['name']}'"
             ))
         except Exception as e:
             self.log_error(f"Error creating notification for achievement: {e}")

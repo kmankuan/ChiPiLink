@@ -149,7 +149,7 @@ class ChallengeService(BaseService):
         challenge_id: str
     ) -> PlayerChallenge:
         """Iniciar un reto para un jugador"""
-        # Verificar si ya tiene el reto activo
+        # Verificar si ya tiene the challenge activo
         existing = await self.player_challenge_repo.find_player_challenge(jugador_id, challenge_id)
         if existing:
             return PlayerChallenge(**existing)
@@ -285,7 +285,7 @@ class ChallengeService(BaseService):
                 "challenge_icon": challenge.get("icon"),
                 "points": challenge.get("points_reward", 0)
             },
-            description=f"Completó el reto '{challenge.get('name')}'"
+            description=f"Completó the challenge '{challenge.get('name')}'"
         ))
         
         self.log_info(f"Challenge completed: {jugador_id} - {challenge.get('name')}")

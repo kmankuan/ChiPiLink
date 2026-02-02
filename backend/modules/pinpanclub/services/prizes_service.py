@@ -168,7 +168,7 @@ class PrizeService(BaseService):
                 "prize_type": prize.get("type"),
                 "position": position
             },
-            description=f"Ganó el premio '{prize.get('name')}'"
+            description=f"Ganó the prize '{prize.get('name')}'"
         ))
         
         self.log_info(f"Prize awarded: {prize.get('name')} to {jugador_id}")

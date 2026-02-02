@@ -10,7 +10,7 @@ import uuid
 
 
 class ChallengeDifficulty(str, Enum):
-    """Dificultad del reto"""
+    """Dificultad dthe challenge"""
     EASY = "easy"           # Fácil
     MEDIUM = "medium"       # Medio
     HARD = "hard"           # Difícil
@@ -32,7 +32,7 @@ class ChallengeType(str, Enum):
 
 
 class ChallengeStatus(str, Enum):
-    """Estado del reto para un jugador"""
+    """Estado dthe challenge para un jugador"""
     AVAILABLE = "available"    # Disponible para iniciar
     IN_PROGRESS = "in_progress"  # In progreso
     COMPLETED = "completed"    # Completado

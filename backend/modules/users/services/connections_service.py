@@ -383,7 +383,7 @@ class ConexionesService:
         )
         
         if aceptar:
-            # Crear la conexión
+            # Crear the connection
             result = await self.crear_conexion(
                 user_id=solicitud["de_usuario_id"],
                 destino_user_id=solicitud["para_usuario_id"],
@@ -652,7 +652,7 @@ class ConexionesService:
                 break
         
         if not conexion:
-            return {"error": "Debes tener conexión con el usuario para transferir"}
+            return {"error": "Debes tener conexión con the user para transferir"}
         
         if not conexion.get("permisos", {}).get("transferir_wallet", False):
             return {"error": "No tienes permiso para transferir a este usuario"}

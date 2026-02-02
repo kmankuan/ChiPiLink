@@ -223,7 +223,7 @@ async def get_resumen_catalogo(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener resumen del catálogo privado para el usuario.
+    Obtener resumen del catálogo privado para the user.
     Muestra productos disponibles para cada estudiante vinculado.
     """
     # Verify acceso

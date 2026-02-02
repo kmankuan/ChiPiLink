@@ -402,7 +402,7 @@ def get_default_notification_templates() -> List[Dict]:
                 "zh": "新挑战可用！"
             },
             "body": {
-                "es": "{{challenge_name}} - Completa el reto y gana {{points}} puntos",
+                "es": "{{challenge_name}} - Completa the challenge y gana {{points}} puntos",
                 "en": "{{challenge_name}} - Complete the challenge and earn {{points}} points",
                 "zh": "{{challenge_name}} - 完成挑战赢取{{points}}积分"
             },

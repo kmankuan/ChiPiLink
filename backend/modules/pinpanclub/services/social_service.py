@@ -243,7 +243,7 @@ class SocialService(BaseService):
     # ============== NOTIFICATIONS ==============
     
     async def create_notification(self, data: NotificationCreate) -> Notification:
-        """Create notificación y enviar en tiempo real si el usuario está conectado"""
+        """Create notificación y enviar en tiempo real si the user está conectado"""
         result = await self.notification_repo.create(data.model_dump())
         notification = Notification(**result)
         

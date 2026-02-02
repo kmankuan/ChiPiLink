@@ -44,7 +44,7 @@ class OrderService(BaseService):
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario
         
-        # Crear documento del pedido
+        # Crear documento dthe order
         order_dict = {
             "user_id": user_id,
             "estudiante_id": data.estudiante_id,
@@ -198,7 +198,7 @@ class OrderService(BaseService):
     
     async def confirm_payment(self, pedido_id: str) -> Optional[Order]:
         """
-        Confirmar pago del pedido.
+        Confirmar pago dthe order.
         Emite evento: store.order.paid
         """
         success = await self.repository.confirm_payment(pedido_id)

@@ -157,7 +157,7 @@ async def record_point(
     error_forzado: bool = False,
     punto_saque: bool = False
 ):
-    """Register punto en el partido"""
+    """Register punto en the match"""
     if jugador not in ['a', 'b']:
         raise HTTPException(status_code=400, detail="Jugador debe ser 'a' o 'b'")
     
@@ -277,7 +277,7 @@ async def update_match_result(
     score_b: int = 0,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update resultado de a match del torneo"""
+    """Update resultado de a match dthe tournament"""
     try:
         result = await superpin_service.update_tournament_match(
             torneo_id, match_id, winner_id, score_a, score_b

@@ -56,7 +56,7 @@ async def send_challenge_notification(
             },
             "date_proposed": {
                 "title": "📅 Nueva propuesta de fecha",
-                "body": f"{challenger_name} propone una nueva fecha para el reto"
+                "body": f"{challenger_name} propone una nueva fecha para the challenge"
             },
             "date_accepted": {
                 "title": "✅ ¡Fecha acordada!",
@@ -91,7 +91,7 @@ async def send_referee_needed_broadcast(
 ) -> bool:
     """
     Enviar notificación broadcast a todos los usuarios cuando hay un partido esperando árbitro.
-    Excluye a los jugadores involucrados en el partido.
+    Excluye a los jugadores involucrados en the match.
     """
     try:
         from modules.notifications.services.push_service import push_notification_service
@@ -328,7 +328,7 @@ class RapidPinService(BaseService):
         
         # Validate que quien registra es uno de los participantes
         if data.registrado_por_id not in participants:
-            raise ValueError("Solo un participante puede registrar el partido")
+            raise ValueError("Solo un participante puede registrar the match")
         
         # Obtener info de jugadores
         jugador_a = await self.player_repo.get_by_id(data.jugador_a_id)
@@ -382,15 +382,15 @@ class RapidPinService(BaseService):
         # Validate que quien confirma es un participante diferente al que registró
         participants = {match["jugador_a_id"], match["jugador_b_id"], match["arbitro_id"]}
         if confirmado_por_id not in participants:
-            raise ValueError("Solo un participante puede confirmar el partido")
+            raise ValueError("Solo un participante puede confirmar the match")
         
         if confirmado_por_id == match["registrado_por_id"]:
             raise ValueError("No puedes confirmar un partido que tú registraste")
         
-        # Confirmar el partido
+        # Confirmar the match
         success = await self.match_repo.confirm_match(match_id, confirmado_por_id)
         if not success:
-            raise ValueError("Error confirmar el partido")
+            raise ValueError("Error confirmar the match")
         
         # Aplicar puntos
         await self._apply_match_points(match)
@@ -452,7 +452,7 @@ class RapidPinService(BaseService):
             points=RAPID_PIN_SCORING["referee"]
         )
         
-        # Update contadores de participantes únicos en la temporada
+        # Update contadores de participantes únicos en the season
         counts = await self.ranking_repo.get_season_participants_count(season_id)
         season = await self.season_repo.get_by_id(season_id)
         if season:
@@ -935,7 +935,7 @@ class RapidPinService(BaseService):
         # Determinar perdedor
         perdedor_id = queue_entry["player2_id"] if ganador_id == queue_entry["player1_id"] else queue_entry["player1_id"]
         
-        # Registrar el partido oficial
+        # Registrar the match oficial
         match_data = RapidPinMatchCreate(
             season_id=queue_entry["season_id"],
             jugador_a_id=queue_entry["player1_id"],
@@ -1194,7 +1194,7 @@ class RapidPinService(BaseService):
         
         # Verificar que sea uno de los jugadores
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo los jugadores del reto pueden responder")
+            raise ValueError("Solo los jugadores dthe challenge pueden responder")
         
         # Verificar que no sea la misma persona que propuso
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
@@ -1308,7 +1308,7 @@ class RapidPinService(BaseService):
             raise ValueError("Este reto no está en cola")
         
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
-            raise ValueError("Solo los jugadores del reto pueden retomarlo")
+            raise ValueError("Solo los jugadores dthe challenge pueden retomarlo")
         
         # Usar respond_to_date con action=counter para proponer nueva fecha
         return await self.respond_to_date(
@@ -1363,7 +1363,7 @@ class RapidPinService(BaseService):
         """Dar o quitar like a un reto"""
         db = await self.get_db()
         
-        # Verificar que el reto existe
+        # Verificar que the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
@@ -1439,7 +1439,7 @@ class RapidPinService(BaseService):
         """Agregar comentario a un reto"""
         db = await self.get_db()
         
-        # Verificar que el reto existe
+        # Verificar que the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
@@ -1452,7 +1452,7 @@ class RapidPinService(BaseService):
         if len(content) > max_length:
             raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
         
-        # Verificar si el usuario está flaggeado (tiene sanciones)
+        # Verificar si the user está flaggeado (tiene sanciones)
         user_moderation = await db["user_moderations"].find_one({
             "user_id": user_id,
             "status": {"$in": ["warning", "sanctioned"]}

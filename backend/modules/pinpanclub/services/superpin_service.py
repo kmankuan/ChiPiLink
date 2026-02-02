@@ -305,7 +305,7 @@ class SuperPinService(BaseService):
                 else:
                     match["sets_jugador_b"] += 1
                 
-                # Verificar si se ganó el partido
+                # Verificar si se ganó the match
                 sets_para_ganar = (match["mejor_de"] // 2) + 1
                 if match["sets_jugador_a"] >= sets_para_ganar:
                     partido_terminado = True
@@ -422,7 +422,7 @@ class SuperPinService(BaseService):
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
-        # Guardar puntos en el partido
+        # Guardar puntos en the match
         await self.match_repo.update_match(match["partido_id"], {
             "puntos_ganador": puntos_ganador,
             "puntos_perdedor": puntos_perdedor,
@@ -644,7 +644,7 @@ class SuperPinService(BaseService):
         score_a: int = 0,
         score_b: int = 0
     ) -> dict:
-        """Update resultado de un partido del torneo"""
+        """Update resultado de un partido dthe tournament"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
             raise ValueError("Torneo not found")
@@ -654,7 +654,7 @@ class SuperPinService(BaseService):
         current_round = 0
         match_position = 0
         
-        # Buscar y actualizar el partido
+        # Buscar y actualizar the match
         for bracket in brackets:
             for match in bracket["matches"]:
                 if match["match_id"] == match_id:
@@ -693,7 +693,7 @@ class SuperPinService(BaseService):
         # Update brackets en DB
         await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
-        # Verificar si el torneo terminó
+        # Verificar si the tournament terminó
         final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
         if final_bracket:
             final_match = final_bracket["matches"][0]
@@ -1239,7 +1239,7 @@ class SuperPinService(BaseService):
             )
             
             match = await self.create_match(match_data)
-            # Iniciar el partido automáticamente
+            # Iniciar the match automáticamente
             await self.start_match(match.partido_id)
             
             created_matches.append({

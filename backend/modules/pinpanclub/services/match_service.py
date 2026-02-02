@@ -114,7 +114,7 @@ class MatchService(BaseService):
         accion: str
     ) -> Optional[Match]:
         """
-        Actualizar puntuación del partido.
+        Actualizar puntuación dthe match.
         Maneja lógica de sets y determina ganador.
         Emite eventos: score_updated, set_completed, match_finished
         """
@@ -122,7 +122,7 @@ class MatchService(BaseService):
         if not match or match.estado not in [MatchState.PENDIENTE, MatchState.EN_CURSO, MatchState.PAUSADO]:
             return None
         
-        # Si es el primer punto, iniciar el partido
+        # Si es el primer punto, iniciar the match
         if match.estado == MatchState.PENDIENTE:
             await self.start_match(partido_id)
             match = await self.get_match(partido_id)
@@ -207,7 +207,7 @@ class MatchService(BaseService):
                 }
             )
         
-        # Verificar si terminó el partido
+        # Verificar si terminó the match
         sets_para_ganar = (match.mejor_de // 2) + 1
         if sets_a >= sets_para_ganar or sets_b >= sets_para_ganar:
             ganador_id = match.jugador_a_id if sets_a > sets_b else match.jugador_b_id

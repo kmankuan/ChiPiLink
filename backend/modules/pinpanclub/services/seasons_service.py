@@ -80,7 +80,7 @@ class RankingSeasonsService(BaseService):
         return season
     
     async def get_current_season(self) -> Optional[Dict]:
-        """Get la temporada activa actual"""
+        """Get the season activa actual"""
         season = await db.pinpanclub_ranking_seasons.find_one(
             {"status": SeasonStatus.ACTIVE.value},
             {"_id": 0}
@@ -410,7 +410,7 @@ class RankingSeasonsService(BaseService):
         challenge_completed: bool = True
     ):
         """
-        Actualizar estadísticas of the player en la temporada actual.
+        Actualizar estadísticas of the player en the season actual.
         Llamar después de completar un reto.
         """
         season = await self.get_current_season()

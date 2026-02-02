@@ -105,7 +105,7 @@ class StatsConfig(BaseModel):
 
 
 class TournamentConfig(BaseModel):
-    """Configuración del torneo final"""
+    """Configuración dthe tournament final"""
     tournament_type: TournamentType = TournamentType.TOP_N
     top_n_players: int = 8  # Si es TOP_N
     categories: List[Dict[str, Any]] = []  # Si es BY_CATEGORY
@@ -221,7 +221,7 @@ class SuperPinMatchCreate(BaseModel):
 
 
 class SuperPinMatchStats(BaseModel):
-    """Estadísticas avanzadas del partido"""
+    """Estadísticas avanzadas dthe match"""
     aces_a: int = 0
     aces_b: int = 0
     errores_a: int = 0
@@ -358,7 +358,7 @@ class SeasonTournament(BaseModel):
     # Estado
     estado: str = "pendiente"  # pendiente, en_curso, finalizado
     
-    # Participantes (copiados del ranking al crear el torneo)
+    # Participantes (copiados del ranking al crear the tournament)
     participantes: List[Dict] = []  # [{jugador_id, posicion_ranking, ...}]
     
     # Brackets/Partidos

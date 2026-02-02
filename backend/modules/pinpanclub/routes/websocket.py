@@ -567,7 +567,7 @@ async def handle_start_match(match_id: str, arbiter_id: str):
     )
     
     if result.modified_count == 0:
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "No se puede iniciar el partido"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "No se puede iniciar the match"})
         return
     
     updated_match = await db.pingpong_matches.find_one({"partido_id": match_id}, {"_id": 0, "historial_puntos": 0})
@@ -601,7 +601,7 @@ async def handle_pause_match(match_id: str, arbiter_id: str):
     )
     
     if result.modified_count == 0:
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "No se puede pausar el partido"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "No se puede pausar the match"})
         return
     
     await manager.broadcast_to_match(match_id, {

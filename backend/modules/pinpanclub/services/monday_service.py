@@ -323,7 +323,7 @@ class MondayService(BaseService):
             return monday_id
     
     async def sync_match_result(self, partido_id: str) -> bool:
-        """Update resultado del partido en Monday.com"""
+        """Update resultado dthe match en Monday.com"""
         config = await self.get_config()
         if not config.matches_board_id:
             return False

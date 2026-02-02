@@ -248,7 +248,7 @@ async def emit_comment_event(
                 "content": content
             },
             "text": {
-                "es": f"{user_name} comentó en el reto",
+                "es": f"{user_name} comentó en the challenge",
                 "en": f"{user_name} commented on the challenge",
                 "zh": f"{user_name} 评论了挑战"
             }

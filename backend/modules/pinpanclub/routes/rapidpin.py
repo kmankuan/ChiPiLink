@@ -125,7 +125,7 @@ async def get_pending_confirmations(
 ):
     """
     Obtener partidos pendientes de confirmación para un usuario.
-    Retorna partidos donde el usuario participa pero no fue quien lo registró.
+    Retorna partidos donde the user participa pero no fue quien lo registró.
     """
     matches = await rapidpin_service.get_pending_confirmations(season_id, user_id)
     return {
@@ -139,7 +139,7 @@ async def get_pending_confirmations(
 async def get_all_pending_confirmations(user_id: str):
     """
     Obtener TODOS matches pendientes de confirmación para un usuario.
-    Retorna partidos de todas seasons donde el usuario participa pero no fue quien lo registró.
+    Retorna partidos de todas seasons donde the user participa pero no fue quien lo registró.
     """
     matches = await rapidpin_service.get_all_pending_confirmations(user_id)
     return {
@@ -532,7 +532,7 @@ async def add_challenge_comment(
     """
     Agregar comentario a a challenge.
     Requiere authenticated user.
-    Si el usuario tiene sanciones, el comentario irá a moderación.
+    Si the user tiene sanciones, el comentario irá a moderación.
     """
     try:
         user_info = {

@@ -68,7 +68,7 @@ async def start_match(
     """Iniciar partido"""
     match = await match_service.start_match(partido_id)
     if not match:
-        raise HTTPException(status_code=400, detail="No se puede iniciar el partido")
+        raise HTTPException(status_code=400, detail="No se puede iniciar the match")
     return match
 
 
@@ -78,10 +78,10 @@ async def update_score(
     data: MatchScoreUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update puntuación del partido"""
+    """Update puntuación dthe match"""
     match = await match_service.update_score(partido_id, data.accion)
     if not match:
-        raise HTTPException(status_code=400, detail="No se puede actualizar el partido")
+        raise HTTPException(status_code=400, detail="No se puede actualizar the match")
     return match
 
 
@@ -93,5 +93,5 @@ async def cancel_match(
     """Cancelar partido"""
     success = await match_service.cancel_match(partido_id)
     if not success:
-        raise HTTPException(status_code=400, detail="No se puede cancelar el partido")
+        raise HTTPException(status_code=400, detail="No se puede cancelar the match")
     return {"success": True, "message": "Partido cancelado"}

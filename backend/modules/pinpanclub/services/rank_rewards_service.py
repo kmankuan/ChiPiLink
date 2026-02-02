@@ -168,7 +168,7 @@ class RankRewardsService(BaseService):
         lang: str = "es"
     ) -> Optional[Dict]:
         """
-        Verificar si el jugador subió de rango y otorgar recompensas.
+        Verificar si the player subió de rango y otorgar recompensas.
         Retorna información de la promoción si hubo una.
         """
         old_rank = self.get_rank_by_points(old_points)

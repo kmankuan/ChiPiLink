@@ -21,7 +21,7 @@ class AchievementType(str, Enum):
 
 
 class AchievementRarity(str, Enum):
-    """Rareza del logro"""
+    """Rareza dthe achievement"""
     COMMON = "common"
     RARE = "rare"
     EPIC = "epic"
