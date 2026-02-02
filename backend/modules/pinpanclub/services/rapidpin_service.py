@@ -1007,7 +1007,7 @@ class RapidPinService(BaseService):
         active_seasons = await self.get_active_seasons()
         active_season = active_seasons[0] if active_seasons else None
         
-        # Estadísticas generales
+        # Statistics generales
         stats = {
             "total_seasons": await db["rapidpin_seasons"].count_documents({}),
             "total_matches": await db["rapidpin_matches"].count_documents({"estado": "validated"}),

@@ -161,7 +161,7 @@ async def record_point(
     if jugador not in ['a', 'b']:
         raise HTTPException(status_code=400, detail="Jugador debe ser 'a' o 'b'")
     
-    # Estadísticas avanzadas opcionales
+    # Statistics avanzadas opcionales
     stats = {}
     if ace:
         stats[f"aces_{jugador}"] = 1

@@ -19,7 +19,7 @@ class ScoringSystem(str, Enum):
 
 class CheckInMethod(str, Enum):
     """Método de check-in"""
-    MANUAL = "manual"          # Registro manual
+    MANUAL = "manual"          # Record manual
     QR_CODE = "qr_code"        # Escaneo de QR
     GEOLOCATION = "geolocation"  # GPS/ubicación
     ANY = "any"                # Cualquier método
@@ -29,7 +29,7 @@ class StatsLevel(str, Enum):
     """Nivel de estadísticas"""
     BASIC = "basic"            # Only sets ganados/perdidos
     STANDARD = "standard"      # Points por set
-    ADVANCED = "advanced"      # Estadísticas completas (aces, errores, etc.)
+    ADVANCED = "advanced"      # Statistics completas (aces, errores, etc.)
 
 
 class LeagueStatus(str, Enum):
@@ -268,7 +268,7 @@ class SuperPinMatch(BaseModel):
     elo_change_a: int = 0
     elo_change_b: int = 0
     
-    # Estadísticas avanzadas
+    # Statistics avanzadas
     stats: Optional[SuperPinMatchStats] = None
     
     # Info adicional
@@ -302,7 +302,7 @@ class RankingEntry(BaseModel):
     puntos_totales: int = 0
     elo_rating: int = 1000
     
-    # Estadísticas
+    # Statistics
     partidos_jugados: int = 0
     partidos_ganados: int = 0
     partidos_perdidos: int = 0

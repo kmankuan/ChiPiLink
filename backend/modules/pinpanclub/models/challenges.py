@@ -136,7 +136,7 @@ class WeeklyChallengeSet(BaseModel):
     # Challenges de la semana
     challenges: List[str] = []  # Lista de challenge_ids
     
-    # Estadísticas
+    # Statistics
     total_participants: int = 0
     total_completions: int = 0
     
@@ -155,7 +155,7 @@ class ChallengeLeaderboardEntry(BaseModel):
     jugador_id: str
     jugador_info: Optional[Dict] = None
     
-    # Estadísticas
+    # Statistics
     challenges_completed: int = 0
     total_points: int = 0
     current_streak: int = 0  # Semanas consecutivas completando retos

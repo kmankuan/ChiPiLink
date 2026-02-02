@@ -115,7 +115,7 @@ class StudentProgress(BaseModel):
     """Progreso del estudiante en el tutor"""
     model_config = ConfigDict(extra="ignore")
     estudiante_id: str
-    # Estadísticas generales
+    # Statistics generales
     total_sesiones: int = 0
     total_minutos: int = 0
     palabras_aprendidas: int = 0

@@ -59,7 +59,7 @@ class RankingSeason(BaseModel):
     # Recompensas por posición
     reward_tiers: List[Dict] = []
     
-    # Estadísticas finales (se llenan al cerrar)
+    # Statistics finales (se llenan al cerrar)
     final_standings: Optional[List[Dict]] = None
     total_participants: int = 0
     total_challenges_completed: int = 0

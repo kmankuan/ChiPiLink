@@ -25,7 +25,7 @@ class ChessPlayer(ChessPlayerBase):
     """Modelo completo de jugador"""
     model_config = ConfigDict(extra="ignore")
     jugador_id: str = Field(default_factory=lambda: f"chess_{uuid.uuid4().hex[:12]}")
-    # Estadísticas
+    # Statistics
     partidas_jugadas: int = 0
     partidas_ganadas: int = 0
     partidas_perdidas: int = 0
