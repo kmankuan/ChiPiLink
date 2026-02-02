@@ -383,12 +383,13 @@ async def test_push_notification(
         "api_key": api_key
     })
     
+    frontend_url = os.environ.get("FRONTEND_URL", "")
     result = await provider.send_to_segment(
         segments=[data.segment],
         title=data.title,
         body=data.body,
         data={"test": True, "from": "ChiPi Link Admin"},
-        action_url="https://textflow-103.preview.emergentagent.com"
+        action_url=frontend_url
     )
     
     return {
