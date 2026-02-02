@@ -63,8 +63,8 @@ export default function UnatiendaModule() {
                 <ShoppingBag className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.productos_publicos || 0}</p>
-                <p className="text-xs text-muted-foreground">Productos Públicos</p>
+                <p className="text-2xl font-bold">{stats?.public_products || 0}</p>
+                <p className="text-xs text-muted-foreground">Public Products</p>
               </div>
             </div>
           </CardContent>
@@ -76,8 +76,8 @@ export default function UnatiendaModule() {
                 <BookOpen className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.productos_privados || 0}</p>
-                <p className="text-xs text-muted-foreground">Catálogo Privado PCA</p>
+                <p className="text-2xl font-bold">{stats?.private_products || 0}</p>
+                <p className="text-xs text-muted-foreground">Private Catalog PCA</p>
               </div>
             </div>
           </CardContent>
@@ -89,8 +89,8 @@ export default function UnatiendaModule() {
                 <Users className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats?.estudiantes || 0}</p>
-                <p className="text-xs text-muted-foreground">Estudiantes PCA</p>
+                <p className="text-2xl font-bold">{stats?.students || 0}</p>
+                <p className="text-xs text-muted-foreground">PCA Students</p>
               </div>
             </div>
           </CardContent>
