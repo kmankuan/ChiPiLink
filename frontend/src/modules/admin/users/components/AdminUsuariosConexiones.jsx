@@ -259,7 +259,7 @@ export default function AdminUsuariosConexiones({ token }) {
     }
   };
 
-  // ============== CAPACIDADES ==============
+  // ============== CAPABILITIES ==============
   
   const resetCapacidadForm = () => {
     setCapacidadForm({
@@ -298,15 +298,15 @@ export default function AdminUsuariosConexiones({ token }) {
   
   const handleSaveCapacidad = async () => {
     if (!capacidadForm.capacidad_id || !capacidadForm.nombre_es) {
-      toast.error('ID y nombre son requeridos');
+      toast.error('ID and name are required');
       return;
     }
     
     setSavingCapacidad(true);
     try {
       const url = editingCapacidad 
-        ? `${API}/api/conexiones/admin/capacidades/${editingCapacidad.capacidad_id}`
-        : `${API}/api/conexiones/admin/capacidades`;
+        ? `${API}/api/connections/admin/capabilities/${editingCapacidad.capacidad_id}`
+        : `${API}/api/connections/admin/capabilities`;
       
       const res = await fetch(url, {
         method: editingCapacidad ? 'PUT' : 'POST',
@@ -320,7 +320,7 @@ export default function AdminUsuariosConexiones({ token }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Error');
       
-      toast.success(editingCapacidad ? 'Capacidad actualizada' : 'Capacidad creada');
+      toast.success(editingCapacidad ? 'Capability updated' : 'Capability created');
       setShowCapacidadDialog(false);
       resetCapacidadForm();
       loadData();
@@ -332,17 +332,17 @@ export default function AdminUsuariosConexiones({ token }) {
   };
   
   const handleDeleteCapacidad = async (capacidadId) => {
-    if (!confirm('¿Desactivar esta capacidad?')) return;
+    if (!confirm('Deactivate this capability?')) return;
     
     try {
-      const res = await fetch(`${API}/api/conexiones/admin/capacidades/${capacidadId}`, {
+      const res = await fetch(`${API}/api/connections/admin/capabilities/${capacidadId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!res.ok) throw new Error('Error al desactivar');
+      if (!res.ok) throw new Error('Error deactivating');
       
-      toast.success('Capacidad desactivada');
+      toast.success('Capability deactivated');
       loadData();
     } catch (err) {
       toast.error(err.message);
