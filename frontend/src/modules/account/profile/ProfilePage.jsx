@@ -1,5 +1,5 @@
 /**
- * User Profile Component - Perfil de usuario avanzado
+ * User Profile Component - Advanced user profile management
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -139,77 +139,6 @@ export default function UserProfile({ token, user }) {
     return lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
   };
 
-  const texts = {
-    es: {
-      title: 'Mi Perfil',
-      subtitle: 'Gestiona tu información personal',
-      createProfile: 'Crear Perfil',
-      selectType: 'Selecciona tu tipo de usuario',
-      edit: 'Editar',
-      save: 'Guardar',
-      cancel: 'Cancelar',
-      displayName: 'Nombre para mostrar',
-      bio: 'Biografía',
-      birthDate: 'Fecha de nacimiento',
-      language: 'Idioma preferido',
-      generalInfo: 'Información General',
-      customFields: 'Campos Adicionales',
-      relationships: 'Relaciones',
-      settings: 'Configuración',
-      userType: 'Tipo de Usuario',
-      memberSince: 'Miembro desde',
-      noRelationships: 'Sin relaciones registradas',
-      dependents: 'Dependientes',
-      guardian: 'Acudiente'
-    },
-    en: {
-      title: 'My Profile',
-      subtitle: 'Manage your personal information',
-      createProfile: 'Create Profile',
-      selectType: 'Select your user type',
-      edit: 'Edit',
-      save: 'Save',
-      cancel: 'Cancel',
-      displayName: 'Display Name',
-      bio: 'Bio',
-      birthDate: 'Birth Date',
-      language: 'Preferred Language',
-      generalInfo: 'General Information',
-      customFields: 'Additional Fields',
-      relationships: 'Relationships',
-      settings: 'Settings',
-      userType: 'User Type',
-      memberSince: 'Member since',
-      noRelationships: 'No relationships registered',
-      dependents: 'Dependents',
-      guardian: 'Guardian'
-    },
-    zh: {
-      title: '我的资料',
-      subtitle: '管理您的个人信息',
-      createProfile: '创建资料',
-      selectType: '选择您的用户类型',
-      edit: '编辑',
-      save: '保存',
-      cancel: '取消',
-      displayName: '显示名称',
-      bio: '简介',
-      birthDate: '出生日期',
-      language: '首选语言',
-      generalInfo: '基本信息',
-      customFields: '附加字段',
-      relationships: '关系',
-      settings: '设置',
-      userType: '用户类型',
-      memberSince: '加入时间',
-      noRelationships: '暂无关系记录',
-      dependents: '受抚养人',
-      guardian: '监护人'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8" data-testid="profile-loading">
@@ -225,9 +154,9 @@ export default function UserProfile({ token, user }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            {txt.createProfile}
+            {t('profile.createProfile')}
           </CardTitle>
-          <CardDescription>{txt.selectType}</CardDescription>
+          <CardDescription>{t('profile.selectType')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -296,7 +225,7 @@ export default function UserProfile({ token, user }) {
                 )}
                 <span className="flex items-center gap-1">
                   <Shield className="h-4 w-4" />
-                  {txt.memberSince}: {new Date(profile.created_at).toLocaleDateString(getLocale())}
+                  {t('profile.memberSince')}: {new Date(profile.created_at).toLocaleDateString(getLocale())}
                 </span>
               </div>
             </div>
@@ -309,12 +238,12 @@ export default function UserProfile({ token, user }) {
               {editing ? (
                 <>
                   <X className="h-4 w-4 mr-2" />
-                  {txt.cancel}
+                  {t('profile.cancel')}
                 </>
               ) : (
                 <>
                   <Edit2 className="h-4 w-4 mr-2" />
-                  {txt.edit}
+                  {t('profile.edit')}
                 </>
               )}
             </Button>
@@ -327,15 +256,15 @@ export default function UserProfile({ token, user }) {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="general" data-testid="general-tab">
             <User className="h-4 w-4 mr-2" />
-            {txt.generalInfo}
+            {t('profile.generalInfo')}
           </TabsTrigger>
           <TabsTrigger value="relationships" data-testid="relationships-tab">
             <Users className="h-4 w-4 mr-2" />
-            {txt.relationships}
+            {t('profile.relationships')}
           </TabsTrigger>
           <TabsTrigger value="settings" data-testid="settings-tab">
             <Settings className="h-4 w-4 mr-2" />
-            {txt.settings}
+            {t('profile.settings')}
           </TabsTrigger>
         </TabsList>
 
@@ -346,7 +275,7 @@ export default function UserProfile({ token, user }) {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>{txt.displayName}</Label>
+                      <Label>{t('profile.displayName')}</Label>
                       <Input
                         value={formData.display_name}
                         onChange={(e) => setFormData({...formData, display_name: e.target.value})}
@@ -354,7 +283,7 @@ export default function UserProfile({ token, user }) {
                       />
                     </div>
                     <div>
-                      <Label>{txt.birthDate}</Label>
+                      <Label>{t('profile.birthDate')}</Label>
                       <Input
                         type="date"
                         value={formData.birth_date}
@@ -364,7 +293,7 @@ export default function UserProfile({ token, user }) {
                     </div>
                   </div>
                   <div>
-                    <Label>{txt.bio}</Label>
+                    <Label>{t('profile.bio')}</Label>
                     <Textarea
                       value={formData.bio}
                       onChange={(e) => setFormData({...formData, bio: e.target.value})}
@@ -373,7 +302,7 @@ export default function UserProfile({ token, user }) {
                     />
                   </div>
                   <div>
-                    <Label>{txt.language}</Label>
+                    <Label>{t('profile.language')}</Label>
                     <Select 
                       value={formData.language} 
                       onValueChange={(v) => setFormData({...formData, language: v})}
@@ -392,7 +321,7 @@ export default function UserProfile({ token, user }) {
                   {/* Custom Fields */}
                   {profileFields.length > 0 && (
                     <div className="pt-4 border-t">
-                      <h4 className="font-semibold mb-4">{txt.customFields}</h4>
+                      <h4 className="font-semibold mb-4">{t('profile.customFields')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {profileFields
                           .filter(f => !f.applicable_user_types?.length || f.applicable_user_types.includes(profile.user_type_id))
@@ -437,30 +366,30 @@ export default function UserProfile({ token, user }) {
 
                   <Button onClick={saveProfile} className="w-full" data-testid="save-profile-btn">
                     <Save className="h-4 w-4 mr-2" />
-                    {txt.save}
+                    {t('profile.save')}
                   </Button>
                 </>
               ) : (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">{txt.displayName}</p>
+                      <p className="text-sm text-muted-foreground">{t('profile.displayName')}</p>
                       <p className="font-medium">{profile.display_name || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">{txt.birthDate}</p>
+                      <p className="text-sm text-muted-foreground">{t('profile.birthDate')}</p>
                       <p className="font-medium">
                         {profile.birth_date ? new Date(profile.birth_date).toLocaleDateString(getLocale()) : '-'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">{txt.language}</p>
+                      <p className="text-sm text-muted-foreground">{t('profile.language')}</p>
                       <p className="font-medium">
                         {profile.language === 'es' ? 'Español' : profile.language === 'en' ? 'English' : '中文'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">{txt.userType}</p>
+                      <p className="text-sm text-muted-foreground">{t('profile.userType')}</p>
                       <p className="font-medium">
                         {userTypeInfo.icon} {getLocalizedText(userTypeInfo.name)}
                       </p>
@@ -469,7 +398,7 @@ export default function UserProfile({ token, user }) {
 
                   {profile.bio && (
                     <div>
-                      <p className="text-sm text-muted-foreground">{txt.bio}</p>
+                      <p className="text-sm text-muted-foreground">{t('profile.bio')}</p>
                       <p>{profile.bio}</p>
                     </div>
                   )}
@@ -477,7 +406,7 @@ export default function UserProfile({ token, user }) {
                   {/* Display Custom Fields */}
                   {Object.keys(profile.custom_fields || {}).length > 0 && (
                     <div className="pt-4 border-t">
-                      <h4 className="font-semibold mb-4">{txt.customFields}</h4>
+                      <h4 className="font-semibold mb-4">{t('profile.customFields')}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {profileFields
                           .filter(f => profile.custom_fields?.[f.field_key])
@@ -501,7 +430,7 @@ export default function UserProfile({ token, user }) {
             <CardContent className="pt-6">
               {relationships.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8" data-testid="no-relationships">
-                  {txt.noRelationships}
+                  {t('profile.noRelationships')}
                 </p>
               ) : (
                 <div className="space-y-4" data-testid="relationships-list">
@@ -518,12 +447,12 @@ export default function UserProfile({ token, user }) {
                         </Avatar>
                         <div>
                           <p className="font-medium">
-                            {rel.related_user_profile?.display_name || 'Usuario'}
+                            {rel.related_user_profile?.display_name || t('profile.user')}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {rel.is_primary 
-                              ? getLocalizedText(rel.role_2) || txt.dependents
-                              : getLocalizedText(rel.role_1) || txt.guardian
+                              ? getLocalizedText(rel.role_2) || t('profile.dependents')
+                              : getLocalizedText(rel.role_1) || t('profile.guardian')
                             }
                           </p>
                         </div>
@@ -545,9 +474,9 @@ export default function UserProfile({ token, user }) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                   <div>
-                    <p className="font-medium">Notificaciones</p>
+                    <p className="font-medium">{t('profile.notifications')}</p>
                     <p className="text-sm text-muted-foreground">
-                      {profile.notifications_enabled ? 'Activadas' : 'Desactivadas'}
+                      {profile.notifications_enabled ? t('profile.enabled') : t('profile.disabled')}
                     </p>
                   </div>
                   <Badge variant={profile.notifications_enabled ? 'default' : 'secondary'}>
@@ -556,15 +485,15 @@ export default function UserProfile({ token, user }) {
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                   <div>
-                    <p className="font-medium">Zona horaria</p>
+                    <p className="font-medium">{t('profile.timezone')}</p>
                     <p className="text-sm text-muted-foreground">{profile.timezone || 'America/Panama'}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                   <div>
-                    <p className="font-medium">Verificado</p>
+                    <p className="font-medium">{t('profile.verified')}</p>
                     <p className="text-sm text-muted-foreground">
-                      {profile.is_verified ? 'Cuenta verificada' : 'Pendiente de verificación'}
+                      {profile.is_verified ? t('profile.accountVerified') : t('profile.pendingVerification')}
                     </p>
                   </div>
                   <Badge variant={profile.is_verified ? 'default' : 'secondary'}>
