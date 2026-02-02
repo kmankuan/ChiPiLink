@@ -114,9 +114,9 @@ class ConexionesService:
         
         # Obtener permisos por defecto si no se especifican
         if not permisos:
-            # Para acudiente→acudido, el acudiente tiene permisos completos
+            # For acudiente→acudido, el acudiente tiene permisos completos
             if subtipo == "acudido":
-                # El acudiente tiene permisos sobre el acudido
+                # The acudiente tiene permisos sobre el acudido
                 config = await db.config_permisos_relacion.find_one({
                     "tipo": "especial",
                     "subtipo": "acudiente"  # Permisos del acudiente
@@ -187,9 +187,9 @@ class ConexionesService:
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
         """Obtener permisos recíprocos (generalmente más limitados)"""
-        # Por defecto, el recíproco tiene permisos mínimos
+        # By defecto, el recíproco tiene permisos mínimos
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
-            # El dependiente no tiene permisos sobre el acudiente
+            # The dependiente no tiene permisos sobre el acudiente
             return {
                 "transferir_wallet": False,
                 "ver_wallet": False,

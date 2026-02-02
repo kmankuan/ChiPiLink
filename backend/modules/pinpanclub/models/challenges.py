@@ -34,7 +34,7 @@ class ChallengeType(str, Enum):
 class ChallengeStatus(str, Enum):
     """Estado del reto para un jugador"""
     AVAILABLE = "available"    # Disponible para iniciar
-    IN_PROGRESS = "in_progress"  # En progreso
+    IN_PROGRESS = "in_progress"  # In progreso
     COMPLETED = "completed"    # Completado
     FAILED = "failed"          # No completado a tiempo
     EXPIRED = "expired"        # Expirado

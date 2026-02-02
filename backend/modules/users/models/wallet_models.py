@@ -207,7 +207,7 @@ class Transaction(BaseModel):
     balance_before: float = 0
     balance_after: float = 0
     
-    # Para transacciones mixtas (USD + Puntos)
+    # For transacciones mixtas (USD + Puntos)
     usd_amount: Optional[float] = None
     points_amount: Optional[int] = None
     

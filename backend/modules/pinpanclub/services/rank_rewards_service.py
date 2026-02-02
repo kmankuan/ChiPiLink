@@ -18,7 +18,7 @@ RANK_DEFINITIONS = [
         "min_points": 0,
         "max_points": 99,
         "icon": "🥉",
-        "reward": None  # Sin recompensa para el rango inicial
+        "reward": None  # Without recompensa para el rango inicial
     },
     {
         "id": "silver",

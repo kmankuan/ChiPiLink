@@ -169,7 +169,7 @@ class SuperPinService(BaseService):
         
         config = league.checkin_config
         if not config.club_latitude or not config.club_longitude:
-            return True  # Sin ubicación configurada, permitir
+            return True  # Without ubicación configurada, permitir
         
         # Calculatesr distancia usando fórmula de Haversine
         distance = self._haversine_distance(
@@ -513,7 +513,7 @@ class SuperPinService(BaseService):
                 for e in ranking.entries[:tournament_config.top_n_players]
             ]
         elif tournament_config.tournament_type == "by_category":
-            # Por categorías
+            # By categorías
             participantes = []
             for cat in tournament_config.categories:
                 cat_players = [
@@ -915,7 +915,7 @@ class SuperPinService(BaseService):
     
     async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
         """Obtener jugadores con más badges"""
-        # Esto requiere agregación en MongoDB
+        # This requiere agregación en MongoDB
         pipeline = [
             {"$group": {
                 "_id": "$jugador_id",

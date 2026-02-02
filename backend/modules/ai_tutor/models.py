@@ -120,7 +120,7 @@ class StudentProgress(BaseModel):
     total_minutos: int = 0
     palabras_aprendidas: int = 0
     palabras_dominadas: int = 0
-    # Por idioma
+    # By idioma
     progreso_por_idioma: Dict[str, Dict] = {}  # {"en": {"nivel": "basico", "palabras": 50}}
     # Racha
     racha_dias: int = 0

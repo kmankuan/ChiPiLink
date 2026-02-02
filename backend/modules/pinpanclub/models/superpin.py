@@ -34,7 +34,7 @@ class StatsLevel(str, Enum):
 
 class LeagueStatus(str, Enum):
     """Estado de la liga"""
-    DRAFT = "draft"            # En configuración
+    DRAFT = "draft"            # In configuración
     ACTIVE = "active"          # Activa
     PAUSED = "paused"          # Pausada
     FINISHED = "finished"      # Finalizada
@@ -44,7 +44,7 @@ class TournamentType(str, Enum):
     """Tipo de torneo final"""
     TOP_N = "top_n"            # Only los mejores N jugadores
     ALL_PLAYERS = "all_players"  # All los jugadores
-    BY_CATEGORY = "by_category"  # Por categorías según ranking
+    BY_CATEGORY = "by_category"  # By categorías según ranking
 
 
 class MatchType(str, Enum):
@@ -380,7 +380,7 @@ class SeasonTournament(BaseModel):
 class SpecialPrizeTypes:
     """Tipos de premios especiales predefinidos"""
     MEJOR_PROGRESO = "mejor_progreso"  # Mayor subida en ranking
-    MAS_PARTIDOS = "mas_partidos"  # Más partidos jugados
+    MAS_PARTIDOS = "mas_partidos"  # More partidos jugados
     MEJOR_RACHA = "mejor_racha"  # Mejor racha de victorias
     MEJOR_DEPORTIVIDAD = "mejor_deportividad"  # Votado por jugadores
     MEJOR_COMEBACK = "mejor_comeback"  # Mejor remontada

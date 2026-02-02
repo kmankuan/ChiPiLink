@@ -29,13 +29,13 @@ class PrizeStatus(str, Enum):
 
 class PrizeConditionType(str, Enum):
     """Tipos de condición para ganar premio"""
-    POSITION = "position"        # Por posición en ranking (1°, 2°, 3°...)
-    PARTICIPATION = "participation"  # Por participar
-    MATCHES_PLAYED = "matches_played"  # Por cantidad de partidos jugados
-    MATCHES_WON = "matches_won"  # Por cantidad de victorias
-    MATCHES_REFEREED = "matches_refereed"  # Por arbitrajes
-    STREAK = "streak"            # Por racha de victorias
-    CHALLENGE = "challenge"      # Por completar un reto
+    POSITION = "position"        # By posición en ranking (1°, 2°, 3°...)
+    PARTICIPATION = "participation"  # By participar
+    MATCHES_PLAYED = "matches_played"  # By cantidad de partidos jugados
+    MATCHES_WON = "matches_won"  # By cantidad de victorias
+    MATCHES_REFEREED = "matches_refereed"  # By arbitrajes
+    STREAK = "streak"            # By racha de victorias
+    CHALLENGE = "challenge"      # By completar un reto
 
 
 # ============== PRIZE DEFINITION ==============
@@ -68,7 +68,7 @@ class PrizeDefinition(BaseModel):
     
     # Límites
     max_winners: Optional[int] = None  # None = sin límite
-    quantity_available: Optional[int] = None  # Para premios físicos
+    quantity_available: Optional[int] = None  # For premios físicos
     
     # Vigencia
     valid_from: Optional[str] = None

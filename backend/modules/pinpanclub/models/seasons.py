@@ -13,7 +13,7 @@ class SeasonStatus(str, Enum):
     """Estado de una temporada"""
     UPCOMING = "upcoming"      # Próxima temporada
     ACTIVE = "active"          # Temporada actual activa
-    CLOSING = "closing"        # En proceso de cierre
+    CLOSING = "closing"        # In proceso de cierre
     COMPLETED = "completed"    # Temporada finalizada
 
 

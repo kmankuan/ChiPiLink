@@ -55,7 +55,7 @@ class ContentItemBase(BaseModel):
     # Metadata del contenido original
     autor_original: Optional[str] = None
     fecha_publicacion_original: Optional[datetime] = None
-    duracion_segundos: Optional[int] = None  # Para videos
+    duracion_segundos: Optional[int] = None  # For videos
     idioma: Optional[str] = None  # es, zh, en
     # Estado
     publicado: bool = True
