@@ -381,10 +381,10 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
         stats = {
             "productos": await db.libros.count_documents({"es_demo": True}),
             "estudiantes": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
-            "pedidos": await db.pedidos_libros.count_documents({"es_demo": True}),
+            "orders": await db.textbook_orders.count_documents({"es_demo": True}),
             "productos_total": await db.libros.count_documents({"es_catalogo_privado": True}),
             "estudiantes_total": await db.estudiantes_sincronizados.count_documents({}),
-            "pedidos_total": await db.pedidos_libros.count_documents({})
+            "orders_total": await db.textbook_orders.count_documents({})
         }
         
         return {
