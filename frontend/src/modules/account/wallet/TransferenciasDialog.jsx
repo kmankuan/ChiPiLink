@@ -70,7 +70,7 @@ export default function TransfersDialog({
   const loadConnections = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/mis-conexiones`, {
+      const res = await fetch(`${API}/api/connections/my-connections`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -111,7 +111,7 @@ export default function TransfersDialog({
 
     setSending(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/transferir`, {
+      const res = await fetch(`${API}/api/connections/transfer`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -144,7 +144,7 @@ export default function TransfersDialog({
 
     setSendingInvite(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/invitar`, {
+      const res = await fetch(`${API}/api/connections/invite`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
