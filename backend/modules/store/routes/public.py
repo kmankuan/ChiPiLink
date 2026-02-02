@@ -43,27 +43,32 @@ async def create_public_order(pedido: OrderPublicCreate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/order/{pedido_id}")
-async def get_public_order(pedido_id: str):
-    """Obtener detalles de pedido para página de checkout (info limitada)"""
-    pedido = await db.pedidos.find_one({"pedido_id": pedido_id}, {"_id": 0})
-    if not pedido:
-        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+@router.get("/order/{order_id}")
+async def get_public_order(order_id: str):
+    """Get order details for checkout page (limited info)"""
+    # Try new collection first, then legacy
+    order = await db.store_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        # Fallback to textbook_orders if not in store_orders
+        order = await db.textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
     
-    # Retornar info limitada para checkout
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Return limited info for checkout
     return {
-        "pedido_id": pedido.get("pedido_id"),
-        "items": pedido.get("items", []),
-        "subtotal": pedido.get("subtotal", pedido.get("total", 0)),
-        "impuestos": pedido.get("impuestos", 0),
-        "descuento": pedido.get("descuento", 0),
-        "total": pedido.get("total", 0),
-        "estado": pedido.get("estado"),
-        "estado_pago": pedido.get("estado_pago", "pendiente"),
-        "cliente_email": pedido.get("cliente_email"),
-        "cliente_telefono": pedido.get("cliente_telefono"),
-        "yappy_status": pedido.get("yappy_status"),
-        "yappy_status_descripcion": pedido.get("yappy_status_descripcion")
+        "order_id": order.get("order_id"),
+        "items": order.get("items", []),
+        "subtotal": order.get("subtotal", order.get("total_amount", 0)),
+        "tax": order.get("tax", 0),
+        "discount": order.get("discount", 0),
+        "total": order.get("total", order.get("total_amount", 0)),
+        "status": order.get("status"),
+        "payment_status": order.get("payment_status", "pending"),
+        "customer_email": order.get("customer_email", order.get("user_email")),
+        "customer_phone": order.get("customer_phone", order.get("user_phone")),
+        "yappy_status": order.get("yappy_status"),
+        "yappy_status_description": order.get("yappy_status_description")
     }
 
 
