@@ -298,15 +298,15 @@ def get_default_referee_prizes() -> List[RapidPinPrize]:
         RapidPinPrize(
             position=1,
             role="referee",
-            name="Mejor Árbitro",
-            description="Más partidos arbitrados en la temporada",
+            name="Best Referee",
+            description="Most matches refereed in the season",
             icon="⚖️"
         ),
         RapidPinPrize(
             position=None,
             role="referee",
-            name="Árbitro Participante",
-            description="Premio por colaborar como árbitro",
+            name="Participating Referee",
+            description="Award for collaborating as referee",
             icon="👨‍⚖️",
             special_type="participation"
         )
@@ -316,15 +316,15 @@ def get_default_referee_prizes() -> List[RapidPinPrize]:
 # ============== MATCH QUEUE (Challenge & Referee System) ==============
 
 class RapidPinChallengeCreate(BaseModel):
-    """Crear desafío a otro jugador"""
+    """Create challenge to another player"""
     season_id: str
-    challenger_id: str      # Quien desafía
-    opponent_id: str        # A quien desafía
+    challenger_id: str      # Who challenges
+    opponent_id: str        # Who is challenged
     notes: Optional[str] = None
 
 
 class RapidPinMatchQueueCreate(BaseModel):
-    """Crear partido en cola (admin/mod) - Salta la fase de desafío"""
+    """Create match in queue (admin/mod) - Skips challenge phase"""
     season_id: str
     player1_id: str
     player2_id: str
@@ -333,23 +333,23 @@ class RapidPinMatchQueueCreate(BaseModel):
 
 
 class RapidPinMatchQueue(BaseModel):
-    """Partido en cola / Desafío"""
+    """Match in queue / Challenge"""
     model_config = ConfigDict(from_attributes=True)
     
     queue_id: str = Field(default_factory=lambda: f"queue_{uuid.uuid4().hex[:12]}")
     season_id: str
     
-    # Jugadores
-    player1_id: str  # Challenger / Jugador 1
-    player2_id: str  # Opponent / Jugador 2
+    # Players
+    player1_id: str  # Challenger / Player 1
+    player2_id: str  # Opponent / Player 2
     player1_info: Optional[Dict] = None
     player2_info: Optional[Dict] = None
     
-    # Árbitro (cuando se asigne)
+    # Referee (when assigned)
     referee_id: Optional[str] = None
     referee_info: Optional[Dict] = None
     
-    # Estado
+    # Status
     status: RapidPinQueueStatus = RapidPinQueueStatus.CHALLENGE_PENDING
     
     # Timestamps
@@ -357,47 +357,47 @@ class RapidPinMatchQueue(BaseModel):
     created_by_id: str = ""
     created_by_role: str = "player"  # player, moderator, admin
     
-    # Aceptación
+    # Acceptance
     accepted_at: Optional[Any] = None
-    accepted_by_id: Optional[str] = None  # Quien aceptó (jugador 2 o admin/mod)
+    accepted_by_id: Optional[str] = None  # Who accepted (player 2 or admin/mod)
     
-    # Árbitro
+    # Referee
     assigned_at: Optional[Any] = None
-    assigned_by_id: Optional[str] = None  # Quien asignó (árbitro mismo o admin/mod)
+    assigned_by_id: Optional[str] = None  # Who assigned (referee themselves or admin/mod)
     
-    # Completado
+    # Completed
     completed_at: Optional[Any] = None
     
-    # Cancelado/Rechazado
+    # Cancelled/Declined
     cancelled_at: Optional[Any] = None
     cancelled_by_id: Optional[str] = None
     decline_reason: Optional[str] = None
     
-    # Notas
+    # Notes
     notes: Optional[str] = None
     
-    # Match ID cuando se complete
+    # Match ID when completed
     match_id: Optional[str] = None
     
-    # === Negociación de fecha ===
-    proposed_date: Optional[str] = None           # Fecha propuesta (ISO format)
-    proposed_by_id: Optional[str] = None          # Quién propuso la fecha actual
-    date_history: List[Dict] = []                 # Historial de propuestas de fecha
-    agreed_date: Optional[str] = None             # Fecha acordada final
+    # === Date negotiation ===
+    proposed_date: Optional[str] = None           # Proposed date (ISO format)
+    proposed_by_id: Optional[str] = None          # Who proposed the current date
+    date_history: List[Dict] = []                 # History of date proposals
+    agreed_date: Optional[str] = None             # Final agreed date
     
-    # === Interacciones del público ===
+    # === Public interactions ===
     likes_count: int = 0
     comments_count: int = 0
 
 
 class RapidPinAcceptChallenge(BaseModel):
-    """Aceptar o rechazar desafío"""
+    """Accept or decline challenge"""
     accepted: bool = True
     decline_reason: Optional[str] = None
 
 
 class RapidPinQueueAssign(BaseModel):
-    """Asignar árbitro a partido en cola"""
+    """Assign referee to queued match"""
     referee_id: str
 
 
