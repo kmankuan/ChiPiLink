@@ -229,28 +229,28 @@ class UserRelationship(BaseModel):
     relationship_type: RelationshipType
     custom_type_name: Optional[Dict[str, str]] = None  # For CUSTOM type
     
-    # Roles en la relación
+    # Roles in the relationship
     role_1: Dict[str, str] = {}  # {"es": "Padre", "en": "Father"}
     role_2: Dict[str, str] = {}  # {"es": "Hijo", "en": "Child"}
     
-    # Permisos
+    # Permissions
     can_view_profile: bool = True
     can_view_wallet: bool = False
     can_view_activity: bool = True
-    can_pay_for: bool = False       # Usuario 1 puede pagar por usuario 2
-    can_manage: bool = False        # Usuario 1 puede gestionar usuario 2
-    receives_notifications: bool = True  # Usuario 1 recibe notificaciones de usuario 2
+    can_pay_for: bool = False       # User 1 can pay for user 2
+    can_manage: bool = False        # User 1 can manage user 2
+    receives_notifications: bool = True  # User 1 receives notifications from user 2
     
-    # Responsabilidad financiera
-    is_financial_responsible: bool = False  # Usuario 1 es responsable de pagos de usuario 2
-    spending_limit: Optional[float] = None  # Límite de gasto (si aplica)
+    # Financial responsibility
+    is_financial_responsible: bool = False  # User 1 is responsible for user 2's payments
+    spending_limit: Optional[float] = None  # Spending limit (if applicable)
     
-    # Verificación
-    is_verified: bool = False       # Relación verificada por admin
+    # Verification
+    is_verified: bool = False       # Relationship verified by admin
     verified_by: Optional[str] = None
     verified_at: Optional[str] = None
     
-    # Estado
+    # Status
     is_active: bool = True
     
     # Metadata
@@ -259,50 +259,50 @@ class UserRelationship(BaseModel):
     created_by: Optional[str] = None
 
 
-# ============== MEMBRESÍAS ==============
+# ============== MEMBERSHIPS ==============
 
 class MembershipPlanConfig(BaseModel):
-    """Configuración de un plan de membresía"""
+    """Membership plan configuration"""
     plan_id: str = Field(default_factory=lambda: f"plan_{uuid.uuid4().hex[:8]}")
     
-    # Nombres multi-idioma
+    # Multi-language names
     name: Dict[str, str]  # {"es": "Recarga 12 Visitas", ...}
     description: Dict[str, str] = {}
     
-    # Tipo de membresía
+    # Membership type
     membership_type: MembershipType
     
-    # Precio y valor
-    price: float                    # Precio en USD
-    price_in_points: Optional[int] = None  # Precio en ChipiPoints (alternativo)
+    # Price and value
+    price: float                    # Price in USD
+    price_in_points: Optional[int] = None  # Price in ChipiPoints (alternative)
     
-    # Configuración según tipo
-    total_visits: Optional[int] = None      # Para VISITS
-    duration_days: Optional[int] = None     # Para UNLIMITED
-    total_credits: Optional[int] = None     # Para CREDITS
+    # Configuration by type
+    total_visits: Optional[int] = None      # For VISITS
+    duration_days: Optional[int] = None     # For UNLIMITED
+    total_credits: Optional[int] = None     # For CREDITS
     
-    # Restricciones
-    applicable_user_types: List[str] = []   # Tipos de usuario que pueden comprar
+    # Restrictions
+    applicable_user_types: List[str] = []   # User types that can purchase
     min_age: Optional[int] = None
     max_age: Optional[int] = None
     
-    # Beneficios adicionales
-    bonus_points: int = 0           # ChipiPoints de regalo
-    discount_percentage: float = 0  # Descuento en tienda
+    # Additional benefits
+    bonus_points: int = 0           # ChipiPoints bonus
+    discount_percentage: float = 0  # Store discount
     
-    # Transferibilidad
-    is_transferable: bool = False   # Se puede transferir a otro usuario
-    is_shareable: bool = False      # Se puede compartir (familia)
+    # Transferability
+    is_transferable: bool = False   # Can be transferred to another user
+    is_shareable: bool = False      # Can be shared (family)
     
-    # Renovación
+    # Renewal
     auto_renew: bool = False
-    renewal_discount: float = 0     # Descuento por renovar
+    renewal_discount: float = 0     # Discount for renewal
     
-    # Estado
+    # Status
     is_active: bool = True
-    is_featured: bool = False       # Destacado en UI
+    is_featured: bool = False       # Featured in UI
     
-    # Ordenamiento
+    # Sort order
     sort_order: int = 0
     
     # Metadata
@@ -311,13 +311,13 @@ class MembershipPlanConfig(BaseModel):
 
 
 class UserMembership(BaseModel):
-    """Membresía activa de un usuario"""
+    """User's active membership"""
     membership_id: str = Field(default_factory=lambda: f"memb_{uuid.uuid4().hex[:8]}")
     
-    # Usuario y plan
+    # User and plan
     user_id: str
     plan_id: str
-    plan_info: Optional[Dict] = None  # Cache de info del plan
+    plan_info: Optional[Dict] = None  # Cache of plan info
     
     # Estado
     status: str = "active"  # active, expired, cancelled, suspended
