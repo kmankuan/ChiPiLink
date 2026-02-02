@@ -123,13 +123,14 @@ Files with `const texts = {}` pattern (working correctly but could be migrated):
 - `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx` - Social feed
 - `/app/frontend/src/components/rapidpin/ChallengeModal.jsx` - Challenge modal
 
-### P0.5 - Spanish Comments (~65 files)
+### P0.5 - Spanish Comments (~60 files)
 These files have Spanish comments that should be translated to English for full compliance with development principles.
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
 2. **Google Sign-Up Loop** - OAuth flow broken
 3. **emergent-main.js error** - Platform script overlay
+4. **SVGAnimatedString error** - Non-critical JS error on /mi-cuenta page
 
 ### P2 - Upcoming Features
 - Frontend for Student Locking & School Year Config
