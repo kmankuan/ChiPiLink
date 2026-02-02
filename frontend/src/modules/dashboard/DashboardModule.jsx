@@ -210,20 +210,20 @@ export default function DashboardModule() {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Productos Públicos</p>
-                <p className="text-2xl font-bold">{unatiendaStats.productos_publicos || 0}</p>
+                <p className="text-sm text-muted-foreground">Public Products</p>
+                <p className="text-2xl font-bold">{unatiendaStats.public_products || 0}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Catálogo Privado PCA</p>
-                <p className="text-2xl font-bold text-purple-600">{unatiendaStats.productos_privados || 0}</p>
+                <p className="text-sm text-muted-foreground">Private Catalog PCA</p>
+                <p className="text-2xl font-bold text-purple-600">{unatiendaStats.private_products || 0}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Estudiantes Vinculados</p>
-                <p className="text-2xl font-bold">{unatiendaStats.estudiantes_vinculados || 0}</p>
+                <p className="text-sm text-muted-foreground">Linked Students</p>
+                <p className="text-2xl font-bold">{unatiendaStats.student_requests_approved || 0}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Vinculaciones Pendientes</p>
-                <p className="text-2xl font-bold text-amber-600">{unatiendaStats.vinculaciones_pendientes || 0}</p>
+                <p className="text-sm text-muted-foreground">Pending Connections</p>
+                <p className="text-2xl font-bold text-amber-600">{unatiendaStats.student_requests_pending || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -232,7 +232,7 @@ export default function DashboardModule() {
 
       {/* Quick Access */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Acceso Rápido</h3>
+        <h3 className="text-lg font-semibold mb-4">Quick Access</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {quickAccessModules.map((module) => {
             const Icon = module.icon;
