@@ -267,12 +267,12 @@ async def clear_demo_data():
     
     result_libros = await db.libros.delete_many({"es_demo": True})
     result_estudiantes = await db.estudiantes_sincronizados.delete_many({"es_demo": True})
-    result_pedidos = await db.pedidos_libros.delete_many({"es_demo": True})
+    result_orders = await db.textbook_orders.delete_many({"es_demo": True})
     
     return {
         "libros_eliminados": result_libros.deleted_count,
         "estudiantes_eliminados": result_estudiantes.deleted_count,
-        "pedidos_eliminados": result_pedidos.deleted_count
+        "orders_deleted": result_orders.deleted_count
     }
 
 
