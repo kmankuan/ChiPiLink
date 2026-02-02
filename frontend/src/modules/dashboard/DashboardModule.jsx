@@ -278,7 +278,7 @@ export default function DashboardModule() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <AlertTriangle className="h-5 w-5" />
-              Alertas
+              Alerts
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -286,14 +286,14 @@ export default function DashboardModule() {
               <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Package className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm">{stats.products.low_stock} productos con bajo stock</span>
+                  <span className="text-sm">{stats.products.low_stock} products with low stock</span>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => window.location.hash = 'unatienda'}
                 >
-                  Ver inventario
+                  View inventory
                 </Button>
               </div>
             )}
@@ -301,14 +301,14 @@ export default function DashboardModule() {
               <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Clock className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm">{stats.orders.pending} pedidos pendientes de procesar</span>
+                  <span className="text-sm">{stats.orders.pending} orders pending processing</span>
                 </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => window.location.hash = 'orders'}
                 >
-                  Ver pedidos
+                  View orders
                 </Button>
               </div>
             )}
@@ -321,28 +321,28 @@ export default function DashboardModule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Resumen de Actividad
+            Activity Summary
           </CardTitle>
           <CardDescription>
-            Estado general del sistema
+            System overall status
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm">Inventario</span>
+              <span className="text-sm">Inventory</span>
               <div className="flex items-center gap-2">
                 <Progress 
                   value={(stats.products?.low_stock || 0) > 0 ? 70 : 100} 
                   className="w-32 h-2" 
                 />
                 <Badge variant={(stats.products?.low_stock || 0) > 0 ? "secondary" : "default"}>
-                  {(stats.products?.low_stock || 0) > 0 ? 'Revisar' : 'OK'}
+                  {(stats.products?.low_stock || 0) > 0 ? 'Review' : 'OK'}
                 </Badge>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm">Pedidos</span>
+              <span className="text-sm">Orders</span>
               <div className="flex items-center gap-2">
                 <Progress 
                   value={(stats.orders?.pending || 0) > 0 ? 60 : 100} 
