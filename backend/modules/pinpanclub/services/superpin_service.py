@@ -140,7 +140,7 @@ class SuperPinService(BaseService):
         
         result = await self.checkin_repo.create(checkin_dict)
         
-        # Increment contador de jugadores en liga si es nuevo
+        # Increment league player counter if new
         await self.league_repo.increment_stats(data.liga_id, jugadores=1)
         
         self.log_info(f"Player checked in: {data.jugador_id} to {data.liga_id}")
@@ -171,7 +171,7 @@ class SuperPinService(BaseService):
         if not config.club_latitude or not config.club_longitude:
             return True  # Without ubicación configurada, permitir
         
-        # Calculatesr distancia usando fórmula de Haversine
+        # Calculate distance using Haversine formula
         distance = self._haversine_distance(
             config.club_latitude, config.club_longitude,
             latitude, longitude
@@ -185,7 +185,7 @@ class SuperPinService(BaseService):
         lat2: float, lon2: float
     ) -> float:
         """Calculate distancia en metros entre dos puntos GPS"""
-        R = 6371000  # Radio de la Tierra en metros
+        R = 6371000  # Earth radius in meters
         
         phi1 = math.radians(lat1)
         phi2 = math.radians(lat2)
@@ -224,7 +224,7 @@ class SuperPinService(BaseService):
         match_dict["set_actual"] = 1
         match_dict["historial_sets"] = []
         
-        # Get ELO actual de the players
+        # Get current player ELO
         ranking_a = await self.ranking_repo.get_or_create(
             data.liga_id, data.jugador_a_id, player_a
         )
@@ -291,7 +291,7 @@ class SuperPinService(BaseService):
                 set_ganado = True
                 ganador_set = 'a' if puntos_a > puntos_b else 'b'
                 
-                # Guardar resultado del set
+                # Save set result
                 match["historial_sets"].append({
                     "set": match["set_actual"],
                     "puntos_a": puntos_a,

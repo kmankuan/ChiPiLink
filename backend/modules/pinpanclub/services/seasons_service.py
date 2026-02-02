@@ -35,7 +35,7 @@ class RankingSeasonsService(BaseService):
         """Create una new season"""
         now = datetime.now(timezone.utc)
         
-        # Determinar número de temporada
+        # Determine season number
         last_season = await db.pinpanclub_ranking_seasons.find_one(
             {"season_type": season_type.value},
             sort=[("season_number", -1)]
@@ -230,7 +230,7 @@ class RankingSeasonsService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         jugador_id = participant["jugador_id"]
         
-        # Verify si ya recibió recompensa de esta temporada
+        # Verify if already received season reward
         existing = await db.pinpanclub_season_rewards.find_one({
             "season_id": season["season_id"],
             "jugador_id": jugador_id
@@ -252,7 +252,7 @@ class RankingSeasonsService(BaseService):
                 "season_id": season["season_id"]
             }
             
-            # Create badge en colección de badges
+            # Create badge in badges collection
             await db.pinpanclub_superpin_badges.insert_one({
                 "badge_id": f"season_{season['season_id']}_{jugador_id[:8]}",
                 "jugador_id": jugador_id,
@@ -291,7 +291,7 @@ class RankingSeasonsService(BaseService):
                 upsert=True
             )
         
-        # Create registro de recompensa
+        # Create reward record
         reward = {
             "reward_id": f"sr_{season['season_id']}_{jugador_id[:8]}",
             "season_id": season["season_id"],
@@ -482,7 +482,7 @@ class RankingSeasonsService(BaseService):
         """Create automáticamente la siguiente temporada mensual"""
         now = datetime.now(timezone.utc)
         
-        # Calculatesr fechas del próximo mes
+        # Calculate next month dates
         if now.day <= 15:
             # Create para este mes si aún no empezó
             start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -494,7 +494,7 @@ class RankingSeasonsService(BaseService):
         
         end_date = (start_date + relativedelta(months=1)) - timedelta(seconds=1)
         
-        # Nombres de meses
+        # Month names
         month_names = {
             "es": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],

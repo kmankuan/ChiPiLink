@@ -122,7 +122,7 @@ class SocialService(BaseService):
         
         result = await self.comment_repo.create(comment_data)
         
-        # Notify al dueño del perfil
+        # Notify profile owner
         if data.target_type == "player" and data.target_id != data.author_id:
             target = await self.player_repo.get_by_id(data.target_id)
             await self.create_notification(NotificationCreate(
@@ -178,7 +178,7 @@ class SocialService(BaseService):
                     await self.comment_repo.remove_reaction(data.target_id, data.reaction_type)
                 raise ValueError("Reacción eliminada")
             else:
-                # Change tipo de reacción
+                # Change reaction type
                 await self.reaction_repo.delete_reaction(
                     data.user_id, data.target_id, data.target_type
                 )
@@ -230,7 +230,7 @@ class SocialService(BaseService):
     
     async def get_following_feed(self, jugador_id: str, limit: int = 50) -> List[ActivityFeedItem]:
         """Get feed de jugadores seguidos"""
-        # Get IDs de jugadores que sigue
+        # Get IDs of followed players
         following = await self.follow_repo.get_following(jugador_id, limit=100)
         following_ids = [f["following_id"] for f in following]
         

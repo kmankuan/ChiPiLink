@@ -432,21 +432,21 @@ class RapidPinService(BaseService):
             season_id, arbitro_id, match.get("arbitro_info")
         )
         
-        # Update estadísticas del ganador
+        # Update winner stats
         await self.ranking_repo.update_player_stats(
             ganador_ranking["ranking_id"],
             is_winner=True,
             points=RAPID_PIN_SCORING["victory"]
         )
         
-        # Update estadísticas del perdedor
+        # Update loser stats
         await self.ranking_repo.update_player_stats(
             perdedor_ranking["ranking_id"],
             is_winner=False,
             points=RAPID_PIN_SCORING["defeat"]
         )
         
-        # Update estadísticas del árbitro
+        # Update referee stats
         await self.ranking_repo.update_referee_stats(
             arbitro_ranking["ranking_id"],
             points=RAPID_PIN_SCORING["referee"]
@@ -1109,7 +1109,7 @@ class RapidPinService(BaseService):
         
         now = datetime.now(timezone.utc).isoformat()
         
-        # Create historial de fecha inicial
+        # Create initial date history
         date_history = [{
             "proposed_date": proposed_date,
             "proposed_by_id": challenger_id,
@@ -1192,7 +1192,7 @@ class RapidPinService(BaseService):
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
             raise ValueError("Este reto no está en fase de negociación de fecha")
         
-        # Verify que sea uno de the players
+        # Verify is one of the players
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden responder")
         
@@ -1207,7 +1207,7 @@ class RapidPinService(BaseService):
         user_info = await self.player_repo.get_by_id(user_id)
         user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
         
-        # Update historial de fecha
+        # Update date history
         date_history = queue_entry.get("date_history", [])
         if date_history and len(date_history) > 0:
             date_history[-1]["status"] = action
