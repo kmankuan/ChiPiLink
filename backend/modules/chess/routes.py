@@ -36,7 +36,7 @@ async def get_chess_status():
             "Management of jugadores con rating ELO",
             "Partidas en tiempo real",
             "Torneos (Suizo, Eliminación, Arena)",
-            "Rankings y estadísticas",
+            "Rankings y statistics",
             "Problemas/Puzzles de ajedrez",
             "Historial de partidas con PGN"
         ]

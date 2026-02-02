@@ -235,7 +235,7 @@ class FormConfigService(BaseService):
                 "label_es": "Teléfono",
                 "label_zh": "电话",
                 "description_en": "Phone number input",
-                "description_es": "Entrada de número telefónico",
+                "description_es": "Entrada de number telefónico",
                 "icon": "phone"
             }
         ]
@@ -300,21 +300,21 @@ class FormConfigService(BaseService):
                             "field": key,
                             "error": "min_value",
                             "message_en": f"Minimum value is {field['min_value']}",
-                            "message_es": f"El valor mínimo es {field['min_value']}"
+                            "message_es": f"El valor minimum es {field['min_value']}"
                         })
                     if field.get("max_value") is not None and num_value > field["max_value"]:
                         errors.append({
                             "field": key,
                             "error": "max_value",
                             "message_en": f"Maximum value is {field['max_value']}",
-                            "message_es": f"El valor máximo es {field['max_value']}"
+                            "message_es": f"El valor maximum es {field['max_value']}"
                         })
                 except (ValueError, TypeError):
                     errors.append({
                         "field": key,
                         "error": "invalid_number",
                         "message_en": "Invalid number",
-                        "message_es": "Número inválido"
+                        "message_es": "Número invalid"
                     })
             
             elif field_type == "select":
@@ -325,7 +325,7 @@ class FormConfigService(BaseService):
                         "field": key,
                         "error": "invalid_option",
                         "message_en": "Invalid selection",
-                        "message_es": "Selección inválida"
+                        "message_es": "Selección invalid"
                     })
         
         return errors

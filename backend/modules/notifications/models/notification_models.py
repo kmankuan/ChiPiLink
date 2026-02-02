@@ -11,7 +11,7 @@ class NotificationProvider(str, Enum):
     FCM = "fcm"
     ONESIGNAL = "onesignal"
     BOTH = "both"  # Send a ambos
-    AUTO = "auto"  # Selección automática basada en carga/disponibilidad
+    AUTO = "auto"  # Selección automatic basada en carga/disponibilidad
 
 
 class NotificationPriority(str, Enum):
@@ -141,7 +141,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "赛季和排名"
             },
             "description": {
-                "es": "Cambios de posición, premios, nuevas temporadas",
+                "es": "Cambios de position, premios, nuevas temporadas",
                 "en": "Position changes, prizes, new seasons",
                 "zh": "排名变化、奖品、新赛季"
             },

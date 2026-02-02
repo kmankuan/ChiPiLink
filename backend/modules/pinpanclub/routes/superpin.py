@@ -217,7 +217,7 @@ async def get_head_to_head(
         liga_id, jugador_a_id, jugador_b_id
     )
     
-    # Calculatesr estadísticas
+    # Calculatesr statistics
     wins_a = sum(1 for m in matches if m.get("ganador_id") == jugador_a_id)
     wins_b = sum(1 for m in matches if m.get("ganador_id") == jugador_b_id)
     

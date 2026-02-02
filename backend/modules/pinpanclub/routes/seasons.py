@@ -70,7 +70,7 @@ async def get_past_seasons(
 
 @router.get("/{season_id}")
 async def get_season_by_id(season_id: str, lang: str = Query("es")):
-    """Get detalles de a season específica"""
+    """Get detalles de a season specific"""
     season = await seasons_service.get_season_by_id(season_id)
     
     if not season:
@@ -152,7 +152,7 @@ async def get_player_current_season_stats(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats/{season_id}")
 async def get_player_season_stats(jugador_id: str, season_id: str):
-    """Get statistics of the player en a season específica"""
+    """Get statistics of the player en a season specific"""
     stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
     
     if not stats:
@@ -215,7 +215,7 @@ async def create_season(
 
 @router.post("/create-monthly")
 async def create_monthly_season(lang: str = Query("es")):
-    """Create automáticamente la siguiente temporada mensual (admin)"""
+    """Create automaticmente la siguiente temporada mensual (admin)"""
     season = await seasons_service.create_next_monthly_season(lang)
     return {"message": "Monthly season created", "season": season}
 

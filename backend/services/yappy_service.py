@@ -176,7 +176,7 @@ class YappyService:
         """Get human-readable error description"""
         errors = {
             "E002": "Algo salió mal. Intenta nuevamente.",
-            "E005": "Este número no está registrado en Yappy.",
+            "E005": "Este number no está registrado en Yappy.",
             "E006": "Algo salió mal. Intenta nuevamente.",
             "E007": "El pedido ya ha sido registrado.",
             "E008": "Algo salió mal. Intenta nuevamente.",

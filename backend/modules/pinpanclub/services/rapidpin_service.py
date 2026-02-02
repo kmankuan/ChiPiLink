@@ -1000,7 +1000,7 @@ class RapidPinService(BaseService):
     # ============== PUBLIC FEED ==============
     
     async def get_public_feed(self) -> Dict:
-        """Get feed público de Rapid Pin"""
+        """Get feed public de Rapid Pin"""
         db = await self.get_db()
         
         # Get temporada activa
@@ -1014,7 +1014,7 @@ class RapidPinService(BaseService):
             "active_season": active_season.model_dump() if active_season else None
         }
         
-        # Matchs recientes (últimos 10 validados)
+        # Matchs recientes (lasts 10 validados)
         recent_matches = []
         if active_season:
             matches_cursor = db["rapidpin_matches"].find(

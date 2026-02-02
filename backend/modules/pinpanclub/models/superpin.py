@@ -26,7 +26,7 @@ class CheckInMethod(str, Enum):
 
 
 class StatsLevel(str, Enum):
-    """Nivel de estadísticas"""
+    """Nivel de statistics"""
     BASIC = "basic"            # Only sets ganados/perdidos
     STANDARD = "standard"      # Points por set
     ADVANCED = "advanced"      # Statistics completas (aces, errores, etc.)
@@ -95,7 +95,7 @@ class CheckInConfig(BaseModel):
 
 
 class StatsConfig(BaseModel):
-    """Configuración de estadísticas"""
+    """Configuración de statistics"""
     level: StatsLevel = StatsLevel.STANDARD
     track_aces: bool = False
     track_errors: bool = False

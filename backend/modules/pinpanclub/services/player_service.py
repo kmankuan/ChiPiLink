@@ -95,7 +95,7 @@ class PlayerService(BaseService):
         opponent_elo: int
     ) -> Optional[Player]:
         """
-        Actualizar estadísticas of the player después de un partido.
+        Actualizar statistics of the player después de un partido.
         Calcula cambio de ELO y emite evento.
         """
         player = await self.get_player(jugador_id)

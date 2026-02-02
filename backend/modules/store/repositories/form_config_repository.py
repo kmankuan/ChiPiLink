@@ -174,7 +174,7 @@ class FormConfigRepository(BaseRepository):
                     "placeholder_es": "ej: STD-2024-001",
                     "placeholder_zh": "例如：STD-2024-001",
                     "help_text_en": "If you know the school ID, it helps speed up verification",
-                    "help_text_es": "Si conoces el ID escolar, ayuda a acelerar la verificación",
+                    "help_text_es": "Si conoces el ID escolar, ayuda a acelerar la verification",
                     "help_text_zh": "如果您知道学校ID，可以加快验证速度"
                 }
             ]

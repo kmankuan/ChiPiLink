@@ -224,7 +224,7 @@ class UserProfileService(BaseService):
         return result
     
     async def update_custom_field(self, user_id: str, field_key: str, value: Any) -> bool:
-        """Update un campo personalizado específico"""
+        """Update un campo personalizado specific"""
         result = await db.chipi_user_profiles.update_one(
             {"user_id": user_id},
             {

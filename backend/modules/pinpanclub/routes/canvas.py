@@ -98,7 +98,7 @@ async def listar_layouts():
 
 @router.get("/layouts/{layout_id}", response_model=dict)
 async def obtener_layout(layout_id: str):
-    """Get un layout específico"""
+    """Get un layout specific"""
     from main import db
     
     layout = await db.pingpong_canvas_layouts.find_one(

@@ -36,7 +36,7 @@ class TutorSession(BaseModel):
     estudiante_nombre: Optional[str] = None
     # Tema de la sesión
     tema: str  # "vocabulario_ingles", "pronunciacion", "gramatica", etc.
-    subtema: Optional[str] = None  # "colores", "números", etc.
+    subtema: Optional[str] = None  # "colores", "numbers", etc.
     nivel: str = "basico"  # basico, intermedio, avanzado
     idioma_objetivo: str = "en"  # Idioma that istá aprendiendo
     # Estado
@@ -64,7 +64,7 @@ class VocabularyItem(BaseModel):
     imagen_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
     # Categorización
-    categoria: Optional[str] = None  # colores, animales, números, etc.
+    categoria: Optional[str] = None  # colores, animales, numbers, etc.
     nivel: str = "basico"
     idioma_origen: str = "es"
     idioma_destino: str = "en"

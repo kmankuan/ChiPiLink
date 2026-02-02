@@ -140,7 +140,7 @@ async def update_category_preference(
     data: UpdateCategoryPreferenceRequest,
     user=Depends(get_current_user)
 ):
-    """Update preferencia de una category específica"""
+    """Update preferencia de una category specific"""
     prefs = await push_notification_service.update_category_preference(
         user_id=user["user_id"],
         category_id=category_id,
@@ -179,7 +179,7 @@ async def get_categories(active_only: bool = Query(True)):
 
 @router.get("/categories/{category_id}")
 async def get_category(category_id: str):
-    """Get una category específica"""
+    """Get una category specific"""
     category = await push_notification_service.get_category(category_id)
     
     if not category:

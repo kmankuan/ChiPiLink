@@ -13,7 +13,7 @@ class TaskSupervisorConfig(BaseModel):
     config_id: str = "task_supervisor_main"
     # Monday.com Integration
     monday_board_id: Optional[str] = None  # Specific board for tasks
-    monday_group_id: Optional[str] = None  # Grupo específico (opcional)
+    monday_group_id: Optional[str] = None  # Grupo specific (opcional)
     # Voice Configuration
     tts_enabled: bool = True
     tts_provider: str = "openai"  # openai, elevenlabs, browser

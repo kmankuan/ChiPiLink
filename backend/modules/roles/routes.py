@@ -399,7 +399,7 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
             "roles.view"
         )
         if not has_permission:
-            raise HTTPException(status_code=403, detail="No tienes permiso para ver estadísticas de auditoría")
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver statistics de auditoría")
     
     # Get counts by action type
     pipeline = [

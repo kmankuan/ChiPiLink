@@ -56,7 +56,7 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, liga_id, data)
     
     async def increment_stats(self, liga_id: str, partidos: int = 0, jugadores: int = 0) -> bool:
-        """Incrementar estadísticas of the league"""
+        """Incrementar statistics of the league"""
         update = {}
         if partidos:
             update["total_partidos"] = partidos
@@ -128,7 +128,7 @@ class PlayerCheckInRepository(BaseRepository):
         return result.modified_count > 0
     
     async def auto_checkout_expired(self, hours: int = 8) -> int:
-        """Checkout automático de check-ins expirados"""
+        """Checkout automatic de check-ins expirados"""
         cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
         result = await self._collection.update_many(
             {"is_active": True, "check_in_time": {"$lt": cutoff}},
@@ -250,7 +250,7 @@ class RankingRepository(BaseRepository):
         if existing:
             return existing
         
-        # Get última posición
+        # Get last position
         count = await self.count({"liga_id": liga_id})
         
         new_entry = {
@@ -282,7 +282,7 @@ class RankingRepository(BaseRepository):
         )
     
     async def get_player_ranking(self, liga_id: str, jugador_id: str) -> Optional[Dict]:
-        """Get posición de un jugador"""
+        """Get position de un jugador"""
         return await self.find_one({
             "liga_id": liga_id,
             "jugador_id": jugador_id
@@ -311,7 +311,7 @@ class RankingRepository(BaseRepository):
                 x.get("sets_ganados", 0) - x.get("sets_perdidos", 0)
             ), reverse=True)
         
-        # Update posiciones
+        # Update positions
         for i, entry in enumerate(rankings):
             old_pos = entry.get("posicion", i + 1)
             new_pos = i + 1
@@ -394,7 +394,7 @@ class PlayerBadgeRepository(BaseRepository):
         )
     
     async def get_badge_by_type(self, jugador_id: str, badge_type: str, **filters) -> Optional[Dict]:
-        """Verify si un jugador ya tiene un badge específico"""
+        """Verify si un jugador ya tiene un badge specific"""
         query = {"jugador_id": jugador_id, "badge_type": badge_type}
         query.update(filters)
         return await self.find_one(query)

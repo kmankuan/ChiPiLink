@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class MondayService(BaseService):
     """
     Service for integración con Monday.com.
-    Escucha eventos del module y sincroniza automáticamente.
+    Escucha eventos del module y sincroniza automaticmente.
     """
     
     MODULE_NAME = "pinpanclub"
@@ -35,7 +35,7 @@ class MondayService(BaseService):
         self._setup_event_listeners()
     
     def _setup_event_listeners(self):
-        """Configurar listeners de eventos para sync automático"""
+        """Configurar listeners de eventos para sync automatic"""
         
         @event_bus.subscribe(PinpanClubEvents.MATCH_CREATED)
         async def on_match_created(event: Event):
@@ -119,7 +119,7 @@ class MondayService(BaseService):
         return result.get("data", {}).get("boards", [])
     
     async def get_board_items(self, board_id: str) -> List[Dict]:
-        """Get items de un board específico (jugadores)"""
+        """Get items de un board specific (jugadores)"""
         query = f'''
         query {{
             boards(ids: [{board_id}]) {{

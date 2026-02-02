@@ -1,5 +1,5 @@
 """
-Achievements Service - Lógica de logros automáticos
+Achievements Service - Lógica de logros automatics
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -14,7 +14,7 @@ from ..models.social import NotificationCreate, NotificationType, ActivityFeedCr
 
 
 class AchievementsService(BaseService):
-    """Service for gestionar logros automáticos"""
+    """Service for gestionar logros automatics"""
     
     MODULE_NAME = "pinpanclub"
     

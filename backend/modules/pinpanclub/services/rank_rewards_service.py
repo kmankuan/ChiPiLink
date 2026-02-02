@@ -231,7 +231,7 @@ class RankRewardsService(BaseService):
         
         await db.pinpanclub_rank_rewards.insert_one(reward_record)
         
-        # Aplicar recompensas específicas
+        # Aplicar recompensas specifics
         bonus_points = 0
         badges_granted = []
         perks_granted = []

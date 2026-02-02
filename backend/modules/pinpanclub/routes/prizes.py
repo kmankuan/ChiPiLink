@@ -67,17 +67,17 @@ async def get_prizes_by_type(prize_type: PrizeType):
 
 @router.get("/catalog")
 async def get_prize_catalog():
-    """Get catálogo of prizes"""
+    """Get catalog of prizes"""
     catalog = await prize_service.get_or_create_default_catalog()
     return catalog
 
 
 @router.get("/catalog/season/{season_id}")
 async def get_season_catalog(season_id: str):
-    """Get catálogo de a season"""
+    """Get catalog de a season"""
     catalog = await prize_service.get_season_catalog(season_id)
     if not catalog:
-        # Returnsr catálogo by default
+        # Returnsr catalog by default
         catalog = await prize_service.get_or_create_default_catalog()
     return catalog
 
@@ -114,7 +114,7 @@ async def award_season_prizes(
     referee_rankings: Optional[List[dict]] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Otorgar premios de temporada automáticamente (solo admin)"""
+    """Otorgar premios de temporada automaticmente (solo admin)"""
     awarded = await prize_service.award_season_prizes(
         season_id,
         player_rankings,

@@ -1,6 +1,6 @@
 """
 Achievements - API Routes
-Endpoints for logros automáticos
+Endpoints for logros automatics
 """
 from fastapi import APIRouter, HTTPException
 from typing import List

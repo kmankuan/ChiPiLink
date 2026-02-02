@@ -227,7 +227,7 @@ async def get_available_boards(admin: dict = Depends(get_admin_user)):
 
 @router.get("/board/{board_id}/structure")
 async def get_board_structure(board_id: str, admin: dict = Depends(get_admin_user)):
-    """Obtener estructura detallada de un tablero específico"""
+    """Obtener estructura detallada de un tablero specific"""
     board = await get_board_columns(board_id)
     
     if not board:
@@ -332,7 +332,7 @@ async def sync_match_to_monday(
     partido_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Sincronizar un partido específico a Monday.com"""
+    """Sincronizar un partido specific a Monday.com"""
     config = await get_pingpong_monday_config()
     
     if not config.matches_board_id:

@@ -142,7 +142,7 @@ class PostService:
             # Send notification
             from modules.notifications.services.push_service import push_notification_service
             
-            # Get título y resumen en español como default
+            # Get title y resumen en español como default
             title = post["title"].get("es", list(post["title"].values())[0])
             summary = post.get("summary", {}).get("es", "")
             

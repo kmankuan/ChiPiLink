@@ -25,7 +25,7 @@ class SeasonType(str, Enum):
 
 
 class SeasonRewardTier(BaseModel):
-    """Nivel de recompensa por posición"""
+    """Nivel de recompensa por position"""
     position_start: int        # Posición inicial (ej: 1)
     position_end: int          # Posición final (ej: 3)
     bonus_points: int          # Points bonus
@@ -56,7 +56,7 @@ class RankingSeason(BaseModel):
     min_challenges_to_qualify: int = 5  # Minimum challenges to qualify
     min_points_to_qualify: int = 50     # Minimum points to qualify
     
-    # Recompensas por posición
+    # Recompensas por position
     reward_tiers: List[Dict] = []
     
     # Statistics finales (se llenan al cerrar)

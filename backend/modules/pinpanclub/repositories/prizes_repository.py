@@ -92,7 +92,7 @@ class AwardedPrizeRepository(BaseRepository):
 
 
 class PrizeCatalogRepository(BaseRepository):
-    """Repository for catálogos de premios"""
+    """Repository for catalogs de premios"""
     
     COLLECTION_NAME = "pinpanclub_prize_catalogs"
     ID_FIELD = "catalog_id"

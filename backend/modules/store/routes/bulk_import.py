@@ -154,7 +154,7 @@ async def get_import_history(
     
     Args:
         tipo: Filtrar by type ("estudiantes" o "libros")
-        limit: Número máximo de registros
+        limit: Número maximum de registros
     """
     result = await bulk_import_service.get_import_history(tipo, limit)
     return result

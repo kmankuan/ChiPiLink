@@ -560,7 +560,7 @@ class SuperPinService(BaseService):
         # Generate bracket structure
         brackets = []
         
-        # Primera ronda - emparejar según ranking (1 vs último, 2 vs penúltimo, etc.)
+        # Primera ronda - emparejar según ranking (1 vs last, 2 vs penlast, etc.)
         round_1_matches = []
         for i in range(bracket_size // 2):
             match = {
@@ -574,7 +574,7 @@ class SuperPinService(BaseService):
                 "score_b": 0,
                 "estado": "pendiente"
             }
-            # Si solo hay un jugador, avanza automáticamente (bye)
+            # Si solo hay un jugador, avanza automaticmente (bye)
             if match["player_a"] and not match["player_b"]:
                 match["winner"] = match["player_a"]["jugador_id"]
                 match["estado"] = "bye"
@@ -839,7 +839,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         partido_id: str
     ) -> List[Dict]:
-        """Verify y otorgar badges basados en estadísticas de partido"""
+        """Verify y otorgar badges basados en statistics de partido"""
         awarded_badges = []
         
         # Get ranking of the player
@@ -1032,7 +1032,7 @@ class SuperPinService(BaseService):
         # Get badges
         badges = await self.get_player_badges(jugador_id)
         
-        # Calculatesr estadísticas agregadas
+        # Calculatesr statistics agregadas
         total_matches = sum(r.get("partidos_jugados", 0) for r in rankings)
         total_wins = sum(r.get("partidos_ganados", 0) for r in rankings)
         total_losses = sum(r.get("partidos_perdidos", 0) for r in rankings)

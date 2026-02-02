@@ -187,7 +187,7 @@ class ConexionesService:
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
         """Get reciprocal permissions (generally more limited)"""
-        # By defecto, el recíproco tiene permisos mínimos
+        # By defecto, el recíproco tiene permisos minimums
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
             # The dependent has no permissions sobre el acudiente
             return {
@@ -495,7 +495,7 @@ class ConexionesService:
         """Process invitación cuando usuario se registra"""
         invitacion = await db.invitaciones.find_one({"token": token, "estado": "pendiente"})
         if not invitacion:
-            return {"error": "Invitación no válida o expirada"}
+            return {"error": "Invitación no valid o expirada"}
         
         # Mark como aceptada
         await db.invitaciones.update_one(
@@ -545,7 +545,7 @@ class ConexionesService:
         """Create usuario acudido (cuenta gestionada)"""
         import uuid
         
-        # Verify email único si se proporciona
+        # Verify email unique si se proporciona
         if email:
             existing = await db.auth_users.find_one({"email": email.lower()})
             if existing:
@@ -657,7 +657,7 @@ class ConexionesService:
         if not conexion.get("permisos", {}).get("transferir_wallet", False):
             return {"error": "No tienes permiso para transferir a este usuario"}
         
-        # Verify límite diario
+        # Verify limit diario
         limite = conexion.get("permisos", {}).get("limite_transferencia_diario")
         if limite:
             # Calculate transferencias del día
@@ -675,7 +675,7 @@ class ConexionesService:
             
             total_hoy = transferencias_hoy[0]["total"] if transferencias_hoy else 0
             if total_hoy + monto > limite:
-                return {"error": f"Excede límite diario de ${limite}. Ya transferiste ${total_hoy} hoy."}
+                return {"error": f"Excede limit diario de ${limite}. Ya transferiste ${total_hoy} hoy."}
         
         # Verify saldo
         wallet = de_usuario.get("wallet", {})

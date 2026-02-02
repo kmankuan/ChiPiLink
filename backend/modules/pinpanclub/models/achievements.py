@@ -1,6 +1,6 @@
 """
 Achievements - Modelos
-System for logros automáticos basados en retos completados
+System for logros automatics basados en retos completados
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -172,10 +172,10 @@ def get_challenge_achievements() -> List[Dict]:
             "requirement_value": 2000,
             "points_reward": 200
         },
-        # Dificultad específica
+        # Dificultad specific
         {
             "name": "Valiente",
-            "description": "Completa 5 retos difíciles",
+            "description": "Completa 5 retos difficultes",
             "type": "difficulty_master",
             "rarity": "rare",
             "icon": "💪",

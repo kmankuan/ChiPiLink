@@ -229,7 +229,7 @@ async def generate_all_demo_data():
     print("🚀 Generando datos de demo para Unatienda...")
     
     # 1. Generate catalog
-    print("\n📚 Generando catálogo de libros...")
+    print("\n📚 Generando catalog de libros...")
     products = await generate_catalog_products()
     print(f"   ✅ {len(products)} libros creados")
     

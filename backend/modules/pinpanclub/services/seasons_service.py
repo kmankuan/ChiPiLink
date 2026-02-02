@@ -185,7 +185,7 @@ class RankingSeasonsService(BaseService):
                 if reward:
                     rewards_granted.append(reward)
         
-        # Calculatesr estadísticas finales
+        # Calculatesr statistics finales
         total_participants = len(final_standings)
         total_challenges = sum(p.get("challenges_completed", 0) for p in final_standings)
         total_points = sum(p.get("season_points", 0) for p in final_standings)
@@ -326,7 +326,7 @@ class RankingSeasonsService(BaseService):
             }.get(lang)
             
             message_text = {
-                "es": f"¡Felicidades! Terminaste en posición #{position}. Ganaste {tier.get('bonus_points', 0)} puntos bonus.",
+                "es": f"¡Felicidades! Terminaste en position #{position}. Ganaste {tier.get('bonus_points', 0)} puntos bonus.",
                 "en": f"Congratulations! You finished in position #{position}. You earned {tier.get('bonus_points', 0)} bonus points.",
                 "zh": f"恭喜！您获得第{position}名。获得{tier.get('bonus_points', 0)}积分奖励。"
             }.get(lang)
@@ -367,7 +367,7 @@ class RankingSeasonsService(BaseService):
         
         participants = await cursor.to_list(length=limit)
         
-        # Add posición
+        # Add position
         for i, p in enumerate(participants, offset + 1):
             p["position"] = i
         
@@ -393,7 +393,7 @@ class RankingSeasonsService(BaseService):
         if not participant:
             return None
         
-        # Get posición actual
+        # Get position actual
         higher_count = await db.pinpanclub_season_participants.count_documents({
             "season_id": season_id,
             "season_points": {"$gt": participant.get("season_points", 0)}
@@ -410,7 +410,7 @@ class RankingSeasonsService(BaseService):
         challenge_completed: bool = True
     ):
         """
-        Actualizar estadísticas of the player en the season actual.
+        Actualizar statistics of the player en the season actual.
         Llamar después de completar un reto.
         """
         season = await self.get_current_season()
@@ -454,7 +454,7 @@ class RankingSeasonsService(BaseService):
             upsert=True
         )
         
-        # Update estadísticas of the season
+        # Update statistics of the season
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season["season_id"]},
             {
@@ -479,7 +479,7 @@ class RankingSeasonsService(BaseService):
     # ============== AUTO-CREATION ==============
     
     async def create_next_monthly_season(self, lang: str = "es") -> Dict:
-        """Create automáticamente la siguiente temporada mensual"""
+        """Create automaticmente la siguiente temporada mensual"""
         now = datetime.now(timezone.utc)
         
         # Calculate next month dates

@@ -70,7 +70,7 @@ class PrizeService(BaseService):
     # ============== PRIZE CATALOG ==============
     
     async def get_or_create_default_catalog(self) -> PrizeCatalog:
-        """Get o crear catálogo by default"""
+        """Get o crear catalog by default"""
         existing = await self.catalog_repo.get_active_catalog()
         if existing:
             return PrizeCatalog(**existing)
@@ -83,7 +83,7 @@ class PrizeService(BaseService):
             created = await self.definition_repo.create(prize_data)
             prize_defs.append(PrizeDefinition(**created))
         
-        # Create catálogo
+        # Create catalog
         catalog_data = {
             "name": "Catálogo Principal",
             "description": "Premios estándar para temporadas",
@@ -94,7 +94,7 @@ class PrizeService(BaseService):
         return PrizeCatalog(**result)
     
     async def get_season_catalog(self, season_id: str) -> Optional[PrizeCatalog]:
-        """Get catálogo de una temporada"""
+        """Get catalog de una temporada"""
         result = await self.catalog_repo.get_season_catalog(season_id)
         return PrizeCatalog(**result) if result else None
     
@@ -120,7 +120,7 @@ class PrizeService(BaseService):
         if prize.get("max_winners"):
             current_winners = await self.awarded_repo.count_prize_winners(prize_id)
             if current_winners >= prize["max_winners"]:
-                raise ValueError("Este premio ha alcanzado el límite de ganadores")
+                raise ValueError("Este premio ha alcanzado el limit de ganadores")
         
         award_data = {
             "prize_id": prize_id,
@@ -182,7 +182,7 @@ class PrizeService(BaseService):
         referee_rankings: List[Dict] = None
     ) -> List[AwardedPrize]:
         """
-        Otorgar premios automáticamente al cerrar una temporada.
+        Otorgar premios automaticmente al cerrar una temporada.
         Evalúa las conditions de cada premio.
         """
         awarded = []
@@ -198,7 +198,7 @@ class PrizeService(BaseService):
             
             for idx, ranking in enumerate(rankings, start=1):
                 if self._check_conditions(prize.conditions, ranking, idx):
-                    # Verify límite
+                    # Verify limit
                     if prize.max_winners:
                         current = await self.awarded_repo.count_prize_winners(prize.prize_id)
                         if current >= prize.max_winners:

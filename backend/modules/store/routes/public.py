@@ -1,6 +1,6 @@
 """
 Store Module - Public Routes
-Endpoints públicos that does not requieren autenticación
+Endpoints publics that does not requieren autenticación
 """
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, List
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/public", tags=["Store - Public"])
 
 @router.get("/products")
 async def get_public_products(grado: Optional[str] = None):
-    """Get productos para formulario público - sin autenticación"""
+    """Get productos para formulario public - sin autenticación"""
     products = await product_service.get_all_products(grado=grado)
     
     # Filter solo productos con stock > 0
@@ -30,7 +30,7 @@ async def get_public_products(grado: Optional[str] = None):
 
 @router.post("/order")
 async def create_public_order(pedido: OrderPublicCreate):
-    """Create pedido desde formulario público - sin autenticación"""
+    """Create pedido desde formulario public - sin autenticación"""
     try:
         order = await order_service.create_public_order(pedido)
         return {

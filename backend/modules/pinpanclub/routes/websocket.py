@@ -331,7 +331,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     tipo_punto = data.get("tipo", "normal")
     
     if jugador not in ["a", "b"]:
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "Jugador inválido"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "Jugador invalid"})
         return
     
     match = await db.pingpong_matches.find_one({"partido_id": match_id})

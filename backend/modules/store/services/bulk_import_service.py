@@ -351,7 +351,7 @@ class BulkImportService:
                 # Parseprecio
                 precio = self._parse_precio(precio_str)
                 if precio is None:
-                    errores.append({"fila": idx + 2, "error": f"Precio inválido: {precio_str}"})
+                    errores.append({"fila": idx + 2, "error": f"Precio invalid: {precio_str}"})
                     continue
                 
                 # Verify duplicados
@@ -448,7 +448,7 @@ class BulkImportService:
                 if precio is None:
                     resultados["errores"].append({
                         "fila": idx + 2,
-                        "error": f"Precio inválido: {precio_str}"
+                        "error": f"Precio invalid: {precio_str}"
                     })
                     continue
                 
@@ -541,7 +541,7 @@ class BulkImportService:
         return await cursor.to_list(length=limit)
     
     async def get_grados_disponibles(self) -> List[str]:
-        """Get lista de grados únicos de estudiantes importados"""
+        """Get lista de grados uniques de estudiantes importados"""
         pipeline = [
             {"$match": {"estado": "activo"}},
             {"$group": {"_id": "$grado"}},

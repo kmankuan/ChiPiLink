@@ -35,7 +35,7 @@ class CreatePaymentSessionRequest(BaseModel):
 
 @router.get("/me")
 async def get_my_qr(user=Depends(get_current_user)):
-    """Get mi código QR"""
+    """Get mi code QR"""
     qr = await qr_code_service.get_or_create_user_qr(
         user_id=user["user_id"]
     )
@@ -48,7 +48,7 @@ async def get_my_qr(user=Depends(get_current_user)):
 
 @router.post("/me/regenerate")
 async def regenerate_my_qr(user=Depends(get_current_user)):
-    """Regenerar mi código QR (invalida el anterior)"""
+    """Regenerar mi code QR (invalida el anterior)"""
     qr = await qr_code_service.regenerate_user_qr(
         user_id=user["user_id"]
     )
@@ -57,7 +57,7 @@ async def regenerate_my_qr(user=Depends(get_current_user)):
         "success": True,
         "qr_code": qr,
         "message": {
-            "es": "Código QR regenerado. El anterior ya no es válido.",
+            "es": "Código QR regenerado. El anterior ya no es valid.",
             "en": "QR code regenerated. The previous one is no longer valid.",
             "zh": "二维码已重新生成。旧的已失效。"
         }
@@ -93,7 +93,7 @@ async def scan_qr(
     data: ScanQRRequest,
     admin=Depends(get_admin_user)
 ):
-    """Escanear un código QR y obtener information of the user"""
+    """Escanear un code QR y obtener information of the user"""
     result = await qr_code_service.scan_qr_code(data.qr_string)
     
     if not result.get("valid"):
@@ -261,7 +261,7 @@ async def admin_get_user_qr(
     user_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Get QR de un usuario específico (admin)"""
+    """Get QR de un usuario specific (admin)"""
     qr = await qr_code_service.get_or_create_user_qr(user_id=user_id)
     
     return {

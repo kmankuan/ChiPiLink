@@ -193,7 +193,7 @@ class GoogleSheetsService:
         rango: str = None
     ) -> List[List[str]]:
         """
-        Leer datos de una hoja específica.
+        Leer datos de una hoja specific.
         
         Args:
             sheet_id: ID of the Google Sheet
@@ -227,8 +227,8 @@ class GoogleSheetsService:
         Sincronizar estudiantes desde Google Sheets.
         
         Args:
-            sheet_id: ID específico del sheet (None = todos los configurados)
-            solo_hoja: Nombre de hoja específica (None = todas)
+            sheet_id: ID specific del sheet (None = todos los configurados)
+            solo_hoja: Nombre de hoja specific (None = todas)
             forzar: Si es True, sincroniza aunque override_local sea True
         
         Returns:
@@ -373,7 +373,7 @@ class GoogleSheetsService:
             except Exception as e:
                 resultados["errores"].append(f"Sheet {sheet_cfg.get('nombre', sheet_cfg['sheet_id'])}: {str(e)}")
         
-        # Update última sincronización
+        # Update last sincronización
         await self.update_sync_config({
             "ultima_sync": datetime.now(timezone.utc).isoformat()
         })
@@ -419,7 +419,7 @@ class GoogleSheetsService:
         }
     
     async def buscar_estudiante_por_numero(self, numero: str) -> Optional[Dict]:
-        """Search estudiante por número"""
+        """Search estudiante por number"""
         return await db.estudiantes_sincronizados.find_one(
             {"numero_estudiante": numero, "estado": "activo"},
             {"_id": 0}

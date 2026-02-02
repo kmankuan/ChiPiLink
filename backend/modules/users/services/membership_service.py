@@ -184,7 +184,7 @@ class MembershipService:
         return plans
     
     async def get_plan(self, plan_id: str) -> Optional[Dict]:
-        """Get un plan específico"""
+        """Get un plan specific"""
         plan = await db[self.collection_plans].find_one(
             {"plan_id": plan_id},
             {"_id": 0}

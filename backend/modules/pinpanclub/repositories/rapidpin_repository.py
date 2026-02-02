@@ -68,7 +68,7 @@ class RapidPinSeasonRepository(BaseRepository):
         players: int = 0,
         referees: int = 0
     ) -> bool:
-        """Incrementar estadísticas of the season"""
+        """Incrementar statistics of the season"""
         update = {}
         if matches:
             update["total_matches"] = matches
@@ -265,7 +265,7 @@ class RapidPinRankingRepository(BaseRepository):
         season_id: str,
         jugador_id: str
     ) -> Optional[Dict]:
-        """Get ranking de un jugador específico"""
+        """Get ranking de un jugador specific"""
         return await self.find_one({
             "season_id": season_id,
             "jugador_id": jugador_id
@@ -298,7 +298,7 @@ class RapidPinRankingRepository(BaseRepository):
         is_winner: bool,
         points: int
     ) -> bool:
-        """Update estadísticas de jugador después de un partido"""
+        """Update statistics de jugador después de un partido"""
         inc_data = {
             "puntos_totales": points,
             "puntos_como_jugador": points,
@@ -327,7 +327,7 @@ class RapidPinRankingRepository(BaseRepository):
         ranking_id: str,
         points: int
     ) -> bool:
-        """Update estadísticas de árbitro"""
+        """Update statistics de árbitro"""
         result = await self._collection.update_one(
             {self.ID_FIELD: ranking_id},
             {
@@ -349,7 +349,7 @@ class RapidPinRankingRepository(BaseRepository):
         # Get all sorted rankings
         rankings = await self.get_season_ranking(season_id)
         
-        # Update posiciones
+        # Update positions
         for idx, ranking in enumerate(rankings, start=1):
             await self._collection.update_one(
                 {self.ID_FIELD: ranking["ranking_id"]},
@@ -359,7 +359,7 @@ class RapidPinRankingRepository(BaseRepository):
         return True
     
     async def get_season_participants_count(self, season_id: str) -> Dict:
-        """Get conteo de participantes únicos"""
+        """Get conteo de participantes uniques"""
         players = await self._collection.count_documents({
             "season_id": season_id,
             "partidos_jugados": {"$gt": 0}

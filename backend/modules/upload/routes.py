@@ -52,7 +52,7 @@ async def upload_image(
         if not validate_image(file):
             raise HTTPException(
                 status_code=400,
-                detail=f"Tipo de archivo no permitido. Extensiones válidas: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
+                detail=f"Tipo de archivo no permitido. Extensiones valids: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
             )
         
         # Read file content
@@ -62,7 +62,7 @@ async def upload_image(
         if len(content) > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=400,
-                detail=f"El archivo excede el límite de {MAX_FILE_SIZE // (1024*1024)}MB"
+                detail=f"El archivo excede el limit de {MAX_FILE_SIZE // (1024*1024)}MB"
             )
         
         # Generate unique filename
@@ -157,7 +157,7 @@ async def upload_image_base64(
         if len(content) > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=400,
-                detail=f"El archivo excede el límite de {MAX_FILE_SIZE // (1024*1024)}MB"
+                detail=f"El archivo excede el limit de {MAX_FILE_SIZE // (1024*1024)}MB"
             )
         
         # Generate unique filename

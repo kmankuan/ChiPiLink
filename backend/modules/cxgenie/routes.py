@@ -34,7 +34,7 @@ DEFAULT_CXGENIE_CONFIG = {
     "workspace_id": "03a35f5f-f777-489a-b60c-69939ac89c49",
     "workspace_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VfaWQiOiIwM2EzNWY1Zi1mNzc3LTQ4OWEtYjYwYy02OTkzOWFjODljNDkiLCJpYXQiOjE3NDQwODk1NDJ9.cOcc7_FFaetfR1tKQ0IciSfs3qV6JM8hH26eSzsg13M",
     "agent_panel_base_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk",
-    # Panel URLs específicos - usando subdominios personalizados con workspace ID
+    # Panel URLs specifics - usando subdominios personalizados con workspace ID
     "tickets_panel_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=tickets",
     "chat_panel_url": "https://livechat.chipilink.com/workspaces/03a35f5f-f777-489a-b60c-69939ac89c49/help-desk?t=live-chat&type=ALL",
     "sign_in_url": "https://livechat.chipilink.com/sign-in",
@@ -315,7 +315,7 @@ async def get_integration_info():
             }
         },
         "frontend_implementation": {
-            "widget": "Inyectar el script del widget en las páginas públicas",
+            "widget": "Inyectar el script del widget en las pages publics",
             "agent_panel": "Cargar la URL del panel en un iframe para administradores"
         },
         "mobile_implementation": {

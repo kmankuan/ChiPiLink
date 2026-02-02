@@ -1,5 +1,5 @@
 """
-QR Code Service - Management of códigos QR para check-in y pagos
+QR Code Service - Management of codes QR para check-in y pagos
 """
 from typing import Dict, Optional, Any
 from datetime import datetime, timezone, timedelta
@@ -12,7 +12,7 @@ from core.database import db
 
 
 class QRCodeService:
-    """Service for management of códigos QR"""
+    """Service for management of codes QR"""
     
     def __init__(self):
         self.collection_qr_codes = "chipi_qr_codes"
@@ -26,11 +26,11 @@ class QRCodeService:
     
     def generate_user_qr_data(self, user_id: str, profile_id: str = None) -> Dict:
         """Generar datos para QR code de usuario"""
-        # Create un código único basado en user_id y timestamp
+        # Create un code unique basado en user_id y timestamp
         timestamp = datetime.now(timezone.utc).isoformat()
         raw_data = f"{user_id}:{profile_id or ''}:{timestamp}"
         
-        # Generate hash único
+        # Generate hash unique
         qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()[:16]
         
         qr_data = {

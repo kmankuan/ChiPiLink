@@ -1,6 +1,6 @@
 """
 PinPanClub Public Activity Feed API
-Endpoints públicos para mostrar actividades del club sin autenticación
+Endpoints publics para mostrar actividades del club sin autenticación
 """
 from fastapi import APIRouter, Query
 from typing import Optional

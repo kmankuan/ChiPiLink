@@ -154,7 +154,7 @@ class RolesService:
             {
                 "role_id": DefaultRoles.USER.value,
                 "nombre": "Usuario",
-                "descripcion": "Acceso básico a funcionalidades públicas",
+                "descripcion": "Acceso básico a funcionalidades publics",
                 "color": "#6366f1",
                 "icono": "User",
                 "es_sistema": True,

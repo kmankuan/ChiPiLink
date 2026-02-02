@@ -14,7 +14,7 @@ router = APIRouter(prefix="/landing", tags=["Community - Landing"])
 @router.get("")
 async def get_community_landing_data():
     """
-    Obtener todos los datos necesarios para la página de landing de comunidad.
+    Obtener todos los datos necesarios para la page de landing de comunidad.
     Combina datos de posts, eventos, galería y productos.
     """
     # Featured posts (hero section)

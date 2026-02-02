@@ -541,7 +541,7 @@ async def clear_demo_data(admin: dict = Depends(get_admin_user)):
 @router.get("/demo-stats")
 async def get_demo_stats():
     """
-    Obtiene estadísticas de datos de demostración
+    Obtiene statistics de datos de demostración
     """
     stats = {
         "pinpanclub": {

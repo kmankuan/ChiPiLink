@@ -102,7 +102,7 @@ class ChallengeService(BaseService):
         
         # Generate o usar retos proporcionados
         if auto_generate and not challenge_ids:
-            # Create retos automáticos
+            # Create retos automatics
             auto_challenges = select_weekly_challenges()
             challenge_ids = []
             
@@ -130,7 +130,7 @@ class ChallengeService(BaseService):
         """Get retos de la semana actual"""
         week = await self.get_current_week()
         if not week:
-            # Create semana automáticamente
+            # Create semana automaticmente
             week = await self.create_weekly_set(auto_generate=True)
         
         challenges = []
@@ -369,7 +369,7 @@ class ChallengeService(BaseService):
         )
     
     async def get_player_rank(self, jugador_id: str) -> Optional[int]:
-        """Get posición de un jugador en el leaderboard"""
+        """Get position de un jugador en el leaderboard"""
         entry = await self.leaderboard_repo.find_one({"jugador_id": jugador_id})
         return entry.get("rank") if entry else None
 

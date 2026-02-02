@@ -19,7 +19,7 @@ class SponsorType(str, Enum):
     PRIMARY = "primary"       # Banner horizontal grande
     SPECIAL = "special"       # Square spaces in header
     SECONDARY = "secondary"   # Others espacios
-    ROTATING = "rotating"     # Rotación automática
+    ROTATING = "rotating"     # Rotación automatic
 
 class SponsorPosition(str, Enum):
     HEADER_LEFT = "header_left"
@@ -347,7 +347,7 @@ async def actualizar_layout_config(config: TVLayoutConfig):
 
 @router.put("/config/space/{space_id}", response_model=dict)
 async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceConfig):
-    """Update configuration de un espacio específico"""
+    """Update configuration de un espacio specific"""
     from main import db
     
     # Get current config
@@ -390,7 +390,7 @@ async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceCon
 async def obtener_sponsors_para_tv():
     """
     Endpoint optimizado para la pantalla TV
-    Retorna todos los patrocinadores active organizados por posición
+    Retorna todos los patrocinadores active organizados por position
     """
     from main import db
     

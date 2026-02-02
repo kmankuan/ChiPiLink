@@ -103,7 +103,7 @@ class PushNotificationService:
         return result
     
     async def update_provider_config(self, provider: str, settings: Dict) -> Dict:
-        """Update configuration de un proveedor específico"""
+        """Update configuration de un proveedor specific"""
         update_key = f"{provider}"
         
         # Merge con configuration existente
@@ -153,7 +153,7 @@ class PushNotificationService:
             if category_provider in available:
                 return category_provider
         
-        # Balanceo de carga automático
+        # Balanceo de carga automatic
         config = self._config or {}
         strategy = config.get("load_balancing", "weighted")
         
@@ -218,7 +218,7 @@ class PushNotificationService:
         return await cursor.to_list(length=100)
     
     async def get_category(self, category_id: str) -> Optional[Dict]:
-        """Get una category específica"""
+        """Get una category specific"""
         return await db[self.collection_categories].find_one(
             {"category_id": category_id},
             {"_id": 0}
@@ -357,7 +357,7 @@ class PushNotificationService:
         push: bool = None,
         email: bool = None
     ) -> Dict:
-        """Update preferencia de una category específica"""
+        """Update preferencia de una category specific"""
         updates = {}
         
         if enabled is not None:
@@ -449,7 +449,7 @@ class PushNotificationService:
         
         # Verify quiet hours
         if prefs.get("quiet_hours", {}).get("enabled"):
-            # TODO: Implementar verificación de quiet hours
+            # TODO: Implementar verification de quiet hours
             pass
         
         # Get category para determinar proveedor

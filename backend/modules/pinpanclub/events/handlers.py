@@ -17,7 +17,7 @@ def setup_event_handlers():
     @event_bus.subscribe(PinpanClubEvents.MATCH_FINISHED)
     async def update_player_stats_on_match_finish(event: Event):
         """
-        Actualizar estadísticas de jugadores cuando termina un partido.
+        Actualizar statistics de jugadores cuando termina un partido.
         """
         from .services import player_service
         

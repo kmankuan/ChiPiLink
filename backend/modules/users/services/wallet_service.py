@@ -302,7 +302,7 @@ class WalletService(BaseService):
             metadata={"payment_reference": reference}
         )
         
-        # Complete automáticamente
+        # Complete automaticmente
         return await self.complete_transaction(transaction["transaction_id"])
     
     async def charge(

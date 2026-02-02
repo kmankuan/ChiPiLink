@@ -81,7 +81,7 @@ class OrderService(BaseService):
     
     async def create_public_order(self, data: OrderPublicCreate) -> Order:
         """
-        Crear pedido público (sin autenticación).
+        Crear pedido public (sin autenticación).
         Emite evento: store.order.created
         """
         # Validate y calcular total

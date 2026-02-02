@@ -117,7 +117,7 @@ async def get_reactions(target_type: str, target_id: str):
 
 @router.get("/reactions/{target_type}/{target_id}/user/{user_id}")
 async def get_user_reaction(target_type: str, target_id: str, user_id: str):
-    """Get reaction de un usuario específico"""
+    """Get reaction de un usuario specific"""
     reaction = await social_service.get_user_reaction(user_id, target_id, target_type)
     return {"user_id": user_id, "reaction_type": reaction}
 

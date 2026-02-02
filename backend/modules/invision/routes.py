@@ -98,7 +98,7 @@ async def oauth_callback(
     if not state_data:
         raise HTTPException(
             status_code=400,
-            detail="Estado de sesión inválido o expirado. Por favor, intente de nuevo."
+            detail="Estado de sesión invalid o expirado. Por favor, intente de nuevo."
         )
     
     # Exchange code for token

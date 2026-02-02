@@ -42,7 +42,7 @@ async def get_supervisor_status():
             "Pantalla grande tipo kiosk con tareas de Monday.com",
             "Anuncios por voz (TTS) para recordar tareas",
             "Comandos de voz para marcar tareas completadas",
-            "Recordatorios automáticos inteligentes",
+            "Recordatorios automatics inteligentes",
             "Gamificación con puntos y logros",
             "Supervisión para niños en casa y estudiantes",
             "Sincronización bidireccional con Monday.com",

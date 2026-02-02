@@ -67,7 +67,7 @@ class PrizeDefinition(BaseModel):
     for_referees: bool = False
     
     # Límites
-    max_winners: Optional[int] = None  # None = sin límite
+    max_winners: Optional[int] = None  # None = sin limit
     quantity_available: Optional[int] = None  # For premios físicos
     
     # Vigencia
@@ -121,7 +121,7 @@ class AwardedPrize(BaseModel):
     
     # Award details
     awarded_for: str  # Description of por qué se otorgó
-    position: Optional[int] = None  # Si fue por posición
+    position: Optional[int] = None  # Si fue por position
     
     # Timestamps
     awarded_at: Optional[Any] = None

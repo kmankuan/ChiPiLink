@@ -94,7 +94,7 @@ async def get_user_types(
 
 @router.get("/types/{type_id}")
 async def get_user_type(type_id: str):
-    """Get un tipo de usuario específico"""
+    """Get un tipo de usuario specific"""
     type_data = await user_profile_service.get_user_type(type_id)
     if not type_data:
         raise HTTPException(status_code=404, detail="User type not found")
@@ -326,7 +326,7 @@ async def get_language_preference(user=Depends(get_current_user)):
 
 @router.get("/profile/{user_id}")
 async def get_user_profile(user_id: str):
-    """Get perfil de un usuario (público)"""
+    """Get perfil de un usuario (public)"""
     profile = await user_profile_service.get_profile(user_id)
     
     if not profile:

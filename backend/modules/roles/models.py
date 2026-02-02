@@ -48,8 +48,8 @@ AVAILABLE_PERMISSIONS = {
     # Unatienda
     "unatienda": {
         "access": "Acceder a Unatienda",
-        "view_public_catalog": "Ver catálogo público",
-        "view_private_catalog": "Ver catálogo privado PCA",
+        "view_public_catalog": "Ver catalog public",
+        "view_private_catalog": "Ver catalog privado PCA",
         "manage_products": "Gestionar productos",
         "manage_categories": "Gestionar categorys",
         "manage_orders": "Gestionar pedidos",
@@ -78,7 +78,7 @@ AVAILABLE_PERMISSIONS = {
         "create_plans": "Crear planes",
         "manage_subscriptions": "Gestionar subscriptions",
         "view_visits": "Ver visitas",
-        "manage_qr": "Gestionar códigos QR",
+        "manage_qr": "Gestionar codes QR",
     },
     
     # Integraciones

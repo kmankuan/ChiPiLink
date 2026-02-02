@@ -97,7 +97,7 @@ class FCMProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notification a dispositivos específicos"""
+        """Send notification a dispositivos specifics"""
         if not self.validate_config():
             return {
                 "success": False,
@@ -312,7 +312,7 @@ class OneSignalProvider(PushProvider):
         image_url: str = None,
         action_url: str = None
     ) -> Dict:
-        """Send notification a dispositivos específicos (por subscription_id)"""
+        """Send notification a dispositivos specifics (por subscription_id)"""
         if not self.validate_config():
             return {
                 "success": False,

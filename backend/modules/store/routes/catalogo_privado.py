@@ -148,7 +148,7 @@ async def get_producto_detalle(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener detalle de un producto del catálogo privado.
+    Obtener detalle de un producto del catalog privado.
     """
     # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
@@ -156,7 +156,7 @@ async def get_producto_detalle(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catálogo privado"
+            detail="You do not have acceso al catalog privado"
         )
     
     producto = await db.libros.find_one(
@@ -176,7 +176,7 @@ async def get_productos_por_grado(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener todos los productos de un grado específico.
+    Obtener todos los productos de un grado specific.
     Útil para mostrar la lista de libros de un estudiante.
     """
     # Verify acceso
@@ -185,7 +185,7 @@ async def get_productos_por_grado(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catálogo privado"
+            detail="You do not have acceso al catalog privado"
         )
     
     query = {
@@ -223,7 +223,7 @@ async def get_resumen_catalogo(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener resumen del catálogo privado para the user.
+    Obtener resumen del catalog privado para the user.
     Muestra productos disponibles para cada estudiante vinculado.
     """
     # Verify acceso
@@ -232,7 +232,7 @@ async def get_resumen_catalogo(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catálogo privado"
+            detail="You do not have acceso al catalog privado"
         )
     
     resumen = []
@@ -287,7 +287,7 @@ async def admin_get_productos_catalogo_privado(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Obtener todos los productos del catálogo privado.
+    Admin: Obtener todos los productos del catalog privado.
     """
     query = {"es_catalogo_privado": True}
     
@@ -319,11 +319,11 @@ async def admin_crear_producto_catalogo_privado(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Crear producto en el catálogo privado.
+    Admin: Crear producto en el catalog privado.
     """
     import uuid
     
-    # Ensure que sea catálogo privado
+    # Ensure que sea catalog privado
     producto["es_catalogo_privado"] = True
     producto["libro_id"] = producto.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
     producto["activo"] = producto.get("activo", True)
@@ -342,7 +342,7 @@ async def admin_actualizar_producto_catalogo_privado(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Actualizar producto del catálogo privado.
+    Admin: Actualizar producto del catalog privado.
     """
     # Ensure that does not se pueda cambiar es_catalogo_privado
     updates["es_catalogo_privado"] = True
@@ -368,7 +368,7 @@ async def admin_eliminar_producto_catalogo_privado(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Eliminar producto del catálogo privado.
+    Admin: Eliminar producto del catalog privado.
     Por defecto hace soft delete (activo=False).
     """
     if hard_delete:

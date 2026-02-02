@@ -1,6 +1,6 @@
 """
 Weekly Challenges - Modelos
-Retos semanales automáticos y configurables
+Retos semanales automatics y configurables
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -60,7 +60,7 @@ class ChallengeDefinition(BaseModel):
     prize_id: Optional[str] = None
     
     # Configuration
-    is_automatic: bool = True  # Si es generado automáticamente
+    is_automatic: bool = True  # Si es generado automaticmente
     is_active: bool = True
     is_repeatable: bool = False  # If can be completed multiple times
     
@@ -175,7 +175,7 @@ class ChallengeLeaderboard(BaseModel):
 # ============== AUTO-GENERATED CHALLENGES ==============
 
 def get_auto_challenges() -> List[Dict]:
-    """Retos automáticos que se pueden generar"""
+    """Retos automatics que se pueden generar"""
     return [
         {
             "name": "Jugador Activo",
@@ -273,7 +273,7 @@ def get_auto_challenges() -> List[Dict]:
 def select_weekly_challenges(difficulty_mix: Dict[str, int] = None) -> List[Dict]:
     """
     Selecciona retos para la semana basándose en dificultad.
-    Por defecto: 2 fáciles, 2 medios, 1 difícil
+    Por defecto: 2 easyes, 2 medios, 1 difficult
     """
     import random
     

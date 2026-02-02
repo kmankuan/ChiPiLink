@@ -81,7 +81,7 @@ async def get_posts(
 
 @router.get("/{post_id}")
 async def get_post(post_id: str):
-    """Get un post específico"""
+    """Get un post specific"""
     post = await post_service.get_post(post_id)
     
     if not post:

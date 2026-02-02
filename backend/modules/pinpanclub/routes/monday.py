@@ -130,7 +130,7 @@ async def sync_single_match(
     partido_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Sincronizar a match específico"""
+    """Sincronizar a match specific"""
     config = await monday_service.get_config()
     if not config.matches_board_id:
         raise HTTPException(status_code=400, detail="Board of matches no configurado")

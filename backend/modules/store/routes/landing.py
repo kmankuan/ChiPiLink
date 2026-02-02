@@ -1,6 +1,6 @@
 """
 Store Module - Category Landing Routes
-Endpoints for páginas de landing de categorys y banners
+Endpoints for pages de landing de categorys y banners
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List
@@ -134,7 +134,7 @@ async def get_all_vendor_permissions(admin: dict = Depends(get_admin_user)):
 
 @router.get("/admin/vendor-permissions/{vendor_id}")
 async def get_vendor_permissions(vendor_id: str, admin: dict = Depends(get_admin_user)):
-    """Get permisos de un vendor específico"""
+    """Get permisos de un vendor specific"""
     permissions = await db.vendor_permissions.find_one({"vendor_id": vendor_id}, {"_id": 0})
     if not permissions:
         return {

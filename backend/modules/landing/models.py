@@ -94,7 +94,7 @@ BLOCK_TEMPLATES = {
     },
     "text": {
         "nombre": "Texto",
-        "descripcion": "Bloque de texto con título",
+        "descripcion": "Bloque de texto con title",
         "config_default": {
             "titulo": "",
             "contenido": "Escribe tu contenido aquí...",
@@ -199,7 +199,7 @@ BLOCK_TEMPLATES = {
                 "zh": "俱乐部活动"
             },
             "subtitulo": {
-                "es": "Lo último en PinPanClub",
+                "es": "Lo last en PinPanClub",
                 "en": "Latest from PinPanClub",
                 "zh": "PinPanClub最新动态"
             },

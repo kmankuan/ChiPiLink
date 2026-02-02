@@ -388,8 +388,8 @@ async def cancel_queue_match(
 @router.get("/public/feed")
 async def get_rapid_pin_public_feed():
     """
-    Feed público de Rapid Pin.
-    Incluye estadísticas, partidos recientes, ranking y cola of matches.
+    Feed public de Rapid Pin.
+    Incluye statistics, partidos recientes, ranking y cola of matches.
     """
     return await rapidpin_service.get_public_feed()
 
