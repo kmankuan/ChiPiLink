@@ -732,17 +732,17 @@ export default function MondayModule() {
                 </Card>
               )}
 
-              {/* Configuración de Subitems (Productos) */}
+              {/* Subitems Configuration (Products) */}
               <Card className="border-primary/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <Layers className="h-5 w-5" />
-                        Subitems (Productos del Pedido)
+                        Subitems (Order Products)
                       </CardTitle>
                       <CardDescription>
-                        Crear un subitem en Monday.com por cada producto del pedido
+                        Create a subitem in Monday.com for each product in the order
                       </CardDescription>
                     </div>
                     <Switch
@@ -759,19 +759,19 @@ export default function MondayModule() {
                   <CardContent className="space-y-4">
                     <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        📦 Cada producto del pedido se creará como un subitem dentro del item principal.
-                        Asegúrate de que el board tenga subitems habilitados en Monday.com.
+                        Each product in the order will be created as a subitem within the main item.
+                        Make sure the board has subitems enabled in Monday.com.
                       </p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { key: 'cantidad', label: 'Cantidad', icon: '🔢' },
-                        { key: 'precio_unitario', label: 'Precio Unitario', icon: '💰' },
+                        { key: 'cantidad', label: 'Quantity', icon: '🔢' },
+                        { key: 'precio_unitario', label: 'Unit Price', icon: '💰' },
                         { key: 'subtotal', label: 'Subtotal', icon: '💵' },
-                        { key: 'codigo', label: 'Código/ISBN', icon: '📖' },
-                        { key: 'materia', label: 'Materia/Categoría', icon: '📚' },
-                        { key: 'estado', label: 'Estado', icon: '📋' }
+                        { key: 'codigo', label: 'Code/ISBN', icon: '📖' },
+                        { key: 'materia', label: 'Subject/Category', icon: '📚' },
+                        { key: 'estado', label: 'Status', icon: '📋' }
                       ].map(({ key, label, icon }) => (
                         <div key={key} className="flex items-center gap-2">
                           <span className="text-lg">{icon}</span>
@@ -787,10 +787,10 @@ export default function MondayModule() {
                             }))}
                           >
                             <SelectTrigger className="flex-1">
-                              <SelectValue placeholder="Seleccionar columna" />
+                              <SelectValue placeholder="Select column" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="none">Sin mapear</SelectItem>
+                              <SelectItem value="none">Not mapped</SelectItem>
                               <SelectItem value="numbers">numbers (Número)</SelectItem>
                               <SelectItem value="numbers0">numbers0</SelectItem>
                               <SelectItem value="numbers1">numbers1</SelectItem>
