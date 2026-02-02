@@ -220,7 +220,7 @@ export default function MisConexiones({ token }) {
     
     setSendingInvite(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/invitar`, {
+      const res = await fetch(`${API}/api/connections/invite`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -261,7 +261,7 @@ export default function MisConexiones({ token }) {
 
   const handleRespondRequest = async (solicitudId, accept) => {
     try {
-      const res = await fetch(`${API}/api/conexiones/solicitudes/${solicitudId}/responder`, {
+      const res = await fetch(`${API}/api/connections/requests/${solicitudId}/respond`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -296,7 +296,7 @@ export default function MisConexiones({ token }) {
     if (!confirm('Delete this connection?')) return;
     
     try {
-      const res = await fetch(`${API}/api/conexiones/${conexionId}`, {
+      const res = await fetch(`${API}/api/connections/${conexionId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
