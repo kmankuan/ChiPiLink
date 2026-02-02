@@ -349,11 +349,11 @@ class SeasonTournamentRepository(BaseRepository):
         return await self.insert_one(tournament_data)
     
     async def get_by_id(self, torneo_id: str) -> Optional[Dict]:
-        """Get torneo by ID"""
+        """Get tournament by ID"""
         return await self.find_one({self.ID_FIELD: torneo_id})
     
     async def get_league_tournaments(self, liga_id: str) -> List[Dict]:
-        """Get torneos de una liga"""
+        """Get league tournaments"""
         return await self.find_many(
             query={"liga_id": liga_id},
             sort=[("created_at", -1)]

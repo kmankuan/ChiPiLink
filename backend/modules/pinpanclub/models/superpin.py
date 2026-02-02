@@ -334,7 +334,7 @@ class RankingTable(BaseModel):
 # ============== SEASON TOURNAMENT MODEL ==============
 
 class SeasonTournamentCreate(BaseModel):
-    """Create torneo de temporada"""
+    """Create season tournament"""
     liga_id: str
     nombre: str
     descripcion: Optional[str] = None

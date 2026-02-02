@@ -550,7 +550,7 @@ class SuperPinService(BaseService):
         num_players = len(participantes)
         
         if num_players < 2:
-            raise ValueError("Se necesitan al menos 2 participantes")
+            raise ValueError("At least needed 2 participantes")
         
         # Calculatesr rondas necesarias
         import math
@@ -1155,12 +1155,12 @@ class SuperPinService(BaseService):
         points_per_set: int = 11
     ) -> Dict:
         """
-        Crear torneo relámpago con jugadores that hasn check-in activo.
+        Create quick tournament with players having active check-in.
         
         pairing_mode:
-        - random: Emparejar aleatoriamente
-        - by_ranking: Mejor vs Peor ranking
-        - swiss: Sistema suizo (similar nivel)
+        - random: Pair randomly
+        - by_ranking: Best vs Worst ranking
+        - swiss: Swiss system (similar level)
         """
         import random
         from datetime import datetime, timezone
@@ -1169,7 +1169,7 @@ class SuperPinService(BaseService):
         available_players = await self.get_available_players(liga_id)
         
         if len(available_players) < 2:
-            raise ValueError("Se necesitan al menos 2 jugadores with active check-in")
+            raise ValueError("At least needed 2 jugadores with active check-in")
         
         # Get ranking info for each player
         players_with_ranking = []
@@ -1190,16 +1190,16 @@ class SuperPinService(BaseService):
         
         # Sort and pair according to mode
         if pairing_mode == "by_ranking":
-            # Ordenar por posición (mejor primero)
+            # Sort by position (best first)
             players_with_ranking.sort(key=lambda x: x["posicion"])
         elif pairing_mode == "swiss":
-            # Ordenar por ELO (similar nivel)
+            # Sort by ELO (similar level)
             players_with_ranking.sort(key=lambda x: x["elo"])
         else:
             # Random
             random.shuffle(players_with_ranking)
         
-        # Create emparejamientos
+        # Create pairings
         pairings = []
         used_players = set()
         

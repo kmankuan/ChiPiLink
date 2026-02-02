@@ -251,7 +251,7 @@ async def get_league_tournaments(liga_id: str):
 
 @router.get("/tournaments/{torneo_id}", response_model=SeasonTournament)
 async def get_tournament(torneo_id: str):
-    """Get torneo by ID"""
+    """Get tournament by ID"""
     tournament = await superpin_service.tournament_repo.get_by_id(torneo_id)
     if not tournament:
         raise HTTPException(status_code=404, detail="Torneo not found")
