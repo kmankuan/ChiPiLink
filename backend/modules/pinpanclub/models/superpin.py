@@ -20,7 +20,7 @@ class ScoringSystem(str, Enum):
 class CheckInMethod(str, Enum):
     """Método de check-in"""
     MANUAL = "manual"          # Record manual
-    QR_CODE = "qr_code"        # Escaneo de QR
+    QR_CODE = "qr_code"        # QR code scan
     GEOLOCATION = "geolocation"  # GPS/ubicación
     ANY = "any"                # Cualquier método
 
@@ -42,7 +42,7 @@ class LeagueStatus(str, Enum):
 
 class TournamentType(str, Enum):
     """Tipo de torneo final"""
-    TOP_N = "top_n"            # Only los mejores N jugadores
+    TOP_N = "top_n"            # Only top N players
     ALL_PLAYERS = "all_players"  # All the players
     BY_CATEGORY = "by_category"  # By categorías según ranking
 
@@ -50,8 +50,8 @@ class TournamentType(str, Enum):
 class MatchType(str, Enum):
     """Tipo de partido"""
     CASUAL = "casual"          # Match casual
-    RANKED = "ranked"          # Cuenta para ranking
-    TOURNAMENT = "tournament"  # Match de torneo
+    RANKED = "ranked"          # Counts for ranking
+    TOURNAMENT = "tournament"  # Tournament match
 
 
 # ============== CONFIGURATION MODELS ==============
@@ -64,10 +64,10 @@ class ScoringConfig(BaseModel):
     points_win: int = 3
     points_loss: int = 1
     points_draw: int = 0  # Si aplica
-    bonus_streak: int = 0  # Bonus por racha de victorias
+    bonus_streak: int = 0  # Bonus for win streak
     
     # ELO config
-    elo_k_factor: int = 32  # Factor K para cálculo ELO
+    elo_k_factor: int = 32  # K factor for ELO calculation
     elo_initial: int = 1000  # ELO inicial
     
     # Custom scoring rules
@@ -76,10 +76,10 @@ class ScoringConfig(BaseModel):
 
 class CheckInConfig(BaseModel):
     """Configuración de check-in"""
-    method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - mantener para compatibilidad
+    method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - keep for compatibility
     methods: List[str] = ["manual"]  # List of métodos permitidos
     require_referee: bool = False  # Requiere árbitro/testigo
-    referee_can_be_player: bool = True  # Otro jugador puede ser árbitro
+    referee_can_be_player: bool = True  # Another player can be referee
     
     # Geolocation config
     club_latitude: Optional[float] = None
@@ -91,7 +91,7 @@ class CheckInConfig(BaseModel):
     qr_expiry_minutes: int = 5
     
     # Auto checkout
-    auto_checkout_hours: int = 8  # Checkout automático después de X horas
+    auto_checkout_hours: int = 8  # Auto checkout after X hours
 
 
 class StatsConfig(BaseModel):
@@ -122,7 +122,7 @@ class PrizeConfig(BaseModel):
     position: Optional[int] = None  # 1, 2, 3, 4... o None para especiales
     special_type: Optional[str] = None  # 'mejor_progreso', 'mas_partidos', etc.
     reward: Optional[str] = None  # Description ofl premio
-    icon: Optional[str] = None  # Emoji o URL de icono
+    icon: Optional[str] = None  # Emoji or icon URL
 
 
 # ============== LEAGUE MODEL ==============
@@ -262,7 +262,7 @@ class SuperPinMatch(BaseModel):
     # Result
     ganador_id: Optional[str] = None
     
-    # Points de ranking otorgados
+    # Ranking points awarded
     puntos_ganador: int = 0
     puntos_perdedor: int = 0
     elo_change_a: int = 0
@@ -358,7 +358,7 @@ class SeasonTournament(BaseModel):
     # Estado
     estado: str = "pendiente"  # pendiente, en_curso, finalizado
     
-    # Participantes (copiados del ranking al crear the tournament)
+    # Participants (copied from ranking when creating tournament)
     participantes: List[Dict] = []  # [{jugador_id, posicion_ranking, ...}]
     
     # Brackets/Partidos
@@ -379,9 +379,9 @@ class SeasonTournament(BaseModel):
 
 class SpecialPrizeTypes:
     """Tipos de premios especiales predefinidos"""
-    MEJOR_PROGRESO = "mejor_progreso"  # Mayor subida en ranking
+    MEJOR_PROGRESO = "mejor_progreso"  # Biggest ranking climb
     MAS_PARTIDOS = "mas_partidos"  # More partidos jugados
-    MEJOR_RACHA = "mejor_racha"  # Mejor racha de victorias
+    MEJOR_RACHA = "mejor_racha"  # Best win streak
     MEJOR_DEPORTIVIDAD = "mejor_deportividad"  # Votado by playeres
     MEJOR_COMEBACK = "mejor_comeback"  # Mejor remontada
     ROOKIE_DEL_ANO = "rookie_del_ano"  # Mejor jugador nuevo
@@ -416,7 +416,7 @@ class PlayerBadge(BaseModel):
     icon: str  # Emoji o URL
     earned_at: Optional[Any] = None
     
-    # Contexto del badge
+    # Badge context
     liga_id: Optional[str] = None
     torneo_id: Optional[str] = None
     partido_id: Optional[str] = None
@@ -437,7 +437,7 @@ class PlayerBadgeCreate(BaseModel):
     metadata: Dict[str, Any] = {}
 
 
-# Badge definitions con iconos y descripciones
+# Badge definitions with icons and descriptions
 BADGE_DEFINITIONS = {
     BadgeType.TOURNAMENT_CHAMPION: {
         "name": "Campeón de Torneo",
