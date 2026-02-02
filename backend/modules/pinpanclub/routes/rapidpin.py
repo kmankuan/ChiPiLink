@@ -502,7 +502,7 @@ async def toggle_challenge_like(
 ):
     """
     Dar o quitar like a a challenge.
-    Requiere usuario autenticado.
+    Requiere authenticated user.
     Emite evento WebSocket en tiempo real.
     """
     try:
@@ -531,7 +531,7 @@ async def add_challenge_comment(
 ):
     """
     Agregar comentario a a challenge.
-    Requiere usuario autenticado.
+    Requiere authenticated user.
     Si el usuario tiene sanciones, el comentario irá a moderación.
     """
     try:
