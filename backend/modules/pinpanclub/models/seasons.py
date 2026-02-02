@@ -12,9 +12,9 @@ import uuid
 class SeasonStatus(str, Enum):
     """Estado de una temporada"""
     UPCOMING = "upcoming"      # Próxima temporada
-    ACTIVE = "active"          # Temporada actual activa
+    ACTIVE = "active"          # Season actual activa
     CLOSING = "closing"        # In proceso de cierre
-    COMPLETED = "completed"    # Temporada finalizada
+    COMPLETED = "completed"    # Season finalizada
 
 
 class SeasonType(str, Enum):
@@ -28,11 +28,11 @@ class SeasonRewardTier(BaseModel):
     """Nivel de recompensa por posición"""
     position_start: int        # Posición inicial (ej: 1)
     position_end: int          # Posición final (ej: 3)
-    bonus_points: int          # Puntos bonus
+    bonus_points: int          # Points bonus
     badge: Optional[Dict] = None  # Badge especial
     title: Optional[Dict] = None  # Título especial
     perks: List[str] = []      # Beneficios adicionales
-    prize_id: Optional[str] = None  # Premio físico
+    prize_id: Optional[str] = None  # Prize físico
 
 
 class RankingSeason(BaseModel):
@@ -80,7 +80,7 @@ class SeasonParticipant(BaseModel):
     # Info del jugador (cached)
     jugador_info: Optional[Dict] = None
     
-    # Puntos de la temporada (se reinician cada temporada)
+    # Points de la temporada (se reinician cada temporada)
     season_points: int = 0
     challenges_completed: int = 0
     current_streak: int = 0

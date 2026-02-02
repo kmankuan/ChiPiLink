@@ -255,7 +255,7 @@ class RapidPinService(BaseService):
                     prize = p
                     break
                 elif p.special_type == "participation" and not prize:
-                    prize = p  # Premio de participación como fallback
+                    prize = p  # Prize de participación como fallback
             
             player_results.append(RapidPinSeasonResult(
                 jugador_id=entry["jugador_id"],
@@ -355,7 +355,7 @@ class RapidPinService(BaseService):
             "apodo": arbitro.get("apodo") if arbitro else None
         }
         
-        # Puntos (se aplicarán cuando se confirme)
+        # Points (se aplicarán cuando se confirme)
         match_dict["puntos_ganador"] = 0
         match_dict["puntos_perdedor"] = 0
         match_dict["puntos_arbitro"] = 0
@@ -1014,7 +1014,7 @@ class RapidPinService(BaseService):
             "active_season": active_season.model_dump() if active_season else None
         }
         
-        # Partidos recientes (últimos 10 validados)
+        # Matchs recientes (últimos 10 validados)
         recent_matches = []
         if active_season:
             matches_cursor = db["rapidpin_matches"].find(
@@ -1032,13 +1032,13 @@ class RapidPinService(BaseService):
             ).sort("puntos_totales", -1).limit(10)
             top_players = await ranking_cursor.to_list(length=10)
         
-        # Partidos en cola esperando árbitro
+        # Matchs en cola esperando árbitro
         waiting_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="waiting"
         )
         
-        # Partidos en progreso (con árbitro asignado)
+        # Matchs en progreso (con árbitro asignado)
         in_progress_matches = await self.get_queue_matches(
             season_id=active_season.season_id if active_season else None,
             status="assigned"

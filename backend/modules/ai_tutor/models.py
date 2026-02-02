@@ -126,5 +126,5 @@ class StudentProgress(BaseModel):
     racha_dias: int = 0
     mejor_racha: int = 0
     ultima_sesion: Optional[datetime] = None
-    # Logros
+    # Achievements
     logros: List[str] = []

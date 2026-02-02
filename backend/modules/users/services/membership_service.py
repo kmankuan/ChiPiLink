@@ -641,7 +641,7 @@ class MembershipService:
                     notes=f"Auto-deducted from visit {visit['visit_id']}"
                 )
         
-        # Retornar visita actualizada
+        # Challengernar visita actualizada
         updated_visit = await db[self.collection_visits].find_one(
             {"visit_id": visit["visit_id"]},
             {"_id": 0}

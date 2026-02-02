@@ -90,13 +90,13 @@ class AchievementsService(BaseService):
     
     async def _get_player_challenge_stats(self, jugador_id: str) -> Dict:
         """Obtener estadísticas de retos del jugador"""
-        # Retos completados total
+        # Challenges completados total
         completed_total = await db.pinpanclub_challenges_progress.count_documents({
             "jugador_id": jugador_id,
             "status": "completed"
         })
         
-        # Puntos totales
+        # Points totales
         leaderboard_entry = await db.pinpanclub_challenges_leaderboard.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0}
@@ -106,7 +106,7 @@ class AchievementsService(BaseService):
         # Racha de semanas
         current_streak = leaderboard_entry.get("current_streak", 0) if leaderboard_entry else 0
         
-        # Retos por dificultad
+        # Challenges por dificultad
         pipeline = [
             {"$match": {"jugador_id": jugador_id, "status": "completed"}},
             {"$lookup": {

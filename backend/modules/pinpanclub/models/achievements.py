@@ -17,7 +17,7 @@ class AchievementType(str, Enum):
     POINTS_MILESTONE = "points_milestone"     # Alcanzar X puntos de retos
     DIFFICULTY_MASTER = "difficulty_master"   # Completar X retos de cierta dificultad
     FIRST_CHALLENGE = "first_challenge"       # Completar el primer reto
-    SOCIAL_BUTTERFLY = "social_butterfly"     # Logros sociales
+    SOCIAL_BUTTERFLY = "social_butterfly"     # Achievements sociales
 
 
 class AchievementRarity(str, Enum):
@@ -47,7 +47,7 @@ class Achievement(BaseModel):
     prize_id: Optional[str] = None
     
     is_active: bool = True
-    is_secret: bool = False  # Logros secretos no se muestran hasta obtenerlos
+    is_secret: bool = False  # Achievements secretos no se muestran hasta obtenerlos
     
     created_at: Optional[Any] = None
 
@@ -88,7 +88,7 @@ def get_challenge_achievements() -> List[Dict]:
             "requirement_value": 1,
             "points_reward": 10
         },
-        # Retos completados
+        # Challenges completados
         {
             "name": "Retador",
             "description": "Completa 5 retos",
@@ -151,7 +151,7 @@ def get_challenge_achievements() -> List[Dict]:
             "requirement_value": 10,
             "points_reward": 300
         },
-        # Puntos acumulados
+        # Points acumulados
         {
             "name": "Coleccionista",
             "description": "Acumula 500 puntos de retos",

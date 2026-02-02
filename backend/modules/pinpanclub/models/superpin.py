@@ -28,7 +28,7 @@ class CheckInMethod(str, Enum):
 class StatsLevel(str, Enum):
     """Nivel de estadísticas"""
     BASIC = "basic"            # Only sets ganados/perdidos
-    STANDARD = "standard"      # Puntos por set
+    STANDARD = "standard"      # Points por set
     ADVANCED = "advanced"      # Estadísticas completas (aces, errores, etc.)
 
 
@@ -49,9 +49,9 @@ class TournamentType(str, Enum):
 
 class MatchType(str, Enum):
     """Tipo de partido"""
-    CASUAL = "casual"          # Partido casual
+    CASUAL = "casual"          # Match casual
     RANKED = "ranked"          # Cuenta para ranking
-    TOURNAMENT = "tournament"  # Partido de torneo
+    TOURNAMENT = "tournament"  # Match de torneo
 
 
 # ============== CONFIGURATION MODELS ==============
@@ -111,7 +111,7 @@ class TournamentConfig(BaseModel):
     categories: List[Dict[str, Any]] = []  # Si es BY_CATEGORY
     # Ej: [{"name": "A", "min_rank": 1, "max_rank": 8}, ...]
     format: str = "eliminacion_simple"  # eliminacion_simple, eliminacion_doble, round_robin
-    third_place_match: bool = True  # Partido por 3er lugar
+    third_place_match: bool = True  # Match por 3er lugar
 
 
 class PrizeConfig(BaseModel):
@@ -241,7 +241,7 @@ class SuperPinMatch(BaseModel):
     liga_id: str
     match_type: MatchType
     
-    # Jugadores
+    # Playeres
     jugador_a_id: str
     jugador_b_id: str
     arbitro_id: Optional[str] = None
@@ -262,7 +262,7 @@ class SuperPinMatch(BaseModel):
     # Result
     ganador_id: Optional[str] = None
     
-    # Puntos de ranking otorgados
+    # Points de ranking otorgados
     puntos_ganador: int = 0
     puntos_perdedor: int = 0
     elo_change_a: int = 0
@@ -298,7 +298,7 @@ class RankingEntry(BaseModel):
     posicion_anterior: Optional[int] = None
     cambio_posicion: int = 0  # +2, -1, 0
     
-    # Puntos
+    # Points
     puntos_totales: int = 0
     elo_rating: int = 1000
     

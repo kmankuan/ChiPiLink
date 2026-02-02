@@ -105,7 +105,7 @@ class PermisosConexion(BaseModel):
 class Conexion(BaseModel):
     """Conexión entre dos usuarios"""
     conexion_id: str = Field(default_factory=lambda: f"con_{uuid.uuid4().hex[:12]}")
-    user_id: str                    # Usuario conectado
+    user_id: str                    # User conectado
     tipo: TipoRelacion
     subtipo: str                    # Puede ser cualquier subtipo
     etiqueta: Optional[str] = None  # Etiqueta personalizada (ej: "Mi hijo mayor")
@@ -275,7 +275,7 @@ class TransferenciaCreate(BaseModel):
 class AlertaWallet(BaseModel):
     """Alerta de saldo insuficiente"""
     alerta_id: str = Field(default_factory=lambda: f"alrt_{uuid.uuid4().hex[:12]}")
-    usuario_id: str                     # Usuario que intentó comprar
+    usuario_id: str                     # User que intentó comprar
     acudientes_ids: List[str] = []      # Acudientes a notificar
     monto_requerido: float
     saldo_actual: float

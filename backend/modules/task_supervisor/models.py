@@ -90,7 +90,7 @@ class SupervisedTask(BaseModel):
     # Recordatorios
     recordatorios_enviados: int = 0
     ultimo_recordatorio: Optional[datetime] = None
-    # Puntos
+    # Points
     puntos_otorgados: int = 0
     bonus_tiempo: bool = False
     # Sync
@@ -132,7 +132,7 @@ class DailyProgress(BaseModel):
     # Tiempo
     tiempo_total_minutos: int = 0
     tiempo_productivo_minutos: int = 0
-    # Puntos
+    # Points
     puntos_ganados: int = 0
     # Detalle
     tareas_ids: List[str] = []  # IDs de tareas del día

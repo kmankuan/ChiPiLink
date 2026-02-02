@@ -12,11 +12,11 @@ import uuid
 class PrizeType(str, Enum):
     """Tipos de premio"""
     BADGE = "badge"              # Badge digital
-    PHYSICAL = "physical"        # Premio físico (trofeo, medalla, etc.)
+    PHYSICAL = "physical"        # Prize físico (trofeo, medalla, etc.)
     DISCOUNT = "discount"        # Descuento en tienda/servicios
     PRIVILEGE = "privilege"      # Privilegio especial (acceso VIP, etc.)
-    POINTS = "points"            # Puntos canjeables
-    CUSTOM = "custom"            # Premio personalizado
+    POINTS = "points"            # Points canjeables
+    CUSTOM = "custom"            # Prize personalizado
 
 
 class PrizeStatus(str, Enum):

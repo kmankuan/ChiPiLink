@@ -64,7 +64,7 @@ class Comment(BaseModel):
     """Comentario en perfil de jugador"""
     comment_id: str = Field(default_factory=lambda: f"comment_{uuid.uuid4().hex[:8]}")
     author_id: str
-    target_id: str        # Jugador o partido
+    target_id: str        # Player o partido
     target_type: str      # "player" o "match"
     content: str
     

@@ -237,7 +237,7 @@ class RankRewardsService(BaseService):
         perks_granted = []
         
         if reward:
-            # Puntos bonus
+            # Points bonus
             bonus_points = reward.get("value", 0)
             if bonus_points > 0:
                 await db.pinpanclub_challenges_leaderboard.update_one(

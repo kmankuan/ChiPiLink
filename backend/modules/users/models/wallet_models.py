@@ -123,7 +123,7 @@ class PointsEarnRule(BaseModel):
     # Tipo de acción que otorga puntos
     earn_type: PointsEarnType
     
-    # Puntos a otorgar
+    # Points a otorgar
     points_amount: int
     
     # O porcentaje del valor
@@ -150,7 +150,7 @@ class Wallet(BaseModel):
     """Billetera de un usuario"""
     wallet_id: str = Field(default_factory=lambda: f"wallet_{uuid.uuid4().hex[:8]}")
     
-    # Usuario
+    # User
     user_id: str
     profile_id: Optional[str] = None
     
@@ -158,7 +158,7 @@ class Wallet(BaseModel):
     balance_usd: float = 0.0
     balance_points: int = 0
     
-    # Puntos pendientes (por compras no confirmadas, etc.)
+    # Points pendientes (por compras no confirmadas, etc.)
     pending_points: int = 0
     
     # Totales históricos
@@ -216,7 +216,7 @@ class Transaction(BaseModel):
     payment_reference: Optional[str] = None
     
     # Relacionados
-    related_user_id: Optional[str] = None       # Usuario relacionado (transferencias)
+    related_user_id: Optional[str] = None       # User relacionado (transferencias)
     related_transaction_id: Optional[str] = None # Transacción relacionada
     
     # Referencia a compra/servicio
@@ -252,7 +252,7 @@ class PointsConversion(BaseModel):
     """Registro de conversión de puntos"""
     conversion_id: str = Field(default_factory=lambda: f"conv_{uuid.uuid4().hex[:8]}")
     
-    # Usuario
+    # User
     wallet_id: str
     user_id: str
     
@@ -283,7 +283,7 @@ class PendingBalance(BaseModel):
     """Saldo pendiente de un usuario (cargado a acudiente)"""
     pending_id: str = Field(default_factory=lambda: f"pend_{uuid.uuid4().hex[:8]}")
     
-    # Usuario que consumió
+    # User que consumió
     user_id: str
     profile_id: Optional[str] = None
     
@@ -361,7 +361,7 @@ class PointsHistory(BaseModel):
     action: str  # earned, spent, converted, expired, adjusted
     earn_type: Optional[PointsEarnType] = None
     
-    # Puntos
+    # Points
     points: int  # Positivo = ganado, Negativo = gastado
     balance_after: int
     

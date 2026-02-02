@@ -447,7 +447,7 @@ class SuperPinService(BaseService):
         # Cambio de ELO
         change = round(k_factor * (1 - expected_winner))
         
-        # Puntos (para el sistema de puntos, además del ELO)
+        # Points (para el sistema de puntos, además del ELO)
         points_winner = 3
         points_loser = 1
         
@@ -698,7 +698,7 @@ class SuperPinService(BaseService):
         if final_bracket:
             final_match = final_bracket["matches"][0]
             if final_match.get("estado") == "finalizado":
-                # Torneo terminado - generar resultados finales
+                # Tournament terminado - generar resultados finales
                 resultados = [
                     {"posicion": 1, "jugador_id": final_match["winner"]},
                     {"posicion": 2, "jugador_id": final_match["player_a"]["jugador_id"] 
@@ -1211,7 +1211,7 @@ class SuperPinService(BaseService):
                 player_b = players_with_ranking[n - 1 - i]
                 pairings.append((player_a, player_b))
         elif pairing_mode == "swiss":
-            # Jugadores de nivel similar
+            # Playeres de nivel similar
             for i in range(0, len(players_with_ranking) - 1, 2):
                 pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
         else:
@@ -1219,7 +1219,7 @@ class SuperPinService(BaseService):
             for i in range(0, len(players_with_ranking) - 1, 2):
                 pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
         
-        # Jugador sin pareja (si número impar)
+        # Player sin pareja (si número impar)
         bye_player = None
         if len(players_with_ranking) % 2 == 1:
             bye_player = players_with_ranking[-1]
