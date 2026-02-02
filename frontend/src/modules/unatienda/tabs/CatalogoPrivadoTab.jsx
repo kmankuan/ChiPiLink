@@ -297,14 +297,14 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{filtros.grados.length}</div>
-            <p className="text-xs text-muted-foreground">Grados</p>
+            <div className="text-2xl font-bold">{filters.grades.length}</div>
+            <p className="text-xs text-muted-foreground">Grades</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{filtros.materias.length}</div>
-            <p className="text-xs text-muted-foreground">Materias</p>
+            <div className="text-2xl font-bold">{filters.subjects.length}</div>
+            <p className="text-xs text-muted-foreground">Subjects</p>
           </CardContent>
         </Card>
       </div>
@@ -315,21 +315,21 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5" />
             <div className="text-sm text-purple-700 dark:text-purple-300">
-              <p className="font-medium">Catálogo Privado PCA</p>
-              <p>Solo los clientes con estudiantes vinculados de PCA pueden ver y comprar estos libros desde la tienda Unatienda.</p>
+              <p className="font-medium">Private Catalog PCA</p>
+              <p>Only customers with linked PCA students can view and purchase these books from the Unatienda store.</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Products Table */}
-      {filteredProductos.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No hay libros en el catálogo privado</p>
+            <p className="text-muted-foreground">No books in the private catalog</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Usa la pestaña "Demo" para generar datos de prueba o agrega libros manualmente
+              Use the "Demo" tab to generate test data or add books manually
             </p>
           </CardContent>
         </Card>
@@ -340,53 +340,53 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Libro</TableHead>
-                    <TableHead>Código</TableHead>
-                    <TableHead>Grado</TableHead>
-                    <TableHead>Materia</TableHead>
-                    <TableHead>Editorial</TableHead>
-                    <TableHead className="text-right">Precio</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead>Book</TableHead>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Publisher</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProductos.map((p) => (
+                  {filteredProducts.map((p) => (
                     <TableRow key={p.libro_id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {p.imagen_url ? (
-                            <img src={p.imagen_url} alt="" className="w-10 h-10 object-cover rounded" />
+                          {(p.imagen_url || p.image_url) ? (
+                            <img src={p.imagen_url || p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                           ) : (
                             <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                               <BookOpen className="h-5 w-5 text-muted-foreground" />
                             </div>
                           )}
                           <div>
-                            <p className="font-medium line-clamp-1">{p.nombre}</p>
+                            <p className="font-medium line-clamp-1">{p.nombre || p.name}</p>
                             {p.isbn && <p className="text-xs text-muted-foreground">ISBN: {p.isbn}</p>}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{p.codigo}</TableCell>
+                      <TableCell className="font-mono text-sm">{p.codigo || p.code}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{p.grado}</Badge>
+                        <Badge variant="secondary">{p.grado || p.grade}</Badge>
                       </TableCell>
-                      <TableCell>{p.materia}</TableCell>
-                      <TableCell>{p.editorial}</TableCell>
+                      <TableCell>{p.materia || p.subject}</TableCell>
+                      <TableCell>{p.editorial || p.publisher}</TableCell>
                       <TableCell className="text-right">
-                        {p.precio_oferta ? (
+                        {(p.precio_oferta || p.sale_price) ? (
                           <div>
-                            <span className="text-green-600 font-medium">${p.precio_oferta.toFixed(2)}</span>
-                            <span className="text-xs text-muted-foreground line-through ml-1">${p.precio?.toFixed(2)}</span>
+                            <span className="text-green-600 font-medium">${(p.precio_oferta || p.sale_price).toFixed(2)}</span>
+                            <span className="text-xs text-muted-foreground line-through ml-1">${(p.precio || p.price)?.toFixed(2)}</span>
                           </div>
                         ) : (
-                          <span className="font-medium">${p.precio?.toFixed(2)}</span>
+                          <span className="font-medium">${(p.precio || p.price)?.toFixed(2)}</span>
                         )}
                       </TableCell>
                       <TableCell>
                         <Badge variant={p.activo !== false ? "default" : "secondary"}>
-                          {p.activo !== false ? "Activo" : "Inactivo"}
+                          {p.activo !== false ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
