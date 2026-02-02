@@ -327,15 +327,15 @@ export default function AdminDashboard() {
                 <div>
                   <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
                   <p className="text-muted-foreground text-sm">
-                    {activeModule === 'dashboard' && 'Bienvenido al panel de administración de ChiPi Link'}
-                    {activeModule === 'unatienda' && 'Gestiona catálogos, productos, estudiantes y pedidos de Unatienda'}
-                    {activeModule === 'orders' && 'Administra los pedidos de tus clientes'}
-                    {activeModule === 'customers' && 'Gestiona usuarios, sus solicitudes de acceso exclusivo y vinculaciones'}
-                    {activeModule === 'memberships' && 'Gestiona planes, membresías, visitas y códigos QR'}
-                    {activeModule === 'pinpanclub' && 'Club de Tenis de Mesa - Partidos, jugadores y torneos'}
-                    {activeModule === 'roles' && 'Gestiona roles de usuario y permisos del sistema'}
-                    {activeModule === 'admin' && 'Configura tu sitio y personalización'}
-                    {activeModule === 'integrations' && 'Conecta con servicios externos'}
+                    {activeModule === 'dashboard' && 'Welcome to ChiPi Link administration panel'}
+                    {activeModule === 'unatienda' && 'Manage catalogs, products, students and Unatienda orders'}
+                    {activeModule === 'orders' && 'Manage your customer orders'}
+                    {activeModule === 'customers' && 'Manage users, their exclusive access requests and connections'}
+                    {activeModule === 'memberships' && 'Manage plans, memberships, visits and QR codes'}
+                    {activeModule === 'pinpanclub' && 'Table Tennis Club - Matches, players and tournaments'}
+                    {activeModule === 'roles' && 'Manage user roles and system permissions'}
+                    {activeModule === 'admin' && 'Configure your site and customization'}
+                    {activeModule === 'integrations' && 'Connect with external services'}
                   </p>
                 </div>
                 {role && (
