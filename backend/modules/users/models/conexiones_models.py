@@ -1,6 +1,6 @@
 """
-ChiPi Users Module - Modelos para Sistema de Conexiones y Capacidades
-Sistema de relaciones entre usuarios, transferencias de wallet e invitaciones
+ChiPi Users Module - Models for Connections and Capabilities System
+System for relationships between users, wallet transfers and invitations
 """
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List, Dict, Any
@@ -12,20 +12,20 @@ import uuid
 # ============== ENUMS ==============
 
 class EstadoCuenta(str, Enum):
-    """Estado de la cuenta del usuario"""
-    ACTIVO = "activo"       # Usuario con credenciales, maneja su cuenta
-    ACUDIDO = "acudido"     # Usuario creado por acudiente/admin, cuenta gestionada
+    """User account status"""
+    ACTIVO = "activo"       # User with credentials, manages their own account
+    ACUDIDO = "acudido"     # User created by guardian/admin, managed account
 
 
 class TipoRelacion(str, Enum):
-    """Categorías principales de relación"""
+    """Main relationship categories"""
     FAMILIAR = "familiar"
     SOCIAL = "social"
     ESPECIAL = "especial"
 
 
 class SubtipoFamiliar(str, Enum):
-    """Subtipos de relación familiar"""
+    """Family relationship subtypes"""
     PADRE = "padre"
     MADRE = "madre"
     HIJO = "hijo"
@@ -42,7 +42,7 @@ class SubtipoFamiliar(str, Enum):
 
 
 class SubtipoSocial(str, Enum):
-    """Subtipos de relación social"""
+    """Social relationship subtypes"""
     AMIGO = "amigo"
     CONOCIDO = "conocido"
     COMPANERO_TRABAJO = "companero_trabajo"
@@ -51,14 +51,14 @@ class SubtipoSocial(str, Enum):
 
 
 class SubtipoEspecial(str, Enum):
-    """Subtipos de relación especial"""
-    ACUDIENTE = "acudiente"     # Responsable legal
-    ACUDIDO = "acudido"         # Bajo responsabilidad
+    """Special relationship subtypes"""
+    ACUDIENTE = "acudiente"     # Legal guardian
+    ACUDIDO = "acudido"         # Under guardianship
     TUTOR = "tutor"
 
 
 class EstadoConexion(str, Enum):
-    """Estado de una conexión entre usuarios"""
+    """Connection status between users"""
     PENDIENTE = "pendiente"
     ACTIVO = "activo"
     RECHAZADO = "rechazado"
@@ -66,7 +66,7 @@ class EstadoConexion(str, Enum):
 
 
 class EstadoSolicitud(str, Enum):
-    """Estado de solicitud de conexión"""
+    """Connection request status"""
     PENDIENTE = "pendiente"
     ACEPTADA = "aceptada"
     RECHAZADA = "rechazada"
@@ -74,25 +74,25 @@ class EstadoSolicitud(str, Enum):
 
 
 class TipoCapacidad(str, Enum):
-    """Tipos de capacidad/habilidad"""
-    PREDETERMINADA = "predeterminada"       # Automática al registrarse
-    POR_SUSCRIPCION = "por_suscripcion"     # Automática al suscribirse
-    BENEFICIO_EXTENDIDO = "beneficio_extendido"  # Otorgada por admin como cortesía
-    SOLICITADA = "solicitada"               # Usuario solicita, admin aprueba
+    """Capability/ability types"""
+    PREDETERMINADA = "predeterminada"       # Automatic on registration
+    POR_SUSCRIPCION = "por_suscripcion"     # Automatic on subscription
+    BENEFICIO_EXTENDIDO = "beneficio_extendido"  # Granted by admin as courtesy
+    SOLICITADA = "solicitada"               # User requests, admin approves
 
 
 class EstadoInvitacion(str, Enum):
-    """Estado de invitación a usuario no registrado"""
+    """Status of invitation to unregistered user"""
     PENDIENTE = "pendiente"
     ACEPTADA = "aceptada"
     EXPIRADA = "expirada"
     CANCELADA = "cancelada"
 
 
-# ============== MODELOS DE PERMISOS ==============
+# ============== PERMISSION MODELS ==============
 
 class PermisosConexion(BaseModel):
-    """Permisos que tiene un usuario sobre otro por su conexión"""
+    """Permissions a user has over another through their connection"""
     transferir_wallet: bool = False
     ver_wallet: bool = False
     recargar_wallet: bool = False
