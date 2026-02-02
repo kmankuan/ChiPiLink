@@ -513,7 +513,7 @@ export default function MondayModule() {
                           </p>
                         </div>
                         {ws.workspace_id === activeWorkspaceId && (
-                          <Badge variant="default" className="ml-2">Activo</Badge>
+                          <Badge variant="default" className="ml-2">Active</Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ export default function MondayModule() {
                             size="sm"
                             onClick={() => handleActivateWorkspace(ws.workspace_id)}
                           >
-                            Activar
+                            Activate
                           </Button>
                         )}
                         {!ws.is_env_key && (
@@ -542,12 +542,12 @@ export default function MondayModule() {
                 </div>
               )}
               
-              {/* Agregar nuevo workspace */}
+              {/* Add new workspace */}
               {showApiKeyInput ? (
                 <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
-                  <Label>API Key de Monday.com</Label>
+                  <Label>Monday.com API Key</Label>
                   <p className="text-sm text-muted-foreground">
-                    Obtén tu API Key desde: Monday.com → Tu perfil → Admin → API → Personal API tokens
+                    Get your API Key from: Monday.com → Your profile → Admin → API → Personal API tokens
                   </p>
                   <div className="flex gap-2">
                     <Input
@@ -561,14 +561,14 @@ export default function MondayModule() {
                       {savingWorkspace ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        'Agregar'
+                        'Add'
                       )}
                     </Button>
                     <Button variant="ghost" onClick={() => {
                       setShowApiKeyInput(false);
                       setApiKeyInput('');
                     }}>
-                      Cancelar
+                      Cancel
                     </Button>
                   </div>
                 </div>
@@ -579,33 +579,33 @@ export default function MondayModule() {
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Agregar Workspace
+                  Add Workspace
                 </Button>
               )}
             </CardContent>
           </Card>
 
-          {/* Info de ayuda */}
+          {/* Help info */}
           <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
             <CardHeader>
               <CardTitle className="text-blue-800 dark:text-blue-200 flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
-                ¿Cómo obtener tu API Key?
+                How to get your API Key?
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-blue-700 dark:text-blue-300">
               <ol className="list-decimal list-inside space-y-2">
-                <li>Inicia sesión en Monday.com</li>
-                <li>Haz clic en tu foto de perfil (esquina superior derecha)</li>
-                <li>Ve a <strong>Administration</strong> → <strong>Developers</strong></li>
-                <li>En la sección <strong>My access tokens</strong>, haz clic en <strong>Show</strong></li>
-                <li>Copia tu token personal y pégalo aquí</li>
+                <li>Log in to Monday.com</li>
+                <li>Click your profile picture (top right corner)</li>
+                <li>Go to <strong>Administration</strong> → <strong>Developers</strong></li>
+                <li>In the <strong>My access tokens</strong> section, click <strong>Show</strong></li>
+                <li>Copy your personal token and paste it here</li>
               </ol>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* ========== TAB: LIBROS ========== */}
+        {/* ========== TAB: BOOKS ========== */}
         <TabsContent value="libros" className="space-y-6 mt-6">
           {!connected ? (
             <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
