@@ -17,7 +17,7 @@ async def get_matches(
     estado: Optional[MatchState] = None,
     limit: int = Query(50, ge=1, le=200)
 ):
-    """Obtener lista de partidos"""
+    """Get lista de partidos"""
     if estado:
         return await match_service.get_matches_by_state(estado, limit)
     return await match_service.get_active_matches()
@@ -25,26 +25,26 @@ async def get_matches(
 
 @router.get("/active", response_model=List[Match])
 async def get_active_matches():
-    """Obtener partidos activos (en curso o pausados)"""
+    """Get partidos activos (en curso o pausados)"""
     return await match_service.get_active_matches()
 
 
 @router.get("/active/all")
 async def get_all_active_matches():
-    """Obtener todos los partidos activos para TV/Canvas"""
+    """Get todos los partidos activos para TV/Canvas"""
     matches = await match_service.get_active_matches()
     return [m.model_dump() for m in matches]
 
 
 @router.get("/stats")
 async def get_match_stats():
-    """Obtener estadísticas de partidos"""
+    """Get estadísticas de partidos"""
     return await match_service.get_stats()
 
 
 @router.get("/{partido_id}", response_model=Match)
 async def get_match(partido_id: str):
-    """Obtener partido por ID"""
+    """Get partido por ID"""
     match = await match_service.get_match(partido_id)
     if not match:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
@@ -56,7 +56,7 @@ async def create_match(
     data: MatchCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nuevo partido (solo admin)"""
+    """Create nuevo partido (solo admin)"""
     return await match_service.create_match(data)
 
 
@@ -78,7 +78,7 @@ async def update_score(
     data: MatchScoreUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar puntuación del partido"""
+    """Update puntuación del partido"""
     match = await match_service.update_score(partido_id, data.accion)
     if not match:
         raise HTTPException(status_code=400, detail="No se puede actualizar el partido")

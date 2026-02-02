@@ -20,13 +20,13 @@ router = APIRouter(prefix="/challenges", tags=["Challenges"])
 
 @router.get("/definitions", response_model=List[ChallengeDefinition])
 async def get_all_challenges():
-    """Obtener todos los retos activos"""
+    """Get todos los retos activos"""
     return await challenge_service.get_all_challenges()
 
 
 @router.get("/definitions/{challenge_id}", response_model=ChallengeDefinition)
 async def get_challenge(challenge_id: str):
-    """Obtener definición de un reto"""
+    """Get definición de un reto"""
     challenge = await challenge_service.get_challenge(challenge_id)
     if not challenge:
         raise HTTPException(status_code=404, detail="Reto no encontrado")
@@ -38,7 +38,7 @@ async def create_challenge(
     data: ChallengeDefinitionCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear un reto personalizado (solo admin)"""
+    """Create un reto personalizado (solo admin)"""
     return await challenge_service.create_challenge(data)
 
 
@@ -48,7 +48,7 @@ async def update_challenge(
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar un reto (solo admin)"""
+    """Update un reto (solo admin)"""
     challenge = await challenge_service.update_challenge(challenge_id, data)
     if not challenge:
         raise HTTPException(status_code=404, detail="Reto no encontrado")
@@ -69,7 +69,7 @@ async def deactivate_challenge(
 
 @router.get("/weekly")
 async def get_weekly_challenges():
-    """Obtener retos de la semana actual"""
+    """Get retos de la semana actual"""
     week = await challenge_service.get_current_week()
     challenges = await challenge_service.get_weekly_challenges()
     
@@ -107,7 +107,7 @@ async def get_player_challenges(
     jugador_id: str,
     status: Optional[str] = None
 ):
-    """Obtener retos de un jugador"""
+    """Get retos de un jugador"""
     challenges = await challenge_service.get_player_challenges(jugador_id, status)
     stats = await challenge_service.get_player_stats(jugador_id)
     
@@ -120,14 +120,14 @@ async def get_player_challenges(
 
 @router.get("/player/{jugador_id}/active")
 async def get_active_challenges(jugador_id: str):
-    """Obtener retos activos de un jugador"""
+    """Get retos activos de un jugador"""
     challenges = await challenge_service.get_player_challenges(jugador_id, "in_progress")
     return {"jugador_id": jugador_id, "active_challenges": challenges}
 
 
 @router.get("/player/{jugador_id}/stats")
 async def get_player_challenge_stats(jugador_id: str):
-    """Obtener estadísticas de retos del jugador"""
+    """Get estadísticas de retos del jugador"""
     stats = await challenge_service.get_player_stats(jugador_id)
     rank = await challenge_service.get_player_rank(jugador_id)
     return {
@@ -145,7 +145,7 @@ async def get_leaderboard(
     offset: int = 0,
     jugador_id: Optional[str] = None
 ):
-    """Obtener leaderboard de retos"""
+    """Get leaderboard de retos"""
     leaderboard = await challenge_service.get_leaderboard(limit, offset)
     return {
         "leaderboard": leaderboard,
@@ -157,7 +157,7 @@ async def get_leaderboard(
 
 @router.get("/player/{jugador_id}/rank")
 async def get_player_rank(jugador_id: str):
-    """Obtener información de rango de un jugador"""
+    """Get información de rango de un jugador"""
     from core.database import db
     
     # Obtener entrada del leaderboard

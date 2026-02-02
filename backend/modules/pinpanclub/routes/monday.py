@@ -16,7 +16,7 @@ router = APIRouter(prefix="/monday", tags=["PinpanClub - Monday.com"])
 
 @router.get("/status")
 async def get_integration_status(admin: dict = Depends(get_admin_user)):
-    """Obtener estado de la integración con Monday.com"""
+    """Get estado de la integración con Monday.com"""
     config = await monday_service.get_config()
     
     status = {
@@ -48,7 +48,7 @@ async def get_integration_status(admin: dict = Depends(get_admin_user)):
 
 @router.get("/config")
 async def get_config(admin: dict = Depends(get_admin_user)):
-    """Obtener configuración de Monday.com"""
+    """Get configuración de Monday.com"""
     config = await monday_service.get_config()
     return {
         "has_api_key": bool(MONDAY_API_KEY),
@@ -61,14 +61,14 @@ async def update_config(
     config: MondayConfig,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar configuración de Monday.com"""
+    """Update configuración de Monday.com"""
     await monday_service.save_config(config)
     return {"success": True, "message": "Configuración guardada"}
 
 
 @router.get("/boards")
 async def get_available_boards(admin: dict = Depends(get_admin_user)):
-    """Obtener lista de tableros de Monday.com"""
+    """Get lista de tableros de Monday.com"""
     if not MONDAY_API_KEY:
         raise HTTPException(status_code=400, detail="API Key no configurada")
     
@@ -180,7 +180,7 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
 
 @router.get("/players")
 async def get_monday_players(admin: dict = Depends(get_admin_user)):
-    """Obtener jugadores desde Monday.com (para selección en partidos)"""
+    """Get jugadores desde Monday.com (para selección en partidos)"""
     config = await monday_service.get_config()
     if not config.players_board_id:
         return {"players": [], "message": "Board de jugadores no configurado en Monday.com"}
@@ -197,7 +197,7 @@ async def get_monday_players(admin: dict = Depends(get_admin_user)):
 
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
-    """Obtener estadísticas de sincronización"""
+    """Get estadísticas de sincronización"""
     config = await monday_service.get_config()
     
     player_repo = PlayerRepository()

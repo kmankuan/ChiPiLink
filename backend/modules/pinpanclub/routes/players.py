@@ -18,7 +18,7 @@ async def get_players(
     limit: int = Query(100, ge=1, le=500),
     search: Optional[str] = None
 ):
-    """Obtener lista de jugadores activos"""
+    """Get lista de jugadores activos"""
     if search:
         return await player_service.search_players(search)
     return await player_service.get_all_players(skip=skip, limit=limit)
@@ -28,13 +28,13 @@ async def get_players(
 async def get_rankings(
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Obtener ranking de jugadores por ELO"""
+    """Get ranking de jugadores por ELO"""
     return await player_service.get_rankings(limit=limit)
 
 
 @router.get("/{jugador_id}", response_model=Player)
 async def get_player(jugador_id: str):
-    """Obtener jugador por ID"""
+    """Get jugador por ID"""
     player = await player_service.get_player(jugador_id)
     if not player:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
@@ -46,7 +46,7 @@ async def create_player(
     data: PlayerCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nuevo jugador (solo admin)"""
+    """Create nuevo jugador (solo admin)"""
     return await player_service.create_player(data)
 
 
@@ -56,7 +56,7 @@ async def update_player(
     data: PlayerUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar jugador (solo admin)"""
+    """Update jugador (solo admin)"""
     player = await player_service.update_player(jugador_id, data)
     if not player:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")

@@ -14,7 +14,7 @@ router = APIRouter(prefix="/inventory", tags=["Store - Inventory"])
 
 @router.get("")
 async def get_inventory(admin: dict = Depends(get_admin_user)):
-    """Obtener estado del inventario (admin)"""
+    """Get estado del inventario (admin)"""
     return await product_service.get_inventory_stats()
 
 
@@ -23,7 +23,7 @@ async def get_low_stock(
     threshold: int = Query(10, ge=1, le=100),
     admin: dict = Depends(get_admin_user)
 ):
-    """Obtener productos con bajo stock (admin)"""
+    """Get productos con bajo stock (admin)"""
     return await product_service.get_low_stock_products(threshold)
 
 
@@ -33,7 +33,7 @@ async def update_inventory(
     cantidad: int,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar inventario de un producto (admin)"""
+    """Update inventario de un producto (admin)"""
     product = await product_service.update_inventory(libro_id, cantidad)
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado")

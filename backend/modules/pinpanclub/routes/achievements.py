@@ -12,14 +12,14 @@ router = APIRouter(prefix="/achievements", tags=["Achievements"])
 
 @router.get("/")
 async def get_all_achievements():
-    """Obtener todos los logros disponibles"""
+    """Get todos los logros disponibles"""
     achievements = await achievements_service.get_all_achievements()
     return {"achievements": achievements, "total": len(achievements)}
 
 
 @router.get("/player/{jugador_id}")
 async def get_player_achievements(jugador_id: str):
-    """Obtener logros de un jugador"""
+    """Get logros de un jugador"""
     achievements = await achievements_service.get_player_achievements(jugador_id)
     return {
         "jugador_id": jugador_id,

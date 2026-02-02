@@ -37,27 +37,27 @@ async def unfollow_player(follower_id: str, following_id: str):
 
 @router.get("/followers/{jugador_id}")
 async def get_followers(jugador_id: str, limit: int = 50):
-    """Obtener seguidores de un jugador"""
+    """Get seguidores de un jugador"""
     followers = await social_service.get_followers(jugador_id, limit)
     return {"jugador_id": jugador_id, "followers": followers, "total": len(followers)}
 
 
 @router.get("/following/{jugador_id}")
 async def get_following(jugador_id: str, limit: int = 50):
-    """Obtener a quiénes sigue un jugador"""
+    """Get a quiénes sigue un jugador"""
     following = await social_service.get_following(jugador_id, limit)
     return {"jugador_id": jugador_id, "following": following, "total": len(following)}
 
 
 @router.get("/follow-stats/{jugador_id}", response_model=FollowStats)
 async def get_follow_stats(jugador_id: str):
-    """Obtener estadísticas de seguidores"""
+    """Get estadísticas de seguidores"""
     return await social_service.get_follow_stats(jugador_id)
 
 
 @router.get("/is-following")
 async def is_following(follower_id: str, following_id: str):
-    """Verificar si un jugador sigue a otro"""
+    """Verify si un jugador sigue a otro"""
     result = await social_service.is_following(follower_id, following_id)
     return {"is_following": result}
 
@@ -66,7 +66,7 @@ async def is_following(follower_id: str, following_id: str):
 
 @router.post("/comments", response_model=Comment)
 async def create_comment(data: CommentCreate):
-    """Crear un comentario"""
+    """Create un comentario"""
     return await social_service.create_comment(data)
 
 
@@ -76,14 +76,14 @@ async def get_comments(
     target_id: str,
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Obtener comentarios de un target (player o match)"""
+    """Get comentarios de un target (player o match)"""
     comments = await social_service.get_comments(target_id, target_type, limit)
     return {"target_id": target_id, "target_type": target_type, "comments": comments}
 
 
 @router.put("/comments/{comment_id}", response_model=Comment)
 async def update_comment(comment_id: str, data: CommentUpdate):
-    """Actualizar comentario"""
+    """Update comentario"""
     result = await social_service.update_comment(comment_id, data.content)
     if not result:
         raise HTTPException(status_code=404, detail="Comentario no encontrado")
@@ -92,7 +92,7 @@ async def update_comment(comment_id: str, data: CommentUpdate):
 
 @router.delete("/comments/{comment_id}")
 async def delete_comment(comment_id: str):
-    """Eliminar comentario"""
+    """Delete comentario"""
     success = await social_service.delete_comment(comment_id)
     return {"success": success}
 
@@ -111,13 +111,13 @@ async def add_reaction(data: ReactionCreate):
 
 @router.get("/reactions/{target_type}/{target_id}", response_model=ReactionSummary)
 async def get_reactions(target_type: str, target_id: str):
-    """Obtener resumen de reacciones"""
+    """Get resumen de reacciones"""
     return await social_service.get_reactions(target_id, target_type)
 
 
 @router.get("/reactions/{target_type}/{target_id}/user/{user_id}")
 async def get_user_reaction(target_type: str, target_id: str, user_id: str):
-    """Obtener reacción de un usuario específico"""
+    """Get reacción de un usuario específico"""
     reaction = await social_service.get_user_reaction(user_id, target_id, target_type)
     return {"user_id": user_id, "reaction_type": reaction}
 
@@ -126,14 +126,14 @@ async def get_user_reaction(target_type: str, target_id: str, user_id: str):
 
 @router.get("/feed/{jugador_id}")
 async def get_player_feed(jugador_id: str, limit: int = Query(20, ge=1, le=100)):
-    """Obtener feed de actividad de un jugador"""
+    """Get feed de actividad de un jugador"""
     feed = await social_service.get_player_feed(jugador_id, limit)
     return {"jugador_id": jugador_id, "feed": feed}
 
 
 @router.get("/feed/{jugador_id}/following")
 async def get_following_feed(jugador_id: str, limit: int = Query(50, ge=1, le=100)):
-    """Obtener feed de jugadores que sigue"""
+    """Get feed de jugadores que sigue"""
     feed = await social_service.get_following_feed(jugador_id, limit)
     return {"jugador_id": jugador_id, "feed": feed}
 
@@ -146,7 +146,7 @@ async def get_notifications(
     unread_only: bool = False,
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Obtener notificaciones de un usuario"""
+    """Get notificaciones de un usuario"""
     notifications = await social_service.get_notifications(user_id, unread_only, limit)
     unread_count = await social_service.get_unread_count(user_id)
     return {
@@ -158,7 +158,7 @@ async def get_notifications(
 
 @router.get("/notifications/{user_id}/unread-count")
 async def get_unread_count(user_id: str):
-    """Obtener cantidad de notificaciones no leídas"""
+    """Get cantidad de notificaciones no leídas"""
     count = await social_service.get_unread_count(user_id)
     return {"user_id": user_id, "unread_count": count}
 
@@ -181,7 +181,7 @@ async def mark_all_notifications_read(user_id: str):
 
 @router.get("/user/{user_id}/warnings")
 async def get_user_warnings(user_id: str):
-    """Obtener cantidad de amonestaciones de un usuario"""
+    """Get cantidad de amonestaciones de un usuario"""
     warnings = await social_service.get_user_warnings(user_id)
     return {"user_id": user_id, "warnings": warnings}
 

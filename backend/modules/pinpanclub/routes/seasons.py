@@ -16,7 +16,7 @@ router = APIRouter(prefix="/seasons", tags=["Ranking Seasons"])
 
 @router.get("/current")
 async def get_current_season(lang: str = Query("es")):
-    """Obtener la temporada activa actual"""
+    """Get la temporada activa actual"""
     season = await seasons_service.get_current_season()
     
     if not season:
@@ -38,7 +38,7 @@ async def get_all_seasons(
     limit: int = Query(20, ge=1, le=50),
     lang: str = Query("es")
 ):
-    """Obtener todas las temporadas"""
+    """Get todas las temporadas"""
     seasons = await seasons_service.get_all_seasons(limit)
     
     # Localizar nombres
@@ -56,7 +56,7 @@ async def get_past_seasons(
     limit: int = Query(10, ge=1, le=50),
     lang: str = Query("es")
 ):
-    """Obtener temporadas pasadas completadas"""
+    """Get temporadas pasadas completadas"""
     seasons = await seasons_service.get_past_seasons(limit)
     
     for s in seasons:
@@ -70,7 +70,7 @@ async def get_past_seasons(
 
 @router.get("/{season_id}")
 async def get_season_by_id(season_id: str, lang: str = Query("es")):
-    """Obtener detalles de una temporada específica"""
+    """Get detalles de una temporada específica"""
     season = await seasons_service.get_season_by_id(season_id)
     
     if not season:
@@ -89,7 +89,7 @@ async def get_current_season_leaderboard(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Obtener leaderboard de la temporada actual"""
+    """Get leaderboard de la temporada actual"""
     season = await seasons_service.get_current_season()
     
     if not season:
@@ -113,7 +113,7 @@ async def get_season_leaderboard(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
-    """Obtener leaderboard de una temporada"""
+    """Get leaderboard de una temporada"""
     leaderboard = await seasons_service.get_season_leaderboard(season_id, limit, offset)
     
     return {
@@ -129,7 +129,7 @@ async def get_season_leaderboard(
 
 @router.get("/player/{jugador_id}/current")
 async def get_player_current_season_stats(jugador_id: str):
-    """Obtener estadísticas del jugador en la temporada actual"""
+    """Get estadísticas del jugador en la temporada actual"""
     stats = await seasons_service.get_player_season_stats(jugador_id)
     
     if not stats:
@@ -152,7 +152,7 @@ async def get_player_current_season_stats(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats/{season_id}")
 async def get_player_season_stats(jugador_id: str, season_id: str):
-    """Obtener estadísticas del jugador en una temporada específica"""
+    """Get estadísticas del jugador en una temporada específica"""
     stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
     
     if not stats:
@@ -171,7 +171,7 @@ async def get_player_season_stats(jugador_id: str, season_id: str):
 
 @router.get("/player/{jugador_id}/rewards")
 async def get_player_season_rewards(jugador_id: str):
-    """Obtener todas las recompensas de temporada de un jugador"""
+    """Get todas las recompensas de temporada de un jugador"""
     rewards = await seasons_service.get_player_season_rewards(jugador_id)
     
     return {
@@ -194,7 +194,7 @@ async def create_season(
     season_type: str = Query("monthly"),
     theme_id: Optional[str] = Query(None)
 ):
-    """Crear una nueva temporada (admin)"""
+    """Create una nueva temporada (admin)"""
     try:
         start_dt = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
@@ -215,7 +215,7 @@ async def create_season(
 
 @router.post("/create-monthly")
 async def create_monthly_season(lang: str = Query("es")):
-    """Crear automáticamente la siguiente temporada mensual (admin)"""
+    """Create automáticamente la siguiente temporada mensual (admin)"""
     season = await seasons_service.create_next_monthly_season(lang)
     return {"message": "Monthly season created", "season": season}
 

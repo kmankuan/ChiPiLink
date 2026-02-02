@@ -182,7 +182,7 @@ DEFAULT_SPONSOR_SPACES = [
 
 @router.post("/", response_model=dict)
 async def crear_patrocinador(sponsor: SponsorCreate):
-    """Crear un nuevo patrocinador"""
+    """Create un nuevo patrocinador"""
     from main import db
     
     sponsor_id = f"sponsor_{uuid.uuid4().hex[:12]}"
@@ -208,7 +208,7 @@ async def listar_patrocinadores(
     posicion: Optional[SponsorPosition] = None,
     activo: Optional[bool] = None
 ):
-    """Listar todos los patrocinadores"""
+    """List todos los patrocinadores"""
     from main import db
     
     query = {}
@@ -245,7 +245,7 @@ async def listar_patrocinadores(
 
 @router.get("/{sponsor_id}", response_model=dict)
 async def obtener_patrocinador(sponsor_id: str):
-    """Obtener un patrocinador por ID"""
+    """Get un patrocinador por ID"""
     from main import db
     
     sponsor = await db.pingpong_sponsors.find_one(
@@ -261,7 +261,7 @@ async def obtener_patrocinador(sponsor_id: str):
 
 @router.put("/{sponsor_id}", response_model=dict)
 async def actualizar_patrocinador(sponsor_id: str, update: SponsorUpdate):
-    """Actualizar un patrocinador"""
+    """Update un patrocinador"""
     from main import db
     
     update_data = {k: v for k, v in update.model_dump().items() if v is not None}
@@ -285,7 +285,7 @@ async def actualizar_patrocinador(sponsor_id: str, update: SponsorUpdate):
 
 @router.delete("/{sponsor_id}")
 async def eliminar_patrocinador(sponsor_id: str):
-    """Eliminar un patrocinador"""
+    """Delete un patrocinador"""
     from main import db
     
     result = await db.pingpong_sponsors.delete_one({"sponsor_id": sponsor_id})
@@ -300,7 +300,7 @@ async def eliminar_patrocinador(sponsor_id: str):
 
 @router.get("/config/layout", response_model=dict)
 async def obtener_layout_config():
-    """Obtener configuración del layout de TV"""
+    """Get configuración del layout de TV"""
     from main import db
     
     config = await db.pingpong_config.find_one(
@@ -327,7 +327,7 @@ async def obtener_layout_config():
 
 @router.put("/config/layout", response_model=dict)
 async def actualizar_layout_config(config: TVLayoutConfig):
-    """Actualizar configuración del layout de TV"""
+    """Update configuración del layout de TV"""
     from main import db
     
     config_doc = {
@@ -347,7 +347,7 @@ async def actualizar_layout_config(config: TVLayoutConfig):
 
 @router.put("/config/space/{space_id}", response_model=dict)
 async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceConfig):
-    """Actualizar configuración de un espacio específico"""
+    """Update configuración de un espacio específico"""
     from main import db
     
     # Get current config

@@ -31,7 +31,7 @@ class CanvasSettings(BaseModel):
     showQR: bool = True
 
 class LayoutCreate(BaseModel):
-    """Crear un nuevo layout"""
+    """Create un nuevo layout"""
     name: str
     layout: List[LayoutItem]
     widget_matches: Dict[str, str] = {}  # widget_key -> match_id
@@ -39,7 +39,7 @@ class LayoutCreate(BaseModel):
     is_default: bool = False
 
 class LayoutUpdate(BaseModel):
-    """Actualizar un layout existente"""
+    """Update un layout existente"""
     name: Optional[str] = None
     layout: Optional[List[LayoutItem]] = None
     widget_matches: Optional[Dict[str, str]] = None
@@ -50,7 +50,7 @@ class LayoutUpdate(BaseModel):
 
 @router.post("/layouts", response_model=dict)
 async def crear_layout(layout_data: LayoutCreate):
-    """Crear un nuevo layout de canvas"""
+    """Create un nuevo layout de canvas"""
     from main import db
     
     layout_id = f"layout_{uuid.uuid4().hex[:12]}"
@@ -85,7 +85,7 @@ async def crear_layout(layout_data: LayoutCreate):
 
 @router.get("/layouts", response_model=List[dict])
 async def listar_layouts():
-    """Listar todos los layouts guardados"""
+    """List todos los layouts guardados"""
     from main import db
     
     layouts = await db.pingpong_canvas_layouts.find(
@@ -98,7 +98,7 @@ async def listar_layouts():
 
 @router.get("/layouts/{layout_id}", response_model=dict)
 async def obtener_layout(layout_id: str):
-    """Obtener un layout específico"""
+    """Get un layout específico"""
     from main import db
     
     layout = await db.pingpong_canvas_layouts.find_one(
@@ -114,7 +114,7 @@ async def obtener_layout(layout_id: str):
 
 @router.put("/layouts/{layout_id}", response_model=dict)
 async def actualizar_layout(layout_id: str, update: LayoutUpdate):
-    """Actualizar un layout existente"""
+    """Update un layout existente"""
     from main import db
     
     update_data = {}
@@ -156,7 +156,7 @@ async def actualizar_layout(layout_id: str, update: LayoutUpdate):
 
 @router.delete("/layouts/{layout_id}")
 async def eliminar_layout(layout_id: str):
-    """Eliminar un layout"""
+    """Delete un layout"""
     from main import db
     
     result = await db.pingpong_canvas_layouts.delete_one({"layout_id": layout_id})
@@ -194,7 +194,7 @@ async def establecer_layout_default(layout_id: str):
 
 @router.get("/presets", response_model=List[dict])
 async def obtener_presets():
-    """Obtener layouts preconfigurados"""
+    """Get layouts preconfigurados"""
     presets = [
         {
             "preset_id": "2x3",
@@ -265,7 +265,7 @@ async def obtener_presets():
 
 @router.post("/layouts/from-preset/{preset_id}")
 async def crear_desde_preset(preset_id: str, name: str = "Nuevo Layout"):
-    """Crear un layout a partir de un preset"""
+    """Create un layout a partir de un preset"""
     from main import db
     
     presets = {

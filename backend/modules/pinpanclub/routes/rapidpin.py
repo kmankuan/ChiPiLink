@@ -21,7 +21,7 @@ router = APIRouter(prefix="/rapidpin", tags=["Rapid Pin"])
 
 @router.get("/seasons", response_model=List[RapidPinSeason])
 async def get_seasons(active_only: bool = False):
-    """Obtener todas las temporadas o solo las activas"""
+    """Get todas las temporadas o solo las activas"""
     if active_only:
         return await rapidpin_service.get_active_seasons()
     return await rapidpin_service.get_all_seasons()
@@ -29,7 +29,7 @@ async def get_seasons(active_only: bool = False):
 
 @router.get("/seasons/{season_id}", response_model=RapidPinSeason)
 async def get_season(season_id: str):
-    """Obtener temporada por ID"""
+    """Get temporada por ID"""
     season = await rapidpin_service.get_season(season_id)
     if not season:
         raise HTTPException(status_code=404, detail="Temporada no encontrada")
@@ -41,7 +41,7 @@ async def create_season(
     data: RapidPinSeasonCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Crear nueva temporada (solo admin)"""
+    """Create nueva temporada (solo admin)"""
     return await rapidpin_service.create_season(data)
 
 
@@ -51,7 +51,7 @@ async def update_season(
     data: RapidPinSeasonUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar temporada (solo admin)"""
+    """Update temporada (solo admin)"""
     season = await rapidpin_service.update_season(season_id, data)
     if not season:
         raise HTTPException(status_code=404, detail="Temporada no encontrada")
@@ -101,7 +101,7 @@ async def confirm_match(
 
 @router.get("/matches/{match_id}", response_model=RapidPinMatch)
 async def get_match(match_id: str):
-    """Obtener partido por ID"""
+    """Get partido por ID"""
     match = await rapidpin_service.get_match(match_id)
     if not match:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
@@ -114,7 +114,7 @@ async def get_season_matches(
     estado: Optional[str] = None,
     limit: int = Query(50, ge=1, le=200)
 ):
-    """Obtener partidos de una temporada"""
+    """Get partidos de una temporada"""
     return await rapidpin_service.get_season_matches(season_id, estado, limit)
 
 
@@ -153,7 +153,7 @@ async def get_all_pending_confirmations(user_id: str):
 
 @router.get("/seasons/{season_id}/ranking", response_model=RapidPinRankingTable)
 async def get_ranking(season_id: str):
-    """Obtener tabla de ranking de jugadores"""
+    """Get tabla de ranking de jugadores"""
     try:
         return await rapidpin_service.get_ranking(season_id)
     except ValueError as e:
@@ -162,13 +162,13 @@ async def get_ranking(season_id: str):
 
 @router.get("/seasons/{season_id}/ranking/referees", response_model=List[RapidPinRankingEntry])
 async def get_referee_ranking(season_id: str):
-    """Obtener ranking de árbitros"""
+    """Get ranking de árbitros"""
     return await rapidpin_service.get_referee_ranking(season_id)
 
 
 @router.get("/seasons/{season_id}/players/{jugador_id}/stats")
 async def get_player_stats(season_id: str, jugador_id: str):
-    """Obtener estadísticas de un jugador en una temporada"""
+    """Get estadísticas de un jugador en una temporada"""
     stats = await rapidpin_service.get_player_stats(season_id, jugador_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador no encontrado en esta temporada")
@@ -179,7 +179,7 @@ async def get_player_stats(season_id: str, jugador_id: str):
 
 @router.get("/scoring")
 async def get_scoring_config():
-    """Obtener configuración de puntuación de Rapid Pin"""
+    """Get configuración de puntuación de Rapid Pin"""
     return {
         "scoring": RAPID_PIN_SCORING,
         "rules": {
@@ -471,7 +471,7 @@ async def resume_challenge_from_queue(
 
 @router.get("/comment-config")
 async def get_comment_configuration():
-    """Obtener configuración de comentarios"""
+    """Get configuración de comentarios"""
     return await rapidpin_service.get_comment_config()
 
 
@@ -481,7 +481,7 @@ async def update_comment_configuration(
     require_approval_for_flagged_users: Optional[bool] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar configuración de comentarios (admin)"""
+    """Update configuración de comentarios (admin)"""
     updates = {}
     if max_comment_length is not None:
         updates["max_comment_length"] = max_comment_length
@@ -516,7 +516,7 @@ async def check_user_liked_challenge(
     queue_id: str,
     user_id: str
 ):
-    """Verificar si un usuario ya dio like a un reto"""
+    """Verify si un usuario ya dio like a un reto"""
     liked = await rapidpin_service.check_user_liked(queue_id, user_id)
     return {"liked": liked}
 
@@ -556,7 +556,7 @@ async def get_challenge_comments(
     queue_id: str,
     limit: int = 50
 ):
-    """Obtener comentarios de un reto"""
+    """Get comentarios de un reto"""
     return await rapidpin_service.get_comments(queue_id, limit=limit)
 
 
@@ -590,5 +590,5 @@ async def get_pending_moderation_comments(
     limit: int = 50,
     admin: dict = Depends(get_admin_user)
 ):
-    """Obtener comentarios pendientes de moderación (admin/mod)"""
+    """Get comentarios pendientes de moderación (admin/mod)"""
     return await rapidpin_service.get_pending_comments(limit=limit)

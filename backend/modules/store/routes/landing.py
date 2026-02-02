@@ -16,13 +16,13 @@ router = APIRouter(prefix="/landing", tags=["Store - Landing"])
 
 @router.get("/category/{categoria}")
 async def get_category_landing_data(categoria: str):
-    """Obtener todos los datos para landing de categoría"""
+    """Get todos los datos para landing de categoría"""
     return await category_service.get_category_landing(categoria)
 
 
 @router.get("/banners/{categoria}")
 async def get_category_banners(categoria: str):
-    """Obtener banners activos de una categoría"""
+    """Get banners activos de una categoría"""
     now = datetime.now(timezone.utc)
     query = {
         "categoria": categoria,
@@ -40,19 +40,19 @@ async def get_category_banners(categoria: str):
 
 @router.get("/featured/{categoria}")
 async def get_category_featured(categoria: str, limit: int = Query(10, ge=1, le=50)):
-    """Obtener productos destacados de una categoría"""
+    """Get productos destacados de una categoría"""
     return await product_service.get_featured_products(categoria, limit)
 
 
 @router.get("/promotions/{categoria}")
 async def get_category_promotions(categoria: str, limit: int = Query(10, ge=1, le=50)):
-    """Obtener productos en promoción de una categoría"""
+    """Get productos en promoción de una categoría"""
     return await product_service.get_promotional_products(categoria, limit)
 
 
 @router.get("/newest/{categoria}")
 async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)):
-    """Obtener productos más nuevos de una categoría"""
+    """Get productos más nuevos de una categoría"""
     return await product_service.get_newest_products(categoria, limit)
 
 
@@ -60,7 +60,7 @@ async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)
 
 @router.get("/admin/banners")
 async def get_all_banners(admin: dict = Depends(get_admin_user)):
-    """Obtener todos los banners (admin)"""
+    """Get todos los banners (admin)"""
     banners = await db.category_banners.find({}, {"_id": 0}).sort(
         [("categoria", 1), ("orden", 1)]
     ).to_list(100)
@@ -69,7 +69,7 @@ async def get_all_banners(admin: dict = Depends(get_admin_user)):
 
 @router.post("/admin/banners")
 async def create_banner(banner: dict, admin: dict = Depends(get_admin_user)):
-    """Crear nuevo banner (admin)"""
+    """Create nuevo banner (admin)"""
     doc = {
         "banner_id": f"banner_{uuid.uuid4().hex[:12]}",
         "categoria": banner.get("categoria"),
@@ -95,7 +95,7 @@ async def update_banner(
     banner: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar banner (admin)"""
+    """Update banner (admin)"""
     update_data = {
         k: v for k, v in banner.items()
         if k not in ["banner_id", "_id", "fecha_creacion"]
@@ -116,7 +116,7 @@ async def update_banner(
 
 @router.delete("/admin/banners/{banner_id}")
 async def delete_banner(banner_id: str, admin: dict = Depends(get_admin_user)):
-    """Eliminar banner (admin)"""
+    """Delete banner (admin)"""
     result = await db.category_banners.delete_one({"banner_id": banner_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Banner no encontrado")
@@ -127,14 +127,14 @@ async def delete_banner(banner_id: str, admin: dict = Depends(get_admin_user)):
 
 @router.get("/admin/vendor-permissions")
 async def get_all_vendor_permissions(admin: dict = Depends(get_admin_user)):
-    """Obtener todos los permisos de vendors (admin)"""
+    """Get todos los permisos de vendors (admin)"""
     permissions = await db.vendor_permissions.find({}, {"_id": 0}).to_list(100)
     return permissions
 
 
 @router.get("/admin/vendor-permissions/{vendor_id}")
 async def get_vendor_permissions(vendor_id: str, admin: dict = Depends(get_admin_user)):
-    """Obtener permisos de un vendor específico"""
+    """Get permisos de un vendor específico"""
     permissions = await db.vendor_permissions.find_one({"vendor_id": vendor_id}, {"_id": 0})
     if not permissions:
         return {
@@ -155,7 +155,7 @@ async def update_vendor_permissions(
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
-    """Actualizar permisos de vendor (admin)"""
+    """Update permisos de vendor (admin)"""
     update_data = {
         "vendor_id": vendor_id,
         "puede_crear_banners": data.get("puede_crear_banners", False),

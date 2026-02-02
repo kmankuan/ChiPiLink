@@ -16,7 +16,7 @@ router = APIRouter(prefix="/public", tags=["Store - Public"])
 
 @router.get("/products")
 async def get_public_products(grado: Optional[str] = None):
-    """Obtener productos para formulario público - sin autenticación"""
+    """Get productos para formulario público - sin autenticación"""
     products = await product_service.get_all_products(grado=grado)
     
     # Filtrar solo productos con stock > 0
@@ -30,7 +30,7 @@ async def get_public_products(grado: Optional[str] = None):
 
 @router.post("/order")
 async def create_public_order(pedido: OrderPublicCreate):
-    """Crear pedido desde formulario público - sin autenticación"""
+    """Create pedido desde formulario público - sin autenticación"""
     try:
         order = await order_service.create_public_order(pedido)
         return {
@@ -74,7 +74,7 @@ async def get_public_order(order_id: str):
 
 @router.get("/grades")
 async def get_grades():
-    """Obtener grados disponibles"""
+    """Get grados disponibles"""
     return {
         "grados": [
             {"id": "preescolar", "nombre": "Preescolar"},
@@ -96,7 +96,7 @@ async def get_grades():
 
 @router.get("/subjects")
 async def get_subjects():
-    """Obtener materias disponibles"""
+    """Get materias disponibles"""
     return {
         "materias": [
             {"id": "matematicas", "nombre": "Matemáticas"},
