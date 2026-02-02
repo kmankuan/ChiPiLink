@@ -1,6 +1,6 @@
 """
 PinpanClub - Main Router
-Agrega todos los routers del módulo
+Aggregates all module routers
 """
 from fastapi import APIRouter
 
@@ -21,10 +21,10 @@ from .rank_rewards import router as rank_rewards_router
 from .seasons import router as seasons_router
 from .public_feed import router as public_feed_router
 
-# Router principal del módulo
+# Main module router
 router = APIRouter(prefix="/pinpanclub", tags=["PinpanClub"])
 
-# Incluir sub-routers
+# Include sub-routers
 router.include_router(players_router)
 router.include_router(matches_router)
 router.include_router(monday_router)
@@ -42,5 +42,5 @@ router.include_router(rank_rewards_router)
 router.include_router(seasons_router)
 router.include_router(public_feed_router)
 
-# Re-exportar para compatibilidad con rutas antiguas
+# Re-export for backwards compatibility with old routes
 pinpanclub_router = router
