@@ -305,8 +305,8 @@ export default function MondayModule() {
         body: JSON.stringify(storeConfig)
       });
       
-      if (!res.ok) throw new Error('Error guardando configuración');
-      toast.success('Configuración de Libros guardada');
+      if (!res.ok) throw new Error('Error saving configuration');
+      toast.success('Books configuration saved');
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -326,7 +326,7 @@ export default function MondayModule() {
       if (data.error) {
         toast.error(data.error);
       } else {
-        toast.success(`Sincronizados: ${data.synced}, Fallidos: ${data.failed}`);
+        toast.success(`Synced: ${data.synced}, Failed: ${data.failed}`);
       }
     } catch (err) {
       toast.error(err.message);
@@ -350,7 +350,7 @@ export default function MondayModule() {
 
   const handleSaveLegacyBoard = async () => {
     if (!legacyBoardId.trim()) {
-      toast.error('Por favor ingresa un Board ID');
+      toast.error('Please enter a Board ID');
       return;
     }
 
@@ -361,10 +361,10 @@ export default function MondayModule() {
         { board_id: legacyBoardId.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Board ID guardado correctamente');
+      toast.success('Board ID saved successfully');
       loadLegacyStatus();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error guardando configuración');
+      toast.error(error.response?.data?.detail || 'Error saving configuration');
     } finally {
       setSavingLegacy(false);
     }
@@ -378,7 +378,7 @@ export default function MondayModule() {
       });
       toast.success(response.data.message);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error probando integración');
+      toast.error(error.response?.data?.detail || 'Error testing integration');
     } finally {
       setTestingLegacy(false);
     }
@@ -396,7 +396,7 @@ export default function MondayModule() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Integración Monday.com</h2>
+          <h2 className="text-2xl font-serif font-bold">Monday.com Integration</h2>
           <p className="text-muted-foreground">
             Configura la conexión y sincronización con Monday.com para diferentes módulos
           </p>
