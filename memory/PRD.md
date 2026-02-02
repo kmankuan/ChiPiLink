@@ -132,16 +132,11 @@ Complete Spanish to English refactoring using the i18n system for multi-language
 
 ## Remaining Work
 
-### P0.5 - Remaining Local Texts Pattern (8 files - Working but not centralized)
-These files use inline `const texts = {}` pattern with es/en/zh translations - functional but not using central JSON files:
-- `/app/frontend/src/modules/notifications/components/CategoryManager.jsx`
-- `/app/frontend/src/modules/notifications/components/NotificationCategories.jsx`
-- `/app/frontend/src/modules/notifications/components/PostEditor.jsx`
-- `/app/frontend/src/modules/notifications/components/ProviderConfig.jsx`
-- `/app/frontend/src/modules/notifications/components/SendNotification.jsx`
-- `/app/frontend/src/modules/admin/users/components/AdminMemberships.jsx`
-- `/app/frontend/src/components/blocks/PinPanClubFeedBlock.jsx`
-- `/app/frontend/src/components/rapidpin/ChallengeModal.jsx`
+### P0 - Spanish Code Comments Translation (Partial Progress)
+Many backend files still contain Spanish comments. Key files needing translation:
+- `/app/backend/modules/pinpanclub/*` - PinPan Club services and models
+- `/app/backend/modules/users/*` - User services and models
+- `/app/backend/modules/store/*` - Store services and models
 
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
