@@ -409,12 +409,12 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         <TabsContent value="categorias" className="space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Categorías de Productos</h3>
-              <p className="text-sm text-muted-foreground">Administra las categorías del catálogo público</p>
+              <h3 className="text-lg font-semibold">Product Categories</h3>
+              <p className="text-sm text-muted-foreground">Manage public catalog categories</p>
             </div>
             <Button onClick={() => openCategoryDialog()} className="gap-2">
               <Plus className="h-4 w-4" />
-              Nueva Categoría
+              New Category
             </Button>
           </div>
 
@@ -431,7 +431,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Badge variant="outline">Orden: {cat.orden}</Badge>
+                      <Badge variant="outline">Order: {cat.orden}</Badge>
                       <div className="flex gap-2">
                         <Button size="icon" variant="ghost" onClick={() => openCategoryDialog(cat)}>
                           <Edit2 className="h-4 w-4" />
@@ -454,12 +454,12 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-orange-500" />
-                Productos con Bajo Stock
+                Low Stock Products
               </CardTitle>
             </CardHeader>
             <CardContent>
               {productos.filter(p => p.cantidad_inventario < 10).length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No hay productos con bajo stock</p>
+                <p className="text-muted-foreground text-center py-4">No products with low stock</p>
               ) : (
                 <div className="space-y-2">
                   {productos.filter(p => p.cantidad_inventario < 10).map((item) => (
