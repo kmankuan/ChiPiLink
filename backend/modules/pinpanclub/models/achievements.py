@@ -1,6 +1,6 @@
 """
 Achievements - Modelos
-Sistema de logros automáticos basados en retos completados
+System for logros automáticos basados en retos completados
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any

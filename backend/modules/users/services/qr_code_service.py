@@ -1,5 +1,5 @@
 """
-QR Code Service - Gestión de códigos QR para check-in y pagos
+QR Code Service - Management of códigos QR para check-in y pagos
 """
 from typing import Dict, Optional, Any
 from datetime import datetime, timezone, timedelta
@@ -12,7 +12,7 @@ from core.database import db
 
 
 class QRCodeService:
-    """Servicio para gestión de códigos QR"""
+    """Service for management of códigos QR"""
     
     def __init__(self):
         self.collection_qr_codes = "chipi_qr_codes"

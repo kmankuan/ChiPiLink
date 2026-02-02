@@ -1,5 +1,5 @@
 """
-Membership Service - Gestión de membresías y pases de visita
+Membership Service - Management of membresías y pases de visita
 Sistema configurable con diferentes tipos de planes y tracking de uso
 """
 from typing import Dict, List, Optional, Any
@@ -13,7 +13,7 @@ from modules.users.models.user_models import (
 
 
 class MembershipService:
-    """Servicio para gestión de membresías y visitas"""
+    """Service for management of membresías y visitas"""
     
     def __init__(self):
         self.collection_plans = "chipi_membership_plans"

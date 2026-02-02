@@ -10,7 +10,7 @@ from core.base import BaseRepository
 
 
 class PrizeDefinitionRepository(BaseRepository):
-    """Repositorio para definiciones de premios"""
+    """Repository for definiciones de premios"""
     
     COLLECTION_NAME = "pinpanclub_prize_definitions"
     ID_FIELD = "prize_id"
@@ -43,7 +43,7 @@ class PrizeDefinitionRepository(BaseRepository):
 
 
 class AwardedPrizeRepository(BaseRepository):
-    """Repositorio para premios otorgados"""
+    """Repository for premios otorgados"""
     
     COLLECTION_NAME = "pinpanclub_awarded_prizes"
     ID_FIELD = "award_id"
@@ -92,7 +92,7 @@ class AwardedPrizeRepository(BaseRepository):
 
 
 class PrizeCatalogRepository(BaseRepository):
-    """Repositorio para catálogos de premios"""
+    """Repository for catálogos de premios"""
     
     COLLECTION_NAME = "pinpanclub_prize_catalogs"
     ID_FIELD = "catalog_id"

@@ -14,7 +14,7 @@ from ..models.social import NotificationCreate, NotificationType, ActivityFeedCr
 
 
 class AchievementsService(BaseService):
-    """Servicio para gestionar logros automáticos"""
+    """Service for gestionar logros automáticos"""
     
     MODULE_NAME = "pinpanclub"
     

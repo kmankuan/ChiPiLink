@@ -1,6 +1,6 @@
 """
 Community Module - Album Service
-Lógica de negocio para álbumes de galería
+Business logic para álbumes de galería
 """
 from typing import List, Optional
 
@@ -11,7 +11,7 @@ from ..models import Album, AlbumCreate, AlbumUpdate
 
 class AlbumService(BaseService):
     """
-    Servicio para gestión de álbumes de galería.
+    Service for management of álbumes de galería.
     """
     
     MODULE_NAME = "community"

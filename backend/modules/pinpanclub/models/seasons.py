@@ -1,5 +1,5 @@
 """
-Ranking Seasons - Modelos para sistema de temporadas
+Ranking Seasons - Modelos para system for temporadas
 Módulo: pinpanclub
 """
 from pydantic import BaseModel, Field

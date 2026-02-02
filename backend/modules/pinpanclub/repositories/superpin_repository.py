@@ -1,6 +1,6 @@
 """
 Super Pin Ranking - Repositories
-Acceso a datos para el sistema de ranking
+Acceso a datos para el system for ranking
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
@@ -301,7 +301,7 @@ class RankingRepository(BaseRepository):
             limit=1000
         )
         
-        # Ordenar según el sistema de puntuación
+        # Ordenar según el system for puntuación
         if scoring_system == "elo":
             rankings.sort(key=lambda x: x.get("elo_rating", 0), reverse=True)
         else:

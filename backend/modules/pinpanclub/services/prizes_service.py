@@ -1,6 +1,6 @@
 """
 Prizes - Service Layer
-Sistema de premios avanzado
+System for premios avanzado
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -24,7 +24,7 @@ from ..models.social import NotificationCreate, NotificationType, ActivityFeedCr
 
 
 class PrizeService(BaseService):
-    """Servicio para sistema de premios avanzado"""
+    """Service for system for premios avanzado"""
     
     MODULE_NAME = "pinpanclub"
     

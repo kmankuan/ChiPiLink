@@ -117,11 +117,11 @@ async def update_cxgenie_config(config: dict, admin: dict = Depends(get_admin_us
     return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
 
 
-# ============== WIDGET CODE (Para usuarios - Sistema de Tickets) ==============
+# ============== WIDGET CODE (Para usuarios - System for Tickets) ==============
 
 @router.get("/widget-code")
 async def get_widget_code():
-    """Get ticket widget embed code for frontend (public) - Sistema de tickets para usuarios"""
+    """Get ticket widget embed code for frontend (public) - System for tickets para usuarios"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     
     # Use default or stored config

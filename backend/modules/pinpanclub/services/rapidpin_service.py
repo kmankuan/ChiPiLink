@@ -1,6 +1,6 @@
 """
 Rapid Pin - Service Layer
-Lógica de negocio para el sistema de partidos espontáneos
+Business logic para el system for partidos espontáneos
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -139,7 +139,7 @@ async def send_referee_needed_broadcast(
 class RapidPinService(BaseService):
     """
     Servicio principal para Rapid Pin.
-    Sistema de partidos espontáneos: 2 jugadores + 1 árbitro
+    System for partidos espontáneos: 2 jugadores + 1 árbitro
     """
     
     MODULE_NAME = "pinpanclub"

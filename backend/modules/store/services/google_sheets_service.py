@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class GoogleSheetsService:
     """
-    Servicio para sincronizar estudiantes desde Google Sheets.
+    Service for sincronizar estudiantes desde Google Sheets.
     Soporta múltiples hojas (pestañas) por grado.
     """
     

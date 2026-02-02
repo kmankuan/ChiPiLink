@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class BulkImportService:
     """
-    Servicio para importar datos desde texto pegado (copy/paste de Google Sheets).
+    Service for importar datos desde texto pegado (copy/paste de Google Sheets).
     Soporta formato TSV (tab-separated) que es el formato nativo de Google Sheets.
     """
     

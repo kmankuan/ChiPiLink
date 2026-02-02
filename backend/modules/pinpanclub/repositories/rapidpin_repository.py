@@ -12,7 +12,7 @@ from core.constants import PinpanClubCollections
 
 
 class RapidPinSeasonRepository(BaseRepository):
-    """Repositorio para temporadas Rapid Pin"""
+    """Repository for temporadas Rapid Pin"""
     
     COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_SEASONS
     ID_FIELD = "season_id"
@@ -88,7 +88,7 @@ class RapidPinSeasonRepository(BaseRepository):
 
 
 class RapidPinMatchRepository(BaseRepository):
-    """Repositorio para partidos Rapid Pin"""
+    """Repository for partidos Rapid Pin"""
     
     COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_MATCHES
     ID_FIELD = "match_id"
@@ -213,7 +213,7 @@ class RapidPinMatchRepository(BaseRepository):
 
 
 class RapidPinRankingRepository(BaseRepository):
-    """Repositorio para rankings Rapid Pin"""
+    """Repository for rankings Rapid Pin"""
     
     COLLECTION_NAME = PinpanClubCollections.RAPIDPIN_RANKINGS
     ID_FIELD = "ranking_id"

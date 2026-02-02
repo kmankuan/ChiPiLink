@@ -447,7 +447,7 @@ class SuperPinService(BaseService):
         # Cambio de ELO
         change = round(k_factor * (1 - expected_winner))
         
-        # Points (para el sistema de puntos, además del ELO)
+        # Points (para el system for puntos, además del ELO)
         points_winner = 3
         points_loser = 1
         

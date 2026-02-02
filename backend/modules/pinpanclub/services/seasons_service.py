@@ -1,5 +1,5 @@
 """
-Ranking Seasons Service - Gestión de temporadas de ranking
+Ranking Seasons Service - Management of temporadas de ranking
 Módulo: pinpanclub
 """
 from typing import Dict, List, Optional, Tuple
@@ -16,7 +16,7 @@ from ..models.social import NotificationCreate, NotificationType, ActivityFeedCr
 
 
 class RankingSeasonsService(BaseService):
-    """Servicio para gestionar temporadas de ranking"""
+    """Service for gestionar temporadas de ranking"""
     
     MODULE_NAME = "pinpanclub"
     

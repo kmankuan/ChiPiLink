@@ -1,6 +1,6 @@
 """
 Community Module - Event Service
-Lógica de negocio para eventos
+Business logic para eventos
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from ..models import Event, EventCreate, EventUpdate
 
 class EventService(BaseService):
     """
-    Servicio para gestión de eventos de comunidad.
+    Service for management of eventos de comunidad.
     """
     
     MODULE_NAME = "community"

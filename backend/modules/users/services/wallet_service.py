@@ -1,5 +1,5 @@
 """
-ChipiWallet Service - Gestión de billetera y ChipiPoints
+ChipiWallet Service - Management of billetera y ChipiPoints
 """
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from ..models.wallet_models import (
 
 
 class WalletService(BaseService):
-    """Servicio para gestión de billeteras y transacciones"""
+    """Service for management of billeteras y transacciones"""
     
     MODULE_NAME = "users"
     

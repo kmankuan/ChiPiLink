@@ -1,5 +1,5 @@
 """
-User Profile Service - Gestión de perfiles y tipos de usuario
+User Profile Service - Management of perfiles y tipos de usuario
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from ..models.user_models import (
 
 
 class UserProfileService(BaseService):
-    """Servicio para gestión de perfiles de usuario"""
+    """Service for management of perfiles de usuario"""
     
     MODULE_NAME = "users"
     

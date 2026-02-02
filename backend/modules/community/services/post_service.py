@@ -1,6 +1,6 @@
 """
 Community Module - Post Service
-Lógica de negocio para posts
+Business logic para posts
 """
 from typing import List, Optional, Dict
 
@@ -12,7 +12,7 @@ from ..models import Post, PostCreate, PostUpdate, Comment, CommentCreate
 
 class PostService(BaseService):
     """
-    Servicio para gestión de posts de comunidad.
+    Service for management of posts de comunidad.
     """
     
     MODULE_NAME = "community"

@@ -1,6 +1,6 @@
 """
 Roles Module - Service Layer
-Lógica de negocio para roles y permisos
+Business logic para roles y permisos
 """
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -144,7 +144,7 @@ class RolesService:
             {
                 "role_id": DefaultRoles.MODERATOR.value,
                 "nombre": "Moderador",
-                "descripcion": "Gestión de contenido y usuarios básicos",
+                "descripcion": "Management of contenido y usuarios básicos",
                 "color": "#0891b2",
                 "icono": "Shield",
                 "es_sistema": True,

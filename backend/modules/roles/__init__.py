@@ -1,6 +1,6 @@
 """
 Roles Module
-Sistema de roles y permisos para la plataforma
+System for roles y permisos para la plataforma
 """
 from .models import (
     Role, RoleCreate, RoleUpdate,

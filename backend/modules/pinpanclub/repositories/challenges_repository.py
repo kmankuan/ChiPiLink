@@ -10,7 +10,7 @@ from core.base import BaseRepository
 
 
 class ChallengeDefinitionRepository(BaseRepository):
-    """Repositorio para definiciones de retos"""
+    """Repository for definiciones de retos"""
     
     COLLECTION_NAME = "pinpanclub_challenge_definitions"
     ID_FIELD = "challenge_id"
@@ -50,7 +50,7 @@ class ChallengeDefinitionRepository(BaseRepository):
 
 
 class PlayerChallengeRepository(BaseRepository):
-    """Repositorio para progreso de jugadores en retos"""
+    """Repository for progreso de jugadores en retos"""
     
     COLLECTION_NAME = "pinpanclub_player_challenges"
     ID_FIELD = "progress_id"
@@ -154,7 +154,7 @@ class PlayerChallengeRepository(BaseRepository):
 
 
 class WeeklyChallengeSetRepository(BaseRepository):
-    """Repositorio para conjuntos semanales de retos"""
+    """Repository for conjuntos semanales de retos"""
     
     COLLECTION_NAME = "pinpanclub_weekly_challenges"
     ID_FIELD = "week_id"
@@ -218,7 +218,7 @@ class WeeklyChallengeSetRepository(BaseRepository):
 
 
 class ChallengeLeaderboardRepository(BaseRepository):
-    """Repositorio para leaderboard de retos"""
+    """Repository for leaderboard de retos"""
     
     COLLECTION_NAME = "pinpanclub_challenge_leaderboard"
     ID_FIELD = "entry_id"

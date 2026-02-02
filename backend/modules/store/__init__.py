@@ -7,7 +7,7 @@ Arquitectura Microservices-Ready:
 /modules/store/
 ├── models/           # Schemas Pydantic (contratos de datos)
 ├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
-├── services/         # Lógica de negocio
+├── services/         # Business logic
 ├── events/           # Event handlers y tipos de eventos
 ├── routes/           # API endpoints (FastAPI routers)
 └── __init__.py       # Initialization del módulo

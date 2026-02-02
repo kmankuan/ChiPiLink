@@ -1,5 +1,5 @@
 """
-Push Notification Models - Modelos para el sistema de notificaciones
+Push Notification Models - Modelos para el system for notificaciones
 """
 from enum import Enum
 from typing import Dict, List, Optional

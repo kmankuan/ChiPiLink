@@ -26,7 +26,7 @@ from ..models.social import NotificationCreate, NotificationType, ActivityFeedCr
 
 
 class ChallengeService(BaseService):
-    """Servicio para Weekly Challenges"""
+    """Service for Weekly Challenges"""
     
     MODULE_NAME = "pinpanclub"
     

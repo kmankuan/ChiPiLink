@@ -1,6 +1,6 @@
 """
 Store Module - Category Service
-Lógica de negocio para categorías
+Business logic para categorías
 """
 from typing import List, Optional, Dict
 
@@ -11,7 +11,7 @@ from ..models import CategoryCreate, Category
 
 class CategoryService(BaseService):
     """
-    Servicio para gestión de categorías.
+    Service for management of categorías.
     """
     
     MODULE_NAME = "store"

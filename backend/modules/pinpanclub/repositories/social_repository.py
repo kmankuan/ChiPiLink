@@ -11,7 +11,7 @@ from core.base import BaseRepository
 
 
 class FollowRepository(BaseRepository):
-    """Repositorio para seguimientos"""
+    """Repository for seguimientos"""
     
     COLLECTION_NAME = "pinpanclub_follows"
     ID_FIELD = "follow_id"
@@ -70,7 +70,7 @@ class FollowRepository(BaseRepository):
 
 
 class CommentRepository(BaseRepository):
-    """Repositorio para comentarios"""
+    """Repository for comentarios"""
     
     COLLECTION_NAME = "pinpanclub_comments"
     ID_FIELD = "comment_id"
@@ -129,7 +129,7 @@ class CommentRepository(BaseRepository):
 
 
 class ReactionRepository(BaseRepository):
-    """Repositorio para reacciones"""
+    """Repository for reacciones"""
     
     COLLECTION_NAME = "pinpanclub_reactions"
     ID_FIELD = "reaction_id"
@@ -186,7 +186,7 @@ class ReactionRepository(BaseRepository):
 
 
 class ActivityFeedRepository(BaseRepository):
-    """Repositorio para feed de actividad"""
+    """Repository for feed de actividad"""
     
     COLLECTION_NAME = "pinpanclub_activity_feed"
     ID_FIELD = "activity_id"
@@ -222,7 +222,7 @@ class ActivityFeedRepository(BaseRepository):
 
 
 class NotificationRepository(BaseRepository):
-    """Repositorio para notificaciones"""
+    """Repository for notificaciones"""
     
     COLLECTION_NAME = "pinpanclub_notifications"
     ID_FIELD = "notification_id"

@@ -1,6 +1,6 @@
 """
 Super Pin Ranking - API Routes
-Endpoints for el sistema de ranking
+Endpoints for el system for ranking
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional

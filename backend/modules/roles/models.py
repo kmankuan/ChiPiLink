@@ -1,6 +1,6 @@
 """
 Roles Module - Models and Schemas
-Sistema de roles y permisos para la plataforma
+System for roles y permisos para la plataforma
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -26,7 +26,7 @@ AVAILABLE_PERMISSIONS = {
         "landing_editor": "Editar landing page",
     },
     
-    # Gestión de usuarios
+    # Management of usuarios
     "users": {
         "view": "Ver lista de usuarios",
         "create": "Crear usuarios",

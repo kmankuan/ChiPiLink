@@ -1,5 +1,5 @@
 """
-Post Service - Gestión de posts/anuncios con editor avanzado
+Post Service - Management of posts/anuncios con editor avanzado
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
@@ -12,7 +12,7 @@ from modules.notifications.models.notification_models import (
 
 
 class PostService:
-    """Servicio para gestión de posts y anuncios"""
+    """Service for management of posts y anuncios"""
     
     def __init__(self):
         self.collection_posts = "chipi_posts"

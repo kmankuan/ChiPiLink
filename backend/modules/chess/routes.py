@@ -2,10 +2,10 @@
 Chess Routes - Endpoints del Club de Ajedrez
 
 PLACEHOLDER - Endpoints a implementar:
-- GET/POST /chess/players - Gestión de jugadores
-- GET/POST /chess/games - Gestión de partidas
+- GET/POST /chess/players - Management of jugadores
+- GET/POST /chess/games - Management of partidas
 - POST /chess/games/{id}/move - Realizar movimiento
-- GET/POST /chess/tournaments - Gestión de torneos
+- GET/POST /chess/tournaments - Management of torneos
 - GET /chess/rankings - Rankings por ELO
 - GET/POST /chess/puzzles - Problemas de ajedrez
 """
@@ -33,7 +33,7 @@ async def get_chess_status():
         "status": "placeholder",
         "message": "Módulo de Ajedrez - Pendiente de implementación",
         "planned_features": [
-            "Gestión de jugadores con rating ELO",
+            "Management of jugadores con rating ELO",
             "Partidas en tiempo real",
             "Torneos (Suizo, Eliminación, Arena)",
             "Rankings y estadísticas",

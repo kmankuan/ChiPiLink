@@ -24,7 +24,7 @@ from ..models.social import (
 
 
 class SocialService(BaseService):
-    """Servicio para funcionalidades sociales"""
+    """Service for funcionalidades sociales"""
     
     MODULE_NAME = "pinpanclub"
     

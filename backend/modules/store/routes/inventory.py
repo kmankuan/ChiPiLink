@@ -1,6 +1,6 @@
 """
 Store Module - Inventory Routes
-Endpoints for gestión de inventario usando el Service Layer
+Endpoints for management of inventario usando el Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List

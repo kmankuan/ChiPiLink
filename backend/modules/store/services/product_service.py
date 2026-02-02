@@ -1,6 +1,6 @@
 """
 Store Module - Product Service
-Lógica de negocio para productos
+Business logic para productos
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from ..models import ProductCreate, ProductUpdate, Product
 
 class ProductService(BaseService):
     """
-    Servicio para gestión de productos.
+    Service for management of productos.
     """
     
     MODULE_NAME = "store"

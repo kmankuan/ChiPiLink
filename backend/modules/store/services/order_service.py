@@ -1,6 +1,6 @@
 """
 Store Module - Order Service
-Lógica de negocio para pedidos
+Business logic para pedidos
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -14,7 +14,7 @@ from ..models import OrderCreate, OrderPublicCreate, Order, OrderStatus
 
 class OrderService(BaseService):
     """
-    Servicio para gestión de pedidos.
+    Service for management of pedidos.
     """
     
     MODULE_NAME = "store"

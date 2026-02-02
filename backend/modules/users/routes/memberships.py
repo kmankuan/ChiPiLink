@@ -1,5 +1,5 @@
 """
-Membership API Routes - Gestión de membresías y visitas
+Membership API Routes - Management of membresías y visitas
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List

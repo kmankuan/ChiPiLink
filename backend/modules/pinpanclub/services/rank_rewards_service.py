@@ -1,5 +1,5 @@
 """
-Rank Rewards Service - Sistema de recompensas por subida de rango
+Rank Rewards Service - System for recompensas por subida de rango
 Módulo: pinpanclub
 """
 from typing import Dict, List, Optional, Tuple
@@ -142,7 +142,7 @@ RANK_DEFINITIONS = [
 
 
 class RankRewardsService(BaseService):
-    """Servicio para gestionar recompensas por subida de rango"""
+    """Service for gestionar recompensas por subida de rango"""
     
     MODULE_NAME = "pinpanclub"
     

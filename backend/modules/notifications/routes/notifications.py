@@ -345,7 +345,7 @@ async def get_templates(
 
 @router.post("/admin/initialize")
 async def initialize_notifications(admin=Depends(get_admin_user)):
-    """Inicializar sistema de notificaciones (admin)"""
+    """Inicializar system for notificaciones (admin)"""
     await push_notification_service.initialize()
     
     return {

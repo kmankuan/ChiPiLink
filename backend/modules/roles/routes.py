@@ -1,6 +1,6 @@
 """
 Roles Module - API Routes
-Endpoints para gestión de roles y permisos
+Endpoints para management of roles y permisos
 """
 from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from typing import List, Optional

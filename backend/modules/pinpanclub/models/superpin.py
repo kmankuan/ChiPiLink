@@ -1,6 +1,6 @@
 """
 Super Pin Ranking - Modelos
-Sistema de ranking individual con ligas configurables
+System for ranking individual con ligas configurables
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
@@ -11,7 +11,7 @@ from enum import Enum
 # ============== ENUMS ==============
 
 class ScoringSystem(str, Enum):
-    """Sistema de puntuación"""
+    """System for puntuación"""
     SIMPLE = "simple"          # +3 victoria, +1 derrota
     ELO = "elo"                # Sistema ELO (como ajedrez)
     CUSTOM = "custom"          # Personalizado
@@ -57,7 +57,7 @@ class MatchType(str, Enum):
 # ============== CONFIGURATION MODELS ==============
 
 class ScoringConfig(BaseModel):
-    """Configuración del sistema de puntuación"""
+    """Configuración del system for puntuación"""
     system: ScoringSystem = ScoringSystem.SIMPLE
     
     # Simple scoring

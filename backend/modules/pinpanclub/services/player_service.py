@@ -1,6 +1,6 @@
 """
 PinpanClub - Player Service
-Lógica de negocio para jugadores
+Business logic para jugadores
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,8 +13,8 @@ from ..models import PlayerCreate, PlayerUpdate, Player
 
 class PlayerService(BaseService):
     """
-    Servicio para gestión de jugadores.
-    Contiene toda la lógica de negocio relacionada con jugadores.
+    Service for management of jugadores.
+    Contiene toda la business logic relacionada con jugadores.
     """
     
     MODULE_NAME = "pinpanclub"

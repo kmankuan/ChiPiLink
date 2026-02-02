@@ -1,6 +1,6 @@
 """
 PinpanClub - Match Service
-Lógica de negocio para partidos
+Business logic para partidos
 """
 from typing import List, Optional, Dict, Set
 from datetime import datetime, timezone
@@ -14,8 +14,8 @@ from ..models import MatchCreate, Match, MatchState
 
 class MatchService(BaseService):
     """
-    Servicio para gestión de partidos.
-    Contiene toda la lógica de negocio relacionada con partidos.
+    Service for management of partidos.
+    Contiene toda la business logic relacionada con partidos.
     """
     
     MODULE_NAME = "pinpanclub"
