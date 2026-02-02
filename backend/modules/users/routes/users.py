@@ -332,7 +332,7 @@ async def get_user_profile(user_id: str):
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     
-    # Remover campos privados
+    # Remove campos privados
     profile.pop("internal_notes", None)
     
     return {"success": True, "profile": profile}

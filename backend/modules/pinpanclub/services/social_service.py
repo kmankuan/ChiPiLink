@@ -178,7 +178,7 @@ class SocialService(BaseService):
                     await self.comment_repo.remove_reaction(data.target_id, data.reaction_type)
                 raise ValueError("Reacción eliminada")
             else:
-                # Cambiar tipo de reacción
+                # Change tipo de reacción
                 await self.reaction_repo.delete_reaction(
                     data.user_id, data.target_id, data.target_type
                 )

@@ -81,7 +81,7 @@ class LayoutRepository(BaseRepository):
     
     async def set_default(self, layout_id: str) -> bool:
         """Establecer layout como default"""
-        # Quitar default de otros
+        # Remove default de otros
         await self._collection.update_many(
             {"is_default": True},
             {"$set": {"is_default": False}}

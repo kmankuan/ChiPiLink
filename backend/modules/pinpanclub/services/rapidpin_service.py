@@ -1376,7 +1376,7 @@ class RapidPinService(BaseService):
         })
         
         if existing:
-            # Quitar like
+            # Remove like
             await db["rapidpin_reactions"].delete_one({"_id": existing["_id"]})
             await db["rapidpin_queue"].update_one(
                 {"queue_id": queue_id},

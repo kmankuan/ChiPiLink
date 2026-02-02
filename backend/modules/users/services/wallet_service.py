@@ -421,7 +421,7 @@ class WalletService(BaseService):
             reference_type="conversion"
         )
         
-        # Agregar USD
+        # Add USD
         result = await self.deposit(
             user_id=user_id,
             amount=usd_amount,
@@ -544,7 +544,7 @@ class WalletService(BaseService):
         }
         
         if existing:
-            # Agregar al existente
+            # Add al existente
             await db.chipi_pending_balances.update_one(
                 {"pending_id": existing["pending_id"]},
                 {

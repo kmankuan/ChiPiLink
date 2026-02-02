@@ -144,7 +144,7 @@ class ConexionesService:
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
         
-        # Agregar conexión al usuario
+        # Add conexión al usuario
         await db.auth_users.update_one(
             {"user_id": user_id},
             {"$push": {"conexiones": conexion}}
@@ -593,7 +593,7 @@ class ConexionesService:
             requiere_solicitud=False
         )
         
-        # Agregar capacidad de acudiente si no la tiene
+        # Add capacidad de acudiente si no la tiene
         await self._asegurar_capacidad(acudiente_id, "acudiente")
         
         return {

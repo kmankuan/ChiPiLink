@@ -348,7 +348,7 @@ class BulkImportService:
                     errores.append({"fila": idx + 2, "error": "Nombre vacío"})
                     continue
                 
-                # Parsear precio
+                # Parseprecio
                 precio = self._parse_precio(precio_str)
                 if precio is None:
                     errores.append({"fila": idx + 2, "error": f"Precio inválido: {precio_str}"})

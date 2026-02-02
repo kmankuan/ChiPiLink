@@ -345,7 +345,7 @@ class MembershipService:
         await db[self.collection_memberships].insert_one(membership)
         membership.pop("_id", None)
         
-        # Agregar info del plan
+        # Add info del plan
         membership["plan_info"] = plan
         
         self.log_info(f"Created membership {membership['membership_id']} for user {user_id}")
