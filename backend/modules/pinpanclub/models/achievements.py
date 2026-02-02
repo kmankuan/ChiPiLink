@@ -11,12 +11,12 @@ import uuid
 
 class AchievementType(str, Enum):
     """Tipos de logro"""
-    CHALLENGE_MASTER = "challenge_master"     # Completar X retos
-    WEEKLY_CHAMPION = "weekly_champion"       # Completar all challenges de una semana
-    STREAK_KEEPER = "streak_keeper"           # Completar retos X semanas seguidas
+    CHALLENGE_MASTER = "challenge_master"     # Complete X retos
+    WEEKLY_CHAMPION = "weekly_champion"       # Complete all challenges de una semana
+    STREAK_KEEPER = "streak_keeper"           # Complete retos X semanas seguidas
     POINTS_MILESTONE = "points_milestone"     # Alcanzar X puntos de retos
-    DIFFICULTY_MASTER = "difficulty_master"   # Completar X retos de cierta dificultad
-    FIRST_CHALLENGE = "first_challenge"       # Completar el primer reto
+    DIFFICULTY_MASTER = "difficulty_master"   # Complete X retos de cierta dificultad
+    FIRST_CHALLENGE = "first_challenge"       # Complete el primer reto
     SOCIAL_BUTTERFLY = "social_butterfly"     # Achievements sociales
 
 

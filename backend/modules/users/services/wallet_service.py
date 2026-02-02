@@ -302,7 +302,7 @@ class WalletService(BaseService):
             metadata={"payment_reference": reference}
         )
         
-        # Completar automáticamente
+        # Complete automáticamente
         return await self.complete_transaction(transaction["transaction_id"])
     
     async def charge(
@@ -506,7 +506,7 @@ class WalletService(BaseService):
             related_user_id=from_user_id
         )
         
-        # Completar ambas
+        # Complete ambas
         out_result = await self.complete_transaction(out_txn["transaction_id"])
         in_result = await self.complete_transaction(in_txn["transaction_id"])
         

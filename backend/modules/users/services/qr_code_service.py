@@ -361,7 +361,7 @@ class QRCodeService:
                 metadata={"processed_by": processed_by}
             )
             
-            # Completar transacción
+            # Complete transacción
             completed = await wallet_service.complete_transaction(transaction["transaction_id"])
             
             return {
@@ -419,7 +419,7 @@ class QRCodeService:
                 metadata={"processed_by": processed_by}
             )
             
-            # Completar transacción
+            # Complete transacción
             completed = await wallet_service.complete_transaction(transaction["transaction_id"])
             
             return {

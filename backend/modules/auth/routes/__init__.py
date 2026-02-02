@@ -11,7 +11,7 @@ from .auth_config import router as auth_config_router
 # Router principal del módulo Auth (refactorizado)
 router = APIRouter(prefix="/auth-v2", tags=["Auth"])
 
-# Incluir sub-routers
+# Include sub-routers
 router.include_router(auth_router)
 router.include_router(users_router)
 router.include_router(auth_config_router)

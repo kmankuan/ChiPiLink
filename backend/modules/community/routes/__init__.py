@@ -12,7 +12,7 @@ from .landing import router as landing_router
 # Router principal del módulo Community (refactorizado)
 router = APIRouter(prefix="/community-v2", tags=["Community"])
 
-# Incluir sub-routers
+# Include sub-routers
 router.include_router(posts_router)
 router.include_router(events_router)
 router.include_router(gallery_router)

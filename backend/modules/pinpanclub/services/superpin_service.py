@@ -327,7 +327,7 @@ class SuperPinService(BaseService):
                 match["stats"] = {}
             match["stats"].update(stats)
         
-        # Finalizar partido si terminó
+        # Finalize partido si terminó
         if partido_terminado:
             match["estado"] = "finalizado"
             match["fecha_fin"] = datetime.now(timezone.utc).isoformat()
