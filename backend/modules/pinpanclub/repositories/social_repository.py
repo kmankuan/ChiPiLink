@@ -28,7 +28,7 @@ class FollowRepository(BaseRepository):
         return await self.find_one({self.ID_FIELD: follow_id})
     
     async def find_follow(self, follower_id: str, following_id: str) -> Optional[Dict]:
-        """Buscar si ya existe el seguimiento"""
+        """Buscar si already exists el seguimiento"""
         return await self.find_one({
             "follower_id": follower_id,
             "following_id": following_id

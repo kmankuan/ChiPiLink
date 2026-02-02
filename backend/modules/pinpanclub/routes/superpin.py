@@ -136,7 +136,7 @@ async def get_match(partido_id: str):
     """Get partido por ID"""
     match = await superpin_service.get_match(partido_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
+        raise HTTPException(status_code=404, detail="Partido not found")
     return match
 
 
@@ -145,7 +145,7 @@ async def start_match(partido_id: str):
     """Iniciar partido"""
     match = await superpin_service.start_match(partido_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
+        raise HTTPException(status_code=404, detail="Partido not found")
     return match
 
 
@@ -202,7 +202,7 @@ async def get_player_stats(liga_id: str, jugador_id: str):
     """Get estadísticas de a player en a league"""
     stats = await superpin_service.get_player_stats(liga_id, jugador_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado en esta liga")
+        raise HTTPException(status_code=404, detail="Jugador not found en esta liga")
     return stats
 
 
@@ -254,7 +254,7 @@ async def get_tournament(torneo_id: str):
     """Get torneo por ID"""
     tournament = await superpin_service.tournament_repo.get_by_id(torneo_id)
     if not tournament:
-        raise HTTPException(status_code=404, detail="Torneo no encontrado")
+        raise HTTPException(status_code=404, detail="Torneo not found")
     return SeasonTournament(**tournament)
 
 
@@ -292,7 +292,7 @@ async def get_tournament_brackets(torneo_id: str):
     """Get brackets de un torneo"""
     tournament = await superpin_service.get_tournament_with_brackets(torneo_id)
     if not tournament:
-        raise HTTPException(status_code=404, detail="Torneo no encontrado")
+        raise HTTPException(status_code=404, detail="Torneo not found")
     return {
         "torneo_id": tournament.get("torneo_id"),
         "nombre": tournament.get("nombre"),
@@ -345,7 +345,7 @@ async def get_player_statistics(jugador_id: str, liga_id: str = None):
     """Get estadísticas detalladas de a player"""
     stats = await superpin_service.get_player_statistics(jugador_id, liga_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+        raise HTTPException(status_code=404, detail="Jugador not found")
     return stats
 
 

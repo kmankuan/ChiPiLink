@@ -108,7 +108,7 @@ async def update_banner(
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Banner no encontrado")
+        raise HTTPException(status_code=404, detail="Banner not found")
     
     updated = await db.category_banners.find_one({"banner_id": banner_id}, {"_id": 0})
     return updated
@@ -119,7 +119,7 @@ async def delete_banner(banner_id: str, admin: dict = Depends(get_admin_user)):
     """Delete banner (admin)"""
     result = await db.category_banners.delete_one({"banner_id": banner_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Banner no encontrado")
+        raise HTTPException(status_code=404, detail="Banner not found")
     return {"success": True}
 
 

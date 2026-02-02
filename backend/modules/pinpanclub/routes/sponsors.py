@@ -254,7 +254,7 @@ async def obtener_patrocinador(sponsor_id: str):
     )
     
     if not sponsor:
-        raise HTTPException(status_code=404, detail="Patrocinador no encontrado")
+        raise HTTPException(status_code=404, detail="Patrocinador not found")
     
     return sponsor
 
@@ -273,7 +273,7 @@ async def actualizar_patrocinador(sponsor_id: str, update: SponsorUpdate):
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Patrocinador no encontrado")
+        raise HTTPException(status_code=404, detail="Patrocinador not found")
     
     sponsor = await db.pingpong_sponsors.find_one(
         {"sponsor_id": sponsor_id},
@@ -291,7 +291,7 @@ async def eliminar_patrocinador(sponsor_id: str):
     result = await db.pingpong_sponsors.delete_one({"sponsor_id": sponsor_id})
     
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Patrocinador no encontrado")
+        raise HTTPException(status_code=404, detail="Patrocinador not found")
     
     return {"success": True, "message": "Patrocinador eliminado"}
 
@@ -460,7 +460,7 @@ async def upload_logo(
     # Check if sponsor exists
     sponsor = await db.pingpong_sponsors.find_one({"sponsor_id": sponsor_id})
     if not sponsor:
-        raise HTTPException(status_code=404, detail="Patrocinador no encontrado")
+        raise HTTPException(status_code=404, detail="Patrocinador not found")
     
     # Read and convert to base64
     content = await file.read()

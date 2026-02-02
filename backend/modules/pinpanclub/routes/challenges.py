@@ -29,7 +29,7 @@ async def get_challenge(challenge_id: str):
     """Get definición de a challenge"""
     challenge = await challenge_service.get_challenge(challenge_id)
     if not challenge:
-        raise HTTPException(status_code=404, detail="Reto no encontrado")
+        raise HTTPException(status_code=404, detail="Reto not found")
     return challenge
 
 
@@ -51,7 +51,7 @@ async def update_challenge(
     """Update a challenge (solo admin)"""
     challenge = await challenge_service.update_challenge(challenge_id, data)
     if not challenge:
-        raise HTTPException(status_code=404, detail="Reto no encontrado")
+        raise HTTPException(status_code=404, detail="Reto not found")
     return challenge
 
 

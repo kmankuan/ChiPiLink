@@ -37,7 +37,7 @@ async def create_public_order(pedido: OrderPublicCreate):
             "success": True,
             "pedido_id": order.pedido_id,
             "total": order.total,
-            "mensaje": "Pedido creado exitosamente"
+            "mensaje": "Pedido creado successfully"
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

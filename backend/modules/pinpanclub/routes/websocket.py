@@ -336,7 +336,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     
     match = await db.pingpong_matches.find_one({"partido_id": match_id})
     if not match:
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "Partido no encontrado"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "Partido not found"})
         return
     
     if match["estado"] != "en_curso":
@@ -510,7 +510,7 @@ async def handle_undo(match_id: str, arbiter_id: str):
     
     match = await db.pingpong_matches.find_one({"partido_id": match_id})
     if not match:
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "Partido no encontrado"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "Partido not found"})
         return
     
     historial = match.get("historial_puntos", [])

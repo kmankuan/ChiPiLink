@@ -544,7 +544,7 @@ class SuperPinService(BaseService):
         """Generar brackets para torneo de eliminación simple"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
-            raise ValueError("Torneo no encontrado")
+            raise ValueError("Torneo not found")
         
         participantes = tournament.get("participantes", [])
         num_players = len(participantes)
@@ -647,7 +647,7 @@ class SuperPinService(BaseService):
         """Actualizar resultado de un partido del torneo"""
         tournament = await self.tournament_repo.get_by_id(torneo_id)
         if not tournament:
-            raise ValueError("Torneo no encontrado")
+            raise ValueError("Torneo not found")
         
         brackets = tournament.get("brackets", [])
         match_found = False
@@ -668,7 +668,7 @@ class SuperPinService(BaseService):
                     break
         
         if not match_found:
-            raise ValueError("Partido no encontrado")
+            raise ValueError("Partido not found")
         
         # Avanzar ganador a la siguiente ronda
         next_round = current_round + 1
@@ -1318,7 +1318,7 @@ class SuperPinService(BaseService):
         stats_b = await self.get_player_statistics(jugador_b_id)
         
         if not stats_a or not stats_b:
-            return {"error": "Jugador no encontrado"}
+            return {"error": "Jugador not found"}
         
         # Obtener historial head-to-head
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)

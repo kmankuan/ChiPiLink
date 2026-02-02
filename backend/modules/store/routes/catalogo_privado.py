@@ -156,7 +156,7 @@ async def get_producto_detalle(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="No tienes acceso al catálogo privado"
+            detail="You do not have acceso al catálogo privado"
         )
     
     producto = await db.libros.find_one(
@@ -165,7 +165,7 @@ async def get_producto_detalle(
     )
     
     if not producto:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     
     return producto
 
@@ -185,7 +185,7 @@ async def get_productos_por_grado(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="No tienes acceso al catálogo privado"
+            detail="You do not have acceso al catálogo privado"
         )
     
     query = {
@@ -232,7 +232,7 @@ async def get_resumen_catalogo(
     if not acceso["tiene_acceso"]:
         raise HTTPException(
             status_code=403, 
-            detail="No tienes acceso al catálogo privado"
+            detail="You do not have acceso al catálogo privado"
         )
     
     resumen = []
@@ -354,7 +354,7 @@ async def admin_actualizar_producto_catalogo_privado(
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     
     producto = await db.libros.find_one({"libro_id": libro_id}, {"_id": 0})
     
@@ -376,13 +376,13 @@ async def admin_eliminar_producto_catalogo_privado(
             {"libro_id": libro_id, "es_catalogo_privado": True}
         )
         if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail="Producto no encontrado")
+            raise HTTPException(status_code=404, detail="Producto not found")
     else:
         result = await db.libros.update_one(
             {"libro_id": libro_id, "es_catalogo_privado": True},
             {"$set": {"activo": False, "fecha_eliminacion": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
-            raise HTTPException(status_code=404, detail="Producto no encontrado")
+            raise HTTPException(status_code=404, detail="Producto not found")
     
     return {"success": True, "message": "Producto eliminado"}

@@ -39,7 +39,7 @@ class OrderService(BaseService):
         for item in data.items:
             product = await self.product_repository.get_by_id(item.libro_id)
             if not product:
-                raise ValueError(f"Producto {item.libro_id} no encontrado")
+                raise ValueError(f"Producto {item.libro_id} not found")
             if product.get("cantidad_inventario", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario
@@ -91,7 +91,7 @@ class OrderService(BaseService):
         for item in data.items:
             product = await self.product_repository.get_by_id(item.libro_id)
             if not product:
-                raise ValueError(f"Producto {item.libro_id} no encontrado")
+                raise ValueError(f"Producto {item.libro_id} not found")
             if product.get("cantidad_inventario", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario

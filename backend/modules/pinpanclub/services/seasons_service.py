@@ -537,7 +537,7 @@ class RankingSeasonsService(BaseService):
         )
     
     async def ensure_active_season(self) -> Optional[Dict]:
-        """Asegurar que existe una temporada activa, crear si no existe"""
+        """Asegurar que existe una temporada activa, crear si does not exist"""
         current = await self.get_current_season()
         
         if current:

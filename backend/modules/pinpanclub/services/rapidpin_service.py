@@ -374,7 +374,7 @@ class RapidPinService(BaseService):
         """Confirmar un partido pendiente"""
         match = await self.match_repo.get_by_id(match_id)
         if not match:
-            raise ValueError("Partido no encontrado")
+            raise ValueError("Partido not found")
         
         if match["estado"] != RapidPinMatchStatus.PENDING:
             raise ValueError("El partido ya fue procesado")
@@ -390,7 +390,7 @@ class RapidPinService(BaseService):
         # Confirmar el partido
         success = await self.match_repo.confirm_match(match_id, confirmado_por_id)
         if not success:
-            raise ValueError("Error al confirmar el partido")
+            raise ValueError("Error confirmar el partido")
         
         # Aplicar puntos
         await self._apply_match_points(match)
@@ -723,7 +723,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Desafío no encontrado")
+            raise ValueError("Desafío not found")
         
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este desafío ya fue procesado")
@@ -786,7 +786,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Desafío no encontrado")
+            raise ValueError("Desafío not found")
         
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este desafío ya fue procesado")
@@ -861,7 +861,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido no encontrado en cola")
+            raise ValueError("Partido not found en cola")
         
         if queue_entry["status"] != "waiting":
             raise ValueError("Este partido no está esperando árbitro")
@@ -923,7 +923,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido no encontrado en cola")
+            raise ValueError("Partido not found en cola")
         
         if queue_entry["status"] != "assigned":
             raise ValueError("El partido debe tener árbitro asignado para completarse")
@@ -979,7 +979,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Partido no encontrado en cola")
+            raise ValueError("Partido not found en cola")
         
         if queue_entry["status"] in ["completed", "cancelled"]:
             raise ValueError("No se puede cancelar un partido ya completado o cancelado")
@@ -1187,7 +1187,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Reto no encontrado")
+            raise ValueError("Reto not found")
         
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
             raise ValueError("Este reto no está en fase de negociación de fecha")
@@ -1302,7 +1302,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Reto no encontrado")
+            raise ValueError("Reto not found")
         
         if queue_entry["status"] != "queued":
             raise ValueError("Este reto no está en cola")
@@ -1366,9 +1366,9 @@ class RapidPinService(BaseService):
         # Verificar que el reto existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
-            raise ValueError("Reto no encontrado")
+            raise ValueError("Reto not found")
         
-        # Verificar si ya existe el like
+        # Verificar si already exists el like
         existing = await db["rapidpin_reactions"].find_one({
             "queue_id": queue_id,
             "user_id": user_id,
@@ -1442,7 +1442,7 @@ class RapidPinService(BaseService):
         # Verificar que el reto existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
-            raise ValueError("Reto no encontrado")
+            raise ValueError("Reto not found")
         
         # Obtener config
         config = await self.get_comment_config()
@@ -1551,7 +1551,7 @@ class RapidPinService(BaseService):
         )
         
         if not comment:
-            raise ValueError("Comentario no encontrado")
+            raise ValueError("Comentario not found")
         
         update_data = {
             "updated_at": datetime.now(timezone.utc).isoformat(),

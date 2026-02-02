@@ -30,7 +30,7 @@ async def get_prize(prize_id: str):
     """Get definición de a prize"""
     prize = await prize_service.get_prize(prize_id)
     if not prize:
-        raise HTTPException(status_code=404, detail="Premio no encontrado")
+        raise HTTPException(status_code=404, detail="Premio not found")
     return prize
 
 
@@ -52,7 +52,7 @@ async def update_prize(
     """Update a prize (solo admin)"""
     prize = await prize_service.update_prize(prize_id, data)
     if not prize:
-        raise HTTPException(status_code=404, detail="Premio no encontrado")
+        raise HTTPException(status_code=404, detail="Premio not found")
     return prize
 
 

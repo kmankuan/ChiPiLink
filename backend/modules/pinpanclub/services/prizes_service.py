@@ -112,7 +112,7 @@ class PrizeService(BaseService):
         """Otorgar premio a un jugador"""
         prize = await self.definition_repo.get_by_id(prize_id)
         if not prize:
-            raise ValueError("Premio no encontrado")
+            raise ValueError("Premio not found")
         
         player = await self.player_repo.get_by_id(jugador_id)
         

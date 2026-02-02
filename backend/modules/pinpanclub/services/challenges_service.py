@@ -90,7 +90,7 @@ class ChallengeService(BaseService):
         week_number = now.isocalendar()[1]
         year = now.year
         
-        # Verificar si ya existe
+        # Verificar si already exists
         existing = await self.weekly_repo.get_by_week_year(week_number, year)
         if existing:
             return WeeklyChallengeSet(**existing)
@@ -156,7 +156,7 @@ class ChallengeService(BaseService):
         
         challenge = await self.definition_repo.get_by_id(challenge_id)
         if not challenge:
-            raise ValueError("Reto no encontrado")
+            raise ValueError("Reto not found")
         
         player = await self.player_repo.get_by_id(jugador_id)
         

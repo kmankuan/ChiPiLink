@@ -104,7 +104,7 @@ async def get_match(match_id: str):
     """Get partido por ID"""
     match = await rapidpin_service.get_match(match_id)
     if not match:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
+        raise HTTPException(status_code=404, detail="Partido not found")
     return match
 
 
@@ -171,7 +171,7 @@ async def get_player_stats(season_id: str, jugador_id: str):
     """Get estadísticas de a player en a season"""
     stats = await rapidpin_service.get_player_stats(season_id, jugador_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador no encontrado en esta temporada")
+        raise HTTPException(status_code=404, detail="Jugador not found en esta temporada")
     return stats
 
 

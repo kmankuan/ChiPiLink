@@ -83,7 +83,7 @@ async def get_product(libro_id: str):
     """Get producto por ID"""
     product = await product_service.get_product(libro_id)
     if not product:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return product
 
 
@@ -105,7 +105,7 @@ async def update_product(
     """Update producto (solo admin)"""
     product = await product_service.update_product(libro_id, data)
     if not product:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return product
 
 
@@ -117,7 +117,7 @@ async def deactivate_product(
     """Desactivar producto - soft delete (solo admin)"""
     success = await product_service.deactivate_product(libro_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return {"success": True, "message": "Producto desactivado"}
 
 
@@ -134,7 +134,7 @@ async def toggle_featured(
         ProductUpdate(destacado=destacado, orden_destacado=orden)
     )
     if not product:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return {"success": True}
 
 
@@ -151,5 +151,5 @@ async def toggle_promotion(
         ProductUpdate(en_promocion=en_promocion, precio_oferta=precio_oferta)
     )
     if not product:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return {"success": True}

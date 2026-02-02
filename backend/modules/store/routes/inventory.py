@@ -36,7 +36,7 @@ async def update_inventory(
     """Update inventario de un producto (admin)"""
     product = await product_service.update_inventory(libro_id, cantidad)
     if not product:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=404, detail="Producto not found")
     return {
         "success": True,
         "libro_id": libro_id,

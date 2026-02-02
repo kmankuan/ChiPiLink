@@ -126,7 +126,7 @@ class GoogleSheetsService:
         """
         config = await self.get_sync_config()
         
-        # Buscar si ya existe este sheet
+        # Buscar si already exists este sheet
         sheets = config.get("sheets", [])
         existing_idx = next(
             (i for i, s in enumerate(sheets) if s["sheet_id"] == sheet_id),
@@ -314,7 +314,7 @@ class GoogleSheetsService:
                             nombre = partes_nombre[0] if partes_nombre else ""
                             apellido = partes_nombre[1] if len(partes_nombre) > 1 else ""
                             
-                            # Buscar si ya existe
+                            # Buscar si already exists
                             existente = await db.estudiantes_sincronizados.find_one({
                                 "numero_estudiante": numero,
                                 "sheet_id": sheet_cfg["sheet_id"]
@@ -436,7 +436,7 @@ class GoogleSheetsService:
         )
         
         if result.matched_count == 0:
-            raise ValueError("Estudiante no encontrado")
+            raise ValueError("Estudiante not found")
         
         return {"success": True, "override_local": override}
     

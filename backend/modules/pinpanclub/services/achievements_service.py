@@ -19,7 +19,7 @@ class AchievementsService(BaseService):
     MODULE_NAME = "pinpanclub"
     
     async def initialize_achievements(self) -> int:
-        """Inicializar logros en la base de datos si no existen"""
+        """Inicializar logros en la base de datos si does not existn"""
         achievements = get_challenge_achievements()
         created = 0
         
@@ -68,7 +68,7 @@ class AchievementsService(BaseService):
         # Obtener estadísticas del jugador
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
-        # Obtener logros que el jugador aún no tiene
+        # Obtener logros que el jugador aún does not have
         player_achievements = await self.get_player_achievements(jugador_id)
         earned_ids = {pa["achievement_id"] for pa in player_achievements}
         

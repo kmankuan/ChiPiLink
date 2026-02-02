@@ -132,7 +132,7 @@ class BulkImportService:
                     continue
                 numeros_vistos.add(numero)
                 
-                # Verificar si ya existe en DB
+                # Verificar si already exists en DB
                 existente = await db.estudiantes_sincronizados.find_one(
                     {"numero_estudiante": numero}
                 )
@@ -360,7 +360,7 @@ class BulkImportService:
                     continue
                 codigos_vistos.add(codigo)
                 
-                # Verificar si ya existe
+                # Verificar si already exists
                 existente = await db.libros.find_one({"codigo": codigo})
                 
                 preview.append({

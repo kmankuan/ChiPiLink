@@ -107,7 +107,7 @@ async def obtener_layout(layout_id: str):
     )
     
     if not layout:
-        raise HTTPException(status_code=404, detail="Layout no encontrado")
+        raise HTTPException(status_code=404, detail="Layout not found")
     
     return layout
 
@@ -144,7 +144,7 @@ async def actualizar_layout(layout_id: str, update: LayoutUpdate):
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Layout no encontrado")
+        raise HTTPException(status_code=404, detail="Layout not found")
     
     layout = await db.pingpong_canvas_layouts.find_one(
         {"layout_id": layout_id},
@@ -162,7 +162,7 @@ async def eliminar_layout(layout_id: str):
     result = await db.pingpong_canvas_layouts.delete_one({"layout_id": layout_id})
     
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Layout no encontrado")
+        raise HTTPException(status_code=404, detail="Layout not found")
     
     return {"success": True, "message": "Layout eliminado"}
 
@@ -185,7 +185,7 @@ async def establecer_layout_default(layout_id: str):
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Layout no encontrado")
+        raise HTTPException(status_code=404, detail="Layout not found")
     
     return {"success": True, "message": "Layout establecido como predeterminado"}
 
@@ -319,7 +319,7 @@ async def crear_desde_preset(preset_id: str, name: str = "Nuevo Layout"):
     }
     
     if preset_id not in presets:
-        raise HTTPException(status_code=404, detail="Preset no encontrado")
+        raise HTTPException(status_code=404, detail="Preset not found")
     
     preset = presets[preset_id]
     layout_id = f"layout_{uuid.uuid4().hex[:12]}"

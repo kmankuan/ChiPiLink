@@ -86,7 +86,7 @@ async def update_comment(comment_id: str, data: CommentUpdate):
     """Update comentario"""
     result = await social_service.update_comment(comment_id, data.content)
     if not result:
-        raise HTTPException(status_code=404, detail="Comentario no encontrado")
+        raise HTTPException(status_code=404, detail="Comentario not found")
     return result
 
 
