@@ -44,7 +44,7 @@ import { cn } from '@/lib/utils';
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
 const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule'));
-const OrdersModule = lazy(() => import('@/modules/store/OrdersModule'));
+const TextbookOrdersAdminTab = lazy(() => import('@/modules/admin/store/TextbookOrdersAdminTab'));
 const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
 const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
