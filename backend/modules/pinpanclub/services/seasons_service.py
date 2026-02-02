@@ -197,7 +197,7 @@ class RankingSeasonsService(BaseService):
                 "$set": {
                     "status": SeasonStatus.COMPLETED.value,
                     "closed_at": now.isoformat(),
-                    "final_standings": qualified[:50],  # Top 50 en historial
+                    "final_standings": qualified[:50],  # Top 50 in history
                     "total_participants": total_participants,
                     "total_challenges_completed": total_challenges,
                     "total_points_earned": total_points
@@ -519,7 +519,7 @@ class RankingSeasonsService(BaseService):
             "zh": f"{year}年{month_names['zh'][month_idx]}月度赛季。争夺第一名！"
         }
         
-        # Seleccionar tema basado en mes
+        # Select theme based on month
         theme_map = {
             1: "winter", 2: "winter", 3: "spring",
             4: "spring", 5: "spring", 6: "summer",

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/sponsors", tags=["PinpanClub Sponsors"])
 
 class SponsorType(str, Enum):
     PRIMARY = "primary"       # Banner horizontal grande
-    SPECIAL = "special"       # Espacios cuadrados en header
+    SPECIAL = "special"       # Square spaces in header
     SECONDARY = "secondary"   # Others espacios
     ROTATING = "rotating"     # Rotación automática
 

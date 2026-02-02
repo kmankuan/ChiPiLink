@@ -422,7 +422,7 @@ class SuperPinService(BaseService):
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
-        # Guardar puntos en the match
+        # Save points in the match
         await self.match_repo.update_match(match["partido_id"], {
             "puntos_ganador": puntos_ganador,
             "puntos_perdedor": puntos_perdedor,
@@ -690,7 +690,7 @@ class SuperPinService(BaseService):
                             match["player_b"] = winner_info
                         break
         
-        # Update brackets en DB
+        # Update brackets in DB
         await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
         # Verify si the tournament terminó
@@ -915,7 +915,7 @@ class SuperPinService(BaseService):
     
     async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
         """Get jugadores con más badges"""
-        # This requiere agregación en MongoDB
+        # This requires MongoDB aggregation
         pipeline = [
             {"$group": {
                 "_id": "$jugador_id",
@@ -982,7 +982,7 @@ class SuperPinService(BaseService):
             rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
             rankings = [r for r in rankings if r]
         else:
-            # Search en all leagues activas
+            # Search in all active leagues
             leagues = await self.league_repo.get_all_leagues()
             rankings = []
             for league in leagues:
@@ -1273,7 +1273,7 @@ class SuperPinService(BaseService):
     
     async def get_quick_tournament_status(self, liga_id: str) -> Dict:
         """Get estado de partidos rápidos activos en una liga"""
-        # Search partidos tipo 'quick' en curso
+        # Search ongoing quick matches
         active_matches = await self.match_repo.find_many(
             query={
                 "liga_id": liga_id,
@@ -1323,7 +1323,7 @@ class SuperPinService(BaseService):
         # Get historial head-to-head
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
         
-        # Calculatesr probabilidad basada en ELO
+        # Calculate probability based on ELO
         elo_a = stats_a.get("player_info", {}).get("elo_rating", 1200)
         elo_b = stats_b.get("player_info", {}).get("elo_rating", 1200)
         

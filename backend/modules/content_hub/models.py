@@ -46,7 +46,7 @@ class ContentItemBase(BaseModel):
     source: str  # youtube, instagram, tiktok, wechat, xiaohongshu, telegram, facebook
     url_original: str  # Original content URL
     # Contenido embebido
-    embed_url: Optional[str] = None  # URL para embed (si aplica)
+    embed_url: Optional[str] = None  # URL for embed (if applicable)
     embed_code: Optional[str] = None  # Código HTML de embed
     thumbnail_url: Optional[str] = None  # Imagen de preview
     # Clasificación

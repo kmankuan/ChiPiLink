@@ -161,7 +161,7 @@ class MatchService(BaseService):
                     sets_b += 1
                     ganador_set = "b"
                 
-                # Guardar en historial
+                # Save to history
                 historial.append({
                     "set": set_actual,
                     "puntos_a": puntos_a,
@@ -174,7 +174,7 @@ class MatchService(BaseService):
                 puntos_b = 0
                 set_actual += 1
         
-        # Update en repository
+        # Update in repository
         await self.repository.update_score(
             partido_id, puntos_a, puntos_b,
             sets_a, sets_b, set_actual, historial

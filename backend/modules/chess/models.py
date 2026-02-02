@@ -57,12 +57,12 @@ class ChessGame(ChessGameBase):
     resultado: Optional[str] = None  # "1-0", "0-1", "1/2-1/2", None
     ganador_id: Optional[str] = None
     razon_fin: Optional[str] = None  # jaque_mate, abandono, tiempo, tablas_acuerdo, etc.
-    # Movimientos en notación algebraica
+    # Moves in algebraic notation
     pgn: Optional[str] = None  # Notación PGN completa
     movimientos: List[str] = []  # List of movimientos
     posicion_actual: Optional[str] = None  # Current position FEN
     # Tiempos
-    tiempo_blancas_ms: int = 600000  # Tiempo restante en milisegundos
+    tiempo_blancas_ms: int = 600000  # Remaining time in milliseconds
     tiempo_negras_ms: int = 600000
     turno: str = "blancas"  # blancas o negras
     # Fechas
@@ -98,7 +98,7 @@ class ChessPuzzle(BaseModel):
     model_config = ConfigDict(extra="ignore")
     puzzle_id: str = Field(default_factory=lambda: f"puzzle_{uuid.uuid4().hex[:12]}")
     titulo: Optional[str] = None
-    fen: str  # Posición inicial en FEN
+    fen: str  # Initial position in FEN
     solucion: List[str]  # Movimientos correctos
     dificultad: str = "medio"  # facil, medio, dificil, experto
     tema: Optional[str] = None  # mate_en_2, tactica, final, etc.

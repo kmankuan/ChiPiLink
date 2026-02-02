@@ -319,7 +319,7 @@ class RankRewardsService(BaseService):
                 action_url="/pinpanclub/challenges"
             ))
             
-            # Actividad en feed
+            # Feed activity
             activity_desc = {
                 "es": f"Ascendió al rango {rank_name}",
                 "en": f"Promoted to {rank_name} rank",

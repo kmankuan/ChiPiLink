@@ -158,7 +158,7 @@ class PrizeService(BaseService):
             action_url="/pinpanclub/prizes"
         ))
         
-        # Create actividad en feed
+        # Create feed activity
         await social_service.create_activity(ActivityFeedCreate(
             jugador_id=jugador_id,
             activity_type=ActivityType.PRIZE_WON,

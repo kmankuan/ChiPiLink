@@ -47,7 +47,7 @@ class SupervisedPerson(BaseModel):
     edad: Optional[int] = None
     # Monday.com link
     monday_user_id: Optional[str] = None
-    monday_assignee_name: Optional[str] = None  # Nombre en Monday
+    monday_assignee_name: Optional[str] = None  # Name in Monday
     # Preferences
     voz_preferida: Optional[str] = None
     volumen_personalizado: Optional[int] = None
@@ -66,7 +66,7 @@ class SupervisedTask(BaseModel):
     """Tarea supervisada (sincronizada con Monday.com)"""
     model_config = ConfigDict(extra="ignore")
     task_id: str = Field(default_factory=lambda: f"task_{uuid.uuid4().hex[:12]}")
-    monday_item_id: Optional[str] = None  # ID en Monday.com
+    monday_item_id: Optional[str] = None  # ID in Monday.com
     # Info
     titulo: str
     descripcion: Optional[str] = None
