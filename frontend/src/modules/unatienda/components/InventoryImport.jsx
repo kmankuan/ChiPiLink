@@ -360,7 +360,7 @@ export default function InventoryImport({ token, onImportComplete }) {
 
           <DialogFooter className="border-t pt-4">
             <Button variant="outline" onClick={() => setShowDialog(false)}>
-              Cancelar
+              Cancel
             </Button>
             <Button 
               onClick={handleImport} 
@@ -370,12 +370,12 @@ export default function InventoryImport({ token, onImportComplete }) {
               {importing ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Importando...
+                  Importing...
                 </>
               ) : (
                 <>
                   <Package className="h-4 w-4" />
-                  Importar {previewData?.valid_rows || 0} productos
+                  Import {previewData?.valid_rows || 0} products
                 </>
               )}
             </Button>
