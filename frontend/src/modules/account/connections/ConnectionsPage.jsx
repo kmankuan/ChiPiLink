@@ -54,7 +54,7 @@ export default function MisConexiones({ token }) {
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState([]);
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState([]);
   
-  // Estados para agregar conexión
+  // State for adding connection
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -66,7 +66,7 @@ export default function MisConexiones({ token }) {
   const [requestMessage, setRequestMessage] = useState('');
   const [sendingRequest, setSendingRequest] = useState(false);
   
-  // Estados para invitación
+  // State for invitation
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteName, setInviteName] = useState('');
