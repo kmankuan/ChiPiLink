@@ -67,7 +67,7 @@ class ChallengeDefinition(BaseModel):
     # Vigencia
     valid_from: Optional[str] = None
     valid_until: Optional[str] = None
-    duration_days: int = 7  # Duración por defecto: 1 semana
+    duration_days: int = 7  # Duración by default: 1 semana
     
     # Metadata
     created_by: Optional[str] = None  # Admin que lo creó (si es manual)

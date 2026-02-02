@@ -161,7 +161,7 @@ class RapidPinService(BaseService):
         """Create new season Rapid Pin"""
         season_dict = data.model_dump()
         
-        # Set premios por defecto if not provided
+        # Set premios by default if not provided
         if not season_dict.get("player_prizes"):
             season_dict["player_prizes"] = [p.model_dump() for p in get_default_player_prizes()]
         else:
@@ -236,7 +236,7 @@ class RapidPinService(BaseService):
         """Cerrar temporada y calcular resultados finales"""
         season = await self.get_season(season_id)
         if not season:
-            raise ValueError("Temporada no encontrada")
+            raise ValueError("Temporada not found")
         
         if season.estado != RapidPinSeasonStatus.ACTIVE:
             raise ValueError("La temporada ya está cerrada")
@@ -312,7 +312,7 @@ class RapidPinService(BaseService):
         # Validaciones
         season = await self.get_season(data.season_id)
         if not season:
-            raise ValueError("Temporada no encontrada")
+            raise ValueError("Temporada not found")
         
         if season.estado != RapidPinSeasonStatus.ACTIVE:
             raise ValueError("La temporada no está activa")
@@ -496,7 +496,7 @@ class RapidPinService(BaseService):
         """Get tabla de ranking completa"""
         season = await self.get_season(season_id)
         if not season:
-            raise ValueError("Temporada no encontrada")
+            raise ValueError("Temporada not found")
         
         entries = await self.ranking_repo.get_season_ranking(season_id)
         
@@ -566,7 +566,7 @@ class RapidPinService(BaseService):
         # Verify temporada activa
         season = await self.season_repo.get_by_id(season_id)
         if not season:
-            raise ValueError("Temporada no encontrada")
+            raise ValueError("Temporada not found")
         if season.get("estado") != "active":
             raise ValueError("La temporada no está activa")
         
@@ -581,7 +581,7 @@ class RapidPinService(BaseService):
             ]
         })
         if existing:
-            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
+            raise ValueError("Already exists un desafío o partido pendiente entre estos jugadores")
         
         # Get player info
         challenger_info = await self.player_repo.get_by_id(challenger_id)
@@ -649,7 +649,7 @@ class RapidPinService(BaseService):
         # Verify temporada activa
         season = await self.season_repo.get_by_id(season_id)
         if not season:
-            raise ValueError("Temporada no encontrada")
+            raise ValueError("Temporada not found")
         if season.get("estado") != "active":
             raise ValueError("La temporada no está activa")
         
@@ -1101,7 +1101,7 @@ class RapidPinService(BaseService):
         })
         
         if existing:
-            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
+            raise ValueError("Already exists un desafío o partido pendiente entre estos jugadores")
         
         # Get player info
         challenger_info = await self.player_repo.get_by_id(challenger_id)
@@ -1331,7 +1331,7 @@ class RapidPinService(BaseService):
         )
         
         if not config:
-            # Create configuración por defecto
+            # Create configuración by default
             config = {
                 "config_id": "comment_config",
                 "max_comment_length": 280,
@@ -1363,7 +1363,7 @@ class RapidPinService(BaseService):
         """Dar o quitar like a un reto"""
         db = await self.get_db()
         
-        # Verify que the challenge existe
+        # Verify that the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
@@ -1439,7 +1439,7 @@ class RapidPinService(BaseService):
         """Agregar comentario a un reto"""
         db = await self.get_db()
         
-        # Verify que the challenge existe
+        # Verify that the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
             raise ValueError("Reto not found")
@@ -1604,5 +1604,5 @@ class RapidPinService(BaseService):
         return await cursor.to_list(length=limit)
 
 
-# Instancia singleton
+# Singleton instance
 rapidpin_service = RapidPinService()

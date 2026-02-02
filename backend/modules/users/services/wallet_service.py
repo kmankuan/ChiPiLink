@@ -203,7 +203,7 @@ class WalletService(BaseService):
         )
         
         if not transaction:
-            raise ValueError("Transacción no encontrada")
+            raise ValueError("Transacción not found")
         
         if transaction["status"] != TransactionStatus.PENDING.value:
             raise ValueError(f"Transacción ya procesada: {transaction['status']}")
@@ -479,7 +479,7 @@ class WalletService(BaseService):
         to_wallet = await self.get_or_create_wallet(to_user_id)
         
         if not from_wallet:
-            raise ValueError("Billetera origen no encontrada")
+            raise ValueError("Billetera origen not found")
         
         # Verify saldo
         balance = from_wallet["balance_usd"] if currency == Currency.USD else from_wallet["balance_points"]

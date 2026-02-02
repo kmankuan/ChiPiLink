@@ -14,7 +14,7 @@ router = APIRouter(prefix="/categories", tags=["Store - Categories"])
 
 @router.get("", response_model=List[Category])
 async def get_categories():
-    """Get todas las categorías activas"""
+    """Get all categorías activas"""
     return await category_service.get_all_categories()
 
 
@@ -23,7 +23,7 @@ async def get_category(categoria_id: str):
     """Get categoría by ID"""
     category = await category_service.get_category(categoria_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+        raise HTTPException(status_code=404, detail="Categoría not found")
     return category
 
 
@@ -51,7 +51,7 @@ async def update_category(
     """Update categoría (solo admin)"""
     category = await category_service.update_category(categoria_id, data)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+        raise HTTPException(status_code=404, detail="Categoría not found")
     return category
 
 
@@ -64,7 +64,7 @@ async def delete_category(
     try:
         success = await category_service.delete_category(categoria_id)
         if not success:
-            raise HTTPException(status_code=404, detail="Categoría no encontrada")
+            raise HTTPException(status_code=404, detail="Categoría not found")
         return {"success": True, "message": "Categoría eliminada"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

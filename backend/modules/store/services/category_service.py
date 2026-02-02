@@ -34,7 +34,7 @@ class CategoryService(BaseService):
         return Category(**result) if result else None
     
     async def get_all_categories(self) -> List[Category]:
-        """Get todas las categorías activas"""
+        """Get all categorías activas"""
         results = await self.repository.get_all_active()
         return [Category(**r) for r in results]
     

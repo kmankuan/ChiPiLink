@@ -33,7 +33,7 @@ class ConexionesService:
             if not existing:
                 await db.config_permisos_relacion.insert_one(perm)
         
-        # Capabilityes
+        # Capabilities
         capacidades = get_default_capacidades()
         for cap in capacidades:
             existing = await db.capacidades_config.find_one({"capacidad_id": cap["capacidad_id"]})
@@ -47,7 +47,7 @@ class ConexionesService:
             if not existing:
                 await db.membresias_config.insert_one(mem)
         
-        logger.info("Configuraciones por defecto inicializadas")
+        logger.info("Configuraciones by default inicializadas")
     
     # ============== GESTIÓN DE CONEXIONES ==============
     
@@ -63,7 +63,7 @@ class ConexionesService:
         
         conexiones = user.get("conexiones", [])
         
-        # Enriquecer con datos of the user conectado
+        # Enrich with data of the user conectado
         for con in conexiones:
             connected_user = await db.auth_users.find_one(
                 {"user_id": con["user_id"]},
@@ -99,27 +99,27 @@ class ConexionesService:
         Crear una conexión entre usuarios.
         Si requiere_solicitud=True, crea solicitud en lugar de conexión directa.
         """
-        # Verify que destidoes not exist
+        # Verify destination exists
         destino = await db.auth_users.find_one({"user_id": destino_user_id})
         if not destino:
             return {"error": "Usuario destino not found"}
         
-        # Verify que does not exist conexión
+        # Verify connection does not exist
         existing = await db.auth_users.find_one({
             "user_id": user_id,
             "conexiones.user_id": destino_user_id
         })
         if existing:
-            return {"error": "Ya existe una conexión con este usuario"}
+            return {"error": "Already exists una conexión con este usuario"}
         
-        # Get permisos por defecto si no se especifican
+        # Get default permissions si no se especifican
         if not permisos:
             # For acudiente→acudido, el acudiente tiene permisos completos
             if subtipo == "acudido":
                 # The acudiente tiene permisos sobre el acudido
                 config = await db.config_permisos_relacion.find_one({
                     "tipo": "especial",
-                    "subtipo": "acudiente"  # Permissions del acudiente
+                    "subtipo": "acudiente"  # Guardian permissions
                 })
             else:
                 config = await db.config_permisos_relacion.find_one({
@@ -144,13 +144,13 @@ class ConexionesService:
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
         
-        # Add conexión al usuario
+        # Add connection to user
         await db.auth_users.update_one(
             {"user_id": user_id},
             {"$push": {"conexiones": conexion}}
         )
         
-        # Create conexión recíproca (con permisos inversos si aplica)
+        # Create reciprocal connection (con permisos inversos si aplica)
         conexion_reciproca = {
             "conexion_id": f"con_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{user_id[-6:]}",
             "user_id": user_id,
@@ -170,7 +170,7 @@ class ConexionesService:
         return {"success": True, "conexion": conexion}
     
     def _get_subtipo_reciproco(self, subtipo: str) -> str:
-        """Get el subtipo recíproco de una relación"""
+        """Get the reciprocal subtype de una relación"""
         reciprocos = {
             "acudiente": "acudido",
             "acudido": "acudiente",
@@ -186,10 +186,10 @@ class ConexionesService:
         return reciprocos.get(subtipo, subtipo)
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
-        """Get permisos recíprocos (generalmente más limitados)"""
+        """Get reciprocal permissions (generalmente más limitados)"""
         # By defecto, el recíproco tiene permisos mínimos
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
-            # The dependiente no tiene permisos sobre el acudiente
+            # The dependent has no permissions sobre el acudiente
             return {
                 "transferir_wallet": False,
                 "ver_wallet": False,
@@ -216,7 +216,7 @@ class ConexionesService:
         )
         
         if result.modified_count == 0:
-            return {"error": "Conexión no encontrada"}
+            return {"error": "Conexión not found"}
         
         return {"success": True}
     
@@ -225,7 +225,7 @@ class ConexionesService:
         # Get conexión para saber el user_id destino
         conexion = await self.get_conexion(user_id, conexion_id)
         if not conexion:
-            return {"error": "Conexión no encontrada"}
+            return {"error": "Conexión not found"}
         
         destino_user_id = conexion["user_id"]
         
@@ -254,13 +254,13 @@ class ConexionesService:
         mensaje: Optional[str] = None
     ) -> Dict:
         """Create solicitud de conexión"""
-        # Verify que does not exist conexión ni solicitud pendiente
+        # Verify connection does not exist ni solicitud pendiente
         existing_conexion = await db.auth_users.find_one({
             "user_id": de_usuario_id,
             "conexiones.user_id": para_usuario_id
         })
         if existing_conexion:
-            return {"error": "Ya existe una conexión con este usuario"}
+            return {"error": "Already exists una conexión con este usuario"}
         
         existing_solicitud = await db.solicitudes_conexion.find_one({
             "de_usuario_id": de_usuario_id,
@@ -268,9 +268,9 @@ class ConexionesService:
             "estado": "pendiente"
         })
         if existing_solicitud:
-            return {"error": "Ya existe una solicitud pendiente"}
+            return {"error": "Already exists una solicitud pendiente"}
         
-        # Get nombres
+        # Get names
         de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id}, {"nombre": 1, "apellido": 1})
         para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id}, {"nombre": 1, "apellido": 1})
         
@@ -296,7 +296,7 @@ class ConexionesService:
         # Remove MongoDB _id before returning
         solicitud.pop("_id", None)
         
-        # Send notificación push al destinatario
+        # Send push notification al destinatario
         push_result = None
         try:
             from modules.notifications.services.push_service import push_notification_service
@@ -366,7 +366,7 @@ class ConexionesService:
         """Responder a una solicitud de conexión"""
         solicitud = await db.solicitudes_conexion.find_one({"solicitud_id": solicitud_id})
         if not solicitud:
-            return {"error": "Solicitud no encontrada"}
+            return {"error": "Solicitud not found"}
         
         if solicitud["estado"] != "pendiente":
             return {"error": "Solicitud ya fue respondida"}
@@ -395,7 +395,7 @@ class ConexionesService:
             if result.get("error"):
                 return result
         
-        # Send notificación push al solicitante original
+        # Send push notification al solicitante original
         push_result = None
         try:
             from modules.notifications.services.push_service import push_notification_service
@@ -445,7 +445,7 @@ class ConexionesService:
         """Create invitación para usuario no registrado"""
         import uuid
         
-        # Verify que email no está registrado
+        # Verify that email no está registrado
         existing = await db.auth_users.find_one({"email": email.lower()})
         if existing:
             return {"error": "Este email ya está registrado", "user_id": existing.get("user_id")}
@@ -456,7 +456,7 @@ class ConexionesService:
             "estado": "pendiente"
         })
         if existing_inv:
-            return {"error": "Ya existe una invitación pendiente para este email"}
+            return {"error": "Already exists una invitación pendiente para este email"}
         
         # Get name of the invitador
         invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
@@ -507,7 +507,7 @@ class ConexionesService:
             }}
         )
         
-        # Create conexión si se especificó
+        # Create connection si se especificó
         if invitacion.get("tipo_relacion_propuesta"):
             await self.crear_conexion(
                 user_id=invitacion["invitado_por_id"],
@@ -583,7 +583,7 @@ class ConexionesService:
         
         await db.auth_users.insert_one(acudido)
         
-        # Create conexión con acudiente
+        # Create connection con acudiente
         await self.crear_conexion(
             user_id=acudiente_id,
             destino_user_id=new_user_id,
@@ -842,7 +842,7 @@ class ConexionesService:
     # ============== CAPACIDADES ==============
     
     async def get_capacidades_config(self) -> List[Dict]:
-        """Get todas las capacidades configuradas"""
+        """Get all capacidades configuradas"""
         cursor = db.capacidades_config.find({"activa": True}, {"_id": 0}).sort("orden", 1)
         return await cursor.to_list(length=100)
     
@@ -888,12 +888,12 @@ class ConexionesService:
         tipo: str = "beneficio_extendido"
     ) -> Dict:
         """Otorgar capacidad a un usuario (admin)"""
-        # Verify que capacidad existe
+        # Verify that capacidad existe
         capacidad_config = await db.capacidades_config.find_one({"capacidad_id": capacidad_id})
         if not capacidad_config:
-            return {"error": "Capacidad no encontrada"}
+            return {"error": "Capacidad not found"}
         
-        # Verify que usuario no la tiene
+        # Verify that usuario no la tiene
         existing = await db.auth_users.find_one({
             "user_id": user_id,
             "capacidades.capacidad_id": capacidad_id,
@@ -926,7 +926,7 @@ class ConexionesService:
         )
         
         if result.modified_count == 0:
-            return {"error": "Capacidad no encontrada"}
+            return {"error": "Capacidad not found"}
         
         return {"success": True}
     
@@ -942,14 +942,14 @@ class ConexionesService:
         if not marketing.get("mostrar_servicios", True):
             return []
         
-        # Get membresías activas of the user
+        # Get active memberships of the user
         suscripciones = await db.suscripciones_usuarios.find(
             {"user_id": user_id, "estado": "activo"},
             {"membresia_id": 1}
         ).to_list(length=50)
         membresias_activas = [s["membresia_id"] for s in suscripciones]
         
-        # Get todas las membresías
+        # Get all membresías
         query = {"activa": True}
         servicios_sugeridos = marketing.get("servicios_sugeridos")
         servicios_excluidos = marketing.get("servicios_excluidos", [])
@@ -966,7 +966,7 @@ class ConexionesService:
         cursor = db.membresias_config.find(query, {"_id": 0}).sort("orden", 1)
         membresias = await cursor.to_list(length=20)
         
-        # Filtrar las que ya tiene
+        # Filter out already owned
         return [m for m in membresias if m["membresia_id"] not in membresias_activas]
     
     async def configurar_marketing_usuario(
@@ -1020,5 +1020,5 @@ class ConexionesService:
         return await cursor.to_list(length=limit)
 
 
-# Instancia global
+# Global instance
 conexiones_service = ConexionesService()

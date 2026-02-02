@@ -382,7 +382,7 @@ class PointsHistory(BaseModel):
 # ============== FUNCIONES DE UTILIDAD ==============
 
 def get_default_points_config() -> Dict:
-    """Configuración por defecto de ChipiPoints"""
+    """Configuración by default de ChipiPoints"""
     return {
         "config_id": "chipipoints_config",
         "points_per_dollar": 100,
@@ -398,7 +398,7 @@ def get_default_points_config() -> Dict:
 
 
 def get_default_earn_rules() -> List[Dict]:
-    """Reglas por defecto to win puntos"""
+    """Reglas by default to win puntos"""
     return [
         {
             "rule_id": "rule_purchase",

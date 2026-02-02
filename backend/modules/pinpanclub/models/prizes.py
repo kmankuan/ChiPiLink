@@ -146,7 +146,7 @@ class PrizeCatalog(BaseModel):
 # ============== DEFAULT PRIZES ==============
 
 def get_default_prize_catalog() -> List[Dict]:
-    """Catálogo de premios por defecto"""
+    """Catálogo de premios by default"""
     return [
         {
             "name": "Campeón de Temporada",

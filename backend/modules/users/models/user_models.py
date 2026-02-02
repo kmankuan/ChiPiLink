@@ -400,7 +400,7 @@ class UserVisit(BaseModel):
 # ============== UTILITY FUNCTIONS ==============
 
 def get_default_user_types() -> List[Dict]:
-    """Tipos de usuario por defecto"""
+    """Tipos de usuario by default"""
     return [
         {
             "type_id": "utype_customer",
@@ -494,7 +494,7 @@ def get_default_user_types() -> List[Dict]:
 
 
 def get_default_profile_fields() -> List[Dict]:
-    """Campos de perfil por defecto"""
+    """Campos de perfil by default"""
     return [
         # Contacto
         {

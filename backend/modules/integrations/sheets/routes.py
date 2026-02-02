@@ -82,7 +82,7 @@ async def get_sheet_config(config_id: str, admin: dict = Depends(get_admin_user)
     """Get a specific sheet sync configuration"""
     config = await db.sheet_configs.find_one({"config_id": config_id}, {"_id": 0})
     if not config:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     return config
 
 
@@ -155,7 +155,7 @@ async def update_sheet_config(config_id: str, config: dict, admin: dict = Depend
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     
     updated = await db.sheet_configs.find_one({"config_id": config_id}, {"_id": 0})
     return updated
@@ -170,7 +170,7 @@ async def toggle_column_lock(config_id: str, columna_id: str, locked: bool, admi
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n o columna no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n o columna not found")
     
     return {"success": True, "locked": locked}
 
@@ -180,7 +180,7 @@ async def delete_sheet_config(config_id: str, admin: dict = Depends(get_admin_us
     """Delete a sheet sync configuration and its data"""
     result = await db.sheet_configs.delete_one({"config_id": config_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     
     # Also delete synced data
     await db.estudiantes_sincronizados.delete_many({"config_id": config_id})
@@ -195,7 +195,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
     """Manually trigger sync for a configuration"""
     config = await db.sheet_configs.find_one({"config_id": config_id})
     if not config:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     
     try:
         # Fetch fresh data
@@ -354,7 +354,7 @@ async def preview_sheet_data(config_id: str, admin: dict = Depends(get_admin_use
     """Preview current sheet data without syncing"""
     config = await db.sheet_configs.find_one({"config_id": config_id})
     if not config:
-        raise HTTPException(status_code=404, detail="Configuraci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     
     try:
         data = await fetch_sheet_data(config["sheet_id"], config.get("gid", "0"))

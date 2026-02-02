@@ -72,7 +72,7 @@ class LayoutRepository(BaseRepository):
         return await self.find_by_id(self.ID_FIELD, layout_id)
     
     async def get_default(self) -> Optional[Dict]:
-        """Get layout por defecto"""
+        """Get layout by default"""
         return await self.find_one({"is_default": True})
     
     async def update_layout(self, layout_id: str, data: Dict) -> bool:

@@ -51,7 +51,7 @@ class ContentBlockType(str, Enum):
 
 
 def get_default_notification_categories() -> List[Dict]:
-    """Categorías de notificación por defecto"""
+    """Categorías de notificación by default"""
     return [
         {
             "category_id": "cat_qr_payments",
@@ -277,7 +277,7 @@ def get_default_notification_categories() -> List[Dict]:
 
 
 def get_default_provider_config() -> Dict:
-    """Configuración por defecto de proveedores"""
+    """Configuración by default de proveedores"""
     return {
         "config_id": "push_providers_config",
         "fcm": {
@@ -314,7 +314,7 @@ def get_default_provider_config() -> Dict:
 
 
 def get_default_notification_templates() -> List[Dict]:
-    """Plantillas de notificación por defecto"""
+    """Plantillas de notificación by default"""
     return [
         {
             "template_id": "tpl_qr_payment_received",

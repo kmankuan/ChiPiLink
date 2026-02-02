@@ -340,5 +340,5 @@ class SocialService(BaseService):
         return True
 
 
-# Instancia singleton
+# Singleton instance
 social_service = SocialService()

@@ -77,7 +77,7 @@ class GoogleSheetsService:
         )
         
         if not config:
-            # Create configuración por defecto
+            # Create configuración by default
             config = {
                 "config_id": "google_sheets_sync_config",
                 "service_account_email": None,
@@ -163,7 +163,7 @@ class GoogleSheetsService:
                 spreadsheetId=sheet_id
             ).execute()
             
-            # Get nombres de las hojas
+            # Get names de las hojas
             hojas = [
                 {
                     "nombre": sheet["properties"]["title"],

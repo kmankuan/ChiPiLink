@@ -231,7 +231,7 @@ async def get_board_structure(board_id: str, admin: dict = Depends(get_admin_use
     board = await get_board_columns(board_id)
     
     if not board:
-        raise HTTPException(status_code=404, detail="Tablero no encontrado")
+        raise HTTPException(status_code=404, detail="Tablero not found")
     
     return board
 
@@ -342,7 +342,7 @@ async def sync_match_to_monday(
     match = await db.pingpong_matches.find_one({"partido_id": partido_id}, {"_id": 0})
     
     if not match:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
+        raise HTTPException(status_code=404, detail="Partido not found")
     
     # Obtener información de jugadores
     player_a = await db.pingpong_players.find_one(

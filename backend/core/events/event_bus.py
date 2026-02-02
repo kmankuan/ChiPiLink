@@ -212,7 +212,7 @@ class EventBus:
         logger.info("EventBus started")
 
 
-# Instancia global del Event Bus
+# Global instance del Event Bus
 event_bus = EventBus()
 
 

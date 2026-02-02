@@ -288,7 +288,7 @@ class AlertaWallet(BaseModel):
 # ============== CONFIGURACIÓN DE PERMISOS POR RELACIÓN ==============
 
 class ConfigPermisosRelacion(BaseModel):
-    """Configuración de permisos por defecto para un tipo de relación"""
+    """Configuración de permisos by default para un tipo de relación"""
     tipo: TipoRelacion
     subtipo: str
     permisos_default: PermisosConexion
@@ -307,7 +307,7 @@ class MarketingConfig(BaseModel):
 # ============== FUNCIONES HELPER ==============
 
 def get_default_permisos_por_relacion() -> List[Dict]:
-    """Retorna configuración por defecto de permisos por relación"""
+    """Retorna configuración by default de permisos por relación"""
     return [
         {
             "tipo": "especial",
@@ -381,7 +381,7 @@ def get_default_permisos_por_relacion() -> List[Dict]:
 
 
 def get_default_capacidades() -> List[Dict]:
-    """Retorna capacidades por defecto del sistema"""
+    """Retorna capacidades by default del sistema"""
     return [
         {
             "capacidad_id": "cliente",
@@ -457,7 +457,7 @@ def get_default_capacidades() -> List[Dict]:
 
 
 def get_default_membresias() -> List[Dict]:
-    """Retorna membresías (productos) por defecto del sistema"""
+    """Retorna membresías (productos) by default del sistema"""
     return [
         {
             "membresia_id": "pinpanclub",

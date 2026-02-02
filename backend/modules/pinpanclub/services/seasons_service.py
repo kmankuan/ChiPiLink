@@ -468,7 +468,7 @@ class RankingSeasonsService(BaseService):
     # ============== PLAYER REWARDS ==============
     
     async def get_player_season_rewards(self, jugador_id: str) -> List[Dict]:
-        """Get todas las recompensas de temporada de un jugador"""
+        """Get all recompensas de temporada de un jugador"""
         cursor = db.pinpanclub_season_rewards.find(
             {"jugador_id": jugador_id},
             {"_id": 0}

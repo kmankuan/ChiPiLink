@@ -24,7 +24,7 @@ async def setup_admin(admin_data: dict):
     """Initial admin setup - only works if no admin exists"""
     existing_admin = await db.users.find_one({"es_admin": True})
     if existing_admin:
-        raise HTTPException(status_code=400, detail="Ya existe un administrador")
+        raise HTTPException(status_code=400, detail="Already exists un administrador")
     
     admin_doc = {
         "user_id": f"admin_{uuid.uuid4().hex[:8]}",
@@ -132,7 +132,7 @@ async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_use
         {"$set": {"leida": True}}
     )
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Notificaci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Notificaci\u00f3n not found")
     return {"success": True}
 
 
@@ -151,7 +151,7 @@ async def delete_notificacion(notificacion_id: str, admin: dict = Depends(get_ad
     """Delete a notification"""
     result = await db.notificaciones.delete_one({"notificacion_id": notificacion_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Notificaci\u00f3n no encontrada")
+        raise HTTPException(status_code=404, detail="Notificaci\u00f3n not found")
     return {"success": True}
 
 

@@ -171,7 +171,7 @@ async def update_supervised_person(
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Persona no encontrada")
+        raise HTTPException(status_code=404, detail="Persona not found")
     
     updated = await db.supervised_people.find_one({"person_id": person_id}, {"_id": 0})
     return updated
@@ -209,7 +209,7 @@ async def complete_task(task_id: str):
     
     task = await db.supervised_tasks.find_one({"task_id": task_id})
     if not task:
-        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        raise HTTPException(status_code=404, detail="Tarea not found")
     
     # Calculate if completed on time
     on_time = True
@@ -336,7 +336,7 @@ async def get_person_progress(
     """Get progress for a supervised person"""
     person = await db.supervised_people.find_one({"person_id": person_id}, {"_id": 0})
     if not person:
-        raise HTTPException(status_code=404, detail="Persona no encontrada")
+        raise HTTPException(status_code=404, detail="Persona not found")
     
     # Get daily progress for last N days
     progress = await db.daily_progress.find(

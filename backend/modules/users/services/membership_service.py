@@ -27,7 +27,7 @@ class MembershipService:
     # ============== PLAN CONFIGURATION ==============
     
     async def initialize_default_plans(self) -> int:
-        """Inicializar planes de membresía por defecto"""
+        """Inicializar planes de membresía by default"""
         defaults = self._get_default_plans()
         created = 0
         
@@ -45,7 +45,7 @@ class MembershipService:
         return created
     
     def _get_default_plans(self) -> List[Dict]:
-        """Planes por defecto"""
+        """Planes by default"""
         return [
             {
                 "plan_id": "plan_visits_12",

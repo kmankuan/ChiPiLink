@@ -171,7 +171,7 @@ async def get_player_season_stats(jugador_id: str, season_id: str):
 
 @router.get("/player/{jugador_id}/rewards")
 async def get_player_season_rewards(jugador_id: str):
-    """Get todas las recompensas de temporada de a player"""
+    """Get all recompensas de temporada de a player"""
     rewards = await seasons_service.get_player_season_rewards(jugador_id)
     
     return {

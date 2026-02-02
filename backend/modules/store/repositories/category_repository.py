@@ -44,7 +44,7 @@ class CategoryRepository(BaseRepository):
         return await self.find_by_id(self.ID_FIELD, categoria_id)
     
     async def get_all_active(self) -> List[Dict]:
-        """Get todas las categorías activas"""
+        """Get all categorías activas"""
         categories = await self.find_many(
             query={"activo": True},
             sort=[("orden", 1)]

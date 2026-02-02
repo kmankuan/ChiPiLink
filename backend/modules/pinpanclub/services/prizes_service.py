@@ -70,12 +70,12 @@ class PrizeService(BaseService):
     # ============== PRIZE CATALOG ==============
     
     async def get_or_create_default_catalog(self) -> PrizeCatalog:
-        """Get o crear catálogo por defecto"""
+        """Get o crear catálogo by default"""
         existing = await self.catalog_repo.get_active_catalog()
         if existing:
             return PrizeCatalog(**existing)
         
-        # Create premios por defecto
+        # Create premios by default
         default_prizes = get_default_prize_catalog()
         prize_defs = []
         
@@ -290,5 +290,5 @@ class PrizeService(BaseService):
         return await self.update_prize_status(award_id, PrizeStatus.DELIVERED)
 
 
-# Instancia singleton
+# Singleton instance
 prize_service = PrizeService()

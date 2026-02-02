@@ -187,7 +187,7 @@ class PushNotificationService:
     # ============== CATEGORIES ==============
     
     async def initialize_categories(self) -> int:
-        """Inicializar categorías por defecto"""
+        """Inicializar categorías by default"""
         defaults = get_default_notification_categories()
         created = 0
         
@@ -263,7 +263,7 @@ class PushNotificationService:
     # ============== TEMPLATES ==============
     
     async def initialize_templates(self) -> int:
-        """Inicializar plantillas por defecto"""
+        """Inicializar plantillas by default"""
         defaults = get_default_notification_templates()
         created = 0
         
@@ -307,7 +307,7 @@ class PushNotificationService:
         if prefs:
             return prefs
         
-        # Create preferencias por defecto
+        # Create preferencias by default
         categories = await self.get_categories()
         default_prefs = {
             "user_id": user_id,

@@ -20,7 +20,7 @@ class UserProfileService(BaseService):
     # ============== USER TYPES ==============
     
     async def initialize_user_types(self) -> int:
-        """Inicializar tipos de usuario por defecto"""
+        """Inicializar tipos de usuario by default"""
         defaults = get_default_user_types()
         created = 0
         
@@ -83,7 +83,7 @@ class UserProfileService(BaseService):
     # ============== PROFILE FIELDS ==============
     
     async def initialize_profile_fields(self) -> int:
-        """Inicializar campos de perfil por defecto"""
+        """Inicializar campos de perfil by default"""
         defaults = get_default_profile_fields()
         created = 0
         
@@ -314,7 +314,7 @@ class UserProfileService(BaseService):
         return relationship
     
     async def get_user_relationships(self, user_id: str) -> List[Dict]:
-        """Get todas las relaciones de un usuario"""
+        """Get all relaciones de un usuario"""
         cursor = db.chipi_user_relationships.find(
             {
                 "$or": [

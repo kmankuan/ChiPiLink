@@ -125,7 +125,7 @@ class SeasonReward(BaseModel):
 # ============== DEFINICIONES DE RECOMPENSAS POR DEFECTO ==============
 
 def get_default_season_rewards() -> List[Dict]:
-    """Recompensas por defecto para temporadas"""
+    """Recompensas by default para temporadas"""
     return [
         {
             "tier_name": "champion",

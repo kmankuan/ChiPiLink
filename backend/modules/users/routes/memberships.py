@@ -127,7 +127,7 @@ async def delete_plan(
 
 @router.post("/plans/initialize")
 async def initialize_plans(admin=Depends(get_admin_user)):
-    """Inicializar planes por defecto (admin)"""
+    """Inicializar planes by default (admin)"""
     count = await membership_service.initialize_default_plans()
     return {"success": True, "initialized": count}
 
@@ -193,7 +193,7 @@ async def get_membership(
     if not membership:
         raise HTTPException(status_code=404, detail="Membership not found")
     
-    # Verify que pertenece al usuario
+    # Verify ownership al usuario
     if membership["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not your membership")
     

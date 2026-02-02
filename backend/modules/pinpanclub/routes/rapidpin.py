@@ -32,7 +32,7 @@ async def get_season(season_id: str):
     """Get temporada by ID"""
     season = await rapidpin_service.get_season(season_id)
     if not season:
-        raise HTTPException(status_code=404, detail="Temporada no encontrada")
+        raise HTTPException(status_code=404, detail="Temporada not found")
     return season
 
 
@@ -54,7 +54,7 @@ async def update_season(
     """Update temporada (solo admin)"""
     season = await rapidpin_service.update_season(season_id, data)
     if not season:
-        raise HTTPException(status_code=404, detail="Temporada no encontrada")
+        raise HTTPException(status_code=404, detail="Temporada not found")
     return season
 
 

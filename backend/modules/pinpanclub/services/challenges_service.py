@@ -374,5 +374,5 @@ class ChallengeService(BaseService):
         return entry.get("rank") if entry else None
 
 
-# Instancia singleton
+# Singleton instance
 challenge_service = ChallengeService()

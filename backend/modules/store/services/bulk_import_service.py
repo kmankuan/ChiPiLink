@@ -86,7 +86,7 @@ class BulkImportService:
                     "grado": 2,              # Columna C (opcional si hay grado_default)
                     "seccion": 3             # Columna D (opcional)
                 }
-            grado_default: Grado por defecto si no está en los datos
+            grado_default: Grado by default si no está en los datos
         
         Returns:
             Previsualización con validaciones

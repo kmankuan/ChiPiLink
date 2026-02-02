@@ -129,7 +129,7 @@ async def update_user_type(
 
 @router.post("/types/initialize")
 async def initialize_user_types(admin=Depends(get_admin_user)):
-    """Inicializar tipos de usuario por defecto (admin)"""
+    """Inicializar tipos de usuario by default (admin)"""
     count = await user_profile_service.initialize_user_types()
     return {"success": True, "initialized": count}
 
@@ -179,7 +179,7 @@ async def update_profile_field(
 
 @router.post("/fields/initialize")
 async def initialize_profile_fields(admin=Depends(get_admin_user)):
-    """Inicializar campos de perfil por defecto (admin)"""
+    """Inicializar campos de perfil by default (admin)"""
     count = await user_profile_service.initialize_profile_fields()
     return {"success": True, "initialized": count}
 

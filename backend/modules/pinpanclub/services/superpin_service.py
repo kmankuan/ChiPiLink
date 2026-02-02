@@ -71,7 +71,7 @@ class SuperPinService(BaseService):
         return SuperPinLeague(**result)
     
     def _default_prizes(self) -> List[Dict]:
-        """Premios por defecto"""
+        """Premios by default"""
         return [
             {"name": "Campeón", "position": 1, "icon": "🥇"},
             {"name": "Subcampeón", "position": 2, "icon": "🥈"},
@@ -459,7 +459,7 @@ class SuperPinService(BaseService):
         """Get tabla de ranking"""
         league = await self.get_league(liga_id)
         if not league:
-            raise ValueError("Liga no encontrada")
+            raise ValueError("Liga not found")
         
         entries = await self.ranking_repo.get_league_ranking(liga_id)
         
@@ -501,7 +501,7 @@ class SuperPinService(BaseService):
         """Create torneo de fin de temporada"""
         league = await self.get_league(data.liga_id)
         if not league:
-            raise ValueError("Liga no encontrada")
+            raise ValueError("Liga not found")
         
         # Get participantes según configuración
         ranking = await self.get_ranking(data.liga_id)
@@ -1427,5 +1427,5 @@ class SuperPinService(BaseService):
         }
 
 
-# Instancia singleton
+# Singleton instance
 superpin_service = SuperPinService()

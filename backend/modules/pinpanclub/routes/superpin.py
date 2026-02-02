@@ -34,7 +34,7 @@ async def get_league(liga_id: str):
     """Get liga by ID"""
     league = await superpin_service.get_league(liga_id)
     if not league:
-        raise HTTPException(status_code=404, detail="Liga no encontrada")
+        raise HTTPException(status_code=404, detail="Liga not found")
     return league
 
 
@@ -56,7 +56,7 @@ async def update_league(
     """Update liga (solo admin)"""
     league = await superpin_service.update_league(liga_id, data)
     if not league:
-        raise HTTPException(status_code=404, detail="Liga no encontrada")
+        raise HTTPException(status_code=404, detail="Liga not found")
     return league
 
 
@@ -68,7 +68,7 @@ async def activate_league(
     """Activar liga (solo admin)"""
     league = await superpin_service.activate_league(liga_id)
     if not league:
-        raise HTTPException(status_code=404, detail="Liga no encontrada")
+        raise HTTPException(status_code=404, detail="Liga not found")
     return league
 
 
@@ -333,7 +333,7 @@ async def award_tournament_badges(torneo_id: str, admin: dict = Depends(get_admi
 
 @router.get("/badges/definitions")
 async def get_badge_definitions():
-    """Get todas las definiciones de badges"""
+    """Get all definiciones de badges"""
     from ..models.superpin import BADGE_DEFINITIONS
     return BADGE_DEFINITIONS
 
