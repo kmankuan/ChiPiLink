@@ -159,7 +159,7 @@ export default function MisConexiones({ token }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setSearchResults(data.usuarios || []);
+        setSearchResults(data.users || data.usuarios || []);
       }
     } catch (err) {
       console.error('Error searching:', err);
@@ -170,7 +170,7 @@ export default function MisConexiones({ token }) {
 
   const handleSendRequest = async () => {
     if (!selectedUser || !relationshipType || !relationshipSubtype) {
-      toast.error('Completa todos los campos');
+      toast.error('Complete all fields');
       return;
     }
     
