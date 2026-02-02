@@ -115,13 +115,13 @@ export default function MisConexiones({ token }) {
     setLoading(true);
     try {
       const [conRes, recRes, envRes] = await Promise.all([
-        fetch(`${API}/api/conexiones/mis-conexiones`, {
+        fetch(`${API}/api/connections/my-connections`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API}/api/conexiones/solicitudes/recibidas`, {
+        fetch(`${API}/api/connections/requests/received`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API}/api/conexiones/solicitudes/enviadas`, {
+        fetch(`${API}/api/connections/requests/sent`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -154,7 +154,7 @@ export default function MisConexiones({ token }) {
     
     setSearching(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/buscar?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${API}/api/connections/search?q=${encodeURIComponent(query)}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -176,7 +176,7 @@ export default function MisConexiones({ token }) {
     
     setSendingRequest(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/solicitar`, {
+      const res = await fetch(`${API}/api/connections/request`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
