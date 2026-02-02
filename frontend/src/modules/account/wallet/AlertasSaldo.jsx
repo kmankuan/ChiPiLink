@@ -41,7 +41,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
   const [loading, setLoading] = useState(true);
   const [alertas, setAlertas] = useState([]);
   
-  // Estado para transferir desde alerta
+  // State for transfer from alert
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [selectedAlerta, setSelectedAlerta] = useState(null);
   const [transferAmount, setTransferAmount] = useState('');
@@ -78,9 +78,9 @@ export default function AlertasSaldo({ token, onTransfer }) {
         }
       });
       
-      if (!res.ok) throw new Error('Error al resolver');
+      if (!res.ok) throw new Error('Error resolving alert');
       
-      toast.success('Alerta resuelta');
+      toast.success('Alert resolved');
       loadAlertas();
     } catch (err) {
       toast.error(err.message);
@@ -101,16 +101,16 @@ export default function AlertasSaldo({ token, onTransfer }) {
         body: JSON.stringify({
           para_usuario_id: selectedAlerta.usuario_id,
           monto: parseFloat(transferAmount),
-          mensaje: `Recarga por alerta: ${selectedAlerta.descripcion}`
+          mensaje: `Reload from alert: ${selectedAlerta.descripcion}`
         })
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Error en transferencia');
+      if (!res.ok) throw new Error(data.detail || 'Transfer error');
       
-      toast.success('Transferencia realizada exitosamente');
+      toast.success('Transfer completed successfully');
       
-      // Marcar alerta como resuelta
+      // Mark alert as resolved
       await handleResolver(selectedAlerta.alerta_id);
       
       setShowTransferDialog(false);
@@ -143,7 +143,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
   }
 
   if (alertas.length === 0) {
-    return null; // No mostrar si no hay alertas
+    return null; // Don't show if no alerts
   }
 
   return (
