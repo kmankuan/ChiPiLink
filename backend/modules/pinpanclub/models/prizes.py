@@ -112,7 +112,7 @@ class AwardedPrize(BaseModel):
     season_id: Optional[str] = None
     challenge_id: Optional[str] = None
     
-    # Info del premio (cached)
+    # Info ofl premio (cached)
     prize_info: Optional[Dict] = None
     jugador_info: Optional[Dict] = None
     

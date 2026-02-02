@@ -85,7 +85,7 @@ async def get_current_rank_info(
     history = await rank_rewards_service.get_player_rank_history(jugador_id)
     earned_ranks = [h["rank_id"] for h in history]
     
-    # Info de recompensas del rango actual
+    # Info of recompensas del rango actual
     all_rewards = await rank_rewards_service.get_rank_rewards_info(lang)
     current_reward_info = next(
         (r for r in all_rewards if r["id"] == current_rank["id"]),

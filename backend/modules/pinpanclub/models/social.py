@@ -68,7 +68,7 @@ class Comment(BaseModel):
     target_type: str      # "player" o "match"
     content: str
     
-    # Info del autor (cached)
+    # Info ofl autor (cached)
     author_info: Optional[Dict] = None
     
     # Reacciones al comentario
