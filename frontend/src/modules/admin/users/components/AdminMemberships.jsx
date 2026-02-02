@@ -188,7 +188,7 @@ export default function AdminMemberships() {
       });
 
       if (res.ok) {
-        toast.success(t('adminMemberships.initialize')d);
+        toast.success(t('adminMemberships.initialized'));
         fetchData();
       }
     } catch (error) {
