@@ -1146,7 +1146,17 @@
     "easy": "Easy",
     "normal": "Normal",
     "hard": "Hard",
-    "extreme": "Extreme"
+    "extreme": "Extreme",
+    "settingsDesc": "Configure which sections are visible to different users",
+    "visibility": "Visibility",
+    "participants": "participants",
+    "roles": {
+      "public": "Public",
+      "registered": "Registered",
+      "moderator": "Moderator",
+      "admin": "Admin",
+      "super_admin": "Super Admin"
+    }
   },
   "postEditor": {
     "addBlock": "Add block",
