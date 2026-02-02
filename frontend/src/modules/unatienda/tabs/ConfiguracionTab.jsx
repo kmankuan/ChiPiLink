@@ -172,7 +172,7 @@ export default function ConfiguracionTab({ token }) {
                   />
                 </div>
                 <div>
-                  <Label>Email de Contacto</Label>
+                  <Label>Contact Email</Label>
                   <Input
                     type="email"
                     value={generalConfig.email}
@@ -180,39 +180,39 @@ export default function ConfiguracionTab({ token }) {
                   />
                 </div>
                 <div>
-                  <Label>Teléfono</Label>
+                  <Label>Phone</Label>
                   <Input
                     value={generalConfig.telefono}
                     onChange={(e) => setGeneralConfig({...generalConfig, telefono: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label>Horario de Atención</Label>
+                  <Label>Business Hours</Label>
                   <Input
                     value={generalConfig.horario_atencion}
                     onChange={(e) => setGeneralConfig({...generalConfig, horario_atencion: e.target.value})}
-                    placeholder="Ej: Lunes a Viernes 8am - 4pm"
+                    placeholder="Ex: Monday to Friday 8am - 4pm"
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label>Dirección</Label>
+                  <Label>Address</Label>
                   <Input
                     value={generalConfig.direccion}
                     onChange={(e) => setGeneralConfig({...generalConfig, direccion: e.target.value})}
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label>Descripción</Label>
+                  <Label>Description</Label>
                   <Input
                     value={generalConfig.descripcion}
                     onChange={(e) => setGeneralConfig({...generalConfig, descripcion: e.target.value})}
-                    placeholder="Breve descripción de la tienda"
+                    placeholder="Brief store description"
                   />
                 </div>
               </div>
               <Button onClick={saveGeneralConfig} disabled={saving} className="gap-2">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Guardar Configuración
+                Save Configuration
               </Button>
             </CardContent>
           </Card>
@@ -224,18 +224,18 @@ export default function ConfiguracionTab({ token }) {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
-                Yappy Comercial
+                Yappy Commercial
               </CardTitle>
               <CardDescription>
-                Configura la integración con Yappy para recibir pagos
+                Configure Yappy integration to receive payments
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                 <div>
-                  <Label className="text-base">Habilitar Yappy</Label>
+                  <Label className="text-base">Enable Yappy</Label>
                   <p className="text-sm text-muted-foreground">
-                    Permite a los clientes pagar con Yappy
+                    Allow customers to pay with Yappy
                   </p>
                 </div>
                 <Switch
@@ -251,7 +251,7 @@ export default function ConfiguracionTab({ token }) {
                     <Input
                       value={yappyConfig.merchant_id}
                       onChange={(e) => setYappyConfig({...yappyConfig, merchant_id: e.target.value})}
-                      placeholder="Tu ID de comerciante Yappy"
+                      placeholder="Your Yappy merchant ID"
                     />
                   </div>
                   <div>
@@ -260,14 +260,14 @@ export default function ConfiguracionTab({ token }) {
                       type="password"
                       value={yappyConfig.secret_key}
                       onChange={(e) => setYappyConfig({...yappyConfig, secret_key: e.target.value})}
-                      placeholder="Tu clave secreta de Yappy"
+                      placeholder="Your Yappy secret key"
                     />
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
                     <div>
-                      <Label className="text-base">Modo Sandbox (Pruebas)</Label>
+                      <Label className="text-base">Sandbox Mode (Testing)</Label>
                       <p className="text-sm text-muted-foreground">
-                        Activa para realizar pruebas sin pagos reales
+                        Enable to test without real payments
                       </p>
                     </div>
                     <Switch
