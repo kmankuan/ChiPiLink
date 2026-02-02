@@ -10,7 +10,7 @@ from core.database import db
 from ..models.social import NotificationCreate, NotificationType, ActivityFeedCreate, ActivityType
 
 
-# Definición de rangos con recompensas
+# Rank definitions with rewards
 RANK_DEFINITIONS = [
     {
         "id": "bronze",
@@ -18,7 +18,7 @@ RANK_DEFINITIONS = [
         "min_points": 0,
         "max_points": 99,
         "icon": "🥉",
-        "reward": None  # Without recompensa para el rango inicial
+        "reward": None  # No reward for initial rank
     },
     {
         "id": "silver",
@@ -213,10 +213,10 @@ class RankRewardsService(BaseService):
         )
         player_name = player.get("apodo") or player.get("nombre", "Jugador") if player else "Jugador"
         
-        # Get nombre localizado del rango
+        # Get localized rank name
         rank_name = rank["name"].get(lang, rank["name"].get("es", rank["id"]))
         
-        # Registrar la recompensa
+        # Register the reward
         reward_record = {
             "jugador_id": jugador_id,
             "rank_id": rank["id"],
@@ -285,7 +285,7 @@ class RankRewardsService(BaseService):
                     {"$set": {"special_title": title, "title_rank": rank["id"]}}
                 )
         
-        # Create notificación de promoción
+        # Create promotion notification
         notification_title = {
             "es": f"¡Subiste a {rank_name}!",
             "en": f"You reached {rank_name}!",

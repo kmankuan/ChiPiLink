@@ -5,7 +5,7 @@ Auth Module - User authentication and session management
 Arquitectura Microservices-Ready:
 
 /modules/auth/
-├── models/           # Schemas Pydantic (contratos de datos)
+├── models/           # Pydantic schemas (data contracts)
 ├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
 ├── services/         # Business logic
 ├── events/           # Event handlers y tipos de eventos

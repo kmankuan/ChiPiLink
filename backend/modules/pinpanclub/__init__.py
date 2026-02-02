@@ -6,7 +6,7 @@ Módulo de Club de Tenis de Mesa preparado para microservicios
 Arquitectura Microservices-Ready:
 
 /modules/pinpanclub/
-├── models/           # Schemas Pydantic (contratos de datos)
+├── models/           # Pydantic schemas (data contracts)
 ├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
 ├── services/         # Business logic
 ├── events/           # Event handlers y tipos de eventos

@@ -5,7 +5,7 @@ Community Module - Posts, events, gallery management
 Arquitectura Microservices-Ready:
 
 /modules/community/
-├── models/           # Schemas Pydantic (contratos de datos)
+├── models/           # Pydantic schemas (data contracts)
 ├── repositories/     # Capa de acceso a datos (solo aquí se toca DB)
 ├── services/         # Business logic
 ├── events/           # Event handlers y tipos de eventos

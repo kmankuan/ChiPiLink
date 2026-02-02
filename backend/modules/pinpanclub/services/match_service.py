@@ -228,7 +228,7 @@ class MatchService(BaseService):
         fecha_fin = datetime.now(timezone.utc).isoformat()
         await self.repository.finish_match(partido_id, ganador_id, fecha_fin)
         
-        # Emit evento de partido finalizado
+        # Emit match finished event
         await self.emit_event(
             PinpanClubEvents.MATCH_FINISHED,
             {

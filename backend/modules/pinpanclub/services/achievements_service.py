@@ -79,7 +79,7 @@ class AchievementsService(BaseService):
             if achievement["achievement_id"] in earned_ids:
                 continue
             
-            # Verify si cumple el requisito
+            # Verify if meets requirement
             if self._check_requirement(achievement, player_stats):
                 # Otorgar logro
                 new_achievement = await self._award_achievement(jugador_id, achievement)
@@ -103,7 +103,7 @@ class AchievementsService(BaseService):
         )
         total_points = leaderboard_entry.get("total_points", 0) if leaderboard_entry else 0
         
-        # Racha de semanas
+        # Week streak
         current_streak = leaderboard_entry.get("current_streak", 0) if leaderboard_entry else 0
         
         # Challenges por dificultad
@@ -152,7 +152,7 @@ class AchievementsService(BaseService):
         if not week or not week.get("challenges"):
             return False
         
-        # Contar retos completados de esta semana
+        # Count challenges completed this week
         completed = await db.pinpanclub_challenges_progress.count_documents({
             "jugador_id": jugador_id,
             "challenge_id": {"$in": week["challenges"]},
@@ -217,7 +217,7 @@ class AchievementsService(BaseService):
         
         await db.pinpanclub_player_achievements.insert_one(player_achievement)
         
-        # Update puntos en el leaderboard si hay recompensa
+        # Update leaderboard points if there is reward
         if achievement.get("points_reward", 0) > 0:
             await db.pinpanclub_challenges_leaderboard.update_one(
                 {"jugador_id": jugador_id},

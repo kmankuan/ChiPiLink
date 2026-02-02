@@ -102,7 +102,7 @@ class PlayerService(BaseService):
         if not player:
             return None
         
-        # Calculatesr cambio de ELO (sistema ELO simplificado)
+        # Calculate ELO change (simplified ELO system)
         k_factor = 32
         expected = 1 / (1 + 10 ** ((opponent_elo - player.elo_rating) / 400))
         actual = 1 if won else 0
@@ -111,7 +111,7 @@ class PlayerService(BaseService):
         # Update en repository
         await self.repository.update_stats(jugador_id, won, elo_change)
         
-        # Emit evento de cambio de ELO
+        # Emit ELO change event
         await self.emit_event(
             PinpanClubEvents.PLAYER_ELO_CHANGED,
             {

@@ -160,7 +160,7 @@ class ChallengeService(BaseService):
         
         player = await self.player_repo.get_by_id(jugador_id)
         
-        # Calculatesr fecha de expiración
+        # Calculate expiration date
         expires_at = datetime.now(timezone.utc) + timedelta(days=challenge.get("duration_days", 7))
         
         progress_data = {
@@ -183,7 +183,7 @@ class ChallengeService(BaseService):
         
         result = await self.player_challenge_repo.create(progress_data)
         
-        # Update estadísticas de la semana
+        # Update weekly stats
         week = await self.get_current_week()
         if week and challenge_id in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, participants=1)
@@ -211,7 +211,7 @@ class ChallengeService(BaseService):
             if not challenge:
                 continue
             
-            # Verify si el tipo de reto coincide
+            # Verify if challenge type matches
             if challenge.get("type") != challenge_type:
                 continue
             
@@ -258,7 +258,7 @@ class ChallengeService(BaseService):
             points=challenge.get("points_reward", 0)
         )
         
-        # Update estadísticas de la semana
+        # Update weekly stats
         week = await self.get_current_week()
         if week and challenge["challenge_id"] in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, completions=1)

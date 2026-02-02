@@ -36,14 +36,14 @@ def setup_event_handlers():
         perdedor = await player_service.get_player(perdedor_id)
         
         if ganador and perdedor:
-            # Update stats del ganador
+            # Update winner stats
             await player_service.update_player_stats(
                 ganador_id,
                 won=True,
                 opponent_elo=perdedor.elo_rating
             )
             
-            # Update stats del perdedor
+            # Update loser stats
             await player_service.update_player_stats(
                 perdedor_id,
                 won=False,
@@ -66,5 +66,5 @@ def setup_event_handlers():
     logger.info("PinpanClub event handlers configured")
 
 
-# Exportar tipos de eventos para uso externo
+# Export event types for external use
 __all__ = ['setup_event_handlers', 'PinpanClubEvents']
