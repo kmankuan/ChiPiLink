@@ -282,14 +282,14 @@ class FormConfigService(BaseService):
                         "field": key,
                         "error": "min_length",
                         "message_en": f"Minimum {field['min_length']} characters required",
-                        "message_es": f"Mínimo {field['min_length']} caracteres requeridos"
+                        "message_es": f"Mínimo {field['min_length']} characters requeridos"
                     })
                 if field.get("max_length") and len(str(value)) > field["max_length"]:
                     errors.append({
                         "field": key,
                         "error": "max_length",
                         "message_en": f"Maximum {field['max_length']} characters allowed",
-                        "message_es": f"Máximo {field['max_length']} caracteres permitidos"
+                        "message_es": f"Máximo {field['max_length']} characters permitidos"
                     })
             
             elif field_type == "number":

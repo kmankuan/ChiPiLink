@@ -516,7 +516,7 @@ async def check_user_liked_challenge(
     queue_id: str,
     user_id: str
 ):
-    """Verify si un usuario ya dio like a a challenge"""
+    """Check if user already liked a a challenge"""
     liked = await rapidpin_service.check_user_liked(queue_id, user_id)
     return {"liked": liked}
 
@@ -532,7 +532,7 @@ async def add_challenge_comment(
     """
     Agregar comentario a a challenge.
     Requiere authenticated user.
-    Si the user tiene sanciones, el comentario irá a moderación.
+    Si the user has sanctions, el comentario irá a moderación.
     """
     try:
         user_info = {
@@ -569,7 +569,7 @@ async def moderate_challenge_comment(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Moderar un comentario (admin/mod).
+    Moderate a comment (admin/mod).
     - approve: Aprobar comentario pendiente
     - reject: Rechazar y ocultar
     - hide: Ocultar comentario aprobado
@@ -590,5 +590,5 @@ async def get_pending_moderation_comments(
     limit: int = 50,
     admin: dict = Depends(get_admin_user)
 ):
-    """Get comentarios pendientes de moderación (admin/mod)"""
+    """Get comments pending moderation (admin/mod)"""
     return await rapidpin_service.get_pending_comments(limit=limit)

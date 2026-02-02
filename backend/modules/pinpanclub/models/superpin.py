@@ -147,7 +147,7 @@ class SuperPinLeagueCreate(SuperPinLeagueBase):
 
 
 class SuperPinLeagueUpdate(BaseModel):
-    """Update liga"""
+    """Update league"""
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
     temporada: Optional[str] = None

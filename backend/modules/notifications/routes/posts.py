@@ -98,7 +98,7 @@ async def like_post(
     post_id: str,
     user=Depends(get_current_user)
 ):
-    """Dar like a un post"""
+    """Give like a un post"""
     post = await post_service.like_post(post_id, user["user_id"])
     
     if not post:

@@ -37,7 +37,7 @@ async def get_post(post_id: str):
 
 @router.post("/{post_id}/like")
 async def like_post(post_id: str):
-    """Dar like a un post"""
+    """Give like a un post"""
     success = await post_service.like_post(post_id)
     if not success:
         raise HTTPException(status_code=404, detail="Post not found")

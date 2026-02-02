@@ -195,7 +195,7 @@ class PostService:
         return result.get("views", 0) if result else 0
     
     async def like_post(self, post_id: str, user_id: str) -> Dict:
-        """Dar like a un post"""
+        """Give like a un post"""
         # TODO: Implementar tracking de likes by user
         result = await db[self.collection_posts].find_one_and_update(
             {"post_id": post_id},

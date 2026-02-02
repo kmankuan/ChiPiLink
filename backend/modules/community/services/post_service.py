@@ -94,7 +94,7 @@ class PostService(BaseService):
         return None
     
     async def like_post(self, post_id: str) -> bool:
-        """Dar like a un post"""
+        """Give like a un post"""
         return await self.repository.increment_likes(post_id)
     
     async def delete_post(self, post_id: str) -> bool:

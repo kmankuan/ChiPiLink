@@ -31,7 +31,7 @@ async def get_leagues(active_only: bool = False):
 
 @router.get("/leagues/{liga_id}", response_model=SuperPinLeague)
 async def get_league(liga_id: str):
-    """Get liga by ID"""
+    """Get league by ID"""
     league = await superpin_service.get_league(liga_id)
     if not league:
         raise HTTPException(status_code=404, detail="Liga not found")
@@ -53,7 +53,7 @@ async def update_league(
     data: SuperPinLeagueUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update liga (solo admin)"""
+    """Update league (solo admin)"""
     league = await superpin_service.update_league(liga_id, data)
     if not league:
         raise HTTPException(status_code=404, detail="Liga not found")
@@ -65,7 +65,7 @@ async def activate_league(
     liga_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Activar liga (solo admin)"""
+    """Activate league (solo admin)"""
     league = await superpin_service.activate_league(liga_id)
     if not league:
         raise HTTPException(status_code=404, detail="Liga not found")
@@ -76,7 +76,7 @@ async def activate_league(
 
 @router.get("/leagues/{liga_id}/available-players", response_model=List[PlayerCheckIn])
 async def get_available_players(liga_id: str):
-    """Get jugadores disponibles (con check-in activo)"""
+    """Get available players (with active check-in)"""
     return await superpin_service.get_available_players(liga_id)
 
 
@@ -89,13 +89,13 @@ async def check_in(
     longitude: Optional[float] = None,
     qr_code: Optional[str] = None
 ):
-    """Register check-in de jugador"""
+    """Register player check-in"""
     # Validate geolocation if it is the method
     if method == CheckInMethod.GEOLOCATION:
         if not latitude or not longitude:
             raise HTTPException(
                 status_code=400,
-                detail="Latitud y longitud requeridas para check-in por geolocalización"
+                detail="Latitud y longitud requeridas para check-in by geolocation"
             )
         is_valid = await superpin_service.validate_geolocation(liga_id, latitude, longitude)
         if not is_valid:
@@ -118,7 +118,7 @@ async def check_in(
 
 @router.post("/leagues/{liga_id}/checkout")
 async def check_out(liga_id: str, jugador_id: str):
-    """Register check-out de jugador"""
+    """Register player check-out"""
     success = await superpin_service.check_out_player(liga_id, jugador_id)
     return {"success": success}
 

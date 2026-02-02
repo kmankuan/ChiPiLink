@@ -80,12 +80,12 @@ class SuperPinService(BaseService):
         ]
     
     async def get_league(self, liga_id: str) -> Optional[SuperPinLeague]:
-        """Get liga by ID"""
+        """Get league by ID"""
         result = await self.league_repo.get_by_id(liga_id)
         return SuperPinLeague(**result) if result else None
     
     async def get_active_leagues(self) -> List[SuperPinLeague]:
-        """Get ligas activas"""
+        """Get active leagues"""
         results = await self.league_repo.get_active_leagues()
         return [SuperPinLeague(**r) for r in results]
     
@@ -99,7 +99,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         data: SuperPinLeagueUpdate
     ) -> Optional[SuperPinLeague]:
-        """Update liga"""
+        """Update league"""
         update_data = data.model_dump(exclude_unset=True)
         
         if not update_data:
@@ -112,7 +112,7 @@ class SuperPinService(BaseService):
         return None
     
     async def activate_league(self, liga_id: str) -> Optional[SuperPinLeague]:
-        """Activar liga"""
+        """Activate league"""
         return await self.update_league(
             liga_id,
             SuperPinLeagueUpdate(estado="active")
@@ -124,15 +124,15 @@ class SuperPinService(BaseService):
         self,
         data: PlayerCheckInCreate
     ) -> PlayerCheckIn:
-        """Register check-in de jugador"""
-        # Verify si ya tiene check-in activo
+        """Register player check-in"""
+        # Check if already has active check-in
         existing = await self.checkin_repo.get_player_checkin(
             data.liga_id, data.jugador_id
         )
         if existing:
             return PlayerCheckIn(**existing)
         
-        # Get info of the player
+        # Get player info
         player = await self.player_repo.get_by_id(data.jugador_id)
         
         checkin_dict = data.model_dump()
@@ -148,11 +148,11 @@ class SuperPinService(BaseService):
         return PlayerCheckIn(**result)
     
     async def check_out_player(self, liga_id: str, jugador_id: str) -> bool:
-        """Register check-out de jugador"""
+        """Register player check-out"""
         return await self.checkin_repo.checkout_by_player(liga_id, jugador_id)
     
     async def get_available_players(self, liga_id: str) -> List[PlayerCheckIn]:
-        """Get jugadores disponibles (con check-in activo)"""
+        """Get available players (with active check-in)"""
         results = await self.checkin_repo.get_active_checkins(liga_id)
         return [PlayerCheckIn(**r) for r in results]
     
@@ -162,14 +162,14 @@ class SuperPinService(BaseService):
         latitude: float,
         longitude: float
     ) -> bool:
-        """Validate ubicación para check-in por geolocalización"""
+        """Validate location for check-in by geolocation"""
         league = await self.get_league(liga_id)
         if not league:
             return False
         
         config = league.checkin_config
         if not config.club_latitude or not config.club_longitude:
-            return True  # Without ubicación configurada, permitir
+            return True  # Without configured location, allow
         
         # Calculate distance using Haversine formula
         distance = self._haversine_distance(
@@ -184,7 +184,7 @@ class SuperPinService(BaseService):
         lat1: float, lon1: float,
         lat2: float, lon2: float
     ) -> float:
-        """Calculate distancia en metros entre dos puntos GPS"""
+        """Calculate distance in meters between two GPS points"""
         R = 6371000  # Earth radius in meters
         
         phi1 = math.radians(lat1)
@@ -1169,7 +1169,7 @@ class SuperPinService(BaseService):
         available_players = await self.get_available_players(liga_id)
         
         if len(available_players) < 2:
-            raise ValueError("Se necesitan al menos 2 jugadores con check-in activo")
+            raise ValueError("Se necesitan al menos 2 jugadores with active check-in")
         
         # Get ranking info for each player
         players_with_ranking = []

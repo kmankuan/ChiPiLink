@@ -206,7 +206,7 @@ class RankRewardsService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         reward = rank.get("reward")
         
-        # Get info of the player
+        # Get player info
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
             {"_id": 0, "nombre": 1, "apodo": 1}

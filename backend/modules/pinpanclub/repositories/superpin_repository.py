@@ -32,11 +32,11 @@ class SuperPinLeagueRepository(BaseRepository):
         return await self.insert_one(league_data)
     
     async def get_by_id(self, liga_id: str) -> Optional[Dict]:
-        """Get liga by ID"""
+        """Get league by ID"""
         return await self.find_one({self.ID_FIELD: liga_id})
     
     async def get_active_leagues(self) -> List[Dict]:
-        """Get ligas activas"""
+        """Get active leagues"""
         return await self.find_many(
             query={"estado": "active"},
             sort=[("created_at", -1)]
@@ -51,7 +51,7 @@ class SuperPinLeagueRepository(BaseRepository):
         )
     
     async def update_league(self, liga_id: str, data: Dict) -> bool:
-        """Update liga"""
+        """Update league"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, liga_id, data)
     

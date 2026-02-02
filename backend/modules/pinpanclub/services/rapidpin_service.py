@@ -1368,7 +1368,7 @@ class RapidPinService(BaseService):
         if not queue_entry:
             raise ValueError("Challenge not found")
         
-        # Verify if like already exists
+        # Check if like already exists
         existing = await db["rapidpin_reactions"].find_one({
             "queue_id": queue_id,
             "user_id": user_id,
@@ -1385,7 +1385,7 @@ class RapidPinService(BaseService):
             new_count = queue_entry.get("likes_count", 1) - 1
             action = "unliked"
         else:
-            # Dar like
+            # Give like
             reaction = {
                 "reaction_id": f"react_{uuid.uuid4().hex[:8]}",
                 "queue_id": queue_id,
@@ -1418,7 +1418,7 @@ class RapidPinService(BaseService):
         return {"action": action, "likes_count": new_count}
     
     async def check_user_liked(self, queue_id: str, user_id: str) -> bool:
-        """Verify si un usuario ya dio like"""
+        """Check if user already liked"""
         db = await self.get_db()
         
         existing = await db["rapidpin_reactions"].find_one({
@@ -1448,11 +1448,11 @@ class RapidPinService(BaseService):
         config = await self.get_comment_config()
         max_length = config.get("max_comment_length", 280)
         
-        # Validate longitud
+        # Validate length
         if len(content) > max_length:
-            raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
+            raise ValueError(f"Comment exceeds the limit de {max_length} characters")
         
-        # Verify si the user está flaggeado (tiene sanciones)
+        # Check if user is flagged (has sanctions)
         user_moderation = await db["user_moderations"].find_one({
             "user_id": user_id,
             "status": {"$in": ["warning", "sanctioned"]}
@@ -1483,7 +1483,7 @@ class RapidPinService(BaseService):
         
         await db["rapidpin_comments"].insert_one(comment)
         
-        # Only incrementar contador si está aprobado
+        # Only increment counter if approved
         new_count = queue_entry.get("comments_count", 0)
         if is_approved:
             await db["rapidpin_queue"].update_one(
@@ -1521,7 +1521,7 @@ class RapidPinService(BaseService):
         include_hidden: bool = False,
         limit: int = 50
     ) -> List[Dict]:
-        """Get comentarios de un reto"""
+        """Get challenge comments"""
         db = await self.get_db()
         
         query = {"queue_id": queue_id, "is_approved": True}
@@ -1542,7 +1542,7 @@ class RapidPinService(BaseService):
         moderator_id: str,
         reason: str = None
     ) -> Dict:
-        """Moderar un comentario (admin/mod)"""
+        """Moderate a comment (admin/mod)"""
         db = await self.get_db()
         
         comment = await db["rapidpin_comments"].find_one(
@@ -1551,7 +1551,7 @@ class RapidPinService(BaseService):
         )
         
         if not comment:
-            raise ValueError("Comentario not found")
+            raise ValueError("Comment not found")
         
         update_data = {
             "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -1564,7 +1564,7 @@ class RapidPinService(BaseService):
             update_data["is_approved"] = True
             update_data["is_moderated"] = False
             
-            # Increment contador si no estaba aprobado antes
+            # Increment counter if not previously approved
             if not was_approved:
                 await db["rapidpin_queue"].update_one(
                     {"queue_id": comment["queue_id"]},
@@ -1578,7 +1578,7 @@ class RapidPinService(BaseService):
         elif action == "hide":
             update_data["is_hidden"] = True
             
-            # Decrement contador si estaba aprobado
+            # Decrement counter if was approved
             if was_approved:
                 await db["rapidpin_queue"].update_one(
                     {"queue_id": comment["queue_id"]},
@@ -1593,7 +1593,7 @@ class RapidPinService(BaseService):
         return await db["rapidpin_comments"].find_one({"comment_id": comment_id}, {"_id": 0})
     
     async def get_pending_comments(self, limit: int = 50) -> List[Dict]:
-        """Get comentarios pendientes de moderación"""
+        """Get comments pending moderation"""
         db = await self.get_db()
         
         cursor = db["rapidpin_comments"].find(
