@@ -8,12 +8,12 @@ from pydantic import BaseModel, EmailStr
 from core.auth import get_current_user, get_admin_user
 from ..services.connections_service import conexiones_service
 
-router = APIRouter(prefix="/conexiones", tags=["Connections"])
+router = APIRouter(prefix="/connections", tags=["Connections"])
 
 
 # ============== REQUEST MODELS ==============
 
-class ConexionCreateRequest(BaseModel):
+class ConnectionCreateRequest(BaseModel):
     user_id_destino: str
     tipo: str  # familiar, social, especial
     subtipo: str
@@ -21,7 +21,7 @@ class ConexionCreateRequest(BaseModel):
     mensaje: Optional[str] = None
 
 
-class SolicitudRequest(BaseModel):
+class ConnectionRequestModel(BaseModel):
     para_usuario_id: str
     tipo: str
     subtipo: str
@@ -29,11 +29,11 @@ class SolicitudRequest(BaseModel):
     mensaje: Optional[str] = None
 
 
-class SolicitudRespuestaRequest(BaseModel):
+class ConnectionResponseRequest(BaseModel):
     aceptar: bool
 
 
-class InvitacionRequest(BaseModel):
+class InvitationRequest(BaseModel):
     email: EmailStr
     nombre: Optional[str] = None
     mensaje: Optional[str] = None
@@ -42,13 +42,13 @@ class InvitacionRequest(BaseModel):
     monto_transferir: Optional[float] = None
 
 
-class TransferenciaRequest(BaseModel):
+class TransferRequest(BaseModel):
     para_usuario_id: str
     monto: float
     mensaje: Optional[str] = None
 
 
-class AcudidoCreateRequest(BaseModel):
+class DependentCreateRequest(BaseModel):
     nombre: str
     apellido: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -63,13 +63,13 @@ class MarketingConfigRequest(BaseModel):
     servicios_excluidos: Optional[List[str]] = None
 
 
-class OtorgarCapacidadRequest(BaseModel):
+class GrantCapabilityRequest(BaseModel):
     user_id: str
     capacidad_id: str
     motivo: Optional[str] = None
 
 
-class PermisosRelacionRequest(BaseModel):
+class RelationshipPermissionsRequest(BaseModel):
     tipo: str
     subtipo: str
     transferir_wallet: bool = False
@@ -79,7 +79,7 @@ class PermisosRelacionRequest(BaseModel):
     limite_transferencia_diario: Optional[float] = None
 
 
-class CapacidadCreateRequest(BaseModel):
+class CapabilityCreateRequest(BaseModel):
     capacidad_id: str
     nombre_es: str
     nombre_en: Optional[str] = None
@@ -93,21 +93,21 @@ class CapacidadCreateRequest(BaseModel):
     activa: bool = True
 
 
-# ============== ENDPOINTS DE CONEXIONES ==============
+# ============== CONNECTION ENDPOINTS ==============
 
-@router.get("/mis-conexiones")
-async def get_mis_conexiones(user: dict = Depends(get_current_user)):
-    """Obtener mis conexiones"""
+@router.get("/my-connections")
+async def get_my_connections(user: dict = Depends(get_current_user)):
+    """Get my connections"""
     conexiones = await conexiones_service.get_conexiones(user["user_id"])
     return {"conexiones": conexiones}
 
 
-@router.post("/solicitar")
-async def crear_solicitud_conexion(
-    request: SolicitudRequest,
+@router.post("/request")
+async def create_connection_request(
+    request: ConnectionRequestModel,
     user: dict = Depends(get_current_user)
 ):
-    """Crear solicitud de conexión a otro usuario"""
+    """Create a connection request to another user"""
     result = await conexiones_service.crear_solicitud(
         de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
@@ -123,29 +123,29 @@ async def crear_solicitud_conexion(
     return result
 
 
-@router.get("/solicitudes/recibidas")
-async def get_solicitudes_recibidas(user: dict = Depends(get_current_user)):
-    """Obtener solicitudes de conexión recibidas"""
+@router.get("/requests/received")
+async def get_received_requests(user: dict = Depends(get_current_user)):
+    """Get received connection requests"""
     solicitudes = await conexiones_service.get_solicitudes_pendientes(user["user_id"])
     return {"solicitudes": solicitudes}
 
 
-@router.get("/solicitudes/enviadas")
-async def get_solicitudes_enviadas(user: dict = Depends(get_current_user)):
-    """Obtener solicitudes de conexión enviadas"""
+@router.get("/requests/sent")
+async def get_sent_requests(user: dict = Depends(get_current_user)):
+    """Get sent connection requests"""
     solicitudes = await conexiones_service.get_solicitudes_enviadas(user["user_id"])
     return {"solicitudes": solicitudes}
 
 
-@router.post("/solicitudes/{solicitud_id}/responder")
-async def responder_solicitud(
-    solicitud_id: str,
-    request: SolicitudRespuestaRequest,
+@router.post("/requests/{request_id}/respond")
+async def respond_to_request(
+    request_id: str,
+    request: ConnectionResponseRequest,
     user: dict = Depends(get_current_user)
 ):
-    """Responder a una solicitud de conexión"""
+    """Respond to a connection request"""
     result = await conexiones_service.responder_solicitud(
-        solicitud_id=solicitud_id,
+        solicitud_id=request_id,
         aceptar=request.aceptar,
         respondido_por=user["user_id"]
     )
@@ -156,13 +156,13 @@ async def responder_solicitud(
     return result
 
 
-@router.delete("/{conexion_id}")
-async def eliminar_conexion(
-    conexion_id: str,
+@router.delete("/{connection_id}")
+async def delete_connection(
+    connection_id: str,
     user: dict = Depends(get_current_user)
 ):
-    """Eliminar una conexión"""
-    result = await conexiones_service.eliminar_conexion(user["user_id"], conexion_id)
+    """Delete a connection"""
+    result = await conexiones_service.eliminar_conexion(user["user_id"], connection_id)
     
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
@@ -170,14 +170,14 @@ async def eliminar_conexion(
     return result
 
 
-# ============== ENDPOINTS DE INVITACIONES ==============
+# ============== INVITATION ENDPOINTS ==============
 
-@router.post("/invitar")
-async def crear_invitacion(
-    request: InvitacionRequest,
+@router.post("/invite")
+async def create_invitation(
+    request: InvitationRequest,
     user: dict = Depends(get_current_user)
 ):
-    """Invitar a usuario no registrado"""
+    """Invite an unregistered user"""
     result = await conexiones_service.crear_invitacion(
         invitado_por_id=user["user_id"],
         email=request.email,
@@ -189,7 +189,7 @@ async def crear_invitacion(
     )
     
     if result.get("error"):
-        # Si el usuario ya existe, devolver su ID para conectar directamente
+        # If user already exists, return their ID to connect directly
         if "user_id" in result:
             return {"existe": True, "user_id": result["user_id"]}
         raise HTTPException(status_code=400, detail=result["error"])
@@ -197,22 +197,22 @@ async def crear_invitacion(
     return result
 
 
-# ============== ENDPOINTS DE ACUDIDOS ==============
+# ============== DEPENDENT ENDPOINTS ==============
 
-@router.get("/mis-acudidos")
-async def get_mis_acudidos(user: dict = Depends(get_current_user)):
-    """Obtener mis usuarios acudidos"""
+@router.get("/my-dependents")
+async def get_my_dependents(user: dict = Depends(get_current_user)):
+    """Get my dependent users"""
     conexiones = await conexiones_service.get_conexiones(user["user_id"])
     acudidos = [c for c in conexiones if c.get("subtipo") == "acudido"]
     return {"acudidos": acudidos}
 
 
-@router.post("/crear-acudido")
-async def crear_acudido(
-    request: AcudidoCreateRequest,
+@router.post("/create-dependent")
+async def create_dependent(
+    request: DependentCreateRequest,
     user: dict = Depends(get_current_user)
 ):
-    """Crear usuario acudido (cuenta gestionada)"""
+    """Create a dependent user (managed account)"""
     result = await conexiones_service.crear_acudido(
         acudiente_id=user["user_id"],
         nombre=request.nombre,
@@ -229,14 +229,14 @@ async def crear_acudido(
     return result
 
 
-# ============== ENDPOINTS DE TRANSFERENCIAS ==============
+# ============== TRANSFER ENDPOINTS ==============
 
-@router.post("/transferir")
-async def transferir_wallet(
-    request: TransferenciaRequest,
+@router.post("/transfer")
+async def transfer_wallet(
+    request: TransferRequest,
     user: dict = Depends(get_current_user)
 ):
-    """Transferir saldo a otro usuario"""
+    """Transfer balance to another user"""
     result = await conexiones_service.transferir_wallet(
         de_usuario_id=user["user_id"],
         para_usuario_id=request.para_usuario_id,
@@ -250,39 +250,39 @@ async def transferir_wallet(
     return result
 
 
-# ============== ENDPOINTS DE CAPACIDADES ==============
+# ============== CAPABILITY ENDPOINTS ==============
 
-@router.get("/capacidades")
-async def get_capacidades_disponibles():
-    """Obtener todas las capacidades configuradas"""
+@router.get("/capabilities")
+async def get_available_capabilities():
+    """Get all configured capabilities"""
     capacidades = await conexiones_service.get_capacidades_config()
     return {"capacidades": capacidades}
 
 
-@router.get("/mis-capacidades")
-async def get_mis_capacidades(user: dict = Depends(get_current_user)):
-    """Obtener mis capacidades activas"""
+@router.get("/my-capabilities")
+async def get_my_capabilities(user: dict = Depends(get_current_user)):
+    """Get my active capabilities"""
     capacidades = await conexiones_service.get_capacidades_usuario(user["user_id"])
     return {"capacidades": capacidades}
 
 
-# ============== ENDPOINTS DE MARKETING ==============
+# ============== MARKETING ENDPOINTS ==============
 
-@router.get("/servicios-sugeridos")
-async def get_servicios_sugeridos(user: dict = Depends(get_current_user)):
-    """Obtener servicios/membresías sugeridos para el usuario"""
+@router.get("/suggested-services")
+async def get_suggested_services(user: dict = Depends(get_current_user)):
+    """Get suggested services/memberships for the user"""
     servicios = await conexiones_service.get_servicios_sugeridos(user["user_id"])
     return {"servicios": servicios}
 
 
-# ============== ENDPOINTS DE BÚSQUEDA ==============
+# ============== SEARCH ENDPOINTS ==============
 
-@router.get("/buscar")
-async def buscar_usuarios(
+@router.get("/search")
+async def search_users(
     q: str,
     user: dict = Depends(get_current_user)
 ):
-    """Buscar usuarios por nombre o email"""
+    """Search users by name or email"""
     if len(q) < 2:
         return {"usuarios": []}
     
@@ -293,17 +293,17 @@ async def buscar_usuarios(
     return {"usuarios": usuarios}
 
 
-# ============== ENDPOINTS ADMIN ==============
+# ============== ADMIN ENDPOINTS ==============
 
-@router.post("/admin/solicitudes/{solicitud_id}/responder")
-async def admin_responder_solicitud(
-    solicitud_id: str,
-    request: SolicitudRespuestaRequest,
+@router.post("/admin/requests/{request_id}/respond")
+async def admin_respond_to_request(
+    request_id: str,
+    request: ConnectionResponseRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Responder solicitud de conexión en nombre del usuario"""
+    """Admin: Respond to connection request on behalf of user"""
     result = await conexiones_service.responder_solicitud(
-        solicitud_id=solicitud_id,
+        solicitud_id=request_id,
         aceptar=request.aceptar,
         respondido_por=admin["user_id"],
         es_admin=True
@@ -315,13 +315,13 @@ async def admin_responder_solicitud(
     return result
 
 
-@router.post("/admin/crear-acudido")
-async def admin_crear_acudido(
+@router.post("/admin/create-dependent")
+async def admin_create_dependent(
     acudiente_id: str,
-    request: AcudidoCreateRequest,
+    request: DependentCreateRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Crear usuario acudido para un acudiente"""
+    """Admin: Create dependent user for a guardian"""
     result = await conexiones_service.crear_acudido(
         acudiente_id=acudiente_id,
         nombre=request.nombre,
@@ -340,12 +340,12 @@ async def admin_crear_acudido(
     return result
 
 
-@router.post("/admin/otorgar-capacidad")
-async def admin_otorgar_capacidad(
-    request: OtorgarCapacidadRequest,
+@router.post("/admin/grant-capability")
+async def admin_grant_capability(
+    request: GrantCapabilityRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Otorgar capacidad a un usuario"""
+    """Admin: Grant capability to a user"""
     result = await conexiones_service.otorgar_capacidad(
         user_id=request.user_id,
         capacidad_id=request.capacidad_id,
@@ -360,12 +360,12 @@ async def admin_otorgar_capacidad(
 
 
 @router.post("/admin/marketing/{user_id}")
-async def admin_configurar_marketing(
+async def admin_configure_marketing(
     user_id: str,
     request: MarketingConfigRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Configurar marketing para un usuario"""
+    """Admin: Configure marketing for a user"""
     result = await conexiones_service.configurar_marketing_usuario(
         user_id=user_id,
         mostrar_servicios=request.mostrar_servicios,
@@ -376,11 +376,11 @@ async def admin_configurar_marketing(
     return result
 
 
-@router.get("/admin/solicitudes-pendientes")
-async def admin_get_solicitudes_pendientes(
+@router.get("/admin/pending-requests")
+async def admin_get_pending_requests(
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Obtener todas las solicitudes de conexión pendientes"""
+    """Admin: Get all pending connection requests"""
     from core.database import db
     cursor = db.solicitudes_conexion.find(
         {"estado": "pendiente"},
@@ -390,19 +390,19 @@ async def admin_get_solicitudes_pendientes(
     return {"solicitudes": solicitudes}
 
 
-# ============== ENDPOINTS DE ALERTAS ==============
+# ============== ALERT ENDPOINTS ==============
 
-class AlertaSaldoRequest(BaseModel):
+class BalanceAlertRequest(BaseModel):
     monto_requerido: float
     descripcion: str
 
 
-@router.post("/alerta-saldo-insuficiente")
-async def crear_alerta_saldo(
-    request: AlertaSaldoRequest,
+@router.post("/balance-alert")
+async def create_balance_alert(
+    request: BalanceAlertRequest,
     user: dict = Depends(get_current_user)
 ):
-    """Crear alerta de saldo insuficiente (notifica al usuario y sus acudientes)"""
+    """Create insufficient balance alert (notifies user and their guardians)"""
     wallet = user.get("wallet", {})
     saldo_actual = wallet.get("USD", 0)
     
@@ -416,48 +416,48 @@ async def crear_alerta_saldo(
     return result
 
 
-@router.get("/mis-alertas")
-async def get_mis_alertas(user: dict = Depends(get_current_user)):
-    """Obtener mis alertas (como usuario o como acudiente)"""
+@router.get("/my-alerts")
+async def get_my_alerts(user: dict = Depends(get_current_user)):
+    """Get my alerts (as user or as guardian)"""
     from core.database import db
     
-    # Alertas donde soy el usuario afectado
-    mis_alertas = await db.alertas_wallet.find(
+    # Alerts where I am the affected user
+    my_alerts = await db.alertas_wallet.find(
         {"usuario_id": user["user_id"], "estado": {"$ne": "resuelta"}},
         {"_id": 0}
     ).sort("creado_en", -1).to_list(length=50)
     
-    # Alertas donde soy acudiente
-    alertas_acudidos = await db.alertas_wallet.find(
+    # Alerts where I am a guardian
+    dependent_alerts = await db.alertas_wallet.find(
         {"acudientes_ids": user["user_id"], "estado": {"$ne": "resuelta"}},
         {"_id": 0}
     ).sort("creado_en", -1).to_list(length=50)
     
-    # Combinar y marcar tipo
-    for a in mis_alertas:
+    # Combine and mark type
+    for a in my_alerts:
         a["es_mia"] = True
-    for a in alertas_acudidos:
+    for a in dependent_alerts:
         a["es_de_acudido"] = True
     
-    todas = mis_alertas + alertas_acudidos
-    # Ordenar por fecha
-    todas.sort(key=lambda x: x.get("creado_en", ""), reverse=True)
+    all_alerts = my_alerts + dependent_alerts
+    # Sort by date
+    all_alerts.sort(key=lambda x: x.get("creado_en", ""), reverse=True)
     
-    return {"alertas": todas}
+    return {"alertas": all_alerts}
 
 
-@router.post("/alertas/{alerta_id}/resolver")
-async def resolver_alerta(
-    alerta_id: str,
+@router.post("/alerts/{alert_id}/resolve")
+async def resolve_alert(
+    alert_id: str,
     user: dict = Depends(get_current_user)
 ):
-    """Marcar alerta como resuelta"""
+    """Mark alert as resolved"""
     from core.database import db
     from datetime import datetime, timezone
     
     result = await db.alertas_wallet.update_one(
         {
-            "alerta_id": alerta_id,
+            "alerta_id": alert_id,
             "$or": [
                 {"usuario_id": user["user_id"]},
                 {"acudientes_ids": user["user_id"]}
@@ -471,29 +471,29 @@ async def resolver_alerta(
     )
     
     if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Alerta no encontrada")
+        raise HTTPException(status_code=404, detail="Alert not found")
     
     return {"success": True}
 
 
 
-# ============== ADMIN: PERMISOS Y CAPACIDADES ==============
+# ============== ADMIN: PERMISSIONS AND CAPABILITIES ==============
 
-@router.get("/admin/permisos-relacion")
-async def admin_get_permisos_relacion(admin: dict = Depends(get_admin_user)):
-    """Admin: Obtener todos los permisos configurados por tipo de relación"""
+@router.get("/admin/relationship-permissions")
+async def admin_get_relationship_permissions(admin: dict = Depends(get_admin_user)):
+    """Admin: Get all configured permissions by relationship type"""
     from core.database import db
     cursor = db.config_permisos_relacion.find({}, {"_id": 0})
     permisos = await cursor.to_list(length=100)
     return {"permisos": permisos}
 
 
-@router.put("/admin/permisos-relacion")
-async def admin_update_permisos_relacion(
-    request: PermisosRelacionRequest,
+@router.put("/admin/relationship-permissions")
+async def admin_update_relationship_permissions(
+    request: RelationshipPermissionsRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Actualizar permisos para un tipo de relación"""
+    """Admin: Update permissions for a relationship type"""
     from core.database import db
     from datetime import datetime, timezone
     
@@ -520,95 +520,82 @@ async def admin_update_permisos_relacion(
     return {"success": True, "modified": result.modified_count > 0}
 
 
-@router.post("/admin/capacidades")
-async def admin_crear_capacidad(
-    request: CapacidadCreateRequest,
+@router.post("/admin/capabilities")
+async def admin_create_capability(
+    request: CapabilityCreateRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Crear nueva capacidad"""
+    """Admin: Create new capability"""
     from core.database import db
     from datetime import datetime, timezone
     
-    # Verificar que no existe
-    existing = await db.capacidades_config.find_one({"capacidad_id": request.capacidad_id})
+    # Check if exists
+    existing = await db.config_capacidades.find_one({"capacidad_id": request.capacidad_id})
     if existing:
-        raise HTTPException(status_code=400, detail="Ya existe una capacidad con ese ID")
+        raise HTTPException(status_code=400, detail="Capability already exists")
     
     capacidad = {
         "capacidad_id": request.capacidad_id,
         "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
         "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
-        "icono": request.icono or "⚡",
+        "icono": request.icono or "✨",
         "color": request.color or "#6366f1",
         "tipo": request.tipo,
         "membresia_requerida": request.membresia_requerida,
         "requiere_aprobacion": request.requiere_aprobacion,
         "activa": request.activa,
-        "orden": 99,
         "creado_por": admin["user_id"],
         "creado_en": datetime.now(timezone.utc).isoformat()
     }
     
-    await db.capacidades_config.insert_one(capacidad)
-    capacidad.pop("_id", None)
+    await db.config_capacidades.insert_one(capacidad)
     
-    return {"success": True, "capacidad": capacidad}
+    return {"success": True, "capacidad_id": request.capacidad_id}
 
 
-@router.put("/admin/capacidades/{capacidad_id}")
-async def admin_actualizar_capacidad(
-    capacidad_id: str,
-    request: CapacidadCreateRequest,
+@router.put("/admin/capabilities/{capability_id}")
+async def admin_update_capability(
+    capability_id: str,
+    request: CapabilityCreateRequest,
     admin: dict = Depends(get_admin_user)
 ):
-    """Admin: Actualizar capacidad existente"""
+    """Admin: Update existing capability"""
     from core.database import db
     from datetime import datetime, timezone
     
-    existing = await db.capacidades_config.find_one({"capacidad_id": capacidad_id})
-    if not existing:
-        raise HTTPException(status_code=404, detail="Capacidad no encontrada")
-    
-    updates = {
-        "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
-        "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
-        "icono": request.icono or existing.get("icono", "⚡"),
-        "color": request.color or existing.get("color", "#6366f1"),
-        "tipo": request.tipo,
-        "membresia_requerida": request.membresia_requerida,
-        "requiere_aprobacion": request.requiere_aprobacion,
-        "activa": request.activa,
-        "actualizado_por": admin["user_id"],
-        "actualizado_en": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.capacidades_config.update_one(
-        {"capacidad_id": capacidad_id},
-        {"$set": updates}
-    )
-    
-    return {"success": True}
-
-
-@router.delete("/admin/capacidades/{capacidad_id}")
-async def admin_eliminar_capacidad(
-    capacidad_id: str,
-    admin: dict = Depends(get_admin_user)
-):
-    """Admin: Desactivar capacidad (no elimina, solo desactiva)"""
-    from core.database import db
-    from datetime import datetime, timezone
-    
-    result = await db.capacidades_config.update_one(
-        {"capacidad_id": capacidad_id},
+    result = await db.config_capacidades.update_one(
+        {"capacidad_id": capability_id},
         {"$set": {
-            "activa": False,
-            "desactivado_por": admin["user_id"],
-            "desactivado_en": datetime.now(timezone.utc).isoformat()
+            "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
+            "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
+            "icono": request.icono,
+            "color": request.color,
+            "tipo": request.tipo,
+            "membresia_requerida": request.membresia_requerida,
+            "requiere_aprobacion": request.requiere_aprobacion,
+            "activa": request.activa,
+            "actualizado_por": admin["user_id"],
+            "actualizado_en": datetime.now(timezone.utc).isoformat()
         }}
     )
     
     if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Capacidad no encontrada")
+        raise HTTPException(status_code=404, detail="Capability not found")
+    
+    return {"success": True}
+
+
+@router.delete("/admin/capabilities/{capability_id}")
+async def admin_delete_capability(
+    capability_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin: Delete capability"""
+    from core.database import db
+    
+    result = await db.config_capacidades.delete_one({"capacidad_id": capability_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Capability not found")
     
     return {"success": True}
