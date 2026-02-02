@@ -116,7 +116,7 @@ class Conexion(BaseModel):
 
 
 class ConexionCreate(BaseModel):
-    """Request para crear conexión"""
+    """Request to create conexión"""
     user_id_destino: str
     tipo: TipoRelacion
     subtipo: str
@@ -125,7 +125,7 @@ class ConexionCreate(BaseModel):
 
 
 class ConexionUpdate(BaseModel):
-    """Request para actualizar conexión"""
+    """Request to update conexión"""
     etiqueta: Optional[str] = None
     permisos: Optional[PermisosConexion] = None
     notas: Optional[str] = None
@@ -151,7 +151,7 @@ class SolicitudConexion(BaseModel):
 
 
 class SolicitudCreate(BaseModel):
-    """Request para crear solicitud de conexión"""
+    """Request to create solicitud de conexión"""
     para_usuario_id: str
     tipo: TipoRelacion
     subtipo: str
@@ -181,7 +181,7 @@ class Invitacion(BaseModel):
 
 
 class InvitacionCreate(BaseModel):
-    """Request para crear invitación"""
+    """Request to create invitación"""
     email: EmailStr
     nombre: Optional[str] = None
     mensaje: Optional[str] = None
@@ -235,7 +235,7 @@ class CapacidadSolicitud(BaseModel):
 # ============== MODELOS DE ACUDIDO ==============
 
 class AcudidoCreate(BaseModel):
-    """Request para crear usuario acudido"""
+    """Request to create usuario acudido"""
     nombre: str
     apellido: Optional[str] = None
     email: Optional[EmailStr] = None        # Opcional para menores
@@ -264,7 +264,7 @@ class TransferenciaWallet(BaseModel):
 
 
 class TransferenciaCreate(BaseModel):
-    """Request para crear transferencia"""
+    """Request to create transferencia"""
     para_usuario_id: str
     monto: float
     mensaje: Optional[str] = None

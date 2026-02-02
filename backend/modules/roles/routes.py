@@ -64,7 +64,7 @@ async def create_role(
             "roles.create"
         )
         if not has_permission:
-            raise HTTPException(status_code=403, detail="No tienes permiso para crear roles")
+            raise HTTPException(status_code=403, detail="No tienes permiso to create roles")
     
     role = await roles_service.create_role(role_data, admin["user_id"])
     
@@ -145,7 +145,7 @@ async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_
             "roles.delete"
         )
         if not has_permission:
-            raise HTTPException(status_code=403, detail="No tienes permiso para eliminar roles")
+            raise HTTPException(status_code=403, detail="No tienes permiso to delete roles")
     
     # Get role info before deletion
     role = await roles_service.get_role(role_id)

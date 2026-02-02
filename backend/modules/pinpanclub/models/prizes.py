@@ -28,7 +28,7 @@ class PrizeStatus(str, Enum):
 
 
 class PrizeConditionType(str, Enum):
-    """Tipos de condición para ganar premio"""
+    """Tipos de condición to win premio"""
     POSITION = "position"        # By ranking position (1°, 2°, 3°...)
     PARTICIPATION = "participation"  # By participar
     MATCHES_PLAYED = "matches_played"  # By number of matches played
@@ -41,7 +41,7 @@ class PrizeConditionType(str, Enum):
 # ============== PRIZE DEFINITION ==============
 
 class PrizeCondition(BaseModel):
-    """Condición para ganar un premio"""
+    """Condición to win un premio"""
     type: PrizeConditionType
     value: int  # Ej: position=1, matches_played=10
     comparison: str = "eq"  # eq, gte, lte

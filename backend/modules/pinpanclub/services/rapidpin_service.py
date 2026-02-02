@@ -926,7 +926,7 @@ class RapidPinService(BaseService):
             raise ValueError("Partido not found en cola")
         
         if queue_entry["status"] != "assigned":
-            raise ValueError("El partido debe tener árbitro asignado para completarse")
+            raise ValueError("El partido debe tener árbitro asignado to completese")
         
         # Verify winner is one of the players
         if ganador_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
@@ -1232,7 +1232,7 @@ class RapidPinService(BaseService):
                 notification_type="date_accepted"
             )
             
-            # Broadcast para buscar árbitro
+            # Broadcast to search árbitro
             player1_info = queue_entry.get("player1_info") or {}
             player2_info = queue_entry.get("player2_info") or {}
             player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")

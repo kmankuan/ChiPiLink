@@ -113,7 +113,7 @@ class ChipiPointsConfig(BaseModel):
 
 
 class PointsEarnRule(BaseModel):
-    """Regla para ganar ChipiPoints"""
+    """Regla to win ChipiPoints"""
     rule_id: str = Field(default_factory=lambda: f"rule_{uuid.uuid4().hex[:8]}")
     
     # Nombre y descripción
@@ -398,7 +398,7 @@ def get_default_points_config() -> Dict:
 
 
 def get_default_earn_rules() -> List[Dict]:
-    """Reglas por defecto para ganar puntos"""
+    """Reglas por defecto to win puntos"""
     return [
         {
             "rule_id": "rule_purchase",

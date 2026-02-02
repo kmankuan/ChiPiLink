@@ -64,7 +64,7 @@ def setup_event_handlers():
         """
         Actualizar libros comprados del estudiante cuando se paga.
         """
-        # Este handler se puede extender para actualizar
+        # Este handler se puede extender to update
         # la lista de libros comprados del estudiante
         logger.info(f"Order paid: {event.payload.get('pedido_id')}")
     
