@@ -51,7 +51,7 @@ class FollowRepository(BaseRepository):
         )
     
     async def get_following(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Get a quiénes sigue un jugador"""
+        """Get a who sigue un jugador"""
         return await self.find_many(
             query={"follower_id": jugador_id},
             sort=[("created_at", -1)],

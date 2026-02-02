@@ -207,7 +207,7 @@ class MatchService(BaseService):
                 }
             )
         
-        # Verify si terminó the match
+        # Verify si ended the match
         sets_para_ganar = (match.mejor_de // 2) + 1
         if sets_a >= sets_para_ganar or sets_b >= sets_para_ganar:
             ganador_id = match.jugador_a_id if sets_a > sets_b else match.jugador_b_id

@@ -184,7 +184,7 @@ async def deposit(
     data: DepositRequest,
     user=Depends(get_current_user)
 ):
-    """Realizar un depósito en la billetera"""
+    """Realizar un deposit en la billetera"""
     try:
         currency = Currency(data.currency)
         payment_method = PaymentMethod(data.payment_method)

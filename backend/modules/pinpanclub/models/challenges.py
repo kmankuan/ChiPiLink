@@ -70,7 +70,7 @@ class ChallengeDefinition(BaseModel):
     duration_days: int = 7  # Duración by default: 1 semana
     
     # Metadata
-    created_by: Optional[str] = None  # Admin que lo creó (si es manual)
+    created_by: Optional[str] = None  # Admin que lo created (si es manual)
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
 

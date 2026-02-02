@@ -91,7 +91,7 @@ async def confirm_match(
 ):
     """
     Confirmar a match pendiente.
-    Solo puede confirmar un participante diferente al que lo registró.
+    Solo puede confirmar un participante diferente al que lo registered.
     """
     try:
         return await rapidpin_service.confirm_match(match_id, confirmado_por_id)
@@ -125,7 +125,7 @@ async def get_pending_confirmations(
 ):
     """
     Obtener partidos pendientes de confirmation para un usuario.
-    Retorna partidos donde the user participa pero no fue quien lo registró.
+    Retorna partidos donde the user participa pero no fue quien lo registered.
     """
     matches = await rapidpin_service.get_pending_confirmations(season_id, user_id)
     return {
@@ -139,7 +139,7 @@ async def get_pending_confirmations(
 async def get_all_pending_confirmations(user_id: str):
     """
     Obtener TODOS matches pendientes de confirmation para un usuario.
-    Retorna partidos de todas seasons donde the user participa pero no fue quien lo registró.
+    Retorna partidos de todas seasons donde the user participa pero no fue quien lo registered.
     """
     matches = await rapidpin_service.get_all_pending_confirmations(user_id)
     return {
@@ -375,7 +375,7 @@ async def cancel_queue_match(
 ):
     """
     Cancelar partido in queue.
-    Solo puede cancelar quien lo creó o un admin.
+    Solo puede cancelar quien lo created o un admin.
     """
     try:
         return await rapidpin_service.cancel_queue_match(queue_id, cancelled_by_id)

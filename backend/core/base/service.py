@@ -1,6 +1,6 @@
 """
 Base Service - Capa de logic de negocio
-Cada module tendrá sus propios servicios que heredan de esta clase base
+Cada module will have sus propios servicios que heredan de esta clase base
 """
 from typing import Optional, Dict, Any
 import logging

@@ -44,7 +44,7 @@ async def get_followers(jugador_id: str, limit: int = 50):
 
 @router.get("/following/{jugador_id}")
 async def get_following(jugador_id: str, limit: int = 50):
-    """Get a quiénes sigue a player"""
+    """Get a who sigue a player"""
     following = await social_service.get_following(jugador_id, limit)
     return {"jugador_id": jugador_id, "following": following, "total": len(following)}
 
@@ -165,7 +165,7 @@ async def get_unread_count(user_id: str):
 
 @router.post("/notifications/{notification_id}/read")
 async def mark_notification_read(notification_id: str):
-    """Marcar notification como leída"""
+    """Marcar notification como read"""
     success = await social_service.mark_notification_read(notification_id)
     return {"success": success}
 

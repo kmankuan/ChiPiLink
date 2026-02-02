@@ -185,7 +185,7 @@ class Notification(BaseModel):
     
     # Estado
     is_read: bool = False
-    is_pushed: bool = False  # Si ya se envió por WebSocket
+    is_pushed: bool = False  # Si ya se sent por WebSocket
     
     # Navegación
     action_url: Optional[str] = None

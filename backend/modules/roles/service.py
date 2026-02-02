@@ -144,7 +144,7 @@ class RolesService:
             {
                 "role_id": DefaultRoles.MODERATOR.value,
                 "nombre": "Moderador",
-                "descripcion": "Management of contenido y usuarios básicos",
+                "descripcion": "Management of contenido y usuarios basics",
                 "color": "#0891b2",
                 "icono": "Shield",
                 "es_sistema": True,
@@ -154,7 +154,7 @@ class RolesService:
             {
                 "role_id": DefaultRoles.USER.value,
                 "nombre": "Usuario",
-                "descripcion": "Acceso básico a funcionalidades publics",
+                "descripcion": "Acceso basic a funcionalidades publics",
                 "color": "#6366f1",
                 "icono": "User",
                 "es_sistema": True,

@@ -1,6 +1,6 @@
 """
 Base Repository - Capa de acceso a datos
-Cada module tendrá su propio repository que hereda de esta clase base
+Cada module will have su propio repository que hereda de esta clase base
 """
 from typing import Dict, List, Optional, Any, TypeVar, Generic
 from datetime import datetime, timezone

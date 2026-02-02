@@ -405,7 +405,7 @@ class ConexionesService:
             
             if aceptar:
                 title = "✅ Connection Aceptada"
-                body = f"{para_nombre} aceptó tu request de connection como {subtipo_label}"
+                body = f"{para_nombre} accepted tu request de connection como {subtipo_label}"
                 notification_type = "connection_accepted"
             else:
                 title = "❌ Connection Rechazada"
@@ -507,7 +507,7 @@ class ConexionesService:
             }}
         )
         
-        # Create connection si se especificó
+        # Create connection si se specified
         if invitacion.get("tipo_relacion_propuesta"):
             await self.crear_conexion(
                 user_id=invitacion["invitado_por_id"],
@@ -517,7 +517,7 @@ class ConexionesService:
                 requiere_request=False
             )
         
-        # Transferir si se especificó monto
+        # Transferir si se specified monto
         if invitacion.get("monto_transferir"):
             await self.transferir_wallet(
                 de_usuario_id=invitacion["invitado_por_id"],
@@ -736,7 +736,7 @@ class ConexionesService:
                 user_id=para_usuario_id,
                 category_id="wallet_alerts",
                 title="💰 Transferencia Recibida",
-                body=f"{de_nombre} te envió ${monto:.2f}" + (f" - {mensaje}" if mensaje else ""),
+                body=f"{de_nombre} te sent ${monto:.2f}" + (f" - {mensaje}" if mensaje else ""),
                 data={
                     "type": "transfer_received",
                     "transferencia_id": transferencia["transferencia_id"],

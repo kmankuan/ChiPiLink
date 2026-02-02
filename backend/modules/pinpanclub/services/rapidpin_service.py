@@ -44,7 +44,7 @@ async def send_challenge_notification(
             },
             "challenge_accepted": {
                 "title": "✅ ¡Challenge Aceptado!",
-                "body": f"{challenger_name} aceptó tu challenge. ¡A buscar referee!"
+                "body": f"{challenger_name} accepted tu challenge. ¡A buscar referee!"
             },
             "referee_needed": {
                 "title": "🏓 ¡Partido esperando referee!",
@@ -60,7 +60,7 @@ async def send_challenge_notification(
             },
             "date_accepted": {
                 "title": "✅ ¡Fecha acordada!",
-                "body": f"{challenger_name} aceptó la fecha. El reto is confirmado"
+                "body": f"{challenger_name} accepted la fecha. El reto is confirmado"
             }
         }
         

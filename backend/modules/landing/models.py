@@ -80,7 +80,7 @@ BLOCK_TEMPLATES = {
     },
     "features": {
         "nombre": "Features",
-        "descripcion": "Lista de características con íconos",
+        "descripcion": "Lista de features con íconos",
         "config_default": {
             "titulo": "¿Por what elegirnos?",
             "subtitulo": "",

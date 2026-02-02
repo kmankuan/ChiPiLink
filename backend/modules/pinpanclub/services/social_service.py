@@ -91,7 +91,7 @@ class SocialService(BaseService):
         return await self.follow_repo.get_followers(jugador_id, limit)
     
     async def get_following(self, jugador_id: str, limit: int = 50) -> List[Dict]:
-        """Get a quiénes sigue un jugador"""
+        """Get a who sigue un jugador"""
         return await self.follow_repo.get_following(jugador_id, limit)
     
     async def get_follow_stats(self, jugador_id: str) -> FollowStats:
@@ -272,7 +272,7 @@ class SocialService(BaseService):
         return await self.notification_repo.count_unread(user_id)
     
     async def mark_notification_read(self, notification_id: str) -> bool:
-        """Marcar notification como leída"""
+        """Marcar notification como read"""
         return await self.notification_repo.mark_as_read(notification_id)
     
     async def mark_all_notifications_read(self, user_id: str) -> int:

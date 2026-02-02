@@ -291,7 +291,7 @@ class WalletService(BaseService):
         reference: str = None,
         description: str = None
     ) -> Dict:
-        """Realizar un depósito/recarga"""
+        """Realizar un deposit/recarga"""
         transaction = await self.create_transaction(
             user_id=user_id,
             transaction_type=TransactionType.DEPOSIT,

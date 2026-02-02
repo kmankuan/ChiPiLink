@@ -211,7 +211,7 @@ class Transaction(BaseModel):
     usd_amount: Optional[float] = None
     points_amount: Optional[int] = None
     
-    # Method de pago (para depósitos/compras)
+    # Method de pago (para deposits/compras)
     payment_method: Optional[PaymentMethod] = None
     payment_reference: Optional[str] = None
     

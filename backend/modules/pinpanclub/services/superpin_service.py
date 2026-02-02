@@ -693,7 +693,7 @@ class SuperPinService(BaseService):
         # Update brackets in DB
         await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
-        # Verify si the tournament terminó
+        # Verify si the tournament ended
         final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
         if final_bracket:
             final_match = final_bracket["matches"][0]
