@@ -9,7 +9,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://i18n-refactor-7.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://language-persist.preview.emergentagent.com')
 
 # Test players
 PLAYER_A_ID = "jugador_544167d88272"  # Carlos / El Rayo
