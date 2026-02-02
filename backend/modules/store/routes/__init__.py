@@ -17,7 +17,7 @@ from .inventory import router as inventory_router
 from .public import router as public_router
 from .landing import router as landing_router
 from .bulk_import import router as bulk_import_router
-from .catalogo_privado import router as catalogo_privado_router
+from .private_catalog import router as private_catalog_router
 from .textbook_access import router as textbook_access_router
 from .form_config import router as form_config_router
 from .textbook_orders import router as textbook_orders_router
@@ -35,7 +35,7 @@ router.include_router(inventory_router)
 router.include_router(public_router)
 router.include_router(landing_router)
 router.include_router(bulk_import_router)
-router.include_router(catalogo_privado_router)
+router.include_router(private_catalog_router)
 router.include_router(textbook_access_router)
 router.include_router(form_config_router)
 router.include_router(textbook_orders_router)
