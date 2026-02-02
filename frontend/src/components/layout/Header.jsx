@@ -136,7 +136,7 @@ export function Header() {
       try {
         const API_URL = process.env.REACT_APP_BACKEND_URL;
         const token = localStorage.getItem('auth_token');
-        const response = await fetch(`${API_URL}/api/store/vinculacion/mis-estudiantes`, {
+        const response = await fetch(`${API_URL}/api/store/textbook-access/my-students`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.ok) {
