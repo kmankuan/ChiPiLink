@@ -88,5 +88,5 @@ class CategoryService(BaseService):
         }
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 category_service = CategoryService()

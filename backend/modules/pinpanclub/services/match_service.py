@@ -122,7 +122,7 @@ class MatchService(BaseService):
         if not match or match.estado not in [MatchState.PENDIENTE, MatchState.EN_CURSO, MatchState.PAUSADO]:
             return None
         
-        # Si es el primer punto, iniciar the match
+        # If first point, start the match
         if match.estado == MatchState.PENDIENTE:
             await self.start_match(partido_id)
             match = await self.get_match(partido_id)
@@ -146,7 +146,7 @@ class MatchService(BaseService):
             puntos_a = 0
             puntos_b = 0
         
-        # Verify si se completó el set
+        # Verify if set was completed
         puntos_para_ganar = match.puntos_por_set
         set_completado = False
         ganador_set = None
@@ -180,7 +180,7 @@ class MatchService(BaseService):
             sets_a, sets_b, set_actual, historial
         )
         
-        # Emit evento de score actualizado
+        # Emit score updated event
         await self.emit_event(
             PinpanClubEvents.MATCH_SCORE_UPDATED,
             {
@@ -306,5 +306,5 @@ class MatchService(BaseService):
         }
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 match_service = MatchService()

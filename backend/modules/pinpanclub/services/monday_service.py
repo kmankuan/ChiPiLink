@@ -154,7 +154,7 @@ class MondayService(BaseService):
                 "email": None
             }
             
-            # Extract datos de columnas
+            # Extract column data
             for col in item.get("column_values", []):
                 col_id = col.get("id", "").lower()
                 col_text = col.get("text", "")
@@ -274,7 +274,7 @@ class MondayService(BaseService):
         if not match:
             return None
         
-        # Get nombres de jugadores
+        # Get player names
         player_a = match.get("jugador_a_info", {})
         player_b = match.get("jugador_b_info", {})
         
@@ -400,5 +400,5 @@ class MondayService(BaseService):
         return {"synced": synced, "failed": failed}
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 monday_service = MondayService()

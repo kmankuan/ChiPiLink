@@ -146,5 +146,5 @@ class PostService(BaseService):
         return Comment(**result)
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 post_service = PostService()

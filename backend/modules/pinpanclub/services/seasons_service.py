@@ -122,7 +122,7 @@ class RankingSeasonsService(BaseService):
             {"$set": {"status": SeasonStatus.UPCOMING.value}}
         )
         
-        # Activate la new season
+        # Activate the new season
         result = await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {"$set": {"status": SeasonStatus.ACTIVE.value}}
@@ -487,7 +487,7 @@ class RankingSeasonsService(BaseService):
             # Create para este mes si aún no empezó
             start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         else:
-            # Create para el próximo mes
+            # Create for next month
             start_date = (now.replace(day=1) + relativedelta(months=1)).replace(
                 hour=0, minute=0, second=0, microsecond=0
             )

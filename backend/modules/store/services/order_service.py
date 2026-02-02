@@ -229,5 +229,5 @@ class OrderService(BaseService):
         }
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 order_service = OrderService()

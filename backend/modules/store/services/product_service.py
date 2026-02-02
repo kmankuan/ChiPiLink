@@ -196,5 +196,5 @@ class ProductService(BaseService):
         }
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 product_service = ProductService()

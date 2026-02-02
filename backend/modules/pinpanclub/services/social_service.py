@@ -62,7 +62,7 @@ class SocialService(BaseService):
         
         result = await self.follow_repo.create(follow_data)
         
-        # Create notificación para el seguido
+        # Create notification for followed user
         await self.create_notification(NotificationCreate(
             user_id=following_id,
             type=NotificationType.NEW_FOLLOWER,
@@ -168,7 +168,7 @@ class SocialService(BaseService):
         )
         
         if existing:
-            # Si es la misma reacción, eliminar
+            # If same reaction, remove
             if existing["reaction_type"] == data.reaction_type:
                 await self.reaction_repo.delete_reaction(
                     data.user_id, data.target_id, data.target_type

@@ -149,5 +149,5 @@ class PlayerService(BaseService):
         return await self.repository.set_monday_item_id(jugador_id, monday_item_id)
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 player_service = PlayerService()

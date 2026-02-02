@@ -61,5 +61,5 @@ class AlbumService(BaseService):
         return await self.repository.delete_album(album_id)
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 album_service = AlbumService()

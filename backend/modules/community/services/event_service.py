@@ -145,5 +145,5 @@ class EventService(BaseService):
         return success
 
 
-# Instancia singleton del servicio
+# Service singleton instance
 event_service = EventService()

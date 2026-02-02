@@ -1196,7 +1196,7 @@ class RapidPinService(BaseService):
         if user_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Solo the players dthe challenge pueden responder")
         
-        # Verify that does not sea la misma persona que propuso
+        # Verify is not the same person who proposed
         if action in ["accept", "counter"] and user_id == queue_entry.get("proposed_by_id"):
             raise ValueError("Debes esperar la respuesta del otro jugador")
         
@@ -1368,7 +1368,7 @@ class RapidPinService(BaseService):
         if not queue_entry:
             raise ValueError("Reto not found")
         
-        # Verify si already exists el like
+        # Verify if like already exists
         existing = await db["rapidpin_reactions"].find_one({
             "queue_id": queue_id,
             "user_id": user_id,

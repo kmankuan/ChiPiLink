@@ -285,7 +285,7 @@ class SuperPinService(BaseService):
         ganador_set = None
         ganador_partido = None
         
-        # Verify si se ganó el set
+        # Verify if set was won
         if puntos_a >= puntos_set or puntos_b >= puntos_set:
             if abs(puntos_a - puntos_b) >= 2:
                 set_ganado = True
@@ -371,7 +371,7 @@ class SuperPinService(BaseService):
         if not ranking_ganador or not ranking_perdedor:
             return
         
-        # Calculatesr puntos según el sistema
+        # Calculate points according to system
         if scoring_system == "elo":
             puntos_ganador, puntos_perdedor, elo_change = self._calculate_elo(
                 ranking_ganador.get("elo_rating", 1000),
@@ -670,7 +670,7 @@ class SuperPinService(BaseService):
         if not match_found:
             raise ValueError("Partido not found")
         
-        # Avanzar ganador a la siguiente ronda
+        # Advance winner to next round
         next_round = current_round + 1
         for bracket in brackets:
             if bracket["round"] == next_round and bracket.get("name") != "Tercer Lugar":
@@ -743,7 +743,7 @@ class SuperPinService(BaseService):
     ) -> Optional[Dict]:
         """Otorgar un badge a un jugador"""
         
-        # Verify si ya tiene el badge (si no se permiten duplicados)
+        # Verify if already has badge (if duplicates not allowed)
         if not allow_duplicates:
             existing = await self.badge_repo.get_badge_by_type(
                 jugador_id, badge_type,
@@ -1188,7 +1188,7 @@ class SuperPinService(BaseService):
                 "posicion": ranking.get("posicion", 999) if ranking else 999
             })
         
-        # Ordenar y emparejar según el modo
+        # Sort and pair according to mode
         if pairing_mode == "by_ranking":
             # Ordenar por posición (mejor primero)
             players_with_ranking.sort(key=lambda x: x["posicion"])

@@ -39,7 +39,7 @@ class PrizeService(BaseService):
     
     async def create_prize(self, data: PrizeDefinitionCreate) -> PrizeDefinition:
         """Create definición de premio"""
-        # Convert conditions a lista de dicts
+        # Convert conditions to list of dicts
         prize_data = data.model_dump()
         result = await self.definition_repo.create(prize_data)
         return PrizeDefinition(**result)
@@ -116,7 +116,7 @@ class PrizeService(BaseService):
         
         player = await self.player_repo.get_by_id(jugador_id)
         
-        # Verify límite de ganadores
+        # Verify winners limit
         if prize.get("max_winners"):
             current_winners = await self.awarded_repo.count_prize_winners(prize_id)
             if current_winners >= prize["max_winners"]:
@@ -187,7 +187,7 @@ class PrizeService(BaseService):
         """
         awarded = []
         
-        # Get catálogo de premios
+        # Get prize catalog
         catalog = await self.get_or_create_default_catalog()
         
         for prize_data in catalog.prizes:
