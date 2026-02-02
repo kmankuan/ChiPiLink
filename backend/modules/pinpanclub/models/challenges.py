@@ -22,10 +22,10 @@ class ChallengeType(str, Enum):
     MATCHES_PLAYED = "matches_played"      # Jugar X partidos
     MATCHES_WON = "matches_won"            # Ganar X partidos
     MATCHES_REFEREED = "matches_refereed"  # Arbitrar X partidos
-    WIN_STREAK = "win_streak"              # Racha de X victorias
+    WIN_STREAK = "win_streak"              # X win streak
     PLAY_DIFFERENT = "play_different"      # Jugar contra X oponentes diferentes
     DAILY_PLAY = "daily_play"              # Jugar X días diferentes
-    COMEBACK = "comeback"                  # Ganar estando abajo en marcador
+    COMEBACK = "comeback"                  # Win while behind on score
     PERFECT_GAME = "perfect_game"          # Ganar sin perder puntos (11-0)
     SOCIAL = "social"                      # Interacciones sociales
     CUSTOM = "custom"                      # Personalizado
@@ -33,7 +33,7 @@ class ChallengeType(str, Enum):
 
 class ChallengeStatus(str, Enum):
     """Estado dthe challenge para un jugador"""
-    AVAILABLE = "available"    # Disponible para iniciar
+    AVAILABLE = "available"    # Available to start
     IN_PROGRESS = "in_progress"  # In progreso
     COMPLETED = "completed"    # Completado
     FAILED = "failed"          # No completado a tiempo
@@ -62,7 +62,7 @@ class ChallengeDefinition(BaseModel):
     # Configuration
     is_automatic: bool = True  # Si es generado automáticamente
     is_active: bool = True
-    is_repeatable: bool = False  # Si se puede completar múltiples veces
+    is_repeatable: bool = False  # If can be completed multiple times
     
     # Vigencia
     valid_from: Optional[str] = None
