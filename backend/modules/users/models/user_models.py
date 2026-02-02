@@ -319,58 +319,58 @@ class UserMembership(BaseModel):
     plan_id: str
     plan_info: Optional[Dict] = None  # Cache of plan info
     
-    # Estado
+    # Status
     status: str = "active"  # active, expired, cancelled, suspended
     
-    # Valores actuales
+    # Current values
     visits_remaining: Optional[int] = None
     credits_remaining: Optional[int] = None
     
-    # Fechas
+    # Dates
     start_date: str
     end_date: Optional[str] = None
     
-    # Compra
+    # Purchase
     purchase_price: float
     paid_with_points: bool = False
     transaction_id: Optional[str] = None
     
-    # Patrocinador (si es cortesía)
-    sponsored_by: Optional[str] = None  # user_id del patrocinador
+    # Sponsor (if courtesy)
+    sponsored_by: Optional[str] = None  # sponsor's user_id
     sponsor_note: Optional[str] = None
     
-    # Renovación
+    # Renewal
     is_auto_renew: bool = False
     renewal_count: int = 0
     
-    # Historial
-    usage_history: List[Dict] = []  # Lista de usos con fecha y notas
+    # History
+    usage_history: List[Dict] = []  # List of usages with date and notes
     
     # Metadata
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
 
-# ============== VISITAS/CHECK-INS ==============
+# ============== VISITS/CHECK-INS ==============
 
 class VisitType(str, Enum):
-    """Tipos de visita"""
-    REGULAR = "regular"         # Visita normal (consume membresía)
-    QUICK = "quick"             # Visita rápida (no consume)
-    EVENT = "event"             # Evento especial
-    GUEST = "guest"             # Invitado
-    TRIAL = "trial"             # Prueba
+    """Visit types"""
+    REGULAR = "regular"         # Regular visit (consumes membership)
+    QUICK = "quick"             # Quick visit (does not consume)
+    EVENT = "event"             # Special event
+    GUEST = "guest"             # Guest
+    TRIAL = "trial"             # Trial
 
 
 class UserVisit(BaseModel):
-    """Registro de visita de un usuario"""
+    """User visit record"""
     visit_id: str = Field(default_factory=lambda: f"visit_{uuid.uuid4().hex[:8]}")
     
-    # Usuario
+    # User
     user_id: str
     profile_id: Optional[str] = None
     
-    # Tipo de visita
+    # Visit type
     visit_type: VisitType = VisitType.REGULAR
     
     # Check-in
@@ -381,23 +381,23 @@ class UserVisit(BaseModel):
     check_out_time: Optional[str] = None
     duration_minutes: Optional[int] = None
     
-    # Geolocalización
+    # Geolocation
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     location_verified: bool = False
     
-    # Membresía
+    # Membership
     membership_id: Optional[str] = None
     consumed_visit: bool = False
     
-    # Notas
+    # Notes
     notes: Optional[str] = None
-    registered_by: Optional[str] = None  # Admin que registró (si manual)
+    registered_by: Optional[str] = None  # Admin who registered (if manual)
     
     created_at: Optional[str] = None
 
 
-# ============== FUNCIONES DE UTILIDAD ==============
+# ============== UTILITY FUNCTIONS ==============
 
 def get_default_user_types() -> List[Dict]:
     """Tipos de usuario por defecto"""
