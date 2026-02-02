@@ -398,12 +398,12 @@ export default function MondayModule() {
         <div>
           <h2 className="text-2xl font-serif font-bold">Monday.com Integration</h2>
           <p className="text-muted-foreground">
-            Configura la conexión y sincronización con Monday.com para diferentes módulos
+            Configure connection and sync with Monday.com for different modules
           </p>
         </div>
         <Button variant="outline" onClick={loadAllData} className="gap-2">
           <RefreshCw className="h-4 w-4" />
-          Actualizar
+          Refresh
         </Button>
       </div>
 
@@ -415,7 +415,7 @@ export default function MondayModule() {
           </TabsTrigger>
           <TabsTrigger value="libros" className="gap-2">
             <BookOpen className="h-4 w-4" />
-            Pedidos de Libros
+            Book Orders
           </TabsTrigger>
           <TabsTrigger value="general" className="gap-2">
             <LayoutGrid className="h-4 w-4" />
@@ -425,12 +425,12 @@ export default function MondayModule() {
 
         {/* ========== TAB: WORKSPACES ========== */}
         <TabsContent value="workspaces" className="space-y-6 mt-6">
-          {/* Estado de conexión */}
+          {/* Connection status */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plug className="h-5 w-5" />
-                Conexión Activa
+                Active Connection
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -440,7 +440,7 @@ export default function MondayModule() {
                     <>
                       <CheckCircle2 className="h-6 w-6 text-green-500" />
                       <div>
-                        <p className="font-medium text-green-600">Conectado</p>
+                        <p className="font-medium text-green-600">Connected</p>
                         {connectionInfo?.user && (
                           <p className="text-sm text-muted-foreground">
                             {connectionInfo.user.name} ({connectionInfo.user.email})
@@ -452,9 +452,9 @@ export default function MondayModule() {
                     <>
                       <XCircle className="h-6 w-6 text-red-500" />
                       <div>
-                        <p className="font-medium text-red-600">No conectado</p>
+                        <p className="font-medium text-red-600">Not connected</p>
                         <p className="text-sm text-muted-foreground">
-                          {connectionInfo?.error || 'Agrega un workspace con API Key válida'}
+                          {connectionInfo?.error || 'Add a workspace with a valid API Key'}
                         </p>
                       </div>
                     </>
@@ -470,21 +470,21 @@ export default function MondayModule() {
                   ) : (
                     <RefreshCw className="h-4 w-4 mr-2" />
                   )}
-                  Verificar
+                  Verify
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Lista de Workspaces */}
+          {/* Workspaces List */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Key className="h-5 w-5" />
-                Workspaces Configurados
+                Configured Workspaces
               </CardTitle>
               <CardDescription>
-                Cada workspace utiliza su propia API Key. Puedes configurar múltiples cuentas de Monday.com.
+                Each workspace uses its own API Key. You can configure multiple Monday.com accounts.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
