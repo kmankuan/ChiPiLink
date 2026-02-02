@@ -1,6 +1,6 @@
 """
-ChipiWallet - Modelos para sistema de billetera digital
-Soporta USD y ChipiPoints con transacciones y conversiones
+ChipiWallet - Models for digital wallet system
+Supports USD and ChipiPoints with transactions and conversions
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -12,32 +12,32 @@ import uuid
 # ============== ENUMS ==============
 
 class TransactionType(str, Enum):
-    """Tipos de transacción"""
-    # Entradas de dinero
-    DEPOSIT = "deposit"                 # Depósito/Recarga
-    REFUND = "refund"                   # Reembolso
-    TRANSFER_IN = "transfer_in"         # Transferencia recibida
-    REWARD = "reward"                   # Recompensa/Premio
-    BONUS = "bonus"                     # Bono
+    """Transaction types"""
+    # Money inflows
+    DEPOSIT = "deposit"                 # Deposit/Reload
+    REFUND = "refund"                   # Refund
+    TRANSFER_IN = "transfer_in"         # Received transfer
+    REWARD = "reward"                   # Reward/Prize
+    BONUS = "bonus"                     # Bonus
     
-    # Salidas de dinero
-    PURCHASE = "purchase"               # Compra
-    PAYMENT = "payment"                 # Pago de servicio
-    TRANSFER_OUT = "transfer_out"       # Transferencia enviada
-    WITHDRAWAL = "withdrawal"           # Retiro
-    FEE = "fee"                         # Comisión
+    # Money outflows
+    PURCHASE = "purchase"               # Purchase
+    PAYMENT = "payment"                 # Service payment
+    TRANSFER_OUT = "transfer_out"       # Sent transfer
+    WITHDRAWAL = "withdrawal"           # Withdrawal
+    FEE = "fee"                         # Fee
     
-    # Conversiones
-    POINTS_TO_USD = "points_to_usd"     # Convertir puntos a dólares
-    USD_TO_POINTS = "usd_to_points"     # Convertir dólares a puntos
+    # Conversions
+    POINTS_TO_USD = "points_to_usd"     # Convert points to dollars
+    USD_TO_POINTS = "usd_to_points"     # Convert dollars to points
     
-    # Ajustes
-    ADJUSTMENT = "adjustment"           # Ajuste manual (admin)
-    CORRECTION = "correction"           # Corrección
+    # Adjustments
+    ADJUSTMENT = "adjustment"           # Manual adjustment (admin)
+    CORRECTION = "correction"           # Correction
 
 
 class TransactionStatus(str, Enum):
-    """Estado de una transacción"""
+    """Transaction status"""
     PENDING = "pending"
     COMPLETED = "completed"
     FAILED = "failed"
@@ -46,58 +46,58 @@ class TransactionStatus(str, Enum):
 
 
 class Currency(str, Enum):
-    """Monedas soportadas"""
+    """Supported currencies"""
     USD = "USD"
     CHIPIPOINTS = "CHIPIPOINTS"
 
 
 class PaymentMethod(str, Enum):
-    """Métodos de pago"""
+    """Payment methods"""
     CASH = "cash"
     CARD = "card"
     YAPPY = "yappy"
     BANK_TRANSFER = "bank_transfer"
     CHIPIPOINTS = "chipipoints"
-    MIXED = "mixed"                     # Combinación USD + Puntos
-    WALLET = "wallet"                   # Desde saldo de billetera
+    MIXED = "mixed"                     # Combination USD + Points
+    WALLET = "wallet"                   # From wallet balance
 
 
 class PointsEarnType(str, Enum):
-    """Formas de ganar ChipiPoints"""
-    PURCHASE = "purchase"               # Por compras
-    CHALLENGE = "challenge"             # Por retos completados
-    ACHIEVEMENT = "achievement"         # Por logros
-    REFERRAL = "referral"               # Por referidos
-    WORK = "work"                       # Por trabajo/ayuda
-    PROMOTION = "promotion"             # Promoción especial
-    SEASON_REWARD = "season_reward"     # Recompensa de temporada
-    RANK_UP = "rank_up"                 # Subida de rango
-    MANUAL = "manual"                   # Otorgado manualmente
-    MEMBERSHIP = "membership"           # Bonus de membresía
+    """Ways to earn ChipiPoints"""
+    PURCHASE = "purchase"               # From purchases
+    CHALLENGE = "challenge"             # From completed challenges
+    ACHIEVEMENT = "achievement"         # From achievements
+    REFERRAL = "referral"               # From referrals
+    WORK = "work"                       # From work/help
+    PROMOTION = "promotion"             # Special promotion
+    SEASON_REWARD = "season_reward"     # Season reward
+    RANK_UP = "rank_up"                 # Rank up
+    MANUAL = "manual"                   # Manually granted
+    MEMBERSHIP = "membership"           # Membership bonus
 
 
-# ============== CONFIGURACIÓN DE CHIPIPOINTS ==============
+# ============== CHIPIPOINTS CONFIGURATION ==============
 
 class ChipiPointsConfig(BaseModel):
-    """Configuración global de ChipiPoints"""
+    """Global ChipiPoints configuration"""
     config_id: str = "chipipoints_config"
     
-    # Tasa de conversión
-    points_per_dollar: float = 100      # Cuántos puntos equivalen a $1 USD
-    conversion_rate: float = 0.008      # 1 punto = $0.008 USD (1000 pts = $8)
+    # Conversion rate
+    points_per_dollar: float = 100      # How many points equal $1 USD
+    conversion_rate: float = 0.008      # 1 point = $0.008 USD (1000 pts = $8)
     
-    # Conversión habilitada
+    # Conversion enabled
     allow_points_to_usd: bool = True
     allow_usd_to_points: bool = True
     
-    # Mínimos para conversión
+    # Minimum for conversion
     min_points_to_convert: int = 100
     min_usd_to_convert: float = 1.0
     
-    # Ganancia de puntos por compras
-    points_per_dollar_spent: int = 10   # Puntos ganados por cada $1 gastado
+    # Points earned per purchase
+    points_per_dollar_spent: int = 10   # Points earned per $1 spent
     
-    # Vencimiento
+    # Expiration
     points_expire: bool = False
     expiration_days: Optional[int] = None  # Días hasta vencimiento
     
