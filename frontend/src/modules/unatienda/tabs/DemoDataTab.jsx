@@ -201,7 +201,7 @@ export default function DemoDataTab({ token, onRefresh }) {
           <ul className="mt-2 text-sm text-green-600 dark:text-green-400 space-y-1">
             <li>• {lastResult.productos} libros de texto para todos los grados</li>
             <li>• {lastResult.estudiantes} estudiantes distribuidos por grado</li>
-            <li>• {lastResult.pedidos} pedidos de ejemplo para probar el flujo</li>
+            <li>• {lastResult.orders} pedidos de ejemplo para probar el flujo</li>
           </ul>
         </div>
       )}
@@ -225,8 +225,8 @@ export default function DemoDataTab({ token, onRefresh }) {
         <StatCard 
           icon={ShoppingCart} 
           title="Pedidos de Libros" 
-          value={stats?.pedidos_total || 0}
-          demoValue={stats?.pedidos || 0}
+          value={stats?.orders_total || 0}
+          demoValue={stats?.orders || 0}
           color="bg-purple-500"
         />
       </div>
@@ -260,7 +260,7 @@ export default function DemoDataTab({ token, onRefresh }) {
             </DialogTitle>
             <DialogDescription>
               ¿Estás seguro de que deseas eliminar todos los datos de demostración?
-              Esta acción eliminará {stats?.productos || 0} libros, {stats?.estudiantes || 0} estudiantes y {stats?.pedidos || 0} pedidos marcados como demo.
+              Esta acción eliminará {stats?.productos || 0} libros, {stats?.estudiantes || 0} estudiantes y {stats?.orders || 0} pedidos marcados como demo.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
