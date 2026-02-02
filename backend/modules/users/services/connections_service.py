@@ -409,7 +409,7 @@ class ConexionesService:
                 notification_type = "connection_accepted"
             else:
                 title = "❌ Connection Rechazada"
-                body = f"{para_nombre} rechazó tu request de connection"
+                body = f"{para_nombre} rejected tu request de connection"
                 notification_type = "connection_rejected"
             
             push_result = await push_notification_service.send_notification(

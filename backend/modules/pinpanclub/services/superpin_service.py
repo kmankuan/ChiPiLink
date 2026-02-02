@@ -582,7 +582,7 @@ class SuperPinService(BaseService):
         
         brackets.append({"round": 1, "name": "Final" if num_rounds == 1 else ("Octavos" if num_rounds >= 3 else "Primera Ronda"), "matches": round_1_matches})
         
-        # Generate rondas siguientes vacías
+        # Generate rondas siguientes empty
         round_names = ["Octavos", "Cuartos", "Semifinal", "Final"]
         for r in range(2, num_rounds + 1):
             num_matches = bracket_size // (2 ** r)

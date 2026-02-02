@@ -21,7 +21,7 @@ class CheckInMethod(str, Enum):
     """Method de check-in"""
     MANUAL = "manual"          # Record manual
     QR_CODE = "qr_code"        # QR code scan
-    GEOLOCATION = "geolocation"  # GPS/ubicación
+    GEOLOCATION = "geolocation"  # GPS/location
     ANY = "any"                # Cualquier method
 
 

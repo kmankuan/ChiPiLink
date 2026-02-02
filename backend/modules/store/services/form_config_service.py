@@ -235,7 +235,7 @@ class FormConfigService(BaseService):
                 "label_es": "Phone",
                 "label_zh": "电话",
                 "description_en": "Phone number input",
-                "description_es": "Entrada de number telefónico",
+                "description_es": "Entrada de number phone",
                 "icon": "phone"
             }
         ]

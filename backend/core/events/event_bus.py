@@ -158,7 +158,7 @@ class EventBus:
         logger.debug(f"Event {event.event_type} processed by {len(matching_handlers)} handlers")
     
     def publish_sync(self, event: Event) -> None:
-        """Publicar evento de forma síncrona (para usar fuera de contexto async)"""
+        """Publicar evento de forma synchronous (para usar fuera de contexto async)"""
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():

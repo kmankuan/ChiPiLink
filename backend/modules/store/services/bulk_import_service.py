@@ -46,7 +46,7 @@ class BulkImportService:
             cells = line.split('\t')
             # Clean espacios extras
             cells = [cell.strip() for cell in cells]
-            if any(cell for cell in cells):  # Si hay al menos una celda no vacía
+            if any(cell for cell in cells):  # Si hay al menos una celda no empty
                 rows.append(cells)
         
         if not rows:
@@ -564,7 +564,7 @@ class BulkImportService:
         if not precio_str:
             return 0.0
         
-        # Remove símbolos de moneda y espacios
+        # Remove symbols de moneda y espacios
         clean = re.sub(r'[^\d.,]', '', str(precio_str))
         
         if not clean:
