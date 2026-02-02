@@ -352,7 +352,7 @@ async def admin_grant_membership(
     sponsor_note: Optional[str] = None,
     admin=Depends(get_admin_user)
 ):
-    """Otorgar membership a un usuario (admin/cortesía)"""
+    """Otorgar membership a un usuario (admin/courtesy)"""
     try:
         membership = await membership_service.purchase_membership(
             user_id=user_id,

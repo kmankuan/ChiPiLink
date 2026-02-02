@@ -144,7 +144,7 @@ class MembershipService:
                     "zh": "礼遇"
                 },
                 "description": {
-                    "es": "Membresía de cortesía otorgada por el club.",
+                    "es": "Membresía de courtesy otorgada por el club.",
                     "en": "Courtesy membership granted by the club.",
                     "zh": "俱乐部授予的礼遇会员资格。"
                 },
@@ -497,7 +497,7 @@ class MembershipService:
         """Inicializar configuration de visitas"""
         config = {
             "config_id": "visit_config",
-            "min_duration_minutes": 30,  # Mínimo para contar como visita regular
+            "min_duration_minutes": 30,  # Minimum para contar como visita regular
             "quick_visit_max_minutes": 15,  # Máximo para visita rápida (no consume)
             "check_in_methods": ["qr", "pin", "geolocation", "manual"],
             "require_checkout": True,

@@ -69,7 +69,7 @@ async def get_auth_config(admin: dict = Depends(get_admin_user)):
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
-                "direccion": {"required": False, "visible": False, "label": "Dirección"},
+                "direccion": {"required": False, "visible": False, "label": "Address"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
             },
             "auto_capture_location": True
@@ -126,7 +126,7 @@ async def get_public_auth_config():
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
-                "direccion": {"required": False, "visible": False, "label": "Dirección"},
+                "direccion": {"required": False, "visible": False, "label": "Address"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
             },
             "auto_capture_location": True
@@ -166,7 +166,7 @@ async def toggle_auth_method(
     Quick toggle for enabling/disabling an auth method
     """
     if method_id not in ["email_password", "google", "facebook", "apple"]:
-        raise HTTPException(status_code=400, detail="Método invalid")
+        raise HTTPException(status_code=400, detail="Method invalid")
     
     config = await db.site_config.find_one(
         {"config_type": AUTH_CONFIG_KEY},

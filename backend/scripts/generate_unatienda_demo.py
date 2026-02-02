@@ -25,8 +25,8 @@ GRADOS_PCA = [
 ]
 
 # Materias por nivel
-MATERIAS_PRIMARIA = ["Espyearl", "Mathematics", "Ciencias Naturales", "Ciencias Sociales", "English", "Religión"]
-MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Física", "Química", "Biología", "Historia", "Geografía", "English", "Religión", "Tecnología"]
+MATERIAS_PRIMARIA = ["Espyearl", "Mathematics", "Ciencias Naturales", "Ciencias Sociales", "English", "Religion"]
+MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Física", "Química", "Biología", "Historia", "Geografía", "English", "Religion", "Tecnología"]
 
 # Editoriales
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
@@ -34,7 +34,7 @@ EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
 # Nombres panameños de ejemplo
 NOMBRES = ["María", "José", "Ana", "Carlos", "Sofía", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
            "Camila", "Andrés", "Lucía", "Juan", "Emma", "Diego", "Gabriela", "Sebastián", "Victoria", "Alejandro"]
-APELLIDOS = ["González", "Rodríguez", "Martínez", "López", "García", "Hernández", "Pérez", "Sánchez", "Ramírez", "Torres",
+APELLIDOS = ["González", "Rodríguez", "Martínez", "López", "García", "Hernández", "Perez", "Sánchez", "Ramírez", "Torres",
              "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Ortega", "Vargas", "Castro", "Jiménez"]
 
 
@@ -75,7 +75,7 @@ async def generate_catalog_products() -> List[Dict]:
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "codigo": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
                 "nombre": f"{materia} {grado} - {editorial}",
-                "descripcion": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Año escolar 2025-2026.",
+                "descripcion": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
                 "categoria": "libros",
                 "grado": grado,
                 "grados": [grado],

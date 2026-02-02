@@ -272,7 +272,7 @@ def get_auto_challenges() -> List[Dict]:
 
 def select_weekly_challenges(difficulty_mix: Dict[str, int] = None) -> List[Dict]:
     """
-    Selecciona retos para la semana basándose en dificultad.
+    Selecciona retos para la semana based on en dificultad.
     Por defecto: 2 easyes, 2 medios, 1 difficult
     """
     import random

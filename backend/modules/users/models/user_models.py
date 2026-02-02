@@ -468,7 +468,7 @@ def get_default_user_types() -> List[Dict]:
         {
             "type_id": "utype_special",
             "name": {"es": "Miembro Especial", "en": "Special Member", "zh": "特殊会员"},
-            "description": {"es": "Membresía de cortesía", "en": "Courtesy membership", "zh": "礼遇会员"},
+            "description": {"es": "Membresía de courtesy", "en": "Courtesy membership", "zh": "礼遇会员"},
             "category": "special",
             "icon": "⭐",
             "color": "#ec4899",

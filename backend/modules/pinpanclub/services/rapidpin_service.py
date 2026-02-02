@@ -39,11 +39,11 @@ async def send_challenge_notification(
         
         messages = {
             "challenge_received": {
-                "title": "⚔️ ¡Nuevo Desafío!",
+                "title": "⚔️ ¡Nuevo Challenge!",
                 "body": f"{challenger_name} te ha desafiado a un partido de Rapid Pin"
             },
             "challenge_accepted": {
-                "title": "✅ ¡Desafío Aceptado!",
+                "title": "✅ ¡Challenge Aceptado!",
                 "body": f"{challenger_name} aceptó tu challenge. ¡A buscar referee!"
             },
             "referee_needed": {
@@ -139,7 +139,7 @@ async def send_referee_needed_broadcast(
 class RapidPinService(BaseService):
     """
     Servicio principal para Rapid Pin.
-    System for partidos espontáneos: 2 jugadores + 1 referee
+    System for partidos spontaneous: 2 jugadores + 1 referee
     """
     
     MODULE_NAME = "pinpanclub"
@@ -723,7 +723,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Desafío not found")
+            raise ValueError("Challenge not found")
         
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este challenge ya fue procesado")
@@ -786,7 +786,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Desafío not found")
+            raise ValueError("Challenge not found")
         
         if queue_entry["status"] != "challenge_pending":
             raise ValueError("Este challenge ya fue procesado")
@@ -1087,7 +1087,7 @@ class RapidPinService(BaseService):
         """
         db = await self.get_db()
         
-        # Validaciones básicas
+        # Validaciones basics
         if challenger_id == opponent_id:
             raise ValueError("You cannot challenge yourself")
         

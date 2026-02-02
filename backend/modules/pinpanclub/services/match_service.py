@@ -115,7 +115,7 @@ class MatchService(BaseService):
     ) -> Optional[Match]:
         """
         Actualizar score dthe match.
-        Maneja lógica de sets y determina ganador.
+        Maneja logic de sets y determina ganador.
         Emite eventos: score_updated, set_completed, match_finished
         """
         match = await self.get_match(partido_id)

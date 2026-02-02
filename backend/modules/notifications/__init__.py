@@ -1,7 +1,7 @@
 """
 Notifications Module - System for push notifications y posts
 
-Características:
+Features:
 - Soporte multi-proveedor (FCM + OneSignal) con failover
 - Categorys de notification configurables
 - Preferencias de usuario por category

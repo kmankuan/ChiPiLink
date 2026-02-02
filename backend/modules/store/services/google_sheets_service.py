@@ -1,5 +1,5 @@
 """
-Store Module - Servicio de Sincronización con Google Sheets
+Store Module - Servicio de Synchronization con Google Sheets
 Sincroniza estudiantes desde hojas de cálculo de Google
 """
 from typing import List, Optional, Dict, Any
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class GoogleSheetsService:
     """
     Service for sincronizar estudiantes desde Google Sheets.
-    Soporta multiple hojas (pestañas) por grado.
+    Soporta multiple hojas (tabs) por grado.
     """
     
     def __init__(self):
@@ -121,7 +121,7 @@ class GoogleSheetsService:
         Args:
             sheet_id: ID of the Google Sheet
             nombre_sheet: Nombre descriptivo
-            hojas: Lista de hojas/pestañas con su configuration
+            hojas: Lista de hojas/tabs con su configuration
                    [{"nombre": "1er Grado", "grado": "1", "columnas": {...}}]
         """
         config = await self.get_sync_config()

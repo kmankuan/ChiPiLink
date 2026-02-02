@@ -111,7 +111,7 @@ async def get_available_rooms():
             {
                 "name": "rapidpin",
                 "description": {
-                    "es": "Desafíos, likes y comentarios de Rapid Pin",
+                    "es": "Challenges, likes y comentarios de Rapid Pin",
                     "en": "Rapid Pin challenges, likes and comments",
                     "zh": "快速对决挑战、点赞和评论"
                 }

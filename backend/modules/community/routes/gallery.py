@@ -23,7 +23,7 @@ async def get_album(album_id: str):
     """Get album by ID"""
     album = await album_service.get_album(album_id)
     if not album:
-        raise HTTPException(status_code=404, detail="Álbum not found")
+        raise HTTPException(status_code=404, detail="Album not found")
     return album
 
 
@@ -56,7 +56,7 @@ async def update_album(
     """Update album (admin)"""
     album = await album_service.update_album(album_id, data)
     if not album:
-        raise HTTPException(status_code=404, detail="Álbum not found")
+        raise HTTPException(status_code=404, detail="Album not found")
     return album
 
 
@@ -68,5 +68,5 @@ async def delete_album(
     """Delete album (admin)"""
     success = await album_service.delete_album(album_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Álbum not found")
+        raise HTTPException(status_code=404, detail="Album not found")
     return {"success": True}

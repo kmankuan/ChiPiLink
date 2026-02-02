@@ -85,7 +85,7 @@ class PrizeService(BaseService):
         
         # Create catalog
         catalog_data = {
-            "name": "Catálogo Principal",
+            "name": "Catalog Principal",
             "description": "Premios isndar para temporadas",
             "prizes": [p.model_dump() for p in prize_defs]
         }

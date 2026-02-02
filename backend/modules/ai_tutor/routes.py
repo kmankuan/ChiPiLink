@@ -4,7 +4,7 @@ AI Tutor Routes - Endpoints para el Tutor Inteligente
 PLACEHOLDER - Endpoints a implementar:
 - GET /ai-tutor/status - Estado del module
 - GET/PUT /ai-tutor/config - Configuration del tutor
-- POST /ai-tutor/sessions - Iniciar session de tutoría
+- POST /ai-tutor/sessions - Iniciar session de tutoring
 - POST /ai-tutor/speak - Generar audio TTS
 - POST /ai-tutor/evaluate-pronunciation - Evaluar pronunciation del estudiante
 - GET /ai-tutor/vocabulary - Obtener vocabulario
@@ -39,9 +39,9 @@ async def get_tutor_status():
         "message": "AI Tutor - Tutor Inteligente para Estudiantes",
         "planned_features": [
             "Práctica de vocabulario con voz",
-            "Evaluación de pronunciation en tiempo real",
+            "Evaluation de pronunciation en tiempo real",
             "Feedback personalizado del tutor",
-            "Planes de lección adaptativos",
+            "Planes de lesson adaptativos",
             "Seguimiento de progreso",
             "Múltiples idiomas (English, Chino, Espyearl)",
             "Gamificación con logros y rachas"
@@ -185,7 +185,7 @@ async def evaluate_pronunciation(data: dict, user: dict = Depends(get_current_us
         "recognized_text": None,
         "score": None,
         "is_correct": False,
-        "feedback": "Evaluación de pronunciation no implementada. Requiere integration con STT.",
+        "feedback": "Evaluation de pronunciation no implementada. Requiere integration con STT.",
         "message": "Requiere: OpenAI Whisper para STT + LLM para feedback."
     }
 

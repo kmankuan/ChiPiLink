@@ -156,7 +156,7 @@ def get_default_notification_categories() -> List[Dict]:
         {
             "category_id": "cat_rapidpin",
             "name": {
-                "es": "Desafíos Rapid Pin",
+                "es": "Challenges Rapid Pin",
                 "en": "Rapid Pin Challenges",
                 "zh": "快速对决挑战"
             },

@@ -38,7 +38,7 @@ class OrderFormConfigService:
                 "field_id": f"field_{uuid.uuid4().hex[:8]}",
                 "field_type": "info",
                 "label": "Payment Information",
-                "label_es": "Información de Pago",
+                "label_es": "Information de Pago",
                 "label_en": "Payment Information",
                 "label_zh": "付款信息",
                 "content": """
@@ -259,7 +259,7 @@ class OrderFormConfigService:
             {"type": "date", "label": "Date", "label_es": "Fecha", "label_zh": "日期", "description": "Date picker"},
             {"type": "email", "label": "Email", "label_es": "Correo", "label_zh": "电子邮件", "description": "Email address"},
             {"type": "phone", "label": "Phone", "label_es": "Phone", "label_zh": "电话", "description": "Phone number"},
-            {"type": "info", "label": "Info Display", "label_es": "Información", "label_zh": "信息显示", "description": "Display-only content (e.g., bank details)"}
+            {"type": "info", "label": "Info Display", "label_es": "Information", "label_zh": "信息显示", "description": "Display-only content (e.g., bank details)"}
         ]
 
 

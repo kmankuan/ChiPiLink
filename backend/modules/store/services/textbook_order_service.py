@@ -530,7 +530,7 @@ class TextbookOrderService(BaseService):
                 f"",
                 f"**Estudiante:** {order['student_name']}",
                 f"**Grado:** {order['grade']}",
-                f"**Año Escolar:** {order['year']}",
+                f"**Year Escolar:** {order['year']}",
                 f"",
                 f"**Cliente:** {user_name}",
                 f"**Email:** {user_email}",

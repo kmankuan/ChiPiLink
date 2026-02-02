@@ -57,7 +57,7 @@ def setup_event_handlers():
     @event_bus.subscribe("pinpanclub.*")
     async def log_all_pinpanclub_events(event: Event):
         """
-        Log de todos los eventos del module (para debugging/auditoría).
+        Log de todos los eventos del module (para debugging/audit).
         """
         logger.debug(
             f"[PINPANCLUB EVENT] {event.event_type}: {event.payload}"

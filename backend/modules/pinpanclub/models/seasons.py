@@ -30,16 +30,16 @@ class SeasonRewardTier(BaseModel):
     position_end: int          # Position final (ej: 3)
     bonus_points: int          # Points bonus
     badge: Optional[Dict] = None  # Badge especial
-    title: Optional[Dict] = None  # Título especial
+    title: Optional[Dict] = None  # Title especial
     perks: List[str] = []      # Beneficios adicionales
-    prize_id: Optional[str] = None  # Prize físico
+    prize_id: Optional[str] = None  # Prize physical
 
 
 class RankingSeason(BaseModel):
     """Definition de una temporada de ranking"""
     season_id: str = Field(default_factory=lambda: f"season_{uuid.uuid4().hex[:8]}")
     
-    # Information básica
+    # Information basic
     name: Dict[str, str]       # Nombre multi-idioma {"es": "...", "en": "..."}
     description: Dict[str, str]  # Description multi-idioma
     season_type: SeasonType = SeasonType.MONTHLY
@@ -150,7 +150,7 @@ def get_default_season_rewards() -> List[Dict]:
                 "icon": "🥇",
                 "rarity": "epic"
             },
-            "title": {"es": "Élite", "en": "Elite", "zh": "精英"},
+            "title": {"es": "Elite", "en": "Elite", "zh": "精英"},
             "perks": ["season_elite_frame"]
         },
         {

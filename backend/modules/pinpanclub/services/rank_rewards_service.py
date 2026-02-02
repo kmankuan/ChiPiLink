@@ -63,12 +63,12 @@ RANK_DEFINITIONS = [
             "prize_type": "exclusive_badge",
             "value": 200,
             "description": {
-                "es": "Badge exclusivo 'Élite' + 200 puntos bonus",
+                "es": "Badge exclusivo 'Elite' + 200 puntos bonus",
                 "en": "Exclusive 'Elite' badge + 200 bonus points",
                 "zh": "独家'精英'徽章 + 200积分奖励"
             },
             "badge": {
-                "name": {"es": "Élite del Club", "en": "Club Elite", "zh": "俱乐部精英"},
+                "name": {"es": "Elite del Club", "en": "Club Elite", "zh": "俱乐部精英"},
                 "icon": "⚡",
                 "rarity": "rare"
             }
@@ -85,7 +85,7 @@ RANK_DEFINITIONS = [
             "prize_type": "special_title",
             "value": 500,
             "description": {
-                "es": "Título 'Leyenda' + 500 puntos bonus + Prioridad en torneos",
+                "es": "Title 'Leyenda' + 500 puntos bonus + Prioridad en torneos",
                 "en": "'Legend' title + 500 bonus points + Tournament priority",
                 "zh": "'传奇'称号 + 500积分奖励 + 锦标赛优先权"
             },
@@ -277,7 +277,7 @@ class RankRewardsService(BaseService):
                     upsert=True
                 )
             
-            # Título especial
+            # Title especial
             if reward.get("title"):
                 title = reward["title"].get(lang, reward["title"].get("es"))
                 await db.pingpong_players.update_one(

@@ -972,7 +972,7 @@ class SuperPinService(BaseService):
     async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
         """Get statistics detalladas de un jugador"""
         
-        # Info básica of the player
+        # Info basic of the player
         player = await self.player_repo.get_by_id(jugador_id)
         if not player:
             return None

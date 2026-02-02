@@ -368,7 +368,7 @@ async def get_audit_logs(
             "roles.view"
         )
         if not has_permission:
-            raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de auditoría")
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de audit")
     
     filters = AuditLogFilter(
         action=AuditActionType(action) if action else None,
@@ -399,7 +399,7 @@ async def get_audit_stats(admin: dict = Depends(get_admin_user)):
             "roles.view"
         )
         if not has_permission:
-            raise HTTPException(status_code=403, detail="No tienes permiso para ver statistics de auditoría")
+            raise HTTPException(status_code=403, detail="No tienes permiso para ver statistics de audit")
     
     # Get counts by action type
     pipeline = [

@@ -103,7 +103,7 @@ class FormConfigRepository(BaseRepository):
                     "label_es": "Nombre Completo del Estudiante",
                     "label_zh": "学生全名",
                     "placeholder_en": "e.g., John Smith",
-                    "placeholder_es": "ej: Juan Pérez García",
+                    "placeholder_es": "ej: Juan Perez García",
                     "placeholder_zh": "例如：张三",
                     "min_length": 2,
                     "max_length": 100
@@ -129,7 +129,7 @@ class FormConfigRepository(BaseRepository):
                     "is_required": True,
                     "order": 2,
                     "label_en": "School Year",
-                    "label_es": "Año Escolar",
+                    "label_es": "Year Escolar",
                     "label_zh": "学年",
                     "options": []  # Will be populated dynamically
                 },

@@ -51,7 +51,7 @@ class EventBus:
     """
     Event Bus interno para comunicación entre modules.
     
-    Características:
+    Features:
     - Pub/Sub like thisncrono
     - Soporte para wildcards (ej: 'pinpanclub.*')
     - Cola de eventos con prioridad

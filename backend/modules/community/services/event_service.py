@@ -108,7 +108,7 @@ class EventService(BaseService):
             raise ValueError("Evento not found")
         
         if not event.get("requiere_inscripcion"):
-            raise ValueError("Este evento no requiere inscripción")
+            raise ValueError("Este evento no requiere registration")
         
         # Verify capacidad
         inscripciones = event.get("inscripciones", [])

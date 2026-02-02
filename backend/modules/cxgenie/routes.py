@@ -6,7 +6,7 @@ Endpoints implementados:
 - GET/PUT /cxgenie/config - Configuration del widget y panel
 - GET /cxgenie/widget-code - Code de embed para frontend (usuarios)
 - GET /cxgenie/agent-panel - URL del panel de agentes
-- GET /cxgenie/integration-info - Información de la integration
+- GET /cxgenie/integration-info - Information de la integration
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional

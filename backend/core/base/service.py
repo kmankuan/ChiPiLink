@@ -1,5 +1,5 @@
 """
-Base Service - Capa de lógica de negocio
+Base Service - Capa de logic de negocio
 Cada module tendrá sus propios servicios que heredan de esta clase base
 """
 from typing import Optional, Dict, Any
@@ -15,7 +15,7 @@ class BaseService(ABC):
     """
     Clase base para servicios de negocio.
     
-    Características:
+    Features:
     - Acceso al Event Bus para publicar eventos
     - Logging integrado
     - Manejo de errores estandarizado

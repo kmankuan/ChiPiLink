@@ -180,7 +180,7 @@ async def sync_completed_results(admin: dict = Depends(get_admin_user)):
 
 @router.get("/players")
 async def get_monday_players(admin: dict = Depends(get_admin_user)):
-    """Get jugadores desde Monday.com (para selección en partidos)"""
+    """Get jugadores desde Monday.com (para selesson en partidos)"""
     config = await monday_service.get_config()
     if not config.players_board_id:
         return {"players": [], "message": "Board of players no configurado en Monday.com"}

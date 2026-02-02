@@ -177,7 +177,7 @@ async def get_productos_por_grado(
 ):
     """
     Obtener todos los productos de un grado specific.
-    Útil para mostrar la lista de libros de un estudiante.
+    Useful para mostrar la lista de libros de un estudiante.
     """
     # Verify acceso
     acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))

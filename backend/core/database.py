@@ -174,7 +174,7 @@ async def seed_landing_page():
                 "publicado": True,
                 "config": {
                     "titulo": "¿Listo para comenzar?",
-                    "descripcion": "Únete a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
+                    "descripcion": "Join a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
                     "cta_texto": "Registrarse",
                     "cta_link": "/registro",
                     "cta_secundario_texto": "Ver Tienda",

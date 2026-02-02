@@ -101,7 +101,7 @@ async def delete_comment(comment_id: str):
 
 @router.post("/reactions", response_model=Reaction)
 async def add_reaction(data: ReactionCreate):
-    """Añadir o cambiar reaction"""
+    """Add o cambiar reaction"""
     try:
         return await social_service.add_reaction(data)
     except ValueError as e:

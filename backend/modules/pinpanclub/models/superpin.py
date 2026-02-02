@@ -18,7 +18,7 @@ class ScoringSystem(str, Enum):
 
 
 class CheckInMethod(str, Enum):
-    """Método de check-in"""
+    """Method de check-in"""
     MANUAL = "manual"          # Record manual
     QR_CODE = "qr_code"        # QR code scan
     GEOLOCATION = "geolocation"  # GPS/ubicación
@@ -221,7 +221,7 @@ class SuperPinMatchCreate(BaseModel):
 
 
 class SuperPinMatchStats(BaseModel):
-    """Estadísticas avanzadas dthe match"""
+    """Statistics avanzadas dthe match"""
     aces_a: int = 0
     aces_b: int = 0
     errores_a: int = 0

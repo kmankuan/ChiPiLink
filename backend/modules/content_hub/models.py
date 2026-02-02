@@ -39,7 +39,7 @@ class ContentTag(BaseModel):
 
 class ContentItemBase(BaseModel):
     """Modelo base de contenido curado"""
-    # Information básica
+    # Information basic
     titulo: str
     descripcion: Optional[str] = None
     # Fuente original
@@ -79,7 +79,7 @@ class ContentItem(ContentItemBase):
 
 
 class ContentPlaylist(BaseModel):
-    """Playlist/Colección de contenido"""
+    """Playlist/Colesson de contenido"""
     model_config = ConfigDict(extra="ignore")
     playlist_id: str = Field(default_factory=lambda: f"playlist_{uuid.uuid4().hex[:12]}")
     titulo: str

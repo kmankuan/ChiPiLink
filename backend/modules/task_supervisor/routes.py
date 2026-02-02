@@ -45,7 +45,7 @@ async def get_supervisor_status():
             "Recordatorios automatics inteligentes",
             "Gamificación con puntos y logros",
             "Supervisión para childs en casa y estudiantes",
-            "Sincronización bidireccional con Monday.com",
+            "Synchronization bidireccional con Monday.com",
             "Reportes de productividad para padres/maestros"
         ],
         "required_integrations": [
@@ -315,7 +315,7 @@ async def sync_with_monday(admin: dict = Depends(get_admin_user)):
     
     return {
         "success": False,
-        "message": "Sincronización con Monday.com - Placeholder. Implementación pendiente.",
+        "message": "Synchronization con Monday.com - Placeholder. Implementación pendiente.",
         "steps": [
             "1. Configurar monday_board_id en Task Supervisor config",
             "2. Obtener items del board via Monday.com API",

@@ -147,7 +147,7 @@ class PostService:
             summary = post.get("summary", {}).get("es", "")
             
             if not summary and post.get("content_blocks"):
-                # Extract primer párrafo como resumen
+                # Extract primer paragraph como resumen
                 for block in post["content_blocks"]:
                     if block.get("type") == ContentBlockType.PARAGRAPH.value:
                         text = block.get("content", "")
@@ -263,7 +263,7 @@ class PostService:
     # ============== CONTENT BLOCKS ==============
     
     def create_paragraph_block(self, content: str, style: Dict = None) -> Dict:
-        """Create bloque de párrafo"""
+        """Create bloque de paragraph"""
         return {
             "type": ContentBlockType.PARAGRAPH.value,
             "content": content,

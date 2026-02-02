@@ -52,7 +52,7 @@ class FollowCreate(BaseModel):
 
 
 class FollowStats(BaseModel):
-    """Estadísticas de seguidores"""
+    """Statistics de seguidores"""
     jugador_id: str
     followers_count: int = 0
     following_count: int = 0

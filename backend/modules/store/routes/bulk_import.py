@@ -32,7 +32,7 @@ class ImportEstudiantesRequest(BaseModel):
     raw_text: str
     column_mapping: Dict[str, int]
     grado_default: Optional[str] = None
-    hoja_nombre: str = "Importación Manual"
+    hoja_nombre: str = "Import Manual"
     actualizar_existentes: bool = True
 
 
@@ -62,7 +62,7 @@ async def parse_tsv(
 ):
     """
     Parsear texto en formato TSV (tab-separated).
-    Útil para detectar la estructura de los datos antes de mapear columnas.
+    Useful para detectar la estructura de los datos antes de mapear columnas.
     """
     result = bulk_import_service.parse_tsv(
         request.raw_text,

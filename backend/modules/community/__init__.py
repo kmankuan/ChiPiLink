@@ -16,7 +16,7 @@ Beneficios de esta arquitectura:
 1. Separation clara de responsabilidades
 2. Easy de testear (cada capa se puede mockear)
 3. Preparado para extraer como microservicio
-4. Comunicación via Event Bus (no dependencias directas)
+4. Communication via Event Bus (no dependencias directas)
 ─────────────────────────────────────────────────────────
 """
 

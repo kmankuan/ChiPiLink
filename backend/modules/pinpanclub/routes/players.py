@@ -1,6 +1,6 @@
 """
 PinpanClub - Player Routes
-Endpoints for gestión of players
+Endpoints for management of players
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional

@@ -16,7 +16,7 @@ router = APIRouter(prefix="/seed", tags=["Demo Data"])
 DEMO_PLAYERS = [
     {"nombre": "Carlos Mendoza", "apodo": "El Rayo", "email": "carlos@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos"},
     {"nombre": "María González", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
-    {"nombre": "Juan Pérez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
+    {"nombre": "Juan Perez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
     {"nombre": "Ana López", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
     {"nombre": "Pedro Sánchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
     {"nombre": "Laura Martínez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},

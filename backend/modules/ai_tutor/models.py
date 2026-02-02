@@ -29,7 +29,7 @@ class TutorConfig(BaseModel):
 
 
 class TutorSession(BaseModel):
-    """Sesión de tutoría"""
+    """Sesión de tutoring"""
     model_config = ConfigDict(extra="ignore")
     session_id: str = Field(default_factory=lambda: f"tutor_{uuid.uuid4().hex[:12]}")
     estudiante_id: str
@@ -81,7 +81,7 @@ class PronunciationAttempt(BaseModel):
     audio_estudiante_url: Optional[str] = None
     texto_esperado: str
     texto_reconocido: Optional[str] = None  # Lo que el STT reconoció
-    # Evaluación
+    # Evaluation
     score: float = 0.0  # 0.0 a 1.0
     es_correcto: bool = False
     feedback: Optional[str] = None  # Feedback del tutor
@@ -91,7 +91,7 @@ class PronunciationAttempt(BaseModel):
 
 
 class LessonPlan(BaseModel):
-    """Plan de lección generado por el tutor"""
+    """Plan de lesson generado por el tutor"""
     model_config = ConfigDict(extra="ignore")
     plan_id: str = Field(default_factory=lambda: f"plan_{uuid.uuid4().hex[:12]}")
     estudiante_id: str

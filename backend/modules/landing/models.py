@@ -79,7 +79,7 @@ BLOCK_TEMPLATES = {
         }
     },
     "features": {
-        "nombre": "Características",
+        "nombre": "Features",
         "descripcion": "Lista de características con íconos",
         "config_default": {
             "titulo": "¿Por what elegirnos?",
@@ -118,7 +118,7 @@ BLOCK_TEMPLATES = {
         "descripcion": "Botón destacado con mensaje",
         "config_default": {
             "titulo": "¿Listo para comenzar?",
-            "subtitulo": "Únete a miles de clientes satisfechos",
+            "subtitulo": "Join a miles de clientes satisfechos",
             "boton_texto": "Registrarse Gratis",
             "boton_url": "/registro",
             "fondo_color": "#16a34a",
@@ -126,7 +126,7 @@ BLOCK_TEMPLATES = {
         }
     },
     "stats": {
-        "nombre": "Estadísticas",
+        "nombre": "Statistics",
         "descripcion": "Numbers destacados",
         "config_default": {
             "items": [

@@ -1,6 +1,6 @@
 """
 PinpanClub - Match Routes
-Endpoints for gestión of matches
+Endpoints for management of matches
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional

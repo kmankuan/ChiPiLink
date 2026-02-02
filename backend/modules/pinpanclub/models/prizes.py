@@ -1,6 +1,6 @@
 """
 System for Premios Avanzado - Modelos
-Premios configurables more allá de badges: físicos, descuentos, privilegios
+Premios configurables more allá de badges: physical, descuentos, privilegios
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -12,7 +12,7 @@ import uuid
 class PrizeType(str, Enum):
     """Tipos de premio"""
     BADGE = "badge"              # Badge digital
-    PHYSICAL = "physical"        # Prize físico (trofeo, medalla, etc.)
+    PHYSICAL = "physical"        # Prize physical (trofeo, medalla, etc.)
     DISCOUNT = "discount"        # Store/service discount
     PRIVILEGE = "privilege"      # Privilegio especial (acceso VIP, etc.)
     POINTS = "points"            # Points canjeables
@@ -66,9 +66,9 @@ class PrizeDefinition(BaseModel):
     for_players: bool = True
     for_referees: bool = False
     
-    # Límites
+    # Limits
     max_winners: Optional[int] = None  # None = sin limit
-    quantity_available: Optional[int] = None  # For premios físicos
+    quantity_available: Optional[int] = None  # For premios physical
     
     # Vigencia
     valid_from: Optional[str] = None
@@ -133,7 +133,7 @@ class AwardedPrize(BaseModel):
 # ============== PRIZE CATALOG ==============
 
 class PrizeCatalog(BaseModel):
-    """Catálogo de premios disponibles"""
+    """Catalog de premios disponibles"""
     catalog_id: str
     name: str
     description: Optional[str] = None
@@ -146,7 +146,7 @@ class PrizeCatalog(BaseModel):
 # ============== DEFAULT PRIZES ==============
 
 def get_default_prize_catalog() -> List[Dict]:
-    """Catálogo de premios by default"""
+    """Catalog de premios by default"""
     return [
         {
             "name": "Champion de Temporada",

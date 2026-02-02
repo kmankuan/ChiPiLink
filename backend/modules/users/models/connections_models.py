@@ -441,8 +441,8 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "estudiante_tutoria",
-            "nombre": {"es": "Estudiante Tutoría", "en": "Tutoring Student", "zh": "辅导学生"},
-            "descripcion": {"es": "Inscrito en programa de Tutoría Integral", "en": "Enrolled in Integral Tutoring program"},
+            "nombre": {"es": "Estudiante Tutoring", "en": "Tutoring Student", "zh": "辅导学生"},
+            "descripcion": {"es": "Inscrito en programa de Tutoring Integral", "en": "Enrolled in Integral Tutoring program"},
             "icono": "📚",
             "color": "#ec4899",
             "tipo": "por_suscripcion",
@@ -477,7 +477,7 @@ def get_default_membresias() -> List[Dict]:
         },
         {
             "membresia_id": "tutoria_integral",
-            "nombre": {"es": "Tutoría Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
+            "nombre": {"es": "Tutoring Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
             "descripcion": {"es": "Programa de apoyo académico", "en": "Academic support program"},
             "icono": "📚",
             "color": "#ec4899",

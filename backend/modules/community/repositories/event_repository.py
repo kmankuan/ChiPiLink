@@ -70,7 +70,7 @@ class EventRepository(BaseRepository):
         return await self.update_by_id(self.ID_FIELD, evento_id, data)
     
     async def add_inscription(self, evento_id: str, inscription: Dict) -> bool:
-        """Agregar inscripción a evento"""
+        """Agregar registration a evento"""
         result = await self._collection.update_one(
             {"evento_id": evento_id},
             {"$push": {"inscripciones": inscription}}

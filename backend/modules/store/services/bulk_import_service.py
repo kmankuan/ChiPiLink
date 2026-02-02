@@ -1,5 +1,5 @@
 """
-Store Module - Servicio de Importación Masiva (Bulk Import)
+Store Module - Servicio de Import Masiva (Bulk Import)
 Permite importar estudiantes y productos desde datos copiados de Google Sheets
 """
 from typing import List, Optional, Dict, Any
@@ -178,7 +178,7 @@ class BulkImportService:
         raw_text: str,
         column_mapping: Dict[str, int],
         grado_default: str = None,
-        hoja_nombre: str = "Importación Manual",
+        hoja_nombre: str = "Import Manual",
         actualizar_existentes: bool = True,
         admin_id: str = None
     ) -> Dict:

@@ -161,7 +161,7 @@ class SocialService(BaseService):
     # ============== REACTIONS ==============
     
     async def add_reaction(self, data: ReactionCreate) -> Reaction:
-        """Añadir reaction"""
+        """Add reaction"""
         # Verify si ya reaccionó
         existing = await self.reaction_repo.find_user_reaction(
             data.user_id, data.target_id, data.target_type
@@ -301,7 +301,7 @@ class SocialService(BaseService):
         return user_mod.get("warnings", 0) if user_mod else 0
     
     async def add_user_warning(self, user_id: str, reason: str) -> int:
-        """Añadir una amonestación al usuario"""
+        """Add una amonestación al usuario"""
         from core.database import db
         from datetime import datetime, timezone
         

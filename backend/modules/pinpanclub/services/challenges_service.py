@@ -198,7 +198,7 @@ class ChallengeService(BaseService):
         extra_data: Dict = None
     ) -> List[PlayerChallenge]:
         """
-        Actualizar progreso de retos of the player basándose en tipo.
+        Actualizar progreso de retos of the player based on en tipo.
         Llamar esto after de cada partido, victoria, etc.
         """
         updated = []

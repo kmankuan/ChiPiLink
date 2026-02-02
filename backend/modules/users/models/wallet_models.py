@@ -101,7 +101,7 @@ class ChipiPointsConfig(BaseModel):
     points_expire: bool = False
     expiration_days: Optional[int] = None  # Días hasta vencimiento
     
-    # Límites
+    # Limits
     max_points_per_transaction: Optional[int] = None
     daily_conversion_limit: Optional[float] = None
     
@@ -168,7 +168,7 @@ class Wallet(BaseModel):
     total_points_spent: int = 0
     total_points_converted: int = 0
     
-    # Límites personalizados (null = usar global)
+    # Limits personalizados (null = usar global)
     daily_spend_limit: Optional[float] = None
     daily_transfer_limit: Optional[float] = None
     
@@ -211,7 +211,7 @@ class Transaction(BaseModel):
     usd_amount: Optional[float] = None
     points_amount: Optional[int] = None
     
-    # Método de pago (para depósitos/compras)
+    # Method de pago (para depósitos/compras)
     payment_method: Optional[PaymentMethod] = None
     payment_reference: Optional[str] = None
     
@@ -249,14 +249,14 @@ class Transaction(BaseModel):
 # ============== CONVERSIONES ==============
 
 class PointsConversion(BaseModel):
-    """Registro de conversión de puntos"""
+    """Registro de conversion de puntos"""
     conversion_id: str = Field(default_factory=lambda: f"conv_{uuid.uuid4().hex[:8]}")
     
     # User
     wallet_id: str
     user_id: str
     
-    # Dirección de conversión
+    # Address de conversion
     from_currency: Currency
     to_currency: Currency
     

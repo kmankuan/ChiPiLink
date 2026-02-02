@@ -400,10 +400,10 @@ class WalletService(BaseService):
         config = await self.get_config()
         
         if not config.get("allow_points_to_usd"):
-            raise ValueError("Conversión de puntos a USD no permitida")
+            raise ValueError("Conversion de puntos a USD no permitida")
         
         if points < config.get("min_points_to_convert", 100):
-            raise ValueError(f"Mínimo {config['min_points_to_convert']} puntos para convertir")
+            raise ValueError(f"Minimum {config['min_points_to_convert']} puntos para convertir")
         
         wallet = await self.get_wallet(user_id)
         if not wallet or wallet["balance_points"] < points:
@@ -417,7 +417,7 @@ class WalletService(BaseService):
             user_id=user_id,
             amount=points,
             currency=Currency.CHIPIPOINTS,
-            description=f"Conversión de {points} puntos a ${usd_amount:.2f}",
+            description=f"Conversion de {points} puntos a ${usd_amount:.2f}",
             reference_type="conversion"
         )
         
@@ -427,10 +427,10 @@ class WalletService(BaseService):
             amount=usd_amount,
             currency=Currency.USD,
             payment_method=PaymentMethod.CHIPIPOINTS,
-            description=f"Conversión de {points} ChipiPoints"
+            description=f"Conversion de {points} ChipiPoints"
         )
         
-        # Registrar conversión
+        # Registrar conversion
         import uuid
         now = datetime.now(timezone.utc).isoformat()
         
