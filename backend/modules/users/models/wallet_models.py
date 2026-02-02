@@ -154,7 +154,7 @@ class Wallet(BaseModel):
     user_id: str
     profile_id: Optional[str] = None
     
-    # Saldos
+    # Balances
     balance_usd: float = 0.0
     balance_points: int = 0
     
@@ -191,7 +191,7 @@ class Transaction(BaseModel):
     """Transacción en la billetera"""
     transaction_id: str = Field(default_factory=lambda: f"txn_{uuid.uuid4().hex[:8]}")
     
-    # Billetera
+    # Wallet
     wallet_id: str
     user_id: str
     
@@ -203,7 +203,7 @@ class Transaction(BaseModel):
     currency: Currency
     amount: float               # Monto de la transacción
     
-    # Saldos resultantes
+    # Balances resultantes
     balance_before: float = 0
     balance_after: float = 0
     
@@ -217,7 +217,7 @@ class Transaction(BaseModel):
     
     # Relacionados
     related_user_id: Optional[str] = None       # User relacionado (transferencias)
-    related_transaction_id: Optional[str] = None # Transacción relacionada
+    related_transaction_id: Optional[str] = None # Transaction relacionada
     
     # Referencia a compra/servicio
     reference_type: Optional[str] = None        # "purchase", "membership", "service"
@@ -270,7 +270,7 @@ class PointsConversion(BaseModel):
     # Estado
     status: TransactionStatus = TransactionStatus.COMPLETED
     
-    # Transacciones relacionadas
+    # Transactions relacionadas
     transaction_id_from: Optional[str] = None
     transaction_id_to: Optional[str] = None
     

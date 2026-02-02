@@ -486,7 +486,7 @@ class WalletService(BaseService):
         if balance < amount:
             raise ValueError(f"Saldo insuficiente. Disponible: {balance}")
         
-        # Transacción de salida
+        # Transaction de salida
         out_txn = await self.create_transaction(
             user_id=from_user_id,
             transaction_type=TransactionType.TRANSFER_OUT,
@@ -496,7 +496,7 @@ class WalletService(BaseService):
             related_user_id=to_user_id
         )
         
-        # Transacción de entrada
+        # Transaction de entrada
         in_txn = await self.create_transaction(
             user_id=to_user_id,
             transaction_type=TransactionType.TRANSFER_IN,
