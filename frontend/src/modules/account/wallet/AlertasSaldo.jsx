@@ -54,7 +54,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
   const loadAlertas = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/mis-alertas`, {
+      const res = await fetch(`${API}/api/connections/my-alerts`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -70,7 +70,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
 
   const handleResolver = async (alertaId) => {
     try {
-      const res = await fetch(`${API}/api/conexiones/alertas/${alertaId}/resolver`, {
+      const res = await fetch(`${API}/api/connections/alerts/${alertaId}/resolve`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -92,7 +92,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
     
     setSending(true);
     try {
-      const res = await fetch(`${API}/api/conexiones/transferir`, {
+      const res = await fetch(`${API}/api/connections/transfer`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
