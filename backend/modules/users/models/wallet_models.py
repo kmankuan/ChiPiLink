@@ -315,7 +315,7 @@ class PointsProduct(BaseModel):
     """Producto/servicio adquirible con ChipiPoints"""
     product_id: str = Field(default_factory=lambda: f"pprod_{uuid.uuid4().hex[:8]}")
     
-    # Información
+    # Information
     name: Dict[str, str]
     description: Dict[str, str] = {}
     image_url: Optional[str] = None

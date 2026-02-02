@@ -55,9 +55,9 @@ class PrizeDefinition(BaseModel):
     type: PrizeType = PrizeType.BADGE
     icon: str = "🏆"
     
-    # Valor del premio
+    # Value del premio
     value: Optional[str] = None  # Descripción del valor (ej: "20% descuento")
-    points_value: int = 0        # Valor en puntos si aplica
+    points_value: int = 0        # Value en puntos si aplica
     
     # Condiciones para ganar
     conditions: List[PrizeCondition] = []

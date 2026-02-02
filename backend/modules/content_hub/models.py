@@ -39,7 +39,7 @@ class ContentTag(BaseModel):
 
 class ContentItemBase(BaseModel):
     """Modelo base de contenido curado"""
-    # Información básica
+    # Information básica
     titulo: str
     descripcion: Optional[str] = None
     # Fuente original

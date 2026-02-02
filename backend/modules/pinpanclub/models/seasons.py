@@ -39,7 +39,7 @@ class RankingSeason(BaseModel):
     """Definición de una temporada de ranking"""
     season_id: str = Field(default_factory=lambda: f"season_{uuid.uuid4().hex[:8]}")
     
-    # Información básica
+    # Information básica
     name: Dict[str, str]       # Nombre multi-idioma {"es": "...", "en": "..."}
     description: Dict[str, str]  # Descripción multi-idioma
     season_type: SeasonType = SeasonType.MONTHLY

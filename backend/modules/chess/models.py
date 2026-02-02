@@ -53,7 +53,7 @@ class ChessGame(ChessGameBase):
     model_config = ConfigDict(extra="ignore")
     partida_id: str = Field(default_factory=lambda: f"game_{uuid.uuid4().hex[:12]}")
     estado: str = "pendiente"  # pendiente, en_curso, finalizada, abandonada
-    # Resultado
+    # Result
     resultado: Optional[str] = None  # "1-0", "0-1", "1/2-1/2", None
     ganador_id: Optional[str] = None
     razon_fin: Optional[str] = None  # jaque_mate, abandono, tiempo, tablas_acuerdo, etc.

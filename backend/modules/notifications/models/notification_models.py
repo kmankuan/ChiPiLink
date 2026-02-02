@@ -287,7 +287,7 @@ def get_default_provider_config() -> Dict:
             "sender_id": None,
             "service_account_key": None,  # JSON string
             "weight": 50,  # For balanceo de carga (0-100)
-            "rate_limit": 1000,  # Mensajes por minuto
+            "rate_limit": 1000,  # Messages por minuto
             "current_load": 0,
             "last_error": None,
             "error_count": 0,

@@ -259,7 +259,7 @@ class SuperPinMatch(BaseModel):
     set_actual: int = 1
     historial_sets: List[Dict] = []
     
-    # Resultado
+    # Result
     ganador_id: Optional[str] = None
     
     # Puntos de ranking otorgados
@@ -365,7 +365,7 @@ class SeasonTournament(BaseModel):
     brackets: List[Dict] = []
     partidos: List[str] = []
     
-    # Resultados
+    # Results
     resultados_finales: List[Dict] = []  # [{posicion, jugador_id, premio}]
     
     # Timestamps

@@ -515,7 +515,7 @@ def get_default_profile_fields() -> List[Dict]:
             "is_required": False,
             "sort_order": 2
         },
-        # Información escolar (para niños)
+        # Information escolar (para niños)
         {
             "field_id": "field_school_name",
             "field_key": "school_name",

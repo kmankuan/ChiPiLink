@@ -121,7 +121,7 @@ class ConexionCreate(BaseModel):
     tipo: TipoRelacion
     subtipo: str
     etiqueta: Optional[str] = None
-    mensaje: Optional[str] = None   # Mensaje para solicitud
+    mensaje: Optional[str] = None   # Message para solicitud
 
 
 class ConexionUpdate(BaseModel):
