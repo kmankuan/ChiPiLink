@@ -37,7 +37,7 @@ async def get_player(jugador_id: str):
     """Get jugador by ID"""
     player = await player_service.get_player(jugador_id)
     if not player:
-        raise HTTPException(status_code=404, detail="Jugador not found")
+        raise HTTPException(status_code=404, detail="Player not found")
     return player
 
 
@@ -59,7 +59,7 @@ async def update_player(
     """Update jugador (solo admin)"""
     player = await player_service.update_player(jugador_id, data)
     if not player:
-        raise HTTPException(status_code=404, detail="Jugador not found")
+        raise HTTPException(status_code=404, detail="Player not found")
     return player
 
 
@@ -71,5 +71,5 @@ async def deactivate_player(
     """Desactivar jugador (soft delete, solo admin)"""
     success = await player_service.deactivate_player(jugador_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Jugador not found")
+        raise HTTPException(status_code=404, detail="Player not found")
     return {"success": True, "message": "Jugador desactivado"}

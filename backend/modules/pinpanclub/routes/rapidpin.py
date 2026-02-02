@@ -171,7 +171,7 @@ async def get_player_stats(season_id: str, jugador_id: str):
     """Get statistics de a player en a season"""
     stats = await rapidpin_service.get_player_stats(season_id, jugador_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador not found en esta temporada")
+        raise HTTPException(status_code=404, detail="Player not found en esta temporada")
     return stats
 
 

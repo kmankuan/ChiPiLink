@@ -52,7 +52,7 @@ class ConexionesService:
     # ============== GESTIÓN DE CONEXIONES ==============
     
     async def get_conexiones(self, user_id: str) -> List[Dict]:
-        """Get all connections de un usuario"""
+        """Get all user connections"""
         user = await db.auth_users.find_one(
             {"user_id": user_id},
             {"conexiones": 1}
@@ -78,7 +78,7 @@ class ConexionesService:
         return conexiones
     
     async def get_conexion(self, user_id: str, conexion_id: str) -> Optional[Dict]:
-        """Get una conexión específica"""
+        """Get a specific connection"""
         conexiones = await self.get_conexiones(user_id)
         for con in conexiones:
             if con.get("conexion_id") == conexion_id:
@@ -96,8 +96,8 @@ class ConexionesService:
         requiere_solicitud: bool = True
     ) -> Dict:
         """
-        Crear una conexión entre usuarios.
-        Si requiere_solicitud=True, crea solicitud en lugar de conexión directa.
+        Create connection between users.
+        If request required, creates request instead of direct connection.
         """
         # Verify destination exists
         destino = await db.auth_users.find_one({"user_id": destino_user_id})

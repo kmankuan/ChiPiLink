@@ -202,7 +202,7 @@ async def get_player_stats(liga_id: str, jugador_id: str):
     """Get statistics de a player en a league"""
     stats = await superpin_service.get_player_stats(liga_id, jugador_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador not found en esta liga")
+        raise HTTPException(status_code=404, detail="Player not found en esta liga")
     return stats
 
 
@@ -345,7 +345,7 @@ async def get_player_statistics(jugador_id: str, liga_id: str = None):
     """Get statistics detalladas de a player"""
     stats = await superpin_service.get_player_statistics(jugador_id, liga_id)
     if not stats:
-        raise HTTPException(status_code=404, detail="Jugador not found")
+        raise HTTPException(status_code=404, detail="Player not found")
     return stats
 
 

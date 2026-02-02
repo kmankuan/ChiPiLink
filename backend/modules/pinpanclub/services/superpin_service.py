@@ -479,7 +479,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         jugador_id: str
     ) -> Dict:
-        """Get player statistics en una liga"""
+        """Get player statistics in a league"""
         ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
         if not ranking:
             return None
@@ -1204,7 +1204,7 @@ class SuperPinService(BaseService):
         used_players = set()
         
         if pairing_mode == "by_ranking":
-            # Mejor vs Peor
+            # Best vs Worst
             n = len(players_with_ranking)
             for i in range(n // 2):
                 player_a = players_with_ranking[i]
@@ -1219,7 +1219,7 @@ class SuperPinService(BaseService):
             for i in range(0, len(players_with_ranking) - 1, 2):
                 pairings.append((players_with_ranking[i], players_with_ranking[i + 1]))
         
-        # Player sin pareja (si número impar)
+        # Player without partner (if odd number)
         bye_player = None
         if len(players_with_ranking) % 2 == 1:
             bye_player = players_with_ranking[-1]
@@ -1239,7 +1239,7 @@ class SuperPinService(BaseService):
             )
             
             match = await self.create_match(match_data)
-            # Iniciar the match automáticamente
+            # Start the match automatically
             await self.start_match(match.partido_id)
             
             created_matches.append({
@@ -1249,7 +1249,7 @@ class SuperPinService(BaseService):
                 "estado": "en_curso"
             })
         
-        # Generate name of the torneo
+        # Generate tournament name
         if not nombre:
             nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
         
@@ -1272,7 +1272,7 @@ class SuperPinService(BaseService):
         return quick_tournament
     
     async def get_quick_tournament_status(self, liga_id: str) -> Dict:
-        """Get estado de partidos rápidos activos en una liga"""
+        """Get active quick matches status in a league"""
         # Search ongoing quick matches
         active_matches = await self.match_repo.find_many(
             query={
@@ -1310,17 +1310,17 @@ class SuperPinService(BaseService):
     
     async def predict_match(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
         """
-        Predice el resultado de un partido entre dos jugadores.
-        Usa ELO rating, historial de enfrentamientos y racha actual.
+        Predict match outcome entre dos jugadores.
+        Uses ELO rating, head-to-head history and current streak.
         """
         # Get stats for both players
         stats_a = await self.get_player_statistics(jugador_a_id)
         stats_b = await self.get_player_statistics(jugador_b_id)
         
         if not stats_a or not stats_b:
-            return {"error": "Jugador not found"}
+            return {"error": "Player not found"}
         
-        # Get historial head-to-head
+        # Get head-to-head history
         h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
         
         # Calculate probability based on ELO
@@ -1331,33 +1331,33 @@ class SuperPinService(BaseService):
         expected_a = 1 / (1 + math.pow(10, (elo_b - elo_a) / 400))
         expected_b = 1 - expected_a
         
-        # Ajustar por historial H2H
+        # Adjust by H2H history
         h2h_adjustment = 0
         if h2h.get("total_matches", 0) > 0:
             wins_a = h2h.get("player_a_wins", 0)
             wins_b = h2h.get("player_b_wins", 0)
             total = wins_a + wins_b
             if total > 0:
-                # Adjustment factor based on H2H (máx ±10%)
+                # Adjustment factor based on H2H (max ±10%)
                 h2h_ratio = (wins_a - wins_b) / total
                 h2h_adjustment = h2h_ratio * 0.10
         
-        # Ajustar por racha actual
+        # Adjust by current streak
         streak_adjustment = 0
         streak_a = stats_a.get("overall_stats", {}).get("best_streak", 0)
         streak_b = stats_b.get("overall_stats", {}).get("best_streak", 0)
         
-        # Racha positiva da pequeña ventaja (máx ±5%)
+        # Positive streak gives small advantage (max ±5%)
         if streak_a > 0 and streak_b <= 0:
             streak_adjustment = min(streak_a * 0.01, 0.05)
         elif streak_b > 0 and streak_a <= 0:
             streak_adjustment = -min(streak_b * 0.01, 0.05)
         
-        # Probabilidad final ajustada
+        # Final adjusted probability
         prob_a = max(0.05, min(0.95, expected_a + h2h_adjustment + streak_adjustment))
         prob_b = 1 - prob_a
         
-        # Determinar favorito
+        # Determine favorite
         if prob_a > prob_b:
             favorite = "player_a"
             confidence = "high" if prob_a > 0.7 else "medium" if prob_a > 0.55 else "low"
@@ -1368,7 +1368,7 @@ class SuperPinService(BaseService):
             favorite = "draw"
             confidence = "low"
         
-        # Calculatesr ventajas por categoría
+        # Calculate advantages by category
         advantages = []
         
         # ELO
@@ -1390,9 +1390,9 @@ class SuperPinService(BaseService):
             wins_a = h2h.get("player_a_wins", 0)
             wins_b = h2h.get("player_b_wins", 0)
             if wins_a > wins_b:
-                advantages.append({"category": "h2h", "player": "a", "detail": f"{wins_a}-{wins_b} en H2H"})
+                advantages.append({"category": "h2h", "player": "a", "detail": f"{wins_a}-{wins_b} in H2H"})
             elif wins_b > wins_a:
-                advantages.append({"category": "h2h", "player": "b", "detail": f"{wins_b}-{wins_a} en H2H"})
+                advantages.append({"category": "h2h", "player": "b", "detail": f"{wins_b}-{wins_a} in H2H"})
         
         return {
             "player_a": {

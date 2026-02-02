@@ -186,7 +186,7 @@ class SuperPinMatchRepository(BaseRepository):
         jugador_id: str,
         limit: int = 50
     ) -> List[Dict]:
-        """Get partidos de un jugador en una liga"""
+        """Get partidos de un jugador in a league"""
         return await self.find_many(
             query={
                 "liga_id": liga_id,
