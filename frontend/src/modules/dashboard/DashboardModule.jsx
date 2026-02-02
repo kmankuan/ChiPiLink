@@ -273,7 +273,7 @@ export default function DashboardModule() {
       </div>
 
       {/* Alerts Section */}
-      {(stats.productos.bajo_stock > 0 || stats.pedidos.pendientes > 0) && (
+      {((stats.products?.low_stock || 0) > 0 || (stats.orders?.pending || 0) > 0) && (
         <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
@@ -282,11 +282,11 @@ export default function DashboardModule() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {stats.productos.bajo_stock > 0 && (
+            {(stats.products?.low_stock || 0) > 0 && (
               <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Package className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm">{stats.productos.bajo_stock} productos con bajo stock</span>
+                  <span className="text-sm">{stats.products.low_stock} productos con bajo stock</span>
                 </div>
                 <Button 
                   variant="outline" 
@@ -297,11 +297,11 @@ export default function DashboardModule() {
                 </Button>
               </div>
             )}
-            {stats.pedidos.pendientes > 0 && (
+            {(stats.orders?.pending || 0) > 0 && (
               <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Clock className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm">{stats.pedidos.pendientes} pedidos pendientes de procesar</span>
+                  <span className="text-sm">{stats.orders.pending} pedidos pendientes de procesar</span>
                 </div>
                 <Button 
                   variant="outline" 
