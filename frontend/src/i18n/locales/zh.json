@@ -854,5 +854,34 @@
     "submit": "提交",
     "matchRecorded": "比赛记录成功",
     "error": "记录比赛出错"
+  },
+  "postEditor": {
+    "addBlock": "添加块",
+    "placeholder": "在此输入...",
+    "listPlaceholder": "每行一个项目...",
+    "urlPlaceholder": "图片或视频URL",
+    "captionPlaceholder": "描述（可选）",
+    "authorPlaceholder": "作者（可选）",
+    "quotePlaceholder": "引用文本...",
+    "calloutPlaceholder": "提示消息...",
+    "buttonText": "按钮文本",
+    "buttonUrl": "按钮URL",
+    "embedPlaceholder": "嵌入URL（YouTube、Twitter等）",
+    "empty": "开始添加一个块",
+    "blocks": {
+      "paragraph": "段落",
+      "heading1": "标题1",
+      "heading2": "标题2",
+      "heading3": "标题3",
+      "bulletList": "列表",
+      "numberedList": "编号列表",
+      "image": "图片",
+      "video": "视频",
+      "quote": "引用",
+      "callout": "提示框",
+      "button": "按钮",
+      "divider": "分隔线",
+      "embed": "嵌入"
+    }
   }
 }

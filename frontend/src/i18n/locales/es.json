@@ -1090,5 +1090,34 @@
     "submit": "Enviar",
     "matchRecorded": "Partido registrado exitosamente",
     "error": "Error al registrar partido"
+  },
+  "postEditor": {
+    "addBlock": "Agregar bloque",
+    "placeholder": "Escribe aquí...",
+    "listPlaceholder": "Un elemento por línea...",
+    "urlPlaceholder": "URL de imagen o video",
+    "captionPlaceholder": "Descripción (opcional)",
+    "authorPlaceholder": "Autor (opcional)",
+    "quotePlaceholder": "Texto de la cita...",
+    "calloutPlaceholder": "Mensaje del callout...",
+    "buttonText": "Texto del botón",
+    "buttonUrl": "URL del botón",
+    "embedPlaceholder": "URL de embed (YouTube, Twitter, etc.)",
+    "empty": "Comienza agregando un bloque",
+    "blocks": {
+      "paragraph": "Párrafo",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "bulletList": "Lista",
+      "numberedList": "Lista numerada",
+      "image": "Imagen",
+      "video": "Video",
+      "quote": "Cita",
+      "callout": "Callout",
+      "button": "Botón",
+      "divider": "Separador",
+      "embed": "Embed"
+    }
   }
 }

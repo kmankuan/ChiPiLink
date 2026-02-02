@@ -1086,5 +1086,34 @@
     "submit": "Submit",
     "matchRecorded": "Match recorded successfully",
     "error": "Error recording match"
+  },
+  "postEditor": {
+    "addBlock": "Add block",
+    "placeholder": "Write here...",
+    "listPlaceholder": "One item per line...",
+    "urlPlaceholder": "Image or video URL",
+    "captionPlaceholder": "Caption (optional)",
+    "authorPlaceholder": "Author (optional)",
+    "quotePlaceholder": "Quote text...",
+    "calloutPlaceholder": "Callout message...",
+    "buttonText": "Button text",
+    "buttonUrl": "Button URL",
+    "embedPlaceholder": "Embed URL (YouTube, Twitter, etc.)",
+    "empty": "Start by adding a block",
+    "blocks": {
+      "paragraph": "Paragraph",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet List",
+      "numberedList": "Numbered List",
+      "image": "Image",
+      "video": "Video",
+      "quote": "Quote",
+      "callout": "Callout",
+      "button": "Button",
+      "divider": "Divider",
+      "embed": "Embed"
+    }
   }
 }
