@@ -168,7 +168,7 @@ async def get_referee_ranking(season_id: str):
 
 @router.get("/seasons/{season_id}/players/{jugador_id}/stats")
 async def get_player_stats(season_id: str, jugador_id: str):
-    """Get estadísticas de a player en a season"""
+    """Get statistics de a player en a season"""
     stats = await rapidpin_service.get_player_stats(season_id, jugador_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador not found en esta temporada")

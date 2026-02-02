@@ -178,7 +178,7 @@ class ProductService(BaseService):
         return await self.repository.deactivate(libro_id)
     
     async def get_inventory_stats(self) -> Dict:
-        """Get estadísticas de inventario"""
+        """Get statistics de inventario"""
         products = await self.repository.get_all_active()
         low_stock = await self.repository.get_low_stock()
         

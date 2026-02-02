@@ -132,7 +132,7 @@ class RapidPinMatchRepository(BaseRepository):
         season_id: str,
         user_id: str
     ) -> List[Dict]:
-        """Get partidos pendientes de confirmación donde the user participa"""
+        """Get matches pending confirmation donde the user participa"""
         return await self.find_many(
             query={
                 "season_id": season_id,

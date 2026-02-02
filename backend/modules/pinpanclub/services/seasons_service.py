@@ -378,7 +378,7 @@ class RankingSeasonsService(BaseService):
         jugador_id: str,
         season_id: str = None
     ) -> Optional[Dict]:
-        """Get estadísticas de un jugador en una temporada"""
+        """Get player statistics en una temporada"""
         if not season_id:
             season = await self.get_current_season()
             if not season:

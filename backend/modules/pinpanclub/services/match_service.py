@@ -293,7 +293,7 @@ class MatchService(BaseService):
             self._websocket_connections[partido_id].discard(ws)
     
     async def get_stats(self) -> Dict:
-        """Get estadísticas de partidos"""
+        """Get statistics de partidos"""
         by_state = await self.repository.count_by_state()
         total = sum(by_state.values())
         

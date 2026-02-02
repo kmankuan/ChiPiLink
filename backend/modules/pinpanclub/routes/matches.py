@@ -38,7 +38,7 @@ async def get_all_active_matches():
 
 @router.get("/stats")
 async def get_match_stats():
-    """Get estadísticas of matches"""
+    """Get statistics of matches"""
     return await match_service.get_stats()
 
 

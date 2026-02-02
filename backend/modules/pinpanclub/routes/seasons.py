@@ -129,7 +129,7 @@ async def get_season_leaderboard(
 
 @router.get("/player/{jugador_id}/current")
 async def get_player_current_season_stats(jugador_id: str):
-    """Get estadísticas of the player en the season actual"""
+    """Get statistics of the player en the season actual"""
     stats = await seasons_service.get_player_season_stats(jugador_id)
     
     if not stats:
@@ -152,7 +152,7 @@ async def get_player_current_season_stats(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats/{season_id}")
 async def get_player_season_stats(jugador_id: str, season_id: str):
-    """Get estadísticas of the player en a season específica"""
+    """Get statistics of the player en a season específica"""
     stats = await seasons_service.get_player_season_stats(jugador_id, season_id)
     
     if not stats:

@@ -197,7 +197,7 @@ async def get_monday_players(admin: dict = Depends(get_admin_user)):
 
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
-    """Get estadísticas de sincronización"""
+    """Get statistics de sincronización"""
     config = await monday_service.get_config()
     
     player_repo = PlayerRepository()

@@ -199,7 +199,7 @@ async def get_ranking(liga_id: str):
 
 @router.get("/leagues/{liga_id}/ranking/{jugador_id}")
 async def get_player_stats(liga_id: str, jugador_id: str):
-    """Get estadísticas de a player en a league"""
+    """Get statistics de a player en a league"""
     stats = await superpin_service.get_player_stats(liga_id, jugador_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador not found en esta liga")
@@ -342,7 +342,7 @@ async def get_badge_definitions():
 
 @router.get("/players/{jugador_id}/statistics")
 async def get_player_statistics(jugador_id: str, liga_id: str = None):
-    """Get estadísticas detalladas de a player"""
+    """Get statistics detalladas de a player"""
     stats = await superpin_service.get_player_statistics(jugador_id, liga_id)
     if not stats:
         raise HTTPException(status_code=404, detail="Jugador not found")
@@ -351,7 +351,7 @@ async def get_player_statistics(jugador_id: str, liga_id: str = None):
 
 @router.get("/head-to-head")
 async def get_head_to_head(jugador_a_id: str, jugador_b_id: str):
-    """Get estadísticas de enfrentamientos directos"""
+    """Get head-to-head statistics directos"""
     return await superpin_service.get_head_to_head(jugador_a_id, jugador_b_id)
 
 

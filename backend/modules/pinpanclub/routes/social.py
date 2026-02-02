@@ -51,7 +51,7 @@ async def get_following(jugador_id: str, limit: int = 50):
 
 @router.get("/follow-stats/{jugador_id}", response_model=FollowStats)
 async def get_follow_stats(jugador_id: str):
-    """Get estadísticas de seguidores"""
+    """Get statistics de seguidores"""
     return await social_service.get_follow_stats(jugador_id)
 
 

@@ -218,7 +218,7 @@ class OrderService(BaseService):
         return await self.repository.set_monday_item_id(pedido_id, monday_id)
     
     async def get_stats(self) -> Dict:
-        """Get estadísticas de pedidos"""
+        """Get statistics de pedidos"""
         by_status = await self.repository.count_by_status()
         total_sales = await self.repository.get_total_sales()
         

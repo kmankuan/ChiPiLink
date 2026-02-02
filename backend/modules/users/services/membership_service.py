@@ -674,7 +674,7 @@ class MembershipService:
         return await cursor.to_list(length=100)
     
     async def get_visit_stats(self, user_id: str) -> Dict:
-        """Get estadísticas de visitas de un usuario"""
+        """Get statistics de visitas de un usuario"""
         # Total de visitas
         total_visits = await db[self.collection_visits].count_documents(
             {"user_id": user_id, "consumed_visit": True}

@@ -65,7 +65,7 @@ class AchievementsService(BaseService):
         """
         awarded = []
         
-        # Get estadísticas of the player
+        # Get statistics of the player
         player_stats = await self._get_player_challenge_stats(jugador_id)
         
         # Get logros que the player aún does not have
@@ -89,7 +89,7 @@ class AchievementsService(BaseService):
         return awarded
     
     async def _get_player_challenge_stats(self, jugador_id: str) -> Dict:
-        """Get estadísticas de retos of the player"""
+        """Get statistics de retos of the player"""
         # Challenges completados total
         completed_total = await db.pinpanclub_challenges_progress.count_documents({
             "jugador_id": jugador_id,

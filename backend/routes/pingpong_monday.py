@@ -605,7 +605,7 @@ async def test_monday_connection(admin: dict = Depends(get_admin_user)):
 
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
-    """Obtener estadísticas de sincronización"""
+    """Get statistics de sincronización"""
     config = await get_pingpong_monday_config()
     
     # Contar jugadores sincronizados

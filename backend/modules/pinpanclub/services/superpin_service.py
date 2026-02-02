@@ -321,7 +321,7 @@ class SuperPinService(BaseService):
                     match["puntos_jugador_a"] = 0
                     match["puntos_jugador_b"] = 0
         
-        # Update estadísticas avanzadas si se proporcionan
+        # Update advanced statistics si se proporcionan
         if stats:
             if not match.get("stats"):
                 match["stats"] = {}
@@ -479,7 +479,7 @@ class SuperPinService(BaseService):
         liga_id: str,
         jugador_id: str
     ) -> Dict:
-        """Get estadísticas de un jugador en una liga"""
+        """Get player statistics en una liga"""
         ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
         if not ranking:
             return None
@@ -970,7 +970,7 @@ class SuperPinService(BaseService):
     # ============== PLAYER STATISTICS ==============
     
     async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
-        """Get estadísticas detalladas de un jugador"""
+        """Get statistics detalladas de un jugador"""
         
         # Info básica of the player
         player = await self.player_repo.get_by_id(jugador_id)
@@ -1084,7 +1084,7 @@ class SuperPinService(BaseService):
         }
     
     async def get_head_to_head(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
-        """Get estadísticas de enfrentamientos directos entre dos jugadores"""
+        """Get head-to-head statistics directos entre dos jugadores"""
         
         matches = await self.match_repo.find_many(
             query={

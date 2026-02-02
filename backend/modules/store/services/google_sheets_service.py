@@ -441,7 +441,7 @@ class GoogleSheetsService:
         return {"success": True, "override_local": override}
     
     async def get_stats(self) -> Dict:
-        """Get estadísticas de sincronización"""
+        """Get statistics de sincronización"""
         config = await self.get_sync_config()
         
         # Contar por grado

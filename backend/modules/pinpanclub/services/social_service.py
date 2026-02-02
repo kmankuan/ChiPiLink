@@ -95,7 +95,7 @@ class SocialService(BaseService):
         return await self.follow_repo.get_following(jugador_id, limit)
     
     async def get_follow_stats(self, jugador_id: str) -> FollowStats:
-        """Get estadísticas de seguidores"""
+        """Get statistics de seguidores"""
         followers = await self.follow_repo.count_followers(jugador_id)
         following = await self.follow_repo.count_following(jugador_id)
         return FollowStats(

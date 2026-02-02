@@ -29,7 +29,7 @@ async def get_challenge(challenge_id: str):
     """Get definición de a challenge"""
     challenge = await challenge_service.get_challenge(challenge_id)
     if not challenge:
-        raise HTTPException(status_code=404, detail="Reto not found")
+        raise HTTPException(status_code=404, detail="Challenge not found")
     return challenge
 
 
@@ -51,7 +51,7 @@ async def update_challenge(
     """Update a challenge (solo admin)"""
     challenge = await challenge_service.update_challenge(challenge_id, data)
     if not challenge:
-        raise HTTPException(status_code=404, detail="Reto not found")
+        raise HTTPException(status_code=404, detail="Challenge not found")
     return challenge
 
 
@@ -127,7 +127,7 @@ async def get_active_challenges(jugador_id: str):
 
 @router.get("/player/{jugador_id}/stats")
 async def get_player_challenge_stats(jugador_id: str):
-    """Get estadísticas of challenges of the player"""
+    """Get statistics of challenges of the player"""
     stats = await challenge_service.get_player_stats(jugador_id)
     rank = await challenge_service.get_player_rank(jugador_id)
     return {

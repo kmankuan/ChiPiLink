@@ -306,7 +306,7 @@ async def get_my_visits(
 
 @router.get("/visits/stats")
 async def get_my_visit_stats(user=Depends(get_current_user)):
-    """Get estadísticas de mis visitas"""
+    """Get statistics de mis visitas"""
     stats = await membership_service.get_visit_stats(user["user_id"])
     return {"success": True, "stats": stats}
 

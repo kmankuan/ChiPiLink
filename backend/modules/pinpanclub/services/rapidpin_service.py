@@ -481,7 +481,7 @@ class RapidPinService(BaseService):
         season_id: str,
         user_id: str
     ) -> List[RapidPinMatch]:
-        """Get partidos pendientes de confirmación para un usuario"""
+        """Get matches pending confirmation para un usuario"""
         results = await self.match_repo.get_pending_matches_for_user(season_id, user_id)
         return [RapidPinMatch(**r) for r in results]
     
@@ -521,7 +521,7 @@ class RapidPinService(BaseService):
         season_id: str,
         jugador_id: str
     ) -> Optional[Dict]:
-        """Get estadísticas de un jugador en una temporada"""
+        """Get player statistics en una temporada"""
         ranking = await self.ranking_repo.get_player_ranking(season_id, jugador_id)
         if not ranking:
             return None
@@ -561,7 +561,7 @@ class RapidPinService(BaseService):
         import uuid
         
         if challenger_id == opponent_id:
-            raise ValueError("No puedes desafiarte a ti mismo")
+            raise ValueError("You cannot challenge yourself")
         
         # Verify temporada activa
         season = await self.season_repo.get_by_id(season_id)
@@ -1089,7 +1089,7 @@ class RapidPinService(BaseService):
         
         # Validaciones básicas
         if challenger_id == opponent_id:
-            raise ValueError("No puedes desafiarte a ti mismo")
+            raise ValueError("You cannot challenge yourself")
         
         # Verify that does not exista un desafío activo entre estos jugadores
         existing = await db["rapidpin_queue"].find_one({
@@ -1187,7 +1187,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Reto not found")
+            raise ValueError("Challenge not found")
         
         if queue_entry["status"] not in ["date_negotiation", "queued"]:
             raise ValueError("Este reto no está en fase de negociación de fecha")
@@ -1302,7 +1302,7 @@ class RapidPinService(BaseService):
         )
         
         if not queue_entry:
-            raise ValueError("Reto not found")
+            raise ValueError("Challenge not found")
         
         if queue_entry["status"] != "queued":
             raise ValueError("Este reto no está in queue")
@@ -1366,7 +1366,7 @@ class RapidPinService(BaseService):
         # Verify that the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
-            raise ValueError("Reto not found")
+            raise ValueError("Challenge not found")
         
         # Verify if like already exists
         existing = await db["rapidpin_reactions"].find_one({
@@ -1442,7 +1442,7 @@ class RapidPinService(BaseService):
         # Verify that the challenge existe
         queue_entry = await db["rapidpin_queue"].find_one({"queue_id": queue_id})
         if not queue_entry:
-            raise ValueError("Reto not found")
+            raise ValueError("Challenge not found")
         
         # Get config
         config = await self.get_comment_config()

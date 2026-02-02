@@ -156,7 +156,7 @@ class ChallengeService(BaseService):
         
         challenge = await self.definition_repo.get_by_id(challenge_id)
         if not challenge:
-            raise ValueError("Reto not found")
+            raise ValueError("Challenge not found")
         
         player = await self.player_repo.get_by_id(jugador_id)
         
@@ -344,7 +344,7 @@ class ChallengeService(BaseService):
         return [PlayerChallenge(**r) for r in results]
     
     async def get_player_stats(self, jugador_id: str) -> Dict:
-        """Get estadísticas de retos of the player"""
+        """Get statistics de retos of the player"""
         completed = await self.player_challenge_repo.get_completed_count(jugador_id)
         total_points = await self.player_challenge_repo.get_total_points(jugador_id)
         active = await self.player_challenge_repo.get_active_challenges(jugador_id)
