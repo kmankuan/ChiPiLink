@@ -69,7 +69,7 @@ const rarityColors = {
 };
 
 export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [feedData, setFeedData] = useState(null);
@@ -81,23 +81,37 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
   const lang = ['es', 'en', 'zh'].includes(detectedLang) ? detectedLang : 'es';
   const L = (value) => getLocalizedText(value, lang);
 
-  const texts = {
-    es: {
-      loading: 'Cargando actividad...',
-      recentMatches: 'Partidos Recientes',
-      superPinMatches: '🏆 Super Pin',
-      rapidPinMatches: '⚡ Rapid Pin',
-      leaderboard: 'Top Jugadores',
-      activeChallenges: 'Retos Activos',
-      recentAchievements: 'Logros Recientes',
-      activePlayers: 'Jugadores Activos',
-      upcomingTournaments: 'Próximos Torneos',
-      viewAll: 'Ver todos',
-      join: 'Unirse',
-      noData: 'Sin datos disponibles',
-      superpin: 'Super Pin',
-      rapidpin: 'Rapid Pin',
-      points: 'pts',
+  // Use centralized i18n translations
+  const txt = {
+    loading: t('pinpanclub.loading'),
+    recentMatches: t('pinpanclub.recentMatches'),
+    superPinMatches: t('pinpanclub.superPinMatches'),
+    rapidPinMatches: t('pinpanclub.rapidPinMatches'),
+    leaderboard: t('pinpanclub.leaderboard'),
+    activeChallenges: t('pinpanclub.activeChallenges'),
+    recentAchievements: t('pinpanclub.recentAchievements'),
+    activePlayers: t('pinpanclub.activePlayers'),
+    upcomingTournaments: t('pinpanclub.upcomingTournaments'),
+    viewAll: t('pinpanclub.viewAll'),
+    join: t('pinpanclub.join'),
+    noData: t('pinpanclub.noData'),
+    superpin: t('pinpanclub.superpin'),
+    rapidpin: t('pinpanclub.rapidpin'),
+    points: t('pinpanclub.points'),
+    games: t('pinpanclub.games'),
+    won: t('pinpanclub.won'),
+    matchesPlayed: t('pinpanclub.matchesPlayed'),
+    streak: t('pinpanclub.streak'),
+    today: t('pinpanclub.today'),
+    level: t('pinpanclub.level'),
+    wins: t('pinpanclub.wins'),
+    losses: t('pinpanclub.losses'),
+    difficulty: t('pinpanclub.difficulty'),
+    easy: t('pinpanclub.easy'),
+    normal: t('pinpanclub.normal'),
+    hard: t('pinpanclub.hard'),
+    extreme: t('pinpanclub.extreme')
+  };
       wins: 'V',
       losses: 'D',
       vs: 'vs',
