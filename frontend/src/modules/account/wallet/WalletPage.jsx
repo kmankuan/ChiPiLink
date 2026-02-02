@@ -132,7 +132,6 @@ export default function ChipiWallet({ token }) {
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    // Use proper locale codes to avoid RangeError with invalid language tags
     const locale = lang === 'zh' ? 'zh-CN' : lang === 'en' ? 'en-US' : 'es-PA';
     return date.toLocaleDateString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
@@ -149,94 +148,6 @@ export default function ChipiWallet({ token }) {
     return icons[type] || <CreditCard className="h-4 w-4" />;
   };
 
-  const texts = {
-    es: {
-      title: 'ChipiWallet',
-      subtitle: 'Tu billetera digital',
-      balance: 'Saldo',
-      points: 'ChipiPoints',
-      totalValue: 'Valor Total',
-      deposit: 'Depositar',
-      convert: 'Convertir',
-      transactions: 'Transacciones',
-      pointsHistory: 'Historial de Puntos',
-      stats: 'Estadísticas',
-      deposited: 'Depositado',
-      spent: 'Gastado',
-      earned: 'Ganados',
-      noTransactions: 'Sin transacciones aún',
-      depositTitle: 'Depositar Fondos',
-      depositDesc: 'Agrega dinero a tu billetera',
-      amount: 'Monto',
-      method: 'Método de Pago',
-      cash: 'Efectivo',
-      card: 'Tarjeta',
-      yappy: 'Yappy',
-      convertTitle: 'Convertir ChipiPoints',
-      convertDesc: 'Convierte tus puntos a USD',
-      pointsToConvert: 'Puntos a convertir',
-      youWillReceive: 'Recibirás aproximadamente',
-      confirm: 'Confirmar'
-    },
-    en: {
-      title: 'ChipiWallet',
-      subtitle: 'Your digital wallet',
-      balance: 'Balance',
-      points: 'ChipiPoints',
-      totalValue: 'Total Value',
-      deposit: 'Deposit',
-      convert: 'Convert',
-      transactions: 'Transactions',
-      pointsHistory: 'Points History',
-      stats: 'Statistics',
-      deposited: 'Deposited',
-      spent: 'Spent',
-      earned: 'Earned',
-      noTransactions: 'No transactions yet',
-      depositTitle: 'Deposit Funds',
-      depositDesc: 'Add money to your wallet',
-      amount: 'Amount',
-      method: 'Payment Method',
-      cash: 'Cash',
-      card: 'Card',
-      yappy: 'Yappy',
-      convertTitle: 'Convert ChipiPoints',
-      convertDesc: 'Convert your points to USD',
-      pointsToConvert: 'Points to convert',
-      youWillReceive: 'You will receive approximately',
-      confirm: 'Confirm'
-    },
-    zh: {
-      title: 'ChipiWallet',
-      subtitle: '您的数字钱包',
-      balance: '余额',
-      points: 'ChipiPoints',
-      totalValue: '总价值',
-      deposit: '充值',
-      convert: '转换',
-      transactions: '交易记录',
-      pointsHistory: '积分历史',
-      stats: '统计',
-      deposited: '已充值',
-      spent: '已花费',
-      earned: '已获得',
-      noTransactions: '暂无交易',
-      depositTitle: '充值',
-      depositDesc: '向您的钱包添加资金',
-      amount: '金额',
-      method: '支付方式',
-      cash: '现金',
-      card: '银行卡',
-      yappy: 'Yappy',
-      convertTitle: '转换 ChipiPoints',
-      convertDesc: '将积分转换为美元',
-      pointsToConvert: '转换积分数量',
-      youWillReceive: '您将获得约',
-      confirm: '确认'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
   const conversionRate = summary?.points_config?.conversion_rate || 0.008;
 
   if (loading) {
@@ -254,7 +165,7 @@ export default function ChipiWallet({ token }) {
         {/* USD Balance */}
         <Card className="bg-gradient-to-br from-green-500 to-emerald-600 text-white">
           <CardHeader className="pb-2">
-            <CardDescription className="text-green-100">{txt.balance} USD</CardDescription>
+            <CardDescription className="text-green-100">{t('wallet.balance')} USD</CardDescription>
             <CardTitle className="text-3xl flex items-center gap-2" data-testid="balance-usd">
               <DollarSign className="h-6 w-6" />
               {formatCurrency(summary?.balance_usd)}
@@ -265,17 +176,17 @@ export default function ChipiWallet({ token }) {
               <DialogTrigger asChild>
                 <Button variant="secondary" size="sm" className="w-full" data-testid="deposit-btn">
                   <ArrowDownLeft className="h-4 w-4 mr-2" />
-                  {txt.deposit}
+                  {t('wallet.deposit')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{txt.depositTitle}</DialogTitle>
-                  <DialogDescription>{txt.depositDesc}</DialogDescription>
+                  <DialogTitle>{t('wallet.depositTitle')}</DialogTitle>
+                  <DialogDescription>{t('wallet.depositDesc')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
                   <div>
-                    <Label>{txt.amount}</Label>
+                    <Label>{t('wallet.amount')}</Label>
                     <Input
                       type="number"
                       placeholder="0.00"
@@ -285,20 +196,20 @@ export default function ChipiWallet({ token }) {
                     />
                   </div>
                   <div>
-                    <Label>{txt.method}</Label>
+                    <Label>{t('wallet.method')}</Label>
                     <Select value={depositMethod} onValueChange={setDepositMethod}>
                       <SelectTrigger data-testid="deposit-method-select">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cash">{txt.cash}</SelectItem>
-                        <SelectItem value="card">{txt.card}</SelectItem>
-                        <SelectItem value="yappy">{txt.yappy}</SelectItem>
+                        <SelectItem value="cash">{t('wallet.cash')}</SelectItem>
+                        <SelectItem value="card">{t('wallet.card')}</SelectItem>
+                        <SelectItem value="yappy">{t('wallet.yappy')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <Button onClick={handleDeposit} className="w-full" data-testid="confirm-deposit-btn">
-                    {txt.confirm}
+                    {t('wallet.confirm')}
                   </Button>
                 </div>
               </DialogContent>
@@ -309,7 +220,7 @@ export default function ChipiWallet({ token }) {
         {/* ChipiPoints Balance */}
         <Card className="bg-gradient-to-br from-purple-500 to-violet-600 text-white">
           <CardHeader className="pb-2">
-            <CardDescription className="text-purple-100">{txt.points}</CardDescription>
+            <CardDescription className="text-purple-100">{t('wallet.points')}</CardDescription>
             <CardTitle className="text-3xl flex items-center gap-2" data-testid="balance-points">
               <Gift className="h-6 w-6" />
               {(summary?.balance_points || 0).toLocaleString()}
@@ -329,17 +240,17 @@ export default function ChipiWallet({ token }) {
                   data-testid="convert-btn"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  {txt.convert}
+                  {t('wallet.convert')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{txt.convertTitle}</DialogTitle>
-                  <DialogDescription>{txt.convertDesc}</DialogDescription>
+                  <DialogTitle>{t('wallet.convertTitle')}</DialogTitle>
+                  <DialogDescription>{t('wallet.convertDesc')}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
                   <div>
-                    <Label>{txt.pointsToConvert}</Label>
+                    <Label>{t('wallet.pointsToConvert')}</Label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -351,11 +262,11 @@ export default function ChipiWallet({ token }) {
                   </div>
                   {convertPoints && (
                     <p className="text-sm text-muted-foreground">
-                      {txt.youWillReceive}: {formatCurrency(parseInt(convertPoints) * conversionRate)}
+                      {t('wallet.youWillReceive')}: {formatCurrency(parseInt(convertPoints) * conversionRate)}
                     </p>
                   )}
                   <Button onClick={handleConvertPoints} className="w-full" data-testid="confirm-convert-btn">
-                    {txt.confirm}
+                    {t('wallet.confirm')}
                   </Button>
                 </div>
               </DialogContent>
@@ -366,7 +277,7 @@ export default function ChipiWallet({ token }) {
         {/* Total Value */}
         <Card className="bg-gradient-to-br from-slate-700 to-slate-800 text-white">
           <CardHeader className="pb-2">
-            <CardDescription className="text-slate-300">{txt.totalValue}</CardDescription>
+            <CardDescription className="text-slate-300">{t('wallet.totalValue')}</CardDescription>
             <CardTitle className="text-3xl flex items-center gap-2" data-testid="total-balance">
               <Wallet className="h-6 w-6" />
               {formatCurrency(summary?.total_balance)}
@@ -375,11 +286,11 @@ export default function ChipiWallet({ token }) {
           <CardContent>
             <div className="space-y-1 text-sm text-slate-300">
               <div className="flex justify-between">
-                <span>{txt.deposited}:</span>
+                <span>{t('wallet.deposited')}:</span>
                 <span>{formatCurrency(summary?.stats?.total_deposited)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{txt.spent}:</span>
+                <span>{t('wallet.spent')}:</span>
                 <span>{formatCurrency(summary?.stats?.total_spent)}</span>
               </div>
             </div>
@@ -392,15 +303,15 @@ export default function ChipiWallet({ token }) {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="qrcode" data-testid="qrcode-tab">
             <QrCode className="h-4 w-4 mr-2" />
-            QR Code
+            {t('wallet.qrCode')}
           </TabsTrigger>
           <TabsTrigger value="transactions" data-testid="transactions-tab">
             <History className="h-4 w-4 mr-2" />
-            {txt.transactions}
+            {t('wallet.transactions')}
           </TabsTrigger>
           <TabsTrigger value="points" data-testid="points-tab">
             <Gift className="h-4 w-4 mr-2" />
-            {txt.pointsHistory}
+            {t('wallet.pointsHistory')}
           </TabsTrigger>
         </TabsList>
 
@@ -413,7 +324,7 @@ export default function ChipiWallet({ token }) {
             <CardContent className="pt-6">
               {transactions.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8" data-testid="no-transactions">
-                  {txt.noTransactions}
+                  {t('wallet.noTransactions')}
                 </p>
               ) : (
                 <div className="space-y-3" data-testid="transactions-list">
@@ -458,7 +369,7 @@ export default function ChipiWallet({ token }) {
             <CardContent className="pt-6">
               {pointsHistory.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  {txt.noTransactions}
+                  {t('wallet.noTransactions')}
                 </p>
               ) : (
                 <div className="space-y-3" data-testid="points-history-list">
