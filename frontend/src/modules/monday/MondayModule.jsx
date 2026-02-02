@@ -60,7 +60,7 @@ export default function MondayModule() {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('auth_token');
 
-  // Estado de conexión
+  // Connection status
   const [connected, setConnected] = useState(false);
   const [connectionInfo, setConnectionInfo] = useState(null);
   const [testingConnection, setTestingConnection] = useState(false);
@@ -72,12 +72,12 @@ export default function MondayModule() {
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [savingWorkspace, setSavingWorkspace] = useState(false);
 
-  // Boards disponibles
+  // Available boards
   const [boards, setBoards] = useState([]);
   const [columns, setColumns] = useState([]);
   const [groups, setGroups] = useState([]);
 
-  // Configuración de Libros (Store)
+  // Store configuration (Books)
   const [storeConfig, setStoreConfig] = useState({
     board_id: '',
     group_id: '',
@@ -92,7 +92,7 @@ export default function MondayModule() {
       fecha: 'date',
       pedido_id: 'text6'
     },
-    // Configuración de subitems para productos
+    // Subitem configuration for products
     subitems_enabled: false,
     subitem_column_mapping: {
       nombre: 'name',
@@ -107,10 +107,10 @@ export default function MondayModule() {
   const [savingStoreConfig, setSavingStoreConfig] = useState(false);
   const [syncingAll, setSyncingAll] = useState(false);
   
-  // Columnas de subitems
+  // Subitem columns
   const [subitemColumns, setSubitemColumns] = useState([]);
 
-  // Configuración General (legacy)
+  // General configuration (legacy)
   const [legacyStatus, setLegacyStatus] = useState(null);
   const [legacyBoardId, setLegacyBoardId] = useState('');
   const [savingLegacy, setSavingLegacy] = useState(false);
