@@ -186,7 +186,7 @@ class ConexionesService:
         return reciprocos.get(subtipo, subtipo)
     
     def _get_permisos_reciprocos(self, tipo: str, subtipo: str) -> Dict:
-        """Get reciprocal permissions (generalmente más limitados)"""
+        """Get reciprocal permissions (generally more limited)"""
         # By defecto, el recíproco tiene permisos mínimos
         if subtipo in ["acudiente", "padre", "madre", "tio", "tia", "abuelo", "abuela"]:
             # The dependent has no permissions sobre el acudiente
@@ -209,27 +209,27 @@ class ConexionesService:
         conexion_id: str,
         updates: Dict
     ) -> Dict:
-        """Update una conexión existente"""
+        """Update an existing connection"""
         result = await db.auth_users.update_one(
             {"user_id": user_id, "conexiones.conexion_id": conexion_id},
             {"$set": {f"conexiones.$.{k}": v for k, v in updates.items()}}
         )
         
         if result.modified_count == 0:
-            return {"error": "Conexión not found"}
+            return {"error": "Connection not found"}
         
         return {"success": True}
     
     async def eliminar_conexion(self, user_id: str, conexion_id: str) -> Dict:
-        """Delete una conexión"""
-        # Get conexión para saber el user_id destino
+        """Delete a connection"""
+        # Get connection to know the destination user_id
         conexion = await self.get_conexion(user_id, conexion_id)
         if not conexion:
-            return {"error": "Conexión not found"}
+            return {"error": "Connection not found"}
         
         destino_user_id = conexion["user_id"]
         
-        # Delete de ambos usuarios
+        # Delete from both users
         await db.auth_users.update_one(
             {"user_id": user_id},
             {"$pull": {"conexiones": {"conexion_id": conexion_id}}}
@@ -253,7 +253,7 @@ class ConexionesService:
         etiqueta: Optional[str] = None,
         mensaje: Optional[str] = None
     ) -> Dict:
-        """Create solicitud de conexión"""
+        """Create connection request"""
         # Verify connection does not exist ni solicitud pendiente
         existing_conexion = await db.auth_users.find_one({
             "user_id": de_usuario_id,
@@ -366,7 +366,7 @@ class ConexionesService:
         """Responder a una solicitud de conexión"""
         solicitud = await db.solicitudes_conexion.find_one({"solicitud_id": solicitud_id})
         if not solicitud:
-            return {"error": "Solicitud not found"}
+            return {"error": "Request not found"}
         
         if solicitud["estado"] != "pendiente":
             return {"error": "Solicitud ya fue respondida"}
