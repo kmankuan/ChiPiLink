@@ -70,7 +70,7 @@ class GoogleSheetsService:
             return False
     
     async def get_sync_config(self) -> Dict:
-        """Get configuration de sincronización"""
+        """Get configuration de synchronization"""
         config = await db.sync_config.find_one(
             {"config_id": "google_sheets_sync_config"},
             {"_id": 0}
@@ -98,7 +98,7 @@ class GoogleSheetsService:
         return config
     
     async def update_sync_config(self, updates: Dict) -> Dict:
-        """Update configuration de sincronización"""
+        """Update configuration de synchronization"""
         updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
         
         await db.sync_config.update_one(
@@ -116,7 +116,7 @@ class GoogleSheetsService:
         hojas: List[Dict[str, Any]]
     ) -> Dict:
         """
-        Configurar un Google Sheet para sincronización.
+        Configurar un Google Sheet para synchronization.
         
         Args:
             sheet_id: ID of the Google Sheet
@@ -232,7 +232,7 @@ class GoogleSheetsService:
             forzar: Si es True, sincroniza aunque override_local sea True
         
         Returns:
-            Resumen de la sincronización
+            Resumen de la synchronization
         """
         if not self._initialized:
             return {
@@ -373,7 +373,7 @@ class GoogleSheetsService:
             except Exception as e:
                 resultados["errores"].append(f"Sheet {sheet_cfg.get('nombre', sheet_cfg['sheet_id'])}: {str(e)}")
         
-        # Update last sincronización
+        # Update last synchronization
         await self.update_sync_config({
             "ultima_sync": datetime.now(timezone.utc).isoformat()
         })
@@ -441,7 +441,7 @@ class GoogleSheetsService:
         return {"success": True, "override_local": override}
     
     async def get_stats(self) -> Dict:
-        """Get statistics de sincronización"""
+        """Get statistics de synchronization"""
         config = await self.get_sync_config()
         
         # Contar por grado

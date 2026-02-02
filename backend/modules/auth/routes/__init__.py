@@ -1,6 +1,6 @@
 """
 Auth Module - Main Router
-Agrega todos los routers del module de autenticación
+Agrega todos los routers del module de authentication
 """
 from fastapi import APIRouter
 

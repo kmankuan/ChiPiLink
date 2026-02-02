@@ -1,6 +1,6 @@
 """
 PinpanClub - Monday.com Integration Routes
-Endpoints for integración con Monday.com
+Endpoints for integration con Monday.com
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, List
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/monday", tags=["PinpanClub - Monday.com"])
 
 @router.get("/status")
 async def get_integration_status(admin: dict = Depends(get_admin_user)):
-    """Get estado de la integración con Monday.com"""
+    """Get estado de la integration con Monday.com"""
     config = await monday_service.get_config()
     
     status = {
@@ -63,7 +63,7 @@ async def update_config(
 ):
     """Update configuration de Monday.com"""
     await monday_service.save_config(config)
-    return {"success": True, "message": "Configuración guardada"}
+    return {"success": True, "message": "Configuration guardada"}
 
 
 @router.get("/boards")
@@ -197,7 +197,7 @@ async def get_monday_players(admin: dict = Depends(get_admin_user)):
 
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
-    """Get statistics de sincronización"""
+    """Get statistics de synchronization"""
     config = await monday_service.get_config()
     
     player_repo = PlayerRepository()

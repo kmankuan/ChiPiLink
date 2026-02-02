@@ -20,8 +20,8 @@ class DefaultRoles(str, Enum):
 AVAILABLE_PERMISSIONS = {
     # Administración general
     "admin": {
-        "access": "Acceder al panel de administración",
-        "dashboard": "Ver dashboard de administración",
+        "access": "Acceder al panel de administration",
+        "dashboard": "Ver dashboard de administration",
         "site_config": "Configurar sitio web",
         "landing_editor": "Editar landing page",
     },
@@ -69,7 +69,7 @@ AVAILABLE_PERMISSIONS = {
         "manage_leagues": "Gestionar ligas",
         "manage_players": "Gestionar jugadores",
         "manage_seasons": "Gestionar temporadas",
-        "admin_panel": "Panel de administración PinpanClub",
+        "admin_panel": "Panel de administration PinpanClub",
     },
     
     # Memberships

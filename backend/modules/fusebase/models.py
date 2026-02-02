@@ -1,5 +1,5 @@
 """
-FuseBase Models - Modelos para integración con FuseBase
+FuseBase Models - Modelos para integration con FuseBase
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
@@ -8,7 +8,7 @@ import uuid
 
 
 class FuseBaseConfig(BaseModel):
-    """Configuración de FuseBase"""
+    """Configuration de FuseBase"""
     model_config = ConfigDict(extra="ignore")
     config_id: str = "fusebase_main"
     # API Configuration
@@ -47,7 +47,7 @@ class FuseBaseDocument(BaseModel):
 
 
 class FuseBaseCategory(BaseModel):
-    """Categoría para organizar documentos"""
+    """Category para organizar documentos"""
     model_config = ConfigDict(extra="ignore")
     category_id: str = Field(default_factory=lambda: f"fb_cat_{uuid.uuid4().hex[:8]}")
     nombre: str

@@ -3,7 +3,7 @@ Task Supervisor Routes - Endpoints para el Supervisor de Tareas
 
 PLACEHOLDER - Endpoints a implementar:
 - GET /task-supervisor/status - Estado del module
-- GET/PUT /task-supervisor/config - Configuración
+- GET/PUT /task-supervisor/config - Configuration
 - GET /task-supervisor/display - Datos para pantalla grande
 - GET/POST /task-supervisor/people - Personas supervisadas
 - GET /task-supervisor/tasks - Tareas sincronizadas de Monday.com
@@ -82,7 +82,7 @@ async def update_supervisor_config(config: dict, admin: dict = Depends(get_admin
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración del Task Supervisor actualizada"}
+    return {"success": True, "message": "Configuration del Task Supervisor actualizada"}
 
 
 # ============== DISPLAY (KIOSK MODE) ==============
@@ -119,7 +119,7 @@ async def get_display_data(person_id: Optional[str] = None):
             "en_progreso": len([t for t in tasks if t.get("estado") == "en_progreso"]),
             "pendientes": len([t for t in tasks if t.get("estado") == "pendiente"])
         },
-        "message": "Display data - Placeholder. Requiere sincronización con Monday.com."
+        "message": "Display data - Placeholder. Requiere synchronization con Monday.com."
     }
 
 
@@ -275,7 +275,7 @@ async def create_announcement(data: dict, admin: dict = Depends(get_admin_user))
     return {
         "success": True,
         "announcement": announcement,
-        "message": "Anuncio creado - Placeholder. Requiere integración TTS para generar audio."
+        "message": "Anuncio creado - Placeholder. Requiere integration TTS para generar audio."
     }
 
 

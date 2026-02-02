@@ -103,7 +103,7 @@ class PermisosConexion(BaseModel):
 # ============== MODELOS DE CONEXIÓN ==============
 
 class Conexion(BaseModel):
-    """Conexión entre dos usuarios"""
+    """Connection entre dos usuarios"""
     conexion_id: str = Field(default_factory=lambda: f"con_{uuid.uuid4().hex[:12]}")
     user_id: str                    # User conectado
     tipo: TipoRelacion
@@ -181,7 +181,7 @@ class Invitacion(BaseModel):
 
 
 class InvitacionCreate(BaseModel):
-    """Request to create invitación"""
+    """Request to create invitation"""
     email: EmailStr
     nombre: Optional[str] = None
     mensaje: Optional[str] = None
@@ -205,7 +205,7 @@ class CapacidadUsuario(BaseModel):
 
 
 class CapacidadConfig(BaseModel):
-    """Configuración de una capacidad (admin configurable)"""
+    """Configuration de una capacidad (admin configurable)"""
     capacidad_id: str = Field(default_factory=lambda: f"cap_{uuid.uuid4().hex[:8]}")
     nombre: Dict[str, str]          # {"es": "Referee", "en": "Referee"}
     descripcion: Dict[str, str] = {}
@@ -288,7 +288,7 @@ class AlertaWallet(BaseModel):
 # ============== CONFIGURACIÓN DE PERMISOS POR RELACIÓN ==============
 
 class ConfigPermisosRelacion(BaseModel):
-    """Configuración de permisos by default para un tipo de relationship"""
+    """Configuration de permisos by default para un tipo de relationship"""
     tipo: TipoRelacion
     subtipo: str
     permisos_default: PermisosConexion
@@ -298,7 +298,7 @@ class ConfigPermisosRelacion(BaseModel):
 # ============== CONFIGURACIÓN DE MARKETING ==============
 
 class MarketingConfig(BaseModel):
-    """Configuración de marketing para un usuario"""
+    """Configuration de marketing para un usuario"""
     mostrar_servicios: bool = True
     servicios_sugeridos: Optional[List[str]] = None  # null = todos
     servicios_excluidos: List[str] = []

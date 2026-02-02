@@ -1,6 +1,6 @@
 """
 PinpanClub - Monday.com Integration Service
-Business logic para sincronización con Monday.com
+Business logic para synchronization con Monday.com
 """
 from typing import List, Dict, Optional
 import httpx
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class MondayService(BaseService):
     """
-    Service for integración con Monday.com.
+    Service for integration con Monday.com.
     Escucha eventos del module y sincroniza automaticmente.
     """
     
@@ -237,7 +237,7 @@ class MondayService(BaseService):
         if not player:
             return None
         
-        # Si ya está sincronizado, skip
+        # Si ya is sincronizado, skip
         if player.get("monday_item_id"):
             return player["monday_item_id"]
         

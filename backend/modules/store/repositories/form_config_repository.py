@@ -118,7 +118,7 @@ class FormConfigRepository(BaseRepository):
                     "label_es": "Colegio",
                     "label_zh": "学校",
                     "help_text_en": "Select the school where the student is enrolled",
-                    "help_text_es": "Selecciona el colegio donde está matriculado el estudiante",
+                    "help_text_es": "Selecciona el colegio donde is matriculado el estudiante",
                     "help_text_zh": "选择学生就读的学校",
                     "options": []  # Will be populated dynamically from schools collection
                 },
@@ -168,7 +168,7 @@ class FormConfigRepository(BaseRepository):
                     "is_required": False,
                     "order": 5,
                     "label_en": "Student ID Number",
-                    "label_es": "Número de Estudiante",
+                    "label_es": "Number de Estudiante",
                     "label_zh": "学生编号",
                     "placeholder_en": "e.g., STD-2024-001",
                     "placeholder_es": "ej: STD-2024-001",

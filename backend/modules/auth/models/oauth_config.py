@@ -21,7 +21,7 @@ class OAuthProviderConfig(BaseModel):
     scopes: List[str] = ["profile", "email"]
     # UI Configuration
     button_text: str = "Sign in with LaoPan"
-    button_text_es: str = "Iniciar sesión con LaoPan"
+    button_text_es: str = "Iniciar session con LaoPan"
     button_text_zh: str = "使用LaoPan登录"
     button_color: str = "#4F46E5"  # Indigo
     button_icon: Optional[str] = None

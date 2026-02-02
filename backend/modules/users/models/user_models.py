@@ -509,7 +509,7 @@ def get_default_profile_fields() -> List[Dict]:
         {
             "field_id": "field_emergency_phone",
             "field_key": "emergency_phone",
-            "label": {"es": "Teléfono de Emergencia", "en": "Emergency Phone", "zh": "紧急电话"},
+            "label": {"es": "Phone de Emergencia", "en": "Emergency Phone", "zh": "紧急电话"},
             "field_type": "phone",
             "section": "contact",
             "is_required": False,

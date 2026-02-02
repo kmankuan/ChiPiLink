@@ -48,7 +48,7 @@ class PrizeCondition(BaseModel):
 
 
 class PrizeDefinition(BaseModel):
-    """Definición de un premio configurable"""
+    """Definition de un premio configurable"""
     prize_id: str = Field(default_factory=lambda: f"prize_{uuid.uuid4().hex[:8]}")
     name: str
     description: Optional[str] = None
@@ -84,7 +84,7 @@ class PrizeDefinition(BaseModel):
 
 
 class PrizeDefinitionCreate(BaseModel):
-    """Create definición de premio"""
+    """Create definition de premio"""
     name: str
     description: Optional[str] = None
     type: PrizeType = PrizeType.BADGE
@@ -120,7 +120,7 @@ class AwardedPrize(BaseModel):
     status: PrizeStatus = PrizeStatus.CLAIMED
     
     # Award details
-    awarded_for: str  # Description of por qué se otorgó
+    awarded_for: str  # Description of por what se otorgó
     position: Optional[int] = None  # Si fue por position
     
     # Timestamps
@@ -149,7 +149,7 @@ def get_default_prize_catalog() -> List[Dict]:
     """Catálogo de premios by default"""
     return [
         {
-            "name": "Campeón de Temporada",
+            "name": "Champion de Temporada",
             "description": "Premio al primer lugar from ranking",
             "type": "physical",
             "icon": "🥇",
@@ -160,7 +160,7 @@ def get_default_prize_catalog() -> List[Dict]:
             "max_winners": 1
         },
         {
-            "name": "Subcampeón",
+            "name": "Runner-up",
             "description": "Premio al segundo lugar",
             "type": "physical",
             "icon": "🥈",

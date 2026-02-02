@@ -158,7 +158,7 @@ async def get_notifications(
 
 @router.get("/notifications/{user_id}/unread-count")
 async def get_unread_count(user_id: str):
-    """Get cantidad de notifications no leídas"""
+    """Get cantidad de notifications no read"""
     count = await social_service.get_unread_count(user_id)
     return {"user_id": user_id, "unread_count": count}
 
@@ -172,7 +172,7 @@ async def mark_notification_read(notification_id: str):
 
 @router.post("/notifications/{user_id}/read-all")
 async def mark_all_notifications_read(user_id: str):
-    """Marcar todas las notifications como leídas"""
+    """Marcar todas las notifications como read"""
     count = await social_service.mark_all_notifications_read(user_id)
     return {"user_id": user_id, "marked_count": count}
 

@@ -469,7 +469,7 @@ class ChallengeCommentCreate(BaseModel):
 
 
 class ChallengeCommentModerationConfig(BaseModel):
-    """Configuración de moderación de comentarios"""
+    """Configuration de moderación de comentarios"""
     config_id: str = "rapidpin_comment_config"
     max_comment_length: int = 280
     require_approval_for_new_users: bool = False

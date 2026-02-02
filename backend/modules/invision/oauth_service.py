@@ -239,7 +239,7 @@ class LaoPanOAuthService:
             "provider_id": "laopan",
             "provider_name": "LaoPan.online",
             "button_text": "Sign in with LaoPan",
-            "button_text_es": "Iniciar sesión con LaoPan",
+            "button_text_es": "Iniciar session con LaoPan",
             "button_text_zh": "使用LaoPan登录",
             "button_color": "#4F46E5"
         }

@@ -413,7 +413,7 @@ class PostService:
     ) -> Optional[Dict]:
         """
         [PLACEHOLDER] Importar contenido desde Monday.com
-        TODO: Implementar integración con Monday.com API
+        TODO: Implementar integration con Monday.com API
         """
         self.log_info(f"Monday.com import placeholder - Board: {board_id}, Item: {item_id}")
         return {
@@ -429,7 +429,7 @@ class PostService:
     ) -> Optional[Dict]:
         """
         [PLACEHOLDER] Importar contenido desde Fusebase
-        TODO: Implementar integración con Fusebase API
+        TODO: Implementar integration con Fusebase API
         """
         self.log_info(f"Fusebase import placeholder - Document: {document_id}")
         return {

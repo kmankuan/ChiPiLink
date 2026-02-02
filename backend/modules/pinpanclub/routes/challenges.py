@@ -26,7 +26,7 @@ async def get_all_challenges():
 
 @router.get("/definitions/{challenge_id}", response_model=ChallengeDefinition)
 async def get_challenge(challenge_id: str):
-    """Get definición de a challenge"""
+    """Get definition de a challenge"""
     challenge = await challenge_service.get_challenge(challenge_id)
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")

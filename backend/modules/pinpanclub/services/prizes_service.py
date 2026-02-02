@@ -38,14 +38,14 @@ class PrizeService(BaseService):
     # ============== PRIZE DEFINITIONS ==============
     
     async def create_prize(self, data: PrizeDefinitionCreate) -> PrizeDefinition:
-        """Create definición de premio"""
+        """Create definition de premio"""
         # Convert conditions to list of dicts
         prize_data = data.model_dump()
         result = await self.definition_repo.create(prize_data)
         return PrizeDefinition(**result)
     
     async def get_prize(self, prize_id: str) -> Optional[PrizeDefinition]:
-        """Get definición de premio"""
+        """Get definition de premio"""
         result = await self.definition_repo.get_by_id(prize_id)
         return PrizeDefinition(**result) if result else None
     
@@ -86,7 +86,7 @@ class PrizeService(BaseService):
         # Create catalog
         catalog_data = {
             "name": "Catálogo Principal",
-            "description": "Premios estándar para temporadas",
+            "description": "Premios isndar para temporadas",
             "prizes": [p.model_dump() for p in prize_defs]
         }
         result = await self.catalog_repo.create(catalog_data)
@@ -208,7 +208,7 @@ class PrizeService(BaseService):
                         award = await self.award_prize(
                             prize_id=prize.prize_id,
                             jugador_id=ranking.get("jugador_id"),
-                            awarded_for=f"Posición #{idx} en temporada",
+                            awarded_for=f"Position #{idx} en temporada",
                             position=idx,
                             season_id=season_id
                         )

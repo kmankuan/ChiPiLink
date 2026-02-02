@@ -1,6 +1,6 @@
 """
 Store Module - Models/Schemas
-Definición de schemas Pydantic para el module de tienda
+Definition de schemas Pydantic para el module de tienda
 """
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import List, Optional, Dict, Any

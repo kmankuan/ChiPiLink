@@ -1,9 +1,9 @@
 """
-Content Hub Routes - Endpoints para Curación de Contenido
+Content Hub Routes - Endpoints para Curation de Contenido
 
 PLACEHOLDER - Endpoints a implementar:
 - GET/POST /content-hub/items - Contenido curado
-- GET/POST /content-hub/categories - Categorías por audiencia
+- GET/POST /content-hub/categories - Categorys por audiencia
 - GET/POST /content-hub/playlists - Colecciones de contenido
 - GET /content-hub/feed/{category} - Feed por category
 - POST /content-hub/import - Importar desde URL
@@ -33,7 +33,7 @@ CONTENT_SOURCES = [
     {"source_id": "twitter", "nombre": "X/Twitter", "icono": "🐦", "color": "#1DA1F2"},
 ]
 
-# Categorías por audiencia predefinidas
+# Categorys por audiencia predefinidas
 DEFAULT_CATEGORIES = [
     {"category_id": "ninos", "nombre": "Para Niños", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
     {"category_id": "padres", "nombre": "Padres de Familia", "nombre_en": "For Parents", "nombre_zh": "家长内容", "icono": "👨‍👩‍👧", "orden": 2},
@@ -53,7 +53,7 @@ async def get_content_hub_status():
     return {
         "module": "content_hub",
         "status": "placeholder",
-        "message": "Content Hub - Curación de Contenido Multimedia",
+        "message": "Content Hub - Curation de Contenido Multimedia",
         "planned_features": [
             "Importar videos/posts de multiple redes sociales",
             "Categorización por audiencia (childs, padres, etc.)",

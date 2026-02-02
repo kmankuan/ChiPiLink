@@ -27,7 +27,7 @@ async def get_all_prizes():
 
 @router.get("/definitions/{prize_id}", response_model=PrizeDefinition)
 async def get_prize(prize_id: str):
-    """Get definición de a prize"""
+    """Get definition de a prize"""
     prize = await prize_service.get_prize(prize_id)
     if not prize:
         raise HTTPException(status_code=404, detail="Premio not found")

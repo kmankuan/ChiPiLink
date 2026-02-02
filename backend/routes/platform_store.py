@@ -110,7 +110,7 @@ async def validate_yappy_merchant():
     yappy_service = await YappyServiceFactory.create_for_platform(db)
     
     if not yappy_service:
-        raise HTTPException(status_code=400, detail="Yappy no está configurado para la tienda de la plataforma")
+        raise HTTPException(status_code=400, detail="Yappy no is configurado para la tienda de la plataforma")
     
     result = await yappy_service.validate_merchant()
     
@@ -133,7 +133,7 @@ async def create_yappy_order(
     yappy_service = await YappyServiceFactory.create_for_platform(db)
     
     if not yappy_service:
-        raise HTTPException(status_code=400, detail="Yappy no está configurado")
+        raise HTTPException(status_code=400, detail="Yappy no is configurado")
     
     # First validate merchant to get token
     validation = await yappy_service.validate_merchant()
@@ -341,14 +341,14 @@ async def test_platform_yappy(admin: dict = Depends(lambda: get_admin_user)):
     yappy_service = await YappyServiceFactory.create_for_platform(db)
     
     if not yappy_service:
-        raise HTTPException(status_code=400, detail="Yappy no está configurado. Configure las credenciales primero.")
+        raise HTTPException(status_code=400, detail="Yappy no is configurado. Configure las credenciales primero.")
     
     result = await yappy_service.validate_merchant()
     
     if result["success"]:
         return {
             "success": True,
-            "message": "Conexión con Yappy exitosa",
+            "message": "Connection con Yappy exitosa",
             "ambiente": yappy_service.ambiente
         }
     

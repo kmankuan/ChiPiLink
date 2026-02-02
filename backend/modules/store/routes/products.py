@@ -45,7 +45,7 @@ async def get_promotional_products(
     categoria: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
-    """Get productos en promoción"""
+    """Get productos en promotion"""
     return await product_service.get_promotional_products(categoria, limit)
 
 
@@ -145,7 +145,7 @@ async def toggle_promotion(
     precio_oferta: Optional[float] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Marcar/desmarcar producto en promoción (solo admin)"""
+    """Marcar/desmarcar producto en promotion (solo admin)"""
     product = await product_service.update_product(
         libro_id,
         ProductUpdate(en_promocion=en_promocion, precio_oferta=precio_oferta)

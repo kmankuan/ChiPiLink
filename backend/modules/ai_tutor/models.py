@@ -8,7 +8,7 @@ import uuid
 
 
 class TutorConfig(BaseModel):
-    """Configuración del AI Tutor"""
+    """Configuration del AI Tutor"""
     model_config = ConfigDict(extra="ignore")
     config_id: str = "ai_tutor_main"
     # LLM Configuration
@@ -34,7 +34,7 @@ class TutorSession(BaseModel):
     session_id: str = Field(default_factory=lambda: f"tutor_{uuid.uuid4().hex[:12]}")
     estudiante_id: str
     estudiante_nombre: Optional[str] = None
-    # Tema de la sesión
+    # Tema de la session
     tema: str  # "vocabulario_ingles", "pronunciacion", "gramatica", etc.
     subtema: Optional[str] = None  # "colores", "numbers", etc.
     nivel: str = "basico"  # basico, intermedio, avanzado
@@ -42,7 +42,7 @@ class TutorSession(BaseModel):
     # Estado
     estado: str = "activa"  # activa, pausada, completada
     progreso: int = 0  # 0-100%
-    # Contenido de la sesión
+    # Contenido de la session
     items_total: int = 0
     items_completados: int = 0
     items_correctos: int = 0
@@ -60,7 +60,7 @@ class VocabularyItem(BaseModel):
     palabra: str  # Palabra en idioma objetivo
     traduccion: str  # Traducción
     pronunciacion_fonetica: Optional[str] = None  # Guía fonética
-    audio_url: Optional[str] = None  # Audio de pronunciación correcta
+    audio_url: Optional[str] = None  # Audio de pronunciation correcta
     imagen_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
     # Categorización
@@ -71,7 +71,7 @@ class VocabularyItem(BaseModel):
 
 
 class PronunciationAttempt(BaseModel):
-    """Intento de pronunciación del estudiante"""
+    """Intento de pronunciation del estudiante"""
     model_config = ConfigDict(extra="ignore")
     attempt_id: str = Field(default_factory=lambda: f"pron_{uuid.uuid4().hex[:12]}")
     session_id: str

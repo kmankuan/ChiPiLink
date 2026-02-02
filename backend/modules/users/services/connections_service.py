@@ -307,7 +307,7 @@ class ConexionesService:
             push_result = await push_notification_service.send_notification(
                 user_id=para_usuario_id,
                 category_id="connections",
-                title="🔗 Nueva Solicitud de Conexión",
+                title="🔗 Nueva Solicitud de Connection",
                 body=f"{de_nombre} quiere conectarse contigo como {subtipo_label}",
                 data={
                     "type": "connection_request",
@@ -404,11 +404,11 @@ class ConexionesService:
             subtipo_label = self._get_subtipo_label(request.get("subtipo", ""))
             
             if aceptar:
-                title = "✅ Conexión Aceptada"
+                title = "✅ Connection Aceptada"
                 body = f"{para_nombre} aceptó tu request de connection como {subtipo_label}"
                 notification_type = "connection_accepted"
             else:
-                title = "❌ Conexión Rechazada"
+                title = "❌ Connection Rechazada"
                 body = f"{para_nombre} rechazó tu request de connection"
                 notification_type = "connection_rejected"
             
@@ -442,21 +442,21 @@ class ConexionesService:
         subtipo: Optional[str] = None,
         monto_transferir: Optional[float] = None
     ) -> Dict:
-        """Create invitación para usuario no registrado"""
+        """Create invitation para usuario no registrado"""
         import uuid
         
-        # Verify that email no está registrado
+        # Verify that email no is registrado
         existing = await db.auth_users.find_one({"email": email.lower()})
         if existing:
-            return {"error": "Este email ya está registrado", "user_id": existing.get("user_id")}
+            return {"error": "Este email ya is registrado", "user_id": existing.get("user_id")}
         
-        # Verify invitación pendiente
+        # Verify invitation pendiente
         existing_inv = await db.invitaciones.find_one({
             "email_destino": email.lower(),
             "estado": "pendiente"
         })
         if existing_inv:
-            return {"error": "Already exists una invitación pendiente para este email"}
+            return {"error": "Already exists una invitation pendiente para este email"}
         
         # Get name of the invitador
         invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
@@ -482,7 +482,7 @@ class ConexionesService:
         # Remove MongoDB _id before returning
         invitacion.pop("_id", None)
         
-        # TODO: Enviar email de invitación
+        # TODO: Enviar email de invitation
         # send_invitation_email(email, invitacion)
         
         return {
@@ -492,7 +492,7 @@ class ConexionesService:
         }
     
     async def procesar_invitacion(self, token: str, nuevo_user_id: str) -> Dict:
-        """Process invitación cuando usuario se registra"""
+        """Process invitation cuando usuario se registra"""
         invitacion = await db.invitaciones.find_one({"token": token, "estado": "pendiente"})
         if not invitacion:
             return {"error": "Invitación no valid o expirada"}

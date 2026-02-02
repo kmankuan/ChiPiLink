@@ -1,6 +1,6 @@
 """
 Community Module - Album Repository
-Acceso a datos de albumes de galería
+Acceso a datos de albumes de gallery
 """
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ from core.constants import CommunityCollections
 
 class AlbumRepository(BaseRepository):
     """
-    Repository para albumes de galería.
+    Repository para albumes de gallery.
     """
     
     COLLECTION_NAME = CommunityCollections.ALBUMS

@@ -124,7 +124,7 @@ async def get_pending_confirmations(
     user_id: str
 ):
     """
-    Obtener partidos pendientes de confirmación para un usuario.
+    Obtener partidos pendientes de confirmation para un usuario.
     Retorna partidos donde the user participa pero no fue quien lo registró.
     """
     matches = await rapidpin_service.get_pending_confirmations(season_id, user_id)
@@ -138,7 +138,7 @@ async def get_pending_confirmations(
 @router.get("/pending/{user_id}")
 async def get_all_pending_confirmations(user_id: str):
     """
-    Obtener TODOS matches pendientes de confirmación para un usuario.
+    Obtener TODOS matches pendientes de confirmation para un usuario.
     Retorna partidos de todas seasons donde the user participa pero no fue quien lo registró.
     """
     matches = await rapidpin_service.get_all_pending_confirmations(user_id)
@@ -184,7 +184,7 @@ async def get_scoring_config():
         "scoring": RAPID_PIN_SCORING,
         "rules": {
             "participants": "2 jugadores + 1 referee",
-            "validation": "Requiere confirmación de 1 participante adicional",
+            "validation": "Requiere confirmation de 1 participante adicional",
             "points_victory": RAPID_PIN_SCORING["victory"],
             "points_defeat": RAPID_PIN_SCORING["defeat"],
             "points_referee": RAPID_PIN_SCORING["referee"]
@@ -202,7 +202,7 @@ async def create_challenge(
     notes: Optional[str] = None
 ):
     """
-    Crear desafío de jugador a jugador.
+    Crear challenge de jugador a jugador.
     El oponente debe aceptar antes de que se busque referee.
     """
     try:
@@ -223,7 +223,7 @@ async def accept_challenge(
     user_role: str = "player"
 ):
     """
-    Aceptar desafío.
+    Aceptar challenge.
     - El oponente (player2) puede aceptar
     - Admin/Mod pueden forzar aceptación
     """
@@ -240,7 +240,7 @@ async def decline_challenge(
     reason: Optional[str] = None
 ):
     """
-    Rechazar desafío.
+    Rechazar challenge.
     Solo el oponente puede rechazar.
     """
     try:
@@ -260,7 +260,7 @@ async def create_queue_match(
 ):
     """
     Crear partido directamente in queue (admin/mod).
-    Salta la fase de desafío, va directo a esperar referee.
+    Salta la fase de challenge, va directo a esperar referee.
     """
     try:
         return await rapidpin_service.create_queue_match(
@@ -282,7 +282,7 @@ async def get_queue_matches(
     player_id: Optional[str] = None
 ):
     """
-    Obtener partidos in queue/desafíos.
+    Obtener partidos in queue/challenges.
     - status: challenge_pending, waiting, assigned, completed, cancelled, declined, active (todos active)
     - player_id: filtrar by player involucrado
     """
@@ -295,7 +295,7 @@ async def get_my_challenges(
     season_id: Optional[str] = None
 ):
     """
-    Obtener mis desafíos pendientes (enviados y recibidos).
+    Obtener mis challenges pendientes (enviados y recibidos).
     """
     db = await rapidpin_service.get_db()
     
@@ -405,7 +405,7 @@ async def create_challenge_with_date(
     message: Optional[str] = None
 ):
     """
-    Crear desafío con propuesta de fecha inicial.
+    Crear challenge con propuesta de fecha inicial.
     El reto inicia en estado date_negotiation.
     """
     try:

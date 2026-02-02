@@ -1,6 +1,6 @@
 """
 Community Module - Models/Schemas
-Definición de schemas Pydantic para comunidad
+Definition de schemas Pydantic para comunidad
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any

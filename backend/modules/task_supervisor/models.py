@@ -8,7 +8,7 @@ import uuid
 
 
 class TaskSupervisorConfig(BaseModel):
-    """Configuración del Task Supervisor"""
+    """Configuration del Task Supervisor"""
     model_config = ConfigDict(extra="ignore")
     config_id: str = "task_supervisor_main"
     # Monday.com Integration

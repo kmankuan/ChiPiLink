@@ -86,7 +86,7 @@ class BulkImportService:
                     "grado": 2,              # Columna C (opcional si hay grado_default)
                     "seccion": 3             # Columna D (opcional)
                 }
-            grado_default: Grado by default si no está en los datos
+            grado_default: Grado by default si no is en los datos
         
         Returns:
             Previsualización con validaciones
@@ -115,18 +115,18 @@ class BulkImportService:
                 
                 # Validaciones
                 if not numero:
-                    errores.append({"fila": idx + 2, "error": "Número de estudiante vacío"})
+                    errores.append({"fila": idx + 2, "error": "Number de estudiante empty"})
                     continue
                 
                 if not nombre_completo:
-                    errores.append({"fila": idx + 2, "error": "Nombre vacío"})
+                    errores.append({"fila": idx + 2, "error": "Nombre empty"})
                     continue
                 
                 if not grado:
-                    errores.append({"fila": idx + 2, "error": "Grado vacío"})
+                    errores.append({"fila": idx + 2, "error": "Grado empty"})
                     continue
                 
-                # Verify duplicados en esta importación
+                # Verify duplicados en esta import
                 if numero in numeros_vistos:
                     duplicados.append({"fila": idx + 2, "numero": numero})
                     continue
@@ -274,7 +274,7 @@ class BulkImportService:
                     "error": str(e)
                 })
         
-        # Registrar la importación
+        # Registrar la import
         import_log = {
             "import_id": import_id,
             "tipo": "estudiantes",
@@ -307,7 +307,7 @@ class BulkImportService:
             raw_text: Texto pegado desde Google Sheets
             column_mapping: Mapeo de campos a indexs de columna
                 {
-                    "codigo": 0,           # Código del libro
+                    "codigo": 0,           # Code del libro
                     "nombre": 1,           # Name ofl libro
                     "precio": 2,           # Precio
                     "editorial": 3,        # Editorial (opcional)
@@ -341,11 +341,11 @@ class BulkImportService:
                 
                 # Validaciones
                 if not codigo:
-                    errores.append({"fila": idx + 2, "error": "Código vacío"})
+                    errores.append({"fila": idx + 2, "error": "Code empty"})
                     continue
                 
                 if not nombre:
-                    errores.append({"fila": idx + 2, "error": "Nombre vacío"})
+                    errores.append({"fila": idx + 2, "error": "Nombre empty"})
                     continue
                 
                 # Parseprecio
@@ -356,7 +356,7 @@ class BulkImportService:
                 
                 # Verify duplicados
                 if codigo in codigos_vistos:
-                    errores.append({"fila": idx + 2, "error": f"Código duplicado: {codigo}"})
+                    errores.append({"fila": idx + 2, "error": f"Code duplicado: {codigo}"})
                     continue
                 codigos_vistos.add(codigo)
                 
@@ -508,7 +508,7 @@ class BulkImportService:
                     "error": str(e)
                 })
         
-        # Registrar la importación
+        # Registrar la import
         import_log = {
             "import_id": import_id,
             "tipo": "libros",

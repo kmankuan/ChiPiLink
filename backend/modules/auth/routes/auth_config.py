@@ -68,7 +68,7 @@ async def get_auth_config(admin: dict = Depends(get_admin_user)):
             "registration_fields": {
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
-                "telefono": {"required": False, "visible": True, "label": "Teléfono"},
+                "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Dirección"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
             },
@@ -101,7 +101,7 @@ async def update_auth_config(
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración guardada"}
+    return {"success": True, "message": "Configuration guardada"}
 
 
 @router.get("/methods/public")
@@ -125,7 +125,7 @@ async def get_public_auth_config():
             "registration_fields": {
                 "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
-                "telefono": {"required": False, "visible": True, "label": "Teléfono"},
+                "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Dirección"},
                 "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
             },

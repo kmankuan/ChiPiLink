@@ -223,7 +223,7 @@ class Transaction(BaseModel):
     reference_type: Optional[str] = None        # "purchase", "membership", "service"
     reference_id: Optional[str] = None
     
-    # Descripción
+    # Description
     description: Optional[str] = None
     description_i18n: Dict[str, str] = {}
     
@@ -324,7 +324,7 @@ class PointsProduct(BaseModel):
     price_usd: Optional[float] = None       # Precio en USD (puede ser null)
     price_points: int                        # Precio en ChipiPoints
     
-    # Categoría
+    # Category
     category: str = "general"
     
     # Stock
@@ -365,7 +365,7 @@ class PointsHistory(BaseModel):
     points: int  # Positivo = ganado, Negativo = gastado
     balance_after: int
     
-    # Descripción
+    # Description
     description: Dict[str, str] = {}
     
     # Referencias
@@ -382,7 +382,7 @@ class PointsHistory(BaseModel):
 # ============== FUNCIONES DE UTILIDAD ==============
 
 def get_default_points_config() -> Dict:
-    """Configuración by default de ChipiPoints"""
+    """Configuration by default de ChipiPoints"""
     return {
         "config_id": "chipipoints_config",
         "points_per_dollar": 100,

@@ -1,6 +1,6 @@
 """
 Community Module - Gallery Routes
-Endpoints para galería usando el Service Layer
+Endpoints para gallery usando el Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List

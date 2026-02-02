@@ -1,6 +1,6 @@
 """
 Auth Module - Event Handlers
-Manejadores de eventos para el module de autenticación
+Manejadores de eventos para el module de authentication
 """
 import logging
 from datetime import datetime, timezone

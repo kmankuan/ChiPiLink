@@ -1,6 +1,6 @@
 """
 PinpanClub Module
-Módulo de Club de Tenis de Mesa preparado para microservicios
+Module de Club de Tenis de Mesa preparado para microservicios
 
 ─────────────────────────────────────────────────────────
 Arquitectura Microservices-Ready:
@@ -14,8 +14,8 @@ Arquitectura Microservices-Ready:
 └── __init__.py       # Module initialization
 
 Beneficios de esta arquitectura:
-1. Separación clara de responsabilidades
-2. Fácil de testear (cada capa se puede mockear)
+1. Separation clara de responsabilidades
+2. Easy de testear (cada capa se puede mockear)
 3. Preparado para extraer como microservicio
 4. Comunicación via Event Bus (no dependencias directas)
 ─────────────────────────────────────────────────────────

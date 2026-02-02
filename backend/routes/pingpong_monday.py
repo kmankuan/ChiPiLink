@@ -21,7 +21,7 @@ router = APIRouter(prefix="/pingpong/monday", tags=["Ping Pong Monday.com Integr
 # ============== MODELS ==============
 
 class MondayConfig(BaseModel):
-    """Configuración de Monday.com para Ping Pong"""
+    """Configuration de Monday.com para Ping Pong"""
     players_board_id: Optional[str] = None
     matches_board_id: Optional[str] = None
     tournaments_board_id: Optional[str] = None
@@ -31,7 +31,7 @@ class MondayConfig(BaseModel):
 
 
 class SyncResult(BaseModel):
-    """Resultado de sincronización"""
+    """Resultado de synchronization"""
     success: bool
     synced_count: int
     failed_count: int
@@ -173,7 +173,7 @@ async def get_board_columns(board_id: str) -> List[Dict]:
 
 @router.get("/config")
 async def get_config(admin: dict = Depends(get_admin_user)):
-    """Obtener configuration de integración Monday.com para Ping Pong"""
+    """Obtener configuration de integration Monday.com para Ping Pong"""
     config = await get_pingpong_monday_config()
     
     # Verificar si hay API key configurada
@@ -187,9 +187,9 @@ async def get_config(admin: dict = Depends(get_admin_user)):
 
 @router.put("/config")
 async def update_config(config: MondayConfig, admin: dict = Depends(get_admin_user)):
-    """Actualizar configuration de integración"""
+    """Actualizar configuration de integration"""
     await save_pingpong_monday_config(config)
-    return {"success": True, "message": "Configuración guardada"}
+    return {"success": True, "message": "Configuration guardada"}
 
 
 @router.get("/boards")
@@ -262,7 +262,7 @@ async def sync_players_to_monday(
     
     for player in players:
         try:
-            # Verificar si ya está sincronizado
+            # Verificar si ya is sincronizado
             if player.get("monday_item_id"):
                 details.append({
                     "jugador_id": player["jugador_id"],
@@ -535,7 +535,7 @@ async def sync_completed_matches(admin: dict = Depends(get_admin_user)):
 
 @router.get("/status")
 async def get_integration_status(admin: dict = Depends(get_admin_user)):
-    """Obtener estado de la integración"""
+    """Obtener estado de la integration"""
     config = await get_pingpong_monday_config()
     
     status = {
@@ -605,7 +605,7 @@ async def test_monday_connection(admin: dict = Depends(get_admin_user)):
 
 @router.get("/stats")
 async def get_sync_stats(admin: dict = Depends(get_admin_user)):
-    """Get statistics de sincronización"""
+    """Get statistics de synchronization"""
     config = await get_pingpong_monday_config()
     
     # Contar jugadores sincronizados

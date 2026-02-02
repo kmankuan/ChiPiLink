@@ -57,7 +57,7 @@ async def regenerate_my_qr(user=Depends(get_current_user)):
         "success": True,
         "qr_code": qr,
         "message": {
-            "es": "Código QR regenerado. El anterior ya no es valid.",
+            "es": "Code QR regenerado. El anterior ya no es valid.",
             "en": "QR code regenerated. The previous one is no longer valid.",
             "zh": "二维码已重新生成。旧的已失效。"
         }
@@ -193,7 +193,7 @@ async def create_payment_session(
     data: CreatePaymentSessionRequest,
     user=Depends(get_current_user)
 ):
-    """Create sesión de pago (para montos grandes que requieren confirmación)"""
+    """Create session de pago (para montos grandes que requieren confirmation)"""
     if data.currency not in ["USD", "CHIPIPOINTS"]:
         raise HTTPException(status_code=400, detail="Currency must be 'USD' or 'CHIPIPOINTS'")
     
@@ -219,7 +219,7 @@ async def confirm_payment_session(
     session_id: str,
     admin=Depends(get_admin_user)
 ):
-    """Confirmar y procesar sesión de pago"""
+    """Confirmar y procesar session de pago"""
     result = await qr_code_service.confirm_payment_session(
         session_id=session_id,
         processed_by=admin["user_id"]

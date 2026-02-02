@@ -1,6 +1,6 @@
 """
 Rank Rewards Service - System for recompensas por subida de rango
-Módulo: pinpanclub
+Module: pinpanclub
 """
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timezone
@@ -154,7 +154,7 @@ class RankRewardsService(BaseService):
         return {**RANK_DEFINITIONS[0], "index": 0}
     
     def get_rank_by_id(self, rank_id: str) -> Optional[Dict]:
-        """Get definición de rango by ID"""
+        """Get definition de rango by ID"""
         for i, rank in enumerate(RANK_DEFINITIONS):
             if rank["id"] == rank_id:
                 return {**rank, "index": i}
@@ -169,16 +169,16 @@ class RankRewardsService(BaseService):
     ) -> Optional[Dict]:
         """
         Verificar si the player subió de rango y otorgar recompensas.
-        Retorna information de la promoción si hubo una.
+        Retorna information de la promotion si hubo una.
         """
         old_rank = self.get_rank_by_points(old_points)
         new_rank = self.get_rank_by_points(new_points)
         
-        # No hubo promoción
+        # No hubo promotion
         if new_rank["index"] <= old_rank["index"]:
             return None
         
-        # ¡Hubo promoción!
+        # ¡Hubo promotion!
         self.log_info(f"Rank promotion: {jugador_id} from {old_rank['id']} to {new_rank['id']}")
         
         # Verify si ya recibió esta recompensa

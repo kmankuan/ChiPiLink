@@ -1,5 +1,5 @@
 """
-Content Hub Module - Curación de Contenido Multimedia
+Content Hub Module - Curation de Contenido Multimedia
 Videos y posts de redes sociales categorizados por audiencia
 (YouTube, Instagram, Facebook, WeChat, Xiaohongshu, Telegram, etc.)
 """

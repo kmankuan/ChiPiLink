@@ -175,15 +175,15 @@ class YappyService:
     def get_error_description(error_code: str) -> str:
         """Get human-readable error description"""
         errors = {
-            "E002": "Algo salió mal. Intenta nuevamente.",
-            "E005": "Este number no está registrado en Yappy.",
-            "E006": "Algo salió mal. Intenta nuevamente.",
+            "E002": "Algo exited mal. Intenta nuevamente.",
+            "E005": "Este number no is registrado en Yappy.",
+            "E006": "Algo exited mal. Intenta nuevamente.",
             "E007": "El pedido ya ha sido registrado.",
-            "E008": "Algo salió mal. Intenta nuevamente.",
+            "E008": "Algo exited mal. Intenta nuevamente.",
             "E009": "ID de la orden mayor a 15 dígitos.",
             "E010": "El valor de los montos no es el correcto.",
             "E011": "Error en los campos de URL.",
-            "E012": "Algo salió mal. Intenta nuevamente.",
+            "E012": "Algo exited mal. Intenta nuevamente.",
             "E100": "Bad Request."
         }
         return errors.get(error_code, f"Error desconocido: {error_code}")

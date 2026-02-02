@@ -97,7 +97,7 @@ class SponsorUpdate(BaseModel):
     tamano_logo: Optional[str] = None
 
 class SponsorSpaceConfig(BaseModel):
-    """Configuración de un espacio publicitario"""
+    """Configuration de un espacio publicitario"""
     space_id: str
     nombre: str
     posicion: SponsorPosition
@@ -112,7 +112,7 @@ class SponsorSpaceConfig(BaseModel):
     border_radius: str = "8px"
 
 class TVLayoutConfig(BaseModel):
-    """Configuración del layout de pantalla TV"""
+    """Configuration del layout de pantalla TV"""
     mostrar_header_sponsors: bool = True
     mostrar_banner_top: bool = False
     mostrar_banner_bottom: bool = True

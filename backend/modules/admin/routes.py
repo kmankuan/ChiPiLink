@@ -329,7 +329,7 @@ async def update_landing_page_config(data: dict, admin: dict = Depends(get_admin
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración guardada"}
+    return {"success": True, "message": "Configuration guardada"}
 
 
 # ============== UNATIENDA DEMO DATA ==============

@@ -40,7 +40,7 @@ async def get_public_landing_page():
         # Return empty page with default blocks
         return {
             "pagina_id": "landing",
-            "titulo": "Página Principal",
+            "titulo": "Page Principal",
             "bloques": [],
             "publicada": True
         }
@@ -95,7 +95,7 @@ async def get_landing_page(admin: dict = Depends(get_admin_user)):
     if not page:
         return {
             "pagina_id": "landing",
-            "titulo": "Página Principal",
+            "titulo": "Page Principal",
             "bloques": [],
             "publicada": True
         }
@@ -142,7 +142,7 @@ async def add_block(
     else:
         new_page = {
             "pagina_id": "landing",
-            "titulo": "Página Principal",
+            "titulo": "Page Principal",
             "bloques": [new_block],
             "publicada": True,
             "fecha_actualizacion": datetime.now(timezone.utc).isoformat()

@@ -3,11 +3,11 @@ Notifications Module - System for push notifications y posts
 
 Características:
 - Soporte multi-proveedor (FCM + OneSignal) con failover
-- Categorías de notification configurables
+- Categorys de notification configurables
 - Preferencias de usuario por category
 - Editor avanzado de posts con bloques
 - Programación de contenido
-- Integración con CRM (placeholders para Monday.com y Fusebase)
+- Integration con CRM (placeholders para Monday.com y Fusebase)
 """
 from .routes import router as notifications_router
 from .services.push_service import push_notification_service

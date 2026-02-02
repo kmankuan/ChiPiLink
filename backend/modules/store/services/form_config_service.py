@@ -196,7 +196,7 @@ class FormConfigService(BaseService):
             {
                 "value": "number",
                 "label_en": "Number",
-                "label_es": "Número",
+                "label_es": "Number",
                 "label_zh": "数字",
                 "description_en": "Numeric input",
                 "description_es": "Entrada numérica",
@@ -232,7 +232,7 @@ class FormConfigService(BaseService):
             {
                 "value": "phone",
                 "label_en": "Phone",
-                "label_es": "Teléfono",
+                "label_es": "Phone",
                 "label_zh": "电话",
                 "description_en": "Phone number input",
                 "description_es": "Entrada de number telefónico",
@@ -314,7 +314,7 @@ class FormConfigService(BaseService):
                         "field": key,
                         "error": "invalid_number",
                         "message_en": "Invalid number",
-                        "message_es": "Número invalid"
+                        "message_es": "Number invalid"
                     })
             
             elif field_type == "select":
@@ -325,7 +325,7 @@ class FormConfigService(BaseService):
                         "field": key,
                         "error": "invalid_option",
                         "message_en": "Invalid selection",
-                        "message_es": "Selección invalid"
+                        "message_es": "Selection invalid"
                     })
         
         return errors

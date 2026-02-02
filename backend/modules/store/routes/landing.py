@@ -46,7 +46,7 @@ async def get_category_featured(categoria: str, limit: int = Query(10, ge=1, le=
 
 @router.get("/promotions/{categoria}")
 async def get_category_promotions(categoria: str, limit: int = Query(10, ge=1, le=50)):
-    """Get productos en promoción de una category"""
+    """Get productos en promotion de una category"""
     return await product_service.get_promotional_products(categoria, limit)
 
 

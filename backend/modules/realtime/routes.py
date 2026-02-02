@@ -48,7 +48,7 @@ async def websocket_endpoint(
                 await websocket.send_json({
                     "type": "pong",
                     "message": {
-                        "es": "Conexión activa",
+                        "es": "Connection activa",
                         "en": "Connection active",
                         "zh": "连接活跃"
                     }

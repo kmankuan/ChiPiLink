@@ -25,8 +25,8 @@ GRADOS_PCA = [
 ]
 
 # Materias por nivel
-MATERIAS_PRIMARIA = ["Espyearl", "Matemáticas", "Ciencias Naturales", "Ciencias Sociales", "Inglés", "Religión"]
-MATERIAS_SECUNDARIA = ["Espyearl", "Matemáticas", "Física", "Química", "Biología", "Historia", "Geografía", "Inglés", "Religión", "Tecnología"]
+MATERIAS_PRIMARIA = ["Espyearl", "Mathematics", "Ciencias Naturales", "Ciencias Sociales", "English", "Religión"]
+MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Física", "Química", "Biología", "Historia", "Geografía", "English", "Religión", "Tecnología"]
 
 # Editoriales
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
@@ -46,7 +46,7 @@ def generate_isbn():
 def get_materias_for_grado(grado: str) -> List[str]:
     """Get subjects for a grade level"""
     if grado in ["Pre-Kinder", "Kinder"]:
-        return ["Apresto", "Inglés"]
+        return ["Apresto", "English"]
     elif grado in ["1ro", "2do", "3ro", "4to", "5to", "6to"]:
         return MATERIAS_PRIMARIA
     else:

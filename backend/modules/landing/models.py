@@ -44,7 +44,7 @@ class ConfiguracionSitio(BaseModel):
 class PaginaBuilder(BaseModel):
     """Page configuration with blocks"""
     pagina_id: str = "landing"
-    titulo: str = "Página Principal"
+    titulo: str = "Page Principal"
     bloques: List[BloquePagina] = []
     publicada: bool = True
     fecha_actualizacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -82,7 +82,7 @@ BLOCK_TEMPLATES = {
         "nombre": "Características",
         "descripcion": "Lista de características con íconos",
         "config_default": {
-            "titulo": "¿Por qué elegirnos?",
+            "titulo": "¿Por what elegirnos?",
             "subtitulo": "",
             "items": [
                 {"icono": "shield", "titulo": "Seguro", "descripcion": "Compras 100% seguras"},
@@ -127,7 +127,7 @@ BLOCK_TEMPLATES = {
     },
     "stats": {
         "nombre": "Estadísticas",
-        "descripcion": "Números destacados",
+        "descripcion": "Numbers destacados",
         "config_default": {
             "items": [
                 {"numero": "1000+", "label": "Clientes"},
@@ -142,9 +142,9 @@ BLOCK_TEMPLATES = {
         "config_default": {
             "titulo": "",
             "items": [
-                {"titulo": "Tarjeta 1", "descripcion": "Descripción", "imagen_url": "", "link": ""},
-                {"titulo": "Tarjeta 2", "descripcion": "Descripción", "imagen_url": "", "link": ""},
-                {"titulo": "Tarjeta 3", "descripcion": "Descripción", "imagen_url": "", "link": ""}
+                {"titulo": "Tarjeta 1", "descripcion": "Description", "imagen_url": "", "link": ""},
+                {"titulo": "Tarjeta 2", "descripcion": "Description", "imagen_url": "", "link": ""},
+                {"titulo": "Tarjeta 3", "descripcion": "Description", "imagen_url": "", "link": ""}
             ],
             "columnas": 3
         }

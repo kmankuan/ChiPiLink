@@ -148,7 +148,7 @@ class RapidPinMatchRepository(BaseRepository):
         )
     
     async def get_all_pending_matches_for_user(self, user_id: str) -> List[Dict]:
-        """Get TODOS the matches pendientes de confirmación donde the user participa (all seasons)"""
+        """Get TODOS the matches pendientes de confirmation donde the user participa (all seasons)"""
         return await self.find_many(
             query={
                 "estado": "pending",

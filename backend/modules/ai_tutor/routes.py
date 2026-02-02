@@ -3,10 +3,10 @@ AI Tutor Routes - Endpoints para el Tutor Inteligente
 
 PLACEHOLDER - Endpoints a implementar:
 - GET /ai-tutor/status - Estado del module
-- GET/PUT /ai-tutor/config - Configuración del tutor
-- POST /ai-tutor/sessions - Iniciar sesión de tutoría
+- GET/PUT /ai-tutor/config - Configuration del tutor
+- POST /ai-tutor/sessions - Iniciar session de tutoría
 - POST /ai-tutor/speak - Generar audio TTS
-- POST /ai-tutor/evaluate-pronunciation - Evaluar pronunciación del estudiante
+- POST /ai-tutor/evaluate-pronunciation - Evaluar pronunciation del estudiante
 - GET /ai-tutor/vocabulary - Obtener vocabulario
 - GET /ai-tutor/progress/{estudiante_id} - Progreso del estudiante
 """
@@ -39,16 +39,16 @@ async def get_tutor_status():
         "message": "AI Tutor - Tutor Inteligente para Estudiantes",
         "planned_features": [
             "Práctica de vocabulario con voz",
-            "Evaluación de pronunciación en tiempo real",
+            "Evaluación de pronunciation en tiempo real",
             "Feedback personalizado del tutor",
             "Planes de lección adaptativos",
             "Seguimiento de progreso",
-            "Múltiples idiomas (Inglés, Chino, Espyearl)",
+            "Múltiples idiomas (English, Chino, Espyearl)",
             "Gamificación con logros y rachas"
         ],
         "required_integrations": [
             "LLM (OpenAI/Anthropic/Google) - Para el tutor inteligente",
-            "TTS (OpenAI/ElevenLabs) - Para audio de pronunciación",
+            "TTS (OpenAI/ElevenLabs) - Para audio de pronunciation",
             "STT (OpenAI Whisper) - Para reconocer voz del estudiante"
         ]
     }
@@ -80,7 +80,7 @@ async def update_tutor_config(config: dict, admin: dict = Depends(get_admin_user
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración del AI Tutor actualizada"}
+    return {"success": True, "message": "Configuration del AI Tutor actualizada"}
 
 
 # ============== SESSIONS (PLACEHOLDER) ==============
@@ -110,7 +110,7 @@ async def create_tutor_session(session_data: dict, user: dict = Depends(get_curr
     return {
         "success": True,
         "session": session,
-        "message": "Sesión creada - Placeholder. Requiere integración LLM para funcionalidad completa."
+        "message": "Sesión creada - Placeholder. Requiere integration LLM para funcionalidad completa."
     }
 
 
@@ -169,7 +169,7 @@ async def generate_speech(data: dict):
         "success": False,
         "text": text,
         "audio_url": None,
-        "message": "TTS no implementado. Requiere integración con OpenAI TTS o ElevenLabs."
+        "message": "TTS no implementado. Requiere integration con OpenAI TTS o ElevenLabs."
     }
 
 
@@ -185,7 +185,7 @@ async def evaluate_pronunciation(data: dict, user: dict = Depends(get_current_us
         "recognized_text": None,
         "score": None,
         "is_correct": False,
-        "feedback": "Evaluación de pronunciación no implementada. Requiere integración con STT.",
+        "feedback": "Evaluación de pronunciation no implementada. Requiere integration con STT.",
         "message": "Requiere: OpenAI Whisper para STT + LLM para feedback."
     }
 

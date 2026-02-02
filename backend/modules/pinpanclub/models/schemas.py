@@ -1,6 +1,6 @@
 """
 PinpanClub - Modelos Pydantic
-Definición de schemas para el module
+Definition de schemas para el module
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
@@ -180,7 +180,7 @@ class Sponsor(SponsorBase):
 # ============== CONFIG MODELS ==============
 
 class MondayConfig(BaseModel):
-    """Configuración de Monday.com"""
+    """Configuration de Monday.com"""
     players_board_id: Optional[str] = None
     matches_board_id: Optional[str] = None
     tournaments_board_id: Optional[str] = None

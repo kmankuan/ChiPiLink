@@ -170,7 +170,7 @@ class PushNotificationService:
             return min(loads, key=loads.get)
         
         else:  # weighted
-            # Selección ponderada
+            # Selection ponderada
             weights = {
                 p: config.get(p, {}).get("weight", 50)
                 for p in available

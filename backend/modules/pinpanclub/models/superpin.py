@@ -57,7 +57,7 @@ class MatchType(str, Enum):
 # ============== CONFIGURATION MODELS ==============
 
 class ScoringConfig(BaseModel):
-    """Configuración del system for score"""
+    """Configuration del system for score"""
     system: ScoringSystem = ScoringSystem.SIMPLE
     
     # Simple scoring
@@ -75,7 +75,7 @@ class ScoringConfig(BaseModel):
 
 
 class CheckInConfig(BaseModel):
-    """Configuración de check-in"""
+    """Configuration de check-in"""
     method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - keep for compatibility
     methods: List[str] = ["manual"]  # List of methods permitidos
     require_referee: bool = False  # Requiere referee/testigo
@@ -95,7 +95,7 @@ class CheckInConfig(BaseModel):
 
 
 class StatsConfig(BaseModel):
-    """Configuración de statistics"""
+    """Configuration de statistics"""
     level: StatsLevel = StatsLevel.STANDARD
     track_aces: bool = False
     track_errors: bool = False
@@ -105,7 +105,7 @@ class StatsConfig(BaseModel):
 
 
 class TournamentConfig(BaseModel):
-    """Configuración dthe tournament final"""
+    """Configuration dthe tournament final"""
     tournament_type: TournamentType = TournamentType.TOP_N
     top_n_players: int = 8  # Si es TOP_N
     categories: List[Dict[str, Any]] = []  # Si es BY_CATEGORY
@@ -115,7 +115,7 @@ class TournamentConfig(BaseModel):
 
 
 class PrizeConfig(BaseModel):
-    """Configuración de premios"""
+    """Configuration de premios"""
     prize_id: Optional[str] = None
     name: str
     description: Optional[str] = None
@@ -293,7 +293,7 @@ class RankingEntry(BaseModel):
     liga_id: str
     jugador_id: str
     
-    # Posición
+    # Position
     posicion: int
     posicion_anterior: Optional[int] = None
     cambio_posicion: int = 0  # +2, -1, 0
@@ -391,8 +391,8 @@ class SpecialPrizeTypes:
 
 class BadgeType(str, Enum):
     """Tipos de badges"""
-    TOURNAMENT_CHAMPION = "tournament_champion"      # 🏆 Campeón de torneo
-    TOURNAMENT_RUNNER_UP = "tournament_runner_up"    # 🥈 Subcampeón
+    TOURNAMENT_CHAMPION = "tournament_champion"      # 🏆 Champion de torneo
+    TOURNAMENT_RUNNER_UP = "tournament_runner_up"    # 🥈 Runner-up
     TOURNAMENT_THIRD = "tournament_third"            # 🥉 Tercer lugar
     SEASON_MVP = "season_mvp"                        # ⭐ MVP de temporada
     WIN_STREAK_5 = "win_streak_5"                    # 🔥 Racha de 5 victorias
@@ -440,7 +440,7 @@ class PlayerBadgeCreate(BaseModel):
 # Badge definitions with icons and descriptions
 BADGE_DEFINITIONS = {
     BadgeType.TOURNAMENT_CHAMPION: {
-        "name": "Campeón de Torneo",
+        "name": "Champion de Torneo",
         "name_en": "Tournament Champion",
         "name_zh": "锦标赛冠军",
         "icon": "🏆",
@@ -448,7 +448,7 @@ BADGE_DEFINITIONS = {
         "rarity": "legendary"
     },
     BadgeType.TOURNAMENT_RUNNER_UP: {
-        "name": "Subcampeón",
+        "name": "Runner-up",
         "name_en": "Runner-up",
         "name_zh": "亚军",
         "icon": "🥈",

@@ -11,7 +11,7 @@ class NotificationProvider(str, Enum):
     FCM = "fcm"
     ONESIGNAL = "onesignal"
     BOTH = "both"  # Send a ambos
-    AUTO = "auto"  # Selección automatic basada en carga/disponibilidad
+    AUTO = "auto"  # Selection automatic basada en carga/disponibilidad
 
 
 class NotificationPriority(str, Enum):
@@ -51,7 +51,7 @@ class ContentBlockType(str, Enum):
 
 
 def get_default_notification_categories() -> List[Dict]:
-    """Categorías de notification by default"""
+    """Categorys de notification by default"""
     return [
         {
             "category_id": "cat_qr_payments",
@@ -161,7 +161,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "快速对决挑战"
             },
             "description": {
-                "es": "Nuevos desafíos, aceptaciones, partidos esperando referee",
+                "es": "Nuevos challenges, aceptaciones, partidos esperando referee",
                 "en": "New challenges, acceptances, matches waiting for referee",
                 "zh": "新挑战、接受、等待裁判的比赛"
             },
@@ -201,7 +201,7 @@ def get_default_notification_categories() -> List[Dict]:
                 "zh": "俱乐部公告"
             },
             "description": {
-                "es": "Posts y anuncios de administración",
+                "es": "Posts y anuncios de administration",
                 "en": "Admin posts and announcements",
                 "zh": "管理员帖子和公告"
             },
@@ -277,7 +277,7 @@ def get_default_notification_categories() -> List[Dict]:
 
 
 def get_default_provider_config() -> Dict:
-    """Configuración by default de proveedores"""
+    """Configuration by default de proveedores"""
     return {
         "config_id": "push_providers_config",
         "fcm": {

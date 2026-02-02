@@ -31,7 +31,7 @@ async def get_chess_status():
     return {
         "module": "chess",
         "status": "placeholder",
-        "message": "Módulo de Ajedrez - Pendiente de implementación",
+        "message": "Module de Ajedrez - Pendiente de implementación",
         "planned_features": [
             "Management of jugadores con rating ELO",
             "Partidas en tiempo real",

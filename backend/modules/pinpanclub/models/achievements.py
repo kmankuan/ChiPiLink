@@ -29,7 +29,7 @@ class AchievementRarity(str, Enum):
 
 
 class Achievement(BaseModel):
-    """Definición de un logro"""
+    """Definition de un logro"""
     achievement_id: str = Field(default_factory=lambda: f"achv_{uuid.uuid4().hex[:8]}")
     name: str
     description: str

@@ -79,7 +79,7 @@ class ProductService(BaseService):
         categoria: Optional[str] = None,
         limit: int = 10
     ) -> List[Product]:
-        """Get productos en promoción"""
+        """Get productos en promotion"""
         results = await self.repository.get_promotions(categoria, limit)
         return [Product(**r) for r in results]
     

@@ -186,7 +186,7 @@ async def seed_landing_page():
         
         landing_doc = {
             "pagina_id": "landing",
-            "titulo": "Página Principal",
+            "titulo": "Page Principal",
             "bloques": initial_blocks,
             "publicada": True,
             "created_at": datetime.now(timezone.utc).isoformat(),

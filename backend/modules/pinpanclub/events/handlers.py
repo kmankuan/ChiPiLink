@@ -1,6 +1,6 @@
 """
 PinpanClub - Event Handlers
-Manejadores de eventos para integración entre modules
+Manejadores de eventos para integration entre modules
 """
 import logging
 from core.events import event_bus, Event, PinpanClubEvents

@@ -472,7 +472,7 @@ class QRCodeService:
         description: str,
         expires_minutes: int = 5
     ) -> Dict:
-        """Create sesión de pago para montos grandes (requiere confirmación)"""
+        """Create session de pago para montos grandes (requiere confirmation)"""
         now = datetime.now(timezone.utc)
         expires_at = (now + timedelta(minutes=expires_minutes)).isoformat()
         
@@ -498,7 +498,7 @@ class QRCodeService:
         confirmation_code: str = None,
         processed_by: str = None
     ) -> Dict:
-        """Confirmar y procesar sesión de pago"""
+        """Confirmar y procesar session de pago"""
         session = await db[self.collection_qr_sessions].find_one(
             {"session_id": session_id},
             {"_id": 0}
@@ -534,7 +534,7 @@ class QRCodeService:
                 processed_by
             )
         
-        # Update sesión
+        # Update session
         await db[self.collection_qr_sessions].update_one(
             {"session_id": session_id},
             {

@@ -1,5 +1,5 @@
 """
-Content Hub Models - Modelos para Curación de Contenido
+Content Hub Models - Modelos para Curation de Contenido
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
@@ -17,7 +17,7 @@ class ContentSource(BaseModel):
 
 
 class ContentCategory(BaseModel):
-    """Categoría de contenido por audiencia"""
+    """Category de contenido por audiencia"""
     model_config = ConfigDict(extra="ignore")
     category_id: str = Field(default_factory=lambda: f"cat_{uuid.uuid4().hex[:8]}")
     nombre: str  # Kids, Parents, Local Culture, Chinese Culture, etc.
@@ -71,7 +71,7 @@ class ContentItem(ContentItemBase):
     vistas: int = 0
     likes: int = 0
     compartidos: int = 0
-    # Curación
+    # Curation
     curado_por: Optional[str] = None  # admin que lo agregó
     notas_curador: Optional[str] = None  # Notas internas
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -85,7 +85,7 @@ class ContentPlaylist(BaseModel):
     titulo: str
     descripcion: Optional[str] = None
     imagen_portada: Optional[str] = None
-    categoria_id: Optional[str] = None  # Categoría principal
+    categoria_id: Optional[str] = None  # Category principal
     items: List[str] = []  # List of content_ids
     publicada: bool = True
     orden: int = 0

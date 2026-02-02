@@ -73,7 +73,7 @@ class ProductRepository(BaseRepository):
         )
     
     async def get_promotions(self, categoria: Optional[str] = None, limit: int = 10) -> List[Dict]:
-        """Get productos en promoción"""
+        """Get productos en promotion"""
         query = {
             "en_promocion": True,
             "activo": True,

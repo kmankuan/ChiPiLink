@@ -1,6 +1,6 @@
 """
 Demo Data Seed Script
-Puebla todos los modules con datos de demostración realistas
+Puebla todos los modules con datos de demonstration realistas
 """
 from fastapi import APIRouter, Depends
 from datetime import datetime, timezone, timedelta
@@ -128,7 +128,7 @@ DEMO_ACHIEVEMENTS = [
 @router.post("/demo-data")
 async def seed_demo_data(admin: dict = Depends(get_admin_user)):
     """
-    Puebla todos los modules con datos de demostración
+    Puebla todos los modules con datos de demonstration
     """
     results = {
         "pinpanclub": {},
@@ -516,7 +516,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
 @router.delete("/demo-data")
 async def clear_demo_data(admin: dict = Depends(get_admin_user)):
     """
-    Elimina todos los datos de demostración
+    Elimina todos los datos de demonstration
     """
     results = {}
     
@@ -541,7 +541,7 @@ async def clear_demo_data(admin: dict = Depends(get_admin_user)):
 @router.get("/demo-stats")
 async def get_demo_stats():
     """
-    Obtiene statistics de datos de demostración
+    Obtiene statistics de datos de demonstration
     """
     stats = {
         "pinpanclub": {

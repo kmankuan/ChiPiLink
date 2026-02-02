@@ -49,7 +49,7 @@ async def initiate_oauth_login(redirect: Optional[str] = Query(None)):
     if not config.get("enabled"):
         raise HTTPException(
             status_code=503,
-            detail="OAuth con LaoPan.online no está configurado"
+            detail="OAuth con LaoPan.online no is configurado"
         )
     
     auth_data = laopan_oauth_service.generate_auth_url(redirect_after=redirect)
@@ -83,22 +83,22 @@ async def oauth_callback(
         logger.warning(f"OAuth error: {error} - {error_description}")
         raise HTTPException(
             status_code=400,
-            detail=f"Error de autenticación: {error_description or error}"
+            detail=f"Error de authentication: {error_description or error}"
         )
     
     # Validate required params
     if not code:
-        raise HTTPException(status_code=400, detail="Código de autorización no recibido")
+        raise HTTPException(status_code=400, detail="Code de autorización no recibido")
     
     if not state:
-        raise HTTPException(status_code=400, detail="Estado de sesión no recibido")
+        raise HTTPException(status_code=400, detail="Estado de session no recibido")
     
     # Validate state (CSRF protection)
     state_data = laopan_oauth_service.validate_state(state)
     if not state_data:
         raise HTTPException(
             status_code=400,
-            detail="Estado de sesión invalid o expirado. Por favor, intente de nuevo."
+            detail="Estado de session invalid o expirado. Por favor, intente de nuevo."
         )
     
     # Exchange code for token
@@ -189,7 +189,7 @@ async def update_invision_config(config: dict, admin: dict = Depends(get_admin_u
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración guardada"}
+    return {"success": True, "message": "Configuration guardada"}
 
 
 # ============== LEGACY PLACEHOLDER ENDPOINTS ==============

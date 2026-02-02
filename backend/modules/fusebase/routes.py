@@ -1,12 +1,12 @@
 """
-FuseBase Routes - Endpoints para integración con FuseBase
+FuseBase Routes - Endpoints para integration con FuseBase
 
 PLACEHOLDER - Endpoints a implementar:
-- GET /fusebase/status - Estado de la integración
-- GET/PUT /fusebase/config - Configuración
+- GET /fusebase/status - Estado de la integration
+- GET/PUT /fusebase/config - Configuration
 - GET /fusebase/embed-url - URL de embed para frontend
 - GET /fusebase/documents - Documentos sincronizados
-- GET /fusebase/categories - Categorías de documentos
+- GET /fusebase/categories - Categorys de documentos
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
@@ -77,7 +77,7 @@ async def update_fusebase_config(config: dict, admin: dict = Depends(get_admin_u
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración de FuseBase actualizada"}
+    return {"success": True, "message": "Configuration de FuseBase actualizada"}
 
 
 # ============== EMBED ==============
@@ -152,7 +152,7 @@ async def get_integration_info():
     """Get information about FuseBase integration options"""
     return {
         "module": "fusebase",
-        "description": "Integración con FuseBase para documentos y wikis",
+        "description": "Integration con FuseBase para documentos y wikis",
         "integration_options": {
             "embed": {
                 "description": "Embeber workspace completo de FuseBase",

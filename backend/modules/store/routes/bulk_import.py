@@ -1,6 +1,6 @@
 """
 Store Module - Bulk Import Routes
-Endpoints for importación masiva desde datos copiados de Google Sheets
+Endpoints for import masiva desde datos copiados de Google Sheets
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Dict, Optional, List
@@ -21,7 +21,7 @@ class ParseTSVRequest(BaseModel):
 
 
 class PreviewEstudiantesRequest(BaseModel):
-    """Request para previsualizar importación de estudiantes"""
+    """Request para previsualizar import de estudiantes"""
     raw_text: str
     column_mapping: Dict[str, int]  # {"numero_estudiante": 0, "nombre_completo": 1, ...}
     grado_default: Optional[str] = None
@@ -37,7 +37,7 @@ class ImportEstudiantesRequest(BaseModel):
 
 
 class PreviewLibrosRequest(BaseModel):
-    """Request para previsualizar importación de libros"""
+    """Request para previsualizar import de libros"""
     raw_text: str
     column_mapping: Dict[str, int]  # {"codigo": 0, "nombre": 1, "precio": 2, ...}
     catalogo_id: Optional[str] = None
@@ -77,8 +77,8 @@ async def preview_estudiantes(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Previsualizar importación de estudiantes antes de ejecutarla.
-    Muestra qué registros se crearán, actualizarán, y cualquier error.
+    Previsualizar import de estudiantes antes de ejecutarla.
+    Muestra what registros se crearán, actualizarán, y cualquier error.
     """
     result = await bulk_import_service.preview_estudiantes(
         request.raw_text,
@@ -113,7 +113,7 @@ async def preview_libros(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Previsualizar importación de libros antes de ejecutarla.
+    Previsualizar import de libros antes de ejecutarla.
     """
     result = await bulk_import_service.preview_libros(
         request.raw_text,
@@ -154,7 +154,7 @@ async def get_import_history(
     
     Args:
         tipo: Filtrar by type ("estudiantes" o "libros")
-        limit: Número maximum de registros
+        limit: Number maximum de registros
     """
     result = await bulk_import_service.get_import_history(tipo, limit)
     return result

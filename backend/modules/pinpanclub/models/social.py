@@ -138,7 +138,7 @@ class ActivityFeedItem(BaseModel):
     # Activity-specific data
     data: Dict = {}  # Ej: {"match_id": "...", "opponent": "...", "score": "11-5"}
     
-    # Descripción generada
+    # Description generada
     description: str = ""
     
     # Reactions

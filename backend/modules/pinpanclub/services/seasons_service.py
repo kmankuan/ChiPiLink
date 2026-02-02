@@ -1,6 +1,6 @@
 """
 Ranking Seasons Service - Management of temporadas de ranking
-Módulo: pinpanclub
+Module: pinpanclub
 """
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timezone, timedelta

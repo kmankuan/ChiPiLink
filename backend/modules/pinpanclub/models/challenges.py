@@ -11,7 +11,7 @@ import uuid
 
 class ChallengeDifficulty(str, Enum):
     """Dificultad dthe challenge"""
-    EASY = "easy"           # Fácil
+    EASY = "easy"           # Easy
     MEDIUM = "medium"       # Medio
     HARD = "hard"           # Difícil
     EXTREME = "extreme"     # Extremo
@@ -43,7 +43,7 @@ class ChallengeStatus(str, Enum):
 # ============== CHALLENGE DEFINITION ==============
 
 class ChallengeDefinition(BaseModel):
-    """Definición de un reto"""
+    """Definition de un reto"""
     challenge_id: str = Field(default_factory=lambda: f"challenge_{uuid.uuid4().hex[:8]}")
     name: str
     description: str
@@ -76,7 +76,7 @@ class ChallengeDefinition(BaseModel):
 
 
 class ChallengeDefinitionCreate(BaseModel):
-    """Create definición de reto"""
+    """Create definition de reto"""
     name: str
     description: str
     type: ChallengeType
@@ -160,7 +160,7 @@ class ChallengeLeaderboardEntry(BaseModel):
     total_points: int = 0
     current_streak: int = 0  # Semanas consecutivas completando retos
     
-    # Posición
+    # Position
     rank: int = 0
 
 

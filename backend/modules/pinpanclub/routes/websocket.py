@@ -340,7 +340,7 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
         return
     
     if match["estado"] != "en_curso":
-        await manager.send_personal(arbiter_id, {"type": "error", "message": "El partido no está en curso"})
+        await manager.send_personal(arbiter_id, {"type": "error", "message": "El partido no is en curso"})
         return
     
     # Update points

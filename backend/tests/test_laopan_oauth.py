@@ -36,7 +36,7 @@ class TestLaoPanOAuthConfig:
             
             assert "button_text" in data
             assert "button_text_es" in data
-            assert data["button_text_es"] == "Iniciar sesión con LaoPan"
+            assert data["button_text_es"] == "Iniciar session con LaoPan"
             
             assert "button_color" in data
             print(f"OAuth is enabled with button color: {data['button_color']}")

@@ -2,11 +2,11 @@
 CXGenie Routes - Endpoints para Chat Support
 
 Endpoints implementados:
-- GET /cxgenie/status - Estado de la integración
-- GET/PUT /cxgenie/config - Configuración del widget y panel
-- GET /cxgenie/widget-code - Código de embed para frontend (usuarios)
+- GET /cxgenie/status - Estado de la integration
+- GET/PUT /cxgenie/config - Configuration del widget y panel
+- GET /cxgenie/widget-code - Code de embed para frontend (usuarios)
 - GET /cxgenie/agent-panel - URL del panel de agentes
-- GET /cxgenie/integration-info - Información de la integración
+- GET /cxgenie/integration-info - Información de la integration
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
@@ -114,7 +114,7 @@ async def update_cxgenie_config(config: dict, admin: dict = Depends(get_admin_us
         upsert=True
     )
     
-    return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
+    return {"success": True, "message": "Configuration de CXGenie actualizada", "config": updated_config}
 
 
 # ============== WIDGET CODE (Para usuarios - System for Tickets) ==============
@@ -299,7 +299,7 @@ async def get_integration_info():
     """Get information about CXGenie integration"""
     return {
         "module": "cxgenie",
-        "description": "Integración con CXGenie para atención al cliente",
+        "description": "Integration con CXGenie para atención al cliente",
         "status": "implemented",
         "features": {
             "widget_chat": {

@@ -14,7 +14,7 @@ router = APIRouter(prefix="/rank-rewards", tags=["Rank Rewards"])
 async def get_rank_rewards_info(lang: str = Query("es", description="Language code (es, en, zh)")):
     """
     Obtener information de todos los rangos y sus recompensas.
-    Útil para mostrar en la UI qué recompensas hay disponibles.
+    Útil para mostrar en la UI what recompensas hay disponibles.
     """
     rewards_info = await rank_rewards_service.get_rank_rewards_info(lang)
     return {
@@ -43,7 +43,7 @@ async def check_rank_promotion(
     lang: str = Query("es", description="Language code")
 ):
     """
-    Verificar si hubo promoción de rango y otorgar recompensas.
+    Verificar si hubo promotion de rango y otorgar recompensas.
     Normalmente llamado internamente after de completar retos.
     """
     result = await rank_rewards_service.check_rank_promotion(

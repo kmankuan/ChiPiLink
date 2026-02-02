@@ -67,7 +67,7 @@ class SocialService(BaseService):
             user_id=following_id,
             type=NotificationType.NEW_FOLLOWER,
             title="Nuevo seguidor",
-            message=f"{follower.get('apodo') or follower.get('nombre', 'Alguien')} te está siguiendo",
+            message=f"{follower.get('apodo') or follower.get('nombre', 'Alguien')} te is siguiendo",
             data={"follower_id": follower_id},
             action_url=f"/pinpanclub/superpin/player/{follower_id}"
         ))
@@ -243,7 +243,7 @@ class SocialService(BaseService):
     # ============== NOTIFICATIONS ==============
     
     async def create_notification(self, data: NotificationCreate) -> Notification:
-        """Create notification y enviar en tiempo real si the user está conectado"""
+        """Create notification y enviar en tiempo real si the user is conectado"""
         result = await self.notification_repo.create(data.model_dump())
         notification = Notification(**result)
         
@@ -268,7 +268,7 @@ class SocialService(BaseService):
         return [Notification(**r) for r in results]
     
     async def get_unread_count(self, user_id: str) -> int:
-        """Get cantidad de notifications no leídas"""
+        """Get cantidad de notifications no read"""
         return await self.notification_repo.count_unread(user_id)
     
     async def mark_notification_read(self, notification_id: str) -> bool:
@@ -276,7 +276,7 @@ class SocialService(BaseService):
         return await self.notification_repo.mark_as_read(notification_id)
     
     async def mark_all_notifications_read(self, user_id: str) -> int:
-        """Marcar todas las notifications como leídas"""
+        """Marcar todas las notifications como read"""
         return await self.notification_repo.mark_all_as_read(user_id)
     
     async def get_unpushed_notifications(self, limit: int = 100) -> List[Notification]:

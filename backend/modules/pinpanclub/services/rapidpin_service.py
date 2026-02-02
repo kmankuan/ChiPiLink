@@ -31,7 +31,7 @@ async def send_challenge_notification(
     notification_type: str = "challenge_received"
 ) -> bool:
     """
-    Send push notification de desafío.
+    Send push notification de challenge.
     notification_type: 'challenge_received', 'challenge_accepted', 'referee_needed', 'referee_assigned'
     """
     try:
@@ -44,14 +44,14 @@ async def send_challenge_notification(
             },
             "challenge_accepted": {
                 "title": "✅ ¡Desafío Aceptado!",
-                "body": f"{challenger_name} aceptó tu desafío. ¡A buscar referee!"
+                "body": f"{challenger_name} aceptó tu challenge. ¡A buscar referee!"
             },
             "referee_needed": {
                 "title": "🏓 ¡Partido esperando referee!",
-                "body": f"El partido entre {challenger_name} está esperando un referee"
+                "body": f"El partido entre {challenger_name} is esperando un referee"
             },
             "referee_assigned": {
-                "title": "🎮 ¡Tu partido está listo!",
+                "title": "🎮 ¡Tu partido is listo!",
                 "body": f"{challenger_name} será el referee de tu partido. ¡A jugar!"
             },
             "date_proposed": {
@@ -60,7 +60,7 @@ async def send_challenge_notification(
             },
             "date_accepted": {
                 "title": "✅ ¡Fecha acordada!",
-                "body": f"{challenger_name} aceptó la fecha. El reto está confirmado"
+                "body": f"{challenger_name} aceptó la fecha. El reto is confirmado"
             }
         }
         
@@ -486,7 +486,7 @@ class RapidPinService(BaseService):
         return [RapidPinMatch(**r) for r in results]
     
     async def get_all_pending_confirmations(self, user_id: str) -> List[RapidPinMatch]:
-        """Get TODOS the matches pendientes de confirmación para un usuario (all seasons)"""
+        """Get TODOS the matches pendientes de confirmation para un usuario (all seasons)"""
         results = await self.match_repo.get_all_pending_matches_for_user(user_id)
         return [RapidPinMatch(**r) for r in results]
     
@@ -555,7 +555,7 @@ class RapidPinService(BaseService):
         notes: Optional[str] = None
     ) -> Dict:
         """
-        Crear desafío de jugador a jugador.
+        Crear challenge de jugador a jugador.
         Estado: CHALLENGE_PENDING hasta que el oponente acepte.
         """
         import uuid
@@ -570,7 +570,7 @@ class RapidPinService(BaseService):
         if season.get("estado") != "active":
             raise ValueError("Season is not active")
         
-        # Verify that does not haya ya un desafío pendiente entre estos jugadores
+        # Verify that does not haya ya un challenge pendiente entre estos jugadores
         db = await self.get_db()
         existing = await db["rapidpin_queue"].find_one({
             "season_id": season_id,
@@ -581,7 +581,7 @@ class RapidPinService(BaseService):
             ]
         })
         if existing:
-            raise ValueError("Already exists un desafío o partido pendiente entre estos jugadores")
+            raise ValueError("Already exists un challenge o partido pendiente entre estos jugadores")
         
         # Get player info
         challenger_info = await self.player_repo.get_by_id(challenger_id)
@@ -639,7 +639,7 @@ class RapidPinService(BaseService):
     ) -> Dict:
         """
         Crear partido directamente in queue (admin/mod).
-        Salta la fase de desafío, va directo a WAITING_REFEREE.
+        Salta la fase de challenge, va directo a WAITING_REFEREE.
         """
         import uuid
         
@@ -711,7 +711,7 @@ class RapidPinService(BaseService):
         user_role: str = "player"
     ) -> Dict:
         """
-        Aceptar desafío.
+        Aceptar challenge.
         - El oponente (player2) puede aceptar
         - Admin/Mod pueden forzar aceptación
         """
@@ -726,14 +726,14 @@ class RapidPinService(BaseService):
             raise ValueError("Desafío not found")
         
         if queue_entry["status"] != "challenge_pending":
-            raise ValueError("Este desafío ya fue procesado")
+            raise ValueError("Este challenge ya fue procesado")
         
         # Verify permisos: solo player2 o admin/mod
         is_opponent = user_id == queue_entry["player2_id"]
         is_privileged = user_role in ["admin", "moderator"]
         
         if not is_opponent and not is_privileged:
-            raise ValueError("Solo el oponente o un admin/moderador puede aceptar este desafío")
+            raise ValueError("Solo el oponente o un admin/moderador puede aceptar este challenge")
         
         update_data = {
             "status": "waiting",
@@ -777,7 +777,7 @@ class RapidPinService(BaseService):
         user_id: str,
         reason: Optional[str] = None
     ) -> Dict:
-        """Rechazar desafío"""
+        """Rechazar challenge"""
         db = await self.get_db()
         
         queue_entry = await db["rapidpin_queue"].find_one(
@@ -789,11 +789,11 @@ class RapidPinService(BaseService):
             raise ValueError("Desafío not found")
         
         if queue_entry["status"] != "challenge_pending":
-            raise ValueError("Este desafío ya fue procesado")
+            raise ValueError("Este challenge ya fue procesado")
         
         # Only player2 puede rechazar
         if user_id != queue_entry["player2_id"]:
-            raise ValueError("Solo el oponente puede rechazar el desafío")
+            raise ValueError("Solo el oponente puede rechazar el challenge")
         
         update_data = {
             "status": "declined",
@@ -864,7 +864,7 @@ class RapidPinService(BaseService):
             raise ValueError("Match not found in queue")
         
         if queue_entry["status"] != "waiting":
-            raise ValueError("Este partido no está esperando referee")
+            raise ValueError("Este partido no is esperando referee")
         
         # Verify referee is not one of the players
         if referee_id in [queue_entry["player1_id"], queue_entry["player2_id"]]:
@@ -1082,7 +1082,7 @@ class RapidPinService(BaseService):
         message: str = None
     ) -> Dict:
         """
-        Crear desafío con propuesta de fecha inicial.
+        Crear challenge con propuesta de fecha inicial.
         El reto inicia en estado date_negotiation.
         """
         db = await self.get_db()
@@ -1091,7 +1091,7 @@ class RapidPinService(BaseService):
         if challenger_id == opponent_id:
             raise ValueError("You cannot challenge yourself")
         
-        # Verify that does not exista un desafío activo entre estos jugadores
+        # Verify that does not exista un challenge activo entre estos jugadores
         existing = await db["rapidpin_queue"].find_one({
             "$or": [
                 {"player1_id": challenger_id, "player2_id": opponent_id},
@@ -1101,7 +1101,7 @@ class RapidPinService(BaseService):
         })
         
         if existing:
-            raise ValueError("Already exists un desafío o partido pendiente entre estos jugadores")
+            raise ValueError("Already exists un challenge o partido pendiente entre estos jugadores")
         
         # Get player info
         challenger_info = await self.player_repo.get_by_id(challenger_id)

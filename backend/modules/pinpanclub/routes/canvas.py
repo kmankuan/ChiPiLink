@@ -25,7 +25,7 @@ class LayoutItem(BaseModel):
     maxH: Optional[int] = 8
 
 class CanvasSettings(BaseModel):
-    """Configuración del canvas"""
+    """Configuration del canvas"""
     cols: int = 12
     rowHeight: int = 80
     showQR: bool = True

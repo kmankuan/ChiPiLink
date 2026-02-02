@@ -73,8 +73,8 @@ class SuperPinService(BaseService):
     def _default_prizes(self) -> List[Dict]:
         """Premios by default"""
         return [
-            {"name": "Campeón", "position": 1, "icon": "🥇"},
-            {"name": "Subcampeón", "position": 2, "icon": "🥈"},
+            {"name": "Champion", "position": 1, "icon": "🥇"},
+            {"name": "Runner-up", "position": 2, "icon": "🥈"},
             {"name": "Tercer Lugar", "position": 3, "icon": "🥉"},
             {"name": "Cuarto Lugar", "position": 4, "icon": "🏅"},
         ]
@@ -608,7 +608,7 @@ class SuperPinService(BaseService):
             ]
             brackets.append({"round": r, "name": round_name, "matches": round_matches})
         
-        # Add partido por 3er lugar si está configurado
+        # Add partido por 3er lugar si is configurado
         config = tournament.get("tournament_config", {})
         if config.get("third_place_match", True) and num_rounds >= 2:
             brackets.append({

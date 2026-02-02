@@ -41,14 +41,14 @@ class ChallengeService(BaseService):
     # ============== CHALLENGE DEFINITIONS ==============
     
     async def create_challenge(self, data: ChallengeDefinitionCreate) -> ChallengeDefinition:
-        """Create definición de reto (por admin)"""
+        """Create definition de reto (por admin)"""
         challenge_data = data.model_dump()
         challenge_data["is_automatic"] = False
         result = await self.definition_repo.create(challenge_data)
         return ChallengeDefinition(**result)
     
     async def get_challenge(self, challenge_id: str) -> Optional[ChallengeDefinition]:
-        """Get definición de reto"""
+        """Get definition de reto"""
         result = await self.definition_repo.get_by_id(challenge_id)
         return ChallengeDefinition(**result) if result else None
     
@@ -62,7 +62,7 @@ class ChallengeService(BaseService):
         challenge_id: str, 
         data: Dict
     ) -> Optional[ChallengeDefinition]:
-        """Update definición de reto"""
+        """Update definition de reto"""
         success = await self.definition_repo.update(challenge_id, data)
         if success:
             result = await self.definition_repo.get_by_id(challenge_id)

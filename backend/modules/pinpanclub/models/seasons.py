@@ -1,6 +1,6 @@
 """
 Ranking Seasons - Modelos para system for temporadas
-Módulo: pinpanclub
+Module: pinpanclub
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -26,8 +26,8 @@ class SeasonType(str, Enum):
 
 class SeasonRewardTier(BaseModel):
     """Nivel de recompensa por position"""
-    position_start: int        # Posición inicial (ej: 1)
-    position_end: int          # Posición final (ej: 3)
+    position_start: int        # Position inicial (ej: 1)
+    position_end: int          # Position final (ej: 3)
     bonus_points: int          # Points bonus
     badge: Optional[Dict] = None  # Badge especial
     title: Optional[Dict] = None  # Título especial
@@ -36,12 +36,12 @@ class SeasonRewardTier(BaseModel):
 
 
 class RankingSeason(BaseModel):
-    """Definición de una temporada de ranking"""
+    """Definition de una temporada de ranking"""
     season_id: str = Field(default_factory=lambda: f"season_{uuid.uuid4().hex[:8]}")
     
     # Information básica
     name: Dict[str, str]       # Nombre multi-idioma {"es": "...", "en": "..."}
-    description: Dict[str, str]  # Descripción multi-idioma
+    description: Dict[str, str]  # Description multi-idioma
     season_type: SeasonType = SeasonType.MONTHLY
     season_number: int = 1     # Number of temporada
     
@@ -86,10 +86,10 @@ class SeasonParticipant(BaseModel):
     current_streak: int = 0
     best_streak: int = 0
     
-    # Posición actual
+    # Position actual
     current_position: Optional[int] = None
     
-    # Posición final (al cerrar temporada)
+    # Position final (al cerrar temporada)
     final_position: Optional[int] = None
     rewards_claimed: bool = False
     
@@ -104,7 +104,7 @@ class SeasonReward(BaseModel):
     season_id: str
     jugador_id: str
     
-    # Posición y tier
+    # Position y tier
     final_position: int
     tier_name: str  # "champion", "top3", "top10", etc.
     
@@ -133,11 +133,11 @@ def get_default_season_rewards() -> List[Dict]:
             "position_end": 1,
             "bonus_points": 1000,
             "badge": {
-                "name": {"es": "Campeón de Temporada", "en": "Season Champion", "zh": "赛季冠军"},
+                "name": {"es": "Champion de Temporada", "en": "Season Champion", "zh": "赛季冠军"},
                 "icon": "🏆",
                 "rarity": "legendary"
             },
-            "title": {"es": "Campeón", "en": "Champion", "zh": "冠军"},
+            "title": {"es": "Champion", "en": "Champion", "zh": "冠军"},
             "perks": ["season_champion_frame", "exclusive_emotes", "priority_matchmaking"]
         },
         {

@@ -23,7 +23,7 @@ async def get_category(categoria_id: str):
     """Get category by ID"""
     category = await category_service.get_category(categoria_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría not found")
+        raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 
@@ -51,7 +51,7 @@ async def update_category(
     """Update category (solo admin)"""
     category = await category_service.update_category(categoria_id, data)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría not found")
+        raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 
@@ -64,7 +64,7 @@ async def delete_category(
     try:
         success = await category_service.delete_category(categoria_id)
         if not success:
-            raise HTTPException(status_code=404, detail="Categoría not found")
-        return {"success": True, "message": "Categoría eliminada"}
+            raise HTTPException(status_code=404, detail="Category not found")
+        return {"success": True, "message": "Category eliminada"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
