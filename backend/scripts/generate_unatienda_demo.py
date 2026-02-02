@@ -157,7 +157,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
     orders = []
     
     # Clear existing demo orders
-    await db.pedidos_libros.delete_many({"es_demo": True})
+    await db.textbook_orders.delete_many({"es_demo": True})
     
     # Select random students to have orders
     students_with_orders = random.sample(students, min(10, len(students)))
@@ -183,44 +183,43 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
             
             items.append({
                 "item_id": f"item_{uuid.uuid4().hex[:8]}",
-                "libro_id": product["libro_id"],
-                "libro_codigo": product["codigo"],
-                "libro_nombre": product["nombre"],
-                "cantidad": cantidad,
-                "precio_unitario": precio,
+                "book_id": product["libro_id"],
+                "book_code": product["codigo"],
+                "book_name": product["nombre"],
+                "quantity_ordered": cantidad,
+                "price": precio,
                 "subtotal": subtotal,
-                "materia": product["materia"],
-                "estado": random.choice(["pendiente", "disponible", "reservado"])
+                "subject": product["materia"],
+                "status": random.choice(["pending", "available", "reserved"])
             })
         
-        # Create order
-        estados = ["borrador", "pre_orden", "confirmado", "en_proceso", "listo_retiro"]
+        # Create order with new schema
+        statuses = ["draft", "pending", "confirmed", "processing", "ready"]
         
         order = {
-            "pedido_id": f"ped_{uuid.uuid4().hex[:12]}",
-            "estudiante_sync_id": student["sync_id"],
-            "estudiante_nombre": student["nombre_completo"],
-            "estudiante_grado": student["grado"],
-            "estudiante_numero": student["numero_estudiante"],
-            "acudiente_nombre": f"Acudiente de {student['nombre']}",
-            "acudiente_email": student["datos_extra"].get("email_acudiente"),
-            "acudiente_telefono": student["datos_extra"].get("telefono_acudiente"),
-            "ano_escolar": "2025-2026",
-            "tipo": "pre_orden",
-            "estado": random.choice(estados),
+            "order_id": f"order_{uuid.uuid4().hex[:12]}",
+            "student_sync_id": student["sync_id"],
+            "student_name": student["nombre_completo"],
+            "grade": student["grado"],
+            "student_number": student["numero_estudiante"],
+            "user_name": f"Acudiente de {student['nombre']}",
+            "user_email": student["datos_extra"].get("email_acudiente"),
+            "user_phone": student["datos_extra"].get("telefono_acudiente"),
+            "year": 2025,
+            "status": random.choice(statuses),
             "items": items,
-            "total": round(total, 2),
-            "cantidad_items": len(items),
-            "notas": f"Pedido de prueba para {student['nombre_completo']}",
+            "total_amount": round(total, 2),
+            "items_count": len(items),
+            "notes": f"Pedido de prueba para {student['nombre_completo']}",
             "es_demo": True,
-            "fecha_creacion": datetime.now(timezone.utc).isoformat(),
-            "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
         }
         orders.append(order)
     
     # Insert all orders
     if orders:
-        await db.pedidos_libros.insert_many(orders)
+        await db.textbook_orders.insert_many(orders)
     
     return orders
 
