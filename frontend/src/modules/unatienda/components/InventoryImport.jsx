@@ -257,12 +257,12 @@ export default function InventoryImport({ token, onImportComplete }) {
                     className="gap-2"
                   >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-                    Previsualizar
+                    Preview
                   </Button>
                 </div>
                 {selectedFile && (
                   <p className="text-sm text-muted-foreground">
-                    Archivo seleccionado: <span className="font-medium">{selectedFile.name}</span>
+                    Selected file: <span className="font-medium">{selectedFile.name}</span>
                   </p>
                 )}
               </CardContent>
@@ -274,7 +274,7 @@ export default function InventoryImport({ token, onImportComplete }) {
                 <CardHeader className="py-3">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs">4</span>
-                    Previsualización
+                    Preview
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-4">
@@ -282,21 +282,21 @@ export default function InventoryImport({ token, onImportComplete }) {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
                       <p className="text-2xl font-bold text-green-600">{previewData.actions?.create || 0}</p>
-                      <p className="text-xs text-muted-foreground">Nuevos</p>
+                      <p className="text-xs text-muted-foreground">New</p>
                     </div>
                     <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center">
                       <p className="text-2xl font-bold text-blue-600">
                         {(previewData.actions?.update_add || 0) + (previewData.actions?.update_replace || 0)}
                       </p>
-                      <p className="text-xs text-muted-foreground">Actualizar</p>
+                      <p className="text-xs text-muted-foreground">Update</p>
                     </div>
                     <div className="p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg text-center">
                       <p className="text-2xl font-bold text-gray-600">{previewData.actions?.skip || 0}</p>
-                      <p className="text-xs text-muted-foreground">Omitir</p>
+                      <p className="text-xs text-muted-foreground">Skip</p>
                     </div>
                     <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center">
                       <p className="text-2xl font-bold text-red-600">{previewData.error_rows || 0}</p>
-                      <p className="text-xs text-muted-foreground">Errores</p>
+                      <p className="text-xs text-muted-foreground">Errors</p>
                     </div>
                   </div>
 
@@ -305,13 +305,13 @@ export default function InventoryImport({ token, onImportComplete }) {
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        {previewData.errors.length} error(es) encontrado(s):
+                        {previewData.errors.length} error(s) found:
                         <ul className="list-disc list-inside mt-1">
                           {previewData.errors.slice(0, 5).map((err, i) => (
-                            <li key={i} className="text-xs">Fila {err.row}: {err.error}</li>
+                            <li key={i} className="text-xs">Row {err.row}: {err.error}</li>
                           ))}
                           {previewData.errors.length > 5 && (
-                            <li className="text-xs">... y {previewData.errors.length - 5} más</li>
+                            <li className="text-xs">... and {previewData.errors.length - 5} more</li>
                           )}
                         </ul>
                       </AlertDescription>
@@ -324,11 +324,11 @@ export default function InventoryImport({ token, onImportComplete }) {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-[100px]">Código</TableHead>
-                            <TableHead>Nombre</TableHead>
-                            <TableHead className="w-[80px]">Grado</TableHead>
-                            <TableHead className="w-[100px] text-right">Cantidad</TableHead>
-                            <TableHead className="w-[100px]">Acción</TableHead>
+                            <TableHead className="w-[100px]">Code</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead className="w-[80px]">Grade</TableHead>
+                            <TableHead className="w-[100px] text-right">Quantity</TableHead>
+                            <TableHead className="w-[100px]">Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
