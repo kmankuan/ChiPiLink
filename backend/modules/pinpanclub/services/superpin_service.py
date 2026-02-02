@@ -140,7 +140,7 @@ class SuperPinService(BaseService):
         
         result = await self.checkin_repo.create(checkin_dict)
         
-        # Incrementar contador de jugadores en liga si es nuevo
+        # Increment contador de jugadores en liga si es nuevo
         await self.league_repo.increment_stats(data.liga_id, jugadores=1)
         
         self.log_info(f"Player checked in: {data.jugador_id} to {data.liga_id}")
@@ -270,7 +270,7 @@ class SuperPinService(BaseService):
         if not match or match["estado"] != "en_curso":
             raise ValueError("Partido no está en curso")
         
-        # Actualizar puntos
+        # Update puntos
         if jugador == 'a':
             match["puntos_jugador_a"] += 1
         else:
@@ -299,7 +299,7 @@ class SuperPinService(BaseService):
                     "ganador": ganador_set
                 })
                 
-                # Actualizar sets
+                # Update sets
                 if ganador_set == 'a':
                     match["sets_jugador_a"] += 1
                 else:
@@ -321,7 +321,7 @@ class SuperPinService(BaseService):
                     match["puntos_jugador_a"] = 0
                     match["puntos_jugador_b"] = 0
         
-        # Actualizar estadísticas avanzadas si se proporcionan
+        # Update estadísticas avanzadas si se proporcionan
         if stats:
             if not match.get("stats"):
                 match["stats"] = {}
@@ -335,7 +335,7 @@ class SuperPinService(BaseService):
             # Calculatesr y actualizar ranking
             await self._update_ranking_after_match(match)
             
-            # Incrementar contador de partidos
+            # Increment contador de partidos
             await self.league_repo.increment_stats(match["liga_id"], partidos=1)
         
         await self.match_repo.update_match(partido_id, match)
@@ -391,7 +391,7 @@ class SuperPinService(BaseService):
             sets_ganador = match["sets_jugador_b"]
             sets_perdedor = match["sets_jugador_a"]
         
-        # Actualizar ranking del ganador
+        # Update ranking del ganador
         racha_ganador = ranking_ganador.get("racha_actual", 0)
         nueva_racha_ganador = racha_ganador + 1 if racha_ganador >= 0 else 1
         
@@ -407,7 +407,7 @@ class SuperPinService(BaseService):
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
-        # Actualizar ranking del perdedor
+        # Update ranking del perdedor
         racha_perdedor = ranking_perdedor.get("racha_actual", 0)
         nueva_racha_perdedor = racha_perdedor - 1 if racha_perdedor <= 0 else -1
         
@@ -557,7 +557,7 @@ class SuperPinService(BaseService):
         num_rounds = math.ceil(math.log2(num_players))
         bracket_size = 2 ** num_rounds
         
-        # Generar estructura de brackets
+        # Generate estructura de brackets
         brackets = []
         
         # Primera ronda - emparejar según ranking (1 vs último, 2 vs penúltimo, etc.)
@@ -582,7 +582,7 @@ class SuperPinService(BaseService):
         
         brackets.append({"round": 1, "name": "Final" if num_rounds == 1 else ("Octavos" if num_rounds >= 3 else "Primera Ronda"), "matches": round_1_matches})
         
-        # Generar rondas siguientes vacías
+        # Generate rondas siguientes vacías
         round_names = ["Octavos", "Cuartos", "Semifinal", "Final"]
         for r in range(2, num_rounds + 1):
             num_matches = bracket_size // (2 ** r)
@@ -628,7 +628,7 @@ class SuperPinService(BaseService):
                 }]
             })
         
-        # Actualizar torneo con brackets
+        # Update torneo con brackets
         await self.tournament_repo.update_tournament(torneo_id, {
             "brackets": brackets,
             "estado": "en_curso"
@@ -690,7 +690,7 @@ class SuperPinService(BaseService):
                             match["player_b"] = winner_info
                         break
         
-        # Actualizar brackets en DB
+        # Update brackets en DB
         await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
         
         # Verificar si el torneo terminó
@@ -1249,7 +1249,7 @@ class SuperPinService(BaseService):
                 "estado": "en_curso"
             })
         
-        # Generar nombre del torneo
+        # Generate nombre del torneo
         if not nombre:
             nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
         

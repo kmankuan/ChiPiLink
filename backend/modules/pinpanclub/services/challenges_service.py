@@ -100,7 +100,7 @@ class ChallengeService(BaseService):
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_week = start_of_week + timedelta(days=6, hours=23, minutes=59, seconds=59)
         
-        # Generar o usar retos proporcionados
+        # Generate o usar retos proporcionados
         if auto_generate and not challenge_ids:
             # Crear retos automáticos
             auto_challenges = select_weekly_challenges()
@@ -183,7 +183,7 @@ class ChallengeService(BaseService):
         
         result = await self.player_challenge_repo.create(progress_data)
         
-        # Actualizar estadísticas de la semana
+        # Update estadísticas de la semana
         week = await self.get_current_week()
         if week and challenge_id in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, participants=1)
@@ -215,7 +215,7 @@ class ChallengeService(BaseService):
             if challenge.get("type") != challenge_type:
                 continue
             
-            # Actualizar progreso
+            # Update progreso
             new_value = progress["current_value"] + increment
             target = progress["target_value"]
             
@@ -245,7 +245,7 @@ class ChallengeService(BaseService):
         challenge: Dict
     ):
         """Process completación de reto"""
-        # Actualizar leaderboard
+        # Update leaderboard
         player = await self.player_repo.get_by_id(jugador_id)
         lb_entry = await self.leaderboard_repo.get_or_create(
             jugador_id,
@@ -258,7 +258,7 @@ class ChallengeService(BaseService):
             points=challenge.get("points_reward", 0)
         )
         
-        # Actualizar estadísticas de la semana
+        # Update estadísticas de la semana
         week = await self.get_current_week()
         if week and challenge["challenge_id"] in week.challenges:
             await self.weekly_repo.increment_stats(week.week_id, completions=1)

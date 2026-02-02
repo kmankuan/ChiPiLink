@@ -146,7 +146,7 @@ class WalletService(BaseService):
         # Obtener billetera
         wallet = await self.get_or_create_wallet(user_id)
         
-        # Calcular saldo antes
+        # Calculate saldo antes
         if currency == Currency.USD:
             balance_before = wallet["balance_usd"]
         else:
@@ -159,7 +159,7 @@ class WalletService(BaseService):
             TransactionType.BONUS, TransactionType.POINTS_TO_USD
         ]
         
-        # Calcular nuevo saldo
+        # Calculate nuevo saldo
         if is_credit:
             balance_after = balance_before + amount
         else:
@@ -208,7 +208,7 @@ class WalletService(BaseService):
         if transaction["status"] != TransactionStatus.PENDING.value:
             raise ValueError(f"Transacción ya procesada: {transaction['status']}")
         
-        # Actualizar saldo de billetera
+        # Update saldo de billetera
         currency = transaction["currency"]
         balance_field = "balance_usd" if currency == Currency.USD.value else "balance_points"
         
@@ -220,7 +220,7 @@ class WalletService(BaseService):
         
         update_amount = transaction["amount"] if is_credit else -transaction["amount"]
         
-        # Actualizar totales según tipo
+        # Update totales según tipo
         totals_update = {}
         if transaction["transaction_type"] == TransactionType.DEPOSIT.value:
             totals_update["total_deposited"] = transaction["amount"]
@@ -369,7 +369,7 @@ class WalletService(BaseService):
         # Completar
         result = await self.complete_transaction(transaction["transaction_id"])
         
-        # Actualizar totales de puntos
+        # Update totales de puntos
         await db.chipi_wallets.update_one(
             {"wallet_id": wallet["wallet_id"]},
             {"$inc": {"total_points_earned": points}}
@@ -409,7 +409,7 @@ class WalletService(BaseService):
         if not wallet or wallet["balance_points"] < points:
             raise ValueError("Puntos insuficientes")
         
-        # Calcular USD
+        # Calculate USD
         usd_amount = points * config.get("conversion_rate", 0.008)
         
         # Descontar puntos
@@ -448,7 +448,7 @@ class WalletService(BaseService):
         }
         await db.chipi_conversions.insert_one(conversion)
         
-        # Actualizar total convertido
+        # Update total convertido
         await db.chipi_wallets.update_one(
             {"wallet_id": wallet["wallet_id"]},
             {"$inc": {"total_points_converted": points}}

@@ -154,7 +154,7 @@ class MondayService(BaseService):
                 "email": None
             }
             
-            # Extraer datos de columnas
+            # Extract datos de columnas
             for col in item.get("column_values", []):
                 col_id = col.get("id", "").lower()
                 col_text = col.get("text", "")
@@ -301,7 +301,7 @@ class MondayService(BaseService):
         }
         
         if match.get("monday_item_id"):
-            # Actualizar existente
+            # Update existente
             await self.update_item(
                 config.matches_board_id,
                 match["monday_item_id"],

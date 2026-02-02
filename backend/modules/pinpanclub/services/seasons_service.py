@@ -190,7 +190,7 @@ class RankingSeasonsService(BaseService):
         total_challenges = sum(p.get("challenges_completed", 0) for p in final_standings)
         total_points = sum(p.get("season_points", 0) for p in final_standings)
         
-        # Actualizar temporada como completada
+        # Update temporada como completada
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season_id},
             {
@@ -239,7 +239,7 @@ class RankingSeasonsService(BaseService):
         if existing:
             return None
         
-        # Preparar recompensa
+        # Prepare recompensa
         badge_earned = None
         title_earned = None
         
@@ -425,7 +425,7 @@ class RankingSeasonsService(BaseService):
             {"_id": 0, "nombre": 1, "apodo": 1}
         )
         
-        # Actualizar o crear participante
+        # Update o crear participante
         update_ops = {
             "$inc": {
                 "season_points": points_earned
@@ -454,7 +454,7 @@ class RankingSeasonsService(BaseService):
             upsert=True
         )
         
-        # Actualizar estadísticas of the season
+        # Update estadísticas of the season
         await db.pinpanclub_ranking_seasons.update_one(
             {"season_id": season["season_id"]},
             {

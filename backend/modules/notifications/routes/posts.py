@@ -87,7 +87,7 @@ async def get_post(post_id: str):
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     
-    # Incrementar vistas
+    # Increment vistas
     await post_service.increment_views(post_id)
     
     return {"success": True, "post": post}

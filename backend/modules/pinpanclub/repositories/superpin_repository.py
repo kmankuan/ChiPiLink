@@ -311,7 +311,7 @@ class RankingRepository(BaseRepository):
                 x.get("sets_ganados", 0) - x.get("sets_perdidos", 0)
             ), reverse=True)
         
-        # Actualizar posiciones
+        # Update posiciones
         for i, entry in enumerate(rankings):
             old_pos = entry.get("posicion", i + 1)
             new_pos = i + 1

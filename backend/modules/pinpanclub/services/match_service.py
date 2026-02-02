@@ -174,7 +174,7 @@ class MatchService(BaseService):
                 puntos_b = 0
                 set_actual += 1
         
-        # Actualizar en repository
+        # Update en repository
         await self.repository.update_score(
             partido_id, puntos_a, puntos_b,
             sets_a, sets_b, set_actual, historial
@@ -288,7 +288,7 @@ class MatchService(BaseService):
             except Exception:
                 dead_connections.add(ws)
         
-        # Limpiar conexiones muertas
+        # Clean conexiones muertas
         for ws in dead_connections:
             self._websocket_connections[partido_id].discard(ws)
     

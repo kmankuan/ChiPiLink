@@ -90,7 +90,7 @@ async def get_wallet_summary(user=Depends(get_current_user)):
         limit=10
     )
     
-    # Calcular valor de puntos en USD
+    # Calculate valor de puntos en USD
     points_value = wallet.get("balance_points", 0) * config.get("conversion_rate", 0.008)
     
     return {

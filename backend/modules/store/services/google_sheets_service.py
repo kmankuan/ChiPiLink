@@ -293,7 +293,7 @@ class GoogleSheetsService:
                     # Procesar cada fila (desde la 2)
                     for fila_num, fila in enumerate(datos[1:], start=2):
                         try:
-                            # Extraer datos con los índices mapeados
+                            # Extract datos con los índices mapeados
                             def get_val(key):
                                 idx = col_idx.get(key)
                                 if idx is not None and idx < len(fila):
@@ -349,7 +349,7 @@ class GoogleSheetsService:
                                     resultados["estudiantes_override"] += 1
                                     continue
                                 
-                                # Actualizar
+                                # Update
                                 await db.estudiantes_sincronizados.update_one(
                                     {"sync_id": existente["sync_id"]},
                                     {"$set": estudiante_data}
@@ -373,7 +373,7 @@ class GoogleSheetsService:
             except Exception as e:
                 resultados["errores"].append(f"Sheet {sheet_cfg.get('nombre', sheet_cfg['sheet_id'])}: {str(e)}")
         
-        # Actualizar última sincronización
+        # Update última sincronización
         await self.update_sync_config({
             "ultima_sync": datetime.now(timezone.utc).isoformat()
         })

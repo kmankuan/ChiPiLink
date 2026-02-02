@@ -217,7 +217,7 @@ class AchievementsService(BaseService):
         
         await db.pinpanclub_player_achievements.insert_one(player_achievement)
         
-        # Actualizar puntos en el leaderboard si hay recompensa
+        # Update puntos en el leaderboard si hay recompensa
         if achievement.get("points_reward", 0) > 0:
             await db.pinpanclub_challenges_leaderboard.update_one(
                 {"jugador_id": jugador_id},

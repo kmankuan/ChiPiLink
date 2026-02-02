@@ -317,7 +317,7 @@ class MembershipService:
         now = datetime.now(timezone.utc)
         now_str = now.isoformat()
         
-        # Calcular fecha de fin
+        # Calculate fecha de fin
         duration_days = plan.get("duration_days", 30)
         end_date = (now + timedelta(days=duration_days)).isoformat()
         
@@ -426,7 +426,7 @@ class MembershipService:
             "consumed": visit_type == VisitType.REGULAR
         }
         
-        # Actualizar membresía
+        # Update membresía
         result = await db[self.collection_memberships].find_one_and_update(
             {"membership_id": membership_id},
             {
@@ -600,7 +600,7 @@ class MembershipService:
         now = datetime.now(timezone.utc)
         now_str = now.isoformat()
         
-        # Calcular duración
+        # Calculate duración
         check_in_time = datetime.fromisoformat(visit["check_in_time"].replace('Z', '+00:00'))
         duration_minutes = int((now - check_in_time).total_seconds() / 60)
         
@@ -617,7 +617,7 @@ class MembershipService:
             visit_type = VisitType.REGULAR.value
             consumed_visit = True
         
-        # Actualizar visita
+        # Update visita
         await db[self.collection_visits].update_one(
             {"visit_id": visit["visit_id"]},
             {

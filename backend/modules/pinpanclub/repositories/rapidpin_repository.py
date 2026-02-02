@@ -349,7 +349,7 @@ class RapidPinRankingRepository(BaseRepository):
         # Obtener todos los rankings ordenados
         rankings = await self.get_season_ranking(season_id)
         
-        # Actualizar posiciones
+        # Update posiciones
         for idx, ranking in enumerate(rankings, start=1):
             await self._collection.update_one(
                 {self.ID_FIELD: ranking["ranking_id"]},

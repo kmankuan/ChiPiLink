@@ -60,7 +60,7 @@ class OrderService(BaseService):
         
         result = await self.repository.create(order_dict)
         
-        # Decrementar inventario
+        # Decrement inventario
         for item in data.items:
             await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
         
@@ -123,7 +123,7 @@ class OrderService(BaseService):
         
         result = await self.repository.create(order_dict)
         
-        # Decrementar inventario
+        # Decrement inventario
         for item in data.items:
             await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
         

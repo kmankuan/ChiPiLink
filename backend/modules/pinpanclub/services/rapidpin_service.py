@@ -161,7 +161,7 @@ class RapidPinService(BaseService):
         """Create new season Rapid Pin"""
         season_dict = data.model_dump()
         
-        # Establecer premios por defecto si no se proporcionan
+        # Set premios por defecto si no se proporcionan
         if not season_dict.get("player_prizes"):
             season_dict["player_prizes"] = [p.model_dump() for p in get_default_player_prizes()]
         else:
@@ -211,7 +211,7 @@ class RapidPinService(BaseService):
         """Update temporada"""
         update_data = data.model_dump(exclude_unset=True)
         
-        # Convertir premios a dict si es necesario
+        # Convert premios a dict si es necesario
         if "player_prizes" in update_data and update_data["player_prizes"]:
             update_data["player_prizes"] = [
                 p.model_dump() if hasattr(p, 'model_dump') else p 
@@ -245,7 +245,7 @@ class RapidPinService(BaseService):
         player_ranking = await self.ranking_repo.get_season_ranking(season_id)
         referee_ranking = await self.ranking_repo.get_referee_ranking(season_id)
         
-        # Preparar resultados de jugadores
+        # Prepare resultados de jugadores
         player_results = []
         for idx, entry in enumerate(player_ranking, start=1):
             # Buscar premio correspondiente
@@ -266,7 +266,7 @@ class RapidPinService(BaseService):
                 prize=prize
             ))
         
-        # Preparar resultados de árbitros
+        # Prepare resultados de árbitros
         referee_results = []
         for idx, entry in enumerate(referee_ranking, start=1):
             prize = None
@@ -395,14 +395,14 @@ class RapidPinService(BaseService):
         # Aplicar puntos
         await self._apply_match_points(match)
         
-        # Actualizar partido con los puntos
+        # Update partido con los puntos
         await self.match_repo.update(match_id, {
             "puntos_ganador": RAPID_PIN_SCORING["victory"],
             "puntos_perdedor": RAPID_PIN_SCORING["defeat"],
             "puntos_arbitro": RAPID_PIN_SCORING["referee"]
         })
         
-        # Incrementar contador de partidos of the season
+        # Increment contador de partidos of the season
         await self.season_repo.increment_stats(match["season_id"], matches=1)
         
         # Recalcular posiciones
@@ -432,27 +432,27 @@ class RapidPinService(BaseService):
             season_id, arbitro_id, match.get("arbitro_info")
         )
         
-        # Actualizar estadísticas del ganador
+        # Update estadísticas del ganador
         await self.ranking_repo.update_player_stats(
             ganador_ranking["ranking_id"],
             is_winner=True,
             points=RAPID_PIN_SCORING["victory"]
         )
         
-        # Actualizar estadísticas del perdedor
+        # Update estadísticas del perdedor
         await self.ranking_repo.update_player_stats(
             perdedor_ranking["ranking_id"],
             is_winner=False,
             points=RAPID_PIN_SCORING["defeat"]
         )
         
-        # Actualizar estadísticas del árbitro
+        # Update estadísticas del árbitro
         await self.ranking_repo.update_referee_stats(
             arbitro_ranking["ranking_id"],
             points=RAPID_PIN_SCORING["referee"]
         )
         
-        # Actualizar contadores de participantes únicos en la temporada
+        # Update contadores de participantes únicos en la temporada
         counts = await self.ranking_repo.get_season_participants_count(season_id)
         season = await self.season_repo.get_by_id(season_id)
         if season:
@@ -1207,7 +1207,7 @@ class RapidPinService(BaseService):
         user_info = await self.player_repo.get_by_id(user_id)
         user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
         
-        # Actualizar historial de fecha
+        # Update historial de fecha
         date_history = queue_entry.get("date_history", [])
         if date_history and len(date_history) > 0:
             date_history[-1]["status"] = action
@@ -1564,7 +1564,7 @@ class RapidPinService(BaseService):
             update_data["is_approved"] = True
             update_data["is_moderated"] = False
             
-            # Incrementar contador si no estaba aprobado antes
+            # Increment contador si no estaba aprobado antes
             if not was_approved:
                 await db["rapidpin_queue"].update_one(
                     {"queue_id": comment["queue_id"]},
@@ -1578,7 +1578,7 @@ class RapidPinService(BaseService):
         elif action == "hide":
             update_data["is_hidden"] = True
             
-            # Decrementar contador si estaba aprobado
+            # Decrement contador si estaba aprobado
             if was_approved:
                 await db["rapidpin_queue"].update_one(
                     {"queue_id": comment["queue_id"]},

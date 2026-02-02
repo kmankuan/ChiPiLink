@@ -147,7 +147,7 @@ class PostService:
             summary = post.get("summary", {}).get("es", "")
             
             if not summary and post.get("content_blocks"):
-                # Extraer primer párrafo como resumen
+                # Extract primer párrafo como resumen
                 for block in post["content_blocks"]:
                     if block.get("type") == ContentBlockType.PARAGRAPH.value:
                         text = block.get("content", "")

@@ -108,7 +108,7 @@ class PlayerService(BaseService):
         actual = 1 if won else 0
         elo_change = int(k_factor * (actual - expected))
         
-        # Actualizar en repository
+        # Update en repository
         await self.repository.update_stats(jugador_id, won, elo_change)
         
         # Emitir evento de cambio de ELO

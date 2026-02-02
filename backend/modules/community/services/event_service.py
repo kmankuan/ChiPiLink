@@ -51,7 +51,7 @@ class EventService(BaseService):
         """
         event_dict = data.model_dump()
         
-        # Convertir fechas a ISO string
+        # Convert fechas a ISO string
         for field in ["fecha_inicio", "fecha_fin"]:
             if event_dict.get(field) and isinstance(event_dict[field], datetime):
                 event_dict[field] = event_dict[field].isoformat()
@@ -79,7 +79,7 @@ class EventService(BaseService):
         if not update_data:
             return await self.get_event(evento_id)
         
-        # Convertir fechas
+        # Convert fechas
         for field in ["fecha_inicio", "fecha_fin"]:
             if update_data.get(field) and isinstance(update_data[field], datetime):
                 update_data[field] = update_data[field].isoformat()

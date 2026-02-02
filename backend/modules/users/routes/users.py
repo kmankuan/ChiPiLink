@@ -220,7 +220,7 @@ async def create_profile(
             custom_fields=data.custom_fields
         )
         
-        # Actualizar campos adicionales
+        # Update campos adicionales
         if data.bio or data.birth_date or data.language:
             updates = {}
             if data.bio:

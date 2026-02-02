@@ -36,14 +36,14 @@ def setup_event_handlers():
         perdedor = await player_service.get_player(perdedor_id)
         
         if ganador and perdedor:
-            # Actualizar stats del ganador
+            # Update stats del ganador
             await player_service.update_player_stats(
                 ganador_id,
                 won=True,
                 opponent_elo=perdedor.elo_rating
             )
             
-            # Actualizar stats del perdedor
+            # Update stats del perdedor
             await player_service.update_player_stats(
                 perdedor_id,
                 won=False,

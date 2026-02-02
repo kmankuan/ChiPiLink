@@ -173,7 +173,7 @@ class SocialService(BaseService):
                 await self.reaction_repo.delete_reaction(
                     data.user_id, data.target_id, data.target_type
                 )
-                # Actualizar contador en target
+                # Update contador en target
                 if data.target_type == "comment":
                     await self.comment_repo.remove_reaction(data.target_id, data.reaction_type)
                 raise ValueError("Reacción eliminada")
@@ -187,7 +187,7 @@ class SocialService(BaseService):
         
         result = await self.reaction_repo.create(data.model_dump())
         
-        # Actualizar contador en target
+        # Update contador en target
         if data.target_type == "comment":
             await self.comment_repo.add_reaction(data.target_id, data.reaction_type)
         

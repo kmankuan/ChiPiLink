@@ -86,5 +86,5 @@ class LayoutRepository(BaseRepository):
             {"is_default": True},
             {"$set": {"is_default": False}}
         )
-        # Establecer nuevo default
+        # Set nuevo default
         return await self.update_layout(layout_id, {"is_default": True})

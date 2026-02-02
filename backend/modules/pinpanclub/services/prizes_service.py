@@ -39,7 +39,7 @@ class PrizeService(BaseService):
     
     async def create_prize(self, data: PrizeDefinitionCreate) -> PrizeDefinition:
         """Create definición de premio"""
-        # Convertir conditions a lista de dicts
+        # Convert conditions a lista de dicts
         prize_data = data.model_dump()
         result = await self.definition_repo.create(prize_data)
         return PrizeDefinition(**result)

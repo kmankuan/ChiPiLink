@@ -660,7 +660,7 @@ class ConexionesService:
         # Verificar límite diario
         limite = conexion.get("permisos", {}).get("limite_transferencia_diario")
         if limite:
-            # Calcular transferencias del día
+            # Calculate transferencias del día
             hoy = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
             transferencias_hoy = await db.transferencias_wallet.aggregate([
                 {

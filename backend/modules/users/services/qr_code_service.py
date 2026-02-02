@@ -30,7 +30,7 @@ class QRCodeService:
         timestamp = datetime.now(timezone.utc).isoformat()
         raw_data = f"{user_id}:{profile_id or ''}:{timestamp}"
         
-        # Generar hash único
+        # Generate hash único
         qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()[:16]
         
         qr_data = {
@@ -168,7 +168,7 @@ class QRCodeService:
             {"_id": 0}
         )
         
-        # Actualizar uso
+        # Update uso
         await db[self.collection_qr_codes].update_one(
             {"qr_id": qr_data["qr_id"]},
             {
@@ -273,7 +273,7 @@ class QRCodeService:
         else:
             result = {"success": False, "error": f"Unknown action: {action}"}
         
-        # Actualizar transacción
+        # Update transacción
         qr_transaction["status"] = "completed" if result.get("success") else "failed"
         qr_transaction["result"] = result
         qr_transaction["completed_at"] = datetime.now(timezone.utc).isoformat()
@@ -534,7 +534,7 @@ class QRCodeService:
                 processed_by
             )
         
-        # Actualizar sesión
+        # Update sesión
         await db[self.collection_qr_sessions].update_one(
             {"session_id": session_id},
             {

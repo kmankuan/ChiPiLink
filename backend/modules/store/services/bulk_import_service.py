@@ -44,7 +44,7 @@ class BulkImportService:
         for line in lines:
             # Splitear por tab
             cells = line.split('\t')
-            # Limpiar espacios extras
+            # Clean espacios extras
             cells = [cell.strip() for cell in cells]
             if any(cell for cell in cells):  # Si hay al menos una celda no vacía
                 rows.append(cells)
@@ -107,7 +107,7 @@ class BulkImportService:
         
         for idx, row in enumerate(parsed["rows"]):
             try:
-                # Extraer datos según mapeo
+                # Extract datos según mapeo
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
                 grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
