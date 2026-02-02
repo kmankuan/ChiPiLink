@@ -42,7 +42,7 @@ export default function AccountDashboard() {
   const [activeTab, setActiveTab] = useState(getInitialTab);
   const [walletBalance, setWalletBalance] = useState(null);
   
-  // Estado para dialog de transferencias
+  // State for transfers dialog
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [transferPreselectedUser, setTransferPreselectedUser] = useState(null);
 
@@ -70,58 +70,11 @@ export default function AccountDashboard() {
     fetchWalletBalance();
   }, [token]);
 
-  // Handler para abrir transferencia desde MisAcudidos
-  const handleTransferFromAcudido = (acudido) => {
-    setTransferPreselectedUser(acudido);
+  // Handler to open transfer from MyDependents
+  const handleTransferFromDependent = (dependent) => {
+    setTransferPreselectedUser(dependent);
     setShowTransferDialog(true);
   };
-
-  const texts = {
-    es: {
-      title: 'Mi Cuenta',
-      subtitle: 'Gestiona tu perfil, billetera, conexiones y más',
-      wallet: 'Wallet',
-      profile: 'Perfil',
-      membership: 'Membresía',
-      connections: 'Conexiones',
-      dependents: 'Acudidos',
-      capacities: 'Capacidades',
-      notifications: 'Notificaciones',
-      loginRequired: 'Debes iniciar sesión para acceder a esta sección',
-      login: 'Iniciar Sesión',
-      transfer: 'Transferir'
-    },
-    en: {
-      title: 'My Account',
-      subtitle: 'Manage your profile, wallet, connections and more',
-      wallet: 'Wallet',
-      profile: 'Profile',
-      membership: 'Membership',
-      connections: 'Connections',
-      dependents: 'Dependents',
-      capacities: 'Capacities',
-      notifications: 'Notifications',
-      loginRequired: 'You must log in to access this section',
-      login: 'Log In',
-      transfer: 'Transfer'
-    },
-    zh: {
-      title: '我的账户',
-      subtitle: '管理您的个人资料、钱包、连接等',
-      wallet: '钱包',
-      profile: '个人资料',
-      membership: '会员资格',
-      connections: '连接',
-      dependents: '受抚养人',
-      capacities: '能力',
-      notifications: '通知',
-      loginRequired: '您必须登录才能访问此部分',
-      login: '登录',
-      transfer: '转账'
-    }
-  };
-
-  const txt = texts[lang] || texts.es;
 
   if (loading) {
     return (
@@ -136,12 +89,12 @@ export default function AccountDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <User className="h-16 w-16 mx-auto text-muted-foreground" />
-          <h2 className="text-2xl font-bold">{txt.loginRequired}</h2>
+          <h2 className="text-2xl font-bold">{t('account.loginRequired')}</h2>
           <a 
             href="/login"
             className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
           >
-            {txt.login}
+            {t('account.login')}
             <ChevronRight className="h-4 w-4 ml-2" />
           </a>
         </div>
@@ -155,11 +108,11 @@ export default function AccountDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">{txt.title}</h1>
-            <p className="text-muted-foreground">{txt.subtitle}</p>
+            <h1 className="text-3xl font-bold">{t('account.title')}</h1>
+            <p className="text-muted-foreground">{t('account.subtitle')}</p>
           </div>
           
-          {/* Botón de transferencia rápida */}
+          {/* Quick transfer button */}
           <Button 
             onClick={() => {
               setTransferPreselectedUser(null);
@@ -169,19 +122,19 @@ export default function AccountDashboard() {
             data-testid="quick-transfer-btn"
           >
             <Send className="h-4 w-4" />
-            {txt.transfer}
+            {t('account.transfer')}
           </Button>
         </div>
 
-        {/* Alertas de saldo (bilateral) */}
+        {/* Balance alerts (bilateral) */}
         <div className="mb-6">
           <AlertasSaldo 
             token={token} 
-            onTransfer={handleTransferFromAcudido}
+            onTransfer={handleTransferFromDependent}
           />
         </div>
 
-        {/* Servicios sugeridos (marketing) */}
+        {/* Suggested services (marketing) */}
         <div className="mb-6">
           <ServiciosSugeridos token={token} />
         </div>
@@ -191,31 +144,31 @@ export default function AccountDashboard() {
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-8 h-auto gap-1 p-1">
             <TabsTrigger value="wallet" data-testid="wallet-tab" className="gap-1 text-xs sm:text-sm">
               <Wallet className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.wallet}</span>
+              <span className="hidden sm:inline">{t('account.wallet')}</span>
             </TabsTrigger>
             <TabsTrigger value="profile" data-testid="profile-tab" className="gap-1 text-xs sm:text-sm">
               <User className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.profile}</span>
+              <span className="hidden sm:inline">{t('account.profile')}</span>
             </TabsTrigger>
             <TabsTrigger value="membership" data-testid="membership-tab" className="gap-1 text-xs sm:text-sm">
               <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.membership}</span>
+              <span className="hidden sm:inline">{t('account.membership')}</span>
             </TabsTrigger>
             <TabsTrigger value="conexiones" data-testid="conexiones-tab" className="gap-1 text-xs sm:text-sm">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.connections}</span>
+              <span className="hidden sm:inline">{t('account.connections')}</span>
             </TabsTrigger>
             <TabsTrigger value="acudidos" data-testid="acudidos-tab" className="gap-1 text-xs sm:text-sm">
               <UserPlus className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.dependents}</span>
+              <span className="hidden sm:inline">{t('account.dependents')}</span>
             </TabsTrigger>
             <TabsTrigger value="capacidades" data-testid="capacidades-tab" className="gap-1 text-xs sm:text-sm">
               <Zap className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.capacities}</span>
+              <span className="hidden sm:inline">{t('account.capacities')}</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" data-testid="notifications-tab" className="gap-1 text-xs sm:text-sm">
               <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">{txt.notifications}</span>
+              <span className="hidden sm:inline">{t('account.notifications')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -238,7 +191,7 @@ export default function AccountDashboard() {
           <TabsContent value="acudidos">
             <MisAcudidos 
               token={token} 
-              onTransfer={handleTransferFromAcudido}
+              onTransfer={handleTransferFromDependent}
             />
           </TabsContent>
 
@@ -256,7 +209,7 @@ export default function AccountDashboard() {
         </Tabs>
       </div>
 
-      {/* Dialog de transferencias */}
+      {/* Transfers dialog */}
       <TransferenciasDialog
         open={showTransferDialog}
         onOpenChange={setShowTransferDialog}
