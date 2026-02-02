@@ -30,7 +30,7 @@ class FuseBaseDocument(BaseModel):
     """Referencia a documento de FuseBase (cache local)"""
     model_config = ConfigDict(extra="ignore")
     local_id: str = Field(default_factory=lambda: f"doc_{uuid.uuid4().hex[:12]}")
-    fusebase_id: str  # ID del documento en FuseBase
+    fusebase_id: str  # ID ofl documento en FuseBase
     # Info
     titulo: str
     descripcion: Optional[str] = None

@@ -120,7 +120,7 @@ class PointsEarnRule(BaseModel):
     name: Dict[str, str]
     description: Dict[str, str] = {}
     
-    # Tipo de acción que otorga puntos
+    # Type of acción que otorga puntos
     earn_type: PointsEarnType
     
     # Points a otorgar

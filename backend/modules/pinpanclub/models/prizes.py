@@ -56,7 +56,7 @@ class PrizeDefinition(BaseModel):
     icon: str = "🏆"
     
     # Value del premio
-    value: Optional[str] = None  # Descripción del valor (ej: "20% descuento")
+    value: Optional[str] = None  # Description ofl valor (ej: "20% descuento")
     points_value: int = 0        # Value en puntos si aplica
     
     # Condiciones para ganar
@@ -120,7 +120,7 @@ class AwardedPrize(BaseModel):
     status: PrizeStatus = PrizeStatus.CLAIMED
     
     # Detalles de otorgamiento
-    awarded_for: str  # Descripción de por qué se otorgó
+    awarded_for: str  # Description of por qué se otorgó
     position: Optional[int] = None  # Si fue por posición
     
     # Timestamps

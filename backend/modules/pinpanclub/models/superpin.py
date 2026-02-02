@@ -77,7 +77,7 @@ class ScoringConfig(BaseModel):
 class CheckInConfig(BaseModel):
     """Configuración de check-in"""
     method: CheckInMethod = CheckInMethod.MANUAL  # Legacy - mantener para compatibilidad
-    methods: List[str] = ["manual"]  # Lista de métodos permitidos
+    methods: List[str] = ["manual"]  # List of métodos permitidos
     require_referee: bool = False  # Requiere árbitro/testigo
     referee_can_be_player: bool = True  # Otro jugador puede ser árbitro
     
@@ -121,7 +121,7 @@ class PrizeConfig(BaseModel):
     description: Optional[str] = None
     position: Optional[int] = None  # 1, 2, 3, 4... o None para especiales
     special_type: Optional[str] = None  # 'mejor_progreso', 'mas_partidos', etc.
-    reward: Optional[str] = None  # Descripción del premio
+    reward: Optional[str] = None  # Description ofl premio
     icon: Optional[str] = None  # Emoji o URL de icono
 
 

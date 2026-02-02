@@ -43,7 +43,7 @@ class RankingSeason(BaseModel):
     name: Dict[str, str]       # Nombre multi-idioma {"es": "...", "en": "..."}
     description: Dict[str, str]  # Descripción multi-idioma
     season_type: SeasonType = SeasonType.MONTHLY
-    season_number: int = 1     # Número de temporada
+    season_number: int = 1     # Number of temporada
     
     # Fechas
     start_date: str            # ISO format

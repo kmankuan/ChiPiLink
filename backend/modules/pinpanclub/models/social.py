@@ -121,7 +121,7 @@ class ReactionSummary(BaseModel):
     target_id: str
     total: int = 0
     by_type: Dict[str, int] = {}  # {"clap": 10, "fire": 5}
-    user_reacted: Optional[str] = None  # Tipo de reacción del current user
+    user_reacted: Optional[str] = None  # Type of reacción del current user
 
 
 # ============== ACTIVITY FEED ==============

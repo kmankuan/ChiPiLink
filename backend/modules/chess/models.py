@@ -59,7 +59,7 @@ class ChessGame(ChessGameBase):
     razon_fin: Optional[str] = None  # jaque_mate, abandono, tiempo, tablas_acuerdo, etc.
     # Movimientos en notación algebraica
     pgn: Optional[str] = None  # Notación PGN completa
-    movimientos: List[str] = []  # Lista de movimientos
+    movimientos: List[str] = []  # List of movimientos
     posicion_actual: Optional[str] = None  # FEN de posición actual
     # Tiempos
     tiempo_blancas_ms: int = 600000  # Tiempo restante en milisegundos

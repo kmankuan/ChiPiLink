@@ -134,7 +134,7 @@ class WeeklyChallengeSet(BaseModel):
     year: int
     
     # Challenges de la semana
-    challenges: List[str] = []  # Lista de challenge_ids
+    challenges: List[str] = []  # List of challenge_ids
     
     # Statistics
     total_participants: int = 0

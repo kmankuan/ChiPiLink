@@ -12,7 +12,7 @@ class CXGenieConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
     config_id: str = "cxgenie_main"
     # Widget Configuration
-    widget_id: Optional[str] = None  # ID del widget de CXGenie
+    widget_id: Optional[str] = None  # ID ofl widget de CXGenie
     widget_script_url: Optional[str] = None  # URL del script
     embed_code: Optional[str] = None  # Código de embed completo
     # API Configuration (para panel de agentes)

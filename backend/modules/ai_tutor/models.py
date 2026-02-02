@@ -102,7 +102,7 @@ class LessonPlan(BaseModel):
     nivel: str
     idioma: str
     # Items del plan
-    items: List[str] = []  # Lista de item_ids
+    items: List[str] = []  # List of item_ids
     duracion_estimada_minutos: int = 15
     # Estado
     completado: bool = False

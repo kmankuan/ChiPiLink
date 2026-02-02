@@ -86,7 +86,7 @@ class ContentPlaylist(BaseModel):
     descripcion: Optional[str] = None
     imagen_portada: Optional[str] = None
     categoria_id: Optional[str] = None  # Categoría principal
-    items: List[str] = []  # Lista de content_ids
+    items: List[str] = []  # List of content_ids
     publicada: bool = True
     orden: int = 0
     fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

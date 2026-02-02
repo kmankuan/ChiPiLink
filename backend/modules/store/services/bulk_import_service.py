@@ -308,7 +308,7 @@ class BulkImportService:
             column_mapping: Mapeo de campos a índices de columna
                 {
                     "codigo": 0,           # Código del libro
-                    "nombre": 1,           # Nombre del libro
+                    "nombre": 1,           # Name ofl libro
                     "precio": 2,           # Precio
                     "editorial": 3,        # Editorial (opcional)
                     "isbn": 4,             # ISBN (opcional)

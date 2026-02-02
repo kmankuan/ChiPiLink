@@ -177,7 +177,7 @@ class Invitacion(BaseModel):
     creado_en: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     expira_en: Optional[str] = None
     aceptado_en: Optional[str] = None
-    usuario_creado_id: Optional[str] = None  # ID del usuario cuando se registre
+    usuario_creado_id: Optional[str] = None  # ID ofl usuario cuando se registre
 
 
 class InvitacionCreate(BaseModel):
@@ -212,7 +212,7 @@ class CapacidadConfig(BaseModel):
     icono: str = "⚡"
     color: str = "#6366f1"
     tipo: TipoCapacidad
-    membresia_requerida: Optional[str] = None   # ID de membresía si requiere
+    membresia_requerida: Optional[str] = None   # ID of membresía si requiere
     auto_asignar_a: List[str] = []              # ["suscriptor", "acudido"]
     puede_extender_a: List[str] = []            # ["acudiente"] - admin puede extender
     requiere_aprobacion: bool = False
