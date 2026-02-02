@@ -185,22 +185,22 @@ async def yappy_ipn_callback(
     
     # Update order status in database
     status_map = {
-        "E": "pagado",
-        "R": "pago_rechazado",
-        "C": "pago_cancelado",
-        "X": "pago_expirado"
+        "E": "paid",
+        "R": "payment_rejected",
+        "C": "payment_cancelled",
+        "X": "payment_expired"
     }
     
-    new_status = status_map.get(status, "pendiente")
+    new_status = status_map.get(status, "pending")
     
-    await db.pedidos.update_one(
-        {"pedido_id": orderId},
+    await db.store_orders.update_one(
+        {"order_id": orderId},
         {
             "$set": {
-                "estado_pago": new_status,
+                "payment_status": new_status,
                 "yappy_status": status,
-                "yappy_status_descripcion": YappyService.get_status_description(status),
-                "fecha_actualizacion_pago": datetime.now(timezone.utc).isoformat()
+                "yappy_status_description": YappyService.get_status_description(status),
+                "payment_updated_at": datetime.now(timezone.utc).isoformat()
             }
         }
     )
