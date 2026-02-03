@@ -141,7 +141,10 @@ async def preview_csv_import(
         for row_num, row in enumerate(reader, start=2):  # Start at 2 (1 is header)
             codigo = row.get('codigo', '').strip()
             nombre = row.get('nombre', '').strip()
-            grado = row.get('grado', '').strip()
+            grado_raw = row.get('grado', '').strip()
+            
+            # Parse grades (supports comma-separated multiple grades)
+            grado, grados = parse_grades(grado_raw)
             
             # Validate required fields
             if not codigo:
@@ -192,6 +195,7 @@ async def preview_csv_import(
                 "codigo": codigo,
                 "nombre": nombre,
                 "grado": grado,
+                "grados": grados,
                 "cantidad_csv": cantidad,
                 "precio": precio,
                 "action": action,
