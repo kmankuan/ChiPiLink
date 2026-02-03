@@ -317,7 +317,7 @@ async def execute_csv_import(
                     )
                     updated += 1
                 else:
-                    # Create new product
+                    # Create new product in libros collection (private catalog)
                     libro_id = f"libro_{datetime.now().strftime('%Y%m%d%H%M%S')}_{created:04d}"
                     
                     new_product = {
@@ -335,13 +335,13 @@ async def execute_csv_import(
                         "imagen_url": None,
                         "activo": True,
                         "destacado": False,
-                        "catalogo_tipo": "privado",
+                        "es_catalogo_privado": True,
                         "created_at": now,
                         "created_by": admin.get("user_id"),
                         "updated_at": now
                     }
                     
-                    await db.productos_privados.insert_one(new_product)
+                    await db.libros.insert_one(new_product)
                     created += 1
                     
             except Exception as e:
