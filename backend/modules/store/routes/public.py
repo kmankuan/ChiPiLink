@@ -15,7 +15,7 @@ router = APIRouter(prefix="/public", tags=["Store - Public"])
 
 
 @router.get("/products")
-async def get_public_products(grado: Optional[str] = None):
+async def get_public_products(grade: Optional[str] = None):
     """Get productos para formulario public - sin authentication"""
     products = await product_service.get_all_products(grado=grado)
     
@@ -77,19 +77,19 @@ async def get_grades():
     """Get grados disponibles"""
     return {
         "grades": [
-            {"id": "preescolar", "nombre": "Preescolar"},
-            {"id": "1", "nombre": "1er Grado"},
-            {"id": "2", "nombre": "2do Grado"},
-            {"id": "3", "nombre": "3er Grado"},
-            {"id": "4", "nombre": "4to Grado"},
-            {"id": "5", "nombre": "5to Grado"},
-            {"id": "6", "nombre": "6to Grado"},
-            {"id": "7", "nombre": "7mo Grado"},
-            {"id": "8", "nombre": "8vo Grado"},
-            {"id": "9", "nombre": "9no Grado"},
-            {"id": "10", "nombre": "10mo Grado"},
-            {"id": "11", "nombre": "11vo Grado"},
-            {"id": "12", "nombre": "12vo Grado"},
+            {"id": "preescolar", "name": "Preescolar"},
+            {"id": "1", "name": "1er Grado"},
+            {"id": "2", "name": "2do Grado"},
+            {"id": "3", "name": "3er Grado"},
+            {"id": "4", "name": "4to Grado"},
+            {"id": "5", "name": "5to Grado"},
+            {"id": "6", "name": "6to Grado"},
+            {"id": "7", "name": "7mo Grado"},
+            {"id": "8", "name": "8vo Grado"},
+            {"id": "9", "name": "9no Grado"},
+            {"id": "10", "name": "10mo Grado"},
+            {"id": "11", "name": "11vo Grado"},
+            {"id": "12", "name": "12vo Grado"},
         ]
     }
 
@@ -99,15 +99,15 @@ async def get_subjects():
     """Get materias disponibles"""
     return {
         "materias": [
-            {"id": "matematicas", "nombre": "Mathematics"},
-            {"id": "espanol", "nombre": "Espyearl"},
-            {"id": "ciencias", "nombre": "Ciencias"},
-            {"id": "sociales", "nombre": "Estudios Sociales"},
-            {"id": "ingles", "nombre": "English"},
-            {"id": "arte", "nombre": "Arte"},
-            {"id": "musica", "nombre": "Music"},
-            {"id": "educacion_fisica", "nombre": "Education Physics"},
-            {"id": "tecnologia", "nombre": "Technology"},
-            {"id": "religion", "nombre": "Religion"},
+            {"id": "matematicas", "name": "Mathematics"},
+            {"id": "espanol", "name": "Espyearl"},
+            {"id": "ciencias", "name": "Ciencias"},
+            {"id": "sociales", "name": "Estudios Sociales"},
+            {"id": "ingles", "name": "English"},
+            {"id": "arte", "name": "Arte"},
+            {"id": "musica", "name": "Music"},
+            {"id": "educacion_fisica", "name": "Education Physics"},
+            {"id": "tecnologia", "name": "Technology"},
+            {"id": "religion", "name": "Religion"},
         ]
     }

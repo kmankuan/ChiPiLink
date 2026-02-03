@@ -204,9 +204,9 @@ async def get_sync_stats(admin: dict = Depends(get_admin_user)):
     match_repo = MatchRepository()
     
     # Contar jugadores
-    total_players = await player_repo.count({"activo": True})
+    total_players = await player_repo.count({"active": True})
     synced_players = await player_repo.count({
-        "activo": True,
+        "active": True,
         "monday_item_id": {"$exists": True, "$ne": None}
     })
     

@@ -135,7 +135,7 @@ class PrizeService(BaseService):
                 "value": prize.get("value")
             },
             "jugador_info": {
-                "nombre": player.get("nombre"),
+                "name": player.get("name"),
                 "apodo": player.get("apodo")
             } if player else None,
             "awarded_for": awarded_for,

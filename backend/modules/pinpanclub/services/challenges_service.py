@@ -174,7 +174,7 @@ class ChallengeService(BaseService):
                 "points_reward": challenge.get("points_reward")
             },
             "jugador_info": {
-                "nombre": player.get("nombre"),
+                "name": player.get("name"),
                 "apodo": player.get("apodo")
             } if player else None,
             "target_value": challenge.get("target_value", 0),
@@ -249,7 +249,7 @@ class ChallengeService(BaseService):
         player = await self.player_repo.get_by_id(jugador_id)
         lb_entry = await self.leaderboard_repo.get_or_create(
             jugador_id,
-            {"nombre": player.get("nombre"), "apodo": player.get("apodo")} if player else None
+            {"name": player.get("name"), "apodo": player.get("apodo")} if player else None
         )
         
         await self.leaderboard_repo.update_stats(

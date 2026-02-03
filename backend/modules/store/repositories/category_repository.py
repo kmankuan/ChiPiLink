@@ -21,12 +21,12 @@ class CategoryRepository(BaseRepository):
     
     # Default categories
     DEFAULT_CATEGORIES = [
-        {"categoria_id": "libros", "nombre": "Libros", "icono": "📚", "orden": 1, "activo": True},
-        {"categoria_id": "snacks", "nombre": "Snacks", "icono": "🍫", "orden": 2, "activo": True},
-        {"categoria_id": "bebidas", "nombre": "Bebidas", "icono": "🥤", "orden": 3, "activo": True},
-        {"categoria_id": "preparados", "nombre": "Preparados", "icono": "🌭", "orden": 4, "activo": True},
-        {"categoria_id": "uniformes", "nombre": "Uniformes", "icono": "👕", "orden": 5, "activo": True},
-        {"categoria_id": "servicios", "nombre": "Servicios", "icono": "🔧", "orden": 6, "activo": True},
+        {"categoria_id": "libros", "name": "Libros", "icono": "📚", "orden": 1, "active": True},
+        {"categoria_id": "snacks", "name": "Snacks", "icono": "🍫", "orden": 2, "active": True},
+        {"categoria_id": "bebidas", "name": "Bebidas", "icono": "🥤", "orden": 3, "active": True},
+        {"categoria_id": "preparados", "name": "Preparados", "icono": "🌭", "orden": 4, "active": True},
+        {"categoria_id": "uniformes", "name": "Uniformes", "icono": "👕", "orden": 5, "active": True},
+        {"categoria_id": "servicios", "name": "Servicios", "icono": "🔧", "orden": 6, "active": True},
     ]
     
     def __init__(self):
@@ -46,7 +46,7 @@ class CategoryRepository(BaseRepository):
     async def get_all_active(self) -> List[Dict]:
         """Get all categorys activas"""
         categories = await self.find_many(
-            query={"activo": True},
+            query={"active": True},
             sort=[("orden", 1)]
         )
         # Return defaults if no categories exist
@@ -60,11 +60,11 @@ class CategoryRepository(BaseRepository):
     
     async def deactivate(self, categoria_id: str) -> bool:
         """Desactivar category"""
-        return await self.update_category(categoria_id, {"activo": False})
+        return await self.update_category(categoria_id, {"active": False})
     
     async def count_products(self, categoria_id: str) -> int:
         """Contar productos en una category"""
         return await db[StoreCollections.PRODUCTS].count_documents({
             "categoria": categoria_id,
-            "activo": True
+            "active": True
         })

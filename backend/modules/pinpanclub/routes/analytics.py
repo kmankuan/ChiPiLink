@@ -98,7 +98,7 @@ async def get_analytics_dashboard():
         if player:
             top_active_players.append({
                 "jugador_id": entry["_id"],
-                "nombre": player.get("nombre"),
+                "name": player.get("name"),
                 "apodo": player.get("apodo"),
                 "matches_count": entry["matches_count"]
             })
@@ -115,7 +115,7 @@ async def get_analytics_dashboard():
         recent_achievements.append({
             "name": badge.get("name"),
             "icon": badge.get("icon"),
-            "player_name": player.get("apodo") or player.get("nombre") if player else "Unknown"
+            "player_name": player.get("apodo") or player.get("name") if player else "Unknown"
         })
     
     # Challenge leaderboard
@@ -127,7 +127,7 @@ async def get_analytics_dashboard():
     for entry in challenge_lb:
         player = await db.pingpong_players.find_one({"jugador_id": entry.get("jugador_id")}, {"_id": 0})
         entry["jugador_info"] = {
-            "nombre": player.get("nombre") if player else "?",
+            "name": player.get("name") if player else "?",
             "apodo": player.get("apodo") if player else None
         }
     
@@ -175,7 +175,7 @@ async def get_analytics_dashboard():
     # New players this week
     new_players = await db.pingpong_players.find(
         {"created_at": {"$gte": week_ago.isoformat()}},
-        {"_id": 0, "nombre": 1, "apodo": 1}
+        {"_id": 0, "name": 1, "apodo": 1}
     ).limit(5).to_list(length=5)
     
     # Activity ranking
@@ -191,7 +191,7 @@ async def get_analytics_dashboard():
         })
         activity_ranking.append({
             "jugador_id": player.get("jugador_id"),
-            "nombre": player.get("nombre"),
+            "name": player.get("name"),
             "apodo": player.get("apodo"),
             "elo_rating": player.get("elo_rating", 1000),
             "matches_this_week": matches_week
@@ -257,7 +257,7 @@ async def get_analytics_summary():
         player = await db.pingpong_players.find_one({"jugador_id": entry["_id"]}, {"_id": 0})
         if player:
             top_players.append({
-                "nombre": player.get("apodo") or player.get("nombre"),
+                "name": player.get("apodo") or player.get("name"),
                 "matches": entry["matches_count"]
             })
     

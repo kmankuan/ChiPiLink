@@ -31,7 +31,7 @@ class AuthConfigRequest(BaseModel):
     
     # Registration fields config
     registration_fields: Dict = {
-        "nombre": {"required": True, "visible": True},
+        "name": {"required": True, "visible": True},
         "email": {"required": True, "visible": True},
         "telefono": {"required": False, "visible": True},
         "direccion": {"required": False, "visible": False},  # Hidden by default, captured via geolocation
@@ -66,7 +66,7 @@ async def get_auth_config(admin: dict = Depends(get_admin_user)):
             "facebook": {"enabled": False, "visible": False, "label": None, "order": 3},
             "apple": {"enabled": False, "visible": False, "label": None, "order": 4},
             "registration_fields": {
-                "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
+                "name": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Address"},
@@ -123,7 +123,7 @@ async def get_public_auth_config():
                 {"id": "google", "enabled": True, "visible": True, "label": "Continuar con Google", "order": 2}
             ],
             "registration_fields": {
-                "nombre": {"required": True, "visible": True, "label": "Nombre completo"},
+                "name": {"required": True, "visible": True, "label": "Nombre completo"},
                 "email": {"required": True, "visible": True, "label": "Correo electronic"},
                 "telefono": {"required": False, "visible": True, "label": "Phone"},
                 "direccion": {"required": False, "visible": False, "label": "Address"},

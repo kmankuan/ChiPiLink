@@ -23,7 +23,7 @@ class SponsorRepository(BaseRepository):
     async def create(self, sponsor_data: Dict) -> Dict:
         """Create nuevo patrocinador"""
         sponsor_data["sponsor_id"] = str(uuid.uuid4())
-        sponsor_data["activo"] = True
+        sponsor_data["active"] = True
         return await self.insert_one(sponsor_data)
     
     async def get_by_id(self, sponsor_id: str) -> Optional[Dict]:
@@ -33,14 +33,14 @@ class SponsorRepository(BaseRepository):
     async def get_all_active(self) -> List[Dict]:
         """Get todos los patrocinadores activos"""
         return await self.find_many(
-            query={"activo": True},
+            query={"active": True},
             sort=[("orden", 1)]
         )
     
     async def get_by_position(self, posicion: str) -> List[Dict]:
         """Get patrocinadores por position"""
         return await self.find_many(
-            query={"activo": True, "posicion": posicion},
+            query={"active": True, "posicion": posicion},
             sort=[("orden", 1)]
         )
     
@@ -50,7 +50,7 @@ class SponsorRepository(BaseRepository):
     
     async def deactivate(self, sponsor_id: str) -> bool:
         """Desactivar patrocinador"""
-        return await self.update_sponsor(sponsor_id, {"activo": False})
+        return await self.update_sponsor(sponsor_id, {"active": False})
     
     async def reorder(self, sponsor_id: str, new_order: int) -> bool:
         """Cambiar orden de patrocinador"""

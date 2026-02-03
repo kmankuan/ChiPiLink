@@ -192,7 +192,7 @@ class AchievementsService(BaseService):
         # Get player info
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
-            {"_id": 0, "nombre": 1, "apodo": 1}
+            {"_id": 0, "name": 1, "apodo": 1}
         )
         
         player_achievement = {
@@ -207,7 +207,7 @@ class AchievementsService(BaseService):
                 "points_reward": achievement.get("points_reward", 0)
             },
             "jugador_info": {
-                "nombre": player.get("nombre") if player else None,
+                "name": player.get("name") if player else None,
                 "apodo": player.get("apodo") if player else None
             },
             "earned_at": now,

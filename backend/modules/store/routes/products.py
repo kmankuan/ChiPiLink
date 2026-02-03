@@ -16,8 +16,8 @@ router = APIRouter(prefix="/products", tags=["Store - Products"])
 @router.get("", response_model=List[Product])
 async def get_products(
     categoria: Optional[str] = None,
-    grado: Optional[str] = None,
-    materia: Optional[str] = None,
+    grade: Optional[str] = None,
+    subject: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(500, ge=1, le=1000)
 ):
@@ -67,14 +67,14 @@ async def search_products(q: str = Query(..., min_length=2)):
 @router.get("/grades")
 async def get_available_grades():
     """Get available grades for filtering"""
-    grados = await db.libros.distinct("grade", {"activo": True})
+    grados = await db.libros.distinct("grade", {"active": True})
     return {"grades": sorted([g for g in grados if g])}
 
 
 @router.get("/subjects")
 async def get_available_subjects():
     """Get available subjects for filtering"""
-    materias = await db.libros.distinct("subject", {"activo": True})
+    materias = await db.libros.distinct("subject", {"active": True})
     return {"materias": sorted([m for m in materias if m])}
 
 
@@ -124,7 +124,7 @@ async def deactivate_product(
 @router.put("/{libro_id}/featured")
 async def toggle_featured(
     libro_id: str,
-    destacado: bool,
+    featured: bool,
     orden: int = 0,
     admin: dict = Depends(get_admin_user)
 ):

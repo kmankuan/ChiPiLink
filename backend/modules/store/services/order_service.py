@@ -42,7 +42,7 @@ class OrderService(BaseService):
                 raise ValueError(f"Producto {item.libro_id} not found")
             if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
-            total += item.cantidad * item.precio_unitario
+            total += item.cantidad * item.price_unitario
         
         # Create documento dthe order
         order_dict = {
@@ -94,20 +94,20 @@ class OrderService(BaseService):
                 raise ValueError(f"Producto {item.libro_id} not found")
             if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
-            total += item.cantidad * item.precio_unitario
+            total += item.cantidad * item.price_unitario
             items_validados.append(item.model_dump())
         
-        nombre_completo = f"{data.nombre_estudiante} {data.apellido_estudiante}"
+        nombre_completo = f"{data.name_estudiante} {data.apellido_estudiante}"
         
         order_dict = {
             "tipo": "publico",
             "user_id": None,
-            "nombre_acudiente": data.nombre_acudiente,
+            "nombre_acudiente": data.name_acudiente,
             "telefono_acudiente": data.telefono_acudiente,
             "email_acudiente": data.email_acudiente,
             "estudiante_id": None,
             "estudiante_nombre": nombre_completo,
-            "estudiante_primer_nombre": data.nombre_estudiante,
+            "estudiante_primer_nombre": data.name_estudiante,
             "estudiante_apellido": data.apellido_estudiante,
             "grado_estudiante": data.grade_estudiante,
             "email_estudiante": data.email_estudiante,
@@ -134,7 +134,7 @@ class OrderService(BaseService):
                 "pedido_id": result["pedido_id"],
                 "tipo": "publico",
                 "total": total,
-                "acudiente": data.nombre_acudiente
+                "acudiente": data.name_acudiente
             },
             priority=EventPriority.HIGH
         )

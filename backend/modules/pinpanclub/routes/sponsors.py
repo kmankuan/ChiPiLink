@@ -37,13 +37,13 @@ class DisplayAnimation(str, Enum):
     PULSE = "pulse"
 
 class SponsorCreate(BaseModel):
-    nombre: str = Field(..., description="Nombre del patrocinador")
+    name: str = Field(..., description="Nombre del patrocinador")
     tipo: SponsorType = Field(default=SponsorType.PRIMARY)
     posicion: SponsorPosition = Field(default=SponsorPosition.BANNER_BOTTOM)
     logo_url: Optional[str] = None
     logo_base64: Optional[str] = None
     website_url: Optional[str] = None
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     
     # Design y estilo
     color_fondo: str = Field(default="#000000")
@@ -62,7 +62,7 @@ class SponsorCreate(BaseModel):
     orden: int = Field(default=0, description="Orden en la rotation")
     
     # Status
-    activo: bool = True
+    active: bool = True
     fecha_inicio: Optional[datetime] = None
     fecha_fin: Optional[datetime] = None
     
@@ -72,13 +72,13 @@ class SponsorCreate(BaseModel):
     tamano_logo: str = Field(default="medium")  # small, medium, large, full
 
 class SponsorUpdate(BaseModel):
-    nombre: Optional[str] = None
+    name: Optional[str] = None
     tipo: Optional[SponsorType] = None
     posicion: Optional[SponsorPosition] = None
     logo_url: Optional[str] = None
     logo_base64: Optional[str] = None
     website_url: Optional[str] = None
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     color_fondo: Optional[str] = None
     color_texto: Optional[str] = None
     color_acento: Optional[str] = None
@@ -89,17 +89,17 @@ class SponsorUpdate(BaseModel):
     duracion_animacion: Optional[int] = None
     duracion_display: Optional[int] = None
     orden: Optional[int] = None
-    activo: Optional[bool] = None
+    active: Optional[bool] = None
     fecha_inicio: Optional[datetime] = None
     fecha_fin: Optional[datetime] = None
     texto_promocional: Optional[str] = None
-    mostrar_nombre: Optional[bool] = None
+    mostrar_name: Optional[bool] = None
     tamano_logo: Optional[str] = None
 
 class SponsorSpaceConfig(BaseModel):
     """Configuration de un espacio publicitario"""
     space_id: str
-    nombre: str
+    name: str
     posicion: SponsorPosition
     ancho: str = Field(default="100%")
     alto: str = Field(default="80px")
@@ -131,7 +131,7 @@ class TVLayoutConfig(BaseModel):
 DEFAULT_SPONSOR_SPACES = [
     {
         "space_id": "header_left",
-        "nombre": "Patrocinador Especial Izquierdo",
+        "name": "Patrocinador Especial Izquierdo",
         "posicion": "header_left",
         "ancho": "150px",
         "alto": "60px",
@@ -142,7 +142,7 @@ DEFAULT_SPONSOR_SPACES = [
     },
     {
         "space_id": "header_right",
-        "nombre": "Patrocinador Especial Derecho",
+        "name": "Patrocinador Especial Derecho",
         "posicion": "header_right",
         "ancho": "150px",
         "alto": "60px",
@@ -153,7 +153,7 @@ DEFAULT_SPONSOR_SPACES = [
     },
     {
         "space_id": "banner_bottom",
-        "nombre": "Banner Principal Inferior",
+        "name": "Banner Principal Inferior",
         "posicion": "banner_bottom",
         "ancho": "100%",
         "alto": "100px",
@@ -167,7 +167,7 @@ DEFAULT_SPONSOR_SPACES = [
     },
     {
         "space_id": "banner_top",
-        "nombre": "Banner Superior",
+        "name": "Banner Superior",
         "posicion": "banner_top",
         "ancho": "100%",
         "alto": "80px",
@@ -206,7 +206,7 @@ async def crear_patrocinador(sponsor: SponsorCreate):
 async def listar_patrocinadores(
     tipo: Optional[SponsorType] = None,
     posicion: Optional[SponsorPosition] = None,
-    activo: Optional[bool] = None
+    active: Optional[bool] = None
 ):
     """List todos los patrocinadores"""
     from main import db
@@ -217,7 +217,7 @@ async def listar_patrocinadores(
     if posicion:
         query["posicion"] = posicion
     if activo is not None:
-        query["activo"] = activo
+        query["active"] = activo
     
     # Filter by date validity
     now = datetime.now(timezone.utc)
@@ -398,7 +398,7 @@ async def obtener_sponsors_para_tv():
     
     # Get all active sponsors
     sponsors = await db.pingpong_sponsors.find(
-        {"activo": True},
+        {"active": True},
         {"_id": 0}
     ).sort("orden", 1).to_list(100)
     
@@ -502,13 +502,13 @@ async def reordenar_patrocinadores(ordenes: Dict[str, int]):
 
 
 @router.post("/bulk/toggle")
-async def toggle_patrocinadores(sponsor_ids: List[str], activo: bool):
+async def toggle_patrocinadores(sponsor_ids: List[str], active: bool):
     """Activar/desactivar multiple patrocinadores"""
     from main import db
     
     result = await db.pingpong_sponsors.update_many(
         {"sponsor_id": {"$in": sponsor_ids}},
-        {"$set": {"activo": activo}}
+        {"$set": {"active": activo}}
     )
     
     return {"success": True, "modified": result.modified_count}

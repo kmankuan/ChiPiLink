@@ -146,7 +146,7 @@ class BulkImportService:
                     "fila": idx + 2,
                     "numero_estudiante": numero,
                     "nombre_completo": nombre_completo,
-                    "nombre": nombre,
+                    "name": nombre,
                     "apellido": apellido,
                     "grade": str(grado),
                     "seccion": seccion,
@@ -178,7 +178,7 @@ class BulkImportService:
         raw_text: str,
         column_mapping: Dict[str, int],
         grado_default: str = None,
-        hoja_nombre: str = "Import Manual",
+        hoja_name: str = "Import Manual",
         actualizar_existentes: bool = True,
         admin_id: str = None
     ) -> Dict:
@@ -238,13 +238,13 @@ class BulkImportService:
                 estudiante_data = {
                     "numero_estudiante": numero,
                     "nombre_completo": nombre_completo,
-                    "nombre": nombre,
+                    "name": nombre,
                     "apellido": apellido,
                     "grade": str(grado),
                     "seccion": seccion,
                     "hoja_nombre": hoja_nombre,
                     "fila_numero": idx + 2,
-                    "estado": "activo",
+                    "estado": "active",
                     "import_id": import_id,
                     "fecha_sync": now,
                     "updated_at": now
@@ -308,9 +308,9 @@ class BulkImportService:
             column_mapping: Mapeo de campos a indexs de columna
                 {
                     "code": 0,           # Code del libro
-                    "nombre": 1,           # Name ofl libro
-                    "precio": 2,           # Precio
-                    "editorial": 3,        # Editorial (opcional)
+                    "name": 1,           # Name ofl libro
+                    "price": 2,           # Precio
+                    "publisher": 3,        # Editorial (opcional)
                     "isbn": 4,             # ISBN (opcional)
                     "grade": 5,            # Grado (opcional si hay default)
                     "subject": 6           # Materia (opcional)
@@ -332,9 +332,9 @@ class BulkImportService:
         for idx, row in enumerate(parsed["rows"]):
             try:
                 codigo = self._get_cell(row, column_mapping.get("code"))
-                nombre = self._get_cell(row, column_mapping.get("nombre"))
-                precio_str = self._get_cell(row, column_mapping.get("precio"))
-                editorial = self._get_cell(row, column_mapping.get("editorial"))
+                nombre = self._get_cell(row, column_mapping.get("name"))
+                precio_str = self._get_cell(row, column_mapping.get("price"))
+                editorial = self._get_cell(row, column_mapping.get("publisher"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
                 grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 materia = self._get_cell(row, column_mapping.get("subject"))
@@ -366,9 +366,9 @@ class BulkImportService:
                 preview.append({
                     "fila": idx + 2,
                     "code": codigo,
-                    "nombre": nombre,
-                    "precio": precio,
-                    "editorial": editorial,
+                    "name": nombre,
+                    "price": precio,
+                    "publisher": editorial,
                     "isbn": isbn,
                     "grade": grado,
                     "subject": materia,
@@ -430,9 +430,9 @@ class BulkImportService:
         for idx, row in enumerate(parsed["rows"]):
             try:
                 codigo = self._get_cell(row, column_mapping.get("code"))
-                nombre = self._get_cell(row, column_mapping.get("nombre"))
-                precio_str = self._get_cell(row, column_mapping.get("precio"))
-                editorial = self._get_cell(row, column_mapping.get("editorial"))
+                nombre = self._get_cell(row, column_mapping.get("name"))
+                precio_str = self._get_cell(row, column_mapping.get("price"))
+                editorial = self._get_cell(row, column_mapping.get("publisher"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
                 grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 materia = self._get_cell(row, column_mapping.get("subject"))
@@ -461,13 +461,13 @@ class BulkImportService:
                 
                 libro_data = {
                     "code": codigo,
-                    "nombre": nombre,
-                    "precio": precio,
-                    "editorial": editorial,
+                    "name": nombre,
+                    "price": precio,
+                    "publisher": editorial,
                     "isbn": isbn,
                     "subject": materia,
                     "categoria": "texto_escolar",
-                    "activo": True,
+                    "active": True,
                     "estado_disponibilidad": "disponible",
                     "import_id": import_id,
                     "updated_at": now
@@ -543,7 +543,7 @@ class BulkImportService:
     async def get_grados_disponibles(self) -> List[str]:
         """Get lista de grados uniques de estudiantes importados"""
         pipeline = [
-            {"$match": {"estado": "activo"}},
+            {"$match": {"estado": "active"}},
             {"$group": {"_id": "$grado"}},
             {"$sort": {"_id": 1}}
         ]

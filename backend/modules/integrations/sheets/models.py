@@ -29,7 +29,7 @@ class ConfiguracionSheetSync(BaseModel):
     """Google Sheet sync configuration"""
     model_config = ConfigDict(extra="ignore")
     config_id: str = Field(default_factory=lambda: f"sheet_cfg_{uuid.uuid4().hex[:8]}")
-    nombre: str  # Config name (e.g., "Matr\u00edculas 2025")
+    name: str  # Config name (e.g., "Matr\u00edculas 2025")
     sheet_url: str  # Google Sheet URL
     sheet_id: str  # Extracted sheet ID
     gid: str = "0"  # Specific tab GID
@@ -57,5 +57,5 @@ class EstudianteSincronizado(BaseModel):
     fila_original: int  # Original row number
     datos: Dict  # Mapped data
     hash_datos: str  # Hash for change detection
-    estado: str = "activo"  # activo, eliminado
+    estado: str = "active"  # activo, eliminado
     fecha_sincronizacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

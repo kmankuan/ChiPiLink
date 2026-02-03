@@ -22,7 +22,7 @@ class FuseBaseConfig(BaseModel):
     tema: str = "light"  # light, dark, auto
     mostrar_navegacion: bool = True
     # Status
-    activo: bool = False
+    active: bool = False
     fecha_configuracion: Optional[datetime] = None
 
 
@@ -33,7 +33,7 @@ class FuseBaseDocument(BaseModel):
     fusebase_id: str  # ID ofl documento en FuseBase
     # Info
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     tipo: str = "documento"  # documento, wiki, nota, tarea
     url_embed: Optional[str] = None
     url_directo: Optional[str] = None
@@ -50,8 +50,8 @@ class FuseBaseCategory(BaseModel):
     """Category para organizar documentos"""
     model_config = ConfigDict(extra="ignore")
     category_id: str = Field(default_factory=lambda: f"fb_cat_{uuid.uuid4().hex[:8]}")
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     icono: Optional[str] = None
     orden: int = 0
-    activo: bool = True
+    active: bool = True

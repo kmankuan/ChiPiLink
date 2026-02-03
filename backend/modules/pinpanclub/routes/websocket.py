@@ -250,11 +250,11 @@ async def send_match_state(client_id: str, match_id: str):
         # Get player info
         player_a = await db.pingpong_players.find_one(
             {"jugador_id": match["jugador_a_id"]},
-            {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
+            {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
         )
         player_b = await db.pingpong_players.find_one(
             {"jugador_id": match["jugador_b_id"]},
-            {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
+            {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
         )
         
         match["jugador_a_info"] = player_a
@@ -279,11 +279,11 @@ async def send_all_active_matches(client_id: str):
     for match in matches:
         player_a = await db.pingpong_players.find_one(
             {"jugador_id": match["jugador_a_id"]},
-            {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+            {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
         )
         player_b = await db.pingpong_players.find_one(
             {"jugador_id": match["jugador_b_id"]},
-            {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+            {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
         )
         match["jugador_a_info"] = player_a
         match["jugador_b_info"] = player_b
@@ -454,11 +454,11 @@ async def handle_point(match_id: str, data: dict, arbiter_id: str):
     
     player_a = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_a_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
     )
     player_b = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_b_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1, "elo_rating": 1}
     )
     
     updated_match["jugador_a_info"] = player_a
@@ -540,11 +540,11 @@ async def handle_undo(match_id: str, arbiter_id: str):
     
     player_a = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_a_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
     )
     player_b = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_b_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
     )
     
     updated_match["jugador_a_info"] = player_a
@@ -574,11 +574,11 @@ async def handle_start_match(match_id: str, arbiter_id: str):
     
     player_a = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_a_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
     )
     player_b = await db.pingpong_players.find_one(
         {"jugador_id": updated_match["jugador_b_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1, "foto_url": 1}
     )
     
     updated_match["jugador_a_info"] = player_a

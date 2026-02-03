@@ -91,7 +91,7 @@ async def create_tutor_session(session_data: dict, user: dict = Depends(get_curr
     session = {
         "session_id": f"tutor_{uuid.uuid4().hex[:12]}",
         "estudiante_id": user.get("user_id"),
-        "estudiante_nombre": user.get("nombre"),
+        "estudiante_nombre": user.get("name"),
         "tema": session_data.get("tema", "vocabulario_ingles"),
         "subtema": session_data.get("subtema"),
         "nivel": session_data.get("nivel", "basico"),

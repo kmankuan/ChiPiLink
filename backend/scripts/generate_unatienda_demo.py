@@ -43,7 +43,7 @@ def generate_isbn():
     return f"978-{random.randint(1000, 9999)}-{random.randint(100, 999)}-{random.randint(10, 99)}"
 
 
-def get_materias_for_grado(grado: str) -> List[str]:
+def get_materias_for_grado(grade: str) -> List[str]:
     """Get subjects for a grade level"""
     if grado in ["Pre-Kinder", "Kinder"]:
         return ["Apresto", "English"]
@@ -74,20 +74,20 @@ async def generate_catalog_products() -> List[Dict]:
             product = {
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "code": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
-                "nombre": f"{materia} {grado} - {editorial}",
-                "descripcion": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
+                "name": f"{materia} {grado} - {editorial}",
+                "description": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
                 "categoria": "libros",
                 "grade": grado,
                 "grades": [grado],
                 "subject": materia,
-                "precio": round(base_price, 2),
+                "price": round(base_price, 2),
                 "sale_price": round(base_price * 0.9, 2) if random.random() > 0.7 else None,
                 "inventory_quantity": random.randint(20, 100),
                 "isbn": generate_isbn(),
-                "editorial": editorial,
+                "publisher": editorial,
                 "image_url": f"https://picsum.photos/seed/{uuid.uuid4().hex[:8]}/300/400",
-                "activo": True,
-                "destacado": random.random() > 0.8,
+                "active": True,
+                "featured": random.random() > 0.8,
                 "on_sale": random.random() > 0.85,
                 "es_demo": True,
                 "ano_escolar": "2025-2026",
@@ -125,14 +125,14 @@ async def generate_students_list() -> List[Dict]:
                 "sync_id": f"sync_{uuid.uuid4().hex[:12]}",
                 "numero_estudiante": f"PCA-{student_number}",
                 "nombre_completo": f"{nombre} {apellido} {apellido2}",
-                "nombre": nombre,
+                "name": nombre,
                 "apellido": f"{apellido} {apellido2}",
                 "grade": grado,
                 "seccion": random.choice(["A", "B", "C"]),
                 "sheet_id": "demo_sheet_pca_2025",
                 "hoja_nombre": f"Estudiantes {grado}",
                 "fila_numero": student_number - 1000,
-                "estado": "activo",
+                "estado": "active",
                 "override_local": False,
                 "datos_extra": {
                     "email_acudiente": f"acudiente{student_number}@email.com",
@@ -177,7 +177,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
         
         for product in order_products:
             cantidad = random.randint(1, 2)
-            precio = product["sale_price"] or product["precio"]
+            precio = product["sale_price"] or product["price"]
             subtotal = cantidad * precio
             total += subtotal
             
@@ -185,7 +185,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
                 "item_id": f"item_{uuid.uuid4().hex[:8]}",
                 "book_id": product["libro_id"],
                 "book_code": product["code"],
-                "book_name": product["nombre"],
+                "book_name": product["name"],
                 "quantity_ordered": cantidad,
                 "price": precio,
                 "subtotal": subtotal,

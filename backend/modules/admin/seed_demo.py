@@ -14,18 +14,18 @@ router = APIRouter(prefix="/seed", tags=["Demo Data"])
 
 # Demo Players for PinPanClub
 DEMO_PLAYERS = [
-    {"nombre": "Carlos Mendoza", "apodo": "El Rayo", "email": "carlos@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos"},
-    {"nombre": "Maria Gonzalez", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
-    {"nombre": "Juan Perez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
-    {"nombre": "Ana Lopez", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
-    {"nombre": "Pedro Sanchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
-    {"nombre": "Laura Martinez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},
-    {"nombre": "Roberto Chen", "apodo": "Dragon", "email": "roberto@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=roberto"},
-    {"nombre": "Sofia Wang", "apodo": "Phoenix", "email": "sofia@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=sofia"},
-    {"nombre": "Miguel Torres", "apodo": "El Maestro", "email": "miguel@demo.com", "nivel": "profesional", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=miguel"},
-    {"nombre": "Isabella Rodriguez", "apodo": "La Reina", "email": "isabella@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=isabella"},
-    {"nombre": "David Kim", "apodo": "Samurai", "email": "david@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=david"},
-    {"nombre": "Valentina Cruz", "apodo": "Valkyrie", "email": "valentina@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=valentina"},
+    {"name": "Carlos Mendoza", "apodo": "El Rayo", "email": "carlos@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos"},
+    {"name": "Maria Gonzalez", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
+    {"name": "Juan Perez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
+    {"name": "Ana Lopez", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
+    {"name": "Pedro Sanchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
+    {"name": "Laura Martinez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},
+    {"name": "Roberto Chen", "apodo": "Dragon", "email": "roberto@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=roberto"},
+    {"name": "Sofia Wang", "apodo": "Phoenix", "email": "sofia@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=sofia"},
+    {"name": "Miguel Torres", "apodo": "El Maestro", "email": "miguel@demo.com", "nivel": "profesional", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=miguel"},
+    {"name": "Isabella Rodriguez", "apodo": "La Reina", "email": "isabella@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=isabella"},
+    {"name": "David Kim", "apodo": "Samurai", "email": "david@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=david"},
+    {"name": "Valentina Cruz", "apodo": "Valkyrie", "email": "valentina@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=valentina"},
 ]
 
 # Demo Challenges
@@ -147,12 +147,12 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
         player_id = f"player_{uuid.uuid4().hex[:8]}"
         player_doc = {
             "jugador_id": player_id,
-            "nombre": player["nombre"],
+            "name": player["name"],
             "apodo": player["apodo"],
             "email": player["email"],
             "nivel": player["nivel"],
             "avatar_url": player["avatar_url"],
-            "activo": True,
+            "active": True,
             "fecha_registro": (now - timedelta(days=random.randint(30, 365))).isoformat(),
             "partidos_jugados": random.randint(10, 100),
             "partidos_ganados": random.randint(5, 50),
@@ -181,7 +181,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
             "posicion": i + 1,
             "partidos_ganados": wins,
             "partidos_perdidos": losses,
-            "activo": True,
+            "active": True,
             "liga_id": "liga_principal",
             "ultima_actualizacion": now.isoformat()
         }
@@ -321,8 +321,8 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
     # 9. Create a demo tournament
     tournament_doc = {
         "torneo_id": f"torneo_{uuid.uuid4().hex[:8]}",
-        "nombre": "Torneo de Primavera 2026",
-        "descripcion": "Gran torneo de temporada con premios especiales",
+        "name": "Torneo de Primavera 2026",
+        "description": "Gran torneo de temporada con premios especiales",
         "fecha_inicio": (now + timedelta(days=7)).isoformat(),
         "fecha_fin": (now + timedelta(days=14)).isoformat(),
         "estado": "inscripciones_abiertas",
@@ -334,7 +334,7 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
         "created_at": now.isoformat()
     }
     await db.pinpanclub_superpin_tournaments.update_one(
-        {"nombre": "Torneo de Primavera 2026"},
+        {"name": "Torneo de Primavera 2026"},
         {"$set": tournament_doc},
         upsert=True
     )
@@ -345,9 +345,9 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
     
     # Create demo user profiles with wallets
     demo_users = [
-        {"nombre": "Demo Usuario", "email": "demo@chipilink.com", "tipo": "regular"},
-        {"nombre": "Demo Padre", "email": "padre@chipilink.com", "tipo": "parent"},
-        {"nombre": "Demo Child", "email": "nino@chipilink.com", "tipo": "child"},
+        {"name": "Demo Usuario", "email": "demo@chipilink.com", "tipo": "regular"},
+        {"name": "Demo Padre", "email": "padre@chipilink.com", "tipo": "parent"},
+        {"name": "Demo Child", "email": "nino@chipilink.com", "tipo": "child"},
     ]
     
     user_ids_created = []
@@ -358,10 +358,10 @@ async def seed_demo_data(admin: dict = Depends(get_admin_user)):
         profile = {
             "user_id": user_id,
             "email": user["email"],
-            "nombre": user["nombre"],
+            "name": user["name"],
             "tipo_usuario": user["tipo"],
             "fecha_registro": (now - timedelta(days=random.randint(30, 180))).isoformat(),
-            "activo": True,
+            "active": True,
             "preferencias": {
                 "idioma": "es",
                 "notifications": True

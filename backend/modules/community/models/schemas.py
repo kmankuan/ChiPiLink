@@ -45,7 +45,7 @@ class PostBase(BaseModel):
     fecha_evento: Optional[Any] = None
     lugar_evento: Optional[str] = None
     publicado: bool = False
-    destacado: bool = False
+    featured: bool = False
     orden: int = 0
     fecha_expiracion: Optional[Any] = None
     tags: Optional[List[str]] = None
@@ -70,7 +70,7 @@ class PostUpdate(BaseModel):
     fecha_evento: Optional[Any] = None
     lugar_evento: Optional[str] = None
     publicado: Optional[bool] = None
-    destacado: Optional[bool] = None
+    featured: Optional[bool] = None
     orden: Optional[int] = None
     fecha_expiracion: Optional[Any] = None
     tags: Optional[List[str]] = None
@@ -122,7 +122,7 @@ class Comment(CommentBase):
 class EventBase(BaseModel):
     """Base event model"""
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     tipo: str = "otro"
     fecha_inicio: Any
     fecha_fin: Optional[Any] = None
@@ -130,7 +130,7 @@ class EventBase(BaseModel):
     image_url: Optional[str] = None
     requiere_inscripcion: bool = False
     max_participantes: Optional[int] = None
-    destacado: bool = False
+    featured: bool = False
 
 
 class EventCreate(EventBase):
@@ -141,7 +141,7 @@ class EventCreate(EventBase):
 class EventUpdate(BaseModel):
     """Event update model"""
     titulo: Optional[str] = None
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     tipo: Optional[str] = None
     fecha_inicio: Optional[Any] = None
     fecha_fin: Optional[Any] = None
@@ -149,7 +149,7 @@ class EventUpdate(BaseModel):
     image_url: Optional[str] = None
     requiere_inscripcion: Optional[bool] = None
     max_participantes: Optional[int] = None
-    destacado: Optional[bool] = None
+    featured: Optional[bool] = None
     estado: Optional[str] = None
 
 
@@ -168,13 +168,13 @@ class Event(EventBase):
 class AlbumBase(BaseModel):
     """Base album model"""
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     google_photos_url: Optional[str] = None
     google_photos_album_id: Optional[str] = None
     fotos: Optional[List[Dict]] = None
     imagen_portada: Optional[str] = None
     orden: int = 0
-    activo: bool = True
+    active: bool = True
 
 
 class AlbumCreate(AlbumBase):
@@ -185,13 +185,13 @@ class AlbumCreate(AlbumBase):
 class AlbumUpdate(BaseModel):
     """Album update model"""
     titulo: Optional[str] = None
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     google_photos_url: Optional[str] = None
     google_photos_album_id: Optional[str] = None
     fotos: Optional[List[Dict]] = None
     imagen_portada: Optional[str] = None
     orden: Optional[int] = None
-    activo: Optional[bool] = None
+    active: Optional[bool] = None
 
 
 class Album(AlbumBase):

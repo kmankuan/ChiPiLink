@@ -15,7 +15,7 @@ router = APIRouter(prefix="/posts", tags=["Community - Posts"])
 @router.get("", response_model=List[Post])
 async def get_posts(
     tipo: Optional[str] = None,
-    destacado: Optional[bool] = None,
+    featured: Optional[bool] = None,
     limit: int = Query(20, ge=1, le=100)
 ):
     """Get posts publicados"""
@@ -59,8 +59,8 @@ async def add_comment(
     """Agregar comentario a un post"""
     try:
         usuario_id = user.get("user_id") if user else None
-        if user and not data.nombre_usuario:
-            data.nombre_usuario = user.get("nombre", "Anonymous")
+        if user and not data.name_usuario:
+            data.name_usuario = user.get("name", "Anonymous")
         return await post_service.add_comment(post_id, data, usuario_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

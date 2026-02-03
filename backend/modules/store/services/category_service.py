@@ -77,7 +77,7 @@ class CategoryService(BaseService):
         featured = await self.product_repository.get_featured(categoria_id)
         promotions = await self.product_repository.get_promotions(categoria_id)
         newest = await self.product_repository.get_newest(categoria_id)
-        total = await self.product_repository.count({"categoria": categoria_id, "activo": True})
+        total = await self.product_repository.count({"categoria": categoria_id, "active": True})
         
         return {
             "categoria": category.model_dump() if category else None,

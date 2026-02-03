@@ -42,7 +42,7 @@ class EventRepository(BaseRepository):
                 "estado": {"$ne": "cancelado"}
             },
             limit=limit,
-            sort=[("destacado", -1), ("fecha_inicio", 1)]
+            sort=[("featured", -1), ("fecha_inicio", 1)]
         )
     
     async def get_past_events(self, limit: int = 10) -> List[Dict]:

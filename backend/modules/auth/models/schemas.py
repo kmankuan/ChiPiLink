@@ -111,7 +111,7 @@ class LegacyLoginRequest(BaseModel):
 class LegacyUserCreate(BaseModel):
     """Legacy user creation with Spanish field names"""
     email: EmailStr
-    nombre: str  # Maps to name
+    name: str  # Maps to name
     contrasena: str  # Maps to password
     telefono: Optional[str] = None
     direccion: Optional[Any] = None

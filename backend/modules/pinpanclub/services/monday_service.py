@@ -150,7 +150,7 @@ class MondayService(BaseService):
             player = {
                 "id": item["id"],
                 "name": item["name"],
-                "nombre": item["name"],
+                "name": item["name"],
                 "email": None
             }
             
@@ -163,7 +163,7 @@ class MondayService(BaseService):
                     player["email"] = col_text
                 elif col_id == "text":
                     if col_text:
-                        player["nombre"] = col_text
+                        player["name"] = col_text
             
             players.append(player)
         
@@ -246,7 +246,7 @@ class MondayService(BaseService):
             nombre_completo += f" ({player['apodo']})"
         
         column_values = {
-            "text": player.get("nombre", ""),
+            "text": player.get("name", ""),
             "text4": player.get("email", ""),
             "numbers": str(player.get("elo_rating", 1000)),
             "status": {"label": player.get("nivel", "principiante")}
@@ -278,8 +278,8 @@ class MondayService(BaseService):
         player_a = match.get("jugador_a_info", {})
         player_b = match.get("jugador_b_info", {})
         
-        nombre_a = player_a.get("apodo") or player_a.get("nombre", "Jugador A")
-        nombre_b = player_b.get("apodo") or player_b.get("nombre", "Jugador B")
+        nombre_a = player_a.get("apodo") or player_a.get("name", "Jugador A")
+        nombre_b = player_b.get("apodo") or player_b.get("name", "Jugador B")
         
         item_name = f"{nombre_a} vs {nombre_b}"
         
@@ -338,9 +338,9 @@ class MondayService(BaseService):
         ganador = ""
         if match.get("ganador_id"):
             if match["ganador_id"] == match["jugador_a_id"]:
-                ganador = match.get("jugador_a_info", {}).get("nombre", "A")
+                ganador = match.get("jugador_a_info", {}).get("name", "A")
             else:
-                ganador = match.get("jugador_b_info", {}).get("nombre", "B")
+                ganador = match.get("jugador_b_info", {}).get("name", "B")
         
         column_values = {
             "text0": resultado,

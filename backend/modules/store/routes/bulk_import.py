@@ -32,14 +32,14 @@ class ImportEstudiantesRequest(BaseModel):
     raw_text: str
     column_mapping: Dict[str, int]
     grado_default: Optional[str] = None
-    hoja_nombre: str = "Import Manual"
+    hoja_name: str = "Import Manual"
     actualizar_existentes: bool = True
 
 
 class PreviewLibrosRequest(BaseModel):
     """Request para previsualizar import de libros"""
     raw_text: str
-    column_mapping: Dict[str, int]  # {"code": 0, "nombre": 1, "precio": 2, ...}
+    column_mapping: Dict[str, int]  # {"code": 0, "name": 1, "price": 2, ...}
     catalogo_id: Optional[str] = None
     grado_default: Optional[str] = None
 
@@ -173,9 +173,9 @@ async def get_grados_disponibles(
 
 @router.get("/estudiantes")
 async def get_estudiantes_importados(
-    grado: Optional[str] = None,
+    grade: Optional[str] = None,
     buscar: Optional[str] = None,
-    estado: str = "activo",
+    estado: str = "active",
     limit: int = 100,
     skip: int = 0,
     admin: dict = Depends(get_admin_user)

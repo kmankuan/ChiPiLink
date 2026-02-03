@@ -35,7 +35,7 @@ class AlbumRepository(BaseRepository):
     async def get_active_albums(self, limit: int = 50) -> List[Dict]:
         """Get albumes activos"""
         return await self.find_many(
-            query={"activo": True},
+            query={"active": True},
             limit=limit,
             sort=[("orden", 1)]
         )

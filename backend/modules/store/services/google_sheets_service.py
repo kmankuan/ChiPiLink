@@ -122,7 +122,7 @@ class GoogleSheetsService:
             sheet_id: ID of the Google Sheet
             nombre_sheet: Nombre descriptivo
             hojas: Lista de hojas/tabs con su configuration
-                   [{"nombre": "1er Grado", "grade": "1", "columnas": {...}}]
+                   [{"name": "1er Grado", "grade": "1", "columnas": {...}}]
         """
         config = await self.get_sync_config()
         
@@ -135,7 +135,7 @@ class GoogleSheetsService:
         
         sheet_config = {
             "sheet_id": sheet_id,
-            "nombre": nombre_sheet,
+            "name": nombre_sheet,
             "hojas": hojas,
             "fecha_configuracion": datetime.now(timezone.utc).isoformat()
         }
@@ -166,7 +166,7 @@ class GoogleSheetsService:
             # Get names de las hojas
             hojas = [
                 {
-                    "nombre": sheet["properties"]["title"],
+                    "name": sheet["properties"]["title"],
                     "sheet_id": sheet["properties"]["sheetId"],
                     "index": sheet["properties"]["index"]
                 }
@@ -189,7 +189,7 @@ class GoogleSheetsService:
     async def read_sheet_data(
         self,
         sheet_id: str,
-        hoja_nombre: str,
+        hoja_name: str,
         rango: str = None
     ) -> List[List[str]]:
         """
@@ -267,13 +267,13 @@ class GoogleSheetsService:
         for sheet_cfg in sheets_config:
             try:
                 for hoja_cfg in sheet_cfg.get("hojas", []):
-                    if solo_hoja and hoja_cfg["nombre"] != solo_hoja:
+                    if solo_hoja and hoja_cfg["name"] != solo_hoja:
                         continue
                     
                     # Leer datos de la hoja
                     datos = await self.read_sheet_data(
                         sheet_cfg["sheet_id"],
-                        hoja_cfg["nombre"]
+                        hoja_cfg["name"]
                     )
                     
                     if not datos or len(datos) < 2:
@@ -307,7 +307,7 @@ class GoogleSheetsService:
                             nombre_completo = get_val("columna_nombre") or ""
                             grado = hoja_cfg.get("grade") or get_val("columna_grado") or ""
                             seccion = get_val("columna_seccion")
-                            estado_raw = get_val("columna_estado") or "activo"
+                            estado_raw = get_val("columna_estado") or "active"
                             
                             # Separar nombre y apellido si es posible
                             partes_nombre = nombre_completo.split(" ", 1)
@@ -323,14 +323,14 @@ class GoogleSheetsService:
                             estudiante_data = {
                                 "numero_estudiante": numero,
                                 "nombre_completo": nombre_completo,
-                                "nombre": nombre,
+                                "name": nombre,
                                 "apellido": apellido,
                                 "grade": str(grado),
                                 "seccion": seccion,
                                 "sheet_id": sheet_cfg["sheet_id"],
-                                "hoja_nombre": hoja_cfg["nombre"],
+                                "hoja_nombre": hoja_cfg["name"],
                                 "fila_numero": fila_num,
-                                "estado": "activo" if estado_raw.lower() in ["activo", "active", "1", "si", "yes"] else "inactivo",
+                                "estado": "active" if estado_raw.lower() in ["active", "active", "1", "si", "yes"] else "inactivo",
                                 "fecha_sync": datetime.now(timezone.utc).isoformat(),
                                 "updated_at": datetime.now(timezone.utc).isoformat()
                             }
@@ -383,8 +383,8 @@ class GoogleSheetsService:
     
     async def get_estudiantes_sincronizados(
         self,
-        grado: str = None,
-        estado: str = "activo",
+        grade: str = None,
+        estado: str = "active",
         buscar: str = None,
         limit: int = 100,
         skip: int = 0
@@ -421,7 +421,7 @@ class GoogleSheetsService:
     async def buscar_estudiante_por_numero(self, numero: str) -> Optional[Dict]:
         """Search estudiante por number"""
         return await db.estudiantes_sincronizados.find_one(
-            {"numero_estudiante": numero, "estado": "activo"},
+            {"numero_estudiante": numero, "estado": "active"},
             {"_id": 0}
         )
     
@@ -446,13 +446,13 @@ class GoogleSheetsService:
         
         # Contar por grado
         pipeline = [
-            {"$match": {"estado": "activo"}},
+            {"$match": {"estado": "active"}},
             {"$group": {"_id": "$grado", "count": {"$sum": 1}}},
             {"$sort": {"_id": 1}}
         ]
         por_grado = await db.estudiantes_sincronizados.aggregate(pipeline).to_list(20)
         
-        total_activos = await db.estudiantes_sincronizados.count_documents({"estado": "activo"})
+        total_activos = await db.estudiantes_sincronizados.count_documents({"estado": "active"})
         total_inactivos = await db.estudiantes_sincronizados.count_documents({"estado": "inactivo"})
         total_override = await db.estudiantes_sincronizados.count_documents({"override_local": True})
         

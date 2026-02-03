@@ -46,11 +46,11 @@ async def get_chess_status():
 # ============== PLAYERS (PLACEHOLDER) ==============
 
 @router.get("/players")
-async def get_players(activo: Optional[bool] = None, limit: int = 100):
+async def get_players(active: Optional[bool] = None, limit: int = 100):
     """Get chess players - PLACEHOLDER"""
     query = {}
     if activo is not None:
-        query["activo"] = activo
+        query["active"] = activo
     
     players = await db.chess_players.find(query, {"_id": 0}).sort("elo_rating", -1).to_list(limit)
     return players
@@ -61,7 +61,7 @@ async def create_player(player: dict):
     """Create chess player - PLACEHOLDER"""
     doc = {
         "jugador_id": f"chess_{uuid.uuid4().hex[:12]}",
-        "nombre": player.get("nombre"),
+        "name": player.get("name"),
         "apellido": player.get("apellido"),
         "apodo": player.get("apodo"),
         "nivel": player.get("nivel", "principiante"),
@@ -70,7 +70,7 @@ async def create_player(player: dict):
         "partidas_ganadas": 0,
         "partidas_perdidas": 0,
         "partidas_tablas": 0,
-        "activo": True,
+        "active": True,
         "fecha_registro": datetime.now(timezone.utc)
     }
     await db.chess_players.insert_one(doc)
@@ -115,7 +115,7 @@ async def create_game(game: dict):
 async def get_rankings(limit: int = 50):
     """Get ELO rankings - PLACEHOLDER"""
     players = await db.chess_players.find(
-        {"activo": True, "partidas_jugadas": {"$gt": 0}},
+        {"active": True, "partidas_jugadas": {"$gt": 0}},
         {"_id": 0}
     ).sort("elo_rating", -1).to_list(limit)
     

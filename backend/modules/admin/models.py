@@ -28,7 +28,7 @@ class ConfiguracionNotificaciones(BaseModel):
     email_nuevos_pedidos: bool = True
     email_bajo_stock: bool = True
     email_nuevas_matriculas: bool = True
-    telegram_activo: bool = False
+    telegram_active: bool = False
     telegram_chat_id: Optional[str] = None
 
 
@@ -42,16 +42,16 @@ class CampoFormulario(BaseModel):
     options: Optional[List[str]] = None  # For select fields
     validacion: Optional[str] = None  # Regex pattern
     orden: int = 0
-    activo: bool = True
+    active: bool = True
 
 
 class ConfiguracionFormulario(BaseModel):
     """Public form configuration"""
     model_config = ConfigDict(extra="ignore")
     form_id: str = "pedido_publico"
-    nombre: str = "Formulario de Pedido"
-    descripcion: Optional[str] = None
+    name: str = "Formulario de Pedido"
+    description: Optional[str] = None
     campos: List[CampoFormulario] = []
-    activo: bool = True
+    active: bool = True
     mensaje_exito: str = "\u00a1Gracias por tu pedido!"
     redireccion_url: Optional[str] = None

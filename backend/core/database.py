@@ -86,7 +86,7 @@ async def seed_site_config():
             config_doc = {
                 "config_id": "main",
                 "nombre_sitio": "ChiPi Link",
-                "descripcion": "Tu Super App",
+                "description": "Tu Super App",
                 "color_primario": "#16a34a",
                 "color_secundario": "#0f766e",
                 "footer_texto": "© 2025 ChiPi Link - Todos los derechos reservados",
@@ -120,12 +120,12 @@ async def seed_landing_page():
                 "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
                 "tipo": "hero",
                 "orden": 1,
-                "activo": True,
+                "active": True,
                 "publicado": True,
                 "config": {
                     "titulo": "Bienvenido a ChiPi Link",
                     "subtitulo": "Tu comunidad china en Panama, conectada",
-                    "descripcion": "La super app que conecta a la comunidad china en Panama con servicios, comercio y entretenimiento.",
+                    "description": "La super app que conecta a la comunidad china en Panama con servicios, comercio y entretenimiento.",
                     "cta_texto": "Explorar",
                     "cta_link": "/unatienda",
                     "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
@@ -136,7 +136,7 @@ async def seed_landing_page():
                 "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
                 "tipo": "features",
                 "orden": 2,
-                "activo": True,
+                "active": True,
                 "publicado": True,
                 "config": {
                     "titulo": "Nuestros Servicios",
@@ -145,22 +145,22 @@ async def seed_landing_page():
                         {
                             "icono": "Store",
                             "titulo": "Tienda Online",
-                            "descripcion": "Compra productos de nuestra comunidad"
+                            "description": "Compra productos de nuestra comunidad"
                         },
                         {
                             "icono": "Users",
                             "titulo": "Comunidad",
-                            "descripcion": "Conecta con otros miembros"
+                            "description": "Conecta con otros miembros"
                         },
                         {
                             "icono": "Calendar",
                             "titulo": "Eventos",
-                            "descripcion": "Participa en actividades y torneos"
+                            "description": "Participa en actividades y torneos"
                         },
                         {
                             "icono": "MessageSquare",
                             "titulo": "Soporte",
-                            "descripcion": "Asistencia en tu idioma"
+                            "description": "Asistencia en tu idioma"
                         }
                     ],
                     "columnas": 4
@@ -170,11 +170,11 @@ async def seed_landing_page():
                 "bloque_id": f"block_{uuid.uuid4().hex[:8]}",
                 "tipo": "cta",
                 "orden": 3,
-                "activo": True,
+                "active": True,
                 "publicado": True,
                 "config": {
                     "titulo": "¿Listo para comenzar?",
-                    "descripcion": "Join a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
+                    "description": "Join a nuestra comunidad y descubre todo lo que tenemos para ofrecer.",
                     "cta_texto": "Registrarse",
                     "cta_link": "/registro",
                     "cta_secundario_texto": "Ver Tienda",
@@ -290,14 +290,14 @@ async def create_indexes():
         await db[StoreCollections.PRODUCTS].create_index("libro_id", unique=True)
         await db[StoreCollections.PRODUCTS].create_index("categoria")
         await db[StoreCollections.PRODUCTS].create_index("grade")
-        await db[StoreCollections.PRODUCTS].create_index("activo")
+        await db[StoreCollections.PRODUCTS].create_index("active")
         
         # Index for store_categories
         await db[StoreCollections.CATEGORIES].create_index("categoria_id", unique=True)
         
         # Compound indexes for common queries
-        await db[StoreCollections.PRODUCTS].create_index([("categoria", 1), ("activo", 1)])
-        await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("activo", 1)])
+        await db[StoreCollections.PRODUCTS].create_index([("categoria", 1), ("active", 1)])
+        await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("active", 1)])
         await db[StoreCollections.ORDERS].create_index([("estado", 1), ("created_at", -1)])
         
         print("✅ Database indexes created successfully")

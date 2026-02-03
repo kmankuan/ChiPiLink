@@ -29,7 +29,7 @@ async def setup_admin(admin_data: dict):
     admin_doc = {
         "user_id": f"admin_{uuid.uuid4().hex[:8]}",
         "email": admin_data.get("email"),
-        "nombre": admin_data.get("nombre", "Administrador"),
+        "name": admin_data.get("name", "Administrador"),
         "contrasena_hash": hash_password(admin_data.get("contrasena")),
         "es_admin": True,
         "estudiantes": [],
@@ -50,12 +50,12 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     cat_count = await db.categorias.count_documents({})
     if cat_count == 0:
         categorias = [
-            {"categoria_id": "libros", "nombre": "Libros", "icono": "\ud83d\udcda", "orden": 1, "activo": True},
-            {"categoria_id": "snacks", "nombre": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "activo": True},
-            {"categoria_id": "bebidas", "nombre": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "activo": True},
-            {"categoria_id": "preparados", "nombre": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "activo": True},
-            {"categoria_id": "uniformes", "nombre": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "activo": True},
-            {"categoria_id": "servicios", "nombre": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "activo": True},
+            {"categoria_id": "libros", "name": "Libros", "icono": "\ud83d\udcda", "orden": 1, "active": True},
+            {"categoria_id": "snacks", "name": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "active": True},
+            {"categoria_id": "bebidas", "name": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "active": True},
+            {"categoria_id": "preparados", "name": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "active": True},
+            {"categoria_id": "uniformes", "name": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "active": True},
+            {"categoria_id": "servicios", "name": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "active": True},
         ]
         await db.categorias.insert_many(categorias)
         seeded.append("categorias")
@@ -66,26 +66,26 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
         libros = [
             {
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "nombre": "Matem\u00e1ticas 1",
-                "descripcion": "Libro de matem\u00e1ticas para primer grado",
+                "name": "Matem\u00e1ticas 1",
+                "description": "Libro de matem\u00e1ticas para primer grado",
                 "categoria": "libros",
                 "grade": "1",
                 "subject": "matematicas",
-                "precio": 25.00,
+                "price": 25.00,
                 "inventory_quantity": 50,
-                "activo": True,
+                "active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "nombre": "Espa\u00f1ol 1",
-                "descripcion": "Libro de espa\u00f1ol para primer grado",
+                "name": "Espa\u00f1ol 1",
+                "description": "Libro de espa\u00f1ol para primer grado",
                 "categoria": "libros",
                 "grade": "1",
                 "subject": "espanol",
-                "precio": 22.00,
+                "price": 22.00,
                 "inventory_quantity": 45,
-                "activo": True,
+                "active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
         ]
@@ -192,9 +192,9 @@ async def get_form_config(form_id: str, admin: dict = Depends(get_admin_user)):
         # Return default config
         return {
             "form_id": form_id,
-            "nombre": "Formulario de Pedido",
+            "name": "Formulario de Pedido",
             "campos": [],
-            "activo": True
+            "active": True
         }
     return config
 
@@ -242,15 +242,15 @@ async def get_embed_code(form_id: str, admin: dict = Depends(get_admin_user)):
 async def get_public_form_config(form_id: str):
     """Get form configuration for public forms (no auth)"""
     config = await db.form_configs.find_one(
-        {"form_id": form_id, "activo": True},
+        {"form_id": form_id, "active": True},
         {"_id": 0}
     )
     if not config:
         return {
             "form_id": form_id,
-            "nombre": "Formulario de Pedido",
+            "name": "Formulario de Pedido",
             "campos": [],
-            "activo": True
+            "active": True
         }
     return config
 
@@ -265,9 +265,9 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     pending_orders = await db.textbook_orders.count_documents({"status": "pending"})
     
     # Products stats
-    total_products = await db.libros.count_documents({"activo": True})
+    total_products = await db.libros.count_documents({"active": True})
     low_stock_products = await db.libros.count_documents({
-        "activo": True,
+        "active": True,
         "inventory_quantity": {"$lt": 10}
     })
     
@@ -402,12 +402,12 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
     try:
         stats = {
             "public_products": await db.libros.count_documents({
-                "activo": True,
+                "active": True,
                 "$or": [{"is_private_catalog": {"$exists": False}}, {"is_private_catalog": False}]
             }),
             "private_products": await db.libros.count_documents({
                 "is_private_catalog": True,
-                "activo": True
+                "active": True
             }),
             "students": await db.estudiantes_sincronizados.count_documents({}),
             "orders_pending": await db.textbook_orders.count_documents({"status": "pending"}),

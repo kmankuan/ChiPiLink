@@ -465,7 +465,7 @@ class SuperPinService(BaseService):
         
         return RankingTable(
             liga_id=liga_id,
-            liga_nombre=league.nombre,
+            liga_nombre=league.name,
             temporada=league.temporada,
             total_jugadores=len(entries),
             total_partidos=league.total_partidos,
@@ -802,7 +802,7 @@ class SuperPinService(BaseService):
                     liga_id=liga_id,
                     torneo_id=torneo_id,
                     temporada=temporada,
-                    metadata={"tournament_name": tournament.get("nombre")}
+                    metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
                     awarded_badges.append(badge)
@@ -814,7 +814,7 @@ class SuperPinService(BaseService):
                     liga_id=liga_id,
                     torneo_id=torneo_id,
                     temporada=temporada,
-                    metadata={"tournament_name": tournament.get("nombre")}
+                    metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
                     awarded_badges.append(badge)
@@ -826,7 +826,7 @@ class SuperPinService(BaseService):
                     liga_id=liga_id,
                     torneo_id=torneo_id,
                     temporada=temporada,
-                    metadata={"tournament_name": tournament.get("nombre")}
+                    metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
                     awarded_badges.append(badge)
@@ -944,7 +944,7 @@ class SuperPinService(BaseService):
             player = await self.player_repo.get_by_id(entry["_id"])
             if player:
                 entry["jugador_info"] = {
-                    "nombre": player.get("nombre"),
+                    "name": player.get("name"),
                     "apodo": player.get("apodo")
                 }
         
@@ -959,7 +959,7 @@ class SuperPinService(BaseService):
             player = await self.player_repo.get_by_id(badge.get("jugador_id"))
             if player:
                 badge["jugador_info"] = {
-                    "nombre": player.get("nombre"),
+                    "name": player.get("name"),
                     "apodo": player.get("apodo")
                 }
             badge_def = BADGE_DEFINITIONS.get(badge.get("badge_type"), {})
@@ -988,7 +988,7 @@ class SuperPinService(BaseService):
             for league in leagues:
                 ranking = await self.ranking_repo.get_player_ranking(league["liga_id"], jugador_id)
                 if ranking:
-                    ranking["liga_nombre"] = league.get("nombre")
+                    ranking["liga_nombre"] = league.get("name")
                     rankings.append(ranking)
         
         # Get match history
@@ -1020,7 +1020,7 @@ class SuperPinService(BaseService):
                 "fecha": match.get("fecha_partido"),
                 "opponent": {
                     "jugador_id": opponent_id,
-                    "nombre": opponent.get("nombre") if opponent else "Desconocido",
+                    "name": opponent.get("name") if opponent else "Desconocido",
                     "apodo": opponent.get("apodo") if opponent else None
                 },
                 "resultado": f"{player_sets}-{opponent_sets}",
@@ -1051,7 +1051,7 @@ class SuperPinService(BaseService):
         return {
             "jugador_id": jugador_id,
             "player_info": {
-                "nombre": player.get("nombre"),
+                "name": player.get("name"),
                 "apellido": player.get("apellido"),
                 "apodo": player.get("apodo"),
                 "nivel": player.get("nivel"),
@@ -1123,14 +1123,14 @@ class SuperPinService(BaseService):
         return {
             "player_a": {
                 "jugador_id": jugador_a_id,
-                "nombre": player_a.get("nombre") if player_a else "Desconocido",
+                "name": player_a.get("name") if player_a else "Desconocido",
                 "apodo": player_a.get("apodo") if player_a else None,
                 "wins": wins_a,
                 "sets": sets_a
             },
             "player_b": {
                 "jugador_id": jugador_b_id,
-                "nombre": player_b.get("nombre") if player_b else "Desconocido",
+                "name": player_b.get("name") if player_b else "Desconocido",
                 "apodo": player_b.get("apodo") if player_b else None,
                 "wins": wins_b,
                 "sets": sets_b
@@ -1149,7 +1149,7 @@ class SuperPinService(BaseService):
     async def create_quick_tournament(
         self,
         liga_id: str,
-        nombre: str = None,
+        name: str = None,
         pairing_mode: str = "random",  # random, by_ranking, swiss
         match_format: str = "best_of_1",  # best_of_1, best_of_3
         points_per_set: int = 11
@@ -1181,7 +1181,7 @@ class SuperPinService(BaseService):
             players_with_ranking.append({
                 "jugador_id": jugador_id,
                 "jugador_info": {
-                    "nombre": player.get("nombre") if player else "Desconocido",
+                    "name": player.get("name") if player else "Desconocido",
                     "apodo": player.get("apodo") if player else None
                 },
                 "elo": ranking.get("elo_rating", 1000) if ranking else 1000,
@@ -1256,7 +1256,7 @@ class SuperPinService(BaseService):
         quick_tournament = {
             "quick_tournament_id": f"qt_{uuid.uuid4().hex[:12]}",
             "liga_id": liga_id,
-            "nombre": nombre,
+            "name": nombre,
             "pairing_mode": pairing_mode,
             "match_format": match_format,
             "total_players": len(players_with_ranking),
@@ -1297,8 +1297,8 @@ class SuperPinService(BaseService):
         for match in active_matches + finished_today:
             player_a = await self.player_repo.get_by_id(match.get("jugador_a_id"))
             player_b = await self.player_repo.get_by_id(match.get("jugador_b_id"))
-            match["jugador_a_info"] = {"nombre": player_a.get("nombre") if player_a else "?"} 
-            match["jugador_b_info"] = {"nombre": player_b.get("nombre") if player_b else "?"}
+            match["jugador_a_info"] = {"name": player_a.get("name") if player_a else "?"} 
+            match["jugador_b_info"] = {"name": player_b.get("name") if player_b else "?"}
         
         return {
             "active_matches": active_matches,
@@ -1397,7 +1397,7 @@ class SuperPinService(BaseService):
         return {
             "player_a": {
                 "jugador_id": jugador_a_id,
-                "nombre": stats_a.get("player_info", {}).get("nombre", "?"),
+                "name": stats_a.get("player_info", {}).get("name", "?"),
                 "apodo": stats_a.get("player_info", {}).get("apodo"),
                 "elo": elo_a,
                 "win_rate": wr_a,
@@ -1405,7 +1405,7 @@ class SuperPinService(BaseService):
             },
             "player_b": {
                 "jugador_id": jugador_b_id,
-                "nombre": stats_b.get("player_info", {}).get("nombre", "?"),
+                "name": stats_b.get("player_info", {}).get("name", "?"),
                 "apodo": stats_b.get("player_info", {}).get("apodo"),
                 "elo": elo_b,
                 "win_rate": wr_b,

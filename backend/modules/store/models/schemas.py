@@ -38,25 +38,25 @@ class PaymentMethod(str, Enum):
 
 class ProductBase(BaseModel):
     """Base product model"""
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     categoria: Optional[str] = "libros"
-    grado: Optional[str] = None
-    grados: Optional[List[str]] = None
-    materia: Optional[str] = None
-    precio: float
+    grade: Optional[str] = None
+    grades: Optional[List[str]] = None
+    subject: Optional[str] = None
+    price: float
     sale_price: Optional[float] = None
     inventory_quantity: int = 0
     isbn: Optional[str] = None
-    editorial: Optional[str] = None
+    publisher: Optional[str] = None
     image_url: Optional[str] = None
-    activo: bool = True
+    active: bool = True
     requires_preparation: bool = False
-    destacado: bool = False
+    featured: bool = False
     on_sale: bool = False
     featured_order: int = 0
     is_private_catalog: bool = False
-    codigo: Optional[str] = None
+    code: Optional[str] = None
 
 
 class ProductCreate(ProductBase):
@@ -66,20 +66,20 @@ class ProductCreate(ProductBase):
 
 class ProductUpdate(BaseModel):
     """Product update model"""
-    nombre: Optional[str] = None
-    descripcion: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
     categoria: Optional[str] = None
-    grado: Optional[str] = None
-    grados: Optional[List[str]] = None
-    materia: Optional[str] = None
-    precio: Optional[float] = None
+    grade: Optional[str] = None
+    grades: Optional[List[str]] = None
+    subject: Optional[str] = None
+    price: Optional[float] = None
     sale_price: Optional[float] = None
     inventory_quantity: Optional[int] = None
     isbn: Optional[str] = None
-    editorial: Optional[str] = None
+    publisher: Optional[str] = None
     image_url: Optional[str] = None
-    activo: Optional[bool] = None
-    destacado: Optional[bool] = None
+    active: Optional[bool] = None
+    featured: Optional[bool] = None
     on_sale: Optional[bool] = None
 
 
@@ -102,7 +102,7 @@ class OrderItem(BaseModel):
     
     @property
     def subtotal(self) -> float:
-        return self.cantidad * self.precio_unitario
+        return self.cantidad * self.price_unitario
 
 
 # ============== ORDER MODELS ==============
@@ -145,7 +145,7 @@ class Order(BaseModel):
     pedido_id: str
     user_id: Optional[str] = None
     estudiante_id: Optional[str] = None
-    estudiante_nombre: str
+    estudiante_name: str
     items: List[Dict]
     total: float
     subtotal: Optional[float] = None
@@ -171,9 +171,9 @@ class Order(BaseModel):
 
 class StudentBase(BaseModel):
     """Base student model"""
-    nombre: str
+    name: str
     apellido: str
-    grado: str
+    grade: str
     escuela: Optional[str] = None
     es_nuevo: bool = True
     notas: Optional[str] = None
@@ -202,10 +202,10 @@ class Student(StudentBase):
 
 class CategoryBase(BaseModel):
     """Base category model"""
-    nombre: str
+    name: str
     icono: str = "📦"
     orden: int = 99
-    activo: bool = True
+    active: bool = True
 
 
 class CategoryCreate(CategoryBase):
@@ -230,7 +230,7 @@ class BannerBase(BaseModel):
     subtitulo: Optional[str] = None
     image_url: str
     link_url: Optional[str] = None
-    activo: bool = True
+    active: bool = True
     orden: int = 0
     fecha_inicio: Optional[Any] = None
     fecha_fin: Optional[Any] = None
@@ -261,6 +261,6 @@ class InventoryUpdate(BaseModel):
 class InventoryAlert(BaseModel):
     """Low stock alert model"""
     libro_id: str
-    nombre: str
+    name: str
     cantidad_actual: int
     umbral: int = 10

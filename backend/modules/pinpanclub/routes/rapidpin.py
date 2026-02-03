@@ -537,7 +537,7 @@ async def add_challenge_comment(
     try:
         user_info = {
             "user_id": user_id,
-            "nombre": user_name,
+            "name": user_name,
             "avatar": user_avatar
         } if user_name else None
         

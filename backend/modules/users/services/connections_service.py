@@ -67,12 +67,12 @@ class ConexionesService:
         for con in connections:
             connected_user = await db.auth_users.find_one(
                 {"user_id": con["user_id"]},
-                {"_id": 0, "nombre": 1, "apellido": 1, "email": 1, "estado_cuenta": 1, "avatar": 1}
+                {"_id": 0, "name": 1, "apellido": 1, "email": 1, "estado_cuenta": 1, "avatar": 1}
             )
             if connected_user:
                 con["usuario_nombre"] = f"{connected_user.get('nombre', '')} {connected_user.get('apellido', '')}".strip()
                 con["usuario_email"] = connected_user.get("email")
-                con["usuario_estado"] = connected_user.get("estado_cuenta", "activo")
+                con["usuario_estado"] = connected_user.get("estado_cuenta", "active")
                 con["usuario_avatar"] = connected_user.get("avatar")
         
         return connections
@@ -140,7 +140,7 @@ class ConexionesService:
             "subtipo": subtipo,
             "etiqueta": etiqueta,
             "permisos": permisos,
-            "estado": "activo",
+            "estado": "active",
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
         
@@ -158,7 +158,7 @@ class ConexionesService:
             "subtipo": self._get_subtipo_reciproco(subtipo),
             "etiqueta": None,
             "permisos": self._get_permisos_reciprocos(tipo, subtipo),
-            "estado": "activo",
+            "estado": "active",
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
         
@@ -271,8 +271,8 @@ class ConexionesService:
             return {"error": "Already exists una request pendiente"}
         
         # Get names
-        de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id}, {"nombre": 1, "apellido": 1})
-        para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id}, {"nombre": 1, "apellido": 1})
+        de_usuario = await db.auth_users.find_one({"user_id": de_usuario_id}, {"name": 1, "apellido": 1})
+        para_usuario = await db.auth_users.find_one({"user_id": para_usuario_id}, {"name": 1, "apellido": 1})
         
         if not para_usuario:
             return {"error": "Usuario destino not found"}
@@ -436,7 +436,7 @@ class ConexionesService:
         self,
         invitado_por_id: str,
         email: str,
-        nombre: Optional[str] = None,
+        name: Optional[str] = None,
         mensaje: Optional[str] = None,
         tipo_relacion: Optional[str] = None,
         subtipo: Optional[str] = None,
@@ -459,7 +459,7 @@ class ConexionesService:
             return {"error": "Already exists una invitation pendiente para este email"}
         
         # Get name of the invitador
-        invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"nombre": 1, "apellido": 1})
+        invitador = await db.auth_users.find_one({"user_id": invitado_por_id}, {"name": 1, "apellido": 1})
         
         invitacion = {
             "invitacion_id": f"inv_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
@@ -533,7 +533,7 @@ class ConexionesService:
     async def crear_acudido(
         self,
         acudiente_id: str,
-        nombre: str,
+        name: str,
         apellido: Optional[str] = None,
         email: Optional[str] = None,
         fecha_nacimiento: Optional[str] = None,
@@ -555,7 +555,7 @@ class ConexionesService:
         
         acudido = {
             "user_id": new_user_id,
-            "nombre": nombre,
+            "name": nombre,
             "apellido": apellido,
             "email": email.lower() if email else None,
             "estado_cuenta": "acudido",
@@ -600,7 +600,7 @@ class ConexionesService:
             "success": True,
             "acudido": {
                 "user_id": new_user_id,
-                "nombre": nombre,
+                "name": nombre,
                 "apellido": apellido,
                 "estado_cuenta": "acudido"
             }
@@ -611,7 +611,7 @@ class ConexionesService:
         result = await db.auth_users.update_one(
             {"user_id": acudido_id, "estado_cuenta": "acudido"},
             {"$set": {
-                "estado_cuenta": "activo",
+                "estado_cuenta": "active",
                 "email": email.lower(),
                 "contrasena_hash": contrasena_hash,
                 "activado_en": datetime.now(timezone.utc).isoformat()
@@ -783,7 +783,7 @@ class ConexionesService:
             "acudientes_ids": acudientes_ids,
             "monto_requerido": monto_requerido,
             "saldo_actual": saldo_actual,
-            "descripcion": descripcion,
+            "description": descripcion,
             "estado": "pendiente",
             "creado_en": datetime.now(timezone.utc).isoformat()
         }
@@ -944,7 +944,7 @@ class ConexionesService:
         
         # Get active memberships of the user
         subscriptions = await db.subscriptions_usuarios.find(
-            {"user_id": user_id, "estado": "activo"},
+            {"user_id": user_id, "estado": "active"},
             {"membresia_id": 1}
         ).to_list(length=50)
         membresias_activas = [s["membresia_id"] for s in subscriptions]
@@ -1003,7 +1003,7 @@ class ConexionesService:
         """Search usuarios by name o email"""
         search_query = {
             "$or": [
-                {"nombre": {"$regex": query, "$options": "i"}},
+                {"name": {"$regex": query, "$options": "i"}},
                 {"apellido": {"$regex": query, "$options": "i"}},
                 {"email": {"$regex": query, "$options": "i"}}
             ]
@@ -1014,7 +1014,7 @@ class ConexionesService:
         
         cursor = db.auth_users.find(
             search_query,
-            {"_id": 0, "user_id": 1, "nombre": 1, "apellido": 1, "email": 1, "avatar": 1, "estado_cuenta": 1}
+            {"_id": 0, "user_id": 1, "name": 1, "apellido": 1, "email": 1, "avatar": 1, "estado_cuenta": 1}
         ).limit(limit)
         
         return await cursor.to_list(length=limit)

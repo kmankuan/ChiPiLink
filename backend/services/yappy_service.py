@@ -215,7 +215,7 @@ class YappyServiceFactory:
             return None
         
         yappy = config["yappy"]
-        if not yappy.get("activo"):
+        if not yappy.get("active"):
             return None
         
         return YappyService(

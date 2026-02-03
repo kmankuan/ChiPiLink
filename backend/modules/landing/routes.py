@@ -49,7 +49,7 @@ async def get_public_landing_page():
     if page.get("bloques"):
         page["bloques"] = [
             b for b in page["bloques"] 
-            if b.get("activo", True) and b.get("publicado", True)
+            if b.get("active", True) and b.get("publicado", True)
         ]
     
     return page
@@ -173,14 +173,14 @@ async def reorder_blocks(request: ReorderBlocksRequest, admin: dict = Depends(ge
 async def update_block(
     bloque_id: str,
     config: dict,
-    activo: Optional[bool] = None,
+    active: Optional[bool] = None,
     publicado: Optional[bool] = None,
     admin: dict = Depends(get_admin_user)
 ):
     """Update block configuration"""
     update_doc = {"bloques.$.config": config}
     if activo is not None:
-        update_doc["bloques.$.activo"] = activo
+        update_doc["bloques.$.active"] = activo
     if publicado is not None:
         update_doc["bloques.$.publicado"] = publicado
     update_doc["updated_at"] = datetime.now(timezone.utc).isoformat()

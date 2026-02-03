@@ -69,13 +69,13 @@ class VendorRedesSociales(BaseModel):
     whatsapp: str = ""
 
 class VendorConfiguracion(BaseModel):
-    campos_requeridos: List[str] = ["nombre", "email"]
+    campos_requeridos: List[str] = ["name", "email"]
     comision_activa: bool = False
     porcentaje_comision: float = 0
     yappy_configurado: bool = False
 
 class VendorCreate(BaseModel):
-    nombre: str
+    name: str
     slug: Optional[str] = None
     descripcion: str = ""
     logo_url: str = ""
@@ -84,8 +84,8 @@ class VendorCreate(BaseModel):
     redes_sociales: VendorRedesSociales = VendorRedesSociales()
 
 class VendorUpdate(BaseModel):
-    nombre: Optional[str] = None
-    descripcion: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
     logo_url: Optional[str] = None
     banner_url: Optional[str] = None
     contacto: Optional[VendorContacto] = None
@@ -95,7 +95,7 @@ class YappyConfig(BaseModel):
     merchant_id: str = ""
     secret_key: str = ""
     url_domain: str = ""
-    activo: bool = False
+    active: bool = False
     ambiente: YappyAmbiente = YappyAmbiente.PRUEBAS
 
 class PaymentConfigUpdate(BaseModel):
@@ -113,16 +113,16 @@ class TeamMemberUpdate(BaseModel):
     estado: Optional[str] = None
 
 class VendorProduct(BaseModel):
-    nombre: str
+    name: str
     descripcion: str = ""
-    precio: float
+    price: float
     precio_descuento: Optional[float] = None
     imagenes: List[str] = []
     categoria: str = ""
     subcategoria: str = ""
     inventario: int = 0
-    activo: bool = True
-    destacado: bool = False
+    active: bool = True
+    featured: bool = False
 
 class VendorSettingsUpdate(BaseModel):
     registro_libre: Optional[bool] = None
@@ -133,11 +133,11 @@ class VendorSettingsUpdate(BaseModel):
 
 # Platform Store (Unatienda) Models
 class PlatformStoreConfig(BaseModel):
-    nombre: str = "Unatienda"
+    name: str = "Unatienda"
     descripcion: str = "Tienda oficial de la plataforma"
     logo_url: str = ""
     yappy_merchant_id: str = ""
     yappy_secret_key: str = ""
     yappy_url_domain: str = ""
-    yappy_activo: bool = False
+    yappy_active: bool = False
     yappy_ambiente: YappyAmbiente = YappyAmbiente.PRUEBAS

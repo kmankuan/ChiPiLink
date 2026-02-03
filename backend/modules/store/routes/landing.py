@@ -26,7 +26,7 @@ async def get_category_banners(categoria: str):
     now = datetime.now(timezone.utc)
     query = {
         "categoria": categoria,
-        "activo": True,
+        "active": True,
         "$or": [
             {"fecha_inicio": None, "fecha_fin": None},
             {"fecha_inicio": {"$lte": now}, "fecha_fin": None},
@@ -77,7 +77,7 @@ async def create_banner(banner: dict, admin: dict = Depends(get_admin_user)):
         "subtitulo": banner.get("subtitulo"),
         "image_url": banner.get("image_url"),
         "link_url": banner.get("link_url"),
-        "activo": banner.get("activo", True),
+        "active": banner.get("active", True),
         "orden": banner.get("orden", 0),
         "fecha_inicio": banner.get("fecha_inicio"),
         "fecha_fin": banner.get("fecha_fin"),

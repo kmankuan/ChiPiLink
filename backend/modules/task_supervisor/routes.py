@@ -106,7 +106,7 @@ async def get_display_data(person_id: Optional[str] = None):
     # Get people if no filter
     people = []
     if not person_id:
-        people = await db.supervised_people.find({"activo": True}, {"_id": 0}).to_list(20)
+        people = await db.supervised_people.find({"active": True}, {"_id": 0}).to_list(20)
     
     return {
         "timestamp": now.isoformat(),
@@ -128,7 +128,7 @@ async def get_display_data(person_id: Optional[str] = None):
 @router.get("/people")
 async def get_supervised_people(admin: dict = Depends(get_admin_user)):
     """Get supervised people (children/students)"""
-    people = await db.supervised_people.find({"activo": True}, {"_id": 0}).to_list(50)
+    people = await db.supervised_people.find({"active": True}, {"_id": 0}).to_list(50)
     return people
 
 
@@ -137,7 +137,7 @@ async def create_supervised_person(person: dict, admin: dict = Depends(get_admin
     """Create supervised person"""
     doc = {
         "person_id": f"person_{uuid.uuid4().hex[:12]}",
-        "nombre": person.get("nombre"),
+        "name": person.get("name"),
         "apodo": person.get("apodo"),
         "foto_url": person.get("foto_url"),
         "tipo": person.get("tipo", "nino"),
@@ -148,7 +148,7 @@ async def create_supervised_person(person: dict, admin: dict = Depends(get_admin
         "puntos_totales": 0,
         "racha_dias": 0,
         "logros": [],
-        "activo": True,
+        "active": True,
         "fecha_registro": datetime.now(timezone.utc)
     }
     await db.supervised_people.insert_one(doc)
@@ -366,7 +366,7 @@ async def get_person_progress(
 async def get_leaderboard():
     """Get points leaderboard"""
     people = await db.supervised_people.find(
-        {"activo": True},
+        {"active": True},
         {"_id": 0}
     ).sort("puntos_totales", -1).to_list(20)
     

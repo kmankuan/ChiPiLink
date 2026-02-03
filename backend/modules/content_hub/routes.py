@@ -23,25 +23,25 @@ router = APIRouter(prefix="/content-hub", tags=["Content Hub"])
 
 # Supported content sources
 CONTENT_SOURCES = [
-    {"source_id": "youtube", "nombre": "YouTube", "icono": "🎬", "color": "#FF0000"},
-    {"source_id": "instagram", "nombre": "Instagram", "icono": "📸", "color": "#E4405F"},
-    {"source_id": "tiktok", "nombre": "TikTok", "icono": "🎵", "color": "#000000"},
-    {"source_id": "facebook", "nombre": "Facebook", "icono": "📘", "color": "#1877F2"},
-    {"source_id": "wechat", "nombre": "WeChat", "icono": "💬", "color": "#07C160"},
-    {"source_id": "xiaohongshu", "nombre": "Xiaohongshu", "icono": "📕", "color": "#FF2442"},
-    {"source_id": "telegram", "nombre": "Telegram", "icono": "✈️", "color": "#0088CC"},
-    {"source_id": "twitter", "nombre": "X/Twitter", "icono": "🐦", "color": "#1DA1F2"},
+    {"source_id": "youtube", "name": "YouTube", "icono": "🎬", "color": "#FF0000"},
+    {"source_id": "instagram", "name": "Instagram", "icono": "📸", "color": "#E4405F"},
+    {"source_id": "tiktok", "name": "TikTok", "icono": "🎵", "color": "#000000"},
+    {"source_id": "facebook", "name": "Facebook", "icono": "📘", "color": "#1877F2"},
+    {"source_id": "wechat", "name": "WeChat", "icono": "💬", "color": "#07C160"},
+    {"source_id": "xiaohongshu", "name": "Xiaohongshu", "icono": "📕", "color": "#FF2442"},
+    {"source_id": "telegram", "name": "Telegram", "icono": "✈️", "color": "#0088CC"},
+    {"source_id": "twitter", "name": "X/Twitter", "icono": "🐦", "color": "#1DA1F2"},
 ]
 
 # Categorys por audiencia predefinidas
 DEFAULT_CATEGORIES = [
-    {"category_id": "ninos", "nombre": "Para Childs", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
-    {"category_id": "padres", "nombre": "Padres de Familia", "nombre_en": "For Parents", "nombre_zh": "家长内容", "icono": "👨‍👩‍👧", "orden": 2},
-    {"category_id": "cultura_local", "nombre": "Cultura Local", "nombre_en": "Local Culture", "nombre_zh": "当地文化", "icono": "🌴", "orden": 3},
-    {"category_id": "cultura_china", "nombre": "Cultura China", "nombre_en": "Chinese Culture", "nombre_zh": "中国文化", "icono": "🏮", "orden": 4},
-    {"category_id": "educativo", "nombre": "Educativo", "nombre_en": "Educational", "nombre_zh": "教育内容", "icono": "📚", "orden": 5},
-    {"category_id": "entretenimiento", "nombre": "Entretenimiento", "nombre_en": "Entertainment", "nombre_zh": "娱乐", "icono": "🎉", "orden": 6},
-    {"category_id": "idiomas", "nombre": "Aprender Idiomas", "nombre_en": "Language Learning", "nombre_zh": "语言学习", "icono": "🗣️", "orden": 7},
+    {"category_id": "ninos", "name": "Para Childs", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
+    {"category_id": "padres", "name": "Padres de Familia", "nombre_en": "For Parents", "nombre_zh": "家长内容", "icono": "👨‍👩‍👧", "orden": 2},
+    {"category_id": "cultura_local", "name": "Cultura Local", "nombre_en": "Local Culture", "nombre_zh": "当地文化", "icono": "🌴", "orden": 3},
+    {"category_id": "cultura_china", "name": "Cultura China", "nombre_en": "Chinese Culture", "nombre_zh": "中国文化", "icono": "🏮", "orden": 4},
+    {"category_id": "educativo", "name": "Educativo", "nombre_en": "Educational", "nombre_zh": "教育内容", "icono": "📚", "orden": 5},
+    {"category_id": "entretenimiento", "name": "Entretenimiento", "nombre_en": "Entertainment", "nombre_zh": "娱乐", "icono": "🎉", "orden": 6},
+    {"category_id": "idiomas", "name": "Aprender Idiomas", "nombre_en": "Language Learning", "nombre_zh": "语言学习", "icono": "🗣️", "orden": 7},
 ]
 
 
@@ -79,7 +79,7 @@ async def get_content_sources():
 @router.get("/categories")
 async def get_categories():
     """Get content categories (audiences)"""
-    categories = await db.content_categories.find({"activo": True}, {"_id": 0}).sort("orden", 1).to_list(50)
+    categories = await db.content_categories.find({"active": True}, {"_id": 0}).sort("orden", 1).to_list(50)
     if not categories:
         return DEFAULT_CATEGORIES
     return categories
@@ -90,13 +90,13 @@ async def create_category(category: dict, admin: dict = Depends(get_admin_user))
     """Create content category - PLACEHOLDER"""
     doc = {
         "category_id": category.get("category_id") or f"cat_{uuid.uuid4().hex[:8]}",
-        "nombre": category.get("nombre"),
+        "name": category.get("name"),
         "nombre_en": category.get("nombre_en"),
         "nombre_zh": category.get("nombre_zh"),
-        "descripcion": category.get("descripcion"),
+        "description": category.get("description"),
         "icono": category.get("icono"),
         "orden": category.get("orden", 0),
-        "activo": True
+        "active": True
     }
     await db.content_categories.insert_one(doc)
     del doc["_id"]
@@ -109,7 +109,7 @@ async def create_category(category: dict, admin: dict = Depends(get_admin_user))
 async def get_content_items(
     categoria: Optional[str] = None,
     source: Optional[str] = None,
-    destacado: Optional[bool] = None,
+    featured: Optional[bool] = None,
     limit: int = 50
 ):
     """Get curated content items - PLACEHOLDER"""
@@ -119,10 +119,10 @@ async def get_content_items(
     if source:
         query["source"] = source
     if destacado is not None:
-        query["destacado"] = destacado
+        query["featured"] = destacado
     
     items = await db.content_items.find(query, {"_id": 0}).sort([
-        ("destacado", -1),
+        ("featured", -1),
         ("created_at", -1)
     ]).to_list(limit)
     return items
@@ -149,7 +149,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
     doc = {
         "content_id": f"content_{uuid.uuid4().hex[:12]}",
         "titulo": item.get("titulo"),
-        "descripcion": item.get("descripcion"),
+        "description": item.get("description"),
         "source": item.get("source"),
         "url_original": item.get("url_original"),
         "embed_url": item.get("embed_url"),
@@ -161,7 +161,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
         "duracion_segundos": item.get("duracion_segundos"),
         "idioma": item.get("idioma"),
         "publicado": item.get("publicado", True),
-        "destacado": item.get("destacado", False),
+        "featured": item.get("featured", False),
         "curado_por": admin.get("user_id"),
         "vistas": 0,
         "likes": 0,
@@ -208,7 +208,7 @@ async def create_playlist(playlist: dict, admin: dict = Depends(get_admin_user))
     doc = {
         "playlist_id": f"playlist_{uuid.uuid4().hex[:12]}",
         "titulo": playlist.get("titulo"),
-        "descripcion": playlist.get("descripcion"),
+        "description": playlist.get("description"),
         "imagen_portada": playlist.get("imagen_portada"),
         "categoria_id": playlist.get("categoria_id"),
         "items": playlist.get("items", []),

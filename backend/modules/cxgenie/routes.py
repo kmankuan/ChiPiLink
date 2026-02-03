@@ -71,13 +71,13 @@ async def get_cxgenie_status():
         "configured": True,
         "widget": {
             "type": value.get("widget_type", "ticket"),
-            "activo": value.get("widget_activo", True),
+            "active": value.get("widget_activo", True),
             "widget_id": value.get("widget_id"),
             "lang": value.get("widget_lang", "es"),
             "posicion": value.get("posicion", "bottom-right")
         },
         "agent_panel": {
-            "activo": value.get("agent_panel_activo", True),
+            "active": value.get("agent_panel_activo", True),
             "workspace_id": value.get("workspace_id"),
             "url_disponible": bool(value.get("agent_panel_url"))
         }
@@ -132,7 +132,7 @@ async def get_widget_code():
     
     if not value.get("widget_activo", True):
         return {
-            "activo": False,
+            "active": False,
             "widget_code": None,
             "message": "Widget de tickets no activo"
         }
@@ -148,7 +148,7 @@ async def get_widget_code():
 <script src="{script_url}" {data_attr}="{widget_id}" data-lang="{lang}"></script>'''
     
     return {
-        "activo": True,
+        "active": True,
         "widget_type": widget_type,
         "widget_code": widget_code,
         "widget_id": widget_id,
@@ -174,7 +174,7 @@ async def get_agent_panel(admin: dict = Depends(get_admin_user)):
     
     if not value.get("agent_panel_activo", True):
         return {
-            "activo": False,
+            "active": False,
             "panels": None,
             "message": "Panel de agentes no activo"
         }
@@ -183,7 +183,7 @@ async def get_agent_panel(admin: dict = Depends(get_admin_user)):
     base_url = value.get("agent_panel_base_url", DEFAULT_CXGENIE_CONFIG["agent_panel_base_url"])
     
     return {
-        "activo": True,
+        "active": True,
         "workspace_id": workspace_id,
         "panels": {
             "tickets": {
@@ -251,7 +251,7 @@ async def get_agent_panel_embed(
 # ============== TOGGLE ENDPOINTS ==============
 
 @router.put("/widget/toggle")
-async def toggle_widget(activo: bool, admin: dict = Depends(get_admin_user)):
+async def toggle_widget(active: bool, admin: dict = Depends(get_admin_user)):
     """Enable/disable the chat widget"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     
@@ -272,7 +272,7 @@ async def toggle_widget(activo: bool, admin: dict = Depends(get_admin_user)):
 
 
 @router.put("/agent-panel/toggle")
-async def toggle_agent_panel(activo: bool, admin: dict = Depends(get_admin_user)):
+async def toggle_agent_panel(active: bool, admin: dict = Depends(get_admin_user)):
     """Enable/disable the agent panel"""
     config = await db.app_config.find_one({"config_key": "cxgenie"})
     

@@ -33,14 +33,14 @@ class TaskSupervisorConfig(BaseModel):
     mostrar_reloj: bool = True
     tema: str = "light"  # light, dark, colorful
     # Status
-    activo: bool = False
+    active: bool = False
 
 
 class SupervisedPerson(BaseModel):
     """Persona supervisada (child/estudiante)"""
     model_config = ConfigDict(extra="ignore")
     person_id: str = Field(default_factory=lambda: f"person_{uuid.uuid4().hex[:12]}")
-    nombre: str
+    name: str
     apodo: Optional[str] = None  # Short name for announcements
     foto_url: Optional[str] = None
     tipo: str = "nino"  # nino, estudiante
@@ -58,7 +58,7 @@ class SupervisedPerson(BaseModel):
     racha_dias: int = 0
     logros: List[str] = []
     # Status
-    activo: bool = True
+    active: bool = True
     fecha_registro: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -69,13 +69,13 @@ class SupervisedTask(BaseModel):
     monday_item_id: Optional[str] = None  # ID in Monday.com
     # Info
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     instrucciones_voz: Optional[str] = None  # Text for TTS
     icono: Optional[str] = None
     color: Optional[str] = None
     # Assignment
     asignado_a: Optional[str] = None  # person_id
-    asignado_nombre: Optional[str] = None
+    asignado_name: Optional[str] = None
     # Tiempo
     duracion_estimada_minutos: int = 15
     hora_programada: Optional[datetime] = None
@@ -109,7 +109,7 @@ class VoiceAnnouncement(BaseModel):
     audio_url: Optional[str] = None  # Audio generado
     # Target
     para_persona_id: Optional[str] = None  # None = todos
-    para_persona_nombre: Optional[str] = None
+    para_persona_name: Optional[str] = None
     # Scheduling
     programado_para: Optional[datetime] = None
     # Status

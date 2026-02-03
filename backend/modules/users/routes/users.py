@@ -216,7 +216,7 @@ async def create_profile(
         profile = await user_profile_service.create_profile(
             user_id=user["user_id"],
             user_type_id=data.user_type_id,
-            display_name=data.display_name or user.get("nombre"),
+            display_name=data.display_name or user.get("name"),
             custom_fields=data.custom_fields
         )
         

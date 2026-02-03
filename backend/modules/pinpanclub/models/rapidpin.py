@@ -78,8 +78,8 @@ class RapidPinPrize(BaseModel):
 
 class RapidPinSeasonCreate(BaseModel):
     """Create Rapid Pin season"""
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     fecha_inicio: str  # ISO format
     fecha_fin: str     # ISO format - deadline to close ranking
     
@@ -90,8 +90,8 @@ class RapidPinSeasonCreate(BaseModel):
 
 class RapidPinSeasonUpdate(BaseModel):
     """Update season"""
-    nombre: Optional[str] = None
-    descripcion: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
     fecha_fin: Optional[str] = None
     estado: Optional[RapidPinSeasonStatus] = None
     player_prizes: Optional[List[RapidPinPrize]] = None
@@ -103,8 +103,8 @@ class RapidPinSeason(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     
     season_id: str
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     fecha_inicio: str
     fecha_fin: str
     estado: RapidPinSeasonStatus = RapidPinSeasonStatus.ACTIVE
@@ -224,7 +224,7 @@ class RapidPinRankingEntry(BaseModel):
 class RapidPinRankingTable(BaseModel):
     """Complete ranking table"""
     season_id: str
-    season_nombre: str
+    season_name: str
     estado: RapidPinSeasonStatus
     fecha_fin: str
     total_participantes: int
@@ -248,7 +248,7 @@ class RapidPinSeasonResult(BaseModel):
 class RapidPinSeasonFinalResults(BaseModel):
     """Final results of a closed season"""
     season_id: str
-    season_nombre: str
+    season_name: str
     fecha_cierre: str
     player_results: List[RapidPinSeasonResult] = []
     referee_results: List[RapidPinSeasonResult] = []

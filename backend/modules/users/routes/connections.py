@@ -35,7 +35,7 @@ class ConnectionResponseRequest(BaseModel):
 
 class InvitationRequest(BaseModel):
     email: EmailStr
-    nombre: Optional[str] = None
+    name: Optional[str] = None
     mensaje: Optional[str] = None
     tipo_relacion: Optional[str] = None
     subtipo: Optional[str] = None
@@ -49,7 +49,7 @@ class TransferRequest(BaseModel):
 
 
 class DependentCreateRequest(BaseModel):
-    nombre: str
+    name: str
     apellido: Optional[str] = None
     email: Optional[EmailStr] = None
     fecha_nacimiento: Optional[str] = None
@@ -181,7 +181,7 @@ async def create_invitation(
     result = await connections_service.crear_invitacion(
         invitado_por_id=user["user_id"],
         email=request.email,
-        nombre=request.nombre,
+        nombre=request.name,
         mensaje=request.mensaje,
         tipo_relacion=request.tipo_relacion,
         subtipo=request.subtipo,
@@ -215,7 +215,7 @@ async def create_dependent(
     """Create a dependent user (managed account)"""
     result = await connections_service.crear_acudido(
         acudiente_id=user["user_id"],
-        nombre=request.nombre,
+        nombre=request.name,
         apellido=request.apellido,
         email=request.email,
         fecha_nacimiento=request.fecha_nacimiento,
@@ -324,7 +324,7 @@ async def admin_create_dependent(
     """Admin: Create dependent user for a guardian"""
     result = await connections_service.crear_acudido(
         acudiente_id=acudiente_id,
-        nombre=request.nombre,
+        nombre=request.name,
         apellido=request.apellido,
         email=request.email,
         fecha_nacimiento=request.fecha_nacimiento,
@@ -410,7 +410,7 @@ async def create_balance_alert(
         usuario_id=user["user_id"],
         monto_requerido=request.monto_requerido,
         saldo_actual=saldo_actual,
-        descripcion=request.descripcion
+        descripcion=request.description
     )
     
     return result
@@ -536,8 +536,8 @@ async def admin_create_capability(
     
     capacidad = {
         "capacidad_id": request.capacidad_id,
-        "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
-        "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
+        "name": {"es": request.name_es, "en": request.name_en or request.name_es},
+        "description": {"es": request.description_es or "", "en": request.description_en or request.description_es or ""},
         "icono": request.icono or "✨",
         "color": request.color or "#6366f1",
         "tipo": request.tipo,
@@ -566,8 +566,8 @@ async def admin_update_capability(
     result = await db.config_capacidades.update_one(
         {"capacidad_id": capability_id},
         {"$set": {
-            "nombre": {"es": request.nombre_es, "en": request.nombre_en or request.nombre_es},
-            "descripcion": {"es": request.descripcion_es or "", "en": request.descripcion_en or request.descripcion_es or ""},
+            "name": {"es": request.name_es, "en": request.name_en or request.name_es},
+            "description": {"es": request.description_es or "", "en": request.description_en or request.description_es or ""},
             "icono": request.icono,
             "color": request.color,
             "tipo": request.tipo,

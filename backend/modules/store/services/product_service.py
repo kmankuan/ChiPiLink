@@ -34,7 +34,7 @@ class ProductService(BaseService):
             StoreEvents.PRODUCT_CREATED,
             {
                 "libro_id": result["libro_id"],
-                "nombre": result["nombre"],
+                "name": result["name"],
                 "categoria": result.get("categoria")
             }
         )
@@ -50,8 +50,8 @@ class ProductService(BaseService):
     async def get_all_products(
         self,
         categoria: Optional[str] = None,
-        grado: Optional[str] = None,
-        materia: Optional[str] = None,
+        grade: Optional[str] = None,
+        subject: Optional[str] = None,
         skip: int = 0,
         limit: int = 500
     ) -> List[Product]:
@@ -139,7 +139,7 @@ class ProductService(BaseService):
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
                         "libro_id": libro_id,
-                        "nombre": product.nombre,
+                        "name": product.name,
                         "cantidad": product.inventory_quantity
                     },
                     priority=EventPriority.HIGH
@@ -160,7 +160,7 @@ class ProductService(BaseService):
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
                         "libro_id": libro_id,
-                        "nombre": product.nombre,
+                        "name": product.name,
                         "cantidad": product.inventory_quantity
                     },
                     priority=EventPriority.HIGH
@@ -188,7 +188,7 @@ class ProductService(BaseService):
             "alertas_bajo_stock": [
                 {
                     "libro_id": p["libro_id"],
-                    "nombre": p["nombre"],
+                    "name": p["name"],
                     "cantidad": p.get("inventory_quantity", 0)
                 }
                 for p in low_stock

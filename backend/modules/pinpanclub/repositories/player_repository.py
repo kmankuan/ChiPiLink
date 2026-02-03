@@ -28,7 +28,7 @@ class PlayerRepository(BaseRepository):
         player_data["partidos_jugados"] = 0
         player_data["partidos_ganados"] = 0
         player_data["partidos_perdidos"] = 0
-        player_data["activo"] = True
+        player_data["active"] = True
         
         return await self.insert_one(player_data)
     
@@ -39,7 +39,7 @@ class PlayerRepository(BaseRepository):
     async def get_all_active(self, skip: int = 0, limit: int = 100) -> List[Dict]:
         """Get all players activos"""
         return await self.find_many(
-            query={"activo": True},
+            query={"active": True},
             skip=skip,
             limit=limit,
             sort=[("elo_rating", -1)]
@@ -48,7 +48,7 @@ class PlayerRepository(BaseRepository):
     async def get_rankings(self, limit: int = 50) -> List[Dict]:
         """Get ranking de jugadores por ELO"""
         return await self.find_many(
-            query={"activo": True, "partidos_jugados": {"$gt": 0}},
+            query={"active": True, "partidos_jugados": {"$gt": 0}},
             limit=limit,
             sort=[("elo_rating", -1)]
         )
@@ -83,23 +83,23 @@ class PlayerRepository(BaseRepository):
         """Search jugadores by name o apodo"""
         search_filter = {
             "$or": [
-                {"nombre": {"$regex": query, "$options": "i"}},
+                {"name": {"$regex": query, "$options": "i"}},
                 {"apellido": {"$regex": query, "$options": "i"}},
                 {"apodo": {"$regex": query, "$options": "i"}}
             ],
-            "activo": True
+            "active": True
         }
         return await self.find_many(query=search_filter, limit=limit)
     
     async def deactivate(self, jugador_id: str) -> bool:
         """Desactivar jugador (soft delete)"""
-        return await self.update_player(jugador_id, {"activo": False})
+        return await self.update_player(jugador_id, {"active": False})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
         """Get jugadores no sincronizados con Monday.com"""
         return await self.find_many(
             query={
-                "activo": True,
+                "active": True,
                 "$or": [
                     {"monday_item_id": {"$exists": False}},
                     {"monday_item_id": None}

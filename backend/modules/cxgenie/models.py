@@ -23,7 +23,7 @@ class CXGenieConfig(BaseModel):
     posicion: str = "bottom-right"  # bottom-right, bottom-left
     mensaje_bienvenida: Optional[str] = None
     # Status
-    activo: bool = False
+    active: bool = False
     modo: str = "widget"  # widget, api, ambos
     fecha_configuracion: Optional[datetime] = None
 
@@ -35,10 +35,10 @@ class ChatConversation(BaseModel):
     cxgenie_conversation_id: Optional[str] = None  # ID en CXGenie
     # Participantes
     user_id: Optional[str] = None
-    cliente_nombre: Optional[str] = None
+    cliente_name: Optional[str] = None
     cliente_email: Optional[str] = None
     agente_id: Optional[str] = None
-    agente_nombre: Optional[str] = None
+    agente_name: Optional[str] = None
     # Estado
     estado: str = "abierta"  # abierta, en_progreso, cerrada
     canal: str = "web"  # web, whatsapp, telegram, etc.
@@ -64,7 +64,7 @@ class ChatMessage(BaseModel):
     # Remitente
     remitente_tipo: str  # cliente, agente, bot
     remitente_id: Optional[str] = None
-    remitente_nombre: Optional[str] = None
+    remitente_name: Optional[str] = None
     # Estado
     leido: bool = False
     fecha_envio: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

@@ -27,7 +27,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
             if student.get("has_approved_access") or student.get("status") == "approved":
                 students.append({
                     "sync_id": student.get("student_id"),
-                    "nombre": student.get("full_name"),
+                    "name": student.get("full_name"),
                     "grade": student.get("grade"),
                     "seccion": student.get("section"),
                     "student_id": student.get("student_id"),
@@ -67,8 +67,8 @@ async def check_access(
 
 @router.get("/productos")
 async def get_private_catalog_products(
-    grado: Optional[str] = None,
-    materia: Optional[str] = None,
+    grade: Optional[str] = None,
+    subject: Optional[str] = None,
     search: Optional[str] = None,
     destacados: bool = False,
     skip: int = Query(0, ge=0),
@@ -91,7 +91,7 @@ async def get_private_catalog_products(
     # Build query
     query = {
         "is_private_catalog": True,
-        "activo": True
+        "active": True
     }
     
     # Filter by grade (if not specified, show all user's grades)
@@ -105,28 +105,28 @@ async def get_private_catalog_products(
         query["subject"] = materia
     
     if destacados:
-        query["destacado"] = True
+        query["featured"] = True
     
     if search:
         query["$or"] = [
-            {"nombre": {"$regex": search, "$options": "i"}},
-            {"descripcion": {"$regex": search, "$options": "i"}},
+            {"name": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}},
             {"code": {"$regex": search, "$options": "i"}},
-            {"editorial": {"$regex": search, "$options": "i"}}
+            {"publisher": {"$regex": search, "$options": "i"}}
         ]
     
     # Get products
     productos = await db.libros.find(
         query,
         {"_id": 0}
-    ).sort([("grade", 1), ("subject", 1), ("nombre", 1)]).skip(skip).limit(limit).to_list(limit)
+    ).sort([("grade", 1), ("subject", 1), ("name", 1)]).skip(skip).limit(limit).to_list(limit)
     
     # Contar total
     total = await db.libros.count_documents(query)
     
     # Get grados y materias disponibles para filtros
-    grados_disponibles = await db.libros.distinct("grade", {"is_private_catalog": True, "activo": True})
-    materias_disponibles = await db.libros.distinct("subject", {"is_private_catalog": True, "activo": True})
+    grados_disponibles = await db.libros.distinct("grade", {"is_private_catalog": True, "active": True})
+    materias_disponibles = await db.libros.distinct("subject", {"is_private_catalog": True, "active": True})
     
     return {
         "productos": productos,
@@ -172,7 +172,7 @@ async def get_producto_detalle(
 
 @router.get("/por-grado/{grado}")
 async def get_productos_por_grado(
-    grado: str,
+    grade: str,
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -190,7 +190,7 @@ async def get_productos_por_grado(
     
     query = {
         "is_private_catalog": True,
-        "activo": True,
+        "active": True,
         "$or": [
             {"grade": grado},
             {"grades": grado}
@@ -200,7 +200,7 @@ async def get_productos_por_grado(
     productos = await db.libros.find(
         query,
         {"_id": 0}
-    ).sort([("subject", 1), ("nombre", 1)]).to_list(200)
+    ).sort([("subject", 1), ("name", 1)]).to_list(200)
     
     # Agrupar por materia
     por_materia = {}
@@ -244,7 +244,7 @@ async def get_resumen_catalogo(
             # Contar productos del grado
             count = await db.libros.count_documents({
                 "is_private_catalog": True,
-                "activo": True,
+                "active": True,
                 "$or": [{"grade": grado}, {"grades": grado}]
             })
             
@@ -252,14 +252,14 @@ async def get_resumen_catalogo(
             productos = await db.libros.find(
                 {
                     "is_private_catalog": True,
-                    "activo": True,
+                    "active": True,
                     "$or": [{"grade": grado}, {"grades": grado}]
                 },
-                {"precio": 1, "sale_price": 1}
+                {"price": 1, "sale_price": 1}
             ).to_list(200)
             
             total_estimado = sum(
-                p.get("sale_price") or p.get("precio", 0) 
+                p.get("sale_price") or p.get("price", 0) 
                 for p in productos
             )
             
@@ -279,9 +279,9 @@ async def get_resumen_catalogo(
 
 @router.get("/admin/productos")
 async def admin_get_productos_catalogo_privado(
-    grado: Optional[str] = None,
-    materia: Optional[str] = None,
-    activo: Optional[bool] = None,
+    grade: Optional[str] = None,
+    subject: Optional[str] = None,
+    active: Optional[bool] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     admin: dict = Depends(get_admin_user)
@@ -298,7 +298,7 @@ async def admin_get_productos_catalogo_privado(
         query["subject"] = materia
     
     if activo is not None:
-        query["activo"] = activo
+        query["active"] = activo
     
     productos = await db.libros.find(
         query,
@@ -326,7 +326,7 @@ async def admin_crear_producto_catalogo_privado(
     # Ensure que sea catalog privado
     producto["is_private_catalog"] = True
     producto["libro_id"] = producto.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
-    producto["activo"] = producto.get("activo", True)
+    producto["active"] = producto.get("active", True)
     producto["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.libros.insert_one(producto)
@@ -380,7 +380,7 @@ async def admin_eliminar_producto_catalogo_privado(
     else:
         result = await db.libros.update_one(
             {"libro_id": libro_id, "is_private_catalog": True},
-            {"$set": {"activo": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
+            {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Producto not found")

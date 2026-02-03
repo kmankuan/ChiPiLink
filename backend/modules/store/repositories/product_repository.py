@@ -35,13 +35,13 @@ class ProductRepository(BaseRepository):
     async def get_all_active(
         self,
         categoria: Optional[str] = None,
-        grado: Optional[str] = None,
-        materia: Optional[str] = None,
+        grade: Optional[str] = None,
+        subject: Optional[str] = None,
         skip: int = 0,
         limit: int = 500
     ) -> List[Dict]:
         """Get productos activos con filtros opcionales"""
-        query = {"activo": True}
+        query = {"active": True}
         
         if categoria:
             query["categoria"] = categoria
@@ -57,13 +57,13 @@ class ProductRepository(BaseRepository):
     async def get_by_category(self, categoria: str, limit: int = 100) -> List[Dict]:
         """Get productos por category"""
         return await self.find_many(
-            query={"categoria": categoria, "activo": True},
+            query={"categoria": categoria, "active": True},
             limit=limit
         )
     
     async def get_featured(self, categoria: Optional[str] = None, limit: int = 10) -> List[Dict]:
         """Get productos destacados"""
-        query = {"destacado": True, "activo": True}
+        query = {"featured": True, "active": True}
         if categoria:
             query["categoria"] = categoria
         return await self.find_many(
@@ -76,7 +76,7 @@ class ProductRepository(BaseRepository):
         """Get productos en promotion"""
         query = {
             "on_sale": True,
-            "activo": True,
+            "active": True,
             "sale_price": {"$ne": None}
         }
         if categoria:
@@ -85,7 +85,7 @@ class ProductRepository(BaseRepository):
     
     async def get_newest(self, categoria: Optional[str] = None, limit: int = 8) -> List[Dict]:
         """Get productos more nuevos"""
-        query = {"activo": True}
+        query = {"active": True}
         if categoria:
             query["categoria"] = categoria
         return await self.find_many(
@@ -99,10 +99,10 @@ class ProductRepository(BaseRepository):
         return await self.find_many(
             query={
                 "$or": [
-                    {"nombre": {"$regex": query_text, "$options": "i"}},
-                    {"descripcion": {"$regex": query_text, "$options": "i"}}
+                    {"name": {"$regex": query_text, "$options": "i"}},
+                    {"description": {"$regex": query_text, "$options": "i"}}
                 ],
-                "activo": True
+                "active": True
             },
             limit=limit
         )
@@ -127,11 +127,11 @@ class ProductRepository(BaseRepository):
         """Get productos con bajo stock"""
         return await self.find_many(
             query={
-                "activo": True,
+                "active": True,
                 "inventory_quantity": {"$lt": threshold}
             }
         )
     
     async def deactivate(self, libro_id: str) -> bool:
         """Desactivar producto (soft delete)"""
-        return await self.update_product(libro_id, {"activo": False})
+        return await self.update_product(libro_id, {"active": False})

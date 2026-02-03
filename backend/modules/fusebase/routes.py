@@ -34,16 +34,16 @@ async def get_fusebase_status():
             "module": "fusebase",
             "status": "not_configured",
             "configured": False,
-            "activo": False,
+            "active": False,
             "message": "FuseBase no configurado. Configure la URL de embed o API."
         }
     
     value = config.get("value", {})
     return {
         "module": "fusebase",
-        "status": "configured" if value.get("activo") else "inactive",
+        "status": "configured" if value.get("active") else "inactive",
         "configured": True,
-        "activo": value.get("activo", False),
+        "active": value.get("active", False),
         "embed_enabled": value.get("embed_enabled", False),
         "workspace_id": value.get("workspace_id")
     }
@@ -87,9 +87,9 @@ async def get_embed_url():
     """Get FuseBase embed URL for frontend (public)"""
     config = await db.app_config.find_one({"config_key": "fusebase"})
     
-    if not config or not config.get("value", {}).get("activo"):
+    if not config or not config.get("value", {}).get("active"):
         return {
-            "activo": False,
+            "active": False,
             "embed_url": None,
             "message": "FuseBase no activo"
         }
@@ -97,7 +97,7 @@ async def get_embed_url():
     value = config["value"]
     
     return {
-        "activo": True,
+        "active": True,
         "embed_url": value.get("embed_url"),
         "tema": value.get("tema", "light"),
         "mostrar_navegacion": value.get("mostrar_navegacion", True)
@@ -131,15 +131,15 @@ async def get_documents(
 @router.get("/categories")
 async def get_document_categories():
     """Get document categories"""
-    categories = await db.fusebase_categories.find({"activo": True}, {"_id": 0}).sort("orden", 1).to_list(50)
+    categories = await db.fusebase_categories.find({"active": True}, {"_id": 0}).sort("orden", 1).to_list(50)
     
     if not categories:
         # Default categories
         categories = [
-            {"category_id": "general", "nombre": "General", "icono": "📄", "orden": 1},
-            {"category_id": "guias", "nombre": "Guides y Tutoriales", "icono": "📖", "orden": 2},
-            {"category_id": "politicas", "nombre": "Policies y Procedimientos", "icono": "📋", "orden": 3},
-            {"category_id": "recursos", "nombre": "Recursos", "icono": "📦", "orden": 4},
+            {"category_id": "general", "name": "General", "icono": "📄", "orden": 1},
+            {"category_id": "guias", "name": "Guides y Tutoriales", "icono": "📖", "orden": 2},
+            {"category_id": "politicas", "name": "Policies y Procedimientos", "icono": "📋", "orden": 3},
+            {"category_id": "recursos", "name": "Recursos", "icono": "📦", "orden": 4},
         ]
     
     return categories

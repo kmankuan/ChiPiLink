@@ -129,8 +129,8 @@ class PrizeConfig(BaseModel):
 
 class SuperPinLeagueBase(BaseModel):
     """Base para liga Super Pin"""
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     temporada: str  # Ej: "2025", "Q1-2025"
     fecha_inicio: Optional[str] = None
     fecha_fin: Optional[str] = None
@@ -148,8 +148,8 @@ class SuperPinLeagueCreate(SuperPinLeagueBase):
 
 class SuperPinLeagueUpdate(BaseModel):
     """Update league"""
-    nombre: Optional[str] = None
-    descripcion: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
     temporada: Optional[str] = None
     fecha_inicio: Optional[str] = None
     fecha_fin: Optional[str] = None
@@ -322,7 +322,7 @@ class RankingEntry(BaseModel):
 class RankingTable(BaseModel):
     """Tabla de ranking completa"""
     liga_id: str
-    liga_nombre: str
+    liga_name: str
     temporada: str
     total_jugadores: int
     total_partidos: int
@@ -336,8 +336,8 @@ class RankingTable(BaseModel):
 class SeasonTournamentCreate(BaseModel):
     """Create season tournament"""
     liga_id: str
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     fecha_inicio: str
     fecha_fin: Optional[str] = None
 
@@ -348,8 +348,8 @@ class SeasonTournament(BaseModel):
     
     torneo_id: str
     liga_id: str
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     
     # Configuration (heredada of the league)
     tournament_config: TournamentConfig

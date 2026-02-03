@@ -36,7 +36,7 @@ class PlayerService(BaseService):
             PinpanClubEvents.PLAYER_CREATED,
             {
                 "jugador_id": result["jugador_id"],
-                "nombre": result["nombre"],
+                "name": result["name"],
                 "elo_rating": result["elo_rating"]
             }
         )

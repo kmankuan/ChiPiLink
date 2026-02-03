@@ -118,7 +118,7 @@ async def create_sheet_config(config: dict, admin: dict = Depends(get_admin_user
                 })
         
         new_config = ConfiguracionSheetSync(
-            nombre=config.get("nombre", "Nueva Configuraci\u00f3n"),
+            nombre=config.get("name", "Nueva Configuraci\u00f3n"),
             sheet_url=sheet_url,
             sheet_id=sheet_id,
             gid=gid,
@@ -210,7 +210,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
         
         # Get existing records (OPTIMIZED: only fetch needed fields for comparison)
         existing = await db.estudiantes_sincronizados.find(
-            {"config_id": config_id, "estado": "activo"},
+            {"config_id": config_id, "estado": "active"},
             {"_id": 0, "sync_id": 1, "fila_original": 1, "datos": 1, "hash_datos": 1}
         ).to_list(10000)
         existing_by_row = {e["fila_original"]: e for e in existing}
@@ -294,7 +294,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
         
         # Update config status
         total_activos = await db.estudiantes_sincronizados.count_documents(
-            {"config_id": config_id, "estado": "activo"}
+            {"config_id": config_id, "estado": "active"}
         )
         
         await db.sheet_configs.update_one(
@@ -302,7 +302,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
             {"$set": {
                 "ultima_sincronizacion": datetime.now(timezone.utc).isoformat(),
                 "total_registros": total_activos,
-                "estado": "activo",
+                "estado": "active",
                 "mensaje_error": None
             }}
         )
@@ -331,7 +331,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
 @router.get("/configs/{config_id}/data")
 async def get_synced_data(
     config_id: str,
-    estado: Optional[str] = "activo",
+    estado: Optional[str] = "active",
     limite: int = 100,
     admin: dict = Depends(get_admin_user)
 ):

@@ -295,7 +295,7 @@ async def get_tournament_brackets(torneo_id: str):
         raise HTTPException(status_code=404, detail="Torneo not found")
     return {
         "torneo_id": tournament.get("torneo_id"),
-        "nombre": tournament.get("nombre"),
+        "name": tournament.get("name"),
         "estado": tournament.get("estado"),
         "brackets": tournament.get("brackets", []),
         "participantes": tournament.get("participantes", []),

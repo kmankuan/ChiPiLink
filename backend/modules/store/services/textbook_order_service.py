@@ -68,7 +68,7 @@ class TextbookOrderService(BaseService):
         
         books = await db.libros.find(
             {
-                "activo": True,
+                "active": True,
                 "is_private_catalog": True,
                 "$or": [
                     {"grade": {"$in": grade_queries}},
@@ -76,7 +76,7 @@ class TextbookOrderService(BaseService):
                 ]
             },
             {"_id": 0}
-        ).sort("nombre", 1).to_list(200)
+        ).sort("name", 1).to_list(200)
         
         return books
     
@@ -125,8 +125,8 @@ class TextbookOrderService(BaseService):
             items.append({
                 "book_id": book["libro_id"],
                 "book_code": book.get("code", ""),
-                "book_name": book["nombre"],
-                "price": float(book.get("precio", 0)),
+                "book_name": book["name"],
+                "price": float(book.get("price", 0)),
                 "quantity_ordered": 0,
                 "max_quantity": 1,
                 "status": status,
@@ -166,8 +166,8 @@ class TextbookOrderService(BaseService):
             if book_id in existing_items:
                 item = existing_items[book_id]
                 # Update price and availability
-                item["price"] = float(book.get("precio", 0))
-                item["book_name"] = book["nombre"]
+                item["price"] = float(book.get("price", 0))
+                item["book_name"] = book["name"]
                 
                 # Only update status if not already ordered
                 if item["status"] not in [OrderItemStatus.ORDERED.value]:
@@ -183,8 +183,8 @@ class TextbookOrderService(BaseService):
                 updated_items.append({
                     "book_id": book_id,
                     "book_code": book.get("code", ""),
-                    "book_name": book["nombre"],
-                    "price": float(book.get("precio", 0)),
+                    "book_name": book["name"],
+                    "price": float(book.get("price", 0)),
                     "quantity_ordered": 0,
                     "max_quantity": 1,
                     "status": status,

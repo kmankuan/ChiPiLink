@@ -13,7 +13,7 @@ import uuid
 
 class EstadoCuenta(str, Enum):
     """User account status"""
-    ACTIVO = "activo"       # User with credentials, manages their own account
+    ACTIVO = "active"       # User with credentials, manages their own account
     ACUDIDO = "acudido"     # User created by guardian/admin, managed account
 
 
@@ -60,7 +60,7 @@ class SubtipoEspecial(str, Enum):
 class EstadoConexion(str, Enum):
     """Connection status between users"""
     PENDIENTE = "pendiente"
-    ACTIVO = "activo"
+    ACTIVO = "active"
     RECHAZADO = "rechazado"
     BLOQUEADO = "bloqueado"
 
@@ -137,9 +137,9 @@ class SolicitudConexion(BaseModel):
     """Solicitud de connection entre usuarios"""
     request_id: str = Field(default_factory=lambda: f"sol_{uuid.uuid4().hex[:12]}")
     de_usuario_id: str
-    de_usuario_nombre: Optional[str] = None
+    de_usuario_name: Optional[str] = None
     para_usuario_id: str
-    para_usuario_nombre: Optional[str] = None
+    para_usuario_name: Optional[str] = None
     tipo: TipoRelacion
     subtipo: str
     etiqueta: Optional[str] = None
@@ -165,7 +165,7 @@ class Invitacion(BaseModel):
     """Invitation a usuario no registrado"""
     invitacion_id: str = Field(default_factory=lambda: f"inv_{uuid.uuid4().hex[:12]}")
     invitado_por_id: str
-    invitado_por_nombre: Optional[str] = None
+    invitado_por_name: Optional[str] = None
     email_destino: EmailStr
     nombre_destino: Optional[str] = None
     mensaje: Optional[str] = None
@@ -183,7 +183,7 @@ class Invitacion(BaseModel):
 class InvitacionCreate(BaseModel):
     """Request to create invitation"""
     email: EmailStr
-    nombre: Optional[str] = None
+    name: Optional[str] = None
     mensaje: Optional[str] = None
     tipo_relacion: Optional[TipoRelacion] = None
     subtipo: Optional[str] = None
@@ -236,7 +236,7 @@ class CapacidadSolicitud(BaseModel):
 
 class AcudidoCreate(BaseModel):
     """Request to create usuario acudido"""
-    nombre: str
+    name: str
     apellido: Optional[str] = None
     email: Optional[EmailStr] = None        # Optional for minors
     telefono: Optional[str] = None
@@ -292,7 +292,7 @@ class ConfigPermisosRelacion(BaseModel):
     tipo: TipoRelacion
     subtipo: str
     permisos_default: PermisosConexion
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
 
 
 # ============== CONFIGURATION DE MARKETING ==============
@@ -319,7 +319,7 @@ def get_default_permisos_por_relacion() -> List[Dict]:
                 "recibir_alertas": True,
                 "limite_transferencia_diario": None
             },
-            "descripcion": "Acudiente tiene acceso completo al acudido"
+            "description": "Acudiente tiene acceso completo al acudido"
         },
         {
             "tipo": "especial",
@@ -331,7 +331,7 @@ def get_default_permisos_por_relacion() -> List[Dict]:
                 "recibir_alertas": False,
                 "limite_transferencia_diario": None
             },
-            "descripcion": "Acudido no tiene permisos sobre acudiente"
+            "description": "Acudido no tiene permisos sobre acudiente"
         },
         {
             "tipo": "familiar",
@@ -385,8 +385,8 @@ def get_default_capacidades() -> List[Dict]:
     return [
         {
             "capacidad_id": "cliente",
-            "nombre": {"es": "Cliente", "en": "Customer", "zh": "客户"},
-            "descripcion": {"es": "Puede comprar productos y servicios", "en": "Can buy products and services"},
+            "name": {"es": "Cliente", "en": "Customer", "zh": "客户"},
+            "description": {"es": "Puede comprar productos y servicios", "en": "Can buy products and services"},
             "icono": "🛒",
             "color": "#10b981",
             "tipo": "predeterminada",
@@ -399,8 +399,8 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "jugador_ranking",
-            "nombre": {"es": "Jugador en Ranking", "en": "Ranked Player", "zh": "排名玩家"},
-            "descripcion": {"es": "Aparece in ranking oficial de PinpanClub", "en": "Appears in official PinpanClub ranking"},
+            "name": {"es": "Jugador en Ranking", "en": "Ranked Player", "zh": "排名玩家"},
+            "description": {"es": "Aparece in ranking oficial de PinpanClub", "en": "Appears in official PinpanClub ranking"},
             "icono": "🏓",
             "color": "#f59e0b",
             "tipo": "por_suscripcion",
@@ -413,8 +413,8 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "arbitro",
-            "nombre": {"es": "Referee", "en": "Referee", "zh": "裁判"},
-            "descripcion": {"es": "Puede arbitrar partidos oficiales", "en": "Can referee official matches"},
+            "name": {"es": "Referee", "en": "Referee", "zh": "裁判"},
+            "description": {"es": "Puede arbitrar partidos oficiales", "en": "Can referee official matches"},
             "icono": "🏅",
             "color": "#8b5cf6",
             "tipo": "solicitada",
@@ -427,8 +427,8 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "acudiente",
-            "nombre": {"es": "Acudiente", "en": "Guardian", "zh": "监护人"},
-            "descripcion": {"es": "Puede vincular y gestionar acudidos", "en": "Can link and manage dependents"},
+            "name": {"es": "Acudiente", "en": "Guardian", "zh": "监护人"},
+            "description": {"es": "Puede vincular y gestionar acudidos", "en": "Can link and manage dependents"},
             "icono": "👨‍👩‍👧",
             "color": "#3b82f6",
             "tipo": "solicitada",
@@ -441,8 +441,8 @@ def get_default_capacidades() -> List[Dict]:
         },
         {
             "capacidad_id": "estudiante_tutoria",
-            "nombre": {"es": "Estudiante Tutoring", "en": "Tutoring Student", "zh": "辅导学生"},
-            "descripcion": {"es": "Inscrito en programa de Tutoring Integral", "en": "Enrolled in Integral Tutoring program"},
+            "name": {"es": "Estudiante Tutoring", "en": "Tutoring Student", "zh": "辅导学生"},
+            "description": {"es": "Inscrito en programa de Tutoring Integral", "en": "Enrolled in Integral Tutoring program"},
             "icono": "📚",
             "color": "#ec4899",
             "tipo": "por_suscripcion",
@@ -461,30 +461,30 @@ def get_default_membresias() -> List[Dict]:
     return [
         {
             "membresia_id": "pinpanclub",
-            "nombre": {"es": "PinpanClub", "en": "PinpanClub", "zh": "乒乓俱乐部"},
-            "descripcion": {"es": "Club de Tenis de Mesa", "en": "Table Tennis Club"},
+            "name": {"es": "PinpanClub", "en": "PinpanClub", "zh": "乒乓俱乐部"},
+            "description": {"es": "Club de Tenis de Mesa", "en": "Table Tennis Club"},
             "icono": "🏓",
             "color": "#f59e0b",
             "planes": [
-                {"plan_id": "pase_6", "nombre": "Pase 6 Visitas", "precio": 165, "tipo": "visits", "visitas": 6, "dias_validez": 60},
-                {"plan_id": "pase_12", "nombre": "Pase 12 Visitas", "precio": 300, "tipo": "visits", "visitas": 12, "dias_validez": 90},
-                {"plan_id": "ilimitado_mensual", "nombre": "Ilimitado Mensual", "precio": 150, "tipo": "unlimited", "dias_validez": 30},
-                {"plan_id": "prueba", "nombre": "Prueba Gratis", "precio": 0, "tipo": "trial", "visitas": 2, "dias_validez": 14},
-                {"plan_id": "cortesia", "nombre": "Courtesy", "precio": 0, "tipo": "courtesy", "dias_validez": 365}
+                {"plan_id": "pase_6", "name": "Pase 6 Visitas", "price": 165, "tipo": "visits", "visitas": 6, "dias_validez": 60},
+                {"plan_id": "pase_12", "name": "Pase 12 Visitas", "price": 300, "tipo": "visits", "visitas": 12, "dias_validez": 90},
+                {"plan_id": "ilimitado_mensual", "name": "Ilimitado Mensual", "price": 150, "tipo": "unlimited", "dias_validez": 30},
+                {"plan_id": "prueba", "name": "Prueba Gratis", "price": 0, "tipo": "trial", "visitas": 2, "dias_validez": 14},
+                {"plan_id": "cortesia", "name": "Courtesy", "price": 0, "tipo": "courtesy", "dias_validez": 365}
             ],
             "activa": True,
             "orden": 1
         },
         {
             "membresia_id": "tutoria_integral",
-            "nombre": {"es": "Tutoring Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
-            "descripcion": {"es": "Programa de apoyo academic", "en": "Academic support program"},
+            "name": {"es": "Tutoring Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
+            "description": {"es": "Programa de apoyo academic", "en": "Academic support program"},
             "icono": "📚",
             "color": "#ec4899",
             "planes": [
-                {"plan_id": "mensual", "nombre": "Plan Mensual", "precio": 200, "tipo": "unlimited", "dias_validez": 30},
-                {"plan_id": "trimestral", "nombre": "Plan Trimestral", "precio": 500, "tipo": "unlimited", "dias_validez": 90},
-                {"plan_id": "anual", "nombre": "Plan Anual", "precio": 1800, "tipo": "unlimited", "dias_validez": 365}
+                {"plan_id": "mensual", "name": "Plan Mensual", "price": 200, "tipo": "unlimited", "dias_validez": 30},
+                {"plan_id": "trimestral", "name": "Plan Trimestral", "price": 500, "tipo": "unlimited", "dias_validez": 90},
+                {"plan_id": "anual", "name": "Plan Anual", "price": 1800, "tipo": "unlimited", "dias_validez": 365}
             ],
             "activa": True,
             "orden": 2

@@ -36,7 +36,7 @@ class TournamentFormat(str, Enum):
 
 class PlayerBase(BaseModel):
     """Base para jugador"""
-    nombre: str
+    name: str
     apellido: Optional[str] = None
     apodo: Optional[str] = None
     email: Optional[str] = None
@@ -52,7 +52,7 @@ class PlayerCreate(PlayerBase):
 
 class PlayerUpdate(BaseModel):
     """Update jugador"""
-    nombre: Optional[str] = None
+    name: Optional[str] = None
     apellido: Optional[str] = None
     apodo: Optional[str] = None
     email: Optional[str] = None
@@ -70,7 +70,7 @@ class Player(PlayerBase):
     partidos_jugados: int = 0
     partidos_ganados: int = 0
     partidos_perdidos: int = 0
-    activo: bool = True
+    active: bool = True
     monday_item_id: Optional[str] = None
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
@@ -125,8 +125,8 @@ class Match(MatchBase):
 
 class TournamentBase(BaseModel):
     """Base para torneo"""
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     formato: TournamentFormat = TournamentFormat.ELIMINACION_SIMPLE
     max_participantes: Optional[int] = None
     fecha_inicio: Optional[str] = None
@@ -155,7 +155,7 @@ class Tournament(TournamentBase):
 
 class SponsorBase(BaseModel):
     """Base para patrocinador"""
-    nombre: str
+    name: str
     logo_url: str
     website_url: Optional[str] = None
     posicion: str = "horizontal"  # horizontal, square, header
@@ -172,7 +172,7 @@ class Sponsor(SponsorBase):
     model_config = ConfigDict(from_attributes=True)
     
     sponsor_id: str
-    activo: bool = True
+    active: bool = True
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 

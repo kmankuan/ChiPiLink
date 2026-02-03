@@ -157,8 +157,8 @@ DEFAULT_ROLE_PERMISSIONS = {
 
 class RoleBase(BaseModel):
     """Base model for roles"""
-    nombre: str = Field(..., min_length=2, max_length=50)
-    descripcion: Optional[str] = None
+    name: str = Field(..., min_length=2, max_length=50)
+    description: Optional[str] = None
     color: Optional[str] = "#6366f1"  # Color for UI
     icono: Optional[str] = "Shield"  # Icono lucide
     es_sistema: bool = False  # True for system roles that cannot be deleted
@@ -172,8 +172,8 @@ class RoleCreate(RoleBase):
 
 class RoleUpdate(BaseModel):
     """Model for updating a role"""
-    nombre: Optional[str] = None
-    descripcion: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
     color: Optional[str] = None
     icono: Optional[str] = None
     permisos: Optional[List[str]] = None

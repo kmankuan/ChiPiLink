@@ -22,7 +22,7 @@ def setup_event_handlers():
         """
         payload = event.payload
         
-        if payload.get("destacado"):
+        if payload.get("featured"):
             notificacion = {
                 "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
                 "tipo": "post_destacado",

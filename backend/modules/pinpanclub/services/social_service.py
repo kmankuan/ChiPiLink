@@ -56,8 +56,8 @@ class SocialService(BaseService):
         follow_data = {
             "follower_id": follower_id,
             "following_id": following_id,
-            "follower_info": {"nombre": follower.get("nombre"), "apodo": follower.get("apodo")} if follower else None,
-            "following_info": {"nombre": following.get("nombre"), "apodo": following.get("apodo")} if following else None
+            "follower_info": {"name": follower.get("name"), "apodo": follower.get("apodo")} if follower else None,
+            "following_info": {"name": following.get("name"), "apodo": following.get("apodo")} if following else None
         }
         
         result = await self.follow_repo.create(follow_data)
@@ -76,7 +76,7 @@ class SocialService(BaseService):
         await self.create_activity(ActivityFeedCreate(
             jugador_id=follower_id,
             activity_type=ActivityType.NEW_FOLLOWER,
-            data={"following_id": following_id, "following_name": following.get("apodo") or following.get("nombre")},
+            data={"following_id": following_id, "following_name": following.get("apodo") or following.get("name")},
             description=f"Ahora sigue a {following.get('apodo') or following.get('nombre')}"
         ))
         
@@ -116,7 +116,7 @@ class SocialService(BaseService):
         
         comment_data = data.model_dump()
         comment_data["author_info"] = {
-            "nombre": author.get("nombre"),
+            "name": author.get("name"),
             "apodo": author.get("apodo")
         } if author else None
         
@@ -216,7 +216,7 @@ class SocialService(BaseService):
         
         activity_data = data.model_dump()
         activity_data["jugador_info"] = {
-            "nombre": player.get("nombre"),
+            "name": player.get("name"),
             "apodo": player.get("apodo")
         } if player else None
         

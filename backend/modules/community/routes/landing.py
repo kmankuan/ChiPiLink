@@ -43,13 +43,13 @@ async def get_community_landing_data():
     
     # Featured products from store (limited)
     featured_products = await db.libros.find(
-        {"destacado": True, "activo": True},
+        {"featured": True, "active": True},
         {"_id": 0}
     ).sort("featured_order", 1).to_list(4)
     
     # Promotional products
     promo_products = await db.libros.find(
-        {"on_sale": True, "activo": True, "sale_price": {"$ne": None}},
+        {"on_sale": True, "active": True, "sale_price": {"$ne": None}},
         {"_id": 0}
     ).to_list(4)
     

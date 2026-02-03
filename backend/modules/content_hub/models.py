@@ -10,30 +10,30 @@ import uuid
 class ContentSource(BaseModel):
     """Fuente de contenido (red social)"""
     source_id: str
-    nombre: str  # YouTube, Instagram, TikTok, WeChat, Xiaohongshu, etc.
+    name: str  # YouTube, Instagram, TikTok, WeChat, Xiaohongshu, etc.
     icono: Optional[str] = None
     color: Optional[str] = None  # Brand color
-    activo: bool = True
+    active: bool = True
 
 
 class ContentCategory(BaseModel):
     """Category de contenido por audiencia"""
     model_config = ConfigDict(extra="ignore")
     category_id: str = Field(default_factory=lambda: f"cat_{uuid.uuid4().hex[:8]}")
-    nombre: str  # Kids, Parents, Local Culture, Chinese Culture, etc.
+    name: str  # Kids, Parents, Local Culture, Chinese Culture, etc.
     nombre_en: Optional[str] = None
     nombre_zh: Optional[str] = None
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     icono: Optional[str] = None
     color: Optional[str] = None
     orden: int = 0
-    activo: bool = True
+    active: bool = True
 
 
 class ContentTag(BaseModel):
     """Etiqueta para contenido"""
     tag_id: str = Field(default_factory=lambda: f"tag_{uuid.uuid4().hex[:8]}")
-    nombre: str
+    name: str
     color: Optional[str] = None
 
 
@@ -41,7 +41,7 @@ class ContentItemBase(BaseModel):
     """Modelo base de contenido curado"""
     # Information basic
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     # Fuente original
     source: str  # youtube, instagram, tiktok, wechat, xiaohongshu, telegram, facebook
     url_original: str  # Original content URL
@@ -59,7 +59,7 @@ class ContentItemBase(BaseModel):
     idioma: Optional[str] = None  # es, zh, en
     # Estado
     publicado: bool = True
-    destacado: bool = False
+    featured: bool = False
     orden: int = 0
 
 
@@ -83,7 +83,7 @@ class ContentPlaylist(BaseModel):
     model_config = ConfigDict(extra="ignore")
     playlist_id: str = Field(default_factory=lambda: f"playlist_{uuid.uuid4().hex[:12]}")
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     imagen_portada: Optional[str] = None
     categoria_id: Optional[str] = None  # Category principal
     items: List[str] = []  # List of content_ids

@@ -209,9 +209,9 @@ class RankRewardsService(BaseService):
         # Get player info
         player = await db.pingpong_players.find_one(
             {"jugador_id": jugador_id},
-            {"_id": 0, "nombre": 1, "apodo": 1}
+            {"_id": 0, "name": 1, "apodo": 1}
         )
-        player_name = player.get("apodo") or player.get("nombre", "Jugador") if player else "Jugador"
+        player_name = player.get("apodo") or player.get("name", "Jugador") if player else "Jugador"
         
         # Get localized rank name
         rank_name = rank["name"].get(lang, rank["name"].get("es", rank["id"]))

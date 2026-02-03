@@ -26,9 +26,9 @@ def calcular_similitud(texto1: str, texto2: str) -> float:
 
 
 def buscar_estudiante_en_matriculas(
-    nombre: str, 
+    name: str, 
     apellido: str, 
-    grado: str, 
+    grade: str, 
     db_sync_estudiantes: list
 ) -> Optional[dict]:
     """
@@ -52,7 +52,7 @@ def buscar_estudiante_en_matriculas(
             key_lower = key.lower()
             value_str = str(value).strip() if value else ""
             
-            if "nombre" in key_lower and "apellido" not in key_lower:
+            if "name" in key_lower and "apellido" not in key_lower:
                 sync_nombre = value_str
             elif "apellido" in key_lower:
                 sync_apellido = value_str

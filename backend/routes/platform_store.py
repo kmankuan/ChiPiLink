@@ -37,18 +37,18 @@ async def get_platform_store():
     config = await db.app_config.find_one({"config_key": "platform_store"}, {"_id": 0})
     if not config:
         return {
-            "nombre": "Unatienda",
-            "descripcion": "Tienda oficial de la plataforma",
+            "name": "Unatienda",
+            "description": "Tienda oficial de la plataforma",
             "logo_url": "",
-            "activo": True
+            "active": True
         }
     
     value = config.get("value", {})
     return {
-        "nombre": value.get("nombre", "Unatienda"),
-        "descripcion": value.get("descripcion", "Tienda oficial de la plataforma"),
+        "name": value.get("name", "Unatienda"),
+        "description": value.get("description", "Tienda oficial de la plataforma"),
         "logo_url": value.get("logo_url", ""),
-        "activo": value.get("activo", True)
+        "active": value.get("active", True)
     }
 
 
@@ -60,15 +60,15 @@ async def get_platform_products(
     limit: int = Query(100, ge=1, le=500)
 ):
     """Get platform store products (uses main libros collection)"""
-    query = {"activo": {"$ne": False}}
+    query = {"active": {"$ne": False}}
     
     if categoria:
         query["categoria"] = categoria
     
     if buscar:
         query["$or"] = [
-            {"nombre": {"$regex": buscar, "$options": "i"}},
-            {"descripcion": {"$regex": buscar, "$options": "i"}}
+            {"name": {"$regex": buscar, "$options": "i"}},
+            {"description": {"$regex": buscar, "$options": "i"}}
         ]
     
     skip = (page - 1) * limit
@@ -89,15 +89,15 @@ async def get_yappy_cdn_url():
     """Get Yappy CDN URL for frontend button"""
     config = await db.app_config.find_one({"config_key": "platform_store_yappy"})
     
-    if not config or not config.get("value", {}).get("activo"):
-        return {"cdn_url": None, "activo": False}
+    if not config or not config.get("value", {}).get("active"):
+        return {"cdn_url": None, "active": False}
     
     ambiente = config["value"].get("ambiente", "pruebas")
     
     from services.yappy_service import YAPPY_URLS
     return {
         "cdn_url": YAPPY_URLS[ambiente]["cdn"],
-        "activo": True,
+        "active": True,
         "ambiente": ambiente
     }
 
@@ -283,16 +283,16 @@ async def get_platform_store_config(admin: dict = Depends(lambda: get_admin_user
     
     return {
         "store": store_config.get("value", {}) if store_config else {
-            "nombre": "Unatienda",
-            "descripcion": "Tienda oficial de la plataforma",
+            "name": "Unatienda",
+            "description": "Tienda oficial de la plataforma",
             "logo_url": "",
-            "activo": True
+            "active": True
         },
         "yappy": yappy_config.get("value", {}) if yappy_config else {
             "merchant_id": "",
             "secret_key": "",
             "url_domain": "",
-            "activo": False,
+            "active": False,
             "ambiente": "pruebas"
         }
     }

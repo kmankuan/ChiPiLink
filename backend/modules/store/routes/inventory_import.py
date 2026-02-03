@@ -37,14 +37,14 @@ class ImportResult(BaseModel):
 # CSV Template columns
 TEMPLATE_COLUMNS = [
     "code",           # Required: Unique product code
-    "nombre",           # Required: Product name
+    "name",           # Required: Product name
     "grade",            # Required: Grade(s) - supports multiple grades separated by comma (e.g., "K4,K5" or "1,2")
     "cantidad",         # Required: Inventory quantity
-    "precio",           # Required: Price
+    "price",           # Required: Price
     "subject",          # Optional: Subject
-    "editorial",        # Optional: Publisher
+    "publisher",        # Optional: Publisher
     "isbn",             # Optional: ISBN
-    "descripcion",      # Optional: Description
+    "description",      # Optional: Description
 ]
 
 
@@ -126,7 +126,7 @@ async def preview_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"code", "nombre", "grade", "cantidad", "precio"}
+        required_columns = {"code", "name", "grade", "cantidad", "price"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -173,7 +173,7 @@ async def preview_csv_import(
             # Check if product exists in the private catalog (libros collection)
             existing = await db.libros.find_one(
                 {"code": codigo, "is_private_catalog": True},
-                {"_id": 0, "libro_id": 1, "nombre": 1, "inventory_quantity": 1}
+                {"_id": 0, "libro_id": 1, "name": 1, "inventory_quantity": 1}
             )
             
             action = "create"
@@ -193,11 +193,11 @@ async def preview_csv_import(
             preview_items.append({
                 "row": row_num,
                 "code": codigo,
-                "nombre": nombre,
+                "name": nombre,
                 "grade": grado,
                 "grades": grados,
                 "cantidad_csv": cantidad,
-                "precio": precio,
+                "price": precio,
                 "action": action,
                 "existing_quantity": existing.get("inventory_quantity", 0) if existing else None,
                 "new_quantity": new_quantity
@@ -254,7 +254,7 @@ async def execute_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"code", "nombre", "grade", "cantidad", "precio"}
+        required_columns = {"code", "name", "grade", "cantidad", "price"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -302,15 +302,15 @@ async def execute_csv_import(
                     await db.libros.update_one(
                         {"code": codigo, "is_private_catalog": True},
                         {"$set": {
-                            "nombre": nombre,
+                            "name": nombre,
                             "grade": grado,
                             "grades": grados if len(grados) > 1 else None,
-                            "precio": precio,
+                            "price": precio,
                             "inventory_quantity": new_cantidad,
                             "subject": row.get('materia', '').strip() or existing.get("subject"),
-                            "editorial": row.get('editorial', '').strip() or existing.get("editorial"),
+                            "publisher": row.get('editorial', '').strip() or existing.get("publisher"),
                             "isbn": row.get('isbn', '').strip() or existing.get("isbn"),
-                            "descripcion": row.get('descripcion', '').strip() or existing.get("descripcion"),
+                            "description": row.get('descripcion', '').strip() or existing.get("description"),
                             "updated_at": now,
                             "updated_by": admin.get("user_id")
                         }}
@@ -323,18 +323,18 @@ async def execute_csv_import(
                     new_product = {
                         "libro_id": libro_id,
                         "code": codigo,
-                        "nombre": nombre,
+                        "name": nombre,
                         "grade": grado,
                         "grades": grados if len(grados) > 1 else None,
-                        "precio": precio,
+                        "price": precio,
                         "inventory_quantity": cantidad,
                         "subject": row.get('materia', '').strip() or None,
-                        "editorial": row.get('editorial', '').strip() or None,
+                        "publisher": row.get('editorial', '').strip() or None,
                         "isbn": row.get('isbn', '').strip() or None,
-                        "descripcion": row.get('descripcion', '').strip() or None,
+                        "description": row.get('descripcion', '').strip() or None,
                         "image_url": None,
-                        "activo": True,
-                        "destacado": False,
+                        "active": True,
+                        "featured": False,
                         "is_private_catalog": True,
                         "created_at": now,
                         "created_by": admin.get("user_id"),

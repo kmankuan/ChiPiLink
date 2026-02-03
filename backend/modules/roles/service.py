@@ -29,7 +29,7 @@ class AuditLogService:
         target_id: str,
         details: Dict[str, Any] = None,
         actor_info: Dict[str, Any] = None,
-        target_nombre: str = None,
+        target_name: str = None,
         ip_address: str = None,
         user_agent: str = None
     ) -> str:
@@ -39,7 +39,7 @@ class AuditLogService:
             "action": action.value if isinstance(action, AuditActionType) else action,
             "actor_id": actor_id,
             "actor_email": actor_info.get("email") if actor_info else None,
-            "actor_nombre": actor_info.get("nombre") if actor_info else None,
+            "actor_nombre": actor_info.get("name") if actor_info else None,
             "target_type": target_type,
             "target_id": target_id,
             "target_nombre": target_nombre,
@@ -123,8 +123,8 @@ class RolesService:
         default_roles = [
             {
                 "role_id": DefaultRoles.SUPER_ADMIN.value,
-                "nombre": "Super Administrador",
-                "descripcion": "Control total del sistema",
+                "name": "Super Administrador",
+                "description": "Control total del sistema",
                 "color": "#dc2626",
                 "icono": "Crown",
                 "es_sistema": True,
@@ -133,8 +133,8 @@ class RolesService:
             },
             {
                 "role_id": DefaultRoles.ADMIN.value,
-                "nombre": "Administrador",
-                "descripcion": "Management completa de la plataforma",
+                "name": "Administrador",
+                "description": "Management completa de la plataforma",
                 "color": "#ea580c",
                 "icono": "ShieldCheck",
                 "es_sistema": True,
@@ -143,8 +143,8 @@ class RolesService:
             },
             {
                 "role_id": DefaultRoles.MODERATOR.value,
-                "nombre": "Moderador",
-                "descripcion": "Management of contenido y usuarios basics",
+                "name": "Moderador",
+                "description": "Management of contenido y usuarios basics",
                 "color": "#0891b2",
                 "icono": "Shield",
                 "es_sistema": True,
@@ -153,8 +153,8 @@ class RolesService:
             },
             {
                 "role_id": DefaultRoles.USER.value,
-                "nombre": "Usuario",
-                "descripcion": "Acceso basic a funcionalidades publics",
+                "name": "Usuario",
+                "description": "Acceso basic a funcionalidades publics",
                 "color": "#6366f1",
                 "icono": "User",
                 "es_sistema": True,
@@ -271,7 +271,7 @@ class RolesService:
         # Update user document
         await db.auth_users.update_one(
             {"user_id": user_id},
-            {"$set": {"role_id": role_id, "rol": role["nombre"]}}
+            {"$set": {"role_id": role_id, "rol": role["name"]}}
         )
         
         return True

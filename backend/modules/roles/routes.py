@@ -74,9 +74,9 @@ async def create_role(
         actor_id=admin["user_id"],
         target_type="role",
         target_id=role["role_id"],
-        target_nombre=role["nombre"],
+        target_nombre=role["name"],
         details={"permisos": role_data.permisos, "nivel": role_data.nivel},
-        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        actor_info={"email": admin.get("email"), "name": admin.get("name")},
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -114,9 +114,9 @@ async def update_role(
         new_perms = set(updates.permisos)
         changes["permisos_agregados"] = list(new_perms - old_perms)
         changes["permisos_removidos"] = list(old_perms - new_perms)
-    if updates.nombre:
-        changes["nombre_anterior"] = old_role.get("nombre") if old_role else None
-        changes["nombre_nuevo"] = updates.nombre
+    if updates.name:
+        changes["nombre_anterior"] = old_role.get("name") if old_role else None
+        changes["nombre_nuevo"] = updates.name
     if updates.nivel is not None:
         changes["nivel_anterior"] = old_role.get("nivel") if old_role else None
         changes["nivel_nuevo"] = updates.nivel
@@ -126,9 +126,9 @@ async def update_role(
         actor_id=admin["user_id"],
         target_type="role",
         target_id=role_id,
-        target_nombre=role.get("nombre"),
+        target_nombre=role.get("name"),
         details=changes,
-        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        actor_info={"email": admin.get("email"), "name": admin.get("name")},
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -163,9 +163,9 @@ async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_
         actor_id=admin["user_id"],
         target_type="role",
         target_id=role_id,
-        target_nombre=role.get("nombre") if role else role_id,
+        target_nombre=role.get("name") if role else role_id,
         details={"permisos": role.get("permisos") if role else []},
-        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        actor_info={"email": admin.get("email"), "name": admin.get("name")},
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -212,7 +212,7 @@ async def assign_role_to_user(
     old_role = await roles_service.get_user_role(target_user_id)
     
     # Get target user info
-    target_user = await db.users.find_one({"user_id": target_user_id}, {"_id": 0, "nombre": 1, "email": 1})
+    target_user = await db.users.find_one({"user_id": target_user_id}, {"_id": 0, "name": 1, "email": 1})
     
     success = await roles_service.assign_role_to_user(
         target_user_id, 
@@ -231,15 +231,15 @@ async def assign_role_to_user(
         actor_id=admin["user_id"],
         target_type="user",
         target_id=target_user_id,
-        target_nombre=target_user.get("nombre") if target_user else target_user_id,
+        target_nombre=target_user.get("name") if target_user else target_user_id,
         details={
-            "rol_anterior": old_role.get("nombre") if old_role else None,
+            "rol_anterior": old_role.get("name") if old_role else None,
             "rol_anterior_id": old_role.get("role_id") if old_role else None,
-            "rol_nuevo": new_role.get("nombre") if new_role else role_id,
+            "rol_nuevo": new_role.get("name") if new_role else role_id,
             "rol_nuevo_id": role_id,
             "target_email": target_user.get("email") if target_user else None
         },
-        actor_info={"email": admin.get("email"), "nombre": admin.get("nombre")},
+        actor_info={"email": admin.get("email"), "name": admin.get("name")},
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -259,7 +259,7 @@ async def get_user_role_and_permissions(
     # Get user info
     user = await db.users.find_one(
         {"user_id": target_user_id},
-        {"_id": 0, "user_id": 1, "nombre": 1, "email": 1}
+        {"_id": 0, "user_id": 1, "name": 1, "email": 1}
     )
     
     return {

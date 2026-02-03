@@ -99,7 +99,7 @@ class EventService(BaseService):
         self,
         evento_id: str,
         usuario_id: str,
-        nombre: str
+        name: str
     ) -> bool:
         """Register usuario para evento"""
         event = await self.repository.get_by_id(evento_id)
@@ -123,7 +123,7 @@ class EventService(BaseService):
         
         inscription = {
             "usuario_id": usuario_id,
-            "nombre": nombre,
+            "name": nombre,
             "fecha": datetime.now(timezone.utc).isoformat()
         }
         

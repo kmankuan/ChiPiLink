@@ -40,7 +40,7 @@ class PostRepository(BaseRepository):
     async def get_published_posts(
         self,
         tipo: Optional[str] = None,
-        destacado: Optional[bool] = None,
+        featured: Optional[bool] = None,
         limit: int = 20
     ) -> List[Dict]:
         """Get posts publicados"""
@@ -55,12 +55,12 @@ class PostRepository(BaseRepository):
         if tipo:
             query["tipo"] = tipo
         if destacado is not None:
-            query["destacado"] = destacado
+            query["featured"] = destacado
         
         return await self.find_many(
             query=query,
             limit=limit,
-            sort=[("destacado", -1), ("fecha_publicacion", -1)]
+            sort=[("featured", -1), ("fecha_publicacion", -1)]
         )
     
     async def get_all_posts(self, limit: int = 100) -> List[Dict]:

@@ -9,7 +9,7 @@ import uuid
 
 class ChessPlayerBase(BaseModel):
     """Modelo base de jugador de ajedrez"""
-    nombre: str
+    name: str
     apellido: Optional[str] = None
     apodo: Optional[str] = None
     foto_url: Optional[str] = None
@@ -18,7 +18,7 @@ class ChessPlayerBase(BaseModel):
     aperturas_favoritas: Optional[List[str]] = None  # Siciliana, Espyearla, etc.
     email: Optional[str] = None
     telefono: Optional[str] = None
-    activo: bool = True
+    active: bool = True
 
 
 class ChessPlayer(ChessPlayerBase):
@@ -75,8 +75,8 @@ class ChessTournament(BaseModel):
     """Modelo de torneo de ajedrez"""
     model_config = ConfigDict(extra="ignore")
     torneo_id: str = Field(default_factory=lambda: f"torneo_chess_{uuid.uuid4().hex[:12]}")
-    nombre: str
-    descripcion: Optional[str] = None
+    name: str
+    description: Optional[str] = None
     fecha_inicio: datetime
     fecha_fin: Optional[datetime] = None
     lugar: Optional[str] = None

@@ -55,24 +55,24 @@ async def get_public_activity_feed(
             for match in superpin_matches:
                 p1 = await db.pingpong_players.find_one(
                     {"jugador_id": match.get("jugador1_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 p2 = await db.pingpong_players.find_one(
                     {"jugador_id": match.get("jugador2_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 matches.append({
                     "match_id": match.get("partido_id"),
                     "type": "superpin",
                     "player1": {
                         "id": match.get("jugador1_id"),
-                        "name": p1.get("nombre") if p1 else "Jugador 1",
+                        "name": p1.get("name") if p1 else "Jugador 1",
                         "nickname": p1.get("apodo") if p1 else None,
                         "avatar": p1.get("avatar_url") if p1 else None
                     },
                     "player2": {
                         "id": match.get("jugador2_id"),
-                        "name": p2.get("nombre") if p2 else "Jugador 2",
+                        "name": p2.get("name") if p2 else "Jugador 2",
                         "nickname": p2.get("apodo") if p2 else None,
                         "avatar": p2.get("avatar_url") if p2 else None
                     },
@@ -90,24 +90,24 @@ async def get_public_activity_feed(
             for match in rapidpin_matches:
                 p1 = await db.pingpong_players.find_one(
                     {"jugador_id": match.get("player1_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 p2 = await db.pingpong_players.find_one(
                     {"jugador_id": match.get("player2_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 matches.append({
                     "match_id": match.get("match_id"),
                     "type": "rapidpin",
                     "player1": {
                         "id": match.get("player1_id"),
-                        "name": p1.get("nombre") if p1 else "Jugador 1",
+                        "name": p1.get("name") if p1 else "Jugador 1",
                         "nickname": p1.get("apodo") if p1 else None,
                         "avatar": p1.get("avatar_url") if p1 else None
                     },
                     "player2": {
                         "id": match.get("player2_id"),
-                        "name": p2.get("nombre") if p2 else "Jugador 2",
+                        "name": p2.get("name") if p2 else "Jugador 2",
                         "nickname": p2.get("apodo") if p2 else None,
                         "avatar": p2.get("avatar_url") if p2 else None
                     },
@@ -124,7 +124,7 @@ async def get_public_activity_feed(
         if include_leaderboard:
             # Get from Super Pin rankings
             rankings = await db.pinpanclub_superpin_rankings.find(
-                {"activo": True},
+                {"active": True},
                 {"_id": 0, "jugador_id": 1, "puntos": 1, "posicion": 1, 
                  "partidos_ganados": 1, "partidos_perdidos": 1}
             ).sort("puntos", -1).limit(leaderboard_limit).to_list(leaderboard_limit)
@@ -133,12 +133,12 @@ async def get_public_activity_feed(
             for i, rank in enumerate(rankings):
                 player = await db.pingpong_players.find_one(
                     {"jugador_id": rank.get("jugador_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 leaderboard.append({
                     "position": i + 1,
                     "player_id": rank.get("jugador_id"),
-                    "name": player.get("nombre") if player else "Jugador",
+                    "name": player.get("name") if player else "Jugador",
                     "nickname": player.get("apodo") if player else None,
                     "avatar": player.get("avatar_url") if player else None,
                     "points": rank.get("puntos", 0),
@@ -203,7 +203,7 @@ async def get_public_activity_feed(
                 # Get player details
                 player = await db.pingpong_players.find_one(
                     {"jugador_id": pa.get("jugador_id")},
-                    {"_id": 0, "nombre": 1, "apodo": 1, "avatar_url": 1}
+                    {"_id": 0, "name": 1, "apodo": 1, "avatar_url": 1}
                 )
                 
                 if achievement and player:
@@ -215,7 +215,7 @@ async def get_public_activity_feed(
                         "rarity": achievement.get("rarity", "common"),
                         "player": {
                             "id": pa.get("jugador_id"),
-                            "name": player.get("nombre"),
+                            "name": player.get("name"),
                             "nickname": player.get("apodo"),
                             "avatar": player.get("avatar_url")
                         },
@@ -229,7 +229,7 @@ async def get_public_activity_feed(
             # Count active players (with matches in last 30 days)
             thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
             
-            active_count = await db.pinpanclub_superpin_rankings.count_documents({"activo": True})
+            active_count = await db.pinpanclub_superpin_rankings.count_documents({"active": True})
             total_matches = await db.pinpanclub_superpin_matches.count_documents({"estado": "completado"})
             rapidpin_matches = await db.pinpanclub_rapidpin_matches.count_documents({"status": "completed"})
             
@@ -252,14 +252,14 @@ async def get_public_activity_feed(
                         {"estado": "en_progreso"}
                     ]
                 },
-                {"_id": 0, "torneo_id": 1, "nombre": 1, "fecha_inicio": 1, 
+                {"_id": 0, "torneo_id": 1, "name": 1, "fecha_inicio": 1, 
                  "fecha_fin": 1, "estado": 1, "max_participantes": 1, "participantes": 1}
             ).sort("fecha_inicio", 1).limit(tournaments_limit).to_list(tournaments_limit)
             
             result["upcoming_tournaments"] = [
                 {
                     "tournament_id": t.get("torneo_id"),
-                    "name": t.get("nombre"),
+                    "name": t.get("name"),
                     "start_date": t.get("fecha_inicio"),
                     "end_date": t.get("fecha_fin"),
                     "status": t.get("estado"),
@@ -289,7 +289,7 @@ async def get_public_activity_feed(
 async def get_public_stats_summary():
     """Get quick stats summary for display"""
     try:
-        active_players = await db.pinpanclub_superpin_rankings.count_documents({"activo": True})
+        active_players = await db.pinpanclub_superpin_rankings.count_documents({"active": True})
         total_matches = await db.pinpanclub_superpin_matches.count_documents({"estado": "completado"})
         rapidpin_matches = await db.pinpanclub_rapidpin_matches.count_documents({"status": "completed"})
         

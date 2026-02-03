@@ -12,7 +12,7 @@ class BloquePagina(BaseModel):
     bloque_id: str = Field(default_factory=lambda: f"blk_{uuid.uuid4().hex[:8]}")
     tipo: str  # hero, features, text, image, cta, stats, cards, banner, testimonials
     orden: int = 0
-    activo: bool = True
+    active: bool = True
     publicado: bool = True  # True = visible for all, False = admin only (under construction)
     config: dict = {}
 
@@ -32,7 +32,7 @@ class ConfiguracionSitio(BaseModel):
     footer_texto: str = "© 2025 Todos los derechos reservados"
     # SEO & Meta Tags
     meta_titulo: Optional[str] = None  # Browser tab title (falls back to nombre_sitio)
-    meta_descripcion: Optional[str] = None  # Meta description for SEO
+    meta_description: Optional[str] = None  # Meta description for SEO
     meta_keywords: Optional[str] = None  # Meta keywords
     og_image: Optional[str] = None  # Open Graph image for social sharing
     # Analytics & Scripts
@@ -64,8 +64,8 @@ class ReorderBlocksRequest(BaseModel):
 # Default block templates
 BLOCK_TEMPLATES = {
     "hero": {
-        "nombre": "Hero Principal",
-        "descripcion": "Section principal con imagen de fondo",
+        "name": "Hero Principal",
+        "description": "Section principal con imagen de fondo",
         "config_default": {
             "titulo": "Bienvenido a nuestra tienda",
             "subtitulo": "Encuentra todo lo que necesitas en un solo lugar",
@@ -79,22 +79,22 @@ BLOCK_TEMPLATES = {
         }
     },
     "features": {
-        "nombre": "Features",
-        "descripcion": "Lista de features con icons",
+        "name": "Features",
+        "description": "Lista de features con icons",
         "config_default": {
             "titulo": "¿Por what elegirnos?",
             "subtitulo": "",
             "items": [
-                {"icono": "shield", "titulo": "Seguro", "descripcion": "Compras 100% seguras"},
-                {"icono": "truck", "titulo": "Shipping Fast", "descripcion": "Entrega en 24-48h"},
-                {"icono": "headphones", "titulo": "Soporte", "descripcion": "Attention personalizada"}
+                {"icono": "shield", "titulo": "Seguro", "description": "Compras 100% seguras"},
+                {"icono": "truck", "titulo": "Shipping Fast", "description": "Entrega en 24-48h"},
+                {"icono": "headphones", "titulo": "Soporte", "description": "Attention personalizada"}
             ],
             "columnas": 3
         }
     },
     "text": {
-        "nombre": "Texto",
-        "descripcion": "Bloque de texto con title",
+        "name": "Texto",
+        "description": "Bloque de texto con title",
         "config_default": {
             "titulo": "",
             "contenido": "Escribe tu contenido here...",
@@ -103,8 +103,8 @@ BLOCK_TEMPLATES = {
         }
     },
     "image": {
-        "nombre": "Imagen",
-        "descripcion": "Imagen con description opcional",
+        "name": "Imagen",
+        "description": "Imagen con description opcional",
         "config_default": {
             "image_url": "",
             "alt": "",
@@ -114,8 +114,8 @@ BLOCK_TEMPLATES = {
         }
     },
     "cta": {
-        "nombre": "Llamada a la Action",
-        "descripcion": "Button destacado con mensaje",
+        "name": "Llamada a la Action",
+        "description": "Button destacado con mensaje",
         "config_default": {
             "titulo": "¿Listo para comenzar?",
             "subtitulo": "Join a miles de clientes satisfechos",
@@ -126,8 +126,8 @@ BLOCK_TEMPLATES = {
         }
     },
     "stats": {
-        "nombre": "Statistics",
-        "descripcion": "Numbers destacados",
+        "name": "Statistics",
+        "description": "Numbers destacados",
         "config_default": {
             "items": [
                 {"numero": "1000+", "label": "Clientes"},
@@ -137,21 +137,21 @@ BLOCK_TEMPLATES = {
         }
     },
     "cards": {
-        "nombre": "Tarjetas",
-        "descripcion": "Grid de tarjetas",
+        "name": "Tarjetas",
+        "description": "Grid de tarjetas",
         "config_default": {
             "titulo": "",
             "items": [
-                {"titulo": "Tarjeta 1", "descripcion": "Description", "image_url": "", "link": ""},
-                {"titulo": "Tarjeta 2", "descripcion": "Description", "image_url": "", "link": ""},
-                {"titulo": "Tarjeta 3", "descripcion": "Description", "image_url": "", "link": ""}
+                {"titulo": "Tarjeta 1", "description": "Description", "image_url": "", "link": ""},
+                {"titulo": "Tarjeta 2", "description": "Description", "image_url": "", "link": ""},
+                {"titulo": "Tarjeta 3", "description": "Description", "image_url": "", "link": ""}
             ],
             "columnas": 3
         }
     },
     "banner": {
-        "nombre": "Banner",
-        "descripcion": "Banner con texto e imagen",
+        "name": "Banner",
+        "description": "Banner con texto e imagen",
         "config_default": {
             "titulo": "Promotion Especial",
             "subtitulo": "Aprovecha nuestras ofertas",
@@ -162,26 +162,26 @@ BLOCK_TEMPLATES = {
         }
     },
     "testimonials": {
-        "nombre": "Testimonios",
-        "descripcion": "Opiniones de clientes",
+        "name": "Testimonios",
+        "description": "Opiniones de clientes",
         "config_default": {
             "titulo": "Lo que dicen nuestros clientes",
             "items": [
-                {"nombre": "Cliente 1", "texto": "Excelente servicio", "avatar_url": "", "cargo": ""},
-                {"nombre": "Cliente 2", "texto": "Muy recomendado", "avatar_url": "", "cargo": ""}
+                {"name": "Cliente 1", "texto": "Excelente servicio", "avatar_url": "", "cargo": ""},
+                {"name": "Cliente 2", "texto": "Muy recomendado", "avatar_url": "", "cargo": ""}
             ]
         }
     },
     "spacer": {
-        "nombre": "Espaciador",
-        "descripcion": "Espacio en blanco",
+        "name": "Espaciador",
+        "description": "Espacio en blanco",
         "config_default": {
             "altura": "60px"
         }
     },
     "divider": {
-        "nombre": "Divisor",
-        "descripcion": "Line divisoria",
+        "name": "Divisor",
+        "description": "Line divisoria",
         "config_default": {
             "estilo": "solid",
             "color": "#e5e7eb",
@@ -190,8 +190,8 @@ BLOCK_TEMPLATES = {
         }
     },
     "pinpanclub_feed": {
-        "nombre": "PinPanClub Activity Feed",
-        "descripcion": "Actividades en vivo del club de ping pong",
+        "name": "PinPanClub Activity Feed",
+        "description": "Actividades en vivo del club de ping pong",
         "config_default": {
             "titulo": {
                 "es": "Actividad del Club",

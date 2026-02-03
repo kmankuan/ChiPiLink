@@ -39,7 +39,7 @@ class MatchService(BaseService):
         
         if player_a:
             match_dict["jugador_a_info"] = {
-                "nombre": player_a.get("nombre"),
+                "name": player_a.get("name"),
                 "apellido": player_a.get("apellido"),
                 "apodo": player_a.get("apodo"),
                 "elo_rating": player_a.get("elo_rating")
@@ -47,7 +47,7 @@ class MatchService(BaseService):
         
         if player_b:
             match_dict["jugador_b_info"] = {
-                "nombre": player_b.get("nombre"),
+                "name": player_b.get("name"),
                 "apellido": player_b.get("apellido"),
                 "apodo": player_b.get("apodo"),
                 "elo_rating": player_b.get("elo_rating")

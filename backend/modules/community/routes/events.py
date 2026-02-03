@@ -40,7 +40,7 @@ async def register_for_event(
         success = await event_service.register_for_event(
             evento_id=evento_id,
             usuario_id=current_user["user_id"],
-            nombre=current_user.get("nombre", "")
+            nombre=current_user.get("name", "")
         )
         return {"success": success}
     except ValueError as e:

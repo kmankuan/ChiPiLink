@@ -250,7 +250,7 @@ async def sync_players_to_monday(
         raise HTTPException(status_code=400, detail="Board ID de jugadores no configurado")
     
     # Obtener jugadores
-    players = await db.pingpong_players.find({"activo": True}, {"_id": 0}).to_list(500)
+    players = await db.pingpong_players.find({"active": True}, {"_id": 0}).to_list(500)
     
     if not players:
         return SyncResult(success=True, synced_count=0, failed_count=0, details=[])
@@ -277,7 +277,7 @@ async def sync_players_to_monday(
                 nombre_completo += f" ({player['apodo']})"
             
             column_values = {
-                "text": player.get("nombre", ""),  # Nombre
+                "text": player.get("name", ""),  # Nombre
                 "text4": player.get("email", ""),  # Email
                 "numbers": str(player.get("elo_rating", 1000)),  # ELO
                 "status": {"label": player.get("nivel", "principiante")}  # Nivel
@@ -347,15 +347,15 @@ async def sync_match_to_monday(
     # Obtener information de jugadores
     player_a = await db.pingpong_players.find_one(
         {"jugador_id": match["jugador_a_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1}
     )
     player_b = await db.pingpong_players.find_one(
         {"jugador_id": match["jugador_b_id"]},
-        {"_id": 0, "nombre": 1, "apellido": 1, "apodo": 1}
+        {"_id": 0, "name": 1, "apellido": 1, "apodo": 1}
     )
     
-    nombre_a = player_a.get("apodo") or player_a.get("nombre", "Jugador A") if player_a else "Jugador A"
-    nombre_b = player_b.get("apodo") or player_b.get("nombre", "Jugador B") if player_b else "Jugador B"
+    nombre_a = player_a.get("apodo") or player_a.get("name", "Jugador A") if player_a else "Jugador A"
+    nombre_b = player_b.get("apodo") or player_b.get("name", "Jugador B") if player_b else "Jugador B"
     
     # Preparar nombre del item
     item_name = f"{nombre_a} vs {nombre_b}"
@@ -485,15 +485,15 @@ async def sync_completed_matches(admin: dict = Depends(get_admin_user)):
             # Obtener nombres de jugadores
             player_a = await db.pingpong_players.find_one(
                 {"jugador_id": match["jugador_a_id"]},
-                {"_id": 0, "nombre": 1, "apodo": 1}
+                {"_id": 0, "name": 1, "apodo": 1}
             )
             player_b = await db.pingpong_players.find_one(
                 {"jugador_id": match["jugador_b_id"]},
-                {"_id": 0, "nombre": 1, "apodo": 1}
+                {"_id": 0, "name": 1, "apodo": 1}
             )
             
-            nombre_a = player_a.get("apodo") or player_a.get("nombre", "A") if player_a else "A"
-            nombre_b = player_b.get("apodo") or player_b.get("nombre", "B") if player_b else "B"
+            nombre_a = player_a.get("apodo") or player_a.get("name", "A") if player_a else "A"
+            nombre_b = player_b.get("apodo") or player_b.get("name", "B") if player_b else "B"
             
             # Determinar ganador
             ganador = ""
@@ -609,9 +609,9 @@ async def get_sync_stats(admin: dict = Depends(get_admin_user)):
     config = await get_pingpong_monday_config()
     
     # Contar jugadores sincronizados
-    total_players = await db.pingpong_players.count_documents({"activo": True})
+    total_players = await db.pingpong_players.count_documents({"active": True})
     synced_players = await db.pingpong_players.count_documents({
-        "activo": True,
+        "active": True,
         "monday_item_id": {"$exists": True, "$ne": None}
     })
     

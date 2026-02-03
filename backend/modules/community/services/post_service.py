@@ -25,7 +25,7 @@ class PostService(BaseService):
     async def get_published_posts(
         self,
         tipo: Optional[str] = None,
-        destacado: Optional[bool] = None,
+        featured: Optional[bool] = None,
         limit: int = 20
     ) -> List[Post]:
         """Get posts publicados"""

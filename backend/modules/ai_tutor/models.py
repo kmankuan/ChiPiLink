@@ -23,7 +23,7 @@ class TutorConfig(BaseModel):
     personalidad: str = "amigable"  # amigable, estricto, motivador
     idioma_principal: str = "es"  # Idioma del tutor
     # Settings
-    activo: bool = False
+    active: bool = False
     max_intentos_pronunciacion: int = 3
     umbral_pronunciacion_correcta: float = 0.8  # 80% de precision
 
@@ -33,7 +33,7 @@ class TutorSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
     session_id: str = Field(default_factory=lambda: f"tutor_{uuid.uuid4().hex[:12]}")
     estudiante_id: str
-    estudiante_nombre: Optional[str] = None
+    estudiante_name: Optional[str] = None
     # Tema de la session
     tema: str  # "vocabulario_ingles", "pronunciacion", "gramatica", etc.
     subtema: Optional[str] = None  # "colores", "numbers", etc.
@@ -97,7 +97,7 @@ class LessonPlan(BaseModel):
     estudiante_id: str
     # Contenido
     titulo: str
-    descripcion: Optional[str] = None
+    description: Optional[str] = None
     tema: str
     nivel: str
     idioma: str

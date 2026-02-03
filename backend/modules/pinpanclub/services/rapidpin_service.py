@@ -289,7 +289,7 @@ class RapidPinService(BaseService):
         # Save results and close season
         final_results = RapidPinSeasonFinalResults(
             season_id=season_id,
-            season_nombre=season.nombre,
+            season_nombre=season.name,
             fecha_cierre=datetime.now(timezone.utc).isoformat(),
             player_results=player_results,
             referee_results=referee_results,
@@ -343,15 +343,15 @@ class RapidPinService(BaseService):
         match_dict["estado"] = RapidPinMatchStatus.PENDING
         match_dict["fecha_partido"] = datetime.now(timezone.utc).isoformat()
         match_dict["jugador_a_info"] = {
-            "nombre": jugador_a.get("nombre") if jugador_a else "Desconocido",
+            "name": jugador_a.get("name") if jugador_a else "Desconocido",
             "apodo": jugador_a.get("apodo") if jugador_a else None
         }
         match_dict["jugador_b_info"] = {
-            "nombre": jugador_b.get("nombre") if jugador_b else "Desconocido",
+            "name": jugador_b.get("name") if jugador_b else "Desconocido",
             "apodo": jugador_b.get("apodo") if jugador_b else None
         }
         match_dict["arbitro_info"] = {
-            "nombre": arbitro.get("nombre") if arbitro else "Desconocido",
+            "name": arbitro.get("name") if arbitro else "Desconocido",
             "apodo": arbitro.get("apodo") if arbitro else None
         }
         
@@ -502,7 +502,7 @@ class RapidPinService(BaseService):
         
         return RapidPinRankingTable(
             season_id=season_id,
-            season_nombre=season.nombre,
+            season_nombre=season.name,
             estado=season.estado,
             fecha_fin=season.fecha_fin,
             total_participantes=len(entries),
@@ -542,7 +542,7 @@ class RapidPinService(BaseService):
             return None
         return {
             "player_id": player_data.get("player_id"),
-            "nombre": player_data.get("nombre"),
+            "name": player_data.get("name"),
             "nickname": player_data.get("nickname"),
             "avatar": player_data.get("avatar")
         }
@@ -619,7 +619,7 @@ class RapidPinService(BaseService):
         queue_entry.pop("_id", None)
         
         # Send push notification to opponent
-        challenger_name = challenger_info.get("apodo") or challenger_info.get("nombre", "Un jugador") if challenger_info else "Un jugador"
+        challenger_name = challenger_info.get("apodo") or challenger_info.get("name", "Un jugador") if challenger_info else "Un jugador"
         await send_challenge_notification(
             recipient_id=opponent_id,
             challenger_name=challenger_name,
@@ -693,8 +693,8 @@ class RapidPinService(BaseService):
         # Send broadcast to all users that a match is waiting for referee
         player1_info_data = queue_entry.get("player1_info") or {}
         player2_info_data = queue_entry.get("player2_info") or {}
-        player1_name = player1_info_data.get("nickname") or player1_info_data.get("nombre", "Jugador 1")
-        player2_name = player2_info_data.get("nickname") or player2_info_data.get("nombre", "Jugador 2")
+        player1_name = player1_info_data.get("nickname") or player1_info_data.get("name", "Jugador 1")
+        player2_name = player2_info_data.get("nickname") or player2_info_data.get("name", "Jugador 2")
         
         await send_referee_needed_broadcast(
             player1_name=player1_name,
@@ -750,7 +750,7 @@ class RapidPinService(BaseService):
         
         # Send push notification to challenger that their challenge was accepted
         accepter_info = queue_entry.get("player2_info") or {}
-        accepter_name = accepter_info.get("nickname") or accepter_info.get("nombre", "Tu oponente")
+        accepter_name = accepter_info.get("nickname") or accepter_info.get("name", "Tu oponente")
         await send_challenge_notification(
             recipient_id=queue_entry["player1_id"],
             challenger_name=accepter_name,
@@ -759,8 +759,8 @@ class RapidPinService(BaseService):
         
         # Send broadcast to all users that a match is waiting for referee
         player1_info = queue_entry.get("player1_info") or {}
-        player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")
-        player2_name = accepter_info.get("nickname") or accepter_info.get("nombre", "Jugador 2")
+        player1_name = player1_info.get("nickname") or player1_info.get("name", "Jugador 1")
+        player2_name = accepter_info.get("nickname") or accepter_info.get("name", "Jugador 2")
         
         await send_referee_needed_broadcast(
             player1_name=player1_name,
@@ -889,7 +889,7 @@ class RapidPinService(BaseService):
         self.log_info(f"Referee {referee_id} assigned to queue {queue_id} by {assigned_by_id or referee_id}")
         
         # Notify both players that referee is assigned
-        referee_name = referee_info.get("apodo") or referee_info.get("nombre", "Un referee") if referee_info else "Un referee"
+        referee_name = referee_info.get("apodo") or referee_info.get("name", "Un referee") if referee_info else "Un referee"
         await send_challenge_notification(
             recipient_id=queue_entry["player1_id"],
             challenger_name=referee_name,
@@ -1113,7 +1113,7 @@ class RapidPinService(BaseService):
         date_history = [{
             "proposed_date": proposed_date,
             "proposed_by_id": challenger_id,
-            "proposed_by_name": challenger_info.get("apodo") or challenger_info.get("nombre") if challenger_info else "Retador",
+            "proposed_by_name": challenger_info.get("apodo") or challenger_info.get("name") if challenger_info else "Retador",
             "message": message,
             "created_at": now,
             "status": "pending"
@@ -1156,7 +1156,7 @@ class RapidPinService(BaseService):
         queue_entry.pop("_id", None)
         
         # Notify al oponente
-        challenger_name = challenger_info.get("apodo") or challenger_info.get("nombre", "Un jugador") if challenger_info else "Un jugador"
+        challenger_name = challenger_info.get("apodo") or challenger_info.get("name", "Un jugador") if challenger_info else "Un jugador"
         await send_challenge_notification(
             recipient_id=opponent_id,
             challenger_name=challenger_name,
@@ -1205,7 +1205,7 @@ class RapidPinService(BaseService):
         
         # Get user info
         user_info = await self.player_repo.get_by_id(user_id)
-        user_name = user_info.get("apodo") or user_info.get("nombre", "Un jugador") if user_info else "Un jugador"
+        user_name = user_info.get("apodo") or user_info.get("name", "Un jugador") if user_info else "Un jugador"
         
         # Update date history
         date_history = queue_entry.get("date_history", [])
@@ -1235,8 +1235,8 @@ class RapidPinService(BaseService):
             # Broadcast to find referee
             player1_info = queue_entry.get("player1_info") or {}
             player2_info = queue_entry.get("player2_info") or {}
-            player1_name = player1_info.get("nickname") or player1_info.get("nombre", "Jugador 1")
-            player2_name = player2_info.get("nickname") or player2_info.get("nombre", "Jugador 2")
+            player1_name = player1_info.get("nickname") or player1_info.get("name", "Jugador 1")
+            player2_name = player2_info.get("nickname") or player2_info.get("name", "Jugador 2")
             
             await send_referee_needed_broadcast(
                 player1_name=player1_name,
@@ -1495,7 +1495,7 @@ class RapidPinService(BaseService):
             # Emit WebSocket event only for approved comments
             try:
                 from modules.realtime.services import emit_comment_event
-                user_name = (user_info or {}).get("nombre", "Usuario")
+                user_name = (user_info or {}).get("name", "Usuario")
                 await emit_comment_event(
                     queue_id=queue_id,
                     comment_id=comment["comment_id"],
