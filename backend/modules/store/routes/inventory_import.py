@@ -1,6 +1,6 @@
 """
 Store Module - Inventory Import Routes
-CSV-based inventory management for textbooks (Catalog Privado PCA)
+CSV-based inventory management for textbooks (Private PCA Catalog)
 """
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
@@ -34,7 +34,7 @@ class ImportResult(BaseModel):
     errors: list
 
 
-# CSV Template columns
+# CSV Template columns (all English)
 TEMPLATE_COLUMNS = [
     "code",             # Required: Unique product code
     "name",             # Required: Product name
@@ -82,9 +82,9 @@ async def download_csv_template(admin: dict = Depends(get_admin_user)):
     
     # Write example rows
     example_data = [
-        ["TXT-001", "Mathematics 1er Grado", "1", "50", "25.00", "Mathematics", "Santillana", "978-123456789", "Libro de mathematics para primer grado"],
-        ["TXT-002", "Espyearl 2do Grado", "2", "30", "28.50", "Espyearl", "SM", "978-987654321", "Libro de espyearl para segundo grado"],
-        ["TXT-003", "Ciencias Prekinder", "Prekinder", "25", "22.00", "Ciencias", "Oxford", "", "Libro de ciencias naturales"],
+        ["TXT-001", "Mathematics Grade 1", "1", "50", "25.00", "Mathematics", "Santillana", "978-123456789", "Math textbook for first grade"],
+        ["TXT-002", "Spanish Grade 2", "2", "30", "28.50", "Spanish", "SM", "978-987654321", "Spanish textbook for second grade"],
+        ["TXT-003", "Science Prekinder", "Prekinder", "25", "22.00", "Science", "Oxford", "", "Natural science textbook"],
         ["TXT-004", "Art Book K4-K5", "K4,K5", "40", "18.00", "Art", "Creative Ed", "", "Art book for K4 and K5 (multiple grades)"],
     ]
     writer.writerows(example_data)
@@ -126,7 +126,7 @@ async def preview_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"code", "name", "grade", "cantidad", "price"}
+        required_columns = {"code", "name", "grade", "quantity", "price"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -139,45 +139,45 @@ async def preview_csv_import(
         errors = []
         
         for row_num, row in enumerate(reader, start=2):  # Start at 2 (1 is header)
-            codigo = row.get('codigo', '').strip()
-            nombre = row.get('nombre', '').strip()
-            grade_raw = row.get('grado', '').strip()
+            code = row.get('code', '').strip()
+            name = row.get('name', '').strip()
+            grade_raw = row.get('grade', '').strip()
             
             # Parse grades (supports comma-separated multiple grades)
-            grade, grados = parse_grades(grade_raw)
+            grade, grades = parse_grades(grade_raw)
             
             # Validate required fields
-            if not codigo:
-                errors.append({"row": row_num, "error": "Missing codigo"})
+            if not code:
+                errors.append({"row": row_num, "error": "Missing code"})
                 continue
-            if not nombre:
-                errors.append({"row": row_num, "error": "Missing nombre"})
+            if not name:
+                errors.append({"row": row_num, "error": "Missing name"})
                 continue
             if not grade:
-                errors.append({"row": row_num, "error": "Missing grado"})
+                errors.append({"row": row_num, "error": "Missing grade"})
                 continue
             
             # Parse numeric fields
             try:
-                cantidad = int(row.get('cantidad', '0').strip() or '0')
+                quantity = int(row.get('quantity', '0').strip() or '0')
             except ValueError:
-                errors.append({"row": row_num, "error": f"Invalid cantidad: {row.get('cantidad')}"})
+                errors.append({"row": row_num, "error": f"Invalid quantity: {row.get('quantity')}"})
                 continue
             
             try:
-                precio = float(row.get('precio', '0').strip() or '0')
+                price = float(row.get('price', '0').strip() or '0')
             except ValueError:
-                errors.append({"row": row_num, "error": f"Invalid precio: {row.get('precio')}"})
+                errors.append({"row": row_num, "error": f"Invalid price: {row.get('price')}"})
                 continue
             
             # Check if product exists in the private catalog (libros collection)
             existing = await db.libros.find_one(
-                {"code": codigo, "is_private_catalog": True},
+                {"code": code, "is_private_catalog": True},
                 {"_id": 0, "libro_id": 1, "name": 1, "inventory_quantity": 1}
             )
             
             action = "create"
-            new_quantity = cantidad
+            new_quantity = quantity
             
             if existing:
                 if duplicate_mode == DuplicateMode.SKIP:
@@ -185,19 +185,19 @@ async def preview_csv_import(
                     new_quantity = existing.get("inventory_quantity", 0)
                 elif duplicate_mode == DuplicateMode.REPLACE:
                     action = "update_replace"
-                    new_quantity = cantidad
+                    new_quantity = quantity
                 elif duplicate_mode == DuplicateMode.ADD:
                     action = "update_add"
-                    new_quantity = existing.get("inventory_quantity", 0) + cantidad
+                    new_quantity = existing.get("inventory_quantity", 0) + quantity
             
             preview_items.append({
                 "row": row_num,
-                "code": codigo,
-                "name": nombre,
+                "code": code,
+                "name": name,
                 "grade": grade,
-                "grades": grados,
-                "cantidad_csv": cantidad,
-                "price": precio,
+                "grades": grades,
+                "quantity_csv": quantity,
+                "price": price,
                 "action": action,
                 "existing_quantity": existing.get("inventory_quantity", 0) if existing else None,
                 "new_quantity": new_quantity
@@ -254,7 +254,7 @@ async def execute_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"code", "name", "grade", "cantidad", "price"}
+        required_columns = {"code", "name", "grade", "quantity", "price"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -270,22 +270,22 @@ async def execute_csv_import(
         
         for row_num, row in enumerate(reader, start=2):
             try:
-                codigo = row.get('codigo', '').strip()
-                nombre = row.get('nombre', '').strip()
-                grade_raw = row.get('grado', '').strip()
+                code = row.get('code', '').strip()
+                name = row.get('name', '').strip()
+                grade_raw = row.get('grade', '').strip()
                 
                 # Parse grades (supports comma-separated multiple grades)
-                grade, grados = parse_grades(grade_raw)
+                grade, grades = parse_grades(grade_raw)
                 
-                if not codigo or not nombre or not grade:
+                if not code or not name or not grade:
                     errors.append({"row": row_num, "error": "Missing required field"})
                     continue
                 
-                cantidad = int(row.get('cantidad', '0').strip() or '0')
-                precio = float(row.get('precio', '0').strip() or '0')
+                quantity = int(row.get('quantity', '0').strip() or '0')
+                price = float(row.get('price', '0').strip() or '0')
                 
                 # Check if exists in the private catalog (libros collection)
-                existing = await db.libros.find_one({"code": codigo, "is_private_catalog": True})
+                existing = await db.libros.find_one({"code": code, "is_private_catalog": True})
                 
                 if existing:
                     if duplicate_mode == DuplicateMode.SKIP:
@@ -294,23 +294,23 @@ async def execute_csv_import(
                     
                     # Calculate new quantity
                     if duplicate_mode == DuplicateMode.REPLACE:
-                        new_cantidad = cantidad
+                        new_quantity = quantity
                     else:  # ADD
-                        new_cantidad = existing.get("inventory_quantity", 0) + cantidad
+                        new_quantity = existing.get("inventory_quantity", 0) + quantity
                     
                     # Update existing product in libros collection
                     await db.libros.update_one(
-                        {"code": codigo, "is_private_catalog": True},
+                        {"code": code, "is_private_catalog": True},
                         {"$set": {
-                            "name": nombre,
+                            "name": name,
                             "grade": grade,
                             "grades": grades if len(grades) > 1 else None,
-                            "price": precio,
-                            "inventory_quantity": new_cantidad,
-                            "subject": row.get('materia', '').strip() or existing.get("subject"),
-                            "publisher": row.get('editorial', '').strip() or existing.get("publisher"),
+                            "price": price,
+                            "inventory_quantity": new_quantity,
+                            "subject": row.get('subject', '').strip() or existing.get("subject"),
+                            "publisher": row.get('publisher', '').strip() or existing.get("publisher"),
                             "isbn": row.get('isbn', '').strip() or existing.get("isbn"),
-                            "description": row.get('descripcion', '').strip() or existing.get("description"),
+                            "description": row.get('description', '').strip() or existing.get("description"),
                             "updated_at": now,
                             "updated_by": admin.get("user_id")
                         }}
@@ -322,16 +322,16 @@ async def execute_csv_import(
                     
                     new_product = {
                         "libro_id": libro_id,
-                        "code": codigo,
-                        "name": nombre,
+                        "code": code,
+                        "name": name,
                         "grade": grade,
                         "grades": grades if len(grades) > 1 else None,
-                        "price": precio,
-                        "inventory_quantity": cantidad,
-                        "subject": row.get('materia', '').strip() or None,
-                        "publisher": row.get('editorial', '').strip() or None,
+                        "price": price,
+                        "inventory_quantity": quantity,
+                        "subject": row.get('subject', '').strip() or None,
+                        "publisher": row.get('publisher', '').strip() or None,
                         "isbn": row.get('isbn', '').strip() or None,
-                        "description": row.get('descripcion', '').strip() or None,
+                        "description": row.get('description', '').strip() or None,
                         "image_url": None,
                         "active": True,
                         "featured": False,
