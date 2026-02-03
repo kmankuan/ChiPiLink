@@ -139,12 +139,12 @@ export default function Login() {
                 {laopanLoading ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Conectando...
+                    {t('auth.laopan.connecting')}
                   </>
                 ) : (
                   <>
                     <ExternalLink className="h-5 w-5" />
-                    {laopanConfig?.button_text_es || 'Iniciar sesión con LaoPan'}
+                    {t('auth.laopan.loginButton')}
                   </>
                 )}
               </Button>
@@ -158,11 +158,11 @@ export default function Login() {
                 data-testid="laopan-register-button"
               >
                 <UserPlus className="h-5 w-5" />
-                ¿No tienes cuenta? Regístrate en LaoPan
+                {t('auth.laopan.registerButton')}
               </Button>
               
               <p className="text-center text-sm text-muted-foreground">
-                Inicia sesión o regístrate en LaoPan.online para acceder
+                {t('auth.laopan.description')}
               </p>
             </div>
           )}
