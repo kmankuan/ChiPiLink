@@ -75,7 +75,8 @@ async def initiate_oauth_login(
     
     logger.info(f"OAuth login initiated from origin: {origin}")
     
-    auth_data = laopan_oauth_service.generate_auth_url(redirect_after=redirect, origin=origin)
+    # Now async - stores state in database
+    auth_data = await laopan_oauth_service.generate_auth_url(redirect_after=redirect, origin=origin)
     
     return {
         "auth_url": auth_data["auth_url"],
