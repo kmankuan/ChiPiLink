@@ -518,7 +518,7 @@ class SuperPinService(BaseService):
             for cat in tournament_config.categories:
                 cat_players = [
                     {"jugador_id": e.jugador_id, "posicion_ranking": e.posicion, 
-                     "categoria": cat["name"], "jugador_info": e.jugador_info}
+                     "category": cat["name"], "jugador_info": e.jugador_info}
                     for e in ranking.entries
                     if cat["min_rank"] <= e.posicion <= cat["max_rank"]
                 ]

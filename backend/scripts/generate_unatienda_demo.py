@@ -18,7 +18,7 @@ from core.database import db
 # ============== DEMO DATA DEFINITIONS ==============
 
 # Grados de PCA (Pre-Kinder a 12vo)
-GRADOS_PCA = [
+PCA_GRADES = [
     "Pre-Kinder", "Kinder",
     "1ro", "2do", "3ro", "4to", "5to", "6to",
     "7mo", "8vo", "9no", "10mo", "11vo", "12vo"
@@ -45,9 +45,9 @@ def generate_isbn():
 
 def get_materias_for_grado(grade: str) -> List[str]:
     """Get subjects for a grade level"""
-    if grado in ["Pre-Kinder", "Kinder"]:
+    if grade in ["Pre-Kinder", "Kinder"]:
         return ["Apresto", "English"]
-    elif grado in ["1ro", "2do", "3ro", "4to", "5to", "6to"]:
+    elif grade in ["1ro", "2do", "3ro", "4to", "5to", "6to"]:
         return MATERIAS_PRIMARIA
     else:
         return MATERIAS_SECUNDARIA
@@ -60,23 +60,23 @@ async def generate_catalog_products() -> List[Dict]:
     # Clear existing demo products
     await db.store_products.delete_many({"is_demo": True})
     
-    for grado in GRADOS_PCA:
+    for grade in PCA_GRADES:
         materias = get_materias_for_grado(grade)
         
-        for materia in materias:
+        for subject in materias:
             editorial = random.choice(EDITORIALES)
             
             # Base price varies by grade level
             base_price = random.uniform(12.0, 35.0)
-            if grado in ["10mo", "11vo", "12vo"]:
+            if grade in ["10mo", "11vo", "12vo"]:
                 base_price = random.uniform(25.0, 45.0)
             
             product = {
                 "book_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "code": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
+                "code": f"PCA-{grade[:3].upper()}-{subject[:3].upper()}-{random.randint(100,999)}",
                 "name": f"{materia} {grado} - {editorial}",
                 "description": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
-                "categoria": "libros",
+                "category": "libros",
                 "grade": grade,
                 "grades": [grado],
                 "subject": materia,
@@ -112,7 +112,7 @@ async def generate_students_list() -> List[Dict]:
     
     student_number = 1001
     
-    for grado in GRADOS_PCA:
+    for grade in PCA_GRADES:
         # Generate 5-10 students per grade
         num_students = random.randint(5, 10)
         
@@ -124,13 +124,13 @@ async def generate_students_list() -> List[Dict]:
             student = {
                 "sync_id": f"sync_{uuid.uuid4().hex[:12]}",
                 "numero_estudiante": f"PCA-{student_number}",
-                "nombre_completo": f"{nombre} {apellido} {apellido2}",
+                "full_name": f"{nombre} {apellido} {apellido2}",
                 "name": nombre,
                 "apellido": f"{apellido} {apellido2}",
                 "grade": grade,
                 "seccion": random.choice(["A", "B", "C"]),
                 "sheet_id": "demo_sheet_pca_2025",
-                "hoja_nombre": f"Estudiantes {grado}",
+                "sheet_name": f"Estudiantes {grado}",
                 "fila_numero": student_number - 1000,
                 "estado": "active",
                 "override_local": False,
@@ -199,7 +199,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
         order = {
             "order_id": f"order_{uuid.uuid4().hex[:12]}",
             "student_sync_id": student["sync_id"],
-            "student_name": student["nombre_completo"],
+            "student_name": student["full_name"],
             "grade": student["grade"],
             "student_number": student["numero_estudiante"],
             "user_name": f"Acudiente de {student['nombre']}",
@@ -210,7 +210,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
             "items": items,
             "total_amount": round(total, 2),
             "items_count": len(items),
-            "notes": f"Pedido de prueba para {student['nombre_completo']}",
+            "notes": f"Pedido de prueba para {student['full_name']}",
             "is_demo": True,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
@@ -234,7 +234,7 @@ async def generate_all_demo_data():
     print(f"   ✅ {len(products)} books created")
     
     # 2. Generate students
-    print("\n👨‍🎓 Generando lista de estudiantes...")
+    print("\n👨‍🎓 Generating student list...")
     students = await generate_students_list()
     print(f"   ✅ {len(students)} estudiantes creados")
     
@@ -245,7 +245,7 @@ async def generate_all_demo_data():
     
     # Summary by grade
     print("\n📊 Resumen por grade:")
-    for grado in GRADOS_PCA:
+    for grade in PCA_GRADES:
         grado_products = len([p for p in products if p["grade"] == grado])
         grado_students = len([s for s in students if s["grade"] == grado])
         grado_orders = len([o for o in orders if o["estudiante_grado"] == grado])

@@ -85,13 +85,13 @@ async def seed_site_config():
         if not existing_config:
             config_doc = {
                 "config_id": "main",
-                "nombre_sitio": "ChiPi Link",
+                "site_name": "ChiPi Link",
                 "description": "Tu Super App",
                 "color_primario": "#16a34a",
                 "color_secundario": "#0f766e",
                 "footer_texto": "© 2025 ChiPi Link - Todos los derechos reservados",
                 "meta_titulo": "ChiPi Link | Tu Super App",
-                "meta_descripcion": "La mejor plataforma para tu negocio"
+                "meta_description": "La mejor plataforma para tu negocio"
             }
             
             await db[CoreCollections.SITE_CONFIG].insert_one(config_doc)
@@ -108,7 +108,7 @@ async def seed_landing_page():
     Create default landing page with initial blocks if it doesn't exist.
     """
     try:
-        existing_page = await db[CoreCollections.PAGES].find_one({"pagina_id": "landing"})
+        existing_page = await db[CoreCollections.PAGES].find_one({"page_id": "landing"})
         
         if existing_page and existing_page.get("bloques") and len(existing_page.get("bloques", [])) > 0:
             print(f"✅ Landing page already has {len(existing_page.get('bloques', []))} blocks")
@@ -185,7 +185,7 @@ async def seed_landing_page():
         ]
         
         landing_doc = {
-            "pagina_id": "landing",
+            "page_id": "landing",
             "titulo": "Page Principal",
             "bloques": initial_blocks,
             "publicada": True,
@@ -195,7 +195,7 @@ async def seed_landing_page():
         
         # Use upsert to update or create
         await db[CoreCollections.PAGES].update_one(
-            {"pagina_id": "landing"},
+            {"page_id": "landing"},
             {"$set": landing_doc},
             upsert=True
         )
@@ -288,15 +288,15 @@ async def create_indexes():
         
         # Index for store_products
         await db[StoreCollections.PRODUCTS].create_index("book_id", unique=True)
-        await db[StoreCollections.PRODUCTS].create_index("categoria")
+        await db[StoreCollections.PRODUCTS].create_index("category")
         await db[StoreCollections.PRODUCTS].create_index("grade")
         await db[StoreCollections.PRODUCTS].create_index("active")
         
         # Index for store_categories
-        await db[StoreCollections.CATEGORIES].create_index("categoria_id", unique=True)
+        await db[StoreCollections.CATEGORIES].create_index("category_id", unique=True)
         
         # Compound indexes for common queries
-        await db[StoreCollections.PRODUCTS].create_index([("categoria", 1), ("active", 1)])
+        await db[StoreCollections.PRODUCTS].create_index([("category", 1), ("active", 1)])
         await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("active", 1)])
         await db[StoreCollections.ORDERS].create_index([("estado", 1), ("created_at", -1)])
         

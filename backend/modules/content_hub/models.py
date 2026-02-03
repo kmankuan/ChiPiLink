@@ -50,7 +50,7 @@ class ContentItemBase(BaseModel):
     embed_code: Optional[str] = None  # HTML embed code
     thumbnail_url: Optional[str] = None  # Preview image
     # Classification
-    categorias: List[str] = []  # Category IDs (audiences)
+    categorys: List[str] = []  # Category IDs (audiences)
     tags: List[str] = []  # Etiquetas adicionales
     # Original content metadata
     autor_original: Optional[str] = None
@@ -85,7 +85,7 @@ class ContentPlaylist(BaseModel):
     titulo: str
     description: Optional[str] = None
     imagen_portada: Optional[str] = None
-    categoria_id: Optional[str] = None  # Category principal
+    category_id: Optional[str] = None  # Category principal
     items: List[str] = []  # List of content_ids
     publicada: bool = True
     orden: int = 0

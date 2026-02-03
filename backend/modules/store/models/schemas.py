@@ -40,7 +40,7 @@ class ProductBase(BaseModel):
     """Base product model"""
     name: str
     description: Optional[str] = None
-    categoria: Optional[str] = "libros"
+    category: Optional[str] = "libros"
     grade: Optional[str] = None
     grades: Optional[List[str]] = None
     subject: Optional[str] = None
@@ -68,7 +68,7 @@ class ProductUpdate(BaseModel):
     """Product update model"""
     name: Optional[str] = None
     description: Optional[str] = None
-    categoria: Optional[str] = None
+    category: Optional[str] = None
     grade: Optional[str] = None
     grades: Optional[List[str]] = None
     subject: Optional[str] = None
@@ -210,14 +210,14 @@ class CategoryBase(BaseModel):
 
 class CategoryCreate(CategoryBase):
     """Category creation model"""
-    categoria_id: Optional[str] = None
+    category_id: Optional[str] = None
 
 
 class Category(CategoryBase):
     """Full category model"""
     model_config = ConfigDict(from_attributes=True)
     
-    categoria_id: str
+    category_id: str
     created_at: Optional[Any] = None
 
 
@@ -225,7 +225,7 @@ class Category(CategoryBase):
 
 class BannerBase(BaseModel):
     """Base banner model"""
-    categoria: str
+    category: str
     titulo: Optional[str] = None
     subtitulo: Optional[str] = None
     image_url: str

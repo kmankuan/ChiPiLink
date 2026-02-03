@@ -23,7 +23,7 @@ class AuthCollections:
 class StoreCollections:
     PRODUCTS = "store_products"              # Previously: libros
     ORDERS = "store_orders"                  # Previously: pedidos
-    CATEGORIES = "store_categories"          # Previously: categorias
+    CATEGORIES = "store_categories"          # Previously: categorys
     STUDENTS = "store_synced_students"       # Previously: estudiantes_sincronizados
 
 
@@ -83,7 +83,7 @@ LEGACY_TO_NEW = {
     # Store
     "libros": StoreCollections.PRODUCTS,
     "pedidos": StoreCollections.ORDERS,
-    "categorias": StoreCollections.CATEGORIES,
+    "categorys": StoreCollections.CATEGORIES,
     "estudiantes_sincronizados": StoreCollections.STUDENTS,
     "synced_students": StoreCollections.STUDENTS,
     

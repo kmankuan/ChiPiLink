@@ -35,7 +35,7 @@ def buscar_estudiante_en_matriculas(
     Search for a student in the synced enrollment database.
     Returns match info if similarity >= 90%, otherwise None.
     """
-    nombre_completo = f"{nombre} {apellido}".lower().strip()
+    full_name = f"{nombre} {apellido}".lower().strip()
     mejor_coincidencia = None
     mejor_similitud = 0.0
     
@@ -69,10 +69,10 @@ def buscar_estudiante_en_matriculas(
                     sync_nombre = value_str
         
         # Calculate similarity
-        sync_nombre_completo = f"{sync_nombre} {sync_apellido}".lower().strip()
+        sync_full_name = f"{sync_nombre} {sync_apellido}".lower().strip()
         
         # Compare full names
-        similitud_nombre = calcular_similitud(nombre_completo, sync_nombre_completo)
+        similitud_nombre = calcular_similitud(full_name, sync_full_name)
         
         # Also compare individual fields
         similitud_nombre_ind = calcular_similitud(nombre, sync_nombre)
@@ -93,7 +93,7 @@ def buscar_estudiante_en_matriculas(
             
             # Try numeric comparison
             try:
-                if grado_norm.isdigit() and sync_grado_norm.isdigit():
+                if grade_norm.isdigit() and sync_grado_norm.isdigit():
                     grado_match = grado_norm == sync_grado_norm
                 else:
                     grado_match = calcular_similitud(grade_norm, sync_grado_norm) >= 0.8
@@ -102,7 +102,7 @@ def buscar_estudiante_en_matriculas(
         
         # Calculate final score (name similarity is most important, grade is secondary)
         # If grade doesn't match, reduce the score significantly
-        if grado_match:
+        if grade_match:
             score_final = similitud_combinada
         else:
             score_final = similitud_combinada * 0.5  # Penalize if grade doesn't match
@@ -113,7 +113,7 @@ def buscar_estudiante_en_matriculas(
                 "sync_id": est_sync.get("sync_id"),
                 "datos": datos,
                 "similitud": round(score_final * 100, 1),
-                "nombre_encontrado": sync_nombre_completo,
+                "nombre_encontrado": sync_full_name,
                 "grado_encontrado": sync_grade,
                 "grado_match": grado_match
             }

@@ -35,7 +35,7 @@ class ProductService(BaseService):
             {
                 "book_id": result["book_id"],
                 "name": result["name"],
-                "categoria": result.get("categoria")
+                "category": result.get("category")
             }
         )
         
@@ -49,7 +49,7 @@ class ProductService(BaseService):
     
     async def get_all_products(
         self,
-        categoria: Optional[str] = None,
+        category: Optional[str] = None,
         grade: Optional[str] = None,
         subject: Optional[str] = None,
         skip: int = 0,
@@ -57,7 +57,7 @@ class ProductService(BaseService):
     ) -> List[Product]:
         """Get productos activos"""
         results = await self.repository.get_all_active(
-            categoria=categoria,
+            category=category,
             grado=grade,
             materia=materia,
             skip=skip,
@@ -67,29 +67,29 @@ class ProductService(BaseService):
     
     async def get_featured_products(
         self,
-        categoria: Optional[str] = None,
+        category: Optional[str] = None,
         limit: int = 10
     ) -> List[Product]:
         """Get productos destacados"""
-        results = await self.repository.get_featured(categoria, limit)
+        results = await self.repository.get_featured(category, limit)
         return [Product(**r) for r in results]
     
     async def get_promotional_products(
         self,
-        categoria: Optional[str] = None,
+        category: Optional[str] = None,
         limit: int = 10
     ) -> List[Product]:
         """Get productos en promotion"""
-        results = await self.repository.get_promotions(categoria, limit)
+        results = await self.repository.get_promotions(category, limit)
         return [Product(**r) for r in results]
     
     async def get_newest_products(
         self,
-        categoria: Optional[str] = None,
+        category: Optional[str] = None,
         limit: int = 8
     ) -> List[Product]:
         """Get productos more nuevos"""
-        results = await self.repository.get_newest(categoria, limit)
+        results = await self.repository.get_newest(category, limit)
         return [Product(**r) for r in results]
     
     async def search_products(self, query: str) -> List[Product]:

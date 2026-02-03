@@ -88,7 +88,7 @@ class GoogleSheetsService:
                 "ultima_sync": None,
                 "proxima_sync": None,
                 "columna_numero": "numero_estudiante",
-                "columna_nombre": "nombre_completo",
+                "columna_nombre": "full_name",
                 "columna_grado": "grade",
                 "columna_seccion": "seccion",
                 "columna_estado": "estado"
@@ -197,14 +197,14 @@ class GoogleSheetsService:
         
         Args:
             sheet_id: ID of the Google Sheet
-            hoja_nombre: Nombre de la tab
+            sheet_name: Nombre de la tab
             rango: Rango a leer (ej: "A1:F100"). Si es None, lee toda la hoja.
         """
         if not self._initialized:
             raise Exception("Servicio no inicializado")
         
         try:
-            range_name = f"'{hoja_nombre}'!{rango}" if rango else f"'{hoja_nombre}'"
+            range_name = f"'{sheet_name}'!{rango}" if rango else f"'{sheet_name}'"
             
             result = self.service.spreadsheets().values().get(
                 spreadsheetId=sheet_id,
@@ -304,13 +304,13 @@ class GoogleSheetsService:
                             if not numero:
                                 continue
                             
-                            nombre_completo = get_val("columna_nombre") or ""
+                            full_name = get_val("columna_nombre") or ""
                             grade = hoja_cfg.get("grade") or get_val("columna_grado") or ""
                             seccion = get_val("columna_seccion")
                             estado_raw = get_val("columna_estado") or "active"
                             
                             # Separar nombre y apellido si es posible
-                            partes_nombre = nombre_completo.split(" ", 1)
+                            partes_nombre = full_name.split(" ", 1)
                             nombre = partes_nombre[0] if partes_nombre else ""
                             apellido = partes_nombre[1] if len(partes_nombre) > 1 else ""
                             
@@ -322,13 +322,13 @@ class GoogleSheetsService:
                             
                             estudiante_data = {
                                 "numero_estudiante": numero,
-                                "nombre_completo": nombre_completo,
+                                "full_name": full_name,
                                 "name": nombre,
                                 "apellido": apellido,
                                 "grade": str(grade),
                                 "seccion": seccion,
                                 "sheet_id": sheet_cfg["sheet_id"],
-                                "hoja_nombre": hoja_cfg["name"],
+                                "sheet_name": hoja_cfg["name"],
                                 "fila_numero": fila_num,
                                 "estado": "active" if estado_raw.lower() in ["active", "active", "1", "si", "yes"] else "inactivo",
                                 "fecha_sync": datetime.now(timezone.utc).isoformat(),
@@ -398,7 +398,7 @@ class GoogleSheetsService:
             query["estado"] = estado
         if buscar:
             query["$or"] = [
-                {"nombre_completo": {"$regex": buscar, "$options": "i"}},
+                {"full_name": {"$regex": buscar, "$options": "i"}},
                 {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
             ]
         
@@ -407,7 +407,7 @@ class GoogleSheetsService:
         cursor = db.synced_students.find(
             query,
             {"_id": 0}
-        ).sort("nombre_completo", 1).skip(skip).limit(limit)
+        ).sort("full_name", 1).skip(skip).limit(limit)
         
         estudiantes = await cursor.to_list(length=limit)
         

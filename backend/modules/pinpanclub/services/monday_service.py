@@ -241,9 +241,9 @@ class MondayService(BaseService):
         if player.get("monday_item_id"):
             return player["monday_item_id"]
         
-        nombre_completo = f"{player.get('nombre', '')} {player.get('apellido', '')}"
+        full_name = f"{player.get('nombre', '')} {player.get('apellido', '')}"
         if player.get("apodo"):
-            nombre_completo += f" ({player['apodo']})"
+            full_name += f" ({player['apodo']})"
         
         column_values = {
             "text": player.get("name", ""),
@@ -254,7 +254,7 @@ class MondayService(BaseService):
         
         monday_id = await self.create_item(
             config.players_board_id,
-            nombre_completo.strip(),
+            full_name.strip(),
             column_values
         )
         

@@ -272,9 +272,9 @@ async def sync_players_to_monday(
                 continue
             
             # Preparar datos para Monday.com
-            nombre_completo = f"{player.get('nombre', '')} {player.get('apellido', '')}".strip()
+            full_name = f"{player.get('nombre', '')} {player.get('apellido', '')}".strip()
             if player.get("apodo"):
-                nombre_completo += f" ({player['apodo']})"
+                full_name += f" ({player['apodo']})"
             
             column_values = {
                 "text": player.get("name", ""),  # Nombre
@@ -286,7 +286,7 @@ async def sync_players_to_monday(
             # Crear item en Monday.com
             result = await create_monday_item(
                 board_id=config.players_board_id,
-                item_name=nombre_completo,
+                item_name=full_name,
                 column_values=column_values
             )
             

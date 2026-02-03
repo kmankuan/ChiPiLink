@@ -34,7 +34,7 @@ class ProductRepository(BaseRepository):
     
     async def get_all_active(
         self,
-        categoria: Optional[str] = None,
+        category: Optional[str] = None,
         grade: Optional[str] = None,
         subject: Optional[str] = None,
         skip: int = 0,
@@ -43,8 +43,8 @@ class ProductRepository(BaseRepository):
         """Get productos activos con filtros opcionales"""
         query = {"active": True}
         
-        if categoria:
-            query["categoria"] = categoria
+        if category:
+            query["category"] = category
         
         if grade:
             query["$or"] = [{"grade": grado}, {"grades": grado}]
@@ -54,40 +54,40 @@ class ProductRepository(BaseRepository):
         
         return await self.find_many(query=query, skip=skip, limit=limit)
     
-    async def get_by_category(self, categoria: str, limit: int = 100) -> List[Dict]:
+    async def get_by_category(self, category: str, limit: int = 100) -> List[Dict]:
         """Get productos por category"""
         return await self.find_many(
-            query={"categoria": categoria, "active": True},
+            query={"category": category, "active": True},
             limit=limit
         )
     
-    async def get_featured(self, categoria: Optional[str] = None, limit: int = 10) -> List[Dict]:
+    async def get_featured(self, category: Optional[str] = None, limit: int = 10) -> List[Dict]:
         """Get productos destacados"""
         query = {"featured": True, "active": True}
-        if categoria:
-            query["categoria"] = categoria
+        if category:
+            query["category"] = category
         return await self.find_many(
             query=query,
             limit=limit,
             sort=[("featured_order", 1)]
         )
     
-    async def get_promotions(self, categoria: Optional[str] = None, limit: int = 10) -> List[Dict]:
+    async def get_promotions(self, category: Optional[str] = None, limit: int = 10) -> List[Dict]:
         """Get productos en promotion"""
         query = {
             "on_sale": True,
             "active": True,
             "sale_price": {"$ne": None}
         }
-        if categoria:
-            query["categoria"] = categoria
+        if category:
+            query["category"] = category
         return await self.find_many(query=query, limit=limit)
     
-    async def get_newest(self, categoria: Optional[str] = None, limit: int = 8) -> List[Dict]:
+    async def get_newest(self, category: Optional[str] = None, limit: int = 8) -> List[Dict]:
         """Get productos more nuevos"""
         query = {"active": True}
-        if categoria:
-            query["categoria"] = categoria
+        if category:
+            query["category"] = category
         return await self.find_many(
             query=query,
             limit=limit,

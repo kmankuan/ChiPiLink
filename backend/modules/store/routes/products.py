@@ -15,7 +15,7 @@ router = APIRouter(prefix="/products", tags=["Store - Products"])
 
 @router.get("", response_model=List[Product])
 async def get_products(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     grade: Optional[str] = None,
     subject: Optional[str] = None,
     skip: int = Query(0, ge=0),
@@ -23,7 +23,7 @@ async def get_products(
 ):
     """Get productos activos con filtros opcionales"""
     return await product_service.get_all_products(
-        categoria=categoria,
+        category=category,
         grado=grade,
         materia=materia,
         skip=skip,
@@ -33,29 +33,29 @@ async def get_products(
 
 @router.get("/featured", response_model=List[Product])
 async def get_featured_products(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
     """Get productos destacados"""
-    return await product_service.get_featured_products(categoria, limit)
+    return await product_service.get_featured_products(category, limit)
 
 
 @router.get("/promotions", response_model=List[Product])
 async def get_promotional_products(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
     """Get productos en promotion"""
-    return await product_service.get_promotional_products(categoria, limit)
+    return await product_service.get_promotional_products(category, limit)
 
 
 @router.get("/newest", response_model=List[Product])
 async def get_newest_products(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     limit: int = Query(8, ge=1, le=50)
 ):
     """Get productos more nuevos"""
-    return await product_service.get_newest_products(categoria, limit)
+    return await product_service.get_newest_products(category, limit)
 
 
 @router.get("/search")

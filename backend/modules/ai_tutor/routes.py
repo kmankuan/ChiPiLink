@@ -129,15 +129,15 @@ async def get_my_sessions(user: dict = Depends(get_current_user)):
 
 @router.get("/vocabulary")
 async def get_vocabulary(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     nivel: Optional[str] = None,
     idioma: str = "en",
     limit: int = 20
 ):
     """Get vocabulary items - PLACEHOLDER"""
     query = {"idioma_destino": idioma}
-    if categoria:
-        query["categoria"] = categoria
+    if category:
+        query["category"] = category
     if nivel:
         query["nivel"] = nivel
     
@@ -146,12 +146,12 @@ async def get_vocabulary(
     # Return sample data if empty
     if not items:
         items = [
-            {"palabra": "hello", "traduccion": "hola", "categoria": "saludos", "nivel": "basico"},
-            {"palabra": "goodbye", "traduccion": "goodbye", "categoria": "saludos", "nivel": "basico"},
-            {"palabra": "thank you", "traduccion": "gracias", "categoria": "expresiones", "nivel": "basico"},
-            {"palabra": "please", "traduccion": "por favor", "categoria": "expresiones", "nivel": "basico"},
-            {"palabra": "yes", "traduccion": "yes", "categoria": "basico", "nivel": "basico"},
-            {"palabra": "no", "traduccion": "no", "categoria": "basico", "nivel": "basico"},
+            {"palabra": "hello", "traduccion": "hola", "category": "saludos", "nivel": "basico"},
+            {"palabra": "goodbye", "traduccion": "goodbye", "category": "saludos", "nivel": "basico"},
+            {"palabra": "thank you", "traduccion": "gracias", "category": "expresiones", "nivel": "basico"},
+            {"palabra": "please", "traduccion": "por favor", "category": "expresiones", "nivel": "basico"},
+            {"palabra": "yes", "traduccion": "yes", "category": "basico", "nivel": "basico"},
+            {"palabra": "no", "traduccion": "no", "category": "basico", "nivel": "basico"},
         ]
     
     return items

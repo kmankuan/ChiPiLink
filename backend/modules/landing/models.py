@@ -19,7 +19,7 @@ class BloquePagina(BaseModel):
 
 class ConfiguracionSitio(BaseModel):
     """Global site configuration"""
-    nombre_sitio: str = "Mi Tienda"
+    site_name: str = "Mi Tienda"
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     descripcion: str = "Plataforma de comercio electronic"
@@ -31,7 +31,7 @@ class ConfiguracionSitio(BaseModel):
     redes_sociales: dict = {}  # {facebook: url, instagram: url, etc}
     footer_texto: str = "© 2025 Todos los derechos reservados"
     # SEO & Meta Tags
-    meta_titulo: Optional[str] = None  # Browser tab title (falls back to nombre_sitio)
+    meta_titulo: Optional[str] = None  # Browser tab title (falls back to site_name)
     meta_description: Optional[str] = None  # Meta description for SEO
     meta_keywords: Optional[str] = None  # Meta keywords
     og_image: Optional[str] = None  # Open Graph image for social sharing
@@ -43,7 +43,7 @@ class ConfiguracionSitio(BaseModel):
 
 class PaginaBuilder(BaseModel):
     """Page configuration with blocks"""
-    pagina_id: str = "landing"
+    page_id: str = "landing"
     titulo: str = "Page Principal"
     bloques: List[BloquePagina] = []
     publicada: bool = True

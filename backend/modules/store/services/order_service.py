@@ -97,7 +97,7 @@ class OrderService(BaseService):
             total += item.cantidad * item.price_unitario
             items_validados.append(item.model_dump())
         
-        nombre_completo = f"{data.name_estudiante} {data.apellido_estudiante}"
+        full_name = f"{data.name_estudiante} {data.apellido_estudiante}"
         
         order_dict = {
             "tipo": "publico",
@@ -106,7 +106,7 @@ class OrderService(BaseService):
             "telefono_acudiente": data.telefono_acudiente,
             "email_acudiente": data.email_acudiente,
             "estudiante_id": None,
-            "estudiante_nombre": nombre_completo,
+            "estudiante_nombre": full_name,
             "estudiante_primer_nombre": data.name_estudiante,
             "estudiante_apellido": data.apellido_estudiante,
             "grado_estudiante": data.grade_estudiante,

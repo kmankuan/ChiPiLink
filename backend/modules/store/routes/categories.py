@@ -18,19 +18,19 @@ async def get_categories():
     return await category_service.get_all_categories()
 
 
-@router.get("/{categoria_id}", response_model=Category)
-async def get_category(categoria_id: str):
+@router.get("/{category_id}", response_model=Category)
+async def get_category(category_id: str):
     """Get category by ID"""
-    category = await category_service.get_category(categoria_id)
+    category = await category_service.get_category(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 
-@router.get("/{categoria_id}/landing")
-async def get_category_landing(categoria_id: str):
+@router.get("/{category_id}/landing")
+async def get_category_landing(category_id: str):
     """Get datos completos para landing de category"""
-    return await category_service.get_category_landing(categoria_id)
+    return await category_service.get_category_landing(category_id)
 
 
 @router.post("", response_model=Category)
@@ -42,27 +42,27 @@ async def create_category(
     return await category_service.create_category(data)
 
 
-@router.put("/{categoria_id}", response_model=Category)
+@router.put("/{category_id}", response_model=Category)
 async def update_category(
-    categoria_id: str,
+    category_id: str,
     data: dict,
     admin: dict = Depends(get_admin_user)
 ):
     """Update category (solo admin)"""
-    category = await category_service.update_category(categoria_id, data)
+    category = await category_service.update_category(category_id, data)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 
-@router.delete("/{categoria_id}")
+@router.delete("/{category_id}")
 async def delete_category(
-    categoria_id: str,
+    category_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Delete category - soft delete (solo admin)"""
     try:
-        success = await category_service.delete_category(categoria_id)
+        success = await category_service.delete_category(category_id)
         if not success:
             raise HTTPException(status_code=404, detail="Category not found")
         return {"success": True, "message": "Category eliminada"}

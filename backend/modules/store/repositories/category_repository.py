@@ -17,16 +17,16 @@ class CategoryRepository(BaseRepository):
     """
     
     COLLECTION_NAME = StoreCollections.CATEGORIES
-    ID_FIELD = "categoria_id"
+    ID_FIELD = "category_id"
     
     # Default categories
     DEFAULT_CATEGORIES = [
-        {"categoria_id": "libros", "name": "Libros", "icono": "📚", "orden": 1, "active": True},
-        {"categoria_id": "snacks", "name": "Snacks", "icono": "🍫", "orden": 2, "active": True},
-        {"categoria_id": "bebidas", "name": "Bebidas", "icono": "🥤", "orden": 3, "active": True},
-        {"categoria_id": "preparados", "name": "Preparados", "icono": "🌭", "orden": 4, "active": True},
-        {"categoria_id": "uniformes", "name": "Uniformes", "icono": "👕", "orden": 5, "active": True},
-        {"categoria_id": "servicios", "name": "Servicios", "icono": "🔧", "orden": 6, "active": True},
+        {"category_id": "libros", "name": "Libros", "icono": "📚", "orden": 1, "active": True},
+        {"category_id": "snacks", "name": "Snacks", "icono": "🍫", "orden": 2, "active": True},
+        {"category_id": "bebidas", "name": "Bebidas", "icono": "🥤", "orden": 3, "active": True},
+        {"category_id": "preparados", "name": "Preparados", "icono": "🌭", "orden": 4, "active": True},
+        {"category_id": "uniformes", "name": "Uniformes", "icono": "👕", "orden": 5, "active": True},
+        {"category_id": "servicios", "name": "Servicios", "icono": "🔧", "orden": 6, "active": True},
     ]
     
     def __init__(self):
@@ -34,14 +34,14 @@ class CategoryRepository(BaseRepository):
     
     async def create(self, category_data: Dict) -> Dict:
         """Create nueva category"""
-        if not category_data.get("categoria_id"):
-            category_data["categoria_id"] = f"cat_{uuid.uuid4().hex[:8]}"
+        if not category_data.get("category_id"):
+            category_data["category_id"] = f"cat_{uuid.uuid4().hex[:8]}"
         category_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(category_data)
     
-    async def get_by_id(self, categoria_id: str) -> Optional[Dict]:
+    async def get_by_id(self, category_id: str) -> Optional[Dict]:
         """Get category by ID"""
-        return await self.find_by_id(self.ID_FIELD, categoria_id)
+        return await self.find_by_id(self.ID_FIELD, category_id)
     
     async def get_all_active(self) -> List[Dict]:
         """Get all categorys activas"""
@@ -54,17 +54,17 @@ class CategoryRepository(BaseRepository):
             return self.DEFAULT_CATEGORIES
         return categories
     
-    async def update_category(self, categoria_id: str, data: Dict) -> bool:
+    async def update_category(self, category_id: str, data: Dict) -> bool:
         """Update category"""
-        return await self.update_by_id(self.ID_FIELD, categoria_id, data)
+        return await self.update_by_id(self.ID_FIELD, category_id, data)
     
-    async def deactivate(self, categoria_id: str) -> bool:
+    async def deactivate(self, category_id: str) -> bool:
         """Desactivar category"""
-        return await self.update_category(categoria_id, {"active": False})
+        return await self.update_category(category_id, {"active": False})
     
-    async def count_products(self, categoria_id: str) -> int:
+    async def count_products(self, category_id: str) -> int:
         """Contar productos en una category"""
         return await db[StoreCollections.PRODUCTS].count_documents({
-            "categoria": categoria_id,
+            "category": category_id,
             "active": True
         })

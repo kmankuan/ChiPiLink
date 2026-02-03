@@ -82,7 +82,7 @@ class BulkImportService:
             column_mapping: Mapeo de campos a indexs de columna
                 {
                     "numero_estudiante": 0,  # Columna A
-                    "nombre_completo": 1,    # Columna B
+                    "full_name": 1,    # Columna B
                     "grade": 2,              # Columna C (opcional si hay grado_default)
                     "seccion": 3             # Columna D (opcional)
                 }
@@ -109,7 +109,7 @@ class BulkImportService:
             try:
                 # Extract datos according to mapeo
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
-                nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
+                full_name = self._get_cell(row, column_mapping.get("full_name"))
                 grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
@@ -118,7 +118,7 @@ class BulkImportService:
                     errores.append({"fila": idx + 2, "error": "Number de estudiante empty"})
                     continue
                 
-                if not nombre_completo:
+                if not full_name:
                     errores.append({"fila": idx + 2, "error": "Nombre empty"})
                     continue
                 
@@ -138,14 +138,14 @@ class BulkImportService:
                 )
                 
                 # Separar nombre y apellido
-                partes = nombre_completo.split(" ", 1)
+                partes = full_name.split(" ", 1)
                 nombre = partes[0]
                 apellido = partes[1] if len(partes) > 1 else ""
                 
                 preview.append({
                     "fila": idx + 2,
                     "numero_estudiante": numero,
-                    "nombre_completo": nombre_completo,
+                    "full_name": full_name,
                     "name": nombre,
                     "apellido": apellido,
                     "grade": str(grade),
@@ -210,11 +210,11 @@ class BulkImportService:
         for idx, row in enumerate(parsed["rows"]):
             try:
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
-                nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
+                full_name = self._get_cell(row, column_mapping.get("full_name"))
                 grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
-                if not numero or not nombre_completo or not grade:
+                if not numero or not full_name or not grade:
                     resultados["errores"].append({
                         "fila": idx + 2,
                         "error": "Datos incompletos"
@@ -227,7 +227,7 @@ class BulkImportService:
                 numeros_procesados.add(numero)
                 
                 # Separar nombre y apellido
-                partes = nombre_completo.split(" ", 1)
+                partes = full_name.split(" ", 1)
                 nombre = partes[0]
                 apellido = partes[1] if len(partes) > 1 else ""
                 
@@ -237,12 +237,12 @@ class BulkImportService:
                 
                 estudiante_data = {
                     "numero_estudiante": numero,
-                    "nombre_completo": nombre_completo,
+                    "full_name": full_name,
                     "name": nombre,
                     "apellido": apellido,
                     "grade": str(grade),
                     "seccion": seccion,
-                    "hoja_nombre": hoja_nombre,
+                    "sheet_name": sheet_name,
                     "fila_numero": idx + 2,
                     "estado": "active",
                     "import_id": import_id,
@@ -279,7 +279,7 @@ class BulkImportService:
             "import_id": import_id,
             "tipo": "estudiantes",
             "admin_id": admin_id,
-            "hoja_nombre": hoja_nombre,
+            "sheet_name": sheet_name,
             "grado_default": grado_default,
             "resultados": {
                 "creados": resultados["creados"],
@@ -466,7 +466,7 @@ class BulkImportService:
                     "publisher": editorial,
                     "isbn": isbn,
                     "subject": materia,
-                    "categoria": "texto_escolar",
+                    "category": "texto_escolar",
                     "active": True,
                     "estado_disponibilidad": "disponible",
                     "import_id": import_id,

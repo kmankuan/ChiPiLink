@@ -14,18 +14,18 @@ from ..services import category_service, product_service
 router = APIRouter(prefix="/landing", tags=["Store - Landing"])
 
 
-@router.get("/category/{categoria}")
-async def get_category_landing_data(categoria: str):
+@router.get("/category/{category}")
+async def get_category_landing_data(category: str):
     """Get todos los datos para landing de category"""
-    return await category_service.get_category_landing(categoria)
+    return await category_service.get_category_landing(category)
 
 
-@router.get("/banners/{categoria}")
-async def get_category_banners(categoria: str):
+@router.get("/banners/{category}")
+async def get_category_banners(category: str):
     """Get banners activos de una category"""
     now = datetime.now(timezone.utc)
     query = {
-        "categoria": categoria,
+        "category": category,
         "active": True,
         "$or": [
             {"fecha_inicio": None, "fecha_fin": None},
@@ -38,22 +38,22 @@ async def get_category_banners(categoria: str):
     return banners
 
 
-@router.get("/featured/{categoria}")
-async def get_category_featured(categoria: str, limit: int = Query(10, ge=1, le=50)):
+@router.get("/featured/{category}")
+async def get_category_featured(category: str, limit: int = Query(10, ge=1, le=50)):
     """Get productos destacados de una category"""
-    return await product_service.get_featured_products(categoria, limit)
+    return await product_service.get_featured_products(category, limit)
 
 
-@router.get("/promotions/{categoria}")
-async def get_category_promotions(categoria: str, limit: int = Query(10, ge=1, le=50)):
+@router.get("/promotions/{category}")
+async def get_category_promotions(category: str, limit: int = Query(10, ge=1, le=50)):
     """Get productos en promotion de una category"""
-    return await product_service.get_promotional_products(categoria, limit)
+    return await product_service.get_promotional_products(category, limit)
 
 
-@router.get("/newest/{categoria}")
-async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)):
+@router.get("/newest/{category}")
+async def get_category_newest(category: str, limit: int = Query(8, ge=1, le=50)):
     """Get productos more nuevos de una category"""
-    return await product_service.get_newest_products(categoria, limit)
+    return await product_service.get_newest_products(category, limit)
 
 
 # ============== ADMIN BANNER MANAGEMENT ==============
@@ -62,7 +62,7 @@ async def get_category_newest(categoria: str, limit: int = Query(8, ge=1, le=50)
 async def get_all_banners(admin: dict = Depends(get_admin_user)):
     """Get todos los banners (admin)"""
     banners = await db.category_banners.find({}, {"_id": 0}).sort(
-        [("categoria", 1), ("orden", 1)]
+        [("category", 1), ("orden", 1)]
     ).to_list(100)
     return banners
 
@@ -72,7 +72,7 @@ async def create_banner(banner: dict, admin: dict = Depends(get_admin_user)):
     """Create nuevo banner (admin)"""
     doc = {
         "banner_id": f"banner_{uuid.uuid4().hex[:12]}",
-        "categoria": banner.get("categoria"),
+        "category": banner.get("category"),
         "titulo": banner.get("titulo"),
         "subtitulo": banner.get("subtitulo"),
         "image_url": banner.get("image_url"),

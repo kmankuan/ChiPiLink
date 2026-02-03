@@ -118,8 +118,8 @@ class VendorProduct(BaseModel):
     price: float
     precio_descuento: Optional[float] = None
     imagenes: List[str] = []
-    categoria: str = ""
-    subcategoria: str = ""
+    category: str = ""
+    subcategory: str = ""
     inventario: int = 0
     active: bool = True
     featured: bool = False

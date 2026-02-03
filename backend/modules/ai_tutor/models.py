@@ -64,7 +64,7 @@ class VocabularyItem(BaseModel):
     image_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
     # Categorization
-    categoria: Optional[str] = None  # colores, animales, numbers, etc.
+    category: Optional[str] = None  # colores, animales, numbers, etc.
     nivel: str = "basico"
     idioma_origen: str = "es"
     idioma_destino: str = "en"

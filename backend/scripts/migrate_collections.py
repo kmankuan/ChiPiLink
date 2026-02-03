@@ -30,7 +30,7 @@ COLLECTION_MIGRATIONS = {
     # Store Module  
     "libros": "store_products",
     "pedidos": "store_orders",
-    "categorias": "store_categories",
+    "categorys": "store_categories",
     "synced_students": "store_students",
     
     # PinpanClub Module

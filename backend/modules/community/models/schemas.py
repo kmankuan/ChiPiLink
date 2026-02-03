@@ -49,7 +49,7 @@ class PostBase(BaseModel):
     orden: int = 0
     fecha_expiracion: Optional[Any] = None
     tags: Optional[List[str]] = None
-    categoria: Optional[str] = None
+    category: Optional[str] = None
     permite_comentarios: bool = True
 
 
@@ -74,7 +74,7 @@ class PostUpdate(BaseModel):
     orden: Optional[int] = None
     fecha_expiracion: Optional[Any] = None
     tags: Optional[List[str]] = None
-    categoria: Optional[str] = None
+    category: Optional[str] = None
     permite_comentarios: Optional[bool] = None
 
 

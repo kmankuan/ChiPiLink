@@ -23,7 +23,7 @@ class ParseTSVRequest(BaseModel):
 class PreviewEstudiantesRequest(BaseModel):
     """Request para previsualizar import de estudiantes"""
     raw_text: str
-    column_mapping: Dict[str, int]  # {"numero_estudiante": 0, "nombre_completo": 1, ...}
+    column_mapping: Dict[str, int]  # {"numero_estudiante": 0, "full_name": 1, ...}
     grado_default: Optional[str] = None
 
 
@@ -100,7 +100,7 @@ async def import_estudiantes(
         request.raw_text,
         request.column_mapping,
         request.grade_default,
-        request.hoja_nombre,
+        request.sheet_name,
         request.actualizar_existentes,
         admin.get("user_id")
     )
@@ -192,7 +192,7 @@ async def get_estudiantes_importados(
         query["estado"] = estado
     if buscar:
         query["$or"] = [
-            {"nombre_completo": {"$regex": buscar, "$options": "i"}},
+            {"full_name": {"$regex": buscar, "$options": "i"}},
             {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
         ]
     
@@ -201,7 +201,7 @@ async def get_estudiantes_importados(
     cursor = db.synced_students.find(
         query,
         {"_id": 0}
-    ).sort("nombre_completo", 1).skip(skip).limit(limit)
+    ).sort("full_name", 1).skip(skip).limit(limit)
     
     estudiantes = await cursor.to_list(length=limit)
     

@@ -107,15 +107,15 @@ async def create_category(category: dict, admin: dict = Depends(get_admin_user))
 
 @router.get("/items")
 async def get_content_items(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     source: Optional[str] = None,
     featured: Optional[bool] = None,
     limit: int = 50
 ):
     """Get curated content items - PLACEHOLDER"""
     query = {"publicado": True}
-    if categoria:
-        query["categorias"] = categoria
+    if category:
+        query["categorys"] = category
     if source:
         query["source"] = source
     if destacado is not None:
@@ -155,7 +155,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
         "embed_url": item.get("embed_url"),
         "embed_code": item.get("embed_code"),
         "thumbnail_url": item.get("thumbnail_url"),
-        "categorias": item.get("categorias", []),
+        "categorys": item.get("categorys", []),
         "tags": item.get("tags", []),
         "autor_original": item.get("autor_original"),
         "duracion_segundos": item.get("duracion_segundos"),
@@ -178,7 +178,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
 async def get_category_feed(category_id: str, limit: int = 20):
     """Get content feed for specific category/audience - PLACEHOLDER"""
     items = await db.content_items.find(
-        {"categorias": category_id, "publicado": True},
+        {"categorys": category_id, "publicado": True},
         {"_id": 0}
     ).sort("created_at", -1).to_list(limit)
     
@@ -192,11 +192,11 @@ async def get_category_feed(category_id: str, limit: int = 20):
 # ============== PLAYLISTS ==============
 
 @router.get("/playlists")
-async def get_playlists(categoria: Optional[str] = None):
+async def get_playlists(category: Optional[str] = None):
     """Get content playlists - PLACEHOLDER"""
     query = {"publicada": True}
-    if categoria:
-        query["categoria_id"] = categoria
+    if category:
+        query["category_id"] = category
     
     playlists = await db.content_playlists.find(query, {"_id": 0}).sort("orden", 1).to_list(50)
     return playlists
@@ -210,7 +210,7 @@ async def create_playlist(playlist: dict, admin: dict = Depends(get_admin_user))
         "titulo": playlist.get("titulo"),
         "description": playlist.get("description"),
         "imagen_portada": playlist.get("imagen_portada"),
-        "categoria_id": playlist.get("categoria_id"),
+        "category_id": playlist.get("category_id"),
         "items": playlist.get("items", []),
         "publicada": True,
         "orden": playlist.get("orden", 0),

@@ -25,12 +25,12 @@ class CategoryService(BaseService):
         """Create nueva category"""
         category_dict = data.model_dump()
         result = await self.repository.create(category_dict)
-        self.log_info(f"Category created: {result['categoria_id']}")
+        self.log_info(f"Category created: {result['category_id']}")
         return Category(**result)
     
-    async def get_category(self, categoria_id: str) -> Optional[Category]:
+    async def get_category(self, category_id: str) -> Optional[Category]:
         """Get category by ID"""
-        result = await self.repository.get_by_id(categoria_id)
+        result = await self.repository.get_by_id(category_id)
         return Category(**result) if result else None
     
     async def get_all_categories(self) -> List[Category]:
@@ -40,7 +40,7 @@ class CategoryService(BaseService):
     
     async def update_category(
         self,
-        categoria_id: str,
+        category_id: str,
         data: Dict
     ) -> Optional[Category]:
         """Update category"""
@@ -48,39 +48,39 @@ class CategoryService(BaseService):
         update_data = {k: v for k, v in data.items() if v is not None}
         
         if not update_data:
-            return await self.get_category(categoria_id)
+            return await self.get_category(category_id)
         
-        success = await self.repository.update_category(categoria_id, update_data)
+        success = await self.repository.update_category(category_id, update_data)
         
         if success:
-            return await self.get_category(categoria_id)
+            return await self.get_category(category_id)
         
         return None
     
-    async def delete_category(self, categoria_id: str) -> bool:
+    async def delete_category(self, category_id: str) -> bool:
         """
         Eliminar category (soft delete).
         Verifica that does not tenga productos activos.
         """
         # Verify productos
-        product_count = await self.repository.count_products(categoria_id)
+        product_count = await self.repository.count_products(category_id)
         if product_count > 0:
             raise ValueError(f"No se puede eliminar. Hay {product_count} productos en esta category.")
         
-        return await self.repository.deactivate(categoria_id)
+        return await self.repository.deactivate(category_id)
     
-    async def get_category_landing(self, categoria_id: str) -> Dict:
+    async def get_category_landing(self, category_id: str) -> Dict:
         """Get datos completos para landing de category"""
-        category = await self.get_category(categoria_id)
+        category = await self.get_category(category_id)
         
         # Get productos
-        featured = await self.product_repository.get_featured(categoria_id)
-        promotions = await self.product_repository.get_promotions(categoria_id)
-        newest = await self.product_repository.get_newest(categoria_id)
-        total = await self.product_repository.count({"categoria": categoria_id, "active": True})
+        featured = await self.product_repository.get_featured(category_id)
+        promotions = await self.product_repository.get_promotions(category_id)
+        newest = await self.product_repository.get_newest(category_id)
+        total = await self.product_repository.count({"category": category_id, "active": True})
         
         return {
-            "categoria": category.model_dump() if category else None,
+            "category": category.model_dump() if category else None,
             "destacados": featured,
             "promociones": promotions,
             "novedades": newest,

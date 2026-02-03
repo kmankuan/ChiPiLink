@@ -108,14 +108,14 @@ async def get_embed_url():
 
 @router.get("/documents")
 async def get_documents(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     publico: Optional[bool] = None,
     limit: int = 50
 ):
     """Get FuseBase documents - PLACEHOLDER"""
     query = {}
-    if categoria:
-        query["categoria"] = categoria
+    if category:
+        query["category"] = category
     if publico is not None:
         query["publico"] = publico
     

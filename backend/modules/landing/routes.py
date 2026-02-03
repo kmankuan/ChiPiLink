@@ -35,11 +35,11 @@ async def get_public_site_config():
 @router.get("/public/landing-page")
 async def get_public_landing_page():
     """Get landing page blocks (public) - only returns published blocks"""
-    page = await db.core_pages.find_one({"pagina_id": "landing"}, {"_id": 0})
+    page = await db.core_pages.find_one({"page_id": "landing"}, {"_id": 0})
     if not page:
         # Return empty page with default blocks
         return {
-            "pagina_id": "landing",
+            "page_id": "landing",
             "titulo": "Page Principal",
             "bloques": [],
             "publicada": True
@@ -91,10 +91,10 @@ async def get_block_templates(admin: dict = Depends(get_admin_user)):
 @router.get("/admin/landing-page")
 async def get_landing_page(admin: dict = Depends(get_admin_user)):
     """Get landing page with all blocks (admin)"""
-    page = await db.core_pages.find_one({"pagina_id": "landing"}, {"_id": 0})
+    page = await db.core_pages.find_one({"page_id": "landing"}, {"_id": 0})
     if not page:
         return {
-            "pagina_id": "landing",
+            "page_id": "landing",
             "titulo": "Page Principal",
             "bloques": [],
             "publicada": True
@@ -115,7 +115,7 @@ async def add_block(
     template = BLOCK_TEMPLATES[tipo]
     
     # Get current page
-    page = await db.core_pages.find_one({"pagina_id": "landing"})
+    page = await db.core_pages.find_one({"page_id": "landing"})
     
     # Calculate order
     if page and page.get("bloques"):
@@ -133,7 +133,7 @@ async def add_block(
     
     if page:
         await db.core_pages.update_one(
-            {"pagina_id": "landing"},
+            {"page_id": "landing"},
             {
                 "$push": {"bloques": new_block},
                 "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
@@ -141,7 +141,7 @@ async def add_block(
         )
     else:
         new_page = {
-            "pagina_id": "landing",
+            "page_id": "landing",
             "titulo": "Page Principal",
             "bloques": [new_block],
             "publicada": True,
@@ -157,12 +157,12 @@ async def reorder_blocks(request: ReorderBlocksRequest, admin: dict = Depends(ge
     """Reorder blocks - expects {orders: [{bloque_id, orden}]}"""
     for item in request.orders:
         await db.core_pages.update_one(
-            {"pagina_id": "landing", "bloques.bloque_id": item.bloque_id},
+            {"page_id": "landing", "bloques.bloque_id": item.bloque_id},
             {"$set": {"bloques.$.orden": item.orden}}
         )
     
     await db.core_pages.update_one(
-        {"pagina_id": "landing"},
+        {"page_id": "landing"},
         {"$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
     )
     
@@ -186,7 +186,7 @@ async def update_block(
     update_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.core_pages.update_one(
-        {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
+        {"page_id": "landing", "bloques.bloque_id": bloque_id},
         {"$set": update_doc}
     )
     
@@ -200,7 +200,7 @@ async def update_block(
 async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = Depends(get_admin_user)):
     """Toggle block publish status (Publicado/En construction)"""
     result = await db.core_pages.update_one(
-        {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
+        {"page_id": "landing", "bloques.bloque_id": bloque_id},
         {"$set": {
             "bloques.$.publicado": publicado,
             "updated_at": datetime.now(timezone.utc).isoformat()
@@ -217,7 +217,7 @@ async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = De
 async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
     """Delete a block from landing page"""
     result = await db.core_pages.update_one(
-        {"pagina_id": "landing"},
+        {"page_id": "landing"},
         {
             "$pull": {"bloques": {"bloque_id": bloque_id}},
             "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
@@ -234,7 +234,7 @@ async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
 async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admin_user)):
     """Toggle landing page published status"""
     await db.core_pages.update_one(
-        {"pagina_id": "landing"},
+        {"page_id": "landing"},
         {"$set": {"publicada": publicada, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
     )

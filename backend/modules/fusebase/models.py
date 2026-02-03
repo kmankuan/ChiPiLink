@@ -38,7 +38,7 @@ class FuseBaseDocument(BaseModel):
     url_embed: Optional[str] = None
     url_directo: Optional[str] = None
     # Classification local
-    categoria: Optional[str] = None
+    category: Optional[str] = None
     tags: List[str] = []
     publico: bool = False  # Visible para todos o solo admin
     orden: int = 0

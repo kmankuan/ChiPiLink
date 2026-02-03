@@ -54,7 +54,7 @@ async def get_platform_store():
 
 @router.get("/products")
 async def get_platform_products(
-    categoria: Optional[str] = None,
+    category: Optional[str] = None,
     buscar: Optional[str] = None,
     page: int = Query(1, ge=1),
     limit: int = Query(100, ge=1, le=500)
@@ -62,8 +62,8 @@ async def get_platform_products(
     """Get platform store products (uses main libros collection)"""
     query = {"active": {"$ne": False}}
     
-    if categoria:
-        query["categoria"] = categoria
+    if category:
+        query["category"] = category
     
     if buscar:
         query["$or"] = [

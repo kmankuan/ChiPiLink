@@ -49,16 +49,16 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     # Seed categories if empty
     cat_count = await db.store_categories.count_documents({})
     if cat_count == 0:
-        categorias = [
-            {"categoria_id": "libros", "name": "Libros", "icono": "\ud83d\udcda", "orden": 1, "active": True},
-            {"categoria_id": "snacks", "name": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "active": True},
-            {"categoria_id": "bebidas", "name": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "active": True},
-            {"categoria_id": "preparados", "name": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "active": True},
-            {"categoria_id": "uniformes", "name": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "active": True},
-            {"categoria_id": "servicios", "name": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "active": True},
+        categorys = [
+            {"category_id": "libros", "name": "Libros", "icono": "\ud83d\udcda", "orden": 1, "active": True},
+            {"category_id": "snacks", "name": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "active": True},
+            {"category_id": "bebidas", "name": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "active": True},
+            {"category_id": "preparados", "name": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "active": True},
+            {"category_id": "uniformes", "name": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "active": True},
+            {"category_id": "servicios", "name": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "active": True},
         ]
-        await db.store_categories.insert_many(categorias)
-        seeded.append("categorias")
+        await db.store_categories.insert_many(categorys)
+        seeded.append("categorys")
     
     # Seed sample products if empty
     libro_count = await db.store_products.count_documents({})
@@ -68,7 +68,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
                 "book_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "name": "Matem\u00e1ticas 1",
                 "description": "Libro de matem\u00e1ticas para primer grado",
-                "categoria": "libros",
+                "category": "libros",
                 "grade": "1",
                 "subject": "matematicas",
                 "price": 25.00,
@@ -80,7 +80,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
                 "book_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "name": "Espa\u00f1ol 1",
                 "description": "Libro de espa\u00f1ol para primer grado",
-                "categoria": "libros",
+                "category": "libros",
                 "grade": "1",
                 "subject": "espanol",
                 "price": 22.00,
