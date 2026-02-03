@@ -127,6 +127,7 @@ export default function Login() {
           {/* Primary: LaoPan OAuth Login */}
           {laopanEnabled && (
             <div className="space-y-4 mb-6">
+              {/* Sign In Button */}
               <Button
                 type="button"
                 className="w-full h-14 rounded-xl text-base font-medium gap-3"
@@ -148,8 +149,20 @@ export default function Login() {
                 )}
               </Button>
               
+              {/* Sign Up Button - for users without LaoPan account */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-14 rounded-xl text-base font-medium gap-3"
+                onClick={() => window.open('https://laopan.online/register/', '_blank')}
+                data-testid="laopan-register-button"
+              >
+                <UserPlus className="h-5 w-5" />
+                ¿No tienes cuenta? Regístrate en LaoPan
+              </Button>
+              
               <p className="text-center text-sm text-muted-foreground">
-                Serás redirigido a LaoPan.online para autenticarte
+                Inicia sesión o regístrate en LaoPan.online para acceder
               </p>
             </div>
           )}
