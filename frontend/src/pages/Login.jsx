@@ -120,7 +120,7 @@ export default function Login() {
               {t('auth.login')}
             </h1>
             <p className="text-muted-foreground">
-              Inicia sesión con tu cuenta de LaoPan.online
+              {t('auth.laopan.description')}
             </p>
           </div>
 
