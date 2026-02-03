@@ -36,11 +36,11 @@ class ImportResult(BaseModel):
 
 # CSV Template columns
 TEMPLATE_COLUMNS = [
-    "code",           # Required: Unique product code
-    "name",           # Required: Product name
+    "code",             # Required: Unique product code
+    "name",             # Required: Product name
     "grade",            # Required: Grade(s) - supports multiple grades separated by comma (e.g., "K4,K5" or "1,2")
-    "cantidad",         # Required: Inventory quantity
-    "price",           # Required: Price
+    "quantity",         # Required: Inventory quantity
+    "price",            # Required: Price
     "subject",          # Optional: Subject
     "publisher",        # Optional: Publisher
     "isbn",             # Optional: ISBN
@@ -55,11 +55,11 @@ def parse_grades(grade_str: str) -> tuple:
     Example: "K4,K5" -> ("K4", ["K4", "K5"])
     Example: "1" -> ("1", ["1"])
     """
-    if not grado_str:
+    if not grade_str:
         return None, []
     
     # Split by comma and clean each grade
-    grades = [g.strip() for g in grado_str.split(',') if g.strip()]
+    grades = [g.strip() for g in grade_str.split(',') if g.strip()]
     
     if not grades:
         return None, []
