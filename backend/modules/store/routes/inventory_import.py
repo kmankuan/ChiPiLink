@@ -284,8 +284,8 @@ async def execute_csv_import(
                 cantidad = int(row.get('cantidad', '0').strip() or '0')
                 precio = float(row.get('precio', '0').strip() or '0')
                 
-                # Check if exists
-                existing = await db.productos_privados.find_one({"codigo": codigo})
+                # Check if exists in the private catalog (libros collection)
+                existing = await db.libros.find_one({"codigo": codigo, "es_catalogo_privado": True})
                 
                 if existing:
                     if duplicate_mode == DuplicateMode.SKIP:
@@ -298,9 +298,9 @@ async def execute_csv_import(
                     else:  # ADD
                         new_cantidad = existing.get("cantidad_inventario", 0) + cantidad
                     
-                    # Update existing product
-                    await db.productos_privados.update_one(
-                        {"codigo": codigo},
+                    # Update existing product in libros collection
+                    await db.libros.update_one(
+                        {"codigo": codigo, "es_catalogo_privado": True},
                         {"$set": {
                             "nombre": nombre,
                             "grado": grado,
