@@ -229,9 +229,9 @@ async def generate_all_demo_data():
     print("🚀 Generando datos de demo para Unatienda...")
     
     # 1. Generate catalog
-    print("\n📚 Generando catalog de libros...")
+    print("\n📚 Generating book catalog...")
     products = await generate_catalog_products()
-    print(f"   ✅ {len(products)} libros creados")
+    print(f"   ✅ {len(products)} books created")
     
     # 2. Generate students
     print("\n👨‍🎓 Generando lista de estudiantes...")
@@ -239,9 +239,9 @@ async def generate_all_demo_data():
     print(f"   ✅ {len(students)} estudiantes creados")
     
     # 3. Generate orders
-    print("\n🛒 Generando pedidos de ejemplo...")
+    print("\n🛒 Generating sample orders...")
     orders = await generate_sample_orders(students, products)
-    print(f"   ✅ {len(orders)} pedidos creados")
+    print(f"   ✅ {len(orders)} orders created")
     
     # Summary by grade
     print("\n📊 Resumen por grade:")
@@ -270,8 +270,8 @@ async def clear_demo_data():
     result_orders = await db.textbook_orders.delete_many({"is_demo": True})
     
     return {
-        "libros_eliminados": result_libros.deleted_count,
-        "estudiantes_eliminados": result_estudiantes.deleted_count,
+        "books_deleted": result_libros.deleted_count,
+        "students_deleted": result_estudiantes.deleted_count,
         "orders_deleted": result_orders.deleted_count
     }
 

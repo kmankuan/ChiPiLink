@@ -26,7 +26,7 @@ class YappyAmbiente(str, Enum):
 ROLE_PERMISSIONS = {
     TeamRole.PROPIETARIO: {
         "gestionar_productos": True,
-        "gestionar_pedidos": True,
+        "manage_orders": True,
         "gestionar_configuracion": True,
         "gestionar_equipo": True,
         "ver_reportes": True,
@@ -34,7 +34,7 @@ ROLE_PERMISSIONS = {
     },
     TeamRole.ADMINISTRADOR: {
         "gestionar_productos": True,
-        "gestionar_pedidos": True,
+        "manage_orders": True,
         "gestionar_configuracion": True,
         "gestionar_equipo": False,
         "ver_reportes": True,
@@ -42,7 +42,7 @@ ROLE_PERMISSIONS = {
     },
     TeamRole.VENDEDOR: {
         "gestionar_productos": True,
-        "gestionar_pedidos": True,
+        "manage_orders": True,
         "gestionar_configuracion": False,
         "gestionar_equipo": False,
         "ver_reportes": True,
@@ -50,7 +50,7 @@ ROLE_PERMISSIONS = {
     },
     TeamRole.SOPORTE: {
         "gestionar_productos": False,
-        "gestionar_pedidos": True,
+        "manage_orders": True,
         "gestionar_configuracion": False,
         "gestionar_equipo": False,
         "ver_reportes": True,
