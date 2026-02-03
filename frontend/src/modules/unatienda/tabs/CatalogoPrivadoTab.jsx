@@ -355,33 +355,33 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                     <TableRow key={p.libro_id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {(p.image_url || p.image_url) ? (
-                            <img src={p.image_url || p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
+                          {p.image_url ? (
+                            <img src={p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                           ) : (
                             <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                               <BookOpen className="h-5 w-5 text-muted-foreground" />
                             </div>
                           )}
                           <div>
-                            <p className="font-medium line-clamp-1">{p.name || p.name}</p>
+                            <p className="font-medium line-clamp-1">{p.name}</p>
                             {p.isbn && <p className="text-xs text-muted-foreground">ISBN: {p.isbn}</p>}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{p.code || p.code}</TableCell>
+                      <TableCell className="font-mono text-sm">{p.code}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{p.grade || p.grade}</Badge>
+                        <Badge variant="secondary">{p.grade}</Badge>
                       </TableCell>
-                      <TableCell>{p.subject || p.subject}</TableCell>
-                      <TableCell>{p.publisher || p.publisher}</TableCell>
+                      <TableCell>{p.subject}</TableCell>
+                      <TableCell>{p.publisher}</TableCell>
                       <TableCell className="text-right">
-                        {(p.sale_price || p.sale_price) ? (
+                        {p.sale_price ? (
                           <div>
-                            <span className="text-green-600 font-medium">${(p.sale_price || p.sale_price).toFixed(2)}</span>
-                            <span className="text-xs text-muted-foreground line-through ml-1">${(p.price || p.price)?.toFixed(2)}</span>
+                            <span className="text-green-600 font-medium">${p.sale_price.toFixed(2)}</span>
+                            <span className="text-xs text-muted-foreground line-through ml-1">${p.price?.toFixed(2)}</span>
                           </div>
                         ) : (
-                          <span className="font-medium">${(p.price || p.price)?.toFixed(2)}</span>
+                          <span className="font-medium">${p.price?.toFixed(2)}</span>
                         )}
                       </TableCell>
                       <TableCell>
