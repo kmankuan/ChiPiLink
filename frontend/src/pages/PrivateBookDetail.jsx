@@ -162,7 +162,7 @@ export default function PrivateBookDetail() {
   const matchingStudents = getMatchingStudents();
   const inCart = isInCart();
   const cartQty = getCartQuantity();
-  const finalPrice = libro.sale_price || libro.precio;
+  const finalPrice = libro.sale_price || libro.price;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
@@ -174,7 +174,7 @@ export default function PrivateBookDetail() {
               {libro.image_url ? (
                 <img 
                   src={libro.image_url} 
-                  alt={libro.nombre}
+                  alt={libro.name}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -207,7 +207,7 @@ export default function PrivateBookDetail() {
                   {libro.subject}
                 </Badge>
               )}
-              {libro.destacado && (
+              {libro.featured && (
                 <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                   Destacado
                 </Badge>
@@ -216,18 +216,18 @@ export default function PrivateBookDetail() {
 
             {/* Title */}
             <div>
-              <h1 className="text-3xl font-bold mb-2">{libro.nombre}</h1>
-              {libro.editorial && (
+              <h1 className="text-3xl font-bold mb-2">{libro.name}</h1>
+              {libro.publisher && (
                 <p className="text-lg text-muted-foreground flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  {libro.editorial}
+                  {libro.publisher}
                 </p>
               )}
             </div>
 
             {/* Description */}
-            {libro.descripcion && (
-              <p className="text-muted-foreground">{libro.descripcion}</p>
+            {libro.description && (
+              <p className="text-muted-foreground">{libro.description}</p>
             )}
 
             {/* Codes */}
@@ -277,15 +277,15 @@ export default function PrivateBookDetail() {
                 <span className="text-4xl font-bold text-primary">
                   ${finalPrice?.toFixed(2)}
                 </span>
-                {libro.sale_price && libro.sale_price < libro.precio && (
+                {libro.sale_price && libro.sale_price < libro.price && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${libro.precio?.toFixed(2)}
+                    ${libro.price?.toFixed(2)}
                   </span>
                 )}
               </div>
-              {libro.sale_price && libro.sale_price < libro.precio && (
+              {libro.sale_price && libro.sale_price < libro.price && (
                 <Badge className="bg-green-100 text-green-700">
-                  Ahorras ${(libro.precio - libro.sale_price).toFixed(2)}
+                  Ahorras ${(libro.price - libro.sale_price).toFixed(2)}
                 </Badge>
               )}
             </div>

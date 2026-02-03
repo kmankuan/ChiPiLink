@@ -335,7 +335,7 @@ export default function InventoryImport({ token, onImportComplete }) {
                           {previewData.items.map((item, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="font-mono text-xs">{item.code}</TableCell>
-                              <TableCell className="max-w-[200px] truncate">{item.nombre}</TableCell>
+                              <TableCell className="max-w-[200px] truncate">{item.name}</TableCell>
                               <TableCell>{item.grade}</TableCell>
                               <TableCell className="text-right">
                                 {item.existing_quantity !== null ? (

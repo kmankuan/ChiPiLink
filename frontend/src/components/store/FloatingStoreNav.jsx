@@ -426,7 +426,7 @@ export default function FloatingStoreNav({
                     className="h-8 rounded-full text-xs"
                   >
                     <span className="mr-1">{cat.icono}</span>
-                    {cat.nombre}
+                    {cat.name}
                   </Button>
                 ))}
               </div>

@@ -78,9 +78,9 @@ export default function UnatiendaCheckout() {
       const orderData = {
         items: items.map(item => ({
           libro_id: item.libro_id,
-          nombre: item.nombre,
+          nombre: item.name,
           cantidad: item.quantity,
-          precio_unitario: item.precio
+          precio_unitario: item.price
         })),
         cliente_nombre: customerInfo.nombre,
         cliente_email: customerInfo.email,
@@ -166,7 +166,7 @@ export default function UnatiendaCheckout() {
                       {item.image_url ? (
                         <img 
                           src={item.image_url} 
-                          alt={item.nombre}
+                          alt={item.name}
                           className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
@@ -176,9 +176,9 @@ export default function UnatiendaCheckout() {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm truncate">{item.nombre}</h4>
+                      <h4 className="font-medium text-sm truncate">{item.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        ${item.precio.toFixed(2)} c/u
+                        ${item.price.toFixed(2)} c/u
                       </p>
                       
                       {/* Quantity */}
@@ -216,7 +216,7 @@ export default function UnatiendaCheckout() {
                     {/* Subtotal */}
                     <div className="text-right">
                       <p className="font-semibold">
-                        ${(item.precio * item.quantity).toFixed(2)}
+                        ${(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>

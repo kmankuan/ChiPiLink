@@ -99,7 +99,7 @@ export default function Login() {
             {siteConfig?.nombre_sitio || 'Mi Tienda'}
           </h2>
           <p className="text-lg opacity-90 max-w-md">
-            {siteConfig?.descripcion || 'Plataforma de comercio electrónico'}
+            {siteConfig?.description || 'Plataforma de comercio electrónico'}
           </p>
         </div>
       </div>

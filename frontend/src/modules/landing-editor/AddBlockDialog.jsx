@@ -155,7 +155,7 @@ export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
                   </div>
                   <p className="font-medium text-sm">{template.nombre}</p>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                    {template.descripcion}
+                    {template.description}
                   </p>
                 </button>
               );

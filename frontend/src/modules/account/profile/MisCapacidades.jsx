@@ -121,17 +121,17 @@ export default function UserCapabilities({ token }) {
   };
 
   const getCapabilityName = (cap) => {
-    if (cap.nombre && typeof cap.nombre === 'object') {
-      return cap.nombre[lang] || cap.nombre['es'] || Object.values(cap.nombre)[0];
+    if (cap.name && typeof cap.name === 'object') {
+      return cap.name[lang] || cap.name['es'] || Object.values(cap.name)[0];
     }
-    return cap.nombre || cap.capacidad_id;
+    return cap.name || cap.capacidad_id;
   };
 
   const getCapabilityDescription = (cap) => {
-    if (cap.descripcion && typeof cap.descripcion === 'object') {
-      return cap.descripcion[lang] || cap.descripcion['es'] || '';
+    if (cap.description && typeof cap.description === 'object') {
+      return cap.description[lang] || cap.description['es'] || '';
     }
-    return cap.descripcion || '';
+    return cap.description || '';
   };
 
   // Filter available capabilities (ones I don't have)

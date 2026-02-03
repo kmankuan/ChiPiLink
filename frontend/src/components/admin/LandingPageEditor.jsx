@@ -165,7 +165,7 @@ export default function LandingPageEditor() {
       setSiteConfig({
         ...config,
         nombre_sitio: safeString(config.nombre_sitio),
-        descripcion: safeString(config.descripcion),
+        descripcion: safeString(config.description),
         footer_texto: safeString(config.footer_texto),
         meta_titulo: safeString(config.meta_titulo),
         meta_descripcion: safeString(config.meta_descripcion),
@@ -212,7 +212,7 @@ export default function LandingPageEditor() {
       
       let url = `${BACKEND_URL}/api/admin/landing-page/blocks/${bloqueId}`;
       const params = new URLSearchParams();
-      if (activo !== null) params.append('activo', activo);
+      if (activo !== null) params.append('active', activo);
       if (params.toString()) url += `?${params.toString()}`;
 
       await axios.put(url, config, {
@@ -401,7 +401,7 @@ export default function LandingPageEditor() {
                     <div className="space-y-2">
                       <Label>Descripción del Sitio</Label>
                       <Textarea
-                        value={typeof siteConfig.descripcion === 'string' ? siteConfig.descripcion : ''}
+                        value={typeof siteConfig.description === 'string' ? siteConfig.description : ''}
                         onChange={(e) => setSiteConfig({ ...siteConfig, descripcion: e.target.value })}
                         placeholder="Descripción del sitio"
                         rows={2}
@@ -625,7 +625,7 @@ export default function LandingPageEditor() {
                 >
                   <Icon className="h-6 w-6 mb-2 text-gray-700" />
                   <p className="font-medium text-sm">{template.nombre}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{template.descripcion}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
                 </button>
               );
             })}
@@ -655,7 +655,7 @@ export default function LandingPageEditor() {
             return (
               <Card
                 key={block.bloque_id}
-                className={`transition-all ${!block.activo ? 'opacity-50' : ''} ${!isPublicado ? 'border-orange-300 bg-orange-50/50' : ''} ${BLOCK_COLORS[block.tipo] || ''}`}
+                className={`transition-all ${!block.active ? 'opacity-50' : ''} ${!isPublicado ? 'border-orange-300 bg-orange-50/50' : ''} ${BLOCK_COLORS[block.tipo] || ''}`}
               >
                 <CardHeader className="py-3">
                   <div className="flex items-center justify-between">
@@ -713,7 +713,7 @@ export default function LandingPageEditor() {
                         <CardDescription className="text-xs">
                           {typeof block.config?.titulo === 'string' 
                             ? block.config.titulo 
-                            : (block.config?.titulo?.es || block.config?.titulo?.en || template?.descripcion || '')}
+                            : (block.config?.titulo?.es || block.config?.titulo?.en || template?.description || '')}
                         </CardDescription>
                       </div>
                     </div>
@@ -721,10 +721,10 @@ export default function LandingPageEditor() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleToggleBlock(block.bloque_id, block.activo)}
-                        title={block.activo ? 'Desactivar bloque' : 'Activar bloque'}
+                        onClick={() => handleToggleBlock(block.bloque_id, block.active)}
+                        title={block.active ? 'Desactivar bloque' : 'Activar bloque'}
                       >
-                        {block.activo ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                        {block.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                       </Button>
                       <Button
                         variant="ghost"
@@ -947,8 +947,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                   />
                   <MultilingualInput
                     label="Descripción"
-                    value={item.descripcion}
-                    onChange={(val) => handleItemChange(index, 'descripcion', val)}
+                    value={item.description}
+                    onChange={(val) => handleItemChange(index, 'description', val)}
                     placeholder={{ en: "Feature description", es: "Descripción", zh: "描述" }}
                     multiline
                     rows={2}
@@ -1206,8 +1206,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 />
                 <MultilingualInput
                   label="Descripción"
-                  value={item.descripcion}
-                  onChange={(val) => handleItemChange(index, 'descripcion', val)}
+                  value={item.description}
+                  onChange={(val) => handleItemChange(index, 'description', val)}
                   placeholder={{ en: "Description", es: "Descripción", zh: "描述" }}
                   multiline
                 />
@@ -1320,7 +1320,7 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                   </Button>
                 </div>
                 <Input
-                  value={item.nombre || ''}
+                  value={item.name || ''}
                   onChange={(e) => handleItemChange(index, 'nombre', e.target.value)}
                   placeholder="Nombre del cliente"
                 />

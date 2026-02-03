@@ -49,17 +49,17 @@ export default function ServiciosSugeridos({ token }) {
   };
 
   const getNombre = (item) => {
-    if (item.nombre && typeof item.nombre === 'object') {
-      return item.nombre[lang] || item.nombre['es'] || Object.values(item.nombre)[0];
+    if (item.name && typeof item.name === 'object') {
+      return item.name[lang] || item.name['es'] || Object.values(item.name)[0];
     }
-    return item.nombre || '';
+    return item.name || '';
   };
 
   const getDescripcion = (item) => {
-    if (item.descripcion && typeof item.descripcion === 'object') {
-      return item.descripcion[lang] || item.descripcion['es'] || '';
+    if (item.description && typeof item.description === 'object') {
+      return item.description[lang] || item.description['es'] || '';
     }
-    return item.descripcion || '';
+    return item.description || '';
   };
 
   if (loading) {
@@ -103,7 +103,7 @@ export default function ServiciosSugeridos({ token }) {
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold flex items-center gap-2">
                     {getNombre(servicio)}
-                    {servicio.destacado && (
+                    {servicio.featured && (
                       <Badge variant="secondary" className="text-xs">
                         <Star className="h-3 w-3 mr-1" />
                         Recomendado
@@ -123,7 +123,7 @@ export default function ServiciosSugeridos({ token }) {
                           variant="outline"
                           className="text-xs"
                         >
-                          {plan.nombre} - ${plan.precio}
+                          {plan.nombre} - ${plan.price}
                         </Badge>
                       ))}
                       {servicio.planes.length > 3 && (

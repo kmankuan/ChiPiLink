@@ -109,7 +109,7 @@ export function MultilingualItemEditor({
   index,
   onItemChange,
   onRemove,
-  fields = ['titulo', 'descripcion']
+  fields = ['titulo', 'description']
 }) {
   return (
     <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
@@ -144,11 +144,11 @@ export function MultilingualItemEditor({
         />
       )}
       
-      {fields.includes('descripcion') && (
+      {fields.includes('description') && (
         <MultilingualInput
           label="Descripción"
-          value={item.descripcion}
-          onChange={(val) => onItemChange(index, 'descripcion', val)}
+          value={item.description}
+          onChange={(val) => onItemChange(index, 'description', val)}
           placeholder={{ default: "Descripción del item" }}
           multiline
           rows={2}

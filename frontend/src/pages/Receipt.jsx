@@ -149,10 +149,10 @@ export default function Receipt() {
       <div className="border-b border-dashed border-gray-400 pb-2 mb-2">
         {pedido.items?.map((item, index) => (
           <div key={index} className="mb-1">
-            <div className="text-xs truncate">{item.nombre}</div>
+            <div className="text-xs truncate">{item.name}</div>
             <div className="flex justify-between text-xs">
-              <span>{item.cantidad} x ${item.precio_unitario?.toFixed(2)}</span>
-              <span>${(item.cantidad * item.precio_unitario)?.toFixed(2)}</span>
+              <span>{item.cantidad} x ${item.price_unitario?.toFixed(2)}</span>
+              <span>${(item.cantidad * item.price_unitario)?.toFixed(2)}</span>
             </div>
           </div>
         ))}
@@ -279,11 +279,11 @@ export default function Receipt() {
             <tbody>
               {pedido.items?.map((item, index) => (
                 <tr key={index} className="border-t">
-                  <td className="p-3">{item.nombre}</td>
+                  <td className="p-3">{item.name}</td>
                   <td className="p-3 text-center">{item.cantidad}</td>
-                  <td className="p-3 text-right">${item.precio_unitario?.toFixed(2)}</td>
+                  <td className="p-3 text-right">${item.price_unitario?.toFixed(2)}</td>
                   <td className="p-3 text-right font-medium">
-                    ${(item.cantidad * item.precio_unitario)?.toFixed(2)}
+                    ${(item.cantidad * item.price_unitario)?.toFixed(2)}
                   </td>
                 </tr>
               ))}

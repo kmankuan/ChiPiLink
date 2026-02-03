@@ -156,8 +156,8 @@ export default function PlatformStoreModule() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={config.store.activo ? "default" : "secondary"}>
-            {config.store.activo ? "Activa" : "Inactiva"}
+          <Badge variant={config.store.active ? "default" : "secondary"}>
+            {config.store.active ? "Activa" : "Inactiva"}
           </Badge>
         </div>
       </div>
@@ -192,8 +192,8 @@ export default function PlatformStoreModule() {
                   </p>
                 </div>
                 <Switch
-                  checked={config.store.activo}
-                  onCheckedChange={(v) => updateStoreConfig('activo', v)}
+                  checked={config.store.active}
+                  onCheckedChange={(v) => updateStoreConfig('active', v)}
                 />
               </div>
 
@@ -208,11 +208,11 @@ export default function PlatformStoreModule() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="descripcion">Descripción</Label>
+                <Label htmlFor="description">Descripción</Label>
                 <Textarea
-                  id="descripcion"
-                  value={config.store.descripcion}
-                  onChange={(e) => updateStoreConfig('descripcion', e.target.value)}
+                  id="description"
+                  value={config.store.description}
+                  onChange={(e) => updateStoreConfig('description', e.target.value)}
                   placeholder="Descripción de la tienda"
                   rows={3}
                 />
@@ -285,7 +285,7 @@ export default function PlatformStoreModule() {
                   </div>
                   
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
-                    {config.yappy.activo ? (
+                    {config.yappy.active ? (
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
                     ) : (
                       <AlertCircle className="h-5 w-5 text-yellow-500" />
@@ -293,7 +293,7 @@ export default function PlatformStoreModule() {
                     <div>
                       <p className="text-sm font-medium">Estado</p>
                       <p className="text-xs text-muted-foreground">
-                        {config.yappy.activo ? "Activo" : "Inactivo"}
+                        {config.yappy.active ? "Activo" : "Inactivo"}
                       </p>
                     </div>
                   </div>
@@ -327,8 +327,8 @@ export default function PlatformStoreModule() {
                     </p>
                   </div>
                   <Switch
-                    checked={config.yappy.activo}
-                    onCheckedChange={(v) => updateYappyConfig('activo', v)}
+                    checked={config.yappy.active}
+                    onCheckedChange={(v) => updateYappyConfig('active', v)}
                   />
                 </div>
 

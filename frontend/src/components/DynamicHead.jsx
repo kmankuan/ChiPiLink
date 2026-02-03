@@ -32,7 +32,7 @@ export default function DynamicHead({ siteConfig }) {
     };
 
     // Update meta description
-    const description = siteConfig.meta_descripcion || siteConfig.descripcion;
+    const description = siteConfig.meta_descripcion || siteConfig.description;
     if (description) {
       updateMetaTag('meta[name="description"]', 'content', description);
     }

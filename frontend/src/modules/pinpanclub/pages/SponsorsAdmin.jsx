@@ -143,7 +143,7 @@ export default function SponsorsAdmin() {
       await fetch(`${API_URL}/api/pinpanclub/sponsors/${sponsor.sponsor_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activo: !sponsor.activo })
+        body: JSON.stringify({ activo: !sponsor.active })
       });
       fetchSponsors();
     } catch (error) {
@@ -202,7 +202,7 @@ export default function SponsorsAdmin() {
       logo_url: sponsor.logo_url || '',
       logo_base64: sponsor.logo_base64 || '',
       website_url: sponsor.website_url || '',
-      descripcion: sponsor.descripcion || '',
+      descripcion: sponsor.description || '',
       color_fondo: sponsor.color_fondo || '#1a1a2e',
       color_texto: sponsor.color_texto || '#ffffff',
       color_acento: sponsor.color_acento || '',
@@ -213,7 +213,7 @@ export default function SponsorsAdmin() {
       duracion_animacion: sponsor.duracion_animacion || 1000,
       duracion_display: sponsor.duracion_display || 10,
       orden: sponsor.orden || 0,
-      activo: sponsor.activo !== false,
+      activo: sponsor.active !== false,
       texto_promocional: sponsor.texto_promocional || '',
       mostrar_nombre: sponsor.mostrar_nombre !== false,
       tamano_logo: sponsor.tamano_logo || 'medium'
@@ -703,7 +703,7 @@ function SponsorCard({ sponsor, onEdit, onDelete, onToggle }) {
   
   return (
     <div className={`flex items-center gap-4 p-3 rounded-lg border ${
-      sponsor.activo ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60'
+      sponsor.active ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60'
     }`}>
       {/* Logo Preview */}
       <div 
@@ -729,10 +729,10 @@ function SponsorCard({ sponsor, onEdit, onDelete, onToggle }) {
       <div className="flex items-center gap-1">
         <button
           onClick={onToggle}
-          className={`p-2 rounded-lg ${sponsor.activo ? 'text-green-500' : 'text-gray-400'}`}
-          title={sponsor.activo ? 'Activo' : 'Inactivo'}
+          className={`p-2 rounded-lg ${sponsor.active ? 'text-green-500' : 'text-gray-400'}`}
+          title={sponsor.active ? 'Activo' : 'Inactivo'}
         >
-          {sponsor.activo ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+          {sponsor.active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
         </button>
         <button onClick={onEdit} className="p-2 rounded-lg hover:bg-gray-100">
           <Edit2 className="w-4 h-4" />

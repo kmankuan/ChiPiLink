@@ -78,9 +78,9 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      (p.nombre || p.name || '')?.toLowerCase().includes(term) ||
+      (p.name || p.name || '')?.toLowerCase().includes(term) ||
       (p.code || p.code || '')?.toLowerCase().includes(term) ||
-      (p.editorial || p.publisher || '')?.toLowerCase().includes(term) ||
+      (p.publisher || p.publisher || '')?.toLowerCase().includes(term) ||
       (p.subject || p.subject || '')?.toLowerCase().includes(term)
     );
   });
@@ -89,18 +89,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (product) {
       setEditingProduct(product);
       setFormData({
-        name: product.nombre || product.name || '',
+        name: product.name || product.name || '',
         code: product.code || product.code || '',
         isbn: product.isbn || '',
-        publisher: product.editorial || product.publisher || '',
+        publisher: product.publisher || product.publisher || '',
         grade: product.grade || product.grade || '',
         subject: product.subject || product.subject || '',
-        price: (product.precio || product.price)?.toString() || '',
+        price: (product.price || product.price)?.toString() || '',
         sale_price: (product.sale_price || product.sale_price)?.toString() || '',
-        description: product.descripcion || product.description || '',
+        description: product.description || product.description || '',
         image_url: product.image_url || product.image_url || '',
-        active: product.activo !== false && product.active !== false,
-        featured: product.destacado || product.featured || false
+        active: product.active !== false && product.active !== false,
+        featured: product.featured || product.featured || false
       });
     } else {
       setEditingProduct(null);
@@ -291,7 +291,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{products.filter(p => p.activo !== false).length}</div>
+            <div className="text-2xl font-bold">{products.filter(p => p.active !== false).length}</div>
             <p className="text-xs text-muted-foreground">Active</p>
           </CardContent>
         </Card>
@@ -363,7 +363,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                             </div>
                           )}
                           <div>
-                            <p className="font-medium line-clamp-1">{p.nombre || p.name}</p>
+                            <p className="font-medium line-clamp-1">{p.name || p.name}</p>
                             {p.isbn && <p className="text-xs text-muted-foreground">ISBN: {p.isbn}</p>}
                           </div>
                         </div>
@@ -373,20 +373,20 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                         <Badge variant="secondary">{p.grade || p.grade}</Badge>
                       </TableCell>
                       <TableCell>{p.subject || p.subject}</TableCell>
-                      <TableCell>{p.editorial || p.publisher}</TableCell>
+                      <TableCell>{p.publisher || p.publisher}</TableCell>
                       <TableCell className="text-right">
                         {(p.sale_price || p.sale_price) ? (
                           <div>
                             <span className="text-green-600 font-medium">${(p.sale_price || p.sale_price).toFixed(2)}</span>
-                            <span className="text-xs text-muted-foreground line-through ml-1">${(p.precio || p.price)?.toFixed(2)}</span>
+                            <span className="text-xs text-muted-foreground line-through ml-1">${(p.price || p.price)?.toFixed(2)}</span>
                           </div>
                         ) : (
-                          <span className="font-medium">${(p.precio || p.price)?.toFixed(2)}</span>
+                          <span className="font-medium">${(p.price || p.price)?.toFixed(2)}</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={p.activo !== false ? "default" : "secondary"}>
-                          {p.activo !== false ? "Active" : "Inactive"}
+                        <Badge variant={p.active !== false ? "default" : "secondary"}>
+                          {p.active !== false ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">

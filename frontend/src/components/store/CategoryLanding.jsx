@@ -91,7 +91,7 @@ export default function CategoryLanding({
     const inCart = isInCart(product.libro_id);
     const cartQty = getCartQuantity(product.libro_id);
     const justAdded = addedItems[product.libro_id];
-    const discount = showPromotion ? calculateDiscount(product.precio, product.sale_price) : 0;
+    const discount = showPromotion ? calculateDiscount(product.price, product.sale_price) : 0;
 
     return (
       <Card 
@@ -102,7 +102,7 @@ export default function CategoryLanding({
           {product.image_url ? (
             <img 
               src={product.image_url} 
-              alt={product.nombre}
+              alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -130,7 +130,7 @@ export default function CategoryLanding({
           </div>
 
           {/* Featured Badge */}
-          {product.destacado && (
+          {product.featured && (
             <div className="absolute bottom-2 left-2">
               <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
                 <Star className="h-3 w-3 mr-1 fill-yellow-500" />
@@ -152,7 +152,7 @@ export default function CategoryLanding({
         
         <CardContent className="p-4">
           <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
-            {product.nombre}
+            {product.name}
           </h3>
           
           {/* Price */}
@@ -163,12 +163,12 @@ export default function CategoryLanding({
                   ${product.sale_price.toFixed(2)}
                 </span>
                 <span className="text-sm text-muted-foreground line-through">
-                  ${product.precio.toFixed(2)}
+                  ${product.price.toFixed(2)}
                 </span>
               </>
             ) : (
               <span className="text-lg font-bold text-primary">
-                ${product.precio.toFixed(2)}
+                ${product.price.toFixed(2)}
               </span>
             )}
           </div>

@@ -293,7 +293,7 @@ export default function Dashboard() {
 
   // Calculate total
   const calculateTotal = () => {
-    return selectedBooks.reduce((sum, book) => sum + book.precio, 0);
+    return selectedBooks.reduce((sum, book) => sum + book.price, 0);
   };
 
   // Submit order
@@ -310,9 +310,9 @@ export default function Dashboard() {
         estudiante_id: selectedStudent.estudiante_id,
         items: selectedBooks.map(book => ({
           libro_id: book.libro_id,
-          nombre_libro: book.nombre,
+          nombre_libro: book.name,
           cantidad: 1,
-          precio_unitario: book.precio
+          precio_unitario: book.price
         })),
         metodo_pago: paymentMethod,
         notas: orderNotes || null
@@ -603,7 +603,7 @@ export default function Dashboard() {
                         <div className="flex flex-wrap gap-2">
                           {pedido.items.map((item, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">
-                              {item.nombre_libro}
+                              {item.name_libro}
                             </Badge>
                           ))}
                         </div>
@@ -792,7 +792,7 @@ export default function Dashboard() {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">{book.nombre}</p>
+                        <p className="font-medium truncate">{book.name}</p>
                         {book.ya_comprado && (
                           <Badge variant="secondary" className="text-xs">Ya Comprado</Badge>
                         )}
@@ -803,7 +803,7 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground">{book.subject}</p>
                     </div>
                     <p className={`font-bold ${book.ya_comprado ? 'text-muted-foreground' : 'text-primary'}`}>
-                      ${book.precio.toFixed(2)}
+                      ${book.price.toFixed(2)}
                     </p>
                   </div>
                 ))}

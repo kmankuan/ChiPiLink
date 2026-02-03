@@ -149,7 +149,7 @@ export default function ProductDetail() {
               {product.image_url ? (
                 <img 
                   src={product.image_url} 
-                  alt={product.nombre}
+                  alt={product.name}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -200,35 +200,35 @@ export default function ProductDetail() {
 
             {/* Title */}
             <h1 className="font-serif text-3xl lg:text-4xl font-bold mb-4">
-              {product.nombre}
+              {product.name}
             </h1>
 
             {/* Price */}
             <div className="mb-6">
               <span className="text-4xl font-bold text-primary">
-                ${product.precio?.toFixed(2)}
+                ${product.price?.toFixed(2)}
               </span>
             </div>
 
             {/* Description */}
-            {product.descripcion && (
+            {product.description && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-2">Descripción</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  {product.descripcion}
+                  {product.description}
                 </p>
               </div>
             )}
 
             {/* Additional Info for Books */}
-            {product.categoria === 'libros' && (product.isbn || product.editorial) && (
+            {product.categoria === 'libros' && (product.isbn || product.publisher) && (
               <div className="mb-6 p-4 rounded-xl bg-muted/50">
                 <h3 className="font-semibold mb-3">Información del libro</h3>
                 <div className="space-y-2 text-sm">
-                  {product.editorial && (
+                  {product.publisher && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Editorial:</span>
-                      <span className="font-medium">{product.editorial}</span>
+                      <span className="font-medium">{product.publisher}</span>
                     </div>
                   )}
                   {product.isbn && (

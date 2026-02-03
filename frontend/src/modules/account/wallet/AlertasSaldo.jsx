@@ -101,7 +101,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
         body: JSON.stringify({
           para_usuario_id: selectedAlerta.usuario_id,
           monto: parseFloat(transferAmount),
-          mensaje: `Reload from alert: ${selectedAlerta.descripcion}`
+          mensaje: `Reload from alert: ${selectedAlerta.description}`
         })
       });
       
@@ -183,7 +183,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
                     </span>
                   </div>
                   
-                  <p className="text-sm font-medium">{alerta.descripcion}</p>
+                  <p className="text-sm font-medium">{alerta.description}</p>
                   
                   <div className="flex items-center gap-4 mt-2 text-xs">
                     <span className="text-red-600 flex items-center gap-1">
@@ -239,7 +239,7 @@ export default function AlertasSaldo({ token, onTransfer }) {
           {selectedAlerta && (
             <div className="space-y-4">
               <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm font-medium">{selectedAlerta.descripcion}</p>
+                <p className="text-sm font-medium">{selectedAlerta.description}</p>
                 <div className="flex items-center gap-4 mt-2 text-sm">
                   <span className="text-red-600">
                     Necesita: ${selectedAlerta.monto_requerido?.toFixed(2)}

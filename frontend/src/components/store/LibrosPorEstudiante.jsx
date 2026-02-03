@@ -319,15 +319,15 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
 
                           {/* Book Info */}
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{producto.nombre}</h4>
+                            <h4 className="font-medium truncate">{producto.name}</h4>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                               {producto.subject && (
                                 <Badge variant="outline" className="text-xs">
                                   {producto.subject}
                                 </Badge>
                               )}
-                              {producto.editorial && (
-                                <span>{producto.editorial}</span>
+                              {producto.publisher && (
+                                <span>{producto.publisher}</span>
                               )}
                               {producto.code && (
                                 <span className="text-xs">• {producto.code}</span>
@@ -338,7 +338,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
                           {/* Price & Action */}
                           <div className="flex items-center gap-3">
                             <span className="font-bold text-lg">
-                              ${producto.precio?.toFixed(2)}
+                              ${producto.price?.toFixed(2)}
                             </span>
                             
                             {inCart ? (

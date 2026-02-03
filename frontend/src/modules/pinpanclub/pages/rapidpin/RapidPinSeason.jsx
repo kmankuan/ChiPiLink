@@ -309,7 +309,7 @@ export default function RapidPinSeason() {
                           <SelectContent>
                             {players.map((p) => (
                               <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                                {p.apodo || p.nombre}
+                                {p.apodo || p.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -327,7 +327,7 @@ export default function RapidPinSeason() {
                           <SelectContent>
                             {players.map((p) => (
                               <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                                {p.apodo || p.nombre}
+                                {p.apodo || p.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -347,7 +347,7 @@ export default function RapidPinSeason() {
                         <SelectContent>
                           {players.map((p) => (
                             <SelectItem key={p.jugador_id} value={p.jugador_id}>
-                              {p.apodo || p.nombre}
+                              {p.apodo || p.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

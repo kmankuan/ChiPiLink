@@ -821,8 +821,8 @@ export default function Unatienda() {
   // Filter products based on hierarchical selection (public catalog)
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
-      product.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
     if (!selectedCategoria) return matchesSearch;
     
@@ -930,7 +930,7 @@ export default function Unatienda() {
           {product.image_url ? (
             <img 
               src={product.image_url} 
-              alt={product.nombre}
+              alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -1013,17 +1013,17 @@ export default function Unatienda() {
           
           {/* Title */}
           <h3 className="font-serif font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-            {product.nombre}
+            {product.name}
           </h3>
           
           {/* Description or Editorial */}
-          {isPrivate && product.editorial ? (
+          {isPrivate && product.publisher ? (
             <p className="text-sm text-muted-foreground mb-3">
-              Editorial: {product.editorial}
+              Editorial: {product.publisher}
             </p>
-          ) : product.descripcion && (
+          ) : product.description && (
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-              {product.descripcion}
+              {product.description}
             </p>
           )}
           
@@ -1036,12 +1036,12 @@ export default function Unatienda() {
                     ${product.sale_price.toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground line-through">
-                    ${product.precio?.toFixed(2)}
+                    ${product.price?.toFixed(2)}
                   </p>
                 </div>
               ) : (
                 <p className="text-2xl font-bold text-primary">
-                  ${product.precio?.toFixed(2)}
+                  ${product.price?.toFixed(2)}
                 </p>
               )}
             </div>
@@ -1087,7 +1087,7 @@ export default function Unatienda() {
                   {storeInfo?.nombre || 'Unatienda'}
                 </h1>
                 <p className="text-muted-foreground">
-                  {storeInfo?.descripcion || 'Tu tienda de confianza'}
+                  {storeInfo?.description || 'Tu tienda de confianza'}
                 </p>
               </div>
             </div>
@@ -1185,7 +1185,7 @@ export default function Unatienda() {
                     className="rounded-full"
                   >
                     <span className="mr-1.5">{cat.icono}</span>
-                    {cat.nombre}
+                    {cat.name}
                   </Button>
                 ))}
               </>

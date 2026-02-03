@@ -54,8 +54,8 @@ export default function Catalog() {
   };
 
   const filteredLibros = libros.filter(libro => {
-    const matchesSearch = libro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         libro.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = libro.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         libro.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGrado = selectedGrado === 'all' || libro.grade === selectedGrado;
     const matchesMateria = selectedMateria === 'all' || libro.subject === selectedMateria;
     
@@ -160,7 +160,7 @@ export default function Catalog() {
                   {libro.image_url ? (
                     <img 
                       src={libro.image_url} 
-                      alt={libro.nombre}
+                      alt={libro.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
@@ -182,20 +182,20 @@ export default function Catalog() {
                   
                   {/* Title */}
                   <h3 className="font-serif font-bold text-lg mb-2 line-clamp-2">
-                    {libro.nombre}
+                    {libro.name}
                   </h3>
                   
                   {/* Description */}
-                  {libro.descripcion && (
+                  {libro.description && (
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {libro.descripcion}
+                      {libro.description}
                     </p>
                   )}
                   
                   {/* Publisher */}
-                  {libro.editorial && (
+                  {libro.publisher && (
                     <p className="text-xs text-muted-foreground mb-3">
-                      {libro.editorial}
+                      {libro.publisher}
                     </p>
                   )}
                   
@@ -203,7 +203,7 @@ export default function Catalog() {
                   <div className="flex items-center justify-between pt-3 border-t border-border">
                     <div>
                       <p className="text-xl font-bold text-primary">
-                        ${libro.precio.toFixed(2)}
+                        ${libro.price.toFixed(2)}
                       </p>
                       <div className={`flex items-center gap-1 text-xs ${
                         stockStatus.color === 'success' ? 'text-green-600 dark:text-green-400' :

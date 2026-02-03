@@ -156,7 +156,7 @@ export default function RolesModule() {
       setEditingRole(role);
       setFormData({
         nombre: role.nombre,
-        descripcion: role.descripcion || '',
+        descripcion: role.description || '',
         color: role.color || '#6366f1',
         nivel: role.nivel || 20,
         permisos: role.permisos || []
@@ -412,7 +412,7 @@ export default function RolesModule() {
                         </div>
                         <div>
                           <CardTitle>{selectedRole.nombre}</CardTitle>
-                          <CardDescription>{selectedRole.descripcion}</CardDescription>
+                          <CardDescription>{selectedRole.description}</CardDescription>
                         </div>
                       </div>
                       {selectedRole.es_sistema && (
@@ -750,7 +750,7 @@ export default function RolesModule() {
                 <div className="col-span-2">
                   <Label>Descripción</Label>
                   <Input
-                    value={formData.descripcion}
+                    value={formData.description}
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                     placeholder="Breve descripción del rol"
                   />
@@ -882,7 +882,7 @@ export default function RolesModule() {
                     </div>
                     <div>
                       <h4 className="font-semibold">{role.nombre}</h4>
-                      <p className="text-xs text-muted-foreground">{role.descripcion}</p>
+                      <p className="text-xs text-muted-foreground">{role.description}</p>
                     </div>
                   </div>
                 </CardContent>

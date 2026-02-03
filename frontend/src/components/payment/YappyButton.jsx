@@ -42,7 +42,7 @@ export default function YappyButton({
   const loadYappyConfig = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/platform-store/yappy/cdn`);
-      if (response.data.activo) {
+      if (response.data.active) {
         setYappyActive(true);
       }
     } catch (error) {

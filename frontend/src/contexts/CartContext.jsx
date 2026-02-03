@@ -50,23 +50,23 @@ export function CartProvider({ children }) {
           ...updated[existingIndex],
           quantity: newQty
         };
-        toast.success(`${product.nombre} actualizado en el carrito`);
+        toast.success(`${product.name} actualizado en el carrito`);
         return updated;
       }
       
       // Add new item
-      toast.success(`${product.nombre} agregado al carrito`);
+      toast.success(`${product.name} agregado al carrito`);
       return [...prev, {
         libro_id: product.libro_id,
-        nombre: product.nombre,
-        precio: product.sale_price || product.precio,
-        precio_original: product.precio,
+        nombre: product.name,
+        precio: product.sale_price || product.price,
+        precio_original: product.price,
         image_url: product.image_url,
         grado: product.grade,
         materia: product.subject,
         inventory_quantity: product.inventory_quantity,
         is_private_catalog: product.is_private_catalog || false,
-        editorial: product.editorial,
+        editorial: product.publisher,
         codigo: product.code,
         quantity
       }];
@@ -106,7 +106,7 @@ export function CartProvider({ children }) {
   const toggleCart = () => setIsOpen(prev => !prev);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce((sum, item) => sum + (item.precio * item.quantity), 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
   // Separate private and public items
   const privateItems = items.filter(item => item.is_private_catalog);

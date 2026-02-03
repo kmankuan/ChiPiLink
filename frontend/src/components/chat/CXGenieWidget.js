@@ -24,7 +24,7 @@ export function CXGenieWidget() {
         const data = await response.json();
 
         // If widget is not active, don't load anything
-        if (!data.activo || !data.widget_id || !data.script_url) {
+        if (!data.active || !data.widget_id || !data.script_url) {
           console.log('CXGenie widget not active or missing configuration');
           return;
         }

@@ -107,9 +107,9 @@ export default function OrderForm() {
     } else {
       setCart([...cart, {
         libro_id: libro.libro_id,
-        nombre_libro: libro.nombre,
+        nombre_libro: libro.name,
         cantidad: 1,
-        precio_unitario: libro.precio,
+        precio_unitario: libro.price,
         max_stock: libro.inventory_quantity
       }]);
     }
@@ -134,7 +134,7 @@ export default function OrderForm() {
     setCart(cart.filter(item => item.libro_id !== libroId));
   };
 
-  const total = cart.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
+  const total = cart.reduce((sum, item) => sum + (item.cantidad * item.price_unitario), 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,9 +156,9 @@ export default function OrderForm() {
         estudiante_id: selectedEstudiante,
         items: cart.map(item => ({
           libro_id: item.libro_id,
-          nombre_libro: item.nombre_libro,
+          nombre_libro: item.name_libro,
           cantidad: item.cantidad,
-          precio_unitario: item.precio_unitario
+          precio_unitario: item.price_unitario
         })),
         metodo_pago: metodoPago,
         notas: notas || null
@@ -314,9 +314,9 @@ export default function OrderForm() {
                         data-testid={`book-item-${libro.libro_id}`}
                       >
                         <div className="flex-1">
-                          <p className="font-medium">{libro.nombre}</p>
+                          <p className="font-medium">{libro.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {t(`subjects.${libro.subject}`)} • ${libro.precio.toFixed(2)}
+                            {t(`subjects.${libro.subject}`)} • ${libro.price.toFixed(2)}
                           </p>
                           {isOutOfStock && (
                             <p className="text-xs text-destructive">Agotado</p>
@@ -441,15 +441,15 @@ export default function OrderForm() {
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">
-                            {item.nombre_libro}
+                            {item.name_libro}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {item.cantidad} x ${item.precio_unitario.toFixed(2)}
+                            {item.cantidad} x ${item.price_unitario.toFixed(2)}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-sm">
-                            ${(item.cantidad * item.precio_unitario).toFixed(2)}
+                            ${(item.cantidad * item.price_unitario).toFixed(2)}
                           </p>
                           <Button
                             type="button"

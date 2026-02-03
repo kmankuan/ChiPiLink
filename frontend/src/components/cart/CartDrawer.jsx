@@ -105,7 +105,7 @@ export default function CartDrawer() {
                     {item.image_url ? (
                       <img 
                         src={item.image_url} 
-                        alt={item.nombre}
+                        alt={item.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -120,10 +120,10 @@ export default function CartDrawer() {
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm truncate">{item.nombre}</h4>
+                    <h4 className="font-medium text-sm truncate">{item.name}</h4>
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className="text-sm text-muted-foreground">
-                        ${item.precio.toFixed(2)}
+                        ${item.price.toFixed(2)}
                       </p>
                       {item.is_private_catalog && item.grade && (
                         <Badge variant="secondary" className="text-xs py-0 h-5">
@@ -169,7 +169,7 @@ export default function CartDrawer() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     <p className="font-semibold text-sm">
-                      ${(item.precio * item.quantity).toFixed(2)}
+                      ${(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>

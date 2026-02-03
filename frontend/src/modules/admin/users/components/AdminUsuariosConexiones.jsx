@@ -282,10 +282,10 @@ export default function AdminUsuariosConexiones({ token }) {
     setEditingCapacidad(cap);
     setCapacidadForm({
       capacidad_id: cap.capacidad_id,
-      nombre_es: cap.nombre?.es || cap.nombre || '',
-      nombre_en: cap.nombre?.en || '',
-      descripcion_es: cap.descripcion?.es || cap.descripcion || '',
-      descripcion_en: cap.descripcion?.en || '',
+      nombre_es: cap.name?.es || cap.name || '',
+      nombre_en: cap.name?.en || '',
+      descripcion_es: cap.description?.es || cap.description || '',
+      descripcion_en: cap.description?.en || '',
       icono: cap.icono || '⚡',
       color: cap.color || '#6366f1',
       tipo: cap.tipo || 'solicitada',
@@ -352,10 +352,10 @@ export default function AdminUsuariosConexiones({ token }) {
   // ============== HELPERS ==============
 
   const getCapacidadNombre = (cap) => {
-    if (cap.nombre && typeof cap.nombre === 'object') {
-      return cap.nombre[lang] || cap.nombre['es'] || Object.values(cap.nombre)[0];
+    if (cap.name && typeof cap.name === 'object') {
+      return cap.name[lang] || cap.name['es'] || Object.values(cap.name)[0];
     }
-    return cap.nombre || cap.capacidad_id;
+    return cap.name || cap.capacidad_id;
   };
 
   const getTipoLabel = (tipo) => {
@@ -922,7 +922,7 @@ export default function AdminUsuariosConexiones({ token }) {
             <div className="space-y-2">
               <Label>Descripción (Español)</Label>
               <Textarea
-                value={capacidadForm.descripcion_es}
+                value={capacidadForm.description_es}
                 onChange={(e) => setCapacidadForm(prev => ({ ...prev, descripcion_es: e.target.value }))}
                 placeholder="Describe qué permite esta capacidad..."
                 rows={2}

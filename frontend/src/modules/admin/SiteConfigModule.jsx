@@ -51,7 +51,7 @@ export default function SiteConfigModule() {
         const data = res.data;
         setConfig({
           nombre_sitio: safeString(data.nombre_sitio),
-          descripcion: safeString(data.descripcion),
+          descripcion: safeString(data.description),
           logo_url: safeString(data.logo_url),
           favicon_url: safeString(data.favicon_url),
           color_primario: data.color_primario || '#16a34a',
@@ -126,7 +126,7 @@ export default function SiteConfigModule() {
           <div>
             <Label>Descripción</Label>
             <Textarea
-              value={config.descripcion || ''}
+              value={config.description || ''}
               onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}
               placeholder="Descripción de tu sitio"
               rows={3}

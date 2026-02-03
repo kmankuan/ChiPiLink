@@ -422,8 +422,8 @@ export default function BulkImportBooksPage() {
                   {[
                     { key: 'code', label: t.codeColumn },
                     { key: 'nombre', label: t.nameColumn },
-                    { key: 'precio', label: t.priceColumn },
-                    { key: 'editorial', label: t.publisherColumn },
+                    { key: 'price', label: t.priceColumn },
+                    { key: 'publisher', label: t.publisherColumn },
                     { key: 'isbn', label: t.isbnColumn },
                     { key: 'grade', label: t.gradeColumn },
                     { key: 'subject', label: t.subjectColumn },
@@ -558,8 +558,8 @@ export default function BulkImportBooksPage() {
                             <TableRow key={idx}>
                               <TableCell className="font-mono text-xs">{libro.fila}</TableCell>
                               <TableCell className="font-mono">{libro.code}</TableCell>
-                              <TableCell className="max-w-[200px] truncate">{libro.nombre}</TableCell>
-                              <TableCell className="text-right">${libro.precio}</TableCell>
+                              <TableCell className="max-w-[200px] truncate">{libro.name}</TableCell>
+                              <TableCell className="text-right">${libro.price}</TableCell>
                               <TableCell>{libro.grade || '-'}</TableCell>
                               <TableCell>
                                 {libro.ya_existe ? (

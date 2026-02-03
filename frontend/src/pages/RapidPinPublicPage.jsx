@@ -535,7 +535,7 @@ export default function RapidPinPublicPage() {
     if (!searchQuery.trim()) return players;
     const query = searchQuery.toLowerCase();
     return players.filter(p => 
-      (p.nombre?.toLowerCase().includes(query)) ||
+      (p.name?.toLowerCase().includes(query)) ||
       (p.nickname?.toLowerCase().includes(query))
     );
   }, [players, searchQuery]);

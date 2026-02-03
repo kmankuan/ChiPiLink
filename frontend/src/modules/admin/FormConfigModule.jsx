@@ -94,7 +94,7 @@ export default function FormConfigModule() {
           <div>
             <Label>Descripción</Label>
             <Textarea
-              value={config.descripcion}
+              value={config.description}
               onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}
               rows={2}
             />

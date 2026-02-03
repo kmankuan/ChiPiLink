@@ -118,7 +118,7 @@ export default function PlayerComparison() {
 
   const filteredPlayers = availablePlayers.filter(p => 
     !selectedPlayers.find(sp => sp.jugador_id === p.jugador_id) &&
-    (p.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
      p.apodo?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 

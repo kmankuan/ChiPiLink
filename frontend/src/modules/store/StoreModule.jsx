@@ -116,7 +116,7 @@ export default function StoreModule() {
   };
 
   const filteredProducts = inventario.libros?.filter(libro => {
-    const matchesSearch = libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = libro.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
@@ -142,7 +142,7 @@ export default function StoreModule() {
   const openCategoryDialog = (category = null) => {
     if (category) {
       setEditingCategory(category);
-      setCategoryForm({ nombre: category.nombre, icono: category.icono, orden: category.orden });
+      setCategoryForm({ nombre: category.name, icono: category.icono, orden: category.orden });
     } else {
       setEditingCategory(null);
       setCategoryForm({ nombre: '', icono: '📦', orden: categorias.length + 1 });
@@ -233,7 +233,7 @@ export default function StoreModule() {
   };
 
   const saveBulkProducts = async () => {
-    const validProducts = bulkProducts.filter(p => p.nombre && p.grade && p.precio);
+    const validProducts = bulkProducts.filter(p => p.name && p.grade && p.price);
     if (validProducts.length === 0) {
       toast.error('Agrega al menos un producto válido');
       return;
@@ -244,7 +244,7 @@ export default function StoreModule() {
       for (const product of validProducts) {
         await api.post('/admin/libros', {
           ...product,
-          precio: parseFloat(product.precio),
+          precio: parseFloat(product.price),
           inventory_quantity: parseInt(product.inventory_quantity) || 0
         });
       }
@@ -307,7 +307,7 @@ export default function StoreModule() {
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
                       <span className="flex items-center gap-2">
-                        <span>{cat.icono}</span> {cat.nombre}
+                        <span>{cat.icono}</span> {cat.name}
                       </span>
                     </SelectItem>
                   ))}
@@ -335,7 +335,7 @@ export default function StoreModule() {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{libro.nombre}</h3>
+                          <h3 className="font-semibold">{libro.name}</h3>
                           {libro.requires_preparation && (
                             <Badge variant="outline" className="text-orange-600 border-orange-300">
                               <Clock className="h-3 w-3 mr-1" />
@@ -346,7 +346,7 @@ export default function StoreModule() {
                         <div className="flex gap-2 mt-1 flex-wrap">
                           {cat && (
                             <Badge variant="default" className="text-xs">
-                              {cat.icono} {cat.nombre}
+                              {cat.icono} {cat.name}
                             </Badge>
                           )}
                           {libro.categoria === 'libros' && libro.grade && (
@@ -358,7 +358,7 @@ export default function StoreModule() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-lg">${libro.precio?.toFixed(2)}</p>
+                        <p className="font-bold text-lg">${libro.price?.toFixed(2)}</p>
                         <p className="text-sm text-muted-foreground">
                           Stock: {libro.inventory_quantity}
                         </p>
@@ -400,7 +400,7 @@ export default function StoreModule() {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{cat.icono}</div>
                       <div>
-                        <h4 className="font-semibold">{cat.nombre}</h4>
+                        <h4 className="font-semibold">{cat.name}</h4>
                         <p className="text-sm text-muted-foreground">ID: {cat.categoria_id}</p>
                       </div>
                     </div>
@@ -437,7 +437,7 @@ export default function StoreModule() {
                   {inventario.alertas_bajo_stock.map((item) => (
                     <div key={item.libro_id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
-                        <p className="font-medium">{item.nombre}</p>
+                        <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">{item.grade}</p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -470,7 +470,7 @@ export default function StoreModule() {
                 {inventario.libros?.map((item) => (
                   <div key={item.libro_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
-                      <p className="font-medium">{item.nombre}</p>
+                      <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">{item.grade} - {item.subject}</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -521,7 +521,7 @@ export default function StoreModule() {
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
                       <span className="flex items-center gap-2">
-                        <span>{cat.icono}</span> {cat.nombre}
+                        <span>{cat.icono}</span> {cat.name}
                       </span>
                     </SelectItem>
                   ))}
@@ -559,7 +559,7 @@ export default function StoreModule() {
                 <Input
                   type="number"
                   step="0.01"
-                  value={editForm.precio}
+                  value={editForm.price}
                   onChange={(e) => setEditForm({...editForm, precio: e.target.value})}
                 />
               </div>
@@ -576,7 +576,7 @@ export default function StoreModule() {
             <div>
               <Label>Descripción</Label>
               <Textarea
-                value={editForm.descripcion}
+                value={editForm.description}
                 onChange={(e) => setEditForm({...editForm, descripcion: e.target.value})}
               />
             </div>
@@ -663,7 +663,7 @@ export default function StoreModule() {
               <div key={index} className="grid grid-cols-5 gap-2 p-3 bg-muted/50 rounded-lg">
                 <Input
                   placeholder="Nombre"
-                  value={product.nombre}
+                  value={product.name}
                   onChange={(e) => updateBulkRow(index, 'nombre', e.target.value)}
                 />
                 <Select value={product.grade} onValueChange={(v) => updateBulkRow(index, 'grade', v)}>
@@ -681,8 +681,8 @@ export default function StoreModule() {
                 <Input
                   type="number"
                   placeholder="Precio"
-                  value={product.precio}
-                  onChange={(e) => updateBulkRow(index, 'precio', e.target.value)}
+                  value={product.price}
+                  onChange={(e) => updateBulkRow(index, 'price', e.target.value)}
                 />
                 <Input
                   type="number"

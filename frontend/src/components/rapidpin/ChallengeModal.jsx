@@ -66,7 +66,7 @@ export default function ChallengeModal({
       const query = searchQuery.toLowerCase();
       setFilteredPlayers(
         players.filter(p => 
-          p.nombre?.toLowerCase().includes(query) ||
+          p.name?.toLowerCase().includes(query) ||
           p.nickname?.toLowerCase().includes(query)
         )
       );

@@ -90,7 +90,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
   };
 
   const filteredProducts = productos.filter(libro => {
-    const matchesSearch = libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = libro.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
@@ -115,7 +115,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
   const openCategoryDialog = (category = null) => {
     if (category) {
       setEditingCategory(category);
-      setCategoryForm({ nombre: category.nombre, icono: category.icono, orden: category.orden });
+      setCategoryForm({ nombre: category.name, icono: category.icono, orden: category.orden });
     } else {
       setEditingCategory(null);
       setCategoryForm({ nombre: '', icono: '📦', orden: categorias.length + 1 });
@@ -178,7 +178,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
   };
 
   const handleSaveProduct = async () => {
-    if (!editForm.nombre || !editForm.precio) {
+    if (!editForm.nombre || !editForm.price) {
       toast.error('Name and price are required');
       return;
     }
@@ -187,7 +187,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     try {
       const payload = {
         ...editForm,
-        precio: parseFloat(editForm.precio),
+        precio: parseFloat(editForm.price),
         inventory_quantity: parseInt(editForm.inventory_quantity) || 0,
         is_private_catalog: false
       };
@@ -310,7 +310,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
                       <span className="flex items-center gap-2">
-                        <span>{cat.icono}</span> {cat.nombre}
+                        <span>{cat.icono}</span> {cat.name}
                       </span>
                     </SelectItem>
                   ))}
@@ -359,7 +359,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                                   </div>
                                 )}
                                 <div>
-                                  <p className="font-medium">{libro.nombre}</p>
+                                  <p className="font-medium">{libro.name}</p>
                                   {libro.requires_preparation && (
                                     <Badge variant="outline" className="text-orange-600 text-xs">
                                       <Clock className="h-3 w-3 mr-1" />
@@ -372,12 +372,12 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                             <TableCell>
                               {cat && (
                                 <Badge variant="secondary">
-                                  {cat.icono} {cat.nombre}
+                                  {cat.icono} {cat.name}
                                 </Badge>
                               )}
                             </TableCell>
                             <TableCell className="text-right font-medium">
-                              ${libro.precio?.toFixed(2)}
+                              ${libro.price?.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
                               <Badge variant={libro.inventory_quantity < 10 ? 'destructive' : 'default'}>
@@ -426,7 +426,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{cat.icono}</div>
                       <div>
-                        <h4 className="font-semibold">{cat.nombre}</h4>
+                        <h4 className="font-semibold">{cat.name}</h4>
                         <p className="text-sm text-muted-foreground">ID: {cat.categoria_id}</p>
                       </div>
                     </div>
@@ -465,7 +465,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                   {productos.filter(p => p.inventory_quantity < 10).map((item) => (
                     <div key={item.libro_id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                       <div>
-                        <p className="font-medium">{item.nombre}</p>
+                        <p className="font-medium">{item.name}</p>
                       </div>
                       <Badge variant="destructive">Stock: {item.inventory_quantity}</Badge>
                     </div>
@@ -500,7 +500,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                   {categorias.map(cat => (
                     <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
                       <span className="flex items-center gap-2">
-                        <span>{cat.icono}</span> {cat.nombre}
+                        <span>{cat.icono}</span> {cat.name}
                       </span>
                     </SelectItem>
                   ))}
@@ -514,7 +514,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                 <Input
                   type="number"
                   step="0.01"
-                  value={editForm.precio}
+                  value={editForm.price}
                   onChange={(e) => setEditForm({...editForm, precio: e.target.value})}
                 />
               </div>
@@ -531,7 +531,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <div>
               <Label>Description</Label>
               <Textarea
-                value={editForm.descripcion}
+                value={editForm.description}
                 onChange={(e) => setEditForm({...editForm, descripcion: e.target.value})}
               />
             </div>

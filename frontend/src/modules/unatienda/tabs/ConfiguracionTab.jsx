@@ -204,7 +204,7 @@ export default function ConfiguracionTab({ token }) {
                 <div className="col-span-2">
                   <Label>Description</Label>
                   <Input
-                    value={generalConfig.descripcion}
+                    value={generalConfig.description}
                     onChange={(e) => setGeneralConfig({...generalConfig, descripcion: e.target.value})}
                     placeholder="Brief store description"
                   />

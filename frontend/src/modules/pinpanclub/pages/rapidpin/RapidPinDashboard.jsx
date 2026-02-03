@@ -146,7 +146,7 @@ export default function RapidPinDashboard() {
                   <div>
                     <Label>{t('rapidpin.seasons.description')}</Label>
                     <Textarea
-                      value={newSeason.descripcion}
+                      value={newSeason.description}
                       onChange={(e) => setNewSeason({ ...newSeason, descripcion: e.target.value })}
                       placeholder={t('rapidpin.seasons.descriptionPlaceholder')}
                     />
@@ -259,8 +259,8 @@ export default function RapidPinDashboard() {
                       {t(`rapidpin.seasons.status.${season.estado}`)}
                     </span>
                   </div>
-                  {season.descripcion && (
-                    <CardDescription className="line-clamp-2">{season.descripcion}</CardDescription>
+                  {season.description && (
+                    <CardDescription className="line-clamp-2">{season.description}</CardDescription>
                   )}
                 </CardHeader>
                 <CardContent>

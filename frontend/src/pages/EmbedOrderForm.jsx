@@ -124,9 +124,9 @@ export default function EmbedOrderForm() {
     } else {
       setCart([...cart, {
         libro_id: libro.libro_id,
-        nombre_libro: libro.nombre,
+        nombre_libro: libro.name,
         cantidad: 1,
-        precio_unitario: libro.precio
+        precio_unitario: libro.price
       }]);
     }
   };
@@ -148,7 +148,7 @@ export default function EmbedOrderForm() {
   };
   
   // Calculate total
-  const total = cart.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
+  const total = cart.reduce((sum, item) => sum + (item.cantidad * item.price_unitario), 0);
   
   // Form validation
   const isFormValid = () => {
@@ -277,7 +277,7 @@ export default function EmbedOrderForm() {
             {formConfig?.titulo || 'Formulario de Pedido de Libros'}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            {formConfig?.descripcion || 'Complete el formulario para ordenar los libros de texto'}
+            {formConfig?.description || 'Complete el formulario para ordenar los libros de texto'}
           </p>
         </div>
         
@@ -499,14 +499,14 @@ export default function EmbedOrderForm() {
                               data-testid={`book-item-${libro.libro_id}`}
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{libro.nombre}</p>
+                                <p className="font-medium truncate">{libro.name}</p>
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   <span className="text-xs bg-muted px-2 py-0.5 rounded">
                                     {libro.subject}
                                   </span>
                                   {formConfig?.mostrar_precios !== false && (
                                     <span className="text-sm font-semibold text-green-600">
-                                      ${libro.precio.toFixed(2)}
+                                      ${libro.price.toFixed(2)}
                                     </span>
                                   )}
                                 </div>
@@ -646,14 +646,14 @@ export default function EmbedOrderForm() {
                           {cart.map((item) => (
                             <div key={item.libro_id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">{item.nombre_libro}</p>
+                                <p className="font-medium text-sm truncate">{item.name_libro}</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {item.cantidad} × ${item.precio_unitario.toFixed(2)}
+                                  {item.cantidad} × ${item.price_unitario.toFixed(2)}
                                 </p>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <p className="font-medium text-sm">
-                                  ${(item.cantidad * item.precio_unitario).toFixed(2)}
+                                  ${(item.cantidad * item.price_unitario).toFixed(2)}
                                 </p>
                                 <Button
                                   type="button"
