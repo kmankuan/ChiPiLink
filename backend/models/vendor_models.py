@@ -116,7 +116,7 @@ class VendorProduct(BaseModel):
     name: str
     descripcion: str = ""
     price: float
-    precio_descuento: Optional[float] = None
+    discount_price: Optional[float] = None
     imagenes: List[str] = []
     category: str = ""
     subcategory: str = ""

@@ -32,9 +32,9 @@ MATERIAS_SECUNDARIA = ["Espyearl", "Mathematics", "Physics", "Chemistry", "Biolo
 EDITORIALES = ["Santillana", "SM", "Norma", "McGraw-Hill", "Pearson", "Oxford"]
 
 # Nombres panamanians de ejemplo
-NOMBRES = ["Maria", "Jose", "Ana", "Carlos", "Sofia", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
+FIRST_NAMES = ["Maria", "Jose", "Ana", "Carlos", "Sofia", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
            "Camila", "Andres", "Lucia", "Juan", "Emma", "Diego", "Gabriela", "Sebastian", "Victoria", "Alejandro"]
-APELLIDOS = ["Gonzalez", "Rodriguez", "Martinez", "Lopez", "Garcia", "Hernandez", "Perez", "Sanchez", "Ramirez", "Torres",
+LAST_NAMES = ["Gonzalez", "Rodriguez", "Martinez", "Lopez", "Garcia", "Hernandez", "Perez", "Sanchez", "Ramirez", "Torres",
              "Flores", "Rivera", "Gomez", "Diaz", "Cruz", "Morales", "Ortega", "Vargas", "Castro", "Jimenez"]
 
 
@@ -117,9 +117,9 @@ async def generate_students_list() -> List[Dict]:
         num_students = random.randint(5, 10)
         
         for _ in range(num_students):
-            nombre = random.choice(NOMBRES)
-            apellido = random.choice(APELLIDOS)
-            apellido2 = random.choice(APELLIDOS)
+            first_name = random.choice(FIRST_NAMES)
+            last_name = random.choice(LAST_NAMES)
+            last_name2 = random.choice(LAST_NAMES)
             
             student = {
                 "sync_id": f"sync_{uuid.uuid4().hex[:12]}",
@@ -178,7 +178,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
         for product in order_products:
             cantidad = random.randint(1, 2)
             precio = product["sale_price"] or product["price"]
-            subtotal = cantidad * precio
+            subtotal = quantity * price
             total += subtotal
             
             items.append({
