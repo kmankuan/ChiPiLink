@@ -39,14 +39,37 @@ class LaoPanOAuthService:
         self.base_url = LAOPAN_BASE_URL
         self._states = {}  # In-memory state storage (consider Redis for production)
     
-    def get_redirect_uri(self) -> str:
-        """Get the OAuth callback URL"""
-        return f"{FRONTEND_URL}/auth/laopan/callback"
+    def get_redirect_uri(self, origin: Optional[str] = None) -> str:
+        """
+        Get the OAuth callback URL.
+        Automatically detects environment from request origin.
+        
+        Priority:
+        1. Request origin (from Referer/Origin header) - auto-detects environment
+        2. FRONTEND_URL environment variable - fallback
+        """
+        # Use origin if provided (auto-detection)
+        if origin:
+            # Clean the origin (remove trailing slashes)
+            clean_origin = origin.rstrip('/')
+            return f"{clean_origin}/auth/laopan/callback"
+        
+        # Fallback to environment variable
+        if FRONTEND_URL:
+            return f"{FRONTEND_URL}/auth/laopan/callback"
+        
+        # Last resort - will cause OAuth error but provides clear message
+        logger.warning("No FRONTEND_URL configured and no origin provided")
+        return "/auth/laopan/callback"
     
-    def generate_auth_url(self, redirect_after: Optional[str] = None) -> Dict:
+    def generate_auth_url(self, redirect_after: Optional[str] = None, origin: Optional[str] = None) -> Dict:
         """
         Generate OAuth authorization URL
         Returns URL and state for CSRF protection
+        
+        Args:
+            redirect_after: Optional URL to redirect after successful login
+            origin: Request origin for auto-detecting callback URL
         """
         state = str(uuid.uuid4())
         
