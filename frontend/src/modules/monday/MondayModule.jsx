@@ -700,7 +700,7 @@ export default function MondayModule() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {['estudiante', 'grado', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
+                      {['estudiante', 'grade', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
                         <div key={field} className="space-y-2">
                           <Label className="capitalize">{field.replace('_', ' ')}</Label>
                           <Select 
@@ -769,8 +769,8 @@ export default function MondayModule() {
                         { key: 'cantidad', label: 'Quantity', icon: '🔢' },
                         { key: 'precio_unitario', label: 'Unit Price', icon: '💰' },
                         { key: 'subtotal', label: 'Subtotal', icon: '💵' },
-                        { key: 'codigo', label: 'Code/ISBN', icon: '📖' },
-                        { key: 'materia', label: 'Subject/Category', icon: '📚' },
+                        { key: 'code', label: 'Code/ISBN', icon: '📖' },
+                        { key: 'subject', label: 'Subject/Category', icon: '📚' },
                         { key: 'estado', label: 'Status', icon: '📋' }
                       ].map(({ key, label, icon }) => (
                         <div key={key} className="flex items-center gap-2">

@@ -57,7 +57,7 @@ export default function CategoryLanding({
 
   const handleAddToCart = (product, e) => {
     e?.stopPropagation();
-    if (product.cantidad_inventario <= 0) {
+    if (product.inventory_quantity <= 0) {
       toast.error('Producto sin stock');
       return;
     }
@@ -87,11 +87,11 @@ export default function CategoryLanding({
 
   // Product Card Component
   const ProductCard = ({ product, showPromotion = false }) => {
-    const stockStatus = getStockStatus(product.cantidad_inventario);
+    const stockStatus = getStockStatus(product.inventory_quantity);
     const inCart = isInCart(product.libro_id);
     const cartQty = getCartQuantity(product.libro_id);
     const justAdded = addedItems[product.libro_id];
-    const discount = showPromotion ? calculateDiscount(product.precio, product.precio_oferta) : 0;
+    const discount = showPromotion ? calculateDiscount(product.precio, product.sale_price) : 0;
 
     return (
       <Card 
@@ -99,9 +99,9 @@ export default function CategoryLanding({
         onClick={() => navigate(`/unatienda/producto/${product.libro_id}`)}
       >
         <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center relative overflow-hidden">
-          {product.imagen_url ? (
+          {product.image_url ? (
             <img 
-              src={product.imagen_url} 
+              src={product.image_url} 
               alt={product.nombre}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -157,10 +157,10 @@ export default function CategoryLanding({
           
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
-            {showPromotion && product.precio_oferta ? (
+            {showPromotion && product.sale_price ? (
               <>
                 <span className="text-lg font-bold text-red-600">
-                  ${product.precio_oferta.toFixed(2)}
+                  ${product.sale_price.toFixed(2)}
                 </span>
                 <span className="text-sm text-muted-foreground line-through">
                   ${product.precio.toFixed(2)}
@@ -241,7 +241,7 @@ export default function CategoryLanding({
           {banners.length === 1 ? (
             <div 
               className="aspect-[21/9] md:aspect-[3/1] bg-cover bg-center relative cursor-pointer"
-              style={{ backgroundImage: `url(${banners[0].imagen_url})` }}
+              style={{ backgroundImage: `url(${banners[0].image_url})` }}
               onClick={() => banners[0].link_url && navigate(banners[0].link_url)}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center">
@@ -261,7 +261,7 @@ export default function CategoryLanding({
                 <div 
                   key={banner.banner_id}
                   className="aspect-[16/9] bg-cover bg-center rounded-xl relative cursor-pointer overflow-hidden"
-                  style={{ backgroundImage: `url(${banner.imagen_url})` }}
+                  style={{ backgroundImage: `url(${banner.image_url})` }}
                   onClick={() => banner.link_url && navigate(banner.link_url)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">

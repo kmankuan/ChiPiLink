@@ -287,7 +287,7 @@ export function NotificationBar() {
                                   {notif.mensaje}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground mt-1">
-                                  {formatTime(notif.fecha_creacion)}
+                                  {formatTime(notif.created_at)}
                                 </p>
                               </div>
                               <Button

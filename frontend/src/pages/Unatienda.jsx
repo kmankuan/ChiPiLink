@@ -348,7 +348,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                 <div>
                   <CardTitle className="text-lg">{selectedStudent.nombre}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Grado {selectedStudent.grado} • {selectedStudent.school_name || 'PCA'}
+                    Grado {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
                   </p>
                 </div>
               </div>
@@ -662,7 +662,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                       <div>
                         <h4 className="font-semibold">{student.nombre}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Grado {student.grado} • {student.school_name || 'PCA'} • Año 2026
+                          Grado {student.grade} • {student.school_name || 'PCA'} • Año 2026
                         </p>
                       </div>
                     </div>
@@ -794,11 +794,11 @@ export default function Unatienda() {
       
       // Filter only public products (not private catalog)
       const allProducts = productsRes.data || [];
-      const publicProducts = allProducts.filter(p => !p.es_catalogo_privado);
+      const publicProducts = allProducts.filter(p => !p.is_private_catalog);
       setProducts(publicProducts);
       setStoreInfo(storeRes.data);
       setCategorias(categoriasRes.data || []);
-      setGrados(gradosRes.data.grados || []);
+      setGrados(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -829,8 +829,8 @@ export default function Unatienda() {
     const matchesCategoria = product.categoria === selectedCategoria;
     
     if (selectedSubcategoria && selectedCategoria === 'libros') {
-      const matchesGrado = product.grado === selectedSubcategoria || 
-        product.grados?.includes(selectedSubcategoria);
+      const matchesGrado = product.grade === selectedSubcategoria || 
+        product.grades?.includes(selectedSubcategoria);
       return matchesSearch && matchesCategoria && matchesGrado;
     }
     
@@ -874,7 +874,7 @@ export default function Unatienda() {
   };
 
   const handleAddToCart = (product) => {
-    if (product.cantidad_inventario <= 0 && !product.es_catalogo_privado) {
+    if (product.inventory_quantity <= 0 && !product.is_private_catalog) {
       toast.error('Producto sin stock');
       return;
     }
@@ -913,7 +913,7 @@ export default function Unatienda() {
 
   // Product Card Component
   const ProductCard = ({ product, isPrivate = false }) => {
-    const stockStatus = getStockStatus(product.cantidad_inventario);
+    const stockStatus = getStockStatus(product.inventory_quantity);
     const inCart = isInCart(product.libro_id);
     const cartQty = getCartQuantity(product.libro_id);
     const justAdded = addedItems[product.libro_id];
@@ -927,9 +927,9 @@ export default function Unatienda() {
       >
         {/* Product Image */}
         <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center overflow-hidden">
-          {product.imagen_url ? (
+          {product.image_url ? (
             <img 
-              src={product.imagen_url} 
+              src={product.image_url} 
               alt={product.nombre}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -972,7 +972,7 @@ export default function Unatienda() {
         )}
 
         {/* Requires Preparation Badge */}
-        {product.requiere_preparacion && (
+        {product.requires_preparation && (
           <div className="absolute top-12 right-3">
             <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
               <Clock className="h-3 w-3 mr-1" />
@@ -988,11 +988,11 @@ export default function Unatienda() {
             {isPrivate ? (
               <>
                 <Badge variant="secondary" className="text-xs">
-                  {product.grado}
+                  {product.grade}
                 </Badge>
-                {product.materia && (
+                {product.subject && (
                   <Badge variant="outline" className="text-xs">
-                    {product.materia}
+                    {product.subject}
                   </Badge>
                 )}
               </>
@@ -1002,9 +1002,9 @@ export default function Unatienda() {
                   <span className="mr-1">{catInfo.icono}</span>
                   {catInfo.nombre}
                 </Badge>
-                {product.categoria === 'libros' && product.grado && (
+                {product.categoria === 'libros' && product.grade && (
                   <Badge variant="secondary" className="text-xs">
-                    {product.grado}
+                    {product.grade}
                   </Badge>
                 )}
               </>
@@ -1030,10 +1030,10 @@ export default function Unatienda() {
           {/* Price & Action */}
           <div className="flex items-center justify-between pt-3 border-t border-border/50">
             <div>
-              {product.precio_oferta ? (
+              {product.sale_price ? (
                 <div>
                   <p className="text-2xl font-bold text-green-600">
-                    ${product.precio_oferta.toFixed(2)}
+                    ${product.sale_price.toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground line-through">
                     ${product.precio?.toFixed(2)}

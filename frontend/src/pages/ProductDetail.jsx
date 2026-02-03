@@ -57,7 +57,7 @@ export default function ProductDetail() {
       
       setProduct(productRes.data);
       setCategorias(categoriasRes.data || []);
-      setGrados(gradosRes.data.grados || []);
+      setGrados(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching product:', error);
       toast.error('Error al cargar el producto');
@@ -84,12 +84,12 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = () => {
-    if (!product || product.cantidad_inventario <= 0) {
+    if (!product || product.inventory_quantity <= 0) {
       toast.error('Producto sin stock');
       return;
     }
     
-    const maxQty = product.cantidad_inventario - getCartQuantity();
+    const maxQty = product.inventory_quantity - getCartQuantity();
     if (quantity > maxQty) {
       toast.error(`Solo puedes agregar ${maxQty} más`);
       return;
@@ -101,7 +101,7 @@ export default function ProductDetail() {
   };
 
   const incrementQuantity = () => {
-    const maxQty = product.cantidad_inventario - getCartQuantity();
+    const maxQty = product.inventory_quantity - getCartQuantity();
     if (quantity < maxQty) {
       setQuantity(q => q + 1);
     }
@@ -134,7 +134,7 @@ export default function ProductDetail() {
   }
 
   const catInfo = getCategoryInfo(product.categoria);
-  const stockStatus = getStockStatus(product.cantidad_inventario);
+  const stockStatus = getStockStatus(product.inventory_quantity);
   const inCart = isInCart();
   const cartQty = getCartQuantity();
 
@@ -146,9 +146,9 @@ export default function ProductDetail() {
           {/* Product Image */}
           <div className="relative">
             <div className="aspect-square bg-gradient-to-br from-secondary to-secondary/50 rounded-3xl flex items-center justify-center overflow-hidden">
-              {product.imagen_url ? (
+              {product.image_url ? (
                 <img 
-                  src={product.imagen_url} 
+                  src={product.image_url} 
                   alt={product.nombre}
                   className="w-full h-full object-cover"
                 />
@@ -168,7 +168,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Preparation Badge */}
-            {product.requiere_preparacion && (
+            {product.requires_preparation && (
               <div className="absolute top-4 left-4">
                 <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
                   <Clock className="h-3 w-3 mr-1" />
@@ -186,14 +186,14 @@ export default function ProductDetail() {
                 <span className="mr-1">{catInfo.icono}</span>
                 {catInfo.nombre}
               </Badge>
-              {product.categoria === 'libros' && product.grado && (
+              {product.categoria === 'libros' && product.grade && (
                 <Badge variant="secondary" className="text-sm">
-                  {grados.find(g => g.id === product.grado)?.nombre || product.grado}
+                  {grados.find(g => g.id === product.grade)?.nombre || product.grade}
                 </Badge>
               )}
-              {product.categoria === 'libros' && product.materia && (
+              {product.categoria === 'libros' && product.subject && (
                 <Badge variant="outline" className="text-sm">
-                  {product.materia}
+                  {product.subject}
                 </Badge>
               )}
             </div>
@@ -277,7 +277,7 @@ export default function ProductDetail() {
                     variant="outline"
                     size="icon"
                     onClick={incrementQuantity}
-                    disabled={quantity >= (product.cantidad_inventario - cartQty)}
+                    disabled={quantity >= (product.inventory_quantity - cartQty)}
                     className="h-10 w-10 rounded-lg"
                   >
                     <Plus className="h-4 w-4" />
@@ -305,8 +305,8 @@ export default function ProductDetail() {
 
             {/* Stock Info */}
             <p className="text-sm text-muted-foreground mt-4 text-center">
-              {product.cantidad_inventario > 0 
-                ? `${product.cantidad_inventario} unidades disponibles`
+              {product.inventory_quantity > 0 
+                ? `${product.inventory_quantity} unidades disponibles`
                 : 'Sin stock disponible'
               }
             </p>

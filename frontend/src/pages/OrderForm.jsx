@@ -57,7 +57,7 @@ export default function OrderForm() {
     if (selectedEstudiante && estudiantes.length > 0) {
       const estudiante = estudiantes.find(e => e.estudiante_id === selectedEstudiante);
       if (estudiante) {
-        setSelectedGrado(estudiante.grado);
+        setSelectedGrado(estudiante.grade);
       }
     }
   }, [selectedEstudiante, estudiantes]);
@@ -77,7 +77,7 @@ export default function OrderForm() {
         const estudiante = estudiantesRes.data.find(e => e.estudiante_id === preselectedStudent);
         if (estudiante) {
           setSelectedEstudiante(estudiante.estudiante_id);
-          setSelectedGrado(estudiante.grado);
+          setSelectedGrado(estudiante.grade);
         }
       }
     } catch (error) {
@@ -89,13 +89,13 @@ export default function OrderForm() {
   };
 
   const filteredLibros = libros.filter(libro => 
-    selectedGrado ? libro.grado === selectedGrado : true
+    selectedGrado ? libro.grade === selectedGrado : true
   );
 
   const addToCart = (libro) => {
     const existing = cart.find(item => item.libro_id === libro.libro_id);
     if (existing) {
-      if (existing.cantidad < libro.cantidad_inventario) {
+      if (existing.cantidad < libro.inventory_quantity) {
         setCart(cart.map(item => 
           item.libro_id === libro.libro_id 
             ? { ...item, cantidad: item.cantidad + 1 }
@@ -110,7 +110,7 @@ export default function OrderForm() {
         nombre_libro: libro.nombre,
         cantidad: 1,
         precio_unitario: libro.precio,
-        max_stock: libro.cantidad_inventario
+        max_stock: libro.inventory_quantity
       }]);
     }
   };
@@ -285,7 +285,7 @@ export default function OrderForm() {
                   <SelectContent>
                     {estudiantes.map((est) => (
                       <SelectItem key={est.estudiante_id} value={est.estudiante_id}>
-                        {est.nombre} - {t(`grades.${est.grado}`)}
+                        {est.nombre} - {t(`grades.${est.grade}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -303,7 +303,7 @@ export default function OrderForm() {
                 <div className="space-y-3">
                   {filteredLibros.map((libro) => {
                     const inCart = cart.find(item => item.libro_id === libro.libro_id);
-                    const isOutOfStock = libro.cantidad_inventario <= 0;
+                    const isOutOfStock = libro.inventory_quantity <= 0;
                     
                     return (
                       <div 
@@ -316,7 +316,7 @@ export default function OrderForm() {
                         <div className="flex-1">
                           <p className="font-medium">{libro.nombre}</p>
                           <p className="text-sm text-muted-foreground">
-                            {t(`subjects.${libro.materia}`)} • ${libro.precio.toFixed(2)}
+                            {t(`subjects.${libro.subject}`)} • ${libro.precio.toFixed(2)}
                           </p>
                           {isOutOfStock && (
                             <p className="text-xs text-destructive">Agotado</p>

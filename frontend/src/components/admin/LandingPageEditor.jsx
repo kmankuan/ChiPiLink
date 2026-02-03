@@ -834,8 +834,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
             
             <ImageUploader
               label="Imagen de Fondo"
-              value={config.imagen_url}
-              onChange={(url) => handleChange('imagen_url', url)}
+              value={config.image_url}
+              onChange={(url) => handleChange('image_url', url)}
               aspectRatio="16/9"
             />
             
@@ -1010,8 +1010,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
           <div className="space-y-4">
             <ImageUploader
               label="Imagen Principal"
-              value={config.imagen_url}
-              onChange={(url) => handleChange('imagen_url', url)}
+              value={config.image_url}
+              onChange={(url) => handleChange('image_url', url)}
               aspectRatio="16/9"
             />
             
@@ -1214,8 +1214,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
                 <div className="space-y-2">
                   <Label className="text-xs">URL de imagen</Label>
                   <Input
-                    value={item.imagen_url || ''}
-                    onChange={(e) => handleItemChange(index, 'imagen_url', e.target.value)}
+                    value={item.image_url || ''}
+                    onChange={(e) => handleItemChange(index, 'image_url', e.target.value)}
                     placeholder="https://..."
                   />
                 </div>
@@ -1253,8 +1253,8 @@ function BlockConfigEditor({ block, template, onSave, saving }) {
             </div>
             <ImageUploader
               label="Imagen del Banner"
-              value={config.imagen_url}
-              onChange={(url) => handleChange('imagen_url', url)}
+              value={config.image_url}
+              onChange={(url) => handleChange('image_url', url)}
               aspectRatio="21/9"
             />
             <div className="space-y-2">

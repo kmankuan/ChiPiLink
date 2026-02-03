@@ -155,12 +155,12 @@ export function MultilingualItemEditor({
         />
       )}
       
-      {fields.includes('imagen_url') && (
+      {fields.includes('image_url') && (
         <div className="space-y-2">
           <Label>URL de Imagen</Label>
           <Input
-            value={item.imagen_url || ''}
-            onChange={(e) => onItemChange(index, 'imagen_url', e.target.value)}
+            value={item.image_url || ''}
+            onChange={(e) => onItemChange(index, 'image_url', e.target.value)}
             placeholder="https://..."
           />
         </div>

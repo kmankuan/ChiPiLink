@@ -43,7 +43,7 @@ export const STORE_ENDPOINTS = {
   products: USE_NEW_ENDPOINTS ? '/store/products' : '/libros',
   productById: (id) => USE_NEW_ENDPOINTS ? `/store/products/${id}` : `/libros/${id}`,
   featuredProducts: USE_NEW_ENDPOINTS ? '/store/products/featured' : '/libros?destacado=true',
-  promotionalProducts: USE_NEW_ENDPOINTS ? '/store/products/promotions' : '/libros?en_promocion=true',
+  promotionalProducts: USE_NEW_ENDPOINTS ? '/store/products/promotions' : '/libros?on_sale=true',
   newestProducts: USE_NEW_ENDPOINTS ? '/store/products/newest' : '/libros/newest',
   searchProducts: (q) => USE_NEW_ENDPOINTS ? `/store/products/search?q=${q}` : `/libros/search?q=${q}`,
   

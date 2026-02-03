@@ -237,7 +237,7 @@ export default function BulkImportBooksPage() {
         });
         if (res.ok) {
           const data = await res.json();
-          setAvailableGrades(data.grados || []);
+          setAvailableGrades(data.grades || []);
         }
       } catch (err) {
         console.error('Error fetching grades:', err);
@@ -420,13 +420,13 @@ export default function BulkImportBooksPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { key: 'codigo', label: t.codeColumn },
+                    { key: 'code', label: t.codeColumn },
                     { key: 'nombre', label: t.nameColumn },
                     { key: 'precio', label: t.priceColumn },
                     { key: 'editorial', label: t.publisherColumn },
                     { key: 'isbn', label: t.isbnColumn },
-                    { key: 'grado', label: t.gradeColumn },
-                    { key: 'materia', label: t.subjectColumn },
+                    { key: 'grade', label: t.gradeColumn },
+                    { key: 'subject', label: t.subjectColumn },
                   ].map(({ key, label }) => (
                     <div key={key} className="space-y-1">
                       <Label className="text-xs">{label}</Label>
@@ -557,10 +557,10 @@ export default function BulkImportBooksPage() {
                           {preview.preview?.map((libro, idx) => (
                             <TableRow key={idx}>
                               <TableCell className="font-mono text-xs">{libro.fila}</TableCell>
-                              <TableCell className="font-mono">{libro.codigo}</TableCell>
+                              <TableCell className="font-mono">{libro.code}</TableCell>
                               <TableCell className="max-w-[200px] truncate">{libro.nombre}</TableCell>
                               <TableCell className="text-right">${libro.precio}</TableCell>
-                              <TableCell>{libro.grado || '-'}</TableCell>
+                              <TableCell>{libro.grade || '-'}</TableCell>
                               <TableCell>
                                 {libro.ya_existe ? (
                                   <Badge variant="secondary">{t.update}</Badge>

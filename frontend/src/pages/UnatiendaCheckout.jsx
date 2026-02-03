@@ -163,9 +163,9 @@ export default function UnatiendaCheckout() {
                   >
                     {/* Image */}
                     <div className="w-14 h-14 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                      {item.imagen_url ? (
+                      {item.image_url ? (
                         <img 
-                          src={item.imagen_url} 
+                          src={item.image_url} 
                           alt={item.nombre}
                           className="w-full h-full object-cover rounded-lg"
                         />

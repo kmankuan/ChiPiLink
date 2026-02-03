@@ -25,12 +25,12 @@ const emptyProductRow = {
   grado: '',
   materia: '',
   precio: '',
-  cantidad_inventario: '',
+  inventory_quantity: '',
   descripcion: '',
   isbn: '',
   editorial: '',
-  requiere_preparacion: false,
-  imagen_url: ''
+  requires_preparation: false,
+  image_url: ''
 };
 
 export default function CatalogoPublicoTab({ token, onRefresh }) {
@@ -76,11 +76,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       const materiasData = await materiasRes.json();
       
       // Filter out private catalog products
-      const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.es_catalogo_privado);
+      const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_private_catalog);
       setProductos(publicProducts);
       setCategorias(Array.isArray(categoriasData) ? categoriasData : []);
-      setGrados(gradosData.grades || gradosData.grados || []);
-      setMaterias(materiasData.subjects || materiasData.materias || []);
+      setGrados(gradosData.grades || gradosData.grades || []);
+      setMaterias(materiasData.subjects || materiasData.subjects || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error loading data');
@@ -91,8 +91,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
 
   const filteredProducts = productos.filter(libro => {
     const matchesSearch = libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.grado?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.materia?.toLowerCase().includes(searchTerm.toLowerCase());
+      libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
     return matchesSearch && matchesCategoria;
   });
@@ -103,7 +103,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       setEditForm({
         ...emptyProductRow,
         ...product,
-        requiere_preparacion: product.requiere_preparacion || false
+        requires_preparation: product.requires_preparation || false
       });
     } else {
       setEditingProduct(null);
@@ -188,8 +188,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       const payload = {
         ...editForm,
         precio: parseFloat(editForm.precio),
-        cantidad_inventario: parseInt(editForm.cantidad_inventario) || 0,
-        es_catalogo_privado: false
+        inventory_quantity: parseInt(editForm.inventory_quantity) || 0,
+        is_private_catalog: false
       };
       
       const url = editingProduct 
@@ -351,8 +351,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                           <TableRow key={libro.libro_id}>
                             <TableCell>
                               <div className="flex items-center gap-3">
-                                {libro.imagen_url ? (
-                                  <img src={libro.imagen_url} alt="" className="w-10 h-10 object-cover rounded" />
+                                {libro.image_url ? (
+                                  <img src={libro.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                                 ) : (
                                   <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                                     <Package className="h-5 w-5 text-muted-foreground" />
@@ -360,7 +360,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                                 )}
                                 <div>
                                   <p className="font-medium">{libro.nombre}</p>
-                                  {libro.requiere_preparacion && (
+                                  {libro.requires_preparation && (
                                     <Badge variant="outline" className="text-orange-600 text-xs">
                                       <Clock className="h-3 w-3 mr-1" />
                                       Preparation
@@ -380,8 +380,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                               ${libro.precio?.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Badge variant={libro.cantidad_inventario < 10 ? 'destructive' : 'default'}>
-                                {libro.cantidad_inventario}
+                              <Badge variant={libro.inventory_quantity < 10 ? 'destructive' : 'default'}>
+                                {libro.inventory_quantity}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
@@ -458,16 +458,16 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {productos.filter(p => p.cantidad_inventario < 10).length === 0 ? (
+              {productos.filter(p => p.inventory_quantity < 10).length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">No products with low stock</p>
               ) : (
                 <div className="space-y-2">
-                  {productos.filter(p => p.cantidad_inventario < 10).map((item) => (
+                  {productos.filter(p => p.inventory_quantity < 10).map((item) => (
                     <div key={item.libro_id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                       <div>
                         <p className="font-medium">{item.nombre}</p>
                       </div>
-                      <Badge variant="destructive">Stock: {item.cantidad_inventario}</Badge>
+                      <Badge variant="destructive">Stock: {item.inventory_quantity}</Badge>
                     </div>
                   ))}
                 </div>
@@ -522,8 +522,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                 <Label>Stock</Label>
                 <Input
                   type="number"
-                  value={editForm.cantidad_inventario}
-                  onChange={(e) => setEditForm({...editForm, cantidad_inventario: e.target.value})}
+                  value={editForm.inventory_quantity}
+                  onChange={(e) => setEditForm({...editForm, inventory_quantity: e.target.value})}
                 />
               </div>
             </div>
@@ -539,8 +539,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <div>
               <Label>Image URL</Label>
               <Input
-                value={editForm.imagen_url}
-                onChange={(e) => setEditForm({...editForm, imagen_url: e.target.value})}
+                value={editForm.image_url}
+                onChange={(e) => setEditForm({...editForm, image_url: e.target.value})}
                 placeholder="https://..."
               />
             </div>
@@ -556,8 +556,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                 </p>
               </div>
               <Switch
-                checked={editForm.requiere_preparacion}
-                onCheckedChange={(v) => setEditForm({...editForm, requiere_preparacion: v})}
+                checked={editForm.requires_preparation}
+                onCheckedChange={(v) => setEditForm({...editForm, requires_preparation: v})}
               />
             </div>
 

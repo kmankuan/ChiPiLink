@@ -116,11 +116,11 @@ export default function Receipt() {
         </div>
         <div className="flex justify-between">
           <span>Fecha:</span>
-          <span>{new Date(pedido.fecha_creacion).toLocaleDateString('es-PA')}</span>
+          <span>{new Date(pedido.created_at).toLocaleDateString('es-PA')}</span>
         </div>
         <div className="flex justify-between">
           <span>Hora:</span>
-          <span>{new Date(pedido.fecha_creacion).toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })}</span>
+          <span>{new Date(pedido.created_at).toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
 
@@ -239,7 +239,7 @@ export default function Receipt() {
         <div className="text-right">
           <p className="text-muted-foreground">Fecha</p>
           <p className="font-bold">
-            {new Date(pedido.fecha_creacion).toLocaleDateString()}
+            {new Date(pedido.created_at).toLocaleDateString()}
           </p>
         </div>
       </div>

@@ -155,7 +155,7 @@ export default function Dashboard() {
       
       setEstudiantes(estudiantesRes.data);
       setPedidos(pedidosRes.data);
-      setGrados(gradosRes.data.grados);
+      setGrados(gradosRes.data.grades);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error al cargar datos');
@@ -202,7 +202,7 @@ export default function Dashboard() {
     setFormData({
       nombre: student.nombre || '',
       apellido: student.apellido || '',
-      grado: student.grado || '',
+      grado: student.grade || '',
       escuela: student.escuela || '',
       es_nuevo: student.es_nuevo ?? true,
       notas: student.notas || ''
@@ -477,7 +477,7 @@ export default function Dashboard() {
                               <StatusBadge status={student.estado_matricula} similitud={student.similitud_matricula} />
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              {grados.find(g => g.id === student.grado)?.nombre || student.grado}
+                              {grados.find(g => g.id === student.grade)?.nombre || student.grade}
                               {student.escuela && ` • ${student.escuela}`}
                             </p>
                             {student.nombre_matricula && student.estado_matricula === 'encontrado' && (
@@ -659,7 +659,7 @@ export default function Dashboard() {
             <div className="space-y-2">
               <Label>Grado a Estudiar *</Label>
               <Select
-                value={formData.grado}
+                value={formData.grade}
                 onValueChange={(v) => setFormData(prev => ({ ...prev, grado: v }))}
                 required
               >
@@ -737,7 +737,7 @@ export default function Dashboard() {
               </Button>
               <Button
                 type="submit"
-                disabled={savingStudent || !formData.nombre || !formData.apellido || !formData.grado}
+                disabled={savingStudent || !formData.nombre || !formData.apellido || !formData.grade}
                 className="flex-1"
               >
                 {savingStudent ? (
@@ -761,7 +761,7 @@ export default function Dashboard() {
               Comprar Libros para {selectedStudent?.nombre} {selectedStudent?.apellido}
             </DialogTitle>
             <DialogDescription>
-              {grados.find(g => g.id === selectedStudent?.grado)?.nombre} • Seleccione los libros que desea comprar
+              {grados.find(g => g.id === selectedStudent?.grade)?.nombre} • Seleccione los libros que desea comprar
             </DialogDescription>
           </DialogHeader>
           
@@ -800,7 +800,7 @@ export default function Dashboard() {
                           <Badge variant="destructive" className="text-xs">Sin Stock</Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">{book.materia}</p>
+                      <p className="text-sm text-muted-foreground">{book.subject}</p>
                     </div>
                     <p className={`font-bold ${book.ya_comprado ? 'text-muted-foreground' : 'text-primary'}`}>
                       ${book.precio.toFixed(2)}

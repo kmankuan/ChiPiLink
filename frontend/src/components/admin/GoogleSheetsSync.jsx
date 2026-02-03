@@ -72,7 +72,7 @@ import {
 const MAPEO_CAMPOS = [
   { value: 'nombre', label: 'Nombre del Estudiante' },
   { value: 'apellido', label: 'Apellido del Estudiante' },
-  { value: 'grado', label: 'Grado' },
+  { value: 'grade', label: 'Grado' },
   { value: 'escuela', label: 'Escuela/Colegio' },
   { value: 'cedula', label: 'Cédula' },
   { value: 'nombre_acudiente', label: 'Nombre del Acudiente' },

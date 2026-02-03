@@ -58,8 +58,8 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       setProducts(data.productos || data.products || []);
       
       const allProducts = data.productos || data.products || [];
-      const grades = [...new Set(allProducts.map(p => p.grado || p.grade).filter(Boolean))].sort();
-      const subjects = [...new Set(allProducts.map(p => p.materia || p.subject).filter(Boolean))].sort();
+      const grades = [...new Set(allProducts.map(p => p.grade || p.grade).filter(Boolean))].sort();
+      const subjects = [...new Set(allProducts.map(p => p.subject || p.subject).filter(Boolean))].sort();
       setFilters({ grades, subjects });
       
     } catch (error) {
@@ -79,9 +79,9 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     const term = searchTerm.toLowerCase();
     return (
       (p.nombre || p.name || '')?.toLowerCase().includes(term) ||
-      (p.codigo || p.code || '')?.toLowerCase().includes(term) ||
+      (p.code || p.code || '')?.toLowerCase().includes(term) ||
       (p.editorial || p.publisher || '')?.toLowerCase().includes(term) ||
-      (p.materia || p.subject || '')?.toLowerCase().includes(term)
+      (p.subject || p.subject || '')?.toLowerCase().includes(term)
     );
   });
 
@@ -90,15 +90,15 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       setEditingProduct(product);
       setFormData({
         name: product.nombre || product.name || '',
-        code: product.codigo || product.code || '',
+        code: product.code || product.code || '',
         isbn: product.isbn || '',
         publisher: product.editorial || product.publisher || '',
-        grade: product.grado || product.grade || '',
-        subject: product.materia || product.subject || '',
+        grade: product.grade || product.grade || '',
+        subject: product.subject || product.subject || '',
         price: (product.precio || product.price)?.toString() || '',
-        sale_price: (product.precio_oferta || product.sale_price)?.toString() || '',
+        sale_price: (product.sale_price || product.sale_price)?.toString() || '',
         description: product.descripcion || product.description || '',
-        image_url: product.imagen_url || product.image_url || '',
+        image_url: product.image_url || product.image_url || '',
         active: product.activo !== false && product.active !== false,
         featured: product.destacado || product.featured || false
       });
@@ -129,9 +129,9 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         grado: formData.grade,
         materia: formData.subject,
         precio: parseFloat(formData.price),
-        precio_oferta: formData.sale_price ? parseFloat(formData.sale_price) : null,
+        sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
         descripcion: formData.description,
-        imagen_url: formData.image_url,
+        image_url: formData.image_url,
         activo: formData.active,
         destacado: formData.featured
       };
@@ -355,8 +355,8 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                     <TableRow key={p.libro_id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {(p.imagen_url || p.image_url) ? (
-                            <img src={p.imagen_url || p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
+                          {(p.image_url || p.image_url) ? (
+                            <img src={p.image_url || p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                           ) : (
                             <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                               <BookOpen className="h-5 w-5 text-muted-foreground" />
@@ -368,16 +368,16 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{p.codigo || p.code}</TableCell>
+                      <TableCell className="font-mono text-sm">{p.code || p.code}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{p.grado || p.grade}</Badge>
+                        <Badge variant="secondary">{p.grade || p.grade}</Badge>
                       </TableCell>
-                      <TableCell>{p.materia || p.subject}</TableCell>
+                      <TableCell>{p.subject || p.subject}</TableCell>
                       <TableCell>{p.editorial || p.publisher}</TableCell>
                       <TableCell className="text-right">
-                        {(p.precio_oferta || p.sale_price) ? (
+                        {(p.sale_price || p.sale_price) ? (
                           <div>
-                            <span className="text-green-600 font-medium">${(p.precio_oferta || p.sale_price).toFixed(2)}</span>
+                            <span className="text-green-600 font-medium">${(p.sale_price || p.sale_price).toFixed(2)}</span>
                             <span className="text-xs text-muted-foreground line-through ml-1">${(p.precio || p.price)?.toFixed(2)}</span>
                           </div>
                         ) : (

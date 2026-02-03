@@ -721,7 +721,7 @@ export default function PingPongDashboard() {
                           {match.sets_jugador_a} - {match.sets_jugador_b}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(match.fecha_fin || match.fecha_creacion).toLocaleDateString('es-PA')}
+                          {new Date(match.fecha_fin || match.created_at).toLocaleDateString('es-PA')}
                         </div>
                       </div>
                     </div>

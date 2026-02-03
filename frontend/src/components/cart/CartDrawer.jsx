@@ -95,23 +95,23 @@ export default function CartDrawer() {
                 <div 
                   key={item.libro_id} 
                   className={`flex gap-4 p-3 rounded-lg ${
-                    item.es_catalogo_privado 
+                    item.is_private_catalog 
                       ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' 
                       : 'bg-muted/50'
                   }`}
                 >
                   {/* Product Image */}
                   <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center overflow-hidden flex-shrink-0 relative">
-                    {item.imagen_url ? (
+                    {item.image_url ? (
                       <img 
-                        src={item.imagen_url} 
+                        src={item.image_url} 
                         alt={item.nombre}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <Book className="h-6 w-6 text-muted-foreground/50" />
                     )}
-                    {item.es_catalogo_privado && (
+                    {item.is_private_catalog && (
                       <div className="absolute -top-1 -right-1 bg-purple-500 rounded-full p-1">
                         <Lock className="h-2.5 w-2.5 text-white" />
                       </div>
@@ -125,10 +125,10 @@ export default function CartDrawer() {
                       <p className="text-sm text-muted-foreground">
                         ${item.precio.toFixed(2)}
                       </p>
-                      {item.es_catalogo_privado && item.grado && (
+                      {item.is_private_catalog && item.grade && (
                         <Badge variant="secondary" className="text-xs py-0 h-5">
                           <GraduationCap className="h-2.5 w-2.5 mr-1" />
-                          {item.grado}
+                          {item.grade}
                         </Badge>
                       )}
                     </div>
@@ -151,7 +151,7 @@ export default function CartDrawer() {
                         size="icon"
                         className="h-7 w-7"
                         onClick={() => updateQuantity(item.libro_id, item.quantity + 1)}
-                        disabled={!item.es_catalogo_privado && item.quantity >= item.cantidad_inventario}
+                        disabled={!item.is_private_catalog && item.quantity >= item.inventory_quantity}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>

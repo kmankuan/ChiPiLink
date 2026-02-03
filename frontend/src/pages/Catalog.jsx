@@ -43,8 +43,8 @@ export default function Catalog() {
       ]);
       
       setLibros(librosRes.data);
-      setGrados(gradosRes.data.grados);
-      setMaterias(materiasRes.data.materias);
+      setGrados(gradosRes.data.grades);
+      setMaterias(materiasRes.data.subjects);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error al cargar catálogo');
@@ -56,8 +56,8 @@ export default function Catalog() {
   const filteredLibros = libros.filter(libro => {
     const matchesSearch = libro.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          libro.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGrado = selectedGrado === 'all' || libro.grado === selectedGrado;
-    const matchesMateria = selectedMateria === 'all' || libro.materia === selectedMateria;
+    const matchesGrado = selectedGrado === 'all' || libro.grade === selectedGrado;
+    const matchesMateria = selectedMateria === 'all' || libro.subject === selectedMateria;
     
     return matchesSearch && matchesGrado && matchesMateria;
   });
@@ -147,7 +147,7 @@ export default function Catalog() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredLibros.map((libro) => {
-            const stockStatus = getStockStatus(libro.cantidad_inventario);
+            const stockStatus = getStockStatus(libro.inventory_quantity);
             
             return (
               <div
@@ -157,9 +157,9 @@ export default function Catalog() {
               >
                 {/* Book Image/Placeholder */}
                 <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
-                  {libro.imagen_url ? (
+                  {libro.image_url ? (
                     <img 
-                      src={libro.imagen_url} 
+                      src={libro.image_url} 
                       alt={libro.nombre}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -173,10 +173,10 @@ export default function Catalog() {
                   {/* Badges */}
                   <div className="flex flex-wrap gap-2 mb-3">
                     <Badge variant="secondary" className="text-xs">
-                      {t(`grades.${libro.grado}`)}
+                      {t(`grades.${libro.grade}`)}
                     </Badge>
                     <Badge variant="outline" className="text-xs">
-                      {t(`subjects.${libro.materia}`)}
+                      {t(`subjects.${libro.subject}`)}
                     </Badge>
                   </div>
                   
@@ -213,11 +213,11 @@ export default function Catalog() {
                         {stockStatus.color !== 'success' && (
                           <AlertCircle className="h-3 w-3" />
                         )}
-                        {stockStatus.label} ({libro.cantidad_inventario})
+                        {stockStatus.label} ({libro.inventory_quantity})
                       </div>
                     </div>
                     
-                    {isAuthenticated && libro.cantidad_inventario > 0 && (
+                    {isAuthenticated && libro.inventory_quantity > 0 && (
                       <Button 
                         size="sm" 
                         className="rounded-full"

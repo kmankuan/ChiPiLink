@@ -55,11 +55,11 @@ const emptyProductRow = {
   grado: '',
   materia: '',
   precio: '',
-  cantidad_inventario: '',
+  inventory_quantity: '',
   descripcion: '',
   isbn: '',
   editorial: '',
-  requiere_preparacion: false
+  requires_preparation: false
 };
 
 export default function StoreModule() {
@@ -106,8 +106,8 @@ export default function StoreModule() {
       ]);
       setInventario(invRes.data);
       setCategorias(categoriasRes.data || []);
-      setGrados(gradosRes.data.grados);
-      setMaterias(materiasRes.data.materias);
+      setGrados(gradosRes.data.grades);
+      setMaterias(materiasRes.data.subjects);
     } catch (error) {
       toast.error('Error al cargar datos');
     } finally {
@@ -117,8 +117,8 @@ export default function StoreModule() {
 
   const filteredProducts = inventario.libros?.filter(libro => {
     const matchesSearch = libro.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.grado?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.materia?.toLowerCase().includes(searchTerm.toLowerCase());
+      libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
     return matchesSearch && matchesCategoria;
   }) || [];
@@ -129,7 +129,7 @@ export default function StoreModule() {
       setEditForm({
         ...emptyProductRow,
         ...product,
-        requiere_preparacion: product.requiere_preparacion || false
+        requires_preparation: product.requires_preparation || false
       });
     } else {
       setEditingProduct(null);
@@ -233,7 +233,7 @@ export default function StoreModule() {
   };
 
   const saveBulkProducts = async () => {
-    const validProducts = bulkProducts.filter(p => p.nombre && p.grado && p.precio);
+    const validProducts = bulkProducts.filter(p => p.nombre && p.grade && p.precio);
     if (validProducts.length === 0) {
       toast.error('Agrega al menos un producto válido');
       return;
@@ -245,7 +245,7 @@ export default function StoreModule() {
         await api.post('/admin/libros', {
           ...product,
           precio: parseFloat(product.precio),
-          cantidad_inventario: parseInt(product.cantidad_inventario) || 0
+          inventory_quantity: parseInt(product.inventory_quantity) || 0
         });
       }
       toast.success(`${validProducts.length} productos creados`);
@@ -336,7 +336,7 @@ export default function StoreModule() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{libro.nombre}</h3>
-                          {libro.requiere_preparacion && (
+                          {libro.requires_preparation && (
                             <Badge variant="outline" className="text-orange-600 border-orange-300">
                               <Clock className="h-3 w-3 mr-1" />
                               Preparación
@@ -349,18 +349,18 @@ export default function StoreModule() {
                               {cat.icono} {cat.nombre}
                             </Badge>
                           )}
-                          {libro.categoria === 'libros' && libro.grado && (
-                            <Badge variant="outline">{libro.grado}</Badge>
+                          {libro.categoria === 'libros' && libro.grade && (
+                            <Badge variant="outline">{libro.grade}</Badge>
                           )}
-                          {libro.categoria === 'libros' && libro.materia && (
-                            <Badge variant="secondary">{libro.materia}</Badge>
+                          {libro.categoria === 'libros' && libro.subject && (
+                            <Badge variant="secondary">{libro.subject}</Badge>
                           )}
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-lg">${libro.precio?.toFixed(2)}</p>
                         <p className="text-sm text-muted-foreground">
-                          Stock: {libro.cantidad_inventario}
+                          Stock: {libro.inventory_quantity}
                         </p>
                       </div>
                       <div className="flex gap-2 ml-4">
@@ -438,10 +438,10 @@ export default function StoreModule() {
                     <div key={item.libro_id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
                         <p className="font-medium">{item.nombre}</p>
-                        <p className="text-sm text-muted-foreground">{item.grado}</p>
+                        <p className="text-sm text-muted-foreground">{item.grade}</p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <Badge variant="destructive">Stock: {item.cantidad_inventario}</Badge>
+                        <Badge variant="destructive">Stock: {item.inventory_quantity}</Badge>
                         <Input
                           type="number"
                           className="w-20"
@@ -471,19 +471,19 @@ export default function StoreModule() {
                   <div key={item.libro_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium">{item.nombre}</p>
-                      <p className="text-sm text-muted-foreground">{item.grado} - {item.materia}</p>
+                      <p className="text-sm text-muted-foreground">{item.grade} - {item.subject}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={item.cantidad_inventario < 10 ? 'destructive' : 'default'}>
-                        Stock: {item.cantidad_inventario}
+                      <Badge variant={item.inventory_quantity < 10 ? 'destructive' : 'default'}>
+                        Stock: {item.inventory_quantity}
                       </Badge>
                       <Input
                         type="number"
                         className="w-24"
-                        defaultValue={item.cantidad_inventario}
+                        defaultValue={item.inventory_quantity}
                         onBlur={(e) => {
                           const newQty = parseInt(e.target.value);
-                          if (newQty !== item.cantidad_inventario) {
+                          if (newQty !== item.inventory_quantity) {
                             updateInventory(item.libro_id, newQty);
                           }
                         }}
@@ -534,7 +534,7 @@ export default function StoreModule() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Grado</Label>
-                  <Select value={editForm.grado} onValueChange={(v) => setEditForm({...editForm, grado: v})}>
+                  <Select value={editForm.grade} onValueChange={(v) => setEditForm({...editForm, grado: v})}>
                     <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
                     <SelectContent>
                       {grados.map(g => <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>)}
@@ -543,7 +543,7 @@ export default function StoreModule() {
                 </div>
                 <div>
                   <Label>Materia</Label>
-                  <Select value={editForm.materia} onValueChange={(v) => setEditForm({...editForm, materia: v})}>
+                  <Select value={editForm.subject} onValueChange={(v) => setEditForm({...editForm, materia: v})}>
                     <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
                     <SelectContent>
                       {materias.map(m => <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>)}
@@ -567,8 +567,8 @@ export default function StoreModule() {
                 <Label>Stock</Label>
                 <Input
                   type="number"
-                  value={editForm.cantidad_inventario}
-                  onChange={(e) => setEditForm({...editForm, cantidad_inventario: e.target.value})}
+                  value={editForm.inventory_quantity}
+                  onChange={(e) => setEditForm({...editForm, inventory_quantity: e.target.value})}
                 />
               </div>
             </div>
@@ -593,8 +593,8 @@ export default function StoreModule() {
                 </p>
               </div>
               <Switch
-                checked={editForm.requiere_preparacion}
-                onCheckedChange={(v) => setEditForm({...editForm, requiere_preparacion: v})}
+                checked={editForm.requires_preparation}
+                onCheckedChange={(v) => setEditForm({...editForm, requires_preparation: v})}
               />
             </div>
 
@@ -666,13 +666,13 @@ export default function StoreModule() {
                   value={product.nombre}
                   onChange={(e) => updateBulkRow(index, 'nombre', e.target.value)}
                 />
-                <Select value={product.grado} onValueChange={(v) => updateBulkRow(index, 'grado', v)}>
+                <Select value={product.grade} onValueChange={(v) => updateBulkRow(index, 'grade', v)}>
                   <SelectTrigger><SelectValue placeholder="Grado" /></SelectTrigger>
                   <SelectContent>
                     {grados.map(g => <SelectItem key={g.id} value={g.id}>{g.nombre}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <Select value={product.materia} onValueChange={(v) => updateBulkRow(index, 'materia', v)}>
+                <Select value={product.subject} onValueChange={(v) => updateBulkRow(index, 'subject', v)}>
                   <SelectTrigger><SelectValue placeholder="Materia" /></SelectTrigger>
                   <SelectContent>
                     {materias.map(m => <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>)}
@@ -687,8 +687,8 @@ export default function StoreModule() {
                 <Input
                   type="number"
                   placeholder="Stock"
-                  value={product.cantidad_inventario}
-                  onChange={(e) => updateBulkRow(index, 'cantidad_inventario', e.target.value)}
+                  value={product.inventory_quantity}
+                  onChange={(e) => updateBulkRow(index, 'inventory_quantity', e.target.value)}
                 />
               </div>
             ))}

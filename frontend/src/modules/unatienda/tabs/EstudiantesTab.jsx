@@ -43,7 +43,7 @@ export default function EstudiantesTab({ token }) {
       e.full_name?.toLowerCase().includes(term) ||
       e.numero_estudiante?.toLowerCase().includes(term) ||
       e.student_number?.toLowerCase().includes(term) ||
-      e.grado?.toLowerCase().includes(term) ||
+      e.grade?.toLowerCase().includes(term) ||
       e.grade?.toLowerCase().includes(term)
     );
   });
@@ -107,7 +107,7 @@ export default function EstudiantesTab({ token }) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {[...new Set(students.map(e => e.grado || e.grade).filter(Boolean))].length}
+              {[...new Set(students.map(e => e.grade || e.grade).filter(Boolean))].length}
             </div>
             <p className="text-xs text-muted-foreground">Grades</p>
           </CardContent>
@@ -149,7 +149,7 @@ export default function EstudiantesTab({ token }) {
                       <TableCell className="font-mono">{e.numero_estudiante || e.student_number}</TableCell>
                       <TableCell className="font-medium">{e.nombre_completo || e.full_name}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{e.grado || e.grade}</Badge>
+                        <Badge variant="secondary">{e.grade || e.grade}</Badge>
                       </TableCell>
                       <TableCell>{e.seccion || e.section || '-'}</TableCell>
                       <TableCell>

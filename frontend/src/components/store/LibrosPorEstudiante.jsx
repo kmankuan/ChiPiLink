@@ -58,7 +58,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
       setResumen(response.data.resumen || []);
       
       // Fetch products for each grade
-      const grados = [...new Set(response.data.resumen.map(r => r.estudiante.grado))];
+      const grados = [...new Set(response.data.resumen.map(r => r.estudiante.grade))];
       for (const grado of grados) {
         fetchProductosPorGrado(grado);
       }
@@ -96,7 +96,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
   };
 
   const handleAddAllToCart = async (estudiante) => {
-    const grado = estudiante.grado;
+    const grado = estudiante.grade;
     const productos = productosPorGrado[grado]?.productos || [];
     
     if (productos.length === 0) {
@@ -111,8 +111,8 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
       if (!isInCart(producto.libro_id)) {
         const productToAdd = {
           ...producto,
-          es_catalogo_privado: true,
-          cantidad_inventario: 999
+          is_private_catalog: true,
+          inventory_quantity: 999
         };
         addItem(productToAdd, 1);
         added++;
@@ -137,8 +137,8 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
     
     const productToAdd = {
       ...producto,
-      es_catalogo_privado: true,
-      cantidad_inventario: 999
+      is_private_catalog: true,
+      inventory_quantity: 999
     };
     addItem(productToAdd, 1);
   };
@@ -188,7 +188,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
       {/* Students Accordion */}
       <Accordion type="multiple" defaultValue={resumen.map(r => r.estudiante.sync_id)} className="space-y-4">
         {resumen.map(({ estudiante, productos_disponibles, total_estimado }) => {
-          const grado = estudiante.grado;
+          const grado = estudiante.grade;
           const gradoData = productosPorGrado[grado];
           const productos = gradoData?.productos || [];
           const isLoadingGrado = loadingGrados[grado];
@@ -212,7 +212,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
                       <h3 className="font-semibold text-lg">{estudiante.nombre}</h3>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <GraduationCap className="h-4 w-4" />
-                        <span>{estudiante.grado}</span>
+                        <span>{estudiante.grade}</span>
                         {estudiante.seccion && (
                           <>
                             <span>•</span>
@@ -321,16 +321,16 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium truncate">{producto.nombre}</h4>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                              {producto.materia && (
+                              {producto.subject && (
                                 <Badge variant="outline" className="text-xs">
-                                  {producto.materia}
+                                  {producto.subject}
                                 </Badge>
                               )}
                               {producto.editorial && (
                                 <span>{producto.editorial}</span>
                               )}
-                              {producto.codigo && (
-                                <span className="text-xs">• {producto.codigo}</span>
+                              {producto.code && (
+                                <span className="text-xs">• {producto.code}</span>
                               )}
                             </div>
                           </div>

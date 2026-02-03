@@ -79,7 +79,7 @@ export default function EmbedOrderForm() {
         ]);
         
         setFormConfig(configRes.data);
-        setGrados(gradosRes.data.grados);
+        setGrados(gradosRes.data.grades);
         setLoading(false);
       } catch (error) {
         console.error('Error loading form data:', error);
@@ -135,7 +135,7 @@ export default function EmbedOrderForm() {
     setCart(cart.map(item => {
       if (item.libro_id === libroId) {
         const libro = libros.find(l => l.libro_id === libroId);
-        const maxQty = libro?.cantidad_inventario || 99;
+        const maxQty = libro?.inventory_quantity || 99;
         const newQty = Math.max(1, Math.min(maxQty, item.cantidad + delta));
         return { ...item, cantidad: newQty };
       }
@@ -158,7 +158,7 @@ export default function EmbedOrderForm() {
       acudiente.email.trim() !== '' &&
       estudiante.nombre.trim() !== '' &&
       estudiante.apellido.trim() !== '' &&
-      estudiante.grado !== '' &&
+      estudiante.grade !== '' &&
       cart.length > 0
     );
   };
@@ -183,7 +183,7 @@ export default function EmbedOrderForm() {
         // Estudiante
         nombre_estudiante: estudiante.nombre,
         apellido_estudiante: estudiante.apellido,
-        grado_estudiante: estudiante.grado,
+        grado_estudiante: estudiante.grade,
         email_estudiante: estudiante.email || null,
         telefono_estudiante: estudiante.telefono || null,
         // Order
@@ -408,7 +408,7 @@ export default function EmbedOrderForm() {
                       Grado a Estudiar <span className="text-destructive">*</span>
                     </Label>
                     <Select
-                      value={estudiante.grado}
+                      value={estudiante.grade}
                       onValueChange={handleGradoChange}
                       required
                     >
@@ -464,7 +464,7 @@ export default function EmbedOrderForm() {
               </Card>
               
               {/* Section 3: Book Selection */}
-              {estudiante.grado && (
+              {estudiante.grade && (
                 <Card>
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -474,7 +474,7 @@ export default function EmbedOrderForm() {
                       Selección de Libros
                     </CardTitle>
                     <CardDescription>
-                      Libros disponibles para {grados.find(g => g.id === estudiante.grado)?.nombre || estudiante.grado}
+                      Libros disponibles para {grados.find(g => g.id === estudiante.grade)?.nombre || estudiante.grade}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -502,7 +502,7 @@ export default function EmbedOrderForm() {
                                 <p className="font-medium truncate">{libro.nombre}</p>
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                                    {libro.materia}
+                                    {libro.subject}
                                   </span>
                                   {formConfig?.mostrar_precios !== false && (
                                     <span className="text-sm font-semibold text-green-600">
@@ -511,7 +511,7 @@ export default function EmbedOrderForm() {
                                   )}
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  {libro.cantidad_inventario} disponibles
+                                  {libro.inventory_quantity} disponibles
                                 </p>
                               </div>
                               
@@ -541,7 +541,7 @@ export default function EmbedOrderForm() {
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={() => updateQuantity(libro.libro_id, 1)}
-                                    disabled={inCart.cantidad >= libro.cantidad_inventario}
+                                    disabled={inCart.cantidad >= libro.inventory_quantity}
                                   >
                                     <Plus className="h-4 w-4" />
                                   </Button>
