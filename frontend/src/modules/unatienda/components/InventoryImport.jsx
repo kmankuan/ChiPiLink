@@ -326,7 +326,7 @@ export default function InventoryImport({ token, onImportComplete }) {
                           <TableRow>
                             <TableHead className="w-[100px]">Code</TableHead>
                             <TableHead>Name</TableHead>
-                            <TableHead className="w-[80px]">Grade</TableHead>
+                            <TableHead className="w-[120px]">Grade(s)</TableHead>
                             <TableHead className="w-[100px] text-right">Quantity</TableHead>
                             <TableHead className="w-[100px]">Action</TableHead>
                           </TableRow>
@@ -336,14 +336,24 @@ export default function InventoryImport({ token, onImportComplete }) {
                             <TableRow key={idx}>
                               <TableCell className="font-mono text-xs">{item.code}</TableCell>
                               <TableCell className="max-w-[200px] truncate">{item.name}</TableCell>
-                              <TableCell>{item.grade}</TableCell>
+                              <TableCell>
+                                {item.grades && item.grades.length > 1 ? (
+                                  <div className="flex flex-wrap gap-1">
+                                    {item.grades.map((g, i) => (
+                                      <Badge key={i} variant="outline" className="text-xs">{g}</Badge>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  item.grade
+                                )}
+                              </TableCell>
                               <TableCell className="text-right">
                                 {item.existing_quantity !== null ? (
                                   <span className="text-xs">
                                     {item.existing_quantity} → {item.new_quantity}
                                   </span>
                                 ) : (
-                                  item.cantidad_csv
+                                  item.quantity_csv
                                 )}
                               </TableCell>
                               <TableCell>{getActionBadge(item.action)}</TableCell>
