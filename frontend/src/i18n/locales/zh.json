@@ -48,7 +48,13 @@
     "noAccount": "没有账户？",
     "hasAccount": "已有账户？",
     "loginWithGoogle": "使用 Google 继续",
-    "orContinueWith": "或继续使用"
+    "orContinueWith": "或继续使用",
+    "laopan": {
+      "loginButton": "使用 LaoPan 登录",
+      "registerButton": "没有账户？在 LaoPan 注册",
+      "description": "登录或注册 LaoPan.online 以访问",
+      "connecting": "连接中..."
+    }
   },
   "membership": {
     "title": "俱乐部会员",
