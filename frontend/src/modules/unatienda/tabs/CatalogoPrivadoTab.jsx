@@ -78,10 +78,10 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      (p.name || p.name || '')?.toLowerCase().includes(term) ||
-      (p.code || p.code || '')?.toLowerCase().includes(term) ||
-      (p.publisher || p.publisher || '')?.toLowerCase().includes(term) ||
-      (p.subject || p.subject || '')?.toLowerCase().includes(term)
+      (p.name || '')?.toLowerCase().includes(term) ||
+      (p.code || '')?.toLowerCase().includes(term) ||
+      (p.publisher || '')?.toLowerCase().includes(term) ||
+      (p.subject || '')?.toLowerCase().includes(term)
     );
   });
 
