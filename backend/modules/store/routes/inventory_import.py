@@ -173,7 +173,7 @@ async def preview_csv_import(
             # Check if product exists in the private catalog (libros collection)
             existing = await db.store_products.find_one(
                 {"code": code, "is_private_catalog": True},
-                {"_id": 0, "libro_id": 1, "name": 1, "inventory_quantity": 1}
+                {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
             )
             
             action = "create"
@@ -318,10 +318,10 @@ async def execute_csv_import(
                     updated += 1
                 else:
                     # Create new product in libros collection (private catalog)
-                    libro_id = f"libro_{datetime.now().strftime('%Y%m%d%H%M%S')}_{created:04d}"
+                    book_id = f"libro_{datetime.now().strftime('%Y%m%d%H%M%S')}_{created:04d}"
                     
                     new_product = {
-                        "libro_id": libro_id,
+                        "book_id": book_id,
                         "code": code,
                         "name": name,
                         "grade": grade,

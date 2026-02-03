@@ -87,7 +87,7 @@ class Product(ProductBase):
     """Full product model"""
     model_config = ConfigDict(from_attributes=True)
     
-    libro_id: str
+    book_id: str
     created_at: Optional[Any] = None
 
 
@@ -95,7 +95,7 @@ class Product(ProductBase):
 
 class OrderItem(BaseModel):
     """Order item model"""
-    libro_id: str
+    book_id: str
     nombre_libro: str
     cantidad: int
     precio_unitario: float
@@ -260,7 +260,7 @@ class InventoryUpdate(BaseModel):
 
 class InventoryAlert(BaseModel):
     """Low stock alert model"""
-    libro_id: str
+    book_id: str
     name: str
     cantidad_actual: int
     umbral: int = 10

@@ -123,7 +123,7 @@ class TextbookOrderService(BaseService):
             status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
             
             items.append({
-                "book_id": book["libro_id"],
+                "book_id": book["book_id"],
                 "book_code": book.get("code", ""),
                 "book_name": book["name"],
                 "price": float(book.get("price", 0)),
@@ -155,7 +155,7 @@ class TextbookOrderService(BaseService):
         """Refresh order items with latest book/inventory data"""
         grade = order.get("grade", "")
         books = await self.get_books_for_grade(grade)
-        books_dict = {b["libro_id"]: b for b in books}
+        books_dict = {b["book_id"]: b for b in books}
         
         existing_items = {item["book_id"]: item for item in order.get("items", [])}
         updated_items = []

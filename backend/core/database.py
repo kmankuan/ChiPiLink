@@ -287,7 +287,7 @@ async def create_indexes():
         await db[StoreCollections.ORDERS].create_index("created_at")
         
         # Index for store_products
-        await db[StoreCollections.PRODUCTS].create_index("libro_id", unique=True)
+        await db[StoreCollections.PRODUCTS].create_index("book_id", unique=True)
         await db[StoreCollections.PRODUCTS].create_index("categoria")
         await db[StoreCollections.PRODUCTS].create_index("grade")
         await db[StoreCollections.PRODUCTS].create_index("active")

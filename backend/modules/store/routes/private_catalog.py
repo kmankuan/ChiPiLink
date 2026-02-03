@@ -142,9 +142,9 @@ async def get_private_catalog_products(
     }
 
 
-@router.get("/productos/{libro_id}")
+@router.get("/productos/{book_id}")
 async def get_product_detail(
-    libro_id: str,
+    book_id: str,
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -160,7 +160,7 @@ async def get_product_detail(
         )
     
     product = await db.store_products.find_one(
-        {"libro_id": libro_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_private_catalog": True},
         {"_id": 0}
     )
     
@@ -325,7 +325,7 @@ async def admin_create_private_catalog_product(
     
     # Ensure it's private catalog
     product["is_private_catalog"] = True
-    product["libro_id"] = product.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
+    product["book_id"] = product.get("book_id") or f"libro_{uuid.uuid4().hex[:12]}"
     product["active"] = product.get("active", True)
     product["created_at"] = datetime.now(timezone.utc).isoformat()
     
@@ -335,9 +335,9 @@ async def admin_create_private_catalog_product(
     return {"success": True, "product": product}
 
 
-@router.put("/admin/productos/{libro_id}")
+@router.put("/admin/productos/{book_id}")
 async def admin_update_private_catalog_product(
-    libro_id: str,
+    book_id: str,
     updates: dict,
     admin: dict = Depends(get_admin_user)
 ):
@@ -349,21 +349,21 @@ async def admin_update_private_catalog_product(
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.store_products.update_one(
-        {"libro_id": libro_id, "is_private_catalog": True},
+        {"book_id": book_id, "is_private_catalog": True},
         {"$set": updates}
     )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    product = await db.store_products.find_one({"libro_id": libro_id}, {"_id": 0})
+    product = await db.store_products.find_one({"book_id": book_id}, {"_id": 0})
     
     return {"success": True, "product": product}
 
 
-@router.delete("/admin/productos/{libro_id}")
+@router.delete("/admin/productos/{book_id}")
 async def admin_delete_private_catalog_product(
-    libro_id: str,
+    book_id: str,
     hard_delete: bool = False,
     admin: dict = Depends(get_admin_user)
 ):
@@ -373,13 +373,13 @@ async def admin_delete_private_catalog_product(
     """
     if hard_delete:
         result = await db.store_products.delete_one(
-            {"libro_id": libro_id, "is_private_catalog": True}
+            {"book_id": book_id, "is_private_catalog": True}
         )
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Product not found")
     else:
         result = await db.store_products.update_one(
-            {"libro_id": libro_id, "is_private_catalog": True},
+            {"book_id": book_id, "is_private_catalog": True},
             {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:

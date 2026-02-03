@@ -17,20 +17,20 @@ class ProductRepository(BaseRepository):
     """
     
     COLLECTION_NAME = StoreCollections.PRODUCTS
-    ID_FIELD = "libro_id"
+    ID_FIELD = "book_id"
     
     def __init__(self):
         super().__init__(db, self.COLLECTION_NAME)
     
     async def create(self, product_data: Dict) -> Dict:
         """Create nuevo producto"""
-        product_data["libro_id"] = f"libro_{uuid.uuid4().hex[:12]}"
+        product_data["book_id"] = f"libro_{uuid.uuid4().hex[:12]}"
         product_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(product_data)
     
-    async def get_by_id(self, libro_id: str) -> Optional[Dict]:
+    async def get_by_id(self, book_id: str) -> Optional[Dict]:
         """Get producto by ID"""
-        return await self.find_by_id(self.ID_FIELD, libro_id)
+        return await self.find_by_id(self.ID_FIELD, book_id)
     
     async def get_all_active(
         self,
@@ -107,18 +107,18 @@ class ProductRepository(BaseRepository):
             limit=limit
         )
     
-    async def update_product(self, libro_id: str, data: Dict) -> bool:
+    async def update_product(self, book_id: str, data: Dict) -> bool:
         """Update producto"""
-        return await self.update_by_id(self.ID_FIELD, libro_id, data)
+        return await self.update_by_id(self.ID_FIELD, book_id, data)
     
-    async def update_inventory(self, libro_id: str, cantidad: int) -> bool:
+    async def update_inventory(self, book_id: str, cantidad: int) -> bool:
         """Update inventario"""
-        return await self.update_product(libro_id, {"inventory_quantity": cantidad})
+        return await self.update_product(book_id, {"inventory_quantity": cantidad})
     
-    async def decrement_inventory(self, libro_id: str, cantidad: int) -> bool:
+    async def decrement_inventory(self, book_id: str, cantidad: int) -> bool:
         """Decrementar inventario"""
         result = await self._collection.update_one(
-            {self.ID_FIELD: libro_id},
+            {self.ID_FIELD: book_id},
             {"$inc": {"inventory_quantity": -cantidad}}
         )
         return result.modified_count > 0
@@ -132,6 +132,6 @@ class ProductRepository(BaseRepository):
             }
         )
     
-    async def deactivate(self, libro_id: str) -> bool:
+    async def deactivate(self, book_id: str) -> bool:
         """Desactivar producto (soft delete)"""
-        return await self.update_product(libro_id, {"active": False})
+        return await self.update_product(book_id, {"active": False})

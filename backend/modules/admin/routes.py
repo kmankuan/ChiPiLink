@@ -65,7 +65,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     if libro_count == 0:
         libros = [
             {
-                "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
+                "book_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "name": "Matem\u00e1ticas 1",
                 "description": "Libro de matem\u00e1ticas para primer grado",
                 "categoria": "libros",
@@ -77,7 +77,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
+                "book_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "name": "Espa\u00f1ol 1",
                 "description": "Libro de espa\u00f1ol para primer grado",
                 "categoria": "libros",

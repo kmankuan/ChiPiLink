@@ -487,14 +487,14 @@ class BulkImportService:
                 if existente:
                     if actualizar_existentes:
                         await db.store_products.update_one(
-                            {"libro_id": existente["libro_id"]},
+                            {"book_id": existente["book_id"]},
                             {"$set": libro_data}
                         )
                         resultados["actualizados"] += 1
                     else:
                         resultados["omitidos"] += 1
                 else:
-                    libro_data["libro_id"] = f"libro_{uuid.uuid4().hex[:12]}"
+                    libro_data["book_id"] = f"libro_{uuid.uuid4().hex[:12]}"
                     libro_data["created_at"] = now
                     libro_data["inventory_quantity"] = 0
                     libro_data["cantidad_reservada"] = 0

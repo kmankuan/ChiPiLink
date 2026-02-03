@@ -33,18 +33,18 @@ class ProductService(BaseService):
         await self.emit_event(
             StoreEvents.PRODUCT_CREATED,
             {
-                "libro_id": result["libro_id"],
+                "book_id": result["book_id"],
                 "name": result["name"],
                 "categoria": result.get("categoria")
             }
         )
         
-        self.log_info(f"Product created: {result['libro_id']}")
+        self.log_info(f"Product created: {result['book_id']}")
         return Product(**result)
     
-    async def get_product(self, libro_id: str) -> Optional[Product]:
+    async def get_product(self, book_id: str) -> Optional[Product]:
         """Get producto by ID"""
-        result = await self.repository.get_by_id(libro_id)
+        result = await self.repository.get_by_id(book_id)
         return Product(**result) if result else None
     
     async def get_all_products(
@@ -99,7 +99,7 @@ class ProductService(BaseService):
     
     async def update_product(
         self,
-        libro_id: str,
+        book_id: str,
         data: ProductUpdate
     ) -> Optional[Product]:
         """
@@ -109,36 +109,36 @@ class ProductService(BaseService):
         update_data = data.model_dump(exclude_unset=True)
         
         if not update_data:
-            return await self.get_product(libro_id)
+            return await self.get_product(book_id)
         
-        success = await self.repository.update_product(libro_id, update_data)
+        success = await self.repository.update_product(book_id, update_data)
         
         if success:
             await self.emit_event(
                 StoreEvents.PRODUCT_UPDATED,
-                {"libro_id": libro_id, "updated_fields": list(update_data.keys())}
+                {"book_id": book_id, "updated_fields": list(update_data.keys())}
             )
-            return await self.get_product(libro_id)
+            return await self.get_product(book_id)
         
         return None
     
     async def update_inventory(
         self,
-        libro_id: str,
+        book_id: str,
         cantidad: int
     ) -> Optional[Product]:
         """Update inventario del producto"""
-        success = await self.repository.update_inventory(libro_id, cantidad)
+        success = await self.repository.update_inventory(book_id, cantidad)
         
         if success:
-            product = await self.get_product(libro_id)
+            product = await self.get_product(book_id)
             
             # Check for low stock
             if product and product.inventory_quantity < 10:
                 await self.emit_event(
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
-                        "libro_id": libro_id,
+                        "book_id": book_id,
                         "name": product.name,
                         "cantidad": product.inventory_quantity
                     },
@@ -149,17 +149,17 @@ class ProductService(BaseService):
         
         return None
     
-    async def decrement_inventory(self, libro_id: str, cantidad: int) -> bool:
+    async def decrement_inventory(self, book_id: str, cantidad: int) -> bool:
         """Decrementar inventario (para pedidos)"""
-        success = await self.repository.decrement_inventory(libro_id, cantidad)
+        success = await self.repository.decrement_inventory(book_id, cantidad)
         
         if success:
-            product = await self.get_product(libro_id)
+            product = await self.get_product(book_id)
             if product and product.inventory_quantity < 10:
                 await self.emit_event(
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
-                        "libro_id": libro_id,
+                        "book_id": book_id,
                         "name": product.name,
                         "cantidad": product.inventory_quantity
                     },
@@ -173,9 +173,9 @@ class ProductService(BaseService):
         results = await self.repository.get_low_stock(threshold)
         return [Product(**r) for r in results]
     
-    async def deactivate_product(self, libro_id: str) -> bool:
+    async def deactivate_product(self, book_id: str) -> bool:
         """Desactivar producto"""
-        return await self.repository.deactivate(libro_id)
+        return await self.repository.deactivate(book_id)
     
     async def get_inventory_stats(self) -> Dict:
         """Get statistics de inventario"""
@@ -187,7 +187,7 @@ class ProductService(BaseService):
             "productos_bajo_stock": len(low_stock),
             "alertas_bajo_stock": [
                 {
-                    "libro_id": p["libro_id"],
+                    "book_id": p["book_id"],
                     "name": p["name"],
                     "cantidad": p.get("inventory_quantity", 0)
                 }

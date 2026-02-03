@@ -78,10 +78,10 @@ async def get_available_subjects():
     return {"materias": sorted([m for m in materias if m])}
 
 
-@router.get("/{libro_id}", response_model=Product)
-async def get_product(libro_id: str):
+@router.get("/{book_id}", response_model=Product)
+async def get_product(book_id: str):
     """Get producto by ID"""
-    product = await product_service.get_product(libro_id)
+    product = await product_service.get_product(book_id)
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
     return product
@@ -96,41 +96,41 @@ async def create_product(
     return await product_service.create_product(data)
 
 
-@router.put("/{libro_id}", response_model=Product)
+@router.put("/{book_id}", response_model=Product)
 async def update_product(
-    libro_id: str,
+    book_id: str,
     data: ProductUpdate,
     admin: dict = Depends(get_admin_user)
 ):
     """Update producto (solo admin)"""
-    product = await product_service.update_product(libro_id, data)
+    product = await product_service.update_product(book_id, data)
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
     return product
 
 
-@router.delete("/{libro_id}")
+@router.delete("/{book_id}")
 async def deactivate_product(
-    libro_id: str,
+    book_id: str,
     admin: dict = Depends(get_admin_user)
 ):
     """Desactivar producto - soft delete (solo admin)"""
-    success = await product_service.deactivate_product(libro_id)
+    success = await product_service.deactivate_product(book_id)
     if not success:
         raise HTTPException(status_code=404, detail="Producto not found")
     return {"success": True, "message": "Producto desactivado"}
 
 
-@router.put("/{libro_id}/featured")
+@router.put("/{book_id}/featured")
 async def toggle_featured(
-    libro_id: str,
+    book_id: str,
     featured: bool,
     orden: int = 0,
     admin: dict = Depends(get_admin_user)
 ):
     """Marcar/desmarcar producto como destacado (solo admin)"""
     product = await product_service.update_product(
-        libro_id,
+        book_id,
         ProductUpdate(destacado=destacado, featured_order=orden)
     )
     if not product:
@@ -138,16 +138,16 @@ async def toggle_featured(
     return {"success": True}
 
 
-@router.put("/{libro_id}/promotion")
+@router.put("/{book_id}/promotion")
 async def toggle_promotion(
-    libro_id: str,
+    book_id: str,
     on_sale: bool,
     sale_price: Optional[float] = None,
     admin: dict = Depends(get_admin_user)
 ):
     """Marcar/desmarcar producto en promotion (solo admin)"""
     product = await product_service.update_product(
-        libro_id,
+        book_id,
         ProductUpdate(on_sale=on_sale, sale_price=sale_price)
     )
     if not product:

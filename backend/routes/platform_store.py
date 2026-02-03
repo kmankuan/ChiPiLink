@@ -252,7 +252,7 @@ async def create_platform_order(order_data: dict):
     # Update inventory (reserve stock)
     for item in order_data["items"]:
         await db.store_products.update_one(
-            {"libro_id": item.get("book_id") or item.get("libro_id")},
+            {"book_id": item.get("book_id") or item.get("book_id")},
             {"$inc": {"inventory_quantity": -item.get("quantity", 1)}}
         )
     

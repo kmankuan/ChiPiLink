@@ -72,7 +72,7 @@ async def generate_catalog_products() -> List[Dict]:
                 base_price = random.uniform(25.0, 45.0)
             
             product = {
-                "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
+                "book_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "code": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
                 "name": f"{materia} {grado} - {editorial}",
                 "description": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
@@ -183,7 +183,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
             
             items.append({
                 "item_id": f"item_{uuid.uuid4().hex[:8]}",
-                "book_id": product["libro_id"],
+                "book_id": product["book_id"],
                 "book_code": product["code"],
                 "book_name": product["name"],
                 "quantity_ordered": cantidad,

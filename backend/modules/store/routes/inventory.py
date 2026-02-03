@@ -27,18 +27,18 @@ async def get_low_stock(
     return await product_service.get_low_stock_products(threshold)
 
 
-@router.put("/{libro_id}")
+@router.put("/{book_id}")
 async def update_inventory(
-    libro_id: str,
+    book_id: str,
     cantidad: int,
     admin: dict = Depends(get_admin_user)
 ):
     """Update inventario de un producto (admin)"""
-    product = await product_service.update_inventory(libro_id, cantidad)
+    product = await product_service.update_inventory(book_id, cantidad)
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
     return {
         "success": True,
-        "libro_id": libro_id,
+        "book_id": book_id,
         "nueva_cantidad": cantidad
     }

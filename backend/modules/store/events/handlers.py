@@ -57,7 +57,7 @@ def setup_event_handlers():
         }
         
         await db.notifications.insert_one(notificacion)
-        logger.warning(f"Low stock alert for {payload.get('libro_id')}")
+        logger.warning(f"Low stock alert for {payload.get('book_id')}")
     
     @event_bus.subscribe(StoreEvents.ORDER_PAID)
     async def on_order_paid(event: Event):

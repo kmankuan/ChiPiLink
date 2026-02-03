@@ -37,9 +37,9 @@ class OrderService(BaseService):
         # Validate y calcular total
         total = 0
         for item in data.items:
-            product = await self.product_repository.get_by_id(item.libro_id)
+            product = await self.product_repository.get_by_id(item.book_id)
             if not product:
-                raise ValueError(f"Producto {item.libro_id} not found")
+                raise ValueError(f"Producto {item.book_id} not found")
             if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.price_unitario
@@ -62,7 +62,7 @@ class OrderService(BaseService):
         
         # Decrement inventario
         for item in data.items:
-            await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
+            await self.product_repository.decrement_inventory(item.book_id, item.cantidad)
         
         # Emit evento
         await self.emit_event(
@@ -89,9 +89,9 @@ class OrderService(BaseService):
         items_validados = []
         
         for item in data.items:
-            product = await self.product_repository.get_by_id(item.libro_id)
+            product = await self.product_repository.get_by_id(item.book_id)
             if not product:
-                raise ValueError(f"Producto {item.libro_id} not found")
+                raise ValueError(f"Producto {item.book_id} not found")
             if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.price_unitario
@@ -125,7 +125,7 @@ class OrderService(BaseService):
         
         # Decrement inventario
         for item in data.items:
-            await self.product_repository.decrement_inventory(item.libro_id, item.cantidad)
+            await self.product_repository.decrement_inventory(item.book_id, item.cantidad)
         
         # Emit evento
         await self.emit_event(

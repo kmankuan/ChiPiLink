@@ -118,7 +118,7 @@ BLOCK_TEMPLATES = {
         "description": "Button destacado con mensaje",
         "config_default": {
             "titulo": "¿Listo para comenzar?",
-            "subtitulo": "Join a miles de clientes satisfechos",
+            "subtitulo": "Join thousands of satisfied customers",
             "boton_texto": "Registrarse Gratis",
             "boton_url": "/registro",
             "fondo_color": "#16a34a",
@@ -163,9 +163,9 @@ BLOCK_TEMPLATES = {
     },
     "testimonials": {
         "name": "Testimonios",
-        "description": "Opiniones de clientes",
+        "description": "Customer reviews",
         "config_default": {
-            "titulo": "Lo que dicen nuestros clientes",
+            "titulo": "What our customers say",
             "items": [
                 {"name": "Cliente 1", "texto": "Excelente servicio", "avatar_url": "", "cargo": ""},
                 {"name": "Cliente 2", "texto": "Muy recomendado", "avatar_url": "", "cargo": ""}
