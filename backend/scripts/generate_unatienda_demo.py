@@ -58,7 +58,7 @@ async def generate_catalog_products() -> List[Dict]:
     products = []
     
     # Clear existing demo products
-    await db.libros.delete_many({"is_demo": True})
+    await db.store_products.delete_many({"is_demo": True})
     
     for grado in GRADOS_PCA:
         materias = get_materias_for_grado(grade)
@@ -98,7 +98,7 @@ async def generate_catalog_products() -> List[Dict]:
     
     # Insert all products
     if products:
-        await db.libros.insert_many(products)
+        await db.store_products.insert_many(products)
     
     return products
 
@@ -265,7 +265,7 @@ async def clear_demo_data():
     """Clear all demo data for Unatienda"""
     print("🗑️ Limpiando datos de demo...")
     
-    result_libros = await db.libros.delete_many({"is_demo": True})
+    result_libros = await db.store_products.delete_many({"is_demo": True})
     result_estudiantes = await db.synced_students.delete_many({"is_demo": True})
     result_orders = await db.textbook_orders.delete_many({"is_demo": True})
     

@@ -67,14 +67,14 @@ async def search_products(q: str = Query(..., min_length=2)):
 @router.get("/grades")
 async def get_available_grades():
     """Get available grades for filtering"""
-    grados = await db.libros.distinct("grade", {"active": True})
+    grados = await db.store_products.distinct("grade", {"active": True})
     return {"grades": sorted([g for g in grades if g])}
 
 
 @router.get("/subjects")
 async def get_available_subjects():
     """Get available subjects for filtering"""
-    materias = await db.libros.distinct("subject", {"active": True})
+    materias = await db.store_products.distinct("subject", {"active": True})
     return {"materias": sorted([m for m in materias if m])}
 
 

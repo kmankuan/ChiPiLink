@@ -47,7 +47,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     seeded = []
     
     # Seed categories if empty
-    cat_count = await db.categorias.count_documents({})
+    cat_count = await db.store_categories.count_documents({})
     if cat_count == 0:
         categorias = [
             {"categoria_id": "libros", "name": "Libros", "icono": "\ud83d\udcda", "orden": 1, "active": True},
@@ -57,11 +57,11 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
             {"categoria_id": "uniformes", "name": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "active": True},
             {"categoria_id": "servicios", "name": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "active": True},
         ]
-        await db.categorias.insert_many(categorias)
+        await db.store_categories.insert_many(categorias)
         seeded.append("categorias")
     
     # Seed sample products if empty
-    libro_count = await db.libros.count_documents({})
+    libro_count = await db.store_products.count_documents({})
     if libro_count == 0:
         libros = [
             {
@@ -89,7 +89,7 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
         ]
-        await db.libros.insert_many(libros)
+        await db.store_products.insert_many(libros)
         seeded.append("libros")
     
     return {"success": True, "seeded": seeded}
@@ -265,8 +265,8 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     pending_orders = await db.textbook_orders.count_documents({"status": "pending"})
     
     # Products stats
-    total_products = await db.libros.count_documents({"active": True})
-    low_stock_products = await db.libros.count_documents({
+    total_products = await db.store_products.count_documents({"active": True})
+    low_stock_products = await db.store_products.count_documents({
         "active": True,
         "inventory_quantity": {"$lt": 10}
     })
@@ -379,10 +379,10 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
     """Get statistics for Unatienda demo data"""
     try:
         stats = {
-            "products": await db.libros.count_documents({"is_demo": True}),
+            "products": await db.store_products.count_documents({"is_demo": True}),
             "students": await db.synced_students.count_documents({"is_demo": True}),
             "orders": await db.textbook_orders.count_documents({"is_demo": True}),
-            "total_products": await db.libros.count_documents({"is_private_catalog": True}),
+            "total_products": await db.store_products.count_documents({"is_private_catalog": True}),
             "total_students": await db.synced_students.count_documents({}),
             "total_orders": await db.textbook_orders.count_documents({})
         }
@@ -401,11 +401,11 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
     """Get overall statistics for Unatienda module"""
     try:
         stats = {
-            "public_products": await db.libros.count_documents({
+            "public_products": await db.store_products.count_documents({
                 "active": True,
                 "$or": [{"is_private_catalog": {"$exists": False}}, {"is_private_catalog": False}]
             }),
-            "private_products": await db.libros.count_documents({
+            "private_products": await db.store_products.count_documents({
                 "is_private_catalog": True,
                 "active": True
             }),

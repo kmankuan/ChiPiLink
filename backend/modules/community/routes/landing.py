@@ -42,13 +42,13 @@ async def get_community_landing_data():
     albums = await album_service.get_active_albums(limit=4)
     
     # Featured products from store (limited)
-    featured_products = await db.libros.find(
+    featured_products = await db.store_products.find(
         {"featured": True, "active": True},
         {"_id": 0}
     ).sort("featured_order", 1).to_list(4)
     
     # Promotional products
-    promo_products = await db.libros.find(
+    promo_products = await db.store_products.find(
         {"on_sale": True, "active": True, "sale_price": {"$ne": None}},
         {"_id": 0}
     ).to_list(4)

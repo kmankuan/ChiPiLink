@@ -66,7 +66,7 @@ class TextbookOrderService(BaseService):
         if grade in grade_mappings:
             grade_queries = grade_mappings[grade]
         
-        books = await db.libros.find(
+        books = await db.store_products.find(
             {
                 "active": True,
                 "is_private_catalog": True,

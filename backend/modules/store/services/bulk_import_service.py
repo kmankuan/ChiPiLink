@@ -361,7 +361,7 @@ class BulkImportService:
                 codigos_vistos.add(codigo)
                 
                 # Verify si already exists
-                existente = await db.libros.find_one({"code": codigo})
+                existente = await db.store_products.find_one({"code": codigo})
                 
                 preview.append({
                     "fila": idx + 2,
@@ -457,7 +457,7 @@ class BulkImportService:
                     continue
                 codigos_procesados.add(codigo)
                 
-                existente = await db.libros.find_one({"code": codigo})
+                existente = await db.store_products.find_one({"code": codigo})
                 
                 libro_data = {
                     "code": codigo,
@@ -486,7 +486,7 @@ class BulkImportService:
                 
                 if existente:
                     if actualizar_existentes:
-                        await db.libros.update_one(
+                        await db.store_products.update_one(
                             {"libro_id": existente["libro_id"]},
                             {"$set": libro_data}
                         )
@@ -499,7 +499,7 @@ class BulkImportService:
                     libro_data["inventory_quantity"] = 0
                     libro_data["cantidad_reservada"] = 0
                     
-                    await db.libros.insert_one(libro_data)
+                    await db.store_products.insert_one(libro_data)
                     resultados["creados"] += 1
                     
             except Exception as e:

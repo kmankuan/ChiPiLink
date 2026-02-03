@@ -116,17 +116,17 @@ async def get_private_catalog_products(
         ]
     
     # Get products
-    products = await db.libros.find(
+    products = await db.store_products.find(
         query,
         {"_id": 0}
     ).sort([("grade", 1), ("subject", 1), ("name", 1)]).skip(skip).limit(limit).to_list(limit)
     
     # Count total
-    total = await db.libros.count_documents(query)
+    total = await db.store_products.count_documents(query)
     
     # Get available grades and subjects for filters
-    available_grades = await db.libros.distinct("grade", {"is_private_catalog": True, "active": True})
-    available_subjects = await db.libros.distinct("subject", {"is_private_catalog": True, "active": True})
+    available_grades = await db.store_products.distinct("grade", {"is_private_catalog": True, "active": True})
+    available_subjects = await db.store_products.distinct("subject", {"is_private_catalog": True, "active": True})
     
     return {
         "products": products,
@@ -159,7 +159,7 @@ async def get_product_detail(
             detail="You do not have access to the private catalog"
         )
     
-    product = await db.libros.find_one(
+    product = await db.store_products.find_one(
         {"libro_id": libro_id, "is_private_catalog": True},
         {"_id": 0}
     )
@@ -197,7 +197,7 @@ async def get_products_by_grade(
         ]
     }
     
-    products = await db.libros.find(
+    products = await db.store_products.find(
         query,
         {"_id": 0}
     ).sort([("subject", 1), ("name", 1)]).to_list(200)
@@ -242,14 +242,14 @@ async def get_catalog_summary(
         
         if grade:
             # Count products for this grade
-            count = await db.libros.count_documents({
+            count = await db.store_products.count_documents({
                 "is_private_catalog": True,
                 "active": True,
                 "$or": [{"grade": grade}, {"grades": grade}]
             })
             
             # Calculate estimated total
-            products = await db.libros.find(
+            products = await db.store_products.find(
                 {
                     "is_private_catalog": True,
                     "active": True,
@@ -300,12 +300,12 @@ async def admin_get_private_catalog_products(
     if active is not None:
         query["active"] = active
     
-    products = await db.libros.find(
+    products = await db.store_products.find(
         query,
         {"_id": 0}
     ).sort([("grade", 1), ("subject", 1)]).skip(skip).limit(limit).to_list(limit)
     
-    total = await db.libros.count_documents(query)
+    total = await db.store_products.count_documents(query)
     
     return {
         "products": products,
@@ -329,7 +329,7 @@ async def admin_create_private_catalog_product(
     product["active"] = product.get("active", True)
     product["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    await db.libros.insert_one(product)
+    await db.store_products.insert_one(product)
     product.pop("_id", None)
     
     return {"success": True, "product": product}
@@ -348,7 +348,7 @@ async def admin_update_private_catalog_product(
     updates["is_private_catalog"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    result = await db.libros.update_one(
+    result = await db.store_products.update_one(
         {"libro_id": libro_id, "is_private_catalog": True},
         {"$set": updates}
     )
@@ -356,7 +356,7 @@ async def admin_update_private_catalog_product(
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    product = await db.libros.find_one({"libro_id": libro_id}, {"_id": 0})
+    product = await db.store_products.find_one({"libro_id": libro_id}, {"_id": 0})
     
     return {"success": True, "product": product}
 
@@ -372,13 +372,13 @@ async def admin_delete_private_catalog_product(
     By default does soft delete (active=False).
     """
     if hard_delete:
-        result = await db.libros.delete_one(
+        result = await db.store_products.delete_one(
             {"libro_id": libro_id, "is_private_catalog": True}
         )
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Product not found")
     else:
-        result = await db.libros.update_one(
+        result = await db.store_products.update_one(
             {"libro_id": libro_id, "is_private_catalog": True},
             {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )

@@ -73,8 +73,8 @@ async def get_platform_products(
     
     skip = (page - 1) * limit
     
-    products = await db.libros.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
-    total = await db.libros.count_documents(query)
+    products = await db.store_products.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.store_products.count_documents(query)
     
     return {
         "products": products,
@@ -251,7 +251,7 @@ async def create_platform_order(order_data: dict):
     
     # Update inventory (reserve stock)
     for item in order_data["items"]:
-        await db.libros.update_one(
+        await db.store_products.update_one(
             {"libro_id": item.get("book_id") or item.get("libro_id")},
             {"$inc": {"inventory_quantity": -item.get("quantity", 1)}}
         )

@@ -171,7 +171,7 @@ async def preview_csv_import(
                 continue
             
             # Check if product exists in the private catalog (libros collection)
-            existing = await db.libros.find_one(
+            existing = await db.store_products.find_one(
                 {"code": code, "is_private_catalog": True},
                 {"_id": 0, "libro_id": 1, "name": 1, "inventory_quantity": 1}
             )
@@ -285,7 +285,7 @@ async def execute_csv_import(
                 price = float(row.get('price', '0').strip() or '0')
                 
                 # Check if exists in the private catalog (libros collection)
-                existing = await db.libros.find_one({"code": code, "is_private_catalog": True})
+                existing = await db.store_products.find_one({"code": code, "is_private_catalog": True})
                 
                 if existing:
                     if duplicate_mode == DuplicateMode.SKIP:
@@ -299,7 +299,7 @@ async def execute_csv_import(
                         new_quantity = existing.get("inventory_quantity", 0) + quantity
                     
                     # Update existing product in libros collection
-                    await db.libros.update_one(
+                    await db.store_products.update_one(
                         {"code": code, "is_private_catalog": True},
                         {"$set": {
                             "name": name,
@@ -341,7 +341,7 @@ async def execute_csv_import(
                         "updated_at": now
                     }
                     
-                    await db.libros.insert_one(new_product)
+                    await db.store_products.insert_one(new_product)
                     created += 1
                     
             except Exception as e:
