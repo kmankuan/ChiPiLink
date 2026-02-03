@@ -215,7 +215,7 @@ async def update_invision_config(config: dict, admin: dict = Depends(get_admin_u
         upsert=True
     )
     
-    return {"success": True, "message": "Configuration guardada"}
+    return {"success": True, "message": "Configuration saved"}
 
 
 # ============== LEGACY PLACEHOLDER ENDPOINTS ==============
