@@ -21,10 +21,10 @@ class AuthCollections:
 # STORE MODULE COLLECTIONS
 # =============================================================================
 class StoreCollections:
-    PRODUCTS = "libros"                      # Using libros collection for products
-    ORDERS = "store_orders"                 # Previously: pedidos
-    CATEGORIES = "categorias"               # Using categorias collection
-    STUDENTS = "synced_students"  # Using synced_students collection
+    PRODUCTS = "store_products"              # Previously: libros
+    ORDERS = "store_orders"                  # Previously: pedidos
+    CATEGORIES = "store_categories"          # Previously: categorias
+    STUDENTS = "store_synced_students"       # Previously: estudiantes_sincronizados
 
 
 # =============================================================================
