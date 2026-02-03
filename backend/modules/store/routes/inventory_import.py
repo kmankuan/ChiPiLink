@@ -38,7 +38,7 @@ class ImportResult(BaseModel):
 TEMPLATE_COLUMNS = [
     "codigo",           # Required: Unique product code
     "nombre",           # Required: Product name
-    "grado",            # Required: Grade (e.g., "1", "2", "Prekinder")
+    "grado",            # Required: Grade(s) - supports multiple grades separated by comma (e.g., "K4,K5" or "1,2")
     "cantidad",         # Required: Inventory quantity
     "precio",           # Required: Price
     "materia",          # Optional: Subject
@@ -46,6 +46,26 @@ TEMPLATE_COLUMNS = [
     "isbn",             # Optional: ISBN
     "descripcion",      # Optional: Description
 ]
+
+
+def parse_grades(grado_str: str) -> tuple:
+    """
+    Parse grade string which may contain multiple grades separated by comma.
+    Returns (primary_grade, grades_list).
+    Example: "K4,K5" -> ("K4", ["K4", "K5"])
+    Example: "1" -> ("1", ["1"])
+    """
+    if not grado_str:
+        return None, []
+    
+    # Split by comma and clean each grade
+    grades = [g.strip() for g in grado_str.split(',') if g.strip()]
+    
+    if not grades:
+        return None, []
+    
+    # Return primary grade (first one) and full list
+    return grades[0], grades
 
 
 @router.get("/template")
