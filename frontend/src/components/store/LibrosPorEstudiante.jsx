@@ -88,11 +88,11 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
     }
   };
 
-  const isInCart = (libroId) => items.some(item => item.libro_id === libroId);
+  const isInCart = (libroId) => items.some(item => item.book_id === libroId);
   
   const getBooksInCartCount = (grado) => {
     const gradoProducts = productosPorGrado[grado]?.productos || [];
-    return gradoProducts.filter(p => isInCart(p.libro_id)).length;
+    return gradoProducts.filter(p => isInCart(p.book_id)).length;
   };
 
   const handleAddAllToCart = async (estudiante) => {
@@ -108,7 +108,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
     
     let added = 0;
     for (const producto of productos) {
-      if (!isInCart(producto.libro_id)) {
+      if (!isInCart(producto.book_id)) {
         const productToAdd = {
           ...producto,
           is_private_catalog: true,
@@ -130,7 +130,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
   };
 
   const handleAddSingleBook = (producto) => {
-    if (isInCart(producto.libro_id)) {
+    if (isInCart(producto.book_id)) {
       toast.info('Este libro ya está en el carrito');
       return;
     }
@@ -292,17 +292,17 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
                 ) : (
                   <div className="grid gap-3">
                     {productos.map(producto => {
-                      const inCart = isInCart(producto.libro_id);
+                      const inCart = isInCart(producto.book_id);
                       
                       return (
                         <div
-                          key={producto.libro_id}
+                          key={producto.book_id}
                           className={`flex items-center gap-4 p-4 rounded-lg border transition-all ${
                             inCart 
                               ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
                               : 'bg-muted/30 hover:bg-muted/50 cursor-pointer'
                           }`}
-                          onClick={() => !inCart && onNavigateToBook?.(producto.libro_id)}
+                          onClick={() => !inCart && onNavigateToBook?.(producto.book_id)}
                         >
                           {/* Book Icon */}
                           <div className={`h-14 w-14 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -367,7 +367,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
                               className="h-8 w-8"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onNavigateToBook?.(producto.libro_id);
+                                onNavigateToBook?.(producto.book_id);
                               }}
                             >
                               <ChevronRight className="h-4 w-4" />

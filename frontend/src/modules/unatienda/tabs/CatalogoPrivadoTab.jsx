@@ -140,7 +140,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       let method = 'POST';
       
       if (editingProduct) {
-        url = `${API}/api/store/catalogo-privado/admin/productos/${editingProduct.libro_id}`;
+        url = `${API}/api/store/catalogo-privado/admin/productos/${editingProduct.book_id}`;
         method = 'PUT';
       }
 
@@ -171,11 +171,11 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     }
   };
 
-  const handleDelete = async (libro_id) => {
+  const handleDelete = async (book_id) => {
     if (!confirm('Are you sure you want to deactivate this product?')) return;
     
     try {
-      const response = await fetch(`${API}/api/store/catalogo-privado/admin/productos/${libro_id}`, {
+      const response = await fetch(`${API}/api/store/catalogo-privado/admin/productos/${book_id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -352,7 +352,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                 </TableHeader>
                 <TableBody>
                   {filteredProducts.map((p) => (
-                    <TableRow key={p.libro_id}>
+                    <TableRow key={p.book_id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           {p.image_url ? (
@@ -394,7 +394,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                           <Button size="sm" variant="ghost" onClick={() => handleOpenForm(p)}>
                             <Settings className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleDelete(p.libro_id)}>
+                          <Button size="sm" variant="ghost" onClick={() => handleDelete(p.book_id)}>
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>

@@ -283,9 +283,9 @@ export default function Dashboard() {
     if (book.ya_comprado || !book.disponible) return;
     
     setSelectedBooks(prev => {
-      const exists = prev.find(b => b.libro_id === book.libro_id);
+      const exists = prev.find(b => b.book_id === book.book_id);
       if (exists) {
-        return prev.filter(b => b.libro_id !== book.libro_id);
+        return prev.filter(b => b.book_id !== book.book_id);
       }
       return [...prev, book];
     });
@@ -309,7 +309,7 @@ export default function Dashboard() {
       const orderData = {
         estudiante_id: selectedStudent.estudiante_id,
         items: selectedBooks.map(book => ({
-          libro_id: book.libro_id,
+          book_id: book.book_id,
           nombre_libro: book.name,
           cantidad: 1,
           precio_unitario: book.price
@@ -775,18 +775,18 @@ export default function Dashboard() {
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                 {availableBooks.map((book) => (
                   <div
-                    key={book.libro_id}
+                    key={book.book_id}
                     onClick={() => toggleBookSelection(book)}
                     className={`flex items-center gap-4 p-4 rounded-lg border transition-colors cursor-pointer ${
                       book.ya_comprado
                         ? 'bg-muted/50 border-border opacity-60 cursor-not-allowed'
-                        : selectedBooks.find(b => b.libro_id === book.libro_id)
+                        : selectedBooks.find(b => b.book_id === book.book_id)
                           ? 'border-primary bg-primary/5'
                           : 'border-border hover:border-primary/50'
                     }`}
                   >
                     <Checkbox
-                      checked={book.ya_comprado || selectedBooks.some(b => b.libro_id === book.libro_id)}
+                      checked={book.ya_comprado || selectedBooks.some(b => b.book_id === book.book_id)}
                       disabled={book.ya_comprado || !book.disponible}
                       className={book.ya_comprado ? 'opacity-50' : ''}
                     />

@@ -93,11 +93,11 @@ export default function OrderForm() {
   );
 
   const addToCart = (libro) => {
-    const existing = cart.find(item => item.libro_id === libro.libro_id);
+    const existing = cart.find(item => item.book_id === libro.book_id);
     if (existing) {
       if (existing.cantidad < libro.inventory_quantity) {
         setCart(cart.map(item => 
-          item.libro_id === libro.libro_id 
+          item.book_id === libro.book_id 
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         ));
@@ -106,7 +106,7 @@ export default function OrderForm() {
       }
     } else {
       setCart([...cart, {
-        libro_id: libro.libro_id,
+        book_id: libro.book_id,
         nombre_libro: libro.name,
         cantidad: 1,
         precio_unitario: libro.price,
@@ -117,7 +117,7 @@ export default function OrderForm() {
 
   const updateQuantity = (libroId, delta) => {
     setCart(cart.map(item => {
-      if (item.libro_id === libroId) {
+      if (item.book_id === libroId) {
         const newQty = item.cantidad + delta;
         if (newQty <= 0) return null;
         if (newQty > item.max_stock) {
@@ -131,7 +131,7 @@ export default function OrderForm() {
   };
 
   const removeFromCart = (libroId) => {
-    setCart(cart.filter(item => item.libro_id !== libroId));
+    setCart(cart.filter(item => item.book_id !== libroId));
   };
 
   const total = cart.reduce((sum, item) => sum + (item.cantidad * item.price_unitario), 0);
@@ -155,7 +155,7 @@ export default function OrderForm() {
       const orderData = {
         estudiante_id: selectedEstudiante,
         items: cart.map(item => ({
-          libro_id: item.libro_id,
+          book_id: item.book_id,
           nombre_libro: item.name_libro,
           cantidad: item.cantidad,
           precio_unitario: item.price_unitario
@@ -302,16 +302,16 @@ export default function OrderForm() {
                 
                 <div className="space-y-3">
                   {filteredLibros.map((libro) => {
-                    const inCart = cart.find(item => item.libro_id === libro.libro_id);
+                    const inCart = cart.find(item => item.book_id === libro.book_id);
                     const isOutOfStock = libro.inventory_quantity <= 0;
                     
                     return (
                       <div 
-                        key={libro.libro_id}
+                        key={libro.book_id}
                         className={`flex items-center justify-between p-4 rounded-lg border ${
                           inCart ? 'border-primary bg-primary/5' : 'border-border'
                         } ${isOutOfStock ? 'opacity-50' : ''}`}
-                        data-testid={`book-item-${libro.libro_id}`}
+                        data-testid={`book-item-${libro.book_id}`}
                       >
                         <div className="flex-1">
                           <p className="font-medium">{libro.name}</p>
@@ -330,7 +330,7 @@ export default function OrderForm() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => updateQuantity(libro.libro_id, -1)}
+                              onClick={() => updateQuantity(libro.book_id, -1)}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -342,7 +342,7 @@ export default function OrderForm() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => updateQuantity(libro.libro_id, 1)}
+                              onClick={() => updateQuantity(libro.book_id, 1)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -354,7 +354,7 @@ export default function OrderForm() {
                             size="sm"
                             onClick={() => addToCart(libro)}
                             disabled={isOutOfStock}
-                            data-testid={`add-book-${libro.libro_id}`}
+                            data-testid={`add-book-${libro.book_id}`}
                           >
                             <Plus className="h-4 w-4 mr-1" />
                             Agregar
@@ -435,9 +435,9 @@ export default function OrderForm() {
                   <div className="space-y-3 mb-4">
                     {cart.map((item) => (
                       <div 
-                        key={item.libro_id}
+                        key={item.book_id}
                         className="flex items-start justify-between gap-2 py-2"
-                        data-testid={`cart-item-${item.libro_id}`}
+                        data-testid={`cart-item-${item.book_id}`}
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">
@@ -456,7 +456,7 @@ export default function OrderForm() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-destructive hover:text-destructive"
-                            onClick={() => removeFromCart(item.libro_id)}
+                            onClick={() => removeFromCart(item.book_id)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>

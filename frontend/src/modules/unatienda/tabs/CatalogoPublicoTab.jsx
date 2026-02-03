@@ -193,7 +193,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       };
       
       const url = editingProduct 
-        ? `${API}/api/store/products/${editingProduct.libro_id}`
+        ? `${API}/api/store/products/${editingProduct.book_id}`
         : `${API}/api/store/products`;
       const method = editingProduct ? 'PUT' : 'POST';
       
@@ -348,7 +348,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                       {filteredProducts.map((libro) => {
                         const cat = categorias.find(c => c.categoria_id === libro.categoria);
                         return (
-                          <TableRow key={libro.libro_id}>
+                          <TableRow key={libro.book_id}>
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 {libro.image_url ? (
@@ -389,7 +389,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                                 <Button size="sm" variant="ghost" onClick={() => openEditDialog(libro)}>
                                   <Edit2 className="h-4 w-4" />
                                 </Button>
-                                <Button size="sm" variant="ghost" onClick={() => handleDeleteProduct(libro.libro_id)}>
+                                <Button size="sm" variant="ghost" onClick={() => handleDeleteProduct(libro.book_id)}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
                               </div>
@@ -463,7 +463,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               ) : (
                 <div className="space-y-2">
                   {productos.filter(p => p.inventory_quantity < 10).map((item) => (
-                    <div key={item.libro_id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <div key={item.book_id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                       <div>
                         <p className="font-medium">{item.name}</p>
                       </div>

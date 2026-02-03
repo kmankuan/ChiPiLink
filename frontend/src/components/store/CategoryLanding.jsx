@@ -62,15 +62,15 @@ export default function CategoryLanding({
       return;
     }
     addItem(product, 1);
-    setAddedItems(prev => ({ ...prev, [product.libro_id]: true }));
+    setAddedItems(prev => ({ ...prev, [product.book_id]: true }));
     setTimeout(() => {
-      setAddedItems(prev => ({ ...prev, [product.libro_id]: false }));
+      setAddedItems(prev => ({ ...prev, [product.book_id]: false }));
     }, 1500);
   };
 
-  const isInCart = (libroId) => items.some(item => item.libro_id === libroId);
+  const isInCart = (libroId) => items.some(item => item.book_id === libroId);
   const getCartQuantity = (libroId) => {
-    const item = items.find(item => item.libro_id === libroId);
+    const item = items.find(item => item.book_id === libroId);
     return item ? item.quantity : 0;
   };
 
@@ -88,15 +88,15 @@ export default function CategoryLanding({
   // Product Card Component
   const ProductCard = ({ product, showPromotion = false }) => {
     const stockStatus = getStockStatus(product.inventory_quantity);
-    const inCart = isInCart(product.libro_id);
-    const cartQty = getCartQuantity(product.libro_id);
-    const justAdded = addedItems[product.libro_id];
+    const inCart = isInCart(product.book_id);
+    const cartQty = getCartQuantity(product.book_id);
+    const justAdded = addedItems[product.book_id];
     const discount = showPromotion ? calculateDiscount(product.price, product.sale_price) : 0;
 
     return (
       <Card 
         className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
-        onClick={() => navigate(`/unatienda/producto/${product.libro_id}`)}
+        onClick={() => navigate(`/unatienda/producto/${product.book_id}`)}
       >
         <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center relative overflow-hidden">
           {product.image_url ? (
@@ -309,7 +309,7 @@ export default function CategoryLanding({
           />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {promociones.slice(0, 4).map((product) => (
-              <ProductCard key={product.libro_id} product={product} showPromotion={true} />
+              <ProductCard key={product.book_id} product={product} showPromotion={true} />
             ))}
           </div>
         </section>
@@ -324,7 +324,7 @@ export default function CategoryLanding({
           />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {destacados.slice(0, 4).map((product) => (
-              <ProductCard key={product.libro_id} product={product} />
+              <ProductCard key={product.book_id} product={product} />
             ))}
           </div>
         </section>
@@ -341,7 +341,7 @@ export default function CategoryLanding({
           />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {novedades.slice(0, 8).map((product) => (
-              <ProductCard key={product.libro_id} product={product} />
+              <ProductCard key={product.book_id} product={product} />
             ))}
           </div>
         </section>

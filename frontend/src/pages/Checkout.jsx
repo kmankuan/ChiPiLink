@@ -150,7 +150,7 @@ export default function Checkout() {
               {order.items?.map((item, index) => (
                 <div key={index} className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium">{item.name || item.libro_id}</p>
+                    <p className="font-medium">{item.name || item.book_id}</p>
                     <p className="text-sm text-muted-foreground">Cantidad: {item.cantidad}</p>
                   </div>
                   <p className="font-medium">${(item.price_unitario * item.cantidad).toFixed(2)}</p>

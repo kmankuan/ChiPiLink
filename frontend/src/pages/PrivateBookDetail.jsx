@@ -79,9 +79,9 @@ export default function PrivateBookDetail() {
     }
   };
 
-  const isInCart = () => items.some(item => item.libro_id === libro?.libro_id);
+  const isInCart = () => items.some(item => item.book_id === libro?.book_id);
   const getCartQuantity = () => {
-    const item = items.find(item => item.libro_id === libro?.libro_id);
+    const item = items.find(item => item.book_id === libro?.book_id);
     return item ? item.quantity : 0;
   };
 

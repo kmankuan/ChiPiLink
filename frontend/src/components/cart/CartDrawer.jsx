@@ -93,7 +93,7 @@ export default function CartDrawer() {
               
               {items.map((item) => (
                 <div 
-                  key={item.libro_id} 
+                  key={item.book_id} 
                   className={`flex gap-4 p-3 rounded-lg ${
                     item.is_private_catalog 
                       ? 'bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800' 
@@ -139,7 +139,7 @@ export default function CartDrawer() {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => updateQuantity(item.libro_id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.book_id, item.quantity - 1)}
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -150,7 +150,7 @@ export default function CartDrawer() {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => updateQuantity(item.libro_id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.book_id, item.quantity + 1)}
                         disabled={!item.is_private_catalog && item.quantity >= item.inventory_quantity}
                       >
                         <Plus className="h-3 w-3" />
@@ -164,7 +164,7 @@ export default function CartDrawer() {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => removeItem(item.libro_id)}
+                      onClick={() => removeItem(item.book_id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

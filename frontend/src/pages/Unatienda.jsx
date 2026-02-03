@@ -879,16 +879,16 @@ export default function Unatienda() {
       return;
     }
     addItem(product, 1);
-    setAddedItems(prev => ({ ...prev, [product.libro_id]: true }));
+    setAddedItems(prev => ({ ...prev, [product.book_id]: true }));
     setTimeout(() => {
-      setAddedItems(prev => ({ ...prev, [product.libro_id]: false }));
+      setAddedItems(prev => ({ ...prev, [product.book_id]: false }));
     }, 1500);
     toast.success('Producto agregado al carrito');
   };
 
-  const isInCart = (libroId) => items.some(item => item.libro_id === libroId);
+  const isInCart = (libroId) => items.some(item => item.book_id === libroId);
   const getCartQuantity = (libroId) => {
-    const item = items.find(item => item.libro_id === libroId);
+    const item = items.find(item => item.book_id === libroId);
     return item ? item.quantity : 0;
   };
 
@@ -914,16 +914,16 @@ export default function Unatienda() {
   // Product Card Component
   const ProductCard = ({ product, isPrivate = false }) => {
     const stockStatus = getStockStatus(product.inventory_quantity);
-    const inCart = isInCart(product.libro_id);
-    const cartQty = getCartQuantity(product.libro_id);
-    const justAdded = addedItems[product.libro_id];
+    const inCart = isInCart(product.book_id);
+    const cartQty = getCartQuantity(product.book_id);
+    const justAdded = addedItems[product.book_id];
     const catInfo = isPrivate ? { nombre: 'Libro de Texto', icono: '📚' } : getCategoryInfo(product.categoria);
     
     return (
       <div
-        data-testid={`product-card-${product.libro_id}`}
+        data-testid={`product-card-${product.book_id}`}
         className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
-        onClick={() => navigate(isPrivate ? `/unatienda/libro/${product.libro_id}` : `/unatienda/producto/${product.libro_id}`)}
+        onClick={() => navigate(isPrivate ? `/unatienda/libro/${product.book_id}` : `/unatienda/producto/${product.book_id}`)}
       >
         {/* Product Image */}
         <div className="aspect-[4/3] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center overflow-hidden">
@@ -1223,7 +1223,7 @@ export default function Unatienda() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.libro_id} product={product} />
+                  <ProductCard key={product.book_id} product={product} />
                 ))}
               </div>
             )}

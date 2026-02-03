@@ -77,7 +77,7 @@ export default function UnatiendaCheckout() {
       // Create order in backend
       const orderData = {
         items: items.map(item => ({
-          libro_id: item.libro_id,
+          book_id: item.book_id,
           nombre: item.name,
           cantidad: item.quantity,
           precio_unitario: item.price
@@ -158,7 +158,7 @@ export default function UnatiendaCheckout() {
               <CardContent className="space-y-4">
                 {items.map((item) => (
                   <div 
-                    key={item.libro_id} 
+                    key={item.book_id} 
                     className="flex gap-4 p-3 rounded-lg bg-muted/50"
                   >
                     {/* Image */}
@@ -188,7 +188,7 @@ export default function UnatiendaCheckout() {
                             variant="outline"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => updateQuantity(item.libro_id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.book_id, item.quantity - 1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -197,7 +197,7 @@ export default function UnatiendaCheckout() {
                             variant="outline"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => updateQuantity(item.libro_id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.book_id, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -205,7 +205,7 @@ export default function UnatiendaCheckout() {
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 ml-2 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeItem(item.libro_id)}
+                            onClick={() => removeItem(item.book_id)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>

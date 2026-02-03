@@ -188,7 +188,7 @@ export default function StoreModule() {
     try {
       setSaving(true);
       if (editingProduct) {
-        await api.put(`/admin/libros/${editingProduct.libro_id}`, editForm);
+        await api.put(`/admin/libros/${editingProduct.book_id}`, editForm);
         toast.success('Producto actualizado');
       } else {
         await api.post('/admin/libros', editForm);
@@ -330,7 +330,7 @@ export default function StoreModule() {
             {filteredProducts.map((libro) => {
               const cat = categorias.find(c => c.categoria_id === libro.categoria);
               return (
-                <Card key={libro.libro_id}>
+                <Card key={libro.book_id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -367,7 +367,7 @@ export default function StoreModule() {
                         <Button size="icon" variant="ghost" onClick={() => openEditDialog(libro)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(libro.libro_id)}>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(libro.book_id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -435,7 +435,7 @@ export default function StoreModule() {
               <CardContent>
                 <div className="space-y-2">
                   {inventario.alertas_bajo_stock.map((item) => (
-                    <div key={item.libro_id} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                    <div key={item.book_id} className="flex items-center justify-between p-3 bg-white rounded-lg">
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">{item.grade}</p>
@@ -449,7 +449,7 @@ export default function StoreModule() {
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               const newQty = parseInt(e.target.value);
-                              if (newQty > 0) updateInventory(item.libro_id, newQty);
+                              if (newQty > 0) updateInventory(item.book_id, newQty);
                             }
                           }}
                         />
@@ -468,7 +468,7 @@ export default function StoreModule() {
             <CardContent>
               <div className="space-y-2">
                 {inventario.libros?.map((item) => (
-                  <div key={item.libro_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div key={item.book_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">{item.grade} - {item.subject}</p>
@@ -484,7 +484,7 @@ export default function StoreModule() {
                         onBlur={(e) => {
                           const newQty = parseInt(e.target.value);
                           if (newQty !== item.inventory_quantity) {
-                            updateInventory(item.libro_id, newQty);
+                            updateInventory(item.book_id, newQty);
                           }
                         }}
                       />

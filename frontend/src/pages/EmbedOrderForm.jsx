@@ -118,12 +118,12 @@ export default function EmbedOrderForm() {
   
   // Cart functions
   const addToCart = (libro) => {
-    const existing = cart.find(item => item.libro_id === libro.libro_id);
+    const existing = cart.find(item => item.book_id === libro.book_id);
     if (existing) {
-      updateQuantity(libro.libro_id, 1);
+      updateQuantity(libro.book_id, 1);
     } else {
       setCart([...cart, {
-        libro_id: libro.libro_id,
+        book_id: libro.book_id,
         nombre_libro: libro.name,
         cantidad: 1,
         precio_unitario: libro.price
@@ -133,8 +133,8 @@ export default function EmbedOrderForm() {
   
   const updateQuantity = (libroId, delta) => {
     setCart(cart.map(item => {
-      if (item.libro_id === libroId) {
-        const libro = libros.find(l => l.libro_id === libroId);
+      if (item.book_id === libroId) {
+        const libro = libros.find(l => l.book_id === libroId);
         const maxQty = libro?.inventory_quantity || 99;
         const newQty = Math.max(1, Math.min(maxQty, item.cantidad + delta));
         return { ...item, cantidad: newQty };
@@ -144,7 +144,7 @@ export default function EmbedOrderForm() {
   };
   
   const removeFromCart = (libroId) => {
-    setCart(cart.filter(item => item.libro_id !== libroId));
+    setCart(cart.filter(item => item.book_id !== libroId));
   };
   
   // Calculate total
@@ -486,17 +486,17 @@ export default function EmbedOrderForm() {
                     ) : (
                       <div className="space-y-3">
                         {libros.map((libro) => {
-                          const inCart = cart.find(item => item.libro_id === libro.libro_id);
+                          const inCart = cart.find(item => item.book_id === libro.book_id);
                           
                           return (
                             <div 
-                              key={libro.libro_id}
+                              key={libro.book_id}
                               className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
                                 inCart 
                                   ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                                   : 'border-border hover:border-green-300 hover:bg-muted/50'
                               }`}
-                              data-testid={`book-item-${libro.libro_id}`}
+                              data-testid={`book-item-${libro.book_id}`}
                             >
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium truncate">{libro.name}</p>
@@ -524,9 +524,9 @@ export default function EmbedOrderForm() {
                                     className="h-8 w-8"
                                     onClick={() => {
                                       if (inCart.cantidad === 1) {
-                                        removeFromCart(libro.libro_id);
+                                        removeFromCart(libro.book_id);
                                       } else {
-                                        updateQuantity(libro.libro_id, -1);
+                                        updateQuantity(libro.book_id, -1);
                                       }
                                     }}
                                   >
@@ -540,7 +540,7 @@ export default function EmbedOrderForm() {
                                     variant="outline"
                                     size="icon"
                                     className="h-8 w-8"
-                                    onClick={() => updateQuantity(libro.libro_id, 1)}
+                                    onClick={() => updateQuantity(libro.book_id, 1)}
                                     disabled={inCart.cantidad >= libro.inventory_quantity}
                                   >
                                     <Plus className="h-4 w-4" />
@@ -553,7 +553,7 @@ export default function EmbedOrderForm() {
                                   size="sm"
                                   className="ml-4 shrink-0"
                                   onClick={() => addToCart(libro)}
-                                  data-testid={`add-book-${libro.libro_id}`}
+                                  data-testid={`add-book-${libro.book_id}`}
                                 >
                                   <Plus className="h-4 w-4 mr-1" />
                                   Agregar
@@ -644,7 +644,7 @@ export default function EmbedOrderForm() {
                       <>
                         <div className="space-y-3 max-h-[300px] overflow-y-auto">
                           {cart.map((item) => (
-                            <div key={item.libro_id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
+                            <div key={item.book_id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm truncate">{item.name_libro}</p>
                                 <p className="text-xs text-muted-foreground">
@@ -660,7 +660,7 @@ export default function EmbedOrderForm() {
                                   variant="ghost"
                                   size="icon"
                                   className="h-6 w-6 text-destructive hover:text-destructive"
-                                  onClick={() => removeFromCart(item.libro_id)}
+                                  onClick={() => removeFromCart(item.book_id)}
                                 >
                                   <Trash2 className="h-3 w-3" />
                                 </Button>

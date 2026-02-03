@@ -32,7 +32,7 @@ export function CartProvider({ children }) {
 
   const addItem = (product, quantity = 1) => {
     setItems(prev => {
-      const existingIndex = prev.findIndex(item => item.libro_id === product.libro_id);
+      const existingIndex = prev.findIndex(item => item.book_id === product.book_id);
       
       if (existingIndex >= 0) {
         // Update quantity if already in cart
@@ -57,7 +57,7 @@ export function CartProvider({ children }) {
       // Add new item
       toast.success(`${product.name} agregado al carrito`);
       return [...prev, {
-        libro_id: product.libro_id,
+        book_id: product.book_id,
         nombre: product.name,
         precio: product.sale_price || product.price,
         precio_original: product.price,
@@ -74,7 +74,7 @@ export function CartProvider({ children }) {
   };
 
   const removeItem = (libroId) => {
-    setItems(prev => prev.filter(item => item.libro_id !== libroId));
+    setItems(prev => prev.filter(item => item.book_id !== libroId));
     toast.success('Producto eliminado del carrito');
   };
 
@@ -85,7 +85,7 @@ export function CartProvider({ children }) {
     }
     
     setItems(prev => prev.map(item => {
-      if (item.libro_id === libroId) {
+      if (item.book_id === libroId) {
         if (quantity > item.inventory_quantity) {
           toast.error('No hay suficiente stock disponible');
           return item;

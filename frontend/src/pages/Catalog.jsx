@@ -151,9 +151,9 @@ export default function Catalog() {
             
             return (
               <div
-                key={libro.libro_id}
+                key={libro.book_id}
                 className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-colors duration-300"
-                data-testid={`book-card-${libro.libro_id}`}
+                data-testid={`book-card-${libro.book_id}`}
               >
                 {/* Book Image/Placeholder */}
                 <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
@@ -222,7 +222,7 @@ export default function Catalog() {
                         size="sm" 
                         className="rounded-full"
                         onClick={() => toast.info('Agregue este libro desde el formulario de orden')}
-                        data-testid={`add-to-cart-${libro.libro_id}`}
+                        data-testid={`add-to-cart-${libro.book_id}`}
                       >
                         <ShoppingCart className="h-4 w-4" />
                       </Button>

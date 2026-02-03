@@ -77,9 +77,9 @@ export default function ProductDetail() {
     return { label: 'En stock', color: 'success', canBuy: true };
   };
 
-  const isInCart = () => items.some(item => item.libro_id === product?.libro_id);
+  const isInCart = () => items.some(item => item.book_id === product?.book_id);
   const getCartQuantity = () => {
-    const item = items.find(item => item.libro_id === product?.libro_id);
+    const item = items.find(item => item.book_id === product?.book_id);
     return item ? item.quantity : 0;
   };
 
