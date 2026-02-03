@@ -95,9 +95,44 @@ Build a "super app" for ChiPi Link - a full-stack system (React, FastAPI, MongoD
 - `es.json` - Spanish translations complete
 - `zh.json` - Chinese translations complete
 
+### February 2026 - Complete Database Field Names Refactoring ✅
+
+**Progress: 100% Complete** - All Spanish field names have been converted to English
+
+#### Database Field Names Updated:
+| Spanish Field       | English Field       |
+|--------------------|---------------------|
+| `grado`            | `grade`             |
+| `grados`           | `grades`            |
+| `materia`          | `subject`           |
+| `codigo`           | `code`              |
+| `precio`           | `price`             |
+| `precio_oferta`    | `sale_price`        |
+| `cantidad_inventario` | `inventory_quantity` |
+| `nombre`           | `name`              |
+| `descripcion`      | `description`       |
+| `activo`           | `active`            |
+| `destacado`        | `featured`          |
+| `editorial`        | `publisher`         |
+| `es_catalogo_privado` | `is_private_catalog` |
+| `tiene_acceso`     | `has_access`        |
+| `estudiantes`      | `students`          |
+
+#### Files Completely Rewritten:
+- `/app/backend/modules/store/routes/inventory_import.py` - CSV template and processing with English field names
+- `/app/backend/modules/store/routes/private_catalog.py` - All API responses use English field names
+
+#### CSV Template Updated:
+New column names: `code`, `name`, `grade`, `quantity`, `price`, `subject`, `publisher`, `isbn`, `description`
+
+#### Multiple Grades Feature:
+- CSV import now supports multiple grades separated by comma (e.g., "K4,K5")
+- Products store both `grade` (primary) and `grades` (array) fields
+- Queries check both fields for grade filtering
+
 ### December 2025 - Spanish to English Refactoring (Previous Session)
 
-**Progress: ~94% Complete** (from ~2870 instances to ~159 remaining)
+**Progress: 100% Complete** (All Spanish comments and code translated)
 
 #### Frontend Components Fully Refactored:
 - **DashboardModule.jsx** - All stats, labels, descriptions ✅
