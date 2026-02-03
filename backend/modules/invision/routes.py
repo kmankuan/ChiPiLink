@@ -117,8 +117,8 @@ async def oauth_callback(
     if not state:
         raise HTTPException(status_code=400, detail="Session state not received")
     
-    # Validate state (CSRF protection)
-    state_data = laopan_oauth_service.validate_state(state)
+    # Validate state (CSRF protection) - now async, reads from database
+    state_data = await laopan_oauth_service.validate_state(state)
     if not state_data:
         raise HTTPException(
             status_code=400,
