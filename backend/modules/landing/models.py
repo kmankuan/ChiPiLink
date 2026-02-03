@@ -47,7 +47,7 @@ class PaginaBuilder(BaseModel):
     titulo: str = "Page Principal"
     bloques: List[BloquePagina] = []
     publicada: bool = True
-    fecha_actualizacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class BlockOrderItem(BaseModel):
@@ -69,7 +69,7 @@ BLOCK_TEMPLATES = {
         "config_default": {
             "titulo": "Bienvenido a nuestra tienda",
             "subtitulo": "Encuentra todo lo que necesitas en un solo lugar",
-            "imagen_url": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200",
+            "image_url": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200",
             "boton_texto": "Comenzar",
             "boton_url": "/registro",
             "boton_secundario_texto": "",
@@ -106,7 +106,7 @@ BLOCK_TEMPLATES = {
         "nombre": "Imagen",
         "descripcion": "Imagen con description opcional",
         "config_default": {
-            "imagen_url": "",
+            "image_url": "",
             "alt": "",
             "caption": "",
             "ancho": "100%",
@@ -142,9 +142,9 @@ BLOCK_TEMPLATES = {
         "config_default": {
             "titulo": "",
             "items": [
-                {"titulo": "Tarjeta 1", "descripcion": "Description", "imagen_url": "", "link": ""},
-                {"titulo": "Tarjeta 2", "descripcion": "Description", "imagen_url": "", "link": ""},
-                {"titulo": "Tarjeta 3", "descripcion": "Description", "imagen_url": "", "link": ""}
+                {"titulo": "Tarjeta 1", "descripcion": "Description", "image_url": "", "link": ""},
+                {"titulo": "Tarjeta 2", "descripcion": "Description", "image_url": "", "link": ""},
+                {"titulo": "Tarjeta 3", "descripcion": "Description", "image_url": "", "link": ""}
             ],
             "columnas": 3
         }
@@ -155,7 +155,7 @@ BLOCK_TEMPLATES = {
         "config_default": {
             "titulo": "Promotion Especial",
             "subtitulo": "Aprovecha nuestras ofertas",
-            "imagen_url": "",
+            "image_url": "",
             "fondo_color": "#f0fdf4",
             "boton_texto": "",
             "boton_url": ""

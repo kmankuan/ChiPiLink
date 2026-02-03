@@ -95,7 +95,7 @@ class SupervisedTask(BaseModel):
     bonus_tiempo: bool = False
     # Sync
     ultima_sincronizacion: Optional[datetime] = None
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class VoiceAnnouncement(BaseModel):
@@ -116,7 +116,7 @@ class VoiceAnnouncement(BaseModel):
     estado: str = "pendiente"  # pendiente, enviado, fallido
     enviado_en: Optional[datetime] = None
     reproducido: bool = False
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class DailyProgress(BaseModel):

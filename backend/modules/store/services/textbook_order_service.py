@@ -69,10 +69,10 @@ class TextbookOrderService(BaseService):
         books = await db.libros.find(
             {
                 "activo": True,
-                "es_catalogo_privado": True,
+                "is_private_catalog": True,
                 "$or": [
-                    {"grado": {"$in": grade_queries}},
-                    {"grados": {"$in": grade_queries}}
+                    {"grade": {"$in": grade_queries}},
+                    {"grades": {"$in": grade_queries}}
                 ]
             },
             {"_id": 0}
@@ -119,12 +119,12 @@ class TextbookOrderService(BaseService):
         
         items = []
         for book in books:
-            inventory = book.get("cantidad_inventario", 0) - book.get("cantidad_reservada", 0)
+            inventory = book.get("inventory_quantity", 0) - book.get("cantidad_reservada", 0)
             status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
             
             items.append({
                 "book_id": book["libro_id"],
-                "book_code": book.get("codigo", ""),
+                "book_code": book.get("code", ""),
                 "book_name": book["nombre"],
                 "price": float(book.get("precio", 0)),
                 "quantity_ordered": 0,
@@ -161,7 +161,7 @@ class TextbookOrderService(BaseService):
         updated_items = []
         
         for book_id, book in books_dict.items():
-            inventory = book.get("cantidad_inventario", 0) - book.get("cantidad_reservada", 0)
+            inventory = book.get("inventory_quantity", 0) - book.get("cantidad_reservada", 0)
             
             if book_id in existing_items:
                 item = existing_items[book_id]
@@ -182,7 +182,7 @@ class TextbookOrderService(BaseService):
                 status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
                 updated_items.append({
                     "book_id": book_id,
-                    "book_code": book.get("codigo", ""),
+                    "book_code": book.get("code", ""),
                     "book_name": book["nombre"],
                     "price": float(book.get("precio", 0)),
                     "quantity_ordered": 0,
@@ -470,9 +470,9 @@ class TextbookOrderService(BaseService):
             column_values[column_mapping["estudiante"]] = order["student_name"]
         if column_mapping.get("acudiente"):
             column_values[column_mapping["acudiente"]] = f"{user_name} ({user_email})"
-        if column_mapping.get("grado"):
+        if column_mapping.get("grade"):
             # Try dropdown format first, fall back to text
-            col_id = column_mapping["grado"]
+            col_id = column_mapping["grade"]
             column_values[col_id] = {"labels": [monday_grade]}
         if column_mapping.get("libros"):
             column_values[column_mapping["libros"]] = items_text[:2000]
@@ -594,8 +594,8 @@ class TextbookOrderService(BaseService):
                         subitem_values[subitem_mapping["precio_unitario"]] = item["price"]
                     if subitem_mapping.get("subtotal"):
                         subitem_values[subitem_mapping["subtotal"]] = item["price"] * item["quantity_ordered"]
-                    if subitem_mapping.get("codigo"):
-                        subitem_values[subitem_mapping["codigo"]] = item.get("book_code", "")
+                    if subitem_mapping.get("code"):
+                        subitem_values[subitem_mapping["code"]] = item.get("book_code", "")
                     
                     subitem_values_json = json.dumps(subitem_values)
                     

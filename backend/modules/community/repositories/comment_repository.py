@@ -24,7 +24,7 @@ class CommentRepository(BaseRepository):
     async def create(self, comment_data: Dict) -> Dict:
         """Create nuevo comentario"""
         comment_data["comment_id"] = f"comment_{uuid.uuid4().hex[:12]}"
-        comment_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        comment_data["created_at"] = datetime.now(timezone.utc).isoformat()
         comment_data["aprobado"] = comment_data.get("aprobado", True)
         comment_data["likes"] = 0
         return await self.insert_one(comment_data)
@@ -34,7 +34,7 @@ class CommentRepository(BaseRepository):
         return await self.find_many(
             query={"post_id": post_id, "aprobado": True},
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def delete_post_comments(self, post_id: str) -> int:

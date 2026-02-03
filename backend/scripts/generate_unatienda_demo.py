@@ -73,26 +73,26 @@ async def generate_catalog_products() -> List[Dict]:
             
             product = {
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "codigo": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
+                "code": f"PCA-{grado[:3].upper()}-{materia[:3].upper()}-{random.randint(100,999)}",
                 "nombre": f"{materia} {grado} - {editorial}",
                 "descripcion": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
                 "categoria": "libros",
-                "grado": grado,
-                "grados": [grado],
-                "materia": materia,
+                "grade": grado,
+                "grades": [grado],
+                "subject": materia,
                 "precio": round(base_price, 2),
-                "precio_oferta": round(base_price * 0.9, 2) if random.random() > 0.7 else None,
-                "cantidad_inventario": random.randint(20, 100),
+                "sale_price": round(base_price * 0.9, 2) if random.random() > 0.7 else None,
+                "inventory_quantity": random.randint(20, 100),
                 "isbn": generate_isbn(),
                 "editorial": editorial,
-                "imagen_url": f"https://picsum.photos/seed/{uuid.uuid4().hex[:8]}/300/400",
+                "image_url": f"https://picsum.photos/seed/{uuid.uuid4().hex[:8]}/300/400",
                 "activo": True,
                 "destacado": random.random() > 0.8,
-                "en_promocion": random.random() > 0.85,
+                "on_sale": random.random() > 0.85,
                 "es_demo": True,
                 "ano_escolar": "2025-2026",
-                "es_catalogo_privado": True,
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "is_private_catalog": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
             products.append(product)
     
@@ -127,7 +127,7 @@ async def generate_students_list() -> List[Dict]:
                 "nombre_completo": f"{nombre} {apellido} {apellido2}",
                 "nombre": nombre,
                 "apellido": f"{apellido} {apellido2}",
-                "grado": grado,
+                "grade": grado,
                 "seccion": random.choice(["A", "B", "C"]),
                 "sheet_id": "demo_sheet_pca_2025",
                 "hoja_nombre": f"Estudiantes {grado}",
@@ -140,7 +140,7 @@ async def generate_students_list() -> List[Dict]:
                 },
                 "es_demo": True,
                 "fecha_sync": datetime.now(timezone.utc).isoformat(),
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
             students.append(student)
             student_number += 1
@@ -164,7 +164,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
     
     for student in students_with_orders:
         # Get products for this student's grade
-        grade_products = [p for p in products if student["grado"] in (p.get("grados") or [p.get("grado")])]
+        grade_products = [p for p in products if student["grade"] in (p.get("grades") or [p.get("grade")])]
         
         if not grade_products:
             continue
@@ -177,19 +177,19 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
         
         for product in order_products:
             cantidad = random.randint(1, 2)
-            precio = product["precio_oferta"] or product["precio"]
+            precio = product["sale_price"] or product["precio"]
             subtotal = cantidad * precio
             total += subtotal
             
             items.append({
                 "item_id": f"item_{uuid.uuid4().hex[:8]}",
                 "book_id": product["libro_id"],
-                "book_code": product["codigo"],
+                "book_code": product["code"],
                 "book_name": product["nombre"],
                 "quantity_ordered": cantidad,
                 "price": precio,
                 "subtotal": subtotal,
-                "subject": product["materia"],
+                "subject": product["subject"],
                 "status": random.choice(["pending", "available", "reserved"])
             })
         
@@ -200,7 +200,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
             "order_id": f"order_{uuid.uuid4().hex[:12]}",
             "student_sync_id": student["sync_id"],
             "student_name": student["nombre_completo"],
-            "grade": student["grado"],
+            "grade": student["grade"],
             "student_number": student["numero_estudiante"],
             "user_name": f"Acudiente de {student['nombre']}",
             "user_email": student["datos_extra"].get("email_acudiente"),
@@ -246,8 +246,8 @@ async def generate_all_demo_data():
     # Summary by grade
     print("\n📊 Resumen por grado:")
     for grado in GRADOS_PCA:
-        grado_products = len([p for p in products if p["grado"] == grado])
-        grado_students = len([s for s in students if s["grado"] == grado])
+        grado_products = len([p for p in products if p["grade"] == grado])
+        grado_students = len([s for s in students if s["grade"] == grado])
         grado_orders = len([o for o in orders if o["estudiante_grado"] == grado])
         print(f"   {grado}: {grado_products} libros, {grado_students} estudiantes, {grado_orders} pedidos")
     

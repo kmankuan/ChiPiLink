@@ -39,7 +39,7 @@ class ImportEstudiantesRequest(BaseModel):
 class PreviewLibrosRequest(BaseModel):
     """Request para previsualizar import de libros"""
     raw_text: str
-    column_mapping: Dict[str, int]  # {"codigo": 0, "nombre": 1, "precio": 2, ...}
+    column_mapping: Dict[str, int]  # {"code": 0, "nombre": 1, "precio": 2, ...}
     catalogo_id: Optional[str] = None
     grado_default: Optional[str] = None
 
@@ -83,7 +83,7 @@ async def preview_estudiantes(
     result = await bulk_import_service.preview_estudiantes(
         request.raw_text,
         request.column_mapping,
-        request.grado_default
+        request.grade_default
     )
     return result
 
@@ -99,7 +99,7 @@ async def import_estudiantes(
     result = await bulk_import_service.importar_estudiantes(
         request.raw_text,
         request.column_mapping,
-        request.grado_default,
+        request.grade_default,
         request.hoja_nombre,
         request.actualizar_existentes,
         admin.get("user_id")
@@ -119,7 +119,7 @@ async def preview_libros(
         request.raw_text,
         request.column_mapping,
         request.catalogo_id,
-        request.grado_default
+        request.grade_default
     )
     return result
 
@@ -136,7 +136,7 @@ async def import_libros(
         request.raw_text,
         request.column_mapping,
         request.catalogo_id,
-        request.grado_default,
+        request.grade_default,
         request.actualizar_existentes,
         admin.get("user_id")
     )
@@ -168,7 +168,7 @@ async def get_grados_disponibles(
     Obtener lista de grados disponibles (de estudiantes importados).
     """
     grados = await bulk_import_service.get_grados_disponibles()
-    return {"grados": grados}
+    return {"grades": grados}
 
 
 @router.get("/estudiantes")
@@ -187,7 +187,7 @@ async def get_estudiantes_importados(
     
     query = {}
     if grado:
-        query["grado"] = grado
+        query["grade"] = grado
     if estado:
         query["estado"] = estado
     if buscar:

@@ -184,8 +184,8 @@ class Role(RoleBase):
     """Full role model"""
     role_id: str
     permisos: List[str] = []
-    fecha_creacion: Optional[str] = None
-    fecha_actualizacion: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
     usuarios_count: int = 0
 
 

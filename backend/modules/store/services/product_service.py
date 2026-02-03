@@ -134,13 +134,13 @@ class ProductService(BaseService):
             product = await self.get_product(libro_id)
             
             # Check for low stock
-            if product and product.cantidad_inventario < 10:
+            if product and product.inventory_quantity < 10:
                 await self.emit_event(
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
                         "libro_id": libro_id,
                         "nombre": product.nombre,
-                        "cantidad": product.cantidad_inventario
+                        "cantidad": product.inventory_quantity
                     },
                     priority=EventPriority.HIGH
                 )
@@ -155,13 +155,13 @@ class ProductService(BaseService):
         
         if success:
             product = await self.get_product(libro_id)
-            if product and product.cantidad_inventario < 10:
+            if product and product.inventory_quantity < 10:
                 await self.emit_event(
                     StoreEvents.PRODUCT_LOW_STOCK,
                     {
                         "libro_id": libro_id,
                         "nombre": product.nombre,
-                        "cantidad": product.cantidad_inventario
+                        "cantidad": product.inventory_quantity
                     },
                     priority=EventPriority.HIGH
                 )
@@ -189,7 +189,7 @@ class ProductService(BaseService):
                 {
                     "libro_id": p["libro_id"],
                     "nombre": p["nombre"],
-                    "cantidad": p.get("cantidad_inventario", 0)
+                    "cantidad": p.get("inventory_quantity", 0)
                 }
                 for p in low_stock
             ]

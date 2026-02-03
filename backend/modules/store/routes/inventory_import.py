@@ -36,12 +36,12 @@ class ImportResult(BaseModel):
 
 # CSV Template columns
 TEMPLATE_COLUMNS = [
-    "codigo",           # Required: Unique product code
+    "code",           # Required: Unique product code
     "nombre",           # Required: Product name
-    "grado",            # Required: Grade(s) - supports multiple grades separated by comma (e.g., "K4,K5" or "1,2")
+    "grade",            # Required: Grade(s) - supports multiple grades separated by comma (e.g., "K4,K5" or "1,2")
     "cantidad",         # Required: Inventory quantity
     "precio",           # Required: Price
-    "materia",          # Optional: Subject
+    "subject",          # Optional: Subject
     "editorial",        # Optional: Publisher
     "isbn",             # Optional: ISBN
     "descripcion",      # Optional: Description
@@ -126,7 +126,7 @@ async def preview_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"codigo", "nombre", "grado", "cantidad", "precio"}
+        required_columns = {"code", "nombre", "grade", "cantidad", "precio"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -172,8 +172,8 @@ async def preview_csv_import(
             
             # Check if product exists in the private catalog (libros collection)
             existing = await db.libros.find_one(
-                {"codigo": codigo, "es_catalogo_privado": True},
-                {"_id": 0, "libro_id": 1, "nombre": 1, "cantidad_inventario": 1}
+                {"code": codigo, "is_private_catalog": True},
+                {"_id": 0, "libro_id": 1, "nombre": 1, "inventory_quantity": 1}
             )
             
             action = "create"
@@ -182,24 +182,24 @@ async def preview_csv_import(
             if existing:
                 if duplicate_mode == DuplicateMode.SKIP:
                     action = "skip"
-                    new_quantity = existing.get("cantidad_inventario", 0)
+                    new_quantity = existing.get("inventory_quantity", 0)
                 elif duplicate_mode == DuplicateMode.REPLACE:
                     action = "update_replace"
                     new_quantity = cantidad
                 elif duplicate_mode == DuplicateMode.ADD:
                     action = "update_add"
-                    new_quantity = existing.get("cantidad_inventario", 0) + cantidad
+                    new_quantity = existing.get("inventory_quantity", 0) + cantidad
             
             preview_items.append({
                 "row": row_num,
-                "codigo": codigo,
+                "code": codigo,
                 "nombre": nombre,
-                "grado": grado,
-                "grados": grados,
+                "grade": grado,
+                "grades": grados,
                 "cantidad_csv": cantidad,
                 "precio": precio,
                 "action": action,
-                "existing_quantity": existing.get("cantidad_inventario", 0) if existing else None,
+                "existing_quantity": existing.get("inventory_quantity", 0) if existing else None,
                 "new_quantity": new_quantity
             })
         
@@ -254,7 +254,7 @@ async def execute_csv_import(
         reader = csv.DictReader(io.StringIO(text))
         
         # Validate headers
-        required_columns = {"codigo", "nombre", "grado", "cantidad", "precio"}
+        required_columns = {"code", "nombre", "grade", "cantidad", "precio"}
         if not required_columns.issubset(set(reader.fieldnames or [])):
             missing = required_columns - set(reader.fieldnames or [])
             raise HTTPException(
@@ -285,7 +285,7 @@ async def execute_csv_import(
                 precio = float(row.get('precio', '0').strip() or '0')
                 
                 # Check if exists in the private catalog (libros collection)
-                existing = await db.libros.find_one({"codigo": codigo, "es_catalogo_privado": True})
+                existing = await db.libros.find_one({"code": codigo, "is_private_catalog": True})
                 
                 if existing:
                     if duplicate_mode == DuplicateMode.SKIP:
@@ -296,18 +296,18 @@ async def execute_csv_import(
                     if duplicate_mode == DuplicateMode.REPLACE:
                         new_cantidad = cantidad
                     else:  # ADD
-                        new_cantidad = existing.get("cantidad_inventario", 0) + cantidad
+                        new_cantidad = existing.get("inventory_quantity", 0) + cantidad
                     
                     # Update existing product in libros collection
                     await db.libros.update_one(
-                        {"codigo": codigo, "es_catalogo_privado": True},
+                        {"code": codigo, "is_private_catalog": True},
                         {"$set": {
                             "nombre": nombre,
-                            "grado": grado,
-                            "grados": grados if len(grados) > 1 else None,
+                            "grade": grado,
+                            "grades": grados if len(grados) > 1 else None,
                             "precio": precio,
-                            "cantidad_inventario": new_cantidad,
-                            "materia": row.get('materia', '').strip() or existing.get("materia"),
+                            "inventory_quantity": new_cantidad,
+                            "subject": row.get('materia', '').strip() or existing.get("subject"),
                             "editorial": row.get('editorial', '').strip() or existing.get("editorial"),
                             "isbn": row.get('isbn', '').strip() or existing.get("isbn"),
                             "descripcion": row.get('descripcion', '').strip() or existing.get("descripcion"),
@@ -322,20 +322,20 @@ async def execute_csv_import(
                     
                     new_product = {
                         "libro_id": libro_id,
-                        "codigo": codigo,
+                        "code": codigo,
                         "nombre": nombre,
-                        "grado": grado,
-                        "grados": grados if len(grados) > 1 else None,
+                        "grade": grado,
+                        "grades": grados if len(grados) > 1 else None,
                         "precio": precio,
-                        "cantidad_inventario": cantidad,
-                        "materia": row.get('materia', '').strip() or None,
+                        "inventory_quantity": cantidad,
+                        "subject": row.get('materia', '').strip() or None,
                         "editorial": row.get('editorial', '').strip() or None,
                         "isbn": row.get('isbn', '').strip() or None,
                         "descripcion": row.get('descripcion', '').strip() or None,
-                        "imagen_url": None,
+                        "image_url": None,
                         "activo": True,
                         "destacado": False,
-                        "es_catalogo_privado": True,
+                        "is_private_catalog": True,
                         "created_at": now,
                         "created_by": admin.get("user_id"),
                         "updated_at": now

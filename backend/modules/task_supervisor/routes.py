@@ -193,7 +193,7 @@ async def get_supervised_tasks(
     if estado:
         query["estado"] = estado
     
-    tasks = await db.supervised_tasks.find(query, {"_id": 0}).sort("fecha_creacion", -1).to_list(100)
+    tasks = await db.supervised_tasks.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
     
     return {
         "tasks": tasks,
@@ -266,7 +266,7 @@ async def create_announcement(data: dict, admin: dict = Depends(get_admin_user))
         "programado_para": data.get("programado_para"),
         "estado": "pendiente",
         "audio_url": None,
-        "fecha_creacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc)
     }
     
     await db.voice_announcements.insert_one(announcement)
@@ -291,7 +291,7 @@ async def get_announcements(
         query["estado"] = estado
     
     announcements = await db.voice_announcements.find(query, {"_id": 0}).sort(
-        "fecha_creacion", -1
+        "created_at", -1
     ).to_list(limit)
     
     return announcements
@@ -348,7 +348,7 @@ async def get_person_progress(
     tasks = await db.supervised_tasks.find(
         {"asignado_a": person_id},
         {"_id": 0}
-    ).sort("fecha_creacion", -1).to_list(20)
+    ).sort("created_at", -1).to_list(20)
     
     return {
         "persona": person,

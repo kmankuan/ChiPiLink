@@ -166,7 +166,7 @@ class RolesService:
         for role_data in default_roles:
             existing = await self.collection.find_one({"role_id": role_data["role_id"]})
             if not existing:
-                role_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+                role_data["created_at"] = datetime.now(timezone.utc).isoformat()
                 await self.collection.insert_one(role_data)
                 print(f"[Roles] Created default role: {role_data['nombre']}")
             else:
@@ -196,7 +196,7 @@ class RolesService:
         role_dict = role_data.model_dump()
         role_dict["role_id"] = f"role_{uuid.uuid4().hex[:8]}"
         role_dict["es_sistema"] = False
-        role_dict["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        role_dict["created_at"] = datetime.now(timezone.utc).isoformat()
         role_dict["creado_por"] = created_by
         
         await self.collection.insert_one(role_dict)
@@ -219,7 +219,7 @@ class RolesService:
             update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
         
         if update_data:
-            update_data["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+            update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
             await self.collection.update_one(
                 {"role_id": role_id},
                 {"$set": update_data}

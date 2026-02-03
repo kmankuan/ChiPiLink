@@ -87,7 +87,7 @@ async def get_games(estado: Optional[str] = None, limit: int = 50):
     if estado:
         query["estado"] = estado
     
-    games = await db.chess_games.find(query, {"_id": 0}).sort("fecha_creacion", -1).to_list(limit)
+    games = await db.chess_games.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
     return games
 
 
@@ -102,7 +102,7 @@ async def create_game(game: dict):
         "estado": "pendiente",
         "movimientos": [],
         "turno": "blancas",
-        "fecha_creacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc)
     }
     await db.chess_games.insert_one(doc)
     del doc["_id"]

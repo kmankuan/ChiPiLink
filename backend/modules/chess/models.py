@@ -68,7 +68,7 @@ class ChessGame(ChessGameBase):
     # Fechas
     fecha_inicio: Optional[datetime] = None
     fecha_fin: Optional[datetime] = None
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ChessTournament(BaseModel):
@@ -85,12 +85,12 @@ class ChessTournament(BaseModel):
     rondas: int = 5
     max_participantes: Optional[int] = None
     premio: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     estado: str = "inscripcion"  # inscripcion, en_curso, finalizado, cancelado
     participantes: List[str] = []
     clasificacion: List[Dict] = []  # [{jugador_id, puntos, desempate}]
     ganador_id: Optional[str] = None
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ChessPuzzle(BaseModel):
@@ -105,4 +105,4 @@ class ChessPuzzle(BaseModel):
     rating: int = 1500  # Puzzle rating
     intentos: int = 0
     resueltos: int = 0
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

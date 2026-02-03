@@ -33,7 +33,7 @@ async def setup_admin(admin_data: dict):
         "contrasena_hash": hash_password(admin_data.get("contrasena")),
         "es_admin": True,
         "estudiantes": [],
-        "fecha_creacion": datetime.now(timezone.utc).isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     
     await db.users.insert_one(admin_doc)
@@ -69,24 +69,24 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
                 "nombre": "Matem\u00e1ticas 1",
                 "descripcion": "Libro de matem\u00e1ticas para primer grado",
                 "categoria": "libros",
-                "grado": "1",
-                "materia": "matematicas",
+                "grade": "1",
+                "subject": "matematicas",
                 "precio": 25.00,
-                "cantidad_inventario": 50,
+                "inventory_quantity": 50,
                 "activo": True,
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
                 "libro_id": f"libro_{uuid.uuid4().hex[:12]}",
                 "nombre": "Espa\u00f1ol 1",
                 "descripcion": "Libro de espa\u00f1ol para primer grado",
                 "categoria": "libros",
-                "grado": "1",
-                "materia": "espanol",
+                "grade": "1",
+                "subject": "espanol",
                 "precio": 22.00,
-                "cantidad_inventario": 45,
+                "inventory_quantity": 45,
                 "activo": True,
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             },
         ]
         await db.libros.insert_many(libros)
@@ -112,7 +112,7 @@ async def get_notifications(
         query["tipo"] = tipo
     
     notifications = await db.notifications.find(query, {"_id": 0}).sort(
-        "fecha_creacion", -1
+        "created_at", -1
     ).to_list(limite)
     
     # Count unread
@@ -268,7 +268,7 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     total_products = await db.libros.count_documents({"activo": True})
     low_stock_products = await db.libros.count_documents({
         "activo": True,
-        "cantidad_inventario": {"$lt": 10}
+        "inventory_quantity": {"$lt": 10}
     })
     
     # Users stats
@@ -382,7 +382,7 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
             "products": await db.libros.count_documents({"es_demo": True}),
             "students": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
             "orders": await db.textbook_orders.count_documents({"es_demo": True}),
-            "total_products": await db.libros.count_documents({"es_catalogo_privado": True}),
+            "total_products": await db.libros.count_documents({"is_private_catalog": True}),
             "total_students": await db.estudiantes_sincronizados.count_documents({}),
             "total_orders": await db.textbook_orders.count_documents({})
         }
@@ -403,10 +403,10 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
         stats = {
             "public_products": await db.libros.count_documents({
                 "activo": True,
-                "$or": [{"es_catalogo_privado": {"$exists": False}}, {"es_catalogo_privado": False}]
+                "$or": [{"is_private_catalog": {"$exists": False}}, {"is_private_catalog": False}]
             }),
             "private_products": await db.libros.count_documents({
-                "es_catalogo_privado": True,
+                "is_private_catalog": True,
                 "activo": True
             }),
             "students": await db.estudiantes_sincronizados.count_documents({}),

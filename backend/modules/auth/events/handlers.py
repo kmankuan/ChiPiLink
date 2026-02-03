@@ -29,7 +29,7 @@ def setup_event_handlers():
             "mensaje": f"{payload.get('nombre', 'Usuario')} se ha registrado",
             "datos": payload,
             "leida": False,
-            "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.notifications.insert_one(notificacion)

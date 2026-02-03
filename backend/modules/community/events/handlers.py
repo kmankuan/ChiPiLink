@@ -30,7 +30,7 @@ def setup_event_handlers():
                 "mensaje": payload.get("titulo", "Nuevo post"),
                 "datos": payload,
                 "leida": False,
-                "fecha_creacion": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.notifications.insert_one(notificacion)
         
@@ -50,7 +50,7 @@ def setup_event_handlers():
             "mensaje": payload.get("titulo", "Nuevo evento"),
             "datos": payload,
             "leida": False,
-            "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.notifications.insert_one(notificacion)
         

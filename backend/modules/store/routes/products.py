@@ -67,14 +67,14 @@ async def search_products(q: str = Query(..., min_length=2)):
 @router.get("/grades")
 async def get_available_grades():
     """Get available grades for filtering"""
-    grados = await db.libros.distinct("grado", {"activo": True})
-    return {"grados": sorted([g for g in grados if g])}
+    grados = await db.libros.distinct("grade", {"activo": True})
+    return {"grades": sorted([g for g in grados if g])}
 
 
 @router.get("/subjects")
 async def get_available_subjects():
     """Get available subjects for filtering"""
-    materias = await db.libros.distinct("materia", {"activo": True})
+    materias = await db.libros.distinct("subject", {"activo": True})
     return {"materias": sorted([m for m in materias if m])}
 
 
@@ -131,7 +131,7 @@ async def toggle_featured(
     """Marcar/desmarcar producto como destacado (solo admin)"""
     product = await product_service.update_product(
         libro_id,
-        ProductUpdate(destacado=destacado, orden_destacado=orden)
+        ProductUpdate(destacado=destacado, featured_order=orden)
     )
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
@@ -141,14 +141,14 @@ async def toggle_featured(
 @router.put("/{libro_id}/promotion")
 async def toggle_promotion(
     libro_id: str,
-    en_promocion: bool,
-    precio_oferta: Optional[float] = None,
+    on_sale: bool,
+    sale_price: Optional[float] = None,
     admin: dict = Depends(get_admin_user)
 ):
     """Marcar/desmarcar producto en promotion (solo admin)"""
     product = await product_service.update_product(
         libro_id,
-        ProductUpdate(en_promocion=en_promocion, precio_oferta=precio_oferta)
+        ProductUpdate(on_sale=on_sale, sale_price=sale_price)
     )
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")

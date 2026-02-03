@@ -128,7 +128,7 @@ async def seed_landing_page():
                     "descripcion": "La super app que conecta a la comunidad china en Panama con servicios, comercio y entretenimiento.",
                     "cta_texto": "Explorar",
                     "cta_link": "/unatienda",
-                    "imagen_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
+                    "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200",
                     "estilo": "gradient"
                 }
             },
@@ -289,7 +289,7 @@ async def create_indexes():
         # Index for store_products
         await db[StoreCollections.PRODUCTS].create_index("libro_id", unique=True)
         await db[StoreCollections.PRODUCTS].create_index("categoria")
-        await db[StoreCollections.PRODUCTS].create_index("grado")
+        await db[StoreCollections.PRODUCTS].create_index("grade")
         await db[StoreCollections.PRODUCTS].create_index("activo")
         
         # Index for store_categories
@@ -297,8 +297,8 @@ async def create_indexes():
         
         # Compound indexes for common queries
         await db[StoreCollections.PRODUCTS].create_index([("categoria", 1), ("activo", 1)])
-        await db[StoreCollections.PRODUCTS].create_index([("grado", 1), ("activo", 1)])
-        await db[StoreCollections.ORDERS].create_index([("estado", 1), ("fecha_creacion", -1)])
+        await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("activo", 1)])
+        await db[StoreCollections.ORDERS].create_index([("estado", 1), ("created_at", -1)])
         
         print("✅ Database indexes created successfully")
     except Exception as e:

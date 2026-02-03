@@ -134,7 +134,7 @@ class SuperPinLeagueBase(BaseModel):
     temporada: str  # Ej: "2025", "Q1-2025"
     fecha_inicio: Optional[str] = None
     fecha_fin: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
 
 
 class SuperPinLeagueCreate(SuperPinLeagueBase):
@@ -153,7 +153,7 @@ class SuperPinLeagueUpdate(BaseModel):
     temporada: Optional[str] = None
     fecha_inicio: Optional[str] = None
     fecha_fin: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     estado: Optional[LeagueStatus] = None
     scoring_config: Optional[ScoringConfig] = None
     checkin_config: Optional[CheckInConfig] = None

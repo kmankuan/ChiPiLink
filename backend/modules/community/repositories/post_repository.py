@@ -24,7 +24,7 @@ class PostRepository(BaseRepository):
     async def create(self, post_data: Dict) -> Dict:
         """Create nuevo post"""
         post_data["post_id"] = f"post_{uuid.uuid4().hex[:12]}"
-        post_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        post_data["created_at"] = datetime.now(timezone.utc).isoformat()
         post_data["vistas"] = 0
         post_data["likes"] = 0
         
@@ -68,7 +68,7 @@ class PostRepository(BaseRepository):
         return await self.find_many(
             query={},
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def update_post(self, post_id: str, data: Dict) -> bool:

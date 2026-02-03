@@ -39,7 +39,7 @@ class PostBase(BaseModel):
     titulo: str
     contenido: str
     resumen: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     imagen_galeria: Optional[List[str]] = None
     video_url: Optional[str] = None
     fecha_evento: Optional[Any] = None
@@ -64,7 +64,7 @@ class PostUpdate(BaseModel):
     titulo: Optional[str] = None
     contenido: Optional[str] = None
     resumen: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     imagen_galeria: Optional[List[str]] = None
     video_url: Optional[str] = None
     fecha_evento: Optional[Any] = None
@@ -83,7 +83,7 @@ class Post(PostBase):
     model_config = ConfigDict(from_attributes=True)
     
     post_id: str
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
     fecha_publicacion: Optional[Any] = None
     creado_por: Optional[str] = None
     fuente: Optional[str] = None
@@ -112,7 +112,7 @@ class Comment(CommentBase):
     comment_id: str
     post_id: str
     usuario_id: Optional[str] = None
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
     aprobado: bool = True
     likes: int = 0
 
@@ -127,7 +127,7 @@ class EventBase(BaseModel):
     fecha_inicio: Any
     fecha_fin: Optional[Any] = None
     lugar: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     requiere_inscripcion: bool = False
     max_participantes: Optional[int] = None
     destacado: bool = False
@@ -146,7 +146,7 @@ class EventUpdate(BaseModel):
     fecha_inicio: Optional[Any] = None
     fecha_fin: Optional[Any] = None
     lugar: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     requiere_inscripcion: Optional[bool] = None
     max_participantes: Optional[int] = None
     destacado: Optional[bool] = None
@@ -160,7 +160,7 @@ class Event(EventBase):
     evento_id: str
     estado: str = "programado"
     inscripciones: List[Dict] = []
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
 
 
 # ============== GALLERY/ALBUM MODELS ==============
@@ -199,4 +199,4 @@ class Album(AlbumBase):
     model_config = ConfigDict(from_attributes=True)
     
     album_id: str
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None

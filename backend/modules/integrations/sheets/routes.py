@@ -129,7 +129,7 @@ async def create_sheet_config(config: dict, admin: dict = Depends(get_admin_user
         )
         
         doc = new_config.model_dump()
-        doc["fecha_creacion"] = doc["fecha_creacion"].isoformat()
+        doc["created_at"] = doc["created_at"].isoformat()
         
         await db.sheet_configs.insert_one(doc)
         
@@ -147,7 +147,7 @@ async def create_sheet_config(config: dict, admin: dict = Depends(get_admin_user
 @router.put("/configs/{config_id}")
 async def update_sheet_config(config_id: str, config: dict, admin: dict = Depends(get_admin_user)):
     """Update sheet sync configuration"""
-    update_data = {k: v for k, v in config.items() if k not in ["config_id", "_id", "fecha_creacion"]}
+    update_data = {k: v for k, v in config.items() if k not in ["config_id", "_id", "created_at"]}
     
     result = await db.sheet_configs.update_one(
         {"config_id": config_id},

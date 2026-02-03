@@ -75,14 +75,14 @@ async def create_banner(banner: dict, admin: dict = Depends(get_admin_user)):
         "categoria": banner.get("categoria"),
         "titulo": banner.get("titulo"),
         "subtitulo": banner.get("subtitulo"),
-        "imagen_url": banner.get("imagen_url"),
+        "image_url": banner.get("image_url"),
         "link_url": banner.get("link_url"),
         "activo": banner.get("activo", True),
         "orden": banner.get("orden", 0),
         "fecha_inicio": banner.get("fecha_inicio"),
         "fecha_fin": banner.get("fecha_fin"),
         "creado_por": "admin",
-        "fecha_creacion": datetime.now(timezone.utc).isoformat()
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.category_banners.insert_one(doc)
     del doc["_id"]
@@ -98,9 +98,9 @@ async def update_banner(
     """Update banner (admin)"""
     update_data = {
         k: v for k, v in banner.items()
-        if k not in ["banner_id", "_id", "fecha_creacion"]
+        if k not in ["banner_id", "_id", "created_at"]
     }
-    update_data["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.category_banners.update_one(
         {"banner_id": banner_id},
@@ -164,7 +164,7 @@ async def update_vendor_permissions(
         "puede_publicar_noticias": data.get("puede_publicar_noticias", False),
         "max_banners": data.get("max_banners", 3),
         "max_productos_destacados": data.get("max_productos_destacados", 5),
-        "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+        "updated_at": datetime.now(timezone.utc).isoformat()
     }
     await db.vendor_permissions.update_one(
         {"vendor_id": vendor_id},

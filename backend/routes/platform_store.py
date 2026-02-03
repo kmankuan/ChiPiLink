@@ -253,7 +253,7 @@ async def create_platform_order(order_data: dict):
     for item in order_data["items"]:
         await db.libros.update_one(
             {"libro_id": item.get("book_id") or item.get("libro_id")},
-            {"$inc": {"cantidad_inventario": -item.get("quantity", 1)}}
+            {"$inc": {"inventory_quantity": -item.get("quantity", 1)}}
         )
     
     return {"order_id": order_id, "total": total, "status": "created"}

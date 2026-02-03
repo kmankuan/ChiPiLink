@@ -26,8 +26,8 @@ class OrderRepository(BaseRepository):
         """Create new order"""
         if "pedido_id" not in order_data:
             order_data["pedido_id"] = f"ped_{uuid.uuid4().hex[:12]}"
-        order_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
-        order_data["fecha_actualizacion"] = order_data["fecha_creacion"]
+        order_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        order_data["updated_at"] = order_data["created_at"]
         return await self.insert_one(order_data)
     
     async def get_by_id(self, pedido_id: str) -> Optional[Dict]:
@@ -39,7 +39,7 @@ class OrderRepository(BaseRepository):
         return await self.find_many(
             query={"user_id": user_id},
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def get_by_status(self, estado: str, limit: int = 500) -> List[Dict]:
@@ -47,7 +47,7 @@ class OrderRepository(BaseRepository):
         return await self.find_many(
             query={"estado": estado},
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def get_all(self, estado: Optional[str] = None, limit: int = 500) -> List[Dict]:
@@ -58,12 +58,12 @@ class OrderRepository(BaseRepository):
         return await self.find_many(
             query=query,
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def update_order(self, pedido_id: str, data: Dict) -> bool:
         """Update pedido"""
-        data["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+        data["updated_at"] = datetime.now(timezone.utc).isoformat()
         return await self.update_by_id(self.ID_FIELD, pedido_id, data)
     
     async def update_status(self, pedido_id: str, estado: str) -> bool:
@@ -94,7 +94,7 @@ class OrderRepository(BaseRepository):
         """Get total de ventas"""
         query = {"pago_confirmado": True}
         if fecha_inicio:
-            query["fecha_creacion"] = {"$gte": fecha_inicio}
+            query["created_at"] = {"$gte": fecha_inicio}
         
         pipeline = [
             {"$match": query},

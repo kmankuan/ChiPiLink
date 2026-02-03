@@ -28,7 +28,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
                 students.append({
                     "sync_id": student.get("student_id"),
                     "nombre": student.get("full_name"),
-                    "grado": student.get("grade"),
+                    "grade": student.get("grade"),
                     "seccion": student.get("section"),
                     "student_id": student.get("student_id"),
                     "school_name": student.get("school_name")
@@ -42,14 +42,14 @@ async def verify_private_catalog_access(user_id: str) -> dict:
         return {
             "tiene_acceso": False,
             "estudiantes": [],
-            "grados": [],
+            "grades": [],
             "mensaje": "No linked students. Link a PCA student to access the private catalog."
         }
     
     return {
         "tiene_acceso": True,
         "estudiantes": students,
-        "grados": list(grades),
+        "grades": list(grades),
         "mensaje": None
     }
 
@@ -90,19 +90,19 @@ async def get_private_catalog_products(
     
     # Build query
     query = {
-        "es_catalogo_privado": True,
+        "is_private_catalog": True,
         "activo": True
     }
     
     # Filter by grade (if not specified, show all user's grades)
     if grado:
         query["$or"] = [
-            {"grado": grado},
-            {"grados": grado}
+            {"grade": grado},
+            {"grades": grado}
         ]
     
     if materia:
-        query["materia"] = materia
+        query["subject"] = materia
     
     if destacados:
         query["destacado"] = True
@@ -111,7 +111,7 @@ async def get_private_catalog_products(
         query["$or"] = [
             {"nombre": {"$regex": search, "$options": "i"}},
             {"descripcion": {"$regex": search, "$options": "i"}},
-            {"codigo": {"$regex": search, "$options": "i"}},
+            {"code": {"$regex": search, "$options": "i"}},
             {"editorial": {"$regex": search, "$options": "i"}}
         ]
     
@@ -119,25 +119,25 @@ async def get_private_catalog_products(
     productos = await db.libros.find(
         query,
         {"_id": 0}
-    ).sort([("grado", 1), ("materia", 1), ("nombre", 1)]).skip(skip).limit(limit).to_list(limit)
+    ).sort([("grade", 1), ("subject", 1), ("nombre", 1)]).skip(skip).limit(limit).to_list(limit)
     
     # Contar total
     total = await db.libros.count_documents(query)
     
     # Get grados y materias disponibles para filtros
-    grados_disponibles = await db.libros.distinct("grado", {"es_catalogo_privado": True, "activo": True})
-    materias_disponibles = await db.libros.distinct("materia", {"es_catalogo_privado": True, "activo": True})
+    grados_disponibles = await db.libros.distinct("grade", {"is_private_catalog": True, "activo": True})
+    materias_disponibles = await db.libros.distinct("subject", {"is_private_catalog": True, "activo": True})
     
     return {
         "productos": productos,
         "total": total,
         "filtros": {
-            "grados": sorted([g for g in grados_disponibles if g]),
+            "grades": sorted([g for g in grados_disponibles if g]),
             "materias": sorted([m for m in materias_disponibles if m])
         },
         "acceso": {
             "estudiantes": acceso["estudiantes"],
-            "grados_estudiante": acceso["grados"]
+            "grados_estudiante": acceso["grades"]
         }
     }
 
@@ -160,7 +160,7 @@ async def get_producto_detalle(
         )
     
     producto = await db.libros.find_one(
-        {"libro_id": libro_id, "es_catalogo_privado": True},
+        {"libro_id": libro_id, "is_private_catalog": True},
         {"_id": 0}
     )
     
@@ -189,29 +189,29 @@ async def get_productos_por_grado(
         )
     
     query = {
-        "es_catalogo_privado": True,
+        "is_private_catalog": True,
         "activo": True,
         "$or": [
-            {"grado": grado},
-            {"grados": grado}
+            {"grade": grado},
+            {"grades": grado}
         ]
     }
     
     productos = await db.libros.find(
         query,
         {"_id": 0}
-    ).sort([("materia", 1), ("nombre", 1)]).to_list(200)
+    ).sort([("subject", 1), ("nombre", 1)]).to_list(200)
     
     # Agrupar por materia
     por_materia = {}
     for p in productos:
-        materia = p.get("materia", "Otros")
+        materia = p.get("subject", "Otros")
         if materia not in por_materia:
             por_materia[materia] = []
         por_materia[materia].append(p)
     
     return {
-        "grado": grado,
+        "grade": grado,
         "total": len(productos),
         "productos": productos,
         "por_materia": por_materia
@@ -238,28 +238,28 @@ async def get_resumen_catalogo(
     resumen = []
     
     for estudiante in acceso["estudiantes"]:
-        grado = estudiante.get("grado")
+        grado = estudiante.get("grade")
         
         if grado:
             # Contar productos del grado
             count = await db.libros.count_documents({
-                "es_catalogo_privado": True,
+                "is_private_catalog": True,
                 "activo": True,
-                "$or": [{"grado": grado}, {"grados": grado}]
+                "$or": [{"grade": grado}, {"grades": grado}]
             })
             
             # Calculatesr total estimado
             productos = await db.libros.find(
                 {
-                    "es_catalogo_privado": True,
+                    "is_private_catalog": True,
                     "activo": True,
-                    "$or": [{"grado": grado}, {"grados": grado}]
+                    "$or": [{"grade": grado}, {"grades": grado}]
                 },
-                {"precio": 1, "precio_oferta": 1}
+                {"precio": 1, "sale_price": 1}
             ).to_list(200)
             
             total_estimado = sum(
-                p.get("precio_oferta") or p.get("precio", 0) 
+                p.get("sale_price") or p.get("precio", 0) 
                 for p in productos
             )
             
@@ -289,13 +289,13 @@ async def admin_get_productos_catalogo_privado(
     """
     Admin: Obtener todos los productos del catalog privado.
     """
-    query = {"es_catalogo_privado": True}
+    query = {"is_private_catalog": True}
     
     if grado:
-        query["$or"] = [{"grado": grado}, {"grados": grado}]
+        query["$or"] = [{"grade": grado}, {"grades": grado}]
     
     if materia:
-        query["materia"] = materia
+        query["subject"] = materia
     
     if activo is not None:
         query["activo"] = activo
@@ -303,7 +303,7 @@ async def admin_get_productos_catalogo_privado(
     productos = await db.libros.find(
         query,
         {"_id": 0}
-    ).sort([("grado", 1), ("materia", 1)]).skip(skip).limit(limit).to_list(limit)
+    ).sort([("grade", 1), ("subject", 1)]).skip(skip).limit(limit).to_list(limit)
     
     total = await db.libros.count_documents(query)
     
@@ -324,10 +324,10 @@ async def admin_crear_producto_catalogo_privado(
     import uuid
     
     # Ensure que sea catalog privado
-    producto["es_catalogo_privado"] = True
+    producto["is_private_catalog"] = True
     producto["libro_id"] = producto.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
     producto["activo"] = producto.get("activo", True)
-    producto["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+    producto["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.libros.insert_one(producto)
     producto.pop("_id", None)
@@ -344,12 +344,12 @@ async def admin_actualizar_producto_catalogo_privado(
     """
     Admin: Actualizar producto del catalog privado.
     """
-    # Ensure that does not se pueda cambiar es_catalogo_privado
-    updates["es_catalogo_privado"] = True
-    updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+    # Ensure that does not se pueda cambiar is_private_catalog
+    updates["is_private_catalog"] = True
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.libros.update_one(
-        {"libro_id": libro_id, "es_catalogo_privado": True},
+        {"libro_id": libro_id, "is_private_catalog": True},
         {"$set": updates}
     )
     
@@ -373,14 +373,14 @@ async def admin_eliminar_producto_catalogo_privado(
     """
     if hard_delete:
         result = await db.libros.delete_one(
-            {"libro_id": libro_id, "es_catalogo_privado": True}
+            {"libro_id": libro_id, "is_private_catalog": True}
         )
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Producto not found")
     else:
         result = await db.libros.update_one(
-            {"libro_id": libro_id, "es_catalogo_privado": True},
-            {"$set": {"activo": False, "fecha_eliminacion": datetime.now(timezone.utc).isoformat()}}
+            {"libro_id": libro_id, "is_private_catalog": True},
+            {"$set": {"activo": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Producto not found")

@@ -56,7 +56,7 @@ def buscar_estudiante_en_matriculas(
                 sync_nombre = value_str
             elif "apellido" in key_lower:
                 sync_apellido = value_str
-            elif "grado" in key_lower or "grade" in key_lower or "class" in key_lower:
+            elif "grade" in key_lower or "grade" in key_lower or "class" in key_lower:
                 sync_grado = value_str
             # Also check for full name field
             elif "student" in key_lower and "name" in key_lower:
@@ -88,8 +88,8 @@ def buscar_estudiante_en_matriculas(
         grado_match = False
         if sync_grado:
             # Normalize grades for comparison (handle "4", "4to", "4to Grado", etc.)
-            grado_norm = grado.lower().replace("grado", "").replace("°", "").strip()
-            sync_grado_norm = sync_grado.lower().replace("grado", "").replace("°", "").replace("th", "").replace("st", "").replace("nd", "").replace("rd", "").strip()
+            grado_norm = grado.lower().replace("grade", "").replace("°", "").strip()
+            sync_grado_norm = sync_grado.lower().replace("grade", "").replace("°", "").replace("th", "").replace("st", "").replace("nd", "").replace("rd", "").strip()
             
             # Try numeric comparison
             try:

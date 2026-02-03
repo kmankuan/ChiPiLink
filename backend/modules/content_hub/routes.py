@@ -123,7 +123,7 @@ async def get_content_items(
     
     items = await db.content_items.find(query, {"_id": 0}).sort([
         ("destacado", -1),
-        ("fecha_creacion", -1)
+        ("created_at", -1)
     ]).to_list(limit)
     return items
 
@@ -165,7 +165,7 @@ async def create_content_item(item: dict, admin: dict = Depends(get_admin_user))
         "curado_por": admin.get("user_id"),
         "vistas": 0,
         "likes": 0,
-        "fecha_creacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc)
     }
     await db.content_items.insert_one(doc)
     del doc["_id"]
@@ -180,7 +180,7 @@ async def get_category_feed(category_id: str, limit: int = 20):
     items = await db.content_items.find(
         {"categorias": category_id, "publicado": True},
         {"_id": 0}
-    ).sort("fecha_creacion", -1).to_list(limit)
+    ).sort("created_at", -1).to_list(limit)
     
     return {
         "category_id": category_id,
@@ -214,7 +214,7 @@ async def create_playlist(playlist: dict, admin: dict = Depends(get_admin_user))
         "items": playlist.get("items", []),
         "publicada": True,
         "orden": playlist.get("orden", 0),
-        "fecha_creacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc)
     }
     await db.content_playlists.insert_one(doc)
     del doc["_id"]

@@ -25,7 +25,7 @@ class AlbumRepository(BaseRepository):
     async def create(self, album_data: Dict) -> Dict:
         """Create nuevo album"""
         album_data["album_id"] = f"album_{uuid.uuid4().hex[:12]}"
-        album_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        album_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(album_data)
     
     async def get_by_id(self, album_id: str) -> Optional[Dict]:

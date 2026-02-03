@@ -61,7 +61,7 @@ class VocabularyItem(BaseModel):
     traduccion: str  # Translation
     pronunciacion_fonetica: Optional[str] = None  # Guide phonetics
     audio_url: Optional[str] = None  # Audio de pronunciation correcta
-    imagen_url: Optional[str] = None  # Imagen ilustrativa
+    image_url: Optional[str] = None  # Imagen ilustrativa
     ejemplo_oracion: Optional[str] = None
     # Categorization
     categoria: Optional[str] = None  # colores, animales, numbers, etc.
@@ -107,7 +107,7 @@ class LessonPlan(BaseModel):
     # Estado
     completado: bool = False
     progreso: int = 0
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     fecha_completado: Optional[datetime] = None
 
 

@@ -190,8 +190,8 @@ async def crear_patrocinador(sponsor: SponsorCreate):
     sponsor_doc = {
         "sponsor_id": sponsor_id,
         **sponsor.model_dump(),
-        "fecha_creacion": datetime.now(timezone.utc),
-        "fecha_actualizacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
     }
     
     await db.pingpong_sponsors.insert_one(sponsor_doc)
@@ -265,7 +265,7 @@ async def actualizar_patrocinador(sponsor_id: str, update: SponsorUpdate):
     from main import db
     
     update_data = {k: v for k, v in update.model_dump().items() if v is not None}
-    update_data["fecha_actualizacion"] = datetime.now(timezone.utc)
+    update_data["updated_at"] = datetime.now(timezone.utc)
     
     result = await db.pingpong_sponsors.update_one(
         {"sponsor_id": sponsor_id},
@@ -333,7 +333,7 @@ async def actualizar_layout_config(config: TVLayoutConfig):
     config_doc = {
         "config_key": "tv_layout",
         **config.model_dump(),
-        "fecha_actualizacion": datetime.now(timezone.utc)
+        "updated_at": datetime.now(timezone.utc)
     }
     
     await db.pingpong_config.update_one(
@@ -373,7 +373,7 @@ async def actualizar_espacio_config(space_id: str, space_config: SponsorSpaceCon
         espacios.append(space_config.model_dump())
     
     config["espacios"] = espacios
-    config["fecha_actualizacion"] = datetime.now(timezone.utc)
+    config["updated_at"] = datetime.now(timezone.utc)
     
     await db.pingpong_config.update_one(
         {"config_key": "tv_layout"},
@@ -475,7 +475,7 @@ async def upload_logo(
         {"sponsor_id": sponsor_id},
         {"$set": {
             "logo_base64": logo_base64,
-            "fecha_actualizacion": datetime.now(timezone.utc)
+            "updated_at": datetime.now(timezone.utc)
         }}
     )
     

@@ -74,8 +74,8 @@ class ContentItem(ContentItemBase):
     # Curation
     curado_por: Optional[str] = None  # admin que lo added
     notas_curador: Optional[str] = None  # Notas internas
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    fecha_actualizacion: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = None
 
 
 class ContentPlaylist(BaseModel):
@@ -89,4 +89,4 @@ class ContentPlaylist(BaseModel):
     items: List[str] = []  # List of content_ids
     publicada: bool = True
     orden: int = 0
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

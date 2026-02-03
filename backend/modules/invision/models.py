@@ -25,7 +25,7 @@ class InvisionConfig(BaseModel):
     last_sync: Optional[datetime] = None
     status: str = "not_configured"  # not_configured, active, error
     error_message: Optional[str] = None
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class InvisionPost(BaseModel):

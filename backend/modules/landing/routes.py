@@ -136,7 +136,7 @@ async def add_block(
             {"pagina_id": "landing"},
             {
                 "$push": {"bloques": new_block},
-                "$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
             }
         )
     else:
@@ -145,7 +145,7 @@ async def add_block(
             "titulo": "Page Principal",
             "bloques": [new_block],
             "publicada": True,
-            "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+            "updated_at": datetime.now(timezone.utc).isoformat()
         }
         await db.paginas.insert_one(new_page)
     
@@ -163,7 +163,7 @@ async def reorder_blocks(request: ReorderBlocksRequest, admin: dict = Depends(ge
     
     await db.paginas.update_one(
         {"pagina_id": "landing"},
-        {"$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
     )
     
     return {"success": True}
@@ -183,7 +183,7 @@ async def update_block(
         update_doc["bloques.$.activo"] = activo
     if publicado is not None:
         update_doc["bloques.$.publicado"] = publicado
-    update_doc["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+    update_doc["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     result = await db.paginas.update_one(
         {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
@@ -203,7 +203,7 @@ async def toggle_block_publish(bloque_id: str, publicado: bool, admin: dict = De
         {"pagina_id": "landing", "bloques.bloque_id": bloque_id},
         {"$set": {
             "bloques.$.publicado": publicado,
-            "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+            "updated_at": datetime.now(timezone.utc).isoformat()
         }}
     )
     
@@ -220,7 +220,7 @@ async def delete_block(bloque_id: str, admin: dict = Depends(get_admin_user)):
         {"pagina_id": "landing"},
         {
             "$pull": {"bloques": {"bloque_id": bloque_id}},
-            "$set": {"fecha_actualizacion": datetime.now(timezone.utc).isoformat()}
+            "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
         }
     )
     
@@ -235,7 +235,7 @@ async def toggle_publish_landing(publicada: bool, admin: dict = Depends(get_admi
     """Toggle landing page published status"""
     await db.paginas.update_one(
         {"pagina_id": "landing"},
-        {"$set": {"publicada": publicada, "fecha_actualizacion": datetime.now(timezone.utc).isoformat()}},
+        {"$set": {"publicada": publicada, "updated_at": datetime.now(timezone.utc).isoformat()}},
         upsert=True
     )
     return {"success": True, "publicada": publicada}

@@ -25,7 +25,7 @@ class ProductRepository(BaseRepository):
     async def create(self, product_data: Dict) -> Dict:
         """Create nuevo producto"""
         product_data["libro_id"] = f"libro_{uuid.uuid4().hex[:12]}"
-        product_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        product_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(product_data)
     
     async def get_by_id(self, libro_id: str) -> Optional[Dict]:
@@ -47,10 +47,10 @@ class ProductRepository(BaseRepository):
             query["categoria"] = categoria
         
         if grado:
-            query["$or"] = [{"grado": grado}, {"grados": grado}]
+            query["$or"] = [{"grade": grado}, {"grades": grado}]
         
         if materia:
-            query["materia"] = materia
+            query["subject"] = materia
         
         return await self.find_many(query=query, skip=skip, limit=limit)
     
@@ -69,15 +69,15 @@ class ProductRepository(BaseRepository):
         return await self.find_many(
             query=query,
             limit=limit,
-            sort=[("orden_destacado", 1)]
+            sort=[("featured_order", 1)]
         )
     
     async def get_promotions(self, categoria: Optional[str] = None, limit: int = 10) -> List[Dict]:
         """Get productos en promotion"""
         query = {
-            "en_promocion": True,
+            "on_sale": True,
             "activo": True,
-            "precio_oferta": {"$ne": None}
+            "sale_price": {"$ne": None}
         }
         if categoria:
             query["categoria"] = categoria
@@ -91,7 +91,7 @@ class ProductRepository(BaseRepository):
         return await self.find_many(
             query=query,
             limit=limit,
-            sort=[("fecha_creacion", -1)]
+            sort=[("created_at", -1)]
         )
     
     async def search(self, query_text: str, limit: int = 50) -> List[Dict]:
@@ -113,13 +113,13 @@ class ProductRepository(BaseRepository):
     
     async def update_inventory(self, libro_id: str, cantidad: int) -> bool:
         """Update inventario"""
-        return await self.update_product(libro_id, {"cantidad_inventario": cantidad})
+        return await self.update_product(libro_id, {"inventory_quantity": cantidad})
     
     async def decrement_inventory(self, libro_id: str, cantidad: int) -> bool:
         """Decrementar inventario"""
         result = await self._collection.update_one(
             {self.ID_FIELD: libro_id},
-            {"$inc": {"cantidad_inventario": -cantidad}}
+            {"$inc": {"inventory_quantity": -cantidad}}
         )
         return result.modified_count > 0
     
@@ -128,7 +128,7 @@ class ProductRepository(BaseRepository):
         return await self.find_many(
             query={
                 "activo": True,
-                "cantidad_inventario": {"$lt": threshold}
+                "inventory_quantity": {"$lt": threshold}
             }
         )
     

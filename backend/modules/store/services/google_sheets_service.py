@@ -89,7 +89,7 @@ class GoogleSheetsService:
                 "proxima_sync": None,
                 "columna_numero": "numero_estudiante",
                 "columna_nombre": "nombre_completo",
-                "columna_grado": "grado",
+                "columna_grado": "grade",
                 "columna_seccion": "seccion",
                 "columna_estado": "estado"
             }
@@ -99,7 +99,7 @@ class GoogleSheetsService:
     
     async def update_sync_config(self, updates: Dict) -> Dict:
         """Update configuration de synchronization"""
-        updates["fecha_actualizacion"] = datetime.now(timezone.utc).isoformat()
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         await db.sync_config.update_one(
             {"config_id": "google_sheets_sync_config"},
@@ -122,7 +122,7 @@ class GoogleSheetsService:
             sheet_id: ID of the Google Sheet
             nombre_sheet: Nombre descriptivo
             hojas: Lista de hojas/tabs con su configuration
-                   [{"nombre": "1er Grado", "grado": "1", "columnas": {...}}]
+                   [{"nombre": "1er Grado", "grade": "1", "columnas": {...}}]
         """
         config = await self.get_sync_config()
         
@@ -305,7 +305,7 @@ class GoogleSheetsService:
                                 continue
                             
                             nombre_completo = get_val("columna_nombre") or ""
-                            grado = hoja_cfg.get("grado") or get_val("columna_grado") or ""
+                            grado = hoja_cfg.get("grade") or get_val("columna_grado") or ""
                             seccion = get_val("columna_seccion")
                             estado_raw = get_val("columna_estado") or "activo"
                             
@@ -325,14 +325,14 @@ class GoogleSheetsService:
                                 "nombre_completo": nombre_completo,
                                 "nombre": nombre,
                                 "apellido": apellido,
-                                "grado": str(grado),
+                                "grade": str(grado),
                                 "seccion": seccion,
                                 "sheet_id": sheet_cfg["sheet_id"],
                                 "hoja_nombre": hoja_cfg["nombre"],
                                 "fila_numero": fila_num,
                                 "estado": "activo" if estado_raw.lower() in ["activo", "active", "1", "si", "yes"] else "inactivo",
                                 "fecha_sync": datetime.now(timezone.utc).isoformat(),
-                                "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+                                "updated_at": datetime.now(timezone.utc).isoformat()
                             }
                             
                             # Guardar datos extra (otras columnas)
@@ -359,7 +359,7 @@ class GoogleSheetsService:
                                 # Create nuevo
                                 import uuid
                                 estudiante_data["sync_id"] = f"sync_{uuid.uuid4().hex[:12]}"
-                                estudiante_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+                                estudiante_data["created_at"] = datetime.now(timezone.utc).isoformat()
                                 estudiante_data["override_local"] = False
                                 
                                 await db.estudiantes_sincronizados.insert_one(estudiante_data)
@@ -393,7 +393,7 @@ class GoogleSheetsService:
         query = {}
         
         if grado:
-            query["grado"] = grado
+            query["grade"] = grado
         if estado:
             query["estado"] = estado
         if buscar:
@@ -431,7 +431,7 @@ class GoogleSheetsService:
             {"sync_id": sync_id},
             {"$set": {
                 "override_local": override,
-                "fecha_actualizacion": datetime.now(timezone.utc).isoformat()
+                "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
         

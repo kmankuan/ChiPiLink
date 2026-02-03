@@ -46,7 +46,7 @@ class ConfiguracionSheetSync(BaseModel):
     estado: str = "configurando"  # configurando, activo, error, pausado
     mensaje_error: Optional[str] = None
     # Dates
-    fecha_creacion: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class EstudianteSincronizado(BaseModel):

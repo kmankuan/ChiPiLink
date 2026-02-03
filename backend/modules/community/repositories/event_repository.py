@@ -24,7 +24,7 @@ class EventRepository(BaseRepository):
     async def create(self, event_data: Dict) -> Dict:
         """Create nuevo evento"""
         event_data["evento_id"] = f"evento_{uuid.uuid4().hex[:12]}"
-        event_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        event_data["created_at"] = datetime.now(timezone.utc).isoformat()
         event_data["estado"] = event_data.get("estado", "programado")
         event_data["inscripciones"] = []
         return await self.insert_one(event_data)

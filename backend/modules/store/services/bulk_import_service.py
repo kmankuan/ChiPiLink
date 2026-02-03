@@ -83,7 +83,7 @@ class BulkImportService:
                 {
                     "numero_estudiante": 0,  # Columna A
                     "nombre_completo": 1,    # Columna B
-                    "grado": 2,              # Columna C (opcional si hay grado_default)
+                    "grade": 2,              # Columna C (opcional si hay grado_default)
                     "seccion": 3             # Columna D (opcional)
                 }
             grado_default: Grado by default si no is en los datos
@@ -110,7 +110,7 @@ class BulkImportService:
                 # Extract datos according to mapeo
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
-                grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
+                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
                 # Validaciones
@@ -148,7 +148,7 @@ class BulkImportService:
                     "nombre_completo": nombre_completo,
                     "nombre": nombre,
                     "apellido": apellido,
-                    "grado": str(grado),
+                    "grade": str(grado),
                     "seccion": seccion,
                     "ya_existe": existente is not None,
                     "accion": "actualizar" if existente else "crear"
@@ -211,7 +211,7 @@ class BulkImportService:
             try:
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
-                grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
+                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
                 if not numero or not nombre_completo or not grado:
@@ -240,14 +240,14 @@ class BulkImportService:
                     "nombre_completo": nombre_completo,
                     "nombre": nombre,
                     "apellido": apellido,
-                    "grado": str(grado),
+                    "grade": str(grado),
                     "seccion": seccion,
                     "hoja_nombre": hoja_nombre,
                     "fila_numero": idx + 2,
                     "estado": "activo",
                     "import_id": import_id,
                     "fecha_sync": now,
-                    "fecha_actualizacion": now
+                    "updated_at": now
                 }
                 
                 if existente:
@@ -262,7 +262,7 @@ class BulkImportService:
                 else:
                     estudiante_data["sync_id"] = f"sync_{uuid.uuid4().hex[:12]}"
                     estudiante_data["sheet_id"] = "manual_import"
-                    estudiante_data["fecha_creacion"] = now
+                    estudiante_data["created_at"] = now
                     estudiante_data["override_local"] = False
                     
                     await db.estudiantes_sincronizados.insert_one(estudiante_data)
@@ -307,13 +307,13 @@ class BulkImportService:
             raw_text: Texto pegado desde Google Sheets
             column_mapping: Mapeo de campos a indexs de columna
                 {
-                    "codigo": 0,           # Code del libro
+                    "code": 0,           # Code del libro
                     "nombre": 1,           # Name ofl libro
                     "precio": 2,           # Precio
                     "editorial": 3,        # Editorial (opcional)
                     "isbn": 4,             # ISBN (opcional)
-                    "grado": 5,            # Grado (opcional si hay default)
-                    "materia": 6           # Materia (opcional)
+                    "grade": 5,            # Grado (opcional si hay default)
+                    "subject": 6           # Materia (opcional)
                 }
         """
         parsed = self.parse_tsv(raw_text, has_headers=True)
@@ -331,13 +331,13 @@ class BulkImportService:
         
         for idx, row in enumerate(parsed["rows"]):
             try:
-                codigo = self._get_cell(row, column_mapping.get("codigo"))
+                codigo = self._get_cell(row, column_mapping.get("code"))
                 nombre = self._get_cell(row, column_mapping.get("nombre"))
                 precio_str = self._get_cell(row, column_mapping.get("precio"))
                 editorial = self._get_cell(row, column_mapping.get("editorial"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
-                grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
-                materia = self._get_cell(row, column_mapping.get("materia"))
+                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                materia = self._get_cell(row, column_mapping.get("subject"))
                 
                 # Validaciones
                 if not codigo:
@@ -361,17 +361,17 @@ class BulkImportService:
                 codigos_vistos.add(codigo)
                 
                 # Verify si already exists
-                existente = await db.libros.find_one({"codigo": codigo})
+                existente = await db.libros.find_one({"code": codigo})
                 
                 preview.append({
                     "fila": idx + 2,
-                    "codigo": codigo,
+                    "code": codigo,
                     "nombre": nombre,
                     "precio": precio,
                     "editorial": editorial,
                     "isbn": isbn,
-                    "grado": grado,
-                    "materia": materia,
+                    "grade": grado,
+                    "subject": materia,
                     "ya_existe": existente is not None,
                     "accion": "actualizar" if existente else "crear"
                 })
@@ -429,13 +429,13 @@ class BulkImportService:
         
         for idx, row in enumerate(parsed["rows"]):
             try:
-                codigo = self._get_cell(row, column_mapping.get("codigo"))
+                codigo = self._get_cell(row, column_mapping.get("code"))
                 nombre = self._get_cell(row, column_mapping.get("nombre"))
                 precio_str = self._get_cell(row, column_mapping.get("precio"))
                 editorial = self._get_cell(row, column_mapping.get("editorial"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
-                grado = self._get_cell(row, column_mapping.get("grado")) or grado_default
-                materia = self._get_cell(row, column_mapping.get("materia"))
+                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                materia = self._get_cell(row, column_mapping.get("subject"))
                 
                 if not codigo or not nombre:
                     resultados["errores"].append({
@@ -457,29 +457,29 @@ class BulkImportService:
                     continue
                 codigos_procesados.add(codigo)
                 
-                existente = await db.libros.find_one({"codigo": codigo})
+                existente = await db.libros.find_one({"code": codigo})
                 
                 libro_data = {
-                    "codigo": codigo,
+                    "code": codigo,
                     "nombre": nombre,
                     "precio": precio,
                     "editorial": editorial,
                     "isbn": isbn,
-                    "materia": materia,
+                    "subject": materia,
                     "categoria": "texto_escolar",
                     "activo": True,
                     "estado_disponibilidad": "disponible",
                     "import_id": import_id,
-                    "fecha_actualizacion": now
+                    "updated_at": now
                 }
                 
                 # Manejar grados (puede ser uno o varios)
                 if grado:
                     if "," in str(grado):
-                        libro_data["grados"] = [g.strip() for g in str(grado).split(",")]
+                        libro_data["grades"] = [g.strip() for g in str(grado).split(",")]
                     else:
-                        libro_data["grado"] = str(grado)
-                        libro_data["grados"] = [str(grado)]
+                        libro_data["grade"] = str(grado)
+                        libro_data["grades"] = [str(grado)]
                 
                 if catalogo_id:
                     libro_data["catalogo_id"] = catalogo_id
@@ -495,8 +495,8 @@ class BulkImportService:
                         resultados["omitidos"] += 1
                 else:
                     libro_data["libro_id"] = f"libro_{uuid.uuid4().hex[:12]}"
-                    libro_data["fecha_creacion"] = now
-                    libro_data["cantidad_inventario"] = 0
+                    libro_data["created_at"] = now
+                    libro_data["inventory_quantity"] = 0
                     libro_data["cantidad_reservada"] = 0
                     
                     await db.libros.insert_one(libro_data)

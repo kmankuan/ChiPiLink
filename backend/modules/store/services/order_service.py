@@ -40,7 +40,7 @@ class OrderService(BaseService):
             product = await self.product_repository.get_by_id(item.libro_id)
             if not product:
                 raise ValueError(f"Producto {item.libro_id} not found")
-            if product.get("cantidad_inventario", 0) < item.cantidad:
+            if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario
         
@@ -92,7 +92,7 @@ class OrderService(BaseService):
             product = await self.product_repository.get_by_id(item.libro_id)
             if not product:
                 raise ValueError(f"Producto {item.libro_id} not found")
-            if product.get("cantidad_inventario", 0) < item.cantidad:
+            if product.get("inventory_quantity", 0) < item.cantidad:
                 raise ValueError(f"Stock insuficiente para {product['nombre']}")
             total += item.cantidad * item.precio_unitario
             items_validados.append(item.model_dump())
@@ -109,7 +109,7 @@ class OrderService(BaseService):
             "estudiante_nombre": nombre_completo,
             "estudiante_primer_nombre": data.nombre_estudiante,
             "estudiante_apellido": data.apellido_estudiante,
-            "grado_estudiante": data.grado_estudiante,
+            "grado_estudiante": data.grade_estudiante,
             "email_estudiante": data.email_estudiante,
             "telefono_estudiante": data.telefono_estudiante,
             "escuela_estudiante": data.escuela_estudiante,

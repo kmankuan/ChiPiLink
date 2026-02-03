@@ -45,17 +45,17 @@ class ProductBase(BaseModel):
     grados: Optional[List[str]] = None
     materia: Optional[str] = None
     precio: float
-    precio_oferta: Optional[float] = None
-    cantidad_inventario: int = 0
+    sale_price: Optional[float] = None
+    inventory_quantity: int = 0
     isbn: Optional[str] = None
     editorial: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     activo: bool = True
-    requiere_preparacion: bool = False
+    requires_preparation: bool = False
     destacado: bool = False
-    en_promocion: bool = False
-    orden_destacado: int = 0
-    es_catalogo_privado: bool = False
+    on_sale: bool = False
+    featured_order: int = 0
+    is_private_catalog: bool = False
     codigo: Optional[str] = None
 
 
@@ -73,14 +73,14 @@ class ProductUpdate(BaseModel):
     grados: Optional[List[str]] = None
     materia: Optional[str] = None
     precio: Optional[float] = None
-    precio_oferta: Optional[float] = None
-    cantidad_inventario: Optional[int] = None
+    sale_price: Optional[float] = None
+    inventory_quantity: Optional[int] = None
     isbn: Optional[str] = None
     editorial: Optional[str] = None
-    imagen_url: Optional[str] = None
+    image_url: Optional[str] = None
     activo: Optional[bool] = None
     destacado: Optional[bool] = None
-    en_promocion: Optional[bool] = None
+    on_sale: Optional[bool] = None
 
 
 class Product(ProductBase):
@@ -88,7 +88,7 @@ class Product(ProductBase):
     model_config = ConfigDict(from_attributes=True)
     
     libro_id: str
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
 
 
 # ============== ORDER ITEM MODELS ==============
@@ -163,8 +163,8 @@ class Order(BaseModel):
     telefono_acudiente: Optional[str] = None
     email_acudiente: Optional[str] = None
     # Timestamps
-    fecha_creacion: Optional[Any] = None
-    fecha_actualizacion: Optional[Any] = None
+    created_at: Optional[Any] = None
+    updated_at: Optional[Any] = None
 
 
 # ============== STUDENT MODELS ==============
@@ -218,7 +218,7 @@ class Category(CategoryBase):
     model_config = ConfigDict(from_attributes=True)
     
     categoria_id: str
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
 
 
 # ============== BANNER MODELS ==============
@@ -228,7 +228,7 @@ class BannerBase(BaseModel):
     categoria: str
     titulo: Optional[str] = None
     subtitulo: Optional[str] = None
-    imagen_url: str
+    image_url: str
     link_url: Optional[str] = None
     activo: bool = True
     orden: int = 0
@@ -247,7 +247,7 @@ class Banner(BannerBase):
     
     banner_id: str
     creado_por: Optional[str] = None
-    fecha_creacion: Optional[Any] = None
+    created_at: Optional[Any] = None
 
 
 # ============== INVENTORY MODELS ==============

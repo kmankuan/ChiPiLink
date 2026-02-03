@@ -31,7 +31,7 @@ def setup_event_handlers():
             "mensaje": f"Pedido {payload.get('pedido_id')} - ${payload.get('total', 0):.2f}",
             "datos": payload,
             "leida": False,
-            "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.notifications.insert_one(notificacion)
@@ -53,7 +53,7 @@ def setup_event_handlers():
             "mensaje": f"{payload.get('nombre')} tiene solo {payload.get('cantidad')} unidades",
             "datos": payload,
             "leida": False,
-            "fecha_creacion": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.notifications.insert_one(notificacion)

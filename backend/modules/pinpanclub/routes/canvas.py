@@ -73,8 +73,8 @@ async def crear_layout(layout_data: LayoutCreate):
             "showQR": True
         },
         "is_default": layout_data.is_default,
-        "fecha_creacion": datetime.now(timezone.utc),
-        "fecha_actualizacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
     }
     
     await db.pingpong_canvas_layouts.insert_one(doc)
@@ -91,7 +91,7 @@ async def listar_layouts():
     layouts = await db.pingpong_canvas_layouts.find(
         {},
         {"_id": 0}
-    ).sort("fecha_creacion", -1).to_list(50)
+    ).sort("created_at", -1).to_list(50)
     
     return layouts
 
@@ -136,7 +136,7 @@ async def actualizar_layout(layout_id: str, update: LayoutUpdate):
                 {"$set": {"is_default": False}}
             )
     
-    update_data["fecha_actualizacion"] = datetime.now(timezone.utc)
+    update_data["updated_at"] = datetime.now(timezone.utc)
     
     result = await db.pingpong_canvas_layouts.update_one(
         {"layout_id": layout_id},
@@ -332,8 +332,8 @@ async def crear_desde_preset(preset_id: str, name: str = "Nuevo Layout"):
         "settings": preset["settings"],
         "is_default": False,
         "preset_origin": preset_id,
-        "fecha_creacion": datetime.now(timezone.utc),
-        "fecha_actualizacion": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
     }
     
     await db.pingpong_canvas_layouts.insert_one(doc)

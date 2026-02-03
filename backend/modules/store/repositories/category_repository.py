@@ -36,7 +36,7 @@ class CategoryRepository(BaseRepository):
         """Create nueva category"""
         if not category_data.get("categoria_id"):
             category_data["categoria_id"] = f"cat_{uuid.uuid4().hex[:8]}"
-        category_data["fecha_creacion"] = datetime.now(timezone.utc).isoformat()
+        category_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(category_data)
     
     async def get_by_id(self, categoria_id: str) -> Optional[Dict]:

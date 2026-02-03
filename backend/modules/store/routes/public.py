@@ -22,7 +22,7 @@ async def get_public_products(grado: Optional[str] = None):
     # Filter solo productos con stock > 0
     productos_disponibles = [
         p for p in products
-        if p.cantidad_inventario > 0
+        if p.inventory_quantity > 0
     ]
     
     return productos_disponibles
@@ -76,7 +76,7 @@ async def get_public_order(order_id: str):
 async def get_grades():
     """Get grados disponibles"""
     return {
-        "grados": [
+        "grades": [
             {"id": "preescolar", "nombre": "Preescolar"},
             {"id": "1", "nombre": "1er Grado"},
             {"id": "2", "nombre": "2do Grado"},
