@@ -124,7 +124,7 @@ async def generate_students_list() -> List[Dict]:
             student = {
                 "sync_id": f"sync_{uuid.uuid4().hex[:12]}",
                 "numero_estudiante": f"PCA-{student_number}",
-                "full_name": f"{nombre} {apellido} {apellido2}",
+                "full_name": f"{first_name} {last_name} {last_name2}",
                 "name": nombre,
                 "apellido": f"{apellido} {apellido2}",
                 "grade": grade,
