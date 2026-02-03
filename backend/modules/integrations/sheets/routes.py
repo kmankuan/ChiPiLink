@@ -183,7 +183,7 @@ async def delete_sheet_config(config_id: str, admin: dict = Depends(get_admin_us
         raise HTTPException(status_code=404, detail="Configuraci\u00f3n not found")
     
     # Also delete synced data
-    await db.estudiantes_sincronizados.delete_many({"config_id": config_id})
+    await db.synced_students.delete_many({"config_id": config_id})
     
     return {"success": True}
 
@@ -209,7 +209,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
         fila_inicio = config.get("fila_inicio_datos", 2) - 1  # 0-indexed
         
         # Get existing records (OPTIMIZED: only fetch needed fields for comparison)
-        existing = await db.estudiantes_sincronizados.find(
+        existing = await db.synced_students.find(
             {"config_id": config_id, "estado": "active"},
             {"_id": 0, "sync_id": 1, "fila_original": 1, "datos": 1, "hash_datos": 1}
         ).to_list(10000)
@@ -246,7 +246,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
                         valor_nuevo=datos_mapeados
                     ))
                     
-                    await db.estudiantes_sincronizados.update_one(
+                    await db.synced_students.update_one(
                         {"sync_id": existing_record["sync_id"]},
                         {"$set": {
                             "datos": datos_mapeados,
@@ -269,7 +269,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
                 doc = new_record.model_dump()
                 doc["fecha_sincronizacion"] = doc["fecha_sincronizacion"].isoformat()
                 
-                await db.estudiantes_sincronizados.insert_one(doc)
+                await db.synced_students.insert_one(doc)
                 
                 cambios.append(CambioRegistro(
                     tipo="nuevo",
@@ -281,7 +281,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
         # Mark remaining as deleted
         eliminados = 0
         for row_idx, record in existing_by_row.items():
-            await db.estudiantes_sincronizados.update_one(
+            await db.synced_students.update_one(
                 {"sync_id": record["sync_id"]},
                 {"$set": {"estado": "eliminado"}}
             )
@@ -293,7 +293,7 @@ async def sync_sheet_data(config_id: str, admin: dict = Depends(get_admin_user))
             eliminados += 1
         
         # Update config status
-        total_activos = await db.estudiantes_sincronizados.count_documents(
+        total_activos = await db.synced_students.count_documents(
             {"config_id": config_id, "estado": "active"}
         )
         
@@ -340,8 +340,8 @@ async def get_synced_data(
     if estado:
         query["estado"] = estado
     
-    data = await db.estudiantes_sincronizados.find(query, {"_id": 0}).to_list(limite)
-    total = await db.estudiantes_sincronizados.count_documents(query)
+    data = await db.synced_students.find(query, {"_id": 0}).to_list(limite)
+    total = await db.synced_students.count_documents(query)
     
     return {
         "data": data,

@@ -31,7 +31,7 @@ COLLECTION_MIGRATIONS = {
     "libros": "store_products",
     "pedidos": "store_orders",
     "categorias": "store_categories",
-    "estudiantes_sincronizados": "store_students",
+    "synced_students": "store_students",
     
     # PinpanClub Module
     "pingpong_players": "pinpanclub_players",

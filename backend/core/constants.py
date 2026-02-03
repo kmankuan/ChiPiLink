@@ -24,7 +24,7 @@ class StoreCollections:
     PRODUCTS = "libros"                      # Using libros collection for products
     ORDERS = "store_orders"                 # Previously: pedidos
     CATEGORIES = "categorias"               # Using categorias collection
-    STUDENTS = "estudiantes_sincronizados"  # Using estudiantes_sincronizados collection
+    STUDENTS = "synced_students"  # Using synced_students collection
 
 
 # =============================================================================
@@ -84,7 +84,7 @@ LEGACY_TO_NEW = {
     "libros": StoreCollections.PRODUCTS,
     "pedidos": StoreCollections.ORDERS,
     "categorias": StoreCollections.CATEGORIES,
-    "estudiantes_sincronizados": StoreCollections.STUDENTS,
+    "synced_students": StoreCollections.STUDENTS,
     
     # PinpanClub
     "pingpong_players": PinpanClubCollections.PLAYERS,

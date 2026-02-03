@@ -196,9 +196,9 @@ async def get_estudiantes_importados(
             {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
         ]
     
-    total = await db.estudiantes_sincronizados.count_documents(query)
+    total = await db.synced_students.count_documents(query)
     
-    cursor = db.estudiantes_sincronizados.find(
+    cursor = db.synced_students.find(
         query,
         {"_id": 0}
     ).sort("nombre_completo", 1).skip(skip).limit(limit)

@@ -379,11 +379,11 @@ async def get_unatienda_demo_stats(admin: dict = Depends(get_admin_user)):
     """Get statistics for Unatienda demo data"""
     try:
         stats = {
-            "products": await db.libros.count_documents({"es_demo": True}),
-            "students": await db.estudiantes_sincronizados.count_documents({"es_demo": True}),
-            "orders": await db.textbook_orders.count_documents({"es_demo": True}),
+            "products": await db.libros.count_documents({"is_demo": True}),
+            "students": await db.synced_students.count_documents({"is_demo": True}),
+            "orders": await db.textbook_orders.count_documents({"is_demo": True}),
             "total_products": await db.libros.count_documents({"is_private_catalog": True}),
-            "total_students": await db.estudiantes_sincronizados.count_documents({}),
+            "total_students": await db.synced_students.count_documents({}),
             "total_orders": await db.textbook_orders.count_documents({})
         }
         
@@ -409,7 +409,7 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
                 "is_private_catalog": True,
                 "active": True
             }),
-            "students": await db.estudiantes_sincronizados.count_documents({}),
+            "students": await db.synced_students.count_documents({}),
             "orders_pending": await db.textbook_orders.count_documents({"status": "pending"}),
             "student_requests_approved": await db.store_textbook_access_students.count_documents({"status": "approved"}),
             "student_requests_pending": await db.store_textbook_access_requests.count_documents({"status": "pending"})

@@ -133,7 +133,7 @@ class BulkImportService:
                 numeros_vistos.add(numero)
                 
                 # Verify si already exists en DB
-                existente = await db.estudiantes_sincronizados.find_one(
+                existente = await db.synced_students.find_one(
                     {"numero_estudiante": numero}
                 )
                 
@@ -231,7 +231,7 @@ class BulkImportService:
                 nombre = partes[0]
                 apellido = partes[1] if len(partes) > 1 else ""
                 
-                existente = await db.estudiantes_sincronizados.find_one(
+                existente = await db.synced_students.find_one(
                     {"numero_estudiante": numero}
                 )
                 
@@ -252,7 +252,7 @@ class BulkImportService:
                 
                 if existente:
                     if actualizar_existentes and not existente.get("override_local"):
-                        await db.estudiantes_sincronizados.update_one(
+                        await db.synced_students.update_one(
                             {"sync_id": existente["sync_id"]},
                             {"$set": estudiante_data}
                         )
@@ -265,7 +265,7 @@ class BulkImportService:
                     estudiante_data["created_at"] = now
                     estudiante_data["override_local"] = False
                     
-                    await db.estudiantes_sincronizados.insert_one(estudiante_data)
+                    await db.synced_students.insert_one(estudiante_data)
                     resultados["creados"] += 1
                     
             except Exception as e:
@@ -547,7 +547,7 @@ class BulkImportService:
             {"$group": {"_id": "$grado"}},
             {"$sort": {"_id": 1}}
         ]
-        result = await db.estudiantes_sincronizados.aggregate(pipeline).to_list(50)
+        result = await db.synced_students.aggregate(pipeline).to_list(50)
         return [r["_id"] for r in result if r["_id"]]
     
     def _get_cell(self, row: List[str], index: Optional[int]) -> Optional[str]:

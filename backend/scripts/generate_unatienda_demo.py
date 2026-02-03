@@ -58,7 +58,7 @@ async def generate_catalog_products() -> List[Dict]:
     products = []
     
     # Clear existing demo products
-    await db.libros.delete_many({"es_demo": True})
+    await db.libros.delete_many({"is_demo": True})
     
     for grado in GRADOS_PCA:
         materias = get_materias_for_grado(grade)
@@ -89,7 +89,7 @@ async def generate_catalog_products() -> List[Dict]:
                 "active": True,
                 "featured": random.random() > 0.8,
                 "on_sale": random.random() > 0.85,
-                "es_demo": True,
+                "is_demo": True,
                 "ano_escolar": "2025-2026",
                 "is_private_catalog": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
@@ -108,7 +108,7 @@ async def generate_students_list() -> List[Dict]:
     students = []
     
     # Clear existing demo students
-    await db.estudiantes_sincronizados.delete_many({"es_demo": True})
+    await db.synced_students.delete_many({"is_demo": True})
     
     student_number = 1001
     
@@ -138,7 +138,7 @@ async def generate_students_list() -> List[Dict]:
                     "email_acudiente": f"acudiente{student_number}@email.com",
                     "telefono_acudiente": f"+507 6{random.randint(100,999)}-{random.randint(1000,9999)}"
                 },
-                "es_demo": True,
+                "is_demo": True,
                 "fecha_sync": datetime.now(timezone.utc).isoformat(),
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
@@ -147,7 +147,7 @@ async def generate_students_list() -> List[Dict]:
     
     # Insert all students
     if students:
-        await db.estudiantes_sincronizados.insert_many(students)
+        await db.synced_students.insert_many(students)
     
     return students
 
@@ -157,7 +157,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
     orders = []
     
     # Clear existing demo orders
-    await db.textbook_orders.delete_many({"es_demo": True})
+    await db.textbook_orders.delete_many({"is_demo": True})
     
     # Select random students to have orders
     students_with_orders = random.sample(students, min(10, len(students)))
@@ -211,7 +211,7 @@ async def generate_sample_orders(students: List[Dict], products: List[Dict]) -> 
             "total_amount": round(total, 2),
             "items_count": len(items),
             "notes": f"Pedido de prueba para {student['nombre_completo']}",
-            "es_demo": True,
+            "is_demo": True,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
@@ -265,9 +265,9 @@ async def clear_demo_data():
     """Clear all demo data for Unatienda"""
     print("🗑️ Limpiando datos de demo...")
     
-    result_libros = await db.libros.delete_many({"es_demo": True})
-    result_estudiantes = await db.estudiantes_sincronizados.delete_many({"es_demo": True})
-    result_orders = await db.textbook_orders.delete_many({"es_demo": True})
+    result_libros = await db.libros.delete_many({"is_demo": True})
+    result_estudiantes = await db.synced_students.delete_many({"is_demo": True})
+    result_orders = await db.textbook_orders.delete_many({"is_demo": True})
     
     return {
         "libros_eliminados": result_libros.deleted_count,

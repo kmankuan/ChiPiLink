@@ -315,7 +315,7 @@ class GoogleSheetsService:
                             apellido = partes_nombre[1] if len(partes_nombre) > 1 else ""
                             
                             # Search si already exists
-                            existente = await db.estudiantes_sincronizados.find_one({
+                            existente = await db.synced_students.find_one({
                                 "numero_estudiante": numero,
                                 "sheet_id": sheet_cfg["sheet_id"]
                             })
@@ -350,7 +350,7 @@ class GoogleSheetsService:
                                     continue
                                 
                                 # Update
-                                await db.estudiantes_sincronizados.update_one(
+                                await db.synced_students.update_one(
                                     {"sync_id": existente["sync_id"]},
                                     {"$set": estudiante_data}
                                 )
@@ -362,7 +362,7 @@ class GoogleSheetsService:
                                 estudiante_data["created_at"] = datetime.now(timezone.utc).isoformat()
                                 estudiante_data["override_local"] = False
                                 
-                                await db.estudiantes_sincronizados.insert_one(estudiante_data)
+                                await db.synced_students.insert_one(estudiante_data)
                                 resultados["estudiantes_nuevos"] += 1
                                 
                         except Exception as e:
@@ -381,7 +381,7 @@ class GoogleSheetsService:
         logger.info(f"[GoogleSheets] Sync completed: {resultados}")
         return resultados
     
-    async def get_estudiantes_sincronizados(
+    async def get_synced_students(
         self,
         grade: str = None,
         estado: str = "active",
@@ -402,9 +402,9 @@ class GoogleSheetsService:
                 {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
             ]
         
-        total = await db.estudiantes_sincronizados.count_documents(query)
+        total = await db.synced_students.count_documents(query)
         
-        cursor = db.estudiantes_sincronizados.find(
+        cursor = db.synced_students.find(
             query,
             {"_id": 0}
         ).sort("nombre_completo", 1).skip(skip).limit(limit)
@@ -420,14 +420,14 @@ class GoogleSheetsService:
     
     async def buscar_estudiante_por_numero(self, numero: str) -> Optional[Dict]:
         """Search estudiante por number"""
-        return await db.estudiantes_sincronizados.find_one(
+        return await db.synced_students.find_one(
             {"numero_estudiante": numero, "estado": "active"},
             {"_id": 0}
         )
     
     async def set_override_local(self, sync_id: str, override: bool) -> Dict:
         """Marcar/desmarcar un estudiante para that does not se actualice desde el Sheet"""
-        result = await db.estudiantes_sincronizados.update_one(
+        result = await db.synced_students.update_one(
             {"sync_id": sync_id},
             {"$set": {
                 "override_local": override,
@@ -450,11 +450,11 @@ class GoogleSheetsService:
             {"$group": {"_id": "$grado", "count": {"$sum": 1}}},
             {"$sort": {"_id": 1}}
         ]
-        por_grade = await db.estudiantes_sincronizados.aggregate(pipeline).to_list(20)
+        por_grade = await db.synced_students.aggregate(pipeline).to_list(20)
         
-        total_activos = await db.estudiantes_sincronizados.count_documents({"estado": "active"})
-        total_inactivos = await db.estudiantes_sincronizados.count_documents({"estado": "inactivo"})
-        total_override = await db.estudiantes_sincronizados.count_documents({"override_local": True})
+        total_activos = await db.synced_students.count_documents({"estado": "active"})
+        total_inactivos = await db.synced_students.count_documents({"estado": "inactivo"})
+        total_override = await db.synced_students.count_documents({"override_local": True})
         
         return {
             "total_estudiantes": total_activos + total_inactivos,
