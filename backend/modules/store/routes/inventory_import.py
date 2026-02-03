@@ -170,9 +170,9 @@ async def preview_csv_import(
                 errors.append({"row": row_num, "error": f"Invalid precio: {row.get('precio')}"})
                 continue
             
-            # Check if product exists
-            existing = await db.productos_privados.find_one(
-                {"codigo": codigo},
+            # Check if product exists in the private catalog (libros collection)
+            existing = await db.libros.find_one(
+                {"codigo": codigo, "es_catalogo_privado": True},
                 {"_id": 0, "libro_id": 1, "nombre": 1, "cantidad_inventario": 1}
             )
             
