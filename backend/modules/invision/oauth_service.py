@@ -73,15 +73,19 @@ class LaoPanOAuthService:
         """
         state = str(uuid.uuid4())
         
-        # Store state with optional redirect
+        # Get the redirect URI (auto-detects from origin)
+        redirect_uri = self.get_redirect_uri(origin)
+        
+        # Store state with optional redirect and the redirect_uri used
         self._states[state] = {
             "created_at": datetime.now(timezone.utc),
-            "redirect_after": redirect_after
+            "redirect_after": redirect_after,
+            "redirect_uri": redirect_uri  # Store for token exchange
         }
         
         params = {
             "client_id": self.client_id,
-            "redirect_uri": self.get_redirect_uri(),
+            "redirect_uri": redirect_uri,
             "response_type": "code",
             "scope": " ".join(OAUTH_SCOPES),
             "state": state
@@ -89,9 +93,12 @@ class LaoPanOAuthService:
         
         auth_url = f"{AUTHORIZE_URL}?{urlencode(params)}"
         
+        logger.info(f"Generated OAuth URL with redirect_uri: {redirect_uri}")
+        
         return {
             "auth_url": auth_url,
-            "state": state
+            "state": state,
+            "redirect_uri": redirect_uri  # Return for debugging
         }
     
     def validate_state(self, state: str) -> Optional[Dict]:
