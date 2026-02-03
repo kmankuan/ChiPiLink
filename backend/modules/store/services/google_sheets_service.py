@@ -305,7 +305,7 @@ class GoogleSheetsService:
                                 continue
                             
                             nombre_completo = get_val("columna_nombre") or ""
-                            grado = hoja_cfg.get("grade") or get_val("columna_grado") or ""
+                            grade = hoja_cfg.get("grade") or get_val("columna_grado") or ""
                             seccion = get_val("columna_seccion")
                             estado_raw = get_val("columna_estado") or "active"
                             
@@ -325,7 +325,7 @@ class GoogleSheetsService:
                                 "nombre_completo": nombre_completo,
                                 "name": nombre,
                                 "apellido": apellido,
-                                "grade": str(grado),
+                                "grade": str(grade),
                                 "seccion": seccion,
                                 "sheet_id": sheet_cfg["sheet_id"],
                                 "hoja_nombre": hoja_cfg["name"],
@@ -392,7 +392,7 @@ class GoogleSheetsService:
         """Get estudiantes sincronizados con filtros"""
         query = {}
         
-        if grado:
+        if grade:
             query["grade"] = grado
         if estado:
             query["estado"] = estado
@@ -450,7 +450,7 @@ class GoogleSheetsService:
             {"$group": {"_id": "$grado", "count": {"$sum": 1}}},
             {"$sort": {"_id": 1}}
         ]
-        por_grado = await db.estudiantes_sincronizados.aggregate(pipeline).to_list(20)
+        por_grade = await db.estudiantes_sincronizados.aggregate(pipeline).to_list(20)
         
         total_activos = await db.estudiantes_sincronizados.count_documents({"estado": "active"})
         total_inactivos = await db.estudiantes_sincronizados.count_documents({"estado": "inactivo"})

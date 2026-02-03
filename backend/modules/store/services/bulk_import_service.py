@@ -110,7 +110,7 @@ class BulkImportService:
                 # Extract datos according to mapeo
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
-                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
                 # Validaciones
@@ -122,7 +122,7 @@ class BulkImportService:
                     errores.append({"fila": idx + 2, "error": "Nombre empty"})
                     continue
                 
-                if not grado:
+                if not grade:
                     errores.append({"fila": idx + 2, "error": "Grado empty"})
                     continue
                 
@@ -148,7 +148,7 @@ class BulkImportService:
                     "nombre_completo": nombre_completo,
                     "name": nombre,
                     "apellido": apellido,
-                    "grade": str(grado),
+                    "grade": str(grade),
                     "seccion": seccion,
                     "ya_existe": existente is not None,
                     "accion": "actualizar" if existente else "crear"
@@ -211,10 +211,10 @@ class BulkImportService:
             try:
                 numero = self._get_cell(row, column_mapping.get("numero_estudiante"))
                 nombre_completo = self._get_cell(row, column_mapping.get("nombre_completo"))
-                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 seccion = self._get_cell(row, column_mapping.get("seccion"))
                 
-                if not numero or not nombre_completo or not grado:
+                if not numero or not nombre_completo or not grade:
                     resultados["errores"].append({
                         "fila": idx + 2,
                         "error": "Datos incompletos"
@@ -240,7 +240,7 @@ class BulkImportService:
                     "nombre_completo": nombre_completo,
                     "name": nombre,
                     "apellido": apellido,
-                    "grade": str(grado),
+                    "grade": str(grade),
                     "seccion": seccion,
                     "hoja_nombre": hoja_nombre,
                     "fila_numero": idx + 2,
@@ -336,7 +336,7 @@ class BulkImportService:
                 precio_str = self._get_cell(row, column_mapping.get("price"))
                 editorial = self._get_cell(row, column_mapping.get("publisher"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
-                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 materia = self._get_cell(row, column_mapping.get("subject"))
                 
                 # Validaciones
@@ -370,7 +370,7 @@ class BulkImportService:
                     "price": precio,
                     "publisher": editorial,
                     "isbn": isbn,
-                    "grade": grado,
+                    "grade": grade,
                     "subject": materia,
                     "ya_existe": existente is not None,
                     "accion": "actualizar" if existente else "crear"
@@ -434,7 +434,7 @@ class BulkImportService:
                 precio_str = self._get_cell(row, column_mapping.get("price"))
                 editorial = self._get_cell(row, column_mapping.get("publisher"))
                 isbn = self._get_cell(row, column_mapping.get("isbn"))
-                grado = self._get_cell(row, column_mapping.get("grade")) or grado_default
+                grade = self._get_cell(row, column_mapping.get("grade")) or grado_default
                 materia = self._get_cell(row, column_mapping.get("subject"))
                 
                 if not codigo or not nombre:
@@ -474,12 +474,12 @@ class BulkImportService:
                 }
                 
                 # Manejar grados (puede ser uno o varios)
-                if grado:
-                    if "," in str(grado):
-                        libro_data["grades"] = [g.strip() for g in str(grado).split(",")]
+                if grade:
+                    if "," in str(grade):
+                        libro_data["grades"] = [g.strip() for g in str(grade).split(",")]
                     else:
-                        libro_data["grade"] = str(grado)
-                        libro_data["grades"] = [str(grado)]
+                        libro_data["grade"] = str(grade)
+                        libro_data["grades"] = [str(grade)]
                 
                 if catalogo_id:
                     libro_data["catalogo_id"] = catalogo_id
@@ -540,7 +540,7 @@ class BulkImportService:
         
         return await cursor.to_list(length=limit)
     
-    async def get_grados_disponibles(self) -> List[str]:
+    async def get_available_grades(self) -> List[str]:
         """Get lista de grados uniques de estudiantes importados"""
         pipeline = [
             {"$match": {"estado": "active"}},

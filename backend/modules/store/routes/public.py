@@ -17,7 +17,7 @@ router = APIRouter(prefix="/public", tags=["Store - Public"])
 @router.get("/products")
 async def get_public_products(grade: Optional[str] = None):
     """Get productos para formulario public - sin authentication"""
-    products = await product_service.get_all_products(grado=grado)
+    products = await product_service.get_all_products(grade=grade)
     
     # Filter solo productos con stock > 0
     productos_disponibles = [

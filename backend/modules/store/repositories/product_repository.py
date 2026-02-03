@@ -46,7 +46,7 @@ class ProductRepository(BaseRepository):
         if categoria:
             query["categoria"] = categoria
         
-        if grado:
+        if grade:
             query["$or"] = [{"grade": grado}, {"grades": grado}]
         
         if materia:

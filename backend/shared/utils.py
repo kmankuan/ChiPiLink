@@ -45,7 +45,7 @@ def buscar_estudiante_en_matriculas(
         # Try to find name fields in the synced data
         sync_nombre = ""
         sync_apellido = ""
-        sync_grado = ""
+        sync_grade = ""
         
         # Look for mapped or common field names
         for key, value in datos.items():
@@ -57,7 +57,7 @@ def buscar_estudiante_en_matriculas(
             elif "apellido" in key_lower:
                 sync_apellido = value_str
             elif "grade" in key_lower or "grade" in key_lower or "class" in key_lower:
-                sync_grado = value_str
+                sync_grade = value_str
             # Also check for full name field
             elif "student" in key_lower and "name" in key_lower:
                 # Could be full name, split it
@@ -86,7 +86,7 @@ def buscar_estudiante_en_matriculas(
         
         # Check grade match (more flexible)
         grado_match = False
-        if sync_grado:
+        if sync_grade:
             # Normalize grades for comparison (handle "4", "4to", "4to Grado", etc.)
             grado_norm = grado.lower().replace("grade", "").replace("°", "").strip()
             sync_grado_norm = sync_grado.lower().replace("grade", "").replace("°", "").replace("th", "").replace("st", "").replace("nd", "").replace("rd", "").strip()
@@ -96,9 +96,9 @@ def buscar_estudiante_en_matriculas(
                 if grado_norm.isdigit() and sync_grado_norm.isdigit():
                     grado_match = grado_norm == sync_grado_norm
                 else:
-                    grado_match = calcular_similitud(grado_norm, sync_grado_norm) >= 0.8
+                    grado_match = calcular_similitud(grade_norm, sync_grado_norm) >= 0.8
             except:
-                grado_match = calcular_similitud(grado, sync_grado) >= 0.8
+                grado_match = calcular_similitud(grade, sync_grade) >= 0.8
         
         # Calculate final score (name similarity is most important, grade is secondary)
         # If grade doesn't match, reduce the score significantly
@@ -114,7 +114,7 @@ def buscar_estudiante_en_matriculas(
                 "datos": datos,
                 "similitud": round(score_final * 100, 1),
                 "nombre_encontrado": sync_nombre_completo,
-                "grado_encontrado": sync_grado,
+                "grado_encontrado": sync_grade,
                 "grado_match": grado_match
             }
     

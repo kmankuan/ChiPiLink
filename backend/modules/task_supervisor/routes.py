@@ -49,7 +49,7 @@ async def get_supervisor_status():
             "Reportes de productividad para padres/maestros"
         ],
         "required_integrations": [
-            "Monday.com (ya integrado) - Para obtener tareas",
+            "Monday.com (ya integrade) - Para obtener tareas",
             "TTS (OpenAI/ElevenLabs) - Para anuncios de voz",
             "(Opcional) STT - Para comandos de voz"
         ]

@@ -61,7 +61,7 @@ async def generate_catalog_products() -> List[Dict]:
     await db.libros.delete_many({"es_demo": True})
     
     for grado in GRADOS_PCA:
-        materias = get_materias_for_grado(grado)
+        materias = get_materias_for_grado(grade)
         
         for materia in materias:
             editorial = random.choice(EDITORIALES)
@@ -77,7 +77,7 @@ async def generate_catalog_products() -> List[Dict]:
                 "name": f"{materia} {grado} - {editorial}",
                 "description": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Year escolar 2025-2026.",
                 "categoria": "libros",
-                "grade": grado,
+                "grade": grade,
                 "grades": [grado],
                 "subject": materia,
                 "price": round(base_price, 2),
@@ -127,7 +127,7 @@ async def generate_students_list() -> List[Dict]:
                 "nombre_completo": f"{nombre} {apellido} {apellido2}",
                 "name": nombre,
                 "apellido": f"{apellido} {apellido2}",
-                "grade": grado,
+                "grade": grade,
                 "seccion": random.choice(["A", "B", "C"]),
                 "sheet_id": "demo_sheet_pca_2025",
                 "hoja_nombre": f"Estudiantes {grado}",
@@ -244,7 +244,7 @@ async def generate_all_demo_data():
     print(f"   ✅ {len(orders)} pedidos creados")
     
     # Summary by grade
-    print("\n📊 Resumen por grado:")
+    print("\n📊 Resumen por grade:")
     for grado in GRADOS_PCA:
         grado_products = len([p for p in products if p["grade"] == grado])
         grado_students = len([s for s in students if s["grade"] == grado])

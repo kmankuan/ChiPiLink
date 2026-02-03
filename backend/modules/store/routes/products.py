@@ -24,7 +24,7 @@ async def get_products(
     """Get productos activos con filtros opcionales"""
     return await product_service.get_all_products(
         categoria=categoria,
-        grado=grado,
+        grado=grade,
         materia=materia,
         skip=skip,
         limit=limit
@@ -68,7 +68,7 @@ async def search_products(q: str = Query(..., min_length=2)):
 async def get_available_grades():
     """Get available grades for filtering"""
     grados = await db.libros.distinct("grade", {"active": True})
-    return {"grades": sorted([g for g in grados if g])}
+    return {"grades": sorted([g for g in grades if g])}
 
 
 @router.get("/subjects")

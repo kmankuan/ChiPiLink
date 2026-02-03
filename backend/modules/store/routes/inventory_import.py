@@ -48,7 +48,7 @@ TEMPLATE_COLUMNS = [
 ]
 
 
-def parse_grades(grado_str: str) -> tuple:
+def parse_grades(grade_str: str) -> tuple:
     """
     Parse grade string which may contain multiple grades separated by comma.
     Returns (primary_grade, grades_list).
@@ -141,10 +141,10 @@ async def preview_csv_import(
         for row_num, row in enumerate(reader, start=2):  # Start at 2 (1 is header)
             codigo = row.get('codigo', '').strip()
             nombre = row.get('nombre', '').strip()
-            grado_raw = row.get('grado', '').strip()
+            grade_raw = row.get('grado', '').strip()
             
             # Parse grades (supports comma-separated multiple grades)
-            grado, grados = parse_grades(grado_raw)
+            grade, grados = parse_grades(grade_raw)
             
             # Validate required fields
             if not codigo:
@@ -153,7 +153,7 @@ async def preview_csv_import(
             if not nombre:
                 errors.append({"row": row_num, "error": "Missing nombre"})
                 continue
-            if not grado:
+            if not grade:
                 errors.append({"row": row_num, "error": "Missing grado"})
                 continue
             
@@ -194,7 +194,7 @@ async def preview_csv_import(
                 "row": row_num,
                 "code": codigo,
                 "name": nombre,
-                "grade": grado,
+                "grade": grade,
                 "grades": grados,
                 "cantidad_csv": cantidad,
                 "price": precio,
@@ -272,12 +272,12 @@ async def execute_csv_import(
             try:
                 codigo = row.get('codigo', '').strip()
                 nombre = row.get('nombre', '').strip()
-                grado_raw = row.get('grado', '').strip()
+                grade_raw = row.get('grado', '').strip()
                 
                 # Parse grades (supports comma-separated multiple grades)
-                grado, grados = parse_grades(grado_raw)
+                grade, grados = parse_grades(grade_raw)
                 
-                if not codigo or not nombre or not grado:
+                if not codigo or not nombre or not grade:
                     errors.append({"row": row_num, "error": "Missing required field"})
                     continue
                 
@@ -303,8 +303,8 @@ async def execute_csv_import(
                         {"code": codigo, "is_private_catalog": True},
                         {"$set": {
                             "name": nombre,
-                            "grade": grado,
-                            "grades": grados if len(grados) > 1 else None,
+                            "grade": grade,
+                            "grades": grades if len(grades) > 1 else None,
                             "price": precio,
                             "inventory_quantity": new_cantidad,
                             "subject": row.get('materia', '').strip() or existing.get("subject"),
@@ -324,8 +324,8 @@ async def execute_csv_import(
                         "libro_id": libro_id,
                         "code": codigo,
                         "name": nombre,
-                        "grade": grado,
-                        "grades": grados if len(grados) > 1 else None,
+                        "grade": grade,
+                        "grades": grades if len(grades) > 1 else None,
                         "price": precio,
                         "inventory_quantity": cantidad,
                         "subject": row.get('materia', '').strip() or None,

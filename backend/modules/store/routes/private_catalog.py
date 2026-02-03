@@ -95,7 +95,7 @@ async def get_private_catalog_products(
     }
     
     # Filter by grade (if not specified, show all user's grades)
-    if grado:
+    if grade:
         query["$or"] = [
             {"grade": grado},
             {"grades": grado}
@@ -125,15 +125,15 @@ async def get_private_catalog_products(
     total = await db.libros.count_documents(query)
     
     # Get grados y materias disponibles para filtros
-    grados_disponibles = await db.libros.distinct("grade", {"is_private_catalog": True, "active": True})
-    materias_disponibles = await db.libros.distinct("subject", {"is_private_catalog": True, "active": True})
+    available_grades = await db.libros.distinct("grade", {"is_private_catalog": True, "active": True})
+    available_subjects = await db.libros.distinct("subject", {"is_private_catalog": True, "active": True})
     
     return {
         "productos": productos,
         "total": total,
         "filtros": {
-            "grades": sorted([g for g in grados_disponibles if g]),
-            "materias": sorted([m for m in materias_disponibles if m])
+            "grades": sorted([g for g in available_grades if g]),
+            "materias": sorted([m for m in available_subjects if m])
         },
         "acceso": {
             "estudiantes": acceso["estudiantes"],
@@ -203,18 +203,18 @@ async def get_productos_por_grado(
     ).sort([("subject", 1), ("name", 1)]).to_list(200)
     
     # Agrupar por materia
-    por_materia = {}
+    by_subject = {}
     for p in productos:
         materia = p.get("subject", "Otros")
-        if materia not in por_materia:
-            por_materia[materia] = []
-        por_materia[materia].append(p)
+        if materia not in by_subject:
+            by_subject[materia] = []
+        by_subject[materia].append(p)
     
     return {
-        "grade": grado,
+        "grade": grade,
         "total": len(productos),
         "productos": productos,
-        "por_materia": por_materia
+        "by_subject": by_subject
     }
 
 
@@ -238,9 +238,9 @@ async def get_resumen_catalogo(
     resumen = []
     
     for estudiante in acceso["estudiantes"]:
-        grado = estudiante.get("grade")
+        grade = estudiante.get("grade")
         
-        if grado:
+        if grade:
             # Contar productos del grado
             count = await db.libros.count_documents({
                 "is_private_catalog": True,
@@ -291,7 +291,7 @@ async def admin_get_productos_catalogo_privado(
     """
     query = {"is_private_catalog": True}
     
-    if grado:
+    if grade:
         query["$or"] = [{"grade": grado}, {"grades": grado}]
     
     if materia:

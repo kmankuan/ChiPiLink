@@ -161,13 +161,13 @@ async def get_import_history(
 
 
 @router.get("/grados")
-async def get_grados_disponibles(
+async def get_available_grades(
     admin: dict = Depends(get_admin_user)
 ):
     """
     Obtener lista de grados disponibles (de estudiantes importados).
     """
-    grados = await bulk_import_service.get_grados_disponibles()
+    grados = await bulk_import_service.get_available_grades()
     return {"grades": grados}
 
 
@@ -186,7 +186,7 @@ async def get_estudiantes_importados(
     from core.database import db
     
     query = {}
-    if grado:
+    if grade:
         query["grade"] = grado
     if estado:
         query["estado"] = estado
