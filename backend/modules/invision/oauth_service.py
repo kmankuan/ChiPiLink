@@ -116,11 +116,18 @@ class LaoPanOAuthService:
         
         return state_data
     
-    async def exchange_code_for_token(self, code: str) -> Optional[Dict]:
+    async def exchange_code_for_token(self, code: str, redirect_uri: Optional[str] = None) -> Optional[Dict]:
         """
         Exchange authorization code for access token
         Returns token data or None on failure
+        
+        Args:
+            code: Authorization code from OAuth callback
+            redirect_uri: The redirect_uri used in the authorization request (must match)
         """
+        # Use provided redirect_uri or fallback to default
+        callback_uri = redirect_uri or self.get_redirect_uri()
+        
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
@@ -130,7 +137,7 @@ class LaoPanOAuthService:
                         "client_id": self.client_id,
                         "client_secret": self.client_secret,
                         "code": code,
-                        "redirect_uri": self.get_redirect_uri()
+                        "redirect_uri": callback_uri
                     },
                     headers={
                         "Content-Type": "application/x-www-form-urlencoded"
