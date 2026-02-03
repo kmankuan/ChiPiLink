@@ -48,18 +48,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     setLoading(true);
     try {
       let url = `${API}/api/store/catalogo-privado/admin/productos?limit=200`;
-      if (selectedGrade) url += `&grado=${encodeURIComponent(selectedGrade)}`;
-      if (selectedSubject) url += `&materia=${encodeURIComponent(selectedSubject)}`;
+      if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
+      if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
       
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setProducts(data.productos || data.products || []);
+      setProducts(data.products || []);
       
-      const allProducts = data.productos || data.products || [];
-      const grades = [...new Set(allProducts.map(p => p.grade || p.grade).filter(Boolean))].sort();
-      const subjects = [...new Set(allProducts.map(p => p.subject || p.subject).filter(Boolean))].sort();
+      const allProducts = data.products || [];
+      const grades = [...new Set(allProducts.map(p => p.grade).filter(Boolean))].sort();
+      const subjects = [...new Set(allProducts.map(p => p.subject).filter(Boolean))].sort();
       setFilters({ grades, subjects });
       
     } catch (error) {
