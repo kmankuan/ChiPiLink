@@ -300,6 +300,10 @@ async def create_indexes():
         await db[StoreCollections.PRODUCTS].create_index([("grade", 1), ("active", 1)])
         await db[StoreCollections.ORDERS].create_index([("estado", 1), ("created_at", -1)])
         
+        # Index for OAuth states (auto-expire after 10 minutes)
+        await db.oauth_states.create_index("state", unique=True)
+        await db.oauth_states.create_index("created_at", expireAfterSeconds=600)  # TTL index - auto-delete after 10 min
+        
         print("✅ Database indexes created successfully")
     except Exception as e:
         print(f"⚠️ Error creating indexes (may already exist): {e}")
