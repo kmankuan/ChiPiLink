@@ -84,6 +84,7 @@ LEGACY_TO_NEW = {
     "libros": StoreCollections.PRODUCTS,
     "pedidos": StoreCollections.ORDERS,
     "categorias": StoreCollections.CATEGORIES,
+    "estudiantes_sincronizados": StoreCollections.STUDENTS,
     "synced_students": StoreCollections.STUDENTS,
     
     # PinpanClub
