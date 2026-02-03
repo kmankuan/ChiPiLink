@@ -85,6 +85,7 @@ async def download_csv_template(admin: dict = Depends(get_admin_user)):
         ["TXT-001", "Mathematics 1er Grado", "1", "50", "25.00", "Mathematics", "Santillana", "978-123456789", "Libro de mathematics para primer grado"],
         ["TXT-002", "Espyearl 2do Grado", "2", "30", "28.50", "Espyearl", "SM", "978-987654321", "Libro de espyearl para segundo grado"],
         ["TXT-003", "Ciencias Prekinder", "Prekinder", "25", "22.00", "Ciencias", "Oxford", "", "Libro de ciencias naturales"],
+        ["TXT-004", "Art Book K4-K5", "K4,K5", "40", "18.00", "Art", "Creative Ed", "", "Art book for K4 and K5 (multiple grades)"],
     ]
     writer.writerows(example_data)
     
