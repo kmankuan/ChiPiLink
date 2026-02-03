@@ -11,7 +11,7 @@ export default function DynamicHead({ siteConfig }) {
     if (!siteConfig) return;
 
     // Update document title
-    const title = siteConfig.meta_titulo || siteConfig.nombre_sitio || 'ChiPi Link';
+    const title = siteConfig.meta_titulo || siteConfig.site_name || 'ChiPi Link';
     document.title = title;
 
     // Helper function to update or create meta tag
@@ -115,6 +115,6 @@ export function useDynamicHead(siteConfig) {
     if (!siteConfig) return;
 
     // Update title
-    document.title = siteConfig.meta_titulo || siteConfig.nombre_sitio || 'ChiPi Link';
+    document.title = siteConfig.meta_titulo || siteConfig.site_name || 'ChiPi Link';
   }, [siteConfig]);
 }

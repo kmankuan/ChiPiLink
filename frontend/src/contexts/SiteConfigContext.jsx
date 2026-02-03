@@ -5,7 +5,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const SiteConfigContext = createContext({
   siteConfig: {
-    nombre_sitio: 'Mi Tienda',
+    site_name: 'Mi Tienda',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
@@ -19,7 +19,7 @@ const SiteConfigContext = createContext({
 
 export function SiteConfigProvider({ children }) {
   const [siteConfig, setSiteConfig] = useState({
-    nombre_sitio: 'Mi Tienda',
+    site_name: 'Mi Tienda',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',

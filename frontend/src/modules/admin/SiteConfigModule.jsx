@@ -20,7 +20,7 @@ export default function SiteConfigModule() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState({
-    nombre_sitio: '',
+    site_name: '',
     descripcion: '',
     logo_url: '',
     favicon_url: '',
@@ -50,7 +50,7 @@ export default function SiteConfigModule() {
       if (res.data) {
         const data = res.data;
         setConfig({
-          nombre_sitio: safeString(data.nombre_sitio),
+          site_name: safeString(data.site_name),
           descripcion: safeString(data.description),
           logo_url: safeString(data.logo_url),
           favicon_url: safeString(data.favicon_url),
@@ -107,8 +107,8 @@ export default function SiteConfigModule() {
             <div>
               <Label>Nombre del Sitio</Label>
               <Input
-                value={config.nombre_sitio || ''}
-                onChange={(e) => setConfig({ ...config, nombre_sitio: e.target.value })}
+                value={config.site_name || ''}
+                onChange={(e) => setConfig({ ...config, site_name: e.target.value })}
                 placeholder="Mi Tienda"
               />
             </div>

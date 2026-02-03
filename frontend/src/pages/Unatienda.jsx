@@ -738,7 +738,7 @@ export default function Unatienda() {
   const [activeView, setActiveView] = useState('public'); // 'public' or 'private'
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
-  const [categorias, setCategorias] = useState([]);
+  const [categories, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -785,7 +785,7 @@ export default function Unatienda() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, storeRes, categoriasRes, gradosRes] = await Promise.all([
+      const [productsRes, storeRes, categoriesRes, gradosRes] = await Promise.all([
         axios.get(`${API_URL}/api/store/products`),
         axios.get(`${API_URL}/api/platform-store`),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
@@ -797,7 +797,7 @@ export default function Unatienda() {
       const publicProducts = allProducts.filter(p => !p.is_private_catalog);
       setProducts(publicProducts);
       setStoreInfo(storeRes.data);
-      setCategorias(categoriasRes.data || []);
+      setCategorias(categoriesRes.data || []);
       setGrados(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -899,7 +899,7 @@ export default function Unatienda() {
   };
 
   const getCategoryInfo = (categoriaId) => {
-    const cat = categorias.find(c => c.categoria_id === categoriaId);
+    const cat = categories.find(c => c.category_id === categoriaId);
     return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
   };
 
@@ -1176,12 +1176,12 @@ export default function Unatienda() {
 
             {!selectedCategoria ? (
               <>
-                {categorias.map((cat) => (
+                {categories.map((cat) => (
                   <Button
-                    key={cat.categoria_id}
+                    key={cat.category_id}
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSelectCategoria(cat.categoria_id)}
+                    onClick={() => handleSelectCategoria(cat.category_id)}
                     className="rounded-full"
                   >
                     <span className="mr-1.5">{cat.icono}</span>
@@ -1233,7 +1233,7 @@ export default function Unatienda() {
 
       {/* Floating Navigation Component */}
       <FloatingStoreNav
-        categorias={categorias}
+        categories={categories}
         grados={grados.map(g => ({ id: g, nombre: g }))}
         selectedCategoria={selectedCategoria}
         selectedSubcategoria={selectedSubcategoria}

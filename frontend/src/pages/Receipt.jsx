@@ -78,7 +78,7 @@ export default function Receipt() {
   }
 
   const { pedido, cliente } = data;
-  const siteName = siteConfig?.nombre_sitio || 'Mi Tienda';
+  const siteName = siteConfig?.site_name || 'Mi Tienda';
 
   // Thermal Receipt Component (80mm width optimized)
   const ThermalReceipt = () => (

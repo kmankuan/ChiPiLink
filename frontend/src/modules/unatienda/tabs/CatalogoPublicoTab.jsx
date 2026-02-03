@@ -36,7 +36,7 @@ const emptyProductRow = {
 export default function CatalogoPublicoTab({ token, onRefresh }) {
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
+  const [categories, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +63,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [productsRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
+      const [productsRes, categoriesRes, gradosRes, materiasRes] = await Promise.all([
         fetch(`${API}/api/store/products`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API}/api/store/categories`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API}/api/store/products/grades`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -71,14 +71,14 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       ]);
       
       const productsData = await productsRes.json();
-      const categoriasData = await categoriasRes.json();
+      const categoriesData = await categoriesRes.json();
       const gradosData = await gradosRes.json();
       const materiasData = await materiasRes.json();
       
       // Filter out private catalog products
       const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_private_catalog);
       setProductos(publicProducts);
-      setCategorias(Array.isArray(categoriasData) ? categoriasData : []);
+      setCategorias(Array.isArray(categoriesData) ? categoriesData : []);
       setGrados(gradosData.grades || gradosData.grades || []);
       setMaterias(materiasData.subjects || materiasData.subjects || []);
     } catch (error) {
@@ -118,7 +118,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
       setCategoryForm({ nombre: category.name, icono: category.icono, orden: category.orden });
     } else {
       setEditingCategory(null);
-      setCategoryForm({ nombre: '', icono: '📦', orden: categorias.length + 1 });
+      setCategoryForm({ nombre: '', icono: '📦', orden: categories.length + 1 });
     }
     setCategoryDialog(true);
   };
@@ -131,7 +131,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     setSavingCategory(true);
     try {
       const url = editingCategory 
-        ? `${API}/api/store/categories/${editingCategory.categoria_id}`
+        ? `${API}/api/store/categories/${editingCategory.category_id}`
         : `${API}/api/store/categories`;
       const method = editingCategory ? 'PUT' : 'POST';
       
@@ -278,7 +278,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
             <Package className="h-4 w-4" />
             Products
           </TabsTrigger>
-          <TabsTrigger value="categorias" className="gap-2">
+          <TabsTrigger value="categories" className="gap-2">
             <Tags className="h-4 w-4" />
             Categories
           </TabsTrigger>
@@ -307,8 +307,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All categories</SelectItem>
-                  {categorias.map(cat => (
-                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.category_id} value={cat.category_id}>
                       <span className="flex items-center gap-2">
                         <span>{cat.icono}</span> {cat.name}
                       </span>
@@ -346,7 +346,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                     </TableHeader>
                     <TableBody>
                       {filteredProducts.map((libro) => {
-                        const cat = categorias.find(c => c.categoria_id === libro.categoria);
+                        const cat = categories.find(c => c.category_id === libro.categoria);
                         return (
                           <TableRow key={libro.book_id}>
                             <TableCell>
@@ -406,7 +406,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         </TabsContent>
 
         {/* Categories Tab */}
-        <TabsContent value="categorias" className="space-y-4">
+        <TabsContent value="categories" className="space-y-4">
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold">Product Categories</h3>
@@ -419,15 +419,15 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
           </div>
 
           <div className="grid gap-3">
-            {categorias.map((cat) => (
-              <Card key={cat.categoria_id}>
+            {categories.map((cat) => (
+              <Card key={cat.category_id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{cat.icono}</div>
                       <div>
                         <h4 className="font-semibold">{cat.name}</h4>
-                        <p className="text-sm text-muted-foreground">ID: {cat.categoria_id}</p>
+                        <p className="text-sm text-muted-foreground">ID: {cat.category_id}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -436,7 +436,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                         <Button size="icon" variant="ghost" onClick={() => openCategoryDialog(cat)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => handleDeleteCategory(cat.categoria_id)}>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteCategory(cat.category_id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -497,8 +497,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               <Select value={editForm.categoria} onValueChange={(v) => setEditForm({...editForm, categoria: v})}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
-                  {categorias.map(cat => (
-                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.category_id} value={cat.category_id}>
                       <span className="flex items-center gap-2">
                         <span>{cat.icono}</span> {cat.name}
                       </span>

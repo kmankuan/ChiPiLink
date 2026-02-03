@@ -66,7 +66,7 @@ export default function StoreModule() {
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [inventario, setInventario] = useState({ libros: [], alertas_bajo_stock: [] });
-  const [categorias, setCategorias] = useState([]);
+  const [categories, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,14 +98,14 @@ export default function StoreModule() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [invRes, categoriasRes, gradosRes, materiasRes] = await Promise.all([
+      const [invRes, categoriesRes, gradosRes, materiasRes] = await Promise.all([
         api.get('/admin/inventario'),
-        api.get('/categorias'),
+        api.get('/categories'),
         api.get('/grados'),
         api.get('/materias')
       ]);
       setInventario(invRes.data);
-      setCategorias(categoriasRes.data || []);
+      setCategorias(categoriesRes.data || []);
       setGrados(gradosRes.data.grades);
       setMaterias(materiasRes.data.subjects);
     } catch (error) {
@@ -145,7 +145,7 @@ export default function StoreModule() {
       setCategoryForm({ nombre: category.name, icono: category.icono, orden: category.orden });
     } else {
       setEditingCategory(null);
-      setCategoryForm({ nombre: '', icono: '📦', orden: categorias.length + 1 });
+      setCategoryForm({ nombre: '', icono: '📦', orden: categories.length + 1 });
     }
     setCategoryDialog(true);
   };
@@ -158,10 +158,10 @@ export default function StoreModule() {
     setSavingCategory(true);
     try {
       if (editingCategory) {
-        await api.put(`/admin/categorias/${editingCategory.categoria_id}`, categoryForm);
+        await api.put(`/admin/categories/${editingCategory.category_id}`, categoryForm);
         toast.success('Categoría actualizada');
       } else {
-        await api.post('/admin/categorias', categoryForm);
+        await api.post('/admin/categories', categoryForm);
         toast.success('Categoría creada');
       }
       setCategoryDialog(false);
@@ -176,7 +176,7 @@ export default function StoreModule() {
   const handleDeleteCategory = async (categoriaId) => {
     if (!confirm('¿Eliminar esta categoría?')) return;
     try {
-      await api.delete(`/admin/categorias/${categoriaId}`);
+      await api.delete(`/admin/categories/${categoriaId}`);
       toast.success('Categoría eliminada');
       fetchData();
     } catch (error) {
@@ -304,8 +304,8 @@ export default function StoreModule() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas las categorías</SelectItem>
-                  {categorias.map(cat => (
-                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.category_id} value={cat.category_id}>
                       <span className="flex items-center gap-2">
                         <span>{cat.icono}</span> {cat.name}
                       </span>
@@ -328,7 +328,7 @@ export default function StoreModule() {
 
           <div className="grid gap-4">
             {filteredProducts.map((libro) => {
-              const cat = categorias.find(c => c.categoria_id === libro.categoria);
+              const cat = categories.find(c => c.category_id === libro.categoria);
               return (
                 <Card key={libro.book_id}>
                   <CardContent className="p-4">
@@ -393,15 +393,15 @@ export default function StoreModule() {
           </div>
 
           <div className="grid gap-3">
-            {categorias.map((cat) => (
-              <Card key={cat.categoria_id}>
+            {categories.map((cat) => (
+              <Card key={cat.category_id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{cat.icono}</div>
                       <div>
                         <h4 className="font-semibold">{cat.name}</h4>
-                        <p className="text-sm text-muted-foreground">ID: {cat.categoria_id}</p>
+                        <p className="text-sm text-muted-foreground">ID: {cat.category_id}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -410,7 +410,7 @@ export default function StoreModule() {
                         <Button size="icon" variant="ghost" onClick={() => openCategoryDialog(cat)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => handleDeleteCategory(cat.categoria_id)}>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteCategory(cat.category_id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -518,8 +518,8 @@ export default function StoreModule() {
               <Select value={editForm.categoria} onValueChange={(v) => setEditForm({...editForm, categoria: v})}>
                 <SelectTrigger><SelectValue placeholder="Seleccionar categoría" /></SelectTrigger>
                 <SelectContent>
-                  {categorias.map(cat => (
-                    <SelectItem key={cat.categoria_id} value={cat.categoria_id}>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.category_id} value={cat.category_id}>
                       <span className="flex items-center gap-2">
                         <span>{cat.icono}</span> {cat.name}
                       </span>

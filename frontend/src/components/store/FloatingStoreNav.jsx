@@ -46,7 +46,7 @@ const savePosition = (position) => {
 };
 
 export default function FloatingStoreNav({
-  categorias = [],
+  categories = [],
   grados = [],
   selectedCategoria,
   selectedSubcategoria,
@@ -204,7 +204,7 @@ export default function FloatingStoreNav({
   }, [isDragging, handleDragMove, handleDragEnd]);
 
   const getCategoryInfo = (categoriaId) => {
-    const cat = categorias.find(c => c.categoria_id === categoriaId);
+    const cat = categories.find(c => c.category_id === categoriaId);
     return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
   };
 
@@ -417,12 +417,12 @@ export default function FloatingStoreNav({
                 >
                   <Home className="h-4 w-4" />
                 </Button>
-                {categorias.map((cat) => (
+                {categories.map((cat) => (
                   <Button
-                    key={cat.categoria_id}
-                    variant={selectedCategoria === cat.categoria_id ? 'default' : 'outline'}
+                    key={cat.category_id}
+                    variant={selectedCategoria === cat.category_id ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => handleCategorySelect(cat.categoria_id)}
+                    onClick={() => handleCategorySelect(cat.category_id)}
                     className="h-8 rounded-full text-xs"
                   >
                     <span className="mr-1">{cat.icono}</span>

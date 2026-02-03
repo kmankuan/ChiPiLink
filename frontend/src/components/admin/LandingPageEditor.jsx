@@ -110,7 +110,7 @@ export default function LandingPageEditor() {
   const [blocks, setBlocks] = useState([]);
   const [templates, setTemplates] = useState({});
   const [siteConfig, setSiteConfig] = useState({
-    nombre_sitio: 'Mi Tienda',
+    site_name: 'Mi Tienda',
     descripcion: 'Plataforma de comercio electrónico',
     color_primario: '#16a34a',
     color_secundario: '#0f766e',
@@ -164,7 +164,7 @@ export default function LandingPageEditor() {
       const config = configRes.data || {};
       setSiteConfig({
         ...config,
-        nombre_sitio: safeString(config.nombre_sitio),
+        site_name: safeString(config.site_name),
         descripcion: safeString(config.description),
         footer_texto: safeString(config.footer_texto),
         meta_titulo: safeString(config.meta_titulo),
@@ -390,8 +390,8 @@ export default function LandingPageEditor() {
                     <div className="space-y-2">
                       <Label>Nombre del Sitio</Label>
                       <Input
-                        value={typeof siteConfig.nombre_sitio === 'string' ? siteConfig.nombre_sitio : ''}
-                        onChange={(e) => setSiteConfig({ ...siteConfig, nombre_sitio: e.target.value })}
+                        value={typeof siteConfig.site_name === 'string' ? siteConfig.site_name : ''}
+                        onChange={(e) => setSiteConfig({ ...siteConfig, site_name: e.target.value })}
                         placeholder="Mi Tienda"
                       />
                       <p className="text-xs text-muted-foreground">

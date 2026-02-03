@@ -37,7 +37,7 @@ export default function ProductDetail() {
   const { addItem, items, openCart } = useCart();
   
   const [product, setProduct] = useState(null);
-  const [categorias, setCategorias] = useState([]);
+  const [categories, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -49,14 +49,14 @@ export default function ProductDetail() {
 
   const fetchProduct = async () => {
     try {
-      const [productRes, categoriasRes, gradosRes] = await Promise.all([
+      const [productRes, categoriesRes, gradosRes] = await Promise.all([
         axios.get(buildUrl(STORE_ENDPOINTS.productById(productId))),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
         axios.get(buildUrl(STORE_ENDPOINTS.grades))
       ]);
       
       setProduct(productRes.data);
-      setCategorias(categoriasRes.data || []);
+      setCategorias(categoriesRes.data || []);
       setGrados(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -67,7 +67,7 @@ export default function ProductDetail() {
   };
 
   const getCategoryInfo = (categoriaId) => {
-    const cat = categorias.find(c => c.categoria_id === categoriaId);
+    const cat = categories.find(c => c.category_id === categoriaId);
     return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
   };
 
@@ -316,7 +316,7 @@ export default function ProductDetail() {
 
       {/* Floating Navigation Component - Back to Store */}
       <FloatingStoreNav
-        categorias={categorias}
+        categories={categories}
         grados={grados}
         showBackToStore={true}
         onSearchChange={(term) => {

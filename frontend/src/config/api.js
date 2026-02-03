@@ -48,9 +48,9 @@ export const STORE_ENDPOINTS = {
   searchProducts: (q) => USE_NEW_ENDPOINTS ? `/store/products/search?q=${q}` : `/libros/search?q=${q}`,
   
   // Categories
-  categories: USE_NEW_ENDPOINTS ? '/store/categories' : '/categorias',
-  categoryById: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}` : `/categorias/${id}`,
-  categoryLanding: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}/landing` : `/categorias/${id}/landing`,
+  categories: USE_NEW_ENDPOINTS ? '/store/categories' : '/categories',
+  categoryById: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}` : `/categories/${id}`,
+  categoryLanding: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}/landing` : `/categories/${id}/landing`,
   
   // Public data
   grades: USE_NEW_ENDPOINTS ? '/store/public/grades' : '/grados',
