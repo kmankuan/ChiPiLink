@@ -8,7 +8,7 @@ Endpoints:
 - GET /invision/status - Check integration status (admin)
 - PUT /invision/config - Update configuration (admin)
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from fastapi.responses import RedirectResponse
 from datetime import datetime, timezone
 from typing import Optional
@@ -36,10 +36,16 @@ async def get_oauth_config():
 
 
 @router.get("/oauth/login")
-async def initiate_oauth_login(redirect: Optional[str] = Query(None)):
+async def initiate_oauth_login(
+    request: Request,
+    redirect: Optional[str] = Query(None)
+):
     """
     Initiate OAuth login flow with LaoPan.online
     Returns authorization URL to redirect user to
+    
+    Automatically detects the correct callback URL based on request origin.
+    Works for both preview and production environments.
     
     Query params:
     - redirect: Optional URL to redirect after successful login
@@ -49,10 +55,27 @@ async def initiate_oauth_login(redirect: Optional[str] = Query(None)):
     if not config.get("enabled"):
         raise HTTPException(
             status_code=503,
-            detail="OAuth con LaoPan.online no is configurado"
+            detail="OAuth with LaoPan.online is not configured"
         )
     
-    auth_data = laopan_oauth_service.generate_auth_url(redirect_after=redirect)
+    # Auto-detect origin from request headers
+    origin = None
+    
+    # Try to get origin from various headers
+    referer = request.headers.get("referer")
+    origin_header = request.headers.get("origin")
+    
+    if origin_header:
+        origin = origin_header
+    elif referer:
+        # Extract origin from referer (e.g., "https://example.com/page" -> "https://example.com")
+        from urllib.parse import urlparse
+        parsed = urlparse(referer)
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+    
+    logger.info(f"OAuth login initiated from origin: {origin}")
+    
+    auth_data = laopan_oauth_service.generate_auth_url(redirect_after=redirect, origin=origin)
     
     return {
         "auth_url": auth_data["auth_url"],
