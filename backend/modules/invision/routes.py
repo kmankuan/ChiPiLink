@@ -106,37 +106,40 @@ async def oauth_callback(
         logger.warning(f"OAuth error: {error} - {error_description}")
         raise HTTPException(
             status_code=400,
-            detail=f"Error de authentication: {error_description or error}"
+            detail=f"Authentication error: {error_description or error}"
         )
     
     # Validate required params
     if not code:
-        raise HTTPException(status_code=400, detail="Code de authorization no recibido")
+        raise HTTPException(status_code=400, detail="Authorization code not received")
     
     if not state:
-        raise HTTPException(status_code=400, detail="Estado de session no recibido")
+        raise HTTPException(status_code=400, detail="Session state not received")
     
     # Validate state (CSRF protection)
     state_data = laopan_oauth_service.validate_state(state)
     if not state_data:
         raise HTTPException(
             status_code=400,
-            detail="Estado de session invalid o expirado. Por favor, intente de nuevo."
+            detail="Session state invalid or expired. Please try again."
         )
     
-    # Exchange code for token
-    token_data = await laopan_oauth_service.exchange_code_for_token(code)
+    # Get the redirect_uri that was used in the authorization request
+    redirect_uri = state_data.get("redirect_uri")
+    
+    # Exchange code for token (using the same redirect_uri)
+    token_data = await laopan_oauth_service.exchange_code_for_token(code, redirect_uri)
     if not token_data:
         raise HTTPException(
             status_code=500,
-            detail="Error al obtener token de acceso. Por favor, intente de nuevo."
+            detail="Error obtaining access token. Please try again."
         )
     
     access_token = token_data.get("access_token")
     if not access_token:
         raise HTTPException(
             status_code=500,
-            detail="Token de acceso no recibido"
+            detail="Access token not received"
         )
     
     # Get user info from LaoPan
@@ -144,7 +147,7 @@ async def oauth_callback(
     if not laopan_user:
         raise HTTPException(
             status_code=500,
-            detail="Error al obtener information of the user"
+            detail="Error obtaining user information"
         )
     
     # Authenticate/create user
