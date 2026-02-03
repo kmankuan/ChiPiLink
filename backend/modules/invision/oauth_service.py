@@ -37,7 +37,6 @@ class LaoPanOAuthService:
         self.client_id = LAOPAN_CLIENT_ID
         self.client_secret = LAOPAN_CLIENT_SECRET
         self.base_url = LAOPAN_BASE_URL
-        self._states = {}  # In-memory state storage (consider Redis for production)
     
     def get_redirect_uri(self, origin: Optional[str] = None) -> str:
         """
@@ -62,7 +61,7 @@ class LaoPanOAuthService:
         logger.warning("No FRONTEND_URL configured and no origin provided")
         return "/auth/laopan/callback"
     
-    def generate_auth_url(self, redirect_after: Optional[str] = None, origin: Optional[str] = None) -> Dict:
+    async def generate_auth_url(self, redirect_after: Optional[str] = None, origin: Optional[str] = None) -> Dict:
         """
         Generate OAuth authorization URL
         Returns URL and state for CSRF protection
@@ -76,12 +75,14 @@ class LaoPanOAuthService:
         # Get the redirect URI (auto-detects from origin)
         redirect_uri = self.get_redirect_uri(origin)
         
-        # Store state with optional redirect and the redirect_uri used
-        self._states[state] = {
+        # Store state in database (persists across server restarts/instances)
+        await db.oauth_states.insert_one({
+            "state": state,
             "created_at": datetime.now(timezone.utc),
             "redirect_after": redirect_after,
-            "redirect_uri": redirect_uri  # Store for token exchange
-        }
+            "redirect_uri": redirect_uri,
+            "expires_at": datetime.now(timezone.utc).isoformat()
+        })
         
         params = {
             "client_id": self.client_id,
@@ -101,20 +102,29 @@ class LaoPanOAuthService:
             "redirect_uri": redirect_uri  # Return for debugging
         }
     
-    def validate_state(self, state: str) -> Optional[Dict]:
-        """Validate and consume state token"""
-        state_data = self._states.pop(state, None)
+    async def validate_state(self, state: str) -> Optional[Dict]:
+        """Validate and consume state token from database"""
+        # Find and delete the state in one operation
+        state_data = await db.oauth_states.find_one_and_delete({"state": state})
+        
         if not state_data:
+            logger.warning(f"OAuth state not found: {state}")
             return None
         
         # Check if state is not too old (10 minutes max)
         created = state_data.get("created_at")
         if created:
+            if isinstance(created, str):
+                created = datetime.fromisoformat(created.replace('Z', '+00:00'))
             age = (datetime.now(timezone.utc) - created).total_seconds()
             if age > 600:  # 10 minutes
+                logger.warning(f"OAuth state expired: {state}")
                 return None
         
-        return state_data
+        return {
+            "redirect_after": state_data.get("redirect_after"),
+            "redirect_uri": state_data.get("redirect_uri")
+        }
     
     async def exchange_code_for_token(self, code: str, redirect_uri: Optional[str] = None) -> Optional[Dict]:
         """
