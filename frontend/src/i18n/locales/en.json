@@ -48,7 +48,13 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "loginWithGoogle": "Continue with Google",
-    "orContinueWith": "or continue with"
+    "orContinueWith": "or continue with",
+    "laopan": {
+      "loginButton": "Sign in with LaoPan",
+      "registerButton": "Don't have an account? Register on LaoPan",
+      "description": "Sign in or register on LaoPan.online to access",
+      "connecting": "Connecting..."
+    }
   },
   "membership": {
     "title": "Club Membership",
