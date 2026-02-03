@@ -89,18 +89,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (product) {
       setEditingProduct(product);
       setFormData({
-        name: product.name || product.name || '',
-        code: product.code || product.code || '',
+        name: product.name || '',
+        code: product.code || '',
         isbn: product.isbn || '',
-        publisher: product.publisher || product.publisher || '',
-        grade: product.grade || product.grade || '',
-        subject: product.subject || product.subject || '',
-        price: (product.price || product.price)?.toString() || '',
-        sale_price: (product.sale_price || product.sale_price)?.toString() || '',
-        description: product.description || product.description || '',
-        image_url: product.image_url || product.image_url || '',
-        active: product.active !== false && product.active !== false,
-        featured: product.featured || product.featured || false
+        publisher: product.publisher || '',
+        grade: product.grade || '',
+        subject: product.subject || '',
+        price: product.price?.toString() || '',
+        sale_price: product.sale_price?.toString() || '',
+        description: product.description || '',
+        image_url: product.image_url || '',
+        active: product.active !== false,
+        featured: product.featured || false
       });
     } else {
       setEditingProduct(null);
