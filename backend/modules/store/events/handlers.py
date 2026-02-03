@@ -25,12 +25,12 @@ def setup_event_handlers():
         payload = event.payload
         
         notificacion = {
-            "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
+            "notification_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
             "tipo": "pedido_nuevo",
             "titulo": "Nuevo Pedido Recibido",
             "mensaje": f"Pedido {payload.get('pedido_id')} - ${payload.get('total', 0):.2f}",
             "datos": payload,
-            "leida": False,
+            "read": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
@@ -47,12 +47,12 @@ def setup_event_handlers():
         payload = event.payload
         
         notificacion = {
-            "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
+            "notification_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
             "tipo": "bajo_stock",
             "titulo": "Alerta de Stock Bajo",
             "mensaje": f"{payload.get('nombre')} tiene solo {payload.get('cantidad')} unidades",
             "datos": payload,
-            "leida": False,
+            "read": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         

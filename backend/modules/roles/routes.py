@@ -92,7 +92,7 @@ async def update_role(
     admin: dict = Depends(get_admin_user)
 ):
     """Update a role"""
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "roles.edit"
@@ -139,7 +139,7 @@ async def update_role(
 @router.delete("/{role_id}")
 async def delete_role(role_id: str, request: Request, admin: dict = Depends(get_admin_user)):
     """Delete a custom role"""
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "roles.delete"
@@ -190,8 +190,8 @@ async def assign_role_to_user(
     admin: dict = Depends(get_admin_user)
 ):
     """Assign a role to a user"""
-    # Allow if user is legacy admin (es_admin=true) or has permission
-    if not admin.get("es_admin"):
+    # Allow if user is legacy admin (is_admin=true) or has permission
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "users.assign_roles"
@@ -200,7 +200,7 @@ async def assign_role_to_user(
             raise HTTPException(status_code=403, detail="No tienes permiso para asignar roles")
     
     # Prevent assigning super_admin unless current user is super_admin or legacy admin
-    if role_id == "super_admin" and not admin.get("es_admin"):
+    if role_id == "super_admin" and not admin.get("is_admin"):
         current_role = await roles_service.get_user_role(admin["user_id"])
         if current_role.get("role_id") != "super_admin":
             raise HTTPException(
@@ -362,7 +362,7 @@ async def get_audit_logs(
 ):
     """Get audit logs with optional filters"""
     # Check permission
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "roles.view"
@@ -393,7 +393,7 @@ async def get_audit_logs(
 @router.get("/audit/stats")
 async def get_audit_stats(admin: dict = Depends(get_admin_user)):
     """Get audit log statistics"""
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "roles.view"
@@ -428,7 +428,7 @@ async def get_user_audit_logs(
     admin: dict = Depends(get_admin_user)
 ):
     """Get audit logs related to a specific user"""
-    if not admin.get("es_admin"):
+    if not admin.get("is_admin"):
         has_permission = await roles_service.check_permission(
             admin["user_id"], 
             "users.view"

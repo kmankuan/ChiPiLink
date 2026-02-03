@@ -24,12 +24,12 @@ def setup_event_handlers():
         
         if payload.get("featured"):
             notificacion = {
-                "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
+                "notification_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
                 "tipo": "post_destacado",
                 "titulo": "Nuevo Contenido Destacado",
                 "mensaje": payload.get("titulo", "Nuevo post"),
                 "datos": payload,
-                "leida": False,
+                "read": False,
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.notifications.insert_one(notificacion)
@@ -44,12 +44,12 @@ def setup_event_handlers():
         payload = event.payload
         
         notificacion = {
-            "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
+            "notification_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
             "tipo": "evento_creado",
             "titulo": "Nuevo Evento",
             "mensaje": payload.get("titulo", "Nuevo evento"),
             "datos": payload,
-            "leida": False,
+            "read": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.notifications.insert_one(notificacion)

@@ -23,12 +23,12 @@ def setup_event_handlers():
         payload = event.payload
         
         notificacion = {
-            "notificacion_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
+            "notification_id": f"notif_{datetime.now(timezone.utc).timestamp()}",
             "tipo": "usuario_registrado",
             "titulo": "Nuevo Usuario Registrado",
             "mensaje": f"{payload.get('nombre', 'Usuario')} se ha registrado",
             "datos": payload,
-            "leida": False,
+            "read": False,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         

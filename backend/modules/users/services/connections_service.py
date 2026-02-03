@@ -361,7 +361,7 @@ class ConexionesService:
         request_id: str,
         aceptar: bool,
         respondido_por: str,
-        es_admin: bool = False
+        is_admin: bool = False
     ) -> Dict:
         """Responder a una request de connection"""
         request = await db.requestes_conexion.find_one({"request_id": request_id})
@@ -378,7 +378,7 @@ class ConexionesService:
             {"$set": {
                 "estado": nuevo_estado,
                 "respondido_en": datetime.now(timezone.utc).isoformat(),
-                "respondido_por": f"admin:{respondido_por}" if es_admin else respondido_por
+                "respondido_por": f"admin:{respondido_por}" if is_admin else respondido_por
             }}
         )
         

@@ -306,7 +306,7 @@ async def admin_respond_to_request(
         request_id=request_id,
         aceptar=request.aceptar,
         respondido_por=admin["user_id"],
-        es_admin=True
+        is_admin=True
     )
     
     if result.get("error"):

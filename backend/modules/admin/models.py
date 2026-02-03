@@ -18,7 +18,7 @@ class NotificacionCreate(BaseModel):
 class Notificacion(NotificacionCreate):
     """Full notification model"""
     model_config = ConfigDict(extra="ignore")
-    notificacion_id: str = Field(default_factory=lambda: f"notif_{uuid.uuid4().hex[:12]}")
+    notification_id: str = Field(default_factory=lambda: f"notif_{uuid.uuid4().hex[:12]}")
     leida: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

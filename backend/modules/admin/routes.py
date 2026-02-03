@@ -22,7 +22,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 @router.post("/setup")
 async def setup_admin(admin_data: dict):
     """Initial admin setup - only works if no admin exists"""
-    existing_admin = await db.users.find_one({"es_admin": True})
+    existing_admin = await db.users.find_one({"is_admin": True})
     if existing_admin:
         raise HTTPException(status_code=400, detail="Already exists un administrador")
     
@@ -31,7 +31,7 @@ async def setup_admin(admin_data: dict):
         "email": admin_data.get("email"),
         "name": admin_data.get("name", "Administrador"),
         "contrasena_hash": hash_password(admin_data.get("contrasena")),
-        "es_admin": True,
+        "is_admin": True,
         "estudiantes": [],
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -107,7 +107,7 @@ async def get_notifications(
     """Get notifications for admin"""
     query = {}
     if leidas is not None:
-        query["leida"] = leidas
+        query["read"] = leidas
     if tipo:
         query["tipo"] = tipo
     
@@ -116,20 +116,20 @@ async def get_notifications(
     ).to_list(limite)
     
     # Count unread
-    no_leidas = await db.notifications.count_documents({"leida": False})
+    unread_count = await db.notifications.count_documents({"read": False})
     
     return {
         "notifications": notifications,
-        "no_leidas": no_leidas
+        "unread_count": unread_count
     }
 
 
-@router.put("/notifications/{notificacion_id}/leer")
-async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_user)):
+@router.put("/notifications/{notification_id}/leer")
+async def marcar_leida(notification_id: str, admin: dict = Depends(get_admin_user)):
     """Mark notification as read"""
     result = await db.notifications.update_one(
-        {"notificacion_id": notificacion_id},
-        {"$set": {"leida": True}}
+        {"notification_id": notification_id},
+        {"$set": {"read": True}}
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Notificaci\u00f3n not found")
@@ -140,16 +140,16 @@ async def marcar_leida(notificacion_id: str, admin: dict = Depends(get_admin_use
 async def marcar_todas_leidas(admin: dict = Depends(get_admin_user)):
     """Mark all notifications as read"""
     await db.notifications.update_many(
-        {"leida": False},
-        {"$set": {"leida": True}}
+        {"read": False},
+        {"$set": {"read": True}}
     )
     return {"success": True}
 
 
-@router.delete("/notifications/{notificacion_id}")
-async def delete_notificacion(notificacion_id: str, admin: dict = Depends(get_admin_user)):
+@router.delete("/notifications/{notification_id}")
+async def delete_notificacion(notification_id: str, admin: dict = Depends(get_admin_user)):
     """Delete a notification"""
-    result = await db.notifications.delete_one({"notificacion_id": notificacion_id})
+    result = await db.notifications.delete_one({"notification_id": notification_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Notificaci\u00f3n not found")
     return {"success": True}
@@ -275,7 +275,7 @@ async def get_dashboard_stats(admin: dict = Depends(get_admin_user)):
     total_users = await db.users.count_documents({"is_admin": False})
     
     # Notifications stats
-    unread_notifications = await db.notifications.count_documents({"leida": False})
+    unread_notifications = await db.notifications.count_documents({"read": False})
     
     return {
         "orders": {
