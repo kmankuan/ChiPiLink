@@ -272,7 +272,10 @@ async def execute_csv_import(
             try:
                 codigo = row.get('codigo', '').strip()
                 nombre = row.get('nombre', '').strip()
-                grado = row.get('grado', '').strip()
+                grado_raw = row.get('grado', '').strip()
+                
+                # Parse grades (supports comma-separated multiple grades)
+                grado, grados = parse_grades(grado_raw)
                 
                 if not codigo or not nombre or not grado:
                     errors.append({"row": row_num, "error": "Missing required field"})
@@ -289,7 +292,7 @@ async def execute_csv_import(
                         skipped += 1
                         continue
                     
-                    # Calculateste new quantity
+                    # Calculate new quantity
                     if duplicate_mode == DuplicateMode.REPLACE:
                         new_cantidad = cantidad
                     else:  # ADD
@@ -301,6 +304,7 @@ async def execute_csv_import(
                         {"$set": {
                             "nombre": nombre,
                             "grado": grado,
+                            "grados": grados if len(grados) > 1 else None,
                             "precio": precio,
                             "cantidad_inventario": new_cantidad,
                             "materia": row.get('materia', '').strip() or existing.get("materia"),
@@ -321,6 +325,7 @@ async def execute_csv_import(
                         "codigo": codigo,
                         "nombre": nombre,
                         "grado": grado,
+                        "grados": grados if len(grados) > 1 else None,
                         "precio": precio,
                         "cantidad_inventario": cantidad,
                         "materia": row.get('materia', '').strip() or None,
