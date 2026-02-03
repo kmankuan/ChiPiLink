@@ -29,7 +29,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
                     "sync_id": student.get("student_id"),
                     "name": student.get("full_name"),
                     "grade": student.get("grade"),
-                    "seccion": student.get("section"),
+                    "section": student.get("section"),
                     "student_id": student.get("student_id"),
                     "school_name": student.get("school_name")
                 })
@@ -40,17 +40,17 @@ async def verify_private_catalog_access(user_id: str) -> dict:
     
     if not students:
         return {
-            "tiene_acceso": False,
-            "estudiantes": [],
+            "has_access": False,
+            "students": [],
             "grades": [],
-            "mensaje": "No linked students. Link a PCA student to access the private catalog."
+            "message": "No linked students. Link a PCA student to access the private catalog."
         }
     
     return {
-        "tiene_acceso": True,
-        "estudiantes": students,
+        "has_access": True,
+        "students": students,
         "grades": list(grades),
-        "mensaje": None
+        "message": None
     }
 
 
@@ -70,7 +70,7 @@ async def get_private_catalog_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
     search: Optional[str] = None,
-    destacados: bool = False,
+    featured: bool = False,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     current_user: dict = Depends(get_current_user)
@@ -80,12 +80,12 @@ async def get_private_catalog_products(
     Only accessible to users with linked PCA students.
     """
     # Verify access
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
-    if not acceso["tiene_acceso"]:
+    if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail=acceso["mensaje"] or "No access to private catalog"
+            detail=access["message"] or "No access to private catalog"
         )
     
     # Build query
@@ -97,14 +97,14 @@ async def get_private_catalog_products(
     # Filter by grade (if not specified, show all user's grades)
     if grade:
         query["$or"] = [
-            {"grade": grado},
-            {"grades": grado}
+            {"grade": grade},
+            {"grades": grade}
         ]
     
-    if materia:
-        query["subject"] = materia
+    if subject:
+        query["subject"] = subject
     
-    if destacados:
+    if featured:
         query["featured"] = True
     
     if search:
@@ -116,169 +116,169 @@ async def get_private_catalog_products(
         ]
     
     # Get products
-    productos = await db.libros.find(
+    products = await db.libros.find(
         query,
         {"_id": 0}
     ).sort([("grade", 1), ("subject", 1), ("name", 1)]).skip(skip).limit(limit).to_list(limit)
     
-    # Contar total
+    # Count total
     total = await db.libros.count_documents(query)
     
-    # Get grados y materias disponibles para filtros
+    # Get available grades and subjects for filters
     available_grades = await db.libros.distinct("grade", {"is_private_catalog": True, "active": True})
     available_subjects = await db.libros.distinct("subject", {"is_private_catalog": True, "active": True})
     
     return {
-        "productos": productos,
+        "products": products,
         "total": total,
-        "filtros": {
+        "filters": {
             "grades": sorted([g for g in available_grades if g]),
-            "materias": sorted([m for m in available_subjects if m])
+            "subjects": sorted([m for m in available_subjects if m])
         },
-        "acceso": {
-            "estudiantes": acceso["estudiantes"],
-            "grados_estudiante": acceso["grades"]
+        "access": {
+            "students": access["students"],
+            "student_grades": access["grades"]
         }
     }
 
 
 @router.get("/productos/{libro_id}")
-async def get_producto_detalle(
+async def get_product_detail(
     libro_id: str,
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener detalle de un producto del catalog privado.
+    Get detail of a product from the private catalog.
     """
-    # Verify acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    # Verify access
+    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
-    if not acceso["tiene_acceso"]:
+    if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catalog privado"
+            detail="You do not have access to the private catalog"
         )
     
-    producto = await db.libros.find_one(
+    product = await db.libros.find_one(
         {"libro_id": libro_id, "is_private_catalog": True},
         {"_id": 0}
     )
     
-    if not producto:
-        raise HTTPException(status_code=404, detail="Producto not found")
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
     
-    return producto
+    return product
 
 
-@router.get("/por-grado/{grado}")
-async def get_productos_por_grado(
+@router.get("/por-grado/{grade}")
+async def get_products_by_grade(
     grade: str,
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener todos los productos de un grado specific.
-    Useful para mostrar la lista de libros de un estudiante.
+    Get all products for a specific grade.
+    Useful to display a student's book list.
     """
-    # Verify acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    # Verify access
+    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
-    if not acceso["tiene_acceso"]:
+    if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catalog privado"
+            detail="You do not have access to the private catalog"
         )
     
     query = {
         "is_private_catalog": True,
         "active": True,
         "$or": [
-            {"grade": grado},
-            {"grades": grado}
+            {"grade": grade},
+            {"grades": grade}
         ]
     }
     
-    productos = await db.libros.find(
+    products = await db.libros.find(
         query,
         {"_id": 0}
     ).sort([("subject", 1), ("name", 1)]).to_list(200)
     
-    # Agrupar por materia
+    # Group by subject
     by_subject = {}
-    for p in productos:
-        materia = p.get("subject", "Otros")
-        if materia not in by_subject:
-            by_subject[materia] = []
-        by_subject[materia].append(p)
+    for p in products:
+        subj = p.get("subject", "Other")
+        if subj not in by_subject:
+            by_subject[subj] = []
+        by_subject[subj].append(p)
     
     return {
         "grade": grade,
-        "total": len(productos),
-        "productos": productos,
+        "total": len(products),
+        "products": products,
         "by_subject": by_subject
     }
 
 
 @router.get("/resumen")
-async def get_resumen_catalogo(
+async def get_catalog_summary(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Obtener resumen del catalog privado para the user.
-    Muestra productos disponibles para cada estudiante vinculado.
+    Get summary of the private catalog for the user.
+    Shows available products for each linked student.
     """
-    # Verify acceso
-    acceso = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
+    # Verify access
+    access = await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
     
-    if not acceso["tiene_acceso"]:
+    if not access["has_access"]:
         raise HTTPException(
             status_code=403, 
-            detail="You do not have acceso al catalog privado"
+            detail="You do not have access to the private catalog"
         )
     
-    resumen = []
+    summary = []
     
-    for estudiante in acceso["estudiantes"]:
-        grade = estudiante.get("grade")
+    for student in access["students"]:
+        grade = student.get("grade")
         
         if grade:
-            # Contar productos del grado
+            # Count products for this grade
             count = await db.libros.count_documents({
                 "is_private_catalog": True,
                 "active": True,
-                "$or": [{"grade": grado}, {"grades": grado}]
+                "$or": [{"grade": grade}, {"grades": grade}]
             })
             
-            # Calculatesr total estimado
-            productos = await db.libros.find(
+            # Calculate estimated total
+            products = await db.libros.find(
                 {
                     "is_private_catalog": True,
                     "active": True,
-                    "$or": [{"grade": grado}, {"grades": grado}]
+                    "$or": [{"grade": grade}, {"grades": grade}]
                 },
                 {"price": 1, "sale_price": 1}
             ).to_list(200)
             
-            total_estimado = sum(
+            estimated_total = sum(
                 p.get("sale_price") or p.get("price", 0) 
-                for p in productos
+                for p in products
             )
             
-            resumen.append({
-                "estudiante": estudiante,
-                "productos_disponibles": count,
-                "total_estimado": round(total_estimado, 2)
+            summary.append({
+                "student": student,
+                "available_products": count,
+                "estimated_total": round(estimated_total, 2)
             })
     
     return {
-        "resumen": resumen,
-        "total_estudiantes": len(acceso["estudiantes"])
+        "summary": summary,
+        "total_students": len(access["students"])
     }
 
 
 # ============== ADMIN ENDPOINTS ==============
 
 @router.get("/admin/productos")
-async def admin_get_productos_catalogo_privado(
+async def admin_get_private_catalog_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
     active: Optional[bool] = None,
@@ -287,20 +287,20 @@ async def admin_get_productos_catalogo_privado(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Obtener todos los productos del catalog privado.
+    Admin: Get all products from the private catalog.
     """
     query = {"is_private_catalog": True}
     
     if grade:
-        query["$or"] = [{"grade": grado}, {"grades": grado}]
+        query["$or"] = [{"grade": grade}, {"grades": grade}]
     
-    if materia:
-        query["subject"] = materia
+    if subject:
+        query["subject"] = subject
     
-    if activo is not None:
-        query["active"] = activo
+    if active is not None:
+        query["active"] = active
     
-    productos = await db.libros.find(
+    products = await db.libros.find(
         query,
         {"_id": 0}
     ).sort([("grade", 1), ("subject", 1)]).skip(skip).limit(limit).to_list(limit)
@@ -308,43 +308,43 @@ async def admin_get_productos_catalogo_privado(
     total = await db.libros.count_documents(query)
     
     return {
-        "productos": productos,
+        "products": products,
         "total": total
     }
 
 
 @router.post("/admin/productos")
-async def admin_crear_producto_catalogo_privado(
-    producto: dict,
+async def admin_create_private_catalog_product(
+    product: dict,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Crear producto en el catalog privado.
+    Admin: Create product in the private catalog.
     """
     import uuid
     
-    # Ensure que sea catalog privado
-    producto["is_private_catalog"] = True
-    producto["libro_id"] = producto.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
-    producto["active"] = producto.get("active", True)
-    producto["created_at"] = datetime.now(timezone.utc).isoformat()
+    # Ensure it's private catalog
+    product["is_private_catalog"] = True
+    product["libro_id"] = product.get("libro_id") or f"libro_{uuid.uuid4().hex[:12]}"
+    product["active"] = product.get("active", True)
+    product["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    await db.libros.insert_one(producto)
-    producto.pop("_id", None)
+    await db.libros.insert_one(product)
+    product.pop("_id", None)
     
-    return {"success": True, "producto": producto}
+    return {"success": True, "product": product}
 
 
 @router.put("/admin/productos/{libro_id}")
-async def admin_actualizar_producto_catalogo_privado(
+async def admin_update_private_catalog_product(
     libro_id: str,
     updates: dict,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Actualizar producto del catalog privado.
+    Admin: Update product in the private catalog.
     """
-    # Ensure that does not se pueda cambiar is_private_catalog
+    # Ensure is_private_catalog cannot be changed
     updates["is_private_catalog"] = True
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
@@ -354,35 +354,35 @@ async def admin_actualizar_producto_catalogo_privado(
     )
     
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Producto not found")
+        raise HTTPException(status_code=404, detail="Product not found")
     
-    producto = await db.libros.find_one({"libro_id": libro_id}, {"_id": 0})
+    product = await db.libros.find_one({"libro_id": libro_id}, {"_id": 0})
     
-    return {"success": True, "producto": producto}
+    return {"success": True, "product": product}
 
 
 @router.delete("/admin/productos/{libro_id}")
-async def admin_eliminar_producto_catalogo_privado(
+async def admin_delete_private_catalog_product(
     libro_id: str,
     hard_delete: bool = False,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Admin: Eliminar producto del catalog privado.
-    Por defecto hace soft delete (activo=False).
+    Admin: Delete product from the private catalog.
+    By default does soft delete (active=False).
     """
     if hard_delete:
         result = await db.libros.delete_one(
             {"libro_id": libro_id, "is_private_catalog": True}
         )
         if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail="Producto not found")
+            raise HTTPException(status_code=404, detail="Product not found")
     else:
         result = await db.libros.update_one(
             {"libro_id": libro_id, "is_private_catalog": True},
             {"$set": {"active": False, "deleted_at": datetime.now(timezone.utc).isoformat()}}
         )
         if result.matched_count == 0:
-            raise HTTPException(status_code=404, detail="Producto not found")
+            raise HTTPException(status_code=404, detail="Product not found")
     
-    return {"success": True, "message": "Producto eliminado"}
+    return {"success": True, "message": "Product deleted"}
