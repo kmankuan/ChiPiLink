@@ -122,18 +122,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     setSaving(true);
     try {
       const payload = {
-        nombre: formData.name,
-        codigo: formData.code,
+        name: formData.name,
+        code: formData.code,
         isbn: formData.isbn,
-        editorial: formData.publisher,
-        grado: formData.grade,
-        materia: formData.subject,
-        precio: parseFloat(formData.price),
+        publisher: formData.publisher,
+        grade: formData.grade,
+        subject: formData.subject,
+        price: parseFloat(formData.price),
         sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
-        descripcion: formData.description,
+        description: formData.description,
         image_url: formData.image_url,
-        activo: formData.active,
-        destacado: formData.featured
+        active: formData.active,
+        featured: formData.featured
       };
 
       let url = `${API}/api/store/catalogo-privado/admin/productos`;
