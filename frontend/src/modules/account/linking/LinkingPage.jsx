@@ -296,6 +296,11 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
   };
 
   const handleSubmitLink = async () => {
+    console.log('=== handleSubmitLink called ===');
+    console.log('editingId:', editingId);
+    console.log('multipleStudents:', multipleStudents);
+    console.log('token present:', !!token);
+    
     // If editing, use single form data
     if (editingId) {
       if (!formData.full_name.trim()) {
