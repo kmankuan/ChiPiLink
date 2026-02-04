@@ -55,11 +55,11 @@ class ProductService(BaseService):
         skip: int = 0,
         limit: int = 500
     ) -> List[Product]:
-        """Get productos activos"""
+        """Get active products"""
         results = await self.repository.get_all_active(
             category=category,
             grado=grade,
-            materia=materia,
+            materia=subject,
             skip=skip,
             limit=limit
         )
