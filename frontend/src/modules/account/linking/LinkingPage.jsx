@@ -243,7 +243,7 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
 
   const handleEditStudent = (student) => {
     setFormData({
-      full_name: student.full_name || student.nombre || '',
+      full_name: student.full_name || '',
       school_id: student.school_id || '',
       student_number: student.student_number || '',
       year: student.year || String(new Date().getFullYear()),
