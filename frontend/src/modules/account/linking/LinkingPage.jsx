@@ -359,39 +359,51 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
     
     if (validStudents.length === 0) {
       toast.error('Please enter at least one student name');
+      console.log('Validation failed: No valid students');
       return;
     }
+
+    console.log('Valid students to submit:', validStudents);
 
     // Validate all students
     for (let i = 0; i < validStudents.length; i++) {
       const s = validStudents[i];
       const num = i + 1;
+      console.log(`Validating student ${num}:`, s);
+      
       if (isFieldActive('school_id') && isFieldRequired('school_id') && !s.school_id) {
         toast.error(`Student ${num}: Please select a school`);
+        console.log('Validation failed: Missing school_id');
         return;
       }
       if (isFieldActive('student_id_number') && isFieldRequired('student_id_number') && !s.student_number?.trim()) {
         toast.error(`Student ${num}: Please enter the student number`);
+        console.log('Validation failed: Missing student_number');
         return;
       }
       if (!s.year) {
         toast.error(`Student ${num}: Please select the year`);
+        console.log('Validation failed: Missing year');
         return;
       }
       if (!s.grade) {
         toast.error(`Student ${num}: Please select the grade`);
+        console.log('Validation failed: Missing grade');
         return;
       }
       if (!s.relationship) {
         toast.error(`Student ${num}: Please select the relationship`);
+        console.log('Validation failed: Missing relationship');
         return;
       }
       if (s.relationship === 'other' && !s.relationship_other?.trim()) {
         toast.error(`Student ${num}: Please specify the relationship`);
+        console.log('Validation failed: Missing relationship_other');
         return;
       }
     }
 
+    console.log('All validations passed, starting submission...');
     setSaving(true);
     let successCount = 0;
     let errorCount = 0;
