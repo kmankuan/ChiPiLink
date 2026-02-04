@@ -1,6 +1,6 @@
 /**
- * ScoreBoard Component - Tablero de puntuación para espectadores
- * Muestra el marcador en tiempo real con estadísticas
+ * ScoreBoard Component - Score board for spectators
+ * Shows real-time score with statistics
  */
 
 import { useState, useEffect } from 'react';
@@ -26,24 +26,24 @@ export default function ScoreBoard({
   const {
     player_a_info,
     player_b_info,
-    puntos_player_a,
-    puntos_player_b,
+    points_player_a,
+    points_player_b,
     sets_player_a,
     sets_player_b,
-    set_actual,
-    sets_detalle,
-    saque,
-    estado,
-    tipo_partido,
-    mesa,
-    ronda,
-    estadisticas,
-    situacion = [],
-    ganador_id
+    current_set,
+    set_history,
+    serve,
+    status,
+    match_type,
+    table,
+    round,
+    statistics,
+    situation = [],
+    winner_id
   } = match;
 
-  const playerAName = player_a_info?.apodo || player_a_info?.nombre || 'Jugador A';
-  const playerBName = player_b_info?.apodo || player_b_info?.nombre || 'Jugador B';
+  const playerAName = player_a_info?.nickname || player_a_info?.name || 'Player A';
+  const playerBName = player_b_info?.nickname || player_b_info?.name || 'Player B';
 
   // Size configurations
   const sizeConfig = {
