@@ -98,15 +98,15 @@ class MatchService(BaseService):
             return None
         
         start_date = datetime.now(timezone.utc).isoformat()
-        await self.repository.start_match(partido_id, fecha_inicio)
+        await self.repository.start_match(match_id, start_date)
         
         await self.emit_event(
             PinpanClubEvents.MATCH_STARTED,
-            {"partido_id": partido_id, "fecha_inicio": fecha_inicio},
+            {"match_id": match_id, "start_date": start_date},
             priority=EventPriority.HIGH
         )
         
-        return await self.get_match(partido_id)
+        return await self.get_match(match_id)
     
     async def update_score(
         self,
