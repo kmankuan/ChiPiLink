@@ -328,18 +328,18 @@ export default function PlayerProfile() {
                     <div className="space-y-2">
                       {league_rankings.map((ranking) => (
                         <div 
-                          key={ranking.liga_id}
+                          key={ranking.league_id}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                         >
                           <div>
-                            <p className="font-medium">{ranking.liga_nombre || ranking.liga_id}</p>
+                            <p className="font-medium">{ranking.league_name || ranking.league_id}</p>
                             <p className="text-sm text-gray-500">
-                              {ranking.partidos_jugados} {t('superpin.profile.matchesPlayed')}
+                              {ranking.matches_played} {t('superpin.profile.matchesPlayed')}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-green-600">#{ranking.posicion}</p>
-                            <p className="text-sm text-yellow-600">{ranking.puntos_totales} pts</p>
+                            <p className="text-2xl font-bold text-green-600">#{ranking.position}</p>
+                            <p className="text-sm text-yellow-600">{ranking.total_points} pts</p>
                           </div>
                         </div>
                       ))}
@@ -354,17 +354,17 @@ export default function PlayerProfile() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="h-5 w-5 text-purple-500" />
-                  Tu Rango de Retos
+                  {t('superpin.profile.challengeRank')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RankProgressCard jugadorId={jugadorId} />
+                <RankProgressCard playerId={playerIdToUse} />
               </CardContent>
             </Card>
             
             {/* Rank Rewards Display */}
             <div className="lg:col-span-2">
-              <RankRewardsDisplay jugadorId={jugadorId} />
+              <RankRewardsDisplay playerId={playerIdToUse} />
             </div>
           </div>
         )}
@@ -388,7 +388,7 @@ export default function PlayerProfile() {
                 <div className="space-y-3">
                   {match_history.map((match) => (
                     <div 
-                      key={match.partido_id}
+                      key={match.match_id}
                       className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${
                         match.is_winner 
                           ? 'bg-green-50 border-green-500' 
