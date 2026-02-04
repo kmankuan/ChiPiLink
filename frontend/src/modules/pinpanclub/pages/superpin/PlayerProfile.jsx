@@ -1,6 +1,6 @@
 /**
  * Player Profile / Statistics Dashboard
- * Vista detallada del perfil y estadísticas de un jugador
+ * Detailed view of player profile and statistics
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -26,7 +26,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PlayerProfile() {
   const { t } = useTranslation();
-  const { jugadorId } = useParams();
+  const { playerId, jugadorId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -34,19 +34,22 @@ export default function PlayerProfile() {
   const [activeTab, setActiveTab] = useState('overview');
   const [followStats, setFollowStats] = useState({ followers_count: 0, following_count: 0 });
   
+  // Support both new and legacy param names
+  const playerIdToUse = playerId || jugadorId;
+  
   // Current user ID for social features
   const currentUserId = user?.user_id || null;
 
   useEffect(() => {
-    if (jugadorId) {
+    if (playerIdToUse) {
       fetchStatistics();
       fetchFollowStats();
     }
-  }, [jugadorId]);
+  }, [playerIdToUse]);
   
   const fetchFollowStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${jugadorId}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${playerIdToUse}`);
       if (response.ok) {
         const data = await response.json();
         setFollowStats(data);
@@ -58,7 +61,7 @@ export default function PlayerProfile() {
 
   const fetchStatistics = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${jugadorId}/statistics`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${playerIdToUse}/statistics`);
       if (response.ok) {
         const data = await response.json();
         setStats(data);
