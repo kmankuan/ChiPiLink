@@ -755,7 +755,7 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
                 {/* Guardian name (auto-filled) */}
                 <div className="p-3 bg-muted rounded-lg">
                   <Label className="text-xs text-muted-foreground">Guardian</Label>
-                  <p className="font-medium">{user?.nombre || user?.name || user?.email}</p>
+                  <p className="font-medium">{user?.name || user?.email}</p>
                 </div>
 
                 {/* Student name */}
@@ -910,7 +910,7 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
                 {/* Guardian name (auto-filled) */}
                 <div className="p-3 bg-muted rounded-lg">
                   <Label className="text-xs text-muted-foreground">Guardian</Label>
-                  <p className="font-medium">{user?.nombre || user?.name || user?.email}</p>
+                  <p className="font-medium">{user?.name || user?.email}</p>
                 </div>
 
                 {multipleStudents.map((student, index) => (
