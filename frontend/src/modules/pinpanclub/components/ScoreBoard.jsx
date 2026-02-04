@@ -80,21 +80,21 @@ export default function ScoreBoard({
   const config = sizeConfig[size] || sizeConfig.large;
 
   // Get situation badges
-  const renderSituacion = () => {
-    return situacion.map((sit, idx) => {
-      switch (sit.tipo) {
+  const renderSituation = () => {
+    return situation.map((sit, idx) => {
+      switch (sit.type) {
         case 'match_point':
           return (
             <Badge key={idx} className="bg-red-500 text-white animate-pulse gap-1">
               <Trophy className="h-3 w-3" />
-              MATCH POINT {sit.jugador === 'a' ? playerAName : playerBName}
+              MATCH POINT {sit.player === 'a' ? playerAName : playerBName}
             </Badge>
           );
         case 'set_point':
           return (
             <Badge key={idx} className="bg-orange-500 text-white gap-1">
               <Target className="h-3 w-3" />
-              SET POINT {sit.jugador === 'a' ? playerAName : playerBName}
+              SET POINT {sit.player === 'a' ? playerAName : playerBName}
             </Badge>
           );
         case 'deuce':
@@ -104,11 +104,11 @@ export default function ScoreBoard({
               DEUCE
             </Badge>
           );
-        case 'racha':
+        case 'streak':
           return (
             <Badge key={idx} className="bg-amber-500 text-white gap-1">
               <Flame className="h-3 w-3" />
-              {sit.jugador === 'a' ? playerAName : playerBName}: ¡{sit.puntos} puntos seguidos!
+              {sit.player === 'a' ? playerAName : playerBName}: {sit.points} points in a row!
             </Badge>
           );
         default:
@@ -123,26 +123,26 @@ export default function ScoreBoard({
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            {mesa && <Badge variant="outline">Mesa {mesa}</Badge>}
-            {ronda && <Badge variant="secondary">{ronda}</Badge>}
+            {table && <Badge variant="outline">Table {table}</Badge>}
+            {round && <Badge variant="secondary">{round}</Badge>}
           </div>
           <Badge 
-            variant={estado === 'en_curso' ? 'default' : estado === 'finalizado' ? 'secondary' : 'outline'}
-            className={estado === 'en_curso' ? 'animate-pulse' : ''}
+            variant={status === 'in_progress' ? 'default' : status === 'finished' ? 'secondary' : 'outline'}
+            className={status === 'in_progress' ? 'animate-pulse' : ''}
           >
-            {estado === 'en_curso' ? '🔴 EN VIVO' : 
-             estado === 'finalizado' ? '✓ Finalizado' : 
-             estado === 'pausado' ? '⏸ Pausado' : 'Pendiente'}
+            {status === 'in_progress' ? '🔴 LIVE' : 
+             status === 'finished' ? '✓ Finished' : 
+             status === 'paused' ? '⏸ Paused' : 'Pending'}
           </Badge>
         </div>
 
         {/* Main Score */}
         <div className="grid grid-cols-3 gap-4 items-center">
           {/* Player A */}
-          <div className={`text-center ${ganador_id === match.player_a_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
-            {player_a_info?.foto_url ? (
+          <div className={`text-center ${winner_id === match.player_a_id ? 'opacity-100' : winner_id ? 'opacity-50' : ''}`}>
+            {player_a_info?.photo_url ? (
               <img 
-                src={player_a_info.foto_url} 
+                src={player_a_info.photo_url} 
                 alt={playerAName}
                 className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
               />
@@ -155,9 +155,9 @@ export default function ScoreBoard({
             {player_a_info?.elo_rating && (
               <span className="text-xs text-muted-foreground">ELO: {player_a_info.elo_rating}</span>
             )}
-            {saque === 'a' && estado === 'en_curso' && (
+            {serve === 'a' && status === 'in_progress' && (
               <div className="mt-1">
-                <Badge className="bg-yellow-400 text-yellow-900">● Saque</Badge>
+                <Badge className="bg-yellow-400 text-yellow-900">● Serve</Badge>
               </div>
             )}
             {ganador_id === match.player_a_id && (
