@@ -79,11 +79,11 @@ const RANKS = [
     borderColor: 'border-blue-500',
     bgColor: 'bg-blue-50',
     glowColor: 'shadow-blue-500/50',
-    description: 'Leyenda viviente'
+    description: 'Living legend'
   },
   {
     id: 'master',
-    name: 'Maestro',
+    name: 'Master',
     minPoints: 2000,
     maxPoints: 4999,
     icon: '👑',
@@ -92,11 +92,11 @@ const RANKS = [
     borderColor: 'border-purple-500',
     bgColor: 'bg-purple-50',
     glowColor: 'shadow-purple-500/50',
-    description: 'Dominador absoluto'
+    description: 'Absolute dominator'
   },
   {
     id: 'grandmaster',
-    name: 'Gran Maestro',
+    name: 'Grandmaster',
     minPoints: 5000,
     maxPoints: Infinity,
     icon: '🏆',
@@ -105,7 +105,7 @@ const RANKS = [
     borderColor: 'border-red-500',
     bgColor: 'bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50',
     glowColor: 'shadow-red-500/50',
-    description: 'El mejor de todos'
+    description: 'The best of all'
   }
 ];
 
@@ -136,16 +136,19 @@ function getProgressToNextRank(points, currentRank, nextRank) {
 }
 
 // Main component - Full badge with progress
-export default function PlayerRankBadge({ jugadorId, showProgress = true, size = 'normal' }) {
+export default function PlayerRankBadge({ playerId, jugadorId, showProgress = true, size = 'normal' }) {
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   
+  // Support both new and legacy prop names
+  const playerIdToUse = playerId || jugadorId;
+  
   useEffect(() => {
-    if (jugadorId) {
+    if (playerIdToUse) {
       fetchRankData();
     }
-  }, [jugadorId]);
+  }, [playerIdToUse]);
   
   const fetchRankData = async () => {
     try {
@@ -154,7 +157,7 @@ export default function PlayerRankBadge({ jugadorId, showProgress = true, size =
       // Try direct rank endpoint first
       try {
         const directResponse = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/player/${jugadorId}/rank`
+          `${API_URL}/api/pinpanclub/challenges/player/${playerIdToUse}/rank`
         );
         if (directResponse.ok) {
           const directData = await directResponse.json();
