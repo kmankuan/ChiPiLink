@@ -426,12 +426,12 @@ export function RankProgressCard({ playerId, jugadorId }) {
       // Fallback to leaderboard
       if (totalPoints === 0) {
         const response = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
+          `${API_URL}/api/pinpanclub/challenges/leaderboard?player_id=${playerIdToUse}`
         );
         
         if (response.ok) {
           const data = await response.json();
-          const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
+          const playerEntry = data.leaderboard?.find(e => e.player_id === playerIdToUse);
           totalPoints = playerEntry?.total_points || 0;
         }
       }
@@ -491,7 +491,7 @@ export function RankProgressCard({ playerId, jugadorId }) {
           </h3>
           <p className="text-sm text-gray-500">{currentRank.description}</p>
           <p className="text-lg font-bold mt-1">
-            {totalPoints.toLocaleString()} <span className="text-sm font-normal text-gray-400">puntos</span>
+            {totalPoints.toLocaleString()} <span className="text-sm font-normal text-gray-400">points</span>
           </p>
         </div>
       </div>
@@ -500,7 +500,7 @@ export function RankProgressCard({ playerId, jugadorId }) {
       {nextRank && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-500">Próximo: <strong>{nextRank.name}</strong> {nextRank.icon}</span>
+            <span className="text-gray-500">Next: <strong>{nextRank.name}</strong> {nextRank.icon}</span>
             <span className={currentRank.textColor}>{progress}%</span>
           </div>
           <div className="relative">
@@ -511,7 +511,7 @@ export function RankProgressCard({ playerId, jugadorId }) {
             />
           </div>
           <p className="text-xs text-center text-gray-400">
-            {pointsToNext.toLocaleString()} puntos para {nextRank.name}
+            {pointsToNext.toLocaleString()} points to {nextRank.name}
           </p>
         </div>
       )}
