@@ -360,22 +360,25 @@ class TextbookAccessService(BaseService):
                 {"_id": 0, "name": 1, "email": 1}
             )
             
+            # Get student name with backward compatibility for old Spanish field names
+            student_name = req.get("full_name") or req.get("nombre_completo") or req.get("nombre") or "Unknown"
+            
             enriched.append({
                 "student_id": req["student_id"],
-                "student_name": req["full_name"],
+                "student_name": student_name,
                 "school_id": req["school_id"],
-                "school_name": req.get("school_name", "Unknown"),
+                "school_name": req.get("school_name") or req.get("nombre_escuela") or "Unknown",
                 "year": req["enrollment"]["year"],
                 "grade": req["enrollment"]["grade"],
-                "relation_type": req["relation_type"],
-                "relation_other": req.get("relation_other"),
+                "relation_type": req.get("relation_type") or req.get("tipo_relacion") or "parent",
+                "relation_other": req.get("relation_other") or req.get("relacion_otro"),
                 "user_id": req["user_id"],
                 "user_name": user.get("name", "Unknown") if user else "Unknown",
                 "user_email": user.get("email", "") if user else "",
                 "status": req["enrollment"]["status"],
                 "created_at": req["created_at"],
-                "student_number": req.get("student_number"),
-                "admin_notes": req["enrollment"].get("admin_notes")
+                "student_number": req.get("student_number") or req.get("numero_estudiante"),
+                "admin_notes": req["enrollment"].get("admin_notes") or req["enrollment"].get("notas_admin")
             })
         
         return enriched
