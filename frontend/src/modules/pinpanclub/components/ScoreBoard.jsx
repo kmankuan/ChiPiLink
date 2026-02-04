@@ -160,9 +160,9 @@ export default function ScoreBoard({
                 <Badge className="bg-yellow-400 text-yellow-900">● Serve</Badge>
               </div>
             )}
-            {ganador_id === match.player_a_id && (
+            {winner_id === match.player_a_id && (
               <div className="mt-2">
-                <Badge className="bg-green-500 text-white">🏆 Ganador</Badge>
+                <Badge className="bg-green-500 text-white">🏆 Winner</Badge>
               </div>
             )}
           </div>
@@ -172,11 +172,11 @@ export default function ScoreBoard({
             {/* Current Set Score */}
             <div className="flex justify-center items-center gap-4 mb-2">
               <span className={`${config.score} font-bold text-red-600`}>
-                {puntos_player_a}
+                {points_player_a}
               </span>
               <span className={`${config.sets} text-muted-foreground`}>-</span>
               <span className={`${config.score} font-bold text-blue-600`}>
-                {puntos_player_b}
+                {points_player_b}
               </span>
             </div>
             
@@ -189,18 +189,18 @@ export default function ScoreBoard({
             </div>
 
             {/* Set indicator */}
-            {estado === 'en_curso' && (
+            {status === 'in_progress' && (
               <div className="text-xs text-muted-foreground mt-1">
-                Set {set_actual}
+                Set {current_set}
               </div>
             )}
           </div>
 
           {/* Player B */}
-          <div className={`text-center ${ganador_id === match.player_b_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
-            {player_b_info?.foto_url ? (
+          <div className={`text-center ${winner_id === match.player_b_id ? 'opacity-100' : winner_id ? 'opacity-50' : ''}`}>
+            {player_b_info?.photo_url ? (
               <img 
-                src={player_b_info.foto_url} 
+                src={player_b_info.photo_url} 
                 alt={playerBName}
                 className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
               />
@@ -213,51 +213,51 @@ export default function ScoreBoard({
             {player_b_info?.elo_rating && (
               <span className="text-xs text-muted-foreground">ELO: {player_b_info.elo_rating}</span>
             )}
-            {saque === 'b' && estado === 'en_curso' && (
+            {serve === 'b' && status === 'in_progress' && (
               <div className="mt-1">
-                <Badge className="bg-yellow-400 text-yellow-900">● Saque</Badge>
+                <Badge className="bg-yellow-400 text-yellow-900">● Serve</Badge>
               </div>
             )}
-            {ganador_id === match.player_b_id && (
+            {winner_id === match.player_b_id && (
               <div className="mt-2">
-                <Badge className="bg-green-500 text-white">🏆 Ganador</Badge>
+                <Badge className="bg-green-500 text-white">🏆 Winner</Badge>
               </div>
             )}
           </div>
         </div>
 
         {/* Sets Detail */}
-        {sets_detalle && sets_detalle.length > 0 && (
+        {set_history && set_history.length > 0 && (
           <div className="mt-4 flex justify-center gap-2">
-            {sets_detalle.map((set, idx) => (
+            {set_history.map((set, idx) => (
               <div 
                 key={idx} 
                 className={`px-3 py-1 rounded-lg text-sm ${
-                  set.ganador === 'a' 
+                  set.winner === 'a' 
                     ? 'bg-red-100 text-red-700' 
                     : 'bg-blue-100 text-blue-700'
                 }`}
               >
-                {set.puntos_a}-{set.puntos_b}
+                {set.points_a}-{set.points_b}
               </div>
             ))}
           </div>
         )}
 
         {/* Situation Badges */}
-        {situacion && situacion.length > 0 && (
+        {situation && situation.length > 0 && (
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {renderSituacion()}
+            {renderSituation()}
           </div>
         )}
 
         {/* Stats */}
-        {showStats && estadisticas && estado === 'en_curso' && (
+        {showStats && statistics && status === 'in_progress' && (
           <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4 text-sm">
             <div className="text-center">
               <div className="text-red-600 font-semibold">{playerAName}</div>
               <div className="text-muted-foreground">
-                Mejor racha: {estadisticas.max_racha_a || 0}
+                Best streak: {statistics.max_streak_a || 0}
               </div>
               {estadisticas.racha_actual_a > 0 && (
                 <Badge variant="outline" className="mt-1">
