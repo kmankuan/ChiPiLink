@@ -155,6 +155,15 @@ export default function LinkingPage({ embedded = false }) {
       toast.error('Please select a school');
       return;
     }
+    
+    // Validate school exists in our list
+    const selectedSchool = schools.find(s => s.school_id === schoolId);
+    if (!selectedSchool) {
+      toast.error('Invalid school selected. Please refresh and try again.');
+      console.error('School not found:', schoolId, 'Available:', schools.map(s => s.school_id));
+      return;
+    }
+    
     if (!grade) {
       toast.error('Please select a grade');
       return;
