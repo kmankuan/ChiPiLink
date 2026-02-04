@@ -172,12 +172,12 @@ export default function PlayerRankBadge({ playerId, jugadorId, showProgress = tr
       // Fallback to leaderboard if direct endpoint didn't work
       if (totalPoints === 0) {
         const response = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/leaderboard?jugador_id=${jugadorId}`
+          `${API_URL}/api/pinpanclub/challenges/leaderboard?player_id=${playerIdToUse}`
         );
         
         if (response.ok) {
           const data = await response.json();
-          const playerEntry = data.leaderboard?.find(e => e.jugador_id === jugadorId);
+          const playerEntry = data.leaderboard?.find(e => e.player_id === playerIdToUse);
           totalPoints = playerEntry?.total_points || 0;
         }
       }
