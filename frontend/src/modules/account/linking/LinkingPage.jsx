@@ -90,25 +90,37 @@ export default function LinkingPage({ embedded = false }) {
   const fetchData = async () => {
     try {
       setLoading(true);
+      console.log('Fetching data with token:', token?.substring(0, 20) + '...');
+      console.log('API_URL:', API_URL);
       
       // Fetch students
       const studentsRes = await fetch(`${API_URL}/api/store/textbook-access/my-students`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      console.log('Students response status:', studentsRes.status);
       
       if (studentsRes.ok) {
         const data = await studentsRes.json();
+        console.log('Students loaded:', data.students?.length || 0);
         setStudents(data.students || []);
+      } else {
+        console.error('Failed to load students:', studentsRes.status);
       }
       
       // Fetch schools
       const schoolsRes = await fetch(`${API_URL}/api/store/textbook-access/schools`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      console.log('Schools response status:', schoolsRes.status);
       
       if (schoolsRes.ok) {
         const data = await schoolsRes.json();
+        console.log('Schools loaded:', data.schools?.length || 0, data.schools?.map(s => s.school_id));
         setSchools(data.schools || []);
+      } else {
+        console.error('Failed to load schools:', schoolsRes.status);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
