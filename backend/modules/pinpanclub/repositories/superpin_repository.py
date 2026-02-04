@@ -33,11 +33,7 @@ class SuperPinLeagueRepository(BaseRepository):
     
     async def get_by_id(self, league_id: str) -> Optional[Dict]:
         """Get league by ID"""
-        # Support both old and new field names during migration
-        result = await self.find_one({self.ID_FIELD: league_id})
-        if not result:
-            result = await self.find_one({"liga_id": league_id})
-        return result
+        return await self.find_one({self.ID_FIELD: league_id})
     
     async def get_active_leagues(self) -> List[Dict]:
         """Get active leagues"""
@@ -57,11 +53,7 @@ class SuperPinLeagueRepository(BaseRepository):
     async def update_league(self, league_id: str, data: Dict) -> bool:
         """Update league"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        # Try both field names
-        result = await self.update_by_id(self.ID_FIELD, league_id, data)
-        if not result:
-            result = await self.update_by_id("liga_id", league_id, data)
-        return result
+        return await self.update_by_id(self.ID_FIELD, league_id, data)
     
     async def increment_stats(self, league_id: str, matches: int = 0, players: int = 0) -> bool:
         """Increment statistics of the league"""
@@ -73,7 +65,7 @@ class SuperPinLeagueRepository(BaseRepository):
         
         if update:
             result = await self._collection.update_one(
-                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                {"league_id": league_id},
                 {"$inc": update, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
             )
             return result.modified_count > 0
@@ -101,20 +93,15 @@ class PlayerCheckInRepository(BaseRepository):
     async def get_active_checkins(self, league_id: str) -> List[Dict]:
         """Get players currently in the club"""
         return await self.find_many(
-            query={
-                "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-                "is_active": True
-            },
+            query={"league_id": league_id, "is_active": True},
             sort=[("check_in_time", -1)]
         )
     
     async def get_player_checkin(self, league_id: str, player_id: str) -> Optional[Dict]:
         """Get active check-in for a player"""
         return await self.find_one({
-            "$and": [
-                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
-            ],
+            "league_id": league_id,
+            "player_id": player_id,
             "is_active": True
         })
     
@@ -133,10 +120,8 @@ class PlayerCheckInRepository(BaseRepository):
         """Perform checkout by player"""
         result = await self._collection.update_many(
             {
-                "$and": [
-                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                    {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
-                ],
+                "league_id": league_id,
+                "player_id": player_id,
                 "is_active": True
             },
             {"$set": {
@@ -180,10 +165,7 @@ class SuperPinMatchRepository(BaseRepository):
     
     async def get_by_id(self, match_id: str) -> Optional[Dict]:
         """Get match by ID"""
-        result = await self.find_one({self.ID_FIELD: match_id})
-        if not result:
-            result = await self.find_one({"partido_id": match_id})
-        return result
+        return await self.find_one({self.ID_FIELD: match_id})
     
     async def get_league_matches(
         self,
@@ -192,7 +174,7 @@ class SuperPinMatchRepository(BaseRepository):
         limit: int = 50
     ) -> List[Dict]:
         """Get matches from a league"""
-        query = {"$or": [{"league_id": league_id}, {"liga_id": league_id}]}
+        query = {"league_id": league_id}
         if status:
             query["status"] = status
         
@@ -211,12 +193,10 @@ class SuperPinMatchRepository(BaseRepository):
         """Get matches for a player in a league"""
         return await self.find_many(
             query={
-                "$and": [
-                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                    {"$or": [
-                        {"player_a_id": player_id},
-                        {"player_b_id": player_id}
-                    ]}
+                "league_id": league_id,
+                "$or": [
+                    {"player_a_id": player_id},
+                    {"player_b_id": player_id}
                 ]
             },
             limit=limit,
@@ -226,10 +206,7 @@ class SuperPinMatchRepository(BaseRepository):
     async def update_match(self, match_id: str, data: Dict) -> bool:
         """Update match"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        result = await self.update_by_id(self.ID_FIELD, match_id, data)
-        if not result:
-            result = await self.update_by_id("partido_id", match_id, data)
-        return result
+        return await self.update_by_id(self.ID_FIELD, match_id, data)
     
     async def get_head_to_head(
         self,
@@ -240,14 +217,12 @@ class SuperPinMatchRepository(BaseRepository):
         """Get match history between two players"""
         return await self.find_many(
             query={
-                "$and": [
-                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                    {"$or": [
-                        {"player_a_id": player_a_id, "player_b_id": player_b_id},
-                        {"player_a_id": player_b_id, "player_b_id": player_a_id}
-                    ]}
-                ],
-                "status": "finished"
+                "league_id": league_id,
+                "status": "finished",
+                "$or": [
+                    {"player_a_id": player_a_id, "player_b_id": player_b_id},
+                    {"player_a_id": player_b_id, "player_b_id": player_a_id}
+                ]
             },
             sort=[("end_date", -1)]
         )
@@ -272,17 +247,15 @@ class RankingRepository(BaseRepository):
     ) -> Dict:
         """Get or create ranking entry"""
         existing = await self.find_one({
-            "$and": [
-                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
-            ]
+            "league_id": league_id,
+            "player_id": player_id
         })
         
         if existing:
             return existing
         
         # Get last position
-        count = await self.count({"$or": [{"league_id": league_id}, {"liga_id": league_id}]})
+        count = await self.count({"league_id": league_id})
         
         new_entry = {
             "ranking_id": f"rank_{uuid.uuid4().hex[:12]}",
@@ -307,7 +280,7 @@ class RankingRepository(BaseRepository):
     async def get_league_ranking(self, league_id: str, limit: int = 100) -> List[Dict]:
         """Get complete ranking for a league"""
         return await self.find_many(
-            query={"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+            query={"league_id": league_id},
             limit=limit,
             sort=[("position", 1)]
         )
@@ -315,10 +288,8 @@ class RankingRepository(BaseRepository):
     async def get_player_ranking(self, league_id: str, player_id: str) -> Optional[Dict]:
         """Get position for a player"""
         return await self.find_one({
-            "$and": [
-                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
-                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
-            ]
+            "league_id": league_id,
+            "player_id": player_id
         })
     
     async def update_ranking(self, ranking_id: str, data: Dict) -> bool:
@@ -330,7 +301,7 @@ class RankingRepository(BaseRepository):
         """Recalculate ranking positions"""
         # Get all league rankings
         rankings = await self.find_many(
-            query={"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+            query={"league_id": league_id},
             limit=1000
         )
         
@@ -383,25 +354,19 @@ class SeasonTournamentRepository(BaseRepository):
     
     async def get_by_id(self, tournament_id: str) -> Optional[Dict]:
         """Get tournament by ID"""
-        result = await self.find_one({self.ID_FIELD: tournament_id})
-        if not result:
-            result = await self.find_one({"torneo_id": tournament_id})
-        return result
+        return await self.find_one({self.ID_FIELD: tournament_id})
     
     async def get_league_tournaments(self, league_id: str) -> List[Dict]:
         """Get league tournaments"""
         return await self.find_many(
-            query={"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+            query={"league_id": league_id},
             sort=[("created_at", -1)]
         )
     
     async def update_tournament(self, tournament_id: str, data: Dict) -> bool:
         """Update tournament"""
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        result = await self.update_by_id(self.ID_FIELD, tournament_id, data)
-        if not result:
-            result = await self.update_by_id("torneo_id", tournament_id, data)
-        return result
+        return await self.update_by_id(self.ID_FIELD, tournament_id, data)
 
 
 class PlayerBadgeRepository(BaseRepository):
@@ -428,14 +393,14 @@ class PlayerBadgeRepository(BaseRepository):
     async def get_player_badges(self, player_id: str) -> List[Dict]:
         """Get all badges for a player"""
         return await self.find_many(
-            query={"$or": [{"player_id": player_id}, {"jugador_id": player_id}]},
+            query={"player_id": player_id},
             sort=[("earned_at", -1)]
         )
     
     async def get_badge_by_type(self, player_id: str, badge_type: str, **filters) -> Optional[Dict]:
         """Check if a player already has a specific badge"""
         query = {
-            "$or": [{"player_id": player_id}, {"jugador_id": player_id}],
+            "player_id": player_id,
             "badge_type": badge_type
         }
         query.update(filters)
@@ -444,7 +409,7 @@ class PlayerBadgeRepository(BaseRepository):
     async def count_badges_by_type(self, player_id: str, badge_type: str) -> int:
         """Count badges of a type for a player"""
         return await self.count({
-            "$or": [{"player_id": player_id}, {"jugador_id": player_id}],
+            "player_id": player_id,
             "badge_type": badge_type
         })
     
@@ -459,6 +424,6 @@ class PlayerBadgeRepository(BaseRepository):
     async def get_league_badges(self, league_id: str) -> List[Dict]:
         """Get all badges for a league"""
         return await self.find_many(
-            query={"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+            query={"league_id": league_id},
             sort=[("earned_at", -1)]
         )
