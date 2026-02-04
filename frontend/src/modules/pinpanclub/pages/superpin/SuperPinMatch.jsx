@@ -248,13 +248,13 @@ export default function SuperPinMatch() {
             <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">{t('superpin.matches.matchFinished')}</h3>
             <p className="text-green-400 text-lg">
-              {t('superpin.matches.winner')}: {match.winner_id === match.player_a_id ? match.player_a_info?.nombre : match.player_b_info?.nombre}
+              {t('superpin.matches.winner')}: {match.winner_id === match.player_a_id ? match.player_a_info?.name : match.player_b_info?.name}
             </p>
-            {(match.elo_change_a || match.puntos_ganador) && (
+            {(match.elo_change_a || match.winner_points) && (
               <div className="mt-4 flex justify-center gap-8">
                 <div className="text-center">
                   <p className="text-gray-400 text-sm">{t('superpin.stats.points')}</p>
-                  <p className="text-white">+{match.puntos_ganador} / +{match.puntos_perdedor}</p>
+                  <p className="text-white">+{match.winner_points} / +{match.loser_points}</p>
                 </div>
                 {match.elo_change_a !== undefined && (
                   <div className="text-center">
