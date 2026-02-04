@@ -210,7 +210,7 @@ export default function RapidPinSeason() {
 
   const getPlayerName = (info) => {
     if (!info) return '?';
-    return info.apodo || info.nombre || '?';
+    return info.nickname || info.name || '?';
   };
 
   const formatDate = (dateStr) => {
@@ -268,20 +268,20 @@ export default function RapidPinSeason() {
                 <Zap className="w-8 h-8" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{season.nombre}</h1>
+                <h1 className="text-2xl font-bold">{season.name}</h1>
                 <div className="flex items-center gap-4 text-white/80 text-sm">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    {formatDate(season.fecha_inicio)} - {formatDate(season.fecha_fin)}
+                    {formatDate(season.start_date)} - {formatDate(season.end_date)}
                   </span>
-                  <Badge variant={season.estado === 'active' ? 'default' : 'secondary'} className="bg-white/20">
-                    {t(`rapidpin.seasons.status.${season.estado}`)}
+                  <Badge variant={season.status === 'active' ? 'default' : 'secondary'} className="bg-white/20">
+                    {t(`rapidpin.seasons.status.${season.status}`)}
                   </Badge>
                 </div>
               </div>
             </div>
             
-            {season.estado === 'active' && (
+            {season.status === 'active' && (
               <div className="flex items-center gap-2">
                 <Dialog open={showNewMatch} onOpenChange={setShowNewMatch}>
                   <DialogTrigger asChild>
