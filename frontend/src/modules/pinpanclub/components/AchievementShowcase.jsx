@@ -322,10 +322,10 @@ export default function AchievementShowcase({ playerId, maxDisplay = 5, showTitl
 }
 
 // Compact version for headers
-export function AchievementShowcaseCompact({ jugadorId }) {
+export function AchievementShowcaseCompact({ playerId }) {
   return (
     <AchievementShowcase 
-      jugadorId={jugadorId} 
+      playerId={playerId} 
       maxDisplay={4} 
       showTitle={false}
     />

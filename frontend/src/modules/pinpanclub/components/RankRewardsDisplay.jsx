@@ -214,7 +214,7 @@ export function RankPromotionModal({ isOpen, onClose, promotion, lang = 'es' }) 
 }
 
 // Full Rank Rewards Display Card
-export default function RankRewardsDisplay({ jugadorId, showAll = false }) {
+export default function RankRewardsDisplay({ playerId, showAll = false }) {
   const { t, i18n } = useTranslation();
   const [ranksInfo, setRanksInfo] = useState([]);
   const [playerRank, setPlayerRank] = useState(null);
@@ -225,7 +225,7 @@ export default function RankRewardsDisplay({ jugadorId, showAll = false }) {
 
   useEffect(() => {
     fetchData();
-  }, [jugadorId, lang]);
+  }, [playerId, lang]);
 
   const fetchData = async () => {
     try {
@@ -236,10 +236,10 @@ export default function RankRewardsDisplay({ jugadorId, showAll = false }) {
         setRanksInfo(infoData.ranks || []);
       }
 
-      // Fetch player's current rank if jugadorId provided
-      if (jugadorId) {
+      // Fetch player's current rank if playerId provided
+      if (playerId) {
         const playerResponse = await fetch(
-          `${API_URL}/api/pinpanclub/rank-rewards/current/${jugadorId}?lang=${lang}`
+          `${API_URL}/api/pinpanclub/rank-rewards/current/${playerId}?lang=${lang}`
         );
         if (playerResponse.ok) {
           const playerData = await playerResponse.json();
