@@ -391,15 +391,18 @@ export function PlayerRankIcon({ points }) {
 }
 
 // Rank progress card for dashboard
-export function RankProgressCard({ jugadorId }) {
+export function RankProgressCard({ playerId, jugadorId }) {
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
   
+  // Support both new and legacy prop names
+  const playerIdToUse = playerId || jugadorId;
+  
   useEffect(() => {
-    if (jugadorId) {
+    if (playerIdToUse) {
       fetchRankData();
     }
-  }, [jugadorId]);
+  }, [playerIdToUse]);
   
   const fetchRankData = async () => {
     try {
@@ -408,7 +411,7 @@ export function RankProgressCard({ jugadorId }) {
       // Try direct rank endpoint first
       try {
         const directResponse = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/player/${jugadorId}/rank`
+          `${API_URL}/api/pinpanclub/challenges/player/${playerIdToUse}/rank`
         );
         if (directResponse.ok) {
           const directData = await directResponse.json();
