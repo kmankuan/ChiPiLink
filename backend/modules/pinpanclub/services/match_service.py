@@ -110,92 +110,92 @@ class MatchService(BaseService):
     
     async def update_score(
         self,
-        partido_id: str,
-        accion: str
+        match_id: str,
+        action: str
     ) -> Optional[Match]:
         """
-        Actualizar score dthe match.
-        Maneja logic de sets y determina ganador.
-        Emite eventos: score_updated, set_completed, match_finished
+        Update match score.
+        Handles set logic and determines winner.
+        Emits events: score_updated, set_completed, match_finished
         """
-        match = await self.get_match(partido_id)
-        if not match or match.estado not in [MatchState.PENDIENTE, MatchState.EN_CURSO, MatchState.PAUSADO]:
+        match = await self.get_match(match_id)
+        if not match or match.status not in [MatchState.PENDING, MatchState.IN_PROGRESS, MatchState.PAUSED]:
             return None
         
         # If first point, start the match
-        if match.estado == MatchState.PENDIENTE:
-            await self.start_match(partido_id)
-            match = await self.get_match(partido_id)
+        if match.status == MatchState.PENDING:
+            await self.start_match(match_id)
+            match = await self.get_match(match_id)
         
-        puntos_a = match.points_player_a
-        puntos_b = match.points_player_b
-        sets_a = match.sets_jugador_a
-        sets_b = match.sets_jugador_b
-        set_actual = match.set_actual
-        historial = match.historial_sets.copy() if match.historial_sets else []
+        points_a = match.points_player_a
+        points_b = match.points_player_b
+        sets_a = match.sets_player_a
+        sets_b = match.sets_player_b
+        current_set = match.current_set
+        history = match.sets_history.copy() if match.sets_history else []
         
-        # Procesar action
-        if accion == "punto_a":
-            puntos_a += 1
-        elif accion == "punto_b":
-            puntos_b += 1
-        elif accion == "undo":
-            # Implementar undo if necessary
+        # Process action
+        if action == "point_a":
+            points_a += 1
+        elif action == "point_b":
+            points_b += 1
+        elif action == "undo":
+            # Implement undo if necessary
             pass
-        elif accion == "reset_set":
-            puntos_a = 0
-            puntos_b = 0
+        elif action == "reset_set":
+            points_a = 0
+            points_b = 0
         
-        # Verify if set was completed
-        puntos_para_ganar = match.puntos_por_set
-        set_completado = False
-        ganador_set = None
+        # Check if set was completed
+        points_to_win = match.points_per_set
+        set_completed = False
+        set_winner = None
         
-        if puntos_a >= puntos_para_ganar or puntos_b >= puntos_para_ganar:
-            if abs(puntos_a - puntos_b) >= 2:
-                set_completado = True
-                if puntos_a > puntos_b:
+        if points_a >= points_to_win or points_b >= points_to_win:
+            if abs(points_a - points_b) >= 2:
+                set_completed = True
+                if points_a > points_b:
                     sets_a += 1
-                    ganador_set = "a"
+                    set_winner = "a"
                 else:
                     sets_b += 1
-                    ganador_set = "b"
+                    set_winner = "b"
                 
                 # Save to history
-                historial.append({
-                    "set": set_actual,
-                    "puntos_a": puntos_a,
-                    "puntos_b": puntos_b,
-                    "ganador": ganador_set
+                history.append({
+                    "set": current_set,
+                    "points_a": points_a,
+                    "points_b": points_b,
+                    "winner": set_winner
                 })
                 
                 # Reset points for new set
-                puntos_a = 0
-                puntos_b = 0
-                set_actual += 1
+                points_a = 0
+                points_b = 0
+                current_set += 1
         
         # Update in repository
         await self.repository.update_score(
-            partido_id, puntos_a, puntos_b,
-            sets_a, sets_b, set_actual, historial
+            match_id, points_a, points_b,
+            sets_a, sets_b, current_set, history
         )
         
         # Emit score updated event
         await self.emit_event(
             PinpanClubEvents.MATCH_SCORE_UPDATED,
             {
-                "partido_id": partido_id,
-                "puntos_a": puntos_a,
-                "puntos_b": puntos_b,
+                "match_id": match_id,
+                "points_a": points_a,
+                "points_b": points_b,
                 "sets_a": sets_a,
                 "sets_b": sets_b,
-                "set_actual": set_actual
+                "current_set": current_set
             },
             priority=EventPriority.HIGH
         )
         
-        # Si se completed set, emitir evento
-        if set_completado:
+        # If set completed, emit event
+        if set_completed:
             await self.emit_event(
                 PinpanClubEvents.MATCH_SET_COMPLETED,
                 {
