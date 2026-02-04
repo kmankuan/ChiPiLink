@@ -164,11 +164,17 @@ class StudentRecordRepository(BaseRepository):
                 "student_id": 1,
                 "user_id": 1,
                 "full_name": 1,
+                "nombre_completo": 1,  # Legacy Spanish field
+                "nombre": 1,  # Legacy Spanish field
                 "school_id": 1,
                 "school_name": 1,
+                "nombre_escuela": 1,  # Legacy Spanish field
                 "student_number": 1,
+                "numero_estudiante": 1,  # Legacy Spanish field
                 "relation_type": 1,
+                "tipo_relacion": 1,  # Legacy Spanish field
                 "relation_other": 1,
+                "relacion_otro": 1,  # Legacy Spanish field
                 "created_at": 1,
                 "enrollment": "$enrollments"
             }}
