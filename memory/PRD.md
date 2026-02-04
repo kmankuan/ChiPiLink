@@ -223,6 +223,12 @@ New column names: `code`, `name`, `grade`, `quantity`, `price`, `subject`, `publ
 - `conexiones_service.py` → `connections_service.py` ✅
 - `catalogo_privado.py` → `private_catalog.py` ✅
 
+### P0 - PinpanClub English Refactoring (IN PROGRESS - 70%)
+**Remaining Work:**
+- Complete frontend component refactoring for remaining pinpanclub pages
+- Update remaining Spanish compatibility fallbacks across the codebase
+- Final audit for any remaining Spanish terms
+
 ### P1 - Known Bugs
 1. **Admin Sidebar Disappears** - Recurring issue after login
 2. **Google Sign-Up Loop** - OAuth flow broken
