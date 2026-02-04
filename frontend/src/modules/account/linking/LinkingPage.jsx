@@ -146,6 +146,8 @@ export default function LinkingPage({ embedded = false }) {
   };
 
   const handleSubmit = async () => {
+    console.log('=== LinkingPage v2.1 - handleSubmit START ===');
+    
     // Validation
     if (!fullName.trim()) {
       toast.error('Please enter the student name');
