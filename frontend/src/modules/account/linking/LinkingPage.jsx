@@ -422,6 +422,10 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
             grade: student.grade
           };
 
+          console.log('Submitting payload:', payload);
+          console.log('API URL:', `${API_URL}/api/store/textbook-access/students`);
+          console.log('Token present:', !!token);
+
           const response = await fetch(`${API_URL}/api/store/textbook-access/students`, {
             method: 'POST',
             headers: {
@@ -431,7 +435,11 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
             body: JSON.stringify(payload)
           });
 
+          console.log('Response status:', response.status);
+
           if (response.ok) {
+            const result = await response.json();
+            console.log('Success response:', result);
             successCount++;
           } else {
             const errorData = await response.json();
