@@ -18,16 +18,17 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Reaction types with icons
 const reactionTypes = [
-  { type: 'clap', icon: '👏', label: 'Aplausos' },
-  { type: 'fire', icon: '🔥', label: 'Fuego' },
-  { type: 'trophy', icon: '🏆', label: 'Trofeo' },
-  { type: 'heart', icon: '❤️', label: 'Corazón' },
+  { type: 'clap', icon: '👏', label: 'Clap' },
+  { type: 'fire', icon: '🔥', label: 'Fire' },
+  { type: 'trophy', icon: '🏆', label: 'Trophy' },
+  { type: 'heart', icon: '❤️', label: 'Heart' },
   { type: 'wow', icon: '😮', label: 'Wow' }
 ];
 
 // ============== FOLLOW BUTTON ==============
 
 export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
+  const { t } = useTranslation();
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -53,7 +54,7 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
 
   const toggleFollow = async () => {
     if (!currentUserId) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('social.loginRequired'));
       return;
     }
     if (currentUserId === targetUserId) return;
@@ -66,7 +67,7 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
           { method: 'DELETE' }
         );
         setIsFollowing(false);
-        toast.success('Dejaste de seguir');
+        toast.success(t('social.unfollowed'));
       } else {
         await fetch(`${API_URL}/api/pinpanclub/social/follow`, {
           method: 'POST',
@@ -74,7 +75,7 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
           body: JSON.stringify({ follower_id: currentUserId, following_id: targetUserId })
         });
         setIsFollowing(true);
-        toast.success('¡Ahora lo sigues!');
+        toast.success(t('social.nowFollowing'));
       }
       onFollowChange?.();
     } catch (error) {
