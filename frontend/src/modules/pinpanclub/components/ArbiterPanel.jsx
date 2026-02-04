@@ -30,15 +30,15 @@ import { PINPANCLUB_API } from '../config/api';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Tipos de punto para registro técnico
+// Point types for technical recording
 const POINT_TYPES = [
   { value: 'normal', label: 'Normal' },
-  { value: 'ace', label: 'Ace (Saque directo)' },
-  { value: 'winner', label: 'Winner (Ganador)' },
-  { value: 'error_rival', label: 'Error del rival' },
-  { value: 'error_propio', label: 'Error propio' },
+  { value: 'ace', label: 'Ace (Direct serve)' },
+  { value: 'winner', label: 'Winner' },
+  { value: 'error_opponent', label: 'Opponent error' },
+  { value: 'error_self', label: 'Self error' },
   { value: 'smash', label: 'Smash' },
-  { value: 'bloqueo', label: 'Bloqueo' },
+  { value: 'block', label: 'Block' },
   { value: 'top_spin', label: 'Top Spin' },
   { value: 'back_spin', label: 'Back Spin' }
 ];
@@ -54,24 +54,24 @@ export default function ArbiterPanel({
   if (!match) return null;
 
   const {
-    partido_id,
+    match_id,
     player_a_info,
     player_b_info,
-    puntos_player_a,
-    puntos_player_b,
+    points_player_a,
+    points_player_b,
     sets_player_a,
     sets_player_b,
-    set_actual,
-    saque,
-    estado
+    current_set,
+    serve,
+    status
   } = match;
 
-  const playerAName = player_a_info?.apodo || player_a_info?.nombre || 'Jugador A';
-  const playerBName = player_b_info?.apodo || player_b_info?.nombre || 'Jugador B';
+  const playerAName = player_a_info?.nickname || player_a_info?.name || 'Player A';
+  const playerBName = player_b_info?.nickname || player_b_info?.name || 'Player B';
 
-  const handleAddPoint = async (jugador) => {
-    if (estado !== 'en_curso') {
-      toast.error('El partido no está en curso');
+  const handleAddPoint = async (player) => {
+    if (status !== 'in_progress') {
+      toast.error('Match is not in progress');
       return;
     }
 
