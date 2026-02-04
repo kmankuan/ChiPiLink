@@ -76,13 +76,17 @@ class LaoPanOAuthService:
         redirect_uri = self.get_redirect_uri(origin)
         
         # Store state in database (persists across server restarts/instances)
-        await db.oauth_states.insert_one({
-            "state": state,
-            "created_at": datetime.now(timezone.utc),
-            "redirect_after": redirect_after,
-            "redirect_uri": redirect_uri,
-            "expires_at": datetime.now(timezone.utc).isoformat()
-        })
+        try:
+            result = await db.oauth_states.insert_one({
+                "state": state,
+                "created_at": datetime.now(timezone.utc),
+                "redirect_after": redirect_after,
+                "redirect_uri": redirect_uri
+            })
+            logger.info(f"OAuth state stored in DB: {state}, inserted_id: {result.inserted_id}")
+        except Exception as e:
+            logger.error(f"Failed to store OAuth state in DB: {e}")
+            # Continue anyway - state validation will fail but at least we can debug
         
         params = {
             "client_id": self.client_id,
