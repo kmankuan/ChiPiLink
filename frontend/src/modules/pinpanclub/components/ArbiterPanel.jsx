@@ -306,20 +306,20 @@ export default function ArbiterPanel({
                 className="gap-2"
               >
                 <Pause className="h-4 w-4" />
-                Pausar
+                Pause
               </Button>
             </>
           )}
         </div>
 
         {/* Match Result */}
-        {estado === 'finalizado' && (
+        {status === 'finished' && (
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-lg font-semibold text-green-700">
-              🏆 Partido Finalizado
+              🏆 Match Finished
             </div>
             <div className="text-2xl font-bold mt-2">
-              Ganador: {match.winner_id === match.player_a_id ? playerAName : playerBName}
+              Winner: {match.winner_id === match.player_a_id ? playerAName : playerBName}
             </div>
           </div>
         )}
