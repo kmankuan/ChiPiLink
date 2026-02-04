@@ -558,14 +558,14 @@ export function PastSeasons({ limit = 5 }) {
 }
 
 // Export default combined component
-export default function RankingSeasons({ jugadorId }) {
+export default function RankingSeasons({ playerId }) {
   const navigate = useNavigate();
   
   return (
     <div className="space-y-6">
       <SeasonBanner onViewLeaderboard={() => navigate('/pinpanclub/seasons')} />
       
-      {jugadorId && <PlayerSeasonCard jugadorId={jugadorId} />}
+      {playerId && <PlayerSeasonCard playerId={playerId} />}
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SeasonLeaderboard limit={10} />
