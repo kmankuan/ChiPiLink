@@ -25,8 +25,8 @@ class MatchRepository(BaseRepository):
         """Create new match"""
         match_data["partido_id"] = str(uuid.uuid4())
         match_data["estado"] = "pendiente"
-        match_data["puntos_jugador_a"] = 0
-        match_data["puntos_jugador_b"] = 0
+        match_data["points_player_a"] = 0
+        match_data["points_player_b"] = 0
         match_data["sets_jugador_a"] = 0
         match_data["sets_jugador_b"] = 0
         match_data["set_actual"] = 1
@@ -58,8 +58,8 @@ class MatchRepository(BaseRepository):
         return await self.find_many(
             query={
                 "$or": [
-                    {"jugador_a_id": jugador_id},
-                    {"jugador_b_id": jugador_id}
+                    {"player_a_id": jugador_id},
+                    {"player_b_id": jugador_id}
                 ]
             },
             limit=limit,
@@ -89,8 +89,8 @@ class MatchRepository(BaseRepository):
     ) -> bool:
         """Update score dthe match"""
         return await self.update_match(partido_id, {
-            "puntos_jugador_a": puntos_a,
-            "puntos_jugador_b": puntos_b,
+            "points_player_a": puntos_a,
+            "points_player_b": puntos_b,
             "sets_jugador_a": sets_a,
             "sets_jugador_b": sets_b,
             "set_actual": set_actual,
@@ -107,13 +107,13 @@ class MatchRepository(BaseRepository):
     async def finish_match(
         self,
         partido_id: str,
-        ganador_id: str,
+        winner_id: str,
         fecha_fin: str
     ) -> bool:
         """Finalizar partido"""
         return await self.update_match(partido_id, {
             "estado": "finalizado",
-            "ganador_id": ganador_id,
+            "winner_id": winner_id,
             "fecha_fin": fecha_fin
         })
     

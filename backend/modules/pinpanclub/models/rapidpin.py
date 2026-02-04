@@ -129,12 +129,12 @@ class RapidPinSeason(BaseModel):
 class RapidPinMatchCreate(BaseModel):
     """Register Rapid Pin match"""
     season_id: str
-    jugador_a_id: str
-    jugador_b_id: str
+    player_a_id: str
+    player_b_id: str
     arbitro_id: str
     
     # Result
-    ganador_id: str  # Winner ID (jugador_a or jugador_b)
+    winner_id: str  # Winner ID (jugador_a or jugador_b)
     score_ganador: int = 11  # Winner's score
     score_perdedor: int = 0  # Loser's score
     
@@ -153,18 +153,18 @@ class RapidPinMatch(BaseModel):
     season_id: str
     
     # Participants
-    jugador_a_id: str
-    jugador_b_id: str
+    player_a_id: str
+    player_b_id: str
     arbitro_id: str
     
     # Participant info (cached)
-    jugador_a_info: Optional[Dict] = None
-    jugador_b_info: Optional[Dict] = None
+    player_a_info: Optional[Dict] = None
+    player_b_info: Optional[Dict] = None
     arbitro_info: Optional[Dict] = None
     
     # Result
-    ganador_id: str
-    perdedor_id: str
+    winner_id: str
+    loser_id: str
     score_ganador: int
     score_perdedor: int
     
@@ -403,7 +403,7 @@ class RapidPinQueueAssign(BaseModel):
 
 class RapidPinQueueComplete(BaseModel):
     """Completar partido from queue con resultado"""
-    ganador_id: str
+    winner_id: str
     score_ganador: int = 11
     score_perdedor: int = 0
 

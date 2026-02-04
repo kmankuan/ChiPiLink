@@ -138,8 +138,8 @@ class RapidPinMatchRepository(BaseRepository):
                 "season_id": season_id,
                 "estado": "pending",
                 "$or": [
-                    {"jugador_a_id": user_id},
-                    {"jugador_b_id": user_id},
+                    {"player_a_id": user_id},
+                    {"player_b_id": user_id},
                     {"arbitro_id": user_id}
                 ],
                 "registrado_por_id": {"$ne": user_id}  # No puede confirmar su propio registro
@@ -153,8 +153,8 @@ class RapidPinMatchRepository(BaseRepository):
             query={
                 "estado": "pending",
                 "$or": [
-                    {"jugador_a_id": user_id},
-                    {"jugador_b_id": user_id},
+                    {"player_a_id": user_id},
+                    {"player_b_id": user_id},
                     {"arbitro_id": user_id}
                 ],
                 "registrado_por_id": {"$ne": user_id}  # No puede confirmar su propio registro
@@ -174,8 +174,8 @@ class RapidPinMatchRepository(BaseRepository):
                 "season_id": season_id,
                 "estado": "validated",
                 "$or": [
-                    {"jugador_a_id": jugador_id},
-                    {"jugador_b_id": jugador_id},
+                    {"player_a_id": jugador_id},
+                    {"player_b_id": jugador_id},
                     {"arbitro_id": jugador_id}
                 ]
             },

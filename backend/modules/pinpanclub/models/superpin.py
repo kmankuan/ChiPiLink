@@ -212,8 +212,8 @@ class PlayerCheckIn(BaseModel):
 class SuperPinMatchCreate(BaseModel):
     """Create Super Pin match"""
     liga_id: str
-    jugador_a_id: str
-    jugador_b_id: str
+    player_a_id: str
+    player_b_id: str
     arbitro_id: Optional[str] = None
     match_type: MatchType = MatchType.RANKED
     mejor_de: int = 3  # Best of 3/5/7
@@ -242,8 +242,8 @@ class SuperPinMatch(BaseModel):
     match_type: MatchType
     
     # Playeres
-    jugador_a_id: str
-    jugador_b_id: str
+    player_a_id: str
+    player_b_id: str
     arbitro_id: Optional[str] = None
     
     # Configuration
@@ -252,15 +252,15 @@ class SuperPinMatch(BaseModel):
     
     # Marcador
     estado: str = "pendiente"  # pendiente, en_curso, finalizado, cancelado
-    puntos_jugador_a: int = 0
-    puntos_jugador_b: int = 0
+    points_player_a: int = 0
+    points_player_b: int = 0
     sets_jugador_a: int = 0
     sets_jugador_b: int = 0
     set_actual: int = 1
     historial_sets: List[Dict] = []
     
     # Result
-    ganador_id: Optional[str] = None
+    winner_id: Optional[str] = None
     
     # Ranking points awarded
     puntos_ganador: int = 0
@@ -272,8 +272,8 @@ class SuperPinMatch(BaseModel):
     stats: Optional[SuperPinMatchStats] = None
     
     # Info adicional
-    jugador_a_info: Optional[Dict] = None
-    jugador_b_info: Optional[Dict] = None
+    player_a_info: Optional[Dict] = None
+    player_b_info: Optional[Dict] = None
     arbitro_info: Optional[Dict] = None
     
     # Timestamps

@@ -318,12 +318,12 @@ class RapidPinService(BaseService):
             raise ValueError("Season is not active")
         
         # Validate all 3 participants are different
-        participants = {data.jugador_a_id, data.jugador_b_id, data.arbitro_id}
+        participants = {data.player_a_id, data.player_b_id, data.arbitro_id}
         if len(participants) != 3:
             raise ValueError("All 3 participants must be different people")
         
         # Validate that winner is one of the players
-        if data.ganador_id not in [data.jugador_a_id, data.jugador_b_id]:
+        if data.winner_id not in [data.player_a_id, data.player_b_id]:
             raise ValueError("Winner must be one of the players")
         
         # Validate that registerer is one of the participants
@@ -331,22 +331,22 @@ class RapidPinService(BaseService):
             raise ValueError("Only a participant can register the match")
         
         # Get player info
-        jugador_a = await self.player_repo.get_by_id(data.jugador_a_id)
-        jugador_b = await self.player_repo.get_by_id(data.jugador_b_id)
+        jugador_a = await self.player_repo.get_by_id(data.player_a_id)
+        jugador_b = await self.player_repo.get_by_id(data.player_b_id)
         arbitro = await self.player_repo.get_by_id(data.arbitro_id)
         
         # Determine loser
-        perdedor_id = data.jugador_b_id if data.ganador_id == data.jugador_a_id else data.jugador_a_id
+        loser_id = data.player_b_id if data.winner_id == data.player_a_id else data.player_a_id
         
         match_dict = data.model_dump()
-        match_dict["perdedor_id"] = perdedor_id
+        match_dict["loser_id"] = loser_id
         match_dict["estado"] = RapidPinMatchStatus.PENDING
         match_dict["fecha_partido"] = datetime.now(timezone.utc).isoformat()
-        match_dict["jugador_a_info"] = {
+        match_dict["player_a_info"] = {
             "name": jugador_a.get("name") if jugador_a else "Desconocido",
             "apodo": jugador_a.get("apodo") if jugador_a else None
         }
-        match_dict["jugador_b_info"] = {
+        match_dict["player_b_info"] = {
             "name": jugador_b.get("name") if jugador_b else "Desconocido",
             "apodo": jugador_b.get("apodo") if jugador_b else None
         }
@@ -380,7 +380,7 @@ class RapidPinService(BaseService):
             raise ValueError("Match was already processed")
         
         # Validate confirmer is a different participant from registrant
-        participants = {match["jugador_a_id"], match["jugador_b_id"], match["arbitro_id"]}
+        participants = {match["player_a_id"], match["player_b_id"], match["arbitro_id"]}
         if confirmado_por_id not in participants:
             raise ValueError("Only a participant can confirm the match")
         
@@ -417,16 +417,16 @@ class RapidPinService(BaseService):
     async def _apply_match_points(self, match: Dict):
         """Apply points after de confirmar un partido"""
         season_id = match["season_id"]
-        ganador_id = match["ganador_id"]
-        perdedor_id = match["perdedor_id"]
+        winner_id = match["winner_id"]
+        loser_id = match["loser_id"]
         arbitro_id = match["arbitro_id"]
         
         # Ensure ranking entries exist for all 3 participants
         ganador_ranking = await self.ranking_repo.get_or_create(
-            season_id, ganador_id, match.get("jugador_a_info") if ganador_id == match["jugador_a_id"] else match.get("jugador_b_info")
+            season_id, winner_id, match.get("player_a_info") if winner_id == match["player_a_id"] else match.get("player_b_info")
         )
         perdedor_ranking = await self.ranking_repo.get_or_create(
-            season_id, perdedor_id, match.get("jugador_b_info") if perdedor_id == match["jugador_b_id"] else match.get("jugador_a_info")
+            season_id, loser_id, match.get("player_b_info") if loser_id == match["player_b_id"] else match.get("player_a_info")
         )
         arbitro_ranking = await self.ranking_repo.get_or_create(
             season_id, arbitro_id, match.get("arbitro_info")
@@ -910,7 +910,7 @@ class RapidPinService(BaseService):
     async def complete_queue_match(
         self,
         queue_id: str,
-        ganador_id: str,
+        winner_id: str,
         score_ganador: int = 11,
         score_perdedor: int = 0
     ) -> Dict:
@@ -929,19 +929,19 @@ class RapidPinService(BaseService):
             raise ValueError("El partido debe tener referee asignado to completese")
         
         # Verify winner is one of the players
-        if ganador_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
+        if winner_id not in [queue_entry["player1_id"], queue_entry["player2_id"]]:
             raise ValueError("Winner must be one of the players")
         
         # Determine loser
-        perdedor_id = queue_entry["player2_id"] if ganador_id == queue_entry["player1_id"] else queue_entry["player1_id"]
+        loser_id = queue_entry["player2_id"] if winner_id == queue_entry["player1_id"] else queue_entry["player1_id"]
         
         # Registrar the match oficial
         match_data = RapidPinMatchCreate(
             season_id=queue_entry["season_id"],
-            jugador_a_id=queue_entry["player1_id"],
-            jugador_b_id=queue_entry["player2_id"],
+            player_a_id=queue_entry["player1_id"],
+            player_b_id=queue_entry["player2_id"],
             arbitro_id=queue_entry["referee_id"],
-            ganador_id=ganador_id,
+            winner_id=winner_id,
             score_ganador=score_ganador,
             score_perdedor=score_perdedor,
             registrado_por_id=queue_entry["referee_id"]
@@ -965,7 +965,7 @@ class RapidPinService(BaseService):
             "queue_id": queue_id,
             "match_id": match.match_id,
             "status": "completed",
-            "ganador_id": ganador_id,
+            "winner_id": winner_id,
             "score": f"{score_ganador}-{score_perdedor}"
         }
     

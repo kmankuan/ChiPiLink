@@ -209,17 +209,17 @@ async def get_player_stats(liga_id: str, jugador_id: str):
 @router.get("/leagues/{liga_id}/head-to-head")
 async def get_head_to_head(
     liga_id: str,
-    jugador_a_id: str,
-    jugador_b_id: str
+    player_a_id: str,
+    player_b_id: str
 ):
     """Get historial entre dos jugadores"""
     matches = await superpin_service.match_repo.get_head_to_head(
-        liga_id, jugador_a_id, jugador_b_id
+        liga_id, player_a_id, player_b_id
     )
     
     # Calculatesr statistics
-    wins_a = sum(1 for m in matches if m.get("ganador_id") == jugador_a_id)
-    wins_b = sum(1 for m in matches if m.get("ganador_id") == jugador_b_id)
+    wins_a = sum(1 for m in matches if m.get("winner_id") == player_a_id)
+    wins_b = sum(1 for m in matches if m.get("winner_id") == player_b_id)
     
     return {
         "total_matches": len(matches),
@@ -350,15 +350,15 @@ async def get_player_statistics(jugador_id: str, liga_id: str = None):
 
 
 @router.get("/head-to-head")
-async def get_head_to_head(jugador_a_id: str, jugador_b_id: str):
+async def get_head_to_head(player_a_id: str, player_b_id: str):
     """Get head-to-head statistics directos"""
-    return await superpin_service.get_head_to_head(jugador_a_id, jugador_b_id)
+    return await superpin_service.get_head_to_head(player_a_id, player_b_id)
 
 
 @router.get("/predict-match")
-async def predict_match(jugador_a_id: str, jugador_b_id: str):
+async def predict_match(player_a_id: str, player_b_id: str):
     """
     Predice el resultado de a match entre dos jugadores.
     Retorna probabilidades basadas en ELO, historial H2H y racha actual.
     """
-    return await superpin_service.predict_match(jugador_a_id, jugador_b_id)
+    return await superpin_service.predict_match(player_a_id, player_b_id)

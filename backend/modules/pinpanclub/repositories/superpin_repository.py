@@ -191,8 +191,8 @@ class SuperPinMatchRepository(BaseRepository):
             query={
                 "liga_id": liga_id,
                 "$or": [
-                    {"jugador_a_id": jugador_id},
-                    {"jugador_b_id": jugador_id}
+                    {"player_a_id": jugador_id},
+                    {"player_b_id": jugador_id}
                 ]
             },
             limit=limit,
@@ -207,8 +207,8 @@ class SuperPinMatchRepository(BaseRepository):
     async def get_head_to_head(
         self,
         liga_id: str,
-        jugador_a_id: str,
-        jugador_b_id: str
+        player_a_id: str,
+        player_b_id: str
     ) -> List[Dict]:
         """Get historial entre dos jugadores"""
         return await self.find_many(
@@ -216,8 +216,8 @@ class SuperPinMatchRepository(BaseRepository):
                 "liga_id": liga_id,
                 "estado": "finalizado",
                 "$or": [
-                    {"jugador_a_id": jugador_a_id, "jugador_b_id": jugador_b_id},
-                    {"jugador_a_id": jugador_b_id, "jugador_b_id": jugador_a_id}
+                    {"player_a_id": player_a_id, "player_b_id": player_b_id},
+                    {"player_a_id": player_b_id, "player_b_id": player_a_id}
                 ]
             },
             sort=[("fecha_fin", -1)]

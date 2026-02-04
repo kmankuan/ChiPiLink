@@ -81,7 +81,7 @@ async def get_analytics_dashboard():
     pipeline = [
         {"$match": {"created_at": {"$gte": week_ago.isoformat()}}},
         {"$group": {
-            "_id": "$jugador_a_id",
+            "_id": "$player_a_id",
             "matches_count": {"$sum": 1}
         }},
         {"$sort": {"matches_count": -1}},
@@ -184,8 +184,8 @@ async def get_analytics_dashboard():
     for player in all_players:
         matches_week = await db.pinpanclub_rapidpin_matches.count_documents({
             "$or": [
-                {"jugador_a_id": player.get("jugador_id")},
-                {"jugador_b_id": player.get("jugador_id")}
+                {"player_a_id": player.get("jugador_id")},
+                {"player_b_id": player.get("jugador_id")}
             ],
             "created_at": {"$gte": week_ago.isoformat()}
         })
@@ -242,7 +242,7 @@ async def get_analytics_summary():
     pipeline = [
         {"$match": {"created_at": {"$gte": week_ago.isoformat()}}},
         {"$group": {
-            "_id": "$jugador_a_id",
+            "_id": "$player_a_id",
             "matches_count": {"$sum": 1}
         }},
         {"$sort": {"matches_count": -1}},

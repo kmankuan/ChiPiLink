@@ -22,36 +22,36 @@ def setup_event_handlers():
         from .services import player_service
         
         payload = event.payload
-        ganador_id = payload.get("ganador_id")
-        jugador_a_id = payload.get("jugador_a_id")
-        jugador_b_id = payload.get("jugador_b_id")
+        winner_id = payload.get("winner_id")
+        player_a_id = payload.get("player_a_id")
+        player_b_id = payload.get("player_b_id")
         
-        if not all([ganador_id, jugador_a_id, jugador_b_id]):
+        if not all([winner_id, player_a_id, player_b_id]):
             return
         
-        perdedor_id = jugador_b_id if ganador_id == jugador_a_id else jugador_a_id
+        loser_id = player_b_id if winner_id == player_a_id else player_a_id
         
         # Get ELOs for calculation
-        ganador = await player_service.get_player(ganador_id)
-        perdedor = await player_service.get_player(perdedor_id)
+        ganador = await player_service.get_player(winner_id)
+        perdedor = await player_service.get_player(loser_id)
         
         if ganador and perdedor:
             # Update winner stats
             await player_service.update_player_stats(
-                ganador_id,
+                winner_id,
                 won=True,
                 opponent_elo=perdedor.elo_rating
             )
             
             # Update loser stats
             await player_service.update_player_stats(
-                perdedor_id,
+                loser_id,
                 won=False,
                 opponent_elo=ganador.elo_rating
             )
             
             logger.info(
-                f"Updated stats for match: winner={ganador_id}, loser={perdedor_id}"
+                f"Updated stats for match: winner={winner_id}, loser={loser_id}"
             )
     
     @event_bus.subscribe("pinpanclub.*")

@@ -80,8 +80,8 @@ class Player(PlayerBase):
 
 class MatchBase(BaseModel):
     """Base para partido"""
-    jugador_a_id: str
-    jugador_b_id: str
+    player_a_id: str
+    player_b_id: str
     mejor_de: int = 5  # Best of 5 sets
     puntos_por_set: int = 11
     mesa: Optional[str] = None
@@ -105,18 +105,18 @@ class Match(MatchBase):
     
     partido_id: str
     estado: MatchState = MatchState.PENDIENTE
-    puntos_jugador_a: int = 0
-    puntos_jugador_b: int = 0
+    points_player_a: int = 0
+    points_player_b: int = 0
     sets_jugador_a: int = 0
     sets_jugador_b: int = 0
     set_actual: int = 1
     historial_sets: List[Dict] = []
-    ganador_id: Optional[str] = None
+    winner_id: Optional[str] = None
     fecha_inicio: Optional[Any] = None  # Can be string or datetime
     fecha_fin: Optional[Any] = None  # Can be string or datetime
     monday_item_id: Optional[str] = None
-    jugador_a_info: Optional[Dict] = None
-    jugador_b_info: Optional[Dict] = None
+    player_a_info: Optional[Dict] = None
+    player_b_info: Optional[Dict] = None
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
 
@@ -146,7 +146,7 @@ class Tournament(TournamentBase):
     estado: str = "inscripcion"
     participantes: List[str] = []
     partidos: List[str] = []
-    ganador_id: Optional[str] = None
+    winner_id: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 

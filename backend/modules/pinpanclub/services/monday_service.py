@@ -275,8 +275,8 @@ class MondayService(BaseService):
             return None
         
         # Get player names
-        player_a = match.get("jugador_a_info", {})
-        player_b = match.get("jugador_b_info", {})
+        player_a = match.get("player_a_info", {})
+        player_b = match.get("player_b_info", {})
         
         nombre_a = player_a.get("apodo") or player_a.get("name", "Jugador A")
         nombre_b = player_b.get("apodo") or player_b.get("name", "Jugador B")
@@ -336,11 +336,11 @@ class MondayService(BaseService):
         
         # Determinar ganador
         ganador = ""
-        if match.get("ganador_id"):
-            if match["ganador_id"] == match["jugador_a_id"]:
-                ganador = match.get("jugador_a_info", {}).get("name", "A")
+        if match.get("winner_id"):
+            if match["winner_id"] == match["player_a_id"]:
+                ganador = match.get("player_a_info", {}).get("name", "A")
             else:
-                ganador = match.get("jugador_b_info", {}).get("name", "B")
+                ganador = match.get("player_b_info", {}).get("name", "B")
         
         column_values = {
             "text0": resultado,

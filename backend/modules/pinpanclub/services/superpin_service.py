@@ -207,18 +207,18 @@ class SuperPinService(BaseService):
     ) -> SuperPinMatch:
         """Create Super Pin match"""
         # Get player info
-        player_a = await self.player_repo.get_by_id(data.jugador_a_id)
-        player_b = await self.player_repo.get_by_id(data.jugador_b_id)
+        player_a = await self.player_repo.get_by_id(data.player_a_id)
+        player_b = await self.player_repo.get_by_id(data.player_b_id)
         arbitro = None
         if data.arbitro_id:
             arbitro = await self.player_repo.get_by_id(data.arbitro_id)
         
         match_dict = data.model_dump()
-        match_dict["jugador_a_info"] = player_a
-        match_dict["jugador_b_info"] = player_b
+        match_dict["player_a_info"] = player_a
+        match_dict["player_b_info"] = player_b
         match_dict["arbitro_info"] = arbitro
-        match_dict["puntos_jugador_a"] = 0
-        match_dict["puntos_jugador_b"] = 0
+        match_dict["points_player_a"] = 0
+        match_dict["points_player_b"] = 0
         match_dict["sets_jugador_a"] = 0
         match_dict["sets_jugador_b"] = 0
         match_dict["set_actual"] = 1
@@ -226,10 +226,10 @@ class SuperPinService(BaseService):
         
         # Get current player ELO
         ranking_a = await self.ranking_repo.get_or_create(
-            data.liga_id, data.jugador_a_id, player_a
+            data.liga_id, data.player_a_id, player_a
         )
         ranking_b = await self.ranking_repo.get_or_create(
-            data.liga_id, data.jugador_b_id, player_b
+            data.liga_id, data.player_b_id, player_b
         )
         
         match_dict["elo_inicial_a"] = ranking_a.get("elo_rating", 1000)
@@ -272,18 +272,18 @@ class SuperPinService(BaseService):
         
         # Update points
         if jugador == 'a':
-            match["puntos_jugador_a"] += 1
+            match["points_player_a"] += 1
         else:
-            match["puntos_jugador_b"] += 1
+            match["points_player_b"] += 1
         
-        puntos_a = match["puntos_jugador_a"]
-        puntos_b = match["puntos_jugador_b"]
+        puntos_a = match["points_player_a"]
+        puntos_b = match["points_player_b"]
         puntos_set = match["puntos_por_set"]
         
         set_ganado = False
         partido_terminado = False
         ganador_set = None
-        ganador_partido = None
+        match_winner = None
         
         # Check if set was won
         if puntos_a >= puntos_set or puntos_b >= puntos_set:
@@ -309,17 +309,17 @@ class SuperPinService(BaseService):
                 sets_para_ganar = (match["mejor_de"] // 2) + 1
                 if match["sets_jugador_a"] >= sets_para_ganar:
                     partido_terminado = True
-                    ganador_partido = 'a'
-                    match["ganador_id"] = match["jugador_a_id"]
+                    match_winner = 'a'
+                    match["winner_id"] = match["player_a_id"]
                 elif match["sets_jugador_b"] >= sets_para_ganar:
                     partido_terminado = True
-                    ganador_partido = 'b'
-                    match["ganador_id"] = match["jugador_b_id"]
+                    match_winner = 'b'
+                    match["winner_id"] = match["player_b_id"]
                 else:
                     # Next set
                     match["set_actual"] += 1
-                    match["puntos_jugador_a"] = 0
-                    match["puntos_jugador_b"] = 0
+                    match["points_player_a"] = 0
+                    match["points_player_b"] = 0
         
         # Update advanced statistics si se proporcionan
         if stats:
@@ -346,7 +346,7 @@ class SuperPinService(BaseService):
             "set_ganado": set_ganado,
             "ganador_set": ganador_set,
             "partido_terminado": partido_terminado,
-            "ganador_partido": ganador_partido
+            "match_winner": match_winner
         }
     
     async def _update_ranking_after_match(self, match: Dict):
@@ -361,12 +361,12 @@ class SuperPinService(BaseService):
         scoring_config = league.get("scoring_config", {})
         scoring_system = scoring_config.get("system", "simple")
         
-        ganador_id = match["ganador_id"]
-        perdedor_id = match["jugador_b_id"] if ganador_id == match["jugador_a_id"] else match["jugador_a_id"]
+        winner_id = match["winner_id"]
+        loser_id = match["player_b_id"] if winner_id == match["player_a_id"] else match["player_a_id"]
         
         # Get rankings
-        ranking_ganador = await self.ranking_repo.get_player_ranking(liga_id, ganador_id)
-        ranking_perdedor = await self.ranking_repo.get_player_ranking(liga_id, perdedor_id)
+        ranking_ganador = await self.ranking_repo.get_player_ranking(liga_id, winner_id)
+        ranking_perdedor = await self.ranking_repo.get_player_ranking(liga_id, loser_id)
         
         if not ranking_ganador or not ranking_perdedor:
             return
@@ -384,7 +384,7 @@ class SuperPinService(BaseService):
             elo_change = 0
         
         # Determine sets won/lost for each player
-        if ganador_id == match["jugador_a_id"]:
+        if winner_id == match["player_a_id"]:
             sets_ganador = match["sets_jugador_a"]
             sets_perdedor = match["sets_jugador_b"]
         else:
@@ -426,8 +426,8 @@ class SuperPinService(BaseService):
         await self.match_repo.update_match(match["partido_id"], {
             "puntos_ganador": puntos_ganador,
             "puntos_perdedor": puntos_perdedor,
-            "elo_change_a": elo_change if ganador_id == match["jugador_a_id"] else -elo_change,
-            "elo_change_b": elo_change if ganador_id == match["jugador_b_id"] else -elo_change
+            "elo_change_a": elo_change if winner_id == match["player_a_id"] else -elo_change,
+            "elo_change_b": elo_change if winner_id == match["player_b_id"] else -elo_change
         })
         
         # Recalculate positions
@@ -995,8 +995,8 @@ class SuperPinService(BaseService):
         matches = await self.match_repo.find_many(
             query={
                 "$or": [
-                    {"jugador_a_id": jugador_id},
-                    {"jugador_b_id": jugador_id}
+                    {"player_a_id": jugador_id},
+                    {"player_b_id": jugador_id}
                 ],
                 "estado": "finalizado"
             },
@@ -1007,13 +1007,13 @@ class SuperPinService(BaseService):
         # Enrich matches with opponent info
         match_history = []
         for match in matches:
-            is_player_a = match.get("jugador_a_id") == jugador_id
-            opponent_id = match.get("jugador_b_id") if is_player_a else match.get("jugador_a_id")
+            is_player_a = match.get("player_a_id") == jugador_id
+            opponent_id = match.get("player_b_id") if is_player_a else match.get("player_a_id")
             opponent = await self.player_repo.get_by_id(opponent_id)
             
             player_sets = match.get("sets_jugador_a") if is_player_a else match.get("sets_jugador_b")
             opponent_sets = match.get("sets_jugador_b") if is_player_a else match.get("sets_jugador_a")
-            is_winner = match.get("ganador_id") == jugador_id
+            is_winner = match.get("winner_id") == jugador_id
             
             match_history.append({
                 "partido_id": match.get("partido_id"),
@@ -1083,22 +1083,22 @@ class SuperPinService(BaseService):
             }
         }
     
-    async def get_head_to_head(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
+    async def get_head_to_head(self, player_a_id: str, player_b_id: str) -> Dict:
         """Get head-to-head statistics directos entre dos jugadores"""
         
         matches = await self.match_repo.find_many(
             query={
                 "$or": [
-                    {"jugador_a_id": jugador_a_id, "jugador_b_id": jugador_b_id},
-                    {"jugador_a_id": jugador_b_id, "jugador_b_id": jugador_a_id}
+                    {"player_a_id": player_a_id, "player_b_id": player_b_id},
+                    {"player_a_id": player_b_id, "player_b_id": player_a_id}
                 ],
                 "estado": "finalizado"
             },
             sort=[("fecha_partido", -1)]
         )
         
-        player_a = await self.player_repo.get_by_id(jugador_a_id)
-        player_b = await self.player_repo.get_by_id(jugador_b_id)
+        player_a = await self.player_repo.get_by_id(player_a_id)
+        player_b = await self.player_repo.get_by_id(player_b_id)
         
         wins_a = 0
         wins_b = 0
@@ -1106,9 +1106,9 @@ class SuperPinService(BaseService):
         sets_b = 0
         
         for match in matches:
-            is_a_first = match.get("jugador_a_id") == jugador_a_id
+            is_a_first = match.get("player_a_id") == player_a_id
             
-            if match.get("ganador_id") == jugador_a_id:
+            if match.get("winner_id") == player_a_id:
                 wins_a += 1
             else:
                 wins_b += 1
@@ -1122,14 +1122,14 @@ class SuperPinService(BaseService):
         
         return {
             "player_a": {
-                "jugador_id": jugador_a_id,
+                "jugador_id": player_a_id,
                 "name": player_a.get("name") if player_a else "Desconocido",
                 "apodo": player_a.get("apodo") if player_a else None,
                 "wins": wins_a,
                 "sets": sets_a
             },
             "player_b": {
-                "jugador_id": jugador_b_id,
+                "jugador_id": player_b_id,
                 "name": player_b.get("name") if player_b else "Desconocido",
                 "apodo": player_b.get("apodo") if player_b else None,
                 "wins": wins_b,
@@ -1139,7 +1139,7 @@ class SuperPinService(BaseService):
             "matches": [{
                 "partido_id": m.get("partido_id"),
                 "fecha": m.get("fecha_partido"),
-                "ganador_id": m.get("ganador_id"),
+                "winner_id": m.get("winner_id"),
                 "score": f"{m.get('sets_jugador_a')}-{m.get('sets_jugador_b')}"
             } for m in matches[:10]]
         }
@@ -1231,8 +1231,8 @@ class SuperPinService(BaseService):
         for player_a, player_b in pairings:
             match_data = SuperPinMatchCreate(
                 liga_id=liga_id,
-                jugador_a_id=player_a["jugador_id"],
-                jugador_b_id=player_b["jugador_id"],
+                player_a_id=player_a["jugador_id"],
+                player_b_id=player_b["jugador_id"],
                 mejor_de=mejor_de,
                 puntos_por_set=points_per_set,
                 match_type="quick"
@@ -1295,10 +1295,10 @@ class SuperPinService(BaseService):
         
         # Enrich with player info
         for match in active_matches + finished_today:
-            player_a = await self.player_repo.get_by_id(match.get("jugador_a_id"))
-            player_b = await self.player_repo.get_by_id(match.get("jugador_b_id"))
-            match["jugador_a_info"] = {"name": player_a.get("name") if player_a else "?"} 
-            match["jugador_b_info"] = {"name": player_b.get("name") if player_b else "?"}
+            player_a = await self.player_repo.get_by_id(match.get("player_a_id"))
+            player_b = await self.player_repo.get_by_id(match.get("player_b_id"))
+            match["player_a_info"] = {"name": player_a.get("name") if player_a else "?"} 
+            match["player_b_info"] = {"name": player_b.get("name") if player_b else "?"}
         
         return {
             "active_matches": active_matches,
@@ -1308,20 +1308,20 @@ class SuperPinService(BaseService):
 
     # ============== HEAD-TO-HEAD PREDICTOR ==============
     
-    async def predict_match(self, jugador_a_id: str, jugador_b_id: str) -> Dict:
+    async def predict_match(self, player_a_id: str, player_b_id: str) -> Dict:
         """
         Predict match outcome entre dos jugadores.
         Uses ELO rating, head-to-head history and current streak.
         """
         # Get stats for both players
-        stats_a = await self.get_player_statistics(jugador_a_id)
-        stats_b = await self.get_player_statistics(jugador_b_id)
+        stats_a = await self.get_player_statistics(player_a_id)
+        stats_b = await self.get_player_statistics(player_b_id)
         
         if not stats_a or not stats_b:
             return {"error": "Player not found"}
         
         # Get head-to-head history
-        h2h = await self.get_head_to_head(jugador_a_id, jugador_b_id)
+        h2h = await self.get_head_to_head(player_a_id, player_b_id)
         
         # Calculate probability based on ELO
         elo_a = stats_a.get("player_info", {}).get("elo_rating", 1200)
@@ -1396,7 +1396,7 @@ class SuperPinService(BaseService):
         
         return {
             "player_a": {
-                "jugador_id": jugador_a_id,
+                "jugador_id": player_a_id,
                 "name": stats_a.get("player_info", {}).get("name", "?"),
                 "apodo": stats_a.get("player_info", {}).get("apodo"),
                 "elo": elo_a,
@@ -1404,7 +1404,7 @@ class SuperPinService(BaseService):
                 "probability": round(prob_a * 100, 1)
             },
             "player_b": {
-                "jugador_id": jugador_b_id,
+                "jugador_id": player_b_id,
                 "name": stats_b.get("player_info", {}).get("name", "?"),
                 "apodo": stats_b.get("player_info", {}).get("apodo"),
                 "elo": elo_b,

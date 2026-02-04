@@ -349,7 +349,7 @@ async def assign_referee(
 @router.post("/queue/{queue_id}/complete")
 async def complete_queue_match(
     queue_id: str,
-    ganador_id: str,
+    winner_id: str,
     score_ganador: int = 11,
     score_perdedor: int = 0
 ):
@@ -360,7 +360,7 @@ async def complete_queue_match(
     try:
         return await rapidpin_service.complete_queue_match(
             queue_id=queue_id,
-            ganador_id=ganador_id,
+            winner_id=winner_id,
             score_ganador=score_ganador,
             score_perdedor=score_perdedor
         )

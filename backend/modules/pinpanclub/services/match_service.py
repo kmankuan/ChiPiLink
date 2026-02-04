@@ -34,11 +34,11 @@ class MatchService(BaseService):
         match_dict = data.model_dump()
         
         # Get player info
-        player_a = await self.player_repository.get_by_id(data.jugador_a_id)
-        player_b = await self.player_repository.get_by_id(data.jugador_b_id)
+        player_a = await self.player_repository.get_by_id(data.player_a_id)
+        player_b = await self.player_repository.get_by_id(data.player_b_id)
         
         if player_a:
-            match_dict["jugador_a_info"] = {
+            match_dict["player_a_info"] = {
                 "name": player_a.get("name"),
                 "apellido": player_a.get("apellido"),
                 "apodo": player_a.get("apodo"),
@@ -46,7 +46,7 @@ class MatchService(BaseService):
             }
         
         if player_b:
-            match_dict["jugador_b_info"] = {
+            match_dict["player_b_info"] = {
                 "name": player_b.get("name"),
                 "apellido": player_b.get("apellido"),
                 "apodo": player_b.get("apodo"),
@@ -60,8 +60,8 @@ class MatchService(BaseService):
             PinpanClubEvents.MATCH_CREATED,
             {
                 "partido_id": result["partido_id"],
-                "jugador_a_id": data.jugador_a_id,
-                "jugador_b_id": data.jugador_b_id,
+                "player_a_id": data.player_a_id,
+                "player_b_id": data.player_b_id,
                 "mejor_de": data.mejor_de
             }
         )
@@ -127,8 +127,8 @@ class MatchService(BaseService):
             await self.start_match(partido_id)
             match = await self.get_match(partido_id)
         
-        puntos_a = match.puntos_jugador_a
-        puntos_b = match.puntos_jugador_b
+        puntos_a = match.points_player_a
+        puntos_b = match.points_player_b
         sets_a = match.sets_jugador_a
         sets_b = match.sets_jugador_b
         set_actual = match.set_actual
@@ -210,8 +210,8 @@ class MatchService(BaseService):
         # Verify si ended the match
         sets_para_ganar = (match.mejor_de // 2) + 1
         if sets_a >= sets_para_ganar or sets_b >= sets_para_ganar:
-            ganador_id = match.jugador_a_id if sets_a > sets_b else match.jugador_b_id
-            await self._finish_match(partido_id, ganador_id, match)
+            winner_id = match.player_a_id if sets_a > sets_b else match.player_b_id
+            await self._finish_match(partido_id, winner_id, match)
         
         # Notify WebSockets
         await self._broadcast_to_match(partido_id)
@@ -221,27 +221,27 @@ class MatchService(BaseService):
     async def _finish_match(
         self,
         partido_id: str,
-        ganador_id: str,
+        winner_id: str,
         match: Match
     ) -> None:
         """Finalizar partido y actualizar ELOs"""
         fecha_fin = datetime.now(timezone.utc).isoformat()
-        await self.repository.finish_match(partido_id, ganador_id, fecha_fin)
+        await self.repository.finish_match(partido_id, winner_id, fecha_fin)
         
         # Emit match finished event
         await self.emit_event(
             PinpanClubEvents.MATCH_FINISHED,
             {
                 "partido_id": partido_id,
-                "ganador_id": ganador_id,
+                "winner_id": winner_id,
                 "fecha_fin": fecha_fin,
-                "jugador_a_id": match.jugador_a_id,
-                "jugador_b_id": match.jugador_b_id
+                "player_a_id": match.player_a_id,
+                "player_b_id": match.player_b_id
             },
             priority=EventPriority.CRITICAL
         )
         
-        self.log_info(f"Match finished: {partido_id}, winner: {ganador_id}")
+        self.log_info(f"Match finished: {partido_id}, winner: {winner_id}")
     
     async def cancel_match(self, partido_id: str) -> bool:
         """

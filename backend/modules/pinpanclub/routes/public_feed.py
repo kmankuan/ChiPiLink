@@ -48,7 +48,7 @@ async def get_public_activity_feed(
             superpin_matches = await db.pinpanclub_superpin_matches.find(
                 {"estado": "completado"},
                 {"_id": 0, "partido_id": 1, "jugador1_id": 1, "jugador2_id": 1, 
-                 "ganador_id": 1, "resultado": 1, "fecha_partido": 1, "liga_id": 1}
+                 "winner_id": 1, "resultado": 1, "fecha_partido": 1, "liga_id": 1}
             ).sort("fecha_partido", -1).limit(matches_limit).to_list(matches_limit)
             
             # Enrich with player names
@@ -76,7 +76,7 @@ async def get_public_activity_feed(
                         "nickname": p2.get("apodo") if p2 else None,
                         "avatar": p2.get("avatar_url") if p2 else None
                     },
-                    "winner_id": match.get("ganador_id"),
+                    "winner_id": match.get("winner_id"),
                     "result": match.get("resultado"),
                     "date": match.get("fecha_partido")
                 })
