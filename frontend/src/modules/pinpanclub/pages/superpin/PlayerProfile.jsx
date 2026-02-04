@@ -128,11 +128,11 @@ export default function PlayerProfile() {
               {/* Avatar with Rank Badge */}
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg">
-                  {player_info.nombre?.[0] || '?'}
+                  {player_info.name?.[0] || '?'}
                 </div>
                 {/* Rank Badge positioned at bottom-right of avatar */}
                 <div className="absolute -bottom-2 -right-2">
-                  <PlayerRankBadge jugadorId={jugadorId} size="compact" />
+                  <PlayerRankBadge playerId={playerIdToUse} size="compact" />
                 </div>
               </div>
               
@@ -140,18 +140,18 @@ export default function PlayerProfile() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h1 className="text-3xl font-bold text-white">
-                    {player_info.nombre} {player_info.apellido || ''}
+                    {player_info.name} {player_info.last_name || ''}
                   </h1>
-                  {player_info.apodo && (
+                  {player_info.nickname && (
                     <Badge className="bg-yellow-500/20 text-yellow-300">
-                      "{player_info.apodo}"
+                      "{player_info.nickname}"
                     </Badge>
                   )}
                   {/* Follow Button */}
-                  {currentUserId && currentUserId !== jugadorId && (
+                  {currentUserId && currentUserId !== playerIdToUse && (
                     <FollowButton 
                       currentUserId={currentUserId}
-                      targetUserId={jugadorId}
+                      targetUserId={playerIdToUse}
                       onFollowChange={fetchFollowStats}
                     />
                   )}
@@ -161,31 +161,31 @@ export default function PlayerProfile() {
                 <div className="flex items-center gap-4 text-white/70 mb-2">
                   <span className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">
                     <Users className="h-4 w-4" />
-                    <strong className="text-white">{followStats.followers_count}</strong> seguidores
+                    <strong className="text-white">{followStats.followers_count}</strong> {t('superpin.profile.followers')}
                   </span>
                   <span className="cursor-pointer hover:text-white transition-colors">
-                    <strong className="text-white">{followStats.following_count}</strong> siguiendo
+                    <strong className="text-white">{followStats.following_count}</strong> {t('superpin.profile.following')}
                   </span>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4 text-white/70">
                   <span className="flex items-center gap-1">
-                    <Medal className="h-4 w-4" /> {player_info.nivel || 'Sin nivel'}
+                    <Medal className="h-4 w-4" /> {player_info.level || t('superpin.profile.noLevel')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Trophy className="h-4 w-4" /> ELO: {player_info.elo_rating}
                   </span>
-                  {player_info.fecha_registro && (
+                  {player_info.registration_date && (
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" /> 
-                      {t('superpin.profile.since')} {new Date(player_info.fecha_registro).toLocaleDateString()}
+                      {t('superpin.profile.since')} {new Date(player_info.registration_date).toLocaleDateString()}
                     </span>
                   )}
                 </div>
                 
                 {/* Achievement Showcase */}
                 <div className="mt-4">
-                  <AchievementShowcase jugadorId={jugadorId} maxDisplay={5} showTitle={true} />
+                  <AchievementShowcase playerId={playerIdToUse} maxDisplay={5} showTitle={true} />
                 </div>
               </div>
               
