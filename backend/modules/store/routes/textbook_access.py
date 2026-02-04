@@ -217,6 +217,15 @@ async def get_all_students_admin(
     return {"students": students}
 
 
+@router.get("/students/synced")
+async def get_synced_students(
+    admin: dict = Depends(get_admin_user)
+):
+    """Get all synced students (admin view) - for EstudiantesTab"""
+    students = await textbook_access_service.get_all_students()
+    return {"students": students}
+
+
 @router.put("/admin/students/{student_id}")
 async def update_student_admin(
     student_id: str,
