@@ -24,8 +24,8 @@ async def get_products(
     """Get active products with optional filters"""
     return await product_service.get_all_products(
         category=category,
-        grado=grade,
-        materia=subject,
+        grade=grade,
+        subject=subject,
         skip=skip,
         limit=limit
     )
