@@ -815,7 +815,7 @@ export default function Unatienda() {
       setCatalogoPrivadoAcceso(response.data);
     } catch (error) {
       console.error('Error checking private catalog access:', error);
-      setCatalogoPrivadoAcceso({ tiene_acceso: false, estudiantes: [], grados: [] });
+      setCatalogoPrivadoAcceso({ has_access: false, students: [], grades: [] });
     }
   };
 
