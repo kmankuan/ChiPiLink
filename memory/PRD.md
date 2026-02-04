@@ -88,10 +88,13 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 | `mejor_de`         | `best_of`           |
 | `historial_sets`   | `set_history`       |
 
-#### Frontend Files Partially Refactored:
+#### Frontend Files Refactored:
 - `SuperPinRanking.jsx` - Updated field references ✅
 - `SuperPinMatch.jsx` - Updated field references ✅
 - `ArbiterPanel.jsx` - Updated field references ✅
+- `PlayerProfile.jsx` - Updated field references ✅
+- `PlayerBadges.jsx` - Updated field references ✅
+- `ScoreBoard.jsx` - Updated field references ✅
 
 ### February 2026 - i18n Integration & Language Sync (Previous Session)
 
