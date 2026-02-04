@@ -40,17 +40,17 @@ class ProductRepository(BaseRepository):
         skip: int = 0,
         limit: int = 500
     ) -> List[Dict]:
-        """Get productos activos con filtros opcionales"""
+        """Get active products with optional filters"""
         query = {"active": True}
         
         if category:
             query["category"] = category
         
         if grade:
-            query["$or"] = [{"grade": grado}, {"grades": grado}]
+            query["$or"] = [{"grade": grade}, {"grades": grade}]
         
-        if materia:
-            query["subject"] = materia
+        if subject:
+            query["subject"] = subject
         
         return await self.find_many(query=query, skip=skip, limit=limit)
     
