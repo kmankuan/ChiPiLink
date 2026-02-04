@@ -1,6 +1,6 @@
 /**
- * Rapid Pin - Vista de Temporada
- * Muestra ranking, partidos pendientes y permite registrar partidos
+ * Rapid Pin - Season View
+ * Shows ranking, pending matches and allows recording matches
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -40,10 +40,10 @@ export default function RapidPinSeason() {
   const [newMatch, setNewMatch] = useState({
     player_a_id: '',
     player_b_id: '',
-    arbitro_id: '',
-    ganador_id: '',
-    score_ganador: 11,
-    score_perdedor: 0
+    referee_id: '',
+    winner_id: '',
+    winner_score: 11,
+    loser_score: 0
   });
 
   useEffect(() => {

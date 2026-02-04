@@ -1,6 +1,6 @@
 /**
- * Rapid Pin - Dashboard Principal
- * Panel de administración para temporadas Rapid Pin
+ * Rapid Pin - Main Dashboard
+ * Admin panel for Rapid Pin seasons
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -26,10 +26,10 @@ export default function RapidPinDashboard() {
   const [loading, setLoading] = useState(true);
   const [showNewSeason, setShowNewSeason] = useState(false);
   const [newSeason, setNewSeason] = useState({
-    nombre: '',
-    descripcion: '',
-    fecha_inicio: new Date().toISOString().split('T')[0],
-    fecha_fin: ''
+    name: '',
+    description: '',
+    start_date: new Date().toISOString().split('T')[0],
+    end_date: ''
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function RapidPinDashboard() {
   };
 
   const createSeason = async () => {
-    if (!newSeason.nombre || !newSeason.fecha_fin) {
+    if (!newSeason.name || !newSeason.end_date) {
       toast.error(t('rapidpin.seasons.fieldsRequired'));
       return;
     }
@@ -69,10 +69,10 @@ export default function RapidPinDashboard() {
         setSeasons([created, ...seasons]);
         setShowNewSeason(false);
         setNewSeason({
-          nombre: '',
-          descripcion: '',
-          fecha_inicio: new Date().toISOString().split('T')[0],
-          fecha_fin: ''
+          name: '',
+          description: '',
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: ''
         });
         toast.success(t('rapidpin.seasons.created'));
       } else {
@@ -85,8 +85,8 @@ export default function RapidPinDashboard() {
     }
   };
 
-  const getStatusColor = (estado) => {
-    switch (estado) {
+  const getStatusColor = (status) => {
+    switch (status) {
       case 'active': return 'bg-green-500/20 text-green-400 border-green-500/30';
       case 'closed': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
       case 'archived': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
