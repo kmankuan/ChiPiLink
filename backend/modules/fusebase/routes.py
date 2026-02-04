@@ -5,7 +5,7 @@ PLACEHOLDER - Endpoints a implementar:
 - GET /fusebase/status - Estado de la integration
 - GET/PUT /fusebase/config - Configuration
 - GET /fusebase/embed-url - URL de embed para frontend
-- GET /fusebase/documents - Documentos sincronizados
+- GET /fusebase/documents - Synced documents
 - GET /fusebase/categories - Categorys de documentos
 """
 from fastapi import APIRouter, HTTPException, Depends

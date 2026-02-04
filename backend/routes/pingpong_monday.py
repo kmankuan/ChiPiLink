@@ -608,14 +608,14 @@ async def get_sync_stats(admin: dict = Depends(get_admin_user)):
     """Get statistics de synchronization"""
     config = await get_pingpong_monday_config()
     
-    # Contar jugadores sincronizados
+    # Count synced players
     total_players = await db.pingpong_players.count_documents({"active": True})
     synced_players = await db.pingpong_players.count_documents({
         "active": True,
         "monday_item_id": {"$exists": True, "$ne": None}
     })
     
-    # Contar partidos sincronizados
+    # Count synced matches
     total_matches = await db.pingpong_matches.count_documents({})
     synced_matches = await db.pingpong_matches.count_documents({
         "monday_item_id": {"$exists": True, "$ne": None}

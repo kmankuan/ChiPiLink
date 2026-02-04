@@ -389,7 +389,7 @@ class GoogleSheetsService:
         limit: int = 100,
         skip: int = 0
     ) -> Dict:
-        """Get estudiantes sincronizados con filtros"""
+        """Get synced students with filters"""
         query = {}
         
         if grade:

@@ -136,7 +136,7 @@ class PlayerService(BaseService):
         return await self.repository.deactivate(jugador_id)
     
     async def get_players_not_synced(self) -> List[Player]:
-        """Get jugadores no sincronizados con Monday.com"""
+        """Get players not synced with Monday.com"""
         results = await self.repository.get_not_synced_to_monday()
         return [Player(**r) for r in results]
     

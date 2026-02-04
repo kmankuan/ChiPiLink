@@ -122,7 +122,7 @@ class MatchRepository(BaseRepository):
         return await self.update_match(partido_id, {"estado": "cancelado"})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
-        """Get partidos no sincronizados con Monday.com"""
+        """Get matches not synced with Monday.com"""
         return await self.find_many(
             query={
                 "estado": {"$in": ["pendiente", "en_curso", "pausado"]},

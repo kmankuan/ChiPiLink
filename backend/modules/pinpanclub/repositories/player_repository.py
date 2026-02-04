@@ -96,7 +96,7 @@ class PlayerRepository(BaseRepository):
         return await self.update_player(jugador_id, {"active": False})
     
     async def get_not_synced_to_monday(self) -> List[Dict]:
-        """Get jugadores no sincronizados con Monday.com"""
+        """Get players not synced with Monday.com"""
         return await self.find_many(
             query={
                 "active": True,
