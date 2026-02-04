@@ -211,10 +211,12 @@ class SuperPinMatchRepository(BaseRepository):
         """Get matches for a player in a league"""
         return await self.find_many(
             query={
-                "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-                "$or": [
-                    {"player_a_id": player_id},
-                    {"player_b_id": player_id}
+                "$and": [
+                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                    {"$or": [
+                        {"player_a_id": player_id},
+                        {"player_b_id": player_id}
+                    ]}
                 ]
             },
             limit=limit,
@@ -238,12 +240,14 @@ class SuperPinMatchRepository(BaseRepository):
         """Get match history between two players"""
         return await self.find_many(
             query={
-                "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-                "status": "finished",
-                "$or": [
-                    {"player_a_id": player_a_id, "player_b_id": player_b_id},
-                    {"player_a_id": player_b_id, "player_b_id": player_a_id}
-                ]
+                "$and": [
+                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                    {"$or": [
+                        {"player_a_id": player_a_id, "player_b_id": player_b_id},
+                        {"player_a_id": player_b_id, "player_b_id": player_a_id}
+                    ]}
+                ],
+                "status": "finished"
             },
             sort=[("end_date", -1)]
         )
@@ -268,8 +272,10 @@ class RankingRepository(BaseRepository):
     ) -> Dict:
         """Get or create ranking entry"""
         existing = await self.find_one({
-            "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-            "$or": [{"player_id": player_id}, {"jugador_id": player_id}]
+            "$and": [
+                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
+            ]
         })
         
         if existing:
