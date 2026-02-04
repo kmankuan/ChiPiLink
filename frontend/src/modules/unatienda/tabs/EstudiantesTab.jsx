@@ -22,11 +22,11 @@ export default function EstudiantesTab({ token }) {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API}/api/store/students/sincronizados`, {
+      const response = await fetch(`${API}/api/store/students/synced`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
-      setStudents(data.students || data.estudiantes || []);
+      setStudents(data.students || []);
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Error loading students');
@@ -39,11 +39,8 @@ export default function EstudiantesTab({ token }) {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      e.nombre_completo?.toLowerCase().includes(term) ||
       e.full_name?.toLowerCase().includes(term) ||
-      e.numero_estudiante?.toLowerCase().includes(term) ||
       e.student_number?.toLowerCase().includes(term) ||
-      e.grade?.toLowerCase().includes(term) ||
       e.grade?.toLowerCase().includes(term)
     );
   });
