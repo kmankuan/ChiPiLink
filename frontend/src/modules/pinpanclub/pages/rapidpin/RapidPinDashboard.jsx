@@ -138,8 +138,8 @@ export default function RapidPinDashboard() {
                   <div>
                     <Label>{t('rapidpin.seasons.name')}</Label>
                     <Input
-                      value={newSeason.nombre}
-                      onChange={(e) => setNewSeason({ ...newSeason, nombre: e.target.value })}
+                      value={newSeason.name}
+                      onChange={(e) => setNewSeason({ ...newSeason, name: e.target.value })}
                       placeholder={t('rapidpin.seasons.namePlaceholder')}
                     />
                   </div>
@@ -147,7 +147,7 @@ export default function RapidPinDashboard() {
                     <Label>{t('rapidpin.seasons.description')}</Label>
                     <Textarea
                       value={newSeason.description}
-                      onChange={(e) => setNewSeason({ ...newSeason, descripcion: e.target.value })}
+                      onChange={(e) => setNewSeason({ ...newSeason, description: e.target.value })}
                       placeholder={t('rapidpin.seasons.descriptionPlaceholder')}
                     />
                   </div>
@@ -156,16 +156,16 @@ export default function RapidPinDashboard() {
                       <Label>{t('rapidpin.seasons.startDate')}</Label>
                       <Input
                         type="date"
-                        value={newSeason.fecha_inicio}
-                        onChange={(e) => setNewSeason({ ...newSeason, fecha_inicio: e.target.value })}
+                        value={newSeason.start_date}
+                        onChange={(e) => setNewSeason({ ...newSeason, start_date: e.target.value })}
                       />
                     </div>
                     <div>
                       <Label>{t('rapidpin.seasons.endDate')}</Label>
                       <Input
                         type="date"
-                        value={newSeason.fecha_fin}
-                        onChange={(e) => setNewSeason({ ...newSeason, fecha_fin: e.target.value })}
+                        value={newSeason.end_date}
+                        onChange={(e) => setNewSeason({ ...newSeason, end_date: e.target.value })}
                       />
                     </div>
                   </div>
