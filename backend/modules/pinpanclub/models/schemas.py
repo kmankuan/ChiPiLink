@@ -100,20 +100,20 @@ class MatchScoreUpdate(BaseModel):
 
 
 class Match(MatchBase):
-    """Partido completo"""
+    """Complete match model"""
     model_config = ConfigDict(from_attributes=True)
     
-    partido_id: str
-    estado: MatchState = MatchState.PENDIENTE
+    match_id: str
+    status: MatchState = MatchState.PENDING
     points_player_a: int = 0
     points_player_b: int = 0
-    sets_jugador_a: int = 0
-    sets_jugador_b: int = 0
-    set_actual: int = 1
-    historial_sets: List[Dict] = []
+    sets_player_a: int = 0
+    sets_player_b: int = 0
+    current_set: int = 1
+    sets_history: List[Dict] = []
     winner_id: Optional[str] = None
-    fecha_inicio: Optional[Any] = None  # Can be string or datetime
-    fecha_fin: Optional[Any] = None  # Can be string or datetime
+    start_date: Optional[Any] = None  # Can be string or datetime
+    end_date: Optional[Any] = None  # Can be string or datetime
     monday_item_id: Optional[str] = None
     player_a_info: Optional[Dict] = None
     player_b_info: Optional[Dict] = None
@@ -124,13 +124,13 @@ class Match(MatchBase):
 # ============== TOURNAMENT MODELS ==============
 
 class TournamentBase(BaseModel):
-    """Base para torneo"""
+    """Base tournament model"""
     name: str
     description: Optional[str] = None
-    formato: TournamentFormat = TournamentFormat.ELIMINACION_SIMPLE
-    max_participantes: Optional[int] = None
-    fecha_inicio: Optional[str] = None
-    fecha_fin: Optional[str] = None
+    format: TournamentFormat = TournamentFormat.SINGLE_ELIMINATION
+    max_participants: Optional[int] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
 
 
 class TournamentCreate(TournamentBase):
@@ -139,13 +139,13 @@ class TournamentCreate(TournamentBase):
 
 
 class Tournament(TournamentBase):
-    """Torneo completo"""
+    """Complete tournament model"""
     model_config = ConfigDict(from_attributes=True)
     
-    torneo_id: str
-    estado: str = "inscripcion"
-    participantes: List[str] = []
-    partidos: List[str] = []
+    tournament_id: str
+    status: str = "registration"
+    participants: List[str] = []
+    matches: List[str] = []
     winner_id: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
@@ -154,21 +154,21 @@ class Tournament(TournamentBase):
 # ============== SPONSOR MODELS ==============
 
 class SponsorBase(BaseModel):
-    """Base para patrocinador"""
+    """Base sponsor model"""
     name: str
     logo_url: str
     website_url: Optional[str] = None
-    posicion: str = "horizontal"  # horizontal, square, header
-    orden: int = 0
+    position: str = "horizontal"  # horizontal, square, header
+    order: int = 0
 
 
 class SponsorCreate(SponsorBase):
-    """Create nuevo patrocinador"""
+    """Create new sponsor"""
     pass
 
 
 class Sponsor(SponsorBase):
-    """Patrocinador completo"""
+    """Complete sponsor model"""
     model_config = ConfigDict(from_attributes=True)
     
     sponsor_id: str
@@ -180,7 +180,7 @@ class Sponsor(SponsorBase):
 # ============== CONFIG MODELS ==============
 
 class MondayConfig(BaseModel):
-    """Configuration de Monday.com"""
+    """Monday.com configuration"""
     players_board_id: Optional[str] = None
     matches_board_id: Optional[str] = None
     tournaments_board_id: Optional[str] = None
@@ -190,7 +190,7 @@ class MondayConfig(BaseModel):
 
 
 class CanvasLayout(BaseModel):
-    """Layout del canvas"""
+    """Canvas layout model"""
     layout_id: str
     name: str
     layout_data: Dict[str, Any]
