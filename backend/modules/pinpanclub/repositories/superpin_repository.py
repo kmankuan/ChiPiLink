@@ -111,8 +111,10 @@ class PlayerCheckInRepository(BaseRepository):
     async def get_player_checkin(self, league_id: str, player_id: str) -> Optional[Dict]:
         """Get active check-in for a player"""
         return await self.find_one({
-            "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-            "$or": [{"player_id": player_id}, {"jugador_id": player_id}],
+            "$and": [
+                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
+            ],
             "is_active": True
         })
     
@@ -131,8 +133,10 @@ class PlayerCheckInRepository(BaseRepository):
         """Perform checkout by player"""
         result = await self._collection.update_many(
             {
-                "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-                "$or": [{"player_id": player_id}, {"jugador_id": player_id}],
+                "$and": [
+                    {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                    {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
+                ],
                 "is_active": True
             },
             {"$set": {
