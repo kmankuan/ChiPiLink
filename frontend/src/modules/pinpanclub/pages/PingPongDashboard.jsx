@@ -84,8 +84,8 @@ export default function PingPongDashboard() {
       const [matchesRes, rankingsRes, tournamentsRes, recentRes] = await Promise.all([
         axios.get(PINPANCLUB_API.activeMatchesAll),
         axios.get(`${PINPANCLUB_API.rankings}?limit=10`),
-        axios.get(`${PINPANCLUB_API.tournaments}?estado=inscripcion&limit=5`),
-        axios.get(`${PINPANCLUB_API.matches}?estado=finalizado&limit=5`)
+        axios.get(`${PINPANCLUB_API.tournaments}?status=registration&limit=5`),
+        axios.get(`${PINPANCLUB_API.matches}?status=finished&limit=5`)
       ]);
       
       setActiveMatches(matchesRes.data);
@@ -139,21 +139,21 @@ export default function PingPongDashboard() {
         <CardContent className="pt-4 text-center">
           <Play className="h-8 w-8 mx-auto mb-2 text-green-500" />
           <div className="text-2xl font-bold">{activeMatches.length}</div>
-          <div className="text-sm text-muted-foreground">Partidos en Vivo</div>
+          <div className="text-sm text-muted-foreground">Live Matches</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="pt-4 text-center">
           <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
           <div className="text-2xl font-bold">{rankings.length}</div>
-          <div className="text-sm text-muted-foreground">Jugadores Activos</div>
+          <div className="text-sm text-muted-foreground">Active Players</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="pt-4 text-center">
           <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
           <div className="text-2xl font-bold">{upcomingTournaments.length}</div>
-          <div className="text-sm text-muted-foreground">Torneos Próximos</div>
+          <div className="text-sm text-muted-foreground">Upcoming Tournaments</div>
         </CardContent>
       </Card>
       <Card>
