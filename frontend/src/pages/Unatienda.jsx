@@ -346,7 +346,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   <User className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">{selectedStudent.name || selectedStudent.nombre}</CardTitle>
+                  <CardTitle className="text-lg">{selectedStudent.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">
                     Grado {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
                   </p>
