@@ -1,6 +1,6 @@
 /**
- * PlayerRankBadge - Sistema de niveles/ranks basado en puntos
- * Muestra el rango actual del jugador con progreso hacia el siguiente nivel
+ * PlayerRankBadge - Level/rank system based on points
+ * Shows the player's current rank with progress towards the next level
  */
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Sparkles, Crown, Shield, Star, Gem, Award, Zap } from 'lucide-react';
@@ -18,7 +18,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const RANKS = [
   {
     id: 'bronze',
-    name: 'Bronce',
+    name: 'Bronze',
     minPoints: 0,
     maxPoints: 99,
     icon: '🥉',
@@ -27,11 +27,11 @@ const RANKS = [
     borderColor: 'border-amber-600',
     bgColor: 'bg-amber-100',
     glowColor: 'shadow-amber-500/30',
-    description: 'Iniciando tu camino'
+    description: 'Starting your journey'
   },
   {
     id: 'silver',
-    name: 'Plata',
+    name: 'Silver',
     minPoints: 100,
     maxPoints: 299,
     icon: '🥈',
@@ -40,11 +40,11 @@ const RANKS = [
     borderColor: 'border-gray-400',
     bgColor: 'bg-gray-100',
     glowColor: 'shadow-gray-400/30',
-    description: 'Jugador comprometido'
+    description: 'Committed player'
   },
   {
     id: 'gold',
-    name: 'Oro',
+    name: 'Gold',
     minPoints: 300,
     maxPoints: 599,
     icon: '🥇',
@@ -53,11 +53,11 @@ const RANKS = [
     borderColor: 'border-yellow-500',
     bgColor: 'bg-yellow-50',
     glowColor: 'shadow-yellow-500/40',
-    description: 'Jugador destacado'
+    description: 'Outstanding player'
   },
   {
     id: 'platinum',
-    name: 'Platino',
+    name: 'Platinum',
     minPoints: 600,
     maxPoints: 999,
     icon: '💎',
@@ -66,11 +66,11 @@ const RANKS = [
     borderColor: 'border-cyan-500',
     bgColor: 'bg-cyan-50',
     glowColor: 'shadow-cyan-500/40',
-    description: 'Élite del club'
+    description: 'Club elite'
   },
   {
     id: 'diamond',
-    name: 'Diamante',
+    name: 'Diamond',
     minPoints: 1000,
     maxPoints: 1999,
     icon: '💠',

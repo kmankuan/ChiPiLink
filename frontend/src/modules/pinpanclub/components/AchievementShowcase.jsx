@@ -1,6 +1,6 @@
 /**
- * AchievementShowcase - Componente de badges visuales con animaciones
- * Muestra los logros más recientes del jugador con efectos de celebración
+ * AchievementShowcase - Visual badges component with animations
+ * Shows the player's most recent achievements with celebration effects
  */
 import React, { useState, useEffect } from 'react';
 import { Award, Sparkles, Crown, Star, Trophy, Flame } from 'lucide-react';
@@ -21,28 +21,28 @@ const rarityConfig = {
     borderClass: 'border-gray-300',
     glowClass: '',
     textClass: 'text-gray-700',
-    label: 'Común'
+    label: 'Common'
   },
   rare: {
     bgClass: 'bg-gradient-to-br from-blue-100 to-blue-200',
     borderClass: 'border-blue-400',
     glowClass: 'shadow-blue-400/30',
     textClass: 'text-blue-700',
-    label: 'Raro'
+    label: 'Rare'
   },
   epic: {
     bgClass: 'bg-gradient-to-br from-purple-100 to-purple-200',
     borderClass: 'border-purple-500',
     glowClass: 'shadow-purple-500/40',
     textClass: 'text-purple-700',
-    label: 'Épico'
+    label: 'Epic'
   },
   legendary: {
     bgClass: 'bg-gradient-to-br from-yellow-100 via-amber-100 to-orange-100',
     borderClass: 'border-yellow-500',
     glowClass: 'shadow-yellow-500/50',
     textClass: 'text-yellow-700',
-    label: 'Legendario'
+    label: 'Legendary'
   }
 };
 

@@ -1,6 +1,6 @@
 /**
- * RankRewardsDisplay - Muestra las recompensas disponibles por rango
- * Con modal de celebración al subir de rango
+ * RankRewardsDisplay - Shows rewards available by rank
+ * With celebration modal when ranking up
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
