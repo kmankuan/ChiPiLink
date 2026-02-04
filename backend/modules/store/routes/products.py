@@ -21,11 +21,11 @@ async def get_products(
     skip: int = Query(0, ge=0),
     limit: int = Query(500, ge=1, le=1000)
 ):
-    """Get productos activos con filtros opcionales"""
+    """Get active products with optional filters"""
     return await product_service.get_all_products(
         category=category,
         grado=grade,
-        materia=materia,
+        materia=subject,
         skip=skip,
         limit=limit
     )
@@ -36,7 +36,7 @@ async def get_featured_products(
     category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
-    """Get productos destacados"""
+    """Get featured products"""
     return await product_service.get_featured_products(category, limit)
 
 
@@ -45,7 +45,7 @@ async def get_promotional_products(
     category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
-    """Get productos en promotion"""
+    """Get promotional products"""
     return await product_service.get_promotional_products(category, limit)
 
 
