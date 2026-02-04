@@ -56,17 +56,27 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 
 ## What's Been Implemented
 
-### February 4, 2026 - PinpanClub Module English Refactoring (Current Session)
+### December 2025 - PinpanClub Module English Refactoring (Current Session)
 
-**Progress: 85% Complete** - Backend fully refactored, frontend components partially updated
+**Progress: ~60% Complete** - Backend models and schemas refactored, frontend components partially updated
 
-#### Backend Files Fully Refactored:
-- `/app/backend/modules/pinpanclub/models/superpin.py` - All Spanish comments/docstrings translated to English ✅
-- `/app/backend/modules/pinpanclub/repositories/superpin_repository.py` - Full refactoring with English field names, removed backward-compatibility fallbacks ✅
-- `/app/backend/modules/pinpanclub/services/superpin_service.py` - Complete rewrite with English field names ✅
-- `/app/backend/modules/pinpanclub/routes/superpin.py` - All API responses use English field names ✅
+#### Backend Model Files Fully Refactored:
+- `/app/backend/modules/pinpanclub/models/schemas.py` - All enums, player/match/tournament models refactored ✅
+- `/app/backend/modules/pinpanclub/models/challenges.py` - Challenge models and auto-generated challenge text ✅
+- `/app/services/pinpanclub/app/models/superpin.py` - League, match, ranking models refactored ✅
+- `/app/backend/modules/pinpanclub/services/match_service.py` - Match service logic refactored ✅
 
-#### Field Name Changes (Complete List):
+#### Frontend Components Refactored:
+- `SuperPinMatch.jsx` - Updated param names (partidoId → matchId), recordPoint logic ✅
+- `RankingSeasons.jsx` - Updated prop names (jugadorId → playerId), component exports ✅
+- `WeeklyChallenges.jsx` - Removed legacy prop fallbacks, updated leaderboard rendering ✅
+- `PlayerRankBadge.jsx` - Removed legacy prop fallbacks ✅
+- `SocialFeatures.jsx` - Removed legacy prop fallbacks ✅
+- `AchievementShowcase.jsx` - Removed legacy prop fallbacks ✅
+- `RankRewardsDisplay.jsx` - Removed legacy prop fallbacks ✅
+- `PingPongMobileArbiter.jsx` - Updated action handlers, UI text ✅
+
+#### Field Name Changes Applied:
 | Spanish Field       | English Field       |
 |--------------------|---------------------|
 | `jugador_id`       | `player_id`         |
@@ -83,29 +93,25 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 | `estado`           | `status`            |
 | `nombre`           | `name`              |
 | `apodo`            | `nickname`          |
-| `puntos_player_a`  | `points_player_a`   |
+| `apellido`         | `last_name`         |
+| `puntos_por_set`   | `points_per_set`    |
 | `set_actual`       | `current_set`       |
 | `mejor_de`         | `best_of`           |
-| `historial_sets`   | `set_history`       |
-| `fecha_registro`   | `registration_date` |
+| `historial_sets`   | `sets_history`      |
 | `nivel`            | `level`             |
-| `apellido`         | `last_name`         |
 | `temporada`        | `season`            |
-| `saque`            | `serve`             |
 | `foto_url`         | `photo_url`         |
+| `telefono`         | `phone`             |
+
+#### Remaining Work (P0 - High Priority):
+- **~72 files still contain Spanish terms** in frontend/backend
+- Key backend files pending: websocket.py, rapidpin_service.py, public_feed.py, monday_service.py
+- Key frontend files pending: PingPongTV.jsx, PingPongDashboard.jsx, PlayerComparison.jsx, AnalyticsDashboard.jsx
 
 #### Database Decision:
 - User confirmed they will redeploy with a fresh database
-- All backward-compatibility fallbacks removed from backend code
+- All backward-compatibility fallbacks being removed from code
 - Code now uses pure English field names only
-
-#### Frontend Files Refactored:
-- `SuperPinRanking.jsx` - Updated field references ✅
-- `SuperPinMatch.jsx` - Updated field references ✅
-- `ArbiterPanel.jsx` - Updated field references ✅
-- `PlayerProfile.jsx` - Updated field references ✅
-- `PlayerBadges.jsx` - Updated field references ✅
-- `ScoreBoard.jsx` - Updated field references ✅
 
 ### February 2026 - i18n Integration & Language Sync (Previous Session)
 
