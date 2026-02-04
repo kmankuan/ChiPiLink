@@ -229,7 +229,7 @@ export default function ArbiterPanel({
         )}
 
         {/* Point Buttons */}
-        {estado === 'en_curso' && (
+        {status === 'in_progress' && (
           <div className="grid grid-cols-2 gap-4">
             {/* Player A Buttons */}
             <div className="space-y-2">
@@ -273,21 +273,21 @@ export default function ArbiterPanel({
 
         {/* Control Buttons */}
         <div className="flex flex-wrap gap-2 justify-center">
-          {estado === 'pendiente' && (
+          {status === 'pending' && (
             <Button onClick={handleStartMatch} disabled={loading} className="gap-2">
               <Play className="h-4 w-4" />
-              Iniciar Partido
+              Start Match
             </Button>
           )}
           
-          {estado === 'pausado' && (
+          {status === 'paused' && (
             <Button onClick={handleStartMatch} disabled={loading} className="gap-2">
               <Play className="h-4 w-4" />
-              Reanudar
+              Resume
             </Button>
           )}
           
-          {estado === 'en_curso' && (
+          {status === 'in_progress' && (
             <>
               <Button 
                 variant="outline" 
@@ -296,7 +296,7 @@ export default function ArbiterPanel({
                 className="gap-2"
               >
                 <RotateCcw className="h-4 w-4" />
-                Deshacer
+                Undo
               </Button>
               
               <Button 
