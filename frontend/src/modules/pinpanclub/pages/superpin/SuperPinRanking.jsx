@@ -137,13 +137,13 @@ export default function SuperPinRanking() {
               <Button
                 key={league.liga_id}
                 variant={selectedLeague === league.liga_id ? 'default' : 'outline'}
-                className={selectedLeague === league.liga_id 
+                className={selectedLeague === (league.league_id || league.liga_id) 
                   ? 'bg-yellow-500 hover:bg-yellow-600 text-black' 
                   : 'border-white/30 text-white hover:bg-white/10'
                 }
-                onClick={() => setSelectedLeague(league.liga_id)}
+                onClick={() => setSelectedLeague(league.league_id || league.liga_id)}
               >
-                {league.nombre}
+                {league.name}
               </Button>
             ))}
           </div>
@@ -157,22 +157,22 @@ export default function SuperPinRanking() {
             <CardContent className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-white">{ranking.liga_nombre}</h2>
-                  <p className="text-green-200">Temporada {ranking.temporada}</p>
+                  <h2 className="text-xl font-bold text-white">{ranking.league_name}</h2>
+                  <p className="text-green-200">{t('superpin.ranking.season')} {ranking.season}</p>
                 </div>
                 <div className="flex gap-6">
                   <div className="text-center">
-                    <p className="text-green-200 text-sm">Jugadores</p>
-                    <p className="text-2xl font-bold text-white">{ranking.total_jugadores}</p>
+                    <p className="text-green-200 text-sm">{t('superpin.ranking.players')}</p>
+                    <p className="text-2xl font-bold text-white">{ranking.total_players}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-green-200 text-sm">Partidos</p>
-                    <p className="text-2xl font-bold text-white">{ranking.total_partidos}</p>
+                    <p className="text-green-200 text-sm">{t('superpin.ranking.matches')}</p>
+                    <p className="text-2xl font-bold text-white">{ranking.total_matches}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-green-200 text-sm">Sistema</p>
+                    <p className="text-green-200 text-sm">{t('superpin.ranking.system')}</p>
                     <Badge className="bg-yellow-500/20 text-yellow-300">
-                      {ranking.scoring_system === 'elo' ? 'ELO' : 'Puntos'}
+                      {ranking.scoring_system === 'elo' ? 'ELO' : t('superpin.ranking.points')}
                     </Badge>
                   </div>
                 </div>
@@ -187,15 +187,15 @@ export default function SuperPinRanking() {
         <Card className="bg-white/10 border-white/20 overflow-hidden">
           <CardHeader className="bg-white/5">
             <CardTitle className="text-white flex items-center gap-2">
-              <Medal className="h-5 w-5 text-yellow-400" /> Clasificación
+              <Medal className="h-5 w-5 text-yellow-400" /> {t('superpin.ranking.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {!ranking || ranking.entries?.length === 0 ? (
               <div className="text-center py-16">
                 <Users className="h-16 w-16 text-white/20 mx-auto mb-4" />
-                <p className="text-white/60">No hay jugadores en el ranking todavía</p>
-                <p className="text-white/40 text-sm mt-2">Los jugadores aparecerán cuando jueguen su primer partido</p>
+                <p className="text-white/60">{t('superpin.ranking.noPlayers')}</p>
+                <p className="text-white/40 text-sm mt-2">{t('superpin.ranking.noPlayersHint')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -203,12 +203,12 @@ export default function SuperPinRanking() {
                   <thead>
                     <tr className="border-b border-white/10 text-white/60 text-sm">
                       <th className="text-left p-4">#</th>
-                      <th className="text-left p-4">Jugador</th>
-                      <th className="text-center p-4">Pts</th>
+                      <th className="text-left p-4">{t('superpin.ranking.player')}</th>
+                      <th className="text-center p-4">{t('superpin.ranking.pts')}</th>
                       {ranking.scoring_system === 'elo' && <th className="text-center p-4">ELO</th>}
-                      <th className="text-center p-4 hidden md:table-cell">PJ</th>
+                      <th className="text-center p-4 hidden md:table-cell">{t('superpin.ranking.played')}</th>
                       <th className="text-center p-4 hidden md:table-cell">Win%</th>
-                      <th className="text-center p-4">Racha</th>
+                      <th className="text-center p-4">{t('superpin.ranking.streak')}</th>
                       <th className="text-center p-4">+/-</th>
                     </tr>
                   </thead>
@@ -222,7 +222,7 @@ export default function SuperPinRanking() {
                       >
                         <td className="p-4">
                           <span className={`text-xl ${index < 3 ? 'font-bold' : 'text-white/60'}`}>
-                            {getPositionIcon(entry.posicion)}
+                            {getPositionIcon(entry.position)}
                           </span>
                         </td>
                         <td className="p-4">
@@ -233,43 +233,43 @@ export default function SuperPinRanking() {
                               index === 2 ? 'bg-amber-700' :
                               'bg-green-700'
                             }`}>
-                              {entry.jugador_info?.nombre?.[0] || '?'}
+                              {entry.player_info?.name?.[0] || '?'}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
                                 <p 
                                   className="font-semibold text-white cursor-pointer hover:text-green-400 transition-colors"
-                                  onClick={() => navigate(`/pinpanclub/superpin/player/${entry.jugador_id}`)}
+                                  onClick={() => navigate(`/pinpanclub/superpin/player/${entry.player_id}`)}
                                 >
-                                  {entry.jugador_info?.nombre || 'Jugador'}
+                                  {entry.player_info?.name || t('superpin.ranking.player')}
                                 </p>
-                                <PlayerBadges jugadorId={entry.jugador_id} compact={true} />
+                                <PlayerBadges jugadorId={entry.player_id} compact={true} />
                               </div>
-                              {entry.jugador_info?.apodo && (
-                                <p className="text-sm text-white/50">"{entry.jugador_info.apodo}"</p>
+                              {entry.player_info?.nickname && (
+                                <p className="text-sm text-white/50">"{entry.player_info.nickname}"</p>
                               )}
                             </div>
                           </div>
                         </td>
                         <td className="p-4 text-center">
-                          <span className="text-xl font-bold text-yellow-400">{entry.puntos_totales}</span>
+                          <span className="text-xl font-bold text-yellow-400">{entry.total_points}</span>
                         </td>
                         {ranking.scoring_system === 'elo' && (
                           <td className="p-4 text-center text-white font-mono">{entry.elo_rating}</td>
                         )}
                         <td className="p-4 text-center text-white/80 hidden md:table-cell">
-                          {entry.partidos_jugados}
+                          {entry.matches_played}
                         </td>
                         <td className="p-4 text-center hidden md:table-cell">
                           <span className="text-green-400">
-                            {getWinRate(entry.partidos_ganados, entry.partidos_jugados)}
+                            {getWinRate(entry.matches_won, entry.matches_played)}
                           </span>
                         </td>
                         <td className="p-4 text-center text-white">
-                          {getStreakDisplay(entry.racha_actual)}
+                          {getStreakDisplay(entry.current_streak)}
                         </td>
                         <td className="p-4 text-center">
-                          {getPositionChange(entry.cambio_posicion)}
+                          {getPositionChange(entry.position_change)}
                         </td>
                       </tr>
                     ))}
