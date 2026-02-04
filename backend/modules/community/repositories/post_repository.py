@@ -40,10 +40,10 @@ class PostRepository(BaseRepository):
     async def get_published_posts(
         self,
         tipo: Optional[str] = None,
-        featured: Optional[bool] = None,
+        destacado: Optional[bool] = None,
         limit: int = 20
     ) -> List[Dict]:
-        """Get posts publicados"""
+        """Get published posts"""
         now = datetime.now(timezone.utc).isoformat()
         query = {
             "publicado": True,
