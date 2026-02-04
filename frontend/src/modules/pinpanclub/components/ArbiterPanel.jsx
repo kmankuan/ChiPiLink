@@ -156,15 +156,15 @@ export default function ArbiterPanel({
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg flex items-center gap-2">
-            🏓 Panel de Arbitraje
+            🏓 Arbiter Panel
           </CardTitle>
           <Badge 
-            variant={estado === 'en_curso' ? 'default' : 'secondary'}
-            className={estado === 'en_curso' ? 'animate-pulse' : ''}
+            variant={status === 'in_progress' ? 'default' : 'secondary'}
+            className={status === 'in_progress' ? 'animate-pulse' : ''}
           >
-            {estado === 'en_curso' ? '🔴 EN VIVO' : 
-             estado === 'finalizado' ? 'Finalizado' : 
-             estado === 'pausado' ? 'Pausado' : 'Pendiente'}
+            {status === 'in_progress' ? '🔴 LIVE' : 
+             status === 'finished' ? 'Finished' : 
+             status === 'paused' ? 'Paused' : 'Pending'}
           </Badge>
         </div>
       </CardHeader>
@@ -173,10 +173,10 @@ export default function ArbiterPanel({
         {/* Match Status */}
         <div className="text-center">
           <div className="text-2xl font-mono font-bold">
-            Set {set_actual} | Sets: {sets_player_a} - {sets_player_b}
+            Set {current_set} | Sets: {sets_player_a} - {sets_player_b}
           </div>
           <div className="text-sm text-muted-foreground mt-1">
-            Saque: {saque === 'a' ? playerAName : playerBName}
+            Serve: {serve === 'a' ? playerAName : playerBName}
           </div>
         </div>
 
@@ -184,12 +184,12 @@ export default function ArbiterPanel({
         <div className="grid grid-cols-3 items-center gap-4">
           {/* Player A */}
           <div className="text-center">
-            <div className={`text-lg font-semibold ${saque === 'a' ? 'text-primary' : ''}`}>
+            <div className={`text-lg font-semibold ${serve === 'a' ? 'text-primary' : ''}`}>
               {playerAName}
-              {saque === 'a' && <span className="ml-1">●</span>}
+              {serve === 'a' && <span className="ml-1">●</span>}
             </div>
             <div className="text-5xl font-bold text-red-600 my-2">
-              {puntos_player_a}
+              {points_player_a}
             </div>
           </div>
 
@@ -199,20 +199,20 @@ export default function ArbiterPanel({
 
           {/* Player B */}
           <div className="text-center">
-            <div className={`text-lg font-semibold ${saque === 'b' ? 'text-primary' : ''}`}>
+            <div className={`text-lg font-semibold ${serve === 'b' ? 'text-primary' : ''}`}>
               {playerBName}
-              {saque === 'b' && <span className="ml-1">●</span>}
+              {serve === 'b' && <span className="ml-1">●</span>}
             </div>
             <div className="text-5xl font-bold text-blue-600 my-2">
-              {puntos_player_b}
+              {points_player_b}
             </div>
           </div>
         </div>
 
         {/* Point Type Selector */}
-        {estado === 'en_curso' && (
+        {status === 'in_progress' && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Tipo de punto:</span>
+            <span className="text-sm text-muted-foreground">Point type:</span>
             <Select value={pointType} onValueChange={setPointType}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
