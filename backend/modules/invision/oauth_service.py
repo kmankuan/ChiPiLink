@@ -128,13 +128,21 @@ class LaoPanOAuthService:
         # Check if state is not too old (10 minutes max)
         created = state_data.get("created_at")
         if created:
-            if isinstance(created, str):
-                created = datetime.fromisoformat(created.replace('Z', '+00:00'))
-            age = (datetime.now(timezone.utc) - created).total_seconds()
-            logger.info(f"OAuth state age: {age} seconds")
-            if age > 600:  # 10 minutes
-                logger.warning(f"OAuth state expired: {state}")
-                return None
+            try:
+                if isinstance(created, str):
+                    created = datetime.fromisoformat(created.replace('Z', '+00:00'))
+                # Ensure both datetimes are timezone-aware for comparison
+                now = datetime.now(timezone.utc)
+                if created.tzinfo is None:
+                    created = created.replace(tzinfo=timezone.utc)
+                age = (now - created).total_seconds()
+                logger.info(f"OAuth state age: {age} seconds")
+                if age > 600:  # 10 minutes
+                    logger.warning(f"OAuth state expired: {state}")
+                    return None
+            except Exception as e:
+                logger.error(f"Error checking state age: {e}")
+                # Continue anyway - don't fail on age check errors
         
         return {
             "redirect_after": state_data.get("redirect_after"),
