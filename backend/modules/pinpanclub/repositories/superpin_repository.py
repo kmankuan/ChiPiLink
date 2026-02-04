@@ -315,8 +315,10 @@ class RankingRepository(BaseRepository):
     async def get_player_ranking(self, league_id: str, player_id: str) -> Optional[Dict]:
         """Get position for a player"""
         return await self.find_one({
-            "$or": [{"league_id": league_id}, {"liga_id": league_id}],
-            "$or": [{"player_id": player_id}, {"jugador_id": player_id}]
+            "$and": [
+                {"$or": [{"league_id": league_id}, {"liga_id": league_id}]},
+                {"$or": [{"player_id": player_id}, {"jugador_id": player_id}]}
+            ]
         })
     
     async def update_ranking(self, ranking_id: str, data: Dict) -> bool:
