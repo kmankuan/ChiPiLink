@@ -79,7 +79,7 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
       }
       onFollowChange?.();
     } catch (error) {
-      toast.error('Error al actualizar');
+      toast.error(t('social.errorUpdating'));
     } finally {
       setLoading(false);
     }
@@ -100,12 +100,12 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
       ) : isFollowing ? (
         <>
           <UserMinus className="h-4 w-4 mr-1" />
-          Siguiendo
+          {t('social.following')}
         </>
       ) : (
         <>
           <UserPlus className="h-4 w-4 mr-1" />
-          Seguir
+          {t('social.follow')}
         </>
       )}
     </Button>
@@ -114,18 +114,22 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
 
 // ============== FOLLOW STATS ==============
 
-export function FollowStats({ jugadorId }) {
+export function FollowStats({ playerId, jugadorId }) {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({ followers_count: 0, following_count: 0 });
+  
+  // Support both new and legacy prop names
+  const playerIdToUse = playerId || jugadorId;
 
   useEffect(() => {
-    if (jugadorId) {
+    if (playerIdToUse) {
       fetchStats();
     }
-  }, [jugadorId]);
+  }, [playerIdToUse]);
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${jugadorId}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${playerIdToUse}`);
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -139,10 +143,10 @@ export function FollowStats({ jugadorId }) {
     <div className="flex items-center gap-4 text-sm">
       <span className="flex items-center gap-1">
         <Users className="h-4 w-4" />
-        <strong>{stats.followers_count}</strong> seguidores
+        <strong>{stats.followers_count}</strong> {t('social.followers')}
       </span>
       <span>
-        <strong>{stats.following_count}</strong> siguiendo
+        <strong>{stats.following_count}</strong> {t('social.followingCount')}
       </span>
     </div>
   );
@@ -151,6 +155,7 @@ export function FollowStats({ jugadorId }) {
 // ============== COMMENTS SECTION ==============
 
 export function CommentsSection({ targetId, targetType = 'player', currentUserId }) {
+  const { t } = useTranslation();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
