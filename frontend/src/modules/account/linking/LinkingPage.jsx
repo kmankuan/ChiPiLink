@@ -210,11 +210,15 @@ export default function LinkingPage({ embedded = false }) {
         setShowDialog(false);
         fetchData();
       } else {
-        toast.error(data.detail || 'Error linking student');
+        const errorMsg = data?.detail || data?.message || `Server error: ${response.status}`;
+        console.error('API error:', errorMsg);
+        toast.error(errorMsg);
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Error submitting request');
+      console.error('Exception during submit:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      toast.error(`Error: ${error.message || 'Failed to submit request'}`);
     } finally {
       setSaving(false);
     }
