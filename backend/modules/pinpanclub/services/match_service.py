@@ -1,6 +1,6 @@
 """
 PinpanClub - Match Service
-Business logic para partidos
+Business logic for matches
 """
 from typing import List, Optional, Dict, Set
 from datetime import datetime, timezone
@@ -14,8 +14,8 @@ from ..models import MatchCreate, Match, MatchState
 
 class MatchService(BaseService):
     """
-    Service for management of partidos.
-    Contiene toda la business logic relacionada con partidos.
+    Service for match management.
+    Contains all business logic related to matches.
     """
     
     MODULE_NAME = "pinpanclub"
@@ -24,12 +24,12 @@ class MatchService(BaseService):
         super().__init__()
         self.repository = MatchRepository()
         self.player_repository = PlayerRepository()
-        self._websocket_connections: Dict[str, Set] = {}  # partido_id -> set of websockets
+        self._websocket_connections: Dict[str, Set] = {}  # match_id -> set of websockets
     
     async def create_match(self, data: MatchCreate) -> Match:
         """
-        Crear new match.
-        Emite evento: pinpanclub.match.created
+        Create new match.
+        Emits event: pinpanclub.match.created
         """
         match_dict = data.model_dump()
         
@@ -40,64 +40,64 @@ class MatchService(BaseService):
         if player_a:
             match_dict["player_a_info"] = {
                 "name": player_a.get("name"),
-                "apellido": player_a.get("apellido"),
-                "apodo": player_a.get("apodo"),
+                "last_name": player_a.get("last_name"),
+                "nickname": player_a.get("nickname"),
                 "elo_rating": player_a.get("elo_rating")
             }
         
         if player_b:
             match_dict["player_b_info"] = {
                 "name": player_b.get("name"),
-                "apellido": player_b.get("apellido"),
-                "apodo": player_b.get("apodo"),
+                "last_name": player_b.get("last_name"),
+                "nickname": player_b.get("nickname"),
                 "elo_rating": player_b.get("elo_rating")
             }
         
         result = await self.repository.create(match_dict)
         
-        # Emit evento
+        # Emit event
         await self.emit_event(
             PinpanClubEvents.MATCH_CREATED,
             {
-                "partido_id": result["partido_id"],
+                "match_id": result["match_id"],
                 "player_a_id": data.player_a_id,
                 "player_b_id": data.player_b_id,
-                "mejor_de": data.mejor_de
+                "best_of": data.best_of
             }
         )
         
-        self.log_info(f"Match created: {result['partido_id']}")
+        self.log_info(f"Match created: {result['match_id']}")
         return Match(**result)
     
-    async def get_match(self, partido_id: str) -> Optional[Match]:
+    async def get_match(self, match_id: str) -> Optional[Match]:
         """Get match by ID"""
-        result = await self.repository.get_by_id(partido_id)
+        result = await self.repository.get_by_id(match_id)
         return Match(**result) if result else None
     
     async def get_active_matches(self) -> List[Match]:
-        """Get partidos activos"""
+        """Get active matches"""
         results = await self.repository.get_active_matches()
         return [Match(**r) for r in results]
     
     async def get_matches_by_state(
         self,
-        estado: MatchState,
+        status: MatchState,
         limit: int = 50
     ) -> List[Match]:
-        """Get partidos by status"""
-        results = await self.repository.get_by_state(estado.value, limit)
+        """Get matches by status"""
+        results = await self.repository.get_by_state(status.value, limit)
         return [Match(**r) for r in results]
     
-    async def start_match(self, partido_id: str) -> Optional[Match]:
+    async def start_match(self, match_id: str) -> Optional[Match]:
         """
         Start match.
-        Emite evento: pinpanclub.match.started
+        Emits event: pinpanclub.match.started
         """
-        match = await self.get_match(partido_id)
-        if not match or match.estado != MatchState.PENDIENTE:
+        match = await self.get_match(match_id)
+        if not match or match.status != MatchState.PENDING:
             return None
         
-        fecha_inicio = datetime.now(timezone.utc).isoformat()
+        start_date = datetime.now(timezone.utc).isoformat()
         await self.repository.start_match(partido_id, fecha_inicio)
         
         await self.emit_event(
