@@ -142,7 +142,7 @@ export default function AccountDashboard() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-8 h-auto gap-1 p-1">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8 h-auto gap-1 p-1">
             <TabsTrigger value="wallet" data-testid="wallet-tab" className="gap-1 text-xs sm:text-sm">
               <Wallet className="h-4 w-4" />
               <span className="hidden sm:inline">{t('account.wallet')}</span>
@@ -166,6 +166,10 @@ export default function AccountDashboard() {
             <TabsTrigger value="capacidades" data-testid="capacidades-tab" className="gap-1 text-xs sm:text-sm">
               <Zap className="h-4 w-4" />
               <span className="hidden sm:inline">{t('account.capacities')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="exclusive" data-testid="exclusive-tab" className="gap-1 text-xs sm:text-sm">
+              <GraduationCap className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('account.exclusive', 'Students')}</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" data-testid="notifications-tab" className="gap-1 text-xs sm:text-sm">
               <Bell className="h-4 w-4" />
