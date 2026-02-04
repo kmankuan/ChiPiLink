@@ -3,6 +3,7 @@ Super Pin Ranking - Service Layer
 Business logic for the ranking system
 """
 import math
+import uuid
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 
@@ -63,25 +64,25 @@ class SuperPinService(BaseService):
         if not league_dict.get("prizes"):
             league_dict["prizes"] = self._default_prizes()
         
-        league_dict["estado"] = "draft"
+        league_dict["status"] = "draft"
         
         result = await self.league_repo.create(league_dict)
-        self.log_info(f"League created: {result['liga_id']}")
+        self.log_info(f"League created: {result.get('league_id')}")
         
         return SuperPinLeague(**result)
     
     def _default_prizes(self) -> List[Dict]:
-        """Premios by default"""
+        """Default prizes"""
         return [
             {"name": "Champion", "position": 1, "icon": "🥇"},
             {"name": "Runner-up", "position": 2, "icon": "🥈"},
-            {"name": "Tercer Lugar", "position": 3, "icon": "🥉"},
-            {"name": "Cuarto Lugar", "position": 4, "icon": "🏅"},
+            {"name": "Third Place", "position": 3, "icon": "🥉"},
+            {"name": "Fourth Place", "position": 4, "icon": "🏅"},
         ]
     
-    async def get_league(self, liga_id: str) -> Optional[SuperPinLeague]:
+    async def get_league(self, league_id: str) -> Optional[SuperPinLeague]:
         """Get league by ID"""
-        result = await self.league_repo.get_by_id(liga_id)
+        result = await self.league_repo.get_by_id(league_id)
         return SuperPinLeague(**result) if result else None
     
     async def get_active_leagues(self) -> List[SuperPinLeague]:
@@ -96,26 +97,26 @@ class SuperPinService(BaseService):
     
     async def update_league(
         self,
-        liga_id: str,
+        league_id: str,
         data: SuperPinLeagueUpdate
     ) -> Optional[SuperPinLeague]:
         """Update league"""
         update_data = data.model_dump(exclude_unset=True)
         
         if not update_data:
-            return await self.get_league(liga_id)
+            return await self.get_league(league_id)
         
-        success = await self.league_repo.update_league(liga_id, update_data)
+        success = await self.league_repo.update_league(league_id, update_data)
         
         if success:
-            return await self.get_league(liga_id)
+            return await self.get_league(league_id)
         return None
     
-    async def activate_league(self, liga_id: str) -> Optional[SuperPinLeague]:
+    async def activate_league(self, league_id: str) -> Optional[SuperPinLeague]:
         """Activate league"""
         return await self.update_league(
-            liga_id,
-            SuperPinLeagueUpdate(estado="active")
+            league_id,
+            SuperPinLeagueUpdate(status="active")
         )
     
     # ============== CHECK-IN MANAGEMENT ==============
@@ -127,43 +128,43 @@ class SuperPinService(BaseService):
         """Register player check-in"""
         # Check if already has active check-in
         existing = await self.checkin_repo.get_player_checkin(
-            data.liga_id, data.jugador_id
+            data.league_id, data.player_id
         )
         if existing:
             return PlayerCheckIn(**existing)
         
         # Get player info
-        player = await self.player_repo.get_by_id(data.jugador_id)
+        player = await self.player_repo.get_by_id(data.player_id)
         
         checkin_dict = data.model_dump()
-        checkin_dict["jugador_info"] = player
+        checkin_dict["player_info"] = player
         
         result = await self.checkin_repo.create(checkin_dict)
         
         # Increment league player counter if new
-        await self.league_repo.increment_stats(data.liga_id, jugadores=1)
+        await self.league_repo.increment_stats(data.league_id, players=1)
         
-        self.log_info(f"Player checked in: {data.jugador_id} to {data.liga_id}")
+        self.log_info(f"Player checked in: {data.player_id} to {data.league_id}")
         
         return PlayerCheckIn(**result)
     
-    async def check_out_player(self, liga_id: str, jugador_id: str) -> bool:
+    async def check_out_player(self, league_id: str, player_id: str) -> bool:
         """Register player check-out"""
-        return await self.checkin_repo.checkout_by_player(liga_id, jugador_id)
+        return await self.checkin_repo.checkout_by_player(league_id, player_id)
     
-    async def get_available_players(self, liga_id: str) -> List[PlayerCheckIn]:
+    async def get_available_players(self, league_id: str) -> List[PlayerCheckIn]:
         """Get available players (with active check-in)"""
-        results = await self.checkin_repo.get_active_checkins(liga_id)
+        results = await self.checkin_repo.get_active_checkins(league_id)
         return [PlayerCheckIn(**r) for r in results]
     
     async def validate_geolocation(
         self,
-        liga_id: str,
+        league_id: str,
         latitude: float,
         longitude: float
     ) -> bool:
         """Validate location for check-in by geolocation"""
-        league = await self.get_league(liga_id)
+        league = await self.get_league(league_id)
         if not league:
             return False
         
@@ -209,152 +210,154 @@ class SuperPinService(BaseService):
         # Get player info
         player_a = await self.player_repo.get_by_id(data.player_a_id)
         player_b = await self.player_repo.get_by_id(data.player_b_id)
-        arbitro = None
-        if data.arbitro_id:
-            arbitro = await self.player_repo.get_by_id(data.arbitro_id)
+        referee = None
+        if data.referee_id:
+            referee = await self.player_repo.get_by_id(data.referee_id)
         
         match_dict = data.model_dump()
         match_dict["player_a_info"] = player_a
         match_dict["player_b_info"] = player_b
-        match_dict["arbitro_info"] = arbitro
+        match_dict["referee_info"] = referee
         match_dict["points_player_a"] = 0
         match_dict["points_player_b"] = 0
-        match_dict["sets_jugador_a"] = 0
-        match_dict["sets_jugador_b"] = 0
-        match_dict["set_actual"] = 1
-        match_dict["historial_sets"] = []
+        match_dict["sets_player_a"] = 0
+        match_dict["sets_player_b"] = 0
+        match_dict["current_set"] = 1
+        match_dict["set_history"] = []
         
         # Get current player ELO
         ranking_a = await self.ranking_repo.get_or_create(
-            data.liga_id, data.player_a_id, player_a
+            data.league_id, data.player_a_id, player_a
         )
         ranking_b = await self.ranking_repo.get_or_create(
-            data.liga_id, data.player_b_id, player_b
+            data.league_id, data.player_b_id, player_b
         )
         
-        match_dict["elo_inicial_a"] = ranking_a.get("elo_rating", 1000)
-        match_dict["elo_inicial_b"] = ranking_b.get("elo_rating", 1000)
+        match_dict["initial_elo_a"] = ranking_a.get("elo_rating", 1000)
+        match_dict["initial_elo_b"] = ranking_b.get("elo_rating", 1000)
         
         result = await self.match_repo.create(match_dict)
         
-        self.log_info(f"Super Pin match created: {result['partido_id']}")
+        self.log_info(f"Super Pin match created: {result.get('match_id')}")
         
         return SuperPinMatch(**result)
     
-    async def get_match(self, partido_id: str) -> Optional[SuperPinMatch]:
+    async def get_match(self, match_id: str) -> Optional[SuperPinMatch]:
         """Get match by ID"""
-        result = await self.match_repo.get_by_id(partido_id)
+        result = await self.match_repo.get_by_id(match_id)
         return SuperPinMatch(**result) if result else None
     
-    async def start_match(self, partido_id: str) -> Optional[SuperPinMatch]:
+    async def start_match(self, match_id: str) -> Optional[SuperPinMatch]:
         """Start match"""
-        match = await self.match_repo.get_by_id(partido_id)
+        match = await self.match_repo.get_by_id(match_id)
         if not match:
             return None
         
-        await self.match_repo.update_match(partido_id, {
-            "estado": "en_curso",
-            "fecha_inicio": datetime.now(timezone.utc).isoformat()
+        await self.match_repo.update_match(match_id, {
+            "status": "in_progress",
+            "start_date": datetime.now(timezone.utc).isoformat()
         })
         
-        return await self.get_match(partido_id)
+        return await self.get_match(match_id)
     
     async def record_point(
         self,
-        partido_id: str,
-        jugador: str,  # 'a' o 'b'
+        match_id: str,
+        player: str,  # 'a' or 'b'
         stats: Optional[Dict] = None
     ) -> Dict:
         """Register point"""
-        match = await self.match_repo.get_by_id(partido_id)
-        if not match or match["estado"] != "en_curso":
+        match = await self.match_repo.get_by_id(match_id)
+        if not match or match.get("status") != "in_progress":
             raise ValueError("Match is not in progress")
         
         # Update points
-        if jugador == 'a':
+        if player == 'a':
             match["points_player_a"] += 1
         else:
             match["points_player_b"] += 1
         
-        puntos_a = match["points_player_a"]
-        puntos_b = match["points_player_b"]
-        puntos_set = match["puntos_por_set"]
+        points_a = match["points_player_a"]
+        points_b = match["points_player_b"]
+        points_per_set = match.get("points_per_set", 11)
         
-        set_ganado = False
-        partido_terminado = False
-        ganador_set = None
+        set_won = False
+        match_finished = False
+        set_winner = None
         match_winner = None
         
         # Check if set was won
-        if puntos_a >= puntos_set or puntos_b >= puntos_set:
-            if abs(puntos_a - puntos_b) >= 2:
-                set_ganado = True
-                ganador_set = 'a' if puntos_a > puntos_b else 'b'
+        if points_a >= points_per_set or points_b >= points_per_set:
+            if abs(points_a - points_b) >= 2:
+                set_won = True
+                set_winner = 'a' if points_a > points_b else 'b'
                 
                 # Save set result
-                match["historial_sets"].append({
-                    "set": match["set_actual"],
-                    "puntos_a": puntos_a,
-                    "puntos_b": puntos_b,
-                    "ganador": ganador_set
+                set_history = match.get("set_history", [])
+                set_history.append({
+                    "set": match.get("current_set", 1),
+                    "points_a": points_a,
+                    "points_b": points_b,
+                    "winner": set_winner
                 })
+                match["set_history"] = set_history
                 
                 # Update sets
-                if ganador_set == 'a':
-                    match["sets_jugador_a"] += 1
+                if set_winner == 'a':
+                    match["sets_player_a"] = match.get("sets_player_a", 0) + 1
                 else:
-                    match["sets_jugador_b"] += 1
+                    match["sets_player_b"] = match.get("sets_player_b", 0) + 1
                 
                 # Check if match was won
-                sets_para_ganar = (match["mejor_de"] // 2) + 1
-                if match["sets_jugador_a"] >= sets_para_ganar:
-                    partido_terminado = True
+                sets_to_win = (match.get("best_of", 3) // 2) + 1
+                if match["sets_player_a"] >= sets_to_win:
+                    match_finished = True
                     match_winner = 'a'
                     match["winner_id"] = match["player_a_id"]
-                elif match["sets_jugador_b"] >= sets_para_ganar:
-                    partido_terminado = True
+                elif match["sets_player_b"] >= sets_to_win:
+                    match_finished = True
                     match_winner = 'b'
                     match["winner_id"] = match["player_b_id"]
                 else:
                     # Next set
-                    match["set_actual"] += 1
+                    match["current_set"] = match.get("current_set", 1) + 1
                     match["points_player_a"] = 0
                     match["points_player_b"] = 0
         
-        # Update advanced statistics si se proporcionan
+        # Update advanced statistics if provided
         if stats:
             if not match.get("stats"):
                 match["stats"] = {}
             match["stats"].update(stats)
         
         # Finalize match if ended
-        if partido_terminado:
-            match["estado"] = "finalizado"
-            match["fecha_fin"] = datetime.now(timezone.utc).isoformat()
+        if match_finished:
+            match["status"] = "finished"
+            match["end_date"] = datetime.now(timezone.utc).isoformat()
             
             # Calculate and update ranking
             await self._update_ranking_after_match(match)
             
             # Increment match counter
-            await self.league_repo.increment_stats(match["liga_id"], partidos=1)
+            await self.league_repo.increment_stats(match["league_id"], matches=1)
         
-        await self.match_repo.update_match(partido_id, match)
+        await self.match_repo.update_match(match_id, match)
         
         return {
             "success": True,
             "match": match,
-            "set_ganado": set_ganado,
-            "ganador_set": ganador_set,
-            "partido_terminado": partido_terminado,
+            "set_won": set_won,
+            "set_winner": set_winner,
+            "match_finished": match_finished,
             "match_winner": match_winner
         }
     
     async def _update_ranking_after_match(self, match: Dict):
         """Update ranking after a match"""
-        liga_id = match["liga_id"]
+        league_id = match.get("league_id")
         
         # Get league configuration
-        league = await self.league_repo.get_by_id(liga_id)
+        league = await self.league_repo.get_by_id(league_id)
         if not league:
             return
         
@@ -365,84 +368,83 @@ class SuperPinService(BaseService):
         loser_id = match["player_b_id"] if winner_id == match["player_a_id"] else match["player_a_id"]
         
         # Get rankings
-        ranking_ganador = await self.ranking_repo.get_player_ranking(liga_id, winner_id)
-        ranking_perdedor = await self.ranking_repo.get_player_ranking(liga_id, loser_id)
+        winner_ranking = await self.ranking_repo.get_player_ranking(league_id, winner_id)
+        loser_ranking = await self.ranking_repo.get_player_ranking(league_id, loser_id)
         
-        if not ranking_ganador or not ranking_perdedor:
+        if not winner_ranking or not loser_ranking:
             return
         
         # Calculate points by system
         if scoring_system == "elo":
-            puntos_ganador, puntos_perdedor, elo_change = self._calculate_elo(
-                ranking_ganador.get("elo_rating", 1000),
-                ranking_perdedor.get("elo_rating", 1000),
+            winner_points, loser_points, elo_change = self._calculate_elo(
+                winner_ranking.get("elo_rating", 1000),
+                loser_ranking.get("elo_rating", 1000),
                 scoring_config.get("elo_k_factor", 32)
             )
         else:  # simple
-            puntos_ganador = scoring_config.get("points_win", 3)
-            puntos_perdedor = scoring_config.get("points_loss", 1)
+            winner_points = scoring_config.get("points_win", 3)
+            loser_points = scoring_config.get("points_loss", 1)
             elo_change = 0
         
         # Determine sets won/lost for each player
         if winner_id == match["player_a_id"]:
-            sets_ganador = match["sets_jugador_a"]
-            sets_perdedor = match["sets_jugador_b"]
+            sets_winner = match.get("sets_player_a", 0)
+            sets_loser = match.get("sets_player_b", 0)
         else:
-            sets_ganador = match["sets_jugador_b"]
-            sets_perdedor = match["sets_jugador_a"]
+            sets_winner = match.get("sets_player_b", 0)
+            sets_loser = match.get("sets_player_a", 0)
         
         # Update winner ranking
-        racha_ganador = ranking_ganador.get("racha_actual", 0)
-        nueva_racha_ganador = racha_ganador + 1 if racha_ganador >= 0 else 1
+        winner_streak = winner_ranking.get("current_streak", 0)
+        new_winner_streak = winner_streak + 1 if winner_streak >= 0 else 1
         
-        await self.ranking_repo.update_ranking(ranking_ganador["ranking_id"], {
-            "puntos_totales": ranking_ganador.get("puntos_totales", 0) + puntos_ganador,
-            "elo_rating": ranking_ganador.get("elo_rating", 1000) + elo_change,
-            "partidos_jugados": ranking_ganador.get("partidos_jugados", 0) + 1,
-            "partidos_ganados": ranking_ganador.get("partidos_ganados", 0) + 1,
-            "sets_ganados": ranking_ganador.get("sets_ganados", 0) + sets_ganador,
-            "sets_perdidos": ranking_ganador.get("sets_perdidos", 0) + sets_perdedor,
-            "racha_actual": nueva_racha_ganador,
-            "mejor_racha": max(ranking_ganador.get("mejor_racha", 0), nueva_racha_ganador),
+        await self.ranking_repo.update_ranking(winner_ranking["ranking_id"], {
+            "total_points": winner_ranking.get("total_points", 0) + winner_points,
+            "elo_rating": winner_ranking.get("elo_rating", 1000) + elo_change,
+            "matches_played": winner_ranking.get("matches_played", 0) + 1,
+            "matches_won": winner_ranking.get("matches_won", 0) + 1,
+            "sets_won": winner_ranking.get("sets_won", 0) + sets_winner,
+            "sets_lost": winner_ranking.get("sets_lost", 0) + sets_loser,
+            "current_streak": new_winner_streak,
+            "best_streak": max(winner_ranking.get("best_streak", 0), new_winner_streak),
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
         # Update loser ranking
-        racha_perdedor = ranking_perdedor.get("racha_actual", 0)
-        nueva_racha_perdedor = racha_perdedor - 1 if racha_perdedor <= 0 else -1
+        loser_streak = loser_ranking.get("current_streak", 0)
+        new_loser_streak = loser_streak - 1 if loser_streak <= 0 else -1
         
-        await self.ranking_repo.update_ranking(ranking_perdedor["ranking_id"], {
-            "puntos_totales": ranking_perdedor.get("puntos_totales", 0) + puntos_perdedor,
-            "elo_rating": ranking_perdedor.get("elo_rating", 1000) - elo_change,
-            "partidos_jugados": ranking_perdedor.get("partidos_jugados", 0) + 1,
-            "partidos_perdidos": ranking_perdedor.get("partidos_perdidos", 0) + 1,
-            "sets_ganados": ranking_perdedor.get("sets_ganados", 0) + sets_perdedor,
-            "sets_perdidos": ranking_perdedor.get("sets_perdidos", 0) + sets_ganador,
-            "racha_actual": nueva_racha_perdedor,
+        await self.ranking_repo.update_ranking(loser_ranking["ranking_id"], {
+            "total_points": loser_ranking.get("total_points", 0) + loser_points,
+            "elo_rating": loser_ranking.get("elo_rating", 1000) - elo_change,
+            "matches_played": loser_ranking.get("matches_played", 0) + 1,
+            "matches_lost": loser_ranking.get("matches_lost", 0) + 1,
+            "sets_won": loser_ranking.get("sets_won", 0) + sets_loser,
+            "sets_lost": loser_ranking.get("sets_lost", 0) + sets_winner,
+            "current_streak": new_loser_streak,
             "last_match_date": datetime.now(timezone.utc).isoformat()
         })
         
         # Save points in the match
-        await self.match_repo.update_match(match["partido_id"], {
-            "puntos_ganador": puntos_ganador,
-            "puntos_perdedor": puntos_perdedor,
+        await self.match_repo.update_match(match.get("match_id"), {
+            "winner_points": winner_points,
+            "loser_points": loser_points,
             "elo_change_a": elo_change if winner_id == match["player_a_id"] else -elo_change,
             "elo_change_b": elo_change if winner_id == match["player_b_id"] else -elo_change
         })
         
         # Recalculate positions
-        await self.ranking_repo.recalculate_positions(liga_id, scoring_system)
+        await self.ranking_repo.recalculate_positions(league_id, scoring_system)
     
     def _calculate_elo(
         self,
-        elo_ganador: int,
-        elo_perdedor: int,
+        winner_elo: int,
+        loser_elo: int,
         k_factor: int = 32
     ) -> tuple:
-        """Calculate cambio de ELO"""
+        """Calculate ELO change"""
         # Expected win probability
-        expected_winner = 1 / (1 + 10 ** ((elo_perdedor - elo_ganador) / 400))
-        expected_loser = 1 - expected_winner
+        expected_winner = 1 / (1 + 10 ** ((loser_elo - winner_elo) / 400))
         
         # ELO change
         change = round(k_factor * (1 - expected_winner))
@@ -455,20 +457,20 @@ class SuperPinService(BaseService):
     
     # ============== RANKING ==============
     
-    async def get_ranking(self, liga_id: str) -> RankingTable:
-        """Get tabla de ranking"""
-        league = await self.get_league(liga_id)
+    async def get_ranking(self, league_id: str) -> RankingTable:
+        """Get ranking table"""
+        league = await self.get_league(league_id)
         if not league:
-            raise ValueError("Liga not found")
+            raise ValueError("League not found")
         
-        entries = await self.ranking_repo.get_league_ranking(liga_id)
+        entries = await self.ranking_repo.get_league_ranking(league_id)
         
         return RankingTable(
-            liga_id=liga_id,
-            liga_nombre=league.name,
-            temporada=league.temporada,
-            total_jugadores=len(entries),
-            total_partidos=league.total_partidos,
+            league_id=league_id,
+            league_name=league.name,
+            season=league.season,
+            total_players=len(entries),
+            total_matches=league.total_matches,
             scoring_system=league.scoring_config.system,
             entries=[RankingEntry(**e) for e in entries],
             last_updated=datetime.now(timezone.utc).isoformat()
@@ -476,16 +478,16 @@ class SuperPinService(BaseService):
     
     async def get_player_stats(
         self,
-        liga_id: str,
-        jugador_id: str
+        league_id: str,
+        player_id: str
     ) -> Dict:
         """Get player statistics in a league"""
-        ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
+        ranking = await self.ranking_repo.get_player_ranking(league_id, player_id)
         if not ranking:
             return None
         
         # Get match history
-        matches = await self.match_repo.get_player_matches(liga_id, jugador_id, limit=20)
+        matches = await self.match_repo.get_player_matches(league_id, player_id, limit=20)
         
         return {
             "ranking": RankingEntry(**ranking),
@@ -498,61 +500,61 @@ class SuperPinService(BaseService):
         self,
         data: SeasonTournamentCreate
     ) -> SeasonTournament:
-        """Create torneo de fin de temporada"""
-        league = await self.get_league(data.liga_id)
+        """Create end of season tournament"""
+        league = await self.get_league(data.league_id)
         if not league:
-            raise ValueError("Liga not found")
+            raise ValueError("League not found")
         
-        # Get participantes according to configuration
-        ranking = await self.get_ranking(data.liga_id)
+        # Get participants according to configuration
+        ranking = await self.get_ranking(data.league_id)
         tournament_config = league.tournament_config
         
         if tournament_config.tournament_type == "top_n":
-            participantes = [
-                {"jugador_id": e.jugador_id, "posicion_ranking": e.posicion, "jugador_info": e.jugador_info}
+            participants = [
+                {"player_id": e.player_id, "ranking_position": e.position, "player_info": e.player_info}
                 for e in ranking.entries[:tournament_config.top_n_players]
             ]
         elif tournament_config.tournament_type == "by_category":
-            # By categorys
-            participantes = []
+            # By categories
+            participants = []
             for cat in tournament_config.categories:
                 cat_players = [
-                    {"jugador_id": e.jugador_id, "posicion_ranking": e.posicion, 
-                     "category": cat["name"], "jugador_info": e.jugador_info}
+                    {"player_id": e.player_id, "ranking_position": e.position, 
+                     "category": cat["name"], "player_info": e.player_info}
                     for e in ranking.entries
-                    if cat["min_rank"] <= e.posicion <= cat["max_rank"]
+                    if cat["min_rank"] <= e.position <= cat["max_rank"]
                 ]
-                participantes.extend(cat_players)
+                participants.extend(cat_players)
         else:  # all_players
-            participantes = [
-                {"jugador_id": e.jugador_id, "posicion_ranking": e.posicion, "jugador_info": e.jugador_info}
+            participants = [
+                {"player_id": e.player_id, "ranking_position": e.position, "player_info": e.player_info}
                 for e in ranking.entries
             ]
         
         tournament_dict = data.model_dump()
         tournament_dict["tournament_config"] = tournament_config.model_dump()
         tournament_dict["prizes"] = [p.model_dump() if hasattr(p, 'model_dump') else p for p in league.prizes]
-        tournament_dict["participantes"] = participantes
+        tournament_dict["participants"] = participants
         
         result = await self.tournament_repo.create(tournament_dict)
         
-        self.log_info(f"Season tournament created: {result['torneo_id']}")
+        self.log_info(f"Season tournament created: {result.get('tournament_id')}")
         
         return SeasonTournament(**result)
     
-    async def generate_tournament_brackets(self, torneo_id: str) -> dict:
-        """Generar brackets para torneo de deletion simple"""
-        tournament = await self.tournament_repo.get_by_id(torneo_id)
+    async def generate_tournament_brackets(self, tournament_id: str) -> dict:
+        """Generate brackets for single elimination tournament"""
+        tournament = await self.tournament_repo.get_by_id(tournament_id)
         if not tournament:
-            raise ValueError("Torneo not found")
+            raise ValueError("Tournament not found")
         
-        participantes = tournament.get("participantes", [])
-        num_players = len(participantes)
+        participants = tournament.get("participants", [])
+        num_players = len(participants)
         
         if num_players < 2:
-            raise ValueError("At least needed 2 participantes")
+            raise ValueError("At least 2 participants needed")
         
-        # Calculatesr rondas necesarias
+        # Calculate needed rounds
         import math
         num_rounds = math.ceil(math.log2(num_players))
         bracket_size = 2 ** num_rounds
@@ -560,37 +562,37 @@ class SuperPinService(BaseService):
         # Generate bracket structure
         brackets = []
         
-        # Primera ronda - emparejar according to ranking (1 vs last, 2 vs penlast, etc.)
+        # First round - pair according to ranking (1 vs last, 2 vs second-last, etc.)
         round_1_matches = []
         for i in range(bracket_size // 2):
             match = {
                 "match_id": f"R1_M{i+1}",
                 "round": 1,
                 "position": i,
-                "player_a": participantes[i] if i < num_players else None,
-                "player_b": participantes[-(i+1)] if (num_players - i - 1) >= 0 and i < num_players // 2 else None,
+                "player_a": participants[i] if i < num_players else None,
+                "player_b": participants[-(i+1)] if (num_players - i - 1) >= 0 and i < num_players // 2 else None,
                 "winner": None,
                 "score_a": 0,
                 "score_b": 0,
-                "estado": "pendiente"
+                "status": "pending"
             }
-            # Si solo hay un jugador, avanza automaticmente (bye)
+            # If only one player, advances automatically (bye)
             if match["player_a"] and not match["player_b"]:
-                match["winner"] = match["player_a"]["jugador_id"]
-                match["estado"] = "bye"
+                match["winner"] = match["player_a"]["player_id"]
+                match["status"] = "bye"
             round_1_matches.append(match)
         
-        brackets.append({"round": 1, "name": "Final" if num_rounds == 1 else ("Octavos" if num_rounds >= 3 else "Primera Ronda"), "matches": round_1_matches})
+        brackets.append({"round": 1, "name": "Final" if num_rounds == 1 else ("Round of 16" if num_rounds >= 3 else "First Round"), "matches": round_1_matches})
         
-        # Generate rondas siguientes empty
-        round_names = ["Octavos", "Cuartos", "Semifinal", "Final"]
+        # Generate empty following rounds
+        round_names = ["Round of 16", "Quarter-finals", "Semi-finals", "Final"]
         for r in range(2, num_rounds + 1):
             num_matches = bracket_size // (2 ** r)
             round_name = round_names[min(r-1, len(round_names)-1)]
             if r == num_rounds:
                 round_name = "Final"
             elif r == num_rounds - 1:
-                round_name = "Semifinal"
+                round_name = "Semi-finals"
             
             round_matches = [
                 {
@@ -602,18 +604,18 @@ class SuperPinService(BaseService):
                     "winner": None,
                     "score_a": 0,
                     "score_b": 0,
-                    "estado": "pendiente"
+                    "status": "pending"
                 }
                 for i in range(num_matches)
             ]
             brackets.append({"round": r, "name": round_name, "matches": round_matches})
         
-        # Add partido por 3er lugar si is configurado
+        # Add match for 3rd place if configured
         config = tournament.get("tournament_config", {})
         if config.get("third_place_match", True) and num_rounds >= 2:
             brackets.append({
                 "round": num_rounds,
-                "name": "Tercer Lugar",
+                "name": "Third Place",
                 "matches": [{
                     "match_id": "3RD_PLACE",
                     "round": num_rounds,
@@ -623,45 +625,45 @@ class SuperPinService(BaseService):
                     "winner": None,
                     "score_a": 0,
                     "score_b": 0,
-                    "estado": "pendiente",
+                    "status": "pending",
                     "is_third_place": True
                 }]
             })
         
         # Update tournament with brackets
-        await self.tournament_repo.update_tournament(torneo_id, {
+        await self.tournament_repo.update_tournament(tournament_id, {
             "brackets": brackets,
-            "estado": "en_curso"
+            "status": "in_progress"
         })
         
         return {"brackets": brackets, "total_rounds": num_rounds}
     
     async def update_tournament_match(
         self, 
-        torneo_id: str, 
+        tournament_id: str, 
         match_id: str, 
         winner_id: str,
         score_a: int = 0,
         score_b: int = 0
     ) -> dict:
-        """Update resultado de un partido dthe tournament"""
-        tournament = await self.tournament_repo.get_by_id(torneo_id)
+        """Update result of a tournament match"""
+        tournament = await self.tournament_repo.get_by_id(tournament_id)
         if not tournament:
-            raise ValueError("Torneo not found")
+            raise ValueError("Tournament not found")
         
         brackets = tournament.get("brackets", [])
         match_found = False
         current_round = 0
         match_position = 0
         
-        # Search y actualizar the match
+        # Search and update the match
         for bracket in brackets:
             for match in bracket["matches"]:
                 if match["match_id"] == match_id:
                     match["winner"] = winner_id
                     match["score_a"] = score_a
                     match["score_b"] = score_b
-                    match["estado"] = "finalizado"
+                    match["status"] = "finished"
                     match_found = True
                     current_round = match["round"]
                     match_position = match["position"]
@@ -673,14 +675,14 @@ class SuperPinService(BaseService):
         # Advance winner to next round
         next_round = current_round + 1
         for bracket in brackets:
-            if bracket["round"] == next_round and bracket.get("name") != "Tercer Lugar":
+            if bracket["round"] == next_round and bracket.get("name") != "Third Place":
                 next_match_pos = match_position // 2
                 for match in bracket["matches"]:
                     if match["position"] == next_match_pos:
-                        # Determinar jugador ganador
+                        # Determine winning player
                         winner_info = None
-                        for p in tournament.get("participantes", []):
-                            if p["jugador_id"] == winner_id:
+                        for p in tournament.get("participants", []):
+                            if p["player_id"] == winner_id:
                                 winner_info = p
                                 break
                         
@@ -691,39 +693,39 @@ class SuperPinService(BaseService):
                         break
         
         # Update brackets in DB
-        await self.tournament_repo.update_tournament(torneo_id, {"brackets": brackets})
+        await self.tournament_repo.update_tournament(tournament_id, {"brackets": brackets})
         
-        # Verify si the tournament ended
+        # Check if tournament ended
         final_bracket = next((b for b in brackets if b["name"] == "Final"), None)
         if final_bracket:
             final_match = final_bracket["matches"][0]
-            if final_match.get("estado") == "finalizado":
-                # Tournament terminado - generar resultados finales
-                resultados = [
-                    {"posicion": 1, "jugador_id": final_match["winner"]},
-                    {"posicion": 2, "jugador_id": final_match["player_a"]["jugador_id"] 
-                     if final_match["player_a"]["jugador_id"] != final_match["winner"] 
-                     else final_match["player_b"]["jugador_id"]}
+            if final_match.get("status") == "finished":
+                # Tournament finished - generate final results
+                final_results = [
+                    {"position": 1, "player_id": final_match["winner"]},
+                    {"position": 2, "player_id": final_match["player_a"]["player_id"] 
+                     if final_match["player_a"]["player_id"] != final_match["winner"] 
+                     else final_match["player_b"]["player_id"]}
                 ]
                 
-                # Add 3er lugar if exists
-                third_bracket = next((b for b in brackets if b["name"] == "Tercer Lugar"), None)
-                if third_bracket and third_bracket["matches"][0].get("estado") == "finalizado":
-                    resultados.append({
-                        "posicion": 3, 
-                        "jugador_id": third_bracket["matches"][0]["winner"]
+                # Add 3rd place if exists
+                third_bracket = next((b for b in brackets if b["name"] == "Third Place"), None)
+                if third_bracket and third_bracket["matches"][0].get("status") == "finished":
+                    final_results.append({
+                        "position": 3, 
+                        "player_id": third_bracket["matches"][0]["winner"]
                     })
                 
-                await self.tournament_repo.update_tournament(torneo_id, {
-                    "estado": "finalizado",
-                    "resultados_finales": resultados
+                await self.tournament_repo.update_tournament(tournament_id, {
+                    "status": "finished",
+                    "final_results": final_results
                 })
         
         return {"success": True, "brackets": brackets}
     
-    async def get_tournament_with_brackets(self, torneo_id: str) -> dict:
-        """Get torneo con information completa de brackets"""
-        tournament = await self.tournament_repo.get_by_id(torneo_id)
+    async def get_tournament_with_brackets(self, tournament_id: str) -> dict:
+        """Get tournament with complete bracket information"""
+        tournament = await self.tournament_repo.get_by_id(tournament_id)
         if not tournament:
             return None
         return tournament
@@ -732,100 +734,100 @@ class SuperPinService(BaseService):
     
     async def award_badge(
         self,
-        jugador_id: str,
+        player_id: str,
         badge_type: str,
-        liga_id: str = None,
-        torneo_id: str = None,
-        partido_id: str = None,
-        temporada: str = None,
+        league_id: str = None,
+        tournament_id: str = None,
+        match_id: str = None,
+        season: str = None,
         allow_duplicates: bool = False,
         metadata: Dict = None
     ) -> Optional[Dict]:
-        """Otorgar un badge a un jugador"""
+        """Award a badge to a player"""
         
-        # Verify if already has badge (if duplicates not allowed)
+        # Check if already has badge (if duplicates not allowed)
         if not allow_duplicates:
             existing = await self.badge_repo.get_badge_by_type(
-                jugador_id, badge_type,
-                liga_id=liga_id if liga_id else None,
-                torneo_id=torneo_id if torneo_id else None
+                player_id, badge_type,
+                league_id=league_id if league_id else None,
+                tournament_id=tournament_id if tournament_id else None
             )
             if existing:
-                return None  # Ya tiene este badge
+                return None  # Already has this badge
         
         # Get badge definition
         badge_def = BADGE_DEFINITIONS.get(badge_type, {})
         
         badge_data = {
-            "jugador_id": jugador_id,
+            "player_id": player_id,
             "badge_type": badge_type,
             "name": badge_def.get("name", badge_type),
             "description": badge_def.get("description", ""),
             "icon": badge_def.get("icon", "🏅"),
-            "liga_id": liga_id,
-            "torneo_id": torneo_id,
-            "partido_id": partido_id,
-            "temporada": temporada,
+            "league_id": league_id,
+            "tournament_id": tournament_id,
+            "match_id": match_id,
+            "season": season,
             "metadata": metadata or {}
         }
         
         result = await self.badge_repo.create(badge_data)
         
-        self.log_info(f"Badge awarded: {badge_type} to player {jugador_id}")
+        self.log_info(f"Badge awarded: {badge_type} to player {player_id}")
         
         return result
     
-    async def award_tournament_badges(self, torneo_id: str) -> List[Dict]:
-        """Otorgar badges a los ganadores de un torneo"""
-        tournament = await self.tournament_repo.get_by_id(torneo_id)
-        if not tournament or tournament.get("estado") != "finalizado":
+    async def award_tournament_badges(self, tournament_id: str) -> List[Dict]:
+        """Award badges to tournament winners"""
+        tournament = await self.tournament_repo.get_by_id(tournament_id)
+        if not tournament or tournament.get("status") != "finished":
             return []
         
         awarded_badges = []
-        resultados = tournament.get("resultados_finales", [])
-        liga_id = tournament.get("liga_id")
-        temporada = None
+        final_results = tournament.get("final_results", [])
+        league_id = tournament.get("league_id")
+        season = None
         
-        # Get temporada of the league
-        league = await self.league_repo.get_by_id(liga_id)
+        # Get season from the league
+        league = await self.league_repo.get_by_id(league_id)
         if league:
-            temporada = league.get("temporada")
+            season = league.get("season")
         
-        for resultado in resultados:
-            posicion = resultado.get("posicion")
-            jugador_id = resultado.get("jugador_id")
+        for result in final_results:
+            position = result.get("position")
+            player_id = result.get("player_id")
             
-            if posicion == 1:
+            if position == 1:
                 badge = await self.award_badge(
-                    jugador_id=jugador_id,
+                    player_id=player_id,
                     badge_type=BadgeType.TOURNAMENT_CHAMPION,
-                    liga_id=liga_id,
-                    torneo_id=torneo_id,
-                    temporada=temporada,
+                    league_id=league_id,
+                    tournament_id=tournament_id,
+                    season=season,
                     metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
                     awarded_badges.append(badge)
                     
-            elif posicion == 2:
+            elif position == 2:
                 badge = await self.award_badge(
-                    jugador_id=jugador_id,
+                    player_id=player_id,
                     badge_type=BadgeType.TOURNAMENT_RUNNER_UP,
-                    liga_id=liga_id,
-                    torneo_id=torneo_id,
-                    temporada=temporada,
+                    league_id=league_id,
+                    tournament_id=tournament_id,
+                    season=season,
                     metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
                     awarded_badges.append(badge)
                     
-            elif posicion == 3:
+            elif position == 3:
                 badge = await self.award_badge(
-                    jugador_id=jugador_id,
+                    player_id=player_id,
                     badge_type=BadgeType.TOURNAMENT_THIRD,
-                    liga_id=liga_id,
-                    torneo_id=torneo_id,
-                    temporada=temporada,
+                    league_id=league_id,
+                    tournament_id=tournament_id,
+                    season=season,
                     metadata={"tournament_name": tournament.get("name")}
                 )
                 if badge:
@@ -835,76 +837,76 @@ class SuperPinService(BaseService):
     
     async def check_and_award_match_badges(
         self,
-        jugador_id: str,
-        liga_id: str,
-        partido_id: str
+        player_id: str,
+        league_id: str,
+        match_id: str
     ) -> List[Dict]:
-        """Verify y otorgar badges basados en statistics de partido"""
+        """Check and award badges based on match statistics"""
         awarded_badges = []
         
         # Get ranking of the player
-        ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
+        ranking = await self.ranking_repo.get_player_ranking(league_id, player_id)
         if not ranking:
             return awarded_badges
         
-        # Badge: Primera victoria
-        if ranking.get("partidos_ganados") == 1:
+        # Badge: First win
+        if ranking.get("matches_won") == 1:
             badge = await self.award_badge(
-                jugador_id=jugador_id,
+                player_id=player_id,
                 badge_type=BadgeType.FIRST_WIN,
-                liga_id=liga_id,
-                partido_id=partido_id
+                league_id=league_id,
+                match_id=match_id
             )
             if badge:
                 awarded_badges.append(badge)
         
         # Badge: 5 win streak
-        if ranking.get("racha_actual", 0) >= 5:
+        if ranking.get("current_streak", 0) >= 5:
             badge = await self.award_badge(
-                jugador_id=jugador_id,
+                player_id=player_id,
                 badge_type=BadgeType.WIN_STREAK_5,
-                liga_id=liga_id,
-                partido_id=partido_id
+                league_id=league_id,
+                match_id=match_id
             )
             if badge:
                 awarded_badges.append(badge)
         
         # Badge: 10 win streak
-        if ranking.get("racha_actual", 0) >= 10:
+        if ranking.get("current_streak", 0) >= 10:
             badge = await self.award_badge(
-                jugador_id=jugador_id,
+                player_id=player_id,
                 badge_type=BadgeType.WIN_STREAK_10,
-                liga_id=liga_id,
-                partido_id=partido_id
+                league_id=league_id,
+                match_id=match_id
             )
             if badge:
                 awarded_badges.append(badge)
         
-        # Badge: 50 partidos jugados
-        if ranking.get("partidos_jugados") == 50:
+        # Badge: 50 matches played
+        if ranking.get("matches_played") == 50:
             badge = await self.award_badge(
-                jugador_id=jugador_id,
+                player_id=player_id,
                 badge_type=BadgeType.MATCHES_50,
-                liga_id=liga_id
+                league_id=league_id
             )
             if badge:
                 awarded_badges.append(badge)
         
-        # Badge: 100 partidos jugados
-        if ranking.get("partidos_jugados") == 100:
+        # Badge: 100 matches played
+        if ranking.get("matches_played") == 100:
             badge = await self.award_badge(
-                jugador_id=jugador_id,
+                player_id=player_id,
                 badge_type=BadgeType.MATCHES_100,
-                liga_id=liga_id
+                league_id=league_id
             )
             if badge:
                 awarded_badges.append(badge)
         
         return awarded_badges
     
-    async def get_player_badges(self, jugador_id: str) -> List[Dict]:
-        """Get todos los badges de un jugador"""
-        badges = await self.badge_repo.get_player_badges(jugador_id)
+    async def get_player_badges(self, player_id: str) -> List[Dict]:
+        """Get all badges for a player"""
+        badges = await self.badge_repo.get_player_badges(player_id)
         
         # Enrich with definitions
         for badge in badges:
@@ -913,12 +915,12 @@ class SuperPinService(BaseService):
         
         return badges
     
-    async def get_badge_leaderboard(self, liga_id: str = None, limit: int = 10) -> List[Dict]:
-        """Get jugadores con more badges"""
+    async def get_badge_leaderboard(self, league_id: str = None, limit: int = 10) -> List[Dict]:
+        """Get players with most badges"""
         # This requires MongoDB aggregation
         pipeline = [
             {"$group": {
-                "_id": "$jugador_id",
+                "_id": "$player_id",
                 "total_badges": {"$sum": 1},
                 "legendary": {"$sum": {"$cond": [{"$in": ["$badge_type", [
                     BadgeType.TOURNAMENT_CHAMPION, BadgeType.SEASON_MVP
@@ -931,10 +933,10 @@ class SuperPinService(BaseService):
             {"$limit": limit}
         ]
         
-        if liga_id:
-            pipeline.insert(0, {"$match": {"liga_id": liga_id}})
+        if league_id:
+            pipeline.insert(0, {"$match": {"league_id": league_id}})
         
-        # Ejecutar aggregation
+        # Execute aggregation
         collection = self.badge_repo.collection
         cursor = collection.aggregate(pipeline)
         results = await cursor.to_list(length=limit)
@@ -943,24 +945,24 @@ class SuperPinService(BaseService):
         for entry in results:
             player = await self.player_repo.get_by_id(entry["_id"])
             if player:
-                entry["jugador_info"] = {
+                entry["player_info"] = {
                     "name": player.get("name"),
-                    "apodo": player.get("apodo")
+                    "nickname": player.get("nickname")
                 }
         
         return results
     
     async def get_recent_badges(self, limit: int = 20) -> List[Dict]:
-        """Get badges more recientes (para feed)"""
+        """Get most recent badges (for feed)"""
         badges = await self.badge_repo.get_recent_badges(limit)
         
         # Enrich with player info
         for badge in badges:
-            player = await self.player_repo.get_by_id(badge.get("jugador_id"))
+            player = await self.player_repo.get_by_id(badge.get("player_id"))
             if player:
-                badge["jugador_info"] = {
+                badge["player_info"] = {
                     "name": player.get("name"),
-                    "apodo": player.get("apodo")
+                    "nickname": player.get("nickname")
                 }
             badge_def = BADGE_DEFINITIONS.get(badge.get("badge_type"), {})
             badge["rarity"] = badge_def.get("rarity", "common")
@@ -969,76 +971,76 @@ class SuperPinService(BaseService):
     
     # ============== PLAYER STATISTICS ==============
     
-    async def get_player_statistics(self, jugador_id: str, liga_id: str = None) -> Dict:
-        """Get statistics detalladas de un jugador"""
+    async def get_player_statistics(self, player_id: str, league_id: str = None) -> Dict:
+        """Get detailed player statistics"""
         
-        # Info basic of the player
-        player = await self.player_repo.get_by_id(jugador_id)
+        # Basic player info
+        player = await self.player_repo.get_by_id(player_id)
         if not player:
             return None
         
         # Get rankings from all leagues or specific one
-        if liga_id:
-            rankings = [await self.ranking_repo.get_player_ranking(liga_id, jugador_id)]
+        if league_id:
+            rankings = [await self.ranking_repo.get_player_ranking(league_id, player_id)]
             rankings = [r for r in rankings if r]
         else:
             # Search in all active leagues
             leagues = await self.league_repo.get_all_leagues()
             rankings = []
             for league in leagues:
-                ranking = await self.ranking_repo.get_player_ranking(league["liga_id"], jugador_id)
+                ranking = await self.ranking_repo.get_player_ranking(league.get("league_id"), player_id)
                 if ranking:
-                    ranking["liga_nombre"] = league.get("name")
+                    ranking["league_name"] = league.get("name")
                     rankings.append(ranking)
         
         # Get match history
         matches = await self.match_repo.find_many(
             query={
                 "$or": [
-                    {"player_a_id": jugador_id},
-                    {"player_b_id": jugador_id}
+                    {"player_a_id": player_id},
+                    {"player_b_id": player_id}
                 ],
-                "estado": "finalizado"
+                "status": "finished"
             },
-            sort=[("fecha_partido", -1)],
+            sort=[("match_date", -1)],
             limit=20
         )
         
         # Enrich matches with opponent info
         match_history = []
         for match in matches:
-            is_player_a = match.get("player_a_id") == jugador_id
+            is_player_a = match.get("player_a_id") == player_id
             opponent_id = match.get("player_b_id") if is_player_a else match.get("player_a_id")
             opponent = await self.player_repo.get_by_id(opponent_id)
             
-            player_sets = match.get("sets_jugador_a") if is_player_a else match.get("sets_jugador_b")
-            opponent_sets = match.get("sets_jugador_b") if is_player_a else match.get("sets_jugador_a")
-            is_winner = match.get("winner_id") == jugador_id
+            player_sets = match.get("sets_player_a") if is_player_a else match.get("sets_player_b")
+            opponent_sets = match.get("sets_player_b") if is_player_a else match.get("sets_player_a")
+            is_winner = match.get("winner_id") == player_id
             
             match_history.append({
-                "partido_id": match.get("partido_id"),
-                "fecha": match.get("fecha_partido"),
+                "match_id": match.get("match_id"),
+                "date": match.get("match_date"),
                 "opponent": {
-                    "jugador_id": opponent_id,
-                    "name": opponent.get("name") if opponent else "Desconocido",
-                    "apodo": opponent.get("apodo") if opponent else None
+                    "player_id": opponent_id,
+                    "name": opponent.get("name") if opponent else "Unknown",
+                    "nickname": opponent.get("nickname") if opponent else None
                 },
-                "resultado": f"{player_sets}-{opponent_sets}",
+                "result": f"{player_sets}-{opponent_sets}",
                 "is_winner": is_winner,
-                "liga_id": match.get("liga_id"),
+                "league_id": match.get("league_id"),
                 "elo_change": match.get("elo_change_a") if is_player_a else match.get("elo_change_b")
             })
         
         # Get badges
-        badges = await self.get_player_badges(jugador_id)
+        badges = await self.get_player_badges(player_id)
         
-        # Calculatesr statistics agregadas
-        total_matches = sum(r.get("partidos_jugados", 0) for r in rankings)
-        total_wins = sum(r.get("partidos_ganados", 0) for r in rankings)
-        total_losses = sum(r.get("partidos_perdidos", 0) for r in rankings)
-        total_sets_won = sum(r.get("sets_ganados", 0) for r in rankings)
-        total_sets_lost = sum(r.get("sets_perdidos", 0) for r in rankings)
-        best_streak = max((r.get("mejor_racha", 0) for r in rankings), default=0)
+        # Calculate aggregate statistics
+        total_matches = sum(r.get("matches_played", 0) for r in rankings)
+        total_wins = sum(r.get("matches_won", 0) for r in rankings)
+        total_losses = sum(r.get("matches_lost", 0) for r in rankings)
+        total_sets_won = sum(r.get("sets_won", 0) for r in rankings)
+        total_sets_lost = sum(r.get("sets_lost", 0) for r in rankings)
+        best_streak = max((r.get("best_streak", 0) for r in rankings), default=0)
         
         win_rate = (total_wins / total_matches * 100) if total_matches > 0 else 0
         set_win_rate = (total_sets_won / (total_sets_won + total_sets_lost) * 100) if (total_sets_won + total_sets_lost) > 0 else 0
@@ -1049,14 +1051,14 @@ class SuperPinService(BaseService):
             recent_form.append("W" if m["is_winner"] else "L")
         
         return {
-            "jugador_id": jugador_id,
+            "player_id": player_id,
             "player_info": {
                 "name": player.get("name"),
-                "apellido": player.get("apellido"),
-                "apodo": player.get("apodo"),
-                "nivel": player.get("nivel"),
-                "foto_url": player.get("foto_url"),
-                "fecha_registro": player.get("fecha_registro") or player.get("created_at"),
+                "last_name": player.get("last_name"),
+                "nickname": player.get("nickname"),
+                "level": player.get("level"),
+                "photo_url": player.get("photo_url"),
+                "registration_date": player.get("registration_date") or player.get("created_at"),
                 "elo_rating": player.get("elo_rating", 1000)
             },
             "overall_stats": {
@@ -1084,7 +1086,7 @@ class SuperPinService(BaseService):
         }
     
     async def get_head_to_head(self, player_a_id: str, player_b_id: str) -> Dict:
-        """Get head-to-head statistics directos entre dos jugadores"""
+        """Get head-to-head statistics between two players"""
         
         matches = await self.match_repo.find_many(
             query={
@@ -1092,9 +1094,9 @@ class SuperPinService(BaseService):
                     {"player_a_id": player_a_id, "player_b_id": player_b_id},
                     {"player_a_id": player_b_id, "player_b_id": player_a_id}
                 ],
-                "estado": "finalizado"
+                "status": "finished"
             },
-            sort=[("fecha_partido", -1)]
+            sort=[("match_date", -1)]
         )
         
         player_a = await self.player_repo.get_by_id(player_a_id)
@@ -1114,41 +1116,41 @@ class SuperPinService(BaseService):
                 wins_b += 1
             
             if is_a_first:
-                sets_a += match.get("sets_jugador_a", 0)
-                sets_b += match.get("sets_jugador_b", 0)
+                sets_a += match.get("sets_player_a", 0)
+                sets_b += match.get("sets_player_b", 0)
             else:
-                sets_a += match.get("sets_jugador_b", 0)
-                sets_b += match.get("sets_jugador_a", 0)
+                sets_a += match.get("sets_player_b", 0)
+                sets_b += match.get("sets_player_a", 0)
         
         return {
             "player_a": {
-                "jugador_id": player_a_id,
-                "name": player_a.get("name") if player_a else "Desconocido",
-                "apodo": player_a.get("apodo") if player_a else None,
+                "player_id": player_a_id,
+                "name": player_a.get("name") if player_a else "Unknown",
+                "nickname": player_a.get("nickname") if player_a else None,
                 "wins": wins_a,
                 "sets": sets_a
             },
             "player_b": {
-                "jugador_id": player_b_id,
-                "name": player_b.get("name") if player_b else "Desconocido",
-                "apodo": player_b.get("apodo") if player_b else None,
+                "player_id": player_b_id,
+                "name": player_b.get("name") if player_b else "Unknown",
+                "nickname": player_b.get("nickname") if player_b else None,
                 "wins": wins_b,
                 "sets": sets_b
             },
             "total_matches": len(matches),
             "matches": [{
-                "partido_id": m.get("partido_id"),
-                "fecha": m.get("fecha_partido"),
+                "match_id": m.get("match_id"),
+                "date": m.get("match_date"),
                 "winner_id": m.get("winner_id"),
-                "score": f"{m.get('sets_jugador_a')}-{m.get('sets_jugador_b')}"
+                "score": f"{m.get('sets_player_a')}-{m.get('sets_player_b')}"
             } for m in matches[:10]]
         }
     
-    # ============== QUICK TOURNAMENT (TORNEO LIGHTNING) ==============
+    # ============== QUICK TOURNAMENT (LIGHTNING TOURNAMENT) ==============
     
     async def create_quick_tournament(
         self,
-        liga_id: str,
+        league_id: str,
         name: str = None,
         pairing_mode: str = "random",  # random, by_ranking, swiss
         match_format: str = "best_of_1",  # best_of_1, best_of_3
@@ -1166,32 +1168,32 @@ class SuperPinService(BaseService):
         from datetime import datetime, timezone
         
         # Get players with active check-in
-        available_players = await self.get_available_players(liga_id)
+        available_players = await self.get_available_players(league_id)
         
         if len(available_players) < 2:
-            raise ValueError("At least needed 2 jugadores with active check-in")
+            raise ValueError("At least 2 players with active check-in needed")
         
         # Get ranking info for each player
         players_with_ranking = []
         for checkin in available_players:
-            jugador_id = checkin.get("jugador_id")
-            ranking = await self.ranking_repo.get_player_ranking(liga_id, jugador_id)
-            player = await self.player_repo.get_by_id(jugador_id)
+            player_id = checkin.get("player_id")
+            ranking = await self.ranking_repo.get_player_ranking(league_id, player_id)
+            player = await self.player_repo.get_by_id(player_id)
             
             players_with_ranking.append({
-                "jugador_id": jugador_id,
-                "jugador_info": {
-                    "name": player.get("name") if player else "Desconocido",
-                    "apodo": player.get("apodo") if player else None
+                "player_id": player_id,
+                "player_info": {
+                    "name": player.get("name") if player else "Unknown",
+                    "nickname": player.get("nickname") if player else None
                 },
                 "elo": ranking.get("elo_rating", 1000) if ranking else 1000,
-                "posicion": ranking.get("posicion", 999) if ranking else 999
+                "position": ranking.get("position", 999) if ranking else 999
             })
         
         # Sort and pair according to mode
         if pairing_mode == "by_ranking":
             # Sort by position (best first)
-            players_with_ranking.sort(key=lambda x: x["posicion"])
+            players_with_ranking.sort(key=lambda x: x["position"])
         elif pairing_mode == "swiss":
             # Sort by ELO (similar level)
             players_with_ranking.sort(key=lambda x: x["elo"])
@@ -1201,7 +1203,6 @@ class SuperPinService(BaseService):
         
         # Create pairings
         pairings = []
-        used_players = set()
         
         if pairing_mode == "by_ranking":
             # Best vs Worst
@@ -1226,37 +1227,37 @@ class SuperPinService(BaseService):
         
         # Create the matches
         created_matches = []
-        mejor_de = 1 if match_format == "best_of_1" else 3
+        best_of = 1 if match_format == "best_of_1" else 3
         
         for player_a, player_b in pairings:
             match_data = SuperPinMatchCreate(
-                liga_id=liga_id,
-                player_a_id=player_a["jugador_id"],
-                player_b_id=player_b["jugador_id"],
-                mejor_de=mejor_de,
-                puntos_por_set=points_per_set,
+                league_id=league_id,
+                player_a_id=player_a["player_id"],
+                player_b_id=player_b["player_id"],
+                best_of=best_of,
+                points_per_set=points_per_set,
                 match_type="quick"
             )
             
             match = await self.create_match(match_data)
             # Start the match automatically
-            await self.start_match(match.partido_id)
+            await self.start_match(match.match_id)
             
             created_matches.append({
-                "partido_id": match.partido_id,
-                "jugador_a": player_a,
-                "jugador_b": player_b,
-                "estado": "en_curso"
+                "match_id": match.match_id,
+                "player_a": player_a,
+                "player_b": player_b,
+                "status": "in_progress"
             })
         
         # Generate tournament name
-        if not nombre:
-            nombre = f"Torneo Lightning {datetime.now(timezone.utc).strftime('%H:%M')}"
+        if not name:
+            name = f"Lightning Tournament {datetime.now(timezone.utc).strftime('%H:%M')}"
         
         quick_tournament = {
             "quick_tournament_id": f"qt_{uuid.uuid4().hex[:12]}",
-            "liga_id": liga_id,
-            "name": nombre,
+            "league_id": league_id,
+            "name": name,
             "pairing_mode": pairing_mode,
             "match_format": match_format,
             "total_players": len(players_with_ranking),
@@ -1264,32 +1265,32 @@ class SuperPinService(BaseService):
             "matches": created_matches,
             "bye_player": bye_player,
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "estado": "en_curso"
+            "status": "in_progress"
         }
         
         self.log_info(f"Quick tournament created: {quick_tournament['quick_tournament_id']} with {len(created_matches)} matches")
         
         return quick_tournament
     
-    async def get_quick_tournament_status(self, liga_id: str) -> Dict:
+    async def get_quick_tournament_status(self, league_id: str) -> Dict:
         """Get active quick matches status in a league"""
         # Search ongoing quick matches
         active_matches = await self.match_repo.find_many(
             query={
-                "liga_id": liga_id,
+                "league_id": league_id,
                 "match_type": "quick",
-                "estado": {"$in": ["pendiente", "en_curso"]}
+                "status": {"$in": ["pending", "in_progress"]}
             },
             sort=[("created_at", -1)]
         )
         
         finished_today = await self.match_repo.find_many(
             query={
-                "liga_id": liga_id,
+                "league_id": league_id,
                 "match_type": "quick",
-                "estado": "finalizado"
+                "status": "finished"
             },
-            sort=[("fecha_partido", -1)],
+            sort=[("match_date", -1)],
             limit=20
         )
         
@@ -1310,7 +1311,7 @@ class SuperPinService(BaseService):
     
     async def predict_match(self, player_a_id: str, player_b_id: str) -> Dict:
         """
-        Predict match outcome entre dos jugadores.
+        Predict match outcome between two players.
         Uses ELO rating, head-to-head history and current streak.
         """
         # Get stats for both players
@@ -1396,17 +1397,17 @@ class SuperPinService(BaseService):
         
         return {
             "player_a": {
-                "jugador_id": player_a_id,
+                "player_id": player_a_id,
                 "name": stats_a.get("player_info", {}).get("name", "?"),
-                "apodo": stats_a.get("player_info", {}).get("apodo"),
+                "nickname": stats_a.get("player_info", {}).get("nickname"),
                 "elo": elo_a,
                 "win_rate": wr_a,
                 "probability": round(prob_a * 100, 1)
             },
             "player_b": {
-                "jugador_id": player_b_id,
+                "player_id": player_b_id,
                 "name": stats_b.get("player_info", {}).get("name", "?"),
-                "apodo": stats_b.get("player_info", {}).get("apodo"),
+                "nickname": stats_b.get("player_info", {}).get("nickname"),
                 "elo": elo_b,
                 "win_rate": wr_b,
                 "probability": round(prob_b * 100, 1)
