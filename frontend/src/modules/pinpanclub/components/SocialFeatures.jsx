@@ -183,7 +183,7 @@ export function CommentsSection({ targetId, targetType = 'player', currentUserId
 
   const submitComment = async () => {
     if (!currentUserId) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('social.loginRequired'));
       return;
     }
     if (!newComment.trim()) return;
@@ -204,10 +204,10 @@ export function CommentsSection({ targetId, targetType = 'player', currentUserId
       if (response.ok) {
         setNewComment('');
         fetchComments();
-        toast.success('Comentario publicado');
+        toast.success(t('social.commentPublished'));
       }
     } catch (error) {
-      toast.error('Error al publicar');
+      toast.error(t('social.errorPublishing'));
     } finally {
       setSubmitting(false);
     }
@@ -226,7 +226,7 @@ export function CommentsSection({ targetId, targetType = 'player', currentUserId
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <MessageSquare className="h-5 w-5" />
-          Comentarios ({comments.length})
+          {t('social.comments')} ({comments.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -234,7 +234,7 @@ export function CommentsSection({ targetId, targetType = 'player', currentUserId
         {currentUserId && (
           <div className="flex gap-2">
             <Input
-              placeholder="Escribe un comentario..."
+              placeholder={t('social.writeComment')}
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && submitComment()}
@@ -253,7 +253,7 @@ export function CommentsSection({ targetId, targetType = 'player', currentUserId
           </div>
         ) : comments.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
-            No hay comentarios aún. ¡Sé el primero!
+            {t('social.noComments')}
           </p>
         ) : (
           <div className="space-y-3">
