@@ -28,10 +28,10 @@ class PostService(BaseService):
         featured: Optional[bool] = None,
         limit: int = 20
     ) -> List[Post]:
-        """Get posts publicados"""
+        """Get published posts"""
         results = await self.repository.get_published_posts(
             tipo=tipo,
-            destacado=destacado,
+            destacado=featured,
             limit=limit
         )
         return [Post(**r) for r in results]
