@@ -1,6 +1,6 @@
 /**
  * Super Pin Match
- * Pantalla de partido con marcador y registro de puntos
+ * Match screen with scoreboard and point recording
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -17,7 +17,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SuperPinMatch() {
   const { t } = useTranslation();
-  const { partidoId } = useParams();
+  const { matchId } = useParams();
   const navigate = useNavigate();
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,11 +25,11 @@ export default function SuperPinMatch() {
 
   useEffect(() => {
     fetchMatch();
-  }, [partidoId]);
+  }, [matchId]);
 
   const fetchMatch = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${partidoId}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${matchId}`);
       const data = await response.json();
       setMatch(data);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function SuperPinMatch() {
 
   const startMatch = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${partidoId}/start`, {
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${matchId}/start`, {
         method: 'POST'
       });
       if (response.ok) {
@@ -52,15 +52,15 @@ export default function SuperPinMatch() {
     }
   };
 
-  const recordPoint = async (jugador, stats = {}) => {
+  const recordPoint = async (player, stats = {}) => {
     if (recording) return;
     setRecording(true);
 
     try {
-      const params = new URLSearchParams({ jugador });
+      const params = new URLSearchParams({ player });
       if (stats.ace) params.append('ace', 'true');
 
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${partidoId}/point?${params}`, {
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/matches/${matchId}/point?${params}`, {
         method: 'POST'
       });
 
