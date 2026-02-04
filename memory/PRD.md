@@ -66,7 +66,7 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 - `/app/backend/modules/pinpanclub/services/superpin_service.py` - Complete rewrite with English field names ✅
 - `/app/backend/modules/pinpanclub/routes/superpin.py` - All API responses use English field names ✅
 
-#### Field Name Changes:
+#### Field Name Changes (Complete List):
 | Spanish Field       | English Field       |
 |--------------------|---------------------|
 | `jugador_id`       | `player_id`         |
