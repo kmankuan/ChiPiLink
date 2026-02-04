@@ -68,9 +68,9 @@ export default function SuperPinMatch() {
         const result = await response.json();
         setMatch(result.match);
 
-        if (result.partido_terminado) {
+        if (result.match_finished) {
           setTimeout(() => {
-            const winnerName = result.ganador_partido === 'a' ? match.player_a_info?.nombre : match.player_b_info?.nombre;
+            const winnerName = result.match_winner === 'a' ? match.player_a_info?.name : match.player_b_info?.name;
             alert(t('superpin.matches.matchFinished') + ' ' + t('superpin.matches.winner') + ': ' + winnerName);
           }, 500);
         }
@@ -98,19 +98,19 @@ export default function SuperPinMatch() {
     );
   }
 
-  const isFinished = match.estado === 'finalizado';
-  const isInProgress = match.estado === 'en_curso';
-  const isPending = match.estado === 'pendiente';
+  const isFinished = match.status === 'finished';
+  const isInProgress = match.status === 'in_progress';
+  const isPending = match.status === 'pending';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       {/* Header */}
       <div className="flex items-center justify-end mb-6">
         <Badge className={{
-          pendiente: 'bg-gray-600',
-          en_curso: 'bg-green-600',
-          finalizado: 'bg-blue-600'
-        }[match.estado]}>
+          pending: 'bg-gray-600',
+          in_progress: 'bg-green-600',
+          finished: 'bg-blue-600'
+        }[match.status]}>
           {isPending && t('superpin.matches.status.pending')}
           {isInProgress && '🔴 ' + t('superpin.matches.status.live')}
           {isFinished && '✅ ' + t('superpin.matches.status.finished')}
@@ -138,16 +138,16 @@ export default function SuperPinMatch() {
             <div className={`p-6 rounded-xl ${match.winner_id === match.player_a_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
-                  {match.player_a_info?.nombre?.[0] || 'A'}
+                  {match.player_a_info?.name?.[0] || 'A'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.player_a_info?.nombre || t('superpin.players.playerA')}</h3>
-                {match.player_a_info?.apodo && (
-                  <p className="text-gray-400">"{match.player_a_info.apodo}"</p>
+                <h3 className="text-xl font-bold text-white">{match.player_a_info?.name || t('superpin.players.playerA')}</h3>
+                {match.player_a_info?.nickname && (
+                  <p className="text-gray-400">"{match.player_a_info.nickname}"</p>
                 )}
               </div>
               <div className="text-center">
-                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
-                <p className="text-6xl font-bold text-white">{match.puntos_player_a}</p>
+                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.current_set}</p>
+                <p className="text-6xl font-bold text-white">{match.points_player_a}</p>
               </div>
               {isInProgress && (
                 <div className="mt-4 space-y-2">
