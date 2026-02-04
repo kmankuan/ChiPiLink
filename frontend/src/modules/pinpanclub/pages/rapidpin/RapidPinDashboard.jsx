@@ -254,9 +254,9 @@ export default function RapidPinDashboard() {
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{season.nombre}</CardTitle>
-                    <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(season.estado)}`}>
-                      {t(`rapidpin.seasons.status.${season.estado}`)}
+                    <CardTitle className="text-lg">{season.name}</CardTitle>
+                    <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(season.status)}`}>
+                      {t(`rapidpin.seasons.status.${season.status}`)}
                     </span>
                   </div>
                   {season.description && (
