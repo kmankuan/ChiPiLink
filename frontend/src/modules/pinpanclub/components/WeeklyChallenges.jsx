@@ -1,6 +1,6 @@
 /**
  * Weekly Challenges Component
- * Muestra retos semanales y progreso del jugador
+ * Shows weekly challenges and player progress
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,23 +18,26 @@ import { toast } from 'sonner';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const difficultyConfig = {
-  easy: { color: 'bg-green-500', label: 'Fácil', icon: '🟢' },
-  medium: { color: 'bg-yellow-500', label: 'Medio', icon: '🟡' },
-  hard: { color: 'bg-orange-500', label: 'Difícil', icon: '🟠' },
-  extreme: { color: 'bg-red-500', label: 'Extremo', icon: '🔴' }
+  easy: { color: 'bg-green-500', label: 'Easy', icon: '🟢' },
+  medium: { color: 'bg-yellow-500', label: 'Medium', icon: '🟡' },
+  hard: { color: 'bg-orange-500', label: 'Hard', icon: '🟠' },
+  extreme: { color: 'bg-red-500', label: 'Extreme', icon: '🔴' }
 };
 
-export default function WeeklyChallenges({ jugadorId }) {
+export default function WeeklyChallenges({ playerId, jugadorId }) {
   const { t } = useTranslation();
   const [weeklyChallenges, setWeeklyChallenges] = useState([]);
   const [playerChallenges, setPlayerChallenges] = useState([]);
   const [playerStats, setPlayerStats] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Support both new and legacy prop names
+  const playerIdToUse = playerId || jugadorId;
 
   useEffect(() => {
     fetchData();
-  }, [jugadorId]);
+  }, [playerIdToUse]);
 
   const fetchData = async () => {
     try {
@@ -46,8 +49,8 @@ export default function WeeklyChallenges({ jugadorId }) {
       }
 
       // Fetch player challenges if logged in
-      if (jugadorId) {
-        const playerRes = await fetch(`${API_URL}/api/pinpanclub/challenges/player/${jugadorId}`);
+      if (playerIdToUse) {
+        const playerRes = await fetch(`${API_URL}/api/pinpanclub/challenges/player/${playerIdToUse}`);
         if (playerRes.ok) {
           const data = await playerRes.json();
           setPlayerChallenges(data.challenges || []);
@@ -69,14 +72,14 @@ export default function WeeklyChallenges({ jugadorId }) {
   };
 
   const startChallenge = async (challengeId) => {
-    if (!jugadorId) {
-      toast.error('Debes iniciar sesión para participar');
+    if (!playerIdToUse) {
+      toast.error(t('challenges.loginRequired'));
       return;
     }
 
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/challenges/start/${challengeId}?jugador_id=${jugadorId}`,
+        `${API_URL}/api/pinpanclub/challenges/start/${challengeId}?player_id=${playerIdToUse}`,
         { method: 'POST' }
       );
 

@@ -1,6 +1,6 @@
 /**
- * RankingSeasons - Componentes para sistema de temporadas de ranking
- * Incluye: SeasonBanner, SeasonLeaderboard, SeasonRewardsPreview, PastSeasons
+ * RankingSeasons - Components for ranking seasons system
+ * Includes: SeasonBanner, SeasonLeaderboard, SeasonRewardsPreview, PastSeasons
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

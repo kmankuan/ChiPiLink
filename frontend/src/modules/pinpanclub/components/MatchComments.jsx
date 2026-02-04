@@ -1,6 +1,6 @@
 /**
- * MatchComments - Sistema de comentarios con moderación para partidos
- * Incluye alerta de reglas comunitarias y sistema de amonestaciones
+ * MatchComments - Comments system with moderation for matches
+ * Includes community rules alert and warning system
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,21 +24,21 @@ import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Reglas de la comunidad
+// Community rules
 const COMMUNITY_RULES = [
-  "Respeta a todos los miembros de la comunidad",
-  "No uses lenguaje obsceno o inapropiado",
-  "No transmitas malos valores o pensamientos negativos",
-  "No publiques comentarios que provoquen consecuencias negativas",
-  "Mantén un ambiente deportivo y positivo"
+  "Respect all community members",
+  "Do not use obscene or inappropriate language",
+  "Do not transmit bad values or negative thoughts",
+  "Do not post comments that cause negative consequences",
+  "Maintain a sporty and positive atmosphere"
 ];
 
 // Reaction types
 const reactionTypes = [
-  { type: 'clap', icon: '👏', label: 'Aplausos' },
-  { type: 'fire', icon: '🔥', label: 'Fuego' },
-  { type: 'trophy', icon: '🏆', label: 'Trofeo' },
-  { type: 'heart', icon: '❤️', label: 'Corazón' },
+  { type: 'clap', icon: '👏', label: 'Clap' },
+  { type: 'fire', icon: '🔥', label: 'Fire' },
+  { type: 'trophy', icon: '🏆', label: 'Trophy' },
+  { type: 'heart', icon: '❤️', label: 'Heart' },
   { type: 'wow', icon: '😮', label: 'Wow' }
 ];
 
