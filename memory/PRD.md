@@ -62,7 +62,7 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 
 #### Backend Files Fully Refactored:
 - `/app/backend/modules/pinpanclub/models/superpin.py` - All Spanish comments/docstrings translated to English ✅
-- `/app/backend/modules/pinpanclub/repositories/superpin_repository.py` - Full refactoring with English field names ✅
+- `/app/backend/modules/pinpanclub/repositories/superpin_repository.py` - Full refactoring with English field names, removed backward-compatibility fallbacks ✅
 - `/app/backend/modules/pinpanclub/services/superpin_service.py` - Complete rewrite with English field names ✅
 - `/app/backend/modules/pinpanclub/routes/superpin.py` - All API responses use English field names ✅
 
