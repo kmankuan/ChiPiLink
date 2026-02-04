@@ -108,12 +108,22 @@ class LaoPanOAuthService:
     
     async def validate_state(self, state: str) -> Optional[Dict]:
         """Validate and consume state token from database"""
+        logger.info(f"Validating OAuth state: {state}")
+        
         # Find and delete the state in one operation
         state_data = await db.oauth_states.find_one_and_delete({"state": state})
         
         if not state_data:
-            logger.warning(f"OAuth state not found: {state}")
+            # Try to find without deleting for debugging
+            existing = await db.oauth_states.find_one({"state": state})
+            logger.warning(f"OAuth state not found: {state}, exists in db: {existing is not None}")
+            
+            # List all states for debugging
+            all_states = await db.oauth_states.find({}, {"state": 1, "_id": 0}).to_list(10)
+            logger.warning(f"Available states: {[s.get('state') for s in all_states]}")
             return None
+        
+        logger.info(f"OAuth state found and deleted: {state}")
         
         # Check if state is not too old (10 minutes max)
         created = state_data.get("created_at")
@@ -121,6 +131,7 @@ class LaoPanOAuthService:
             if isinstance(created, str):
                 created = datetime.fromisoformat(created.replace('Z', '+00:00'))
             age = (datetime.now(timezone.utc) - created).total_seconds()
+            logger.info(f"OAuth state age: {age} seconds")
             if age > 600:  # 10 minutes
                 logger.warning(f"OAuth state expired: {state}")
                 return None
