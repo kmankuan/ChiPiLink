@@ -263,7 +263,7 @@ export function SeasonLeaderboard({ seasonId, limit = 10, showFull = false }) {
           <div className="space-y-2">
             {leaderboard.map((entry, idx) => (
               <div
-                key={entry.jugador_id}
+                key={entry.player_id}
                 className={`
                   flex items-center gap-3 p-3 rounded-xl transition-all
                   ${entry.position <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200' : 'hover:bg-gray-50'}
@@ -280,10 +280,10 @@ export function SeasonLeaderboard({ seasonId, limit = 10, showFull = false }) {
                 {/* Player Info */}
                 <div 
                   className="flex-1 cursor-pointer"
-                  onClick={() => navigate(`/pinpanclub/superpin/player/${entry.jugador_id}`)}
+                  onClick={() => navigate(`/pinpanclub/superpin/player/${entry.player_id}`)}
                 >
                   <p className="font-medium">
-                    {entry.jugador_info?.apodo || entry.jugador_info?.nombre || 'Jugador'}
+                    {entry.player_info?.nickname || entry.player_info?.name || 'Player'}
                   </p>
                   <p className="text-xs text-gray-500">
                     {entry.challenges_completed} {t('seasons.challenges')}
@@ -414,21 +414,21 @@ export function SeasonRewardsPreview({ seasonId }) {
 
 // ============== PLAYER SEASON CARD ==============
 
-export function PlayerSeasonCard({ jugadorId }) {
+export function PlayerSeasonCard({ playerId }) {
   const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    if (jugadorId) {
+    if (playerId) {
       fetchStats();
     }
-  }, [jugadorId]);
+  }, [playerId]);
   
   const fetchStats = async () => {
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/seasons/player/${jugadorId}/current`
+        `${API_URL}/api/pinpanclub/seasons/player/${playerId}/current`
       );
       if (response.ok) {
         const data = await response.json();
