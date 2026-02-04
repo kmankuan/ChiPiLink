@@ -78,21 +78,21 @@ export default function ArbiterPanel({
     setLoading(true);
     try {
       const response = await axios.post(
-        PINPANCLUB_API.matchPoint(partido_id),
-        { jugador, tipo: pointType }
+        PINPANCLUB_API.matchPoint(match_id || match.partido_id),
+        { player, type: pointType }
       );
       
       if (response.data.success) {
-        if (response.data.set_ganado) {
-          toast.success(`¡Set ganado por ${response.data.ganador_set === 'a' ? playerAName : playerBName}!`);
+        if (response.data.set_won) {
+          toast.success(`Set won by ${response.data.set_winner === 'a' ? playerAName : playerBName}!`);
         }
-        if (response.data.partido_terminado) {
-          toast.success(`🏆 ¡Partido ganado por ${response.data.ganador_partido === 'a' ? playerAName : playerBName}!`);
+        if (response.data.match_finished) {
+          toast.success(`🏆 Match won by ${response.data.match_winner === 'a' ? playerAName : playerBName}!`);
         }
         onMatchUpdate(response.data.match);
       }
     } catch (error) {
-      toast.error('Error al registrar punto');
+      toast.error('Error recording point');
       console.error(error);
     } finally {
       setLoading(false);
@@ -102,14 +102,14 @@ export default function ArbiterPanel({
   const handleUndo = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(PINPANCLUB_API.matchUndo(partido_id));
+      const response = await axios.post(PINPANCLUB_API.matchUndo(match_id || match.partido_id));
       
       if (response.data.success) {
-        toast.info('Punto deshecho');
+        toast.info('Point undone');
         onMatchUpdate(response.data.match);
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al deshacer');
+      toast.error(error.response?.data?.detail || 'Error undoing');
     } finally {
       setLoading(false);
     }
@@ -118,16 +118,16 @@ export default function ArbiterPanel({
   const handleStartMatch = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(PINPANCLUB_API.matchStart(partido_id));
+      const response = await axios.post(PINPANCLUB_API.matchStart(match_id || match.partido_id));
       
       if (response.data.success) {
-        toast.success('¡Partido iniciado!');
+        toast.success('Match started!');
         // Refresh match data
-        const matchResponse = await axios.get(PINPANCLUB_API.matchById(partido_id));
+        const matchResponse = await axios.get(PINPANCLUB_API.matchById(match_id || match.partido_id));
         onMatchUpdate(matchResponse.data);
       }
     } catch (error) {
-      toast.error('Error al iniciar partido');
+      toast.error('Error starting match');
     } finally {
       setLoading(false);
     }
@@ -136,16 +136,16 @@ export default function ArbiterPanel({
   const handlePauseMatch = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(PINPANCLUB_API.matchPause(partido_id));
+      const response = await axios.post(PINPANCLUB_API.matchPause(match_id || match.partido_id));
       
       if (response.data.success) {
-        toast.info('Partido pausado');
+        toast.info('Match paused');
         // Refresh match data
-        const matchResponse = await axios.get(PINPANCLUB_API.matchById(partido_id));
+        const matchResponse = await axios.get(PINPANCLUB_API.matchById(match_id || match.partido_id));
         onMatchUpdate(matchResponse.data);
       }
     } catch (error) {
-      toast.error('Error al pausar partido');
+      toast.error('Error pausing match');
     } finally {
       setLoading(false);
     }
