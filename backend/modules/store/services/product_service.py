@@ -58,8 +58,8 @@ class ProductService(BaseService):
         """Get active products"""
         results = await self.repository.get_all_active(
             category=category,
-            grado=grade,
-            materia=subject,
+            grade=grade,
+            subject=subject,
             skip=skip,
             limit=limit
         )
