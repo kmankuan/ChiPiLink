@@ -642,10 +642,10 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         <div className="space-y-4">
           <h3 className="font-semibold flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Mis Estudiantes ({catalogoPrivadoAcceso.estudiantes.length})
+            Mis Estudiantes ({catalogoPrivadoAcceso.students || catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes.length})
           </h3>
           
-          {catalogoPrivadoAcceso.estudiantes.map((student) => {
+          {catalogoPrivadoAcceso.students || catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes.map((student) => {
             const orderStatus = getStudentOrderStatus(student.student_id || student.sync_id);
             
             return (
@@ -1102,9 +1102,9 @@ export default function Unatienda() {
                 >
                   <GraduationCap className="h-4 w-4" />
                   Compra Exclusiva
-                  {catalogoPrivadoAcceso?.tiene_acceso && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
+                  {catalogoPrivadoAcceso?.has_access && catalogoPrivadoAcceso?.estudiantes?.length > 0 && (
                     <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs">
-                      {catalogoPrivadoAcceso.estudiantes.length}
+                      {catalogoPrivadoAcceso.students || catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes.length}
                     </Badge>
                   )}
                 </Button>
