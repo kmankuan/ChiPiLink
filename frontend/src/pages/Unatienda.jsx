@@ -639,14 +639,14 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       </div>
 
       {/* Students List */}
-      {catalogoPrivadoAcceso?.estudiantes?.length > 0 ? (
+      {(catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes)?.length > 0 ? (
         <div className="space-y-4">
           <h3 className="font-semibold flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Mis Estudiantes ({catalogoPrivadoAcceso.students || catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes.length})
+            Mis Estudiantes ({(catalogoPrivadoAcceso.students || catalogoPrivadoAcceso.estudiantes).length})
           </h3>
           
-          {catalogoPrivadoAcceso.students || catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes.map((student) => {
+          {(catalogoPrivadoAcceso.students || catalogoPrivadoAcceso.estudiantes).map((student) => {
             const orderStatus = getStudentOrderStatus(student.student_id || student.sync_id);
             
             return (
