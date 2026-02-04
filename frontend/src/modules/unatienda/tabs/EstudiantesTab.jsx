@@ -143,12 +143,12 @@ export default function EstudiantesTab({ token }) {
                 <TableBody>
                   {filteredStudents.map((e) => (
                     <TableRow key={e.sync_id}>
-                      <TableCell className="font-mono">{e.numero_estudiante || e.student_number}</TableCell>
-                      <TableCell className="font-medium">{e.nombre_completo || e.full_name}</TableCell>
+                      <TableCell className="font-mono">{e.student_number}</TableCell>
+                      <TableCell className="font-medium">{e.full_name}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{e.grade || e.grade}</Badge>
+                        <Badge variant="secondary">{e.grade}</Badge>
                       </TableCell>
-                      <TableCell>{e.seccion || e.section || '-'}</TableCell>
+                      <TableCell>{e.section || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={e.has_access ? 'default' : 'outline'}>
                           {e.has_access ? 'With Access' : 'No Access'}
