@@ -320,16 +320,16 @@ export default function PingPongMobileArbiter() {
           </div>
           <div className="text-3xl text-white/40">:</div>
           <div className="text-center">
-            <div className={`text-7xl font-black ${match.saque === 'b' ? 'text-yellow-400' : 'text-white'}`}>
-              {match.puntos_player_b}
+            <div className={`text-7xl font-black ${match.serve === 'b' ? 'text-yellow-400' : 'text-white'}`}>
+              {match.points_player_b}
             </div>
-            {match.saque === 'b' && <div className="text-yellow-400 text-xs mt-1">● SAQUE</div>}
+            {match.serve === 'b' && <div className="text-yellow-400 text-xs mt-1">● SERVE</div>}
           </div>
         </div>
 
         {/* Set Info */}
         <div className="text-center mt-2 text-white/60 text-sm">
-          Set {match.set_actual} • {match.tipo_partido.replace('_', ' ')}
+          Set {match.current_set} • {match.match_type.replace('_', ' ')}
         </div>
       </div>
 
@@ -345,15 +345,15 @@ export default function PingPongMobileArbiter() {
               : 'bg-gray-700 opacity-50'
           }`}
         >
-          {playerA.foto_url ? (
-            <img src={playerA.foto_url} className="w-20 h-20 rounded-full mb-3 border-4 border-white/30" alt="" />
+          {playerA.photo_url ? (
+            <img src={playerA.photo_url} className="w-20 h-20 rounded-full mb-3 border-4 border-white/30" alt="" />
           ) : (
             <div className="w-20 h-20 rounded-full mb-3 bg-white/20 flex items-center justify-center text-4xl font-bold">
-              {playerA.nombre?.[0] || 'A'}
+              {playerA.name?.[0] || 'A'}
             </div>
           )}
-          <div className="text-2xl font-bold">{playerA.apodo || playerA.nombre || 'Jugador A'}</div>
-          <div className="text-white/60 mt-1">Toca para anotar punto</div>
+          <div className="text-2xl font-bold">{playerA.nickname || playerA.name || 'Player A'}</div>
+          <div className="text-white/60 mt-1">Tap to score point</div>
           <ChevronUp className="w-8 h-8 mt-2 animate-bounce" />
         </button>
 
@@ -368,13 +368,13 @@ export default function PingPongMobileArbiter() {
           }`}
         >
           <ChevronDown className="w-8 h-8 mb-2 animate-bounce" />
-          <div className="text-white/60 mb-1">Toca para anotar punto</div>
-          <div className="text-2xl font-bold">{playerB.apodo || playerB.nombre || 'Jugador B'}</div>
-          {playerB.foto_url ? (
-            <img src={playerB.foto_url} className="w-20 h-20 rounded-full mt-3 border-4 border-white/30" alt="" />
+          <div className="text-white/60 mb-1">Tap to score point</div>
+          <div className="text-2xl font-bold">{playerB.nickname || playerB.name || 'Player B'}</div>
+          {playerB.photo_url ? (
+            <img src={playerB.photo_url} className="w-20 h-20 rounded-full mt-3 border-4 border-white/30" alt="" />
           ) : (
             <div className="w-20 h-20 rounded-full mt-3 bg-white/20 flex items-center justify-center text-4xl font-bold">
-              {playerB.nombre?.[0] || 'B'}
+              {playerB.name?.[0] || 'B'}
             </div>
           )}
         </button>
@@ -392,7 +392,7 @@ export default function PingPongMobileArbiter() {
               <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
                 <Play className="w-7 h-7" />
               </div>
-              <span className="text-xs">Iniciar</span>
+              <span className="text-xs">Start</span>
             </button>
           ) : isLive ? (
             <button
