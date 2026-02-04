@@ -104,7 +104,7 @@ export default function EstudiantesTab({ token }) {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {[...new Set(students.map(e => e.grade || e.grade).filter(Boolean))].length}
+              {[...new Set(students.map(e => e.grade).filter(Boolean))].length}
             </div>
             <p className="text-xs text-muted-foreground">Grades</p>
           </CardContent>
