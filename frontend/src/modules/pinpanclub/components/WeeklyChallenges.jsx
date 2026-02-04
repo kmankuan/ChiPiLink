@@ -277,19 +277,19 @@ export default function WeeklyChallenges({ playerId }) {
         <TabsContent value="leaderboard">
           <Card>
             <CardHeader>
-              <CardTitle>Top Retadores</CardTitle>
-              <CardDescription>Jugadores con más puntos en retos</CardDescription>
+              <CardTitle>Top Challengers</CardTitle>
+              <CardDescription>Players with most challenge points</CardDescription>
             </CardHeader>
             <CardContent>
               {leaderboard.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  Aún no hay participantes
+                  No participants yet
                 </p>
               ) : (
                 <div className="space-y-2">
                   {leaderboard.map((entry, idx) => (
                     <div 
-                      key={entry.jugador_id}
+                      key={entry.player_id}
                       className={`flex items-center justify-between p-3 rounded-lg ${
                         idx < 3 ? 'bg-yellow-50' : 'bg-gray-50'
                       }`}
@@ -299,12 +299,12 @@ export default function WeeklyChallenges({ playerId }) {
                           {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`}
                         </span>
                         <span className="font-medium">
-                          {entry.jugador_info?.apodo || entry.jugador_info?.nombre || 'Jugador'}
+                          {entry.player_info?.nickname || entry.player_info?.name || 'Player'}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <span className="text-purple-500 font-bold">
-                          {entry.challenges_completed} retos
+                          {entry.challenges_completed} challenges
                         </span>
                         <span className="text-yellow-500 font-bold">
                           {entry.total_points} pts

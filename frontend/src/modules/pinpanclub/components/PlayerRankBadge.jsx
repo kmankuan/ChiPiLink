@@ -388,18 +388,15 @@ export function PlayerRankIcon({ points }) {
 }
 
 // Rank progress card for dashboard
-export function RankProgressCard({ playerId, jugadorId }) {
+export function RankProgressCard({ playerId }) {
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Support both new and legacy prop names
-  const playerIdToUse = playerId || jugadorId;
-  
   useEffect(() => {
-    if (playerIdToUse) {
+    if (playerId) {
       fetchRankData();
     }
-  }, [playerIdToUse]);
+  }, [playerId]);
   
   const fetchRankData = async () => {
     try {
@@ -408,7 +405,7 @@ export function RankProgressCard({ playerId, jugadorId }) {
       // Try direct rank endpoint first
       try {
         const directResponse = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/player/${playerIdToUse}/rank`
+          `${API_URL}/api/pinpanclub/challenges/player/${playerId}/rank`
         );
         if (directResponse.ok) {
           const directData = await directResponse.json();
@@ -423,12 +420,12 @@ export function RankProgressCard({ playerId, jugadorId }) {
       // Fallback to leaderboard
       if (totalPoints === 0) {
         const response = await fetch(
-          `${API_URL}/api/pinpanclub/challenges/leaderboard?player_id=${playerIdToUse}`
+          `${API_URL}/api/pinpanclub/challenges/leaderboard?player_id=${playerId}`
         );
         
         if (response.ok) {
           const data = await response.json();
-          const playerEntry = data.leaderboard?.find(e => e.player_id === playerIdToUse);
+          const playerEntry = data.leaderboard?.find(e => e.player_id === playerId);
           totalPoints = playerEntry?.total_points || 0;
         }
       }
