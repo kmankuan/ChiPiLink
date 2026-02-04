@@ -114,22 +114,19 @@ export function FollowButton({ currentUserId, targetUserId, onFollowChange }) {
 
 // ============== FOLLOW STATS ==============
 
-export function FollowStats({ playerId, jugadorId }) {
+export function FollowStats({ playerId }) {
   const { t } = useTranslation();
   const [stats, setStats] = useState({ followers_count: 0, following_count: 0 });
-  
-  // Support both new and legacy prop names
-  const playerIdToUse = playerId || jugadorId;
 
   useEffect(() => {
-    if (playerIdToUse) {
+    if (playerId) {
       fetchStats();
     }
-  }, [playerIdToUse]);
+  }, [playerId]);
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${playerIdToUse}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/social/follow-stats/${playerId}`);
       if (response.ok) {
         const data = await response.json();
         setStats(data);

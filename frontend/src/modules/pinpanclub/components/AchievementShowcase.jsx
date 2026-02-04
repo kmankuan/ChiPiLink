@@ -133,23 +133,20 @@ function AchievementBadge({ achievement, index, showNew = false }) {
 }
 
 // Main showcase component
-export default function AchievementShowcase({ playerId, jugadorId, maxDisplay = 5, showTitle = true }) {
+export default function AchievementShowcase({ playerId, maxDisplay = 5, showTitle = true }) {
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCelebration, setShowCelebration] = useState(false);
   
-  // Support both new and legacy prop names
-  const playerIdToUse = playerId || jugadorId;
-  
   useEffect(() => {
-    if (playerIdToUse) {
+    if (playerId) {
       fetchAchievements();
     }
-  }, [playerIdToUse]);
+  }, [playerId]);
   
   const fetchAchievements = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/achievements/player/${playerIdToUse}`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/achievements/player/${playerId}`);
       if (response.ok) {
         const data = await response.json();
         setAchievements(data.achievements || []);
