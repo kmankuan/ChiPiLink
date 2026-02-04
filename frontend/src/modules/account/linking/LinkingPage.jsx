@@ -688,7 +688,7 @@ export default function LinkingPage({ embedded = false, onStudentLinked = null }
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-semibold">{student.full_name || student.nombre}</h4>
+                              <h4 className="font-semibold">{student.full_name}</h4>
                               {getStatusBadge(student)}
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
