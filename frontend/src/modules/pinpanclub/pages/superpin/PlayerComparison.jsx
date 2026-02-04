@@ -206,9 +206,9 @@ export default function PlayerComparison() {
                   className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-full"
                 >
                   <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {player.nombre?.[0]}
+                    {player.name?.[0]}
                   </div>
-                  <span className="font-medium">{player.nombre}</span>
+                  <span className="font-medium">{player.name}</span>
                   {player.apodo && <span className="text-gray-500 text-sm">"{player.apodo}"</span>}
                   <button
                     onClick={() => removePlayer(player.jugador_id)}
@@ -253,10 +253,10 @@ export default function PlayerComparison() {
                             className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 text-left"
                           >
                             <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold">
-                              {player.nombre?.[0]}
+                              {player.name?.[0]}
                             </div>
                             <div>
-                              <p className="font-medium">{player.nombre}</p>
+                              <p className="font-medium">{player.name}</p>
                               {player.apodo && <p className="text-sm text-gray-500">"{player.apodo}"</p>}
                             </div>
                           </button>
@@ -294,9 +294,9 @@ export default function PlayerComparison() {
                         >
                           <div className="flex flex-col items-center gap-1">
                             <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                              {player.nombre?.[0]}
+                              {player.name?.[0]}
                             </div>
-                            <span className="font-medium">{player.nombre}</span>
+                            <span className="font-medium">{player.name}</span>
                             {player.apodo && (
                               <span className="text-xs text-gray-400">"{player.apodo}"</span>
                             )}

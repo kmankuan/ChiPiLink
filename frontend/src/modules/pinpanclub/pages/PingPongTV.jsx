@@ -604,7 +604,7 @@ export default function PingPongTV() {
                   </span>
                   <div className="flex-1">
                     <div className="font-semibold text-white">
-                      {player.apodo || player.nombre}
+                      {player.apodo || player.name}
                     </div>
                     <div className="text-xs text-white/60">
                       {player.partidos_ganados}W - {player.partidos_perdidos}L

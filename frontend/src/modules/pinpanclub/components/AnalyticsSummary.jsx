@@ -83,7 +83,7 @@ export default function AnalyticsSummary() {
                 variant="outline" 
                 className="border-white/20 text-white/80"
               >
-                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'} {player.nombre} ({player.matches})
+                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'} {player.name} ({player.matches})
               </Badge>
             ))}
           </div>

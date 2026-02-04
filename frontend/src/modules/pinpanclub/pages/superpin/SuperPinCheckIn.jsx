@@ -245,7 +245,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                   <option value="">{t('superpin.players.selectPlayer')}</option>
                   {playersNotCheckedIn.map((player) => (
                     <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                      {player.name} {player.apodo ? `"${player.apodo}"` : ''}
                     </option>
                   ))}
                 </select>
@@ -282,7 +282,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                     <option value="">{t('superpin.checkin.selectForQr')}</option>
                     {playersNotCheckedIn.map((player) => (
                       <option key={player.jugador_id} value={player.jugador_id}>
-                        {player.nombre}
+                        {player.name}
                       </option>
                     ))}
                   </select>
@@ -328,7 +328,7 @@ export default function SuperPinCheckIn({ ligaId, leagueConfig, onCheckInComplet
                   <option value="">{t('superpin.players.selectPlayer')}</option>
                   {playersNotCheckedIn.map((player) => (
                     <option key={player.jugador_id} value={player.jugador_id}>
-                      {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                      {player.name} {player.apodo ? `"${player.apodo}"` : ''}
                     </option>
                   ))}
                 </select>

@@ -467,7 +467,7 @@ export default function SuperPinLeagueDetail() {
                       <option value="">{t('superpin.players.selectPlayer')}</option>
                       {availablePlayers.map((player) => (
                         <option key={player.jugador_id} value={player.jugador_id}>
-                          {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                          {player.name} {player.apodo ? `"${player.apodo}"` : ''}
                         </option>
                       ))}
                     </select>
@@ -482,7 +482,7 @@ export default function SuperPinLeagueDetail() {
                       <option value="">{t('superpin.players.selectPlayer')}</option>
                       {availablePlayers.filter(p => p.jugador_id !== newMatch.player_a_id).map((player) => (
                         <option key={player.jugador_id} value={player.jugador_id}>
-                          {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
+                          {player.name} {player.apodo ? `"${player.apodo}"` : ''}
                         </option>
                       ))}
                     </select>
@@ -562,7 +562,7 @@ export default function SuperPinLeagueDetail() {
                         return (
                           <div key={player.id || idx} className="flex items-center justify-between p-3 border rounded-lg">
                             <div>
-                              <p className="font-medium">{player.nombre || player.name}</p>
+                              <p className="font-medium">{player.name || player.name}</p>
                               {player.email && <p className="text-sm text-gray-500">{player.email}</p>}
                             </div>
                             {isAlreadyPlayer ? (

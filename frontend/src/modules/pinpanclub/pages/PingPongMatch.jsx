@@ -117,7 +117,7 @@ export default function PingPongMatch() {
                           value={player.jugador_id}
                           disabled={player.jugador_id === formData.player_b_id}
                         >
-                          {player.apodo || player.nombre} {player.apellido} (ELO: {player.elo_rating})
+                          {player.apodo || player.name} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -140,7 +140,7 @@ export default function PingPongMatch() {
                           value={player.jugador_id}
                           disabled={player.jugador_id === formData.player_a_id}
                         >
-                          {player.apodo || player.nombre} {player.apellido} (ELO: {player.elo_rating})
+                          {player.apodo || player.name} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>
                       ))}
                     </SelectContent>

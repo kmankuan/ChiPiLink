@@ -599,7 +599,7 @@ export default function PingPongDashboard() {
                         {player.foto_url ? (
                           <img 
                             src={player.foto_url} 
-                            alt={player.nombre}
+                            alt={player.name}
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
@@ -609,7 +609,7 @@ export default function PingPongDashboard() {
                         )}
                         <div>
                           <div className="font-semibold">
-                            {player.apodo || player.nombre} {player.apellido}
+                            {player.apodo || player.name} {player.apellido}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {player.partidos_ganados}V - {player.partidos_perdidos}D

@@ -387,7 +387,7 @@ function TopPlayersList({ players }) {
               #{idx + 1}
             </span>
             <span className="text-white font-medium">
-              {player.apodo || player.nombre || 'Jugador'}
+              {player.apodo || player.name || 'Jugador'}
             </span>
           </div>
           <Badge variant="outline" className="border-indigo-500 text-indigo-300">
@@ -432,7 +432,7 @@ function ActivityRanking({ players }) {
                 {idx + 1}
               </span>
               <div>
-                <p className="text-white font-medium">{player.apodo || player.nombre}</p>
+                <p className="text-white font-medium">{player.apodo || player.name}</p>
                 <p className="text-white/60 text-xs">ELO: {player.elo_rating || 1000}</p>
               </div>
             </div>
@@ -459,7 +459,7 @@ function NewPlayersList({ players }) {
               <Users className="w-4 h-4 text-green-400" />
             </div>
             <div>
-              <p className="text-white text-sm">{player.nombre}</p>
+              <p className="text-white text-sm">{player.name}</p>
               <p className="text-white/60 text-xs">Nuevo</p>
             </div>
           </div>
