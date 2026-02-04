@@ -1,1356 +1,186 @@
 <analysis>**original_problem_statement:**
-The user's initial goal was to build a super app. The session's primary mandate became a proactive, complete refactoring of the entire codebase (backend and frontend) to be 100% in English. This includes all code comments, variables, filenames, and API responses. The user also approved an enhancement to persist the chosen language to the user's profile.
+The user's initial goal was to build a super app. The session's mandate evolved into a proactive, multi-stage refactoring of the entire codebase (backend and frontend) to be 100% in English. This included all code comments, variables, filenames, API responses, database field names, and collection names.
 
-Throughout the session, the user has consistently prioritized this P0 refactoring task over fixing long-standing bugs. The last instruction was to continue translating all remaining Spanish comments in the codebase.
+During the session, the user also requested several features and bug fixes:
+1.  Support for multiple, comma-separated grades in the Private Catalog inventory CSV upload.
+2.  A fix for the broken LaoPan.online OAuth 2.0 login flow, which was failing intermittently.
+3.  An investigation into a 115 PCA students statistic on the Unatienda dashboard.
+4.  A fix for the Link Student functionality, which was not working after the initial refactoring.
+5.  A strict mandate to remove all Spanish compatibility fallbacks and enforce a pure English-only nomenclature across the entire application.
 
 **User's preferred language**: Spanish (User provides instructions in Spanish, but has explicitly mandated that the agent MUST communicate, code, and comment exclusively in English.)
 
 **what currently exists?**
-The application is a full-stack system (React, FastAPI, MongoDB). An extensive Spanish-to-English refactoring is approximately 95% complete.
-- **Frontend i18n Refactoring (Complete):** All frontend components have been migrated from using hardcoded Spanish strings and local  objects to the centralized  system. A bug found by the testing agent related to missing translations was also fixed.
-- **Backend Refactoring (In Progress):**
-  - **File Renaming:** Spanish-named files within the  module (e.g., , ) have been renamed to English (, ).
-  - **API Route Refactoring:** The corresponding API endpoint was updated from  to , and all frontend calls were updated accordingly.
-  - **Comment Translation:** A massive, systematic effort has translated the majority of Spanish comments and docstrings in the backend codebase, reducing the remaining count by over 60%.
+The application is a full-stack system (React, FastAPI, MongoDB) that has undergone extensive, multi-layered refactoring to convert it from Spanish to English.
+
+-   **Code Refactoring:** All Spanish comments, docstrings, and most filenames/variables have been translated to English.
+-   **Database Refactoring:** A comprehensive refactoring was performed to rename database collections (e.g.,  -> ) and field names (e.g.,  -> ,  -> ) to English across the entire codebase.
+-   **Inventory Import Feature:** The inventory import system () was updated to correctly parse and store multiple comma-separated grades into a  array and write to the correct  collection.
+-   **LaoPan OAuth 2.0 Flow:** The OAuth flow has been completely fixed. The fix included:
+    1.  Implementing dynamic, environment-aware  generation based on the request origin.
+    2.  Migrating OAuth state storage from volatile in-memory storage to a persistent MongoDB collection () to survive server restarts and work in multi-instance environments.
+    3.  Adding a Sign Up link to the login page for better user experience and internationalizing all related text.
+-   **Link Student Functionality:** This feature was fixed by updating the frontend () to use the new English data contract (e.g., , ) returned by the backend APIs.
 
 **Last working item**:
-- **Last item agent was working:** The agent was executing the user's explicit instruction to translate all remaining inline Spanish comments in the backend. This was being done via a methodical process of using  to find Spanish patterns and then using  (with ) to translate them in large batches across the entire backend directory.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** Y (The agent periodically ran , checked for import errors, restarted the backend service, and checked its health status to ensure the batch comment changes did not introduce syntax errors.)
-- **Which testing method agent to use?** backend testing agent (Once the translations are complete, run the backend agent to ensure no regressions were introduced. A simple health check might not catch subtle bugs.)
-- **User Testing Done:** N
+-   **Last item agent was working:** The agent was executing the user's final, strict instruction to perform a comprehensive cleanup, removing any remaining Spanish-named variables and compatibility fallbacks (e.g., ). The agent had identified numerous Spanish fields in the  module (e.g., , ) and was in the process of refactoring them in both the backend and frontend.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** both (A full-stack test using the testing agent is crucial after this massive, cross-cutting refactoring is complete).
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Complete Spanish-to-English Refactoring (P0)**
-  - **Description:** This is the highest priority task. It involves translating the remaining Spanish comments and renaming any remaining Spanish files and variables.
-  - **Status:** IN PROGRESS
-- **Issue 2: Admin Sidebar Modules Disappear (P1)**
-  - **Description:** A recurring critical bug where the admin sidebar modules vanish after login, blocking all admin functions.
-  - **Status:** NOT STARTED
-  - **Is recurring issue?** Y
-- **Issue 3: Google Sign-Up Flow is Broken (P2)**
-  - **Description:** The Continue with Google feature is stuck in an infinite loop. This has been a known issue for multiple sessions.
-  - **Status:** NOT STARTED
-  - **Is recurring issue?** Y
-- **Issue 4: Persistent Development Script Error (P3)**
-  - **Description**: A recurring runtime error from an external script () overlays the UI.
-  - **Status:** NOT STARTED
-  - **Is recurring issue?** Y
+-   **Issue 1: Finalize English-Only Refactoring (P0)**
+    -   **Description:** This is the highest priority task. It involves removing all remaining Spanish variables and compatibility fallbacks from the codebase, particularly within the  module and any other missed areas.
+    -   **Status:** IN PROGRESS
+-   **Issue 2: Admin Sidebar Modules Disappear (P1)**
+    -   **Description:** A recurring critical bug where the admin sidebar modules vanish after login, blocking all admin functions.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+-   **Issue 3: Google Sign-Up Flow is Broken (P2)**
+    -   **Description:** The Continue with Google feature is stuck in an infinite loop. This has been a known issue for multiple sessions.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+-   **Issue 4: Persistent Development Script Error (P3)**
+    -   **Description**: A recurring runtime error from an external script () overlays the UI.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
 
 **In progress Task List**:
-- **Task 1: Finalize Backend Spanish Comment Translation (P0)**
-  - **Where to resume:** Continue the batch translation process. The last check showed approximately 317 instances of Spanish characters remaining in comments. The next step is to run /app/backend/core/base/repository.py:Cada módulo tendrá su propio repository que hereda de esta clase base
-/app/backend/core/base/repository.py:    - Migración a diferentes bases de datos
-/app/backend/core/base/repository.py:    - Separación en microservicios
-/app/backend/core/base/repository.py:    Cada módulo implementa su propio repository heredando de esta clase.
-/app/backend/core/base/repository.py:        """Buscar múltiples documentos"""
-/app/backend/core/base/repository.py:        """Ejecutar pipeline de agregación"""
-/app/backend/core/base/service.py:Base Service - Capa de lógica de negocio
-/app/backend/core/base/service.py:Cada módulo tendrá sus propios servicios que heredan de esta clase base
-/app/backend/core/base/service.py:    Características:
-/app/backend/core/base/service.py:    Cada módulo implementa sus servicios heredando de esta clase.
-/app/backend/core/base/service.py:    MODULE_NAME: str = "base"  # Override en cada módulo
-/app/backend/core/base/service.py:        """Log info con contexto del módulo"""
-/app/backend/core/base/service.py:        """Log error con contexto del módulo"""
-/app/backend/core/base/service.py:        """Log warning con contexto del módulo"""
-/app/backend/core/database.py:                    "subtitulo": "Tu comunidad china en Panamá, conectada",
-/app/backend/core/database.py:                    "descripcion": "La super app que conecta a la comunidad china en Panamá con servicios, comercio y entretenimiento.",
-/app/backend/core/database.py:            "titulo": "Página Principal",
-/app/backend/core/events/event_bus.py:Event Bus - Sistema de eventos interno para comunicación entre módulos
-/app/backend/core/events/event_bus.py:    Event Bus interno para comunicación entre módulos.
-/app/backend/core/events/event_bus.py:    Características:
-/app/backend/core/events/event_bus.py:    - Pub/Sub asíncrono
-/app/backend/core/events/event_bus.py:        """Suscribir un handler programáticamente"""
-/app/backend/core/events/event_bus.py:        Los handlers se ejecutan de forma asíncrona.
-/app/backend/core/events/event_bus.py:        # Ejecutar handlers de forma asíncrona
-/app/backend/core/events/event_bus.py:        """Publicar evento de forma síncrona (para usar fuera de contexto async)"""
-/app/backend/core/events/event_bus.py:        """Verificar si un evento coincide con un patrón (soporta wildcards)"""
-/app/backend/core/events/event_bus.py:    """Tipos de eventos del módulo PinpanClub"""
-/app/backend/core/events/event_bus.py:    """Tipos de eventos del módulo Store"""
-/app/backend/core/events/event_bus.py:    """Tipos de eventos del módulo Auth"""
-/app/backend/core/events/event_bus.py:    """Tipos de eventos del módulo Community"""
-/app/backend/tests/test_laopan_oauth.py:            assert data["button_text_es"] == "Iniciar sesión con LaoPan"
-/app/backend/scripts/db_manager.py:Scripts para gestión y migración de la base de datos por módulo
-/app/backend/scripts/generate_unatienda_demo.py:MATERIAS_PRIMARIA = ["Español", "Matemáticas", "Ciencias Naturales", "Ciencias Sociales", "Inglés", "Religión"]
-/app/backend/scripts/generate_unatienda_demo.py:MATERIAS_SECUNDARIA = ["Español", "Matemáticas", "Física", "Química", "Biología", "Historia", "Geografía", "Inglés", "Religión", "Tecnología"]
-/app/backend/scripts/generate_unatienda_demo.py:# Nombres panameños de ejemplo
-/app/backend/scripts/generate_unatienda_demo.py:NOMBRES = ["María", "José", "Ana", "Carlos", "Sofía", "Miguel", "Isabella", "David", "Valentina", "Daniel", 
-/app/backend/scripts/generate_unatienda_demo.py:           "Camila", "Andrés", "Lucía", "Juan", "Emma", "Diego", "Gabriela", "Sebastián", "Victoria", "Alejandro"]
-/app/backend/scripts/generate_unatienda_demo.py:APELLIDOS = ["González", "Rodríguez", "Martínez", "López", "García", "Hernández", "Pérez", "Sánchez", "Ramírez", "Torres",
-/app/backend/scripts/generate_unatienda_demo.py:             "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Ortega", "Vargas", "Castro", "Jiménez"]
-/app/backend/scripts/generate_unatienda_demo.py:        return ["Apresto", "Inglés"]
-/app/backend/scripts/generate_unatienda_demo.py:                "descripcion": f"Libro de texto de {materia} para {grado} grado. Editorial {editorial}. Año escolar 2025-2026.",
-/app/backend/scripts/generate_unatienda_demo.py:    print("\n📚 Generando catálogo de libros...")
-/app/backend/scripts/migrate_collections.py:Migra las colecciones a nombres con prefijo de módulo.
-/app/backend/routes/pingpong_monday.py:    """Configuración de Monday.com para Ping Pong"""
-/app/backend/routes/pingpong_monday.py:    """Resultado de sincronización"""
-/app/backend/routes/pingpong_monday.py:    """Obtener configuración de Monday.com para Ping Pong"""
-/app/backend/routes/pingpong_monday.py:    """Guardar configuración de Monday.com para Ping Pong"""
-/app/backend/routes/pingpong_monday.py:            raise HTTPException(status_code=500, detail=f"Error de conexión: {str(e)}")
-/app/backend/routes/pingpong_monday.py:    """Crear un ítem en Monday.com"""
-/app/backend/routes/pingpong_monday.py:    """Actualizar un ítem en Monday.com"""
-/app/backend/routes/pingpong_monday.py:    """Obtener configuración de integración Monday.com para Ping Pong"""
-/app/backend/routes/pingpong_monday.py:    """Actualizar configuración de integración"""
-/app/backend/routes/pingpong_monday.py:    return {"success": True, "message": "Configuración guardada"}
-/app/backend/routes/pingpong_monday.py:    """Obtener estructura detallada de un tablero específico"""
-/app/backend/routes/pingpong_monday.py:            # Verificar si ya está sincronizado
-/app/backend/routes/pingpong_monday.py:            # Crear ítem en Monday.com
-/app/backend/routes/pingpong_monday.py:    """Sincronizar un partido específico a Monday.com"""
-/app/backend/routes/pingpong_monday.py:    # Obtener información de jugadores
-/app/backend/routes/pingpong_monday.py:    # Preparar nombre del ítem
-/app/backend/routes/pingpong_monday.py:            # Actualizar ítem existente
-/app/backend/routes/pingpong_monday.py:            # Crear nuevo ítem
-/app/backend/routes/pingpong_monday.py:    """Obtener estado de la integración"""
-/app/backend/routes/pingpong_monday.py:    # Verificar conexión
-/app/backend/routes/pingpong_monday.py:    """Probar conexión con Monday.com"""
-/app/backend/routes/pingpong_monday.py:    """Obtener estadísticas de sincronización"""
-/app/backend/routes/platform_store.py:        raise HTTPException(status_code=400, detail="Yappy no está configurado para la tienda de la plataforma")
-/app/backend/routes/platform_store.py:        raise HTTPException(status_code=400, detail="Yappy no está configurado")
-/app/backend/routes/platform_store.py:        raise HTTPException(status_code=400, detail="Yappy no está configurado. Configure las credenciales primero.")
-/app/backend/routes/platform_store.py:            "message": "Conexión con Yappy exitosa",
-/app/backend/routes/platform_store.py:    raise HTTPException(status_code=400, detail=f"Error de conexión: {result.get('error')}")
-/app/backend/services/yappy_service.py:            "R": "Rechazado - El cliente no confirmó el pago",
-/app/backend/services/yappy_service.py:            "C": "Cancelado - El cliente canceló el pago",
-/app/backend/services/yappy_service.py:            "X": "Expirado - La solicitud de pago expiró"
-/app/backend/services/yappy_service.py:            "E002": "Algo salió mal. Intenta nuevamente.",
-/app/backend/services/yappy_service.py:            "E005": "Este número no está registrado en Yappy.",
-/app/backend/services/yappy_service.py:            "E006": "Algo salió mal. Intenta nuevamente.",
-/app/backend/services/yappy_service.py:            "E008": "Algo salió mal. Intenta nuevamente.",
-/app/backend/services/yappy_service.py:            "E009": "ID de la orden mayor a 15 dígitos.",
-/app/backend/services/yappy_service.py:            "E012": "Algo salió mal. Intenta nuevamente.",
-/app/backend/modules/pinpanclub/models/superpin.py:    """System for puntuación"""
-/app/backend/modules/pinpanclub/models/superpin.py:    """Método de check-in"""
-/app/backend/modules/pinpanclub/models/superpin.py:    GEOLOCATION = "geolocation"  # GPS/ubicación
-/app/backend/modules/pinpanclub/models/superpin.py:    ANY = "any"                # Cualquier método
-/app/backend/modules/pinpanclub/models/superpin.py:    """Nivel de estadísticas"""
-/app/backend/modules/pinpanclub/models/superpin.py:    DRAFT = "draft"            # In configuración
-/app/backend/modules/pinpanclub/models/superpin.py:    BY_CATEGORY = "by_category"  # By categorías según ranking
-/app/backend/modules/pinpanclub/models/superpin.py:    """Configuración del system for puntuación"""
-/app/backend/modules/pinpanclub/models/superpin.py:    """Configuración de check-in"""
-/app/backend/modules/pinpanclub/models/superpin.py:    methods: List[str] = ["manual"]  # List of métodos permitidos
-/app/backend/modules/pinpanclub/models/superpin.py:    require_referee: bool = False  # Requiere árbitro/testigo
-/app/backend/modules/pinpanclub/models/superpin.py:    """Configuración de estadísticas"""
-/app/backend/modules/pinpanclub/models/superpin.py:    """Configuración dthe tournament final"""
-/app/backend/modules/pinpanclub/models/superpin.py:    """Configuración de premios"""
-/app/backend/modules/pinpanclub/models/superpin.py:    """Estadísticas avanzadas dthe match"""
-/app/backend/modules/pinpanclub/models/superpin.py:    # Posición
-/app/backend/modules/pinpanclub/models/superpin.py:    TOURNAMENT_CHAMPION = "tournament_champion"      # 🏆 Campeón de torneo
-/app/backend/modules/pinpanclub/models/superpin.py:    TOURNAMENT_RUNNER_UP = "tournament_runner_up"    # 🥈 Subcampeón
-/app/backend/modules/pinpanclub/models/superpin.py:        "name": "Campeón de Torneo",
-/app/backend/modules/pinpanclub/models/superpin.py:        "name": "Subcampeón",
-/app/backend/modules/pinpanclub/models/superpin.py:        "description": "Jugador más valioso of the season",
-/app/backend/modules/pinpanclub/models/challenges.py:Retos semanales automáticos y configurables
-/app/backend/modules/pinpanclub/models/challenges.py:    EASY = "easy"           # Fácil
-/app/backend/modules/pinpanclub/models/challenges.py:    HARD = "hard"           # Difícil
-/app/backend/modules/pinpanclub/models/challenges.py:    DAILY_PLAY = "daily_play"              # Jugar X días diferentes
-/app/backend/modules/pinpanclub/models/challenges.py:    """Definición de un reto"""
-/app/backend/modules/pinpanclub/models/challenges.py:    is_automatic: bool = True  # Si es generado automáticamente
-/app/backend/modules/pinpanclub/models/challenges.py:    duration_days: int = 7  # Duración por defecto: 1 semana
-/app/backend/modules/pinpanclub/models/challenges.py:    created_by: Optional[str] = None  # Admin que lo creó (si es manual)
-/app/backend/modules/pinpanclub/models/challenges.py:    """Create definición de reto"""
-/app/backend/modules/pinpanclub/models/challenges.py:    # Posición
-/app/backend/modules/pinpanclub/models/challenges.py:    """Retos automáticos que se pueden generar"""
-/app/backend/modules/pinpanclub/models/challenges.py:            "description": "Juega al menos un partido 4 días diferentes",
-/app/backend/modules/pinpanclub/models/challenges.py:            "description": "Gana un partido después de perder el primer set",
-/app/backend/modules/pinpanclub/models/challenges.py:    Selecciona retos para la semana basándose en dificultad.
-/app/backend/modules/pinpanclub/models/challenges.py:    Por defecto: 2 fáciles, 2 medios, 1 difícil
-/app/backend/modules/pinpanclub/models/schemas.py:Definición de schemas para el módulo
-/app/backend/modules/pinpanclub/models/schemas.py:    """Update puntuación"""
-/app/backend/modules/pinpanclub/models/schemas.py:    """Configuración de Monday.com"""
-/app/backend/modules/pinpanclub/models/achievements.py:System for logros automáticos basados en retos completados
-/app/backend/modules/pinpanclub/models/achievements.py:    """Definición de un logro"""
-/app/backend/modules/pinpanclub/models/achievements.py:    # Cuándo se obtuvo
-/app/backend/modules/pinpanclub/models/achievements.py:        # Dificultad específica
-/app/backend/modules/pinpanclub/models/achievements.py:            "description": "Completa 5 retos difíciles",
-/app/backend/modules/pinpanclub/models/achievements.py:            "name": "Intrépido",
-/app/backend/modules/pinpanclub/models/prizes.py:Premios configurables más allá de badges: físicos, descuentos, privilegios
-/app/backend/modules/pinpanclub/models/prizes.py:    PHYSICAL = "physical"        # Prize físico (trofeo, medalla, etc.)
-/app/backend/modules/pinpanclub/models/prizes.py:    """Tipos de condición to win premio"""
-/app/backend/modules/pinpanclub/models/prizes.py:    """Condición to win un premio"""
-/app/backend/modules/pinpanclub/models/prizes.py:    """Definición de un premio configurable"""
-/app/backend/modules/pinpanclub/models/prizes.py:    # Límites
-/app/backend/modules/pinpanclub/models/prizes.py:    max_winners: Optional[int] = None  # None = sin límite
-/app/backend/modules/pinpanclub/models/prizes.py:    quantity_available: Optional[int] = None  # For premios físicos
-/app/backend/modules/pinpanclub/models/prizes.py:    """Create definición de premio"""
-/app/backend/modules/pinpanclub/models/prizes.py:    awarded_for: str  # Description of por qué se otorgó
-/app/backend/modules/pinpanclub/models/prizes.py:    position: Optional[int] = None  # Si fue por posición
-/app/backend/modules/pinpanclub/models/prizes.py:    """Catálogo de premios disponibles"""
-/app/backend/modules/pinpanclub/models/prizes.py:    """Catálogo de premios por defecto"""
-/app/backend/modules/pinpanclub/models/prizes.py:            "name": "Campeón de Temporada",
-/app/backend/modules/pinpanclub/models/prizes.py:            "name": "Subcampeón",
-/app/backend/modules/pinpanclub/models/prizes.py:            "description": "Árbitro con más partidos dirigidos",
-/app/backend/modules/pinpanclub/models/rapidpin.py:    """Like/reacción a un reto"""
-/app/backend/modules/pinpanclub/models/rapidpin.py:    """Configuración de moderación de comentarios"""
-/app/backend/modules/pinpanclub/models/social.py:    """Tipos de reacción"""
-/app/backend/modules/pinpanclub/models/social.py:    """Relación de seguimiento entre jugadores"""
-/app/backend/modules/pinpanclub/models/social.py:    """Estadísticas de seguidores"""
-/app/backend/modules/pinpanclub/models/social.py:    """Reacción a un partido o comentario"""
-/app/backend/modules/pinpanclub/models/social.py:    """Create reacción"""
-/app/backend/modules/pinpanclub/models/social.py:    # Descripción generada
-/app/backend/modules/pinpanclub/models/social.py:    """Tipos de notificación"""
-/app/backend/modules/pinpanclub/models/social.py:    """Notificación para usuario"""
-/app/backend/modules/pinpanclub/models/social.py:    is_pushed: bool = False  # Si ya se envió por WebSocket
-/app/backend/modules/pinpanclub/models/social.py:    # Navegación
-/app/backend/modules/pinpanclub/models/social.py:    """Create notificación"""
-/app/backend/modules/pinpanclub/models/seasons.py:Módulo: pinpanclub
-/app/backend/modules/pinpanclub/models/seasons.py:    UPCOMING = "upcoming"      # Próxima temporada
-/app/backend/modules/pinpanclub/models/seasons.py:    """Nivel de recompensa por posición"""
-/app/backend/modules/pinpanclub/models/seasons.py:    position_start: int        # Posición inicial (ej: 1)
-/app/backend/modules/pinpanclub/models/seasons.py:    position_end: int          # Posición final (ej: 3)
-/app/backend/modules/pinpanclub/models/seasons.py:    title: Optional[Dict] = None  # Título especial
-/app/backend/modules/pinpanclub/models/seasons.py:    prize_id: Optional[str] = None  # Prize físico
-/app/backend/modules/pinpanclub/models/seasons.py:    """Definición de una temporada de ranking"""
-/app/backend/modules/pinpanclub/models/seasons.py:    # Information básica
-/app/backend/modules/pinpanclub/models/seasons.py:    description: Dict[str, str]  # Descripción multi-idioma
-/app/backend/modules/pinpanclub/models/seasons.py:    # Recompensas por posición
-/app/backend/modules/pinpanclub/models/seasons.py:    # Posición actual
-/app/backend/modules/pinpanclub/models/seasons.py:    # Posición final (al cerrar temporada)
-/app/backend/modules/pinpanclub/models/seasons.py:    # Posición y tier
-/app/backend/modules/pinpanclub/models/seasons.py:                "name": {"es": "Campeón de Temporada", "en": "Season Champion", "zh": "赛季冠军"},
-/app/backend/modules/pinpanclub/models/seasons.py:            "title": {"es": "Campeón", "en": "Champion", "zh": "冠军"},
-/app/backend/modules/pinpanclub/models/seasons.py:            "name": {"es": "Otoño", "en": "Autumn", "zh": "秋季"},
-/app/backend/modules/pinpanclub/routes/superpin.py:                detail="Latitud y longitud requeridas para check-in por geolocalización"
-/app/backend/modules/pinpanclub/routes/superpin.py:                detail="Ubicación fuera del rango permitido"
-/app/backend/modules/pinpanclub/routes/superpin.py:    """Get estadísticas de a player en a league"""
-/app/backend/modules/pinpanclub/routes/superpin.py:    # Calculatesr estadísticas
-/app/backend/modules/pinpanclub/routes/superpin.py:    """Generar brackets para torneo de eliminación"""
-/app/backend/modules/pinpanclub/routes/superpin.py:    """Get badges más recientes (feed)"""
-/app/backend/modules/pinpanclub/routes/superpin.py:    """Get estadísticas detalladas de a player"""
-/app/backend/modules/pinpanclub/routes/superpin.py:    """Get estadísticas de enfrentamientos directos"""
-/app/backend/modules/pinpanclub/routes/challenges.py:    """Get definición de a challenge"""
-/app/backend/modules/pinpanclub/routes/challenges.py:    """Get estadísticas of challenges of the player"""
-/app/backend/modules/pinpanclub/routes/challenges.py:    """Get información de rango de a player"""
-/app/backend/modules/pinpanclub/routes/players.py:Endpoints for gestión of players
-/app/backend/modules/pinpanclub/routes/canvas.py:    """Configuración del canvas"""
-/app/backend/modules/pinpanclub/routes/canvas.py:    """Get un layout específico"""
-/app/backend/modules/pinpanclub/routes/achievements.py:Endpoints for logros automáticos
-/app/backend/modules/pinpanclub/routes/achievements.py:    Llamar después de completar retos.
-/app/backend/modules/pinpanclub/routes/rank_rewards.py:    Obtener información de todos los rangos y sus recompensas.
-/app/backend/modules/pinpanclub/routes/rank_rewards.py:    Útil para mostrar en la UI qué recompensas hay disponibles.
-/app/backend/modules/pinpanclub/routes/rank_rewards.py:    Verificar si hubo promoción de rango y otorgar recompensas.
-/app/backend/modules/pinpanclub/routes/rank_rewards.py:    Normalmente llamado internamente después de completar retos.
-/app/backend/modules/pinpanclub/routes/rank_rewards.py:    """Get información del rango actual de a player"""
-/app/backend/modules/pinpanclub/routes/monday.py:Endpoints for integración con Monday.com
-/app/backend/modules/pinpanclub/routes/monday.py:    """Get estado de la integración con Monday.com"""
-/app/backend/modules/pinpanclub/routes/monday.py:    """Get configuración de Monday.com"""
-/app/backend/modules/pinpanclub/routes/monday.py:    """Update configuración de Monday.com"""
-/app/backend/modules/pinpanclub/routes/monday.py:    return {"success": True, "message": "Configuración guardada"}
-/app/backend/modules/pinpanclub/routes/monday.py:    """Probar conexión con Monday.com"""
-/app/backend/modules/pinpanclub/routes/monday.py:    """Sincronizar a match específico"""
-/app/backend/modules/pinpanclub/routes/monday.py:    """Get jugadores desde Monday.com (para selección en partidos)"""
-/app/backend/modules/pinpanclub/routes/monday.py:    """Get estadísticas de sincronización"""
-/app/backend/modules/pinpanclub/routes/prizes.py:    """Get definición de a prize"""
-/app/backend/modules/pinpanclub/routes/prizes.py:    """Get catálogo of prizes"""
-/app/backend/modules/pinpanclub/routes/prizes.py:    """Get catálogo de a season"""
-/app/backend/modules/pinpanclub/routes/prizes.py:        # Returnsr catálogo por defecto
-/app/backend/modules/pinpanclub/routes/prizes.py:    """Otorgar premios de temporada automáticamente (solo admin)"""
-/app/backend/modules/pinpanclub/routes/matches.py:Endpoints for gestión of matches
-/app/backend/modules/pinpanclub/routes/matches.py:    """Get estadísticas of matches"""
-/app/backend/modules/pinpanclub/routes/matches.py:    """Update puntuación dthe match"""
-/app/backend/modules/pinpanclub/routes/websocket.py:        await manager.send_personal(arbiter_id, {"type": "error", "message": "Jugador inválido"})
-/app/backend/modules/pinpanclub/routes/websocket.py:        await manager.send_personal(arbiter_id, {"type": "error", "message": "El partido no está en curso"})
-/app/backend/modules/pinpanclub/routes/rapidpin.py:Endpoints for el sistema of matches espontáneos
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Solo puede confirmar un participante diferente al que lo registró.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Obtener partidos pendientes de confirmación para un usuario.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Retorna partidos donde the user participa pero no fue quien lo registró.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Obtener TODOS matches pendientes de confirmación para un usuario.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Retorna partidos de todas seasons donde the user participa pero no fue quien lo registró.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Get ranking de árbitros"""
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Get estadísticas de a player en a season"""
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Get configuración de puntuación de Rapid Pin"""
-/app/backend/modules/pinpanclub/routes/rapidpin.py:            "participants": "2 jugadores + 1 árbitro",
-/app/backend/modules/pinpanclub/routes/rapidpin.py:            "validation": "Requiere confirmación de 1 participante adicional",
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Crear desafío de jugador a jugador.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    El oponente debe aceptar antes de que se busque árbitro.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Aceptar desafío.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    - Admin/Mod pueden forzar aceptación
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Rechazar desafío.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Salta la fase de desafío, va directo a esperar árbitro.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Obtener partidos in queue/desafíos.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Obtener mis desafíos pendientes (enviados y recibidos).
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Asignarse como árbitro de a match in queue.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Solo el árbitro asignado puede completarlo.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Solo puede cancelar quien lo creó o un admin.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Feed público de Rapid Pin.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Incluye estadísticas, partidos recientes, ranking y cola of matches.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Crear desafío con propuesta de fecha inicial.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    - queue: Poner in queue para retomar después
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Get configuración de comentarios"""
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Update configuración de comentarios (admin)"""
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    Si the user tiene sanciones, el comentario irá a moderación.
-/app/backend/modules/pinpanclub/routes/rapidpin.py:    """Get comentarios pendientes de moderación (admin/mod)"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Get a quiénes sigue a player"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Get estadísticas de seguidores"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Añadir o cambiar reacción"""
-/app/backend/modules/pinpanclub/routes/social.py:        # Reacción eliminada
-/app/backend/modules/pinpanclub/routes/social.py:    """Get reacción de un usuario específico"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Get cantidad de notificaciones no leídas"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Marcar notificación como leída"""
-/app/backend/modules/pinpanclub/routes/social.py:    """Marcar todas las notificaciones como leídas"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:Permite configurar espacios publicitarios, logos, diseños y más
-/app/backend/modules/pinpanclub/routes/sponsors.py:    ROTATING = "rotating"     # Rotación automática
-/app/backend/modules/pinpanclub/routes/sponsors.py:    # Diseño y estilo
-/app/backend/modules/pinpanclub/routes/sponsors.py:    # Animación
-/app/backend/modules/pinpanclub/routes/sponsors.py:    # Rotación (para banners rotativos)
-/app/backend/modules/pinpanclub/routes/sponsors.py:    orden: int = Field(default=0, description="Orden en la rotación")
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Configuración de un espacio publicitario"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Configuración del layout de pantalla TV"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Get configuración del layout de TV"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Update configuración del layout de TV"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Update configuración de un espacio específico"""
-/app/backend/modules/pinpanclub/routes/sponsors.py:    Retorna todos los patrocinadores active organizados por posición
-/app/backend/modules/pinpanclub/routes/sponsors.py:    """Activar/desactivar múltiples patrocinadores"""
-/app/backend/modules/pinpanclub/routes/public_feed.py:Endpoints públicos para mostrar actividades del club sin autenticación
-/app/backend/modules/pinpanclub/routes/seasons.py:    # Localizar nombre y descripción
-/app/backend/modules/pinpanclub/routes/seasons.py:    """Get detalles de a season específica"""
-/app/backend/modules/pinpanclub/routes/seasons.py:    """Get estadísticas of the player en the season actual"""
-/app/backend/modules/pinpanclub/routes/seasons.py:    """Get estadísticas of the player en a season específica"""
-/app/backend/modules/pinpanclub/routes/seasons.py:    """Create automáticamente la siguiente temporada mensual (admin)"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:Business logic para el system for partidos espontáneos
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:    Enviar notificación push de desafío.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "title": "⚔️ ¡Nuevo Desafío!",
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "title": "✅ ¡Desafío Aceptado!",
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "body": f"{challenger_name} aceptó tu desafío. ¡A buscar árbitro!"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "title": "🏓 ¡Partido esperando árbitro!",
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "body": f"El partido entre {challenger_name} está esperando un árbitro"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "title": "🎮 ¡Tu partido está listo!",
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "body": f"{challenger_name} será el árbitro de tu partido. ¡A jugar!"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:                "body": f"{challenger_name} aceptó la fecha. El reto está confirmado"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:    Enviar notificación broadcast a todos the users cuando hay un partido esperando árbitro.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        title = "⚖️ ¡Se busca árbitro!"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        body = f"{player1_name} vs {player2_name} esperan un árbitro. ¡Gana +2 puntos!"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:    System for partidos espontáneos: 2 jugadores + 1 árbitro
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get conexión to database"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("La temporada ya está cerrada")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("La temporada no está activa")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Points (se aplicarán cuando se confirme)
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Validate que quien confirma es un participante diferente al que registró
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("No puedes confirmar un partido que tú registraste")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Aplicar puntos después de confirmar un partido"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get partidos pendientes de confirmación para un usuario"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get TODOS the matches pendientes de confirmación para un usuario (all seasons)"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get ranking de árbitros"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get estadísticas de un jugador en una temporada"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        Crear desafío de jugador a jugador.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("La temporada no está activa")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Verify that does not haya ya un desafío pendiente entre estos jugadores
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        Salta la fase de desafío, va directo a WAITING_REFEREE.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("La temporada no está activa")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            "status": "waiting",  # Directo a esperando árbitro
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        Aceptar desafío.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        - Admin/Mod pueden forzar aceptación
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Desafío not found")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Este desafío ya fue procesado")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Solo el oponente o un admin/moderador puede aceptar este desafío")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Rechazar desafío"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Desafío not found")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Este desafío ya fue procesado")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Solo el oponente puede rechazar el desafío")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        Asignar árbitro a partido in queue.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Este partido no está esperando árbitro")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("El árbitro no puede ser uno de the players")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Get info of the árbitro
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        referee_name = referee_info.get("apodo") or referee_info.get("nombre", "Un árbitro") if referee_info else "Un árbitro"
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("El partido debe tener árbitro asignado to completese")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get feed público de Rapid Pin"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Matchs recientes (últimos 10 validados)
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Matchs in queue esperando árbitro
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Matchs in progress (con árbitro asignado)
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        Crear desafío con propuesta de fecha inicial.
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Validaciones básicas
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Verify that does not exista un desafío activo entre estos jugadores
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Ya existe un desafío o partido pendiente entre estos jugadores")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        - queue: Poner in queue para retomar después -> pasa a queued
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Este reto no está en fase de negociación de fecha")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            # Broadcast to search árbitro
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError("Este reto no está in queue")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get configuración de comentarios"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            # Create configuración por defecto
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Update configuración de comentarios (admin)"""
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:            raise ValueError(f"El comentario excede el límite de {max_length} caracteres")
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Verify si the user está flaggeado (tiene sanciones)
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        # Only incrementar contador si está aprobado
-/app/backend/modules/pinpanclub/services/rapidpin_service.py:        """Get comentarios pendientes de moderación"""
-/app/backend/modules/pinpanclub/services/seasons_service.py:Módulo: pinpanclub
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Calculatesr estadísticas finales
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Create notificación
-/app/backend/modules/pinpanclub/services/seasons_service.py:                "es": f"¡Felicidades! Terminaste en posición #{position}. Ganaste {tier.get('bonus_points', 0)} puntos bonus.",
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Add posición
-/app/backend/modules/pinpanclub/services/seasons_service.py:        """Get estadísticas de un jugador en una temporada"""
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Get posición actual
-/app/backend/modules/pinpanclub/services/seasons_service.py:        Actualizar estadísticas of the player en the season actual.
-/app/backend/modules/pinpanclub/services/seasons_service.py:        Llamar después de completar un reto.
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Update estadísticas of the season
-/app/backend/modules/pinpanclub/services/seasons_service.py:        """Create automáticamente la siguiente temporada mensual"""
-/app/backend/modules/pinpanclub/services/seasons_service.py:        # Verify si hay una temporada próxima que debería activarse
-/app/backend/modules/pinpanclub/services/social_service.py:            message=f"{follower.get('apodo') or follower.get('nombre', 'Alguien')} te está siguiendo",
-/app/backend/modules/pinpanclub/services/social_service.py:        """Get a quiénes sigue un jugador"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Get estadísticas de seguidores"""
-/app/backend/modules/pinpanclub/services/social_service.py:                message=f"{author.get('apodo') or author.get('nombre', 'Alguien')} comentó en tu perfil",
-/app/backend/modules/pinpanclub/services/social_service.py:        """Añadir reacción"""
-/app/backend/modules/pinpanclub/services/social_service.py:        # Verify si ya reaccionó
-/app/backend/modules/pinpanclub/services/social_service.py:                raise ValueError("Reacción eliminada")
-/app/backend/modules/pinpanclub/services/social_service.py:        """Get tipo de reacción of the user"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Create notificación y enviar en tiempo real si the user está conectado"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Get cantidad de notificaciones no leídas"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Marcar notificación como leída"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Marcar todas las notificaciones como leídas"""
-/app/backend/modules/pinpanclub/services/social_service.py:        """Añadir una amonestación al usuario"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:            {"name": "Campeón", "position": 1, "icon": "🥇"},
-/app/backend/modules/pinpanclub/services/superpin_service.py:            {"name": "Subcampeón", "position": 2, "icon": "🥈"},
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Validate ubicación para check-in por geolocalización"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:            return True  # Without ubicación configurada, permitir
-/app/backend/modules/pinpanclub/services/superpin_service.py:            raise ValueError("Partido no está en curso")
-/app/backend/modules/pinpanclub/services/superpin_service.py:                # Verify si se ganó the match
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Update estadísticas avanzadas si se proporcionan
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Finalize partido si terminó
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Update ranking después de un partido"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Get configuración of the league
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get estadísticas de un jugador en una liga"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Get participantes según configuración
-/app/backend/modules/pinpanclub/services/superpin_service.py:            # By categorías
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Generar brackets para torneo de eliminación simple"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Primera ronda - emparejar según ranking (1 vs último, 2 vs penúltimo, etc.)
-/app/backend/modules/pinpanclub/services/superpin_service.py:            # Si solo hay un jugador, avanza automáticamente (bye)
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Generate rondas siguientes vacías
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Add partido por 3er lugar si está configurado
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Verify si the tournament terminó
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get torneo con información completa de brackets"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Verify y otorgar badges basados en estadísticas de partido"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get jugadores con más badges"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Ejecutar agregación
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get badges más recientes (para feed)"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get estadísticas detalladas de un jugador"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Info básica of the player
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Calculatesr estadísticas agregadas
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get estadísticas de enfrentamientos directos entre dos jugadores"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:        Crear torneo relámpago con jugadores that hasn check-in activo.
-/app/backend/modules/pinpanclub/services/superpin_service.py:            # Ordenar por posición (mejor primero)
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Player sin pareja (si número impar)
-/app/backend/modules/pinpanclub/services/superpin_service.py:            # Iniciar the match automáticamente
-/app/backend/modules/pinpanclub/services/superpin_service.py:            nombre = f"Torneo Relámpago {datetime.now(timezone.utc).strftime('%H:%M')}"
-/app/backend/modules/pinpanclub/services/superpin_service.py:        """Get estado de partidos rápidos activos en una liga"""
-/app/backend/modules/pinpanclub/services/superpin_service.py:                # Adjustment factor based on H2H (máx ±10%)
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Racha positiva da pequeña ventaja (máx ±5%)
-/app/backend/modules/pinpanclub/services/superpin_service.py:        # Calculatesr ventajas por categoría
-/app/backend/modules/pinpanclub/services/monday_service.py:Business logic para sincronización con Monday.com
-/app/backend/modules/pinpanclub/services/monday_service.py:    Service for integración con Monday.com.
-/app/backend/modules/pinpanclub/services/monday_service.py:    Escucha eventos del módulo y sincroniza automáticamente.
-/app/backend/modules/pinpanclub/services/monday_service.py:        """Configurar listeners de eventos para sync automático"""
-/app/backend/modules/pinpanclub/services/monday_service.py:        """Get configuración de Monday.com"""
-/app/backend/modules/pinpanclub/services/monday_service.py:        """Save configuración de Monday.com"""
-/app/backend/modules/pinpanclub/services/monday_service.py:        """Probar conexión con Monday.com"""
-/app/backend/modules/pinpanclub/services/monday_service.py:        """Get items de un board específico (jugadores)"""
-/app/backend/modules/pinpanclub/services/monday_service.py:        # Si ya está sincronizado, skip
-/app/backend/modules/pinpanclub/services/prizes_service.py:        """Create definición de premio"""
-/app/backend/modules/pinpanclub/services/prizes_service.py:        """Get definición de premio"""
-/app/backend/modules/pinpanclub/services/prizes_service.py:        """Get o crear catálogo por defecto"""
-/app/backend/modules/pinpanclub/services/prizes_service.py:        # Create catálogo
-/app/backend/modules/pinpanclub/services/prizes_service.py:            "name": "Catálogo Principal",
-/app/backend/modules/pinpanclub/services/prizes_service.py:            "description": "Premios estándar para temporadas",
-/app/backend/modules/pinpanclub/services/prizes_service.py:        """Get catálogo de una temporada"""
-/app/backend/modules/pinpanclub/services/prizes_service.py:                raise ValueError("Este premio ha alcanzado el límite de ganadores")
-/app/backend/modules/pinpanclub/services/prizes_service.py:            description=f"Ganó the prize '{prize.get('name')}'"
-/app/backend/modules/pinpanclub/services/prizes_service.py:        Otorgar premios automáticamente al cerrar una temporada.
-/app/backend/modules/pinpanclub/services/prizes_service.py:        Evalúa las condiciones de cada premio.
-/app/backend/modules/pinpanclub/services/prizes_service.py:                    # Verify límite
-/app/backend/modules/pinpanclub/services/prizes_service.py:                            awarded_for=f"Posición #{idx} en temporada",
-/app/backend/modules/pinpanclub/services/prizes_service.py:            # Evaluar comparación
-/app/backend/modules/pinpanclub/services/match_service.py:        Actualizar puntuación dthe match.
-/app/backend/modules/pinpanclub/services/match_service.py:        Maneja lógica de sets y determina ganador.
-/app/backend/modules/pinpanclub/services/match_service.py:        # Procesar acción
-/app/backend/modules/pinpanclub/services/match_service.py:        # Si se completó set, emitir evento
-/app/backend/modules/pinpanclub/services/match_service.py:        # Verify si terminó the match
-/app/backend/modules/pinpanclub/services/match_service.py:        """Register conexión WebSocket para un partido"""
-/app/backend/modules/pinpanclub/services/match_service.py:        """Desregistrar conexión WebSocket"""
-/app/backend/modules/pinpanclub/services/match_service.py:        """Send actualización a todos los WebSockets de un partido"""
-/app/backend/modules/pinpanclub/services/match_service.py:        """Get estadísticas de partidos"""
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:Módulo: pinpanclub
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:                "es": "Título 'Leyenda' + 500 puntos bonus + Prioridad en torneos",
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        """Get definición de rango by ID"""
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        Verificar si the player subió de rango y otorgar recompensas.
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        Retorna información de la promoción si hubo una.
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        # No hubo promoción
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        # ¡Hubo promoción!
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        # Verify si ya recibió esta recompensa
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        # Aplicar recompensas específicas
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:            # Título especial
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:                "es": f"Ascendió al rango {rank_name}",
-/app/backend/modules/pinpanclub/services/rank_rewards_service.py:        """Get información de recompensas por rango (para mostrar en UI)"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Create definición de reto (por admin)"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Get definición de reto"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Update definición de reto"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:            # Create retos automáticos
-/app/backend/modules/pinpanclub/services/challenges_service.py:            # Create semana automáticamente
-/app/backend/modules/pinpanclub/services/challenges_service.py:        Actualizar progreso de retos of the player basándose en tipo.
-/app/backend/modules/pinpanclub/services/challenges_service.py:        Llamar esto después de cada partido, victoria, etc.
-/app/backend/modules/pinpanclub/services/challenges_service.py:                # Procesar completación
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Process completación de reto"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:        # Create notificación
-/app/backend/modules/pinpanclub/services/challenges_service.py:            description=f"Completó the challenge '{challenge.get('name')}'"
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Get estadísticas de retos of the player"""
-/app/backend/modules/pinpanclub/services/challenges_service.py:        """Get posición de un jugador en el leaderboard"""
-/app/backend/modules/pinpanclub/services/player_service.py:        Actualizar estadísticas of the player después de un partido.
-/app/backend/modules/pinpanclub/services/achievements_service.py:Achievements Service - Lógica de logros automáticos
-/app/backend/modules/pinpanclub/services/achievements_service.py:    """Service for gestionar logros automáticos"""
-/app/backend/modules/pinpanclub/services/achievements_service.py:        Verificar y otorgar logros al jugador basándose en su progreso.
-/app/backend/modules/pinpanclub/services/achievements_service.py:        Llamar después de completar un reto.
-/app/backend/modules/pinpanclub/services/achievements_service.py:        # Get estadísticas of the player
-/app/backend/modules/pinpanclub/services/achievements_service.py:        # Get logros que the player aún does not have
-/app/backend/modules/pinpanclub/services/achievements_service.py:        """Get estadísticas de retos of the player"""
-/app/backend/modules/pinpanclub/services/achievements_service.py:        """Verify si the player completó all challenges de la semana actual"""
-/app/backend/modules/pinpanclub/services/achievements_service.py:        # Create notificación
-/app/backend/modules/pinpanclub/events/handlers.py:Manejadores de eventos para integración entre módulos
-/app/backend/modules/pinpanclub/events/handlers.py:    Configurar handlers de eventos del módulo PinpanClub.
-/app/backend/modules/pinpanclub/events/handlers.py:    Llamar esta función al iniciar la aplicación.
-/app/backend/modules/pinpanclub/events/handlers.py:        Actualizar estadísticas de jugadores cuando termina un partido.
-/app/backend/modules/pinpanclub/events/handlers.py:        Log de todos los eventos del módulo (para debugging/auditoría).
-/app/backend/modules/pinpanclub/__init__.py:Módulo de Club de Tenis de Mesa preparado para microservicios
-/app/backend/modules/pinpanclub/__init__.py:1. Separación clara de responsabilidades
-/app/backend/modules/pinpanclub/__init__.py:2. Fácil de testear (cada capa se puede mockear)
-/app/backend/modules/pinpanclub/__init__.py:4. Comunicación via Event Bus (no dependencias directas)
-/app/backend/modules/pinpanclub/__init__.py:    Inicializar el módulo PinpanClub.
-/app/backend/modules/pinpanclub/__init__.py:    Llamar esta función al iniciar la aplicación.
-/app/backend/modules/pinpanclub/repositories/sponsor_repository.py:        """Get patrocinadores por posición"""
-/app/backend/modules/pinpanclub/repositories/config_repository.py:Acceso a datos de configuración
-/app/backend/modules/pinpanclub/repositories/config_repository.py:    Repository para configuración de PinpanClub.
-/app/backend/modules/pinpanclub/repositories/config_repository.py:        """Get configuración por clave"""
-/app/backend/modules/pinpanclub/repositories/config_repository.py:        """Save configuración"""
-/app/backend/modules/pinpanclub/repositories/config_repository.py:        """Get configuración de Monday.com"""
-/app/backend/modules/pinpanclub/repositories/config_repository.py:        """Save configuración de Monday.com"""
-/app/backend/modules/pinpanclub/repositories/player_repository.py:        """Update estadísticas después de un partido"""
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        """Incrementar estadísticas of the league"""
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        """Checkout automático de check-ins expirados"""
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        # Get última posición
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        """Get posición de un jugador"""
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        """Verify si un jugador ya tiene un badge específico"""
-/app/backend/modules/pinpanclub/repositories/superpin_repository.py:        """Get badges más recientes (para feed)"""
-/app/backend/modules/pinpanclub/repositories/prizes_repository.py:    """Repository for catálogos de premios"""
-/app/backend/modules/pinpanclub/repositories/match_repository.py:        """Update puntuación dthe match"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Incrementar estadísticas of the season"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get partidos pendientes de confirmación donde the user participa"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get TODOS the matches pendientes de confirmación donde the user participa (all seasons)"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get partidos de un jugador (como jugador o árbitro)"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get ranking de un jugador específico"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get ranking de árbitros (por partidos arbitrados)"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Update estadísticas de jugador después de un partido"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Update estadísticas de árbitro"""
-/app/backend/modules/pinpanclub/repositories/rapidpin_repository.py:        """Get conteo de participantes únicos"""
-/app/backend/modules/pinpanclub/repositories/social_repository.py:        """Get a quiénes sigue un jugador"""
-/app/backend/modules/chess/models.py:    aperturas_favoritas: Optional[List[str]] = None  # Siciliana, Española, etc.
-/app/backend/modules/chess/models.py:    pgn: Optional[str] = None  # Notación PGN completa
-/app/backend/modules/chess/routes.py:        "message": "Módulo de Ajedrez - Pendiente de implementación",
-/app/backend/modules/chess/routes.py:            "Torneos (Suizo, Eliminación, Arena)",
-/app/backend/modules/chess/routes.py:            "Rankings y estadísticas",
-/app/backend/modules/chess/__init__.py:System for torneos, partidas, rankings y estadísticas
-/app/backend/modules/landing/models.py:    descripcion: str = "Plataforma de comercio electrónico"
-/app/backend/modules/landing/models.py:    titulo: str = "Página Principal"
-/app/backend/modules/landing/models.py:        "descripcion": "Sección principal con imagen de fondo",
-/app/backend/modules/landing/models.py:        "nombre": "Características",
-/app/backend/modules/landing/models.py:        "descripcion": "Lista de características con íconos",
-/app/backend/modules/landing/models.py:            "titulo": "¿Por qué elegirnos?",
-/app/backend/modules/landing/models.py:                {"icono": "truck", "titulo": "Envío Rápido", "descripcion": "Entrega en 24-48h"},
-/app/backend/modules/landing/models.py:                {"icono": "headphones", "titulo": "Soporte", "descripcion": "Atención personalizada"}
-/app/backend/modules/landing/models.py:        "descripcion": "Bloque de texto con título",
-/app/backend/modules/landing/models.py:            "contenido": "Escribe tu contenido aquí...",
-/app/backend/modules/landing/models.py:        "descripcion": "Imagen con descripción opcional",
-/app/backend/modules/landing/models.py:        "nombre": "Llamada a la Acción",
-/app/backend/modules/landing/models.py:        "descripcion": "Botón destacado con mensaje",
-/app/backend/modules/landing/models.py:        "nombre": "Estadísticas",
-/app/backend/modules/landing/models.py:        "descripcion": "Números destacados",
-/app/backend/modules/landing/models.py:                {"numero": "99%", "label": "Satisfacción"}
-/app/backend/modules/landing/models.py:                {"titulo": "Tarjeta 1", "descripcion": "Descripción", "imagen_url": "", "link": ""},
-/app/backend/modules/landing/models.py:                {"titulo": "Tarjeta 2", "descripcion": "Descripción", "imagen_url": "", "link": ""},
-/app/backend/modules/landing/models.py:                {"titulo": "Tarjeta 3", "descripcion": "Descripción", "imagen_url": "", "link": ""}
-/app/backend/modules/landing/models.py:            "titulo": "Promoción Especial",
-/app/backend/modules/landing/models.py:        "descripcion": "Línea divisoria",
-/app/backend/modules/landing/models.py:                "es": "Lo último en PinPanClub",
-/app/backend/modules/landing/models.py:                    "title": {"es": "Próximos Torneos", "en": "Upcoming Tournaments", "zh": "即将举行的比赛"},
-/app/backend/modules/landing/models.py:                "cta_text": {"es": "Ver más en PinPanClub", "en": "See more in PinPanClub", "zh": "在PinPanClub查看更多"},
-/app/backend/modules/landing/routes.py:            "titulo": "Página Principal",
-/app/backend/modules/landing/routes.py:            "titulo": "Página Principal",
-/app/backend/modules/landing/routes.py:            "titulo": "Página Principal",
-/app/backend/modules/landing/routes.py:    """Toggle block publish status (Publicado/En construcción)"""
-/app/backend/modules/task_supervisor/models.py:    """Configuración del Task Supervisor"""
-/app/backend/modules/task_supervisor/models.py:    monday_group_id: Optional[str] = None  # Grupo específico (opcional)
-/app/backend/modules/task_supervisor/models.py:    """Persona supervisada (niño/estudiante)"""
-/app/backend/modules/task_supervisor/models.py:    # Asignación
-/app/backend/modules/task_supervisor/routes.py:- GET /task-supervisor/status - Estado del módulo
-/app/backend/modules/task_supervisor/routes.py:- GET/PUT /task-supervisor/config - Configuración
-/app/backend/modules/task_supervisor/routes.py:            "Recordatorios automáticos inteligentes",
-/app/backend/modules/task_supervisor/routes.py:            "Gamificación con puntos y logros",
-/app/backend/modules/task_supervisor/routes.py:            "Supervisión para niños en casa y estudiantes",
-/app/backend/modules/task_supervisor/routes.py:            "Sincronización bidireccional con Monday.com",
-/app/backend/modules/task_supervisor/routes.py:    return {"success": True, "message": "Configuración del Task Supervisor actualizada"}
-/app/backend/modules/task_supervisor/routes.py:        "message": "Display data - Placeholder. Requiere sincronización con Monday.com."
-/app/backend/modules/task_supervisor/routes.py:        "message": "Anuncio creado - Placeholder. Requiere integración TTS para generar audio."
-/app/backend/modules/task_supervisor/routes.py:        "message": "Sincronización con Monday.com - Placeholder. Implementación pendiente.",
-/app/backend/modules/task_supervisor/__init__.py:y supervisión automática para niños y estudiantes.
-/app/backend/modules/content_hub/models.py:Content Hub Models - Modelos para Curación de Contenido
-/app/backend/modules/content_hub/models.py:    """Categoría de contenido por audiencia"""
-/app/backend/modules/content_hub/models.py:    # Information básica
-/app/backend/modules/content_hub/models.py:    # Clasificación
-/app/backend/modules/content_hub/models.py:    # Curación
-/app/backend/modules/content_hub/models.py:    curado_por: Optional[str] = None  # admin que lo agregó
-/app/backend/modules/content_hub/models.py:    """Playlist/Colección de contenido"""
-/app/backend/modules/content_hub/models.py:    categoria_id: Optional[str] = None  # Categoría principal
-/app/backend/modules/content_hub/routes.py:Content Hub Routes - Endpoints para Curación de Contenido
-/app/backend/modules/content_hub/routes.py:- GET/POST /content-hub/categories - Categorías por audiencia
-/app/backend/modules/content_hub/routes.py:- GET /content-hub/feed/{category} - Feed por categoría
-/app/backend/modules/content_hub/routes.py:# Categorías por audiencia predefinidas
-/app/backend/modules/content_hub/routes.py:    {"category_id": "ninos", "nombre": "Para Niños", "nombre_en": "For Kids", "nombre_zh": "儿童内容", "icono": "👶", "orden": 1},
-/app/backend/modules/content_hub/routes.py:        "message": "Content Hub - Curación de Contenido Multimedia",
-/app/backend/modules/content_hub/routes.py:            "Importar videos/posts de múltiples redes sociales",
-/app/backend/modules/content_hub/routes.py:            "Categorización por audiencia (niños, padres, etc.)",
-/app/backend/modules/content_hub/routes.py:            "Feed personalizado por categoría",
-/app/backend/modules/content_hub/__init__.py:Content Hub Module - Curación de Contenido Multimedia
-/app/backend/modules/roles/models.py:    # Administración general
-/app/backend/modules/roles/models.py:        "access": "Acceder al panel de administración",
-/app/backend/modules/roles/models.py:        "dashboard": "Ver dashboard de administración",
-/app/backend/modules/roles/models.py:        "manage_memberships": "Gestionar membresías",
-/app/backend/modules/roles/models.py:        "view_public_catalog": "Ver catálogo público",
-/app/backend/modules/roles/models.py:        "view_private_catalog": "Ver catálogo privado PCA",
-/app/backend/modules/roles/models.py:        "manage_categories": "Gestionar categorías",
-/app/backend/modules/roles/models.py:        "admin_panel": "Panel de administración PinpanClub",
-/app/backend/modules/roles/models.py:        "view": "Ver membresías",
-/app/backend/modules/roles/models.py:        "manage_qr": "Gestionar códigos QR",
-/app/backend/modules/roles/models.py:    nivel: int = 0  # Nivel jerárquico (mayor = más privilegios)
-/app/backend/modules/roles/service.py:                "descripcion": "Gestión completa de la plataforma",
-/app/backend/modules/roles/service.py:                "descripcion": "Management of contenido y usuarios básicos",
-/app/backend/modules/roles/service.py:                "descripcion": "Acceso básico a funcionalidades públicas",
-/app/backend/modules/roles/routes.py:            raise HTTPException(status_code=403, detail="No tienes permiso para ver logs de auditoría")
-/app/backend/modules/roles/routes.py:            raise HTTPException(status_code=403, detail="No tienes permiso para ver estadísticas de auditoría")
-/app/backend/modules/admin/seed_demo.py:Puebla todos los módulos con datos de demostración realistas
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "María González", "apodo": "La Tigresa", "email": "maria@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=maria"},
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "Juan Pérez", "apodo": "Speedy", "email": "juan@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=juan"},
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "Ana López", "apodo": "La Cobra", "email": "ana@demo.com", "nivel": "principiante", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=ana"},
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "Pedro Sánchez", "apodo": "Thunder", "email": "pedro@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=pedro"},
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "Laura Martínez", "apodo": "Flash", "email": "laura@demo.com", "nivel": "avanzado", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=laura"},
-/app/backend/modules/admin/seed_demo.py:    {"nombre": "Isabella Rodríguez", "apodo": "La Reina", "email": "isabella@demo.com", "nivel": "intermedio", "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=isabella"},
-/app/backend/modules/admin/seed_demo.py:        "description_es": "Gana un partido después de ir perdiendo 0-2",
-/app/backend/modules/admin/seed_demo.py:        "name_es": "Decálogo",
-/app/backend/modules/admin/seed_demo.py:    Puebla todos los módulos con datos de demostración
-/app/backend/modules/admin/seed_demo.py:        {"nombre": "Demo Niño", "email": "nino@chipilink.com", "tipo": "child"},
-/app/backend/modules/admin/seed_demo.py:            "summary": {"es": "El club estará cerrado el domingo", "en": "Club closed on Sunday", "zh": "周日俱乐部关闭"},
-/app/backend/modules/admin/seed_demo.py:    Elimina todos los datos de demostración
-/app/backend/modules/admin/seed_demo.py:    Obtiene estadísticas de datos de demostración
-/app/backend/modules/admin/routes.py:    return {"success": True, "message": "Configuración guardada"}
-/app/backend/modules/community/models/schemas.py:Definición de schemas Pydantic para comunidad
-/app/backend/modules/community/routes/landing.py:    Obtener todos los datos necesarios para la página de landing de comunidad.
-/app/backend/modules/community/routes/landing.py:    Combina datos de posts, eventos, galería y productos.
-/app/backend/modules/community/routes/posts.py:            data.nombre_usuario = user.get("nombre", "Anónimo")
-/app/backend/modules/community/routes/__init__.py:Agrega todos los routers del módulo de comunidad
-/app/backend/modules/community/routes/gallery.py:Endpoints para galería usando el Service Layer
-/app/backend/modules/community/routes/gallery.py:    """Get álbumes activos"""
-/app/backend/modules/community/routes/gallery.py:    """Get álbum by ID"""
-/app/backend/modules/community/routes/gallery.py:    """Get todos los álbumes (admin)"""
-/app/backend/modules/community/routes/gallery.py:    """Create nuevo álbum (admin)"""
-/app/backend/modules/community/routes/gallery.py:    """Update álbum (admin)"""
-/app/backend/modules/community/routes/gallery.py:    """Delete álbum (admin)"""
-/app/backend/modules/community/services/post_service.py:            comment_dict["nombre_usuario"] = "Anónimo"
-/app/backend/modules/community/services/event_service.py:            raise ValueError("Este evento no requiere inscripción")
-/app/backend/modules/community/services/event_service.py:        # Verify si ya está inscrito
-/app/backend/modules/community/services/event_service.py:            raise ValueError("Ya está inscrito en este evento")
-/app/backend/modules/community/services/album_service.py:Business logic para álbumes de galería
-/app/backend/modules/community/services/album_service.py:    Service for management of álbumes de galería.
-/app/backend/modules/community/services/album_service.py:        """Get álbumes activos"""
-/app/backend/modules/community/services/album_service.py:        """Get álbum by ID"""
-/app/backend/modules/community/services/album_service.py:        """Get todos los álbumes (admin)"""
-/app/backend/modules/community/services/album_service.py:        """Create nuevo álbum"""
-/app/backend/modules/community/services/album_service.py:        """Update álbum"""
-/app/backend/modules/community/services/album_service.py:        """Delete álbum"""
-/app/backend/modules/community/events/handlers.py:Manejadores de eventos para el módulo de comunidad
-/app/backend/modules/community/events/handlers.py:    Configurar handlers de eventos del módulo Community.
-/app/backend/modules/community/events/handlers.py:        Crear notificación cuando se crea un post destacado.
-/app/backend/modules/community/events/handlers.py:        Crear notificación cuando se crea un evento.
-/app/backend/modules/community/events/handlers.py:        Log de todos los eventos del módulo Community.
-/app/backend/modules/community/__init__.py:1. Separación clara de responsabilidades
-/app/backend/modules/community/__init__.py:2. Fácil de testear (cada capa se puede mockear)
-/app/backend/modules/community/__init__.py:4. Comunicación via Event Bus (no dependencias directas)
-/app/backend/modules/community/__init__.py:    Inicializar el módulo Community.
-/app/backend/modules/community/__init__.py:    Llamar esta función al iniciar la aplicación.
-/app/backend/modules/community/repositories/event_repository.py:        """Get eventos próximos"""
-/app/backend/modules/community/repositories/event_repository.py:        """Agregar inscripción a evento"""
-/app/backend/modules/community/repositories/album_repository.py:Acceso a datos de álbumes de galería
-/app/backend/modules/community/repositories/album_repository.py:    Repository para álbumes de galería.
-/app/backend/modules/community/repositories/album_repository.py:        """Create nuevo álbum"""
-/app/backend/modules/community/repositories/album_repository.py:        """Get álbum by ID"""
-/app/backend/modules/community/repositories/album_repository.py:        """Get álbumes activos"""
-/app/backend/modules/community/repositories/album_repository.py:        """Get todos los álbumes (admin)"""
-/app/backend/modules/community/repositories/album_repository.py:        """Update álbum"""
-/app/backend/modules/community/repositories/album_repository.py:        """Delete álbum"""
-/app/backend/modules/realtime/services/websocket_manager.py:                "es": f"{user_name} {'dio like' if action == 'liked' else 'quitó su like'} al reto",
-/app/backend/modules/realtime/services/websocket_manager.py:                "es": f"{user_name} comentó en the challenge",
-/app/backend/modules/realtime/services/websocket_manager.py:            "es": f"{player1_name} desafió a {player2_name}",
-/app/backend/modules/realtime/services/websocket_manager.py:            "es": f"{player1_name} vs {player2_name} esperan árbitro",
-/app/backend/modules/realtime/routes.py:                        "es": "Conexión activa",
-/app/backend/modules/realtime/routes.py:                            "es": "Idioma cambiado a Español",
-/app/backend/modules/realtime/routes.py:                    "es": "Desafíos, likes y comentarios de Rapid Pin",
-/app/backend/modules/users/models/user_models.py:    options: List[Dict[str, str]] = []  # [{"value": "opt1", "label": {"es": "Opción 1"}}]
-/app/backend/modules/users/models/user_models.py:            "description": {"es": "Niño miembro del club", "en": "Child club member", "zh": "俱乐部儿童会员"},
-/app/backend/modules/users/models/user_models.py:            "description": {"es": "Membresía de cortesía", "en": "Courtesy membership", "zh": "礼遇会员"},
-/app/backend/modules/users/models/user_models.py:            "label": {"es": "Teléfono de Emergencia", "en": "Emergency Phone", "zh": "紧急电话"},
-/app/backend/modules/users/models/user_models.py:        # Information escolar (para niños)
-/app/backend/modules/users/models/user_models.py:        # Médico
-/app/backend/modules/users/models/user_models.py:            "label": {"es": "Condiciones Médicas", "en": "Medical Conditions", "zh": "医疗状况"},
-/app/backend/modules/users/models/connections_models.py:    """Conexión entre dos usuarios"""
-/app/backend/modules/users/models/connections_models.py:    """Request to create conexión"""
-/app/backend/modules/users/models/connections_models.py:    """Request to update conexión"""
-/app/backend/modules/users/models/connections_models.py:    """Solicitud de conexión entre usuarios"""
-/app/backend/modules/users/models/connections_models.py:    """Request to create solicitud de conexión"""
-/app/backend/modules/users/models/connections_models.py:    """Invitación a usuario no registrado"""
-/app/backend/modules/users/models/connections_models.py:    monto_transferir: Optional[float] = None  # Si quería transferir al invitarlo
-/app/backend/modules/users/models/connections_models.py:    """Request to create invitación"""
-/app/backend/modules/users/models/connections_models.py:    """Configuración de una capacidad (admin configurable)"""
-/app/backend/modules/users/models/connections_models.py:    membresia_requerida: Optional[str] = None   # ID of membresía si requiere
-/app/backend/modules/users/models/connections_models.py:    # Suscripción inicial opcional
-/app/backend/modules/users/models/connections_models.py:    usuario_id: str                     # User que intentó comprar
-/app/backend/modules/users/models/connections_models.py:    """Configuración de permisos por defecto para un tipo de relación"""
-/app/backend/modules/users/models/connections_models.py:    """Configuración de marketing para un usuario"""
-/app/backend/modules/users/models/connections_models.py:    """Retorna configuración por defecto de permisos por relación"""
-/app/backend/modules/users/models/connections_models.py:            "nombre": {"es": "Estudiante Tutoría", "en": "Tutoring Student", "zh": "辅导学生"},
-/app/backend/modules/users/models/connections_models.py:            "descripcion": {"es": "Inscrito en programa de Tutoría Integral", "en": "Enrolled in Integral Tutoring program"},
-/app/backend/modules/users/models/connections_models.py:    """Retorna membresías (productos) por defecto del sistema"""
-/app/backend/modules/users/models/connections_models.py:                {"plan_id": "cortesia", "nombre": "Cortesía", "precio": 0, "tipo": "courtesy", "dias_validez": 365}
-/app/backend/modules/users/models/connections_models.py:            "nombre": {"es": "Tutoría Integral", "en": "Integral Tutoring", "zh": "综合辅导"},
-/app/backend/modules/users/models/connections_models.py:            "descripcion": {"es": "Programa de apoyo académico", "en": "Academic support program"},
-/app/backend/modules/users/models/wallet_models.py:    expiration_days: Optional[int] = None  # Días hasta vencimiento
-/app/backend/modules/users/models/wallet_models.py:    # Límites
-/app/backend/modules/users/models/wallet_models.py:    # Nombre y descripción
-/app/backend/modules/users/models/wallet_models.py:    # Type of acción que otorga puntos
-/app/backend/modules/users/models/wallet_models.py:    applicable_user_types: List[str] = []  # Vacío = todos
-/app/backend/modules/users/models/wallet_models.py:    # Totales históricos
-/app/backend/modules/users/models/wallet_models.py:    # Límites personalizados (null = usar global)
-/app/backend/modules/users/models/wallet_models.py:    """Transacción en la billetera"""
-/app/backend/modules/users/models/wallet_models.py:    # Método de pago (para depósitos/compras)
-/app/backend/modules/users/models/wallet_models.py:    # Descripción
-/app/backend/modules/users/models/wallet_models.py:    """Registro de conversión de puntos"""
-/app/backend/modules/users/models/wallet_models.py:    # Dirección de conversión
-/app/backend/modules/users/models/wallet_models.py:    # User que consumió
-/app/backend/modules/users/models/wallet_models.py:    # Categoría
-/app/backend/modules/users/models/wallet_models.py:    # Acción
-/app/backend/modules/users/models/wallet_models.py:    # Descripción
-/app/backend/modules/users/models/wallet_models.py:    """Configuración por defecto de ChipiPoints"""
-/app/backend/modules/users/models/wallet_models.py:            "points_percentage": 10,  # 10 puntos por dólar
-/app/backend/modules/users/routes/memberships.py:Membership API Routes - Management of membresías y visitas
-/app/backend/modules/users/routes/memberships.py:    """Get planes de membresía disponibles"""
-/app/backend/modules/users/routes/memberships.py:    """Create un nuevo plan de membresía (admin)"""
-/app/backend/modules/users/routes/memberships.py:    """Get mis membresías"""
-/app/backend/modules/users/routes/memberships.py:    """Get mi membresía activa"""
-/app/backend/modules/users/routes/memberships.py:    """Comprar una membresía"""
-/app/backend/modules/users/routes/memberships.py:    """Get detalle de una membresía"""
-/app/backend/modules/users/routes/memberships.py:    """Cancelar una membresía"""
-/app/backend/modules/users/routes/memberships.py:    """Get configuración de visitas"""
-/app/backend/modules/users/routes/memberships.py:    """Update configuración de visitas (admin)"""
-/app/backend/modules/users/routes/memberships.py:    """Get estadísticas de mis visitas"""
-/app/backend/modules/users/routes/memberships.py:    """Get membresías de un usuario (admin)"""
-/app/backend/modules/users/routes/memberships.py:    """Otorgar membresía a un usuario (admin/cortesía)"""
-/app/backend/modules/users/routes/memberships.py:    """Agregar visitas a una membresía (admin)"""
-/app/backend/modules/users/routes/wallet.py:        # Create billetera automáticamente
-/app/backend/modules/users/routes/wallet.py:    """Get resumen de mi billetera con estadísticas"""
-/app/backend/modules/users/routes/wallet.py:    # Get últimas transacciones
-/app/backend/modules/users/routes/wallet.py:    """Get detalle de una transacción"""
-/app/backend/modules/users/routes/wallet.py:    """Realizar un depósito en la billetera"""
-/app/backend/modules/users/routes/wallet.py:    """Get configuración de ChipiPoints"""
-/app/backend/modules/users/routes/wallet.py:    """Update configuración de ChipiPoints (admin)"""
-/app/backend/modules/users/routes/wallet.py:    """Inicializar configuración de ChipiPoints (admin)"""
-/app/backend/modules/users/routes/users.py:    """Get un tipo de usuario específico"""
-/app/backend/modules/users/routes/users.py:    """Get perfil de un usuario (público)"""
-/app/backend/modules/users/routes/users.py:    """Create una relación con otro usuario"""
-/app/backend/modules/users/routes/users.py:    """Update una relación"""
-/app/backend/modules/users/routes/users.py:    """Desactivar una relación"""
-/app/backend/modules/users/routes/qr_code.py:    """Get mi código QR"""
-/app/backend/modules/users/routes/qr_code.py:    """Regenerar mi código QR (invalida el anterior)"""
-/app/backend/modules/users/routes/qr_code.py:            "es": "Código QR regenerado. El anterior ya no es válido.",
-/app/backend/modules/users/routes/qr_code.py:    """Escanear un código QR y obtener información of the user"""
-/app/backend/modules/users/routes/qr_code.py:    """Process una acción desde QR (check-in o pago)"""
-/app/backend/modules/users/routes/qr_code.py:    """Check-in rápido vía QR"""
-/app/backend/modules/users/routes/qr_code.py:    """Process pago vía QR"""
-/app/backend/modules/users/routes/qr_code.py:    """Create sesión de pago (para montos grandes que requieren confirmación)"""
-/app/backend/modules/users/routes/qr_code.py:    """Confirmar y procesar sesión de pago"""
-/app/backend/modules/users/routes/qr_code.py:    """Get QR de un usuario específico (admin)"""
-/app/backend/modules/users/services/membership_service.py:Membership Service - Management of membresías y pases de visita
-/app/backend/modules/users/services/membership_service.py:    """Service for management of membresías y visitas"""
-/app/backend/modules/users/services/membership_service.py:        """Inicializar planes de membresía por defecto"""
-/app/backend/modules/users/services/membership_service.py:                    "es": "Pase de 12 visitas al club. Válido por 3 meses.",
-/app/backend/modules/users/services/membership_service.py:                    "es": "Pase de 6 visitas al club. Válido por 2 meses.",
-/app/backend/modules/users/services/membership_service.py:                    "es": "Cortesía",
-/app/backend/modules/users/services/membership_service.py:                    "es": "Membresía de cortesía otorgada por el club.",
-/app/backend/modules/users/services/membership_service.py:        """Get planes de membresía"""
-/app/backend/modules/users/services/membership_service.py:        """Get un plan específico"""
-/app/backend/modules/users/services/membership_service.py:        """Create un nuevo plan de membresía"""
-/app/backend/modules/users/services/membership_service.py:        """Get membresía by ID"""
-/app/backend/modules/users/services/membership_service.py:        """Get membresías de un usuario"""
-/app/backend/modules/users/services/membership_service.py:        """Get membresía activa de un usuario"""
-/app/backend/modules/users/services/membership_service.py:        """Comprar una membresía"""
-/app/backend/modules/users/services/membership_service.py:        """Marcar membresía como expirada"""
-/app/backend/modules/users/services/membership_service.py:        """Cancelar una membresía"""
-/app/backend/modules/users/services/membership_service.py:        """Usar una visita de la membresía"""
-/app/backend/modules/users/services/membership_service.py:        # Verify tipo de membresía
-/app/backend/modules/users/services/membership_service.py:        # Update membresía
-/app/backend/modules/users/services/membership_service.py:        """Agregar visitas a una membresía"""
-/app/backend/modules/users/services/membership_service.py:        """Get configuración de visitas"""
-/app/backend/modules/users/services/membership_service.py:        """Inicializar configuración de visitas"""
-/app/backend/modules/users/services/membership_service.py:            "min_duration_minutes": 30,  # Mínimo para contar como visita regular
-/app/backend/modules/users/services/membership_service.py:            "quick_visit_max_minutes": 15,  # Máximo para visita rápida (no consume)
-/app/backend/modules/users/services/membership_service.py:            "auto_checkout_hours": 8,  # Auto checkout después de 8 horas
-/app/backend/modules/users/services/membership_service.py:        """Update configuración de visitas"""
-/app/backend/modules/users/services/membership_service.py:        # Calculate duración
-/app/backend/modules/users/services/membership_service.py:        # Get configuración
-/app/backend/modules/users/services/membership_service.py:        # Si consumió visita, descontar de membresía
-/app/backend/modules/users/services/membership_service.py:        """Get estadísticas de visitas de un usuario"""
-/app/backend/modules/users/services/user_profile_service.py:        """Update un campo personalizado específico"""
-/app/backend/modules/users/services/user_profile_service.py:        """Create relación entre usuarios"""
-/app/backend/modules/users/services/user_profile_service.py:        """Update una relación"""
-/app/backend/modules/users/services/user_profile_service.py:        """Desactivar una relación"""
-/app/backend/modules/users/services/wallet_service.py:        """Inicializar configuración de ChipiPoints"""
-/app/backend/modules/users/services/wallet_service.py:        """Get configuración de ChipiPoints"""
-/app/backend/modules/users/services/wallet_service.py:        """Update configuración de ChipiPoints"""
-/app/backend/modules/users/services/wallet_service.py:        """Create una transacción"""
-/app/backend/modules/users/services/wallet_service.py:        """Completar una transacción pendiente"""
-/app/backend/modules/users/services/wallet_service.py:        # Get transacción
-/app/backend/modules/users/services/wallet_service.py:            raise ValueError("Transacción no encontrada")
-/app/backend/modules/users/services/wallet_service.py:            raise ValueError(f"Transacción ya procesada: {transaction['status']}")
-/app/backend/modules/users/services/wallet_service.py:        # Update totales según tipo
-/app/backend/modules/users/services/wallet_service.py:        # Mark transacción como completada
-/app/backend/modules/users/services/wallet_service.py:        """Realizar un depósito/recarga"""
-/app/backend/modules/users/services/wallet_service.py:            description=description or f"Depósito de {amount} {currency.value}",
-/app/backend/modules/users/services/wallet_service.py:        # Complete automáticamente
-/app/backend/modules/users/services/wallet_service.py:        # Create transacción
-/app/backend/modules/users/services/wallet_service.py:            raise ValueError("Conversión de puntos a USD no permitida")
-/app/backend/modules/users/services/wallet_service.py:            raise ValueError(f"Mínimo {config['min_points_to_convert']} puntos para convertir")
-/app/backend/modules/users/services/wallet_service.py:            description=f"Conversión de {points} puntos a ${usd_amount:.2f}",
-/app/backend/modules/users/services/wallet_service.py:            description=f"Conversión de {points} ChipiPoints"
-/app/backend/modules/users/services/wallet_service.py:        # Registrar conversión
-/app/backend/modules/users/services/connections_service.py:        """Get una conexión específica"""
-/app/backend/modules/users/services/connections_service.py:        Crear una conexión entre usuarios.
-/app/backend/modules/users/services/connections_service.py:        Si requiere_solicitud=True, crea solicitud en lugar de conexión directa.
-/app/backend/modules/users/services/connections_service.py:        # Verify que does not exist conexión
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Ya existe una conexión con este usuario"}
-/app/backend/modules/users/services/connections_service.py:        # Add conexión al usuario
-/app/backend/modules/users/services/connections_service.py:        # Create conexión recíproca (con permisos inversos si aplica)
-/app/backend/modules/users/services/connections_service.py:        """Get el subtipo recíproco de una relación"""
-/app/backend/modules/users/services/connections_service.py:        """Get permisos recíprocos (generalmente más limitados)"""
-/app/backend/modules/users/services/connections_service.py:        # By defecto, el recíproco tiene permisos mínimos
-/app/backend/modules/users/services/connections_service.py:        """Update una conexión existente"""
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Conexión no encontrada"}
-/app/backend/modules/users/services/connections_service.py:        """Delete una conexión"""
-/app/backend/modules/users/services/connections_service.py:        # Get conexión para saber el user_id destino
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Conexión no encontrada"}
-/app/backend/modules/users/services/connections_service.py:        """Create solicitud de conexión"""
-/app/backend/modules/users/services/connections_service.py:        # Verify que does not exist conexión ni solicitud pendiente
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Ya existe una conexión con este usuario"}
-/app/backend/modules/users/services/connections_service.py:        # Send notificación push al destinatario
-/app/backend/modules/users/services/connections_service.py:                title="🔗 Nueva Solicitud de Conexión",
-/app/backend/modules/users/services/connections_service.py:        """Get etiqueta legible para subtipo de relación"""
-/app/backend/modules/users/services/connections_service.py:            "tio": "Tío/Tía",
-/app/backend/modules/users/services/connections_service.py:            "companero": "Compañero",
-/app/backend/modules/users/services/connections_service.py:        """Responder a una solicitud de conexión"""
-/app/backend/modules/users/services/connections_service.py:        # Send notificación push al solicitante original
-/app/backend/modules/users/services/connections_service.py:                title = "✅ Conexión Aceptada"
-/app/backend/modules/users/services/connections_service.py:                body = f"{para_nombre} aceptó tu solicitud de conexión como {subtipo_label}"
-/app/backend/modules/users/services/connections_service.py:                title = "❌ Conexión Rechazada"
-/app/backend/modules/users/services/connections_service.py:                body = f"{para_nombre} rechazó tu solicitud de conexión"
-/app/backend/modules/users/services/connections_service.py:        """Create invitación para usuario no registrado"""
-/app/backend/modules/users/services/connections_service.py:        # Verify que email no está registrado
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Este email ya está registrado", "user_id": existing.get("user_id")}
-/app/backend/modules/users/services/connections_service.py:        # Verify invitación pendiente
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Ya existe una invitación pendiente para este email"}
-/app/backend/modules/users/services/connections_service.py:        # TODO: Enviar email de invitación
-/app/backend/modules/users/services/connections_service.py:        """Process invitación cuando usuario se registra"""
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Invitación no válida o expirada"}
-/app/backend/modules/users/services/connections_service.py:        # Create conexión si se especificó
-/app/backend/modules/users/services/connections_service.py:        # Transferir si se especificó monto
-/app/backend/modules/users/services/connections_service.py:        # Verify email único si se proporciona
-/app/backend/modules/users/services/connections_service.py:        # Create conexión con acudiente
-/app/backend/modules/users/services/connections_service.py:        # Verify conexión y permisos
-/app/backend/modules/users/services/connections_service.py:            return {"error": "Debes tener conexión con the user para transferir"}
-/app/backend/modules/users/services/connections_service.py:        # Verify límite diario
-/app/backend/modules/users/services/connections_service.py:            # Calculate transferencias del día
-/app/backend/modules/users/services/connections_service.py:                return {"error": f"Excede límite diario de ${limite}. Ya transferiste ${total_hoy} hoy."}
-/app/backend/modules/users/services/connections_service.py:                body=f"{de_nombre} te envió ${monto:.2f}" + (f" - {mensaje}" if mensaje else ""),
-/app/backend/modules/users/services/connections_service.py:        """Create alerta de saldo insuficiente (envía a usuario y acudientes)"""
-/app/backend/modules/users/services/connections_service.py:        # Get membresías activas of the user
-/app/backend/modules/users/services/connections_service.py:        # Get todas las membresías
-/app/backend/modules/users/services/qr_code_service.py:QR Code Service - Management of códigos QR para check-in y pagos
-/app/backend/modules/users/services/qr_code_service.py:    """Service for management of códigos QR"""
-/app/backend/modules/users/services/qr_code_service.py:        # Create un código único basado en user_id y timestamp
-/app/backend/modules/users/services/qr_code_service.py:        # Generate hash único
-/app/backend/modules/users/services/qr_code_service.py:        # Get información of the user
-/app/backend/modules/users/services/qr_code_service.py:        # Get membresía activa
-/app/backend/modules/users/services/qr_code_service.py:        """Determinar acciones disponibles basadas en wallet y membresía"""
-/app/backend/modules/users/services/qr_code_service.py:        """Process una acción desde QR code"""
-/app/backend/modules/users/services/qr_code_service.py:        # Registrar transacción
-/app/backend/modules/users/services/qr_code_service.py:        # Procesar según acción
-/app/backend/modules/users/services/qr_code_service.py:        # Update transacción
-/app/backend/modules/users/services/qr_code_service.py:            # Create transacción usando la firma correcta
-/app/backend/modules/users/services/qr_code_service.py:            # Complete transacción
-/app/backend/modules/users/services/qr_code_service.py:            # Create transacción usando la firma correcta
-/app/backend/modules/users/services/qr_code_service.py:            # Complete transacción
-/app/backend/modules/users/services/qr_code_service.py:        """Create sesión de pago para montos grandes (requiere confirmación)"""
-/app/backend/modules/users/services/qr_code_service.py:        """Confirmar y procesar sesión de pago"""
-/app/backend/modules/users/services/qr_code_service.py:        # Update sesión
-/app/backend/modules/store/models/schemas.py:Definición de schemas Pydantic para el módulo de tienda
-/app/backend/modules/store/routes/products.py:    """Get productos en promoción"""
-/app/backend/modules/store/routes/products.py:    """Get productos más nuevos"""
-/app/backend/modules/store/routes/products.py:    """Search productos by name o descripción"""
-/app/backend/modules/store/routes/products.py:    """Marcar/desmarcar producto en promoción (solo admin)"""
-/app/backend/modules/store/routes/categories.py:Endpoints for management of categorías usando el Service Layer
-/app/backend/modules/store/routes/categories.py:    """Get todas las categorías activas"""
-/app/backend/modules/store/routes/categories.py:    """Get categoría by ID"""
-/app/backend/modules/store/routes/categories.py:        raise HTTPException(status_code=404, detail="Categoría no encontrada")
-/app/backend/modules/store/routes/categories.py:    """Get datos completos para landing de categoría"""
-/app/backend/modules/store/routes/categories.py:    """Create nueva categoría (solo admin)"""
-/app/backend/modules/store/routes/categories.py:    """Update categoría (solo admin)"""
-/app/backend/modules/store/routes/categories.py:        raise HTTPException(status_code=404, detail="Categoría no encontrada")
-/app/backend/modules/store/routes/categories.py:    """Delete categoría - soft delete (solo admin)"""
-/app/backend/modules/store/routes/categories.py:            raise HTTPException(status_code=404, detail="Categoría no encontrada")
-/app/backend/modules/store/routes/categories.py:        return {"success": True, "message": "Categoría eliminada"}
-/app/backend/modules/store/routes/landing.py:Endpoints for páginas de landing de categorías y banners
-/app/backend/modules/store/routes/landing.py:    """Get todos los datos para landing de categoría"""
-/app/backend/modules/store/routes/landing.py:    """Get banners activos de una categoría"""
-/app/backend/modules/store/routes/landing.py:    """Get productos destacados de una categoría"""
-/app/backend/modules/store/routes/landing.py:    """Get productos en promoción de una categoría"""
-/app/backend/modules/store/routes/landing.py:    """Get productos más nuevos de una categoría"""
-/app/backend/modules/store/routes/landing.py:    """Get permisos de un vendor específico"""
-/app/backend/modules/store/routes/bulk_import.py:Endpoints for importación masiva desde datos copiados de Google Sheets
-/app/backend/modules/store/routes/bulk_import.py:    """Request para previsualizar importación de estudiantes"""
-/app/backend/modules/store/routes/bulk_import.py:    hoja_nombre: str = "Importación Manual"
-/app/backend/modules/store/routes/bulk_import.py:    """Request para previsualizar importación de libros"""
-/app/backend/modules/store/routes/bulk_import.py:    Previsualizar importación de estudiantes antes de ejecutarla.
-/app/backend/modules/store/routes/bulk_import.py:    Muestra qué registros se crearán, actualizarán, y cualquier error.
-/app/backend/modules/store/routes/bulk_import.py:    Previsualizar importación de libros antes de ejecutarla.
-/app/backend/modules/store/routes/bulk_import.py:        limit: Número máximo de registros
-/app/backend/modules/store/routes/public.py:Endpoints públicos that does not requieren autenticación
-/app/backend/modules/store/routes/public.py:    """Get productos para formulario público - sin autenticación"""
-/app/backend/modules/store/routes/public.py:    """Create pedido desde formulario público - sin autenticación"""
-/app/backend/modules/store/routes/public.py:            {"id": "matematicas", "nombre": "Matemáticas"},
-/app/backend/modules/store/routes/public.py:            {"id": "espanol", "nombre": "Español"},
-/app/backend/modules/store/routes/public.py:            {"id": "ingles", "nombre": "Inglés"},
-/app/backend/modules/store/routes/public.py:            {"id": "musica", "nombre": "Música"},
-/app/backend/modules/store/routes/public.py:            {"id": "educacion_fisica", "nombre": "Educación Física"},
-/app/backend/modules/store/routes/public.py:            {"id": "tecnologia", "nombre": "Tecnología"},
-/app/backend/modules/store/routes/public.py:            {"id": "religion", "nombre": "Religión"},
-/app/backend/modules/store/routes/inventory_import.py:CSV-based inventory management for textbooks (Catálogo Privado PCA)
-/app/backend/modules/store/routes/inventory_import.py:        ["TXT-001", "Matemáticas 1er Grado", "1", "50", "25.00", "Matemáticas", "Santillana", "978-123456789", "Libro de matemáticas para primer grado"],
-/app/backend/modules/store/routes/inventory_import.py:        ["TXT-002", "Español 2do Grado", "2", "30", "28.50", "Español", "SM", "978-987654321", "Libro de español para segundo grado"],
-/app/backend/modules/store/routes/catalogo_privado.py:    Obtener detalle de un producto del catálogo privado.
-/app/backend/modules/store/routes/catalogo_privado.py:            detail="You do not have acceso al catálogo privado"
-/app/backend/modules/store/routes/catalogo_privado.py:    Obtener todos los productos de un grado específico.
-/app/backend/modules/store/routes/catalogo_privado.py:            detail="You do not have acceso al catálogo privado"
-/app/backend/modules/store/routes/catalogo_privado.py:    Obtener resumen del catálogo privado para the user.
-/app/backend/modules/store/routes/catalogo_privado.py:            detail="You do not have acceso al catálogo privado"
-/app/backend/modules/store/routes/catalogo_privado.py:    Admin: Obtener todos los productos del catálogo privado.
-/app/backend/modules/store/routes/catalogo_privado.py:    Admin: Crear producto en el catálogo privado.
-/app/backend/modules/store/routes/catalogo_privado.py:    # Ensure que sea catálogo privado
-/app/backend/modules/store/routes/catalogo_privado.py:    Admin: Actualizar producto del catálogo privado.
-/app/backend/modules/store/routes/catalogo_privado.py:    Admin: Eliminar producto del catálogo privado.
-/app/backend/modules/store/services/bulk_import_service.py:Store Module - Servicio de Importación Masiva (Bulk Import)
-/app/backend/modules/store/services/bulk_import_service.py:            if any(cell for cell in cells):  # Si hay al menos una celda no vacía
-/app/backend/modules/store/services/bulk_import_service.py:            column_mapping: Mapeo de campos a índices de columna
-/app/backend/modules/store/services/bulk_import_service.py:            grado_default: Grado por defecto si no está en los datos
-/app/backend/modules/store/services/bulk_import_service.py:            Previsualización con validaciones
-/app/backend/modules/store/services/bulk_import_service.py:                # Extract datos según mapeo
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": "Número de estudiante vacío"})
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": "Nombre vacío"})
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": "Grado vacío"})
-/app/backend/modules/store/services/bulk_import_service.py:                # Verify duplicados en esta importación
-/app/backend/modules/store/services/bulk_import_service.py:        hoja_nombre: str = "Importación Manual",
-/app/backend/modules/store/services/bulk_import_service.py:        # Registrar la importación
-/app/backend/modules/store/services/bulk_import_service.py:            column_mapping: Mapeo de campos a índices de columna
-/app/backend/modules/store/services/bulk_import_service.py:                    "codigo": 0,           # Código del libro
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": "Código vacío"})
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": "Nombre vacío"})
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": f"Precio inválido: {precio_str}"})
-/app/backend/modules/store/services/bulk_import_service.py:                    errores.append({"fila": idx + 2, "error": f"Código duplicado: {codigo}"})
-/app/backend/modules/store/services/bulk_import_service.py:                        "error": f"Precio inválido: {precio_str}"
-/app/backend/modules/store/services/bulk_import_service.py:        # Registrar la importación
-/app/backend/modules/store/services/bulk_import_service.py:        """Get lista de grados únicos de estudiantes importados"""
-/app/backend/modules/store/services/bulk_import_service.py:        # Remove símbolos de moneda y espacios
-/app/backend/modules/store/services/product_service.py:        """Get productos en promoción"""
-/app/backend/modules/store/services/product_service.py:        """Get productos más nuevos"""
-/app/backend/modules/store/services/product_service.py:        """Get estadísticas de inventario"""
-/app/backend/modules/store/services/order_form_config_service.py:                "label_es": "Información de Pago",
-/app/backend/modules/store/services/order_form_config_service.py:            {"type": "number", "label": "Number", "label_es": "Número", "label_zh": "数字", "description": "Numeric input"},
-/app/backend/modules/store/services/order_form_config_service.py:            {"type": "multiselect", "label": "Multi-Select", "label_es": "Selección Múltiple", "label_zh": "多选", "description": "Multiple selection"},
-/app/backend/modules/store/services/order_form_config_service.py:            {"type": "phone", "label": "Phone", "label_es": "Teléfono", "label_zh": "电话", "description": "Phone number"},
-/app/backend/modules/store/services/order_form_config_service.py:            {"type": "info", "label": "Info Display", "label_es": "Información", "label_zh": "信息显示", "description": "Display-only content (e.g., bank details)"}
-/app/backend/modules/store/services/category_service.py:Business logic para categorías
-/app/backend/modules/store/services/category_service.py:    Service for management of categorías.
-/app/backend/modules/store/services/category_service.py:        """Create nueva categoría"""
-/app/backend/modules/store/services/category_service.py:        """Get categoría by ID"""
-/app/backend/modules/store/services/category_service.py:        """Get todas las categorías activas"""
-/app/backend/modules/store/services/category_service.py:        """Update categoría"""
-/app/backend/modules/store/services/category_service.py:        Eliminar categoría (soft delete).
-/app/backend/modules/store/services/category_service.py:            raise ValueError(f"No se puede eliminar. Hay {product_count} productos en esta categoría.")
-/app/backend/modules/store/services/category_service.py:        """Get datos completos para landing de categoría"""
-/app/backend/modules/store/services/textbook_access_service.py:                RequestStatus.IN_REVIEW: "en revisión",
-/app/backend/modules/store/services/textbook_access_service.py:                RequestStatus.INFO_REQUIRED: "requiere información adicional"
-/app/backend/modules/store/services/textbook_access_service.py:                "title": "Actualización de solicitud de textos",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Entrada de texto de una línea",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Entrada de texto multilínea",
-/app/backend/modules/store/services/form_config_service.py:                "label_es": "Número",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Entrada numérica",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Subir documentos o imágenes",
-/app/backend/modules/store/services/form_config_service.py:                "label_es": "Correo Electrónico",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Entrada de correo electrónico",
-/app/backend/modules/store/services/form_config_service.py:                "label_es": "Teléfono",
-/app/backend/modules/store/services/form_config_service.py:                "description_es": "Entrada de número telefónico",
-/app/backend/modules/store/services/form_config_service.py:                        "message_es": f"Mínimo {field['min_length']} caracteres requeridos"
-/app/backend/modules/store/services/form_config_service.py:                        "message_es": f"Máximo {field['max_length']} caracteres permitidos"
-/app/backend/modules/store/services/form_config_service.py:                            "message_es": f"El valor mínimo es {field['min_value']}"
-/app/backend/modules/store/services/form_config_service.py:                            "message_es": f"El valor máximo es {field['max_value']}"
-/app/backend/modules/store/services/form_config_service.py:                        "message_es": "Número inválido"
-/app/backend/modules/store/services/form_config_service.py:                        "message_es": "Selección inválida"
-/app/backend/modules/store/services/order_service.py:        Crear pedido público (sin autenticación).
-/app/backend/modules/store/services/order_service.py:            # Emit eventos según el estado
-/app/backend/modules/store/services/order_service.py:        """Get estadísticas de pedidos"""
-/app/backend/modules/store/services/google_sheets_service.py:Store Module - Servicio de Sincronización con Google Sheets
-/app/backend/modules/store/services/google_sheets_service.py:Sincroniza estudiantes desde hojas de cálculo de Google
-/app/backend/modules/store/services/google_sheets_service.py:    Soporta múltiples hojas (pestañas) por grado.
-/app/backend/modules/store/services/google_sheets_service.py:        1. Parámetro directo (dict del JSON)
-/app/backend/modules/store/services/google_sheets_service.py:            # Intentar importar las librerías de Google
-/app/backend/modules/store/services/google_sheets_service.py:        """Get configuración de sincronización"""
-/app/backend/modules/store/services/google_sheets_service.py:            # Create configuración por defecto
-/app/backend/modules/store/services/google_sheets_service.py:        """Update configuración de sincronización"""
-/app/backend/modules/store/services/google_sheets_service.py:        Configurar un Google Sheet para sincronización.
-/app/backend/modules/store/services/google_sheets_service.py:            hojas: Lista de hojas/pestañas con su configuración
-/app/backend/modules/store/services/google_sheets_service.py:        """Probar conexión a un Google Sheet"""
-/app/backend/modules/store/services/google_sheets_service.py:        Leer datos de una hoja específica.
-/app/backend/modules/store/services/google_sheets_service.py:            hoja_nombre: Nombre de la pestaña
-/app/backend/modules/store/services/google_sheets_service.py:            sheet_id: ID específico del sheet (None = todos los configurados)
-/app/backend/modules/store/services/google_sheets_service.py:            solo_hoja: Nombre de hoja específica (None = todas)
-/app/backend/modules/store/services/google_sheets_service.py:            Resumen de la sincronización
-/app/backend/modules/store/services/google_sheets_service.py:                    # Mapear índices de columnas
-/app/backend/modules/store/services/google_sheets_service.py:                            # Extract datos con los índices mapeados
-/app/backend/modules/store/services/google_sheets_service.py:        # Update última sincronización
-/app/backend/modules/store/services/google_sheets_service.py:        """Search estudiante por número"""
-/app/backend/modules/store/services/google_sheets_service.py:        """Get estadísticas de sincronización"""
-/app/backend/modules/store/services/textbook_order_service.py:                f"**Año Escolar:** {order['year']}",
-/app/backend/modules/store/events/handlers.py:Manejadores de eventos para el módulo de tienda
-/app/backend/modules/store/events/handlers.py:    Configurar handlers de eventos del módulo Store.
-/app/backend/modules/store/events/handlers.py:        Crear notificación cuando se crea un pedido.
-/app/backend/modules/store/events/handlers.py:        Crear notificación de bajo stock.
-/app/backend/modules/store/events/handlers.py:        Log de todos los eventos del módulo Store.
-/app/backend/modules/store/__init__.py:1. Separación clara de responsabilidades
-/app/backend/modules/store/__init__.py:2. Fácil de testear (cada capa se puede mockear)
-/app/backend/modules/store/__init__.py:4. Comunicación via Event Bus (no dependencias directas)
-/app/backend/modules/store/__init__.py:    Inicializar el módulo Store.
-/app/backend/modules/store/__init__.py:    Llamar esta función al iniciar la aplicación.
-/app/backend/modules/store/repositories/form_config_repository.py:                    "placeholder_es": "ej: Juan Pérez García",
-/app/backend/modules/store/repositories/form_config_repository.py:                    "help_text_es": "Selecciona el colegio donde está matriculado el estudiante",
-/app/backend/modules/store/repositories/form_config_repository.py:                    "label_es": "Año Escolar",
-/app/backend/modules/store/repositories/form_config_repository.py:                    "label_es": "Relación con el Estudiante",
-/app/backend/modules/store/repositories/form_config_repository.py:                    "label_es": "Número de Estudiante",
-/app/backend/modules/store/repositories/form_config_repository.py:                    "help_text_es": "Si conoces el ID escolar, ayuda a acelerar la verificación",
-/app/backend/modules/store/repositories/product_repository.py:        """Get productos por categoría"""
-/app/backend/modules/store/repositories/product_repository.py:        """Get productos en promoción"""
-/app/backend/modules/store/repositories/product_repository.py:        """Get productos más nuevos"""
-/app/backend/modules/store/repositories/category_repository.py:Acceso a datos de categorías
-/app/backend/modules/store/repositories/category_repository.py:    Repository para categorías de productos.
-/app/backend/modules/store/repositories/category_repository.py:        """Create nueva categoría"""
-/app/backend/modules/store/repositories/category_repository.py:        """Get categoría by ID"""
-/app/backend/modules/store/repositories/category_repository.py:        """Get todas las categorías activas"""
-/app/backend/modules/store/repositories/category_repository.py:        """Update categoría"""
-/app/backend/modules/store/repositories/category_repository.py:        """Desactivar categoría"""
-/app/backend/modules/store/repositories/category_repository.py:        """Contar productos en una categoría"""
-/app/backend/modules/invision/oauth_service.py:            "button_text_es": "Iniciar sesión con LaoPan",
-/app/backend/modules/invision/routes.py:            detail="OAuth con LaoPan.online no está configurado"
-/app/backend/modules/invision/routes.py:            detail=f"Error de autenticación: {error_description or error}"
-/app/backend/modules/invision/routes.py:        raise HTTPException(status_code=400, detail="Código de autorización no recibido")
-/app/backend/modules/invision/routes.py:        raise HTTPException(status_code=400, detail="Estado de sesión no recibido")
-/app/backend/modules/invision/routes.py:            detail="Estado de sesión inválido o expirado. Por favor, intente de nuevo."
-/app/backend/modules/invision/routes.py:            detail="Error al obtener información of the user"
-/app/backend/modules/invision/routes.py:    return {"success": True, "message": "Configuración guardada"}
-/app/backend/modules/ai_tutor/models.py:    """Configuración del AI Tutor"""
-/app/backend/modules/ai_tutor/models.py:    umbral_pronunciacion_correcta: float = 0.8  # 80% de precisión
-/app/backend/modules/ai_tutor/models.py:    """Sesión de tutoría"""
-/app/backend/modules/ai_tutor/models.py:    # Tema de la sesión
-/app/backend/modules/ai_tutor/models.py:    subtema: Optional[str] = None  # "colores", "números", etc.
-/app/backend/modules/ai_tutor/models.py:    idioma_objetivo: str = "en"  # Idioma that istá aprendiendo
-/app/backend/modules/ai_tutor/models.py:    # Contenido de la sesión
-/app/backend/modules/ai_tutor/models.py:    traduccion: str  # Traducción
-/app/backend/modules/ai_tutor/models.py:    pronunciacion_fonetica: Optional[str] = None  # Guía fonética
-/app/backend/modules/ai_tutor/models.py:    audio_url: Optional[str] = None  # Audio de pronunciación correcta
-/app/backend/modules/ai_tutor/models.py:    # Categorización
-/app/backend/modules/ai_tutor/models.py:    categoria: Optional[str] = None  # colores, animales, números, etc.
-/app/backend/modules/ai_tutor/models.py:    """Intento de pronunciación del estudiante"""
-/app/backend/modules/ai_tutor/models.py:    texto_reconocido: Optional[str] = None  # Lo que el STT reconoció
-/app/backend/modules/ai_tutor/models.py:    # Evaluación
-/app/backend/modules/ai_tutor/models.py:    """Plan de lección generado por el tutor"""
-/app/backend/modules/ai_tutor/routes.py:- GET /ai-tutor/status - Estado del módulo
-/app/backend/modules/ai_tutor/routes.py:- GET/PUT /ai-tutor/config - Configuración del tutor
-/app/backend/modules/ai_tutor/routes.py:- POST /ai-tutor/sessions - Iniciar sesión de tutoría
-/app/backend/modules/ai_tutor/routes.py:- POST /ai-tutor/evaluate-pronunciation - Evaluar pronunciación del estudiante
-/app/backend/modules/ai_tutor/routes.py:            "Práctica de vocabulario con voz",
-/app/backend/modules/ai_tutor/routes.py:            "Evaluación de pronunciación en tiempo real",
-/app/backend/modules/ai_tutor/routes.py:            "Planes de lección adaptativos",
-/app/backend/modules/ai_tutor/routes.py:            "Múltiples idiomas (Inglés, Chino, Español)",
-/app/backend/modules/ai_tutor/routes.py:            "Gamificación con logros y rachas"
-/app/backend/modules/ai_tutor/routes.py:            "TTS (OpenAI/ElevenLabs) - Para audio de pronunciación",
-/app/backend/modules/ai_tutor/routes.py:    return {"success": True, "message": "Configuración del AI Tutor actualizada"}
-/app/backend/modules/ai_tutor/routes.py:        "message": "Sesión creada - Placeholder. Requiere integración LLM para funcionalidad completa."
-/app/backend/modules/ai_tutor/routes.py:            {"palabra": "goodbye", "traduccion": "adiós", "categoria": "saludos", "nivel": "basico"},
-/app/backend/modules/ai_tutor/routes.py:            {"palabra": "yes", "traduccion": "sí", "categoria": "basico", "nivel": "basico"},
-/app/backend/modules/ai_tutor/routes.py:        "message": "TTS no implementado. Requiere integración con OpenAI TTS o ElevenLabs."
-/app/backend/modules/ai_tutor/routes.py:        "feedback": "Evaluación de pronunciación no implementada. Requiere integración con STT.",
-/app/backend/modules/ai_tutor/__init__.py:Práctica de idiomas con voz, evaluación de pronunciación,
-/app/backend/modules/upload/routes.py:                detail=f"Tipo de archivo no permitido. Extensiones válidas: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
-/app/backend/modules/upload/routes.py:                detail=f"El archivo excede el límite de {MAX_FILE_SIZE // (1024*1024)}MB"
-/app/backend/modules/upload/routes.py:                detail=f"El archivo excede el límite de {MAX_FILE_SIZE // (1024*1024)}MB"
-/app/backend/modules/cxgenie/models.py:    """Configuración de CXGenie"""
-/app/backend/modules/cxgenie/models.py:    embed_code: Optional[str] = None  # Código de embed completo
-/app/backend/modules/cxgenie/models.py:    """Conversación de chat (cache local)"""
-/app/backend/modules/cxgenie/routes.py:- GET /cxgenie/status - Estado de la integración
-/app/backend/modules/cxgenie/routes.py:- GET/PUT /cxgenie/config - Configuración del widget y panel
-/app/backend/modules/cxgenie/routes.py:- GET /cxgenie/widget-code - Código de embed para frontend (usuarios)
-/app/backend/modules/cxgenie/routes.py:- GET /cxgenie/integration-info - Información de la integración
-/app/backend/modules/cxgenie/routes.py:    # Panel URLs específicos - usando subdominios personalizados con workspace ID
-/app/backend/modules/cxgenie/routes.py:    return {"success": True, "message": "Configuración de CXGenie actualizada", "config": updated_config}
-/app/backend/modules/cxgenie/routes.py:        "description": "Integración con CXGenie para atención al cliente",
-/app/backend/modules/cxgenie/routes.py:            "widget": "Inyectar el script del widget en las páginas públicas",
-/app/backend/modules/cxgenie/routes.py:            "widget": "El widget funciona en WebView móvil",
-/app/backend/modules/auth/models/oauth_config.py:    button_text_es: str = "Iniciar sesión con LaoPan"
-/app/backend/modules/auth/routes/__init__.py:Agrega todos los routers del módulo de autenticación
-/app/backend/modules/auth/routes/__init__.py:# Router principal del módulo Auth (refactorizado)
-/app/backend/modules/auth/routes/auth_config.py:                "email": {"required": True, "visible": True, "label": "Correo electrónico"},
-/app/backend/modules/auth/routes/auth_config.py:                "telefono": {"required": False, "visible": True, "label": "Teléfono"},
-/app/backend/modules/auth/routes/auth_config.py:                "direccion": {"required": False, "visible": False, "label": "Dirección"},
-/app/backend/modules/auth/routes/auth_config.py:                "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
-/app/backend/modules/auth/routes/auth_config.py:    return {"success": True, "message": "Configuración guardada"}
-/app/backend/modules/auth/routes/auth_config.py:                "email": {"required": True, "visible": True, "label": "Correo electrónico"},
-/app/backend/modules/auth/routes/auth_config.py:                "telefono": {"required": False, "visible": True, "label": "Teléfono"},
-/app/backend/modules/auth/routes/auth_config.py:                "direccion": {"required": False, "visible": False, "label": "Dirección"},
-/app/backend/modules/auth/routes/auth_config.py:                "contrasena": {"required": True, "visible": True, "label": "Contraseña"}
-/app/backend/modules/auth/routes/auth_config.py:        raise HTTPException(status_code=400, detail="Método invalid")
-/app/backend/modules/auth/events/handlers.py:Manejadores de eventos para el módulo de autenticación
-/app/backend/modules/auth/events/handlers.py:    Configurar handlers de eventos del módulo Auth.
-/app/backend/modules/auth/events/handlers.py:        Crear notificación cuando se registra un usuario.
-/app/backend/modules/auth/events/handlers.py:        Registrar último login of the user.
-/app/backend/modules/auth/events/handlers.py:        Log de todos los eventos del módulo Auth.
-/app/backend/modules/auth/__init__.py:1. Separación clara de responsabilidades
-/app/backend/modules/auth/__init__.py:2. Fácil de testear (cada capa se puede mockear)
-/app/backend/modules/auth/__init__.py:4. Comunicación via Event Bus (no dependencias directas)
-/app/backend/modules/auth/__init__.py:    Inicializar el módulo Auth.
-/app/backend/modules/auth/__init__.py:    Llamar esta función al iniciar la aplicación.
-/app/backend/modules/notifications/providers/push_providers.py:        """Validate configuración FCM"""
-/app/backend/modules/notifications/providers/push_providers.py:        # In producción real, usaríamos OAuth2 con service account
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a dispositivos específicos"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a un topic"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Validate configuración OneSignal"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a dispositivos específicos (por subscription_id)"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a segmentos de OneSignal"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación usando filtros de tags"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a todos los suscriptores"""
-/app/backend/modules/notifications/providers/push_providers.py:        """Send notificación a usuarios por external_id (user_id)"""
-/app/backend/modules/notifications/models/notification_models.py:    AUTO = "auto"  # Selección automática basada en carga/disponibilidad
-/app/backend/modules/notifications/models/notification_models.py:    """Categorías de notificación por defecto"""
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Confirmación de pagos y cobros vía QR",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Membresías",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Cambios de posición, premios, nuevas temporadas",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Desafíos Rapid Pin",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Nuevos desafíos, aceptaciones, partidos esperando árbitro",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Posts y anuncios de administración",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Solicitudes de conexión, aprobaciones, nuevos acudidos",
-/app/backend/modules/notifications/models/notification_models.py:    """Configuración por defecto de proveedores"""
-/app/backend/modules/notifications/models/notification_models.py:    """Plantillas de notificación por defecto"""
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Tu membresía vence pronto",
-/app/backend/modules/notifications/models/notification_models.py:                "es": "Tu membresía vence en {{days}} días. Renuévala para seguir disfrutando.",
-/app/backend/modules/notifications/routes/notifications.py:    """Get mis preferencias de notificación"""
-/app/backend/modules/notifications/routes/notifications.py:    """Update mis preferencias de notificación"""
-/app/backend/modules/notifications/routes/notifications.py:    """Update preferencia de una categoría específica"""
-/app/backend/modules/notifications/routes/notifications.py:    """Get categorías de notificación"""
-/app/backend/modules/notifications/routes/notifications.py:    """Get una categoría específica"""
-/app/backend/modules/notifications/routes/notifications.py:    """Get configuración de proveedores (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Update configuración de un proveedor (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Create nueva categoría de notificación (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Update categoría (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Delete categoría (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Send notificación a un usuario (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Send notificación masiva (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Get plantillas de notificación (admin)"""
-/app/backend/modules/notifications/routes/notifications.py:    """Send notificación push de prueba a un segmento de OneSignal (admin)"""
-/app/backend/modules/notifications/routes/posts.py:    """Get un post específico"""
-/app/backend/modules/notifications/services/post_service.py:            # Send notificación
-/app/backend/modules/notifications/services/post_service.py:            # Get título y resumen en español como default
-/app/backend/modules/notifications/services/post_service.py:                # Extract primer párrafo como resumen
-/app/backend/modules/notifications/services/post_service.py:        """Create bloque de párrafo"""
-/app/backend/modules/notifications/services/post_service.py:        """Create bloque de botón"""
-/app/backend/modules/notifications/services/post_service.py:        TODO: Implementar integración con Monday.com API
-/app/backend/modules/notifications/services/post_service.py:        TODO: Implementar integración con Fusebase API
-/app/backend/modules/notifications/services/push_service.py:Soporta múltiples proveedores (FCM, OneSignal) con failover y balanceo de carga
-/app/backend/modules/notifications/services/push_service.py:        """Inicializar servicio y configuración"""
-/app/backend/modules/notifications/services/push_service.py:        """Inicializar configuración de proveedores"""
-/app/backend/modules/notifications/services/push_service.py:        """Get configuración"""
-/app/backend/modules/notifications/services/push_service.py:        """Update configuración de proveedores"""
-/app/backend/modules/notifications/services/push_service.py:        """Update configuración de un proveedor específico"""
-/app/backend/modules/notifications/services/push_service.py:        # Merge con configuración existente
-/app/backend/modules/notifications/services/push_service.py:        """Seleccionar proveedor según estrategia"""
-/app/backend/modules/notifications/services/push_service.py:        # Balanceo de carga automático
-/app/backend/modules/notifications/services/push_service.py:            # Selección ponderada
-/app/backend/modules/notifications/services/push_service.py:        """Inicializar categorías por defecto"""
-/app/backend/modules/notifications/services/push_service.py:        """Get categorías de notificación"""
-/app/backend/modules/notifications/services/push_service.py:        """Get una categoría específica"""
-/app/backend/modules/notifications/services/push_service.py:        """Create nueva categoría"""
-/app/backend/modules/notifications/services/push_service.py:        """Update categoría"""
-/app/backend/modules/notifications/services/push_service.py:        """Desactivar categoría (soft delete)"""
-/app/backend/modules/notifications/services/push_service.py:        """Get preferencias de notificación of the user"""
-/app/backend/modules/notifications/services/push_service.py:        """Update preferencia de una categoría específica"""
-/app/backend/modules/notifications/services/push_service.py:        """Send notificación a un usuario"""
-/app/backend/modules/notifications/services/push_service.py:            # TODO: Implementar verificación de quiet hours
-/app/backend/modules/notifications/services/push_service.py:        # Get categoría para determinar proveedor
-/app/backend/modules/notifications/services/push_service.py:        # Send según estrategia
-/app/backend/modules/notifications/services/push_service.py:        """Send notificación a múltiples usuarios"""
-/app/backend/modules/notifications/services/push_service.py:        """Send notificación a todos the users con dispositivos registrados"""
-/app/backend/modules/notifications/services/push_service.py:        """Register log de notificación"""
-/app/backend/modules/notifications/__init__.py:Características:
-/app/backend/modules/notifications/__init__.py:- Categorías de notificación configurables
-/app/backend/modules/notifications/__init__.py:- Preferencias de usuario por categoría
-/app/backend/modules/notifications/__init__.py:- Programación de contenido
-/app/backend/modules/notifications/__init__.py:- Integración con CRM (placeholders para Monday.com y Fusebase)
-/app/backend/modules/notifications/__init__.py:    """Inicializar módulo de notificaciones"""
-/app/backend/modules/fusebase/models.py:FuseBase Models - Modelos para integración con FuseBase
-/app/backend/modules/fusebase/models.py:    """Configuración de FuseBase"""
-/app/backend/modules/fusebase/models.py:    # Clasificación local
-/app/backend/modules/fusebase/models.py:    """Categoría para organizar documentos"""
-/app/backend/modules/fusebase/routes.py:FuseBase Routes - Endpoints para integración con FuseBase
-/app/backend/modules/fusebase/routes.py:- GET /fusebase/status - Estado de la integración
-/app/backend/modules/fusebase/routes.py:- GET/PUT /fusebase/config - Configuración
-/app/backend/modules/fusebase/routes.py:- GET /fusebase/categories - Categorías de documentos
-/app/backend/modules/fusebase/routes.py:    return {"success": True, "message": "Configuración de FuseBase actualizada"}
-/app/backend/modules/fusebase/routes.py:            {"category_id": "guias", "nombre": "Guías y Tutoriales", "icono": "📖", "orden": 2},
-/app/backend/modules/fusebase/routes.py:            {"category_id": "politicas", "nombre": "Políticas y Procedimientos", "icono": "📋", "orden": 3},
-/app/backend/modules/fusebase/routes.py:        "description": "Integración con FuseBase para documentos y wikis",
-/app/backend/modules/fusebase/routes.py:                "features": ["Wiki completa", "Documentos", "Navegación integrada"]
-/app/backend/modules/fusebase/routes.py:                "features": ["Lista de documentos", "Búsqueda", "Organización personalizada"]
-/app/backend/modules/fusebase/routes.py:            "3. Los documentos estarán disponibles en la app"
-/app/backend/modules/fusebase/__init__.py:Integración con FuseBase para documentos, wikis y
-/app/backend/modules/fusebase/__init__.py:colaboración de la comunidad. to identify remaining patterns and continue translating them with  until the count is zero.
-  - **What will be achieved with this?** The codebase's comments and docstrings will be 100% in English, fulfilling a major part of the user's mandate.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** backend
-- **Task 2: Rename Remaining Spanish Files and Variables (P0)**
-  - **Where to resume:** After comment translation is complete, perform a comprehensive search for any remaining Spanish filenames (e.g., ), variables, and hardcoded strings. Rename and refactor them, similar to how the  module was handled.
-  - **What will be achieved with this?** The codebase will be fully compliant with the 100% English requirement.
-  - **Status:** NOT STARTED
-  - **Should Test frontend/backend/both after fix?** both
+-   **Task 1: Finalize English-Only Refactoring (P0)**
+    -   **Where to resume:** The agent had just finished a batch replacement of  fields in the  frontend components. The next step is to refactor the corresponding backend models (e.g., ) to rename fields like  and , and ensure there are no remaining Spanish terms or compatibility fallbacks anywhere in the codebase.
+    -   **What will be achieved with this?** The codebase will be 100% compliant with the user's strict English-only requirement, improving consistency and maintainability.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** both
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks:**
-    - **P1:** Fix the recurring Admin Sidebar bug.
-    - **P2:** Fix the broken Google Sign-Up flow.
-    - **P3:** Implement the admin UI for existing backend features (school year automation, student profile locking).
-    - **P4:** Update the user-facing student profile form to disable fields when a profile is locked.
-    - **P5:** Implement OneSignal push notifications for textbook order status changes.
-- **Future Tasks:**
-    - Integrate Stripe for payment processing.
-    - Integrate Google Sheets API for data import.
-    - Create a template selector for landing page blocks.
-    - Develop a system for teams/clans with collective rewards.
-    - Add email notifications for critical role assignments.
-    - Integrate ChipiPoints as a payment method.
+-   **Upcoming Tasks:**
+    -   **P1:** Fix the recurring Admin Sidebar bug.
+    -   **P2:** Fix the broken Google Sign-Up flow.
+    -   **P3:** Implement the admin UI for existing backend features (school year automation, student profile locking).
+    -   **P4:** Update the user-facing student profile form to disable fields when a profile is locked.
+    -   **P5:** Implement OneSignal push notifications for textbook order status changes.
+-   **Future Tasks:**
+    -   Integrate Stripe for payment processing.
+    -   Integrate Google Sheets API for data import.
+    -   Create a template selector for landing page blocks.
+    -   Develop a system for teams/clans with collective rewards.
+    -   Add email notifications for critical role assignments.
+    -   Integrate ChipiPoints as a payment method.
 
 **Completed work in this session**
-- **Frontend i18n Refactoring (100% Complete):**
-  - Migrated the final components (, ) from the local  object pattern to the  system.
-  - Fixed missing translation keys in  that were identified by the testing agent ().
-- **Backend Refactoring (Partial):**
-  - Renamed , , and  to their English equivalents ().
-  - Updated the API route prefix from  to .
-  - Updated all corresponding API calls in the frontend to use the new route.
-  - Translated over 60% of Spanish comments and docstrings in the backend via numerous batch  operations.
-- **Continuous Verification:** Successfully ran multiple frontend builds (yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.) and backend health checks to ensure stability during the extensive refactoring.
+-   **Comprehensive Spanish-to-English Refactoring (Code, DB Fields & Collections):**
+    -   Successfully refactored backend and frontend to use English names for all database fields (e.g., , , ).
+    -   Renamed all Spanish database collections to English (e.g.,  -> ,  -> ).
+    -   Rewrote key files like  and  to align with the new English-only data contract.
+-   **LaoPan OAuth 2.0 Flow Fixed:**
+    -   Resolved intermittent login failures by migrating OAuth state from in-memory to a persistent MongoDB collection ().
+    -   Implemented dynamic  generation to work across both preview and production environments.
+    -   Added a Sign Up link to the login page and fully internationalized all new UI text.
+-   **Link Student Functionality Fixed:**
+    -   Diagnosed and fixed the user-facing bug where linked students were not appearing by updating  to use the refactored English field names (, ).
+-   **Inventory Import Feature Enhanced:**
+    -   Implemented support for comma-separated grades (e.g., K4,K5) in CSV uploads.
+    -   Fixed the preview UI to correctly display multiple grades as distinct badges.
+-   **i18n Admin Module Verified:**
+    -   Confirmed the admin translations module at  is fully functional.
+    -   Synced all new translation keys from JSON files to the database.
 
 **Earlier issues found/mentioned but not fixed**
-- All recurring issues (Admin Sidebar Disappearance, Google Sign-Up Loop,  error) remain unaddressed, as the user has consistently prioritized the codebase refactoring.
+-   All recurring issues (Admin Sidebar Disappearance, Google Sign-Up Loop,  error) remain unaddressed, as the user has consistently prioritized the codebase refactoring and other fixes.
 
 **Known issue recurrence from previous fork**
-- **Admin Sidebar Disappears**: The admin navigation randomly fails to render after login. Status: **NOT STARTED**.
-- **Google Sign-Up Loop**: The Google OAuth flow is broken. Status: **NOT STARTED**.
-- ** error**: A script error from the platform overlays the UI. Status: **NOT STARTED**.
+-   **Admin Sidebar Disappears**: The admin navigation randomly fails to render after login. Status: **NOT STARTED**.
+-   **Google Sign-Up Loop**: The Google OAuth flow is broken. Status: **NOT STARTED**.
+-   ** error**: A script error from the platform overlays the UI. Status: **NOT STARTED**.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Large-Scale Code Refactoring:** Systematically improving codebase quality and consistency using scripted search-and-replace ( and ) for mass changes.
-- **API Endpoint Refactoring:** The process of renaming a route prefix on the backend ( -> ) and updating all client-side consumers.
-- **Full-Stack Language Consistency:** Enforcing a strict rule that all assets—filenames, comments, variables, API routes, and UI text—must be in English.
+-   **Large-Scale Code Refactoring:** Executed multiple, deep refactoring passes on code, database field names, and collection names using a combination of scripted () and manual edits.
+-   **OAuth 2.0 State Management:** Migrated state from volatile memory to a persistent database collection ( in MongoDB) with a TTL index to ensure reliability in a production environment.
+-   **Dynamic OAuth Redirect URI:** Implemented a backend mechanism to dynamically generate the  based on the request's  or  header, allowing the same code to work across different environments (preview, production).
+-   **Frontend/Backend Data Contract Synchronization:** Debugged and fixed UI issues caused by mismatches between frontend expectations and backend API responses after major refactoring.
 
 **key DB schema**
-- No schema changes were made in this session.
+-   **oauth_states (NEW):**  - Includes a TTL index to automatically delete documents after 10 minutes.
+-   **store_products (REFACTORED from ):** 
+-   **synced_students (REFACTORED from ):** 
+-   **Other renamed collections:**  (from ),  (from ).
 
 **changes in tech stack**
-- None.
+-   None.
 
 **All files of reference**
-- : Contains project requirements and has been updated with refactoring progress.
-- : Test report that identified a frontend i18n bug, which has since been fixed.
-- : The primary backend route file that was renamed and had its comments and prefix refactored.
-- : One of several frontend files updated to use the new  endpoint.
-- : An example of a file that still has a Spanish name and needs to be refactored as part of P0.
+-   : Core logic for the fixed OAuth flow.
+-   : Rewritten for multi-grade support and English fields.
+-   : Heavily refactored to fix UI bugs post-refactoring.
+-   : Contains the updated LaoPan login/signup flow.
+-   : Source of truth for all current database collection names.
+-   : Next file to be refactored.
 
 **Areas that need refactoring**:
-- **Code Comments:** The remaining ~300+ Spanish comments and docstrings in the backend.
-- **Filenames:** Files with Spanish names, such as , need to be renamed and their imports updated.
-- **Variables/Strings:** Any remaining hardcoded Spanish variables or strings inside backend logic.
+-   The  module (backend models and frontend components) is the immediate focus for completing the English-only refactoring.
+-   A final global search for any lingering Spanish terms or compatibility fallbacks is required before concluding the P0 task.
 
 **key api endpoints**
-- **UPDATED:**  (and all other endpoints under this prefix, formerly ).
-- 
-- 
+-   : Modified to accept  header for dynamic redirect URI.
+-   : Modified to use database for state validation.
+-   : Rewritten to handle new data schema and multi-grade logic.
+-   : Verified working.
+-   : Investigated and confirmed to be querying the correct collection.
+-    (NEW): Added to fetch synced students for the admin UI.
 
 **Critical Info for New Agent**
-- **User Language Protocol:** The user communicates in Spanish. You **MUST** respond and code exclusively in English.
-- **Top Priority is Refactoring (P0):** You must complete the Spanish-to-English refactoring before addressing any other tasks. This means:
-  1. Translate the rest of the backend comments to zero.
-  2. Find and rename all remaining Spanish-named files, variables, etc.
-- Do not start work on the recurring bugs (Admin Sidebar, Google Auth) until the user explicitly confirms the P0 refactoring is 100% complete and approves moving on.
+-   **User Language Protocol:** The user communicates in Spanish. You **MUST** respond and code exclusively in English.
+-   **Top Priority is Refactoring (P0):** Your first task is to complete the 100% English-only refactoring. This is non-negotiable. Remove all compatibility fallbacks (e.g., ) and ensure only English names () are used. Start with the  module.
+-   **No Production Data:** The user has confirmed they do not have real production data, so database migrations are not necessary. However, the code must be 100% consistent with the new English-only schema.
+-   **OAuth Callback URLs:** For the LaoPan OAuth to work, the production domain's callback URL (e.g., ) must be added to the allowed list in the LaoPan.online admin panel.
 
 **documents and test reports created in this job**
-- 
--  (updated multiple times)
+-    (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. **User:** Asked to continue with P0 (refactoring).
-2. **Agent:** Finished a batch of backend comment translations and proposed moving to the P1 Admin Sidebar bug.
-3. **User:** Corrected the agent, pointing out a file named  that was still in Spanish.
-4. **Agent:** Acknowledged the mistake and proceeded to rename the  files and refactor the associated API route.
-5. **User:** Approved the file renaming and instructed the agent to continue translating comments AND update the route prefix/frontend calls.
-6. **Agent:** Completed the route prefix refactoring.
-7. **User:** Instructed the agent to continue with Next Action Items P0, referring to the remaining backend comment translations.
-8. **Agent:** Translated another large batch of comments.
-9. **User:** Re-iterated to complete remaining inline comments translation.
-10. **Agent:** Executed a massive, multi-step batch translation effort, significantly reducing the number of remaining Spanish comments and confirming with the user.
+1.  **User:** Reports that the Link Student function is not working after a form submission.
+2.  **Agent:** Investigates and finds the frontend () is using old Spanish field names (, ) while the backend sends English names (, ). Fixes the frontend.
+3.  **User:** Insists that the agent must remove all Spanish compatibility fallbacks and use only English names, as per the 100% English refactoring goal.
+4.  **Agent:** Agrees and begins a final, strict refactoring pass, starting with the  module.
+5.  **User:** Asks where to change the i18n translations.
+6.  **Agent:** Provides the file paths for , , and .
+7.  **User:** Asks the agent to ensure the admin translation management feature is still working.
+8.  **Agent:** Verifies the admin module and its APIs are functional and syncs the new keys to the database.
+9.  **User:** Reports an intermittent OAuth error in production (Invalid Client ID on the first try).
+10. **Agent:** Diagnoses the issue as in-memory state storage. Fixes it by migrating state to a persistent MongoDB collection.
+11. **User:** Reports a new OAuth error after the fix (Session state invalid or expired).
+12. **Agent:** Investigates further, finds a timezone-related bug in the state validation logic, and fixes it.
 
 **Project Health Check:**
-- **Broken**:
-  - Google Authentication (recurring, unaddressed).
-  - Admin Sidebar (recurring, unaddressed).
-- **Needs Refactoring**:
-  - ~300+ remaining Spanish code comments in the backend.
-  - Backend files with Spanish names (e.g., ).
-- **Mocked**:
-  - OneSignal (Push Notifications).
+-   **Broken**:
+    -   Google Authentication (recurring, unaddressed).
+    -   Admin Sidebar (recurring, unaddressed).
+-   **Needs Refactoring**:
+    -   The  module (backend and frontend) to remove all Spanish nomenclature.
+    -   A final audit of the entire codebase for any remaining Spanish fallbacks.
+-   **Mocked**:
+    -   OneSignal (Push Notifications).
 
 **3rd Party Integrations**
-- **i18next / react-i18next**: Mandatory standard for all UI text.
-- **Monday.com**: Textbook order fulfillment.
-- **ipapi.co**: IP-based geolocation.
-- **Yappy Comercial (BG)**: Payment processing.
-- **Invision Community (LaoPan.online)**: OAuth 2.0 for user authentication.
+-   **i18next / react-i18next**: Standard for all UI text.
+-   **Monday.com**: Textbook order fulfillment.
+-   **ipapi.co**: IP-based geolocation.
+-   **Yappy Comercial (BG)**: Payment processing.
+-   **Invision Community (LaoPan.online)**: OAuth 2.0 for user authentication (heavily refactored and fixed).
 
 **Testing status**
-- **Testing agent used after significant changes**: YES (Used once to verify frontend i18n refactoring; it found a valid bug that was fixed).
-- **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: NO
-- **Known regressions**: The Admin Sidebar and Google Auth bugs are long-standing, known regressions from previous sessions.
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: NO
+-   **Known regressions**: The Admin Sidebar and Google Auth bugs are long-standing, known regressions from previous sessions.
 
 **Credentials to test flow:**
-- **Super Admin Email**: 
-- **Super Admin Password**: 
+-   **Super Admin Email**: 
+-   **Super Admin Password**: 
 
 **What agent forgot to execute**
-- The agent has not yet performed a comprehensive audit for other Spanish-named files beyond the  module that the user pointed out. The task to find and rename files like  is part of the P0 refactoring but has not been started. The immediate focus has been on comment translation per the user's latest instructions.</analysis>
+-   The agent was in the middle of executing the user's highest-priority task (final P0 refactoring) when the session ended. The work on the  module and the final audit for Spanish terms is incomplete and must be resumed immediately.</analysis>
