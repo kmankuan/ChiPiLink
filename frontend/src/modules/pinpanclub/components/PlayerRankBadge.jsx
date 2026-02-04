@@ -240,7 +240,7 @@ export default function PlayerRankBadge({ playerId, jugadorId, showProgress = tr
           <TooltipContent side="bottom" className={`${currentRank.bgColor} border-2 ${currentRank.borderColor}`}>
             <div className="text-center p-1">
               <p className={`font-bold ${currentRank.textColor}`}>{currentRank.name}</p>
-              <p className="text-xs text-gray-600">{totalPoints} puntos</p>
+              <p className="text-xs text-gray-600">{totalPoints} points</p>
             </div>
           </TooltipContent>
         </Tooltip>
@@ -317,19 +317,19 @@ export default function PlayerRankBadge({ playerId, jugadorId, showProgress = tr
             
             <div className="border-t border-gray-200 pt-2">
               <p className="text-sm">
-                <span className="font-bold">{totalPoints.toLocaleString()}</span> puntos totales
+                <span className="font-bold">{totalPoints.toLocaleString()}</span> total points
               </p>
             </div>
             
             {nextRank && (
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span>Siguiente: <strong className={RANKS[currentRank.index + 1]?.textColor}>{nextRank.name}</strong></span>
+                  <span>Next: <strong className={RANKS[currentRank.index + 1]?.textColor}>{nextRank.name}</strong></span>
                   <span>{progress}%</span>
                 </div>
                 <Progress value={progress} className="h-2" />
                 <p className="text-xs text-gray-500 text-center">
-                  Faltan <strong>{pointsToNext.toLocaleString()}</strong> puntos
+                  <strong>{pointsToNext.toLocaleString()}</strong> points to go
                 </p>
               </div>
             )}
@@ -337,7 +337,7 @@ export default function PlayerRankBadge({ playerId, jugadorId, showProgress = tr
             {isMaxRank && (
               <div className="bg-gradient-to-r from-red-100 to-yellow-100 rounded-lg p-2 text-center">
                 <p className="text-sm font-bold text-red-600">
-                  🎉 ¡Has alcanzado el rango máximo!
+                  🎉 You have reached the maximum rank!
                 </p>
               </div>
             )}
