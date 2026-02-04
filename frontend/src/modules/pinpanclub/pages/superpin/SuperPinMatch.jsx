@@ -174,16 +174,16 @@ export default function SuperPinMatch() {
             <div className={`p-6 rounded-xl ${match.winner_id === match.player_b_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
-                  {match.player_b_info?.nombre?.[0] || 'B'}
+                  {match.player_b_info?.name?.[0] || 'B'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.player_b_info?.nombre || t('superpin.players.playerB')}</h3>
-                {match.player_b_info?.apodo && (
-                  <p className="text-gray-400">"{match.player_b_info.apodo}"</p>
+                <h3 className="text-xl font-bold text-white">{match.player_b_info?.name || t('superpin.players.playerB')}</h3>
+                {match.player_b_info?.nickname && (
+                  <p className="text-gray-400">"{match.player_b_info.nickname}"</p>
                 )}
               </div>
               <div className="text-center">
-                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
-                <p className="text-6xl font-bold text-white">{match.puntos_player_b}</p>
+                <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.current_set}</p>
+                <p className="text-6xl font-bold text-white">{match.points_player_b}</p>
               </div>
               {isInProgress && (
                 <div className="mt-4 space-y-2">
@@ -209,18 +209,18 @@ export default function SuperPinMatch() {
 
           {/* Match Info */}
           <div className="mt-6 text-center text-gray-400">
-            <p>{t('superpin.matches.bestOf')} {match.mejor_de} • {match.puntos_por_set} {t('superpin.matches.pointsPerSet')}</p>
+            <p>{t('superpin.matches.bestOf')} {match.best_of} • {match.points_per_set} {t('superpin.matches.pointsPerSet')}</p>
           </div>
 
           {/* Set History */}
-          {match.historial_sets?.length > 0 && (
+          {match.set_history?.length > 0 && (
             <div className="mt-6">
               <p className="text-gray-400 text-sm mb-2 text-center">{t('superpin.matches.setHistory')}</p>
               <div className="flex justify-center gap-4">
-                {match.historial_sets.map((set, i) => (
+                {match.set_history.map((set, i) => (
                   <div key={i} className="bg-gray-700 px-4 py-2 rounded-lg text-center">
                     <p className="text-xs text-gray-400">{t('superpin.matches.set')} {set.set}</p>
-                    <p className="text-white font-bold">{set.puntos_a} - {set.puntos_b}</p>
+                    <p className="text-white font-bold">{set.points_a} - {set.points_b}</p>
                   </div>
                 ))}
               </div>
