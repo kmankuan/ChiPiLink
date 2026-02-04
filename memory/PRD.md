@@ -237,10 +237,9 @@ New column names: `code`, `name`, `grade`, `quantity`, `price`, `subject`, `publ
 - `conexiones_service.py` → `connections_service.py` ✅
 - `catalogo_privado.py` → `private_catalog.py` ✅
 
-### P0 - PinpanClub English Refactoring (IN PROGRESS - 90%)
+### P0 - PinpanClub English Refactoring (IN PROGRESS - 95%)
 **Remaining Work:**
-- Complete frontend component refactoring for ~20 remaining pinpanclub pages/components
-- Files remaining: WeeklyChallenges, RankingSeasons, MatchComments, SocialFeatures, PingPongDashboard, etc.
+- Complete frontend component refactoring for ~10 remaining pinpanclub pages (rapidpin, tournaments, etc.)
 - User will redeploy with fresh database (no backward-compatibility needed)
 
 ### P1 - Known Bugs
