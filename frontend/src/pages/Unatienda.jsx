@@ -140,7 +140,8 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
   // Fetch orders for all students
   useEffect(() => {
-    if (catalogoPrivadoAcceso?.estudiantes?.length > 0) {
+    const students = catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes;
+    if (students?.length > 0) {
       fetchStudentOrders();
     }
   }, [catalogoPrivadoAcceso]);
