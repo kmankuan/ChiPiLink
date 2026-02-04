@@ -1,6 +1,6 @@
 """
 Community Module - Post Routes
-Endpoints para posts usando el Service Layer
+Endpoints for posts using Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
@@ -18,10 +18,10 @@ async def get_posts(
     featured: Optional[bool] = None,
     limit: int = Query(20, ge=1, le=100)
 ):
-    """Get posts publicados"""
+    """Get published posts"""
     return await post_service.get_published_posts(
         tipo=tipo,
-        destacado=destacado,
+        featured=featured,
         limit=limit
     )
 
