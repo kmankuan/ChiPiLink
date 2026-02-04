@@ -87,6 +87,17 @@ The session is focused on completing the 100% English-only refactoring mandate, 
 | `set_actual`       | `current_set`       |
 | `mejor_de`         | `best_of`           |
 | `historial_sets`   | `set_history`       |
+| `fecha_registro`   | `registration_date` |
+| `nivel`            | `level`             |
+| `apellido`         | `last_name`         |
+| `temporada`        | `season`            |
+| `saque`            | `serve`             |
+| `foto_url`         | `photo_url`         |
+
+#### Database Decision:
+- User confirmed they will redeploy with a fresh database
+- All backward-compatibility fallbacks removed from backend code
+- Code now uses pure English field names only
 
 #### Frontend Files Refactored:
 - `SuperPinRanking.jsx` - Updated field references ✅
