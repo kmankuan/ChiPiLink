@@ -84,14 +84,14 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
       );
 
       if (response.ok) {
-        toast.success('¡Reto iniciado!');
+        toast.success(t('challenges.started'));
         fetchData();
       } else {
         const error = await response.json();
-        toast.error(error.detail || 'Error al iniciar el reto');
+        toast.error(error.detail || t('challenges.errorStarting'));
       }
     } catch (error) {
-      toast.error('Error al iniciar el reto');
+      toast.error(t('challenges.errorStarting'));
     }
   };
 
@@ -123,8 +123,8 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
             <Target className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Retos Semanales</h2>
-            <p className="text-muted-foreground">Completa retos y gana puntos</p>
+            <h2 className="text-2xl font-bold">{t('challenges.weeklyTitle')}</h2>
+            <p className="text-muted-foreground">{t('challenges.subtitle')}</p>
           </div>
         </div>
 
@@ -132,11 +132,11 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
           <div className="flex items-center gap-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-purple-500">{playerStats.challenges_completed}</p>
-              <p className="text-xs text-muted-foreground">Completados</p>
+              <p className="text-xs text-muted-foreground">{t('challenges.completed')}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-yellow-500">{playerStats.total_points}</p>
-              <p className="text-xs text-muted-foreground">Puntos</p>
+              <p className="text-xs text-muted-foreground">{t('challenges.points')}</p>
             </div>
           </div>
         )}
@@ -146,15 +146,15 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
         <TabsList>
           <TabsTrigger value="weekly">
             <Calendar className="w-4 h-4 mr-2" />
-            Esta Semana
+            {t('challenges.thisWeek')}
           </TabsTrigger>
           <TabsTrigger value="my-challenges">
             <Target className="w-4 h-4 mr-2" />
-            Mis Retos
+            {t('challenges.myChallenges')}
           </TabsTrigger>
           <TabsTrigger value="leaderboard">
             <Trophy className="w-4 h-4 mr-2" />
-            Ranking
+            {t('challenges.ranking')}
           </TabsTrigger>
         </TabsList>
 
