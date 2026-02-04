@@ -1102,9 +1102,9 @@ export default function Unatienda() {
                 >
                   <GraduationCap className="h-4 w-4" />
                   Compra Exclusiva
-                  {catalogoPrivadoAcceso?.has_access && (catalogoPrivadoAcceso?.students || catalogoPrivadoAcceso?.estudiantes)?.length > 0 && (
+                  {catalogoPrivadoAcceso?.has_access && catalogoPrivadoAcceso?.students?.length > 0 && (
                     <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs">
-                      {(catalogoPrivadoAcceso.students || catalogoPrivadoAcceso.estudiantes).length}
+                      {catalogoPrivadoAcceso.students.length}
                     </Badge>
                   )}
                 </Button>
