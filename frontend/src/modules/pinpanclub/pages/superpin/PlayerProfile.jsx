@@ -403,16 +403,16 @@ export default function PlayerProfile() {
                         </div>
                         <div>
                           <p className="font-medium">
-                            vs {match.opponent.nombre}
-                            {match.opponent.apodo && <span className="text-gray-500"> "{match.opponent.apodo}"</span>}
+                            vs {match.opponent.name}
+                            {match.opponent.nickname && <span className="text-gray-500"> "{match.opponent.nickname}"</span>}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {match.fecha && new Date(match.fecha).toLocaleDateString()}
+                            {match.date && new Date(match.date).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold">{match.resultado}</p>
+                        <p className="text-2xl font-bold">{match.result}</p>
                         {match.elo_change !== undefined && match.elo_change !== null && (
                           <p className={`text-sm ${match.elo_change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {match.elo_change >= 0 ? '+' : ''}{match.elo_change} ELO
@@ -476,8 +476,8 @@ export default function PlayerProfile() {
                         </span>
                         <p className="font-bold mt-2">{badge.name}</p>
                         <p className="text-xs text-gray-500 mt-1">{badge.description}</p>
-                        {badge.temporada && (
-                          <Badge className="mt-2" variant="outline">{badge.temporada}</Badge>
+                        {badge.season && (
+                          <Badge className="mt-2" variant="outline">{badge.season}</Badge>
                         )}
                         <p className="text-xs text-gray-400 mt-2">
                           {new Date(badge.earned_at).toLocaleDateString()}
@@ -496,7 +496,7 @@ export default function PlayerProfile() {
           <div className="space-y-6">
             {/* Comments Section */}
             <CommentsSection
-              targetId={jugadorId}
+              targetId={playerIdToUse}
               targetType="player"
               currentUserId={currentUserId}
             />
