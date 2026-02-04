@@ -160,7 +160,7 @@ export default function PingPongDashboard() {
         <CardContent className="pt-4 text-center">
           <Target className="h-8 w-8 mx-auto mb-2 text-purple-500" />
           <div className="text-2xl font-bold">{recentMatches.length}</div>
-          <div className="text-sm text-muted-foreground">Partidos Recientes</div>
+          <div className="text-sm text-muted-foreground">Recent Matches</div>
         </CardContent>
       </Card>
     </div>
@@ -168,7 +168,7 @@ export default function PingPongDashboard() {
 
   return (
     <div className={isInsideAdmin ? "" : "min-h-screen bg-background"}>
-      {/* Header - Solo mostrar si NO estamos dentro del admin */}
+      {/* Header - Only show if NOT inside admin */}
       {!isInsideAdmin && (
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b">
           <div className="container mx-auto px-4 py-3">
@@ -185,7 +185,7 @@ export default function PingPongDashboard() {
                     mode="both"
                   />
                 )}
-                {/* Super Pin - Destacado */}
+                {/* Super Pin - Featured */}
                 <Button 
                   variant="default" 
                   size="sm" 
@@ -195,7 +195,7 @@ export default function PingPongDashboard() {
                   <Trophy className="h-4 w-4 mr-2" />
                   🏆 Super Pin
                 </Button>
-                {/* Rapid Pin - Nuevo */}
+                {/* Rapid Pin - New */}
                 <Button 
                   variant="default" 
                   size="sm" 
@@ -212,11 +212,11 @@ export default function PingPongDashboard() {
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/players')}>
                   <Users className="h-4 w-4 mr-2" />
-                  Jugadores
+                  Players
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate('/pinpanclub/tournaments')}>
                   <Trophy className="h-4 w-4 mr-2" />
-                  Torneos
+                  Tournaments
                 </Button>
                 {/* Configuration Menu - Only for admins/moderators */}
                 {canManage && (
@@ -224,7 +224,7 @@ export default function PingPongDashboard() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Settings className="h-4 w-4 mr-2" />
-                        Configuración
+                        Settings
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -247,12 +247,12 @@ export default function PingPongDashboard() {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/pinpanclub/sponsors')}>
                         <Image className="h-4 w-4 mr-2" />
-                        Patrocinadores
+                        Sponsors
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => navigate('/tv/pinpanclub')}>
                         <Eye className="h-4 w-4 mr-2" />
-                        Vista TV
+                        TV View
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/canvas')}>
                         <CalendarDays className="h-4 w-4 mr-2" />
