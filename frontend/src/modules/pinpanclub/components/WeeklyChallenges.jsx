@@ -24,20 +24,17 @@ const difficultyConfig = {
   extreme: { color: 'bg-red-500', label: 'Extreme', icon: '🔴' }
 };
 
-export default function WeeklyChallenges({ playerId, jugadorId }) {
+export default function WeeklyChallenges({ playerId }) {
   const { t } = useTranslation();
   const [weeklyChallenges, setWeeklyChallenges] = useState([]);
   const [playerChallenges, setPlayerChallenges] = useState([]);
   const [playerStats, setPlayerStats] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Support both new and legacy prop names
-  const playerIdToUse = playerId || jugadorId;
 
   useEffect(() => {
     fetchData();
-  }, [playerIdToUse]);
+  }, [playerId]);
 
   const fetchData = async () => {
     try {
@@ -49,8 +46,8 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
       }
 
       // Fetch player challenges if logged in
-      if (playerIdToUse) {
-        const playerRes = await fetch(`${API_URL}/api/pinpanclub/challenges/player/${playerIdToUse}`);
+      if (playerId) {
+        const playerRes = await fetch(`${API_URL}/api/pinpanclub/challenges/player/${playerId}`);
         if (playerRes.ok) {
           const data = await playerRes.json();
           setPlayerChallenges(data.challenges || []);
@@ -72,7 +69,7 @@ export default function WeeklyChallenges({ playerId, jugadorId }) {
   };
 
   const startChallenge = async (challengeId) => {
-    if (!playerIdToUse) {
+    if (!playerId) {
       toast.error(t('challenges.loginRequired'));
       return;
     }
