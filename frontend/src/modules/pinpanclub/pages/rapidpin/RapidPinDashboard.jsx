@@ -268,7 +268,7 @@ export default function RapidPinDashboard() {
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        {formatDate(season.fecha_inicio)} - {formatDate(season.fecha_fin)}
+                        {formatDate(season.start_date)} - {formatDate(season.end_date)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
