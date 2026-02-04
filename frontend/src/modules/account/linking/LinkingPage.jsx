@@ -159,6 +159,14 @@ export default function LinkingPage({ embedded = false }) {
     setSaving(true);
 
     try {
+      // Check if token exists
+      if (!token) {
+        toast.error('Please log in again');
+        console.error('No auth token available');
+        setSaving(false);
+        return;
+      }
+
       const payload = {
         full_name: fullName.trim(),
         school_id: schoolId,
@@ -169,19 +177,33 @@ export default function LinkingPage({ embedded = false }) {
         relation_other: relationship === 'other' ? relationshipOther.trim() : undefined
       };
 
-      console.log('Submitting:', payload);
+      console.log('Submitting payload:', JSON.stringify(payload));
+      console.log('API URL:', `${API_URL}/api/store/textbook-access/students`);
+      console.log('Token present:', !!token, 'Token start:', token?.substring(0, 20));
 
       const response = await fetch(`${API_URL}/api/store/textbook-access/students`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
-      console.log('Response:', response.status, data);
+      console.log('Response status:', response.status);
+      
+      let data;
+      try {
+        data = await response.json();
+        console.log('Response data:', data);
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        const text = await response.text();
+        console.error('Response text:', text);
+        toast.error('Server returned invalid response');
+        setSaving(false);
+        return;
+      }
 
       if (response.ok) {
         toast.success('Student linked successfully!');
