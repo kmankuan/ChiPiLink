@@ -211,6 +211,10 @@ export default function AccountDashboard() {
               <NotificationHistory token={token} />
             </div>
           </TabsContent>
+
+          <TabsContent value="exclusive">
+            <LinkingPage embedded={true} />
+          </TabsContent>
         </Tabs>
       </div>
 
