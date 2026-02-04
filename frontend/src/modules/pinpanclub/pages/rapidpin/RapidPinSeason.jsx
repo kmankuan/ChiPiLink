@@ -112,12 +112,12 @@ export default function RapidPinSeason() {
 
   const registerMatch = async () => {
     // Validations
-    if (!newMatch.player_a_id || !newMatch.player_b_id || !newMatch.arbitro_id || !newMatch.winner_id) {
+    if (!newMatch.player_a_id || !newMatch.player_b_id || !newMatch.referee_id || !newMatch.winner_id) {
       toast.error(t('rapidpin.matches.fieldsRequired'));
       return;
     }
 
-    const participants = new Set([newMatch.player_a_id, newMatch.player_b_id, newMatch.arbitro_id]);
+    const participants = new Set([newMatch.player_a_id, newMatch.player_b_id, newMatch.referee_id]);
     if (participants.size !== 3) {
       toast.error(t('rapidpin.matches.differentParticipants'));
       return;
@@ -135,7 +135,7 @@ export default function RapidPinSeason() {
         body: JSON.stringify({
           season_id: seasonId,
           ...newMatch,
-          registrado_por_id: currentUserId || newMatch.player_a_id
+          registered_by_id: currentUserId || newMatch.player_a_id
         })
       });
 
@@ -145,10 +145,10 @@ export default function RapidPinSeason() {
         setNewMatch({
           player_a_id: '',
           player_b_id: '',
-          arbitro_id: '',
-          ganador_id: '',
-          score_ganador: 11,
-          score_perdedor: 0
+          referee_id: '',
+          winner_id: '',
+          winner_score: 11,
+          loser_score: 0
         });
         fetchData();
       } else {
@@ -163,7 +163,7 @@ export default function RapidPinSeason() {
 
   const confirmMatch = async (matchId) => {
     try {
-      const response = await fetch(`${API_BASE}/rapidpin/matches/${matchId}/confirm?confirmado_por_id=${currentUserId}`, {
+      const response = await fetch(`${API_BASE}/rapidpin/matches/${matchId}/confirm?confirmed_by_id=${currentUserId}`, {
         method: 'POST'
       });
 
