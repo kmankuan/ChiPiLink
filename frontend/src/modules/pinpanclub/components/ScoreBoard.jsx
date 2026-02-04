@@ -259,22 +259,22 @@ export default function ScoreBoard({
               <div className="text-muted-foreground">
                 Best streak: {statistics.max_streak_a || 0}
               </div>
-              {estadisticas.racha_actual_a > 0 && (
+              {statistics.current_streak_a > 0 && (
                 <Badge variant="outline" className="mt-1">
                   <Flame className="h-3 w-3 mr-1 text-orange-500" />
-                  Racha: {estadisticas.racha_actual_a}
+                  Streak: {statistics.current_streak_a}
                 </Badge>
               )}
             </div>
             <div className="text-center">
               <div className="text-blue-600 font-semibold">{playerBName}</div>
               <div className="text-muted-foreground">
-                Mejor racha: {estadisticas.max_racha_b || 0}
+                Best streak: {statistics.max_streak_b || 0}
               </div>
-              {estadisticas.racha_actual_b > 0 && (
+              {statistics.current_streak_b > 0 && (
                 <Badge variant="outline" className="mt-1">
                   <Flame className="h-3 w-3 mr-1 text-orange-500" />
-                  Racha: {estadisticas.racha_actual_b}
+                  Streak: {statistics.current_streak_b}
                 </Badge>
               )}
             </div>
