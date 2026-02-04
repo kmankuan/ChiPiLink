@@ -213,14 +213,17 @@ export default function LinkingPage({ embedded = false }) {
 
       console.log('Response status:', response.status);
       
+      // Read response as text first (can only read body once)
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
       let data;
       try {
-        data = await response.json();
-        console.log('Response data:', data);
+        data = responseText ? JSON.parse(responseText) : {};
+        console.log('Parsed response data:', data);
       } catch (parseError) {
-        console.error('Failed to parse response:', parseError);
-        const text = await response.text();
-        console.error('Response text:', text);
+        console.error('Failed to parse response as JSON:', parseError);
+        console.error('Raw response was:', responseText);
         toast.error('Server returned invalid response');
         setSaving(false);
         return;
