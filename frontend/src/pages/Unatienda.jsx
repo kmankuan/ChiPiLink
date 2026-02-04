@@ -660,7 +660,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                         <User className="h-5 w-5 text-purple-600" />
                       </div>
                       <div>
-                        <h4 className="font-semibold">{student.name || student.nombre}</h4>
+                        <h4 className="font-semibold">{student.name}</h4>
                         <p className="text-sm text-muted-foreground">
                           Grado {student.grade} • {student.school_name || 'PCA'} • Año 2026
                         </p>
