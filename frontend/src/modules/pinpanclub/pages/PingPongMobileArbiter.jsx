@@ -155,7 +155,7 @@ export default function PingPongMobileArbiter() {
           response = await fetch(PINPANCLUB_API.matchPoint(matchId), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jugador: data.jugador, tipo: data.tipo || 'normal' })
+            body: JSON.stringify({ player: data.player, type: data.type || 'normal' })
           });
         } else if (action === 'undo') {
           response = await fetch(PINPANCLUB_API.matchUndo(matchId), {
@@ -181,7 +181,7 @@ export default function PingPongMobileArbiter() {
           }
         }
       } catch (err) {
-        setError('Error al enviar acción');
+        setError('Error sending action');
       }
     }
     
@@ -207,13 +207,13 @@ export default function PingPongMobileArbiter() {
 
   // ============== ACTIONS ==============
   
-  const addPoint = (jugador) => {
-    sendAction('point', { jugador, tipo: 'normal' });
+  const addPoint = (player) => {
+    sendAction('point', { player, type: 'normal' });
   };
 
   const undoPoint = () => {
     setConfirmAction({
-      title: '¿Deshacer último punto?',
+      title: 'Undo last point?',
       action: () => {
         sendAction('undo');
         setConfirmAction(null);
@@ -229,8 +229,8 @@ export default function PingPongMobileArbiter() {
     sendAction('pause');
   };
 
-  const callTimeout = (jugador) => {
-    sendAction('timeout', { jugador, duracion: 60 });
+  const callTimeout = (player) => {
+    sendAction('timeout', { player, duration: 60 });
   };
 
   // ============== RENDER ==============
@@ -240,7 +240,7 @@ export default function PingPongMobileArbiter() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-white rounded-full mx-auto mb-4" />
-          <p>Conectando...</p>
+          <p>Connecting...</p>
         </div>
       </div>
     );
