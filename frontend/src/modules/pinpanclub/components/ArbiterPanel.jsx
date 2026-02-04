@@ -55,19 +55,19 @@ export default function ArbiterPanel({
 
   const {
     partido_id,
-    jugador_a_info,
-    jugador_b_info,
-    puntos_jugador_a,
-    puntos_jugador_b,
-    sets_jugador_a,
-    sets_jugador_b,
+    player_a_info,
+    player_b_info,
+    puntos_player_a,
+    puntos_player_b,
+    sets_player_a,
+    sets_player_b,
     set_actual,
     saque,
     estado
   } = match;
 
-  const playerAName = jugador_a_info?.apodo || jugador_a_info?.nombre || 'Jugador A';
-  const playerBName = jugador_b_info?.apodo || jugador_b_info?.nombre || 'Jugador B';
+  const playerAName = player_a_info?.apodo || player_a_info?.nombre || 'Jugador A';
+  const playerBName = player_b_info?.apodo || player_b_info?.nombre || 'Jugador B';
 
   const handleAddPoint = async (jugador) => {
     if (estado !== 'en_curso') {
@@ -173,7 +173,7 @@ export default function ArbiterPanel({
         {/* Match Status */}
         <div className="text-center">
           <div className="text-2xl font-mono font-bold">
-            Set {set_actual} | Sets: {sets_jugador_a} - {sets_jugador_b}
+            Set {set_actual} | Sets: {sets_player_a} - {sets_player_b}
           </div>
           <div className="text-sm text-muted-foreground mt-1">
             Saque: {saque === 'a' ? playerAName : playerBName}
@@ -189,7 +189,7 @@ export default function ArbiterPanel({
               {saque === 'a' && <span className="ml-1">●</span>}
             </div>
             <div className="text-5xl font-bold text-red-600 my-2">
-              {puntos_jugador_a}
+              {puntos_player_a}
             </div>
           </div>
 
@@ -204,7 +204,7 @@ export default function ArbiterPanel({
               {saque === 'b' && <span className="ml-1">●</span>}
             </div>
             <div className="text-5xl font-bold text-blue-600 my-2">
-              {puntos_jugador_b}
+              {puntos_player_b}
             </div>
           </div>
         </div>
@@ -319,7 +319,7 @@ export default function ArbiterPanel({
               🏆 Partido Finalizado
             </div>
             <div className="text-2xl font-bold mt-2">
-              Ganador: {match.ganador_id === match.jugador_a_id ? playerAName : playerBName}
+              Ganador: {match.winner_id === match.player_a_id ? playerAName : playerBName}
             </div>
           </div>
         )}

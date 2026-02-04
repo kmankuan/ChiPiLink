@@ -357,8 +357,8 @@ export default function PingPongTV() {
       );
     }
 
-    const playerA = currentMatch.jugador_a_info || {};
-    const playerB = currentMatch.jugador_b_info || {};
+    const playerA = currentMatch.player_a_info || {};
+    const playerB = currentMatch.player_b_info || {};
 
     return (
       <div className="h-full flex flex-col p-8">
@@ -393,10 +393,10 @@ export default function PingPongTV() {
                 
                 {/* Sets Won */}
                 <div className="flex justify-center gap-2 mt-4">
-                  {Array.from({ length: currentMatch.sets_jugador_a }).map((_, i) => (
+                  {Array.from({ length: currentMatch.sets_player_a }).map((_, i) => (
                     <div key={i} className="w-6 h-6 rounded-full bg-green-500" />
                   ))}
-                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_jugador_a) }).map((_, i) => (
+                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_player_a) }).map((_, i) => (
                     <div key={i} className="w-6 h-6 rounded-full bg-white/20" />
                   ))}
                 </div>
@@ -408,19 +408,19 @@ export default function PingPongTV() {
                   {/* Current Set Score */}
                   <div className="flex items-center justify-center gap-8">
                     <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'a' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
-                      {currentMatch.puntos_jugador_a}
+                      {currentMatch.puntos_player_a}
                     </span>
                     <span className="text-6xl text-white/40">:</span>
                     <span className={`text-[12rem] font-black leading-none ${pointAnimation?.player === 'b' ? 'text-green-400' : 'text-white'} transition-colors duration-300`}>
-                      {currentMatch.puntos_jugador_b}
+                      {currentMatch.puntos_player_b}
                     </span>
                   </div>
 
                   {/* Sets Score */}
                   <div className="flex items-center justify-center gap-4 mt-4">
-                    <span className="text-5xl font-bold text-blue-400">{currentMatch.sets_jugador_a}</span>
+                    <span className="text-5xl font-bold text-blue-400">{currentMatch.sets_player_a}</span>
                     <span className="text-2xl text-white/40">SETS</span>
-                    <span className="text-5xl font-bold text-red-400">{currentMatch.sets_jugador_b}</span>
+                    <span className="text-5xl font-bold text-red-400">{currentMatch.sets_player_b}</span>
                   </div>
 
                   {/* Serve Indicator */}
@@ -470,10 +470,10 @@ export default function PingPongTV() {
                 
                 {/* Sets Won */}
                 <div className="flex justify-center gap-2 mt-4">
-                  {Array.from({ length: currentMatch.sets_jugador_b }).map((_, i) => (
+                  {Array.from({ length: currentMatch.sets_player_b }).map((_, i) => (
                     <div key={i} className="w-6 h-6 rounded-full bg-green-500" />
                   ))}
-                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_jugador_b) }).map((_, i) => (
+                  {Array.from({ length: Math.max(0, 3 - currentMatch.sets_player_b) }).map((_, i) => (
                     <div key={i} className="w-6 h-6 rounded-full bg-white/20" />
                   ))}
                 </div>
@@ -566,16 +566,16 @@ export default function PingPongTV() {
               {recentResults.slice(0, 5).map(match => (
                 <div key={match.partido_id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
                   <div className="flex items-center gap-3">
-                    <span className={`font-bold ${match.ganador_id === match.jugador_a_id ? 'text-green-400' : 'text-white/60'}`}>
-                      {match.jugador_a_info?.nombre || 'Jugador A'}
+                    <span className={`font-bold ${match.winner_id === match.player_a_id ? 'text-green-400' : 'text-white/60'}`}>
+                      {match.player_a_info?.nombre || 'Jugador A'}
                     </span>
                     <span className="text-white/40">vs</span>
-                    <span className={`font-bold ${match.ganador_id === match.jugador_b_id ? 'text-green-400' : 'text-white/60'}`}>
-                      {match.jugador_b_info?.nombre || 'Jugador B'}
+                    <span className={`font-bold ${match.winner_id === match.player_b_id ? 'text-green-400' : 'text-white/60'}`}>
+                      {match.player_b_info?.nombre || 'Jugador B'}
                     </span>
                   </div>
                   <div className="text-xl font-bold text-white">
-                    {match.sets_jugador_a} - {match.sets_jugador_b}
+                    {match.sets_player_a} - {match.sets_player_b}
                   </div>
                 </div>
               ))}
@@ -913,8 +913,8 @@ function SponsorBanner({ sponsors, currentIndex, layout }) {
 // ============== MINI SCOREBOARD COMPONENT ==============
 
 function MiniScoreboard({ match, onClick }) {
-  const playerA = match.jugador_a_info || {};
-  const playerB = match.jugador_b_info || {};
+  const playerA = match.player_a_info || {};
+  const playerB = match.player_b_info || {};
   
   return (
     <button
@@ -947,8 +947,8 @@ function MiniScoreboard({ match, onClick }) {
             <span className="text-white font-semibold">{playerA.apodo || playerA.nombre || 'Jugador A'}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-white">{match.puntos_jugador_a}</span>
-            <span className="text-lg text-blue-400">{match.sets_jugador_a}</span>
+            <span className="text-2xl font-bold text-white">{match.puntos_player_a}</span>
+            <span className="text-lg text-blue-400">{match.sets_player_a}</span>
           </div>
         </div>
 
@@ -965,8 +965,8 @@ function MiniScoreboard({ match, onClick }) {
             <span className="text-white font-semibold">{playerB.apodo || playerB.nombre || 'Jugador B'}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-white">{match.puntos_jugador_b}</span>
-            <span className="text-lg text-red-400">{match.sets_jugador_b}</span>
+            <span className="text-2xl font-bold text-white">{match.puntos_player_b}</span>
+            <span className="text-lg text-red-400">{match.sets_player_b}</span>
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@ export default function MatchPredictor({ playerA, playerB, onClose }) {
     setError(null);
     try {
       const response = await fetch(
-        `${API_URL}/api/pinpanclub/superpin/predict-match?jugador_a_id=${playerA.jugador_id}&jugador_b_id=${playerB.jugador_id}`
+        `${API_URL}/api/pinpanclub/superpin/predict-match?player_a_id=${playerA.jugador_id}&player_b_id=${playerB.jugador_id}`
       );
       if (response.ok) {
         const data = await response.json();

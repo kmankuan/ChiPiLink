@@ -38,8 +38,8 @@ export default function RapidPinSeason() {
   const [currentUserId, setCurrentUserId] = useState(null);
   
   const [newMatch, setNewMatch] = useState({
-    jugador_a_id: '',
-    jugador_b_id: '',
+    player_a_id: '',
+    player_b_id: '',
     arbitro_id: '',
     ganador_id: '',
     score_ganador: 11,
@@ -112,18 +112,18 @@ export default function RapidPinSeason() {
 
   const registerMatch = async () => {
     // Validations
-    if (!newMatch.jugador_a_id || !newMatch.jugador_b_id || !newMatch.arbitro_id || !newMatch.ganador_id) {
+    if (!newMatch.player_a_id || !newMatch.player_b_id || !newMatch.arbitro_id || !newMatch.winner_id) {
       toast.error(t('rapidpin.matches.fieldsRequired'));
       return;
     }
 
-    const participants = new Set([newMatch.jugador_a_id, newMatch.jugador_b_id, newMatch.arbitro_id]);
+    const participants = new Set([newMatch.player_a_id, newMatch.player_b_id, newMatch.arbitro_id]);
     if (participants.size !== 3) {
       toast.error(t('rapidpin.matches.differentParticipants'));
       return;
     }
 
-    if (newMatch.ganador_id !== newMatch.jugador_a_id && newMatch.ganador_id !== newMatch.jugador_b_id) {
+    if (newMatch.winner_id !== newMatch.player_a_id && newMatch.winner_id !== newMatch.player_b_id) {
       toast.error(t('rapidpin.matches.winnerMustBePlayer'));
       return;
     }
@@ -135,7 +135,7 @@ export default function RapidPinSeason() {
         body: JSON.stringify({
           season_id: seasonId,
           ...newMatch,
-          registrado_por_id: currentUserId || newMatch.jugador_a_id
+          registrado_por_id: currentUserId || newMatch.player_a_id
         })
       });
 
@@ -143,8 +143,8 @@ export default function RapidPinSeason() {
         toast.success(t('rapidpin.matches.registered'));
         setShowNewMatch(false);
         setNewMatch({
-          jugador_a_id: '',
-          jugador_b_id: '',
+          player_a_id: '',
+          player_b_id: '',
           arbitro_id: '',
           ganador_id: '',
           score_ganador: 11,
@@ -300,8 +300,8 @@ export default function RapidPinSeason() {
                       <div>
                         <Label>{t('rapidpin.matches.playerA')}</Label>
                         <Select
-                          value={newMatch.jugador_a_id}
-                          onValueChange={(v) => setNewMatch({ ...newMatch, jugador_a_id: v })}
+                          value={newMatch.player_a_id}
+                          onValueChange={(v) => setNewMatch({ ...newMatch, player_a_id: v })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder={t('rapidpin.matches.selectPlayer')} />
@@ -318,8 +318,8 @@ export default function RapidPinSeason() {
                       <div>
                         <Label>{t('rapidpin.matches.playerB')}</Label>
                         <Select
-                          value={newMatch.jugador_b_id}
-                          onValueChange={(v) => setNewMatch({ ...newMatch, jugador_b_id: v })}
+                          value={newMatch.player_b_id}
+                          onValueChange={(v) => setNewMatch({ ...newMatch, player_b_id: v })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder={t('rapidpin.matches.selectPlayer')} />
@@ -357,24 +357,24 @@ export default function RapidPinSeason() {
                     <div>
                       <Label>{t('rapidpin.matches.winner')}</Label>
                       <Select
-                        value={newMatch.ganador_id}
+                        value={newMatch.winner_id}
                         onValueChange={(v) => setNewMatch({ ...newMatch, ganador_id: v })}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder={t('rapidpin.matches.selectWinner')} />
                         </SelectTrigger>
                         <SelectContent>
-                          {newMatch.jugador_a_id && (
-                            <SelectItem value={newMatch.jugador_a_id}>
-                              {players.find(p => p.jugador_id === newMatch.jugador_a_id)?.apodo || 
-                               players.find(p => p.jugador_id === newMatch.jugador_a_id)?.nombre || 
+                          {newMatch.player_a_id && (
+                            <SelectItem value={newMatch.player_a_id}>
+                              {players.find(p => p.jugador_id === newMatch.player_a_id)?.apodo || 
+                               players.find(p => p.jugador_id === newMatch.player_a_id)?.nombre || 
                                t('rapidpin.matches.playerA')}
                             </SelectItem>
                           )}
-                          {newMatch.jugador_b_id && (
-                            <SelectItem value={newMatch.jugador_b_id}>
-                              {players.find(p => p.jugador_id === newMatch.jugador_b_id)?.apodo || 
-                               players.find(p => p.jugador_id === newMatch.jugador_b_id)?.nombre || 
+                          {newMatch.player_b_id && (
+                            <SelectItem value={newMatch.player_b_id}>
+                              {players.find(p => p.jugador_id === newMatch.player_b_id)?.apodo || 
+                               players.find(p => p.jugador_id === newMatch.player_b_id)?.nombre || 
                                t('rapidpin.matches.playerB')}
                             </SelectItem>
                           )}
@@ -557,9 +557,9 @@ export default function RapidPinSeason() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-sm">
-                        <span className="font-medium">{getPlayerName(match.jugador_a_info)}</span>
+                        <span className="font-medium">{getPlayerName(match.player_a_info)}</span>
                         <span className="text-muted-foreground"> vs </span>
-                        <span className="font-medium">{getPlayerName(match.jugador_b_info)}</span>
+                        <span className="font-medium">{getPlayerName(match.player_b_info)}</span>
                       </div>
                       <Badge variant="outline" className="text-xs">
                         <Scale className="w-3 h-3 mr-1" />
@@ -717,16 +717,16 @@ export default function RapidPinSeason() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div>
-                              <span className={`font-medium ${match.ganador_id === match.jugador_a_id ? 'text-green-500' : ''}`}>
-                                {getPlayerName(match.jugador_a_info)}
+                              <span className={`font-medium ${match.winner_id === match.player_a_id ? 'text-green-500' : ''}`}>
+                                {getPlayerName(match.player_a_info)}
                               </span>
                               <span className="text-muted-foreground mx-2">vs</span>
-                              <span className={`font-medium ${match.ganador_id === match.jugador_b_id ? 'text-green-500' : ''}`}>
-                                {getPlayerName(match.jugador_b_info)}
+                              <span className={`font-medium ${match.winner_id === match.player_b_id ? 'text-green-500' : ''}`}>
+                                {getPlayerName(match.player_b_info)}
                               </span>
                             </div>
                             <span className="text-lg font-mono">
-                              {match.ganador_id === match.jugador_a_id 
+                              {match.winner_id === match.player_a_id 
                                 ? `${match.score_ganador}-${match.score_perdedor}`
                                 : `${match.score_perdedor}-${match.score_ganador}`
                               }

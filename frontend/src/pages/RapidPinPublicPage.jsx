@@ -1359,23 +1359,23 @@ export default function RapidPinPublicPage() {
                         >
                           <div className="flex items-center gap-3 flex-1">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={match.jugador_a_info?.avatar} />
-                              <AvatarFallback>{match.jugador_a_info?.nombre?.charAt(0)}</AvatarFallback>
+                              <AvatarImage src={match.player_a_info?.avatar} />
+                              <AvatarFallback>{match.player_a_info?.nombre?.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span className={`text-sm font-medium ${match.ganador_id === match.jugador_a_id ? 'text-green-600' : ''}`}>
-                              {match.jugador_a_info?.nickname || match.jugador_a_info?.nombre}
+                            <span className={`text-sm font-medium ${match.winner_id === match.player_a_id ? 'text-green-600' : ''}`}>
+                              {match.player_a_info?.nickname || match.player_a_info?.nombre}
                             </span>
                           </div>
                           <Badge className="bg-orange-500 text-white">
                             {match.score_ganador}-{match.score_perdedor}
                           </Badge>
                           <div className="flex items-center gap-3 flex-1 justify-end">
-                            <span className={`text-sm font-medium ${match.ganador_id === match.jugador_b_id ? 'text-green-600' : ''}`}>
-                              {match.jugador_b_info?.nickname || match.jugador_b_info?.nombre}
+                            <span className={`text-sm font-medium ${match.winner_id === match.player_b_id ? 'text-green-600' : ''}`}>
+                              {match.player_b_info?.nickname || match.player_b_info?.nombre}
                             </span>
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={match.jugador_b_info?.avatar} />
-                              <AvatarFallback>{match.jugador_b_info?.nombre?.charAt(0)}</AvatarFallback>
+                              <AvatarImage src={match.player_b_info?.avatar} />
+                              <AvatarFallback>{match.player_b_info?.nombre?.charAt(0)}</AvatarFallback>
                             </Avatar>
                           </div>
                         </div>

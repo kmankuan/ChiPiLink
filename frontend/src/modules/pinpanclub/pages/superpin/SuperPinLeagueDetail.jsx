@@ -31,7 +31,7 @@ export default function SuperPinLeagueDetail() {
   const [showNewMatchModal, setShowNewMatchModal] = useState(false);
   const [showCreateTournamentModal, setShowCreateTournamentModal] = useState(false);
   const [playerSource, setPlayerSource] = useState('pinpanclub');
-  const [newMatch, setNewMatch] = useState({ jugador_a_id: '', jugador_b_id: '' });
+  const [newMatch, setNewMatch] = useState({ player_a_id: '', player_b_id: '' });
   const [loadingMonday, setLoadingMonday] = useState(false);
   const [tournaments, setTournaments] = useState([]);
   const [newTournament, setNewTournament] = useState({ nombre: '', fecha_inicio: '' });
@@ -117,8 +117,8 @@ export default function SuperPinLeagueDetail() {
   };
 
   const createMatch = async () => {
-    if (!newMatch.jugador_a_id || !newMatch.jugador_b_id) return;
-    if (newMatch.jugador_a_id === newMatch.jugador_b_id) {
+    if (!newMatch.player_a_id || !newMatch.player_b_id) return;
+    if (newMatch.player_a_id === newMatch.player_b_id) {
       alert(t('superpin.matches.differentPlayers'));
       return;
     }
@@ -129,8 +129,8 @@ export default function SuperPinLeagueDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           liga_id: ligaId,
-          jugador_a_id: newMatch.jugador_a_id,
-          jugador_b_id: newMatch.jugador_b_id,
+          player_a_id: newMatch.player_a_id,
+          player_b_id: newMatch.player_b_id,
           match_type: 'ranked'
         })
       });
@@ -138,7 +138,7 @@ export default function SuperPinLeagueDetail() {
       if (response.ok) {
         const match = await response.json();
         setShowNewMatchModal(false);
-        setNewMatch({ jugador_a_id: '', jugador_b_id: '' });
+        setNewMatch({ player_a_id: '', player_b_id: '' });
         navigate(`/pinpanclub/superpin/match/${match.partido_id}`);
       }
     } catch (error) {
@@ -377,13 +377,13 @@ export default function SuperPinLeagueDetail() {
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <div className="text-center flex-1">
-                        <p className="font-medium">{match.jugador_a_info?.nombre || t('superpin.players.playerA')}</p>
-                        <p className="text-2xl font-bold">{match.sets_jugador_a}</p>
+                        <p className="font-medium">{match.player_a_info?.nombre || t('superpin.players.playerA')}</p>
+                        <p className="text-2xl font-bold">{match.sets_player_a}</p>
                       </div>
                       <div className="text-gray-400 font-bold">VS</div>
                       <div className="text-center flex-1">
-                        <p className="font-medium">{match.jugador_b_info?.nombre || t('superpin.players.playerB')}</p>
-                        <p className="text-2xl font-bold">{match.sets_jugador_b}</p>
+                        <p className="font-medium">{match.player_b_info?.nombre || t('superpin.players.playerB')}</p>
+                        <p className="text-2xl font-bold">{match.sets_player_b}</p>
                       </div>
                     </div>
                     <Badge className={{
@@ -460,8 +460,8 @@ export default function SuperPinLeagueDetail() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.players.playerA')}</label>
                     <select
-                      value={newMatch.jugador_a_id}
-                      onChange={(e) => setNewMatch({ ...newMatch, jugador_a_id: e.target.value })}
+                      value={newMatch.player_a_id}
+                      onChange={(e) => setNewMatch({ ...newMatch, player_a_id: e.target.value })}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">{t('superpin.players.selectPlayer')}</option>
@@ -475,12 +475,12 @@ export default function SuperPinLeagueDetail() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('superpin.players.playerB')}</label>
                     <select
-                      value={newMatch.jugador_b_id}
-                      onChange={(e) => setNewMatch({ ...newMatch, jugador_b_id: e.target.value })}
+                      value={newMatch.player_b_id}
+                      onChange={(e) => setNewMatch({ ...newMatch, player_b_id: e.target.value })}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">{t('superpin.players.selectPlayer')}</option>
-                      {availablePlayers.filter(p => p.jugador_id !== newMatch.jugador_a_id).map((player) => (
+                      {availablePlayers.filter(p => p.jugador_id !== newMatch.player_a_id).map((player) => (
                         <option key={player.jugador_id} value={player.jugador_id}>
                           {player.nombre} {player.apodo ? `"${player.apodo}"` : ''}
                         </option>
@@ -595,7 +595,7 @@ export default function SuperPinLeagueDetail() {
                 type="button" 
                 onClick={createMatch} 
                 className="bg-green-600 hover:bg-green-700"
-                disabled={playerSource !== 'pinpanclub' || !newMatch.jugador_a_id || !newMatch.jugador_b_id}
+                disabled={playerSource !== 'pinpanclub' || !newMatch.player_a_id || !newMatch.player_b_id}
               >
                 {t('superpin.matches.create')}
               </Button>

@@ -554,8 +554,8 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                       className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
                     >
                       <div className="font-medium">
-                        {m.jugador_a_info?.apodo || m.jugador_a_info?.nombre || 'Jugador A'} vs{' '}
-                        {m.jugador_b_info?.apodo || m.jugador_b_info?.nombre || 'Jugador B'}
+                        {m.player_a_info?.apodo || m.player_a_info?.nombre || 'Jugador A'} vs{' '}
+                        {m.player_b_info?.apodo || m.player_b_info?.nombre || 'Jugador B'}
                       </div>
                       <div className="text-xs text-white/60">
                         Mesa {m.mesa || '?'} • {m.estado}
@@ -579,8 +579,8 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
     );
   }
 
-  const playerA = match.jugador_a_info || {};
-  const playerB = match.jugador_b_info || {};
+  const playerA = match.player_a_info || {};
+  const playerB = match.player_b_info || {};
   const isLive = match.estado === 'en_curso';
 
   return (
@@ -651,10 +651,10 @@ function MatchWidget({ item, match, allMatches, isEditing, onRemove, onAssignMat
                 className="w-full text-left p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white text-sm"
               >
                 <div className="font-medium truncate">
-                  {m.jugador_a_info?.apodo || 'A'} vs {m.jugador_b_info?.apodo || 'B'}
+                  {m.player_a_info?.apodo || 'A'} vs {m.player_b_info?.apodo || 'B'}
                 </div>
                 <div className="text-xs text-white/60">
-                  Mesa {m.mesa || '?'} • {m.puntos_jugador_a}-{m.puntos_jugador_b}
+                  Mesa {m.mesa || '?'} • {m.puntos_player_a}-{m.puntos_player_b}
                 </div>
               </button>
             ))}
@@ -692,10 +692,10 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
         
         {/* Sets indicators */}
         <div className="flex justify-center gap-1 mt-2">
-          {Array.from({ length: match.sets_jugador_a }).map((_, i) => (
+          {Array.from({ length: match.sets_player_a }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-green-500" />
           ))}
-          {Array.from({ length: 3 - match.sets_jugador_a }).map((_, i) => (
+          {Array.from({ length: 3 - match.sets_player_a }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-white/20" />
           ))}
         </div>
@@ -705,20 +705,20 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
       <div className="text-center px-4">
         <div className="flex items-center gap-3">
           <span className={`text-6xl font-black ${match.saque === 'a' ? 'text-yellow-400' : 'text-white'}`}>
-            {match.puntos_jugador_a}
+            {match.puntos_player_a}
           </span>
           <span className="text-2xl text-white/40">:</span>
           <span className={`text-6xl font-black ${match.saque === 'b' ? 'text-yellow-400' : 'text-white'}`}>
-            {match.puntos_jugador_b}
+            {match.puntos_player_b}
           </span>
         </div>
         <div className="text-sm text-white/60 mt-2">
           Set {match.set_actual}
         </div>
         <div className="flex justify-center gap-2 mt-1">
-          <span className="text-xl font-bold text-blue-400">{match.sets_jugador_a}</span>
+          <span className="text-xl font-bold text-blue-400">{match.sets_player_a}</span>
           <span className="text-white/40">-</span>
-          <span className="text-xl font-bold text-red-400">{match.sets_jugador_b}</span>
+          <span className="text-xl font-bold text-red-400">{match.sets_player_b}</span>
         </div>
       </div>
 
@@ -737,10 +737,10 @@ function LargeMatchDisplay({ match, playerA, playerB }) {
         <div className="text-xs text-white/60">ELO: {playerB.elo_rating || 1000}</div>
         
         <div className="flex justify-center gap-1 mt-2">
-          {Array.from({ length: match.sets_jugador_b }).map((_, i) => (
+          {Array.from({ length: match.sets_player_b }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-green-500" />
           ))}
-          {Array.from({ length: 3 - match.sets_jugador_b }).map((_, i) => (
+          {Array.from({ length: 3 - match.sets_player_b }).map((_, i) => (
             <div key={i} className="w-3 h-3 rounded-full bg-white/20" />
           ))}
         </div>
@@ -770,8 +770,8 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
           {match.saque === 'a' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-black text-white">{match.puntos_jugador_a}</span>
-          <span className="text-lg font-bold text-blue-400">{match.sets_jugador_a}</span>
+          <span className="text-3xl font-black text-white">{match.puntos_player_a}</span>
+          <span className="text-lg font-bold text-blue-400">{match.sets_player_a}</span>
         </div>
       </div>
 
@@ -793,8 +793,8 @@ function MediumMatchDisplay({ match, playerA, playerB }) {
           {match.saque === 'b' && <span className="text-yellow-400 text-xs">●</span>}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-black text-white">{match.puntos_jugador_b}</span>
-          <span className="text-lg font-bold text-red-400">{match.sets_jugador_b}</span>
+          <span className="text-3xl font-black text-white">{match.puntos_player_b}</span>
+          <span className="text-lg font-bold text-red-400">{match.sets_player_b}</span>
         </div>
       </div>
     </div>
@@ -808,12 +808,12 @@ function SmallMatchDisplay({ match, playerA, playerB }) {
         {playerA.apodo?.[0] || playerA.nombre?.[0] || 'A'} vs {playerB.apodo?.[0] || playerB.nombre?.[0] || 'B'}
       </div>
       <div className="flex items-center justify-center gap-2">
-        <span className="text-2xl font-black text-white">{match.puntos_jugador_a}</span>
+        <span className="text-2xl font-black text-white">{match.puntos_player_a}</span>
         <span className="text-white/40">:</span>
-        <span className="text-2xl font-black text-white">{match.puntos_jugador_b}</span>
+        <span className="text-2xl font-black text-white">{match.puntos_player_b}</span>
       </div>
       <div className="text-xs text-white/40">
-        {match.sets_jugador_a}-{match.sets_jugador_b}
+        {match.sets_player_a}-{match.sets_player_b}
       </div>
     </div>
   );

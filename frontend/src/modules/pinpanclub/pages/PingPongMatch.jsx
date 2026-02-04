@@ -26,8 +26,8 @@ export default function PingPongMatch() {
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState([]);
   const [formData, setFormData] = useState({
-    jugador_a_id: '',
-    jugador_b_id: '',
+    player_a_id: '',
+    player_b_id: '',
     tipo_partido: 'mejor_de_3',
     puntos_por_set: 11,
     diferencia_minima: 2,
@@ -52,12 +52,12 @@ export default function PingPongMatch() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.jugador_a_id || !formData.jugador_b_id) {
+    if (!formData.player_a_id || !formData.player_b_id) {
       toast.error('Debes seleccionar ambos jugadores');
       return;
     }
     
-    if (formData.jugador_a_id === formData.jugador_b_id) {
+    if (formData.player_a_id === formData.player_b_id) {
       toast.error('Los jugadores deben ser diferentes');
       return;
     }
@@ -104,8 +104,8 @@ export default function PingPongMatch() {
                 <div className="space-y-2">
                   <Label>Jugador A (Rojo)</Label>
                   <Select
-                    value={formData.jugador_a_id}
-                    onValueChange={(value) => setFormData({ ...formData, jugador_a_id: value })}
+                    value={formData.player_a_id}
+                    onValueChange={(value) => setFormData({ ...formData, player_a_id: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar jugador" />
@@ -115,7 +115,7 @@ export default function PingPongMatch() {
                         <SelectItem 
                           key={player.jugador_id} 
                           value={player.jugador_id}
-                          disabled={player.jugador_id === formData.jugador_b_id}
+                          disabled={player.jugador_id === formData.player_b_id}
                         >
                           {player.apodo || player.nombre} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>
@@ -127,8 +127,8 @@ export default function PingPongMatch() {
                 <div className="space-y-2">
                   <Label>Jugador B (Azul)</Label>
                   <Select
-                    value={formData.jugador_b_id}
-                    onValueChange={(value) => setFormData({ ...formData, jugador_b_id: value })}
+                    value={formData.player_b_id}
+                    onValueChange={(value) => setFormData({ ...formData, player_b_id: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar jugador" />
@@ -138,7 +138,7 @@ export default function PingPongMatch() {
                         <SelectItem 
                           key={player.jugador_id} 
                           value={player.jugador_id}
-                          disabled={player.jugador_id === formData.jugador_a_id}
+                          disabled={player.jugador_id === formData.player_a_id}
                         >
                           {player.apodo || player.nombre} {player.apellido} (ELO: {player.elo_rating})
                         </SelectItem>

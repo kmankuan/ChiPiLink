@@ -70,7 +70,7 @@ export default function SuperPinMatch() {
 
         if (result.partido_terminado) {
           setTimeout(() => {
-            const winnerName = result.ganador_partido === 'a' ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre;
+            const winnerName = result.ganador_partido === 'a' ? match.player_a_info?.nombre : match.player_b_info?.nombre;
             alert(t('superpin.matches.matchFinished') + ' ' + t('superpin.matches.winner') + ': ' + winnerName);
           }, 500);
         }
@@ -125,9 +125,9 @@ export default function SuperPinMatch() {
             <div className="text-center">
               <p className="text-gray-400 text-sm mb-1">{t('superpin.matches.sets')}</p>
               <div className="flex items-center gap-4">
-                <span className="text-5xl font-bold text-white">{match.sets_jugador_a}</span>
+                <span className="text-5xl font-bold text-white">{match.sets_player_a}</span>
                 <span className="text-2xl text-gray-500">-</span>
-                <span className="text-5xl font-bold text-white">{match.sets_jugador_b}</span>
+                <span className="text-5xl font-bold text-white">{match.sets_player_b}</span>
               </div>
             </div>
           </div>
@@ -135,19 +135,19 @@ export default function SuperPinMatch() {
           {/* Players & Current Score */}
           <div className="grid grid-cols-2 gap-4">
             {/* Player A */}
-            <div className={`p-6 rounded-xl ${match.ganador_id === match.jugador_a_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
+            <div className={`p-6 rounded-xl ${match.winner_id === match.player_a_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
-                  {match.jugador_a_info?.nombre?.[0] || 'A'}
+                  {match.player_a_info?.nombre?.[0] || 'A'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.jugador_a_info?.nombre || t('superpin.players.playerA')}</h3>
-                {match.jugador_a_info?.apodo && (
-                  <p className="text-gray-400">"{match.jugador_a_info.apodo}"</p>
+                <h3 className="text-xl font-bold text-white">{match.player_a_info?.nombre || t('superpin.players.playerA')}</h3>
+                {match.player_a_info?.apodo && (
+                  <p className="text-gray-400">"{match.player_a_info.apodo}"</p>
                 )}
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
-                <p className="text-6xl font-bold text-white">{match.puntos_jugador_a}</p>
+                <p className="text-6xl font-bold text-white">{match.puntos_player_a}</p>
               </div>
               {isInProgress && (
                 <div className="mt-4 space-y-2">
@@ -171,19 +171,19 @@ export default function SuperPinMatch() {
             </div>
 
             {/* Player B */}
-            <div className={`p-6 rounded-xl ${match.ganador_id === match.jugador_b_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
+            <div className={`p-6 rounded-xl ${match.winner_id === match.player_b_id ? 'bg-green-900/30 ring-2 ring-green-500' : 'bg-gray-700/50'}`}>
               <div className="text-center mb-4">
                 <div className="w-20 h-20 bg-red-600 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-bold text-white">
-                  {match.jugador_b_info?.nombre?.[0] || 'B'}
+                  {match.player_b_info?.nombre?.[0] || 'B'}
                 </div>
-                <h3 className="text-xl font-bold text-white">{match.jugador_b_info?.nombre || t('superpin.players.playerB')}</h3>
-                {match.jugador_b_info?.apodo && (
-                  <p className="text-gray-400">"{match.jugador_b_info.apodo}"</p>
+                <h3 className="text-xl font-bold text-white">{match.player_b_info?.nombre || t('superpin.players.playerB')}</h3>
+                {match.player_b_info?.apodo && (
+                  <p className="text-gray-400">"{match.player_b_info.apodo}"</p>
                 )}
               </div>
               <div className="text-center">
                 <p className="text-gray-400 text-sm">{t('superpin.matches.point')} {t('superpin.matches.set')} {match.set_actual}</p>
-                <p className="text-6xl font-bold text-white">{match.puntos_jugador_b}</p>
+                <p className="text-6xl font-bold text-white">{match.puntos_player_b}</p>
               </div>
               {isInProgress && (
                 <div className="mt-4 space-y-2">
@@ -248,7 +248,7 @@ export default function SuperPinMatch() {
             <Trophy className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">{t('superpin.matches.matchFinished')}</h3>
             <p className="text-green-400 text-lg">
-              {t('superpin.matches.winner')}: {match.ganador_id === match.jugador_a_id ? match.jugador_a_info?.nombre : match.jugador_b_info?.nombre}
+              {t('superpin.matches.winner')}: {match.winner_id === match.player_a_id ? match.player_a_info?.nombre : match.player_b_info?.nombre}
             </p>
             {(match.elo_change_a || match.puntos_ganador) && (
               <div className="mt-4 flex justify-center gap-8">

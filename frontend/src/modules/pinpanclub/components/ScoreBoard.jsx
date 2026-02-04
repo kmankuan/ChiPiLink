@@ -24,12 +24,12 @@ export default function ScoreBoard({
   if (!match) return null;
 
   const {
-    jugador_a_info,
-    jugador_b_info,
-    puntos_jugador_a,
-    puntos_jugador_b,
-    sets_jugador_a,
-    sets_jugador_b,
+    player_a_info,
+    player_b_info,
+    puntos_player_a,
+    puntos_player_b,
+    sets_player_a,
+    sets_player_b,
     set_actual,
     sets_detalle,
     saque,
@@ -42,8 +42,8 @@ export default function ScoreBoard({
     ganador_id
   } = match;
 
-  const playerAName = jugador_a_info?.apodo || jugador_a_info?.nombre || 'Jugador A';
-  const playerBName = jugador_b_info?.apodo || jugador_b_info?.nombre || 'Jugador B';
+  const playerAName = player_a_info?.apodo || player_a_info?.nombre || 'Jugador A';
+  const playerBName = player_b_info?.apodo || player_b_info?.nombre || 'Jugador B';
 
   // Size configurations
   const sizeConfig = {
@@ -139,10 +139,10 @@ export default function ScoreBoard({
         {/* Main Score */}
         <div className="grid grid-cols-3 gap-4 items-center">
           {/* Player A */}
-          <div className={`text-center ${ganador_id === match.jugador_a_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
-            {jugador_a_info?.foto_url ? (
+          <div className={`text-center ${ganador_id === match.player_a_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
+            {player_a_info?.foto_url ? (
               <img 
-                src={jugador_a_info.foto_url} 
+                src={player_a_info.foto_url} 
                 alt={playerAName}
                 className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
               />
@@ -152,15 +152,15 @@ export default function ScoreBoard({
               </div>
             )}
             <h3 className={`font-bold ${config.name} truncate`}>{playerAName}</h3>
-            {jugador_a_info?.elo_rating && (
-              <span className="text-xs text-muted-foreground">ELO: {jugador_a_info.elo_rating}</span>
+            {player_a_info?.elo_rating && (
+              <span className="text-xs text-muted-foreground">ELO: {player_a_info.elo_rating}</span>
             )}
             {saque === 'a' && estado === 'en_curso' && (
               <div className="mt-1">
                 <Badge className="bg-yellow-400 text-yellow-900">● Saque</Badge>
               </div>
             )}
-            {ganador_id === match.jugador_a_id && (
+            {ganador_id === match.player_a_id && (
               <div className="mt-2">
                 <Badge className="bg-green-500 text-white">🏆 Ganador</Badge>
               </div>
@@ -172,20 +172,20 @@ export default function ScoreBoard({
             {/* Current Set Score */}
             <div className="flex justify-center items-center gap-4 mb-2">
               <span className={`${config.score} font-bold text-red-600`}>
-                {puntos_jugador_a}
+                {puntos_player_a}
               </span>
               <span className={`${config.sets} text-muted-foreground`}>-</span>
               <span className={`${config.score} font-bold text-blue-600`}>
-                {puntos_jugador_b}
+                {puntos_player_b}
               </span>
             </div>
             
             {/* Sets Score */}
             <div className="flex justify-center items-center gap-2">
               <span className="text-muted-foreground text-sm">Sets:</span>
-              <span className={`${config.sets} font-bold text-red-600`}>{sets_jugador_a}</span>
+              <span className={`${config.sets} font-bold text-red-600`}>{sets_player_a}</span>
               <span className="text-muted-foreground">-</span>
-              <span className={`${config.sets} font-bold text-blue-600`}>{sets_jugador_b}</span>
+              <span className={`${config.sets} font-bold text-blue-600`}>{sets_player_b}</span>
             </div>
 
             {/* Set indicator */}
@@ -197,10 +197,10 @@ export default function ScoreBoard({
           </div>
 
           {/* Player B */}
-          <div className={`text-center ${ganador_id === match.jugador_b_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
-            {jugador_b_info?.foto_url ? (
+          <div className={`text-center ${ganador_id === match.player_b_id ? 'opacity-100' : ganador_id ? 'opacity-50' : ''}`}>
+            {player_b_info?.foto_url ? (
               <img 
-                src={jugador_b_info.foto_url} 
+                src={player_b_info.foto_url} 
                 alt={playerBName}
                 className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
               />
@@ -210,15 +210,15 @@ export default function ScoreBoard({
               </div>
             )}
             <h3 className={`font-bold ${config.name} truncate`}>{playerBName}</h3>
-            {jugador_b_info?.elo_rating && (
-              <span className="text-xs text-muted-foreground">ELO: {jugador_b_info.elo_rating}</span>
+            {player_b_info?.elo_rating && (
+              <span className="text-xs text-muted-foreground">ELO: {player_b_info.elo_rating}</span>
             )}
             {saque === 'b' && estado === 'en_curso' && (
               <div className="mt-1">
                 <Badge className="bg-yellow-400 text-yellow-900">● Saque</Badge>
               </div>
             )}
-            {ganador_id === match.jugador_b_id && (
+            {ganador_id === match.player_b_id && (
               <div className="mt-2">
                 <Badge className="bg-green-500 text-white">🏆 Ganador</Badge>
               </div>

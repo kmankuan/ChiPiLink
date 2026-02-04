@@ -398,7 +398,7 @@ export default function PingPongDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {rapidPinData.matches.slice(0, 5).map((match) => {
-                      const isPlayerAWinner = match.ganador_id === match.jugador_a_id;
+                      const isPlayerAWinner = match.winner_id === match.player_a_id;
                       return (
                         <div 
                           key={match.match_id}
@@ -411,11 +411,11 @@ export default function PingPongDashboard() {
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
                               <span className={`font-medium text-white ${isPlayerAWinner ? 'text-green-400' : ''}`}>
-                                {match.jugador_a_info?.apodo || match.jugador_a_info?.nombre || '?'}
+                                {match.player_a_info?.apodo || match.player_a_info?.nombre || '?'}
                               </span>
                               <span className="text-orange-300">vs</span>
                               <span className={`font-medium text-white ${!isPlayerAWinner ? 'text-green-400' : ''}`}>
-                                {match.jugador_b_info?.apodo || match.jugador_b_info?.nombre || '?'}
+                                {match.player_b_info?.apodo || match.player_b_info?.nombre || '?'}
                               </span>
                             </div>
                             <Badge variant="outline" className="text-orange-200 border-orange-500/30 text-xs">
@@ -695,9 +695,9 @@ export default function PingPongDashboard() {
             <Card>
               <CardContent className="p-0 divide-y">
                 {recentMatches.map((match) => {
-                  const playerA = match.jugador_a_info;
-                  const playerB = match.jugador_b_info;
-                  const ganadorA = match.ganador_id === match.jugador_a_id;
+                  const playerA = match.player_a_info;
+                  const playerB = match.player_b_info;
+                  const ganadorA = match.winner_id === match.player_a_id;
                   
                   return (
                     <div 
@@ -718,7 +718,7 @@ export default function PingPongDashboard() {
                       </div>
                       <div className="text-right">
                         <div className="font-mono font-bold">
-                          {match.sets_jugador_a} - {match.sets_jugador_b}
+                          {match.sets_player_a} - {match.sets_player_b}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {new Date(match.fecha_fin || match.created_at).toLocaleDateString('es-PA')}

@@ -36,8 +36,8 @@ export default function PingPongMobileArbiter() {
   const [lastAction, setLastAction] = useState(null);
   
   // Player info
-  const playerA = match?.jugador_a_info || {};
-  const playerB = match?.jugador_b_info || {};
+  const playerA = match?.player_a_info || {};
+  const playerB = match?.player_b_info || {};
 
   // ============== WEBSOCKET ==============
   
@@ -300,12 +300,12 @@ export default function PingPongMobileArbiter() {
         {/* Sets */}
         <div className="flex justify-center gap-4 mb-4">
           <div className="text-center">
-            <div className="text-4xl font-black text-blue-400">{match.sets_jugador_a}</div>
+            <div className="text-4xl font-black text-blue-400">{match.sets_player_a}</div>
             <div className="text-xs text-white/60">SETS</div>
           </div>
           <div className="text-2xl text-white/40 self-center">-</div>
           <div className="text-center">
-            <div className="text-4xl font-black text-red-400">{match.sets_jugador_b}</div>
+            <div className="text-4xl font-black text-red-400">{match.sets_player_b}</div>
             <div className="text-xs text-white/60">SETS</div>
           </div>
         </div>
@@ -314,14 +314,14 @@ export default function PingPongMobileArbiter() {
         <div className="flex justify-center items-center gap-8">
           <div className="text-center">
             <div className={`text-7xl font-black ${match.saque === 'a' ? 'text-yellow-400' : 'text-white'}`}>
-              {match.puntos_jugador_a}
+              {match.puntos_player_a}
             </div>
             {match.saque === 'a' && <div className="text-yellow-400 text-xs mt-1">● SAQUE</div>}
           </div>
           <div className="text-3xl text-white/40">:</div>
           <div className="text-center">
             <div className={`text-7xl font-black ${match.saque === 'b' ? 'text-yellow-400' : 'text-white'}`}>
-              {match.puntos_jugador_b}
+              {match.puntos_player_b}
             </div>
             {match.saque === 'b' && <div className="text-yellow-400 text-xs mt-1">● SAQUE</div>}
           </div>
@@ -461,13 +461,13 @@ export default function PingPongMobileArbiter() {
             <div className="text-6xl mb-4">🏆</div>
             <h2 className="text-3xl font-bold mb-2">Partido Finalizado</h2>
             <p className="text-xl text-white/60 mb-6">
-              {match.ganador_id === match.jugador_a_id 
+              {match.winner_id === match.player_a_id 
                 ? `¡${playerA.nombre || 'Jugador A'} GANA!`
                 : `¡${playerB.nombre || 'Jugador B'} GANA!`
               }
             </p>
             <div className="text-4xl font-bold mb-8">
-              {match.sets_jugador_a} - {match.sets_jugador_b}
+              {match.sets_player_a} - {match.sets_player_b}
             </div>
             <button
               onClick={() => navigate('/pinpanclub')}
