@@ -1,6 +1,6 @@
 """
-PinpanClub - Modelos Pydantic
-Definition de schemas para el module
+PinpanClub - Pydantic Models
+Schema definitions for the module
 """
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
@@ -11,38 +11,38 @@ from enum import Enum
 # ============== ENUMS ==============
 
 class PlayerLevel(str, Enum):
-    PRINCIPIANTE = "principiante"
-    INTERMEDIO = "intermedio"
-    AVANZADO = "avanzado"
-    PROFESIONAL = "profesional"
+    BEGINNER = "beginner"
+    INTERMEDIATE = "intermediate"
+    ADVANCED = "advanced"
+    PROFESSIONAL = "professional"
 
 
 class MatchState(str, Enum):
-    PENDIENTE = "pendiente"
-    EN_CURSO = "en_curso"
-    PAUSADO = "pausado"
-    FINALIZADO = "finalizado"
-    CANCELADO = "cancelado"
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    PAUSED = "paused"
+    FINISHED = "finished"
+    CANCELLED = "cancelled"
 
 
 class TournamentFormat(str, Enum):
-    ELIMINACION_SIMPLE = "eliminacion_simple"
-    ELIMINACION_DOBLE = "eliminacion_doble"
+    SINGLE_ELIMINATION = "single_elimination"
+    DOUBLE_ELIMINATION = "double_elimination"
     ROUND_ROBIN = "round_robin"
-    SUIZO = "suizo"
+    SWISS = "swiss"
 
 
 # ============== PLAYER MODELS ==============
 
 class PlayerBase(BaseModel):
-    """Base para jugador"""
+    """Base player model"""
     name: str
-    apellido: Optional[str] = None
-    apodo: Optional[str] = None
+    last_name: Optional[str] = None
+    nickname: Optional[str] = None
     email: Optional[str] = None
-    telefono: Optional[str] = None
-    foto_url: Optional[str] = None
-    nivel: PlayerLevel = PlayerLevel.PRINCIPIANTE
+    phone: Optional[str] = None
+    photo_url: Optional[str] = None
+    level: PlayerLevel = PlayerLevel.BEGINNER
 
 
 class PlayerCreate(PlayerBase):
@@ -51,25 +51,25 @@ class PlayerCreate(PlayerBase):
 
 
 class PlayerUpdate(BaseModel):
-    """Update jugador"""
+    """Update player"""
     name: Optional[str] = None
-    apellido: Optional[str] = None
-    apodo: Optional[str] = None
+    last_name: Optional[str] = None
+    nickname: Optional[str] = None
     email: Optional[str] = None
-    telefono: Optional[str] = None
-    foto_url: Optional[str] = None
-    nivel: Optional[PlayerLevel] = None
+    phone: Optional[str] = None
+    photo_url: Optional[str] = None
+    level: Optional[PlayerLevel] = None
 
 
 class Player(PlayerBase):
-    """Jugador completo"""
+    """Complete player model"""
     model_config = ConfigDict(from_attributes=True)
     
-    jugador_id: str
+    player_id: str
     elo_rating: int = 1000
-    partidos_jugados: int = 0
-    partidos_ganados: int = 0
-    partidos_perdidos: int = 0
+    matches_played: int = 0
+    matches_won: int = 0
+    matches_lost: int = 0
     active: bool = True
     monday_item_id: Optional[str] = None
     created_at: Optional[Any] = None
@@ -79,14 +79,14 @@ class Player(PlayerBase):
 # ============== MATCH MODELS ==============
 
 class MatchBase(BaseModel):
-    """Base para partido"""
+    """Base match model"""
     player_a_id: str
     player_b_id: str
-    mejor_de: int = 5  # Best of 5 sets
-    puntos_por_set: int = 11
-    mesa: Optional[str] = None
-    ronda: Optional[str] = None
-    torneo_id: Optional[str] = None
+    best_of: int = 5  # Best of 5 sets
+    points_per_set: int = 11
+    table: Optional[str] = None
+    round: Optional[str] = None
+    tournament_id: Optional[str] = None
 
 
 class MatchCreate(MatchBase):
@@ -96,7 +96,7 @@ class MatchCreate(MatchBase):
 
 class MatchScoreUpdate(BaseModel):
     """Update score"""
-    accion: str  # 'punto_a', 'punto_b', 'undo', 'reset_set'
+    action: str  # 'point_a', 'point_b', 'undo', 'reset_set'
 
 
 class Match(MatchBase):
