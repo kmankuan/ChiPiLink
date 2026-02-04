@@ -1,7 +1,7 @@
 /**
- * Ping Pong Mobile Arbiter - Control de partido desde el celular
- * Interfaz táctil optimizada para árbitros
- * Usa WebSocket para sincronización en tiempo real con todas las pantallas
+ * Ping Pong Mobile Arbiter - Match control from mobile device
+ * Touch-optimized interface for referees
+ * Uses WebSocket for real-time sync with all screens
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
