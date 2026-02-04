@@ -1,6 +1,6 @@
 /**
  * Player Badges Component
- * Muestra los badges/logros de un jugador
+ * Shows badges/achievements for a player
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,26 +19,29 @@ const RARITY_STYLES = {
 };
 
 const RARITY_LABELS = {
-  common: 'Común',
-  rare: 'Raro',
-  epic: 'Épico',
-  legendary: 'Legendario'
+  common: 'Common',
+  rare: 'Rare',
+  epic: 'Epic',
+  legendary: 'Legendary'
 };
 
-export default function PlayerBadges({ jugadorId, compact = false }) {
+export default function PlayerBadges({ playerId, jugadorId, compact = false }) {
   const { t } = useTranslation();
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Support both new and legacy prop names
+  const playerIdToUse = playerId || jugadorId;
 
   useEffect(() => {
-    if (jugadorId) {
+    if (playerIdToUse) {
       fetchBadges();
     }
-  }, [jugadorId]);
+  }, [playerIdToUse]);
 
   const fetchBadges = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${jugadorId}/badges`);
+      const response = await fetch(`${API_URL}/api/pinpanclub/superpin/players/${playerIdToUse}/badges`);
       if (response.ok) {
         const data = await response.json();
         setBadges(data.badges || []);
