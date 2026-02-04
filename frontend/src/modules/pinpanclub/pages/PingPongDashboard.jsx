@@ -1,6 +1,6 @@
 /**
- * Ping Pong Dashboard - Página principal del módulo
- * Muestra partidos en vivo, rankings, torneos
+ * Ping Pong Dashboard - Main page of the module
+ * Shows live matches, rankings, tournaments
  */
 
 import { useState, useEffect } from 'react';
@@ -64,9 +64,9 @@ export default function PingPongDashboard() {
   const currentUserId = user?.user_id || null;
   
   // Check if user is admin or moderator
-  const canManage = isAdmin || user?.role === 'moderator' || user?.rol === 'moderator';
+  const canManage = isAdmin || user?.role === 'moderator';
   
-  // Detectar si estamos dentro del admin panel
+  // Detect if we're inside the admin panel
   const isInsideAdmin = location.pathname.startsWith('/admin');
 
   useEffect(() => {
