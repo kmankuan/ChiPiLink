@@ -1,6 +1,6 @@
 """
-Weekly Challenges - Modelos
-Retos semanales automatics y configurables
+Weekly Challenges - Models
+Automatic and configurable weekly challenges
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -10,40 +10,40 @@ import uuid
 
 
 class ChallengeDifficulty(str, Enum):
-    """Dificultad dthe challenge"""
-    EASY = "easy"           # Easy
-    MEDIUM = "medium"       # Medio
-    HARD = "hard"           # Difficult
-    EXTREME = "extreme"     # Extremo
+    """Challenge difficulty levels"""
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+    EXTREME = "extreme"
 
 
 class ChallengeType(str, Enum):
-    """Tipos de reto"""
-    MATCHES_PLAYED = "matches_played"      # Jugar X partidos
-    MATCHES_WON = "matches_won"            # Ganar X partidos
-    MATCHES_REFEREED = "matches_refereed"  # Arbitrar X partidos
+    """Challenge types"""
+    MATCHES_PLAYED = "matches_played"      # Play X matches
+    MATCHES_WON = "matches_won"            # Win X matches
+    MATCHES_REFEREED = "matches_refereed"  # Referee X matches
     WIN_STREAK = "win_streak"              # X win streak
-    PLAY_DIFFERENT = "play_different"      # Jugar contra X oponentes diferentes
-    DAILY_PLAY = "daily_play"              # Jugar X days diferentes
+    PLAY_DIFFERENT = "play_different"      # Play against X different opponents
+    DAILY_PLAY = "daily_play"              # Play X different days
     COMEBACK = "comeback"                  # Win while behind on score
-    PERFECT_GAME = "perfect_game"          # Ganar sin perder puntos (11-0)
-    SOCIAL = "social"                      # Interactions sociales
-    CUSTOM = "custom"                      # Personalizado
+    PERFECT_GAME = "perfect_game"          # Win without losing points (11-0)
+    SOCIAL = "social"                      # Social interactions
+    CUSTOM = "custom"                      # Custom challenge
 
 
 class ChallengeStatus(str, Enum):
-    """Estado dthe challenge para un jugador"""
-    AVAILABLE = "available"    # Available to start
-    IN_PROGRESS = "in_progress"  # In progreso
-    COMPLETED = "completed"    # Completado
-    FAILED = "failed"          # No completado a tiempo
-    EXPIRED = "expired"        # Expirado
+    """Challenge status for a player"""
+    AVAILABLE = "available"      # Available to start
+    IN_PROGRESS = "in_progress"  # In progress
+    COMPLETED = "completed"      # Completed
+    FAILED = "failed"            # Not completed in time
+    EXPIRED = "expired"          # Expired
 
 
 # ============== CHALLENGE DEFINITION ==============
 
 class ChallengeDefinition(BaseModel):
-    """Definition de un reto"""
+    """Challenge definition model"""
     challenge_id: str = Field(default_factory=lambda: f"challenge_{uuid.uuid4().hex[:8]}")
     name: str
     description: str
@@ -51,32 +51,32 @@ class ChallengeDefinition(BaseModel):
     difficulty: ChallengeDifficulty = ChallengeDifficulty.MEDIUM
     icon: str = "🎯"
     
-    # Objetivo
-    target_value: int  # Ej: 5 partidos, 3 victorias
+    # Objective
+    target_value: int  # E.g.: 5 matches, 3 wins
     
-    # Recompensas
+    # Rewards
     points_reward: int = 0
     badge_id: Optional[str] = None
     prize_id: Optional[str] = None
     
     # Configuration
-    is_automatic: bool = True  # Si es generado automaticmente
+    is_automatic: bool = True  # If automatically generated
     is_active: bool = True
     is_repeatable: bool = False  # If can be completed multiple times
     
-    # Vigencia
+    # Validity
     valid_from: Optional[str] = None
     valid_until: Optional[str] = None
-    duration_days: int = 7  # Duration by default: 1 semana
+    duration_days: int = 7  # Default duration: 1 week
     
     # Metadata
-    created_by: Optional[str] = None  # Admin que lo created (si es manual)
+    created_by: Optional[str] = None  # Admin who created it (if manual)
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
 
 
 class ChallengeDefinitionCreate(BaseModel):
-    """Create definition de reto"""
+    """Create challenge definition"""
     name: str
     description: str
     type: ChallengeType
@@ -96,21 +96,21 @@ class ChallengeDefinitionCreate(BaseModel):
 # ============== PLAYER CHALLENGE ==============
 
 class PlayerChallenge(BaseModel):
-    """Progreso de un jugador en un reto"""
+    """Player progress in a challenge"""
     progress_id: str = Field(default_factory=lambda: f"progress_{uuid.uuid4().hex[:8]}")
     challenge_id: str
-    jugador_id: str
+    player_id: str
     
     # Info (cached)
     challenge_info: Optional[Dict] = None
-    jugador_info: Optional[Dict] = None
+    player_info: Optional[Dict] = None
     
-    # Progreso
+    # Progress
     current_value: int = 0
     target_value: int = 0
     progress_percent: float = 0.0
     
-    # Estado
+    # Status
     status: ChallengeStatus = ChallengeStatus.IN_PROGRESS
     
     # Timestamps
@@ -120,7 +120,7 @@ class PlayerChallenge(BaseModel):
 
 
 class PlayerChallengeUpdate(BaseModel):
-    """Update progreso de reto"""
+    """Update challenge progress"""
     current_value: int
     status: Optional[ChallengeStatus] = None
 
@@ -128,7 +128,7 @@ class PlayerChallengeUpdate(BaseModel):
 # ============== WEEKLY CHALLENGE SET ==============
 
 class WeeklyChallengeSet(BaseModel):
-    """Conjunto de retos de la semana"""
+    """Weekly challenge set"""
     week_id: str = Field(default_factory=lambda: f"week_{uuid.uuid4().hex[:8]}")
     week_number: int
     year: int
@@ -140,7 +140,7 @@ class WeeklyChallengeSet(BaseModel):
     total_participants: int = 0
     total_completions: int = 0
     
-    # Vigencia
+    # Validity
     start_date: str
     end_date: str
     
@@ -151,21 +151,21 @@ class WeeklyChallengeSet(BaseModel):
 # ============== CHALLENGE LEADERBOARD ==============
 
 class ChallengeLeaderboardEntry(BaseModel):
-    """Entrada en el leaderboard de retos"""
-    jugador_id: str
-    jugador_info: Optional[Dict] = None
+    """Challenge leaderboard entry"""
+    player_id: str
+    player_info: Optional[Dict] = None
     
     # Statistics
     challenges_completed: int = 0
     total_points: int = 0
-    current_streak: int = 0  # Semanas consecutivas completando retos
+    current_streak: int = 0  # Consecutive weeks completing challenges
     
     # Position
     rank: int = 0
 
 
 class ChallengeLeaderboard(BaseModel):
-    """Leaderboard de retos"""
+    """Challenge leaderboard"""
     week_id: Optional[str] = None
     period: str = "weekly"  # weekly, monthly, all_time
     entries: List[ChallengeLeaderboardEntry] = []
@@ -175,11 +175,11 @@ class ChallengeLeaderboard(BaseModel):
 # ============== AUTO-GENERATED CHALLENGES ==============
 
 def get_auto_challenges() -> List[Dict]:
-    """Retos automatics que se pueden generar"""
+    """Automatic challenges that can be generated"""
     return [
         {
-            "name": "Jugador Activo",
-            "description": "Juega 5 partidos esta semana",
+            "name": "Active Player",
+            "description": "Play 5 matches this week",
             "type": "matches_played",
             "difficulty": "easy",
             "icon": "🏓",
@@ -187,8 +187,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 50
         },
         {
-            "name": "Racha Ganadora",
-            "description": "Gana 3 partidos seguidos",
+            "name": "Winning Streak",
+            "description": "Win 3 consecutive matches",
             "type": "win_streak",
             "difficulty": "medium",
             "icon": "🔥",
@@ -196,8 +196,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 100
         },
         {
-            "name": "Colaborador",
-            "description": "Arbitra 3 partidos esta semana",
+            "name": "Collaborator",
+            "description": "Referee 3 matches this week",
             "type": "matches_refereed",
             "difficulty": "easy",
             "icon": "⚖️",
@@ -205,8 +205,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 75
         },
         {
-            "name": "Victorioso",
-            "description": "Gana 5 partidos esta semana",
+            "name": "Victorious",
+            "description": "Win 5 matches this week",
             "type": "matches_won",
             "difficulty": "medium",
             "icon": "🏆",
@@ -215,7 +215,7 @@ def get_auto_challenges() -> List[Dict]:
         },
         {
             "name": "Social Player",
-            "description": "Juega contra 5 oponentes diferentes",
+            "description": "Play against 5 different opponents",
             "type": "play_different",
             "difficulty": "medium",
             "icon": "🤝",
@@ -223,8 +223,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 80
         },
         {
-            "name": "Constancia",
-            "description": "Juega al menos un partido 4 days diferentes",
+            "name": "Consistency",
+            "description": "Play at least one match on 4 different days",
             "type": "daily_play",
             "difficulty": "medium",
             "icon": "📅",
@@ -232,8 +232,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 100
         },
         {
-            "name": "Remontada Epic",
-            "description": "Gana un partido after de perder el primer set",
+            "name": "Epic Comeback",
+            "description": "Win a match after losing the first set",
             "type": "comeback",
             "difficulty": "hard",
             "icon": "💪",
@@ -241,8 +241,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 150
         },
         {
-            "name": "Partido Perfecto",
-            "description": "Gana un partido 11-0",
+            "name": "Perfect Match",
+            "description": "Win a match 11-0",
             "type": "perfect_game",
             "difficulty": "extreme",
             "icon": "⭐",
@@ -250,8 +250,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 200
         },
         {
-            "name": "Maratonista",
-            "description": "Juega 10 partidos esta semana",
+            "name": "Marathon Runner",
+            "description": "Play 10 matches this week",
             "type": "matches_played",
             "difficulty": "hard",
             "icon": "🏃",
@@ -259,8 +259,8 @@ def get_auto_challenges() -> List[Dict]:
             "points_reward": 150
         },
         {
-            "name": "Invicto",
-            "description": "Gana 5 partidos seguidos",
+            "name": "Undefeated",
+            "description": "Win 5 consecutive matches",
             "type": "win_streak",
             "difficulty": "hard",
             "icon": "👑",
@@ -272,8 +272,8 @@ def get_auto_challenges() -> List[Dict]:
 
 def select_weekly_challenges(difficulty_mix: Dict[str, int] = None) -> List[Dict]:
     """
-    Selecciona retos para la semana based on en dificultad.
-    Por defecto: 2 easyes, 2 medios, 1 difficult
+    Select challenges for the week based on difficulty.
+    Default: 2 easy, 2 medium, 1 hard
     """
     import random
     
