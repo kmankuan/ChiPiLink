@@ -613,15 +613,15 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
   // Main Students View
   return (
     <>
-      {/* Header */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <GraduationCap className="h-6 w-6 text-purple-600" />
-            <div>
-              <h3 className="font-bold">Compra Exclusiva</h3>
-              <p className="text-sm text-muted-foreground">
-                Gestiona los textos de tus estudiantes vinculados
+      {/* Header - Compact on mobile */}
+      <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg sm:rounded-xl border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 shrink-0" />
+            <div className="min-w-0">
+              <h3 className="font-bold text-sm sm:text-base">Compra Exclusiva</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                Textos de tus estudiantes
               </p>
             </div>
           </div>
@@ -629,10 +629,10 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
             variant="outline"
             size="sm"
             onClick={() => setView('linking')}
-            className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50"
+            className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50 shrink-0 text-xs sm:text-sm px-2 sm:px-3"
           >
-            <UserPlus className="h-4 w-4" />
-            Vincular Nuevo
+            <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Vincular</span> Nuevo
           </Button>
         </div>
       </div>
