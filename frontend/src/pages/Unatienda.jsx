@@ -947,7 +947,7 @@ export default function Unatienda() {
     if (selectedSubcategoria && selectedCategoria === 'books') {
       const matchesGrade = product.grade === selectedSubcategoria || 
         product.grades?.includes(selectedSubcategoria);
-      return matchesSearch && matchesCategoria && matchesGrado;
+      return matchesSearch && matchesCategory && matchesGrade;
     }
     
     return matchesSearch && matchesCategoria;
