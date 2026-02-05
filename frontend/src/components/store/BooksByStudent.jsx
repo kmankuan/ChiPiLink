@@ -40,9 +40,9 @@ export default function BooksByStudent({ onNavigateToBook }) {
   const navigate = useNavigate();
   
   const [resumen, setResumen] = useState([]);
-  const [productosPorGrado, setProductosPorGrado] = useState({});
+  const [productsByGrade, setProductosPorGrado] = useState({});
   const [loading, setLoading] = useState(true);
-  const [loadingGrados, setLoadingGrados] = useState({});
+  const [loadingGrades, setLoadingGrados] = useState({});
   const [addingAll, setAddingAll] = useState({});
 
   useEffect(() => {
@@ -58,9 +58,9 @@ export default function BooksByStudent({ onNavigateToBook }) {
       setResumen(response.data.resumen || []);
       
       // Fetch products for each grade
-      const grados = [...new Set(response.data.resumen.map(r => r.estudiante.grade))];
-      for (const grado of grados) {
-        fetchProductosPorGrado(grado);
+      const grades = [...new Set(response.data.resumen.map(r => r.student.grade))];
+      for (const grade of grades) {
+        fetchProductsByGrade(grade);
       }
     } catch (error) {
       console.error('Error fetching resumen:', error);
@@ -70,44 +70,44 @@ export default function BooksByStudent({ onNavigateToBook }) {
     }
   };
 
-  const fetchProductosPorGrado = async (grado) => {
-    setLoadingGrados(prev => ({ ...prev, [grado]: true }));
+  const fetchProductsByGrade = async (grade) => {
+    setLoadingGrados(prev => ({ ...prev, [grade]: true }));
     try {
       const response = await axios.get(
-        `${API_URL}/api/store/private-catalog/por-grado/${encodeURIComponent(grado)}`,
+        `${API_URL}/api/store/private-catalog/por-grade/${encodeURIComponent(grade)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProductosPorGrado(prev => ({
         ...prev,
-        [grado]: response.data
+        [grade]: response.data
       }));
     } catch (error) {
-      console.error('Error fetching productos por grado:', error);
+      console.error('Error fetching products por grade:', error);
     } finally {
-      setLoadingGrados(prev => ({ ...prev, [grado]: false }));
+      setLoadingGrados(prev => ({ ...prev, [grade]: false }));
     }
   };
 
-  const isInCart = (libroId) => items.some(item => item.book_id === libroId);
+  const isInCart = (bookId) => items.some(item => item.book_id === bookId);
   
-  const getBooksInCartCount = (grado) => {
-    const gradoProducts = productosPorGrado[grado]?.productos || [];
-    return gradoProducts.filter(p => isInCart(p.book_id)).length;
+  const getBooksInCartCount = (grade) => {
+    const gradeProducts = productsByGrade[grade]?.products || [];
+    return gradeProducts.filter(p => isInCart(p.book_id)).length;
   };
 
-  const handleAddAllToCart = async (estudiante) => {
-    const grado = estudiante.grade;
-    const productos = productosPorGrado[grado]?.productos || [];
+  const handleAddAllToCart = async (student) => {
+    const grade = student.grade;
+    const products = productsByGrade[grade]?.products || [];
     
-    if (productos.length === 0) {
-      toast.error('No hay libros disponibles para este grado');
+    if (products.length === 0) {
+      toast.error('No hay libros disponibles para este grade');
       return;
     }
 
-    setAddingAll(prev => ({ ...prev, [estudiante.sync_id]: true }));
+    setAddingAll(prev => ({ ...prev, [student.sync_id]: true }));
     
     let added = 0;
-    for (const producto of productos) {
+    for (const producto of products) {
       if (!isInCart(producto.book_id)) {
         const productToAdd = {
           ...producto,
@@ -120,9 +120,9 @@ export default function BooksByStudent({ onNavigateToBook }) {
     }
 
     setTimeout(() => {
-      setAddingAll(prev => ({ ...prev, [estudiante.sync_id]: false }));
+      setAddingAll(prev => ({ ...prev, [student.sync_id]: false }));
       if (added > 0) {
-        toast.success(`${added} libro${added > 1 ? 's' : ''} agregado${added > 1 ? 's' : ''} al carrito para ${estudiante.nombre}`);
+        toast.success(`${added} libro${added > 1 ? 's' : ''} agregado${added > 1 ? 's' : ''} al carrito para ${student.nombre}`);
       } else {
         toast.info('Todos los libros ya están en el carrito');
       }
@@ -158,9 +158,9 @@ export default function BooksByStudent({ onNavigateToBook }) {
       <Card className="border-dashed">
         <CardContent className="py-12 text-center">
           <GraduationCap className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="font-semibold mb-2">No hay estudiantes vinculados</h3>
+          <h3 className="font-semibold mb-2">No hay students vinculados</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Vincula a tus estudiantes para ver los libros que necesitan
+            Vincula a tus students para ver los libros que necesitan
           </p>
           <Button variant="outline" onClick={() => navigate('/mi-cuenta?tab=exclusive')}>
             Vincular Estudiante
@@ -180,43 +180,43 @@ export default function BooksByStudent({ onNavigateToBook }) {
             Libros por Estudiante
           </h2>
           <p className="text-muted-foreground">
-            Encuentra rápidamente todos los libros que necesita cada estudiante
+            Encuentra rápidamente todos los libros que necesita cada student
           </p>
         </div>
       </div>
 
       {/* Students Accordion */}
-      <Accordion type="multiple" defaultValue={resumen.map(r => r.estudiante.sync_id)} className="space-y-4">
-        {resumen.map(({ estudiante, productos_disponibles, total_estimado }) => {
-          const grado = estudiante.grade;
-          const gradoData = productosPorGrado[grado];
-          const productos = gradoData?.productos || [];
-          const isLoadingGrado = loadingGrados[grado];
-          const booksInCart = getBooksInCartCount(grado);
-          const allInCart = booksInCart === productos.length && productos.length > 0;
-          const isAdding = addingAll[estudiante.sync_id];
+      <Accordion type="multiple" defaultValue={resumen.map(r => r.student.sync_id)} className="space-y-4">
+        {resumen.map(({ student, products_disponibles, total_estimado }) => {
+          const grade = student.grade;
+          const gradeData = productsByGrade[grade];
+          const products = gradeData?.products || [];
+          const isLoadingGrado = loadingGrades[grade];
+          const booksInCart = getBooksInCartCount(grade);
+          const allInCart = booksInCart === products.length && products.length > 0;
+          const isAdding = addingAll[student.sync_id];
 
           return (
             <AccordionItem
-              key={estudiante.sync_id}
-              value={estudiante.sync_id}
+              key={student.sync_id}
+              value={student.sync_id}
               className="border rounded-xl overflow-hidden bg-card shadow-sm"
             >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
                 <div className="flex items-center justify-between w-full pr-4">
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
-                      {estudiante.nombre.charAt(0)}
+                      {student.nombre.charAt(0)}
                     </div>
                     <div className="text-left">
-                      <h3 className="font-semibold text-lg">{estudiante.nombre}</h3>
+                      <h3 className="font-semibold text-lg">{student.nombre}</h3>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <GraduationCap className="h-4 w-4" />
-                        <span>{estudiante.grade}</span>
-                        {estudiante.seccion && (
+                        <span>{student.grade}</span>
+                        {student.seccion && (
                           <>
                             <span>•</span>
-                            <span>Sección {estudiante.seccion}</span>
+                            <span>Sección {student.seccion}</span>
                           </>
                         )}
                       </div>
@@ -226,7 +226,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
                   <div className="flex items-center gap-3">
                     <Badge variant="secondary" className="gap-1">
                       <BookOpen className="h-3 w-3" />
-                      {productos_disponibles} libros
+                      {products_disponibles} libros
                     </Badge>
                     <Badge className="bg-green-100 text-green-700 border-green-200">
                       ${total_estimado.toFixed(2)}
@@ -249,11 +249,11 @@ export default function BooksByStudent({ onNavigateToBook }) {
                   <p className="text-sm text-muted-foreground">
                     {allInCart 
                       ? '✅ Todos los libros están en el carrito'
-                      : `Agrega todos los libros de ${estudiante.nombre} con un clic`
+                      : `Agrega todos los libros de ${student.nombre} con un clic`
                     }
                   </p>
                   <Button
-                    onClick={() => handleAddAllToCart(estudiante)}
+                    onClick={() => handleAddAllToCart(student)}
                     disabled={isAdding || allInCart || isLoadingGrado}
                     className="gap-2"
                     variant={allInCart ? "secondary" : "default"}
@@ -284,14 +284,14 @@ export default function BooksByStudent({ onNavigateToBook }) {
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
                   </div>
-                ) : productos.length === 0 ? (
+                ) : products.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No hay libros disponibles para este grado</p>
+                    <p>No hay libros disponibles para este grade</p>
                   </div>
                 ) : (
                   <div className="grid gap-3">
-                    {productos.map(producto => {
+                    {products.map(producto => {
                       const inCart = isInCart(producto.book_id);
                       
                       return (
