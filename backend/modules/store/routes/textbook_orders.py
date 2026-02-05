@@ -246,3 +246,150 @@ async def get_order_details(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
+
+
+@router.get("/admin/diagnostic/textbooks")
+async def diagnostic_textbooks(
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Diagnostic endpoint to debug textbook visibility issues.
+    Returns detailed information about products, students, and field names.
+    """
+    from core.database import db
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    result = {
+        "products": {},
+        "students": {},
+        "field_analysis": {},
+        "recommendations": []
+    }
+    
+    # 1. Check product field names and counts
+    logger.info("[DIAGNOSTIC] Checking store_products collection...")
+    
+    total_products = await db.store_products.count_documents({})
+    
+    # Check for English fields
+    with_active_true = await db.store_products.count_documents({"active": True})
+    with_active_false = await db.store_products.count_documents({"active": False})
+    with_private_true = await db.store_products.count_documents({"is_private_catalog": True})
+    with_private_false = await db.store_products.count_documents({"is_private_catalog": False})
+    with_grade = await db.store_products.count_documents({"grade": {"$exists": True, "$ne": None}})
+    with_grades = await db.store_products.count_documents({"grades": {"$exists": True, "$ne": []}})
+    
+    # Check for Spanish fields (should be 0 after migration)
+    with_activo = await db.store_products.count_documents({"activo": {"$exists": True}})
+    with_catalogo = await db.store_products.count_documents({"catalogo_privado": {"$exists": True}})
+    with_grado = await db.store_products.count_documents({"grado": {"$exists": True}})
+    
+    # Products that should show (active + private catalog)
+    visible_products = await db.store_products.count_documents({
+        "active": True,
+        "is_private_catalog": True
+    })
+    
+    result["products"] = {
+        "total": total_products,
+        "english_fields": {
+            "active_true": with_active_true,
+            "active_false": with_active_false,
+            "is_private_catalog_true": with_private_true,
+            "is_private_catalog_false": with_private_false,
+            "has_grade": with_grade,
+            "has_grades_array": with_grades
+        },
+        "spanish_fields_remaining": {
+            "has_activo": with_activo,
+            "has_catalogo_privado": with_catalogo,
+            "has_grado": with_grado
+        },
+        "visible_for_textbook_orders": visible_products
+    }
+    
+    # 2. Get sample products to inspect
+    sample_products = await db.store_products.find(
+        {},
+        {"_id": 0, "name": 1, "grade": 1, "grades": 1, "active": 1, "is_private_catalog": 1, "grado": 1, "activo": 1, "catalogo_privado": 1}
+    ).limit(10).to_list(10)
+    result["products"]["samples"] = sample_products
+    
+    # 3. Get visible products (what textbook service queries)
+    visible_product_list = await db.store_products.find(
+        {"active": True, "is_private_catalog": True},
+        {"_id": 0, "name": 1, "grade": 1, "grades": 1}
+    ).to_list(50)
+    result["products"]["visible_product_list"] = visible_product_list
+    
+    # 4. Get unique grades from visible products
+    grades_in_products = set()
+    for p in visible_product_list:
+        if p.get("grade"):
+            grades_in_products.add(str(p.get("grade")))
+        if p.get("grades"):
+            for g in p.get("grades", []):
+                grades_in_products.add(str(g))
+    result["products"]["grades_available"] = list(grades_in_products)
+    
+    # 5. Check student records
+    logger.info("[DIAGNOSTIC] Checking store_student_records collection...")
+    
+    total_students = await db.store_student_records.count_documents({})
+    approved_students = await db.store_student_records.count_documents({
+        "enrollments": {"$elemMatch": {"status": "approved"}}
+    })
+    
+    # Sample student with enrollments
+    sample_students = await db.store_student_records.find(
+        {},
+        {"_id": 0, "full_name": 1, "student_id": 1, "enrollments": 1, "user_id": 1}
+    ).limit(5).to_list(5)
+    
+    result["students"] = {
+        "total": total_students,
+        "with_approved_enrollment": approved_students,
+        "samples": sample_students
+    }
+    
+    # 6. Get grades from approved enrollments
+    grades_in_students = set()
+    for s in sample_students:
+        for e in s.get("enrollments", []):
+            if e.get("status") == "approved" and e.get("grade"):
+                grades_in_students.add(str(e.get("grade")))
+    result["students"]["grades_enrolled"] = list(grades_in_students)
+    
+    # 7. Check field name consistency
+    result["field_analysis"] = {
+        "products_use_english": with_activo == 0 and with_catalogo == 0 and with_grado == 0,
+        "has_visible_products": visible_products > 0,
+        "grade_match": bool(grades_in_products & grades_in_students) if grades_in_products and grades_in_students else "unknown"
+    }
+    
+    # 8. Generate recommendations
+    if with_activo > 0 or with_catalogo > 0 or with_grado > 0:
+        result["recommendations"].append("CRITICAL: Spanish field names still exist. Run the migration again.")
+    
+    if visible_products == 0:
+        if with_private_true == 0:
+            result["recommendations"].append("No products have is_private_catalog=true. Set this field for textbooks.")
+        if with_active_true == 0:
+            result["recommendations"].append("No products have active=true. Activate some products.")
+        if with_private_true > 0 and with_active_true > 0:
+            result["recommendations"].append("Products exist but none match both active=true AND is_private_catalog=true.")
+    
+    if grades_in_products and grades_in_students:
+        if not (grades_in_products & grades_in_students):
+            result["recommendations"].append(
+                f"Grade mismatch! Products have grades {list(grades_in_products)}, "
+                f"but students are enrolled in {list(grades_in_students)}."
+            )
+    
+    if not result["recommendations"]:
+        result["recommendations"].append("Configuration looks correct. Check browser console for API errors.")
+    
+    logger.info(f"[DIAGNOSTIC] Complete. Recommendations: {result['recommendations']}")
+    
+    return result
