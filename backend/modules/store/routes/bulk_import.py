@@ -168,20 +168,20 @@ async def get_available_grades(
     Get list of available grades (from imported students).
     """
     grades = await bulk_import_service.get_available_grades()
-    return {"grades": grados}
+    return {"grades": grades}
 
 
-@router.get("/estudiantes")
-async def get_estudiantes_importados(
+@router.get("/students")
+async def get_imported_students(
     grade: Optional[str] = None,
-    buscar: Optional[str] = None,
-    estado: str = "active",
+    search: Optional[str] = None,
+    status: str = "active",
     limit: int = 100,
     skip: int = 0,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Obtener estudiantes importados con filtros.
+    Get imported students with filters.
     """
     from core.database import db
     
