@@ -864,7 +864,7 @@ export default function Unatienda() {
   
   // Hierarchical navigation state (for public catalog)
   const [selectedCategoria, setSelectedCategoria] = useState(null);
-  const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [showLandingView, setShowLandingView] = useState(true);
   
   const [addedItems, setAddedItems] = useState({});
