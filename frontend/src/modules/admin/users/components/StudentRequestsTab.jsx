@@ -427,99 +427,165 @@ export default function TextbookAccessAdminTab({ token }) {
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <ScrollArea className="max-h-[600px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t.student}</TableHead>
-                      <TableHead>{t.school}</TableHead>
-                      <TableHead>{t.year}</TableHead>
-                      <TableHead>{t.grade}</TableHead>
-                      <TableHead>{t.user}</TableHead>
-                      <TableHead>{t.relation}</TableHead>
-                      <TableHead>{t.status}</TableHead>
-                      <TableHead className="text-right">{t.actions}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {requests.map((request, idx) => (
-                      <TableRow key={`${request.student_id}-${request.year}-${idx}`}>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{request.student_name}</p>
-                            {request.student_number && (
-                              <p className="text-xs text-muted-foreground">
-                                ID: {request.student_number}
-                              </p>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>{request.school_name}</TableCell>
-                        <TableCell>{request.year}</TableCell>
-                        <TableCell>{request.grade}°</TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="text-sm">{request.user_name}</p>
-                            <p className="text-xs text-muted-foreground">{request.user_email}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="capitalize">{request.relation_type}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={request.status} t={t} />
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-1">
-                            {request.status !== 'approved' && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={() => handleAction(request, 'approved')}
-                                title={t.approve}
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {request.status !== 'rejected' && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => handleAction(request, 'rejected')}
-                                title={t.reject}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {request.status === 'pending' && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={() => handleAction(request, 'in_review')}
-                                title={t.markInReview}
-                              >
-                                <Info className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                              onClick={() => handleAction(request, 'info_required')}
-                              title={t.requestInfo}
-                            >
-                              <HelpCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+            <>
+              {/* Mobile Card View */}
+              <div className="block sm:hidden space-y-3">
+                {requests.map((request, idx) => (
+                  <Card key={`mobile-${request.student_id}-${request.year}-${idx}`} className="border-l-4 border-l-primary">
+                    <CardContent className="p-4">
+                      {/* Header: Student Name + Status */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-base truncate">{request.student_name}</p>
+                          {request.student_number && (
+                            <p className="text-xs text-muted-foreground">ID: {request.student_number}</p>
+                          )}
+                        </div>
+                        <StatusBadge status={request.status} t={t} />
+                      </div>
+                      
+                      {/* Info Grid */}
+                      <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                        <div>
+                          <p className="text-muted-foreground text-xs">{t.school}</p>
+                          <p className="font-medium truncate">{request.school_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs">{t.year} / {t.grade}</p>
+                          <p className="font-medium">{request.year} / {request.grade}°</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-muted-foreground text-xs">{t.user}</p>
+                          <p className="font-medium truncate">{request.user_name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{request.user_email}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex justify-end gap-2 pt-2 border-t">
+                        {request.status !== 'approved' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-green-600 border-green-200 hover:bg-green-50"
+                            onClick={() => handleAction(request, 'approved')}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            {t.approve}
+                          </Button>
+                        )}
+                        {request.status !== 'rejected' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                            onClick={() => handleAction(request, 'rejected')}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            {t.reject}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <Card className="hidden sm:block">
+                <ScrollArea className="max-h-[600px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t.student}</TableHead>
+                        <TableHead>{t.school}</TableHead>
+                        <TableHead>{t.year}</TableHead>
+                        <TableHead>{t.grade}</TableHead>
+                        <TableHead>{t.user}</TableHead>
+                        <TableHead>{t.relation}</TableHead>
+                        <TableHead>{t.status}</TableHead>
+                        <TableHead className="text-right">{t.actions}</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {requests.map((request, idx) => (
+                        <TableRow key={`${request.student_id}-${request.year}-${idx}`}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{request.student_name}</p>
+                              {request.student_number && (
+                                <p className="text-xs text-muted-foreground">
+                                  ID: {request.student_number}
+                                </p>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>{request.school_name}</TableCell>
+                          <TableCell>{request.year}</TableCell>
+                          <TableCell>{request.grade}°</TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="text-sm">{request.user_name}</p>
+                              <p className="text-xs text-muted-foreground">{request.user_email}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="capitalize">{request.relation_type}</TableCell>
+                          <TableCell>
+                            <StatusBadge status={request.status} t={t} />
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-end gap-1">
+                              {request.status !== 'approved' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                  onClick={() => handleAction(request, 'approved')}
+                                  title={t.approve}
+                                >
+                                  <Check className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {request.status !== 'rejected' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => handleAction(request, 'rejected')}
+                                  title={t.reject}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {request.status === 'pending' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  onClick={() => handleAction(request, 'in_review')}
+                                  title={t.markInReview}
+                                >
+                                  <Info className="h-4 w-4" />
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                onClick={() => handleAction(request, 'info_required')}
+                                title={t.requestInfo}
+                              >
+                                <HelpCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </Card>
+            </>
           )}
         </TabsContent>
       </Tabs>
