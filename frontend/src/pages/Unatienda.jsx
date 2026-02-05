@@ -168,8 +168,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadingFile, setUploadingFile] = useState(null);
 
-  // Get current language
+  // Get current language and translations
   const lang = i18n.language || 'es';
+  const t = exclusivaTranslations[lang] || exclusivaTranslations.es;
 
   // Fetch form fields configuration
   useEffect(() => {
