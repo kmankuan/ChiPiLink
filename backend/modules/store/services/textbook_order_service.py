@@ -70,13 +70,31 @@ class TextbookOrderService(BaseService):
         
         logger.info(f"[get_books_for_grade] Query grades: {grade_queries}")
         
+        # Query with both English and Spanish field names for backward compatibility
         books = await db.store_products.find(
             {
-                "active": True,
-                "is_private_catalog": True,
+                # Check both English (active) and Spanish (activo) field names
                 "$or": [
-                    {"grade": {"$in": grade_queries}},
-                    {"grades": {"$in": grade_queries}}
+                    {"active": True},
+                    {"activo": True}
+                ],
+                # Check both English and Spanish catalog flag names
+                "$and": [
+                    {
+                        "$or": [
+                            {"is_private_catalog": True},
+                            {"catalogo_privado": True},
+                            {"es_catalogo_privado": True}
+                        ]
+                    },
+                    {
+                        "$or": [
+                            {"grade": {"$in": grade_queries}},
+                            {"grades": {"$in": grade_queries}},
+                            {"grado": {"$in": grade_queries}},
+                            {"grados": {"$in": grade_queries}}
+                        ]
+                    }
                 ]
             },
             {"_id": 0}
@@ -84,7 +102,13 @@ class TextbookOrderService(BaseService):
         
         logger.info(f"[get_books_for_grade] Found {len(books)} books")
         if len(books) > 0:
-            logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')}")
+            logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')} or {books[0].get('grado')}")
+        else:
+            # Debug: check what products exist at all
+            total_private = await db.store_products.count_documents({"is_private_catalog": True})
+            total_private_es = await db.store_products.count_documents({"catalogo_privado": True})
+            total_active = await db.store_products.count_documents({"active": True})
+            logger.warning(f"[get_books_for_grade] No books found! Debug info: is_private_catalog={total_private}, catalogo_privado={total_private_es}, active={total_active}")
         
         return books
     
