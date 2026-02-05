@@ -480,7 +480,7 @@ class TextbookOrderService(BaseService):
         column_values = {}
         
         # Map fields based on configuration
-        if column_mapping.get("estudiante"):
+        if column_mapping.get("student"):
             column_values[column_mapping["estudiante"]] = order["student_name"]
         if column_mapping.get("acudiente"):
             column_values[column_mapping["acudiente"]] = f"{user_name} ({user_email})"
