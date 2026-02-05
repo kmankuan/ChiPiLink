@@ -44,25 +44,39 @@ class TextbookOrderService(BaseService):
         # Handle grade format variations
         grade_queries = [grade]
         
-        # Map simple grades to full format
+        # Map simple grades to all possible format variations
+        # Supports: numeric ("3"), prefixed ("G3"), ordinal ("3rd Grade"), Spanish ("3er Grado")
         grade_mappings = {
-            "1": ["1", "1st Grade"],
-            "2": ["2", "2nd Grade"],
-            "3": ["3", "3rd Grade"],
-            "4": ["4", "4th Grade"],
-            "5": ["5", "5th Grade"],
-            "6": ["6", "6th Grade"],
-            "7": ["7", "7th Grade"],
-            "8": ["8", "8th Grade"],
-            "9": ["9", "9th Grade"],
-            "10": ["10", "10th Grade"],
-            "11": ["11", "11th Grade"],
-            "12": ["12", "12th Grade"],
+            "1": ["1", "G1", "1st Grade", "1er Grado", "Grade 1", "Grado 1"],
+            "2": ["2", "G2", "2nd Grade", "2do Grado", "Grade 2", "Grado 2"],
+            "3": ["3", "G3", "3rd Grade", "3er Grado", "Grade 3", "Grado 3"],
+            "4": ["4", "G4", "4th Grade", "4to Grado", "Grade 4", "Grado 4"],
+            "5": ["5", "G5", "5th Grade", "5to Grado", "Grade 5", "Grado 5"],
+            "6": ["6", "G6", "6th Grade", "6to Grado", "Grade 6", "Grado 6"],
+            "7": ["7", "G7", "7th Grade", "7mo Grado", "Grade 7", "Grado 7"],
+            "8": ["8", "G8", "8th Grade", "8vo Grado", "Grade 8", "Grado 8"],
+            "9": ["9", "G9", "9th Grade", "9no Grado", "Grade 9", "Grado 9"],
+            "10": ["10", "G10", "10th Grade", "10mo Grado", "Grade 10", "Grado 10"],
+            "11": ["11", "G11", "11th Grade", "11vo Grado", "Grade 11", "Grado 11"],
+            "12": ["12", "G12", "12th Grade", "12vo Grado", "Grade 12", "Grado 12"],
             "K": ["K", "Kinder", "Kindergarten"],
-            "K3": ["K3", "Pre-K3"],
-            "K4": ["K4", "Pre-K4"],
-            "K5": ["K5", "Pre-K5", "Kinder"],
+            "K3": ["K3", "Pre-K3", "PK3"],
+            "K4": ["K4", "Pre-K4", "PK4"],
+            "K5": ["K5", "Pre-K5", "PK5", "Kinder"],
             "PK": ["PK", "Pre-Kinder", "Pre-K"],
+            # Also handle reverse mappings (if student has "G3", map to all "3" variants)
+            "G1": ["G1", "1", "1st Grade", "1er Grado", "Grade 1", "Grado 1"],
+            "G2": ["G2", "2", "2nd Grade", "2do Grado", "Grade 2", "Grado 2"],
+            "G3": ["G3", "3", "3rd Grade", "3er Grado", "Grade 3", "Grado 3"],
+            "G4": ["G4", "4", "4th Grade", "4to Grado", "Grade 4", "Grado 4"],
+            "G5": ["G5", "5", "5th Grade", "5to Grado", "Grade 5", "Grado 5"],
+            "G6": ["G6", "6", "6th Grade", "6to Grado", "Grade 6", "Grado 6"],
+            "G7": ["G7", "7", "7th Grade", "7mo Grado", "Grade 7", "Grado 7"],
+            "G8": ["G8", "8", "8th Grade", "8vo Grado", "Grade 8", "Grado 8"],
+            "G9": ["G9", "9", "9th Grade", "9no Grado", "Grade 9", "Grado 9"],
+            "G10": ["G10", "10", "10th Grade", "10mo Grado", "Grade 10", "Grado 10"],
+            "G11": ["G11", "11", "11th Grade", "11vo Grado", "Grade 11", "Grado 11"],
+            "G12": ["G12", "12", "12th Grade", "12vo Grado", "Grade 12", "Grado 12"],
         }
         
         if grade in grade_mappings:
