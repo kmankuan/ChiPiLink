@@ -1122,14 +1122,14 @@ export default function Unatienda() {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl">
         {/* Search Bar - only show in public view */}
         {activeView === 'public' && (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <div className="relative max-w-xl">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar productos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11"
+                className="pl-10 h-10 sm:h-11 text-sm"
               />
             </div>
           </div>
