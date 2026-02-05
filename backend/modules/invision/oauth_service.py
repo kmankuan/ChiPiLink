@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 
 from core.database import db
 from core.auth import create_token
+from core.constants import AuthCollections
 
 logger = logging.getLogger(__name__)
 
