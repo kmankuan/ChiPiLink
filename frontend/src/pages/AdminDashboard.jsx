@@ -51,6 +51,7 @@ const IntegrationsModule = lazy(() => import('@/modules/integrations/Integration
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
 const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
 const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
+const StoreAnalyticsModule = lazy(() => import('@/modules/admin/store/StoreAnalyticsModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
@@ -65,6 +66,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
   { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+  { id: 'analytics', label: 'Reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
   { id: 'customers', label: 'Users', icon: Users, permission: 'users.view' },
   { id: 'memberships', label: 'Memberships', icon: CreditCard, permission: 'memberships.view' },
   { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
