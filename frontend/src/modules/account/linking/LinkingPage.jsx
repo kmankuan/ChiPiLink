@@ -110,36 +110,50 @@ export default function LinkingPage({ embedded = false }) {
   const loadData = useCallback(async () => {
     // Wait for auth to be ready
     if (authLoading) {
+      console.log('[LinkingPage] Auth still loading, waiting...');
       return;
     }
     
     // Check authentication
     if (!token || !isAuthenticated) {
+      console.log('[LinkingPage] Not authenticated - token:', !!token, 'isAuthenticated:', isAuthenticated);
       setLoading(false);
       setLoadError('Please log in to access this feature');
       return;
     }
     
+    console.log('[LinkingPage] Loading data with token:', token?.substring(0, 30) + '...');
     setLoading(true);
     setLoadError(null);
     
     try {
       const api = createApiClient(token);
       
-      // Load students and schools in parallel
-      const [studentsRes, schoolsRes] = await Promise.all([
-        api.get('/api/store/textbook-access/my-students'),
-        api.get('/api/store/textbook-access/schools')
-      ]);
-      
-      setStudents(studentsRes.data?.students || []);
+      // Load schools first (doesn't require auth)
+      console.log('[LinkingPage] Fetching schools...');
+      const schoolsRes = await api.get('/api/store/textbook-access/schools');
+      console.log('[LinkingPage] Schools loaded:', schoolsRes.data?.schools?.length || 0);
       setSchools(schoolsRes.data?.schools || []);
+      
+      // Then load students (requires auth)
+      console.log('[LinkingPage] Fetching my-students...');
+      const studentsRes = await api.get('/api/store/textbook-access/my-students');
+      console.log('[LinkingPage] Students loaded:', studentsRes.data?.students?.length || 0);
+      setStudents(studentsRes.data?.students || []);
+      
       setLoadError(null);
     } catch (err) {
-      console.error('Load data error:', err);
+      console.error('[LinkingPage] Load data error:', err);
+      console.error('[LinkingPage] Error response:', err.response?.data);
+      console.error('[LinkingPage] Error status:', err.response?.status);
+      
       const errorMsg = err.response?.data?.detail || err.message || 'Failed to load data';
       setLoadError(errorMsg);
-      toast.error(errorMsg);
+      
+      // Don't show toast for auth errors - just display inline
+      if (err.response?.status !== 401) {
+        toast.error(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
