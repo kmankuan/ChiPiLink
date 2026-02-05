@@ -173,6 +173,8 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
   const [loadingTextbooks, setLoadingTextbooks] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState({});
+  const [reorderingBook, setReorderingBook] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
   
   // Dynamic form fields
   const [formFields, setFormFields] = useState([]);
