@@ -140,6 +140,8 @@ export default function AdminDashboard() {
         return <UnatiendaModule />;
       case 'orders':
         return <TextbookOrdersAdminTab />;
+      case 'analytics':
+        return <StoreAnalyticsModule />;
       case 'customers':
         return <UsersManagementModule />;
       case 'memberships':
