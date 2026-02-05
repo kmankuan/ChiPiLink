@@ -754,7 +754,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         <div className="space-y-3 sm:space-y-4">
           <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
             <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-            Mis Estudiantes ({catalogoPrivadoAcceso.students.length})
+            {t.myStudents} ({catalogoPrivadoAcceso.students.length})
           </h3>
           
           {catalogoPrivadoAcceso.students.map((student) => {
@@ -776,7 +776,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                       <div className="min-w-0 flex-1">
                         <h4 className="font-semibold text-sm sm:text-base truncate">{student.name}</h4>
                         <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                          Grado {student.grade} • {student.school_name || 'PCA'}
+                          {t.grade} {student.grade} • {student.school_name || 'PCA'}
                         </p>
                       </div>
                     </div>
@@ -788,10 +788,10 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                           <div className="text-left sm:text-right">
                             <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Enviado
+                              {t.sent}
                             </Badge>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {orderStatus.count} libros • ${orderStatus.total.toFixed(2)}
+                              {orderStatus.count} {t.books} • ${orderStatus.total.toFixed(2)}
                             </p>
                           </div>
                           <Button
@@ -800,14 +800,14 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                             onClick={() => handleViewTextbooks(student)}
                             className="text-xs h-8"
                           >
-                            Ver
+                            {t.view}
                           </Button>
                         </>
                       ) : (
                         <>
                           <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
                             <Clock className="h-3 w-3 mr-1" />
-                            Pendiente
+                            {t.pending}
                           </Badge>
                           <Button
                             size="sm"
@@ -815,7 +815,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                             className="gap-1 text-xs h-8"
                           >
                             <BookOpen className="h-3 w-3" />
-                            <span className="hidden xs:inline">Ver</span> Listado
+                            <span className="hidden xs:inline">{t.view}</span> {t.viewList.split(' ')[1] || ''}
                           </Button>
                         </>
                       )}
