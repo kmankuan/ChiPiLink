@@ -88,18 +88,33 @@ async def get_private_catalog_products(
             detail=access["message"] or "No access to private catalog"
         )
     
-    # Build query
+    # Build query - support both English and Spanish field names for backward compatibility
     query = {
-        "is_private_catalog": True,
-        "active": True
+        "$or": [
+            {"active": True},
+            {"activo": True}
+        ],
+        "$and": [
+            {
+                "$or": [
+                    {"is_private_catalog": True},
+                    {"catalogo_privado": True},
+                    {"es_catalogo_privado": True}
+                ]
+            }
+        ]
     }
     
     # Filter by grade (if not specified, show all user's grades)
     if grade:
-        query["$or"] = [
-            {"grade": grade},
-            {"grades": grade}
-        ]
+        query["$and"].append({
+            "$or": [
+                {"grade": grade},
+                {"grades": grade},
+                {"grado": grade},
+                {"grados": grade}
+            ]
+        })
     
     if subject:
         query["subject"] = subject
