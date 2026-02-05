@@ -106,7 +106,13 @@ const exclusivaTranslations = {
     view: 'Ver',
     noStudentsLinked: 'No tienes estudiantes vinculados',
     linkStudent: 'Vincular Estudiante',
-    backToStore: 'Volver a la tienda'
+    backToStore: 'Volver a la tienda',
+    reorderButton: 'Solicitar Re-orden',
+    reorderPending: 'Re-orden pendiente de aprobación',
+    reorderApproved: 'Re-orden aprobada - Selecciona para ordenar',
+    reorderReason: '¿Por qué necesitas re-ordenar?',
+    reorderSuccess: 'Solicitud de re-orden enviada',
+    reorderError: 'Error al solicitar re-orden'
   },
   zh: {
     backToStudents: '返回学生列表',
