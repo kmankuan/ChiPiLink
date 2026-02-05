@@ -421,7 +421,7 @@ class TextbookOrderService(BaseService):
         submission_total: float = None
     ) -> Dict:
         """Send order to Monday.com board with items as subitems and summary as update
-        Uses configuration from Integrations -> Monday.com -> Pedidos de Libros
+        Uses configuration from Integrations -> Monday.com -> Textbook Orders
         """
         # Get Monday.com configuration from the store config service
         monday_config = await monday_config_service.get_config()
