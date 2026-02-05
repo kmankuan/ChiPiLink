@@ -33,7 +33,9 @@ async def submit_order_direct(
         student_id = request.student_id
         
         logger.info(f"[submit_order_direct] user_id={user_id}, student_id={student_id}")
-        logger.info(f"[submit_order_direct] items={request.items}")
+        logger.info(f"[submit_order_direct] Request items count: {len(request.items)}")
+        for item in request.items:
+            logger.info(f"[submit_order_direct] Request item: book_id={item.book_id}, qty={item.get_quantity()}")
         
         # Get or create the order for this student
         order = await textbook_order_service.get_or_create_order(
@@ -41,9 +43,17 @@ async def submit_order_direct(
             student_id=student_id
         )
         
-        logger.info(f"[submit_order_direct] Got order: {order.get('order_id')}")
+        order_id = order.get("order_id")
+        logger.info(f"[submit_order_direct] Got order: {order_id}")
+        logger.info(f"[submit_order_direct] Order items count: {len(order.get('items', []))}")
+        
+        # Log existing order items
+        for item in order.get("items", []):
+            logger.info(f"[submit_order_direct] Order item: book_id={item.get('book_id')}, status={item.get('status')}, qty_ordered={item.get('quantity_ordered')}")
         
         # Update selections based on submitted items
+        update_count = 0
+        update_errors = []
         for item in request.items:
             book_id = item.book_id
             quantity = item.get_quantity()
@@ -51,20 +61,38 @@ async def submit_order_direct(
                 try:
                     await textbook_order_service.update_item_selection(
                         user_id=user_id,
-                        order_id=order["order_id"],
+                        order_id=order_id,
                         book_id=book_id,
                         quantity=quantity
                     )
+                    update_count += 1
+                    logger.info(f"[submit_order_direct] Updated item {book_id} to qty={quantity}")
                 except ValueError as e:
-                    logger.warning(f"[submit_order_direct] Could not update item {book_id}: {e}")
+                    error_msg = f"Could not update item {book_id}: {str(e)}"
+                    update_errors.append(error_msg)
+                    logger.warning(f"[submit_order_direct] {error_msg}")
+        
+        logger.info(f"[submit_order_direct] Updated {update_count} items, {len(update_errors)} errors")
+        
+        if update_count == 0:
+            # No items were updated - return detailed error
+            error_detail = "No items could be updated. "
+            if update_errors:
+                error_detail += "Errors: " + "; ".join(update_errors[:3])
+            raise ValueError(error_detail)
         
         # Refresh order to get updated items
-        order = await textbook_order_service.order_repo.get_by_id(order["order_id"])
+        order = await textbook_order_service.order_repo.get_by_id(order_id)
+        
+        # Log refreshed order items
+        logger.info(f"[submit_order_direct] Refreshed order items:")
+        for item in order.get("items", []):
+            logger.info(f"  - book_id={item.get('book_id')}, status={item.get('status')}, qty_ordered={item.get('quantity_ordered')}")
         
         # Submit the order
         result = await textbook_order_service.submit_order(
             user_id=user_id,
-            order_id=order["order_id"],
+            order_id=order_id,
             notes=request.form_data.get("notes") if request.form_data else None
         )
         
@@ -76,6 +104,8 @@ async def submit_order_direct(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"[submit_order_direct] Error: {e}")
+        import traceback
+        logger.error(f"[submit_order_direct] Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
