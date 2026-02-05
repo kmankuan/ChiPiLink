@@ -863,7 +863,7 @@ export default function Unatienda() {
   const [catalogoPrivadoAcceso, setCatalogoPrivadoAcceso] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
-  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [selectedCategory, setSelectedCategoria] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [showLandingView, setShowLandingView] = useState(true);
   
@@ -940,11 +940,11 @@ export default function Unatienda() {
       product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (!selectedCategoria) return matchesSearch;
+    if (!selectedCategory) return matchesSearch;
     
-    const matchesCategory = product.categoria === selectedCategoria;
+    const matchesCategory = product.categoria === selectedCategory;
     
-    if (selectedSubcategory && selectedCategoria === 'books') {
+    if (selectedSubcategory && selectedCategory === 'books') {
       const matchesGrade = product.grade === selectedSubcategory || 
         product.grades?.includes(selectedSubcategory);
       return matchesSearch && matchesCategory && matchesGrade;
@@ -954,9 +954,9 @@ export default function Unatienda() {
   });
 
   // Navigation helpers
-  const hasSubcategories = selectedCategoria === 'books' || selectedCategoria === 'libros';
+  const hasSubcategories = selectedCategory === 'books' || selectedCategory === 'libros';
   const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
-  const shouldShowLanding = selectedCategoria && !selectedSubcategory && showLandingView && !searchTerm;
+  const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
   const handleSelectCategoria = (categoriaId) => {
     setSelectedCategoria(categoriaId);
@@ -972,7 +972,7 @@ export default function Unatienda() {
   const handleViewAllProducts = () => setShowLandingView(false);
 
   const handleGoBack = () => {
-    if (!showLandingView && selectedCategoria && !selectedSubcategory) {
+    if (!showLandingView && selectedCategory && !selectedSubcategory) {
       setShowLandingView(true);
     } else if (selectedSubcategory) {
       setSelectedSubcategory(null);
@@ -1265,7 +1265,7 @@ export default function Unatienda() {
           <div className="mb-4 sm:mb-6" data-category-nav>
             <div className="flex gap-1.5 sm:gap-2 flex-wrap items-center">
               <Button
-                variant={!selectedCategoria ? 'default' : 'outline'}
+                variant={!selectedCategory ? 'default' : 'outline'}
                 size="icon"
                 onClick={handleGoHome}
                 className="h-9 w-9 rounded-full"
@@ -1274,7 +1274,7 @@ export default function Unatienda() {
                 <Home className="h-4 w-4" />
               </Button>
 
-              {(selectedCategoria || selectedSubcategory) && (
+              {(selectedCategory || selectedSubcategory) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -1286,11 +1286,11 @@ export default function Unatienda() {
               </Button>
             )}
 
-            {selectedCategoria && (
+            {selectedCategory && (
               <span className="text-muted-foreground/50 mx-1">|</span>
             )}
 
-            {!selectedCategoria ? (
+            {!selectedCategory ? (
               <>
                 {categories.map((cat) => (
                   <Button
@@ -1308,7 +1308,7 @@ export default function Unatienda() {
             ) : (
               <>
                 <span className="font-semibold text-sm flex items-center gap-1">
-                  {getCategoryInfo(selectedCategoria).icono} {getCategoryInfo(selectedCategoria).nombre}
+                  {getCategoryInfo(selectedCategory).icono} {getCategoryInfo(selectedCategory).nombre}
                 </span>
                 {!showLandingView && (
                   <Badge variant="secondary" className="text-xs">
@@ -1351,7 +1351,7 @@ export default function Unatienda() {
       <FloatingStoreNav
         categories={categories}
         grados={grados.map(g => ({ id: g, nombre: g }))}
-        selectedCategoria={selectedCategoria}
+        selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
         onSelectCategoria={handleSelectCategoria}
         onSelectSubcategoria={handleSelectSubcategoria}
