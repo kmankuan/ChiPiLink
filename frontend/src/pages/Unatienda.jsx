@@ -380,7 +380,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       setUploadedFiles({});
     } catch (error) {
       console.error('Error submitting order:', error);
-      toast.error(error.response?.data?.detail || 'Error al enviar el pedido');
+      toast.error(error.response?.data?.detail || t.orderError);
     } finally {
       setSubmitting(false);
     }
