@@ -924,7 +924,7 @@ export default function Unatienda() {
 
   const checkPrivateCatalogAccess = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/store/catalogo-privado/acceso`, {
+      const response = await axios.get(`${API_URL}/api/store/private-catalog/acceso`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPrivateCatalogAccess(response.data);

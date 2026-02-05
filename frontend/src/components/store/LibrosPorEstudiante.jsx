@@ -52,7 +52,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
   const fetchResumen = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/api/store/catalogo-privado/resumen`,
+        `${API_URL}/api/store/private-catalog/resumen`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResumen(response.data.resumen || []);
@@ -74,7 +74,7 @@ export default function LibrosPorEstudiante({ onNavigateToBook }) {
     setLoadingGrados(prev => ({ ...prev, [grado]: true }));
     try {
       const response = await axios.get(
-        `${API_URL}/api/store/catalogo-privado/por-grado/${encodeURIComponent(grado)}`,
+        `${API_URL}/api/store/private-catalog/por-grado/${encodeURIComponent(grado)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProductosPorGrado(prev => ({

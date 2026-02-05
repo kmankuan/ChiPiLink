@@ -55,10 +55,10 @@ export default function PrivateBookDetail() {
     try {
       // Fetch book details and access info in parallel
       const [libroRes, accesoRes] = await Promise.all([
-        axios.get(`${API_URL}/api/store/catalogo-privado/productos/${libroId}`, {
+        axios.get(`${API_URL}/api/store/private-catalog/productos/${libroId}`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`${API_URL}/api/store/catalogo-privado/acceso`, {
+        axios.get(`${API_URL}/api/store/private-catalog/acceso`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);

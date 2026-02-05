@@ -117,7 +117,7 @@ export default function UnatiendaModule() {
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Public</span>
           </TabsTrigger>
-          <TabsTrigger value="catalogo-privado" className="flex items-center gap-2">
+          <TabsTrigger value="private-catalog" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
             <span className="hidden md:inline">Private PCA</span>
           </TabsTrigger>
@@ -151,7 +151,7 @@ export default function UnatiendaModule() {
           <CatalogoPublicoTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
-        <TabsContent value="catalogo-privado">
+        <TabsContent value="private-catalog">
           <CatalogoPrivadoTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
