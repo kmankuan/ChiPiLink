@@ -34,7 +34,7 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function LibrosPorEstudiante({ onNavigateToBook }) {
+export default function BooksByStudent({ onNavigateToBook }) {
   const { token } = useAuth();
   const { addItem, items } = useCart();
   const navigate = useNavigate();
