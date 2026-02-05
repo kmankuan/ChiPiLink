@@ -148,11 +148,11 @@ export default function UnatiendaModule() {
         </TabsList>
 
         <TabsContent value="public-catalog">
-          <CatalogoPublicoTab token={token} onRefresh={fetchStats} />
+          <PublicCatalogTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
         <TabsContent value="private-catalog">
-          <CatalogoPrivadoTab token={token} onRefresh={fetchStats} />
+          <PrivateCatalogTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
         <TabsContent value="solicitudes">
@@ -168,11 +168,11 @@ export default function UnatiendaModule() {
         </TabsContent>
 
         <TabsContent value="students">
-          <EstudiantesTab token={token} />
+          <StudentsTab token={token} />
         </TabsContent>
 
         <TabsContent value="configuration">
-          <ConfiguracionTab token={token} />
+          <ConfigurationTab token={token} />
         </TabsContent>
 
         <TabsContent value="demo">
