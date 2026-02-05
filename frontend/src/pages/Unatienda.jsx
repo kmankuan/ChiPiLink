@@ -168,6 +168,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
   const fetchTextbooksForStudent = async (student) => {
     setLoadingTextbooks(true);
+    setTextbooks([]); // Reset textbooks
     try {
       // Get or create order for this student - returns available books
       const response = await axios.get(
@@ -200,7 +201,15 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       setSelectedBooks(initialSelected);
     } catch (error) {
       console.error('Error fetching textbooks:', error);
-      toast.error('Error al cargar los libros');
+      const errorMsg = error.response?.data?.detail || 'Error al cargar los libros';
+      
+      // Check if it's an enrollment/approval issue
+      if (errorMsg.includes('approved') || errorMsg.includes('enrollment')) {
+        toast.error('El estudiante debe estar aprobado para ver los libros disponibles');
+      } else {
+        toast.error(errorMsg);
+      }
+      setTextbooks([]);
     } finally {
       setLoadingTextbooks(false);
     }
