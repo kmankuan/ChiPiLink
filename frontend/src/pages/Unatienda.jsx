@@ -954,7 +954,7 @@ export default function Unatienda() {
   });
 
   // Navigation helpers
-  const hasSubcategories = selectedCategoria === 'libros';
+  const hasSubcategories = selectedCategoria === 'books' || selectedCategoria === 'libros';
   const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
   const shouldShowLanding = selectedCategoria && !selectedSubcategoria && showLandingView && !searchTerm;
 
