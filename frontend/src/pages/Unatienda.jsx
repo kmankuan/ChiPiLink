@@ -544,7 +544,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   <div className="mt-6 space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <h4 className="font-semibold flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      Información Adicional
+                      {t.additionalInfo}
                     </h4>
                     {formFields.map(field => (
                       <div key={field.field_id} className="space-y-2">
