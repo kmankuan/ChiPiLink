@@ -348,25 +348,25 @@ export default function TextbookAccessAdminTab({ token }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold">{t.title}</h3>
-          <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+          <h3 className="text-base sm:text-lg font-semibold">{t.title}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">{t.subtitle}</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchRequests}>
+        <Button variant="outline" size="sm" onClick={fetchRequests} className="self-start sm:self-auto">
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           {t.refresh}
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 flex-1 sm:flex-none">
+          <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
           <Select value={filterSchool} onValueChange={setFilterSchool}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="flex-1 sm:w-[200px]">
               <SelectValue placeholder={t.filterSchool} />
             </SelectTrigger>
             <SelectContent>
@@ -381,7 +381,7 @@ export default function TextbookAccessAdminTab({ token }) {
         </div>
         
         <Select value={filterYear} onValueChange={setFilterYear}>
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder={t.filterYear} />
           </SelectTrigger>
           <SelectContent>
