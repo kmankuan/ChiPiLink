@@ -901,7 +901,7 @@ export default function Unatienda() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, storeRes, categoriesRes, gradosRes] = await Promise.all([
+      const [productsRes, storeRes, categoriesRes, gradesRes] = await Promise.all([
         axios.get(`${API_URL}/api/store/products`),
         axios.get(`${API_URL}/api/platform-store`),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
@@ -914,7 +914,7 @@ export default function Unatienda() {
       setProducts(publicProducts);
       setStoreInfo(storeRes.data);
       setCategories(categoriesRes.data || []);
-      setGrades(gradosRes.data.grades || []);
+      setGrades(gradesRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
