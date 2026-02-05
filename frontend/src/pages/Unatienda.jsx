@@ -69,7 +69,13 @@ const exclusivaTranslations = {
     view: 'View',
     noStudentsLinked: 'No students linked yet',
     linkStudent: 'Link Student',
-    backToStore: 'Back to store'
+    backToStore: 'Back to store',
+    reorderButton: 'Request Reorder',
+    reorderPending: 'Reorder pending approval',
+    reorderApproved: 'Reorder approved - Select to order',
+    reorderReason: 'Why do you need to reorder?',
+    reorderSuccess: 'Reorder request sent',
+    reorderError: 'Error requesting reorder'
   },
   es: {
     backToStudents: 'Volver a estudiantes',
