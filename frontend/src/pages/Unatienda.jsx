@@ -731,9 +731,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 shrink-0" />
             <div className="min-w-0">
-              <h3 className="font-bold text-sm sm:text-base">Compra Exclusiva</h3>
+              <h3 className="font-bold text-sm sm:text-base">{t.exclusivePurchase}</h3>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                Textos de tus estudiantes
+                {t.yourStudentsBooks}
               </p>
             </div>
           </div>
@@ -744,7 +744,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
             className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50 shrink-0 text-xs sm:text-sm px-2 sm:px-3"
           >
             <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Vincular</span> Nuevo
+            <span className="hidden sm:inline">{t.linkNew.split(' ')[0]}</span> {t.linkNew.split(' ')[1] || ''}
           </Button>
         </div>
       </div>
