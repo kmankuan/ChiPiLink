@@ -414,7 +414,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           className="mb-4 gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
-          Volver a estudiantes
+          {t.backToStudents}
         </Button>
         <CompraExclusiva embedded={true} onStudentLinked={() => {
           onRefreshAccess();
