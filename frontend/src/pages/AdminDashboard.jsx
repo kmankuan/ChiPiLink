@@ -106,8 +106,10 @@ export default function AdminDashboard() {
       return navItems;
     }
     
-    // Non-admin users: filter by specific permissions
+    // Non-admin users: filter by specific permissions and exclude adminOnly items
     return navItems.filter(item => {
+      // Skip admin-only items for non-admins
+      if (item.adminOnly) return false;
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
