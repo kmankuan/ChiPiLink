@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList, Package, FileText } from 'lucide-react';
 
 // Import sub-modules
-import CatalogoPublicoTab from './tabs/CatalogoPublicoTab';
-import CatalogoPrivadoTab from './tabs/CatalogoPrivadoTab';
-import EstudiantesTab from './tabs/EstudiantesTab';
-import ConfiguracionTab from './tabs/ConfiguracionTab';
+import PublicCatalogTab from './tabs/PublicCatalogTab';
+import PrivateCatalogTab from './tabs/PrivateCatalogTab';
+import StudentsTab from './tabs/StudentsTab';
+import ConfigurationTab from './tabs/ConfigurationTab';
 import DemoDataTab from './tabs/DemoDataTab';
 import TextbookAccessAdminTab from '@/modules/admin/users/components/StudentRequestsTab';
 import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
@@ -20,7 +20,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function UnatiendaModule() {
   const { token } = useAuth();
-  const [activeTab, setActiveTab] = useState('catalogo-publico');
+  const [activeTab, setActiveTab] = useState('public-catalog');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
