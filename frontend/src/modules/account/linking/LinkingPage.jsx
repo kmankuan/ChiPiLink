@@ -83,7 +83,7 @@ const createApiClient = (token) => {
 };
 
 export default function LinkingPage({ embedded = false }) {
-  const { token } = useAuth();
+  const { token, isAuthenticated, loading: authLoading } = useAuth();
   
   // Data states
   const [students, setStudents] = useState([]);
@@ -91,6 +91,7 @@ export default function LinkingPage({ embedded = false }) {
   
   // UI states
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -107,12 +108,24 @@ export default function LinkingPage({ embedded = false }) {
 
   // Load initial data
   const loadData = useCallback(async () => {
-    if (!token) return;
+    // Wait for auth to be ready
+    if (authLoading) {
+      return;
+    }
+    
+    // Check authentication
+    if (!token || !isAuthenticated) {
+      setLoading(false);
+      setLoadError('Please log in to access this feature');
+      return;
+    }
     
     setLoading(true);
-    const api = createApiClient(token);
+    setLoadError(null);
     
     try {
+      const api = createApiClient(token);
+      
       // Load students and schools in parallel
       const [studentsRes, schoolsRes] = await Promise.all([
         api.get('/api/store/textbook-access/my-students'),
@@ -121,13 +134,16 @@ export default function LinkingPage({ embedded = false }) {
       
       setStudents(studentsRes.data?.students || []);
       setSchools(schoolsRes.data?.schools || []);
+      setLoadError(null);
     } catch (err) {
       console.error('Load data error:', err);
-      toast.error('Failed to load data');
+      const errorMsg = err.response?.data?.detail || err.message || 'Failed to load data';
+      setLoadError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, isAuthenticated, authLoading]);
 
   useEffect(() => {
     loadData();
