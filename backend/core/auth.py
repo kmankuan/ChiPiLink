@@ -9,10 +9,13 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
 import fnmatch
+import logging
 
 from .config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRATION_HOURS
 from .database import db
 from .constants import AuthCollections
+
+logger = logging.getLogger(__name__)
 
 # Security scheme
 security = HTTPBearer(auto_error=False)
