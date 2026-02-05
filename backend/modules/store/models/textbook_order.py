@@ -41,7 +41,16 @@ class OrderItem(BaseModel):
 class OrderItemCreate(BaseModel):
     """Request to add/update item in order"""
     book_id: str
-    quantity: int = 1
+    quantity: Optional[int] = 1
+    quantity_ordered: Optional[int] = None  # Alternative field name from frontend
+    book_name: Optional[str] = None  # Optional, frontend may send this
+    price: Optional[float] = None  # Optional, frontend may send this
+    
+    def get_quantity(self) -> int:
+        """Get the quantity, preferring quantity_ordered if set"""
+        if self.quantity_ordered is not None:
+            return self.quantity_ordered
+        return self.quantity or 1
 
 
 class ReorderRequest(BaseModel):
