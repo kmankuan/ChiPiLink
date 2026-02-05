@@ -96,13 +96,13 @@ class Product(ProductBase):
 class OrderItem(BaseModel):
     """Order item model"""
     book_id: str
-    nombre_libro: str
-    cantidad: int
-    precio_unitario: float
+    book_name: str
+    quantity: int
+    unit_price: float
     
     @property
     def subtotal(self) -> float:
-        return self.cantidad * self.price_unitario
+        return self.quantity * self.unit_price
 
 
 # ============== ORDER MODELS ==============
@@ -110,58 +110,58 @@ class OrderItem(BaseModel):
 class OrderBase(BaseModel):
     """Base order model"""
     items: List[OrderItem]
-    metodo_pago: PaymentMethod
-    notas: Optional[str] = None
+    payment_method: PaymentMethod
+    notes: Optional[str] = None
 
 
 class OrderCreate(OrderBase):
     """Order creation model (authenticated)"""
-    estudiante_id: str
+    student_id: str
 
 
 class OrderPublicCreate(BaseModel):
     """Public order creation model (no auth required)"""
     # Guardian info
-    nombre_acudiente: str
-    telefono_acudiente: str
-    email_acudiente: EmailStr
+    guardian_name: str
+    guardian_phone: str
+    guardian_email: EmailStr
     # Student info
-    nombre_estudiante: str
-    apellido_estudiante: str
-    grado_estudiante: str
-    email_estudiante: Optional[EmailStr] = None
-    telefono_estudiante: Optional[str] = None
-    escuela_estudiante: Optional[str] = None
+    student_name: str
+    student_last_name: str
+    student_grade: str
+    student_email: Optional[EmailStr] = None
+    student_phone: Optional[str] = None
+    student_school: Optional[str] = None
     # Order info
     items: List[OrderItem]
-    metodo_pago: str
-    notas: Optional[str] = None
+    payment_method: str
+    notes: Optional[str] = None
 
 
 class Order(BaseModel):
     """Full order model"""
     model_config = ConfigDict(from_attributes=True)
     
-    pedido_id: str
+    order_id: str
     user_id: Optional[str] = None
-    estudiante_id: Optional[str] = None
-    estudiante_name: str
+    student_id: Optional[str] = None
+    student_name: str
     items: List[Dict]
     total: float
     subtotal: Optional[float] = None
-    impuestos: Optional[float] = 0
-    descuento: Optional[float] = 0
-    metodo_pago: str
-    estado: OrderStatus = OrderStatus.PENDIENTE
-    estado_pago: PaymentStatus = PaymentStatus.PENDIENTE
-    pago_confirmado: bool = False
-    notas: Optional[str] = None
+    taxes: Optional[float] = 0
+    discount: Optional[float] = 0
+    payment_method: str
+    status: OrderStatus = OrderStatus.PENDIENTE
+    payment_status: PaymentStatus = PaymentStatus.PENDIENTE
+    payment_confirmed: bool = False
+    notes: Optional[str] = None
     monday_item_id: Optional[str] = None
-    tipo: Optional[str] = None  # "publico", "unatienda", etc.
+    type: Optional[str] = None  # "public", "unatienda", etc.
     # Public order fields
-    nombre_acudiente: Optional[str] = None
-    telefono_acudiente: Optional[str] = None
-    email_acudiente: Optional[str] = None
+    guardian_name: Optional[str] = None
+    guardian_phone: Optional[str] = None
+    guardian_email: Optional[str] = None
     # Timestamps
     created_at: Optional[Any] = None
     updated_at: Optional[Any] = None
@@ -172,11 +172,11 @@ class Order(BaseModel):
 class StudentBase(BaseModel):
     """Base student model"""
     name: str
-    apellido: str
+    last_name: str
     grade: str
-    escuela: Optional[str] = None
-    es_nuevo: bool = True
-    notas: Optional[str] = None
+    school: Optional[str] = None
+    is_new: bool = True
+    notes: Optional[str] = None
 
 
 class StudentCreate(StudentBase):
@@ -188,14 +188,14 @@ class Student(StudentBase):
     """Full student model"""
     model_config = ConfigDict(from_attributes=True)
     
-    estudiante_id: str
-    estado_matricula: str = "no_encontrado"
-    matricula_sync_id: Optional[str] = None
-    similitud_matricula: Optional[float] = None
-    nombre_matricula: Optional[str] = None
-    ano_escolar: Optional[str] = None
-    fecha_registro: Optional[Any] = None
-    libros_comprados: List[str] = []
+    student_id: str
+    enrollment_status: str = "not_found"
+    enrollment_sync_id: Optional[str] = None
+    enrollment_similarity: Optional[float] = None
+    enrollment_name: Optional[str] = None
+    school_year: Optional[str] = None
+    registration_date: Optional[Any] = None
+    purchased_books: List[str] = []
 
 
 # ============== CATEGORY MODELS ==============
@@ -203,8 +203,8 @@ class Student(StudentBase):
 class CategoryBase(BaseModel):
     """Base category model"""
     name: str
-    icono: str = "📦"
-    orden: int = 99
+    icon: str = "📦"
+    order: int = 99
     active: bool = True
 
 
