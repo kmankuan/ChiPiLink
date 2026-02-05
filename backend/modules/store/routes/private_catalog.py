@@ -10,7 +10,7 @@ from core.auth import get_current_user, get_admin_user, get_optional_user
 from core.database import db
 from ..services.textbook_access_service import textbook_access_service
 
-router = APIRouter(prefix="/catalogo-privado", tags=["Store - Private Catalog"])
+router = APIRouter(prefix="/private-catalog", tags=["Store - Private Catalog"])
 
 
 async def verify_private_catalog_access(user_id: str) -> dict:
