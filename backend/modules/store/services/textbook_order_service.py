@@ -86,26 +86,37 @@ class TextbookOrderService(BaseService):
         student_id: str
     ) -> Dict:
         """Get existing order or create a new one for a student"""
+        logger.info(f"[get_or_create_order] user_id={user_id}, student_id={student_id}")
+        
         # Verify student belongs to user and is approved
         student = await self.student_repo.get_by_id(student_id)
         if not student:
+            logger.warning(f"[get_or_create_order] Student not found: {student_id}")
             raise ValueError("Student not found")
         
+        logger.info(f"[get_or_create_order] Found student: {student.get('full_name')}, user_id={student.get('user_id')}")
+        
         if student.get("user_id") != user_id:
+            logger.warning(f"[get_or_create_order] Access denied - student user_id={student.get('user_id')}, request user_id={user_id}")
             raise ValueError("Access denied")
         
         # Check if student has approved enrollment for current year
         current_year = self.get_current_year()
         enrollments = student.get("enrollments", [])
+        logger.info(f"[get_or_create_order] Current year={current_year}, enrollments count={len(enrollments)}")
+        logger.info(f"[get_or_create_order] Enrollments: {enrollments}")
+        
         current_enrollment = next(
             (e for e in enrollments if e.get("year") == current_year and e.get("status") == "approved"),
             None
         )
         
         if not current_enrollment:
+            logger.warning(f"[get_or_create_order] No approved enrollment found for year {current_year}")
             raise ValueError("Student must have approved enrollment to order textbooks")
         
         grade = current_enrollment.get("grade", "")
+        logger.info(f"[get_or_create_order] Found enrollment - grade={grade}, year={current_year}")
         
         # Check if order already exists
         existing_order = await self.order_repo.get_by_student(student_id, current_year)
