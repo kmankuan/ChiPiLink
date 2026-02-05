@@ -457,24 +457,24 @@ class TextbookOrderService(BaseService):
         # Build items list for text column
         items_text = ", ".join([f"{item['book_name']} (x{item['quantity_ordered']})" for item in selected_items])
         
-        # Map grade to Monday.com dropdown labels (if dropdown is used)
+        # Map grade to Monday.com format (kept Spanish for Monday.com compatibility)
         grade = order["grade"]
         grade_mapping = {
             "K4": "K4", "K5": "K5",
-            "1": "Grado 1", "1er Grado": "Grado 1", "1ro": "Grado 1",
-            "2": "Grado 2", "2do Grado": "Grado 2", "2do": "Grado 2",
-            "3": "Grado 3", "3er Grado": "Grado 3", "3ro": "Grado 3",
-            "4": "Grado 4", "4to Grado": "Grado 4", "4to": "Grado 4",
-            "5": "Grado 5", "5to Grado": "Grado 5", "5to": "Grado 5",
-            "6": "Grado 6", "6to Grado": "Grado 6", "6to": "Grado 6",
-            "7": "Grado 7", "7mo Grado": "Grado 7", "7mo": "Grado 7",
-            "8": "Grado 8", "8vo Grado": "Grado 8", "8vo": "Grado 8",
-            "9": "Grado 9", "9no Grado": "Grado 9", "9no": "Grado 9",
-            "10": "Grado 10", "10mo Grado": "Grado 10", "10mo": "Grado 10",
-            "11": "Grado 11", "11vo Grado": "Grado 11", "11vo": "Grado 11",
-            "12": "Grado 12", "12vo Grado": "Grado 12", "12vo": "Grado 12",
+            "1": "Grade 1", "1st Grade": "Grade 1", "1ro": "Grade 1", "1er Grado": "Grade 1",
+            "2": "Grade 2", "2nd Grade": "Grade 2", "2do": "Grade 2", "2do Grado": "Grade 2",
+            "3": "Grade 3", "3rd Grade": "Grade 3", "3ro": "Grade 3", "3er Grado": "Grade 3",
+            "4": "Grade 4", "4th Grade": "Grade 4", "4to": "Grade 4", "4to Grado": "Grade 4",
+            "5": "Grade 5", "5th Grade": "Grade 5", "5to": "Grade 5", "5to Grado": "Grade 5",
+            "6": "Grade 6", "6th Grade": "Grade 6", "6to": "Grade 6", "6to Grado": "Grade 6",
+            "7": "Grade 7", "7th Grade": "Grade 7", "7mo": "Grade 7", "7mo Grado": "Grade 7",
+            "8": "Grade 8", "8th Grade": "Grade 8", "8vo": "Grade 8", "8vo Grado": "Grade 8",
+            "9": "Grade 9", "9th Grade": "Grade 9", "9no": "Grade 9", "9no Grado": "Grade 9",
+            "10": "Grade 10", "10th Grade": "Grade 10", "10mo": "Grade 10", "10mo Grado": "Grade 10",
+            "11": "Grade 11", "11th Grade": "Grade 11", "11vo": "Grade 11", "11vo Grado": "Grade 11",
+            "12": "Grade 12", "12th Grade": "Grade 12", "12vo": "Grade 12", "12vo Grado": "Grade 12",
         }
-        monday_grade = grade_mapping.get(grade, f"Grado {grade}" if grade.isdigit() else grade)
+        monday_grade = grade_mapping.get(grade, f"Grade {grade}" if grade.isdigit() else grade)
         
         # Build column values using configured mapping
         column_values = {}
