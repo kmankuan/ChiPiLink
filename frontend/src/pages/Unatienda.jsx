@@ -1256,7 +1256,7 @@ export default function Unatienda() {
             className="mb-4 gap-1"
           >
             <ChevronLeft className="h-4 w-4" />
-            Volver a la tienda
+            {t('store.backToStore')}
           </Button>
         )}
 
