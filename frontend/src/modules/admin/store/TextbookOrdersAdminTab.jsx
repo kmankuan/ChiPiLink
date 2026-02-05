@@ -358,7 +358,7 @@ export default function TextbookOrdersAdminTab() {
           {stats && (
             <>
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-4">
@@ -368,20 +368,6 @@ export default function TextbookOrdersAdminTab() {
                       <div>
                         <p className="text-sm text-muted-foreground">Total Orders</p>
                         <p className="text-2xl font-bold">{stats.total_orders}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                        <DollarSign className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Total Revenue</p>
-                        <p className="text-2xl font-bold">${stats.total_revenue?.toFixed(2)}</p>
                       </div>
                     </div>
                   </CardContent>
