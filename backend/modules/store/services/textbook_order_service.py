@@ -133,7 +133,7 @@ class TextbookOrderService(BaseService):
         
         items = []
         for book in books:
-            inventory = book.get("inventory_quantity", 0) - book.get("cantidad_reservada", 0)
+            inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", book.get("cantidad_reservada", 0))
             status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
             
             items.append({
@@ -175,7 +175,7 @@ class TextbookOrderService(BaseService):
         updated_items = []
         
         for book_id, book in books_dict.items():
-            inventory = book.get("inventory_quantity", 0) - book.get("cantidad_reservada", 0)
+            inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", book.get("cantidad_reservada", 0))
             
             if book_id in existing_items:
                 item = existing_items[book_id]
