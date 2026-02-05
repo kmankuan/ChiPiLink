@@ -361,7 +361,7 @@ async def admin_update_private_catalog_product(
     return {"success": True, "product": product}
 
 
-@router.delete("/admin/productos/{book_id}")
+@router.delete("/admin/products/{book_id}")
 async def admin_delete_private_catalog_product(
     book_id: str,
     hard_delete: bool = False,
