@@ -45,8 +45,8 @@ async def submit_order_direct(
         
         # Update selections based on submitted items
         for item in request.items:
-            book_id = item.get("book_id")
-            quantity = item.get("quantity", 1)
+            book_id = item.book_id
+            quantity = item.get_quantity()
             if book_id and quantity > 0:
                 try:
                     await textbook_order_service.update_item_selection(
