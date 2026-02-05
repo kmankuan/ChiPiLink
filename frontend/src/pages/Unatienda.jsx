@@ -337,7 +337,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       .map(([bookId]) => bookId);
 
     if (selectedBookIds.length === 0) {
-      toast.error('Selecciona al menos un libro');
+      toast.error(t.selectAtLeastOne);
       return;
     }
 
