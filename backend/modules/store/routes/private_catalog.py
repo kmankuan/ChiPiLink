@@ -54,7 +54,7 @@ async def verify_private_catalog_access(user_id: str) -> dict:
     }
 
 
-@router.get("/acceso")
+@router.get("/access")
 async def check_access(
     current_user: dict = Depends(get_current_user)
 ):
@@ -65,7 +65,7 @@ async def check_access(
     return await verify_private_catalog_access(current_user.get("user_id") or current_user.get("user_id"))
 
 
-@router.get("/productos")
+@router.get("/products")
 async def get_private_catalog_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
@@ -170,7 +170,7 @@ async def get_product_detail(
     return product
 
 
-@router.get("/por-grado/{grade}")
+@router.get("/by-grade/{grade}")
 async def get_products_by_grade(
     grade: str,
     current_user: dict = Depends(get_current_user)
@@ -218,7 +218,7 @@ async def get_products_by_grade(
     }
 
 
-@router.get("/resumen")
+@router.get("/summary")
 async def get_catalog_summary(
     current_user: dict = Depends(get_current_user)
 ):
@@ -277,7 +277,7 @@ async def get_catalog_summary(
 
 # ============== ADMIN ENDPOINTS ==============
 
-@router.get("/admin/productos")
+@router.get("/admin/products")
 async def admin_get_private_catalog_products(
     grade: Optional[str] = None,
     subject: Optional[str] = None,
@@ -313,7 +313,7 @@ async def admin_get_private_catalog_products(
     }
 
 
-@router.post("/admin/productos")
+@router.post("/admin/products")
 async def admin_create_private_catalog_product(
     product: dict,
     admin: dict = Depends(get_admin_user)
