@@ -44,20 +44,20 @@ class TextbookOrderService(BaseService):
         # Handle grade format variations
         grade_queries = [grade]
         
-        # Map simple grades to full format (kept for database compatibility)
+        # Map simple grades to full format
         grade_mappings = {
-            "1": ["1", "1st Grade", "1ro", "1er Grado"],
-            "2": ["2", "2nd Grade", "2do", "2do Grado"],
-            "3": ["3", "3rd Grade", "3ro", "3er Grado"],
-            "4": ["4", "4th Grade", "4to", "4to Grado"],
-            "5": ["5", "5th Grade", "5to", "5to Grado"],
-            "6": ["6", "6th Grade", "6to", "6to Grado"],
-            "7": ["7", "7th Grade", "7mo", "7mo Grado"],
-            "8": ["8", "8th Grade", "8vo", "8vo Grado"],
-            "9": ["9", "9th Grade", "9no", "9no Grado"],
-            "10": ["10", "10th Grade", "10mo", "10mo Grado"],
-            "11": ["11", "11th Grade", "11vo", "11vo Grado"],
-            "12": ["12", "12th Grade", "12vo", "12vo Grado"],
+            "1": ["1", "1st Grade"],
+            "2": ["2", "2nd Grade"],
+            "3": ["3", "3rd Grade"],
+            "4": ["4", "4th Grade"],
+            "5": ["5", "5th Grade"],
+            "6": ["6", "6th Grade"],
+            "7": ["7", "7th Grade"],
+            "8": ["8", "8th Grade"],
+            "9": ["9", "9th Grade"],
+            "10": ["10", "10th Grade"],
+            "11": ["11", "11th Grade"],
+            "12": ["12", "12th Grade"],
             "K": ["K", "Kinder", "Kindergarten"],
             "K3": ["K3", "Pre-K3"],
             "K4": ["K4", "Pre-K4"],
@@ -70,31 +70,14 @@ class TextbookOrderService(BaseService):
         
         logger.info(f"[get_books_for_grade] Query grades: {grade_queries}")
         
-        # Query with both English and Spanish field names for backward compatibility
+        # Query using English field names only
         books = await db.store_products.find(
             {
-                # Check both English (active) and Spanish (activo) field names
+                "active": True,
+                "is_private_catalog": True,
                 "$or": [
-                    {"active": True},
-                    {"activo": True}
-                ],
-                # Check both English and Spanish catalog flag names
-                "$and": [
-                    {
-                        "$or": [
-                            {"is_private_catalog": True},
-                            {"catalogo_privado": True},
-                            {"es_catalogo_privado": True}
-                        ]
-                    },
-                    {
-                        "$or": [
-                            {"grade": {"$in": grade_queries}},
-                            {"grades": {"$in": grade_queries}},
-                            {"grado": {"$in": grade_queries}},
-                            {"grados": {"$in": grade_queries}}
-                        ]
-                    }
+                    {"grade": {"$in": grade_queries}},
+                    {"grades": {"$in": grade_queries}}
                 ]
             },
             {"_id": 0}
@@ -102,13 +85,12 @@ class TextbookOrderService(BaseService):
         
         logger.info(f"[get_books_for_grade] Found {len(books)} books")
         if len(books) > 0:
-            logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')} or {books[0].get('grado')}")
+            logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')}")
         else:
-            # Debug: check what products exist at all
+            # Debug: check what products exist
             total_private = await db.store_products.count_documents({"is_private_catalog": True})
-            total_private_es = await db.store_products.count_documents({"catalogo_privado": True})
             total_active = await db.store_products.count_documents({"active": True})
-            logger.warning(f"[get_books_for_grade] No books found! Debug info: is_private_catalog={total_private}, catalogo_privado={total_private_es}, active={total_active}")
+            logger.warning(f"[get_books_for_grade] No books found! is_private_catalog={total_private}, active={total_active}")
         
         return books
     
