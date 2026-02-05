@@ -283,13 +283,22 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
       const books = order.items || [];
       
       // Transform items to book format
+      // Check item.status === 'ordered' to determine if already ordered
       const transformedBooks = books.map(item => ({
         book_id: item.book_id,
         name: item.book_name,
         book_name: item.book_name,
         subject: item.subject,
         price: item.price,
-        already_ordered: item.quantity_ordered > 0 && order.status === 'submitted'
+        status: item.status,
+        quantity_ordered: item.quantity_ordered || 0,
+        max_quantity: item.max_quantity || 1,
+        // Item is already ordered if status is 'ordered' or has been submitted
+        already_ordered: item.status === 'ordered',
+        // Item can be reordered if status is 'reorder_approved'
+        can_reorder: item.status === 'reorder_approved',
+        // Item has pending reorder request
+        reorder_pending: item.status === 'reorder_requested'
       }));
       
       setTextbooks(transformedBooks);
