@@ -142,7 +142,7 @@ async def get_private_catalog_products(
     }
 
 
-@router.get("/productos/{book_id}")
+@router.get("/products/{book_id}")
 async def get_product_detail(
     book_id: str,
     current_user: dict = Depends(get_current_user)
