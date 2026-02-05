@@ -506,7 +506,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
-                  Libros disponibles para ordenar ({availableBooks.length})
+                  {t.booksAvailable} ({availableBooks.length})
                 </h3>
                 <div className="space-y-2 mb-6">
                   {availableBooks.map(book => (
