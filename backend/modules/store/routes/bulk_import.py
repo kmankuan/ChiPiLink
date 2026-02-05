@@ -1,6 +1,6 @@
 """
 Store Module - Bulk Import Routes
-Endpoints for import masiva desde datos copiados de Google Sheets
+Endpoints for bulk import from Google Sheets data
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from typing import Dict, Optional, List
@@ -15,42 +15,42 @@ router = APIRouter(prefix="/bulk-import", tags=["Store - Bulk Import"])
 # ============== REQUEST MODELS ==============
 
 class ParseTSVRequest(BaseModel):
-    """Request para parsear texto TSV"""
+    """Request for parsing TSV text"""
     raw_text: str
     has_headers: bool = True
 
 
-class PreviewEstudiantesRequest(BaseModel):
-    """Request para previsualizar import de estudiantes"""
+class PreviewStudentsRequest(BaseModel):
+    """Request for previewing student import"""
     raw_text: str
-    column_mapping: Dict[str, int]  # {"numero_estudiante": 0, "full_name": 1, ...}
-    grado_default: Optional[str] = None
+    column_mapping: Dict[str, int]  # {"student_number": 0, "full_name": 1, ...}
+    grade_default: Optional[str] = None
 
 
-class ImportEstudiantesRequest(BaseModel):
-    """Request para importar estudiantes"""
+class ImportStudentsRequest(BaseModel):
+    """Request for importing students"""
     raw_text: str
     column_mapping: Dict[str, int]
-    grado_default: Optional[str] = None
-    hoja_name: str = "Import Manual"
-    actualizar_existentes: bool = True
+    grade_default: Optional[str] = None
+    sheet_name: str = "Manual Import"
+    update_existing: bool = True
 
 
-class PreviewLibrosRequest(BaseModel):
-    """Request para previsualizar import de libros"""
+class PreviewBooksRequest(BaseModel):
+    """Request for previewing book import"""
     raw_text: str
     column_mapping: Dict[str, int]  # {"code": 0, "name": 1, "price": 2, ...}
-    catalogo_id: Optional[str] = None
-    grado_default: Optional[str] = None
+    catalog_id: Optional[str] = None
+    grade_default: Optional[str] = None
 
 
-class ImportLibrosRequest(BaseModel):
-    """Request para importar libros"""
+class ImportBooksRequest(BaseModel):
+    """Request for importing books"""
     raw_text: str
     column_mapping: Dict[str, int]
-    catalogo_id: Optional[str] = None
-    grado_default: Optional[str] = None
-    actualizar_existentes: bool = True
+    catalog_id: Optional[str] = None
+    grade_default: Optional[str] = None
+    update_existing: bool = True
 
 
 # ============== ENDPOINTS ==============
@@ -61,8 +61,8 @@ async def parse_tsv(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Parsear texto en formato TSV (tab-separated).
-    Useful para detectar la estructura de los datos antes de mapear columnas.
+    Parse text in TSV (tab-separated) format.
+    Useful for detecting data structure before mapping columns.
     """
     result = bulk_import_service.parse_tsv(
         request.raw_text,
@@ -71,16 +71,16 @@ async def parse_tsv(
     return result
 
 
-@router.post("/estudiantes/preview")
-async def preview_estudiantes(
-    request: PreviewEstudiantesRequest,
+@router.post("/students/preview")
+async def preview_students(
+    request: PreviewStudentsRequest,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Previsualizar import de estudiantes antes de ejecutarla.
-    Muestra what registros se will create, will update, y cualquier error.
+    Preview student import before executing.
+    Shows which records will be created, updated, and any errors.
     """
-    result = await bulk_import_service.preview_estudiantes(
+    result = await bulk_import_service.preview_students(
         request.raw_text,
         request.column_mapping,
         request.grade_default
@@ -88,26 +88,26 @@ async def preview_estudiantes(
     return result
 
 
-@router.post("/estudiantes/import")
-async def import_estudiantes(
-    request: ImportEstudiantesRequest,
+@router.post("/students/import")
+async def import_students(
+    request: ImportStudentsRequest,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Importar estudiantes desde datos copiados de Google Sheets.
+    Import students from Google Sheets data.
     """
-    result = await bulk_import_service.importar_estudiantes(
+    result = await bulk_import_service.import_students(
         request.raw_text,
         request.column_mapping,
         request.grade_default,
         request.sheet_name,
-        request.actualizar_existentes,
+        request.update_existing,
         admin.get("user_id")
     )
     return result
 
 
-@router.post("/libros/preview")
+@router.post("/books/preview")
 async def preview_libros(
     request: PreviewLibrosRequest,
     admin: dict = Depends(get_admin_user)
