@@ -296,6 +296,9 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
       const order = response.data;
       const books = order.items || [];
       
+      // Store the order_id for reorder requests
+      setCurrentOrderId(order.order_id);
+      
       // Transform items to book format
       // Check item.status === 'ordered' to determine if already ordered
       const transformedBooks = books.map(item => ({
@@ -307,7 +310,7 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
         status: item.status,
         quantity_ordered: item.quantity_ordered || 0,
         max_quantity: item.max_quantity || 1,
-        // Item is already ordered if status is 'ordered' or has been submitted
+        // Item is already ordered if status is 'ordered'
         already_ordered: item.status === 'ordered',
         // Item can be reordered if status is 'reorder_approved'
         can_reorder: item.status === 'reorder_approved',
@@ -317,10 +320,10 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
       
       setTextbooks(transformedBooks);
       
-      // Initialize selected books (only those not already ordered)
+      // Initialize selected books - include available AND reorder_approved items
       const initialSelected = {};
       transformedBooks.forEach(book => {
-        if (!book.already_ordered) {
+        if (!book.already_ordered && !book.reorder_pending) {
           initialSelected[book.book_id] = false;
         }
       });
