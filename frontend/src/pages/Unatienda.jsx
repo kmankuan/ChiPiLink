@@ -950,7 +950,7 @@ export default function Unatienda() {
       return matchesSearch && matchesCategory && matchesGrade;
     }
     
-    return matchesSearch && matchesCategoria;
+    return matchesSearch && matchesCategory;
   });
 
   // Navigation helpers
