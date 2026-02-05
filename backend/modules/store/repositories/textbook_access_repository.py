@@ -219,7 +219,26 @@ class StudentRecordRepository(BaseRepository):
                     "enrollments.status": "approved"
                 }
             },
-            {"$project": {"_id": 0}}
+            {
+                "$project": {
+                    "_id": 0,
+                    "student_id": 1,
+                    "user_id": 1,
+                    "full_name": 1,
+                    "school_id": 1,
+                    "school_name": 1,
+                    "student_number": 1,
+                    "is_active": 1,
+                    "created_at": 1,
+                    "updated_at": 1,
+                    "sync_id": 1,
+                    # Flatten enrollment data for frontend consumption
+                    "grade": "$enrollments.grade",
+                    "year": "$enrollments.year",
+                    "status": "$enrollments.status",
+                    "name": "$full_name"  # Alias for frontend compatibility
+                }
+            }
         ]
         
         cursor = self._collection.aggregate(pipeline)
