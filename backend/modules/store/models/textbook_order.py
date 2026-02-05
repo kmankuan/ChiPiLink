@@ -52,7 +52,10 @@ class ReorderRequest(BaseModel):
 
 class SubmitOrderRequest(BaseModel):
     """Request to submit an order"""
+    student_id: str
     items: List[OrderItemCreate]
+    form_data: Optional[dict] = None
+    uploaded_files: Optional[dict] = None
     notes: Optional[str] = None
 
 
