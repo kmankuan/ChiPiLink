@@ -958,7 +958,7 @@ export default function Unatienda() {
   const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
   const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
-  const handleSelectCategoria = (categoriaId) => {
+  const handleSelectCategory = (categoriaId) => {
     setSelectedCategory(categoriaId);
     setSelectedSubcategory(null);
     setShowLandingView(true);
@@ -1297,7 +1297,7 @@ export default function Unatienda() {
                     key={cat.category_id}
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSelectCategoria(cat.category_id)}
+                    onClick={() => handleSelectCategory(cat.category_id)}
                     className="rounded-full"
                   >
                     <span className="mr-1.5">{cat.icono}</span>
@@ -1353,7 +1353,7 @@ export default function Unatienda() {
         grados={grados.map(g => ({ id: g, nombre: g }))}
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
-        onSelectCategoria={handleSelectCategoria}
+        onSelectCategoria={handleSelectCategory}
         onSelectSubcategoria={handleSelectSubcategoria}
         onGoHome={handleGoHome}
         onGoBack={handleGoBack}
