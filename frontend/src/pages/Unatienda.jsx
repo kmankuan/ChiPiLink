@@ -955,7 +955,7 @@ export default function Unatienda() {
 
   // Navigation helpers
   const hasSubcategories = selectedCategory === 'books' || selectedCategory === 'libros';
-  const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
+  const subcategories = hasSubcategories ? grades.map(g => ({ id: g, nombre: g })) : [];
   const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
   const handleSelectCategory = (categoryId) => {
@@ -1350,7 +1350,7 @@ export default function Unatienda() {
       {/* Floating Navigation Component */}
       <FloatingStoreNav
         categories={categories}
-        grados={grados.map(g => ({ id: g, nombre: g }))}
+        grades={grades.map(g => ({ id: g, nombre: g }))}
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
         onSelectCategoria={handleSelectCategory}
