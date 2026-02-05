@@ -138,10 +138,18 @@ class TextbookOrderService(BaseService):
         logger.info(f"[get_or_create_order] Current year={current_year}, enrollments count={len(enrollments)}")
         logger.info(f"[get_or_create_order] Enrollments: {enrollments}")
         
+        # Find approved enrollment - check both year formats (int and string)
         current_enrollment = next(
-            (e for e in enrollments if e.get("year") == current_year and e.get("status") == "approved"),
+            (e for e in enrollments if (e.get("year") == current_year or e.get("year") == str(current_year) or e.get("año") == current_year) and e.get("status") == "approved"),
             None
         )
+        
+        # If not found with "approved", also check Spanish status
+        if not current_enrollment:
+            current_enrollment = next(
+                (e for e in enrollments if (e.get("year") == current_year or e.get("year") == str(current_year) or e.get("año") == current_year) and e.get("status") in ["approved", "aprobado", "aprobada"]),
+                None
+            )
         
         if not current_enrollment:
             logger.warning(f"[get_or_create_order] No approved enrollment found for year {current_year}")
