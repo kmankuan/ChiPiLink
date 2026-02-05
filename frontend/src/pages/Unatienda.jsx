@@ -479,8 +479,10 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
   // Textbooks View for selected student
   if (view === 'textbooks' && selectedStudent) {
     const orderStatus = getStudentOrderStatus(selectedStudent.student_id);
-    const availableBooks = textbooks.filter(b => !b.already_ordered);
-    const orderedBooks = textbooks.filter(b => b.already_ordered);
+    // Available books: not ordered OR reorder approved (can order again)
+    const availableBooks = textbooks.filter(b => !b.already_ordered || b.can_reorder);
+    // Ordered books: already ordered AND not reorder approved (can't order again unless approved)
+    const orderedBooks = textbooks.filter(b => b.already_ordered && !b.can_reorder);
     const selectedCount = Object.values(selectedBooks).filter(Boolean).length;
     const selectedTotal = textbooks
       .filter(b => selectedBooks[b.book_id])
