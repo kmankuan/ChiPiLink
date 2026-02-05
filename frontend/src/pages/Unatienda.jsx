@@ -942,7 +942,7 @@ export default function Unatienda() {
     
     if (!selectedCategoria) return matchesSearch;
     
-    const matchesCategoria = product.categoria === selectedCategoria;
+    const matchesCategory = product.categoria === selectedCategoria;
     
     if (selectedSubcategoria && selectedCategoria === 'books') {
       const matchesGrade = product.grade === selectedSubcategoria || 
