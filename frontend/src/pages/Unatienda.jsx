@@ -479,7 +479,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 flex items-center gap-2 text-green-700">
                   <CheckCircle className="h-4 w-4" />
-                  Libros ya ordenados ({orderedBooks.length})
+                  {t.booksOrdered} ({orderedBooks.length})
                 </h3>
                 <div className="space-y-2">
                   {orderedBooks.map(book => (
