@@ -62,6 +62,7 @@ from modules.integrations.sheets.routes import router as sheets_router
 # Admin Module (notifications, config, setup)
 from modules.admin.routes import router as admin_router
 from modules.admin.seed_demo import router as seed_demo_router
+from modules.admin.routes.migrations import router as migrations_router
 
 # Invision Module (placeholder for laopan.online integration)
 from modules.invision.routes import router as invision_router
