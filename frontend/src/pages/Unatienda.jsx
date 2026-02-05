@@ -1150,8 +1150,8 @@ export default function Unatienda() {
 
         {/* Category Navigation - only in public view */}
         {activeView === 'public' && (
-          <div className="mb-6" data-category-nav>
-            <div className="flex gap-2 flex-wrap items-center">
+          <div className="mb-4 sm:mb-6" data-category-nav>
+            <div className="flex gap-1.5 sm:gap-2 flex-wrap items-center">
               <Button
                 variant={!selectedCategoria ? 'default' : 'outline'}
                 size="icon"
