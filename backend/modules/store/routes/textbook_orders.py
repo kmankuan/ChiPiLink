@@ -333,24 +333,34 @@ async def diagnostic_textbooks(
                 grades_in_products.add(str(g))
     result["products"]["grades_available"] = list(grades_in_products)
     
-    # 5. Check student records
-    logger.info("[DIAGNOSTIC] Checking store_student_records collection...")
+    # 5. Check student records - check multiple possible collections
+    logger.info("[DIAGNOSTIC] Checking student collections...")
     
-    total_students = await db.store_student_records.count_documents({})
-    approved_students = await db.store_student_records.count_documents({
+    # The actual collection used by the repository is 'store_students'
+    total_students = await db.store_students.count_documents({})
+    approved_students = await db.store_students.count_documents({
         "enrollments": {"$elemMatch": {"status": "approved"}}
     })
     
     # Sample student with enrollments
-    sample_students = await db.store_student_records.find(
+    sample_students = await db.store_students.find(
         {},
-        {"_id": 0, "full_name": 1, "student_id": 1, "enrollments": 1, "user_id": 1}
+        {"_id": 0, "full_name": 1, "nombre_completo": 1, "student_id": 1, "enrollments": 1, "user_id": 1}
     ).limit(5).to_list(5)
     
+    # Also check other possible collections for students
+    other_collections = {
+        "store_student_records": await db.store_student_records.count_documents({}),
+        "synced_students": await db.synced_students.count_documents({}),
+        "estudiantes_sincronizados": await db.estudiantes_sincronizados.count_documents({})
+    }
+    
     result["students"] = {
+        "collection_used": "store_students",
         "total": total_students,
         "with_approved_enrollment": approved_students,
-        "samples": sample_students
+        "samples": sample_students,
+        "other_collections": other_collections
     }
     
     # 6. Get grades from approved enrollments
