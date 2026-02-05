@@ -396,7 +396,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
     
     return {
       status: 'ordered',
-      label: `Pedido enviado`,
+      label: t.sent,
       count: itemCount,
       total: total,
       order: latestOrder
