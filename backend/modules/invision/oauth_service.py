@@ -226,8 +226,11 @@ class LaoPanOAuthService:
         primary_group = laopan_user.get("primaryGroup", {})
         group_name = primary_group.get("name") if primary_group else None
         
+        # Use the correct collection (auth_users)
+        users_collection = db[AuthCollections.USERS]
+        
         # Try to find existing user by laopan_id or email
-        existing_user = await db.users.find_one({
+        existing_user = await users_collection.find_one({
             "$or": [
                 {"laopan_id": laopan_id},
                 {"email": email}
@@ -255,13 +258,13 @@ class LaoPanOAuthService:
             if not existing_user.get("name") and name:
                 update_data["name"] = name
             
-            await db.users.update_one(
+            await users_collection.update_one(
                 {"user_id": user_id},
                 {"$set": update_data}
             )
             
             # Get updated user
-            user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
+            user = await users_collection.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
         else:
             # Create new user
             user_id = f"user_{uuid.uuid4().hex[:12]}"
@@ -283,7 +286,7 @@ class LaoPanOAuthService:
                 "updated_at": now
             }
             
-            await db.users.insert_one(user)
+            await users_collection.insert_one(user)
             # Remove _id for response
             user.pop("_id", None)
         
