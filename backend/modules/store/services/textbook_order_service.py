@@ -153,9 +153,10 @@ class TextbookOrderService(BaseService):
         
         if not current_enrollment:
             logger.warning(f"[get_or_create_order] No approved enrollment found for year {current_year}")
+            logger.warning(f"[get_or_create_order] Available enrollments: {[(e.get('year'), e.get('status')) for e in enrollments]}")
             raise ValueError("Student must have approved enrollment to order textbooks")
         
-        grade = current_enrollment.get("grade", "")
+        grade = current_enrollment.get("grade") or current_enrollment.get("grado", "")
         logger.info(f"[get_or_create_order] Found enrollment - grade={grade}, year={current_year}")
         
         # Check if order already exists
