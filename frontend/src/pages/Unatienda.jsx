@@ -1119,7 +1119,7 @@ export default function Unatienda() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-7xl">
         {/* Search Bar - only show in public view */}
         {activeView === 'public' && (
           <div className="mb-6">
