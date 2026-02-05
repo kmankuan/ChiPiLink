@@ -831,11 +831,11 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           <CardContent className="py-8 sm:py-12 text-center">
             <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/30 mx-auto mb-3 sm:mb-4" />
             <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
-              No tienes estudiantes vinculados
+              {t.noStudentsLinked}
             </p>
             <Button onClick={() => setView('linking')} size="sm" className="text-xs sm:text-sm">
               <UserPlus className="h-4 w-4 mr-2" />
-              Vincular Estudiante
+              {t.linkStudent}
             </Button>
           </CardContent>
         </Card>
