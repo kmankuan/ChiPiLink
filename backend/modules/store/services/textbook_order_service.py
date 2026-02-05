@@ -168,10 +168,16 @@ class TextbookOrderService(BaseService):
     async def _refresh_order_items(self, order: Dict) -> Dict:
         """Refresh order items with latest book/inventory data"""
         grade = order.get("grade", "")
+        logger.info(f"[_refresh_order_items] Refreshing order {order.get('order_id')} for grade={grade}")
+        
         books = await self.get_books_for_grade(grade)
+        logger.info(f"[_refresh_order_items] Found {len(books)} books for grade {grade}")
+        
         books_dict = {b["book_id"]: b for b in books}
         
         existing_items = {item["book_id"]: item for item in order.get("items", [])}
+        logger.info(f"[_refresh_order_items] Existing items count: {len(existing_items)}")
+        
         updated_items = []
         
         for book_id, book in books_dict.items():
