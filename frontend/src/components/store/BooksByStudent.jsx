@@ -52,7 +52,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
   const fetchResumen = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/api/store/private-catalog/resumen`,
+        `${API_URL}/api/store/private-catalog/summary`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResumen(response.data.resumen || []);

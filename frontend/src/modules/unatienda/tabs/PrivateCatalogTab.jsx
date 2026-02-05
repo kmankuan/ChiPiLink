@@ -47,7 +47,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      let url = `${API}/api/store/private-catalog/admin/productos?limit=200`;
+      let url = `${API}/api/store/private-catalog/admin/products?limit=200`;
       if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
       if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
       
@@ -136,11 +136,11 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         featured: formData.featured
       };
 
-      let url = `${API}/api/store/private-catalog/admin/productos`;
+      let url = `${API}/api/store/private-catalog/admin/products`;
       let method = 'POST';
       
       if (editingProduct) {
-        url = `${API}/api/store/private-catalog/admin/productos/${editingProduct.book_id}`;
+        url = `${API}/api/store/private-catalog/admin/products/${editingProduct.book_id}`;
         method = 'PUT';
       }
 
@@ -175,7 +175,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     if (!confirm('Are you sure you want to deactivate this product?')) return;
     
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/productos/${book_id}`, {
+      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
