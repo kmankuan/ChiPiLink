@@ -122,11 +122,14 @@ class TextbookOrderService(BaseService):
         existing_order = await self.order_repo.get_by_student(student_id, current_year)
         
         if existing_order:
+            logger.info(f"[get_or_create_order] Found existing order: {existing_order.get('order_id')}")
             # Refresh items with latest book data
             return await self._refresh_order_items(existing_order)
         
         # Create new order with all books for this grade
+        logger.info(f"[get_or_create_order] No existing order, fetching books for grade={grade}")
         books = await self.get_books_for_grade(grade)
+        logger.info(f"[get_or_create_order] Found {len(books)} books for grade {grade}")
         
         items = []
         for book in books:
