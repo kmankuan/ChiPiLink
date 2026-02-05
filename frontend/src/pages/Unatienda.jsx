@@ -914,7 +914,7 @@ export default function Unatienda() {
       setProducts(publicProducts);
       setStoreInfo(storeRes.data);
       setCategorias(categoriesRes.data || []);
-      setGrados(gradosRes.data.grades || []);
+      setGrades(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
