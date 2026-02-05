@@ -117,18 +117,20 @@ async def get_private_catalog_products(
         })
     
     if subject:
-        query["subject"] = subject
+        query["$and"].append({"subject": subject})
     
     if featured:
-        query["featured"] = True
+        query["$and"].append({"featured": True})
     
     if search:
-        query["$or"] = [
-            {"name": {"$regex": search, "$options": "i"}},
-            {"description": {"$regex": search, "$options": "i"}},
-            {"code": {"$regex": search, "$options": "i"}},
-            {"publisher": {"$regex": search, "$options": "i"}}
-        ]
+        query["$and"].append({
+            "$or": [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"description": {"$regex": search, "$options": "i"}},
+                {"code": {"$regex": search, "$options": "i"}},
+                {"publisher": {"$regex": search, "$options": "i"}}
+            ]
+        })
     
     # Get products
     products = await db.store_products.find(
@@ -139,9 +141,19 @@ async def get_private_catalog_products(
     # Count total
     total = await db.store_products.count_documents(query)
     
-    # Get available grades and subjects for filters
-    available_grades = await db.store_products.distinct("grade", {"is_private_catalog": True, "active": True})
-    available_subjects = await db.store_products.distinct("subject", {"is_private_catalog": True, "active": True})
+    # Get available grades and subjects for filters (check both English and Spanish field names)
+    base_filter = {
+        "$or": [
+            {"is_private_catalog": True},
+            {"catalogo_privado": True}
+        ]
+    }
+    available_grades = await db.store_products.distinct("grade", base_filter)
+    # Also check Spanish field
+    available_grades_es = await db.store_products.distinct("grado", base_filter)
+    available_grades = list(set(available_grades + available_grades_es))
+    
+    available_subjects = await db.store_products.distinct("subject", base_filter)
     
     return {
         "products": products,
