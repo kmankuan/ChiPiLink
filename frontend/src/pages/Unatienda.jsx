@@ -860,7 +860,7 @@ export default function Unatienda() {
   const [searchTerm, setSearchTerm] = useState('');
   
   // Private catalog state
-  const [privateCatalogAccess, setCatalogoPrivadoAcceso] = useState(null);
+  const [privateCatalogAccess, setPrivateCatalogAccess] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -895,7 +895,7 @@ export default function Unatienda() {
     if (isAuthenticated && token) {
       checkPrivateCatalogAccess();
     } else {
-      setCatalogoPrivadoAcceso(null);
+      setPrivateCatalogAccess(null);
     }
   }, [isAuthenticated, token]);
 
@@ -927,10 +927,10 @@ export default function Unatienda() {
       const response = await axios.get(`${API_URL}/api/store/catalogo-privado/acceso`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setCatalogoPrivadoAcceso(response.data);
+      setPrivateCatalogAccess(response.data);
     } catch (error) {
       console.error('Error checking private catalog access:', error);
-      setCatalogoPrivadoAcceso({ has_access: false, students: [], grades: [] });
+      setPrivateCatalogAccess({ has_access: false, students: [], grades: [] });
     }
   };
 
