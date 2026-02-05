@@ -955,7 +955,7 @@ export default function Unatienda() {
 
   // Navigation helpers
   const hasSubcategories = selectedCategory === 'books' || selectedCategory === 'libros';
-  const subcategories = hasSubcategories ? grades.map(g => ({ id: g, nombre: g })) : [];
+  const subcategories = hasSubcategories ? grades.map(g => ({ id: g, name: g })) : [];
   const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
   const handleSelectCategory = (categoryId) => {
@@ -1016,7 +1016,7 @@ export default function Unatienda() {
 
   const getCategoryInfo = (categoryId) => {
     const cat = categories.find(c => c.category_id === categoryId);
-    return cat || { nombre: categoryId, icono: categoryIcons[categoryId] || '📦' };
+    return cat || { name: categoryId, icono: categoryIcons[categoryId] || '📦' };
   };
 
   if (loading) {
@@ -1033,7 +1033,7 @@ export default function Unatienda() {
     const inCart = isInCart(product.book_id);
     const cartQty = getCartQuantity(product.book_id);
     const justAdded = addedItems[product.book_id];
-    const catInfo = isPrivate ? { nombre: 'Libro de Texto', icono: '📚' } : getCategoryInfo(product.categoria);
+    const catInfo = isPrivate ? { name: 'Libro de Texto', icono: '📚' } : getCategoryInfo(product.categoria);
     
     return (
       <div
@@ -1116,7 +1116,7 @@ export default function Unatienda() {
               <>
                 <Badge variant="outline" className="text-xs">
                   <span className="mr-1">{catInfo.icono}</span>
-                  {catInfo.nombre}
+                  {catInfo.name}
                 </Badge>
                 {(product.categoria === 'libros' || product.categoria === 'books') && product.grade && (
                   <Badge variant="secondary" className="text-xs">
@@ -1201,7 +1201,7 @@ export default function Unatienda() {
               </div>
               <div className="min-w-0">
                 <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-bold truncate">
-                  {storeInfo?.nombre || 'Unatienda'}
+                  {storeInfo?.name || 'Unatienda'}
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
                   {storeInfo?.description || 'Tu tienda de confianza'}
@@ -1308,7 +1308,7 @@ export default function Unatienda() {
             ) : (
               <>
                 <span className="font-semibold text-sm flex items-center gap-1">
-                  {getCategoryInfo(selectedCategory).icono} {getCategoryInfo(selectedCategory).nombre}
+                  {getCategoryInfo(selectedCategory).icono} {getCategoryInfo(selectedCategory).name}
                 </span>
                 {!showLandingView && (
                   <Badge variant="secondary" className="text-xs">
@@ -1350,7 +1350,7 @@ export default function Unatienda() {
       {/* Floating Navigation Component */}
       <FloatingStoreNav
         categories={categories}
-        grades={grades.map(g => ({ id: g, nombre: g }))}
+        grades={grades.map(g => ({ id: g, name: g }))}
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
         onSelectCategoria={handleSelectCategory}
