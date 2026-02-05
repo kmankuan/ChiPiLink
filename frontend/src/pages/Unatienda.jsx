@@ -446,7 +446,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           className="mb-4 gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
-          Volver a estudiantes
+          {t.backToStudents}
         </Button>
 
         {/* Student Header */}
@@ -460,7 +460,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                 <div>
                   <CardTitle className="text-lg">{selectedStudent.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Grado {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
+                    {t.grade} {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
                   </p>
                 </div>
               </div>
