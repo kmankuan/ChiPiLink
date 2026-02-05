@@ -445,7 +445,7 @@ class TextbookOrderService(BaseService):
             api_key = MONDAY_API_KEY
         
         if not api_key or not board_id:
-            logger.warning("Monday.com not configured - go to Admin -> Integraciones -> Monday.com -> Pedidos de Libros")
+            logger.warning("Monday.com not configured - go to Admin -> Integrations -> Monday.com -> Textbook Orders")
             raise ValueError("Monday.com not configured. Please configure in Admin -> Integraciones -> Monday.com")
         
         # Use submission total if provided, otherwise calculate from order
