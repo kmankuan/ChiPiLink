@@ -944,9 +944,9 @@ export default function Unatienda() {
     
     const matchesCategory = product.categoria === selectedCategoria;
     
-    if (selectedSubcategoria && selectedCategoria === 'books') {
-      const matchesGrade = product.grade === selectedSubcategoria || 
-        product.grades?.includes(selectedSubcategoria);
+    if (selectedSubcategory && selectedCategoria === 'books') {
+      const matchesGrade = product.grade === selectedSubcategory || 
+        product.grades?.includes(selectedSubcategory);
       return matchesSearch && matchesCategory && matchesGrade;
     }
     
@@ -956,7 +956,7 @@ export default function Unatienda() {
   // Navigation helpers
   const hasSubcategories = selectedCategoria === 'books' || selectedCategoria === 'libros';
   const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
-  const shouldShowLanding = selectedCategoria && !selectedSubcategoria && showLandingView && !searchTerm;
+  const shouldShowLanding = selectedCategoria && !selectedSubcategory && showLandingView && !searchTerm;
 
   const handleSelectCategoria = (categoriaId) => {
     setSelectedCategoria(categoriaId);
@@ -972,9 +972,9 @@ export default function Unatienda() {
   const handleViewAllProducts = () => setShowLandingView(false);
 
   const handleGoBack = () => {
-    if (!showLandingView && selectedCategoria && !selectedSubcategoria) {
+    if (!showLandingView && selectedCategoria && !selectedSubcategory) {
       setShowLandingView(true);
-    } else if (selectedSubcategoria) {
+    } else if (selectedSubcategory) {
       setSelectedSubcategoria(null);
       setShowLandingView(true);
     } else {
@@ -1274,7 +1274,7 @@ export default function Unatienda() {
                 <Home className="h-4 w-4" />
               </Button>
 
-              {(selectedCategoria || selectedSubcategoria) && (
+              {(selectedCategoria || selectedSubcategory) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -1352,7 +1352,7 @@ export default function Unatienda() {
         categories={categories}
         grados={grados.map(g => ({ id: g, nombre: g }))}
         selectedCategoria={selectedCategoria}
-        selectedSubcategoria={selectedSubcategoria}
+        selectedSubcategory={selectedSubcategory}
         onSelectCategoria={handleSelectCategoria}
         onSelectSubcategoria={handleSelectSubcategoria}
         onGoHome={handleGoHome}
