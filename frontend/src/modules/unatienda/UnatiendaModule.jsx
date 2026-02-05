@@ -113,7 +113,7 @@ export default function UnatiendaModule() {
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-10 mb-6">
-          <TabsTrigger value="catalogo-publico" className="flex items-center gap-2">
+          <TabsTrigger value="public-catalog" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Public</span>
           </TabsTrigger>
@@ -133,11 +133,11 @@ export default function UnatiendaModule() {
             <FileText className="h-4 w-4" />
             <span className="hidden md:inline">Form</span>
           </TabsTrigger>
-          <TabsTrigger value="estudiantes" className="flex items-center gap-2">
+          <TabsTrigger value="students" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden md:inline">Students</span>
           </TabsTrigger>
-          <TabsTrigger value="configuracion" className="flex items-center gap-2">
+          <TabsTrigger value="configuration" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden md:inline">Config</span>
           </TabsTrigger>
@@ -147,7 +147,7 @@ export default function UnatiendaModule() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="catalogo-publico">
+        <TabsContent value="public-catalog">
           <CatalogoPublicoTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
@@ -167,11 +167,11 @@ export default function UnatiendaModule() {
           <OrderFormConfigTab />
         </TabsContent>
 
-        <TabsContent value="estudiantes">
+        <TabsContent value="students">
           <EstudiantesTab token={token} />
         </TabsContent>
 
-        <TabsContent value="configuracion">
+        <TabsContent value="configuration">
           <ConfiguracionTab token={token} />
         </TabsContent>
 
