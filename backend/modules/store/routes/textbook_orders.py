@@ -16,6 +16,69 @@ router = APIRouter(prefix="/textbook-orders", tags=["Store - Textbook Orders"])
 
 # ============== USER ENDPOINTS ==============
 
+@router.post("/submit")
+async def submit_order_direct(
+    request: SubmitOrderRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Submit order directly with student_id and items.
+    This endpoint handles the complete submission flow from Unatienda.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        user_id = current_user["user_id"]
+        student_id = request.student_id
+        
+        logger.info(f"[submit_order_direct] user_id={user_id}, student_id={student_id}")
+        logger.info(f"[submit_order_direct] items={request.items}")
+        
+        # Get or create the order for this student
+        order = await textbook_order_service.get_or_create_order(
+            user_id=user_id,
+            student_id=student_id
+        )
+        
+        logger.info(f"[submit_order_direct] Got order: {order.get('order_id')}")
+        
+        # Update selections based on submitted items
+        for item in request.items:
+            book_id = item.get("book_id")
+            quantity = item.get("quantity", 1)
+            if book_id and quantity > 0:
+                try:
+                    await textbook_order_service.update_item_selection(
+                        user_id=user_id,
+                        order_id=order["order_id"],
+                        book_id=book_id,
+                        quantity=quantity
+                    )
+                except ValueError as e:
+                    logger.warning(f"[submit_order_direct] Could not update item {book_id}: {e}")
+        
+        # Refresh order to get updated items
+        order = await textbook_order_service.order_repo.get_by_id(order["order_id"])
+        
+        # Submit the order
+        result = await textbook_order_service.submit_order(
+            user_id=user_id,
+            order_id=order["order_id"],
+            notes=request.form_data.get("notes") if request.form_data else None
+        )
+        
+        logger.info(f"[submit_order_direct] Order submitted successfully: {result.get('order_id')}")
+        
+        return result
+    except ValueError as e:
+        logger.error(f"[submit_order_direct] ValueError: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"[submit_order_direct] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/student/{student_id}")
 async def get_student_order(
     student_id: str,
