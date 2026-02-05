@@ -42,20 +42,20 @@ class TextbookOrderService(BaseService):
         # Handle grade format variations
         grade_queries = [grade]
         
-        # Map simple grades to full format
+        # Map simple grades to full format (kept for database compatibility)
         grade_mappings = {
-            "1": ["1", "1er Grado", "1ro"],
-            "2": ["2", "2do Grado", "2do"],
-            "3": ["3", "3er Grado", "3ro"],
-            "4": ["4", "4to Grado", "4to"],
-            "5": ["5", "5to Grado", "5to"],
-            "6": ["6", "6to Grado", "6to"],
-            "7": ["7", "7mo Grado", "7mo"],
-            "8": ["8", "8vo Grado", "8vo"],
-            "9": ["9", "9no Grado", "9no"],
-            "10": ["10", "10mo Grado", "10mo"],
-            "11": ["11", "11vo Grado", "11vo"],
-            "12": ["12", "12vo Grado", "12vo"],
+            "1": ["1", "1st Grade", "1ro", "1er Grado"],
+            "2": ["2", "2nd Grade", "2do", "2do Grado"],
+            "3": ["3", "3rd Grade", "3ro", "3er Grado"],
+            "4": ["4", "4th Grade", "4to", "4to Grado"],
+            "5": ["5", "5th Grade", "5to", "5to Grado"],
+            "6": ["6", "6th Grade", "6to", "6to Grado"],
+            "7": ["7", "7th Grade", "7mo", "7mo Grado"],
+            "8": ["8", "8th Grade", "8vo", "8vo Grado"],
+            "9": ["9", "9th Grade", "9no", "9no Grado"],
+            "10": ["10", "10th Grade", "10mo", "10mo Grado"],
+            "11": ["11", "11th Grade", "11vo", "11vo Grado"],
+            "12": ["12", "12th Grade", "12vo", "12vo Grado"],
             "K": ["K", "Kinder", "Kindergarten"],
             "K3": ["K3", "Pre-K3"],
             "K4": ["K4", "Pre-K4"],
