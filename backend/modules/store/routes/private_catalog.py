@@ -88,49 +88,41 @@ async def get_private_catalog_products(
             detail=access["message"] or "No access to private catalog"
         )
     
-    # Build query - support both English and Spanish field names for backward compatibility
+    # Build query - English field names only
     query = {
-        "$or": [
-            {"active": True},
-            {"activo": True}
-        ],
-        "$and": [
-            {
-                "$or": [
-                    {"is_private_catalog": True},
-                    {"catalogo_privado": True},
-                    {"es_catalogo_privado": True}
-                ]
-            }
-        ]
+        "is_private_catalog": True,
+        "active": True
     }
     
-    # Filter by grade (if not specified, show all user's grades)
+    # Filter by grade
     if grade:
-        query["$and"].append({
-            "$or": [
-                {"grade": grade},
-                {"grades": grade},
-                {"grado": grade},
-                {"grados": grade}
-            ]
-        })
+        query["$or"] = [
+            {"grade": grade},
+            {"grades": grade}
+        ]
     
     if subject:
-        query["$and"].append({"subject": subject})
+        query["subject"] = subject
     
     if featured:
-        query["$and"].append({"featured": True})
+        query["featured"] = True
     
     if search:
-        query["$and"].append({
+        # Use $and to combine with existing conditions
+        search_query = {
             "$or": [
                 {"name": {"$regex": search, "$options": "i"}},
                 {"description": {"$regex": search, "$options": "i"}},
                 {"code": {"$regex": search, "$options": "i"}},
                 {"publisher": {"$regex": search, "$options": "i"}}
             ]
-        })
+        }
+        if "$or" in query:
+            # Combine grade filter with search
+            grade_filter = query.pop("$or")
+            query["$and"] = [{"$or": grade_filter}, search_query]
+        else:
+            query.update(search_query)
     
     # Get products
     products = await db.store_products.find(
@@ -141,18 +133,9 @@ async def get_private_catalog_products(
     # Count total
     total = await db.store_products.count_documents(query)
     
-    # Get available grades and subjects for filters (check both English and Spanish field names)
-    base_filter = {
-        "$or": [
-            {"is_private_catalog": True},
-            {"catalogo_privado": True}
-        ]
-    }
+    # Get available grades and subjects for filters
+    base_filter = {"is_private_catalog": True, "active": True}
     available_grades = await db.store_products.distinct("grade", base_filter)
-    # Also check Spanish field
-    available_grades_es = await db.store_products.distinct("grado", base_filter)
-    available_grades = list(set(available_grades + available_grades_es))
-    
     available_subjects = await db.store_products.distinct("subject", base_filter)
     
     return {
