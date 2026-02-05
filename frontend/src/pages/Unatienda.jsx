@@ -863,7 +863,7 @@ export default function Unatienda() {
   const [catalogoPrivadoAcceso, setCatalogoPrivadoAcceso] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
-  const [selectedCategory, setSelectedCategoria] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [showLandingView, setShowLandingView] = useState(true);
   
@@ -876,7 +876,7 @@ export default function Unatienda() {
     const search = params.get('search');
     const tab = params.get('tab');
     
-    if (categoria) setSelectedCategoria(categoria);
+    if (categoria) setSelectedCategory(categoria);
     if (search) setSearchTerm(decodeURIComponent(search));
     if (tab === 'private') setActiveView('private');
     
@@ -959,7 +959,7 @@ export default function Unatienda() {
   const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
   const handleSelectCategoria = (categoriaId) => {
-    setSelectedCategoria(categoriaId);
+    setSelectedCategory(categoriaId);
     setSelectedSubcategory(null);
     setShowLandingView(true);
   };
@@ -978,13 +978,13 @@ export default function Unatienda() {
       setSelectedSubcategory(null);
       setShowLandingView(true);
     } else {
-      setSelectedCategoria(null);
+      setSelectedCategory(null);
       setShowLandingView(true);
     }
   };
 
   const handleGoHome = () => {
-    setSelectedCategoria(null);
+    setSelectedCategory(null);
     setSelectedSubcategory(null);
     setShowLandingView(true);
   };
