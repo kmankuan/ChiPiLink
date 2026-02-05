@@ -1,6 +1,6 @@
 /**
- * LibrosPorEstudiante - Vista de libros agrupados por estudiante vinculado
- * Permite agregar todos los libros de un estudiante al carrito con un clic
+ * BooksByStudent - View of books grouped by linked student
+ * Shows textbooks available for each linked student based on their grade
  */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
