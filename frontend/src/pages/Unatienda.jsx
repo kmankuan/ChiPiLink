@@ -151,7 +151,7 @@ const categoryIcons = {
 };
 
 // Compra Exclusiva Section Component - Student-centered view
-function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess }) {
+function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess }) {
   const { token } = useAuth();
   const { t, i18n } = useTranslation();
   const [view, setView] = useState('students'); // 'students', 'textbooks', 'linking'
@@ -243,10 +243,10 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
   // Fetch orders for all students
   useEffect(() => {
-    if (catalogoPrivadoAcceso?.students?.length > 0) {
+    if (privateCatalogAccess?.students?.length > 0) {
       fetchStudentOrders();
     }
-  }, [catalogoPrivadoAcceso]);
+  }, [privateCatalogAccess]);
 
   const fetchStudentOrders = async () => {
     try {
@@ -750,14 +750,14 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       </div>
 
       {/* Students List */}
-      {catalogoPrivadoAcceso?.students?.length > 0 ? (
+      {privateCatalogAccess?.students?.length > 0 ? (
         <div className="space-y-3 sm:space-y-4">
           <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
             <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-            {te.myStudents} ({catalogoPrivadoAcceso.students.length})
+            {te.myStudents} ({privateCatalogAccess.students.length})
           </h3>
           
-          {catalogoPrivadoAcceso.students.map((student) => {
+          {privateCatalogAccess.students.map((student) => {
             const orderStatus = getStudentOrderStatus(student.student_id || student.sync_id);
             
             return (
@@ -860,7 +860,7 @@ export default function Unatienda() {
   const [searchTerm, setSearchTerm] = useState('');
   
   // Private catalog state
-  const [catalogoPrivadoAcceso, setCatalogoPrivadoAcceso] = useState(null);
+  const [privateCatalogAccess, setCatalogoPrivadoAcceso] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -1219,9 +1219,9 @@ export default function Unatienda() {
               >
                 <GraduationCap className="h-4 w-4" />
                 <span className="hidden xs:inline">Compra</span> Exclusiva
-                {catalogoPrivadoAcceso?.has_access && catalogoPrivadoAcceso?.students?.length > 0 && (
+                {privateCatalogAccess?.has_access && privateCatalogAccess?.students?.length > 0 && (
                   <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs h-5 w-5 p-0 flex items-center justify-center rounded-full">
-                    {catalogoPrivadoAcceso.students.length}
+                    {privateCatalogAccess.students.length}
                   </Badge>
                 )}
               </Button>
@@ -1324,7 +1324,7 @@ export default function Unatienda() {
         {/* Content - Public or Private */}
         {activeView === 'private' ? (
           <CompraExclusivaSection 
-            catalogoPrivadoAcceso={catalogoPrivadoAcceso}
+            privateCatalogAccess={privateCatalogAccess}
             onBack={() => setActiveView('public')}
             onRefreshAccess={checkPrivateCatalogAccess}
           />
