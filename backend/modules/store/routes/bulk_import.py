@@ -187,13 +187,13 @@ async def get_imported_students(
     
     query = {}
     if grade:
-        query["grade"] = grado
-    if estado:
-        query["estado"] = estado
-    if buscar:
+        query["grade"] = grade
+    if status:
+        query["status"] = status
+    if search:
         query["$or"] = [
-            {"full_name": {"$regex": buscar, "$options": "i"}},
-            {"numero_estudiante": {"$regex": buscar, "$options": "i"}}
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"student_number": {"$regex": search, "$options": "i"}}
         ]
     
     total = await db.synced_students.count_documents(query)
@@ -203,11 +203,11 @@ async def get_imported_students(
         {"_id": 0}
     ).sort("full_name", 1).skip(skip).limit(limit)
     
-    estudiantes = await cursor.to_list(length=limit)
+    students = await cursor.to_list(length=limit)
     
     return {
         "total": total,
-        "estudiantes": estudiantes,
+        "students": students,
         "pagina": skip // limit + 1 if limit > 0 else 1,
         "total_paginas": (total + limit - 1) // limit if limit > 0 else 1
     }
