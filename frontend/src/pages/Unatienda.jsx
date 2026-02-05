@@ -412,6 +412,32 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
     }
   };
 
+  // Handle reorder request
+  const handleReorderRequest = async (bookId) => {
+    const reason = prompt(te.reorderReason);
+    if (!reason) return;
+    
+    setReorderingBook(bookId);
+    try {
+      await axios.post(
+        `${API_URL}/api/store/textbook-orders/${currentOrderId}/reorder/${bookId}`,
+        { reason, book_id: bookId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(te.reorderSuccess);
+      // Refresh the textbooks to show updated status
+      if (selectedStudent) {
+        fetchTextbooksForStudent(selectedStudent);
+      }
+    } catch (error) {
+      console.error('Error requesting reorder:', error);
+      toast.error(error.response?.data?.detail || te.reorderError);
+    } finally {
+      setReorderingBook(null);
+    }
+  };
+
   const getStudentOrderStatus = (studentId) => {
     const orders = studentOrders[studentId] || [];
     if (orders.length === 0) return { status: 'pending', label: te.pending, count: 0, total: 0 };
