@@ -1118,7 +1118,7 @@ export default function Unatienda() {
                   <span className="mr-1">{catInfo.icono}</span>
                   {catInfo.nombre}
                 </Badge>
-                {product.categoria === 'libros' && product.grade && (
+                {(product.categoria === 'libros' || product.categoria === 'books') && product.grade && (
                   <Badge variant="secondary" className="text-xs">
                     {product.grade}
                   </Badge>
