@@ -958,14 +958,14 @@ export default function Unatienda() {
   const subcategories = hasSubcategories ? grados.map(g => ({ id: g, nombre: g })) : [];
   const shouldShowLanding = selectedCategory && !selectedSubcategory && showLandingView && !searchTerm;
 
-  const handleSelectCategory = (categoriaId) => {
-    setSelectedCategory(categoriaId);
+  const handleSelectCategory = (categoryId) => {
+    setSelectedCategory(categoryId);
     setSelectedSubcategory(null);
     setShowLandingView(true);
   };
 
-  const handleSelectSubcategoria = (subcategoriaId) => {
-    setSelectedSubcategory(subcategoriaId);
+  const handleSelectSubcategoria = (subcategoryId) => {
+    setSelectedSubcategory(subcategoryId);
     setShowLandingView(false);
   };
 
@@ -1014,9 +1014,9 @@ export default function Unatienda() {
     return { label: 'Disponible', color: 'success', canBuy: true };
   };
 
-  const getCategoryInfo = (categoriaId) => {
-    const cat = categories.find(c => c.category_id === categoriaId);
-    return cat || { nombre: categoriaId, icono: categoryIcons[categoriaId] || '📦' };
+  const getCategoryInfo = (categoryId) => {
+    const cat = categories.find(c => c.category_id === categoryId);
+    return cat || { nombre: categoryId, icono: categoryIcons[categoryId] || '📦' };
   };
 
   if (loading) {
