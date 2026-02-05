@@ -372,7 +372,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success('Pedido enviado exitosamente');
+      toast.success(t.orderSuccess);
       fetchStudentOrders();
       setView('students');
       // Reset form data
