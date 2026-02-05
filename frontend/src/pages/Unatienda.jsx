@@ -544,9 +544,29 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
                         <div>
                           <p className="font-medium">{book.name || book.book_name}</p>
                           <p className="text-sm text-muted-foreground">{book.subject}</p>
+                          {book.reorder_pending && (
+                            <p className="text-xs text-amber-600">{te.reorderPending}</p>
+                          )}
                         </div>
                       </div>
-                      <span className="font-semibold text-green-700">${book.price?.toFixed(2)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-green-700">${book.price?.toFixed(2)}</span>
+                        {!book.reorder_pending && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleReorderRequest(book.book_id)}
+                            disabled={reorderingBook === book.book_id}
+                            className="text-xs"
+                          >
+                            {reorderingBook === book.book_id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              te.reorderButton
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
