@@ -960,12 +960,12 @@ export default function Unatienda() {
 
   const handleSelectCategoria = (categoriaId) => {
     setSelectedCategoria(categoriaId);
-    setSelectedSubcategoria(null);
+    setSelectedSubcategory(null);
     setShowLandingView(true);
   };
 
   const handleSelectSubcategoria = (subcategoriaId) => {
-    setSelectedSubcategoria(subcategoriaId);
+    setSelectedSubcategory(subcategoriaId);
     setShowLandingView(false);
   };
 
@@ -975,7 +975,7 @@ export default function Unatienda() {
     if (!showLandingView && selectedCategoria && !selectedSubcategory) {
       setShowLandingView(true);
     } else if (selectedSubcategory) {
-      setSelectedSubcategoria(null);
+      setSelectedSubcategory(null);
       setShowLandingView(true);
     } else {
       setSelectedCategoria(null);
@@ -985,7 +985,7 @@ export default function Unatienda() {
 
   const handleGoHome = () => {
     setSelectedCategoria(null);
-    setSelectedSubcategoria(null);
+    setSelectedSubcategory(null);
     setShowLandingView(true);
   };
 
