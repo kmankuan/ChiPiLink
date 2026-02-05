@@ -1074,41 +1074,41 @@ export default function Unatienda() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-12 px-4">
+      {/* Hero Section - Compact on mobile */}
+      <div className="relative bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-8 px-4">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-primary/10">
-                <Store className="h-8 w-8 text-primary" />
+          <div className="flex items-center justify-between gap-3">
+            {/* Title - compact on mobile */}
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-primary/10 shrink-0">
+                <Store className="h-5 w-5 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <div>
-                <h1 className="font-serif text-3xl md:text-4xl font-bold">
+              <div className="min-w-0">
+                <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-bold truncate">
                   {storeInfo?.nombre || 'Unatienda'}
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate hidden sm:block">
                   {storeInfo?.description || 'Tu tienda de confianza'}
                 </p>
               </div>
             </div>
             
-            {/* Action Buttons */}
+            {/* Action Button - compact on mobile */}
             {isAuthenticated && (
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setActiveView('private')}
-                  variant="outline"
-                  className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30"
-                >
-                  <GraduationCap className="h-4 w-4" />
-                  Compra Exclusiva
-                  {catalogoPrivadoAcceso?.has_access && catalogoPrivadoAcceso?.students?.length > 0 && (
-                    <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs">
-                      {catalogoPrivadoAcceso.students.length}
-                    </Badge>
-                  )}
-                </Button>
-              </div>
+              <Button
+                onClick={() => setActiveView('private')}
+                variant="outline"
+                size="sm"
+                className="gap-1 sm:gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30 shrink-0 text-xs sm:text-sm px-2 sm:px-4"
+              >
+                <GraduationCap className="h-4 w-4" />
+                <span className="hidden xs:inline">Compra</span> Exclusiva
+                {catalogoPrivadoAcceso?.has_access && catalogoPrivadoAcceso?.students?.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs h-5 w-5 p-0 flex items-center justify-center rounded-full">
+                    {catalogoPrivadoAcceso.students.length}
+                  </Badge>
+                )}
+              </Button>
             )}
           </div>
         </div>
