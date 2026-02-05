@@ -854,7 +854,7 @@ export default function Unatienda() {
   const [activeView, setActiveView] = useState('public'); // 'public' or 'private'
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
-  const [categories, setCategorias] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -913,7 +913,7 @@ export default function Unatienda() {
       const publicProducts = allProducts.filter(p => !p.is_private_catalog);
       setProducts(publicProducts);
       setStoreInfo(storeRes.data);
-      setCategorias(categoriesRes.data || []);
+      setCategories(categoriesRes.data || []);
       setGrades(gradosRes.data.grades || []);
     } catch (error) {
       console.error('Error fetching data:', error);
