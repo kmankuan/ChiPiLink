@@ -639,9 +639,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
       {/* Students List */}
       {catalogoPrivadoAcceso?.students?.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="font-semibold flex items-center gap-2">
-            <Users className="h-5 w-5" />
+        <div className="space-y-3 sm:space-y-4">
+          <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
             Mis Estudiantes ({catalogoPrivadoAcceso.students.length})
           </h3>
           
@@ -653,53 +653,57 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                 key={student.student_id || student.sync_id}
                 className="border-l-4 border-l-purple-500"
               >
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                        <User className="h-5 w-5 text-purple-600" />
+                <CardContent className="p-3 sm:p-4">
+                  {/* Mobile: Stack layout, Desktop: Row layout */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    {/* Student Info */}
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div className="p-1.5 sm:p-2 rounded-full bg-purple-100 dark:bg-purple-900/30 shrink-0">
+                        <User className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                       </div>
-                      <div>
-                        <h4 className="font-semibold">{student.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Grado {student.grade} • {student.school_name || 'PCA'} • Año 2026
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-sm sm:text-base truncate">{student.name}</h4>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                          Grado {student.grade} • {student.school_name || 'PCA'}
                         </p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
+                    {/* Status and Action */}
+                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 pl-8 sm:pl-0">
                       {orderStatus.status === 'ordered' ? (
                         <>
-                          <div className="text-right">
-                            <Badge className="bg-green-100 text-green-700 border-green-200">
+                          <div className="text-left sm:text-right">
+                            <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              {orderStatus.label}
+                              Enviado
                             </Badge>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {orderStatus.count} libros - ${orderStatus.total.toFixed(2)}
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {orderStatus.count} libros • ${orderStatus.total.toFixed(2)}
                             </p>
                           </div>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleViewTextbooks(student)}
+                            className="text-xs h-8"
                           >
-                            Ver Listado
+                            Ver
                           </Button>
                         </>
                       ) : (
                         <>
-                          <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                          <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
                             <Clock className="h-3 w-3 mr-1" />
-                            {orderStatus.label}
+                            Pendiente
                           </Badge>
                           <Button
                             size="sm"
                             onClick={() => handleViewTextbooks(student)}
-                            className="gap-1"
+                            className="gap-1 text-xs h-8"
                           >
-                            <BookOpen className="h-4 w-4" />
-                            Ver Listado y Ordenar
+                            <BookOpen className="h-3 w-3" />
+                            <span className="hidden xs:inline">Ver</span> Listado
                           </Button>
                         </>
                       )}
