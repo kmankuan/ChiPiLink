@@ -679,9 +679,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        {selectedCount} libro{selectedCount !== 1 ? 's' : ''} seleccionado{selectedCount !== 1 ? 's' : ''}
+                        {selectedCount} {t.booksSelected}
                       </p>
-                      <p className="font-semibold">Total: ${selectedTotal.toFixed(2)}</p>
+                      <p className="font-semibold">{t.total}: ${selectedTotal.toFixed(2)}</p>
                     </div>
                     <Button 
                       onClick={handleSubmitOrder}
@@ -693,7 +693,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                       ) : (
                         <ClipboardList className="h-4 w-4" />
                       )}
-                      Enviar Pedido
+                      {t.submitOrder}
                     </Button>
                   </div>
                 </div>
@@ -702,9 +702,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <Card>
                 <CardContent className="py-8 text-center">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <p className="font-semibold text-green-700">¡Todos los libros han sido ordenados!</p>
+                  <p className="font-semibold text-green-700">{t.allBooksOrdered}</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Si necesitas ordenar más, solicita habilitación al administrador.
+                    {t.requestMoreInfo}
                   </p>
                 </CardContent>
               </Card>
@@ -712,7 +712,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <Card>
                 <CardContent className="py-8 text-center">
                   <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground">No hay libros disponibles para este grado</p>
+                  <p className="text-muted-foreground">{t.noBooksAvailable}</p>
                 </CardContent>
               </Card>
             )}
