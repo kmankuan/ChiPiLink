@@ -304,11 +304,11 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       setSelectedBooks(initialSelected);
     } catch (error) {
       console.error('Error fetching textbooks:', error);
-      const errorMsg = error.response?.data?.detail || t.loadError;
+      const errorMsg = error.response?.data?.detail || te.loadError;
       
       // Check if it's an enrollment/approval issue
       if (errorMsg.includes('approved') || errorMsg.includes('enrollment')) {
-        toast.error(t.approvalRequired);
+        toast.error(te.approvalRequired);
       } else {
         toast.error(errorMsg);
       }
@@ -337,7 +337,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       .map(([bookId]) => bookId);
 
     if (selectedBookIds.length === 0) {
-      toast.error(t.selectAtLeastOne);
+      toast.error(te.selectAtLeastOne);
       return;
     }
 
@@ -372,7 +372,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success(t.orderSuccess);
+      toast.success(te.orderSuccess);
       fetchStudentOrders();
       setView('students');
       // Reset form data
@@ -380,7 +380,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       setUploadedFiles({});
     } catch (error) {
       console.error('Error submitting order:', error);
-      toast.error(error.response?.data?.detail || t.orderError);
+      toast.error(error.response?.data?.detail || te.orderError);
     } finally {
       setSubmitting(false);
     }
@@ -388,7 +388,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
   const getStudentOrderStatus = (studentId) => {
     const orders = studentOrders[studentId] || [];
-    if (orders.length === 0) return { status: 'pending', label: t.pending, count: 0, total: 0 };
+    if (orders.length === 0) return { status: 'pending', label: te.pending, count: 0, total: 0 };
     
     const latestOrder = orders[0];
     const itemCount = latestOrder.items?.filter(i => i.quantity_ordered > 0).length || 0;
@@ -396,7 +396,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
     
     return {
       status: 'ordered',
-      label: t.sent,
+      label: te.sent,
       count: itemCount,
       total: total,
       order: latestOrder
@@ -414,7 +414,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           className="mb-4 gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
-          {t.backToStudents}
+          {te.backToStudents}
         </Button>
         <CompraExclusiva embedded={true} onStudentLinked={() => {
           onRefreshAccess();
@@ -446,7 +446,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           className="mb-4 gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
-          {t.backToStudents}
+          {te.backToStudents}
         </Button>
 
         {/* Student Header */}
@@ -460,7 +460,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                 <div>
                   <CardTitle className="text-lg">{selectedStudent.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    {t.grade} {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
+                    {te.grade} {selectedStudent.grade} • {selectedStudent.school_name || 'PCA'}
                   </p>
                 </div>
               </div>
@@ -479,7 +479,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 flex items-center gap-2 text-green-700">
                   <CheckCircle className="h-4 w-4" />
-                  {t.booksOrdered} ({orderedBooks.length})
+                  {te.booksOrdered} ({orderedBooks.length})
                 </h3>
                 <div className="space-y-2">
                   {orderedBooks.map(book => (
@@ -506,7 +506,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
-                  {t.booksAvailable} ({availableBooks.length})
+                  {te.booksAvailable} ({availableBooks.length})
                 </h3>
                 <div className="space-y-2 mb-6">
                   {availableBooks.map(book => (
@@ -544,7 +544,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   <div className="mt-6 space-y-4 p-4 bg-muted/50 rounded-lg border">
                     <h4 className="font-semibold flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      {t.additionalInfo}
+                      {te.additionalInfo}
                     </h4>
                     {formFields.map(field => (
                       <div key={field.field_id} className="space-y-2">
@@ -659,7 +659,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                               onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
                               className="w-full px-3 py-2 border rounded-lg bg-background"
                             >
-                              <option value="">{t.select}</option>
+                              <option value="">{te.select}</option>
                               {field.options.map(opt => (
                                 <option key={opt.value} value={opt.value}>
                                   {lang === 'zh' && opt.label_zh ? opt.label_zh : 
@@ -679,9 +679,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        {selectedCount} {t.booksSelected}
+                        {selectedCount} {te.booksSelected}
                       </p>
-                      <p className="font-semibold">{t.total}: ${selectedTotal.toFixed(2)}</p>
+                      <p className="font-semibold">{te.total}: ${selectedTotal.toFixed(2)}</p>
                     </div>
                     <Button 
                       onClick={handleSubmitOrder}
@@ -693,7 +693,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                       ) : (
                         <ClipboardList className="h-4 w-4" />
                       )}
-                      {t.submitOrder}
+                      {te.submitOrder}
                     </Button>
                   </div>
                 </div>
@@ -702,9 +702,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <Card>
                 <CardContent className="py-8 text-center">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <p className="font-semibold text-green-700">{t.allBooksOrdered}</p>
+                  <p className="font-semibold text-green-700">{te.allBooksOrdered}</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {t.requestMoreInfo}
+                    {te.requestMoreInfo}
                   </p>
                 </CardContent>
               </Card>
@@ -712,7 +712,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
               <Card>
                 <CardContent className="py-8 text-center">
                   <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground">{t.noBooksAvailable}</p>
+                  <p className="text-muted-foreground">{te.noBooksAvailable}</p>
                 </CardContent>
               </Card>
             )}
@@ -731,9 +731,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 shrink-0" />
             <div className="min-w-0">
-              <h3 className="font-bold text-sm sm:text-base">{t.exclusivePurchase}</h3>
+              <h3 className="font-bold text-sm sm:text-base">{te.exclusivePurchase}</h3>
               <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                {t.yourStudentsBooks}
+                {te.yourStudentsBooks}
               </p>
             </div>
           </div>
@@ -744,7 +744,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
             className="gap-1 border-purple-300 text-purple-700 hover:bg-purple-50 shrink-0 text-xs sm:text-sm px-2 sm:px-3"
           >
             <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">{t.linkNew.split(' ')[0]}</span> {t.linkNew.split(' ')[1] || ''}
+            <span className="hidden sm:inline">{te.linkNew.split(' ')[0]}</span> {te.linkNew.split(' ')[1] || ''}
           </Button>
         </div>
       </div>
@@ -754,7 +754,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
         <div className="space-y-3 sm:space-y-4">
           <h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
             <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-            {t.myStudents} ({catalogoPrivadoAcceso.students.length})
+            {te.myStudents} ({catalogoPrivadoAcceso.students.length})
           </h3>
           
           {catalogoPrivadoAcceso.students.map((student) => {
@@ -776,7 +776,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                       <div className="min-w-0 flex-1">
                         <h4 className="font-semibold text-sm sm:text-base truncate">{student.name}</h4>
                         <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                          {t.grade} {student.grade} • {student.school_name || 'PCA'}
+                          {te.grade} {student.grade} • {student.school_name || 'PCA'}
                         </p>
                       </div>
                     </div>
@@ -788,10 +788,10 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                           <div className="text-left sm:text-right">
                             <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              {t.sent}
+                              {te.sent}
                             </Badge>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {orderStatus.count} {t.books} • ${orderStatus.total.toFixed(2)}
+                              {orderStatus.count} {te.books} • ${orderStatus.total.toFixed(2)}
                             </p>
                           </div>
                           <Button
@@ -800,14 +800,14 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                             onClick={() => handleViewTextbooks(student)}
                             className="text-xs h-8"
                           >
-                            {t.view}
+                            {te.view}
                           </Button>
                         </>
                       ) : (
                         <>
                           <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
                             <Clock className="h-3 w-3 mr-1" />
-                            {t.pending}
+                            {te.pending}
                           </Badge>
                           <Button
                             size="sm"
@@ -815,7 +815,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                             className="gap-1 text-xs h-8"
                           >
                             <BookOpen className="h-3 w-3" />
-                            <span className="hidden xs:inline">{t.view}</span> {t.viewList.split(' ')[1] || ''}
+                            <span className="hidden xs:inline">{te.view}</span> {te.viewList.split(' ')[1] || ''}
                           </Button>
                         </>
                       )}
@@ -831,11 +831,11 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
           <CardContent className="py-8 sm:py-12 text-center">
             <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/30 mx-auto mb-3 sm:mb-4" />
             <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
-              {t.noStudentsLinked}
+              {te.noStudentsLinked}
             </p>
             <Button onClick={() => setView('linking')} size="sm" className="text-xs sm:text-sm">
               <UserPlus className="h-4 w-4 mr-2" />
-              {t.linkStudent}
+              {te.linkStudent}
             </Button>
           </CardContent>
         </Card>
