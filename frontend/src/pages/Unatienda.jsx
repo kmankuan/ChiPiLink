@@ -855,7 +855,7 @@ export default function Unatienda() {
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [categories, setCategorias] = useState([]);
-  const [grados, setGrados] = useState([]);
+  const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
