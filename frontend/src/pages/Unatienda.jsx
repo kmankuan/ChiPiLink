@@ -388,7 +388,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
 
   const getStudentOrderStatus = (studentId) => {
     const orders = studentOrders[studentId] || [];
-    if (orders.length === 0) return { status: 'pending', label: 'Pendiente de ordenar', count: 0, total: 0 };
+    if (orders.length === 0) return { status: 'pending', label: t.pending, count: 0, total: 0 };
     
     const latestOrder = orders[0];
     const itemCount = latestOrder.items?.filter(i => i.quantity_ordered > 0).length || 0;
