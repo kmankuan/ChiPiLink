@@ -108,36 +108,36 @@ async def import_students(
 
 
 @router.post("/books/preview")
-async def preview_libros(
-    request: PreviewLibrosRequest,
+async def preview_books(
+    request: PreviewBooksRequest,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Previsualizar import de libros antes de ejecutarla.
+    Preview book import before executing.
     """
-    result = await bulk_import_service.preview_libros(
+    result = await bulk_import_service.preview_books(
         request.raw_text,
         request.column_mapping,
-        request.catalogo_id,
+        request.catalog_id,
         request.grade_default
     )
     return result
 
 
-@router.post("/libros/import")
-async def import_libros(
-    request: ImportLibrosRequest,
+@router.post("/books/import")
+async def import_books(
+    request: ImportBooksRequest,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Importar libros desde datos copiados de Google Sheets.
+    Import books from Google Sheets data.
     """
-    result = await bulk_import_service.importar_libros(
+    result = await bulk_import_service.import_books(
         request.raw_text,
         request.column_mapping,
-        request.catalogo_id,
+        request.catalog_id,
         request.grade_default,
-        request.actualizar_existentes,
+        request.update_existing,
         admin.get("user_id")
     )
     return result
@@ -145,29 +145,29 @@ async def import_libros(
 
 @router.get("/history")
 async def get_import_history(
-    tipo: Optional[str] = None,
+    type: Optional[str] = None,
     limit: int = 20,
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Obtener historial de importaciones.
+    Get import history.
     
     Args:
-        tipo: Filtrar by type ("estudiantes" o "libros")
-        limit: Number maximum de registros
+        type: Filter by type ("students" or "books")
+        limit: Maximum number of records
     """
-    result = await bulk_import_service.get_import_history(tipo, limit)
+    result = await bulk_import_service.get_import_history(type, limit)
     return result
 
 
-@router.get("/grados")
+@router.get("/grades")
 async def get_available_grades(
     admin: dict = Depends(get_admin_user)
 ):
     """
-    Obtener lista de grados disponibles (de estudiantes importados).
+    Get list of available grades (from imported students).
     """
-    grados = await bulk_import_service.get_available_grades()
+    grades = await bulk_import_service.get_available_grades()
     return {"grades": grados}
 
 
