@@ -659,7 +659,7 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
                               onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
                               className="w-full px-3 py-2 border rounded-lg bg-background"
                             >
-                              <option value="">-- Seleccionar --</option>
+                              <option value="">{t.select}</option>
                               {field.options.map(opt => (
                                 <option key={opt.value} value={opt.value}>
                                   {lang === 'zh' && opt.label_zh ? opt.label_zh : 
