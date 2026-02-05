@@ -74,11 +74,13 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload.get("sub")
+        logger.info(f"[auth] Looking up user_id from token: {user_id}")
         user = await db[AuthCollections.USERS].find_one(
             {"user_id": user_id}, 
             {"_id": 0, "password_hash": 0}
         )
         if not user:
+            logger.warning(f"[auth] User not found in database: {user_id}")
             raise HTTPException(status_code=401, detail="User not found")
         return user
     except jwt.ExpiredSignatureError:
