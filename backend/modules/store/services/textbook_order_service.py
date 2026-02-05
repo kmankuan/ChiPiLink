@@ -39,6 +39,8 @@ class TextbookOrderService(BaseService):
     
     async def get_books_for_grade(self, grade: str) -> List[Dict]:
         """Get all books for a specific grade"""
+        logger.info(f"[get_books_for_grade] Looking for books for grade: {grade}")
+        
         # Handle grade format variations
         grade_queries = [grade]
         
@@ -66,6 +68,8 @@ class TextbookOrderService(BaseService):
         if grade in grade_mappings:
             grade_queries = grade_mappings[grade]
         
+        logger.info(f"[get_books_for_grade] Query grades: {grade_queries}")
+        
         books = await db.store_products.find(
             {
                 "active": True,
@@ -77,6 +81,10 @@ class TextbookOrderService(BaseService):
             },
             {"_id": 0}
         ).sort("name", 1).to_list(200)
+        
+        logger.info(f"[get_books_for_grade] Found {len(books)} books")
+        if len(books) > 0:
+            logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')}")
         
         return books
     
