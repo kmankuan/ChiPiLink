@@ -304,11 +304,11 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
       setSelectedBooks(initialSelected);
     } catch (error) {
       console.error('Error fetching textbooks:', error);
-      const errorMsg = error.response?.data?.detail || 'Error al cargar los libros';
+      const errorMsg = error.response?.data?.detail || t.loadError;
       
       // Check if it's an enrollment/approval issue
       if (errorMsg.includes('approved') || errorMsg.includes('enrollment')) {
-        toast.error('El estudiante debe estar aprobado para ver los libros disponibles');
+        toast.error(t.approvalRequired);
       } else {
         toast.error(errorMsg);
       }
