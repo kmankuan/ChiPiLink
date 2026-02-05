@@ -419,7 +419,3 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
     except Exception as e:
         logger.error(f"Error getting Unatienda stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-# Import and include migrations router
-from .routes.migrations import router as migrations_router
