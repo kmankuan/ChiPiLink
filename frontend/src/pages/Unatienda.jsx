@@ -153,7 +153,7 @@ const categoryIcons = {
 // Compra Exclusiva Section Component - Student-centered view
 function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess }) {
   const { token } = useAuth();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [view, setView] = useState('students'); // 'students', 'textbooks', 'linking'
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentOrders, setStudentOrders] = useState({});
@@ -168,9 +168,9 @@ function CompraExclusivaSection({ catalogoPrivadoAcceso, onBack, onRefreshAccess
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadingFile, setUploadingFile] = useState(null);
 
-  // Get current language and translations
+  // Get current language - use i18n translations with fallback to inline
   const lang = i18n.language || 'es';
-  const t = exclusivaTranslations[lang] || exclusivaTranslations.es;
+  const te = exclusivaTranslations[lang] || exclusivaTranslations.es;
 
   // Fetch form fields configuration
   useEffect(() => {
