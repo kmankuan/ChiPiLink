@@ -49,7 +49,10 @@ import {
   ExternalLink,
   ChevronRight,
   Eye,
-  RotateCcw
+  RotateCcw,
+  Lock,
+  Pencil,
+  Save
 } from 'lucide-react';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL;
