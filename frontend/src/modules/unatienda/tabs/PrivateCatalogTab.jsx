@@ -38,6 +38,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
     subject: '',
     price: '',
     sale_price: '',
+    inventory_quantity: '',
     description: '',
     image_url: '',
     active: true,
