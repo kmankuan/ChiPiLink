@@ -31,7 +31,7 @@
   },
 
   "passed_tests": [
-    "Landing page loads correctly at https://coderefactor-14.preview.emergentagent.com",
+    "Landing page loads correctly at https://bookfix-4.preview.emergentagent.com",
     "Admin dashboard loads at /admin after login with teck@koh.one credentials",
     "Admin sidebar navigation displays English text (Dashboard, Unatienda, Orders, Users, Memberships, PinpanClub, Roles & Permissions, Administration, Integrations, Tickets/Chat)",
     "/mi-cuenta page loads with all tabs: Wallet, Profile, Membership, Connections, Dependents, Capacities, Notifications",
