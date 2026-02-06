@@ -198,12 +198,19 @@ async def get_products_by_grade(
             detail="You do not have access to the private catalog"
         )
     
+    # Handle grade format variations (e.g., "3" vs "G3")
+    grade_variants = [grade]
+    if grade.startswith("G"):
+        grade_variants.append(grade[1:])  # "G3" -> "3"
+    else:
+        grade_variants.append(f"G{grade}")  # "3" -> "G3"
+    
     query = {
         "is_private_catalog": True,
         "active": True,
         "$or": [
-            {"grade": grade},
-            {"grades": grade}
+            {"grade": {"$in": grade_variants}},
+            {"grades": {"$in": grade_variants}}
         ]
     }
     
