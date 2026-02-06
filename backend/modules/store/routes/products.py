@@ -90,10 +90,7 @@ async def search_products(q: str = Query(..., min_length=2)):
 async def get_available_grades():
     """Get available grades for filtering"""
     try:
-        # Check both 'grade' and 'grado' fields for backward compatibility
         grades_list = await db.store_products.distinct("grade", {"active": True})
-        if not grades_list:
-            grades_list = await db.store_products.distinct("grado", {"activo": True})
         return {"grades": sorted([g for g in grades_list if g])}
     except Exception as e:
         logger.error(f"Error fetching grades: {e}")
@@ -105,8 +102,6 @@ async def get_available_subjects():
     """Get available subjects for filtering"""
     try:
         subjects_list = await db.store_products.distinct("subject", {"active": True})
-        if not subjects_list:
-            subjects_list = await db.store_products.distinct("materia", {"activo": True})
         return {"subjects": sorted([s for s in subjects_list if s])}
     except Exception as e:
         logger.error(f"Error fetching subjects: {e}")
