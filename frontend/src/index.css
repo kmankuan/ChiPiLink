@@ -185,20 +185,13 @@
 .scrollable-table-container {
   overflow-x: scroll !important;
   overflow-y: auto !important;
-  scrollbar-width: thin;
+  /* Firefox scrollbar styling */
+  scrollbar-width: auto;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted));
   -webkit-overflow-scrolling: touch;
-  /* Force scrollbar visibility on macOS */
-  scrollbar-gutter: stable;
 }
 
-/* For browsers that support it, always show scrollbars */
-@supports (overflow: overlay) {
-  .scrollable-table-container {
-    overflow-x: overlay !important;
-    overflow-y: overlay !important;
-  }
-}
-
+/* WebKit (Chrome, Safari, Edge) scrollbar styling */
 .scrollable-table-container::-webkit-scrollbar {
   height: 14px;
   width: 14px;
