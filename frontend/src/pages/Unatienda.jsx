@@ -991,11 +991,12 @@ export default function Unatienda() {
 
   const fetchData = async () => {
     try {
-      const [productsRes, storeRes, categoriesRes, gradesRes] = await Promise.all([
+      const [productsRes, storeRes, categoriesRes, gradesRes, configRes] = await Promise.all([
         axios.get(`${API_URL}/api/store/products`),
         axios.get(`${API_URL}/api/platform-store`),
         axios.get(buildUrl(STORE_ENDPOINTS.categories)),
-        axios.get(`${API_URL}/api/store/products/grades`)
+        axios.get(`${API_URL}/api/store/products/grades`),
+        axios.get(`${API_URL}/api/store/store-config/public`)
       ]);
       
       // Filter only public products (not private catalog)
@@ -1005,6 +1006,7 @@ export default function Unatienda() {
       setStoreInfo(storeRes.data);
       setCategories(categoriesRes.data || []);
       setGrades(gradesRes.data.grades || []);
+      setStoreConfig(configRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
