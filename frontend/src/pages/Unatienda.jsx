@@ -1412,11 +1412,29 @@ export default function Unatienda() {
         </div>
         )}
 
-        {/* Content - Public or Private */}
-        {activeView === 'private' ? (
+        {/* Content - Public, Textbooks Selection, or Textbook Order */}
+        {activeView === 'textbooks' ? (
+          // School Textbooks View - Show students or login prompt
+          <SchoolTextbooksView 
+            isAuthenticated={isAuthenticated}
+            privateCatalogAccess={privateCatalogAccess}
+            storeConfig={storeConfig}
+            onSelectStudent={(student) => {
+              setSelectedStudent(student);
+              setActiveView('textbook-order');
+            }}
+            onLinkStudent={() => navigate('/my-account?tab=students')}
+            onBack={() => setActiveView('public')}
+          />
+        ) : activeView === 'textbook-order' && selectedStudent ? (
+          // Textbook Order View for a specific student
           <CompraExclusivaSection 
             privateCatalogAccess={privateCatalogAccess}
-            onBack={() => setActiveView('public')}
+            selectedStudentId={selectedStudent.student_id}
+            onBack={() => {
+              setSelectedStudent(null);
+              setActiveView('textbooks');
+            }}
             onRefreshAccess={checkPrivateCatalogAccess}
           />
         ) : (
