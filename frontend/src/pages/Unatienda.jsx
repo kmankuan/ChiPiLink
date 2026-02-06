@@ -1052,7 +1052,7 @@ function SchoolTextbooksView({
       try {
         const grade = selectedStudent.grade;
         const res = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/store/private-catalog/products-by-grade/${grade}`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/store/private-catalog/by-grade/${grade}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTextbooks(res.data?.products || []);
