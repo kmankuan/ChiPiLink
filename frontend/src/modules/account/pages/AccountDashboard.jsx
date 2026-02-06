@@ -1,6 +1,6 @@
 /**
  * Account Dashboard Page - Main page for user's personal portal
- * Includes: Wallet, Profile, Membership, Connections, Dependents, Capacities, Notifications, Exclusive
+ * Includes: Wallet, Profile, Membership, Connections, Dependents, Capacities, Notifications, My Students
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ import MisCapacidades from '../profile/MisCapacidades';
 import ServiciosSugeridos from '../ServiciosSugeridos';
 import TransferenciasDialog from '../wallet/TransferenciasDialog';
 import AlertasSaldo from '../wallet/AlertasSaldo';
-import LinkingPage from '../linking/LinkingPage';
+import MyStudentsSection from '../students/MyStudentsSection';
 
 // Notification components
 import NotificationPreferences from '@/modules/notifications/components/NotificationPreferences';
