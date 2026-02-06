@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,79 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import {
-  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package, Maximize2, Minimize2, X
+  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package, Maximize2, Minimize2, X, GripVertical
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
+
+// Default column widths
+const DEFAULT_COLUMN_WIDTHS = {
+  name: 250,
+  code: 100,
+  grade: 80,
+  subject: 120,
+  publisher: 120,
+  price: 100,
+  stock: 100,
+  status: 90,
+  actions: 70
+};
+
+// Resizable column header component
+function ResizableHeader({ children, columnKey, width, onResize, isSticky = false, className = '' }) {
+  const [isResizing, setIsResizing] = useState(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    startXRef.current = e.clientX;
+    startWidthRef.current = width;
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing) return;
+    const diff = e.clientX - startXRef.current;
+    const newWidth = Math.max(50, startWidthRef.current + diff);
+    onResize(columnKey, newWidth);
+  }, [isResizing, columnKey, onResize]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseMove]);
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
+
+  return (
+    <th
+      className={`relative select-none ${isSticky ? 'sticky left-0 z-30' : ''} bg-muted px-3 py-2 text-left text-sm font-medium border-b ${isSticky ? 'border-r' : ''} ${className}`}
+      style={{ width: `${width}px`, minWidth: `${width}px` }}
+    >
+      <div className="flex items-center justify-between pr-2">
+        {children}
+      </div>
+      {/* Resize handle */}
+      <div
+        className={`absolute right-0 top-0 h-full w-3 cursor-col-resize group flex items-center justify-center hover:bg-primary/20 ${isResizing ? 'bg-primary/30' : ''}`}
+        onMouseDown={handleMouseDown}
+        title="Drag to resize"
+      >
+        <div className={`w-0.5 h-4 bg-border group-hover:bg-primary ${isResizing ? 'bg-primary' : ''}`} />
+      </div>
+    </th>
+  );
+}
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
