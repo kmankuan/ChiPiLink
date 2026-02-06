@@ -1171,6 +1171,9 @@ export default function Unatienda() {
   
   const [addedItems, setAddedItems] = useState({});
 
+  // Store URL params for later use
+  const [urlParams, setUrlParams] = useState(null);
+  
   // Read category and search from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1180,23 +1183,50 @@ export default function Unatienda() {
     const tab = params.get('tab');
     const studentId = params.get('student');
     
-    // Handle textbooks category from My Students section
-    if (category === 'textbooks' && studentId) {
-      setActiveView('textbook-order');
-      // Student will be set after privateCatalogAccess loads
-      setSelectedStudent({ student_id: studentId });
-    } else if (tab === 'textbooks') {
-      setActiveView('textbooks');
+    // Store params for processing after data loads
+    if (category === 'textbooks' || tab === 'textbooks' || studentId) {
+      setUrlParams({ category, tab, studentId });
     }
     
     if (categoria) setSelectedCategory(categoria);
     if (search) setSearchTerm(decodeURIComponent(search));
     
-    // Clean up URL
-    if (categoria || search || tab || category) {
-      window.history.replaceState({}, '', '/unatienda');
+    // Clean up URL (except for textbook params which need privateCatalogAccess)
+    if (categoria || search) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('categoria');
+      newUrl.searchParams.delete('search');
+      window.history.replaceState({}, '', newUrl.pathname + newUrl.search);
     }
   }, []);
+  
+  // Process textbook URL params after privateCatalogAccess loads
+  useEffect(() => {
+    if (!urlParams || !privateCatalogAccess) return;
+    
+    const { category, tab, studentId } = urlParams;
+    
+    if (category === 'textbooks' && studentId) {
+      // Find the student in privateCatalogAccess
+      const student = privateCatalogAccess.students?.find(
+        s => s.student_id === studentId || s.sync_id === studentId
+      );
+      
+      if (student && student.current_year_status === 'approved') {
+        setSelectedStudent(student);
+        setActiveView('textbook-order');
+      } else {
+        // Student not found or not approved, show textbooks selection
+        setActiveView('textbooks');
+      }
+    } else if (tab === 'textbooks') {
+      setActiveView('textbooks');
+    }
+    
+    // Clean URL params after processing
+    window.history.replaceState({}, '', '/unatienda');
+    setUrlParams(null);
+  }, [urlParams, privateCatalogAccess]);
 
   useEffect(() => {
     fetchData();
