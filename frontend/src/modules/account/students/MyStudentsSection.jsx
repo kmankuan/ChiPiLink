@@ -220,10 +220,11 @@ const STATUS_CONFIG = {
 };
 
 // Student Card Component
-function StudentCard({ student, t, lang, onOrderTextbooks, onViewOrders, onRetry }) {
+function StudentCard({ student, t, lang, onOrderTextbooks, onViewOrders, onRetry, onEditProfile }) {
   const status = student.current_year_status || 'pending';
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
   const StatusIcon = config.icon;
+  const isLocked = student.is_locked === true;
   
   return (
     <Card 
@@ -251,11 +252,18 @@ function StudentCard({ student, t, lang, onOrderTextbooks, onViewOrders, onRetry
               <span className="truncate">{student.school_name || 'School'}</span>
             </div>
           </div>
-          <Badge className={`${config.badgeColor} text-white text-xs`}>
-            {t[status === 'approved' ? 'approved' : 
-               status === 'pending' ? 'pendingApproval' : 
-               status === 'rejected' ? 'rejected' : 'infoRequired']}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            {isLocked && (
+              <Badge variant="outline" className="gap-1 text-xs border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20">
+                <Lock className="h-3 w-3" />
+              </Badge>
+            )}
+            <Badge className={`${config.badgeColor} text-white text-xs`}>
+              {t[status === 'approved' ? 'approved' : 
+                 status === 'pending' ? 'pendingApproval' : 
+                 status === 'rejected' ? 'rejected' : 'infoRequired']}
+            </Badge>
+          </div>
         </div>
         
         {/* Info Row */}
@@ -290,6 +298,14 @@ function StudentCard({ student, t, lang, onOrderTextbooks, onViewOrders, onRetry
                 data-testid={`orders-btn-${student.student_id}`}
               >
                 <Eye className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => onEditProfile(student)}
+                data-testid={`edit-btn-${student.student_id}`}
+              >
+                <Pencil className="h-4 w-4" />
               </Button>
             </>
           )}
