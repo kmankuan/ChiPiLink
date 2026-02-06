@@ -146,6 +146,10 @@ export default function UnatiendaModule() {
             <Database className="h-4 w-4" />
             <span className="hidden md:inline">Demo</span>
           </TabsTrigger>
+          <TabsTrigger value="school-year" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden md:inline">School Year</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="public-catalog">
