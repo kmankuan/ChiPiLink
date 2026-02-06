@@ -930,7 +930,7 @@ function CompraExclusivaSection({ privateCatalogAccess, selectedStudentId, onBac
   );
 }
 
-// School Textbooks View - Shows validated students or prompts to link/login
+// School Textbooks View - Tabbed view with direct textbook listing
 function SchoolTextbooksView({ 
   isAuthenticated, 
   privateCatalogAccess, 
@@ -940,105 +940,258 @@ function SchoolTextbooksView({
   onBack 
 }) {
   const { i18n } = useTranslation();
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const lang = i18n?.language || 'es';
+  
+  // State for selected student and textbooks
+  const [selectedStudentIndex, setSelectedStudentIndex] = useState(0);
+  const [textbooks, setTextbooks] = useState([]);
+  const [loadingTextbooks, setLoadingTextbooks] = useState(false);
+  const [selectedBooks, setSelectedBooks] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  
+  // Dynamic form fields
+  const [formFields, setFormFields] = useState([]);
+  const [formData, setFormData] = useState({});
+  const [uploadedFiles, setUploadedFiles] = useState({});
+  const [uploadingFile, setUploadingFile] = useState(null);
   
   // Translations
   const texts = {
     en: {
       title: 'School Textbooks',
-      subtitle: 'Order textbooks for your validated students',
+      subtitle: 'Order textbooks for your students',
       loginRequired: 'Login Required',
       loginMessage: 'Please login to access exclusive school textbooks',
       loginButton: 'Login',
       noStudents: 'No Students Linked',
       noStudentsDesc: 'Link a student to your account to order their textbooks',
       linkStudentBtn: 'Link Student',
-      selectStudent: 'Select a Student',
-      selectStudentDesc: 'Choose which student you want to order textbooks for',
-      orderTextbooks: 'Order Textbooks',
-      pendingApproval: 'Pending Approval',
-      grade: 'Grade',
       back: 'Back to Store',
       noValidatedStudents: 'No Validated Students',
-      noValidatedStudentsDesc: 'Your student link requests are pending approval. You will be able to order once approved.',
-      goToMyStudents: 'View My Students'
+      noValidatedStudentsDesc: 'Your student link requests are pending approval.',
+      goToMyStudents: 'View My Students',
+      grade: 'Grade',
+      availableBooks: 'Available Textbooks',
+      noBooks: 'No textbooks available for this grade',
+      loadingBooks: 'Loading textbooks...',
+      selectedCount: 'selected',
+      total: 'Total',
+      submitOrder: 'Submit Order',
+      additionalInfo: 'Additional Information',
+      orderSuccess: 'Order submitted successfully!',
+      orderError: 'Error submitting order',
+      selectAtLeastOne: 'Please select at least one book'
     },
     es: {
       title: 'Textos Escolares',
-      subtitle: 'Ordena los textos de tus estudiantes validados',
+      subtitle: 'Ordena los textos de tus estudiantes',
       loginRequired: 'Inicio de Sesión Requerido',
-      loginMessage: 'Inicia sesión para acceder a los textos escolares exclusivos',
+      loginMessage: 'Inicia sesión para acceder a textos escolares exclusivos',
       loginButton: 'Iniciar Sesión',
       noStudents: 'Sin Estudiantes Vinculados',
-      noStudentsDesc: 'Vincula un estudiante a tu cuenta para ordenar sus textos',
+      noStudentsDesc: 'Vincula un estudiante para ordenar sus textos',
       linkStudentBtn: 'Vincular Estudiante',
-      selectStudent: 'Selecciona un Estudiante',
-      selectStudentDesc: 'Elige para cuál estudiante deseas ordenar textos',
-      orderTextbooks: 'Ordenar Textos',
-      pendingApproval: 'Pendiente de Aprobación',
-      grade: 'Grado',
       back: 'Volver a la Tienda',
       noValidatedStudents: 'Sin Estudiantes Validados',
-      noValidatedStudentsDesc: 'Tus solicitudes de vinculación están pendientes de aprobación. Podrás ordenar una vez aprobadas.',
-      goToMyStudents: 'Ver Mis Estudiantes'
+      noValidatedStudentsDesc: 'Tus solicitudes están pendientes de aprobación.',
+      goToMyStudents: 'Ver Mis Estudiantes',
+      grade: 'Grado',
+      availableBooks: 'Textos Disponibles',
+      noBooks: 'No hay textos disponibles para este grado',
+      loadingBooks: 'Cargando textos...',
+      selectedCount: 'seleccionado(s)',
+      total: 'Total',
+      submitOrder: 'Enviar Pedido',
+      additionalInfo: 'Información Adicional',
+      orderSuccess: '¡Pedido enviado correctamente!',
+      orderError: 'Error al enviar el pedido',
+      selectAtLeastOne: 'Selecciona al menos un libro'
     },
     zh: {
       title: '学校教科书',
-      subtitle: '为您验证的学生订购教科书',
+      subtitle: '为您的学生订购教科书',
       loginRequired: '需要登录',
       loginMessage: '请登录以访问专属学校教科书',
       loginButton: '登录',
       noStudents: '未关联学生',
-      noStudentsDesc: '将学生关联到您的账户以订购他们的教科书',
+      noStudentsDesc: '关联学生以订购教科书',
       linkStudentBtn: '关联学生',
-      selectStudent: '选择学生',
-      selectStudentDesc: '选择您要为哪个学生订购教科书',
-      orderTextbooks: '订购教科书',
-      pendingApproval: '等待批准',
-      grade: '年级',
       back: '返回商店',
       noValidatedStudents: '无验证学生',
-      noValidatedStudentsDesc: '您的学生关联请求正在等待批准。批准后即可订购。',
-      goToMyStudents: '查看我的学生'
+      noValidatedStudentsDesc: '您的请求正在等待批准。',
+      goToMyStudents: '查看我的学生',
+      grade: '年级',
+      availableBooks: '可用教科书',
+      noBooks: '此年级暂无教科书',
+      loadingBooks: '加载教科书...',
+      selectedCount: '已选',
+      total: '总计',
+      submitOrder: '提交订单',
+      additionalInfo: '附加信息',
+      orderSuccess: '订单提交成功！',
+      orderError: '提交订单时出错',
+      selectAtLeastOne: '请至少选择一本书'
     }
   };
   
   const t = texts[lang] || texts.es;
-  const navigate = useNavigate();
-  
-  // Students from private catalog access are already validated (has_access = true)
   const validatedStudents = privateCatalogAccess?.students || [];
   const hasAccess = privateCatalogAccess?.has_access === true;
+  const selectedStudent = validatedStudents[selectedStudentIndex];
   
-  return (
-    <div className="space-y-6">
-      {/* Back Button */}
-      <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
-        <ChevronLeft className="h-4 w-4" />
-        {t.back}
-      </Button>
+  // Fetch textbooks when student changes
+  useEffect(() => {
+    if (!selectedStudent || !token) return;
+    
+    const fetchTextbooks = async () => {
+      setLoadingTextbooks(true);
+      try {
+        const grade = selectedStudent.grade;
+        const res = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/store/private-catalog/products-by-grade/${grade}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setTextbooks(res.data?.products || []);
+        setSelectedBooks({}); // Reset selection when changing student
+      } catch (error) {
+        console.error('Error fetching textbooks:', error);
+        setTextbooks([]);
+      } finally {
+        setLoadingTextbooks(false);
+      }
+    };
+    
+    fetchTextbooks();
+  }, [selectedStudent, token]);
+  
+  // Fetch form fields
+  useEffect(() => {
+    const fetchFormFields = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/store/order-form-config/client`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setFormFields(res.data?.fields || []);
+        // Initialize form data
+        const initialData = {};
+        (res.data?.fields || []).forEach(field => {
+          initialData[field.field_id] = field.default_value || '';
+        });
+        setFormData(initialData);
+      } catch (error) {
+        console.error('Error fetching form fields:', error);
+      }
+    };
+    
+    if (token) fetchFormFields();
+  }, [token]);
+  
+  // Toggle book selection
+  const toggleBook = (bookId) => {
+    setSelectedBooks(prev => ({
+      ...prev,
+      [bookId]: !prev[bookId]
+    }));
+  };
+  
+  // Calculate total
+  const selectedBooksList = textbooks.filter(b => selectedBooks[b.book_id]);
+  const totalPrice = selectedBooksList.reduce((sum, b) => sum + (b.price || 0), 0);
+  
+  // Handle file upload
+  const handleFileUpload = async (fieldId, file) => {
+    if (!file) return;
+    setUploadingFile(fieldId);
+    
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
       
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50">
-            <GraduationCap className="h-8 w-8 text-purple-600" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">{t.title}</h2>
-            <p className="text-muted-foreground">{t.subtitle}</p>
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/upload-proof`,
+        formDataUpload,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          } 
+        }
+      );
+      
+      setUploadedFiles(prev => ({ ...prev, [fieldId]: res.data.url || res.data.file_url }));
+      setFormData(prev => ({ ...prev, [fieldId]: res.data.url || res.data.file_url }));
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Error uploading file');
+    } finally {
+      setUploadingFile(null);
+    }
+  };
+  
+  // Submit order
+  const handleSubmitOrder = async () => {
+    if (selectedBooksList.length === 0) {
+      toast.error(t.selectAtLeastOne);
+      return;
+    }
+    
+    setSubmitting(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/direct`,
+        {
+          student_id: selectedStudent.student_id || selectedStudent.sync_id,
+          books: selectedBooksList.map(b => ({
+            book_id: b.book_id,
+            quantity: 1,
+            price: b.price
+          })),
+          form_data: formData
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(t.orderSuccess);
+      setSelectedBooks({});
+      setFormData({});
+      setUploadedFiles({});
+    } catch (error) {
+      console.error('Order error:', error);
+      toast.error(error.response?.data?.detail || t.orderError);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
+  // Not logged in
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+          <ChevronLeft className="h-4 w-4" />
+          {t.back}
+        </Button>
+        
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2 sm:p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50">
+              <GraduationCap className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold">{t.title}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">{t.subtitle}</p>
+            </div>
           </div>
         </div>
-      </div>
-      
-      {/* Content based on state */}
-      {!isAuthenticated ? (
-        // Not logged in - show login prompt
+        
         <Card className="border-dashed">
-          <CardContent className="py-12 text-center">
-            <Lock className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-            <h3 className="font-semibold text-lg mb-2">{t.loginRequired}</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+          <CardContent className="py-8 sm:py-12 text-center">
+            <Lock className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="font-semibold text-base sm:text-lg mb-2">{t.loginRequired}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
               {storeConfig?.textbooks_login_message?.[lang] || t.loginMessage}
             </p>
             <Button onClick={() => window.location.href = '/login'}>
@@ -1046,8 +1199,294 @@ function SchoolTextbooksView({
             </Button>
           </CardContent>
         </Card>
-      ) : !hasAccess || validatedStudents.length === 0 ? (
-        // No validated students - show prompt
+      </div>
+    );
+  }
+  
+  // No validated students
+  if (!hasAccess || validatedStudents.length === 0) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+          <ChevronLeft className="h-4 w-4" />
+          {t.back}
+        </Button>
+        
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2 sm:p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50">
+              <GraduationCap className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold">{t.title}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">{t.subtitle}</p>
+            </div>
+          </div>
+        </div>
+        
+        <Card className="border-dashed">
+          <CardContent className="py-8 sm:py-12 text-center">
+            <Users className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="font-semibold text-base sm:text-lg mb-2">{t.noValidatedStudents}</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-6">{t.noValidatedStudentsDesc}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={() => navigate('/my-account?tab=students')} variant="outline">
+                {t.goToMyStudents}
+              </Button>
+              <Button onClick={onLinkStudent}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                {t.linkStudentBtn}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  // Has validated students - show tabs with textbooks
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Back Button */}
+      <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+        <ChevronLeft className="h-4 w-4" />
+        {t.back}
+      </Button>
+      
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-3 sm:p-4 border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/50">
+              <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold">{t.title}</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{t.subtitle}</p>
+            </div>
+          </div>
+          <Button variant="outline" size="sm" onClick={onLinkStudent} className="shrink-0 text-xs sm:text-sm">
+            <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+            <span className="hidden sm:inline">{t.linkStudentBtn}</span>
+          </Button>
+        </div>
+      </div>
+      
+      {/* Student Tabs - Horizontal Scrollable */}
+      <div className="relative">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent -mx-1 px-1">
+          {validatedStudents.map((student, index) => (
+            <button
+              key={student.student_id || student.sync_id}
+              onClick={() => setSelectedStudentIndex(index)}
+              className={`
+                flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 transition-all whitespace-nowrap shrink-0
+                ${selectedStudentIndex === index 
+                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' 
+                  : 'border-transparent bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground'
+                }
+              `}
+            >
+              <div className={`p-1.5 rounded-full ${selectedStudentIndex === index ? 'bg-purple-200 dark:bg-purple-800' : 'bg-muted'}`}>
+                <User className="h-3 w-3 sm:h-4 sm:w-4" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[150px]">
+                  {student.name || student.full_name}
+                </p>
+                <p className="text-[10px] sm:text-xs opacity-70">
+                  {t.grade} {student.grade}
+                </p>
+              </div>
+              {selectedStudentIndex === index && (
+                <CheckCircle className="h-4 w-4 text-purple-600 ml-1" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Selected Student Info + Textbooks */}
+      {selectedStudent && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Textbooks List - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2 space-y-4">
+            <Card>
+              <CardHeader className="py-3 px-4 border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-purple-600" />
+                    <CardTitle className="text-base sm:text-lg">
+                      {t.availableBooks} ({textbooks.length})
+                    </CardTitle>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {selectedStudent.school_name || 'School'}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {loadingTextbooks ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                    <span className="ml-2 text-muted-foreground">{t.loadingBooks}</span>
+                  </div>
+                ) : textbooks.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+                    <p className="text-muted-foreground">{t.noBooks}</p>
+                  </div>
+                ) : (
+                  <div className="divide-y max-h-[400px] sm:max-h-[500px] overflow-y-auto">
+                    {textbooks.map((book) => (
+                      <label
+                        key={book.book_id}
+                        className={`
+                          flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer hover:bg-muted/50 transition-colors
+                          ${selectedBooks[book.book_id] ? 'bg-purple-50 dark:bg-purple-900/20' : ''}
+                        `}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={!!selectedBooks[book.book_id]}
+                          onChange={() => toggleBook(book.book_id)}
+                          className="h-4 w-4 sm:h-5 sm:w-5 rounded border-2 text-purple-600 focus:ring-purple-500"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm sm:text-base truncate">{book.name}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {book.publisher && `${book.publisher} • `}{book.code || book.isbn}
+                          </p>
+                        </div>
+                        <span className="font-bold text-sm sm:text-base text-purple-600 shrink-0">
+                          ${book.price?.toFixed(2) || '0.00'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Order Summary + Form - 1 column */}
+          <div className="space-y-4">
+            {/* Order Summary */}
+            <Card className="border-purple-200 dark:border-purple-800">
+              <CardHeader className="py-3 px-4 bg-purple-50 dark:bg-purple-900/20 border-b">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4" />
+                  {selectedBooksList.length} {t.selectedCount}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                {selectedBooksList.length > 0 ? (
+                  <div className="space-y-2 mb-4">
+                    {selectedBooksList.map(book => (
+                      <div key={book.book_id} className="flex justify-between text-sm">
+                        <span className="truncate mr-2">{book.name}</span>
+                        <span className="shrink-0">${book.price?.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {lang === 'es' ? 'Selecciona textos de la lista' : 'Select textbooks from the list'}
+                  </p>
+                )}
+                <div className="border-t pt-3 flex justify-between items-center font-bold">
+                  <span>{t.total}:</span>
+                  <span className="text-lg text-purple-600">${totalPrice.toFixed(2)}</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Additional Form Fields */}
+            {formFields.length > 0 && (
+              <Card>
+                <CardHeader className="py-3 px-4 border-b">
+                  <CardTitle className="text-sm">{t.additionalInfo}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  {formFields.map(field => (
+                    <div key={field.field_id} className="space-y-2">
+                      <Label className="text-xs sm:text-sm">
+                        {field.label?.[lang] || field.label?.es || field.name}
+                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                      </Label>
+                      
+                      {field.type === 'text' && (
+                        <Input
+                          value={formData[field.field_id] || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
+                          placeholder={field.placeholder?.[lang] || ''}
+                          className="text-sm"
+                        />
+                      )}
+                      
+                      {field.type === 'textarea' && (
+                        <textarea
+                          value={formData[field.field_id] || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, [field.field_id]: e.target.value }))}
+                          placeholder={field.placeholder?.[lang] || ''}
+                          className="w-full px-3 py-2 text-sm border rounded-md resize-none"
+                          rows={3}
+                        />
+                      )}
+                      
+                      {field.type === 'file' && (
+                        <div className="space-y-2">
+                          <Input
+                            type="file"
+                            onChange={(e) => handleFileUpload(field.field_id, e.target.files?.[0])}
+                            disabled={uploadingFile === field.field_id}
+                            className="text-xs"
+                          />
+                          {uploadingFile === field.field_id && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              Uploading...
+                            </p>
+                          )}
+                          {uploadedFiles[field.field_id] && (
+                            <p className="text-xs text-green-600 flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              File uploaded
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {field.type === 'info' && (
+                        <div className="bg-muted/50 rounded-md p-3 text-xs">
+                          <p className="whitespace-pre-wrap">{field.content?.[lang] || field.content?.es}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Submit Button */}
+            <Button
+              onClick={handleSubmitOrder}
+              disabled={submitting || selectedBooksList.length === 0}
+              className="w-full gap-2 bg-purple-600 hover:bg-purple-700"
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+              {t.submitOrder}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Users className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
