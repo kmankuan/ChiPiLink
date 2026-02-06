@@ -647,27 +647,27 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                       
                       return (
                         <tr key={p.book_id} className="group border-b hover:bg-muted/30">
-                          <td className="sticky left-0 z-10 bg-background border-r p-1">
+                          <td className="sticky left-0 z-10 bg-background border-r p-1" style={{ minWidth: '250px' }}>
                             <EditableCell
                               value={p.name}
                               onSave={(val) => updateProductField(p.book_id, 'name', val)}
                               className="font-medium"
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ minWidth: '100px' }}>
                             <EditableCell
                               value={p.code}
                               onSave={(val) => updateProductField(p.book_id, 'code', val)}
                               className="font-mono text-sm"
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ minWidth: '80px' }}>
                             <EditableCell
                               value={p.grade}
                               onSave={(val) => updateProductField(p.book_id, 'grade', val)}
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ minWidth: '120px' }}>
                             <EditableCell
                               value={p.subject}
                               onSave={(val) => updateProductField(p.book_id, 'subject', val)}
