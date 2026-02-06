@@ -564,6 +564,7 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
               onOrderTextbooks={handleOrderTextbooks}
               onViewOrders={handleViewOrders}
               onRetry={handleRetry}
+              onEditProfile={handleEditProfile}
             />
           ))}
           <AddStudentCard t={t} onClick={() => setDialogOpen(true)} />
