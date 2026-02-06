@@ -140,7 +140,7 @@ async def update_config(
 
 
 @router.post("/admin/reset", response_model=StoreConfigResponse)
-async def reset_config(current_user: dict = Depends(require_admin)):
+async def reset_config(current_user: dict = Depends(get_admin_user)):
     """Reset store configuration to defaults (admin only)"""
     db = get_database()
     
