@@ -132,6 +132,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         subject: formData.subject,
         price: parseFloat(formData.price),
         sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
+        inventory_quantity: formData.inventory_quantity ? parseInt(formData.inventory_quantity) : 0,
         description: formData.description,
         image_url: formData.image_url,
         active: formData.active,
