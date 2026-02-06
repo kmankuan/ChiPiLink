@@ -30,7 +30,9 @@ import {
   UserPlus,
   Users,
   CheckCircle,
-  FileText
+  FileText,
+  Package,
+  Send
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 import CategoryLanding from '@/components/store/CategoryLanding';
