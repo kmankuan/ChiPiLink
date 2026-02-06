@@ -199,10 +199,6 @@ async def toggle_featured(
     except Exception as e:
         logger.error(f"Error toggling featured for {book_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    )
-    if not product:
-        raise HTTPException(status_code=404, detail="Producto not found")
-    return {"success": True}
 
 
 @router.put("/{book_id}/promotion")
@@ -212,11 +208,12 @@ async def toggle_promotion(
     sale_price: Optional[float] = None,
     admin: dict = Depends(get_admin_user)
 ):
-    """Marcar/desmarcar producto en promotion (solo admin)"""
-    product = await product_service.update_product(
-        book_id,
-        ProductUpdate(on_sale=on_sale, sale_price=sale_price)
-    )
-    if not product:
+    """Toggle product promotion status (admin only)"""
+    try:
+        product = await product_service.update_product(
+            book_id,
+            ProductUpdate(on_sale=on_sale, sale_price=sale_price)
+        )
+        if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
     return {"success": True}
