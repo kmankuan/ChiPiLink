@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -10,13 +10,75 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import {
-  BookOpen, Plus, Search, Loader2, RefreshCw, Settings, Trash2, CheckCircle2, AlertCircle, Upload, Download
+  BookOpen, Plus, Search, Loader2, RefreshCw, Settings, Trash2, CheckCircle2, AlertCircle, Upload, Download, Check, X, Package
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-export default function CatalogoPrivadoTab({ token, onRefresh }) {
+// Inline editable cell component
+function EditableCell({ value, onSave, type = 'text', className = '' }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (editValue === value) {
+      setIsEditing(false);
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      await onSave(type === 'number' ? parseFloat(editValue) || 0 : editValue);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Save error:', error);
+      setEditValue(value); // Reset on error
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setEditValue(value);
+      setIsEditing(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1">
+        <Input
+          type={type}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleSave}
+          autoFocus
+          className="h-8 w-full min-w-[60px]"
+          disabled={saving}
+        />
+        {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={() => setIsEditing(true)}
+      className={`cursor-pointer hover:bg-muted/50 px-2 py-1 rounded transition-colors min-h-[32px] flex items-center ${className}`}
+      title="Click to edit"
+    >
+      {value || <span className="text-muted-foreground italic">-</span>}
+    </div>
+  );
+}
+
+export default function PrivateCatalogTab({ token, onRefresh }) {
   const navigate = useNavigate();
   const { t: translate } = useTranslation();
   const [products, setProducts] = useState([]);
@@ -85,6 +147,38 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       (p.subject || '')?.toLowerCase().includes(term)
     );
   });
+
+  // Inline update function
+  const updateProductField = useCallback(async (bookId, field, value) => {
+    try {
+      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${bookId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ [field]: value })
+      });
+
+      const data = await response.json();
+      
+      if (data.success || response.ok) {
+        // Update local state
+        setProducts(prev => prev.map(p => 
+          p.book_id === bookId ? { ...p, [field]: value } : p
+        ));
+        toast.success('Updated');
+        onRefresh?.();
+      } else {
+        toast.error(data.detail || 'Error updating');
+        throw new Error('Update failed');
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+      toast.error('Error updating');
+      throw error;
+    }
+  }, [token, onRefresh]);
 
   const handleOpenForm = (product = null) => {
     if (product) {
@@ -158,7 +252,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
 
       const data = await response.json();
       
-      if (data.success) {
+      if (data.success || response.ok) {
         toast.success(editingProduct ? 'Product updated' : 'Product created');
         setShowForm(false);
         fetchProducts();
@@ -194,14 +288,26 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
   };
 
   const GRADE_OPTIONS = [
-    'Pre-Kinder', 'Kinder', '1st', '2nd', '3rd', '4th', '5th', '6th',
-    '7th', '8th', '9th', '10th', '11th', '12th'
+    'Pre-Kinder', 'Kinder', 'K3', 'K4', 'K5', 'G1', 'G2', 'G3', 'G4', 'G5', 'G6',
+    'G7', 'G8', 'G9', 'G10', 'G11', 'G12',
+    '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'
   ];
 
   const SUBJECT_OPTIONS = [
     'Mathematics', 'Spanish', 'English', 'Natural Sciences', 'Social Sciences',
     'Religion', 'Art', 'Music', 'Physical Education', 'Technology', 'Others'
   ];
+
+  // Calculate stats
+  const totalStock = products.reduce((sum, p) => sum + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0);
+  const lowStockCount = products.filter(p => {
+    const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+    return stock > 0 && stock < 5;
+  }).length;
+  const outOfStockCount = products.filter(p => {
+    const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+    return stock <= 0;
+  }).length;
 
   if (loading) {
     return (
@@ -216,7 +322,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       {/* Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
                 <BookOpen className="h-5 w-5 text-white" />
@@ -224,11 +330,11 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               <div>
                 <CardTitle>Private Catalog - PCA</CardTitle>
                 <CardDescription>
-                  Textbooks for linked Panama Christian Academy students
+                  Textbooks for linked Panama Christian Academy students • Click any cell to edit
                 </CardDescription>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 {translate('common.refresh', 'Refresh')}
@@ -285,7 +391,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       </Card>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-6">
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{products.length}</div>
@@ -300,10 +406,20 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">
-              {products.reduce((sum, p) => sum + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0)}
-            </div>
+            <div className="text-2xl font-bold text-green-600">{totalStock}</div>
             <p className="text-xs text-muted-foreground">Total Stock</p>
+          </CardContent>
+        </Card>
+        <Card className={lowStockCount > 0 ? 'border-amber-300' : ''}>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-amber-600">{lowStockCount}</div>
+            <p className="text-xs text-muted-foreground">Low Stock</p>
+          </CardContent>
+        </Card>
+        <Card className={outOfStockCount > 0 ? 'border-red-300' : ''}>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-red-600">{outOfStockCount}</div>
+            <p className="text-xs text-muted-foreground">Out of Stock</p>
           </CardContent>
         </Card>
         <Card>
@@ -312,23 +428,14 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
             <p className="text-xs text-muted-foreground">Grades</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{filters.subjects.length}</div>
-            <p className="text-xs text-muted-foreground">Subjects</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Info Banner */}
-      <Card className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
-        <CardContent className="py-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5" />
-            <div className="text-sm text-purple-700 dark:text-purple-300">
-              <p className="font-medium">Private Catalog PCA</p>
-              <p>Only customers with linked PCA students can view and purchase these books from the Unatienda store.</p>
-            </div>
+      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+        <CardContent className="py-3">
+          <div className="flex items-center gap-3 text-sm text-blue-700 dark:text-blue-300">
+            <AlertCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
+            <p><strong>Tip:</strong> Click directly on any cell (Name, Code, Price, Stock, etc.) to edit it inline. Changes save automatically.</p>
           </div>
         </CardContent>
       </Card>
@@ -347,19 +454,24 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <ScrollArea className="h-[400px]">
+            <ScrollArea className="h-[500px]">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Book</TableHead>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Publisher</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-center">Stock</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[250px]">Book Name</TableHead>
+                    <TableHead className="w-[100px]">Code</TableHead>
+                    <TableHead className="w-[80px]">Grade</TableHead>
+                    <TableHead className="w-[120px]">Subject</TableHead>
+                    <TableHead className="w-[120px]">Publisher</TableHead>
+                    <TableHead className="w-[90px] text-right">Price</TableHead>
+                    <TableHead className="w-[80px] text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Package className="h-4 w-4" />
+                        Stock
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[80px]">Status</TableHead>
+                    <TableHead className="w-[60px] text-right">Del</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -369,69 +481,90 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                     const isOutOfStock = stock <= 0;
                     
                     return (
-                    <TableRow key={p.book_id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          {p.image_url ? (
-                            <img src={p.image_url} alt="" className="w-10 h-10 object-cover rounded" />
-                          ) : (
-                            <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                              <BookOpen className="h-5 w-5 text-muted-foreground" />
-                            </div>
-                          )}
-                          <div>
-                            <p className="font-medium line-clamp-1">{p.name}</p>
-                            {p.isbn && <p className="text-xs text-muted-foreground">ISBN: {p.isbn}</p>}
+                      <TableRow key={p.book_id} className="group">
+                        <TableCell className="p-1">
+                          <EditableCell
+                            value={p.name}
+                            onSave={(val) => updateProductField(p.book_id, 'name', val)}
+                            className="font-medium"
+                          />
+                        </TableCell>
+                        <TableCell className="p-1">
+                          <EditableCell
+                            value={p.code}
+                            onSave={(val) => updateProductField(p.book_id, 'code', val)}
+                            className="font-mono text-sm"
+                          />
+                        </TableCell>
+                        <TableCell className="p-1">
+                          <EditableCell
+                            value={p.grade}
+                            onSave={(val) => updateProductField(p.book_id, 'grade', val)}
+                          />
+                        </TableCell>
+                        <TableCell className="p-1">
+                          <EditableCell
+                            value={p.subject}
+                            onSave={(val) => updateProductField(p.book_id, 'subject', val)}
+                          />
+                        </TableCell>
+                        <TableCell className="p-1">
+                          <EditableCell
+                            value={p.publisher}
+                            onSave={(val) => updateProductField(p.book_id, 'publisher', val)}
+                          />
+                        </TableCell>
+                        <TableCell className="p-1 text-right">
+                          <EditableCell
+                            value={p.price?.toFixed(2) || '0.00'}
+                            onSave={(val) => updateProductField(p.book_id, 'price', parseFloat(val) || 0)}
+                            type="number"
+                            className="justify-end font-medium"
+                          />
+                        </TableCell>
+                        <TableCell className="p-1 text-center">
+                          <div 
+                            className={`
+                              cursor-pointer rounded px-2 py-1 text-center font-semibold
+                              ${isOutOfStock ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 
+                                isLowStock ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 
+                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}
+                              hover:ring-2 hover:ring-primary/50 transition-all
+                            `}
+                            onClick={() => {
+                              const newQty = prompt('Enter new stock quantity:', p.inventory_quantity || 0);
+                              if (newQty !== null && !isNaN(parseInt(newQty))) {
+                                updateProductField(p.book_id, 'inventory_quantity', parseInt(newQty));
+                              }
+                            }}
+                            title="Click to edit stock"
+                          >
+                            {p.inventory_quantity || 0}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">{p.code}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{p.grade}</Badge>
-                      </TableCell>
-                      <TableCell>{p.subject}</TableCell>
-                      <TableCell>{p.publisher}</TableCell>
-                      <TableCell className="text-right">
-                        {p.sale_price ? (
-                          <div>
-                            <span className="text-green-600 font-medium">${p.sale_price.toFixed(2)}</span>
-                            <span className="text-xs text-muted-foreground line-through ml-1">${p.price?.toFixed(2)}</span>
-                          </div>
-                        ) : (
-                          <span className="font-medium">${p.price?.toFixed(2)}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge 
-                          variant={isOutOfStock ? "destructive" : isLowStock ? "warning" : "outline"}
-                          className={isLowStock ? "bg-amber-100 text-amber-800 border-amber-300" : ""}
-                        >
-                          {stock}
-                        </Badge>
-                        {isLowStock && (
-                          <p className="text-xs text-amber-600 mt-1">Low</p>
-                        )}
-                        {isOutOfStock && (
-                          <p className="text-xs text-red-600 mt-1">Out</p>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={p.active !== false ? "default" : "secondary"}>
-                          {p.active !== false ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => handleOpenForm(p)}>
-                            <Settings className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleDelete(p.book_id)}>
+                        </TableCell>
+                        <TableCell className="p-1">
+                          <Badge 
+                            variant={p.active !== false ? "default" : "secondary"}
+                            className="cursor-pointer"
+                            onClick={() => updateProductField(p.book_id, 'active', p.active === false)}
+                            title="Click to toggle"
+                          >
+                            {p.active !== false ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="p-1 text-right">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            onClick={() => handleDelete(p.book_id)}
+                            className="opacity-50 group-hover:opacity-100"
+                          >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )})}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </ScrollArea>
@@ -439,7 +572,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         </Card>
       )}
 
-      {/* Form Dialog */}
+      {/* Form Dialog - For creating new products */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
