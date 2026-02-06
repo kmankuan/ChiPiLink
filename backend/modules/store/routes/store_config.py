@@ -102,7 +102,7 @@ async def get_admin_config(current_user: dict = Depends(get_admin_user)):
 @router.put("/admin", response_model=StoreConfigResponse)
 async def update_config(
     update: StoreConfigUpdate,
-    current_user: dict = Depends(require_admin)
+    current_user: dict = Depends(get_admin_user)
 ):
     """Update store configuration (admin only)"""
     db = get_database()
