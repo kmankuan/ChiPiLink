@@ -167,9 +167,9 @@ export default function AccountDashboard() {
               <Zap className="h-4 w-4" />
               <span className="hidden sm:inline">{t('account.capacities')}</span>
             </TabsTrigger>
-            <TabsTrigger value="exclusive" data-testid="exclusive-tab" className="gap-1 text-xs sm:text-sm">
+            <TabsTrigger value="students" data-testid="students-tab" className="gap-1 text-xs sm:text-sm">
               <GraduationCap className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('account.exclusive', 'Students')}</span>
+              <span className="hidden sm:inline">{t('account.students', 'Students')}</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" data-testid="notifications-tab" className="gap-1 text-xs sm:text-sm">
               <Bell className="h-4 w-4" />
