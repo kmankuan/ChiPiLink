@@ -9,65 +9,70 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 ├── backend/          # FastAPI + MongoDB
 │   ├── modules/
 │   │   ├── auth/     # Authentication (LaoPan OAuth + Admin login)
-│   │   ├── store/    # Products, Orders, Private Catalog, Textbook Orders
+│   │   ├── store/    # Products, Orders, Private Catalog, Textbook Orders, School Year
 │   │   ├── admin/    # Admin routes, migrations
 │   │   └── pinpanclub/ # Tournament system
 │   └── core/         # Base repository, auth middleware
 └── frontend/         # React + Tailwind + Shadcn UI
-    ├── modules/      # Feature modules (account, admin, unatienda, pinpanclub)
-    └── pages/        # Main pages (Unatienda.jsx, Login.jsx, etc.)
+    ├── modules/
+    │   ├── admin/store/  # TextbookOrdersAdminTab (reorder approval)
+    │   ├── unatienda/
+    │   │   ├── tabs/
+    │   │   │   ├── SchoolYearTab.jsx  # NEW - School year config
+    │   │   │   ├── StudentsTab.jsx    # ENHANCED - Lock/unlock profiles
+    │   │   │   └── ...other tabs
+    │   │   └── UnatiendaModule.jsx
+    │   └── ...
+    └── pages/
+        └── Unatienda.jsx  # SchoolTextbooksView with reorder request
 ```
 
 ## What's Been Implemented
 
-### February 6, 2026 (Latest Session)
+### February 6, 2026 — Session 2
 
-**Textbook Ordering Flow Redesign (P0):**
+**Feature 1: Re-order Request Flow (Client-side)**
+- Locked textbook items now show "Purchased · Request Reorder" link
+- Clicking opens a bottom sheet (mobile-first) with reason textarea
+- Submits via POST /textbook-orders/{order_id}/reorder/{book_id}
+- After request: item shows amber clock icon + "Reorden pendiente"
+- Admin sees pending requests in TextbookOrdersAdminTab
+
+**Feature 2: Admin School Year Configuration Tab**
+- New SchoolYearTab in Unatienda admin module
+- Status cards: Current Year, Next Year, Enrollment Status
+- Config form: Calendar Type, School Year, Enrollment Start Month/Day
+- Auto-Enrollment toggle with months-before-year-end setting
+- Manual auto-enrollment trigger with confirmation dialog
+
+**Feature 3: Admin Student Profile Lock/Unlock**
+- Enhanced StudentsTab showing 20 students in table
+- Stats: Total Students, Locked Profiles, Active Grades
+- Search by name/student ID
+- Lock/Unlock buttons with confirmation dialogs
+- View detail dialog showing enrollments
+- Unlock includes optional reason field
+
+### February 6, 2026 — Session 1
+- Fixed 6 textbook flow bugs (routes, imports, grade format)
 - Redesigned SchoolTextbooksView with order-aware item statuses
-- Items show as LOCKED (green check + "Comprado") when already purchased
-- Items show as AVAILABLE (checkbox) when not yet ordered
-- Order status now correctly set to "submitted" after any submission (was "draft")
-- Progress indicator: "X de Y comprado" with total purchased amount
-- Sticky bottom submit bar only appears when items are available to order
-- Mobile-first design: compact layout, truncated tabs, single-column items
+- Items show LOCKED (purchased) or AVAILABLE (checkbox)
+- Order status correctly "submitted" after any submission
 
-**Bug Fixes:**
-- Fixed missing Package/Send lucide-react imports
-- Fixed frontend route: /textbook-orders/direct → /textbook-orders/submit
-- Fixed frontend field: books → items in order submission payload
-- Fixed frontend URL: /products-by-grade/ → /by-grade/
-- Fixed backend grade format: handles both "3" and "G3"
-- Fixed form config URL: /order-form-config/client → /order-form-config/fields
-
-**Business Rules Implemented:**
+## Business Rules
 1. Each textbook item can only be ordered ONCE per student
-2. Ordered items are LOCKED and shown as "Purchased" (not selectable)
-3. Parents can buy partial textbooks and return later for remaining ones
-4. Locked items prevent accidental duplicate orders
-5. Re-order flow: student requests → admin approves → item unlocks
-
-### Previous Sessions
-- Exclusive Purchase Flow with horizontal student tabs
-- Quick Reject Workflow, PCA Table improvements
-- Reports & Analytics, Private Catalog inline editing
-- Fullscreen mode, sticky headers
+2. Ordered items are LOCKED — shown as "Purchased", not selectable
+3. Parents can buy partial textbooks and return for remaining ones
+4. To re-buy a locked item: Request Reorder → Admin Approves → Item unlocks
+5. Locked profiles prevent parents from editing student info
 
 ## Known Issues
-
-### Resolved This Session
-- ~~Order stays "Draft" after submission~~ → Fixed: now "Submitted"
-- ~~Order submission fails for new students~~ → Fixed: route + field mismatch
-- ~~Textbooks don't load by grade~~ → Fixed: grade format + URL path
-
-### Remaining (Lower Priority)
-- P3: Admin Sidebar occasionally disappears (tested OK this session)
+- P3: Admin Sidebar occasionally disappears (tested OK both sessions)
 - P4: Google Sign-Up OAuth flow broken (long-standing)
-- Minor: React key console warning in Unatienda.jsx
 
 ## Upcoming Tasks
-1. Admin UI for school year automation & student profile locking
-2. OneSignal push notifications for order status
-3. Re-order request flow (student requests, admin approves)
+1. OneSignal push notifications for order status changes
+2. User-facing student profile form: disable fields when locked
 
 ## Future/Backlog
 - Stripe payment, Google Sheets API, landing page templates
@@ -80,7 +85,16 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 - GET /api/store/private-catalog/by-grade/{grade}
 - GET /api/store/textbook-orders/student/{student_id}
 - POST /api/store/textbook-orders/submit
-- GET /api/store/order-form-config/fields
+- POST /api/store/textbook-orders/{order_id}/reorder/{book_id}
+- GET /api/store/textbook-orders/admin/pending-reorders
+- PUT /api/store/textbook-orders/admin/{order_id}/items/{book_id}/approve-reorder
+- GET /api/store/school-year/config
+- PUT /api/store/school-year/config
+- GET /api/store/school-year/status
+- POST /api/store/school-year/trigger-auto-enrollment
+- POST /api/store/school-year/students/{id}/lock
+- POST /api/store/school-year/students/{id}/unlock
+- GET /api/store/textbook-access/admin/all-students
 
 ## Test Credentials
 - Super Admin: teck@koh.one / Acdb##0897
