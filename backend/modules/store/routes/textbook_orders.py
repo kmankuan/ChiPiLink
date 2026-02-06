@@ -412,7 +412,7 @@ async def diagnostic_textbooks(
     # 3. Get visible products (what textbook service queries)
     visible_product_list = await db.store_products.find(
         {"active": True, "is_private_catalog": True},
-        {"_id": 0, "name": 1, "grade": 1, "grades": 1}
+        {"_id": 0, "name": 1, "grade": 1, "grades": 1, "book_id": 1}
     ).to_list(50)
     result["products"]["visible_product_list"] = visible_product_list
     
@@ -494,5 +494,144 @@ async def diagnostic_textbooks(
         result["recommendations"].append("Configuration looks correct. Check browser console for API errors.")
     
     logger.info(f"[DIAGNOSTIC] Complete. Recommendations: {result['recommendations']}")
+    
+    return result
+
+
+@router.get("/admin/diagnostic/order-flow/{student_id}")
+async def diagnostic_order_flow(
+    student_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Diagnostic endpoint to debug order submission issues for a specific student.
+    """
+    from core.database import db
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    result = {
+        "student_id": student_id,
+        "student": None,
+        "enrollment": None,
+        "order": None,
+        "available_books": [],
+        "issues": []
+    }
+    
+    # 1. Find student
+    student = await db.store_students.find_one(
+        {"student_id": student_id},
+        {"_id": 0}
+    )
+    
+    if not student:
+        result["issues"].append(f"Student not found with student_id: {student_id}")
+        return result
+    
+    result["student"] = {
+        "student_id": student.get("student_id"),
+        "full_name": student.get("full_name") or student.get("nombre_completo"),
+        "user_id": student.get("user_id"),
+        "enrollments_count": len(student.get("enrollments", []))
+    }
+    
+    # 2. Check enrollment
+    current_year = 2025  # You may need to adjust this
+    enrollments = student.get("enrollments", [])
+    
+    approved_enrollment = next(
+        (e for e in enrollments if e.get("status") == "approved"),
+        None
+    )
+    
+    if not approved_enrollment:
+        result["issues"].append("No approved enrollment found for this student")
+        result["enrollment"] = {"all_enrollments": enrollments}
+        return result
+    
+    result["enrollment"] = {
+        "status": approved_enrollment.get("status"),
+        "grade": approved_enrollment.get("grade"),
+        "year": approved_enrollment.get("year"),
+        "school": approved_enrollment.get("school")
+    }
+    
+    grade = approved_enrollment.get("grade")
+    
+    # 3. Check existing order
+    order = await db.store_textbook_orders.find_one(
+        {"student_id": student_id},
+        {"_id": 0}
+    )
+    
+    if order:
+        result["order"] = {
+            "order_id": order.get("order_id"),
+            "status": order.get("status"),
+            "total_items": len(order.get("items", [])),
+            "items": [
+                {
+                    "book_id": item.get("book_id"),
+                    "book_name": item.get("book_name"),
+                    "status": item.get("status"),
+                    "quantity_ordered": item.get("quantity_ordered", 0)
+                }
+                for item in order.get("items", [])
+            ]
+        }
+        
+        # Check for issues with order items
+        for item in order.get("items", []):
+            if item.get("status") == "ordered":
+                result["issues"].append(f"Item '{item.get('book_name')}' is already ordered")
+    else:
+        result["order"] = None
+        result["issues"].append("No existing order found - will be created on first access")
+    
+    # 4. Check available books for this grade
+    # Use the same grade mapping as the service
+    grade_mappings = {
+        "1": ["1", "G1", "1st Grade", "Grade 1"],
+        "2": ["2", "G2", "2nd Grade", "Grade 2"],
+        "3": ["3", "G3", "3rd Grade", "Grade 3"],
+        "4": ["4", "G4", "4th Grade", "Grade 4"],
+        "5": ["5", "G5", "5th Grade", "Grade 5"],
+        "6": ["6", "G6", "6th Grade", "Grade 6"],
+        "G1": ["G1", "1", "1st Grade", "Grade 1"],
+        "G2": ["G2", "2", "2nd Grade", "Grade 2"],
+        "G3": ["G3", "3", "3rd Grade", "Grade 3"],
+        "G4": ["G4", "4", "4th Grade", "Grade 4"],
+        "G5": ["G5", "5", "5th Grade", "Grade 5"],
+        "G6": ["G6", "6", "6th Grade", "Grade 6"],
+    }
+    
+    grade_queries = grade_mappings.get(str(grade), [str(grade)])
+    
+    books = await db.store_products.find(
+        {
+            "active": True,
+            "is_private_catalog": True,
+            "$or": [
+                {"grade": {"$in": grade_queries}},
+                {"grades": {"$in": grade_queries}}
+            ]
+        },
+        {"_id": 0, "book_id": 1, "name": 1, "grade": 1, "grades": 1, "price": 1}
+    ).to_list(50)
+    
+    result["available_books"] = {
+        "grade_searched": grade,
+        "grade_queries_used": grade_queries,
+        "books_found": len(books),
+        "books": books
+    }
+    
+    if len(books) == 0:
+        result["issues"].append(f"No books found for grade '{grade}' (searched: {grade_queries})")
+    
+    # 5. Summary
+    if not result["issues"]:
+        result["issues"].append("No issues detected - order flow should work")
     
     return result
