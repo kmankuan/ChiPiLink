@@ -7,7 +7,7 @@ from typing import Optional
 from pydantic import BaseModel
 from datetime import datetime, timezone
 
-from core.auth.middleware import get_current_user, require_admin
+from core.auth import get_current_user, get_admin_user
 from core.database import get_database
 
 router = APIRouter(prefix="/store-config", tags=["Store - Configuration"])
