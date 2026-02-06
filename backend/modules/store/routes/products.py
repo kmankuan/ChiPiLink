@@ -15,6 +15,53 @@ router = APIRouter(prefix="/products", tags=["Store - Products"])
 logger = logging.getLogger(__name__)
 
 
+@router.get("/admin/diagnostic")
+async def diagnostic_products(
+    admin: dict = Depends(get_admin_user)
+):
+    """
+    Diagnostic endpoint to debug product loading issues.
+    Returns sample products with all field names to identify data issues.
+    """
+    try:
+        # Get raw products directly from DB to see actual field names
+        raw_products = await db.store_products.find({}).limit(5).to_list(5)
+        
+        # Convert ObjectIds to strings
+        samples = []
+        for p in raw_products:
+            p["_id"] = str(p["_id"]) if "_id" in p else None
+            samples.append(p)
+        
+        # Get field statistics
+        total = await db.store_products.count_documents({})
+        with_name = await db.store_products.count_documents({"name": {"$exists": True, "$ne": None}})
+        with_nombre = await db.store_products.count_documents({"nombre": {"$exists": True}})
+        with_active_true = await db.store_products.count_documents({"active": True})
+        with_active_false = await db.store_products.count_documents({"active": False})
+        with_activo = await db.store_products.count_documents({"activo": {"$exists": True}})
+        
+        return {
+            "total_products": total,
+            "field_counts": {
+                "has_name": with_name,
+                "has_nombre_spanish": with_nombre,
+                "active_true": with_active_true,
+                "active_false": with_active_false,
+                "has_activo_spanish": with_activo
+            },
+            "sample_products": samples,
+            "sample_field_names": list(samples[0].keys()) if samples else []
+        }
+    except Exception as e:
+        logger.error(f"Diagnostic error: {e}")
+        import traceback
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
+
 @router.get("")
 async def get_products(
     category: Optional[str] = None,
