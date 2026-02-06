@@ -183,27 +183,39 @@
 
 /* Force horizontal scrollbar visibility for tables */
 .scrollable-table-container {
-  overflow-x: auto !important;
+  overflow-x: scroll !important;
   overflow-y: auto !important;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+  /* Force scrollbar visibility on macOS */
+  scrollbar-gutter: stable;
+}
+
+/* For browsers that support it, always show scrollbars */
+@supports (overflow: overlay) {
+  .scrollable-table-container {
+    overflow-x: overlay !important;
+    overflow-y: overlay !important;
+  }
 }
 
 .scrollable-table-container::-webkit-scrollbar {
-  height: 12px;
-  width: 12px;
+  height: 14px;
+  width: 14px;
   display: block !important;
+  background: hsl(var(--muted));
 }
 
 .scrollable-table-container::-webkit-scrollbar-track {
   background: hsl(var(--muted));
-  border-radius: 6px;
+  border-radius: 7px;
 }
 
 .scrollable-table-container::-webkit-scrollbar-thumb {
   background: hsl(var(--muted-foreground) / 0.4);
-  border-radius: 6px;
-  border: 2px solid hsl(var(--muted));
+  border-radius: 7px;
+  border: 3px solid hsl(var(--muted));
+  min-height: 40px;
 }
 
 .scrollable-table-container::-webkit-scrollbar-thumb:hover {
