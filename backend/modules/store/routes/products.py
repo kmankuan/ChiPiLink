@@ -63,61 +63,93 @@ async def get_promotional_products(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/newest", response_model=List[Product])
+@router.get("/newest")
 async def get_newest_products(
     category: Optional[str] = None,
     limit: int = Query(8, ge=1, le=50)
 ):
-    """Get productos more nuevos"""
-    return await product_service.get_newest_products(category, limit)
+    """Get newest products"""
+    try:
+        return await product_service.get_newest_products(category, limit)
+    except Exception as e:
+        logger.error(f"Error fetching newest products: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/search")
 async def search_products(q: str = Query(..., min_length=2)):
-    """Search productos by name o description"""
-    return await product_service.search_products(q)
+    """Search products by name or description"""
+    try:
+        return await product_service.search_products(q)
+    except Exception as e:
+        logger.error(f"Error searching products: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/grades")
 async def get_available_grades():
     """Get available grades for filtering"""
-    grades_list = await db.store_products.distinct("grade", {"active": True})
-    return {"grades": sorted([g for g in grades_list if g])}
+    try:
+        # Check both 'grade' and 'grado' fields for backward compatibility
+        grades_list = await db.store_products.distinct("grade", {"active": True})
+        if not grades_list:
+            grades_list = await db.store_products.distinct("grado", {"activo": True})
+        return {"grades": sorted([g for g in grades_list if g])}
+    except Exception as e:
+        logger.error(f"Error fetching grades: {e}")
+        return {"grades": []}
 
 
 @router.get("/subjects")
 async def get_available_subjects():
     """Get available subjects for filtering"""
-    subjects_list = await db.store_products.distinct("subject", {"active": True})
-    return {"subjects": sorted([s for s in subjects_list if s])}
+    try:
+        subjects_list = await db.store_products.distinct("subject", {"active": True})
+        if not subjects_list:
+            subjects_list = await db.store_products.distinct("materia", {"activo": True})
+        return {"subjects": sorted([s for s in subjects_list if s])}
+    except Exception as e:
+        logger.error(f"Error fetching subjects: {e}")
+        return {"subjects": []}
 
 
-@router.get("/{book_id}", response_model=Product)
+@router.get("/{book_id}")
 async def get_product(book_id: str):
-    """Get producto by ID"""
-    product = await product_service.get_product(book_id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Producto not found")
-    return product
+    """Get product by ID"""
+    try:
+        product = await product_service.get_product(book_id)
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching product {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("", response_model=Product)
+@router.post("")
 async def create_product(
     data: ProductCreate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Create nuevo producto (solo admin)"""
-    return await product_service.create_product(data)
+    """Create new product (admin only)"""
+    try:
+        return await product_service.create_product(data)
+    except Exception as e:
+        logger.error(f"Error creating product: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{book_id}", response_model=Product)
+@router.put("/{book_id}")
 async def update_product(
     book_id: str,
     data: ProductUpdate,
     admin: dict = Depends(get_admin_user)
 ):
-    """Update producto (solo admin)"""
-    product = await product_service.update_product(book_id, data)
+    """Update product (admin only)"""
+    try:
+        product = await product_service.update_product(book_id, data)
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
     return product
