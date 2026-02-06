@@ -79,7 +79,7 @@ async def get_public_config():
 
 
 @router.get("/admin", response_model=StoreConfigResponse)
-async def get_admin_config(current_user: dict = Depends(require_admin)):
+async def get_admin_config(current_user: dict = Depends(get_admin_user)):
     """Get full store configuration (admin only)"""
     db = get_database()
     
