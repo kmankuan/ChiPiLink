@@ -163,10 +163,10 @@ const categoryIcons = {
 };
 
 // Compra Exclusiva Section Component - Student-centered view
-function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess }) {
+function CompraExclusivaSection({ privateCatalogAccess, selectedStudentId, onBack, onRefreshAccess }) {
   const { token } = useAuth();
   const { t, i18n } = useTranslation();
-  const [view, setView] = useState('students'); // 'students', 'textbooks', 'linking'
+  const [view, setView] = useState(selectedStudentId ? 'textbooks' : 'students'); // 'students', 'textbooks', 'linking'
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentOrders, setStudentOrders] = useState({});
   const [textbooks, setTextbooks] = useState([]);
@@ -185,6 +185,18 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
   // Get current language - use i18n translations with fallback to inline
   const lang = i18n.language || 'es';
   const te = exclusivaTranslations[lang] || exclusivaTranslations.es;
+  
+  // Auto-select student if selectedStudentId is provided
+  useEffect(() => {
+    if (selectedStudentId && privateCatalogAccess?.students) {
+      const student = privateCatalogAccess.students.find(
+        s => s.student_id === selectedStudentId || s.sync_id === selectedStudentId
+      );
+      if (student) {
+        handleViewTextbooks(student);
+      }
+    }
+  }, [selectedStudentId, privateCatalogAccess]);
 
   // Fetch form fields configuration
   useEffect(() => {
