@@ -29,39 +29,29 @@ const DEFAULT_COLUMN_WIDTHS = {
 
 // Resizable column header component
 function ResizableHeader({ children, columnKey, width, onResize, isSticky = false, className = '' }) {
-  const [isResizing, setIsResizing] = useState(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
-
-  const handleMouseMove = useCallback((e) => {
-    const diff = e.clientX - startXRef.current;
-    const newWidth = Math.max(50, startWidthRef.current + diff);
-    onResize(columnKey, newWidth);
-  }, [columnKey, onResize]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsResizing(true);
     startXRef.current = e.clientX;
     startWidthRef.current = width;
     
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
+    const handleMouseMove = (moveEvent) => {
+      const diff = moveEvent.clientX - startXRef.current;
+      const newWidth = Math.max(50, startWidthRef.current + diff);
+      onResize(columnKey, newWidth);
+    };
 
-  useEffect(() => {
-    return () => {
+    const handleMouseUp = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [handleMouseMove, handleMouseUp]);
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
 
   return (
     <th
@@ -73,11 +63,11 @@ function ResizableHeader({ children, columnKey, width, onResize, isSticky = fals
       </div>
       {/* Resize handle */}
       <div
-        className={`absolute right-0 top-0 h-full w-3 cursor-col-resize group flex items-center justify-center hover:bg-primary/20 ${isResizing ? 'bg-primary/30' : ''}`}
+        className="absolute right-0 top-0 h-full w-3 cursor-col-resize group flex items-center justify-center hover:bg-primary/20 active:bg-primary/30"
         onMouseDown={handleMouseDown}
         title="Drag to resize"
       >
-        <div className={`w-0.5 h-4 bg-border group-hover:bg-primary ${isResizing ? 'bg-primary' : ''}`} />
+        <div className="w-0.5 h-4 bg-border group-hover:bg-primary" />
       </div>
     </th>
   );
