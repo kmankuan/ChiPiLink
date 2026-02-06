@@ -605,24 +605,32 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[500px] overflow-auto relative">
-                <table className="w-full border-collapse min-w-[1100px]">
+              <div 
+                className="h-[500px] overflow-scroll relative"
+                style={{ 
+                  overflowX: 'scroll',
+                  overflowY: 'scroll',
+                  scrollbarWidth: 'auto',
+                  WebkitOverflowScrolling: 'touch'
+                }}
+              >
+                <table className="w-full border-collapse" style={{ minWidth: '1200px' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
-                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r w-[250px]">Book Name</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[100px]">Code</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[80px]">Grade</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[120px]">Subject</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[120px]">Publisher</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[90px]">Price</th>
-                      <th className="px-3 py-2 text-center text-sm font-medium border-b w-[80px]">
+                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '250px', minWidth: '250px' }}>Book Name</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Code</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '80px', minWidth: '80px' }}>Grade</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '120px', minWidth: '120px' }}>Subject</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '120px', minWidth: '120px' }}>Publisher</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Price</th>
+                      <th className="px-3 py-2 text-center text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>
                         <div className="flex items-center justify-center gap-1">
                           <Package className="h-4 w-4" />
                           Stock
                         </div>
                       </th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[80px]">Status</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[60px]">Del</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '90px', minWidth: '90px' }}>Status</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '70px', minWidth: '70px' }}>Del</th>
                     </tr>
                   </thead>
                   <tbody>
