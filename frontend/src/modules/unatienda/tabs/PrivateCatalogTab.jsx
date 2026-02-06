@@ -456,68 +456,68 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         <>
           {/* Fullscreen Table Dialog */}
           <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-            <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0">
-              <DialogHeader className="px-4 py-3 border-b flex-row items-center justify-between">
+            <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 flex flex-col [&>button]:hidden">
+              <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
                 <div>
-                  <DialogTitle>Private Catalog - PCA</DialogTitle>
-                  <DialogDescription>
+                  <h2 className="text-lg font-semibold">Private Catalog - PCA</h2>
+                  <p className="text-sm text-muted-foreground">
                     {filteredProducts.length} books • Click any cell to edit
-                  </DialogDescription>
+                  </p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(false)}>
-                  <X className="h-5 w-5" />
+                <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
+                  <Minimize2 className="h-4 w-4" />
+                  Exit Fullscreen
                 </Button>
-              </DialogHeader>
-              <div className="flex-1 overflow-auto p-0">
-                <div className="overflow-x-auto">
-                  <Table className="min-w-[1200px]">
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="w-[280px] sticky left-0 bg-muted/50 z-10">Book Name</TableHead>
-                        <TableHead className="w-[100px]">Code</TableHead>
-                        <TableHead className="w-[80px]">Grade</TableHead>
-                        <TableHead className="w-[130px]">Subject</TableHead>
-                        <TableHead className="w-[130px]">Publisher</TableHead>
-                        <TableHead className="w-[100px] text-right">Price</TableHead>
-                        <TableHead className="w-[90px] text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Package className="h-4 w-4" />
-                            Stock
-                          </div>
-                        </TableHead>
-                        <TableHead className="w-[90px]">Status</TableHead>
-                        <TableHead className="w-[70px] text-right">Del</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredProducts.map((p) => {
-                        const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
-                        const isLowStock = stock > 0 && stock < 5;
-                        const isOutOfStock = stock <= 0;
-                        
-                        return (
-                          <TableRow key={p.book_id} className="group">
-                            <TableCell className="p-1 sticky left-0 bg-background z-10">
-                              <EditableCell
-                                value={p.name}
-                                onSave={(val) => updateProductField(p.book_id, 'name', val)}
-                                className="font-medium"
-                              />
-                            </TableCell>
-                            <TableCell className="p-1">
-                              <EditableCell
-                                value={p.code}
-                                onSave={(val) => updateProductField(p.book_id, 'code', val)}
-                                className="font-mono text-sm"
-                              />
-                            </TableCell>
-                            <TableCell className="p-1">
-                              <EditableCell
-                                value={p.grade}
-                                onSave={(val) => updateProductField(p.book_id, 'grade', val)}
-                              />
-                            </TableCell>
-                            <TableCell className="p-1">
+              </div>
+              <div className="flex-1 overflow-auto relative">
+                <table className="w-full border-collapse min-w-[1200px]">
+                  <thead className="sticky top-0 z-20 bg-muted">
+                    <tr>
+                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r w-[280px]">Book Name</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[100px]">Code</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[80px]">Grade</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[130px]">Subject</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[130px]">Publisher</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[100px]">Price</th>
+                      <th className="px-3 py-2 text-center text-sm font-medium border-b w-[90px]">
+                        <div className="flex items-center justify-center gap-1">
+                          <Package className="h-4 w-4" />
+                          Stock
+                        </div>
+                      </th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[90px]">Status</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[70px]">Del</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProducts.map((p) => {
+                      const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+                      const isLowStock = stock > 0 && stock < 5;
+                      const isOutOfStock = stock <= 0;
+                      
+                      return (
+                        <tr key={p.book_id} className="group border-b hover:bg-muted/30">
+                          <td className="sticky left-0 z-10 bg-background border-r p-1">
+                            <EditableCell
+                              value={p.name}
+                              onSave={(val) => updateProductField(p.book_id, 'name', val)}
+                              className="font-medium"
+                            />
+                          </td>
+                          <td className="p-1">
+                            <EditableCell
+                              value={p.code}
+                              onSave={(val) => updateProductField(p.book_id, 'code', val)}
+                              className="font-mono text-sm"
+                            />
+                          </td>
+                          <td className="p-1">
+                            <EditableCell
+                              value={p.grade}
+                              onSave={(val) => updateProductField(p.book_id, 'grade', val)}
+                            />
+                          </td>
+                          <td className="p-1">
                               <EditableCell
                                 value={p.subject}
                                 onSave={(val) => updateProductField(p.book_id, 'subject', val)}
