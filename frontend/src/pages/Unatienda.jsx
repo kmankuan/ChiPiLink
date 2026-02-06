@@ -1143,10 +1143,10 @@ function SchoolTextbooksView({
     setSubmitting(true);
     try {
       await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/direct`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/submit`,
         {
           student_id: selectedStudent.student_id || selectedStudent.sync_id,
-          books: selectedBooksList.map(b => ({
+          items: selectedBooksList.map(b => ({
             book_id: b.book_id,
             quantity: 1,
             price: b.price
