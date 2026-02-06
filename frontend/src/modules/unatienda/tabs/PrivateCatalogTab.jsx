@@ -285,7 +285,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       </Card>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{products.length}</div>
@@ -296,6 +296,14 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">{products.filter(p => p.active !== false).length}</div>
             <p className="text-xs text-muted-foreground">Active</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-2xl font-bold text-green-600">
+              {products.reduce((sum, p) => sum + ((p.inventory_quantity || 0) - (p.reserved_quantity || 0)), 0)}
+            </div>
+            <p className="text-xs text-muted-foreground">Total Stock</p>
           </CardContent>
         </Card>
         <Card>
