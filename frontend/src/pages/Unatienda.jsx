@@ -953,15 +953,25 @@ export default function Unatienda() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const categoria = params.get('categoria');
+    const category = params.get('category');
     const search = params.get('search');
     const tab = params.get('tab');
+    const studentId = params.get('student');
+    
+    // Handle textbooks category from My Students section
+    if (category === 'textbooks' && studentId) {
+      setActiveView('textbook-order');
+      // Student will be set after privateCatalogAccess loads
+      setSelectedStudent({ student_id: studentId });
+    } else if (tab === 'textbooks') {
+      setActiveView('textbooks');
+    }
     
     if (categoria) setSelectedCategory(categoria);
     if (search) setSearchTerm(decodeURIComponent(search));
-    if (tab === 'private') setActiveView('private');
     
     // Clean up URL
-    if (categoria || search || tab) {
+    if (categoria || search || tab || category) {
       window.history.replaceState({}, '', '/unatienda');
     }
   }, []);
