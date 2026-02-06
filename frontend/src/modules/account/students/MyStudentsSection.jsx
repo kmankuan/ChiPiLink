@@ -705,6 +705,101 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={!!editStudent} onOpenChange={() => setEditStudent(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {editStudent?.is_locked ? <Lock className="h-4 w-4 text-amber-600" /> : <Pencil className="h-4 w-4" />}
+              {lang === 'es' ? 'Perfil del Estudiante' : 'Student Profile'}
+            </DialogTitle>
+            <DialogDescription>
+              {editStudent?.full_name} &middot; {t.grade} {editStudent?.grade}
+            </DialogDescription>
+          </DialogHeader>
+
+          {editStudent?.is_locked && (
+            <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-3">
+              <Lock className="h-4 w-4 text-amber-600 shrink-0" />
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                {lang === 'es'
+                  ? 'Este perfil está bloqueado por el administrador. Los campos no pueden ser editados.'
+                  : 'This profile is locked by the administrator. Fields cannot be edited.'}
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">
+                {lang === 'es' ? 'Nombre Completo' : 'Full Name'}
+              </Label>
+              <Input
+                value={editForm.full_name || ''}
+                onChange={(e) => setEditForm(p => ({ ...p, full_name: e.target.value }))}
+                disabled={editStudent?.is_locked}
+                className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
+                data-testid="edit-full-name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">
+                {lang === 'es' ? 'Número de Estudiante' : 'Student Number'}
+              </Label>
+              <Input
+                value={editForm.student_number || ''}
+                onChange={(e) => setEditForm(p => ({ ...p, student_number: e.target.value }))}
+                disabled={editStudent?.is_locked}
+                className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
+                data-testid="edit-student-number"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">
+                {lang === 'es' ? 'Relación' : 'Relation'}
+              </Label>
+              <Input
+                value={editForm.relation_type || ''}
+                onChange={(e) => setEditForm(p => ({ ...p, relation_type: e.target.value }))}
+                disabled={editStudent?.is_locked}
+                className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
+                data-testid="edit-relation"
+              />
+            </div>
+
+            {/* Read-only info */}
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{lang === 'es' ? 'Escuela' : 'School'}</p>
+                <p className="text-xs font-medium">{editStudent?.school_name || '-'}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t.grade}</p>
+                <p className="text-xs font-medium">{editStudent?.grade || '-'}</p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" size="sm" onClick={() => setEditStudent(null)}>
+              {lang === 'es' ? 'Cerrar' : 'Close'}
+            </Button>
+            {!editStudent?.is_locked && (
+              <Button
+                size="sm"
+                onClick={handleSaveProfile}
+                disabled={editSaving}
+                className="gap-1.5"
+                data-testid="save-profile-btn"
+              >
+                {editSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                {lang === 'es' ? 'Guardar' : 'Save'}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
