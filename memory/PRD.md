@@ -15,12 +15,17 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 ├── backend/          # FastAPI + MongoDB
 │   ├── modules/
 │   │   ├── auth/     # Authentication (LaoPan OAuth + Admin login)
-│   │   ├── store/    # Products, Orders, Private Catalog
+│   │   ├── store/    # Products, Orders, Private Catalog, Store Config
 │   │   ├── admin/    # Admin routes, migrations
 │   │   └── pinpanclub/ # Tournament system
 │   └── core/         # Base repository, auth middleware
 └── frontend/         # React + Tailwind + Shadcn UI
     ├── modules/
+    │   ├── account/  
+    │   │   ├── students/  # NEW: My Students Section
+    │   │   ├── wallet/
+    │   │   ├── profile/
+    │   │   └── pages/
     │   ├── admin/    # Admin dashboard modules
     │   ├── unatienda/ # Store management
     │   └── pinpanclub/ # Tournament UI
@@ -29,11 +34,17 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 
 ## What's Been Implemented
 
-### February 6, 2026
-- ✅ **PCA Table Horizontal Scrollbar** - Fixed scrollbar visibility issue
-  - Added `.scrollable-table-container` CSS class
-  - Custom scrollbar styling for WebKit/Firefox
-  - Stock column now accessible via horizontal scroll
+### February 6, 2026 (Latest Session)
+- ✅ **My Students Section** - New compact card grid in Account Dashboard
+  - Visual status indicators (green/yellow/red/orange)
+  - "Order Textbooks" button for validated students
+  - Multi-language support (EN/ES/ZH)
+- ✅ **Store Configuration API** - Configurable textbooks visibility
+  - `textbooks_public_visibility` setting
+  - Localized category labels
+- ✅ **PCA Table Resizable Columns** - Drag to resize column widths
+- ✅ **PCA Table Horizontal Scrollbar** - Fixed scrollbar visibility
+- ✅ **Textbook Request Quick Reject** - Dropdown with predefined reasons
 
 ### Previous Sessions
 - ✅ Reports & Analytics Module (`/admin#analytics`)
@@ -41,7 +52,6 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 - ✅ Fullscreen mode for PCA table
 - ✅ Sticky headers and first column
 - ✅ Grade mismatch fix (G3 vs 3)
-- ✅ CORS error fix (production environment)
 
 ## Known Issues (Prioritized)
 
@@ -49,31 +59,30 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 1. **Order Submission Regression** - "Please select at least one new book to order"
    - File: `/app/frontend/src/pages/Unatienda.jsx`
    - Backend: `/app/backend/modules/store/services/textbook_order_service.py`
-   
-2. **Re-order Flow Incomplete** - Started but not finished in Unatienda.jsx
 
 ### P2 - High Priority
-3. **500 Error on /api/store/products** - Needs production verification
-   - Diagnostic endpoint: `/api/store/products/admin/diagnostic/raw-products`
+2. **Complete Unatienda Integration** - Use store config for textbooks category visibility
+3. **Client Orders View** - Create orders section under Unatienda
 
 ### P3 - Medium Priority  
 4. **Admin Sidebar Disappears** - Recurring issue after login
 5. **Google Sign-Up Loop** - OAuth flow broken (long-standing)
 
 ## Upcoming Tasks
-1. Admin UI for school year automation
-2. Student profile locking UI
-3. OneSignal push notifications for order status
-
-## Future/Backlog
-- Stripe payment integration
-- Google Sheets API integration
-- ChipiPoints as payment method
-- Teams/clans system with rewards
+1. Phase 2 of purchase flow redesign:
+   - Update Unatienda to use store config
+   - Create client orders view
+   - Add quick navigation from student cards
+2. Admin UI for school year automation
+3. Student profile locking UI
+4. OneSignal push notifications for order status
 
 ## Key API Endpoints
 - `POST /api/auth-v2/login` - Admin login
+- `GET /api/store/store-config/public` - Public store config (NEW)
+- `PUT /api/store/store-config/admin` - Update store config (NEW)
 - `GET /api/store/private-catalog/admin/products` - PCA products
+- `GET /api/store/textbook-access/my-students` - User's linked students
 - `POST /api/store/textbook-orders/direct` - Direct order submission
 - `GET /api/store/analytics/comprehensive` - Analytics data
 
