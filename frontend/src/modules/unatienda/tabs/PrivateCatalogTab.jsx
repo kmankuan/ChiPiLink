@@ -590,7 +590,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
           </Dialog>
 
           {/* Normal Table View */}
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden max-w-full">
             <CardHeader className="py-3 px-4 border-b">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
@@ -607,12 +607,13 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-hidden">
               <div 
-                className="scrollable-table-container h-[500px] w-full"
+                className="scrollable-table-container h-[500px]"
+                style={{ maxWidth: '100%', width: '100%' }}
                 data-testid="pca-table-scroll-container"
               >
-                <table className="w-full border-collapse" style={{ minWidth: '1200px', tableLayout: 'fixed' }}>
+                <table className="border-collapse" style={{ minWidth: '1200px', width: 'max-content', tableLayout: 'fixed' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
                       <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '250px', minWidth: '250px' }}>Book Name</th>
