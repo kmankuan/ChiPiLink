@@ -98,6 +98,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
         subject: product.subject || '',
         price: product.price?.toString() || '',
         sale_price: product.sale_price?.toString() || '',
+        inventory_quantity: product.inventory_quantity?.toString() || '0',
         description: product.description || '',
         image_url: product.image_url || '',
         active: product.active !== false,
@@ -107,7 +108,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
       setEditingProduct(null);
       setFormData({
         name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
-        price: '', sale_price: '', description: '', image_url: '',
+        price: '', sale_price: '', inventory_quantity: '0', description: '', image_url: '',
         active: true, featured: false
       });
     }
