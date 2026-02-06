@@ -593,11 +593,11 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
           </Dialog>
 
           {/* Normal Table View */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="py-3 px-4 border-b">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Showing {filteredProducts.length} books
+                  Showing {filteredProducts.length} books • Scroll right to see all columns →
                 </span>
                 <Button 
                   variant="outline" 
@@ -612,15 +612,10 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             </CardHeader>
             <CardContent className="p-0">
               <div 
-                className="h-[500px] overflow-scroll relative"
-                style={{ 
-                  overflowX: 'scroll',
-                  overflowY: 'scroll',
-                  scrollbarWidth: 'auto',
-                  WebkitOverflowScrolling: 'touch'
-                }}
+                className="scrollable-table-container h-[500px] w-full"
+                data-testid="pca-table-scroll-container"
               >
-                <table className="w-full border-collapse" style={{ minWidth: '1200px' }}>
+                <table className="w-full border-collapse" style={{ minWidth: '1200px', tableLayout: 'fixed' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
                       <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '250px', minWidth: '250px' }}>Book Name</th>
