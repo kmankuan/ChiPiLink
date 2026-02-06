@@ -951,6 +951,9 @@ function SchoolTextbooksView({
   const [loading, setLoading] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [reorderItem, setReorderItem] = useState(null);
+  const [reorderReason, setReorderReason] = useState('');
+  const [requestingReorder, setRequestingReorder] = useState(false);
   
   const texts = {
     en: {
