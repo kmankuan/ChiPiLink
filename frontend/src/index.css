@@ -180,3 +180,36 @@
 [data-debug-wrapper="true"] {
   display: contents !important;
 }
+
+/* Force horizontal scrollbar visibility for tables */
+.scrollable-table-container {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollable-table-container::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+  display: block !important;
+}
+
+.scrollable-table-container::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+}
+
+.scrollable-table-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 6px;
+  border: 2px solid hsl(var(--muted));
+}
+
+.scrollable-table-container::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+.scrollable-table-container::-webkit-scrollbar-corner {
+  background: hsl(var(--muted));
+}
