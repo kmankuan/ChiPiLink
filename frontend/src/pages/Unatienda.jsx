@@ -1191,16 +1191,17 @@ export default function Unatienda() {
     const { category, studentId } = urlParams;
     
     if (category === 'textbooks' && studentId) {
-      // Find the student in privateCatalogAccess
+      // Find the student in privateCatalogAccess (check both student_id and sync_id)
       const student = privateCatalogAccess.students?.find(
-        s => s.student_id === studentId || s.sync_id === studentId
+        s => s.student_id === studentId || s.sync_id === studentId || 
+             s.student_id?.includes(studentId) || studentId?.includes(s.student_id)
       );
       
-      if (student && student.current_year_status === 'approved') {
+      if (student && privateCatalogAccess.has_access) {
         setSelectedStudent(student);
         setActiveView('textbook-order');
       } else {
-        // Student not found or not approved, show textbooks selection
+        // Student not found or no access, show textbooks selection
         setActiveView('textbooks');
       }
       
