@@ -1,9 +1,10 @@
 """
 Store Module - Product Routes
-Endpoints for management of productos usando el Service Layer
+Endpoints for product management using Service Layer
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
+import logging
 
 from core.auth import get_admin_user
 from core.database import db
@@ -11,9 +12,10 @@ from ..models import Product, ProductCreate, ProductUpdate
 from ..services import product_service
 
 router = APIRouter(prefix="/products", tags=["Store - Products"])
+logger = logging.getLogger(__name__)
 
 
-@router.get("", response_model=List[Product])
+@router.get("")
 async def get_products(
     category: Optional[str] = None,
     grade: Optional[str] = None,
@@ -22,31 +24,43 @@ async def get_products(
     limit: int = Query(500, ge=1, le=1000)
 ):
     """Get active products with optional filters"""
-    return await product_service.get_all_products(
-        category=category,
-        grade=grade,
-        subject=subject,
-        skip=skip,
-        limit=limit
-    )
+    try:
+        return await product_service.get_all_products(
+            category=category,
+            grade=grade,
+            subject=subject,
+            skip=skip,
+            limit=limit
+        )
+    except Exception as e:
+        logger.error(f"Error fetching products: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/featured", response_model=List[Product])
+@router.get("/featured")
 async def get_featured_products(
     category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
     """Get featured products"""
-    return await product_service.get_featured_products(category, limit)
+    try:
+        return await product_service.get_featured_products(category, limit)
+    except Exception as e:
+        logger.error(f"Error fetching featured products: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/promotions", response_model=List[Product])
+@router.get("/promotions")
 async def get_promotional_products(
     category: Optional[str] = None,
     limit: int = Query(10, ge=1, le=50)
 ):
     """Get promotional products"""
-    return await product_service.get_promotional_products(category, limit)
+    try:
+        return await product_service.get_promotional_products(category, limit)
+    except Exception as e:
+        logger.error(f"Error fetching promotional products: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/newest", response_model=List[Product])
