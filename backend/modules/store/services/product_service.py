@@ -54,8 +54,8 @@ class ProductService(BaseService):
         subject: Optional[str] = None,
         skip: int = 0,
         limit: int = 500
-    ) -> List[Product]:
-        """Get active products"""
+    ) -> List[dict]:
+        """Get active products - returns raw dicts to avoid validation errors"""
         results = await self.repository.get_all_active(
             category=category,
             grade=grade,
@@ -63,16 +63,17 @@ class ProductService(BaseService):
             skip=skip,
             limit=limit
         )
-        return [Product(**r) for r in results]
+        # Return raw dicts instead of Pydantic models to handle legacy data
+        return results
     
     async def get_featured_products(
         self,
         category: Optional[str] = None,
         limit: int = 10
-    ) -> List[Product]:
-        """Get productos destacados"""
+    ) -> List[dict]:
+        """Get featured products"""
         results = await self.repository.get_featured(category, limit)
-        return [Product(**r) for r in results]
+        return results
     
     async def get_promotional_products(
         self,
