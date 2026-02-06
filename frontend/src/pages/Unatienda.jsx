@@ -1073,7 +1073,7 @@ function SchoolTextbooksView({
     const fetchFormFields = async () => {
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/store/order-form-config/client`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/store/order-form-config/fields`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setFormFields(res.data?.fields || []);
