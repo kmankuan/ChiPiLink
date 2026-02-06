@@ -461,7 +461,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <div>
                   <h2 className="text-lg font-semibold">Private Catalog - PCA</h2>
                   <p className="text-sm text-muted-foreground">
-                    {filteredProducts.length} books • Click any cell to edit
+                    {filteredProducts.length} books • Click any cell to edit • Scroll horizontally to see all columns
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
@@ -469,24 +469,30 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                   Exit Fullscreen
                 </Button>
               </div>
-              <div className="flex-1 overflow-auto relative">
-                <table className="w-full border-collapse min-w-[1200px]">
+              <div 
+                className="flex-1 relative"
+                style={{ 
+                  overflow: 'scroll',
+                  scrollbarWidth: 'auto'
+                }}
+              >
+                <table className="w-full border-collapse" style={{ minWidth: '1300px' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
-                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r w-[280px]">Book Name</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[100px]">Code</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[80px]">Grade</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[130px]">Subject</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[130px]">Publisher</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[100px]">Price</th>
-                      <th className="px-3 py-2 text-center text-sm font-medium border-b w-[90px]">
+                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '280px', minWidth: '280px' }}>Book Name</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Code</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '80px', minWidth: '80px' }}>Grade</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '130px', minWidth: '130px' }}>Subject</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '130px', minWidth: '130px' }}>Publisher</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Price</th>
+                      <th className="px-3 py-2 text-center text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>
                         <div className="flex items-center justify-center gap-1">
                           <Package className="h-4 w-4" />
                           Stock
                         </div>
                       </th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b w-[90px]">Status</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b w-[70px]">Del</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Status</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '80px', minWidth: '80px' }}>Del</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -497,7 +503,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                       
                       return (
                         <tr key={p.book_id} className="group border-b hover:bg-muted/30">
-                          <td className="sticky left-0 z-10 bg-background border-r p-1">
+                          <td className="sticky left-0 z-10 bg-background border-r p-1" style={{ minWidth: '280px' }}>
                             <EditableCell
                               value={p.name}
                               onSave={(val) => updateProductField(p.book_id, 'name', val)}
