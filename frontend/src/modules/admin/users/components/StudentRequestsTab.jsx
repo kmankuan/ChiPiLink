@@ -270,10 +270,11 @@ export default function TextbookAccessAdminTab({ token }) {
   const [filterSchool, setFilterSchool] = useState('all');
   const [filterYear, setFilterYear] = useState('all');
   const [actionDialog, setActionDialog] = useState(null);
-  const [actionData, setActionData] = useState({ notes: '', reason: '' });
+  const [actionData, setActionData] = useState({ notes: '', reason: '', selectedReasonId: '' });
   const [processing, setProcessing] = useState(false);
 
   const t = translations[i18n.language] || translations.en;
+  const quickRejectReasons = QUICK_REJECT_REASONS[i18n.language] || QUICK_REJECT_REASONS.en;
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
