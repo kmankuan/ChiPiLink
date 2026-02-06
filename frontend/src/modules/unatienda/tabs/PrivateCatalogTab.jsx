@@ -33,6 +33,18 @@ function ResizableHeader({ children, columnKey, width, onResize, isSticky = fals
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
 
+  const handleMouseMove = useCallback((e) => {
+    const diff = e.clientX - startXRef.current;
+    const newWidth = Math.max(50, startWidthRef.current + diff);
+    onResize(columnKey, newWidth);
+  }, [columnKey, onResize]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseMove]);
+
   const handleMouseDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -43,19 +55,6 @@ function ResizableHeader({ children, columnKey, width, onResize, isSticky = fals
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isResizing) return;
-    const diff = e.clientX - startXRef.current;
-    const newWidth = Math.max(50, startWidthRef.current + diff);
-    onResize(columnKey, newWidth);
-  }, [isResizing, columnKey, onResize]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseMove]);
 
   useEffect(() => {
     return () => {
