@@ -918,6 +918,216 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
   );
 }
 
+// School Textbooks View - Shows validated students or prompts to link/login
+function SchoolTextbooksView({ 
+  isAuthenticated, 
+  privateCatalogAccess, 
+  storeConfig, 
+  onSelectStudent, 
+  onLinkStudent,
+  onBack 
+}) {
+  const { i18n } = useTranslation();
+  const lang = i18n?.language || 'es';
+  
+  // Translations
+  const texts = {
+    en: {
+      title: 'School Textbooks',
+      subtitle: 'Order textbooks for your validated students',
+      loginRequired: 'Login Required',
+      loginMessage: 'Please login to access exclusive school textbooks',
+      loginButton: 'Login',
+      noStudents: 'No Students Linked',
+      noStudentsDesc: 'Link a student to your account to order their textbooks',
+      linkStudentBtn: 'Link Student',
+      selectStudent: 'Select a Student',
+      selectStudentDesc: 'Choose which student you want to order textbooks for',
+      orderTextbooks: 'Order Textbooks',
+      pendingApproval: 'Pending Approval',
+      grade: 'Grade',
+      back: 'Back to Store'
+    },
+    es: {
+      title: 'Textos Escolares',
+      subtitle: 'Ordena los textos de tus estudiantes validados',
+      loginRequired: 'Inicio de Sesión Requerido',
+      loginMessage: 'Inicia sesión para acceder a los textos escolares exclusivos',
+      loginButton: 'Iniciar Sesión',
+      noStudents: 'Sin Estudiantes Vinculados',
+      noStudentsDesc: 'Vincula un estudiante a tu cuenta para ordenar sus textos',
+      linkStudentBtn: 'Vincular Estudiante',
+      selectStudent: 'Selecciona un Estudiante',
+      selectStudentDesc: 'Elige para cuál estudiante deseas ordenar textos',
+      orderTextbooks: 'Ordenar Textos',
+      pendingApproval: 'Pendiente de Aprobación',
+      grade: 'Grado',
+      back: 'Volver a la Tienda'
+    },
+    zh: {
+      title: '学校教科书',
+      subtitle: '为您验证的学生订购教科书',
+      loginRequired: '需要登录',
+      loginMessage: '请登录以访问专属学校教科书',
+      loginButton: '登录',
+      noStudents: '未关联学生',
+      noStudentsDesc: '将学生关联到您的账户以订购他们的教科书',
+      linkStudentBtn: '关联学生',
+      selectStudent: '选择学生',
+      selectStudentDesc: '选择您要为哪个学生订购教科书',
+      orderTextbooks: '订购教科书',
+      pendingApproval: '等待批准',
+      grade: '年级',
+      back: '返回商店'
+    }
+  };
+  
+  const t = texts[lang] || texts.es;
+  const validatedStudents = privateCatalogAccess?.students?.filter(s => 
+    s.current_year_status === 'approved'
+  ) || [];
+  const pendingStudents = privateCatalogAccess?.students?.filter(s => 
+    s.current_year_status !== 'approved'
+  ) || [];
+  
+  return (
+    <div className="space-y-6">
+      {/* Back Button */}
+      <Button variant="ghost" size="sm" onClick={onBack} className="gap-1">
+        <ChevronLeft className="h-4 w-4" />
+        {t.back}
+      </Button>
+      
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50">
+            <GraduationCap className="h-8 w-8 text-purple-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">{t.title}</h2>
+            <p className="text-muted-foreground">{t.subtitle}</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Content based on state */}
+      {!isAuthenticated ? (
+        // Not logged in - show login prompt
+        <Card className="border-dashed">
+          <CardContent className="py-12 text-center">
+            <Lock className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="font-semibold text-lg mb-2">{t.loginRequired}</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              {storeConfig?.textbooks_login_message?.[lang] || t.loginMessage}
+            </p>
+            <Button onClick={() => window.location.href = '/login'}>
+              {t.loginButton}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : validatedStudents.length === 0 && pendingStudents.length === 0 ? (
+        // No students linked
+        <Card className="border-dashed">
+          <CardContent className="py-12 text-center">
+            <Users className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="font-semibold text-lg mb-2">{t.noStudents}</h3>
+            <p className="text-muted-foreground mb-6">{t.noStudentsDesc}</p>
+            <Button onClick={onLinkStudent}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              {t.linkStudentBtn}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        // Has students - show cards
+        <div className="space-y-6">
+          {validatedStudents.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                {t.selectStudent}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.selectStudentDesc}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {validatedStudents.map((student) => (
+                  <Card 
+                    key={student.student_id}
+                    className="cursor-pointer hover:shadow-lg transition-all border-l-4 border-l-green-500 hover:border-l-green-600"
+                    onClick={() => onSelectStudent(student)}
+                    data-testid={`student-select-${student.student_id}`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+                          <User className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold truncate">{student.name || student.full_name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {t.grade} {student.grade} • {student.school_name || 'School'}
+                          </p>
+                        </div>
+                        <Button size="sm" className="shrink-0 gap-1">
+                          <BookOpen className="h-4 w-4" />
+                          {t.orderTextbooks}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {pendingStudents.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-4 flex items-center gap-2 text-muted-foreground">
+                <Clock className="h-5 w-5 text-amber-500" />
+                {t.pendingApproval}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-75">
+                {pendingStudents.map((student) => (
+                  <Card 
+                    key={student.student_id}
+                    className="border-l-4 border-l-amber-400"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/30">
+                          <User className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold truncate">{student.name || student.full_name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {t.grade} {student.grade}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="bg-amber-100 text-amber-700">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {t.pendingApproval}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Link more students */}
+          <div className="pt-4 border-t">
+            <Button variant="outline" onClick={onLinkStudent} className="gap-2">
+              <UserPlus className="h-4 w-4" />
+              {t.linkStudentBtn}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Unatienda() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
