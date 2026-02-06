@@ -70,17 +70,36 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
         fetch(`${API}/api/store/products/subjects`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       
-      const productsData = await productsRes.json();
-      const categoriesData = await categoriesRes.json();
-      const gradosData = await gradosRes.json();
-      const materiasData = await materiasRes.json();
+      // Handle each response separately to avoid "body stream already read" error
+      let productsData = [];
+      let categoriesData = [];
+      let gradosData = { grades: [] };
+      let materiasData = { subjects: [] };
+      
+      if (productsRes.ok) {
+        productsData = await productsRes.json();
+      } else {
+        console.error('Products API error:', productsRes.status);
+      }
+      
+      if (categoriesRes.ok) {
+        categoriesData = await categoriesRes.json();
+      }
+      
+      if (gradosRes.ok) {
+        gradosData = await gradosRes.json();
+      }
+      
+      if (materiasRes.ok) {
+        materiasData = await materiasRes.json();
+      }
       
       // Filter out private catalog products
       const publicProducts = (Array.isArray(productsData) ? productsData : []).filter(p => !p.is_private_catalog);
       setProductos(publicProducts);
       setCategorias(Array.isArray(categoriesData) ? categoriesData : []);
-      setGrados(gradosData.grades || gradosData.grades || []);
-      setMaterias(materiasData.subjects || materiasData.subjects || []);
+      setGrados(gradosData.grades || []);
+      setMaterias(materiasData.subjects || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error loading data');
