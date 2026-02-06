@@ -919,7 +919,7 @@ function CompraExclusivaSection({ privateCatalogAccess, onBack, onRefreshAccess 
 }
 
 export default function Unatienda() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
   const { addItem, items, openCart } = useCart();
