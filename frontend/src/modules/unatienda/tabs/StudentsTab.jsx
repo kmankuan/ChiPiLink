@@ -49,12 +49,12 @@ export default function StudentsTab({ token }) {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/store/textbook-access/admin/students`, {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/all-students`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        setStudents(data.students || []);
+        setStudents(data.students || data || []);
       } else {
         // Fallback to synced students
         const res2 = await fetch(`${API}/api/store/students/synced`, {
