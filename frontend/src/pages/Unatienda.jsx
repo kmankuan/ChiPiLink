@@ -969,6 +969,10 @@ function SchoolTextbooksView({
       submitOrder: 'Submit Order', orderSuccess: 'Order submitted successfully!',
       orderError: 'Error submitting order', selectAtLeastOne: 'Please select at least one book',
       total: 'Total', itemsOf: 'of',
+      requestReorder: 'Request Reorder', reorderReason: 'Reason for reorder',
+      reorderSuccess: 'Reorder requested', reorderError: 'Error requesting reorder',
+      reorderReasonPlaceholder: 'e.g., Book was damaged, need replacement',
+      send: 'Send Request', cancel: 'Cancel',
     },
     es: {
       title: 'Textos Escolares', subtitle: 'Ordena los textos de tus estudiantes',
@@ -983,6 +987,10 @@ function SchoolTextbooksView({
       submitOrder: 'Enviar Pedido', orderSuccess: '¡Pedido enviado correctamente!',
       orderError: 'Error al enviar el pedido', selectAtLeastOne: 'Selecciona al menos un libro',
       total: 'Total', itemsOf: 'de',
+      requestReorder: 'Solicitar Reorden', reorderReason: 'Motivo de la reorden',
+      reorderSuccess: 'Reorden solicitada', reorderError: 'Error al solicitar reorden',
+      reorderReasonPlaceholder: 'Ej: Libro dañado, necesito reemplazo',
+      send: 'Enviar Solicitud', cancel: 'Cancelar',
     },
     zh: {
       title: '学校教科书', subtitle: '为您的学生订购教科书',
