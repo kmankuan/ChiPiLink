@@ -1074,6 +1074,26 @@ function SchoolTextbooksView({
     }
   };
   
+  const handleReorderRequest = async () => {
+    if (!reorderItem || !orderData?.order_id) return;
+    setRequestingReorder(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/${orderData.order_id}/reorder/${reorderItem.book_id}`,
+        { reason: reorderReason || '' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(t.reorderSuccess);
+      setReorderItem(null);
+      setReorderReason('');
+      await fetchOrder();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || t.reorderError);
+    } finally {
+      setRequestingReorder(false);
+    }
+  };
+  
   // ---- Early returns for unauthenticated / no students ----
   if (!isAuthenticated) {
     return (
