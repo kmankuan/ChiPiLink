@@ -545,7 +545,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <div>
                   <h2 className="text-lg font-semibold">Private Catalog - PCA</h2>
                   <p className="text-sm text-muted-foreground">
-                    {filteredProducts.length} books • Click any cell to edit • Scroll horizontally to see all columns
+                    {filteredProducts.length} books • Drag column edges to resize • Click any cell to edit
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
@@ -557,23 +557,44 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 className="scrollable-table-container flex-1"
                 data-testid="pca-table-fullscreen-container"
               >
-                <table className="w-full border-collapse" style={{ minWidth: '1300px', tableLayout: 'fixed' }}>
+                <table className="border-collapse" style={{ minWidth: `${totalTableWidth}px`, width: 'max-content', tableLayout: 'fixed' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
-                      <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '280px', minWidth: '280px' }}>Book Name</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Code</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '80px', minWidth: '80px' }}>Grade</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '130px', minWidth: '130px' }}>Subject</th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '130px', minWidth: '130px' }}>Publisher</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Price</th>
-                      <th className="px-3 py-2 text-center text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>
+                      <ResizableHeader 
+                        columnKey="name" 
+                        width={columnWidths.name} 
+                        onResize={handleColumnResize}
+                        isSticky={true}
+                      >
+                        Book Name
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="code" width={columnWidths.code} onResize={handleColumnResize}>
+                        Code
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="grade" width={columnWidths.grade} onResize={handleColumnResize}>
+                        Grade
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="subject" width={columnWidths.subject} onResize={handleColumnResize}>
+                        Subject
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="publisher" width={columnWidths.publisher} onResize={handleColumnResize}>
+                        Publisher
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="price" width={columnWidths.price} onResize={handleColumnResize} className="text-right">
+                        Price
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="stock" width={columnWidths.stock} onResize={handleColumnResize} className="text-center">
                         <div className="flex items-center justify-center gap-1">
                           <Package className="h-4 w-4" />
                           Stock
                         </div>
-                      </th>
-                      <th className="px-3 py-2 text-left text-sm font-medium border-b" style={{ width: '100px', minWidth: '100px' }}>Status</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium border-b" style={{ width: '80px', minWidth: '80px' }}>Del</th>
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="status" width={columnWidths.status} onResize={handleColumnResize}>
+                        Status
+                      </ResizableHeader>
+                      <ResizableHeader columnKey="actions" width={columnWidths.actions} onResize={handleColumnResize} className="text-right">
+                        Del
+                      </ResizableHeader>
                     </tr>
                   </thead>
                   <tbody>
@@ -584,39 +605,39 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                       
                       return (
                         <tr key={p.book_id} className="group border-b hover:bg-muted/30">
-                          <td className="sticky left-0 z-10 bg-background border-r p-1" style={{ minWidth: '280px' }}>
+                          <td className="sticky left-0 z-10 bg-background border-r p-1" style={{ width: `${columnWidths.name}px`, minWidth: `${columnWidths.name}px` }}>
                             <EditableCell
                               value={p.name}
                               onSave={(val) => updateProductField(p.book_id, 'name', val)}
                               className="font-medium"
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ width: `${columnWidths.code}px`, minWidth: `${columnWidths.code}px` }}>
                             <EditableCell
                               value={p.code}
                               onSave={(val) => updateProductField(p.book_id, 'code', val)}
                               className="font-mono text-sm"
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ width: `${columnWidths.grade}px`, minWidth: `${columnWidths.grade}px` }}>
                             <EditableCell
                               value={p.grade}
                               onSave={(val) => updateProductField(p.book_id, 'grade', val)}
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ width: `${columnWidths.subject}px`, minWidth: `${columnWidths.subject}px` }}>
                             <EditableCell
                               value={p.subject}
                               onSave={(val) => updateProductField(p.book_id, 'subject', val)}
                             />
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ width: `${columnWidths.publisher}px`, minWidth: `${columnWidths.publisher}px` }}>
                             <EditableCell
                               value={p.publisher}
                               onSave={(val) => updateProductField(p.book_id, 'publisher', val)}
                             />
                           </td>
-                          <td className="p-1 text-right">
+                          <td className="p-1 text-right" style={{ width: `${columnWidths.price}px`, minWidth: `${columnWidths.price}px` }}>
                             <EditableCell
                               value={p.price?.toFixed(2) || '0.00'}
                               onSave={(val) => updateProductField(p.book_id, 'price', parseFloat(val) || 0)}
@@ -624,7 +645,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                               className="justify-end font-medium"
                             />
                           </td>
-                          <td className="p-1 text-center">
+                          <td className="p-1 text-center" style={{ width: `${columnWidths.stock}px`, minWidth: `${columnWidths.stock}px` }}>
                             <div 
                               className={`
                                 cursor-pointer rounded px-2 py-1 text-center font-semibold
@@ -644,7 +665,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                               {p.inventory_quantity || 0}
                             </div>
                           </td>
-                          <td className="p-1">
+                          <td className="p-1" style={{ width: `${columnWidths.status}px`, minWidth: `${columnWidths.status}px` }}>
                             <Badge 
                               variant={p.active !== false ? "default" : "secondary"}
                               className="cursor-pointer"
@@ -654,7 +675,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                               {p.active !== false ? "Active" : "Inactive"}
                             </Badge>
                           </td>
-                          <td className="p-1 text-right">
+                          <td className="p-1 text-right" style={{ width: `${columnWidths.actions}px`, minWidth: `${columnWidths.actions}px` }}>
                             <Button 
                               size="sm" 
                               variant="ghost" 
