@@ -669,15 +669,37 @@ export default function TextbookAccessAdminTab({ token }) {
                                 </Button>
                               )}
                               {request.status !== 'rejected' && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  onClick={() => handleAction(request, 'rejected')}
-                                  title={t.reject}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      title={t.reject}
+                                    >
+                                      <X className="h-4 w-4" />
+                                      <ChevronDown className="h-3 w-3 ml-0.5" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-48">
+                                    {quickRejectReasons.slice(0, -1).map((reason) => (
+                                      <DropdownMenuItem
+                                        key={reason.id}
+                                        onClick={() => handleQuickReject(request, reason.id)}
+                                        className="text-red-600 cursor-pointer"
+                                      >
+                                        {reason.label}
+                                      </DropdownMenuItem>
+                                    ))}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      onClick={() => handleAction(request, 'rejected')}
+                                      className="text-muted-foreground cursor-pointer"
+                                    >
+                                      {quickRejectReasons.find(r => r.id === 'other')?.label}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               )}
                               {request.status === 'pending' && (
                                 <Button
