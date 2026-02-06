@@ -6,11 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
 import {
-  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package, Maximize2, Minimize2, X, GripVertical
+  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package, Maximize2, Minimize2
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
