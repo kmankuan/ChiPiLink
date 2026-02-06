@@ -39,54 +39,24 @@ class PaymentMethod(str, Enum):
 class ProductBase(BaseModel):
     """Base product model"""
     name: Optional[str] = None
-    nombre: Optional[str] = None  # Legacy Spanish field - fallback
     description: Optional[str] = None
     category: Optional[str] = "libros"
     grade: Optional[str] = None
     grades: Optional[List[str]] = None
     subject: Optional[str] = None
     price: Optional[float] = 0
-    precio: Optional[float] = None  # Legacy Spanish field - fallback
     sale_price: Optional[float] = None
     inventory_quantity: int = 0
     isbn: Optional[str] = None
     publisher: Optional[str] = None
     image_url: Optional[str] = None
     active: bool = True
-    activo: Optional[bool] = None  # Legacy Spanish field - fallback
     requires_preparation: bool = False
     featured: bool = False
     on_sale: bool = False
     featured_order: int = 0
     is_private_catalog: bool = False
-    catalogo_privado: Optional[bool] = None  # Legacy Spanish field - fallback
     code: Optional[str] = None
-    
-    @property
-    def display_name(self) -> str:
-        """Get name with fallback to nombre"""
-        return self.name or self.nombre or "Unknown"
-    
-    @property
-    def display_price(self) -> float:
-        """Get price with fallback to precio"""
-        if self.price is not None and self.price > 0:
-            return self.price
-        return self.precio or 0
-    
-    @property
-    def is_active(self) -> bool:
-        """Get active with fallback to activo"""
-        if self.activo is not None:
-            return self.activo
-        return self.active
-    
-    @property  
-    def is_private(self) -> bool:
-        """Get is_private_catalog with fallback to catalogo_privado"""
-        if self.catalogo_privado is not None:
-            return self.catalogo_privado
-        return self.is_private_catalog
 
 
 class ProductCreate(ProductBase):
