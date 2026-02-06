@@ -325,7 +325,17 @@ export default function TextbookAccessAdminTab({ token }) {
 
   const handleAction = async (request, action) => {
     setActionDialog({ request, action });
-    setActionData({ notes: '', reason: '' });
+    setActionData({ notes: '', reason: '', selectedReasonId: '' });
+  };
+
+  // Handle quick reject reason selection
+  const handleReasonSelect = (reasonId) => {
+    const selectedReason = quickRejectReasons.find(r => r.id === reasonId);
+    setActionData(prev => ({
+      ...prev,
+      selectedReasonId: reasonId,
+      reason: selectedReason?.reason || ''
+    }));
   };
 
   const processAction = async () => {
@@ -333,11 +343,14 @@ export default function TextbookAccessAdminTab({ token }) {
     
     const { request, action } = actionDialog;
     
-    // Validate
-    if (action === 'rejected' && !actionData.reason.trim()) {
-      toast.error('Please provide a rejection reason');
+    // For info_required, reason is required
+    if (action === 'info_required' && !actionData.reason.trim()) {
+      toast.error('Please provide the information message');
       return;
     }
+    
+    // For rejection, use either selected reason or custom reason (both optional now)
+    const finalReason = actionData.reason.trim() || null;
     
     setProcessing(true);
     try {
@@ -352,7 +365,7 @@ export default function TextbookAccessAdminTab({ token }) {
           body: JSON.stringify({
             status: action,
             admin_notes: actionData.notes || null,
-            rejection_reason: action === 'rejected' ? actionData.reason : null
+            rejection_reason: action === 'rejected' ? finalReason : null
           })
         }
       );
@@ -371,6 +384,47 @@ export default function TextbookAccessAdminTab({ token }) {
       
       toast.success(successMessages[action] || 'Action completed');
       setActionDialog(null);
+      fetchRequests();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Quick reject without dialog
+  const handleQuickReject = async (request, reasonId) => {
+    const reason = quickRejectReasons.find(r => r.id === reasonId);
+    if (!reason || reasonId === 'other') {
+      // Open dialog for custom reason
+      handleAction(request, 'rejected');
+      return;
+    }
+    
+    setProcessing(true);
+    try {
+      const res = await fetch(
+        `${API}/api/store/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            status: 'rejected',
+            admin_notes: null,
+            rejection_reason: reason.reason
+          })
+        }
+      );
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Action failed');
+      }
+      
+      toast.success(t.success.rejected);
       fetchRequests();
     } catch (err) {
       toast.error(err.message);
