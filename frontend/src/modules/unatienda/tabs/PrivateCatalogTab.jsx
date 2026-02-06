@@ -90,6 +90,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
