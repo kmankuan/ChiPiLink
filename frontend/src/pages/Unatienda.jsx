@@ -1283,23 +1283,7 @@ export default function Unatienda() {
               </div>
             </div>
             
-            {/* Action Button - compact on mobile */}
-            {isAuthenticated && (
-              <Button
-                onClick={() => setActiveView('private')}
-                variant="outline"
-                size="sm"
-                className="gap-1 sm:gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-900/30 shrink-0 text-xs sm:text-sm px-2 sm:px-4"
-              >
-                <GraduationCap className="h-4 w-4" />
-                <span className="hidden xs:inline">Compra</span> Exclusiva
-                {privateCatalogAccess?.has_access && privateCatalogAccess?.students?.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 bg-purple-200 dark:bg-purple-800 text-xs h-5 w-5 p-0 flex items-center justify-center rounded-full">
-                    {privateCatalogAccess.students.length}
-                  </Badge>
-                )}
-              </Button>
-            )}
+            {/* Action Button removed - School Textbooks now accessible via category */}
           </div>
         </div>
       </div>
