@@ -161,6 +161,20 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Column widths state for resizable columns
+  const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+  
+  // Handle column resize
+  const handleColumnResize = useCallback((columnKey, newWidth) => {
+    setColumnWidths(prev => ({
+      ...prev,
+      [columnKey]: newWidth
+    }));
+  }, []);
+  
+  // Calculate total table width based on column widths
+  const totalTableWidth = Object.values(columnWidths).reduce((sum, w) => sum + w, 0);
 
   const [formData, setFormData] = useState({
     name: '',
