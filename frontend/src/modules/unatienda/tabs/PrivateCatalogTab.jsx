@@ -346,12 +346,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                     <TableHead>Subject</TableHead>
                     <TableHead>Publisher</TableHead>
                     <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-center">Stock</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((p) => (
+                  {filteredProducts.map((p) => {
+                    const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+                    const isLowStock = stock > 0 && stock < 5;
+                    const isOutOfStock = stock <= 0;
+                    
+                    return (
                     <TableRow key={p.book_id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -384,6 +390,20 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                           <span className="font-medium">${p.price?.toFixed(2)}</span>
                         )}
                       </TableCell>
+                      <TableCell className="text-center">
+                        <Badge 
+                          variant={isOutOfStock ? "destructive" : isLowStock ? "warning" : "outline"}
+                          className={isLowStock ? "bg-amber-100 text-amber-800 border-amber-300" : ""}
+                        >
+                          {stock}
+                        </Badge>
+                        {isLowStock && (
+                          <p className="text-xs text-amber-600 mt-1">Low</p>
+                        )}
+                        {isOutOfStock && (
+                          <p className="text-xs text-red-600 mt-1">Out</p>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={p.active !== false ? "default" : "secondary"}>
                           {p.active !== false ? "Active" : "Inactive"}
@@ -400,7 +420,7 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )})}
                 </TableBody>
               </Table>
             </ScrollArea>
