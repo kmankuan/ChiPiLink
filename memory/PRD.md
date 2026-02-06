@@ -1,13 +1,7 @@
 # ChiPi Link - Product Requirements Document
 
 ## Original Problem Statement
-Build a comprehensive school management and e-commerce platform for Panama Christian Academy (PCA) with:
-- User authentication via LaoPan OAuth
-- Admin dashboard for managing products, orders, users
-- Unatienda (store) with public and private catalogs
-- Textbook ordering system for students
-- PinpanClub tournament system
-- Role-based access control
+School management and e-commerce platform for Panama Christian Academy (PCA) with user auth, admin dashboard, store (Unatienda), textbook ordering, PinpanClub tournaments, and role-based access control.
 
 ## Current Architecture
 ```
@@ -15,86 +9,82 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 ├── backend/          # FastAPI + MongoDB
 │   ├── modules/
 │   │   ├── auth/     # Authentication (LaoPan OAuth + Admin login)
-│   │   ├── store/    # Products, Orders, Private Catalog, Store Config
+│   │   ├── store/    # Products, Orders, Private Catalog, Textbook Orders
 │   │   ├── admin/    # Admin routes, migrations
 │   │   └── pinpanclub/ # Tournament system
 │   └── core/         # Base repository, auth middleware
 └── frontend/         # React + Tailwind + Shadcn UI
-    ├── modules/
-    │   ├── account/  
-    │   │   ├── students/  # My Students Section
-    │   │   ├── wallet/
-    │   │   ├── profile/
-    │   │   └── pages/
-    │   ├── admin/    # Admin dashboard modules
-    │   ├── unatienda/ # Store management
-    │   └── pinpanclub/ # Tournament UI
-    └── pages/        # Main pages
+    ├── modules/      # Feature modules (account, admin, unatienda, pinpanclub)
+    └── pages/        # Main pages (Unatienda.jsx, Login.jsx, etc.)
 ```
 
 ## What's Been Implemented
 
 ### February 6, 2026 (Latest Session)
-- Fixed deployment build failure (orphaned JSX in Unatienda.jsx)
-- Fixed missing `Package` and `Send` lucide-react imports
-- Fixed frontend route mismatch: `/textbook-orders/direct` -> `/textbook-orders/submit`
-- Fixed frontend field naming: `books` -> `items` in order submission
-- Fixed frontend URL: `/products-by-grade/` -> `/by-grade/`
-- Fixed backend grade format mismatch: now handles both "3" and "G3" formats
-- Fixed frontend form config URL: `/order-form-config/client` -> `/order-form-config/fields`
-- Verified School Textbooks horizontal tab UI works end-to-end
-- All tests passing (100% backend, 100% frontend)
+
+**Textbook Ordering Flow Redesign (P0):**
+- Redesigned SchoolTextbooksView with order-aware item statuses
+- Items show as LOCKED (green check + "Comprado") when already purchased
+- Items show as AVAILABLE (checkbox) when not yet ordered
+- Order status now correctly set to "submitted" after any submission (was "draft")
+- Progress indicator: "X de Y comprado" with total purchased amount
+- Sticky bottom submit bar only appears when items are available to order
+- Mobile-first design: compact layout, truncated tabs, single-column items
+
+**Bug Fixes:**
+- Fixed missing Package/Send lucide-react imports
+- Fixed frontend route: /textbook-orders/direct → /textbook-orders/submit
+- Fixed frontend field: books → items in order submission payload
+- Fixed frontend URL: /products-by-grade/ → /by-grade/
+- Fixed backend grade format: handles both "3" and "G3"
+- Fixed form config URL: /order-form-config/client → /order-form-config/fields
+
+**Business Rules Implemented:**
+1. Each textbook item can only be ordered ONCE per student
+2. Ordered items are LOCKED and shown as "Purchased" (not selectable)
+3. Parents can buy partial textbooks and return later for remaining ones
+4. Locked items prevent accidental duplicate orders
+5. Re-order flow: student requests → admin approves → item unlocks
 
 ### Previous Sessions
-- Exclusive Purchase Flow Redesign with horizontal student tabs
-- Quick Reject Workflow with dropdown
-- PCA Table Resizable Columns and Horizontal Scrollbar
-- Reports & Analytics Module
-- Private Catalog inline editing
-- Fullscreen mode for PCA table
-- Sticky headers and first column
+- Exclusive Purchase Flow with horizontal student tabs
+- Quick Reject Workflow, PCA Table improvements
+- Reports & Analytics, Private Catalog inline editing
+- Fullscreen mode, sticky headers
 
-## Known Issues (Prioritized)
+## Known Issues
 
-### P3 - Medium Priority  
-1. **Admin Sidebar Disappears** - Recurring issue after login (testing showed it working now)
-2. **Google Sign-Up Loop** - OAuth flow broken (long-standing)
+### Resolved This Session
+- ~~Order stays "Draft" after submission~~ → Fixed: now "Submitted"
+- ~~Order submission fails for new students~~ → Fixed: route + field mismatch
+- ~~Textbooks don't load by grade~~ → Fixed: grade format + URL path
 
-### Resolved
-- Order Submission for new students - FIXED (route + field mismatch)
-- School Textbooks UI Redesign - COMPLETED (horizontal tabs working)
-- Grade format mismatch - FIXED (backend handles G3/3)
-- Unatienda data loading 500 error - Products endpoint working correctly
+### Remaining (Lower Priority)
+- P3: Admin Sidebar occasionally disappears (tested OK this session)
+- P4: Google Sign-Up OAuth flow broken (long-standing)
+- Minor: React key console warning in Unatienda.jsx
 
 ## Upcoming Tasks
-1. Admin UI for school year automation
-2. Student profile locking UI
-3. OneSignal push notifications for order status
+1. Admin UI for school year automation & student profile locking
+2. OneSignal push notifications for order status
+3. Re-order request flow (student requests, admin approves)
 
-## Future Tasks
-- Stripe payment integration
-- Google Sheets API integration
-- Landing page template selector
-- Teams/clans with rewards
+## Future/Backlog
+- Stripe payment, Google Sheets API, landing page templates
+- Teams/clans with rewards, ChipiPoints as payment
 - Email notifications for role assignments
-- ChipiPoints as payment method
 
 ## Key API Endpoints
-- `POST /api/auth-v2/login` - Admin login
-- `GET /api/store/store-config/public` - Public store config
-- `GET /api/store/private-catalog/access` - Check textbook access
-- `GET /api/store/private-catalog/by-grade/{grade}` - Textbooks by grade
-- `POST /api/store/textbook-orders/submit` - Submit textbook order
-- `GET /api/store/order-form-config/fields` - Order form fields
-- `GET /api/store/products` - Admin products list
+- POST /api/auth-v2/login
+- GET /api/store/private-catalog/access
+- GET /api/store/private-catalog/by-grade/{grade}
+- GET /api/store/textbook-orders/student/{student_id}
+- POST /api/store/textbook-orders/submit
+- GET /api/store/order-form-config/fields
 
-## Credentials (Test)
-- Super Admin: `teck@koh.one` / `Acdb##0897`
-- Test Client: `test@client.com` / `password`
+## Test Credentials
+- Super Admin: teck@koh.one / Acdb##0897
+- Test Client: test@client.com / password
 
 ## 3rd Party Integrations
-- i18next/react-i18next (translations)
-- Monday.com (order fulfillment)
-- ipapi.co (geolocation)
-- Yappy Comercial BG (payments)
-- Invision Community/LaoPan (OAuth)
+- i18next/react-i18next, Monday.com, ipapi.co, Yappy Comercial BG, Invision Community/LaoPan OAuth
