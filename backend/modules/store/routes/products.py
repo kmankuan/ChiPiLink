@@ -150,9 +150,14 @@ async def update_product(
     """Update product (admin only)"""
     try:
         product = await product_service.update_product(book_id, data)
-    if not product:
-        raise HTTPException(status_code=404, detail="Producto not found")
-    return product
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating product {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{book_id}")
