@@ -532,6 +532,18 @@ export default function CatalogoPrivadoTab({ token, onRefresh }) {
               </div>
               
               <div>
+                <label className="text-sm font-medium">Stock Quantity</label>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={formData.inventory_quantity}
+                  onChange={(e) => setFormData({...formData, inventory_quantity: e.target.value})}
+                  placeholder="0"
+                />
+              </div>
+              
+              <div>
                 <label className="text-sm font-medium">Image URL</label>
                 <Input
                   value={formData.image_url}
