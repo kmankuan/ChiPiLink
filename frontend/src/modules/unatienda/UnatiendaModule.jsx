@@ -183,6 +183,10 @@ export default function UnatiendaModule() {
         <TabsContent value="demo">
           <DemoDataTab token={token} onRefresh={fetchStats} />
         </TabsContent>
+
+        <TabsContent value="school-year">
+          <SchoolYearTab token={token} />
+        </TabsContent>
       </Tabs>
     </div>
   );
