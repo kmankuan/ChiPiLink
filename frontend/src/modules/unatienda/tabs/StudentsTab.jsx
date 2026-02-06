@@ -82,35 +82,20 @@ export default function StudentsTab({ token }) {
       : `${API}/api/store/school-year/students/${studentId}/unlock`;
 
     try {
-      const body = actionType === 'unlock' && unlockReason
-        ? JSON.stringify({ reason: unlockReason })
-        : undefined;
-
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: actionType === 'unlock' ? `"${unlockReason}"` : undefined
+        ...(actionType === 'unlock' && unlockReason ? { body: JSON.stringify({ reason: unlockReason }) } : {})
       });
 
-      // The endpoint takes reason as query param for unlock
-      const url = new URL(endpoint);
-      if (actionType === 'unlock' && unlockReason) {
-        url.searchParams.set('reason', unlockReason);
-      }
-
-      const res2 = await fetch(url.toString(), {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res2.ok) {
+      if (res.ok) {
         toast.success(actionType === 'lock' ? 'Student profile locked' : 'Student profile unlocked');
         fetchStudents();
       } else {
-        const err = await res2.json();
+        const err = await res.json();
         toast.error(err.detail || 'Error updating student');
       }
     } catch (error) {
