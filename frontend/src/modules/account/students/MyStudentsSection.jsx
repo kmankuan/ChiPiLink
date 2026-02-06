@@ -500,6 +500,34 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
     setDialogOpen(true);
   };
 
+  const handleEditProfile = (student) => {
+    setEditStudent(student);
+    setEditForm({
+      full_name: student.full_name || '',
+      student_number: student.student_number || '',
+      relation_type: student.relation_type || '',
+    });
+  };
+
+  const handleSaveProfile = async () => {
+    if (!editStudent) return;
+    setEditSaving(true);
+    try {
+      await api().put(
+        `/api/store/textbook-access/students/${editStudent.student_id}`,
+        editForm
+      );
+      toast.success(lang === 'es' ? 'Perfil actualizado' : 'Profile updated');
+      setEditStudent(null);
+      loadData();
+    } catch (error) {
+      const msg = error.response?.data?.detail || (lang === 'es' ? 'Error al actualizar' : 'Error updating profile');
+      toast.error(msg);
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   // Loading state
   if (loading || authLoading) {
     return (
