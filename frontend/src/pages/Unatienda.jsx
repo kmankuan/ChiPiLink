@@ -1333,6 +1333,8 @@ function SchoolTextbooksView({
     </div>
   );
 }
+
+export default function Unatienda() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
