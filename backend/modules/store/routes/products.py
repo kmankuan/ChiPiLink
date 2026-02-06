@@ -165,11 +165,17 @@ async def deactivate_product(
     book_id: str,
     admin: dict = Depends(get_admin_user)
 ):
-    """Desactivar producto - soft delete (solo admin)"""
-    success = await product_service.deactivate_product(book_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Producto not found")
-    return {"success": True, "message": "Producto desactivado"}
+    """Deactivate product - soft delete (admin only)"""
+    try:
+        success = await product_service.deactivate_product(book_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"success": True, "message": "Product deactivated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deactivating product {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/{book_id}/featured")
@@ -179,10 +185,20 @@ async def toggle_featured(
     orden: int = 0,
     admin: dict = Depends(get_admin_user)
 ):
-    """Marcar/desmarcar producto como destacado (solo admin)"""
-    product = await product_service.update_product(
-        book_id,
-        ProductUpdate(destacado=destacado, featured_order=orden)
+    """Toggle product featured status (admin only)"""
+    try:
+        product = await product_service.update_product(
+            book_id,
+            ProductUpdate(featured=featured, featured_order=orden)
+        )
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error toggling featured for {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     )
     if not product:
         raise HTTPException(status_code=404, detail="Producto not found")
