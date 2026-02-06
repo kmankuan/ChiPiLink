@@ -453,31 +453,280 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent className="p-0">
-            <ScrollArea className="h-[500px]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50">
-                    <TableHead className="w-[250px]">Book Name</TableHead>
-                    <TableHead className="w-[100px]">Code</TableHead>
-                    <TableHead className="w-[80px]">Grade</TableHead>
-                    <TableHead className="w-[120px]">Subject</TableHead>
-                    <TableHead className="w-[120px]">Publisher</TableHead>
-                    <TableHead className="w-[90px] text-right">Price</TableHead>
-                    <TableHead className="w-[80px] text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Package className="h-4 w-4" />
-                        Stock
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[80px]">Status</TableHead>
-                    <TableHead className="w-[60px] text-right">Del</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProducts.map((p) => {
-                    const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+        <>
+          {/* Fullscreen Table Dialog */}
+          <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+            <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0">
+              <DialogHeader className="px-4 py-3 border-b flex-row items-center justify-between">
+                <div>
+                  <DialogTitle>Private Catalog - PCA</DialogTitle>
+                  <DialogDescription>
+                    {filteredProducts.length} books • Click any cell to edit
+                  </DialogDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(false)}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </DialogHeader>
+              <div className="flex-1 overflow-auto p-0">
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[1200px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-[280px] sticky left-0 bg-muted/50 z-10">Book Name</TableHead>
+                        <TableHead className="w-[100px]">Code</TableHead>
+                        <TableHead className="w-[80px]">Grade</TableHead>
+                        <TableHead className="w-[130px]">Subject</TableHead>
+                        <TableHead className="w-[130px]">Publisher</TableHead>
+                        <TableHead className="w-[100px] text-right">Price</TableHead>
+                        <TableHead className="w-[90px] text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Package className="h-4 w-4" />
+                            Stock
+                          </div>
+                        </TableHead>
+                        <TableHead className="w-[90px]">Status</TableHead>
+                        <TableHead className="w-[70px] text-right">Del</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredProducts.map((p) => {
+                        const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+                        const isLowStock = stock > 0 && stock < 5;
+                        const isOutOfStock = stock <= 0;
+                        
+                        return (
+                          <TableRow key={p.book_id} className="group">
+                            <TableCell className="p-1 sticky left-0 bg-background z-10">
+                              <EditableCell
+                                value={p.name}
+                                onSave={(val) => updateProductField(p.book_id, 'name', val)}
+                                className="font-medium"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.code}
+                                onSave={(val) => updateProductField(p.book_id, 'code', val)}
+                                className="font-mono text-sm"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.grade}
+                                onSave={(val) => updateProductField(p.book_id, 'grade', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.subject}
+                                onSave={(val) => updateProductField(p.book_id, 'subject', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.publisher}
+                                onSave={(val) => updateProductField(p.book_id, 'publisher', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1 text-right">
+                              <EditableCell
+                                value={p.price?.toFixed(2) || '0.00'}
+                                onSave={(val) => updateProductField(p.book_id, 'price', parseFloat(val) || 0)}
+                                type="number"
+                                className="justify-end font-medium"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1 text-center">
+                              <div 
+                                className={`
+                                  cursor-pointer rounded px-2 py-1 text-center font-semibold
+                                  ${isOutOfStock ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 
+                                    isLowStock ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 
+                                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}
+                                  hover:ring-2 hover:ring-primary/50 transition-all
+                                `}
+                                onClick={() => {
+                                  const newQty = prompt('Enter new stock quantity:', p.inventory_quantity || 0);
+                                  if (newQty !== null && !isNaN(parseInt(newQty))) {
+                                    updateProductField(p.book_id, 'inventory_quantity', parseInt(newQty));
+                                  }
+                                }}
+                                title="Click to edit stock"
+                              >
+                                {p.inventory_quantity || 0}
+                              </div>
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <Badge 
+                                variant={p.active !== false ? "default" : "secondary"}
+                                className="cursor-pointer"
+                                onClick={() => updateProductField(p.book_id, 'active', p.active === false)}
+                                title="Click to toggle"
+                              >
+                                {p.active !== false ? "Active" : "Inactive"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="p-1 text-right">
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => handleDelete(p.book_id)}
+                                className="opacity-50 group-hover:opacity-100"
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Normal Table View */}
+          <Card>
+            <CardHeader className="py-3 px-4 border-b">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Showing {filteredProducts.length} books
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsFullscreen(true)}
+                  className="gap-2"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                  Fullscreen
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ScrollArea className="h-[500px]">
+                <div className="overflow-x-auto">
+                  <Table className="min-w-[1100px]">
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-[250px] sticky left-0 bg-muted/50 z-10">Book Name</TableHead>
+                        <TableHead className="w-[100px]">Code</TableHead>
+                        <TableHead className="w-[80px]">Grade</TableHead>
+                        <TableHead className="w-[120px]">Subject</TableHead>
+                        <TableHead className="w-[120px]">Publisher</TableHead>
+                        <TableHead className="w-[90px] text-right">Price</TableHead>
+                        <TableHead className="w-[80px] text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Package className="h-4 w-4" />
+                            Stock
+                          </div>
+                        </TableHead>
+                        <TableHead className="w-[80px]">Status</TableHead>
+                        <TableHead className="w-[60px] text-right">Del</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredProducts.map((p) => {
+                        const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
+                        const isLowStock = stock > 0 && stock < 5;
+                        const isOutOfStock = stock <= 0;
+                        
+                        return (
+                          <TableRow key={p.book_id} className="group">
+                            <TableCell className="p-1 sticky left-0 bg-background z-10">
+                              <EditableCell
+                                value={p.name}
+                                onSave={(val) => updateProductField(p.book_id, 'name', val)}
+                                className="font-medium"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.code}
+                                onSave={(val) => updateProductField(p.book_id, 'code', val)}
+                                className="font-mono text-sm"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.grade}
+                                onSave={(val) => updateProductField(p.book_id, 'grade', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.subject}
+                                onSave={(val) => updateProductField(p.book_id, 'subject', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <EditableCell
+                                value={p.publisher}
+                                onSave={(val) => updateProductField(p.book_id, 'publisher', val)}
+                              />
+                            </TableCell>
+                            <TableCell className="p-1 text-right">
+                              <EditableCell
+                                value={p.price?.toFixed(2) || '0.00'}
+                                onSave={(val) => updateProductField(p.book_id, 'price', parseFloat(val) || 0)}
+                                type="number"
+                                className="justify-end font-medium"
+                              />
+                            </TableCell>
+                            <TableCell className="p-1 text-center">
+                              <div 
+                                className={`
+                                  cursor-pointer rounded px-2 py-1 text-center font-semibold
+                                  ${isOutOfStock ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 
+                                    isLowStock ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 
+                                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}
+                                  hover:ring-2 hover:ring-primary/50 transition-all
+                                `}
+                                onClick={() => {
+                                  const newQty = prompt('Enter new stock quantity:', p.inventory_quantity || 0);
+                                  if (newQty !== null && !isNaN(parseInt(newQty))) {
+                                    updateProductField(p.book_id, 'inventory_quantity', parseInt(newQty));
+                                  }
+                                }}
+                                title="Click to edit stock"
+                              >
+                                {p.inventory_quantity || 0}
+                              </div>
+                            </TableCell>
+                            <TableCell className="p-1">
+                              <Badge 
+                                variant={p.active !== false ? "default" : "secondary"}
+                                className="cursor-pointer"
+                                onClick={() => updateProductField(p.book_id, 'active', p.active === false)}
+                                title="Click to toggle"
+                              >
+                                {p.active !== false ? "Active" : "Inactive"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="p-1 text-right">
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => handleDelete(p.book_id)}
+                                className="opacity-50 group-hover:opacity-100"
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </>
+      )}
                     const isLowStock = stock > 0 && stock < 5;
                     const isOutOfStock = stock <= 0;
                     
