@@ -55,8 +55,7 @@ class OrderItemCreate(BaseModel):
 
 class ReorderRequest(BaseModel):
     """Request for reordering a book"""
-    book_id: str
-    reason: str  # Why user needs to reorder
+    reason: str = ""  # Why user needs to reorder
 
 
 class SubmitOrderRequest(BaseModel):
