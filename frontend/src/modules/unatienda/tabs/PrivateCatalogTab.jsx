@@ -470,13 +470,10 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 </Button>
               </div>
               <div 
-                className="flex-1 relative"
-                style={{ 
-                  overflow: 'scroll',
-                  scrollbarWidth: 'auto'
-                }}
+                className="scrollable-table-container flex-1"
+                data-testid="pca-table-fullscreen-container"
               >
-                <table className="w-full border-collapse" style={{ minWidth: '1300px' }}>
+                <table className="w-full border-collapse" style={{ minWidth: '1300px', tableLayout: 'fixed' }}>
                   <thead className="sticky top-0 z-20 bg-muted">
                     <tr>
                       <th className="sticky left-0 z-30 bg-muted px-3 py-2 text-left text-sm font-medium border-b border-r" style={{ width: '280px', minWidth: '280px' }}>Book Name</th>
