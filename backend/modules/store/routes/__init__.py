@@ -25,6 +25,7 @@ from .school_year import router as school_year_router
 from .order_form_config import router as order_form_config_router
 from .inventory_import import router as inventory_import_router
 from .analytics import router as analytics_router
+from .store_config import router as store_config_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -44,6 +45,7 @@ router.include_router(school_year_router)
 router.include_router(order_form_config_router)
 router.include_router(inventory_import_router)
 router.include_router(analytics_router)
+router.include_router(store_config_router)
 
 # Re-export for compatibility
 store_refactored_router = router
