@@ -419,8 +419,8 @@ class TextbookOrderService(BaseService):
             if item["status"] == OrderItemStatus.ORDERED.value
         )
         
-        # Status: "partial" if there are more items available, "submitted" if all items ordered or none left
-        new_status = OrderStatus.DRAFT.value if available_items else OrderStatus.SUBMITTED.value
+        # Status: always "submitted" after any submission - user has made a purchase
+        new_status = OrderStatus.SUBMITTED.value
         
         # Update order
         await self.order_repo.update_order(order_id, {
