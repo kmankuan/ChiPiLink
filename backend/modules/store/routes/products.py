@@ -215,5 +215,10 @@ async def toggle_promotion(
             ProductUpdate(on_sale=on_sale, sale_price=sale_price)
         )
         if not product:
-        raise HTTPException(status_code=404, detail="Producto not found")
-    return {"success": True}
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error toggling promotion for {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
