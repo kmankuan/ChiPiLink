@@ -212,8 +212,8 @@ export default function AccountDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="exclusive">
-            <LinkingPage embedded={true} />
+          <TabsContent value="students">
+            <MyStudentsSection />
           </TabsContent>
         </Tabs>
       </div>
