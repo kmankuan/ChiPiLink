@@ -1005,6 +1005,10 @@ function SchoolTextbooksView({
       submitOrder: '提交订单', orderSuccess: '订单提交成功！',
       orderError: '提交订单时出错', selectAtLeastOne: '请至少选择一本书',
       total: '总计', itemsOf: '/',
+      requestReorder: '请求重新订购', reorderReason: '重新订购原因',
+      reorderSuccess: '重新订购已请求', reorderError: '请求重新订购时出错',
+      reorderReasonPlaceholder: '例如：书籍损坏，需要更换',
+      send: '发送请求', cancel: '取消',
     }
   };
   
