@@ -750,16 +750,43 @@ export default function TextbookAccessAdminTab({ token }) {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {/* Rejection Reason */}
+            {/* Rejection Reason - with quick select */}
             {actionDialog?.action === 'rejected' && (
-              <div className="space-y-2">
-                <Label>{t.rejectionReason} *</Label>
-                <Textarea
-                  value={actionData.reason}
-                  onChange={(e) => setActionData(prev => ({ ...prev, reason: e.target.value }))}
-                  placeholder={t.rejectionReasonPlaceholder}
-                  rows={3}
-                />
+              <div className="space-y-3">
+                <Label>{t.selectReason}</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickRejectReasons.map((reason) => (
+                    <Button
+                      key={reason.id}
+                      type="button"
+                      variant={actionData.selectedReasonId === reason.id ? "default" : "outline"}
+                      size="sm"
+                      className={`justify-start text-left h-auto py-2 px-3 ${
+                        actionData.selectedReasonId === reason.id 
+                          ? 'bg-red-600 hover:bg-red-700 text-white' 
+                          : 'hover:bg-red-50 hover:text-red-600 hover:border-red-200'
+                      }`}
+                      onClick={() => handleReasonSelect(reason.id)}
+                    >
+                      {reason.label}
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* Custom reason textarea (always shown for editing) */}
+                <div className="space-y-2">
+                  <Label>{t.customReason}</Label>
+                  <Textarea
+                    value={actionData.reason}
+                    onChange={(e) => setActionData(prev => ({ 
+                      ...prev, 
+                      reason: e.target.value,
+                      selectedReasonId: e.target.value ? 'other' : prev.selectedReasonId 
+                    }))}
+                    placeholder={t.rejectionReasonPlaceholder}
+                    rows={2}
+                  />
+                </div>
               </div>
             )}
             
