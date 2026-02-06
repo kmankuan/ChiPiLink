@@ -828,35 +828,6 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                         </tr>
                       );
                     })}
-                              }}
-                              title="Click to edit stock"
-                            >
-                              {p.inventory_quantity || 0}
-                            </div>
-                          </td>
-                          <td className="p-1">
-                            <Badge 
-                              variant={p.active !== false ? "default" : "secondary"}
-                              className="cursor-pointer"
-                              onClick={() => updateProductField(p.book_id, 'active', p.active === false)}
-                              title="Click to toggle"
-                            >
-                              {p.active !== false ? "Active" : "Inactive"}
-                            </Badge>
-                          </td>
-                          <td className="p-1 text-right">
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              onClick={() => handleDelete(p.book_id)}
-                              className="opacity-50 group-hover:opacity-100"
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
                   </tbody>
                 </table>
               </div>
