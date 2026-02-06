@@ -382,6 +382,11 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
   const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   
+  // Edit profile states
+  const [editStudent, setEditStudent] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editSaving, setEditSaving] = useState(false);
+  
   // Form states
   const [formData, setFormData] = useState({
     full_name: '',
