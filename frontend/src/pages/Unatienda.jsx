@@ -1246,13 +1246,19 @@ function SchoolTextbooksView({
                     </p>
                   </div>
                   
-                  {/* Price + status badge */}
-                  <div className="shrink-0 text-right">
+                  {/* Price + status badge + reorder action */}
+                  <div className="shrink-0 text-right flex flex-col items-end gap-0.5">
                     <p className={`text-sm font-semibold ${isOrdered ? 'text-green-600' : 'text-foreground'}`}>
                       ${item.price?.toFixed(2)}
                     </p>
                     {isOrdered && (
-                      <span className="text-[10px] text-green-600 font-medium">{t.purchased}</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setReorderItem(item); }}
+                        className="text-[10px] text-green-600 hover:text-purple-600 hover:underline font-medium transition-colors"
+                        data-testid={`reorder-btn-${item.book_id}`}
+                      >
+                        {t.purchased} &middot; {t.requestReorder}
+                      </button>
                     )}
                     {isPending && (
                       <span className="text-[10px] text-amber-600 font-medium">{t.reorderPending}</span>
