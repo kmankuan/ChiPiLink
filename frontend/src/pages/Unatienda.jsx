@@ -958,7 +958,10 @@ function SchoolTextbooksView({
       orderTextbooks: 'Order Textbooks',
       pendingApproval: 'Pending Approval',
       grade: 'Grade',
-      back: 'Back to Store'
+      back: 'Back to Store',
+      noValidatedStudents: 'No Validated Students',
+      noValidatedStudentsDesc: 'Your student link requests are pending approval. You will be able to order once approved.',
+      goToMyStudents: 'View My Students'
     },
     es: {
       title: 'Textos Escolares',
@@ -974,7 +977,10 @@ function SchoolTextbooksView({
       orderTextbooks: 'Ordenar Textos',
       pendingApproval: 'Pendiente de Aprobación',
       grade: 'Grado',
-      back: 'Volver a la Tienda'
+      back: 'Volver a la Tienda',
+      noValidatedStudents: 'Sin Estudiantes Validados',
+      noValidatedStudentsDesc: 'Tus solicitudes de vinculación están pendientes de aprobación. Podrás ordenar una vez aprobadas.',
+      goToMyStudents: 'Ver Mis Estudiantes'
     },
     zh: {
       title: '学校教科书',
@@ -990,17 +996,19 @@ function SchoolTextbooksView({
       orderTextbooks: '订购教科书',
       pendingApproval: '等待批准',
       grade: '年级',
-      back: '返回商店'
+      back: '返回商店',
+      noValidatedStudents: '无验证学生',
+      noValidatedStudentsDesc: '您的学生关联请求正在等待批准。批准后即可订购。',
+      goToMyStudents: '查看我的学生'
     }
   };
   
   const t = texts[lang] || texts.es;
-  const validatedStudents = privateCatalogAccess?.students?.filter(s => 
-    s.current_year_status === 'approved'
-  ) || [];
-  const pendingStudents = privateCatalogAccess?.students?.filter(s => 
-    s.current_year_status !== 'approved'
-  ) || [];
+  const navigate = useNavigate();
+  
+  // Students from private catalog access are already validated (has_access = true)
+  const validatedStudents = privateCatalogAccess?.students || [];
+  const hasAccess = privateCatalogAccess?.has_access === true;
   
   return (
     <div className="space-y-6">
@@ -1038,94 +1046,62 @@ function SchoolTextbooksView({
             </Button>
           </CardContent>
         </Card>
-      ) : validatedStudents.length === 0 && pendingStudents.length === 0 ? (
-        // No students linked
+      ) : !hasAccess || validatedStudents.length === 0 ? (
+        // No validated students - show prompt
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Users className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-            <h3 className="font-semibold text-lg mb-2">{t.noStudents}</h3>
-            <p className="text-muted-foreground mb-6">{t.noStudentsDesc}</p>
-            <Button onClick={onLinkStudent}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              {t.linkStudentBtn}
-            </Button>
+            <h3 className="font-semibold text-lg mb-2">{t.noValidatedStudents}</h3>
+            <p className="text-muted-foreground mb-6">{t.noValidatedStudentsDesc}</p>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={() => navigate('/my-account?tab=students')} variant="outline">
+                {t.goToMyStudents}
+              </Button>
+              <Button onClick={onLinkStudent}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                {t.linkStudentBtn}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
-        // Has students - show cards
+        // Has validated students - show cards
         <div className="space-y-6">
-          {validatedStudents.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                {t.selectStudent}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">{t.selectStudentDesc}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {validatedStudents.map((student) => (
-                  <Card 
-                    key={student.student_id}
-                    className="cursor-pointer hover:shadow-lg transition-all border-l-4 border-l-green-500 hover:border-l-green-600"
-                    onClick={() => onSelectStudent(student)}
-                    data-testid={`student-select-${student.student_id}`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
-                          <User className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold truncate">{student.name || student.full_name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {t.grade} {student.grade} • {student.school_name || 'School'}
-                          </p>
-                        </div>
-                        <Button size="sm" className="shrink-0 gap-1">
-                          <BookOpen className="h-4 w-4" />
-                          {t.orderTextbooks}
-                        </Button>
+          <div>
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              {t.selectStudent}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">{t.selectStudentDesc}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {validatedStudents.map((student) => (
+                <Card 
+                  key={student.student_id || student.sync_id}
+                  className="cursor-pointer hover:shadow-lg transition-all border-l-4 border-l-green-500 hover:border-l-green-600"
+                  onClick={() => onSelectStudent(student)}
+                  data-testid={`student-select-${student.student_id || student.sync_id}`}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <User className="h-5 w-5 text-green-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {pendingStudents.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-4 flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-5 w-5 text-amber-500" />
-                {t.pendingApproval}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 opacity-75">
-                {pendingStudents.map((student) => (
-                  <Card 
-                    key={student.student_id}
-                    className="border-l-4 border-l-amber-400"
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/30">
-                          <User className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold truncate">{student.name || student.full_name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {t.grade} {student.grade}
-                          </p>
-                        </div>
-                        <Badge variant="secondary" className="bg-amber-100 text-amber-700">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {t.pendingApproval}
-                        </Badge>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold truncate">{student.name || student.full_name}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {t.grade} {student.grade} • {student.school_name || 'School'}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      <Button size="sm" className="shrink-0 gap-1">
+                        <BookOpen className="h-4 w-4" />
+                        {t.orderTextbooks}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          )}
+          </div>
           
           {/* Link more students */}
           <div className="pt-4 border-t">
