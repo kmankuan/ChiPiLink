@@ -1368,6 +1368,7 @@ export default function Unatienda() {
 
             {!selectedCategory ? (
               <>
+                {/* Regular categories */}
                 {categories.map((cat) => (
                   <Button
                     key={cat.category_id}
@@ -1380,6 +1381,20 @@ export default function Unatienda() {
                     {cat.name}
                   </Button>
                 ))}
+                
+                {/* School Textbooks Category - always visible if config allows */}
+                {storeConfig?.textbooks_category_enabled !== false && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActiveView('textbooks')}
+                    className="rounded-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400"
+                    data-testid="textbooks-category-btn"
+                  >
+                    <GraduationCap className="h-4 w-4 mr-1.5" />
+                    {storeConfig?.textbooks_category_label?.[i18n?.language] || 'School Textbooks'}
+                  </Button>
+                )}
               </>
             ) : (
               <>
