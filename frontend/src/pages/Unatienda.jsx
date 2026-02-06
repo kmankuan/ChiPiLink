@@ -925,7 +925,7 @@ export default function Unatienda() {
   const { addItem, items, openCart } = useCart();
   
   // Main state
-  const [activeView, setActiveView] = useState('public'); // 'public' or 'private'
+  const [activeView, setActiveView] = useState('public'); // 'public', 'textbooks', or 'textbook-order'
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -933,8 +933,14 @@ export default function Unatienda() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Store config for textbooks visibility
+  const [storeConfig, setStoreConfig] = useState(null);
+  
   // Private catalog state
   const [privateCatalogAccess, setPrivateCatalogAccess] = useState(null);
+  
+  // Selected student for textbook ordering
+  const [selectedStudent, setSelectedStudent] = useState(null);
   
   // Hierarchical navigation state (for public catalog)
   const [selectedCategory, setSelectedCategory] = useState(null);
