@@ -1183,28 +1183,36 @@ export default function Unatienda() {
     const tab = params.get('tab');
     const studentId = params.get('student');
     
-    // Store params for processing after data loads
-    if (category === 'textbooks' || tab === 'textbooks' || studentId) {
-      setUrlParams({ category, tab, studentId });
+    // Handle textbooks navigation immediately if no student ID needed
+    if (category === 'textbooks' && !studentId) {
+      setActiveView('textbooks');
+      // Clean URL
+      window.history.replaceState({}, '', '/unatienda');
+    } else if (tab === 'textbooks') {
+      setActiveView('textbooks');
+      window.history.replaceState({}, '', '/unatienda');
+    } else if (category === 'textbooks' && studentId) {
+      // Store params for processing after privateCatalogAccess loads
+      setUrlParams({ category, studentId });
     }
     
     if (categoria) setSelectedCategory(categoria);
     if (search) setSearchTerm(decodeURIComponent(search));
     
-    // Clean up URL (except for textbook params which need privateCatalogAccess)
+    // Clean up URL for regular params
     if (categoria || search) {
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete('categoria');
       newUrl.searchParams.delete('search');
-      window.history.replaceState({}, '', newUrl.pathname + newUrl.search);
+      window.history.replaceState({}, '', newUrl.pathname);
     }
   }, []);
   
-  // Process textbook URL params after privateCatalogAccess loads
+  // Process textbook URL params after privateCatalogAccess loads (only for student-specific)
   useEffect(() => {
     if (!urlParams || !privateCatalogAccess) return;
     
-    const { category, tab, studentId } = urlParams;
+    const { category, studentId } = urlParams;
     
     if (category === 'textbooks' && studentId) {
       // Find the student in privateCatalogAccess
@@ -1219,13 +1227,11 @@ export default function Unatienda() {
         // Student not found or not approved, show textbooks selection
         setActiveView('textbooks');
       }
-    } else if (tab === 'textbooks') {
-      setActiveView('textbooks');
+      
+      // Clean URL params after processing
+      window.history.replaceState({}, '', '/unatienda');
+      setUrlParams(null);
     }
-    
-    // Clean URL params after processing
-    window.history.replaceState({}, '', '/unatienda');
-    setUrlParams(null);
   }, [urlParams, privateCatalogAccess]);
 
   useEffect(() => {
