@@ -22,7 +22,7 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 └── frontend/         # React + Tailwind + Shadcn UI
     ├── modules/
     │   ├── account/  
-    │   │   ├── students/  # NEW: My Students Section
+    │   │   ├── students/  # My Students Section
     │   │   ├── wallet/
     │   │   ├── profile/
     │   │   └── pages/
@@ -35,54 +35,58 @@ Build a comprehensive school management and e-commerce platform for Panama Chris
 ## What's Been Implemented
 
 ### February 6, 2026 (Latest Session)
-- ✅ **Exclusive Purchase Flow Redesign** - Complete overhaul
-  - New "My Students" section in Account with compact card grid
-  - "Textos Escolares" category in Unatienda (replaces old "Compra Exclusiva" button)
-  - Click "Order Textbooks" from student card → goes directly to order view
-  - Store configuration API for visibility settings
-- ✅ **Quick Reject Workflow** - Dropdown with predefined rejection reasons
-- ✅ **PCA Table Resizable Columns** - Drag to resize column widths
-- ✅ **PCA Table Horizontal Scrollbar** - Fixed scrollbar visibility
+- Fixed deployment build failure (orphaned JSX in Unatienda.jsx)
+- Fixed missing `Package` and `Send` lucide-react imports
+- Fixed frontend route mismatch: `/textbook-orders/direct` -> `/textbook-orders/submit`
+- Fixed frontend field naming: `books` -> `items` in order submission
+- Fixed frontend URL: `/products-by-grade/` -> `/by-grade/`
+- Fixed backend grade format mismatch: now handles both "3" and "G3" formats
+- Fixed frontend form config URL: `/order-form-config/client` -> `/order-form-config/fields`
+- Verified School Textbooks horizontal tab UI works end-to-end
+- All tests passing (100% backend, 100% frontend)
 
 ### Previous Sessions
-- ✅ Reports & Analytics Module (`/admin#analytics`)
-- ✅ Private Catalog inline editing
-- ✅ Fullscreen mode for PCA table
-- ✅ Sticky headers and first column
-- ✅ Grade mismatch fix (G3 vs 3)
+- Exclusive Purchase Flow Redesign with horizontal student tabs
+- Quick Reject Workflow with dropdown
+- PCA Table Resizable Columns and Horizontal Scrollbar
+- Reports & Analytics Module
+- Private Catalog inline editing
+- Fullscreen mode for PCA table
+- Sticky headers and first column
 
 ## Known Issues (Prioritized)
 
-### P1 - Critical
-1. **Order Submission Regression** - "Please select at least one new book to order"
-   - File: `/app/frontend/src/pages/Unatienda.jsx`
-   - Backend: `/app/backend/modules/store/services/textbook_order_service.py`
-
-### P2 - High Priority
-2. **Complete Unatienda Integration** - Use store config for textbooks category visibility
-3. **Client Orders View** - Create orders section under Unatienda
-
 ### P3 - Medium Priority  
-4. **Admin Sidebar Disappears** - Recurring issue after login
-5. **Google Sign-Up Loop** - OAuth flow broken (long-standing)
+1. **Admin Sidebar Disappears** - Recurring issue after login (testing showed it working now)
+2. **Google Sign-Up Loop** - OAuth flow broken (long-standing)
+
+### Resolved
+- Order Submission for new students - FIXED (route + field mismatch)
+- School Textbooks UI Redesign - COMPLETED (horizontal tabs working)
+- Grade format mismatch - FIXED (backend handles G3/3)
+- Unatienda data loading 500 error - Products endpoint working correctly
 
 ## Upcoming Tasks
-1. Phase 2 of purchase flow redesign:
-   - Update Unatienda to use store config
-   - Create client orders view
-   - Add quick navigation from student cards
-2. Admin UI for school year automation
-3. Student profile locking UI
-4. OneSignal push notifications for order status
+1. Admin UI for school year automation
+2. Student profile locking UI
+3. OneSignal push notifications for order status
+
+## Future Tasks
+- Stripe payment integration
+- Google Sheets API integration
+- Landing page template selector
+- Teams/clans with rewards
+- Email notifications for role assignments
+- ChipiPoints as payment method
 
 ## Key API Endpoints
 - `POST /api/auth-v2/login` - Admin login
-- `GET /api/store/store-config/public` - Public store config (NEW)
-- `PUT /api/store/store-config/admin` - Update store config (NEW)
-- `GET /api/store/private-catalog/admin/products` - PCA products
-- `GET /api/store/textbook-access/my-students` - User's linked students
-- `POST /api/store/textbook-orders/direct` - Direct order submission
-- `GET /api/store/analytics/comprehensive` - Analytics data
+- `GET /api/store/store-config/public` - Public store config
+- `GET /api/store/private-catalog/access` - Check textbook access
+- `GET /api/store/private-catalog/by-grade/{grade}` - Textbooks by grade
+- `POST /api/store/textbook-orders/submit` - Submit textbook order
+- `GET /api/store/order-form-config/fields` - Order form fields
+- `GET /api/store/products` - Admin products list
 
 ## Credentials (Test)
 - Super Admin: `teck@koh.one` / `Acdb##0897`
