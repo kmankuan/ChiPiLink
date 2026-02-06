@@ -18,6 +18,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Table,
   TableBody,
   TableCell,
@@ -42,7 +49,8 @@ import {
   MessageSquare,
   Check,
   X,
-  HelpCircle
+  HelpCircle,
+  ChevronDown
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
