@@ -531,7 +531,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-muted-foreground">No books in the private catalog</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Use the "Demo" tab to generate test data or add books manually
+              Use the &quot;Demo&quot; tab to generate test data or add books manually
             </p>
           </CardContent>
         </Card>
