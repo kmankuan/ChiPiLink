@@ -47,6 +47,34 @@ import {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
+// Predefined rejection reasons for quick actions
+const QUICK_REJECT_REASONS = {
+  en: [
+    { id: 'not_enrolled', label: 'Student not enrolled', reason: 'The student is not currently enrolled in our system.' },
+    { id: 'wrong_school', label: 'Wrong school', reason: 'The student is registered at a different school.' },
+    { id: 'wrong_grade', label: 'Incorrect grade', reason: 'The grade level does not match our records.' },
+    { id: 'duplicate', label: 'Duplicate request', reason: 'A request for this student already exists.' },
+    { id: 'incomplete', label: 'Incomplete info', reason: 'The request is missing required information.' },
+    { id: 'other', label: 'Other (custom)', reason: '' }
+  ],
+  es: [
+    { id: 'not_enrolled', label: 'No está matriculado', reason: 'El estudiante no está matriculado actualmente en nuestro sistema.' },
+    { id: 'wrong_school', label: 'Colegio incorrecto', reason: 'El estudiante está registrado en otro colegio.' },
+    { id: 'wrong_grade', label: 'Grado incorrecto', reason: 'El nivel de grado no coincide con nuestros registros.' },
+    { id: 'duplicate', label: 'Solicitud duplicada', reason: 'Ya existe una solicitud para este estudiante.' },
+    { id: 'incomplete', label: 'Info incompleta', reason: 'La solicitud carece de información requerida.' },
+    { id: 'other', label: 'Otro (personalizado)', reason: '' }
+  ],
+  zh: [
+    { id: 'not_enrolled', label: '未注册', reason: '该学生目前未在我们的系统中注册。' },
+    { id: 'wrong_school', label: '学校错误', reason: '该学生注册在不同的学校。' },
+    { id: 'wrong_grade', label: '年级错误', reason: '年级与我们的记录不符。' },
+    { id: 'duplicate', label: '重复请求', reason: '该学生已有请求。' },
+    { id: 'incomplete', label: '信息不完整', reason: '请求缺少必要信息。' },
+    { id: 'other', label: '其他（自定义）', reason: '' }
+  ]
+};
+
 // Translations
 const translations = {
   en: {
