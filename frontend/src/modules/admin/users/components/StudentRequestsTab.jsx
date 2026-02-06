@@ -575,15 +575,37 @@ export default function TextbookAccessAdminTab({ token }) {
                           </Button>
                         )}
                         {request.status !== 'rejected' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 text-red-600 border-red-200 hover:bg-red-50"
-                            onClick={() => handleAction(request, 'rejected')}
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            {t.reject}
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4 mr-1" />
+                                {t.reject}
+                                <ChevronDown className="h-3 w-3 ml-1" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              {quickRejectReasons.slice(0, -1).map((reason) => (
+                                <DropdownMenuItem
+                                  key={reason.id}
+                                  onClick={() => handleQuickReject(request, reason.id)}
+                                  className="text-red-600"
+                                >
+                                  {reason.label}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleAction(request, 'rejected')}
+                                className="text-muted-foreground"
+                              >
+                                {quickRejectReasons.find(r => r.id === 'other')?.label}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         )}
                       </div>
                     </CardContent>
