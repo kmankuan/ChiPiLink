@@ -723,54 +723,6 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
           </Card>
         </>
       )}
-                                  ${isOutOfStock ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 
-                                    isLowStock ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 
-                                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'}
-                                  hover:ring-2 hover:ring-primary/50 transition-all
-                                `}
-                                onClick={() => {
-                                  const newQty = prompt('Enter new stock quantity:', p.inventory_quantity || 0);
-                                  if (newQty !== null && !isNaN(parseInt(newQty))) {
-                                    updateProductField(p.book_id, 'inventory_quantity', parseInt(newQty));
-                                  }
-                                }}
-                                title="Click to edit stock"
-                              >
-                                {p.inventory_quantity || 0}
-                              </div>
-                            </TableCell>
-                            <TableCell className="p-1">
-                              <Badge 
-                                variant={p.active !== false ? "default" : "secondary"}
-                                className="cursor-pointer"
-                                onClick={() => updateProductField(p.book_id, 'active', p.active === false)}
-                                title="Click to toggle"
-                              >
-                                {p.active !== false ? "Active" : "Inactive"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="p-1 text-right">
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                onClick={() => handleDelete(p.book_id)}
-                                className="opacity-50 group-hover:opacity-100"
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </>
-      )}
 
       {/* Form Dialog - For creating new products */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
