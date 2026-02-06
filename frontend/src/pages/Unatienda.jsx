@@ -1294,11 +1294,45 @@ function SchoolTextbooksView({
           )}
         </div>
       )}
+      
+      {/* Reorder Request Dialog */}
+      {reorderItem && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40" onClick={() => setReorderItem(null)}>
+          <div className="bg-background rounded-t-xl sm:rounded-xl w-full sm:max-w-sm p-4 space-y-3 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div>
+              <h3 className="font-semibold text-sm">{t.requestReorder}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">{reorderItem.book_name}</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium">{t.reorderReason}</label>
+              <textarea
+                value={reorderReason}
+                onChange={(e) => setReorderReason(e.target.value)}
+                placeholder={t.reorderReasonPlaceholder}
+                className="w-full px-3 py-2 text-sm border rounded-lg resize-none bg-muted/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                rows={2}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setReorderItem(null)} className="flex-1">
+                {t.cancel}
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleReorderRequest}
+                disabled={requestingReorder}
+                className="flex-1 gap-1.5 bg-purple-600 hover:bg-purple-700"
+              >
+                {requestingReorder ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                {t.send}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default function Unatienda() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
