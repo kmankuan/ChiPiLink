@@ -79,24 +79,24 @@ class ProductService(BaseService):
         self,
         category: Optional[str] = None,
         limit: int = 10
-    ) -> List[Product]:
-        """Get productos en promotion"""
+    ) -> List[dict]:
+        """Get products on promotion"""
         results = await self.repository.get_promotions(category, limit)
-        return [Product(**r) for r in results]
+        return results
     
     async def get_newest_products(
         self,
         category: Optional[str] = None,
         limit: int = 8
-    ) -> List[Product]:
-        """Get productos more nuevos"""
+    ) -> List[dict]:
+        """Get newest products"""
         results = await self.repository.get_newest(category, limit)
-        return [Product(**r) for r in results]
+        return results
     
-    async def search_products(self, query: str) -> List[Product]:
-        """Search productos"""
+    async def search_products(self, query: str) -> List[dict]:
+        """Search products"""
         results = await self.repository.search(query)
-        return [Product(**r) for r in results]
+        return results
     
     async def update_product(
         self,
