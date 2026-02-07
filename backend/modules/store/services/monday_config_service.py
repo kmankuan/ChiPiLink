@@ -1,185 +1,96 @@
 """
 Monday.com Configuration Service for Store Module
-Provides configuration management for Monday.com integration
+Now delegates to the centralized MondayConfigManager with namespaced keys.
+
+Config key mapping (old → new):
+  "textbook_orders"  →  store.textbook_orders.board
+  "inventory_board"  →  store.textbook_orders.txb_inventory
+  "webhooks"         →  store.textbook_orders.webhooks
+  "workspaces"       →  global.workspaces
 """
-from typing import Dict, List, Optional
-from core.database import db
+from typing import Dict
 import logging
+
+from modules.integrations.monday.config_manager import monday_config
 
 logger = logging.getLogger(__name__)
 
-MONDAY_CONFIG_COLLECTION = "store_monday_config"
+# Namespaced config keys
+BOARD_KEY = "store.textbook_orders.board"
+TXB_INVENTORY_KEY = "store.textbook_orders.txb_inventory"
+WEBHOOKS_KEY = "store.textbook_orders.webhooks"
+STATUS_MAPPING_KEY = "store.textbook_orders.status_mapping"
+WORKSPACES_KEY = "global.workspaces"
 
 
 class MondayConfigService:
-    """Service for managing Monday.com configuration for textbook orders"""
+    """Store module config service — delegates to centralized config manager"""
+
+    # ---------- Textbook Orders Board ----------
 
     async def get_config(self) -> Dict:
-        """Get Monday.com configuration for textbook orders board"""
-        config = await db[MONDAY_CONFIG_COLLECTION].find_one(
-            {"config_type": "textbook_orders"},
-            {"_id": 0}
-        )
-
-        if not config:
-            return {
-                "board_id": None,
-                "group_id": None,
-                "auto_sync": True,
-                "column_mapping": {},
-                "subitems_enabled": False,
-                "subitem_column_mapping": {},
-                "status_mapping": {},
-            }
-
-        return config
+        config = await monday_config.get(BOARD_KEY)
+        return {
+            "board_id": config.get("board_id"),
+            "group_id": config.get("group_id"),
+            "auto_sync": config.get("auto_sync", True),
+            "column_mapping": config.get("column_mapping", {}),
+            "subitems_enabled": config.get("subitems_enabled", False),
+            "subitem_column_mapping": config.get("subitem_column_mapping", {}),
+            "status_mapping": config.get("status_mapping", {}),
+        }
 
     async def save_config(self, config: Dict) -> bool:
-        """Save Monday.com textbook orders board configuration"""
-        config["config_type"] = "textbook_orders"
+        return await monday_config.save(BOARD_KEY, config)
 
-        result = await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "textbook_orders"},
-            {"$set": config},
-            upsert=True
-        )
-
-        return result.acknowledged
-
-    # ---------- Inventory Board ----------
+    # ---------- TXB Inventory Board ----------
 
     async def get_inventory_config(self) -> Dict:
-        """Get Monday.com configuration for inventory board"""
-        config = await db[MONDAY_CONFIG_COLLECTION].find_one(
-            {"config_type": "inventory_board"},
-            {"_id": 0}
-        )
-
-        if not config:
-            return {
-                "board_id": None,
-                "enabled": False,
-                "column_mapping": {
-                    "code": None,        # text column for book code
-                    "name": None,        # text column for book name
-                    "ordered_count": None,  # number column to increment
-                    "grade": None,       # text/dropdown for grade
-                },
-            }
-
-        return config
+        config = await monday_config.get(TXB_INVENTORY_KEY)
+        return {
+            "board_id": config.get("board_id"),
+            "enabled": config.get("enabled", False),
+            "group_id": config.get("group_id"),
+            "column_mapping": config.get("column_mapping", {
+                "code": None,
+                "name": None,
+                "ordered_count": None,
+                "grade": None,
+                "publisher": None,
+                "unit_price": None,
+            }),
+        }
 
     async def save_inventory_config(self, config: Dict) -> bool:
-        """Save inventory board configuration"""
-        config["config_type"] = "inventory_board"
+        return await monday_config.save(TXB_INVENTORY_KEY, config)
 
-        result = await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "inventory_board"},
-            {"$set": config},
-            upsert=True
-        )
-
-        return result.acknowledged
-
-    # ---------- Webhook ----------
+    # ---------- Webhooks ----------
 
     async def get_webhook_config(self) -> Dict:
-        """Get webhook configuration"""
-        config = await db[MONDAY_CONFIG_COLLECTION].find_one(
-            {"config_type": "webhooks"},
-            {"_id": 0}
-        )
-
-        if not config:
-            return {
-                "webhook_id": None,
-                "webhook_url": None,
-                "registered_at": None,
-            }
-
-        return config
+        config = await monday_config.get(WEBHOOKS_KEY)
+        return {
+            "webhook_id": config.get("webhook_id"),
+            "webhook_url": config.get("webhook_url"),
+            "registered_at": config.get("registered_at"),
+        }
 
     async def save_webhook_config(self, config: Dict) -> bool:
-        """Save webhook configuration"""
-        config["config_type"] = "webhooks"
-
-        result = await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "webhooks"},
-            {"$set": config},
-            upsert=True
-        )
-
-        return result.acknowledged
+        return await monday_config.save(WEBHOOKS_KEY, config)
 
     # ---------- Workspaces ----------
 
     async def get_workspaces(self) -> Dict:
-        """Get configured workspaces with API keys"""
-        config = await db[MONDAY_CONFIG_COLLECTION].find_one(
-            {"config_type": "workspaces"},
-            {"_id": 0}
-        )
-
-        if not config:
-            return {
-                "workspaces": [],
-                "active_workspace_id": None
-            }
-
-        return config
+        return await monday_config.get_workspaces()
 
     async def add_workspace(self, api_key: str, name: str = None) -> Dict:
-        """Add a new workspace configuration"""
-        import uuid
-
-        workspace_id = f"ws_{uuid.uuid4().hex[:8]}"
-        workspace = {
-            "workspace_id": workspace_id,
-            "name": name or "Default",
-            "api_key": api_key
-        }
-
-        workspaces_config = await self.get_workspaces()
-        workspaces = workspaces_config.get("workspaces", [])
-        workspaces.append(workspace)
-
-        active_id = workspaces_config.get("active_workspace_id") or workspace_id
-
-        await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "workspaces"},
-            {"$set": {
-                "config_type": "workspaces",
-                "workspaces": workspaces,
-                "active_workspace_id": active_id
-            }},
-            upsert=True
-        )
-
-        return {"success": True, "workspace_id": workspace_id}
+        return await monday_config.add_workspace(api_key, name)
 
     async def set_active_workspace(self, workspace_id: str) -> bool:
-        """Set the active workspace"""
-        result = await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "workspaces"},
-            {"$set": {"active_workspace_id": workspace_id}}
-        )
-
-        return result.modified_count > 0
+        return await monday_config.set_active_workspace(workspace_id)
 
     async def remove_workspace(self, workspace_id: str) -> bool:
-        """Remove a workspace configuration"""
-        workspaces_config = await self.get_workspaces()
-        workspaces = workspaces_config.get("workspaces", [])
-
-        workspaces = [ws for ws in workspaces if ws.get("workspace_id") != workspace_id]
-
-        await db[MONDAY_CONFIG_COLLECTION].update_one(
-            {"config_type": "workspaces"},
-            {"$set": {"workspaces": workspaces}}
-        )
-
-        return True
+        return await monday_config.remove_workspace(workspace_id)
 
 
-# Singleton instance
+# Singleton
 monday_config_service = MondayConfigService()
