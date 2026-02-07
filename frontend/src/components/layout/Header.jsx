@@ -7,7 +7,7 @@ import { useSiteConfig } from '@/contexts/SiteConfigContext';
 import { useCart } from '@/contexts/CartContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useNotifications } from '@/hooks/useNotifications';
 import {
   DropdownMenu,
   DropdownMenuContent,
