@@ -209,16 +209,16 @@ export default function SchoolTextbooksView({
   const navigate = useNavigate();
   const lang = i18n?.language || 'es';
   
-  const [selectedStudentIndex, setSelectedStudentIndex] = useState(0);
-  const [orderData, setOrderData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedBooks, setSelectedBooks] = useState({});
+  const [expandedStudentId, setExpandedStudentId] = useState(null);
+  const [studentOrders, setStudentOrders] = useState({}); // { studentId: orderData }
+  const [studentLoading, setStudentLoading] = useState({}); // { studentId: boolean }
+  const [selectedBooks, setSelectedBooks] = useState({}); // { studentId: { bookId: bool } }
   const [submitting, setSubmitting] = useState(false);
   const [reorderItem, setReorderItem] = useState(null);
   const [reorderReason, setReorderReason] = useState('');
   const [requestingReorder, setRequestingReorder] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
-  const [allStudents, setAllStudents] = useState(null); // null = not fetched yet
+  const [allStudents, setAllStudents] = useState(null);
   
   const texts = {
     en: {
