@@ -459,10 +459,10 @@ export default function SchoolTextbooksView({
     );
   }
   
-  // ---- Main view: students tabs + textbook items ----
+  // ---- Main view: student cards with expandable textbook lists ----
   return (
     <div className="space-y-3" data-testid="school-textbooks-view">
-      {/* Back + Header row */}
+      {/* Header row */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <GraduationCap className="h-5 w-5 text-purple-600" />
@@ -474,7 +474,7 @@ export default function SchoolTextbooksView({
         </Button>
       </div>
 
-      {/* Inline student linking form (for main view too) */}
+      {/* Inline student linking form */}
       {showLinkForm && (
         <InlineStudentForm
           token={token}
@@ -488,148 +488,185 @@ export default function SchoolTextbooksView({
         />
       )}
       
-      {/* Student Tabs */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" data-testid="student-tabs">
-        {validatedStudents.map((student, index) => {
-          const isActive = selectedStudentIndex === index;
+      {/* Student Accordion Cards */}
+      <div className="space-y-3" data-testid="student-accordion">
+        {validatedStudents.map((student) => {
+          const studentId = student.student_id || student.sync_id;
+          const isExpanded = expandedStudentId === studentId;
+          const isLoading = studentLoading[studentId];
+          const orderData = getStudentOrder(studentId);
+          const books = getStudentBooks(studentId);
+          const items = orderData?.items || [];
+          const orderedItems = items.filter(i => i.status === 'ordered');
+          const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+          const selectedList = availableItems.filter(i => books[i.book_id]);
+          const selectedTotal = selectedList.reduce((sum, i) => sum + (i.price || 0), 0);
+          const orderedTotal = orderedItems.reduce((sum, i) => sum + (i.price || 0), 0);
+          const studentName = student.name || student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim();
+
           return (
-            <button
-              key={student.student_id || student.sync_id}
-              data-testid={`student-tab-${index}`}
-              onClick={() => setSelectedStudentIndex(index)}
-              className={`
-                flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all whitespace-nowrap shrink-0 text-xs sm:text-sm
-                ${isActive
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium' 
-                  : 'border-border/50 bg-muted/30 hover:bg-muted text-muted-foreground'
-                }
-              `}
-            >
-              <User className="h-3.5 w-3.5" />
-              <span className="truncate max-w-[100px] sm:max-w-[140px]">{student.name || student.full_name}</span>
-              <span className="opacity-60">{t.grade} {student.grade}</span>
-            </button>
-          );
-        })}
-      </div>
-      
-      {/* Content */}
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-          <span className="ml-2 text-sm text-muted-foreground">{t.loading}</span>
-        </div>
-      ) : items.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="py-10 text-center">
-            <Package className="h-10 w-10 mx-auto text-muted-foreground/30 mb-2" />
-            <p className="text-sm text-muted-foreground">{t.noBooks}</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {/* Progress indicator */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-            <span>{orderedItems.length} {t.itemsOf} {items.length} {t.purchased.toLowerCase()}</span>
-            {orderedTotal > 0 && <span className="font-medium text-foreground">{t.purchased}: ${orderedTotal.toFixed(2)}</span>}
-          </div>
-          
-          {/* Item list - single column, compact for mobile */}
-          <div className="rounded-lg border divide-y bg-card" data-testid="textbook-list">
-            {items.map((item) => {
-              const isOrdered = item.status === 'ordered';
-              const isPending = item.status === 'reorder_requested';
-              const isAvailable = item.status === 'available' || item.status === 'reorder_approved';
-              const isSelected = !!selectedBooks[item.book_id];
-              
-              return (
-                <div
-                  key={item.book_id}
-                  data-testid={`textbook-item-${item.book_id}`}
-                  className={`
-                    flex items-center gap-2.5 px-3 py-2.5 sm:py-3 transition-colors
-                    ${isOrdered ? 'bg-green-50/50 dark:bg-green-900/10' : ''}
-                    ${isPending ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}
-                    ${isSelected ? 'bg-purple-50 dark:bg-purple-900/20' : ''}
-                    ${isAvailable && !isSelected ? 'hover:bg-muted/50 cursor-pointer' : ''}
-                  `}
-                  onClick={() => isAvailable && toggleBook(item.book_id)}
-                >
-                  {/* Selection / Status indicator */}
-                  <div className="shrink-0 w-5 flex justify-center">
-                    {isOrdered ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : isPending ? (
-                      <Clock className="h-4 w-4 text-amber-500" />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleBook(item.book_id)}
-                        className="h-4 w-4 rounded border-2 text-purple-600 focus:ring-purple-500 cursor-pointer"
-                        data-testid={`checkbox-${item.book_id}`}
-                      />
-                    )}
-                  </div>
-                  
-                  {/* Book info */}
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${isOrdered ? 'text-muted-foreground' : ''}`}>
-                      {item.book_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {item.book_code}
-                    </p>
-                  </div>
-                  
-                  {/* Price + status badge + reorder action */}
-                  <div className="shrink-0 text-right flex flex-col items-end gap-0.5">
-                    <p className={`text-sm font-semibold ${isOrdered ? 'text-green-600' : 'text-foreground'}`}>
-                      ${item.price?.toFixed(2)}
-                    </p>
-                    {isOrdered && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setReorderItem(item); }}
-                        className="text-[10px] text-green-600 hover:text-purple-600 hover:underline font-medium transition-colors"
-                        data-testid={`reorder-btn-${item.book_id}`}
-                      >
-                        {t.purchased} &middot; {t.requestReorder}
-                      </button>
-                    )}
-                    {isPending && (
-                      <span className="text-[10px] text-amber-600 font-medium">{t.reorderPending}</span>
-                    )}
-                  </div>
+            <div key={studentId} className="rounded-xl border bg-card overflow-hidden" data-testid={`student-card-${studentId}`}>
+              {/* Student info header */}
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40">
+                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600">
+                  <User className="h-4 w-4" />
                 </div>
-              );
-            })}
-          </div>
-          
-          {/* Sticky bottom bar for selection + submit (only when items can be ordered) */}
-          {availableItems.length > 0 && (
-            <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t -mx-4 px-4 py-3 sm:static sm:mx-0 sm:px-0 sm:py-0 sm:border-0 sm:bg-transparent" data-testid="order-bar">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm">
-                  <span className="text-muted-foreground">{selectedList.length} {lang === 'es' ? 'seleccionado(s)' : 'selected'}</span>
-                  {selectedTotal > 0 && (
-                    <span className="ml-2 font-bold text-purple-600">${selectedTotal.toFixed(2)}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate">{studentName}</p>
+                  <p className="text-xs text-muted-foreground">{student.school_name} &middot; {t.grade} {student.grade}</p>
+                </div>
+                <Badge variant="outline" className="shrink-0 text-xs border-green-300 text-green-700 bg-green-50 dark:bg-green-900/20">
+                  <Check className="h-3 w-3 mr-1" /> {lang === 'es' ? 'Aprobado' : 'Approved'}
+                </Badge>
+              </div>
+              
+              {/* Textbooks List expandable bar */}
+              <button
+                onClick={() => toggleExpand(studentId)}
+                className={`
+                  w-full flex items-center justify-between px-4 py-2.5 transition-colors text-left
+                  ${isExpanded 
+                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300' 
+                    : 'bg-muted/30 hover:bg-muted/60 text-muted-foreground'}
+                `}
+                data-testid={`textbooks-list-btn-${studentId}`}
+              >
+                <span className="flex items-center gap-2 text-sm font-medium">
+                  <BookOpen className="h-4 w-4" />
+                  {t.textbooksList}
+                  {orderData && items.length > 0 && (
+                    <span className="text-xs font-normal opacity-70">
+                      ({orderedItems.length}/{items.length} {t.purchased.toLowerCase()})
+                    </span>
+                  )}
+                </span>
+                <ChevronRight className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+              </button>
+
+              {/* Expanded textbook list content */}
+              {isExpanded && (
+                <div className="border-t">
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-5 w-5 animate-spin text-purple-600" />
+                      <span className="ml-2 text-sm text-muted-foreground">{t.loading}</span>
+                    </div>
+                  ) : items.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <Package className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                      <p className="text-sm text-muted-foreground">{t.noBooks}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Progress indicator */}
+                      <div className="flex items-center justify-between text-xs text-muted-foreground px-4 py-2 bg-muted/20">
+                        <span>{orderedItems.length} {t.itemsOf} {items.length} {t.purchased.toLowerCase()}</span>
+                        {orderedTotal > 0 && <span className="font-medium text-foreground">{t.purchased}: ${orderedTotal.toFixed(2)}</span>}
+                      </div>
+                      
+                      {/* Item list */}
+                      <div className="divide-y" data-testid={`textbook-list-${studentId}`}>
+                        {items.map((item) => {
+                          const isOrdered = item.status === 'ordered';
+                          const isPending = item.status === 'reorder_requested';
+                          const isAvailable = item.status === 'available' || item.status === 'reorder_approved';
+                          const isSelected = !!books[item.book_id];
+                          
+                          return (
+                            <div
+                              key={item.book_id}
+                              data-testid={`textbook-item-${item.book_id}`}
+                              className={`
+                                flex items-center gap-2.5 px-4 py-2.5 transition-colors
+                                ${isOrdered ? 'bg-green-50/50 dark:bg-green-900/10' : ''}
+                                ${isPending ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}
+                                ${isSelected ? 'bg-purple-50 dark:bg-purple-900/20' : ''}
+                                ${isAvailable && !isSelected ? 'hover:bg-muted/50 cursor-pointer' : ''}
+                              `}
+                              onClick={() => isAvailable && toggleBook(studentId, item.book_id)}
+                            >
+                              {/* Selection / Status indicator */}
+                              <div className="shrink-0 w-5 flex justify-center">
+                                {isOrdered ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : isPending ? (
+                                  <Clock className="h-4 w-4 text-amber-500" />
+                                ) : (
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleBook(studentId, item.book_id)}
+                                    className="h-4 w-4 rounded border-2 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                  />
+                                )}
+                              </div>
+                              
+                              {/* Book info */}
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-medium truncate ${isOrdered ? 'text-muted-foreground' : ''}`}>
+                                  {item.book_name}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">{item.book_code}</p>
+                              </div>
+                              
+                              {/* Price + status badge */}
+                              <div className="shrink-0 text-right flex flex-col items-end gap-0.5">
+                                <p className={`text-sm font-semibold ${isOrdered ? 'text-green-600' : 'text-foreground'}`}>
+                                  ${item.price?.toFixed(2)}
+                                </p>
+                                {isOrdered && (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setReorderItem(item); }}
+                                    className="text-[10px] text-green-600 hover:text-purple-600 hover:underline font-medium transition-colors"
+                                  >
+                                    {t.purchased} &middot; {t.requestReorder}
+                                  </button>
+                                )}
+                                {isPending && (
+                                  <span className="text-[10px] text-amber-600 font-medium">{t.reorderPending}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Submit bar */}
+                      {availableItems.length > 0 && (
+                        <div className="border-t px-4 py-3 bg-muted/10" data-testid={`order-bar-${studentId}`}>
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm">
+                              <span className="text-muted-foreground">{selectedList.length} {lang === 'es' ? 'seleccionado(s)' : 'selected'}</span>
+                              {selectedTotal > 0 && (
+                                <span className="ml-2 font-bold text-purple-600">${selectedTotal.toFixed(2)}</span>
+                              )}
+                            </div>
+                            <Button
+                              onClick={() => handleSubmit(student)}
+                              disabled={submitting || selectedList.length === 0}
+                              className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
+                              size="sm"
+                              data-testid={`submit-order-btn-${studentId}`}
+                            >
+                              {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                              {t.submitOrder}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={submitting || selectedList.length === 0}
-                  className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
-                  size="sm"
-                  data-testid="submit-order-btn"
-                >
-                  {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                  {t.submitOrder}
-                </Button>
-              </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          );
+        })}
+
+        {/* Add student card */}
+        {!showLinkForm && (
+          <EmptyStudentCard onClick={() => setShowLinkForm(true)} lang={lang} />
+        )}
+      </div>
       
       {/* Reorder Request Dialog */}
       {reorderItem && (
