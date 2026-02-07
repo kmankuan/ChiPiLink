@@ -185,9 +185,6 @@ export default function SchoolTextbooksView({
   if (!isAuthenticated) {
     return (
       <div className="space-y-4">
-        <Button variant="ghost" size="sm" onClick={onBack} className="gap-1" data-testid="back-to-store">
-          <ChevronLeft className="h-4 w-4" /> {t.back}
-        </Button>
         <Card className="border-dashed">
           <CardContent className="py-10 text-center">
             <Lock className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
