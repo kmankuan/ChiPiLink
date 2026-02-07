@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner';
 import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import OrderChat from '@/components/chat/OrderChat';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
