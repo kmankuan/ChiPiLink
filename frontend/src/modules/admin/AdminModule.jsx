@@ -67,6 +67,16 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Migration</span>
             <span className="sm:hidden">Migrate</span>
           </TabsTrigger>
+          <TabsTrigger value="modules" className="gap-2" data-testid="modules-tab">
+            <LayoutGrid className="h-4 w-4" />
+            <span className="hidden sm:inline">Module Status</span>
+            <span className="sm:hidden">Modules</span>
+          </TabsTrigger>
+          <TabsTrigger value="ui-style" className="gap-2" data-testid="ui-style-tab">
+            <Paintbrush className="h-4 w-4" />
+            <span className="hidden sm:inline">UI Style</span>
+            <span className="sm:hidden">Style</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
