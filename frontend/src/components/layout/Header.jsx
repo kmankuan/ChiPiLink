@@ -94,6 +94,7 @@ const ROUTE_CONFIG = {
 export function Header() {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { totalUnread } = useNotifications();
   const { hasPermission, isAdmin: hasAdminAccess, loading: permissionsLoading } = usePermissions();
   const { theme, toggleTheme } = useTheme();
   const { siteConfig } = useSiteConfig();
