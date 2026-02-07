@@ -283,7 +283,6 @@ export default function SchoolTextbooksView({
   const t = texts[lang] || texts.es;
   const validatedStudents = privateCatalogAccess?.students || [];
   const hasAccess = privateCatalogAccess?.has_access === true;
-  const selectedStudent = validatedStudents[selectedStudentIndex];
 
   // Fetch all students (including pending) for the card display
   const fetchAllStudents = useCallback(async () => {
@@ -301,57 +300,69 @@ export default function SchoolTextbooksView({
       fetchAllStudents();
     }
   }, [isAuthenticated, hasAccess, validatedStudents.length, fetchAllStudents]);
-  
-  // Items derived from orderData
-  const items = orderData?.items || [];
-  const orderedItems = items.filter(i => i.status === 'ordered');
-  const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
-  const pendingItems = items.filter(i => i.status === 'reorder_requested');
-  const selectedList = availableItems.filter(i => selectedBooks[i.book_id]);
-  const selectedTotal = selectedList.reduce((sum, i) => sum + (i.price || 0), 0);
-  const orderedTotal = orderedItems.reduce((sum, i) => sum + (i.price || 0), 0);
 
-  // Fetch student order (has items with statuses)
-  const fetchOrder = async () => {
-    if (!selectedStudent || !token) return;
-    const studentId = selectedStudent.student_id || selectedStudent.sync_id;
-    setLoading(true);
-    setSelectedBooks({});
+  // Fetch order for a specific student (with caching)
+  const fetchOrderForStudent = useCallback(async (studentId) => {
+    if (!studentId || !token) return;
+    setStudentLoading(prev => ({ ...prev, [studentId]: true }));
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/student/${studentId}`,
+        `${API_URL}/api/store/textbook-orders/student/${studentId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setOrderData(res.data);
-    } catch (error) {
-      console.error('Error fetching order:', error);
-      setOrderData(null);
+      setStudentOrders(prev => ({ ...prev, [studentId]: res.data }));
+    } catch {
+      setStudentOrders(prev => ({ ...prev, [studentId]: null }));
     } finally {
-      setLoading(false);
+      setStudentLoading(prev => ({ ...prev, [studentId]: false }));
     }
-  };
+  }, [token]);
 
-  useEffect(() => { fetchOrder(); }, [selectedStudent, token]);
+  // Toggle accordion: expand one, collapse others
+  const toggleExpand = useCallback((studentId) => {
+    setExpandedStudentId(prev => {
+      const newId = prev === studentId ? null : studentId;
+      // Fetch order data if expanding and not already loaded
+      if (newId && !studentOrders[newId]) {
+        fetchOrderForStudent(newId);
+      }
+      return newId;
+    });
+  }, [studentOrders, fetchOrderForStudent]);
+
+  // Helpers for the currently expanded student
+  const getStudentOrder = (studentId) => studentOrders[studentId];
+  const getStudentBooks = (studentId) => selectedBooks[studentId] || {};
   
-  const toggleBook = (bookId) => {
-    setSelectedBooks(prev => ({ ...prev, [bookId]: !prev[bookId] }));
+  const toggleBook = (studentId, bookId) => {
+    setSelectedBooks(prev => ({
+      ...prev,
+      [studentId]: { ...(prev[studentId] || {}), [bookId]: !(prev[studentId]?.[bookId]) }
+    }));
   };
   
-  const handleSubmit = async () => {
+  const handleSubmit = async (student) => {
+    const studentId = student.student_id || student.sync_id;
+    const orderData = getStudentOrder(studentId);
+    const books = getStudentBooks(studentId);
+    const items = orderData?.items || [];
+    const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+    const selectedList = availableItems.filter(i => books[i.book_id]);
+    
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
     setSubmitting(true);
     try {
       await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/submit`,
+        `${API_URL}/api/store/textbook-orders/submit`,
         {
-          student_id: selectedStudent.student_id || selectedStudent.sync_id,
+          student_id: studentId,
           items: selectedList.map(b => ({ book_id: b.book_id, quantity: 1 })),
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(t.orderSuccess);
-      setSelectedBooks({});
-      await fetchOrder(); // Refresh to show newly locked items
+      setSelectedBooks(prev => ({ ...prev, [studentId]: {} }));
+      await fetchOrderForStudent(studentId);
     } catch (error) {
       toast.error(error.response?.data?.detail || t.orderError);
     } finally {
@@ -360,18 +371,21 @@ export default function SchoolTextbooksView({
   };
   
   const handleReorderRequest = async () => {
-    if (!reorderItem || !orderData?.order_id) return;
+    if (!reorderItem) return;
+    const studentId = expandedStudentId;
+    const orderData = getStudentOrder(studentId);
+    if (!orderData?.order_id) return;
     setRequestingReorder(true);
     try {
       await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/store/textbook-orders/${orderData.order_id}/reorder/${reorderItem.book_id}`,
+        `${API_URL}/api/store/textbook-orders/${orderData.order_id}/reorder/${reorderItem.book_id}`,
         { reason: reorderReason || '' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(t.reorderSuccess);
       setReorderItem(null);
       setReorderReason('');
-      await fetchOrder();
+      await fetchOrderForStudent(studentId);
     } catch (error) {
       toast.error(error.response?.data?.detail || t.reorderError);
     } finally {
