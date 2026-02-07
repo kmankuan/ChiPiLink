@@ -53,6 +53,10 @@ import {
   Layers
 } from 'lucide-react';
 
+import TxbInventoryTab from './components/TxbInventoryTab';
+import WebhooksTab from './components/WebhooksTab';
+import StatusMappingTab from './components/StatusMappingTab';
+
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function MondayModule() {
