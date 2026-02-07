@@ -376,6 +376,29 @@ async def post_order_update(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+@router.post("/{order_id}/updates/mark-read")
+async def mark_messages_read(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mark all chat messages in an order as read by the current user"""
+    try:
+        result = await textbook_order_service.mark_order_messages_read(
+            order_id, current_user["user_id"]
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/notifications/unread")
+async def get_unread_notifications(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get unread message counts for the current user across all orders"""
+    return await textbook_order_service.get_unread_counts(current_user["user_id"])
+
+
 
 @router.get("/admin/diagnostic/textbooks")
 async def diagnostic_textbooks(
