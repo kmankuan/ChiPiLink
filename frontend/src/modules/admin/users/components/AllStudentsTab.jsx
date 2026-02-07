@@ -128,9 +128,11 @@ export default function AllStudentsTab({ token }) {
   const rejectedCount = students.filter(s => s.status === 'rejected').length;
 
   const exportToCSV = () => {
-    const headers = ['Student Name', 'School', 'Grade', 'Year', 'Status', 'Relationship', 'User ID', 'Created'];
+    const headers = ['First Name', 'Last Name', 'Full Name', 'School', 'Grade', 'Year', 'Status', 'Relationship', 'User ID', 'Created'];
     const rows = filteredStudents.map(s => [
-      s.full_name,
+      s.first_name || '',
+      s.last_name || '',
+      s.full_name || `${s.first_name || ''} ${s.last_name || ''}`.trim(),
       s.school_name,
       s.grade,
       s.year,
