@@ -28,6 +28,9 @@ async def verify_private_catalog_access(user_id: str) -> dict:
                 students.append({
                     "sync_id": student.get("student_id"),
                     "name": student.get("full_name"),
+                    "first_name": student.get("first_name", ""),
+                    "last_name": student.get("last_name", ""),
+                    "full_name": student.get("full_name"),
                     "grade": student.get("grade"),
                     "section": student.get("section"),
                     "student_id": student.get("student_id"),
