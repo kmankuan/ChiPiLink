@@ -94,7 +94,10 @@ const SectionHeader = ({ icon: Icon, title, action, actionLink, className = '' }
   </div>
 );
 
-const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => {
+import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
+import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
+
+const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey }) => {
   const navigate = useNavigate();
   const colorClasses = {
     primary: 'bg-primary/10 text-primary hover:bg-primary/20',
@@ -104,13 +107,20 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary' }) => {
     blue: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
   };
 
+  const modStatus = moduleKey ? DEFAULT_MODULE_STATUS[moduleKey] : null;
+
   return (
     <button
       onClick={() => navigate(to)}
-      className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
+      className={`relative flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
     >
       <Icon className="h-6 w-6 mb-2" />
       <span className="text-xs font-medium text-center">{label}</span>
+      {modStatus && (
+        <div className="mt-1">
+          <ModuleStatusBadge status={modStatus.status} customLabel={modStatus.customLabel} size="xs" />
+        </div>
+      )}
     </button>
   );
 };
