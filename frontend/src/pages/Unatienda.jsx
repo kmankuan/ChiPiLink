@@ -283,14 +283,6 @@ export default function Unatienda() {
           </div>
         )}
 
-        {/* Back to store - private view */}
-        {activeView === 'private' && (
-          <Button variant="ghost" size="sm" onClick={() => setActiveView('public')} className="mb-4 gap-1">
-            <ChevronLeft className="h-4 w-4" />
-            {t('store.backToStore')}
-          </Button>
-        )}
-
         {/* Category Navigation - public view */}
         {activeView === 'public' && (
           <div className="mb-4 sm:mb-6" data-category-nav>
