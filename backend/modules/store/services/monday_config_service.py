@@ -54,10 +54,13 @@ class MondayConfigService:
             "column_mapping": config.get("column_mapping", {
                 "code": None,
                 "name": None,
-                "ordered_count": None,
                 "grade": None,
                 "publisher": None,
                 "unit_price": None,
+            }),
+            "subitem_column_mapping": config.get("subitem_column_mapping", {
+                "quantity": None,
+                "date": None,
             }),
         }
 
