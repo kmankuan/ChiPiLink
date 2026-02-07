@@ -20,7 +20,7 @@ import OrderChat from '@/components/chat/OrderChat';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function Orders() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { api, token } = useAuth();
   
   const [pedidos, setPedidos] = useState([]);
