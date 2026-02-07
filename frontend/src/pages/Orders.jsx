@@ -23,6 +23,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 export default function Orders() {
   const { t, i18n } = useTranslation();
   const { api, token } = useAuth();
+  const { perOrder, markOrderRead, refreshUnread } = useNotifications();
   
   const [pedidos, setPedidos] = useState([]);
   const [textbookOrders, setTextbookOrders] = useState([]);
