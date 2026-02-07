@@ -332,12 +332,20 @@ export default function Orders() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setChatOrder(order)}
-                        className="gap-1.5 text-xs"
+                        onClick={() => {
+                          setChatOrder(order);
+                          markOrderRead(order.order_id);
+                        }}
+                        className="gap-1.5 text-xs relative"
                         data-testid={`chat-btn-${order.order_id}`}
                       >
                         <MessageCircle className="h-3.5 w-3.5" />
                         {t('orders.messages', 'Messages')}
+                        {(perOrder[order.order_id] || 0) > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
+                            {perOrder[order.order_id]}
+                          </span>
+                        )}
                       </Button>
                     </div>
                   </CardContent>
