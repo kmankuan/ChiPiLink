@@ -47,6 +47,7 @@ router.include_router(order_form_config_router)
 router.include_router(inventory_import_router)
 router.include_router(analytics_router)
 router.include_router(store_config_router)
+router.include_router(monday_sync_router)
 
 # Re-export for compatibility
 store_refactored_router = router
