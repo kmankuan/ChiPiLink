@@ -238,6 +238,7 @@ export default function SchoolTextbooksView({
       reorderSuccess: 'Reorder requested', reorderError: 'Error requesting reorder',
       reorderReasonPlaceholder: 'e.g., Book was damaged, need replacement',
       send: 'Send Request', cancel: 'Cancel',
+      textbooksList: 'Textbooks List', tapToView: 'Tap to view textbooks',
     },
     es: {
       title: 'Textos Escolares', subtitle: 'Ordena los textos de tus estudiantes',
@@ -256,6 +257,7 @@ export default function SchoolTextbooksView({
       reorderSuccess: 'Reorden solicitada', reorderError: 'Error al solicitar reorden',
       reorderReasonPlaceholder: 'Ej: Libro dañado, necesito reemplazo',
       send: 'Enviar Solicitud', cancel: 'Cancelar',
+      textbooksList: 'Lista de Textos', tapToView: 'Toca para ver los textos',
     },
     zh: {
       title: '学校教科书', subtitle: '为您的学生订购教科书',
@@ -274,6 +276,7 @@ export default function SchoolTextbooksView({
       reorderSuccess: '重新订购已请求', reorderError: '请求重新订购时出错',
       reorderReasonPlaceholder: '例如：书籍损坏，需要更换',
       send: '发送请求', cancel: '取消',
+      textbooksList: '教科书列表', tapToView: '点击查看教科书',
     }
   };
   
