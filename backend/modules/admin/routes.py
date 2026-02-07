@@ -418,9 +418,7 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
         return stats
     except Exception as e:
         logger.error(f"Error getting Unatienda stats: {e}")
-
-
-# ============== MODULE STATUS ROUTES ==============
+        raise HTTPException(status_code=500, detail=str(e))
 
 DEFAULT_MODULE_STATUSES = {
     "home": {"status": "production", "customLabel": ""},
