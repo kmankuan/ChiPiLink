@@ -123,6 +123,10 @@ export default function UnatiendaModule() {
             <BookOpen className="h-4 w-4" />
             <span className="hidden md:inline">Private PCA</span>
           </TabsTrigger>
+          <TabsTrigger value="inventory" className="flex items-center gap-2">
+            <Warehouse className="h-4 w-4" />
+            <span className="hidden md:inline">Inventory</span>
+          </TabsTrigger>
           <TabsTrigger value="access-requests" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
             <span className="hidden md:inline">Requests</span>
