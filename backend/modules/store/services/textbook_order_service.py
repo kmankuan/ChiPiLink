@@ -463,211 +463,31 @@ class TextbookOrderService(BaseService):
         user_email: str,
         submission_total: float = None
     ) -> Dict:
-        """Send order to Monday.com board with items as subitems and summary as update.
-        Also triggers inventory board update.
+        """Send order to Monday.com — delegates to adapter architecture.
+        Creates item + subitems on orders board, then updates TXB inventory board.
         """
         from .monday_sync_service import monday_sync_service
 
-        monday_config = await monday_config_service.get_config()
-        board_id = monday_config.get("board_id")
-        column_mapping = monday_config.get("column_mapping", {})
-        subitems_enabled = monday_config.get("subitems_enabled", False)
-        subitem_mapping = monday_config.get("subitem_column_mapping", {})
+        # 1. Sync order to Monday.com (item + subitems + update)
+        result = await monday_sync_service.sync_order_to_monday(
+            order, selected_items, user_name, user_email, submission_total
+        )
 
-        api_key = await self._get_monday_api_key()
+        # 2. Update TXB inventory board (non-blocking)
+        try:
+            inv_items = [{
+                "book_code": item.get("book_code", ""),
+                "book_name": item["book_name"],
+                "quantity_ordered": item["quantity_ordered"],
+                "grade": order.get("grade", ""),
+                "price": item.get("price"),
+            } for item in selected_items]
+            inv_result = await monday_sync_service.update_inventory_board(inv_items)
+            logger.info(f"TXB Inventory update: {inv_result}")
+        except Exception as e:
+            logger.warning(f"TXB Inventory update failed (non-blocking): {e}")
 
-        if not api_key or not board_id:
-            logger.warning("Monday.com not configured")
-            raise ValueError("Monday.com not configured. Please configure in Admin -> Integrations -> Monday.com")
-
-        total = submission_total if submission_total is not None else order['total_amount']
-
-        item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f}"
-        items_text = ", ".join([f"{item['book_name']} (x{item['quantity_ordered']})" for item in selected_items])
-
-        # Grade mapping for Monday.com
-        grade = order["grade"]
-        grade_mapping = {
-            "K4": "K4", "K5": "K5",
-            "1": "Grade 1", "2": "Grade 2", "3": "Grade 3",
-            "4": "Grade 4", "5": "Grade 5", "6": "Grade 6",
-            "7": "Grade 7", "8": "Grade 8", "9": "Grade 9",
-            "10": "Grade 10", "11": "Grade 11", "12": "Grade 12",
-        }
-        monday_grade = grade_mapping.get(grade, f"Grade {grade}" if grade.isdigit() else grade)
-
-        # Build column values using configured mapping (English keys)
-        column_values = {}
-
-        if column_mapping.get("student"):
-            column_values[column_mapping["student"]] = order["student_name"]
-        if column_mapping.get("guardian"):
-            column_values[column_mapping["guardian"]] = f"{user_name} ({user_email})"
-        if column_mapping.get("grade"):
-            column_values[column_mapping["grade"]] = {"labels": [monday_grade]}
-        if column_mapping.get("books"):
-            column_values[column_mapping["books"]] = items_text[:2000]
-        if column_mapping.get("total"):
-            column_values[column_mapping["total"]] = total
-        if column_mapping.get("status"):
-            column_values[column_mapping["status"]] = {"label": "Working on it"}
-        if column_mapping.get("order_id"):
-            column_values[column_mapping["order_id"]] = order["order_id"]
-        if column_mapping.get("date"):
-            column_values[column_mapping["date"]] = {"date": datetime.now(timezone.utc).strftime("%Y-%m-%d")}
-
-        column_values_json = json.dumps(column_values)
-
-        async with httpx.AsyncClient() as client:
-            # 1. Create main item
-            mutation = f'''
-            mutation {{
-                create_item (
-                    board_id: {board_id},
-                    item_name: "{item_name}",
-                    column_values: {json.dumps(column_values_json)}
-                ) {{
-                    id
-                }}
-            }}
-            '''
-
-            response = await client.post(
-                "https://api.monday.com/v2",
-                json={"query": mutation},
-                headers={"Authorization": api_key, "Content-Type": "application/json"},
-                timeout=30.0
-            )
-
-            result = response.json()
-
-            if "errors" in result:
-                logger.error(f"Monday.com error: {result['errors']}")
-                raise ValueError(f"Monday.com error: {result['errors']}")
-
-            item_id = result.get("data", {}).get("create_item", {}).get("id")
-
-            if not item_id:
-                raise ValueError("Failed to create Monday.com item")
-
-            logger.info(f"Created Monday.com item {item_id} for order {order['order_id']}")
-
-            # 2. Create Update (order summary)
-            summary_lines = [
-                f"New Textbook Order",
-                f"",
-                f"Student: {order['student_name']}",
-                f"Grade: {order['grade']}",
-                f"School Year: {order['year']}",
-                f"",
-                f"Client: {user_name}",
-                f"Email: {user_email}",
-                f"",
-                f"Books Ordered:",
-            ]
-
-            for item in selected_items:
-                summary_lines.append(f"  - {item['book_name']} - ${item['price']:.2f} x{item['quantity_ordered']}")
-
-            summary_lines.extend([
-                f"",
-                f"Total: ${total:.2f}",
-                f"Order ID: {order['order_id']}",
-            ])
-
-            summary_text = "\\n".join(summary_lines)
-
-            update_mutation = f'''
-            mutation {{
-                create_update (
-                    item_id: {item_id},
-                    body: "{summary_text}"
-                ) {{
-                    id
-                }}
-            }}
-            '''
-
-            try:
-                await client.post(
-                    "https://api.monday.com/v2",
-                    json={"query": update_mutation},
-                    headers={"Authorization": api_key, "Content-Type": "application/json"},
-                    timeout=15.0
-                )
-                logger.info(f"Added update to Monday.com item {item_id}")
-            except Exception as e:
-                logger.warning(f"Failed to add update: {e}")
-
-            # 3. Create subitems for each book (with initial status)
-            subitems = []
-            if subitems_enabled:
-                for item in selected_items:
-                    subitem_name = f"{item['book_name']} (x{item['quantity_ordered']})"
-
-                    subitem_values = {}
-                    if subitem_mapping.get("quantity"):
-                        subitem_values[subitem_mapping["quantity"]] = item["quantity_ordered"]
-                    if subitem_mapping.get("unit_price"):
-                        subitem_values[subitem_mapping["unit_price"]] = item["price"]
-                    if subitem_mapping.get("subtotal"):
-                        subitem_values[subitem_mapping["subtotal"]] = item["price"] * item["quantity_ordered"]
-                    if subitem_mapping.get("code"):
-                        subitem_values[subitem_mapping["code"]] = item.get("book_code", "")
-                    if subitem_mapping.get("status"):
-                        subitem_values[subitem_mapping["status"]] = {"label": "Pendiente"}
-
-                    subitem_values_json = json.dumps(subitem_values)
-
-                    subitem_mutation = f'''
-                    mutation {{
-                        create_subitem (
-                            parent_item_id: {item_id},
-                            item_name: "{subitem_name}",
-                            column_values: {json.dumps(subitem_values_json)}
-                        ) {{
-                            id
-                        }}
-                    }}
-                    '''
-
-                    try:
-                        sub_response = await client.post(
-                            "https://api.monday.com/v2",
-                            json={"query": subitem_mutation},
-                            headers={"Authorization": api_key, "Content-Type": "application/json"},
-                            timeout=10.0
-                        )
-
-                        sub_result = sub_response.json()
-                        subitem_id = sub_result.get("data", {}).get("create_subitem", {}).get("id")
-
-                        if subitem_id:
-                            subitems.append({
-                                "book_id": item["book_id"],
-                                "monday_subitem_id": subitem_id
-                            })
-                    except Exception as e:
-                        logger.error(f"Failed to create subitem: {e}")
-
-            # 4. Update inventory board
-            try:
-                inv_items = [{
-                    "book_code": item.get("book_code", ""),
-                    "book_name": item["book_name"],
-                    "quantity_ordered": item["quantity_ordered"],
-                    "grade": order.get("grade", ""),
-                } for item in selected_items]
-
-                inv_result = await monday_sync_service.update_inventory_board(inv_items)
-                logger.info(f"Inventory board update: {inv_result}")
-            except Exception as e:
-                logger.warning(f"Inventory board update failed (non-blocking): {e}")
-
-            return {
-                "item_id": item_id,
-                "subitems": subitems
-            }
+        return result
     
     async def request_reorder(
         self,
