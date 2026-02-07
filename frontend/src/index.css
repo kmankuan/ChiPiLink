@@ -92,6 +92,18 @@
   }
 }
 
+/* Card style variants (applied via data-card-style on :root) */
+[data-card-style="flat"] .card,
+[data-card-style="flat"] [class*="bg-card"] {
+  box-shadow: none;
+}
+
+[data-card-style="bordered"] .card,
+[data-card-style="bordered"] [class*="bg-card"] {
+  box-shadow: none;
+  border-width: 1.5px;
+}
+
 /* Shimmer animation for tracing beam effect */
 @keyframes shimmer {
   0% {
