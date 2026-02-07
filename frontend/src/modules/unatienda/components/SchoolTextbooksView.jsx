@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, Clock, Eye, GraduationCap,
-  Loader2, Lock, Package, ShoppingCart, User, UserPlus
+  Loader2, Lock, Package, Send, ShoppingCart, User, UserPlus, Users
 } from 'lucide-react';
 import { exclusivaTranslations } from '../constants/translations';
 
