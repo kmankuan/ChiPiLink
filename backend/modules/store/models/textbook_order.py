@@ -18,11 +18,32 @@ class OrderStatus(str, Enum):
 
 
 class OrderItemStatus(str, Enum):
-    AVAILABLE = "available"     # Can be ordered
-    ORDERED = "ordered"         # Already ordered, locked
-    OUT_OF_STOCK = "out_of_stock"  # No inventory
+    AVAILABLE = "available"              # Can be ordered
+    ORDERED = "ordered"                  # Already ordered, locked
+    PROCESSING = "processing"            # Being prepared / in process
+    READY_FOR_PICKUP = "ready_for_pickup"  # Ready to deliver
+    DELIVERED = "delivered"              # Successfully delivered
+    ISSUE = "issue"                      # Problem with this item
+    OUT_OF_STOCK = "out_of_stock"        # No inventory
     REORDER_REQUESTED = "reorder_requested"  # User requested reorder
     REORDER_APPROVED = "reorder_approved"    # Admin approved reorder
+
+
+# Maps Monday.com subitem status labels → app OrderItemStatus
+# Configurable via admin, these are sensible defaults
+DEFAULT_STATUS_MAPPING = {
+    "Pendiente": OrderItemStatus.ORDERED.value,
+    "Pending": OrderItemStatus.ORDERED.value,
+    "En Proceso": OrderItemStatus.PROCESSING.value,
+    "Working on it": OrderItemStatus.PROCESSING.value,
+    "Listo": OrderItemStatus.READY_FOR_PICKUP.value,
+    "Ready": OrderItemStatus.READY_FOR_PICKUP.value,
+    "Entregado": OrderItemStatus.DELIVERED.value,
+    "Done": OrderItemStatus.DELIVERED.value,
+    "Delivered": OrderItemStatus.DELIVERED.value,
+    "Problema": OrderItemStatus.ISSUE.value,
+    "Stuck": OrderItemStatus.ISSUE.value,
+}
 
 
 class OrderItem(BaseModel):
