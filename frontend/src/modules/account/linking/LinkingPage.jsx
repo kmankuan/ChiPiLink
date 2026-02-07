@@ -167,7 +167,8 @@ export default function LinkingPage({ embedded = false }) {
   // Reset form
   const resetForm = () => {
     setFormData({
-      full_name: '',
+      first_name: '',
+      last_name: '',
       school_id: '',
       student_number: '',
       year: new Date().getFullYear(),
