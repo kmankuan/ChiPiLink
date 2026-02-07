@@ -159,3 +159,55 @@ async def test_monday_integration(admin: dict = Depends(get_admin_user)):
     except httpx.RequestError as e:
         logger.error(f"Monday.com test error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+# ============== ADAPTER CONFIG ROUTES ==============
+
+
+@router.get("/adapters/pinpanclub/config")
+async def get_pinpanclub_monday_config(admin: dict = Depends(get_admin_user)):
+    """Get PinPanClub Monday.com adapter configuration"""
+    from modules.pinpanclub.integrations.monday_adapter import pinpanclub_monday_adapter
+    config = await pinpanclub_monday_adapter._get_sync_config()
+    return {"config": config, "module": "pinpanclub"}
+
+
+@router.put("/adapters/pinpanclub/config")
+async def update_pinpanclub_monday_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update PinPanClub Monday.com adapter configuration"""
+    from modules.pinpanclub.integrations.monday_adapter import pinpanclub_monday_adapter
+    await pinpanclub_monday_adapter.save_sync_config(data.get("config", {}))
+    return {"success": True, "message": "PinPanClub Monday config updated"}
+
+
+@router.post("/adapters/pinpanclub/sync/players")
+async def sync_pinpanclub_players(admin: dict = Depends(get_admin_user)):
+    """Sync all un-synced players to Monday.com"""
+    from modules.pinpanclub.integrations.monday_adapter import pinpanclub_monday_adapter
+    result = await pinpanclub_monday_adapter.sync_all_players()
+    return {"success": True, **result}
+
+
+@router.post("/adapters/pinpanclub/sync/matches")
+async def sync_pinpanclub_matches(admin: dict = Depends(get_admin_user)):
+    """Sync all un-synced matches to Monday.com"""
+    from modules.pinpanclub.integrations.monday_adapter import pinpanclub_monday_adapter
+    result = await pinpanclub_monday_adapter.sync_all_matches()
+    return {"success": True, **result}
+
+
+@router.get("/adapters/memberships/config")
+async def get_memberships_monday_config(admin: dict = Depends(get_admin_user)):
+    """Get Memberships Monday.com adapter configuration"""
+    from modules.users.integrations.monday_memberships_adapter import memberships_monday_adapter
+    config = await memberships_monday_adapter.get_config()
+    return {"config": config, "module": "memberships"}
+
+
+@router.put("/adapters/memberships/config")
+async def update_memberships_monday_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update Memberships Monday.com adapter configuration"""
+    from modules.users.integrations.monday_memberships_adapter import memberships_monday_adapter
+    await memberships_monday_adapter.save_config(data.get("config", {}))
+    return {"success": True, "message": "Memberships Monday config updated"}
