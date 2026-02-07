@@ -248,23 +248,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full glass border-b border-border/50">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Left Section: Back Button + Logo + Breadcrumb */}
+          {/* Left Section: Logo + Breadcrumb with Back */}
           <div className="flex items-center gap-2">
-            {/* Back Button - only show when not on home */}
-            {canGoBack && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate(-1)}
-                className="h-9 w-9 rounded-full hover:bg-muted"
-                data-testid="back-button"
-                title="Regresar"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            )}
-            
-            {/* Logo - links to home */}
+            {/* Logo - always first, links to home */}
             <Link 
               to="/" 
               className="flex items-center gap-2 group"
@@ -279,9 +265,9 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Breadcrumb - current page indicator */}
+            {/* Breadcrumb with integrated back navigation */}
             {!isHomePage && (
-              <div className="hidden sm:flex items-center">
+              <div className="flex items-center">
                 <ChevronRight className="h-4 w-4 text-muted-foreground/50 mx-1" />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
