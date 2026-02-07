@@ -487,7 +487,10 @@ export default function Orders() {
         orderId={chatOrder?.order_id}
         studentName={chatOrder?.student_name}
         isOpen={!!chatOrder}
-        onClose={() => setChatOrder(null)}
+        onClose={() => {
+          setChatOrder(null);
+          refreshUnread();
+        }}
         lang={i18n?.language || 'es'}
       />
     </div>
