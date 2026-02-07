@@ -1,46 +1,54 @@
-# Test Results - Order Chat Feature (Monday.com Integration)
+# Test Results - Monday.com Full Integration
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Order Chat Feature - Monday.com CRM Integration
+- **Feature**: Monday.com Order Sync: Subitems, Status Sync, Inventory Board, Webhooks
 - **Tester**: Main Agent + Testing Agent
 
 ## Implementation Summary
 
-### Backend Fixes Applied
-1. Fixed `has_monday_item` to return actual state (was hardcoded `True`)
-2. Fixed wrong DB collection `db.users` → `db.auth_users` in `post_monday_update` 
-3. Removed redundant inline imports, using module-level `db` and `MONDAY_API_KEY`
-4. Centralized Monday.com API key retrieval via `_get_monday_api_key()` helper
-5. Consistent API key lookup: workspace config → env fallback
+### Backend Changes
+1. **Models**: Added delivery statuses (PROCESSING, READY_FOR_PICKUP, DELIVERED, ISSUE) + DEFAULT_STATUS_MAPPING + monday_subitem_id per OrderItem
+2. **Monday Sync Service** (NEW): `monday_sync_service.py` — webhook processing, manual status sync, inventory board update (find-by-code + increment, or create new)
+3. **Monday Config Service** (UPDATED): Added inventory board config, webhook config, status mapping
+4. **Textbook Order Service** (UPDATED): Fixed column mapping keys to English, set initial subitem status, link subitem IDs per book, trigger inventory board update after sync
+5. **Routes** (NEW): `monday_sync.py` — webhook endpoint, manual sync, webhook management, inventory config, status mapping config
+
+### Key API Endpoints
+- `POST /api/store/monday/webhooks/subitem-status` — Monday.com webhook receiver (handles challenge + events)
+- `POST /api/store/monday/sync-order/{order_id}` — Manual status sync from Monday.com
+- `POST /api/store/monday/webhooks/register` — Admin: register webhook
+- `DELETE /api/store/monday/webhooks` — Admin: unregister webhook
+- `GET /api/store/monday/webhooks/config` — Admin: get webhook config
+- `GET/PUT /api/store/monday/inventory-config` — Admin: inventory board config
+- `GET/PUT /api/store/monday/status-mapping` — Admin: status label mapping
+- `GET /api/store/textbook-orders/{order_id}/updates` — Chat messages
+- `POST /api/store/textbook-orders/{order_id}/updates` — Send chat message
+
+### Frontend Changes
+- Orders page (`Orders.jsx`): per-book delivery status badges, delivery progress bar, i18n for all labels
 
 ### Key Files
-- **Backend Service**: `backend/modules/store/services/textbook_order_service.py` (methods: `get_monday_updates`, `post_monday_update`, `_get_monday_api_key`)
-- **Backend Routes**: `backend/modules/store/routes/textbook_orders.py` (GET/POST `/{order_id}/updates`)
-- **Frontend Component**: `frontend/src/components/chat/OrderChat.jsx`
-- **Frontend Page**: `frontend/src/pages/Orders.jsx`
-
-### API Endpoints
-- `GET /api/store/textbook-orders/{order_id}/updates` - Fetch chat messages
-- `POST /api/store/textbook-orders/{order_id}/updates` - Send a chat message
-- `POST /api/auth-v2/login` - Auth login endpoint
-- `GET /api/store/textbook-orders/my-orders` - Get user's orders
+- `backend/modules/store/models/textbook_order.py` — Updated model with new statuses
+- `backend/modules/store/services/monday_sync_service.py` — NEW: sync engine
+- `backend/modules/store/services/monday_config_service.py` — Updated config service
+- `backend/modules/store/services/textbook_order_service.py` — Updated order service
+- `backend/modules/store/routes/monday_sync.py` — NEW: sync routes
+- `backend/modules/store/routes/__init__.py` — Updated to include monday_sync_router
+- `frontend/src/pages/Orders.jsx` — Updated with per-book status + progress
 
 ### Test Credentials
-- **Client User**: `test@client.com` / `password` (user_id: cli_d2aad7f00f86)
-- **Admin Users**: `teck@koh.one`, `admin@libreria.com`
-- **Test Orders**: `ord_2f069060c203` (Test Student Beta), `ord_a3480a98d56d` (Test Student Alpha)
+- **Client User**: `test@client.com` / `password`
+- **Admin User**: `admin@libreria.com` / `admin`
+- **Test Orders**: `ord_2f069060c203`, `ord_a3480a98d56d` (both without Monday.com linkage)
 
 ### Login Flow
-- Regular users login via LaoPan OAuth
-- Admin/test login via "Acceso Administrativo" section at `/login` page
-- The admin login form works for any user (including test@client.com)
-
-### Orders Page Route
-- Orders page is at `/pedidos` (NOT `/mis-pedidos`)
+- Admin login: "Acceso Administrativo" section at `/login`
+- Orders page: `/pedidos`
+- Auth endpoint: `POST /api/auth-v2/login`
 
 ## Incorporate User Feedback
-- Chat feature should work for orders with AND without Monday.com linkage
-- UI text should use i18n (currently supports ES/EN/ZH in OrderChat component)
-- Mobile-first design principle
-- Codebase should be in English
+- Webhook-based auto-sync for subitem status changes
+- Inventory board: find by code and increment, create if not exists
+- Codebase in English, i18n for ES/EN/ZH
+- Mobile-first design
