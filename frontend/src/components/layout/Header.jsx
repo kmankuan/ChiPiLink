@@ -39,6 +39,7 @@ import {
   QrCode,
   CreditCard,
   MessageCircle,
+  Bell,
   ChevronLeft,
   ChevronRight,
   Home
