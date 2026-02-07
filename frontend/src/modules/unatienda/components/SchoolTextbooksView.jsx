@@ -110,8 +110,12 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs">{ft.name} *</Label>
-            <Input value={form.full_name} onChange={e => set('full_name', e.target.value)} placeholder="John Doe" className="h-9 text-sm" />
+            <Label className="text-xs">{ft.firstName} *</Label>
+            <Input value={form.first_name} onChange={e => set('first_name', e.target.value)} placeholder="John" className="h-9 text-sm" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.lastName} *</Label>
+            <Input value={form.last_name} onChange={e => set('last_name', e.target.value)} placeholder="Doe" className="h-9 text-sm" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">{ft.school} *</Label>
