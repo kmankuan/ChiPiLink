@@ -631,14 +631,24 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Student Name */}
-            <div className="space-y-2">
-              <Label>{t.fullName} <span className="text-red-500">*</span></Label>
-              <Input
-                value={formData.full_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
-                placeholder="Enter student's full name"
-              />
+            {/* Student Name - Split into First and Last */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t.firstName} <span className="text-red-500">*</span></Label>
+                <Input
+                  value={formData.first_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                  placeholder="John"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t.lastName} <span className="text-red-500">*</span></Label>
+                <Input
+                  value={formData.last_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                  placeholder="Doe"
+                />
+              </div>
             </div>
 
             {/* School */}
