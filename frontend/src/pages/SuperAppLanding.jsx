@@ -352,6 +352,7 @@ export default function SuperAppLanding() {
   // Community data
   const [communityData, setCommunityData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [moduleStatuses, setModuleStatuses] = useState(null);
   
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
