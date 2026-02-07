@@ -82,6 +82,8 @@ const translations = {
     dialogTitle: 'Link New Student',
     dialogDesc: 'Enter student information to request textbook access',
     fullName: 'Full Name',
+    firstName: 'First Name',
+    lastName: 'Last Name',
     selectSchool: 'Select School',
     studentNumber: 'Student ID (optional)',
     selectGrade: 'Select Grade',
