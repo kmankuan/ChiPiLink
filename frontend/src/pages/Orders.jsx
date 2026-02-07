@@ -228,9 +228,11 @@ export default function Orders() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {textbookOrders.map((order) => (
+              {textbookOrders.map((order) => {
+                const progress = getDeliveryProgress(order.items);
+                return (
                 <Card key={order.order_id} data-testid={`textbook-order-${order.order_id}`}>
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                       <div>
                         <div className="flex items-center gap-3 mb-2">
@@ -238,10 +240,7 @@ export default function Orders() {
                         </div>
                         <p className="font-bold text-lg">{order.student_name}</p>
                         <p className="text-sm text-muted-foreground">
-                          Grado {order.grade} • Año {order.year}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono mt-1">
-                          {order.order_id}
+                          {t('orders.grade', 'Grade')} {order.grade} • {t('orders.year', 'Year')} {order.year}
                         </p>
                       </div>
                       
@@ -250,14 +249,30 @@ export default function Orders() {
                           ${order.total_amount?.toFixed(2)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {order.items?.filter(i => i.quantity_ordered > 0).length || 0} libros
+                          {order.items?.filter(i => i.quantity_ordered > 0).length || 0} {t('orders.books', 'books')}
                         </p>
                       </div>
                     </div>
 
-                    {/* Items Preview - Expandable */}
+                    {/* Delivery progress bar */}
+                    {progress && progress.total > 0 && order.status !== 'draft' && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                          <span>{t('orders.deliveryProgress', 'Delivery Progress')}</span>
+                          <span>{progress.delivered}/{progress.total}</span>
+                        </div>
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500 rounded-full transition-all"
+                            style={{ width: `${(progress.delivered / progress.total) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Items Preview - Expandable with per-book status */}
                     {order.items && order.items.filter(i => i.quantity_ordered > 0).length > 0 && (
-                      <div className="bg-muted rounded-lg p-4">
+                      <div className="bg-muted rounded-lg p-3 sm:p-4">
                         <div className="space-y-2">
                           {(() => {
                             const filteredItems = order.items.filter(i => i.quantity_ordered > 0);
@@ -268,11 +283,14 @@ export default function Orders() {
                             return (
                               <>
                                 {itemsToShow.map((item, idx) => (
-                                  <div key={idx} className="flex justify-between text-sm">
-                                    <span>{item.book_name}</span>
-                                    <span className="text-muted-foreground">
-                                      {item.quantity_ordered} x ${item.price?.toFixed(2)}
-                                    </span>
+                                  <div key={idx} className="flex items-center justify-between text-sm gap-2">
+                                    <span className="truncate flex-1">{item.book_name}</span>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {getItemStatusBadge(item.status)}
+                                      <span className="text-muted-foreground text-xs">
+                                        ${item.price?.toFixed(2)}
+                                      </span>
+                                    </div>
                                   </div>
                                 ))}
                                 {hasMoreItems && (
@@ -284,12 +302,12 @@ export default function Orders() {
                                     {isExpanded ? (
                                       <>
                                         <ChevronUp className="h-4 w-4" />
-                                        Ver menos
+                                        {t('orders.showLess', 'Show less')}
                                       </>
                                     ) : (
                                       <>
                                         <ChevronDown className="h-4 w-4" />
-                                        +{filteredItems.length - 3} más
+                                        +{filteredItems.length - 3} {t('orders.more', 'more')}
                                       </>
                                     )}
                                   </button>
@@ -303,7 +321,7 @@ export default function Orders() {
 
                     {order.last_submitted_at && (
                       <p className="text-xs text-muted-foreground mt-3">
-                        Último envío: {new Date(order.last_submitted_at).toLocaleDateString()}
+                        {t('orders.lastSubmitted', 'Last submitted')}: {new Date(order.last_submitted_at).toLocaleDateString()}
                       </p>
                     )}
                     
