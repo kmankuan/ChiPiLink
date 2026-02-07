@@ -722,11 +722,20 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
           {editStudent?.is_locked && (
             <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/20 p-3">
               <Lock className="h-4 w-4 text-amber-600 shrink-0" />
-              <p className="text-xs text-amber-700 dark:text-amber-400">
-                {lang === 'es'
-                  ? 'Este perfil está bloqueado por el administrador. Los campos no pueden ser editados.'
-                  : 'This profile is locked by the administrator. Fields cannot be edited.'}
-              </p>
+              <div className="flex-1">
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  {lang === 'es'
+                    ? 'Este perfil está bloqueado por el administrador. Los campos no pueden ser editados.'
+                    : 'This profile is locked by the administrator. Fields cannot be edited.'}
+                </p>
+                <a
+                  href="/pedidos"
+                  className="text-xs text-purple-600 hover:underline font-medium mt-1 inline-block"
+                >
+                  {lang === 'es' ? 'Ir a Mensajes para contactar soporte' : 'Go to Messages to contact support'}
+                  &rarr;
+                </a>
+              </div>
             </div>
           )}
 
