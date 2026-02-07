@@ -198,8 +198,12 @@ export default function LinkingPage({ embedded = false }) {
   // Submit form
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.full_name.trim()) {
-      toast.error('Please enter student name');
+    if (!formData.first_name.trim()) {
+      toast.error('Please enter student first name');
+      return;
+    }
+    if (!formData.last_name.trim()) {
+      toast.error('Please enter student last name');
       return;
     }
     if (!formData.school_id) {
