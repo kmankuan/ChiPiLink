@@ -367,10 +367,13 @@ async def post_order_update(
     message = body.get("message", "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-    result = await textbook_order_service.post_monday_update(
-        order_id, current_user["user_id"], message
-    )
-    return result
+    try:
+        result = await textbook_order_service.post_monday_update(
+            order_id, current_user["user_id"], message
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 
