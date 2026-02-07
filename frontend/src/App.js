@@ -16,6 +16,7 @@ import { OneSignalProvider } from '@/contexts/OneSignalContext';
 // Layout
 import { Header } from '@/components/layout/Header';
 import { NotificationBar } from '@/components/layout/NotificationBar';
+import BottomNav from '@/components/layout/BottomNav';
 
 // Pages
 import SuperAppLanding from '@/pages/SuperAppLanding';
