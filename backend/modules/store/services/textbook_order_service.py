@@ -473,8 +473,10 @@ class TextbookOrderService(BaseService):
             order, selected_items, user_name, user_email, submission_total
         )
 
-        # 2. Update TXB inventory board (non-blocking)
+        # 2. Update TXB inventory board — create subitems per student (non-blocking)
         try:
+            student_name = order.get("student_name", "")
+            order_reference = order.get("order_id", "")
             inv_items = [{
                 "book_code": item.get("book_code", ""),
                 "book_name": item["book_name"],
@@ -482,7 +484,9 @@ class TextbookOrderService(BaseService):
                 "grade": order.get("grade", ""),
                 "price": item.get("price"),
             } for item in selected_items]
-            inv_result = await monday_sync_service.update_inventory_board(inv_items)
+            inv_result = await monday_sync_service.update_inventory_board(
+                inv_items, student_name=student_name, order_reference=order_reference
+            )
             logger.info(f"TXB Inventory update: {inv_result}")
         except Exception as e:
             logger.warning(f"TXB Inventory update failed (non-blocking): {e}")
