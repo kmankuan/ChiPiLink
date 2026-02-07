@@ -342,21 +342,19 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - hide current page since breadcrumb shows it */}
           <nav className="hidden md:flex items-center gap-6">
-            {/* Unatienda - Public store link */}
-            <Link 
-              to="/unatienda" 
-              className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                isUnatiendaPage 
-                  ? 'text-primary' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-              data-testid="unatienda-nav-link"
-            >
-              <Store className="h-4 w-4" />
-              Unatienda
-            </Link>
+            {/* Unatienda - Public store link (hide when on Unatienda since breadcrumb shows it) */}
+            {!isUnatiendaPage && (
+              <Link 
+                to="/unatienda" 
+                className="text-sm font-medium transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+                data-testid="unatienda-nav-link"
+              >
+                <Store className="h-4 w-4" />
+                Unatienda
+              </Link>
+            )}
 
             {/* PinPanClub Quick Access - Solo visible para usuarios con membresía activa o admins */}
             {(user?.tiene_membresia_activa || canAccessAdmin) && (
