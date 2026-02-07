@@ -204,13 +204,15 @@ export default function SchoolTextbooksView({
   const lang = i18n?.language || 'es';
   
   const [selectedStudentIndex, setSelectedStudentIndex] = useState(0);
-  const [orderData, setOrderData] = useState(null); // Full order from backend
+  const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [reorderItem, setReorderItem] = useState(null);
   const [reorderReason, setReorderReason] = useState('');
   const [requestingReorder, setRequestingReorder] = useState(false);
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [allStudents, setAllStudents] = useState(null); // null = not fetched yet
   
   const texts = {
     en: {
