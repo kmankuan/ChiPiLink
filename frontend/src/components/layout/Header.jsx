@@ -578,119 +578,18 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate('/login')}
-                  className="hidden sm:inline-flex"
-                  data-testid="login-button"
-                >
-                  {t('nav.login')}
-                </Button>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/login')}
+                className="hidden md:inline-flex"
+                data-testid="login-button"
+              >
+                {t('nav.login')}
+              </Button>
             )}
-
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden h-9 w-9"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              data-testid="mobile-menu-toggle"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border/50">
-            <div className="flex flex-col gap-2">
-              {/* Unatienda */}
-              <Link 
-                to="/unatienda"
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                  isUnatiendaPage ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-                data-testid="mobile-unatienda-link"
-              >
-                <Store className="h-4 w-4" />
-                Unatienda
-              </Link>
-
-              {/* Catalog link removed - now in Admin > Unatienda */}
-              
-              {isAuthenticated && (
-                <>
-                  {/* Mis Pedidos - Siempre visible */}
-                  <Link 
-                    to="/pedidos"
-                    className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-orders-link"
-                  >
-                    {t('nav.orders')}
-                  </Link>
-                  
-                  {/* Mis Libros Escolares - Solo si tiene estudiantes vinculados */}
-                  {hasLinkedStudents && (
-                    <Link 
-                      to="/mis-pedidos-libros"
-                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                        location.pathname === '/mis-pedidos-libros' ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid="mobile-book-orders-link"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      Mis Libros Escolares
-                    </Link>
-                  )}
-                  
-                  {/* PinpanClub - Solo si tiene membresía activa */}
-                  {user?.tiene_membresia_activa && (
-                    <Link 
-                      to="/pinpanclub"
-                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                        location.pathname.startsWith('/pinpanclub') ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid="mobile-pingpong-link"
-                    >
-                      <Trophy className="h-4 w-4" />
-                      PinpanClub
-                    </Link>
-                  )}
-                </>
-              )}
-              
-              {canAccessAdmin && (
-                <Link 
-                  to="/admin"
-                  className="px-4 py-2 text-sm font-medium text-accent hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-admin-link"
-                >
-                  {t('nav.admin')}
-                </Link>
-              )}
-
-              {!isAuthenticated && (
-                <Link 
-                  to="/login"
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid="mobile-login-link"
-                >
-                  {t('nav.login')}
-                </Link>
-              )}
-            </div>
-          </nav>
-        )}
       </div>
     </header>
   );
