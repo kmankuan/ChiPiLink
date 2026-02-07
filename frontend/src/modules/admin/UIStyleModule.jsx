@@ -114,7 +114,8 @@ export default function UIStyleModule() {
       });
       setOriginalStyle(JSON.parse(JSON.stringify(style)));
       setHasChanges(false);
-      toast.success('UI style saved! Changes will apply on next page reload.');
+      await refreshUIStyle();
+      toast.success('UI style saved and applied!');
     } catch (err) {
       toast.error('Failed to save UI style');
     } finally {
