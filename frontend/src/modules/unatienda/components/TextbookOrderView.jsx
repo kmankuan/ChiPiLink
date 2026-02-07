@@ -326,7 +326,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
     };
   };
 
-  // Linking View
+  // Linking View — redirect to My Students page
   if (view === 'linking') {
     return (
       <>
@@ -339,10 +339,21 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
           <ChevronLeft className="h-4 w-4" />
           {te.backToStudents}
         </Button>
-        <CompraExclusiva embedded={true} onStudentLinked={() => {
-          onRefreshAccess();
-          setView('students');
-        }} />
+        <Card>
+          <CardContent className="p-6 text-center">
+            <UserPlus className="h-12 w-12 text-primary mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">{te.linkStudent}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {te.noStudentsLinked}
+            </p>
+            <Button onClick={() => {
+              window.location.href = '/mi-cuenta?tab=students';
+            }}>
+              <UserPlus className="h-4 w-4 mr-2" />
+              {te.linkNew}
+            </Button>
+          </CardContent>
+        </Card>
       </>
     );
   }
