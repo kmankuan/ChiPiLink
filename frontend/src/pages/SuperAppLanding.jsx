@@ -612,12 +612,12 @@ export default function SuperAppLanding() {
               case 'quickAccess':
                 return (
                   <section key={block.id} data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" />
-                    <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" />
-                    <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" />
-                    <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" />
-                    <QuickAccessButton icon={Image} label="Galería" to="/galeria" />
-                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" />
+                    <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" />
+                    <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" />
+                    <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" />
+                    <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" moduleKey="events" />
+                    <QuickAccessButton icon={Image} label="Galería" to="/galeria" moduleKey="gallery" />
+                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" moduleKey="players" />
                   </section>
                 );
               
