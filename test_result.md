@@ -1,38 +1,49 @@
-# Test Results - User Notifications (P2)
+# Test Results - Module Status Admin UI (P1) & UI Style (P2)
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Unread message notification system
+- **Feature**: Admin UI for Module Status Management & UI Style Selection
 - **Tester**: Main Agent + Testing Agent
 
 ## Implementation Summary
 
-### Backend
-1. Added `read_by` array to messages in `order_messages` collection
-2. `GET /api/store/textbook-orders/notifications/unread` — total + per-order unread counts
-3. `POST /api/store/textbook-orders/{order_id}/updates/mark-read` — mark all as read for user
-4. Auto-marks sender's own messages as read on send
+### Backend (admin routes)
+1. `GET /api/admin/module-status` — Get module statuses with defaults (admin auth)
+2. `PUT /api/admin/module-status` — Save module statuses (admin auth)
+3. `GET /api/admin/ui-style` — Get UI style config with template list (admin auth)
+4. `PUT /api/admin/ui-style` — Save UI style config (admin auth)
+5. `GET /api/public/module-status` — Public endpoint for frontend display (no auth)
+6. `GET /api/public/ui-style` — Public endpoint for frontend theming (no auth)
 
 ### Frontend
-1. `useNotifications` hook — polls every 30s, provides totalUnread + perOrder + markOrderRead
-2. Header bell icon with red badge showing total unread count
-3. Per-order unread badge on "Messages" button
-4. Auto-mark-read when chat opens; refresh unread when chat closes
+1. `ModuleStatusModule.jsx` — Admin tab to manage module lifecycle statuses with live preview badges
+2. `UIStyleModule.jsx` — Admin tab for design template selection with color/font/radius/card customization
+3. `AdminModule.jsx` — Updated with two new tabs: "Module Status" and "UI Style"
+4. `SuperAppLanding.jsx` — Updated to fetch module statuses from API instead of static config
 
 ### Key Files
-- `backend/modules/store/services/textbook_order_service.py` — mark_order_messages_read, get_unread_counts
-- `backend/modules/store/routes/textbook_orders.py` — new routes
-- `frontend/src/hooks/useNotifications.js` — notification hook
-- `frontend/src/components/layout/Header.jsx` — bell icon + badge
-- `frontend/src/pages/Orders.jsx` — per-order badges + mark-read on open
+- `backend/modules/admin/routes.py` — Module status & UI style CRUD endpoints
+- `backend/modules/landing/routes.py` — Public module-status & ui-style endpoints
+- `frontend/src/modules/admin/ModuleStatusModule.jsx` — Module Status admin UI
+- `frontend/src/modules/admin/UIStyleModule.jsx` — UI Style admin UI
+- `frontend/src/modules/admin/AdminModule.jsx` — Updated with new tabs
+- `frontend/src/pages/SuperAppLanding.jsx` — API-driven module statuses
 
 ### Test Credentials
-- Client: test@client.com / password
 - Admin: admin@libreria.com / admin
 - Auth: POST /api/auth-v2/login
-- Orders: /pedidos
+- Admin login page: /admin/login
+- Admin dashboard: /admin
+
+### Previously Verified (P0)
+- Admin login page at /admin/login — working
+- Admin login redirects to /admin dashboard — working
+- Public login page at /login only shows LaoPan — working
+- Module status badges on home page — working
+- /unatienda route — working
 
 ## Incorporate User Feedback
-- Real-time feel via 30s polling
-- Optimistic UI updates on mark-read
-- Non-blocking — errors silently fail
+- Module statuses are now API-driven, customizable by admin
+- Status changes reflect immediately on public home page
+- 5 predefined design templates available in UI Style
+- Live preview in both admin UIs
