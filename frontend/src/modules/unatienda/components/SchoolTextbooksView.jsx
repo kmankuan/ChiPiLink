@@ -275,6 +275,23 @@ export default function SchoolTextbooksView({
   const validatedStudents = privateCatalogAccess?.students || [];
   const hasAccess = privateCatalogAccess?.has_access === true;
   const selectedStudent = validatedStudents[selectedStudentIndex];
+
+  // Fetch all students (including pending) for the card display
+  const fetchAllStudents = useCallback(async () => {
+    if (!token) return;
+    try {
+      const { data } = await axios.get(`${API_URL}/api/store/textbook-access/my-students`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAllStudents(data?.students || []);
+    } catch { setAllStudents([]); }
+  }, [token]);
+
+  useEffect(() => {
+    if (isAuthenticated && (!hasAccess || validatedStudents.length === 0)) {
+      fetchAllStudents();
+    }
+  }, [isAuthenticated, hasAccess, validatedStudents.length, fetchAllStudents]);
   
   // Items derived from orderData
   const items = orderData?.items || [];
