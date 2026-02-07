@@ -418,6 +418,15 @@ export default function Orders() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Order Chat */}
+      <OrderChat
+        orderId={chatOrder?.order_id}
+        studentName={chatOrder?.student_name}
+        isOpen={!!chatOrder}
+        onClose={() => setChatOrder(null)}
+        lang={i18n?.language || 'es'}
+      />
     </div>
   );
 }
