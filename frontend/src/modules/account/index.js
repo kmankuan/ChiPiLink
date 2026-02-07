@@ -6,7 +6,7 @@
 // Main dashboard
 export { default as AccountDashboard } from './pages/AccountDashboard';
 
-// Linking (Compra Exclusiva)
+// Linking (School Textbooks)
 export { default as LinkingPage } from './linking/LinkingPage';
 
 // Profile
