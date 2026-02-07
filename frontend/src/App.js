@@ -21,6 +21,7 @@ import { NotificationBar } from '@/components/layout/NotificationBar';
 import SuperAppLanding from '@/pages/SuperAppLanding';
 import RapidPinPublicPage from '@/pages/RapidPinPublicPage';
 import Login from '@/pages/Login';
+import AdminLogin from '@/pages/AdminLogin';
 import Register from '@/pages/Register';
 import AuthCallback from '@/pages/AuthCallback';
 import LaoPanCallback from '@/pages/LaoPanCallback';
