@@ -22,9 +22,14 @@ class MondaySyncService:
         """Manual sync of subitem statuses from Monday.com"""
         return await textbook_monday_adapter.sync_order_statuses(order_id)
 
-    async def update_inventory_board(self, ordered_items: List[Dict]) -> dict:
-        """Update TXB inventory board after order"""
-        return await txb_inventory_adapter.update_inventory(ordered_items)
+    async def update_inventory_board(
+        self, ordered_items: List[Dict],
+        student_name: str = "", order_reference: str = ""
+    ) -> dict:
+        """Update TXB inventory board after order — creates subitems per student"""
+        return await txb_inventory_adapter.update_inventory(
+            ordered_items, student_name=student_name, order_reference=order_reference
+        )
 
     async def sync_order_to_monday(
         self, order: Dict, selected_items: List[Dict],
