@@ -57,6 +57,7 @@ from modules.community import community_refactored_router
 
 # Integrations Module
 from modules.integrations.monday.routes import router as monday_router
+from modules.integrations.monday.webhook_router import router as monday_webhook_router
 from modules.integrations.sheets.routes import router as sheets_router
 
 # Admin Module (notifications, config, setup)
