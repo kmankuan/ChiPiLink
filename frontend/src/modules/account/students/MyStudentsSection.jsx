@@ -506,7 +506,8 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
   const handleRetry = (student) => {
     // Pre-fill form with student data and open dialog
     setFormData({
-      full_name: student.full_name,
+      first_name: student.first_name || '',
+      last_name: student.last_name || '',
       school_id: student.school_id || '',
       student_number: student.student_number || '',
       year: student.year || new Date().getFullYear(),
