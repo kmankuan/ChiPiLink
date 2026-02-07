@@ -599,14 +599,6 @@ export function Header() {
                 >
                   {t('nav.login')}
                 </Button>
-                <Button 
-                  size="sm"
-                  onClick={() => navigate('/registro')}
-                  className="rounded-full px-4"
-                  data-testid="register-button"
-                >
-                  {t('nav.register')}
-                </Button>
               </div>
             )}
 
