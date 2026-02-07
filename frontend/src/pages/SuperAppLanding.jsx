@@ -97,7 +97,7 @@ const SectionHeader = ({ icon: Icon, title, action, actionLink, className = '' }
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 
-const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey }) => {
+const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey, moduleStatuses }) => {
   const navigate = useNavigate();
   const colorClasses = {
     primary: 'bg-primary/10 text-primary hover:bg-primary/20',
@@ -107,7 +107,7 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey
     blue: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
   };
 
-  const modStatus = moduleKey ? DEFAULT_MODULE_STATUS[moduleKey] : null;
+  const modStatus = moduleKey ? (moduleStatuses?.[moduleKey] || DEFAULT_MODULE_STATUS[moduleKey]) : null;
 
   return (
     <button
