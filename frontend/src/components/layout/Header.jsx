@@ -454,6 +454,25 @@ export function Header() {
               <span className="sr-only">Soporte</span>
             </Button>
 
+            {/* Notifications Bell — unread order messages */}
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/pedidos')}
+                className="h-9 w-9 rounded-full relative"
+                data-testid="notifications-bell"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                {totalUnread > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
+                    {totalUnread > 99 ? '99+' : totalUnread}
+                  </span>
+                )}
+              </Button>
+            )}
+
             {/* Cart Button */}
             <Button
               variant="ghost"
