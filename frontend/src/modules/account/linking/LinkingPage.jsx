@@ -368,7 +368,7 @@ export default function LinkingPage({ embedded = false }) {
                       <User className="h-5 w-5 text-purple-600" />
                     </div>
                     <div>
-                      <p className="font-medium">{student.full_name}</p>
+                      <p className="font-medium">{student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim()}</p>
                       <p className="text-sm text-muted-foreground">
                         {student.school_name || 'School'} • Grade {student.grade || 'N/A'}
                       </p>
