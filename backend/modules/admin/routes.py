@@ -554,5 +554,3 @@ async def update_ui_style(data: dict, admin: dict = Depends(get_admin_user)):
         upsert=True
     )
     return {"success": True, "message": "UI style updated"}
-
-        raise HTTPException(status_code=500, detail=str(e))
