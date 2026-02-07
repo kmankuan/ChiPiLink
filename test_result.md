@@ -1,49 +1,45 @@
-# Test Results - Module Status Admin UI (P1) & UI Style (P2)
+# Test Results - P1 UI Style Application + Retail Inventory
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Admin UI for Module Status Management & UI Style Selection
-- **Tester**: Main Agent + Testing Agent
+- **Features**: 
+  - P1: Apply UI Style templates to frontend (CSS variables, dark/light mode)
+  - Retail E-commerce Inventory for Unatienda
 
 ## Implementation Summary
 
-### Backend (admin routes)
-1. `GET /api/admin/module-status` — Get module statuses with defaults (admin auth)
-2. `PUT /api/admin/module-status` — Save module statuses (admin auth)
-3. `GET /api/admin/ui-style` — Get UI style config with template list (admin auth)
-4. `PUT /api/admin/ui-style` — Save UI style config (admin auth)
-5. `GET /api/public/module-status` — Public endpoint for frontend display (no auth)
-6. `GET /api/public/ui-style` — Public endpoint for frontend theming (no auth)
+### P1 — UI Style Application
+- Created `uiStylePresets.js` with 5 template presets (default, elegant, warm, ocean, minimal), each with light + dark mode CSS variable definitions
+- Extended `ThemeContext.js` to fetch UI style from `/api/public/ui-style` and apply CSS variables dynamically
+- Updated `UIStyleModule.jsx` to call `refreshUIStyle()` after save for instant preview
+- Added card-style CSS classes in `index.css` for flat/bordered/elevated variants
+- Hex-to-HSL conversion utility for custom primary color override
 
-### Frontend
-1. `ModuleStatusModule.jsx` — Admin tab to manage module lifecycle statuses with live preview badges
-2. `UIStyleModule.jsx` — Admin tab for design template selection with color/font/radius/card customization
-3. `AdminModule.jsx` — Updated with two new tabs: "Module Status" and "UI Style"
-4. `SuperAppLanding.jsx` — Updated to fetch module statuses from API instead of static config
-
-### Key Files
-- `backend/modules/admin/routes.py` — Module status & UI style CRUD endpoints
-- `backend/modules/landing/routes.py` — Public module-status & ui-style endpoints
-- `frontend/src/modules/admin/ModuleStatusModule.jsx` — Module Status admin UI
-- `frontend/src/modules/admin/UIStyleModule.jsx` — UI Style admin UI
-- `frontend/src/modules/admin/AdminModule.jsx` — Updated with new tabs
-- `frontend/src/pages/SuperAppLanding.jsx` — API-driven module statuses
+### Retail Inventory System
+- Backend: `/app/backend/modules/store/routes/inventory.py` — Full CRUD with:
+  - `GET /api/store/inventory/dashboard` — Stats overview (totals, value, low/out, category breakdown, recent movements)
+  - `GET /api/store/inventory/products` — Paginated list with search, filter, sort
+  - `POST /api/store/inventory/adjust` — Single product stock adjustment with history logging
+  - `POST /api/store/inventory/adjust/batch` — Batch stock adjustments
+  - `GET /api/store/inventory/movements` — Stock movement history
+  - `GET /api/store/inventory/alerts` — Low-stock alert list
+- Frontend: `InventoryTab.jsx` — Full admin UI with dashboard stats, product table, adjust dialog, movement history
 
 ### Test Credentials
 - Admin: admin@libreria.com / admin
 - Auth: POST /api/auth-v2/login
-- Admin login page: /admin/login
-- Admin dashboard: /admin
+- Admin login: /admin/login
 
-### Previously Verified (P0)
-- Admin login page at /admin/login — working
-- Admin login redirects to /admin dashboard — working
-- Public login page at /login only shows LaoPan — working
-- Module status badges on home page — working
-- /unatienda route — working
+### Key Files
+- `frontend/src/config/uiStylePresets.js` — Template presets + hex-to-HSL utility
+- `frontend/src/contexts/ThemeContext.js` — Extended with UI style fetch + apply
+- `frontend/src/index.css` — Card style CSS classes
+- `backend/modules/store/routes/inventory.py` — Inventory API routes
+- `frontend/src/modules/unatienda/tabs/InventoryTab.jsx` — Inventory admin UI
+- `frontend/src/modules/unatienda/UnatiendaModule.jsx` — Added Inventory tab
 
 ## Incorporate User Feedback
-- Module statuses are now API-driven, customizable by admin
-- Status changes reflect immediately on public home page
-- 5 predefined design templates available in UI Style
-- Live preview in both admin UIs
+- UI style templates now apply to both light and dark modes
+- Admin can customize primary color, font, radius, card style per template
+- Changes apply instantly after save
+- Full inventory management with movement history and stock alerts
