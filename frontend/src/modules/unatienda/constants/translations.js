@@ -59,7 +59,7 @@ export const schoolTxbTranslations = {
     submitOrder: 'Enviar Pedido',
     additionalInfo: 'Información Adicional',
     select: '-- Seleccionar --',
-    exclusivePurchase: 'Compra Exclusiva',
+    exclusivePurchase: 'Textos Escolares',
     yourStudentsBooks: 'Textos de tus estudiantes',
     linkNew: 'Vincular Nuevo',
     myStudents: 'Mis Estudiantes',
