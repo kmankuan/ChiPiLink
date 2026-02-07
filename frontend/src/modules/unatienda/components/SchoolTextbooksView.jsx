@@ -41,7 +41,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    full_name: '', school_id: '', student_number: '',
+    first_name: '', last_name: '', school_id: '', student_number: '',
     year: new Date().getFullYear(), grade: '', relation_type: '', relation_other: '',
   });
 
