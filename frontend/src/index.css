@@ -149,6 +149,11 @@
   background: hsl(var(--muted-foreground) / 0.5);
 }
 
+/* Safe area for bottom nav on mobile */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Print styles for thermal receipt */
 @media print {
   @page {
