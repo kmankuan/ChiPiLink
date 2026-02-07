@@ -445,11 +445,25 @@ export default function SchoolTextbooksView({
           <GraduationCap className="h-5 w-5 text-purple-600" />
           <h2 className="text-base sm:text-lg font-bold">{t.title}</h2>
         </div>
-        <Button variant="outline" size="sm" onClick={onLinkStudent} className="shrink-0 text-xs" data-testid="link-student-btn">
-          <UserPlus className="h-3.5 w-3.5 sm:mr-1" />
-          <span className="hidden sm:inline">{t.linkStudentBtn}</span>
+        <Button variant="outline" size="sm" onClick={() => setShowLinkForm(!showLinkForm)} className="shrink-0 text-xs" data-testid="link-student-btn">
+          {showLinkForm ? <X className="h-3.5 w-3.5 sm:mr-1" /> : <UserPlus className="h-3.5 w-3.5 sm:mr-1" />}
+          <span className="hidden sm:inline">{showLinkForm ? t.cancel : t.linkStudentBtn}</span>
         </Button>
       </div>
+
+      {/* Inline student linking form (for main view too) */}
+      {showLinkForm && (
+        <InlineStudentForm
+          token={token}
+          lang={lang}
+          onSuccess={() => {
+            setShowLinkForm(false);
+            fetchAllStudents();
+            if (typeof onBack === 'function') onBack();
+          }}
+          onCancel={() => setShowLinkForm(false)}
+        />
+      )}
       
       {/* Student Tabs */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" data-testid="student-tabs">
