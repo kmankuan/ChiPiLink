@@ -57,6 +57,7 @@ class OrderItem(BaseModel):
     status: OrderItemStatus = OrderItemStatus.AVAILABLE
     ordered_at: Optional[str] = None
     notes: Optional[str] = None
+    monday_subitem_id: Optional[str] = None  # Links to Monday.com subitem
 
 
 class OrderItemCreate(BaseModel):
