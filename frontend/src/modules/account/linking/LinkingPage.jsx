@@ -393,18 +393,32 @@ export default function LinkingPage({ embedded = false }) {
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {/* Student Name */}
-            <div className="space-y-2">
-              <Label htmlFor="studentName">
-                Full Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="studentName"
-                value={formData.full_name}
-                onChange={(e) => handleChange('full_name', e.target.value)}
-                placeholder="Enter student's full name"
-                data-testid="input-student-name"
-              />
+            {/* Student First Name */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">
+                  First Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="firstName"
+                  value={formData.first_name}
+                  onChange={(e) => handleChange('first_name', e.target.value)}
+                  placeholder="John"
+                  data-testid="input-first-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">
+                  Last Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="lastName"
+                  value={formData.last_name}
+                  onChange={(e) => handleChange('last_name', e.target.value)}
+                  placeholder="Doe"
+                  data-testid="input-last-name"
+                />
+              </div>
             </div>
 
             {/* School Selection */}
