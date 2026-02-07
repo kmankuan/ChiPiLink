@@ -131,11 +131,10 @@ class TextbookAccessService(BaseService):
         
         # Enrich with computed fields
         for student in students:
-            # Get school name
-            school = await self.school_repo.get_by_id(student.get("school_id"))
-            student["school_name"] = school.get("name") if school else "Unknown"
+            # Normalize name fields for backward compatibility
+            self._normalize_name_fields(student)
             
-            # Mark which years are editable
+            # Get school name
             enrollments = student.get("enrollments", [])
             for enrollment in enrollments:
                 enrollment["is_editable"] = self.is_year_editable(enrollment.get("year", 0))
