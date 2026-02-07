@@ -252,7 +252,7 @@ function StudentCard({ student, t, lang, onOrderTextbooks, onViewOrders, onRetry
             <GraduationCap className={`h-6 w-6 ${config.iconColor}`} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-base truncate">{student.full_name}</h3>
+            <h3 className="font-semibold text-base truncate">{student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim()}</h3>
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <School className="h-3.5 w-3.5" />
               <span className="truncate">{student.school_name || 'School'}</span>
