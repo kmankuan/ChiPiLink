@@ -335,12 +335,13 @@ export default function Orders() {
                         data-testid={`chat-btn-${order.order_id}`}
                       >
                         <MessageCircle className="h-3.5 w-3.5" />
-                        Mensajes
+                        {t('orders.messages', 'Messages')}
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </TabsContent>
