@@ -402,6 +402,13 @@ class TextbookOrderService(BaseService):
         except Exception as e:
             logger.error(f"Failed to send to Monday.com: {e}")
             # Continue even if Monday fails - we can retry later
+
+        # Link monday_subitem_id to each book item in the order
+        if monday_subitems:
+            subitem_map = {s["book_id"]: s["monday_subitem_id"] for s in monday_subitems}
+            for item in items:
+                if item["book_id"] in subitem_map:
+                    item["monday_subitem_id"] = subitem_map[item["book_id"]]
         
         # Track submission history
         submissions = order.get("submissions", [])
