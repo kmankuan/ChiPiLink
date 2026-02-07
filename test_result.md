@@ -1,44 +1,35 @@
-# Test Results - Monday.com Textbooks Board Subitem Workflow
+# Test Results - Student Accordion Textbooks List
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Changed TXB inventory sync from count-increment to subitem-per-student workflow
+- **Feature**: Convert student tab-based layout to accordion-style expandable "Textbooks List" per student
 
 ## Implementation Summary
 
 ### Changes Made
-1. **monday_txb_inventory_adapter.py** — Rewrote `update_inventory()` to:
-   - Find textbook by book code on TB2026-Textbooks board
-   - Create textbook item if not found
-   - Create subitem with "Student Name - Order Reference" (not increment count)
-   - Removed `ordered_count` column logic
-   - Added `subitem_column_mapping` support (quantity, date)
+- Replaced student **tabs** with student **cards** + expandable "Textbooks List" bar
+- Each student card shows: name, school, grade, Approved badge
+- Below each card: "Textbooks List" bar that expands/collapses on click
+- Accordion behavior: expanding one student's list auto-collapses the others
+- Each expanded section loads textbook order data for that student
+- Per-student state: selectedBooks, orderData, loading — all keyed by studentId
+- Maintained all existing functionality: checkbox selection, submit order, reorder request
 
-2. **monday_sync_service.py** — Updated `update_inventory_board()` to accept `student_name` and `order_reference`
-
-3. **textbook_order_service.py** — Updated `_send_to_monday()` to pass student_name and order_reference from order data
-
-4. **monday_config_service.py** — Updated `get_inventory_config()` to include `subitem_column_mapping`
-
-5. **TxbInventoryTab.jsx** — Updated admin config UI to show subitem column mapping section
-
-### Board Configuration (already saved)
-- **TB2026-Textbooks Board ID**: 18397140920
-- **Group ID**: topics
-- **Book Code Column**: text_mm02vh63
-- **Subitem Qty Column**: numeric_mm02sj3t
-- **Subitem Date Column**: date0
+### Key Files
+- `frontend/src/modules/unatienda/components/SchoolTextbooksView.jsx` — Major refactor from tabs to accordion
 
 ### Test Credentials
 - Admin: admin@libreria.com / admin
 - Auth: POST /api/auth-v2/login with {"email":"admin@libreria.com","password":"admin"}
+- Note: Client users log in via LaoPan SSO
 
-### Key API Endpoints
-- GET /api/store/monday/txb-inventory-config — Get inventory config
-- PUT /api/store/monday/txb-inventory-config — Save inventory config
-- POST /api/store/textbook-orders/submit — Submit order (triggers Monday sync)
+### API Endpoints  
+- GET /api/store/textbook-orders/student/{studentId} — Get student's textbook order
+- POST /api/store/textbook-orders/submit — Submit order for a student
+- POST /api/store/textbook-orders/{orderId}/reorder/{bookId} — Request reorder
 
 ## Incorporate User Feedback
-- Subitems create per-student tracking on textbooks board
-- Monday.com auto-counts subitems for demand tracking
-- No status column on subitems (handled via Orders board)
+- Student cards are no longer clickable-but-do-nothing
+- "Textbooks List" bar provides clear visual cue for expanding textbook list
+- Accordion auto-collapses other students when one is expanded
+- Add student card still available at the bottom
