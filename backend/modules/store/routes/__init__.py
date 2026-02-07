@@ -26,6 +26,7 @@ from .order_form_config import router as order_form_config_router
 from .inventory_import import router as inventory_import_router
 from .analytics import router as analytics_router
 from .store_config import router as store_config_router
+from .monday_sync import router as monday_sync_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
