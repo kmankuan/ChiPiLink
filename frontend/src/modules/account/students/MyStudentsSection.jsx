@@ -154,6 +154,8 @@ const translations = {
     dialogTitle: '关联新学生',
     dialogDesc: '输入学生信息以请求教科书访问权限',
     fullName: '全名',
+    firstName: '名',
+    lastName: '姓',
     selectSchool: '选择学校',
     studentNumber: '学生编号（可选）',
     selectGrade: '选择年级',
