@@ -1,77 +1,46 @@
-# Test Results - Super Pin Implementation
+# Test Results - Order Chat Feature (Monday.com Integration)
 
 ## Test Context
-- **Date**: 2026-01-09
-- **Feature**: Super Pin Ranking System (Frontend + Backend)
-- **Tester**: Frontend Testing Agent
+- **Date**: 2026-02-07
+- **Feature**: Order Chat Feature - Monday.com CRM Integration
+- **Tester**: Main Agent + Testing Agent
 
 ## Implementation Summary
 
-### Backend (Already Complete)
-- Leagues CRUD
-- Player Check-in (Manual, QR, Geolocation)
-- Match management with scoring
-- Ranking system (Simple points + ELO)
-- Season tournaments
+### Backend Fixes Applied
+1. Fixed `has_monday_item` to return actual state (was hardcoded `True`)
+2. Fixed wrong DB collection `db.users` → `db.auth_users` in `post_monday_update` 
+3. Removed redundant inline imports, using module-level `db` and `MONDAY_API_KEY`
+4. Centralized Monday.com API key retrieval via `_get_monday_api_key()` helper
+5. Consistent API key lookup: workspace config → env fallback
 
-### Frontend (Just Implemented)
-- SuperPinAdmin.jsx - Admin dashboard for leagues
-- SuperPinLeagueDetail.jsx - League detail with ranking and matches
-- SuperPinMatch.jsx - Live match scoring interface
-- SuperPinRanking.jsx - Public ranking view
+### Key Files
+- **Backend Service**: `backend/modules/store/services/textbook_order_service.py` (methods: `get_monday_updates`, `post_monday_update`, `_get_monday_api_key`)
+- **Backend Routes**: `backend/modules/store/routes/textbook_orders.py` (GET/POST `/{order_id}/updates`)
+- **Frontend Component**: `frontend/src/components/chat/OrderChat.jsx`
+- **Frontend Page**: `frontend/src/pages/Orders.jsx`
 
-## Test Scenarios
+### API Endpoints
+- `GET /api/store/textbook-orders/{order_id}/updates` - Fetch chat messages
+- `POST /api/store/textbook-orders/{order_id}/updates` - Send a chat message
+- `POST /api/auth-v2/login` - Auth login endpoint
+- `GET /api/store/textbook-orders/my-orders` - Get user's orders
 
-### 1. Admin Panel ✅ PASSED
-- [x] Navigate to /pingpong/superpin/admin
-- [x] View existing leagues (Liga Demo 2025 found)
-- [x] Create new league modal functionality
-- [x] Stats cards display correctly (Ligas Totales, Ligas Activas, etc.)
+### Test Credentials
+- **Client User**: `test@client.com` / `password` (user_id: cli_d2aad7f00f86)
+- **Admin Users**: `teck@koh.one`, `admin@libreria.com`
+- **Test Orders**: `ord_2f069060c203` (Test Student Beta), `ord_a3480a98d56d` (Test Student Alpha)
 
-### 2. League Detail ✅ PASSED
-- [x] View league ranking (Liga Demo 2025 - liga_01bc717ff842)
-- [x] Create new match modal with player selection
-- [x] View matches list with proper empty states
-- [x] Tab switching between Ranking and Partidos works
+### Login Flow
+- Regular users login via LaoPan OAuth
+- Admin/test login via "Acceso Administrativo" section at `/login` page
+- The admin login form works for any user (including test@client.com)
 
-### 3. Match Flow ⚠️ NOT TESTED
-- [ ] Start match (requires players to be created first)
-- [ ] Record points (requires active match)
-- [ ] Complete match (requires match completion)
-
-### 4. Public Ranking ✅ PASSED
-- [x] View ranking at /pingpong/superpin/ranking
-- [x] Verify green gradient background displays correctly
-- [x] Liga Demo 2025 info displays properly
-- [x] Empty state message shows correctly
-
-## Test Results Summary
-
-### ✅ WORKING FEATURES:
-1. **Admin Panel**: Loads correctly with all UI elements, stats cards, and Liga Demo 2025
-2. **New League Creation**: Modal opens, form fields work, proper validation
-3. **League Detail Page**: Displays Liga Demo 2025 with correct stats and navigation
-4. **Ranking/Partidos Tabs**: Tab switching works correctly
-5. **New Match Modal**: Opens with player selection dropdowns (Jugador A/B)
-6. **Public Ranking**: Green gradient background, proper league info, empty state messages
-7. **Navigation**: Back buttons and routing work correctly
-8. **Empty States**: Proper messages for no players/matches
-
-### ⚠️ LIMITATIONS NOTED:
-1. **Match Flow**: Cannot test match creation/completion without existing players in system
-2. **Player Management**: No players exist in Liga Demo 2025 to test match functionality
-3. **Live Scoring**: Cannot test SuperPinMatch.jsx without active matches
-
-### 🔧 TECHNICAL DETAILS:
-- **League ID**: Liga Demo 2025 uses ID "liga_01bc717ff842"
-- **API Integration**: Backend APIs responding correctly
-- **UI Components**: All shadcn/ui components rendering properly
-- **Responsive Design**: Desktop layout working correctly
-- **Error Handling**: Proper "Liga no encontrada" for invalid IDs
+### Orders Page Route
+- Orders page is at `/pedidos` (NOT `/mis-pedidos`)
 
 ## Incorporate User Feedback
-- ✅ Admin panel tested and working
-- ✅ League creation modal tested
-- ✅ League detail navigation tested  
-- ✅ Public ranking display tested
-- ⚠️ Complete flow testing limited by lack of test data (players/matches)
+- Chat feature should work for orders with AND without Monday.com linkage
+- UI text should use i18n (currently supports ES/EN/ZH in OrderChat component)
+- Mobile-first design principle
+- Codebase should be in English
