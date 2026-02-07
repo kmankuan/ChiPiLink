@@ -192,9 +192,12 @@ class TextbookAccessService(BaseService):
             "admin_notes": None
         }
         
+        full_name = f"{data.first_name} {data.last_name}".strip()
         student_data = {
             "user_id": user_id,
-            "full_name": data.full_name,
+            "first_name": data.first_name,
+            "last_name": data.last_name,
+            "full_name": full_name,
             "school_id": data.school_id,
             "school_name": school.get("name"),
             "student_number": data.student_number,
