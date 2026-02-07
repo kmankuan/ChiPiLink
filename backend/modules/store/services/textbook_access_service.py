@@ -393,11 +393,14 @@ class TextbookAccessService(BaseService):
             )
             
             # Get student name with backward compatibility for old Spanish field names
+            self._normalize_name_fields(req)
             student_name = req.get("full_name") or req.get("nombre_completo") or req.get("nombre") or "Unknown"
             
             enriched.append({
                 "student_id": req["student_id"],
                 "student_name": student_name,
+                "first_name": req.get("first_name", ""),
+                "last_name": req.get("last_name", ""),
                 "school_id": req["school_id"],
                 "school_name": req.get("school_name") or req.get("nombre_escuela") or "Unknown",
                 "year": req["enrollment"]["year"],
