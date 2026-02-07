@@ -116,7 +116,6 @@ class MondaySyncService:
         pulse_id = str(event.get("pulseId", ""))
         column_id = event.get("columnId", "")
         column_value = event.get("value", {})
-        board_id = str(event.get("boardId", ""))
 
         new_label = ""
         if isinstance(column_value, dict):
