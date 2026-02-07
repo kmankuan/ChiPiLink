@@ -341,6 +341,36 @@ async def get_order_details(
     return order
 
 
+
+# ============== MONDAY.COM UPDATES (CHAT) ==============
+
+@router.get("/{order_id}/updates")
+async def get_order_updates(
+    order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Fetch Monday.com Updates (chat messages) for an order"""
+    updates = await textbook_order_service.get_monday_updates(order_id, current_user["user_id"])
+    return updates
+
+
+@router.post("/{order_id}/updates")
+async def post_order_update(
+    order_id: str,
+    body: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Post a new Monday.com Update (chat message) for an order"""
+    message = body.get("message", "").strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    result = await textbook_order_service.post_monday_update(
+        order_id, current_user["user_id"], message
+    )
+    return result
+
+
+
 @router.get("/admin/diagnostic/textbooks")
 async def diagnostic_textbooks(
     admin: dict = Depends(get_admin_user)
