@@ -101,6 +101,29 @@ class TextbookAccessService(BaseService):
     
     # ============== STUDENT RECORD MANAGEMENT ==============
     
+    @staticmethod
+    def _normalize_name_fields(student: Dict) -> None:
+        """Ensure first_name, last_name, and full_name are all present (backward compat)"""
+        first = student.get("first_name", "")
+        last = student.get("last_name", "")
+        full = student.get("full_name", "")
+        
+        if first or last:
+            # New-style record: compute full_name
+            student["first_name"] = first
+            student["last_name"] = last
+            student["full_name"] = f"{first} {last}".strip()
+        elif full:
+            # Legacy record: split full_name into first/last
+            parts = full.strip().split(" ", 1)
+            student["first_name"] = parts[0]
+            student["last_name"] = parts[1] if len(parts) > 1 else ""
+            student["full_name"] = full
+        else:
+            student["first_name"] = ""
+            student["last_name"] = ""
+            student["full_name"] = ""
+    
     async def get_user_students(self, user_id: str) -> List[Dict]:
         """Get all student records for a user with computed fields"""
         students = await self.student_repo.get_by_user(user_id)
