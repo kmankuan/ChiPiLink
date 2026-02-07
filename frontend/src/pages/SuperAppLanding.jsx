@@ -373,7 +373,17 @@ export default function SuperAppLanding() {
   useEffect(() => {
     fetchData();
     loadBlockConfig();
+    fetchModuleStatuses();
   }, []);
+
+  const fetchModuleStatuses = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/api/public/module-status`);
+      setModuleStatuses(data.statuses);
+    } catch (err) {
+      // Silently fall back to defaults
+    }
+  };
 
   const fetchData = async () => {
     try {
