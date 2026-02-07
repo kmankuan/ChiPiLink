@@ -768,17 +768,31 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
           )}
 
           <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {lang === 'es' ? 'Nombre Completo' : 'Full Name'}
-              </Label>
-              <Input
-                value={editForm.full_name || ''}
-                onChange={(e) => setEditForm(p => ({ ...p, full_name: e.target.value }))}
-                disabled={editStudent?.is_locked}
-                className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
-                data-testid="edit-full-name"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">
+                  {lang === 'es' ? 'Nombre' : 'First Name'}
+                </Label>
+                <Input
+                  value={editForm.first_name || ''}
+                  onChange={(e) => setEditForm(p => ({ ...p, first_name: e.target.value }))}
+                  disabled={editStudent?.is_locked}
+                  className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
+                  data-testid="edit-first-name"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">
+                  {lang === 'es' ? 'Apellido' : 'Last Name'}
+                </Label>
+                <Input
+                  value={editForm.last_name || ''}
+                  onChange={(e) => setEditForm(p => ({ ...p, last_name: e.target.value }))}
+                  disabled={editStudent?.is_locked}
+                  className={editStudent?.is_locked ? 'bg-muted cursor-not-allowed opacity-60' : ''}
+                  data-testid="edit-last-name"
+                />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs font-medium">
