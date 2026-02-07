@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList, Package, FileText, Calendar } from 'lucide-react';
+import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList, Package, FileText, Calendar, Warehouse } from 'lucide-react';
 
 // Import sub-modules
 import PublicCatalogTab from './tabs/PublicCatalogTab';
@@ -12,6 +12,7 @@ import PrivateCatalogTab from './tabs/PrivateCatalogTab';
 import StudentsTab from './tabs/StudentsTab';
 import ConfigurationTab from './tabs/ConfigurationTab';
 import DemoDataTab from './tabs/DemoDataTab';
+import InventoryTab from './tabs/InventoryTab';
 import TextbookAccessAdminTab from '@/modules/admin/users/components/StudentRequestsTab';
 import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
 import OrderFormConfigTab from './tabs/OrderFormConfigTab';
