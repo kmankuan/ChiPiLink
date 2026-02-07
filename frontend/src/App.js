@@ -352,8 +352,9 @@ function App() {
             <InlineTranslationProvider>
               <CartProvider>
                 <BrowserRouter>
-                  <div className="App min-h-screen bg-background noise-bg">
+                  <div className="App min-h-screen bg-background noise-bg pb-14 md:pb-0">
                     <AppRouter />
+                    <BottomNav />
                     <CartDrawer />
                     {/* CXGenie widget removed - access via header support button instead */}
                     <Toaster 
