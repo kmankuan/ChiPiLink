@@ -820,20 +820,66 @@ class TextbookOrderService(BaseService):
                 except Exception as e:
                     logger.error(f"Error posting Monday.com update: {e}")
 
-        # Store locally
+        # Store locally — auto-mark as read by sender
         msg_doc = {
             "message_id": f"msg_{uuid.uuid4().hex[:12]}",
             "order_id": order_id,
             "user_id": user_id,
             "author_name": author_name,
             "message": message,
+            "is_staff": False,
             "monday_posted": monday_posted,
+            "read_by": [user_id],
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.order_messages.insert_one(msg_doc)
         del msg_doc["_id"]
 
         return {"success": True, "monday_posted": monday_posted, "message": msg_doc}
+
+    async def mark_order_messages_read(self, order_id: str, user_id: str) -> dict:
+        """Mark all messages in an order as read by this user"""
+        order = await db.store_textbook_orders.find_one({"order_id": order_id})
+        if not order:
+            raise ValueError("Order not found")
+        if order["user_id"] != user_id:
+            raise ValueError("Access denied")
+
+        result = await db.order_messages.update_many(
+            {"order_id": order_id, "read_by": {"$ne": user_id}},
+            {"$addToSet": {"read_by": user_id}}
+        )
+
+        return {"marked_read": result.modified_count}
+
+    async def get_unread_counts(self, user_id: str) -> dict:
+        """Get unread message counts per order and total for a user"""
+        # Find all orders belonging to this user
+        orders = await db.store_textbook_orders.find(
+            {"user_id": user_id},
+            {"_id": 0, "order_id": 1, "student_name": 1}
+        ).to_list(100)
+
+        order_ids = [o["order_id"] for o in orders]
+        if not order_ids:
+            return {"total_unread": 0, "per_order": {}}
+
+        # Count unread messages: messages NOT read by this user
+        pipeline = [
+            {"$match": {
+                "order_id": {"$in": order_ids},
+                "read_by": {"$not": {"$elemMatch": {"$eq": user_id}}}
+            }},
+            {"$group": {"_id": "$order_id", "count": {"$sum": 1}}}
+        ]
+
+        cursor = db.order_messages.aggregate(pipeline)
+        results = await cursor.to_list(100)
+
+        per_order = {r["_id"]: r["count"] for r in results}
+        total = sum(per_order.values())
+
+        return {"total_unread": total, "per_order": per_order}
 
 
 # Singleton instance
