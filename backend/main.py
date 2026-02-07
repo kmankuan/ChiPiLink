@@ -149,6 +149,7 @@ api_router.include_router(store_refactored_router)  # Microservices-ready routes
 api_router.include_router(landing_router)
 api_router.include_router(community_refactored_router)  # Microservices-ready routes
 api_router.include_router(monday_router)
+api_router.include_router(monday_webhook_router)  # Universal webhook endpoint
 api_router.include_router(sheets_router)
 api_router.include_router(admin_router)
 api_router.include_router(seed_demo_router)  # Demo data seeding
