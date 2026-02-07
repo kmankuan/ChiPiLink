@@ -451,7 +451,8 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
   // Form handlers
   const resetForm = () => {
     setFormData({
-      full_name: '',
+      first_name: '',
+      last_name: '',
       school_id: '',
       student_number: '',
       year: new Date().getFullYear(),
