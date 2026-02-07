@@ -1042,6 +1042,21 @@ export default function MondayModule() {
             </a>
           </div>
         </TabsContent>
+
+        {/* ========== TAB: TXB INVENTORY ========== */}
+        <TabsContent value="txb-inventory" className="mt-6">
+          <TxbInventoryTab />
+        </TabsContent>
+
+        {/* ========== TAB: WEBHOOKS ========== */}
+        <TabsContent value="webhooks" className="mt-6">
+          <WebhooksTab />
+        </TabsContent>
+
+        {/* ========== TAB: STATUS MAPPING ========== */}
+        <TabsContent value="status-mapping" className="mt-6">
+          <StatusMappingTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
