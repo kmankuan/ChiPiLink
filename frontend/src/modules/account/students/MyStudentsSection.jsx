@@ -520,7 +520,8 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
   const handleEditProfile = (student) => {
     setEditStudent(student);
     setEditForm({
-      full_name: student.full_name || '',
+      first_name: student.first_name || '',
+      last_name: student.last_name || '',
       student_number: student.student_number || '',
       relation_type: student.relation_type || '',
     });
