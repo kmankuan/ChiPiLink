@@ -55,6 +55,45 @@ async def get_public_landing_page():
     return page
 
 
+@router.get("/public/module-status")
+async def get_public_module_statuses():
+    """Get module statuses (public - for frontend display)"""
+    config = await db.app_config.find_one({"config_key": "module_statuses"}, {"_id": 0})
+    if config and config.get("value"):
+        return {"statuses": config["value"]}
+    # Return defaults
+    return {"statuses": {
+        "home": {"status": "production", "customLabel": ""},
+        "unatienda": {"status": "live_beta", "customLabel": "Live Beta"},
+        "textbook_orders": {"status": "live_beta", "customLabel": "Live Beta"},
+        "orders": {"status": "live_beta", "customLabel": "Live Beta"},
+        "my_students": {"status": "live_beta", "customLabel": "Live Beta"},
+        "pinpanclub": {"status": "live_beta", "customLabel": "Live Beta"},
+        "super_pin": {"status": "live_beta", "customLabel": "Live Beta"},
+        "rapid_pin": {"status": "coming_soon", "customLabel": ""},
+        "events": {"status": "coming_soon", "customLabel": ""},
+        "gallery": {"status": "coming_soon", "customLabel": ""},
+        "players": {"status": "live_beta", "customLabel": "Live Beta"},
+        "admin_dashboard": {"status": "production", "customLabel": ""},
+        "admin_integrations": {"status": "live_beta", "customLabel": "Live Beta"},
+    }}
+
+
+@router.get("/public/ui-style")
+async def get_public_ui_style():
+    """Get UI style configuration (public - for frontend theming)"""
+    config = await db.app_config.find_one({"config_key": "ui_style"}, {"_id": 0})
+    if config and config.get("value"):
+        return {"style": config["value"]}
+    return {"style": {
+        "template": "default",
+        "primary_color": "#16a34a",
+        "font_family": "Inter",
+        "border_radius": "0.75rem",
+        "card_style": "elevated",
+    }}
+
+
 # ============== ADMIN ROUTES ==============
 
 @router.get("/admin/site-config")
