@@ -118,6 +118,8 @@ const translations = {
     dialogTitle: 'Vincular Nuevo Estudiante',
     dialogDesc: 'Ingresa la información del estudiante para solicitar acceso a textos',
     fullName: 'Nombre Completo',
+    firstName: 'Nombre',
+    lastName: 'Apellido',
     selectSchool: 'Seleccionar Colegio',
     studentNumber: 'Nº Estudiante (opcional)',
     selectGrade: 'Seleccionar Grado',
