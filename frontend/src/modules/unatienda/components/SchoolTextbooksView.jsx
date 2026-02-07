@@ -1,9 +1,9 @@
 /**
  * SchoolTextbooksView — Student selection and textbook order status
  * Extracted from Unatienda.jsx for maintainability.
- * Handles: student tabs, student cards with order status, login prompt, link student flow.
+ * Handles: student tabs, student cards with order status, login prompt, inline link student flow.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -11,10 +11,12 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
-  BookOpen, Check, ChevronLeft, ChevronRight, Clock, Eye, GraduationCap,
-  Loader2, Lock, Package, Send, ShoppingCart, User, UserPlus, Users
+  BookOpen, Check, ChevronRight, Clock, Eye, GraduationCap,
+  Loader2, Lock, Package, Plus, Send, ShoppingCart, User, UserPlus, Users, X
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 
