@@ -82,7 +82,9 @@ class StudentRecord(BaseModel):
     """A student record linked to a user"""
     student_id: Optional[str] = None
     user_id: str  # Owner of this record
-    full_name: str
+    first_name: str = ""
+    last_name: str = ""
+    full_name: Optional[str] = None  # Computed: first_name + last_name (backward compat)
     school_id: str
     school_name: Optional[str] = None  # Denormalized for display
     student_number: Optional[str] = None  # Optional school ID
@@ -101,7 +103,8 @@ class StudentRecord(BaseModel):
 
 class StudentRecordCreate(BaseModel):
     """Create a new student record"""
-    full_name: str
+    first_name: str
+    last_name: str
     school_id: str
     student_number: Optional[str] = None
     relation_type: RelationType
@@ -112,7 +115,9 @@ class StudentRecordCreate(BaseModel):
 
 class StudentRecordUpdate(BaseModel):
     """Update a student record"""
-    full_name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    full_name: Optional[str] = None  # Legacy support
     school_id: Optional[str] = None
     student_number: Optional[str] = None
     relation_type: Optional[RelationType] = None
@@ -153,7 +158,9 @@ class StudentRecordResponse(BaseModel):
     """Response model for student record"""
     student_id: str
     user_id: str
-    full_name: str
+    first_name: str = ""
+    last_name: str = ""
+    full_name: str = ""  # Computed for backward compat
     school_id: str
     school_name: Optional[str] = None
     student_number: Optional[str] = None
