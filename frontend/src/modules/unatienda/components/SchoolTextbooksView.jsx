@@ -387,19 +387,51 @@ export default function SchoolTextbooksView({
   }
   
   if (!hasAccess || validatedStudents.length === 0) {
+    const pendingStudents = (allStudents || []).filter(s => s.status === 'pending' || s.estado === 'pendiente');
+
     return (
       <div className="space-y-4">
-        <Card className="border-dashed">
-          <CardContent className="py-10 text-center">
-            <Users className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
-            <h3 className="font-semibold mb-1">{t.noValidatedStudents}</h3>
-            <p className="text-sm text-muted-foreground mb-4">{t.noValidatedStudentsDesc}</p>
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Button onClick={() => navigate('/my-account?tab=students')} variant="outline" size="sm">{t.goToMyStudents}</Button>
-              <Button onClick={onLinkStudent} size="sm"><UserPlus className="h-4 w-4 mr-1" />{t.linkStudentBtn}</Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-purple-600" />
+            <h2 className="text-base sm:text-lg font-bold">{t.title}</h2>
+          </div>
+        </div>
+
+        {/* Student cards grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Existing pending students */}
+          {pendingStudents.map((s, i) => (
+            <PendingStudentCard key={s.student_id || i} student={s} />
+          ))}
+
+          {/* Empty card to add a new student (always show when no validated) */}
+          {!showLinkForm && (
+            <EmptyStudentCard onClick={() => setShowLinkForm(true)} lang={lang} />
+          )}
+        </div>
+
+        {/* Inline student linking form */}
+        {showLinkForm && (
+          <InlineStudentForm
+            token={token}
+            lang={lang}
+            onSuccess={() => {
+              setShowLinkForm(false);
+              fetchAllStudents();
+              // Trigger parent refresh to check for new access
+              if (typeof onBack === 'function') onBack();
+            }}
+            onCancel={() => setShowLinkForm(false)}
+          />
+        )}
+
+        {/* Info message when students are pending */}
+        {pendingStudents.length > 0 && !showLinkForm && (
+          <p className="text-xs text-muted-foreground text-center">
+            {t.noValidatedStudentsDesc}
+          </p>
+        )}
       </div>
     );
   }
