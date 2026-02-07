@@ -178,6 +178,9 @@ class TextbookAccessService(BaseService):
         
         # Enrich with computed fields
         for student in students:
+            # Normalize name fields for backward compatibility
+            self._normalize_name_fields(student)
+            
             # Get school name
             school = await self.school_repo.get_by_id(student.get("school_id"))
             student["school_name"] = school.get("name") if school else "Unknown"
