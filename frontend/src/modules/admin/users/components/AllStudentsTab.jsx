@@ -107,8 +107,11 @@ export default function AllStudentsTab({ token }) {
   };
 
   const filteredStudents = students.filter(student => {
+    const fullName = student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim();
     const matchesSearch = 
-      student.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.user_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.student_number?.toLowerCase().includes(searchTerm.toLowerCase());
     
