@@ -96,7 +96,7 @@ export const schoolTxbTranslations = {
     submitOrder: '提交订单',
     additionalInfo: '附加信息',
     select: '-- 选择 --',
-    exclusivePurchase: '专属购买',
+    exclusivePurchase: '学校教科书',
     yourStudentsBooks: '学生教科书',
     linkNew: '关联新学生',
     myStudents: '我的学生',
