@@ -135,6 +135,10 @@ class TextbookAccessService(BaseService):
             self._normalize_name_fields(student)
             
             # Get school name
+            school = await self.school_repo.get_by_id(student.get("school_id"))
+            student["school_name"] = school.get("name") if school else "Unknown"
+            
+            # Mark which years are editable
             enrollments = student.get("enrollments", [])
             for enrollment in enrollments:
                 enrollment["is_editable"] = self.is_year_editable(enrollment.get("year", 0))
