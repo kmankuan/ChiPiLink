@@ -920,39 +920,40 @@ class TextbookOrderService(BaseService):
             raise ValueError("Access denied")
         
         monday_item_ids = order.get("monday_item_ids", [])
-        if not monday_item_ids:
-            return {"updates": [], "has_monday_item": False}
-        
-        item_id = monday_item_ids[0]
-        api_key = settings.monday_api_key
-        if not api_key:
-            return {"updates": [], "has_monday_item": True, "error": "Monday.com not configured"}
-        
-        query = f'''query {{ items(ids: [{item_id}]) {{ updates {{ id body text_body creator {{ name }} created_at }} }} }}'''
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://api.monday.com/v2",
-                json={"query": query},
-                headers={"Authorization": api_key, "Content-Type": "application/json"},
-                timeout=15.0
-            )
-            data = response.json()
-        
-        items = data.get("data", {}).get("items", [])
-        raw_updates = items[0].get("updates", []) if items else []
-        
+        has_monday_item = bool(monday_item_ids)
         updates = []
-        for u in raw_updates:
-            updates.append({
-                "id": u.get("id"),
-                "body": u.get("text_body") or u.get("body", ""),
-                "author": u.get("creator", {}).get("name", "Staff"),
-                "created_at": u.get("created_at"),
-                "is_staff": True  # All Monday.com native updates are from staff
-            })
         
-        # Also fetch local user messages stored in DB
+        # Fetch from Monday.com if item exists
+        if monday_item_ids:
+            item_id = monday_item_ids[0]
+            api_key = settings.monday_api_key
+            if api_key:
+                query = f'''query {{ items(ids: [{item_id}]) {{ updates {{ id body text_body creator {{ name }} created_at }} }} }}'''
+                try:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            "https://api.monday.com/v2",
+                            json={"query": query},
+                            headers={"Authorization": api_key, "Content-Type": "application/json"},
+                            timeout=15.0
+                        )
+                        data = response.json()
+                    
+                    items = data.get("data", {}).get("items", [])
+                    raw_updates = items[0].get("updates", []) if items else []
+                    
+                    for u in raw_updates:
+                        updates.append({
+                            "id": u.get("id"),
+                            "body": u.get("text_body") or u.get("body", ""),
+                            "author": u.get("creator", {}).get("name", "Staff"),
+                            "created_at": u.get("created_at"),
+                            "is_staff": True
+                        })
+                except Exception as e:
+                    logger.error(f"Error fetching Monday.com updates: {e}")
+        
+        # Always fetch local user messages
         local_msgs = await db.order_messages.find(
             {"order_id": order_id},
             {"_id": 0}
