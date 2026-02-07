@@ -106,6 +106,14 @@ export default function AdminModule() {
         <TabsContent value="migration">
           <DatabaseMigrationModule />
         </TabsContent>
+
+        <TabsContent value="modules">
+          <ModuleStatusModule />
+        </TabsContent>
+
+        <TabsContent value="ui-style">
+          <UIStyleModule />
+        </TabsContent>
       </Tabs>
     </div>
   );
