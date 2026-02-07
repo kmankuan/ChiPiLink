@@ -743,7 +743,7 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
               {lang === 'es' ? 'Perfil del Estudiante' : 'Student Profile'}
             </DialogTitle>
             <DialogDescription>
-              {editStudent?.full_name} &middot; {t.grade} {editStudent?.grade}
+              {editStudent?.full_name || `${editStudent?.first_name || ''} ${editStudent?.last_name || ''}`.trim()} &middot; {t.grade} {editStudent?.grade}
             </DialogDescription>
           </DialogHeader>
 
