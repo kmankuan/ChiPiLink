@@ -87,25 +87,25 @@ export default function MondayModule() {
     group_id: '',
     auto_sync: true,
     column_mapping: {
-      estudiante: 'text',
-      grado: 'text0',
-      acudiente: 'text4',
-      libros: 'long_text',
+      student: 'text',
+      grade: 'text0',
+      guardian: 'text4',
+      books: 'long_text',
       total: 'numbers',
-      estado: 'status',
-      fecha: 'date',
-      pedido_id: 'text6'
+      status: 'status',
+      date: 'date',
+      order_id: 'text6'
     },
     // Subitem configuration for products
     subitems_enabled: false,
     subitem_column_mapping: {
-      nombre: 'name',
-      cantidad: 'numbers',
-      precio_unitario: 'numbers0',
+      name: 'name',
+      quantity: 'numbers',
+      unit_price: 'numbers0',
       subtotal: 'numbers1',
-      codigo: 'text',
-      materia: 'text0',
-      estado: 'status'
+      code: 'text',
+      subject: 'text0',
+      status: 'status'
     }
   });
   const [savingStoreConfig, setSavingStoreConfig] = useState(false);
