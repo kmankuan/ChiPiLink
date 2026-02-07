@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
-  BookOpen, Check, ChevronRight, Clock, Eye, GraduationCap,
-  Loader2, Lock, Package, Plus, Send, ShoppingCart, User, UserPlus, Users, X
+  BookOpen, Check, ChevronRight, Clock, GraduationCap,
+  Loader2, Lock, Package, Plus, Send, User, UserPlus, X
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 
