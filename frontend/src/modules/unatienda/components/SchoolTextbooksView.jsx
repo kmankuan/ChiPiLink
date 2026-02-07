@@ -22,6 +22,174 @@ import { schoolTxbTranslations } from '../constants/translations';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const GRADE_OPTIONS = [
+  { value: 'K3', label: 'K3' }, { value: 'K4', label: 'K4' }, { value: 'K5', label: 'K5' },
+  { value: '1', label: '1st Grade' }, { value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' },
+  { value: '4', label: '4th Grade' }, { value: '5', label: '5th Grade' }, { value: '6', label: '6th Grade' },
+  { value: '7', label: '7th Grade' }, { value: '8', label: '8th Grade' }, { value: '9', label: '9th Grade' },
+  { value: '10', label: '10th Grade' }, { value: '11', label: '11th Grade' }, { value: '12', label: '12th Grade' },
+];
+
+const RELATIONSHIP_OPTIONS = [
+  { value: 'parent', label: 'Parent' }, { value: 'guardian', label: 'Legal Guardian' },
+  { value: 'grandparent', label: 'Grandparent' }, { value: 'representative', label: 'Representative' },
+  { value: 'other', label: 'Other' },
+];
+
+function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
+  const [schools, setSchools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    full_name: '', school_id: '', student_number: '',
+    year: new Date().getFullYear(), grade: '', relation_type: '', relation_other: '',
+  });
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/api/store/textbook-access/schools`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSchools(data?.schools || []);
+      } catch { /* ignore */ }
+      setLoading(false);
+    };
+    fetchSchools();
+  }, [token]);
+
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const handleSubmit = async () => {
+    if (!form.full_name.trim()) { toast.error('Enter student name'); return; }
+    if (!form.school_id) { toast.error('Select a school'); return; }
+    if (!form.grade) { toast.error('Select a grade'); return; }
+    if (!form.relation_type) { toast.error('Select your relationship'); return; }
+
+    setSubmitting(true);
+    try {
+      await axios.post(`${API_URL}/api/store/textbook-access/students`, {
+        full_name: form.full_name.trim(),
+        school_id: form.school_id,
+        student_number: form.student_number.trim() || null,
+        year: form.year,
+        grade: form.grade,
+        relation_type: form.relation_type,
+        relation_other: form.relation_type === 'other' ? form.relation_other.trim() : null,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Student linked! Pending admin approval.');
+      onSuccess();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to submit');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) return <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+
+  const texts = {
+    en: { name: 'Student Full Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel' },
+    es: { name: 'Nombre Completo', school: 'Escuela', grade: 'Grado', studentNo: 'Número de Estudiante (opcional)', relationship: 'Su Relación', other: 'Especificar relación', submit: 'Vincular Estudiante', cancel: 'Cancelar' },
+    zh: { name: '学生全名', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消' },
+  };
+  const ft = texts[lang] || texts.es;
+
+  return (
+    <Card className="border-primary/30 shadow-sm">
+      <CardContent className="pt-5 space-y-3">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-sm">{ft.submit}</h3>
+          </div>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCancel}><X className="h-4 w-4" /></Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.name} *</Label>
+            <Input value={form.full_name} onChange={e => set('full_name', e.target.value)} placeholder="John Doe" className="h-9 text-sm" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.school} *</Label>
+            <select value={form.school_id} onChange={e => set('school_id', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
+              <option value="">-- Select --</option>
+              {schools.map(s => <option key={s.school_id} value={s.school_id}>{s.name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.grade} *</Label>
+            <select value={form.grade} onChange={e => set('grade', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
+              <option value="">-- Select --</option>
+              {GRADE_OPTIONS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.studentNo}</Label>
+            <Input value={form.student_number} onChange={e => set('student_number', e.target.value)} placeholder="12345" className="h-9 text-sm" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">{ft.relationship} *</Label>
+            <select value={form.relation_type} onChange={e => set('relation_type', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
+              <option value="">-- Select --</option>
+              {RELATIONSHIP_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+            </select>
+          </div>
+          {form.relation_type === 'other' && (
+            <div className="space-y-1">
+              <Label className="text-xs">{ft.other}</Label>
+              <Input value={form.relation_other} onChange={e => set('relation_other', e.target.value)} className="h-9 text-sm" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2 pt-1">
+          <Button variant="outline" size="sm" onClick={onCancel}>{ft.cancel}</Button>
+          <Button size="sm" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <UserPlus className="h-3.5 w-3.5 mr-1" />}
+            {ft.submit}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function EmptyStudentCard({ onClick, lang }) {
+  const labels = { en: 'Add a student', es: 'Agregar estudiante', zh: '添加学生' };
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-muted-foreground/20 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[120px]"
+    >
+      <div className="p-3 rounded-full bg-primary/10 text-primary">
+        <Plus className="h-6 w-6" />
+      </div>
+      <span className="text-sm font-medium text-muted-foreground">{labels[lang] || labels.es}</span>
+    </button>
+  );
+}
+
+function PendingStudentCard({ student }) {
+  return (
+    <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
+      <CardContent className="py-4 flex items-center gap-3">
+        <div className="p-2 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30">
+          <Clock className="h-5 w-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-sm truncate">{student.full_name || student.nombre}</p>
+          <p className="text-xs text-muted-foreground">{student.school_name || student.escuela} • {student.grade || student.grado}</p>
+        </div>
+        <Badge variant="secondary" className="shrink-0 text-xs">
+          <Clock className="h-3 w-3 mr-1" /> Pending
+        </Badge>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function SchoolTextbooksView({ 
   isAuthenticated, 
   privateCatalogAccess, 
