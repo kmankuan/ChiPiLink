@@ -267,6 +267,17 @@ class TextbookAccessService(BaseService):
         
         update_data = data.model_dump(exclude_unset=True)
         
+        # Recompute full_name if first_name or last_name changed
+        if "first_name" in update_data or "last_name" in update_data:
+            fn = update_data.get("first_name", student.get("first_name", ""))
+            ln = update_data.get("last_name", student.get("last_name", ""))
+            update_data["full_name"] = f"{fn} {ln}".strip()
+        # Legacy: if only full_name sent (from old clients), split it
+        elif "full_name" in update_data and "first_name" not in update_data:
+            parts = update_data["full_name"].strip().split(" ", 1)
+            update_data["first_name"] = parts[0]
+            update_data["last_name"] = parts[1] if len(parts) > 1 else ""
+        
         # If changing school, get new school name
         if "school_id" in update_data:
             school = await self.school_repo.get_by_id(update_data["school_id"])
