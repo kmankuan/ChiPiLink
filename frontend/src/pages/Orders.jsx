@@ -272,6 +272,20 @@ export default function Orders() {
                         Último envío: {new Date(order.last_submitted_at).toLocaleDateString()}
                       </p>
                     )}
+                    
+                    {/* Chat button */}
+                    <div className="flex justify-end mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setChatOrder(order)}
+                        className="gap-1.5 text-xs"
+                        data-testid={`chat-btn-${order.order_id}`}
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        Mensajes
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
