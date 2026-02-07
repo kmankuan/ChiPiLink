@@ -1,44 +1,45 @@
-# Test Results - UX Fixes + Native App Navigation
+# Test Results - Split Full Name into First Name / Last Name
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Features**:
-  1. Fix duplicate login access (single login entry point)
-  2. Fix back button position + remove duplicate breadcrumbs
-  3. Native app-style bottom tab navigation for mobile
+- **Feature**: Split "Full Name" field into separate "First Name" and "Last Name" in student linking forms
 
 ## Implementation Summary
 
-### Fix 1: Single Login Access
-- Removed hamburger mobile menu entirely
-- Desktop: "Login" button only visible on md+ screens
-- Mobile: Login accessible via bottom tab navigation
-- Admin login remains at separate `/admin/login` URL
+### Backend Changes
+- Updated `StudentRecordCreate` model to accept `first_name` and `last_name` instead of `full_name`
+- Updated `StudentRecordUpdate` model with `first_name` and `last_name` fields
+- Added backward compatibility: old records with only `full_name` get auto-split into `first_name`/`last_name`
+- New records compute `full_name` as `first_name + " " + last_name`
+- All API responses now include `first_name`, `last_name`, and `full_name`
 
-### Fix 2: Back Button + Breadcrumb
-- Logo always appears first in the header
-- Back button removed from before logo — integrated as "Back" option inside breadcrumb dropdown
-- Center nav "Unatienda" link hidden when already on Unatienda page (prevents duplication with breadcrumb)
-
-### Fix 3: Native App Bottom Navigation
-- Created `BottomNav.jsx` — iOS/Android-style bottom tab bar
-- Shows: Home | Store | Cart (with badge) | Login (or Me when authenticated)
-- Active tab has primary color + top indicator line
-- Hidden on desktop (md+) and admin pages
-- Safe area support for notched phones
-- Added `pb-14 md:pb-0` padding to prevent content overlap
+### Frontend Changes (3 forms updated)
+1. `SchoolTextbooksView.jsx` - InlineStudentForm: Split into First Name + Last Name fields
+2. `LinkingPage.jsx` - Dialog form: Split into First Name + Last Name fields
+3. `MyStudentsSection.jsx` - Dialog form + Edit Profile Dialog: Split into First Name + Last Name fields
+4. `AllStudentsTab.jsx` - Admin table: Shows separate First Name and Last Name columns
 
 ### Key Files
-- `frontend/src/components/layout/BottomNav.jsx` — Native bottom tab bar (NEW)
-- `frontend/src/components/layout/Header.jsx` — Simplified header, removed hamburger menu + duplicate nav
-- `frontend/src/App.js` — Added BottomNav component + bottom padding
-- `frontend/src/index.css` — Safe area CSS for mobile
+- `backend/modules/store/models/textbook_access.py` — Updated Pydantic models
+- `backend/modules/store/services/textbook_access_service.py` — Added `_normalize_name_fields()` for backward compat
+- `backend/modules/store/repositories/textbook_access_repository.py` — Added first_name/last_name to aggregation projection
+- `backend/modules/store/routes/private_catalog.py` — Added first_name/last_name to catalog access response
+- `frontend/src/modules/unatienda/components/SchoolTextbooksView.jsx` — Updated inline form
+- `frontend/src/modules/account/linking/LinkingPage.jsx` — Updated dialog form
+- `frontend/src/modules/account/students/MyStudentsSection.jsx` — Updated dialog + edit forms
+- `frontend/src/modules/admin/users/components/AllStudentsTab.jsx` — Updated admin table
 
 ### Test Credentials
-- Admin: admin@libreria.com / admin
-- Admin login: /admin/login
+- Admin: admin@libreria.com / admin (password field)
+- Admin login: POST /api/auth-v2/login with {"email":"admin@libreria.com","password":"admin"}
+
+### API Endpoints
+- POST /api/store/textbook-access/students - Create student (now accepts first_name, last_name)
+- GET /api/store/textbook-access/my-students - Get user's students (returns first_name, last_name, full_name)
+- PUT /api/store/textbook-access/students/{id} - Update student (accepts first_name, last_name)
+- GET /api/store/textbook-access/admin/all-students - Admin view (returns first_name, last_name, full_name)
 
 ## Incorporate User Feedback
-- Single login flow — no redundancy
-- Logo always first, breadcrumb with integrated back action
-- Native app feel on mobile with bottom tab bar
+- Forms now have separate First Name and Last Name fields
+- Backend maintains backward compatibility with existing records
+- Admin table shows separate name columns for better sorting
