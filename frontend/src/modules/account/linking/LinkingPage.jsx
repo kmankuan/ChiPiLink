@@ -229,7 +229,8 @@ export default function LinkingPage({ embedded = false }) {
       const api = createApiClient(token);
       
       const payload = {
-        full_name: formData.full_name.trim(),
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
         school_id: formData.school_id,
         student_number: formData.student_number.trim() || null,
         year: formData.year,
