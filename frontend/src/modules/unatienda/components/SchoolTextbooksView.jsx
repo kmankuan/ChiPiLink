@@ -220,9 +220,6 @@ export default function SchoolTextbooksView({
     <div className="space-y-3" data-testid="school-textbooks-view">
       {/* Back + Header row */}
       <div className="flex items-center justify-between gap-2">
-        <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 shrink-0" data-testid="back-to-store">
-          <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">{t.back}</span>
-        </Button>
         <div className="flex items-center gap-2">
           <GraduationCap className="h-5 w-5 text-purple-600" />
           <h2 className="text-base sm:text-lg font-bold">{t.title}</h2>
