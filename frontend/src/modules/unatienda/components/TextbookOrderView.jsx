@@ -44,7 +44,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
 
   // Get current language - use i18n translations with fallback to inline
   const lang = i18n.language || 'es';
-  const te = exclusivaTranslations[lang] || exclusivaTranslations.es;
+  const te = schoolTxbTranslations[lang] || schoolTxbTranslations.es;
   
   // Auto-select student if selectedStudentId is provided
   useEffect(() => {
