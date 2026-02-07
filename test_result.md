@@ -1,37 +1,38 @@
-# Test Results - Unatienda.jsx Refactoring
+# Test Results - User Notifications (P2)
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Break down monolithic Unatienda.jsx (1,927 lines → 5 focused files)
+- **Feature**: Unread message notification system
 - **Tester**: Main Agent + Testing Agent
 
-## Refactoring Summary
-| File | Lines | Purpose |
-|------|-------|---------|
-| `pages/Unatienda.jsx` | 426 | Slim orchestrator (routing, data loading, cart) |
-| `components/TextbookOrderView.jsx` | 801 | Textbook order flow (was CompraExclusivaSection) |
-| `components/SchoolTextbooksView.jsx` | 421 | Student selection + textbook status tabs |
-| `components/ProductCard.jsx` | 149 | Product card for public catalog |
-| `constants/translations.js` | 126 | Shared translations + category icons |
+## Implementation Summary
 
-## Key Files
-- `frontend/src/pages/Unatienda.jsx` — Orchestrator
-- `frontend/src/modules/unatienda/components/TextbookOrderView.jsx`
-- `frontend/src/modules/unatienda/components/SchoolTextbooksView.jsx`
-- `frontend/src/modules/unatienda/components/ProductCard.jsx`
-- `frontend/src/modules/unatienda/constants/translations.js`
+### Backend
+1. Added `read_by` array to messages in `order_messages` collection
+2. `GET /api/store/textbook-orders/notifications/unread` — total + per-order unread counts
+3. `POST /api/store/textbook-orders/{order_id}/updates/mark-read` — mark all as read for user
+4. Auto-marks sender's own messages as read on send
 
-## Test Credentials
+### Frontend
+1. `useNotifications` hook — polls every 30s, provides totalUnread + perOrder + markOrderRead
+2. Header bell icon with red badge showing total unread count
+3. Per-order unread badge on "Messages" button
+4. Auto-mark-read when chat opens; refresh unread when chat closes
+
+### Key Files
+- `backend/modules/store/services/textbook_order_service.py` — mark_order_messages_read, get_unread_counts
+- `backend/modules/store/routes/textbook_orders.py` — new routes
+- `frontend/src/hooks/useNotifications.js` — notification hook
+- `frontend/src/components/layout/Header.jsx` — bell icon + badge
+- `frontend/src/pages/Orders.jsx` — per-order badges + mark-read on open
+
+### Test Credentials
 - Client: test@client.com / password
 - Admin: admin@libreria.com / admin
 - Auth: POST /api/auth-v2/login
-
-## Key Pages to Test
-- `/unatienda` — Public store with category navigation + search
-- `/unatienda?category=textbooks` — School textbooks view
-- `/pedidos` — Orders page with per-book status + chat
+- Orders: /pedidos
 
 ## Incorporate User Feedback
-- No functionality should be broken by the refactoring
-- Mobile-first design must be preserved
-- i18n translations must still work
+- Real-time feel via 30s polling
+- Optimistic UI updates on mark-read
+- Non-blocking — errors silently fail
