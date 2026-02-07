@@ -97,7 +97,8 @@ export default function LinkingPage({ embedded = false }) {
   
   // Form states
   const [formData, setFormData] = useState({
-    full_name: '',
+    first_name: '',
+    last_name: '',
     school_id: '',
     student_number: '',
     year: new Date().getFullYear(),
