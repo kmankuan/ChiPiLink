@@ -182,7 +182,7 @@ export default function InventoryTab({ token }) {
       const { data } = await axios.get(`${API_URL}/api/store/inventory/dashboard`, { headers });
       setDashboard(data);
     } catch { /* ignore */ }
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -193,7 +193,7 @@ export default function InventoryTab({ token }) {
       setProducts(data.products);
       setTotal(data.total);
     } catch { /* ignore */ }
-  }, [token, search, stockFilter, sortBy, sortDir]);
+  }, [token, search, stockFilter, sortBy, sortDir]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     Promise.all([fetchDashboard(), fetchProducts()]).then(() => setLoading(false));
