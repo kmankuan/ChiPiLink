@@ -178,7 +178,9 @@ class StudentRecordResponse(BaseModel):
 class PendingRequestResponse(BaseModel):
     """Response for admin panel - pending requests"""
     student_id: str
-    student_name: str
+    student_name: str  # Combined full name
+    first_name: str = ""
+    last_name: str = ""
     school_id: str
     school_name: str
     year: int
