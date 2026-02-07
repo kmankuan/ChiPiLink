@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Save, Check, Palette, Type, RectangleHorizontal, SquareStack } from 'lucide-react';
 import axios from 'axios';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
