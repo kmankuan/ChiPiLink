@@ -1,50 +1,44 @@
-# Test Results - Monday.com Horizontal Scaling + Service-Layer Refactoring
+# Test Results - UX Fixes + Native App Navigation
 
 ## Test Context
 - **Date**: 2026-02-07
 - **Features**:
-  1. PinPanClub Monday.com Adapter (adapter pattern migration)
-  2. Memberships Monday.com Adapter (admin-configurable skeleton)
-  3. Admin Service-Layer Refactoring
+  1. Fix duplicate login access (single login entry point)
+  2. Fix back button position + remove duplicate breadcrumbs
+  3. Native app-style bottom tab navigation for mobile
 
 ## Implementation Summary
 
-### PinPanClub Monday.com Adapter
-- Created `PinPanClubMondayAdapter` extending `BaseMondayAdapter`
-- Supports: player sync, match sync, match result sync, bulk sync
-- Maintains backward compatibility with event listeners (auto-sync on match/player events)
-- Webhook handler for status updates from Monday.com
-- Admin config endpoints: GET/PUT /api/monday/adapters/pinpanclub/config
-- Bulk sync triggers: POST /api/monday/adapters/pinpanclub/sync/players, /sync/matches
+### Fix 1: Single Login Access
+- Removed hamburger mobile menu entirely
+- Desktop: "Login" button only visible on md+ screens
+- Mobile: Login accessible via bottom tab navigation
+- Admin login remains at separate `/admin/login` URL
 
-### Memberships Monday.com Adapter
-- Created `MembershipsMondayAdapter` extending `BaseMondayAdapter`
-- Admin-configurable: board IDs, column mappings, enable/disable flags
-- Supports: plan sync, subscription sync, webhook handling
-- Admin config endpoints: GET/PUT /api/monday/adapters/memberships/config
-- Config structure allows admin to set up later via admin panel
+### Fix 2: Back Button + Breadcrumb
+- Logo always appears first in the header
+- Back button removed from before logo — integrated as "Back" option inside breadcrumb dropdown
+- Center nav "Unatienda" link hidden when already on Unatienda page (prevents duplication with breadcrumb)
 
-### Service-Layer Refactoring
-- Created `/app/backend/modules/admin/services/` with:
-  - `module_status_service.py` — Module status CRUD logic
-  - `ui_style_service.py` — UI style/theme CRUD logic
-  - `dashboard_service.py` — Dashboard statistics aggregation
-- Refactored admin routes to use service layer (thin controllers)
-- Refactored landing public routes to use service layer
+### Fix 3: Native App Bottom Navigation
+- Created `BottomNav.jsx` — iOS/Android-style bottom tab bar
+- Shows: Home | Store | Cart (with badge) | Login (or Me when authenticated)
+- Active tab has primary color + top indicator line
+- Hidden on desktop (md+) and admin pages
+- Safe area support for notched phones
+- Added `pb-14 md:pb-0` padding to prevent content overlap
 
 ### Key Files
-- `backend/modules/pinpanclub/integrations/monday_adapter.py` — PinPanClub adapter
-- `backend/modules/users/integrations/monday_memberships_adapter.py` — Memberships adapter
-- `backend/modules/integrations/monday/routes.py` — Added adapter config endpoints
-- `backend/modules/admin/services/` — Service layer (3 services)
-- `backend/modules/admin/routes.py` — Refactored to use service layer
-- `backend/modules/landing/routes.py` — Refactored public endpoints
+- `frontend/src/components/layout/BottomNav.jsx` — Native bottom tab bar (NEW)
+- `frontend/src/components/layout/Header.jsx` — Simplified header, removed hamburger menu + duplicate nav
+- `frontend/src/App.js` — Added BottomNav component + bottom padding
+- `frontend/src/index.css` — Safe area CSS for mobile
 
 ### Test Credentials
 - Admin: admin@libreria.com / admin
-- Auth: POST /api/auth-v2/login
+- Admin login: /admin/login
 
 ## Incorporate User Feedback
-- PinPanClub adapter maintains backward compatibility with event listeners
-- Memberships adapter is admin-configurable (board IDs, column mappings, enable/disable)
-- Service-layer refactoring chosen over full microservice per user approval
+- Single login flow — no redundancy
+- Logo always first, breadcrumb with integrated back action
+- Native app feel on mobile with bottom tab bar
