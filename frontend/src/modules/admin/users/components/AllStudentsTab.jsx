@@ -289,7 +289,8 @@ export default function AllStudentsTab({ token }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Student</TableHead>
+                    <TableHead>First Name</TableHead>
+                    <TableHead>Last Name</TableHead>
                     <TableHead>School</TableHead>
                     <TableHead>Grade</TableHead>
                     <TableHead>Year</TableHead>
