@@ -72,6 +72,7 @@ function TemplateCard({ template, isSelected, onSelect }) {
 }
 
 export default function UIStyleModule() {
+  const { refreshUIStyle } = useTheme();
   const [style, setStyle] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
