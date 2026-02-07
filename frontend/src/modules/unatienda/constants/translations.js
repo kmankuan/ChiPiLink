@@ -3,7 +3,7 @@
  * Shared across textbook ordering components.
  */
 
-export const exclusivaTranslations = {
+export const schoolTxbTranslations = {
   en: {
     backToStudents: 'Back to students',
     grade: 'Grade',
@@ -22,7 +22,7 @@ export const exclusivaTranslations = {
     submitOrder: 'Submit Order',
     additionalInfo: 'Additional Information',
     select: '-- Select --',
-    exclusivePurchase: 'Exclusive Purchase',
+    exclusivePurchase: 'School Textbooks',
     yourStudentsBooks: 'Your students\' textbooks',
     linkNew: 'Link New',
     myStudents: 'My Students',
