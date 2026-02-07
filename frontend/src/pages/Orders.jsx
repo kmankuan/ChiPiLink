@@ -116,12 +116,12 @@ export default function Orders() {
       cancelled: 'bg-red-100 text-red-700',
     };
     const labels = {
-      draft: 'Borrador',
-      submitted: 'Enviado',
-      processing: 'Procesando',
-      ready: 'Listo',
-      delivered: 'Entregado',
-      cancelled: 'Cancelado',
+      draft: t('orders.statusDraft', 'Draft'),
+      submitted: t('orders.statusSubmitted', 'Submitted'),
+      processing: t('orders.statusProcessing', 'Processing'),
+      ready: t('orders.statusReady', 'Ready'),
+      delivered: t('orders.statusDelivered', 'Delivered'),
+      cancelled: t('orders.statusCancelled', 'Cancelled'),
     };
     return (
       <Badge className={styles[status] || styles.draft}>
@@ -130,6 +130,40 @@ export default function Orders() {
     );
   };
 
+  // Per-book item delivery status
+  const getItemStatusBadge = (status) => {
+    const styles = {
+      available: 'bg-gray-100 text-gray-600 text-[10px]',
+      ordered: 'bg-blue-100 text-blue-700 text-[10px]',
+      processing: 'bg-amber-100 text-amber-700 text-[10px]',
+      ready_for_pickup: 'bg-green-100 text-green-700 text-[10px]',
+      delivered: 'bg-emerald-100 text-emerald-700 text-[10px]',
+      issue: 'bg-red-100 text-red-700 text-[10px]',
+      out_of_stock: 'bg-gray-200 text-gray-500 text-[10px]',
+    };
+    const labels = {
+      available: t('orders.itemAvailable', 'Available'),
+      ordered: t('orders.itemOrdered', 'Ordered'),
+      processing: t('orders.itemProcessing', 'Processing'),
+      ready_for_pickup: t('orders.itemReady', 'Ready'),
+      delivered: t('orders.itemDelivered', 'Delivered'),
+      issue: t('orders.itemIssue', 'Issue'),
+      out_of_stock: t('orders.itemOutOfStock', 'Out of Stock'),
+    };
+    return (
+      <Badge className={styles[status] || styles.ordered}>
+        {labels[status] || status}
+      </Badge>
+    );
+  };
+
+  // Compute delivery progress for an order
+  const getDeliveryProgress = (items) => {
+    const orderedItems = (items || []).filter(i => i.quantity_ordered > 0);
+    if (orderedItems.length === 0) return null;
+    const delivered = orderedItems.filter(i => i.status === 'delivered').length;
+    return { delivered, total: orderedItems.length };
+  };
   const isLoading = loading && loadingTextbooks;
 
   if (isLoading) {
