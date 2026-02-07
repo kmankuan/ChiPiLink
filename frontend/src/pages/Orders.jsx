@@ -30,6 +30,7 @@ export default function Orders() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('textbooks');
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [chatOrder, setChatOrder] = useState(null);
 
   const toggleOrderExpansion = (orderId) => {
     setExpandedOrders(prev => ({
