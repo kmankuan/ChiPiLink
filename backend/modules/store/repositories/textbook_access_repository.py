@@ -224,6 +224,8 @@ class StudentRecordRepository(BaseRepository):
                     "_id": 0,
                     "student_id": 1,
                     "user_id": 1,
+                    "first_name": 1,
+                    "last_name": 1,
                     "full_name": 1,
                     "school_id": 1,
                     "school_name": 1,
