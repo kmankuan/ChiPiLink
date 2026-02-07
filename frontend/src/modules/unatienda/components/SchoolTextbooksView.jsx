@@ -61,7 +61,8 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!form.full_name.trim()) { toast.error('Enter student name'); return; }
+    if (!form.first_name.trim()) { toast.error('Enter student first name'); return; }
+    if (!form.last_name.trim()) { toast.error('Enter student last name'); return; }
     if (!form.school_id) { toast.error('Select a school'); return; }
     if (!form.grade) { toast.error('Select a grade'); return; }
     if (!form.relation_type) { toast.error('Select your relationship'); return; }
@@ -69,7 +70,8 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
     setSubmitting(true);
     try {
       await axios.post(`${API_URL}/api/store/textbook-access/students`, {
-        full_name: form.full_name.trim(),
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
         school_id: form.school_id,
         student_number: form.student_number.trim() || null,
         year: form.year,
