@@ -13,7 +13,9 @@ import {
   Languages,
   Database,
   Shield,
-  ArrowRightLeft
+  ArrowRightLeft,
+  LayoutGrid,
+  Paintbrush
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
@@ -22,6 +24,8 @@ import TranslationsModule from './TranslationsModule';
 import DemoDataModule from './DemoDataModule';
 import AuthMethodsConfig from './AuthMethodsConfig';
 import DatabaseMigrationModule from './DatabaseMigrationModule';
+import ModuleStatusModule from './ModuleStatusModule';
+import UIStyleModule from './UIStyleModule';
 
 export default function AdminModule() {
   return (
