@@ -19,7 +19,7 @@ import {
   Clock, FileText, GraduationCap, Info, Loader2, Lock, Upload,
   User, UserPlus, Users
 } from 'lucide-react';
-import { exclusivaTranslations } from '../constants/translations';
+import { schoolTxbTranslations } from '../constants/translations';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
