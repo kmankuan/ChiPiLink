@@ -908,6 +908,124 @@ class TextbookOrderService(BaseService):
         except Exception as e:
             logger.error(f"Error sending notification: {e}")
 
+    async def get_monday_updates(self, order_id: str, user_id: str) -> dict:
+        """Fetch Monday.com Updates for an order's item"""
+        from core.database import db
+        from core.config import settings
+        
+        order = await db.textbook_orders.find_one({"order_id": order_id})
+        if not order:
+            raise ValueError("Order not found")
+        if order["user_id"] != user_id:
+            raise ValueError("Access denied")
+        
+        monday_item_ids = order.get("monday_item_ids", [])
+        if not monday_item_ids:
+            return {"updates": [], "has_monday_item": False}
+        
+        item_id = monday_item_ids[0]
+        api_key = settings.monday_api_key
+        if not api_key:
+            return {"updates": [], "has_monday_item": True, "error": "Monday.com not configured"}
+        
+        query = f'''query {{ items(ids: [{item_id}]) {{ updates {{ id body text_body creator {{ name }} created_at }} }} }}'''
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.monday.com/v2",
+                json={"query": query},
+                headers={"Authorization": api_key, "Content-Type": "application/json"},
+                timeout=15.0
+            )
+            data = response.json()
+        
+        items = data.get("data", {}).get("items", [])
+        raw_updates = items[0].get("updates", []) if items else []
+        
+        updates = []
+        for u in raw_updates:
+            updates.append({
+                "id": u.get("id"),
+                "body": u.get("text_body") or u.get("body", ""),
+                "author": u.get("creator", {}).get("name", "Staff"),
+                "created_at": u.get("created_at"),
+                "is_staff": True  # All Monday.com native updates are from staff
+            })
+        
+        # Also fetch local user messages stored in DB
+        local_msgs = await db.order_messages.find(
+            {"order_id": order_id},
+            {"_id": 0}
+        ).sort("created_at", 1).to_list(200)
+        
+        for msg in local_msgs:
+            updates.append({
+                "id": msg.get("message_id"),
+                "body": msg.get("message", ""),
+                "author": msg.get("author_name", "You"),
+                "created_at": msg.get("created_at"),
+                "is_staff": False
+            })
+        
+        # Sort all by created_at
+        updates.sort(key=lambda x: x.get("created_at", ""))
+        
+        return {"updates": updates, "has_monday_item": True}
+    
+    async def post_monday_update(self, order_id: str, user_id: str, message: str) -> dict:
+        """Post a new Monday.com Update for an order"""
+        from core.database import db
+        from core.config import settings
+        import uuid
+        
+        order = await db.textbook_orders.find_one({"order_id": order_id})
+        if not order:
+            raise ValueError("Order not found")
+        if order["user_id"] != user_id:
+            raise ValueError("Access denied")
+        
+        # Get user info
+        user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "name": 1, "email": 1})
+        author_name = user.get("name", user.get("email", "Client")) if user else "Client"
+        
+        monday_item_ids = order.get("monday_item_ids", [])
+        monday_posted = False
+        
+        if monday_item_ids:
+            item_id = monday_item_ids[0]
+            api_key = settings.monday_api_key
+            if api_key:
+                escaped = message.replace('"', '\\"').replace('\n', '\\n')
+                mutation = f'mutation {{ create_update(item_id: {item_id}, body: "[{author_name}]: {escaped}") {{ id }} }}'
+                try:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(
+                            "https://api.monday.com/v2",
+                            json={"query": mutation},
+                            headers={"Authorization": api_key, "Content-Type": "application/json"},
+                            timeout=15.0
+                        )
+                        data = response.json()
+                        if data.get("data", {}).get("create_update", {}).get("id"):
+                            monday_posted = True
+                except Exception as e:
+                    logger.error(f"Error posting Monday.com update: {e}")
+        
+        # Store locally too
+        msg_doc = {
+            "message_id": f"msg_{uuid.uuid4().hex[:12]}",
+            "order_id": order_id,
+            "user_id": user_id,
+            "author_name": author_name,
+            "message": message,
+            "monday_posted": monday_posted,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.order_messages.insert_one(msg_doc)
+        del msg_doc["_id"]
+        
+        return {"success": True, "monday_posted": monday_posted, "message": msg_doc}
+
 
 # Singleton instance
 textbook_order_service = TextbookOrderService()
