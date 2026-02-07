@@ -91,9 +91,9 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   if (loading) return <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
 
   const texts = {
-    en: { name: 'Student Full Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel' },
-    es: { name: 'Nombre Completo', school: 'Escuela', grade: 'Grado', studentNo: 'Número de Estudiante (opcional)', relationship: 'Su Relación', other: 'Especificar relación', submit: 'Vincular Estudiante', cancel: 'Cancelar' },
-    zh: { name: '学生全名', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消' },
+    en: { firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel' },
+    es: { firstName: 'Nombre', lastName: 'Apellido', school: 'Escuela', grade: 'Grado', studentNo: 'Número de Estudiante (opcional)', relationship: 'Su Relación', other: 'Especificar relación', submit: 'Vincular Estudiante', cancel: 'Cancelar' },
+    zh: { firstName: '名', lastName: '姓', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消' },
   };
   const ft = texts[lang] || texts.es;
 
