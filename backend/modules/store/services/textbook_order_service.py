@@ -908,25 +908,34 @@ class TextbookOrderService(BaseService):
         except Exception as e:
             logger.error(f"Error sending notification: {e}")
 
+    async def _get_monday_api_key(self) -> Optional[str]:
+        """Get active Monday.com API key from workspace config or env fallback"""
+        try:
+            workspaces_config = await monday_config_service.get_workspaces()
+            active_workspace_id = workspaces_config.get("active_workspace_id")
+            for ws in workspaces_config.get("workspaces", []):
+                if ws.get("workspace_id") == active_workspace_id and ws.get("api_key"):
+                    return ws["api_key"]
+        except Exception as e:
+            logger.debug(f"Could not load workspace config: {e}")
+        return MONDAY_API_KEY or None
+
     async def get_monday_updates(self, order_id: str, user_id: str) -> dict:
-        """Fetch Monday.com Updates for an order's item"""
-        from core.database import db
-        from core.config import settings
-        
+        """Fetch chat messages: local DB + Monday.com Updates if linked"""
         order = await db.store_textbook_orders.find_one({"order_id": order_id})
         if not order:
             raise ValueError("Order not found")
         if order["user_id"] != user_id:
             raise ValueError("Access denied")
-        
+
         monday_item_ids = order.get("monday_item_ids", [])
         has_monday_item = bool(monday_item_ids)
         updates = []
-        
-        # Fetch from Monday.com if item exists
-        if monday_item_ids:
+
+        # Fetch from Monday.com if item is linked
+        if has_monday_item:
             item_id = monday_item_ids[0]
-            api_key = settings.monday_api_key
+            api_key = await self._get_monday_api_key()
             if api_key:
                 query = f'''query {{ items(ids: [{item_id}]) {{ updates {{ id body text_body creator {{ name }} created_at }} }} }}'''
                 try:
@@ -938,10 +947,10 @@ class TextbookOrderService(BaseService):
                             timeout=15.0
                         )
                         data = response.json()
-                    
+
                     items = data.get("data", {}).get("items", [])
                     raw_updates = items[0].get("updates", []) if items else []
-                    
+
                     for u in raw_updates:
                         updates.append({
                             "id": u.get("id"),
@@ -952,13 +961,13 @@ class TextbookOrderService(BaseService):
                         })
                 except Exception as e:
                     logger.error(f"Error fetching Monday.com updates: {e}")
-        
+
         # Always fetch local user messages
         local_msgs = await db.order_messages.find(
             {"order_id": order_id},
             {"_id": 0}
         ).sort("created_at", 1).to_list(200)
-        
+
         for msg in local_msgs:
             updates.append({
                 "id": msg.get("message_id"),
@@ -967,34 +976,32 @@ class TextbookOrderService(BaseService):
                 "created_at": msg.get("created_at"),
                 "is_staff": False
             })
-        
-        # Sort all by created_at
+
+        # Sort all chronologically
         updates.sort(key=lambda x: x.get("created_at", ""))
-        
-        return {"updates": updates, "has_monday_item": True}
-    
+
+        return {"updates": updates, "has_monday_item": has_monday_item}
+
     async def post_monday_update(self, order_id: str, user_id: str, message: str) -> dict:
-        """Post a new Monday.com Update for an order"""
-        from core.database import db
-        from core.config import settings
+        """Post a chat message — stores locally and syncs to Monday.com if linked"""
         import uuid
-        
+
         order = await db.store_textbook_orders.find_one({"order_id": order_id})
         if not order:
             raise ValueError("Order not found")
         if order["user_id"] != user_id:
             raise ValueError("Access denied")
-        
-        # Get user info
-        user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "name": 1, "email": 1})
-        author_name = user.get("name", user.get("email", "Client")) if user else "Client"
-        
+
+        # Get user info from correct collection
+        user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0, "name": 1, "email": 1})
+        author_name = user.get("name", user.get("email", "User")) if user else "User"
+
         monday_item_ids = order.get("monday_item_ids", [])
         monday_posted = False
-        
+
         if monday_item_ids:
             item_id = monday_item_ids[0]
-            api_key = settings.monday_api_key
+            api_key = await self._get_monday_api_key()
             if api_key:
                 escaped = message.replace('"', '\\"').replace('\n', '\\n')
                 mutation = f'mutation {{ create_update(item_id: {item_id}, body: "[{author_name}]: {escaped}") {{ id }} }}'
@@ -1011,8 +1018,8 @@ class TextbookOrderService(BaseService):
                             monday_posted = True
                 except Exception as e:
                     logger.error(f"Error posting Monday.com update: {e}")
-        
-        # Store locally too
+
+        # Store locally
         msg_doc = {
             "message_id": f"msg_{uuid.uuid4().hex[:12]}",
             "order_id": order_id,
@@ -1024,7 +1031,7 @@ class TextbookOrderService(BaseService):
         }
         await db.order_messages.insert_one(msg_doc)
         del msg_doc["_id"]
-        
+
         return {"success": True, "monday_posted": monday_posted, "message": msg_doc}
 
 
