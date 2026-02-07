@@ -350,8 +350,11 @@ async def get_order_updates(
     current_user: dict = Depends(get_current_user)
 ):
     """Fetch Monday.com Updates (chat messages) for an order"""
-    updates = await textbook_order_service.get_monday_updates(order_id, current_user["user_id"])
-    return updates
+    try:
+        updates = await textbook_order_service.get_monday_updates(order_id, current_user["user_id"])
+        return updates
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.post("/{order_id}/updates")
