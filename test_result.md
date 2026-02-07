@@ -1,45 +1,44 @@
-# Test Results - Split Full Name into First Name / Last Name
+# Test Results - Monday.com Textbooks Board Subitem Workflow
 
 ## Test Context
 - **Date**: 2026-02-07
-- **Feature**: Split "Full Name" field into separate "First Name" and "Last Name" in student linking forms
+- **Feature**: Changed TXB inventory sync from count-increment to subitem-per-student workflow
 
 ## Implementation Summary
 
-### Backend Changes
-- Updated `StudentRecordCreate` model to accept `first_name` and `last_name` instead of `full_name`
-- Updated `StudentRecordUpdate` model with `first_name` and `last_name` fields
-- Added backward compatibility: old records with only `full_name` get auto-split into `first_name`/`last_name`
-- New records compute `full_name` as `first_name + " " + last_name`
-- All API responses now include `first_name`, `last_name`, and `full_name`
+### Changes Made
+1. **monday_txb_inventory_adapter.py** — Rewrote `update_inventory()` to:
+   - Find textbook by book code on TB2026-Textbooks board
+   - Create textbook item if not found
+   - Create subitem with "Student Name - Order Reference" (not increment count)
+   - Removed `ordered_count` column logic
+   - Added `subitem_column_mapping` support (quantity, date)
 
-### Frontend Changes (3 forms updated)
-1. `SchoolTextbooksView.jsx` - InlineStudentForm: Split into First Name + Last Name fields
-2. `LinkingPage.jsx` - Dialog form: Split into First Name + Last Name fields
-3. `MyStudentsSection.jsx` - Dialog form + Edit Profile Dialog: Split into First Name + Last Name fields
-4. `AllStudentsTab.jsx` - Admin table: Shows separate First Name and Last Name columns
+2. **monday_sync_service.py** — Updated `update_inventory_board()` to accept `student_name` and `order_reference`
 
-### Key Files
-- `backend/modules/store/models/textbook_access.py` — Updated Pydantic models
-- `backend/modules/store/services/textbook_access_service.py` — Added `_normalize_name_fields()` for backward compat
-- `backend/modules/store/repositories/textbook_access_repository.py` — Added first_name/last_name to aggregation projection
-- `backend/modules/store/routes/private_catalog.py` — Added first_name/last_name to catalog access response
-- `frontend/src/modules/unatienda/components/SchoolTextbooksView.jsx` — Updated inline form
-- `frontend/src/modules/account/linking/LinkingPage.jsx` — Updated dialog form
-- `frontend/src/modules/account/students/MyStudentsSection.jsx` — Updated dialog + edit forms
-- `frontend/src/modules/admin/users/components/AllStudentsTab.jsx` — Updated admin table
+3. **textbook_order_service.py** — Updated `_send_to_monday()` to pass student_name and order_reference from order data
+
+4. **monday_config_service.py** — Updated `get_inventory_config()` to include `subitem_column_mapping`
+
+5. **TxbInventoryTab.jsx** — Updated admin config UI to show subitem column mapping section
+
+### Board Configuration (already saved)
+- **TB2026-Textbooks Board ID**: 18397140920
+- **Group ID**: topics
+- **Book Code Column**: text_mm02vh63
+- **Subitem Qty Column**: numeric_mm02sj3t
+- **Subitem Date Column**: date0
 
 ### Test Credentials
-- Admin: admin@libreria.com / admin (password field)
-- Admin login: POST /api/auth-v2/login with {"email":"admin@libreria.com","password":"admin"}
+- Admin: admin@libreria.com / admin
+- Auth: POST /api/auth-v2/login with {"email":"admin@libreria.com","password":"admin"}
 
-### API Endpoints
-- POST /api/store/textbook-access/students - Create student (now accepts first_name, last_name)
-- GET /api/store/textbook-access/my-students - Get user's students (returns first_name, last_name, full_name)
-- PUT /api/store/textbook-access/students/{id} - Update student (accepts first_name, last_name)
-- GET /api/store/textbook-access/admin/all-students - Admin view (returns first_name, last_name, full_name)
+### Key API Endpoints
+- GET /api/store/monday/txb-inventory-config — Get inventory config
+- PUT /api/store/monday/txb-inventory-config — Save inventory config
+- POST /api/store/textbook-orders/submit — Submit order (triggers Monday sync)
 
 ## Incorporate User Feedback
-- Forms now have separate First Name and Last Name fields
-- Backend maintains backward compatibility with existing records
-- Admin table shows separate name columns for better sorting
+- Subitems create per-student tracking on textbooks board
+- Monday.com auto-counts subitems for demand tracking
+- No status column on subitems (handled via Orders board)
