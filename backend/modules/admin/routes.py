@@ -420,135 +420,36 @@ async def get_unatienda_stats(admin: dict = Depends(get_admin_user)):
         logger.error(f"Error getting Unatienda stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-DEFAULT_MODULE_STATUSES = {
-    "home": {"status": "production", "customLabel": ""},
-    "unatienda": {"status": "live_beta", "customLabel": "Live Beta"},
-    "textbook_orders": {"status": "live_beta", "customLabel": "Live Beta"},
-    "orders": {"status": "live_beta", "customLabel": "Live Beta"},
-    "my_students": {"status": "live_beta", "customLabel": "Live Beta"},
-    "pinpanclub": {"status": "live_beta", "customLabel": "Live Beta"},
-    "super_pin": {"status": "live_beta", "customLabel": "Live Beta"},
-    "rapid_pin": {"status": "coming_soon", "customLabel": ""},
-    "events": {"status": "coming_soon", "customLabel": ""},
-    "gallery": {"status": "coming_soon", "customLabel": ""},
-    "players": {"status": "live_beta", "customLabel": "Live Beta"},
-    "admin_dashboard": {"status": "production", "customLabel": ""},
-    "admin_integrations": {"status": "live_beta", "customLabel": "Live Beta"},
-}
+# ============== MODULE STATUS ROUTES (Service Layer) ==============
 
-MODULE_NAMES = {
-    "home": "Home",
-    "unatienda": "Unatienda (Store)",
-    "textbook_orders": "Textbook Orders",
-    "orders": "My Orders",
-    "my_students": "My Students",
-    "pinpanclub": "PinPanClub",
-    "super_pin": "Super Pin",
-    "rapid_pin": "Rapid Pin",
-    "events": "Events",
-    "gallery": "Gallery",
-    "players": "Players",
-    "admin_dashboard": "Admin Dashboard",
-    "admin_integrations": "Admin Integrations",
-}
+from .services.module_status_service import module_status_service
+from .services.ui_style_service import ui_style_service
 
 
 @router.get("/module-status")
 async def get_module_statuses(admin: dict = Depends(get_admin_user)):
     """Get module statuses (admin view with defaults)"""
-    config = await db.app_config.find_one({"config_key": "module_statuses"}, {"_id": 0})
-    statuses = config.get("value", DEFAULT_MODULE_STATUSES) if config else DEFAULT_MODULE_STATUSES
-    return {
-        "statuses": statuses,
-        "module_names": MODULE_NAMES,
-        "available_statuses": ["production", "live_beta", "coming_soon", "maintenance"]
-    }
+    return await module_status_service.get_statuses()
 
 
 @router.put("/module-status")
 async def update_module_statuses(data: dict, admin: dict = Depends(get_admin_user)):
     """Update module statuses"""
-    statuses = data.get("statuses", {})
-    await db.app_config.update_one(
-        {"config_key": "module_statuses"},
-        {"$set": {
-            "config_key": "module_statuses",
-            "value": statuses,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-            "updated_by": admin.get("user_id")
-        }},
-        upsert=True
-    )
+    await module_status_service.update_statuses(data.get("statuses", {}), admin.get("user_id"))
     return {"success": True, "message": "Module statuses updated"}
 
 
-# ============== UI STYLE ROUTES ==============
-
-DEFAULT_UI_STYLE = {
-    "template": "default",
-    "primary_color": "#16a34a",
-    "font_family": "Inter",
-    "border_radius": "0.75rem",
-    "card_style": "elevated",
-}
-
-AVAILABLE_TEMPLATES = [
-    {
-        "id": "default",
-        "name": "Default",
-        "description": "Clean and modern with subtle green tones",
-        "preview_colors": ["#16a34a", "#f0fdf4", "#1e293b"],
-    },
-    {
-        "id": "elegant",
-        "name": "Elegant",
-        "description": "Sophisticated with deep purple and gold accents",
-        "preview_colors": ["#7c3aed", "#faf5ff", "#1e1b4b"],
-    },
-    {
-        "id": "warm",
-        "name": "Warm",
-        "description": "Inviting design with warm orange and cream palette",
-        "preview_colors": ["#ea580c", "#fff7ed", "#431407"],
-    },
-    {
-        "id": "ocean",
-        "name": "Ocean",
-        "description": "Cool blue tones with crisp white backgrounds",
-        "preview_colors": ["#0284c7", "#f0f9ff", "#0c4a6e"],
-    },
-    {
-        "id": "minimal",
-        "name": "Minimal",
-        "description": "Ultra-clean black and white with sharp contrasts",
-        "preview_colors": ["#18181b", "#fafafa", "#52525b"],
-    },
-]
+# ============== UI STYLE ROUTES (Service Layer) ==============
 
 
 @router.get("/ui-style")
 async def get_ui_style(admin: dict = Depends(get_admin_user)):
     """Get UI style configuration"""
-    config = await db.app_config.find_one({"config_key": "ui_style"}, {"_id": 0})
-    style = config.get("value", DEFAULT_UI_STYLE) if config else DEFAULT_UI_STYLE
-    return {
-        "style": style,
-        "available_templates": AVAILABLE_TEMPLATES,
-    }
+    return await ui_style_service.get_style()
 
 
 @router.put("/ui-style")
 async def update_ui_style(data: dict, admin: dict = Depends(get_admin_user)):
     """Update UI style configuration"""
-    style = data.get("style", {})
-    await db.app_config.update_one(
-        {"config_key": "ui_style"},
-        {"$set": {
-            "config_key": "ui_style",
-            "value": style,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-            "updated_by": admin.get("user_id")
-        }},
-        upsert=True
-    )
+    await ui_style_service.update_style(data.get("style", {}), admin.get("user_id"))
     return {"success": True, "message": "UI style updated"}
