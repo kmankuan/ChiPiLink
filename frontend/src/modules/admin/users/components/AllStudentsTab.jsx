@@ -304,11 +304,14 @@ export default function AllStudentsTab({ token }) {
                     <TableRow key={student.student_id}>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{student.full_name}</p>
+                          <p className="font-medium">{student.first_name || student.full_name?.split(' ')[0] || ''}</p>
                           <p className="text-xs text-muted-foreground">
                             {student.student_number || student.student_id}
                           </p>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="font-medium">{student.last_name || (student.full_name?.split(' ').slice(1).join(' ')) || ''}</p>
                       </TableCell>
                       <TableCell>{student.school_name}</TableCell>
                       <TableCell>{student.grade}</TableCell>
