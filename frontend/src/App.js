@@ -138,6 +138,7 @@ function AppRouter() {
       {/* Public Routes */}
       <Route path="/" element={<><Header /><SuperAppLanding /></>} />
       <Route path="/login" element={<><Header /><Login /></>} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/registro" element={<><Header /><Register /></>} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/auth/laopan/callback" element={<LaoPanCallback />} />
