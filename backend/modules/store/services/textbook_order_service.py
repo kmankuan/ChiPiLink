@@ -978,7 +978,7 @@ class TextbookOrderService(BaseService):
         from core.config import settings
         import uuid
         
-        order = await db.textbook_orders.find_one({"order_id": order_id})
+        order = await db.store_textbook_orders.find_one({"order_id": order_id})
         if not order:
             raise ValueError("Order not found")
         if order["user_id"] != user_id:
