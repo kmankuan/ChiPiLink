@@ -412,17 +412,29 @@ export default function MondayModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="workspaces" className="gap-2">
-            <Building2 className="h-4 w-4" />
+        <TabsList className="flex flex-wrap gap-1 h-auto p-1">
+          <TabsTrigger value="workspaces" className="gap-1.5 text-xs">
+            <Building2 className="h-3.5 w-3.5" />
             Workspaces
           </TabsTrigger>
-          <TabsTrigger value="libros" className="gap-2">
-            <BookOpen className="h-4 w-4" />
+          <TabsTrigger value="libros" className="gap-1.5 text-xs">
+            <BookOpen className="h-3.5 w-3.5" />
             Book Orders
           </TabsTrigger>
-          <TabsTrigger value="general" className="gap-2">
-            <LayoutGrid className="h-4 w-4" />
+          <TabsTrigger value="txb-inventory" className="gap-1.5 text-xs">
+            <Layers className="h-3.5 w-3.5" />
+            TXB Inventory
+          </TabsTrigger>
+          <TabsTrigger value="webhooks" className="gap-1.5 text-xs">
+            <Plug className="h-3.5 w-3.5" />
+            Webhooks
+          </TabsTrigger>
+          <TabsTrigger value="status-mapping" className="gap-1.5 text-xs">
+            <Settings className="h-3.5 w-3.5" />
+            Status Mapping
+          </TabsTrigger>
+          <TabsTrigger value="general" className="gap-1.5 text-xs">
+            <LayoutGrid className="h-3.5 w-3.5" />
             General
           </TabsTrigger>
         </TabsList>
