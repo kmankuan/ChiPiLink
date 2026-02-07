@@ -462,14 +462,22 @@ export default function MyStudentsSection({ embedded = false, onNavigateToTextbo
   };
 
   const handleSubmit = async () => {
-    if (!formData.full_name.trim() || !formData.school_id || !formData.grade || !formData.relation_type) {
+    if (!formData.first_name.trim() || !formData.last_name.trim() || !formData.school_id || !formData.grade || !formData.relation_type) {
       toast.error('Please fill all required fields');
       return;
     }
     
     setSubmitting(true);
     try {
-      await api().post('/api/store/textbook-access/request', formData);
+      await api().post('/api/store/textbook-access/students', {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        school_id: formData.school_id,
+        student_number: formData.student_number,
+        year: formData.year,
+        grade: formData.grade,
+        relation_type: formData.relation_type,
+      });
       toast.success(t.submitSuccess);
       setDialogOpen(false);
       resetForm();
