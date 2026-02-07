@@ -185,7 +185,7 @@ function PendingStudentCard({ student }) {
           <Clock className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{student.full_name || student.nombre}</p>
+          <p className="font-medium text-sm truncate">{student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || student.nombre}</p>
           <p className="text-xs text-muted-foreground">{student.school_name || student.escuela} • {student.grade || student.grado}</p>
         </div>
         <Badge variant="secondary" className="shrink-0 text-xs">
