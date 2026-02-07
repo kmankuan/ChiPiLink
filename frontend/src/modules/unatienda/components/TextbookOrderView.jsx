@@ -14,8 +14,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
-  Book, BookOpen, Check, ChevronLeft, Clock, GraduationCap,
-  Info, Loader2, Lock, Upload
+  Book, BookOpen, Check, CheckCircle, ChevronLeft, ClipboardList,
+  Clock, FileText, GraduationCap, Info, Loader2, Lock, Upload,
+  User, UserPlus, Users
 } from 'lucide-react';
 import { exclusivaTranslations } from '../constants/translations';
 
