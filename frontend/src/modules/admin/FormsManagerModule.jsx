@@ -139,21 +139,21 @@ function FormFieldEditor({ formType, onBack }) {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success(field.is_active ? 'Field disabled' : 'Field enabled');
+      toast.success(field.is_active ? t.fieldDisabled : t.fieldEnabled);
       fetchFields();
-    } catch { toast.error('Error toggling field'); }
+    } catch { toast.error(t.error); }
   };
 
   const deleteField = async (fieldId) => {
-    if (!confirm('Delete this field permanently?')) return;
+    if (!confirm(t.deleteConfirm)) return;
     try {
       await fetch(`${API}/api/store/form-config/admin/fields/${fieldId}?hard=true`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success('Field deleted');
+      toast.success(t.fieldDeleted);
       fetchFields();
-    } catch { toast.error('Error deleting field'); }
+    } catch { toast.error(t.error); }
   };
 
   const saveField = async (fieldData, isNew = false) => {
@@ -170,15 +170,15 @@ function FormFieldEditor({ formType, onBack }) {
         body: JSON.stringify(fieldData),
       });
       if (res.ok) {
-        toast.success(isNew ? 'Field created' : 'Field updated');
+        toast.success(isNew ? t.fieldCreated : t.fieldUpdated);
         setEditingField(null);
         setShowAddField(false);
         fetchFields();
       } else {
         const err = await res.json();
-        toast.error(err.detail || 'Error saving field');
+        toast.error(err.detail || t.error);
       }
-    } catch { toast.error('Network error'); }
+    } catch { toast.error(t.error); }
     finally { setSaving(false); }
   };
 
