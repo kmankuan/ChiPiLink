@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { SiteConfigProvider } from '@/contexts/SiteConfigContext';
 import { InlineTranslationProvider } from '@/contexts/InlineTranslationContext';
+import { LayoutProvider } from '@/contexts/LayoutContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { OneSignalProvider } from '@/contexts/OneSignalContext';
 
