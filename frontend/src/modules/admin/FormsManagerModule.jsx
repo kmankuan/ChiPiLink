@@ -512,16 +512,22 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
                 <span className="flex-1 truncate">{opt.label_en}</span>
                 <span className="text-muted-foreground truncate">{opt.label_es}</span>
                 <span className="text-muted-foreground truncate">{opt.label_zh}</span>
+                <button onClick={() => handleTranslateExistingOption(idx)} title="Translate" className="p-0.5 rounded hover:bg-primary/10 text-primary transition-colors shrink-0" data-testid={`translate-option-${idx}`}>
+                  <Languages className="h-3 w-3" />
+                </button>
                 <Button variant="ghost" size="icon" className="h-5 w-5 shrink-0" onClick={() => removeOption(idx)}>
                   <X className="h-3 w-3" />
                 </Button>
               </div>
             ))}
             <div className="flex gap-2">
-              <Input placeholder="value (auto)" value={newOption.value} onChange={e => { setOptEdited(p => ({ ...p, value: true })); setNewOption(p => ({ ...p, value: e.target.value })); }} className="h-7 text-xs flex-1 font-mono" />
-              <Input placeholder="Label EN (auto)" value={newOption.label_en} onChange={e => handleOptionEnChange(e.target.value)} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label ES (auto)" value={newOption.label_es} onChange={e => handleOptionEsChange(e.target.value)} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label ZH (auto)" value={newOption.label_zh} onChange={e => handleOptionZhChange(e.target.value)} className="h-7 text-xs flex-1" />
+              <Input placeholder="value (auto)" value={newOption.value} onChange={e => setNewOption(p => ({ ...p, value: e.target.value }))} className="h-7 text-xs flex-1 font-mono" />
+              <Input placeholder="Label EN" value={newOption.label_en} onChange={e => setNewOption(p => ({ ...p, label_en: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label ES" value={newOption.label_es} onChange={e => setNewOption(p => ({ ...p, label_es: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label ZH" value={newOption.label_zh} onChange={e => setNewOption(p => ({ ...p, label_zh: e.target.value }))} className="h-7 text-xs flex-1" />
+              <button onClick={handleTranslateOption} title="Translate" className="p-1 rounded hover:bg-primary/10 text-primary transition-colors shrink-0" data-testid="translate-new-option-btn">
+                <Languages className="h-3.5 w-3.5" />
+              </button>
               <Button size="sm" variant="outline" className="h-7 text-xs shrink-0" onClick={addOption}>Add</Button>
             </div>
           </div>
