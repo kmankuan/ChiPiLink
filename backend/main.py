@@ -191,6 +191,10 @@ api_router.include_router(realtime_router)
 # Roles & Permissions Module
 api_router.include_router(roles_router)
 
+# Widget Module
+from modules.widget import widget_router
+api_router.include_router(widget_router)
+
 # Include main router in app
 app.include_router(api_router)
 
