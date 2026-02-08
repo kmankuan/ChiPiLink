@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Save, Check, Palette, Type, RectangleHorizontal, SquareStack, Minimize2, Globe, Shield, ExternalLink } from 'lucide-react';
+import { Loader2, Save, Check, Palette, Type, RectangleHorizontal, SquareStack, Minimize2, Globe, Shield, ExternalLink, LayoutGrid } from 'lucide-react';
 import axios from 'axios';
 import { useTheme } from '@/contexts/ThemeContext';
 
