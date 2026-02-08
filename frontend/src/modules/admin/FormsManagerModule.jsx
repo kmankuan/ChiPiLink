@@ -406,18 +406,34 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   // When English label changes: auto-generate key + auto-translate ES/ZH
   const handleEnLabelChange = (val) => {
     const updates = { label_en: val };
-    // Auto-generate field key if user hasn't manually edited it
     if (isNew && !userEdited.field_key) {
       updates.field_key = toFieldKey(val);
     }
-    // Auto-translate if user hasn't manually edited those fields
-    const translations = autoTranslate(val);
-    if (!userEdited.label_es && translations.es) {
-      updates.label_es = translations.es;
-    }
-    if (!userEdited.label_zh && translations.zh) {
-      updates.label_zh = translations.zh;
-    }
+    const tr = autoTranslate(val, 'en');
+    if (!userEdited.label_es && tr.es) updates.label_es = tr.es;
+    if (!userEdited.label_zh && tr.zh) updates.label_zh = tr.zh;
+    setForm(p => ({ ...p, ...updates }));
+  };
+
+  // When Spanish label changes: auto-translate EN/ZH
+  const handleEsLabelChange = (val) => {
+    setUserEdited(p => ({ ...p, label_es: true }));
+    const updates = { label_es: val };
+    const tr = autoTranslate(val, 'es');
+    if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
+    if (tr.zh && !userEdited.label_zh && !form.label_zh) updates.label_zh = tr.zh;
+    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = toFieldKey(tr.en);
+    setForm(p => ({ ...p, ...updates }));
+  };
+
+  // When Chinese label changes: auto-translate EN/ES
+  const handleZhLabelChange = (val) => {
+    setUserEdited(p => ({ ...p, label_zh: true }));
+    const updates = { label_zh: val };
+    const tr = autoTranslate(val, 'zh');
+    if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
+    if (tr.es && !userEdited.label_es && !form.label_es) updates.label_es = tr.es;
+    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = toFieldKey(tr.en);
     setForm(p => ({ ...p, ...updates }));
   };
 
