@@ -205,35 +205,29 @@ const NewsCard = ({ post }) => {
   const navigate = useNavigate();
   
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer group hover:shadow-lg transition-all"
+    <button
+      className="flex items-start gap-3 p-4 w-full text-left border-b border-border/30 last:border-0 active:bg-muted/30 transition-colors"
       onClick={() => navigate(`/comunidad/post/${post.post_id}`)}
+      data-testid={`news-card-${post.post_id}`}
     >
-      <div className="aspect-video relative overflow-hidden">
-        <img
-          src={post.imagen_portada || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400'}
-          alt={post.titulo}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {post.categoria && (
-          <Badge className="absolute top-3 left-3">{post.categoria}</Badge>
-        )}
-      </div>
-      <CardContent className="p-4">
-        <h3 className="font-semibold line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-semibold line-clamp-2 mb-1 tracking-tight">
           {post.titulo}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
           {post.resumen}
         </p>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {formatDate(post.fecha_publicacion)}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
+        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {formatDate(post.fecha_publicacion)}
+        </span>
+      </div>
+      <img
+        src={post.imagen_portada || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400'}
+        alt={post.titulo}
+        className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+      />
+    </button>
   );
 };
 
