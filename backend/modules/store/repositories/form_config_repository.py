@@ -186,6 +186,111 @@ class FormConfigRepository(BaseRepository):
             
             return created_fields
         
+        if form_type == "student_linking":
+            default_fields = [
+                {
+                    "form_type": "student_linking",
+                    "field_key": "first_name",
+                    "field_type": "text",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 0,
+                    "label_en": "First Name",
+                    "label_es": "Nombre",
+                    "label_zh": "名",
+                    "placeholder_en": "John",
+                    "placeholder_es": "Juan",
+                    "placeholder_zh": "明",
+                    "min_length": 1,
+                    "max_length": 50
+                },
+                {
+                    "form_type": "student_linking",
+                    "field_key": "last_name",
+                    "field_type": "text",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 1,
+                    "label_en": "Last Name",
+                    "label_es": "Apellido",
+                    "label_zh": "姓",
+                    "placeholder_en": "Doe",
+                    "placeholder_es": "Pérez",
+                    "placeholder_zh": "张",
+                    "min_length": 1,
+                    "max_length": 50
+                },
+                {
+                    "form_type": "student_linking",
+                    "field_key": "school_id",
+                    "field_type": "select",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 2,
+                    "label_en": "School",
+                    "label_es": "Colegio",
+                    "label_zh": "学校",
+                    "help_text_en": "Select the school",
+                    "help_text_es": "Selecciona el colegio",
+                    "help_text_zh": "选择学校",
+                    "options": []
+                },
+                {
+                    "form_type": "student_linking",
+                    "field_key": "grade",
+                    "field_type": "select",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 3,
+                    "label_en": "Grade",
+                    "label_es": "Grado",
+                    "label_zh": "年级",
+                    "options": []
+                },
+                {
+                    "form_type": "student_linking",
+                    "field_key": "student_number",
+                    "field_type": "text",
+                    "is_required": False,
+                    "is_system": False,
+                    "order": 4,
+                    "label_en": "Student Number",
+                    "label_es": "Número de Estudiante",
+                    "label_zh": "学号",
+                    "placeholder_en": "Optional",
+                    "placeholder_es": "Opcional",
+                    "placeholder_zh": "可选",
+                    "help_text_en": "Helps speed up verification",
+                    "help_text_es": "Ayuda a acelerar la verificación",
+                    "help_text_zh": "有助于加速验证"
+                },
+                {
+                    "form_type": "student_linking",
+                    "field_key": "relation_type",
+                    "field_type": "select",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 5,
+                    "label_en": "Relationship",
+                    "label_es": "Relación",
+                    "label_zh": "关系",
+                    "options": [
+                        {"value": "parent", "label_en": "Parent", "label_es": "Padre/Madre", "label_zh": "父母"},
+                        {"value": "guardian", "label_en": "Legal Guardian", "label_es": "Tutor Legal", "label_zh": "法定监护人"},
+                        {"value": "grandparent", "label_en": "Grandparent", "label_es": "Abuelo/a", "label_zh": "祖父母"},
+                        {"value": "representative", "label_en": "Representative", "label_es": "Representante", "label_zh": "代表"},
+                        {"value": "other", "label_en": "Other", "label_es": "Otro", "label_zh": "其他"}
+                    ]
+                }
+            ]
+            
+            created_fields = []
+            for field_data in default_fields:
+                created = await self.create(field_data)
+                created_fields.append(created)
+            
+            return created_fields
+        
         return []
 
 
