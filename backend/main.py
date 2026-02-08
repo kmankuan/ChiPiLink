@@ -176,6 +176,9 @@ api_router.include_router(pinpanclub_router)
 api_router.include_router(membership_router)
 api_router.include_router(translations_router)
 
+# Translation Dictionary (core feature)
+api_router.include_router(translation_dict_router)
+
 # Notifications Module
 api_router.include_router(notifications_router)
 
