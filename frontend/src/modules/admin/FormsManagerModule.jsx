@@ -3,6 +3,7 @@
  * Shows a catalog of form types, each openable to a field editor.
  */
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,20 @@ const FIELD_TYPE_LABELS = {
   text: 'Text', textarea: 'Long Text', select: 'Dropdown',
   number: 'Number', file: 'File Upload', date: 'Date', email: 'Email', phone: 'Phone',
 };
+
+// Helper to get localized label from form type or field data
+function getLabel(item, lang) {
+  return item[`label_${lang}`] || item.label_en || item.label_es || '';
+}
+function getDesc(item, lang) {
+  return item[`description_${lang}`] || item.description_en || item.description_es || '';
+}
+function getPlaceholder(item, lang) {
+  return item[`placeholder_${lang}`] || item.placeholder_en || item.placeholder_es || '';
+}
+function getHelp(item, lang) {
+  return item[`help_text_${lang}`] || item.help_text_en || item.help_text_es || '';
+}
 
 /* ============ Form Types Catalog ============ */
 function FormTypesCatalog({ formTypes, loading, onSelectType }) {
