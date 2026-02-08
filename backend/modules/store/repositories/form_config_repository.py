@@ -84,6 +84,10 @@ class FormConfigRepository(BaseRepository):
         if result and result[0].get("max_order") is not None:
             return result[0]["max_order"] + 1
         return 0
+
+    async def get_all_form_types(self) -> list:
+        """Get all distinct form types that have fields configured"""
+        return await self._collection.distinct("form_type")
     
     async def seed_default_fields(self, form_type: str) -> List[Dict]:
         """Seed default fields for a form type if none exist"""
