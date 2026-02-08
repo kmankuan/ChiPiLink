@@ -666,15 +666,15 @@ export default function SuperAppLanding() {
               case 'news':
                 if (!noticias || noticias.length === 0) return null;
                 return (
-                  <section key={block.id} data-block="news">
+                  <section key={block.id} data-block="news" className="bg-card">
                     <SectionHeader 
                       icon={Newspaper} 
-                      title="Últimas Noticias" 
+                      title="Noticias" 
                       action="Ver todas"
                       actionLink="/comunidad/noticias"
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {noticias.slice(0, 3).map((post) => (
+                    <div>
+                      {noticias.slice(0, 5).map((post) => (
                         <NewsCard key={post.post_id} post={post} />
                       ))}
                     </div>
@@ -684,14 +684,14 @@ export default function SuperAppLanding() {
               case 'events':
                 if (!eventos || eventos.length === 0) return null;
                 return (
-                  <section key={block.id} data-block="events">
+                  <section key={block.id} data-block="events" className="bg-card">
                     <SectionHeader 
                       icon={Calendar} 
-                      title="Próximos Eventos" 
+                      title="Eventos" 
                       action="Ver todos"
                       actionLink="/eventos"
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
                       {eventos.slice(0, 4).map((evento) => (
                         <EventCard key={evento.evento_id} evento={evento} />
                       ))}
@@ -702,15 +702,15 @@ export default function SuperAppLanding() {
               case 'gallery':
                 if (!galerias || galerias.length === 0) return null;
                 return (
-                  <section key={block.id} data-block="gallery">
+                  <section key={block.id} data-block="gallery" className="bg-card">
                     <SectionHeader 
                       icon={Image} 
-                      title="Galería" 
+                      title="Galeria" 
                       action="Ver todo"
                       actionLink="/galeria"
                     />
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {galerias.slice(0, 4).map((album) => (
+                    <div className="grid grid-cols-3 gap-0.5 px-4 pb-4">
+                      {galerias.slice(0, 6).map((album) => (
                         <GalleryCard key={album.album_id} album={album} />
                       ))}
                     </div>
