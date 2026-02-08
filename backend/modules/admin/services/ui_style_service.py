@@ -30,6 +30,17 @@ AVAILABLE_TEMPLATES = [
     {"id": "warm", "name": "Warm", "description": "Inviting design with warm orange and cream palette", "preview_colors": ["#ea580c", "#fff7ed", "#431407"]},
     {"id": "ocean", "name": "Ocean", "description": "Cool blue tones with crisp white backgrounds", "preview_colors": ["#0284c7", "#f0f9ff", "#0c4a6e"]},
     {"id": "minimal", "name": "Minimal", "description": "Ultra-clean black and white with sharp contrasts", "preview_colors": ["#18181b", "#fafafa", "#52525b"]},
+    {"id": "china_panama", "name": "China-Panama", "description": "Cultural fusion — Chinese red & gold with Panama blue", "preview_colors": ["#dc2626", "#fbbf24", "#1d4ed8"]},
+]
+
+AVAILABLE_LAYOUTS = [
+    {"id": "mobile_app", "name": "Mobile App", "description": "Bottom tab nav, full-width cards, minimal header — native app feel", "icon": "smartphone"},
+    {"id": "storefront", "name": "Storefront", "description": "Top category menu, hero banners, product grid — shopping experience", "icon": "store"},
+    {"id": "portal", "name": "Portal", "description": "Left sidebar nav + top bar, content panels — returning users", "icon": "layout-dashboard"},
+    {"id": "single_page", "name": "Single Page", "description": "Scrollable sections, sticky nav, anchor links — landing/marketing", "icon": "scroll"},
+    {"id": "chat_app", "name": "Chat / App", "description": "Full-height layout, floating action button, swipe panels — community", "icon": "message-circle"},
+    {"id": "card_grid", "name": "Card Grid", "description": "Masonry grid, filter bar, infinite scroll — content discovery", "icon": "grid-3x3"},
+    {"id": "china_panama", "name": "China-Panama", "description": "Cultural fusion — lattice-inspired frames, red lantern accents, balanced symmetry", "icon": "globe"},
 ]
 
 
