@@ -613,10 +613,10 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
               </div>
             ))}
             <div className="flex gap-2">
-              <Input placeholder="value" value={newOption.value} onChange={e => setNewOption(p => ({ ...p, value: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Input placeholder="value (auto)" value={newOption.value} onChange={e => { setOptEdited(p => ({ ...p, value: true })); setNewOption(p => ({ ...p, value: e.target.value })); }} className="h-7 text-xs flex-1 font-mono" />
               <Input placeholder="Label EN (auto)" value={newOption.label_en} onChange={e => handleOptionEnChange(e.target.value)} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label ES (auto)" value={newOption.label_es} onChange={e => setNewOption(p => ({ ...p, label_es: e.target.value }))} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label ZH (auto)" value={newOption.label_zh} onChange={e => setNewOption(p => ({ ...p, label_zh: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label ES (auto)" value={newOption.label_es} onChange={e => handleOptionEsChange(e.target.value)} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label ZH (auto)" value={newOption.label_zh} onChange={e => handleOptionZhChange(e.target.value)} className="h-7 text-xs flex-1" />
               <Button size="sm" variant="outline" className="h-7 text-xs shrink-0" onClick={addOption}>Add</Button>
             </div>
           </div>
