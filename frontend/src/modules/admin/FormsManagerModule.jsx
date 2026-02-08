@@ -421,7 +421,7 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
     options: field?.options || [],
   });
 
-  const [newOption, setNewOption] = useState({ value: '', label_en: '', label_es: '' });
+  const [newOption, setNewOption] = useState({ value: '', label_en: '', label_es: '', label_zh: '' });
 
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
