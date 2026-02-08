@@ -313,7 +313,7 @@ const DENSITY_VARS = {
 
 /**
  * Apply UI style to the document
- * @param {object} style - { template, primary_color, font_family, border_radius, card_style }
+ * @param {object} style - { template, primary_color, font_family, border_radius, card_style, density }
  * @param {string} mode - 'light' or 'dark'
  */
 export function applyUIStyle(style, mode = 'light') {
@@ -358,6 +358,14 @@ export function applyUIStyle(style, mode = 'light') {
     root.style.setProperty('--font-sans', `'${style.font_family}', system-ui, sans-serif`);
     document.body.style.fontFamily = `'${style.font_family}', system-ui, sans-serif`;
   }
+
+  // Apply density
+  const density = style.density || 'comfortable';
+  const densityVars = DENSITY_VARS[density] || DENSITY_VARS.comfortable;
+  Object.entries(densityVars).forEach(([key, value]) => {
+    root.style.setProperty(key, value);
+  });
+  root.dataset.density = density;
 
   // Apply card style via data attribute (CSS picks it up)
   root.dataset.cardStyle = style.card_style || 'elevated';
