@@ -76,7 +76,7 @@ LOADER_JS_TEMPLATE = """
 
   var frame = document.createElement('iframe');
   frame.id = 'chipi-widget-frame';
-  frame.src = API_URL.replace('/api','') + '/embed/widget';
+  frame.src = API_URL + '/embed/widget';
   frame.allow = 'clipboard-write';
   var sidebarPx = parseInt(sidebarWidth) || 380;
   frame.style.cssText = 'position:fixed; width:' + sidebarWidth + '; height:100vh; top:0; right:-' + (sidebarPx + 20) + 'px; box-shadow:-4px 0 30px rgba(0,0,0,0.15); border-radius:0;';
