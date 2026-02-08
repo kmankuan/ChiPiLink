@@ -249,7 +249,7 @@ function FormFieldEditor({ formType, onBack }) {
         {fields.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
-              No fields configured. Click "Add Field" to start.
+              {t.noFields}
             </CardContent>
           </Card>
         )}
