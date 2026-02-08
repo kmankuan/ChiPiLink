@@ -9,7 +9,7 @@ from typing import Optional, List
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from core.database import get_db
+from core.database import get_database
 from modules.auth.dependencies import get_admin_user
 
 router = APIRouter(prefix="/translations", tags=["Translation Dictionary"])
@@ -34,7 +34,7 @@ class DictionaryEntryUpdate(BaseModel):
 @router.get("/dictionary")
 async def get_dictionary():
     """Public: get full translation dictionary (frontend caches this)"""
-    db = await get_db()
+    db = get_database()
     entries = await db.translation_dictionary.find({}, {"_id": 0}).to_list(5000)
     
     # If empty, seed defaults
@@ -53,7 +53,7 @@ async def admin_get_dictionary(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: get dictionary with optional filters"""
-    db = await get_db()
+    db = get_database()
     query = {}
     if category:
         query["category"] = category
@@ -80,7 +80,7 @@ async def admin_add_entry(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: add a new dictionary entry"""
-    db = await get_db()
+    db = get_database()
     
     # Check for duplicate EN key
     existing = await db.translation_dictionary.find_one({"en": {"$regex": f"^{entry.en}$", "$options": "i"}})
@@ -108,7 +108,7 @@ async def admin_update_entry(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: update a dictionary entry"""
-    db = await get_db()
+    db = get_database()
     update = {k: v for k, v in data.model_dump(exclude_unset=True).items() if v is not None}
     if not update:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -128,7 +128,7 @@ async def admin_delete_entry(
     admin: dict = Depends(get_admin_user)
 ):
     """Admin: delete a dictionary entry"""
-    db = await get_db()
+    db = get_database()
     result = await db.translation_dictionary.delete_one({"term_id": term_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Entry not found")
@@ -138,7 +138,7 @@ async def admin_delete_entry(
 @router.get("/admin/dictionary/categories")
 async def admin_get_categories(admin: dict = Depends(get_admin_user)):
     """Admin: get all distinct categories"""
-    db = await get_db()
+    db = get_database()
     categories = await db.translation_dictionary.distinct("category")
     return {"categories": categories}
 
