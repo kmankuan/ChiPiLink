@@ -382,10 +382,14 @@ export function clearUIStyle() {
     '--secondary', '--secondary-foreground', '--muted', '--muted-foreground',
     '--accent', '--accent-foreground', '--destructive', '--destructive-foreground',
     '--border', '--input', '--ring', '--radius', '--font-sans',
+    '--density-padding', '--density-padding-lg', '--density-gap', '--density-gap-lg',
+    '--density-text-sm', '--density-text-base', '--density-text-lg', '--density-line-height',
+    '--density-radius-scale',
   ];
   allVars.forEach(v => root.style.removeProperty(v));
   document.body.style.fontFamily = '';
   delete root.dataset.cardStyle;
+  delete root.dataset.density;
 }
 
-export { TEMPLATE_PRESETS };
+export { TEMPLATE_PRESETS, DENSITY_VARS };
