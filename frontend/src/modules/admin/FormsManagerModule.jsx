@@ -474,13 +474,13 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   // Auto-translate option labels when English is typed
   const handleOptionEnChange = (val) => {
     const tr = coreTranslate(val, 'en');
-    setNewOption(p => ({ ...p, label_en: val, label_es: p.label_es || tr.es || '' }));
+    setNewOption(p => ({ ...p, label_en: val, label_es: p.label_es || tr.es || '', label_zh: p.label_zh || tr.zh || '' }));
   };
 
   const addOption = () => {
     if (!newOption.value || !newOption.label_en) return;
     set('options', [...form.options, { ...newOption }]);
-    setNewOption({ value: '', label_en: '', label_es: '' });
+    setNewOption({ value: '', label_en: '', label_es: '', label_zh: '' });
   };
 
   const removeOption = (idx) => {
