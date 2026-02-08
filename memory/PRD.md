@@ -70,7 +70,9 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 - Monday.com Sub-item Workflow
 - Textbook Ordering UI Redesign (accordion-style)
 - Centralized Forms Manager with field CRUD
-- Core Auto-Translate Service (bidirectional EN<>ES<>ZH)
+- Core Auto-Translate Service (bidirectional EN<>ES<>ZH) with explicit translate icon buttons
+- Translate icon (Languages) replaces auto-translate-on-typing: user types label, clicks icon to fill other languages
+- Fallback on save: empty ES/ZH fields auto-fill with EN content
 - Form Manager UX Fixes (inline editor, reset button)
 - User-facing Student Profile Lock/Unlock
 - Re-order request flow, Admin School Year config
