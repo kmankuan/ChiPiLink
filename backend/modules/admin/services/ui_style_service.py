@@ -89,8 +89,12 @@ class UIStyleService:
     async def get_public_style(self) -> Dict:
         config = await db.app_config.find_one({"config_key": "ui_style"}, {"_id": 0})
         if config and config.get("value"):
-            return {"style": config["value"]}
-        return {"style": DEFAULT_UI_STYLE}
+            style = config["value"]
+            # Return public-specific style if available, else root-level
+            public_style = style.get("public", {k: v for k, v in style.items() if k not in ("public", "admin")})
+            admin_style = style.get("admin", {**DEFAULT_STYLE_BASE, "template": "minimal", "density": "compact"})
+            return {"public": public_style, "admin": admin_style}
+        return {"public": DEFAULT_STYLE_BASE, "admin": {**DEFAULT_STYLE_BASE, "template": "minimal", "density": "compact"}}
 
 
 ui_style_service = UIStyleService()
