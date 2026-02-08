@@ -570,19 +570,21 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
             <Label className="text-xs font-medium">Dropdown Options</Label>
             {form.options.map((opt, idx) => (
               <div key={idx} className="flex items-center gap-2 text-xs bg-muted/50 rounded px-2 py-1.5">
-                <span className="font-mono text-muted-foreground">{opt.value}</span>
-                <span className="flex-1">{opt.label_en}</span>
-                <span className="text-muted-foreground">{opt.label_es}</span>
-                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => removeOption(idx)}>
+                <span className="font-mono text-muted-foreground shrink-0">{opt.value}</span>
+                <span className="flex-1 truncate">{opt.label_en}</span>
+                <span className="text-muted-foreground truncate">{opt.label_es}</span>
+                <span className="text-muted-foreground truncate">{opt.label_zh}</span>
+                <Button variant="ghost" size="icon" className="h-5 w-5 shrink-0" onClick={() => removeOption(idx)}>
                   <X className="h-3 w-3" />
                 </Button>
               </div>
             ))}
             <div className="flex gap-2">
               <Input placeholder="value" value={newOption.value} onChange={e => setNewOption(p => ({ ...p, value: e.target.value }))} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label EN (auto-translates)" value={newOption.label_en} onChange={e => handleOptionEnChange(e.target.value)} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label EN (auto)" value={newOption.label_en} onChange={e => handleOptionEnChange(e.target.value)} className="h-7 text-xs flex-1" />
               <Input placeholder="Label ES (auto)" value={newOption.label_es} onChange={e => setNewOption(p => ({ ...p, label_es: e.target.value }))} className="h-7 text-xs flex-1" />
-              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={addOption}>Add</Button>
+              <Input placeholder="Label ZH (auto)" value={newOption.label_zh} onChange={e => setNewOption(p => ({ ...p, label_zh: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Button size="sm" variant="outline" className="h-7 text-xs shrink-0" onClick={addOption}>Add</Button>
             </div>
           </div>
         )}
