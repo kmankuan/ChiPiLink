@@ -56,7 +56,7 @@ function TemplateCard({ template, isSelected, onSelect }) {
   );
 }
 
-function StyleEditor({ style, onChange, templates, fonts, densityOptions }) {
+function StyleEditor({ style, onChange, templates, fonts, densityOptions, layouts }) {
   const update = (key, value) => onChange({ ...style, [key]: value });
 
   return (
