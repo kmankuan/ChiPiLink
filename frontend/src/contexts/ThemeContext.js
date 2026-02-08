@@ -31,6 +31,25 @@ export function ThemeProvider({ children }) {
   // Fetch UI style from API on mount
   useEffect(() => {
     const fetchStyle = async () => {
+      // Check for preview mode (admin previewing unsaved public theme)
+      const urlParams = new URLSearchParams(window.location.search);
+      const isPreview = urlParams.get('preview_theme') === '1';
+
+      if (isPreview) {
+        try {
+          const previewRaw = localStorage.getItem('chipi_preview_style');
+          if (previewRaw) {
+            const previewStyle = JSON.parse(previewRaw);
+            setUIStyles({ public: previewStyle, admin: previewStyle });
+            // Clean up after loading — one-time use
+            localStorage.removeItem('chipi_preview_style');
+            return;
+          }
+        } catch {
+          // Fall through to normal fetch
+        }
+      }
+
       try {
         const { data } = await axios.get(`${API_URL}/api/public/ui-style`);
         // Handle both old format ({style: ...}) and new format ({public: ..., admin: ...})
