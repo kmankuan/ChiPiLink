@@ -290,11 +290,7 @@ function FormFieldEditor({ formType, onBack }) {
 
 /* ============ Field Form (Add / Edit) ============ */
 function FieldForm({ field, isNew, saving, onSave, onCancel }) {
-  // Use the core auto-translate hook
   const { translate: coreTranslate, toFieldKey: coreToFieldKey } = useAutoTranslate();
-  
-  // Track which fields the user has manually edited (to avoid overwriting)
-  const [userEdited, setUserEdited] = useState({ field_key: false, label_es: false, label_zh: false });
 
   const [form, setForm] = useState({
     field_key: field?.field_key || '',
@@ -316,95 +312,99 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
-  // Reset labels + key + re-enable auto-translate
-  const handleReset = () => {
-    setForm(p => ({ ...p, label_en: '', label_es: '', label_zh: '', field_key: isNew ? '' : p.field_key }));
-    setUserEdited({ field_key: false, label_es: false, label_zh: false });
-  };
-
-  // When English label changes: auto-generate key + auto-translate ES/ZH
+  // EN label change: only auto-generate field key (no auto-translate)
   const handleEnLabelChange = (val) => {
     const updates = { label_en: val };
-    if (isNew && !userEdited.field_key) {
-      updates.field_key = coreToFieldKey(val);
+    if (isNew) updates.field_key = coreToFieldKey(val);
+    setForm(p => ({ ...p, ...updates }));
+  };
+
+  // Reset labels + key
+  const handleReset = () => {
+    setForm(p => ({ ...p, label_en: '', label_es: '', label_zh: '', field_key: isNew ? '' : p.field_key }));
+  };
+
+  // Translate button: fill ES/ZH from whichever language has content
+  const handleTranslateLabels = () => {
+    const updates = {};
+    if (form.label_en) {
+      const tr = coreTranslate(form.label_en, 'en');
+      if (tr.es) updates.label_es = tr.es;
+      if (tr.zh) updates.label_zh = tr.zh;
+    } else if (form.label_es) {
+      const tr = coreTranslate(form.label_es, 'es');
+      if (tr.en) { updates.label_en = tr.en; if (isNew) updates.field_key = coreToFieldKey(tr.en); }
+      if (tr.zh) updates.label_zh = tr.zh;
+    } else if (form.label_zh) {
+      const tr = coreTranslate(form.label_zh, 'zh');
+      if (tr.en) { updates.label_en = tr.en; if (isNew) updates.field_key = coreToFieldKey(tr.en); }
+      if (tr.es) updates.label_es = tr.es;
     }
-    const tr = coreTranslate(val, 'en');
-    if (!userEdited.label_es && tr.es) updates.label_es = tr.es;
-    if (!userEdited.label_zh && tr.zh) updates.label_zh = tr.zh;
-    setForm(p => ({ ...p, ...updates }));
+    if (Object.keys(updates).length > 0) {
+      setForm(p => ({ ...p, ...updates }));
+      toast.success('Translated!');
+    } else {
+      toast.info('No translation found in dictionary');
+    }
   };
 
-  // When Spanish label changes: auto-translate EN/ZH
-  const handleEsLabelChange = (val) => {
-    setUserEdited(p => ({ ...p, label_es: true }));
-    const updates = { label_es: val };
-    const tr = coreTranslate(val, 'es');
-    if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
-    if (tr.zh && !userEdited.label_zh && !form.label_zh) updates.label_zh = tr.zh;
-    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = coreToFieldKey(tr.en);
-    setForm(p => ({ ...p, ...updates }));
+  // Translate button for a single option row (new option input)
+  const handleTranslateOption = () => {
+    const updates = {};
+    if (newOption.label_en) {
+      const tr = coreTranslate(newOption.label_en, 'en');
+      if (tr.es) updates.label_es = tr.es;
+      if (tr.zh) updates.label_zh = tr.zh;
+      if (!newOption.value) updates.value = newOption.label_en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+    } else if (newOption.label_es) {
+      const tr = coreTranslate(newOption.label_es, 'es');
+      if (tr.en) { updates.label_en = tr.en; if (!newOption.value) updates.value = tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_'); }
+      if (tr.zh) updates.label_zh = tr.zh;
+    } else if (newOption.label_zh) {
+      const tr = coreTranslate(newOption.label_zh, 'zh');
+      if (tr.en) { updates.label_en = tr.en; if (!newOption.value) updates.value = tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_'); }
+      if (tr.es) updates.label_es = tr.es;
+    }
+    if (Object.keys(updates).length > 0) {
+      setNewOption(p => ({ ...p, ...updates }));
+      toast.success('Translated!');
+    } else {
+      toast.info('No translation found in dictionary');
+    }
   };
 
-  // When Chinese label changes: auto-translate EN/ES
-  const handleZhLabelChange = (val) => {
-    setUserEdited(p => ({ ...p, label_zh: true }));
-    const updates = { label_zh: val };
-    const tr = coreTranslate(val, 'zh');
-    if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
-    if (tr.es && !userEdited.label_es && !form.label_es) updates.label_es = tr.es;
-    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = coreToFieldKey(tr.en);
-    setForm(p => ({ ...p, ...updates }));
-  };
-
-  // Mark field as manually edited when user changes it directly
-  const handleManualEdit = (key, val) => {
-    setUserEdited(p => ({ ...p, [key]: true }));
-    set(key, val);
-  };
-
-  // Auto-translate option labels — bidirectional
-  const [optEdited, setOptEdited] = useState({ value: false, label_es: false, label_zh: false });
-
-  const handleOptionEnChange = (val) => {
-    const tr = coreTranslate(val, 'en');
-    setNewOption(p => ({
-      ...p,
-      label_en: val,
-      value: !optEdited.value ? val.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
-      label_es: !optEdited.label_es && tr.es ? tr.es : p.label_es,
-      label_zh: !optEdited.label_zh && tr.zh ? tr.zh : p.label_zh,
-    }));
-  };
-
-  const handleOptionEsChange = (val) => {
-    setOptEdited(p => ({ ...p, label_es: true }));
-    const tr = coreTranslate(val, 'es');
-    setNewOption(p => ({
-      ...p,
-      label_es: val,
-      label_en: !p.label_en && tr.en ? tr.en : p.label_en,
-      label_zh: !optEdited.label_zh && tr.zh ? tr.zh : p.label_zh,
-      value: !optEdited.value && !p.value && tr.en ? tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
-    }));
-  };
-
-  const handleOptionZhChange = (val) => {
-    setOptEdited(p => ({ ...p, label_zh: true }));
-    const tr = coreTranslate(val, 'zh');
-    setNewOption(p => ({
-      ...p,
-      label_zh: val,
-      label_en: !p.label_en && tr.en ? tr.en : p.label_en,
-      label_es: !optEdited.label_es && tr.es ? tr.es : p.label_es,
-      value: !optEdited.value && !p.value && tr.en ? tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
-    }));
+  // Translate an existing option in the list
+  const handleTranslateExistingOption = (idx) => {
+    const opt = form.options[idx];
+    const updates = {};
+    if (opt.label_en) {
+      const tr = coreTranslate(opt.label_en, 'en');
+      if (tr.es) updates.label_es = tr.es;
+      if (tr.zh) updates.label_zh = tr.zh;
+    }
+    if (Object.keys(updates).length > 0) {
+      const newOptions = [...form.options];
+      newOptions[idx] = { ...newOptions[idx], ...updates };
+      set('options', newOptions);
+      toast.success('Option translated!');
+    } else {
+      toast.info('No translation found');
+    }
   };
 
   const addOption = () => {
-    if (!newOption.value || !newOption.label_en) return;
-    set('options', [...form.options, { ...newOption }]);
+    if (!newOption.label_en) return;
+    // Auto-generate value from EN if empty
+    const value = newOption.value || newOption.label_en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_');
+    // Fallback: copy EN to empty ES/ZH
+    const finalOption = {
+      value,
+      label_en: newOption.label_en,
+      label_es: newOption.label_es || newOption.label_en,
+      label_zh: newOption.label_zh || newOption.label_en,
+    };
+    set('options', [...form.options, finalOption]);
     setNewOption({ value: '', label_en: '', label_es: '', label_zh: '' });
-    setOptEdited({ value: false, label_es: false, label_zh: false });
   };
 
   const removeOption = (idx) => {
@@ -416,7 +416,16 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
       toast.error('Field key and English label are required');
       return;
     }
+    // Fallback: copy EN to empty ES/ZH on save
     const payload = { ...form };
+    if (!payload.label_es) payload.label_es = payload.label_en;
+    if (!payload.label_zh) payload.label_zh = payload.label_en;
+    // Same fallback for options
+    payload.options = payload.options.map(opt => ({
+      ...opt,
+      label_es: opt.label_es || opt.label_en,
+      label_zh: opt.label_zh || opt.label_en,
+    }));
     if (!isNew) payload.field_id = field.field_id;
     onSave(payload, isNew);
   };
