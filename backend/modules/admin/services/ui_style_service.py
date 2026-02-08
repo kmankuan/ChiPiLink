@@ -61,9 +61,16 @@ class UIStyleService:
     async def get_style(self) -> Dict:
         config = await db.app_config.find_one({"config_key": "ui_style"}, {"_id": 0})
         style = config.get("value", DEFAULT_UI_STYLE) if config else DEFAULT_UI_STYLE
+        # Ensure public/admin sub-objects exist for backward compatibility
+        if "public" not in style:
+            style["public"] = {k: v for k, v in style.items() if k not in ("public", "admin")}
+        if "admin" not in style:
+            style["admin"] = {**DEFAULT_STYLE_BASE, "template": "minimal", "density": "compact"}
         return {
             "style": style,
             "available_templates": AVAILABLE_TEMPLATES,
+            "available_fonts": AVAILABLE_FONTS,
+            "density_options": DENSITY_OPTIONS,
         }
 
     async def update_style(self, style: Dict, admin_id: str) -> bool:
