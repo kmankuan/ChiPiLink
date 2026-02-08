@@ -190,6 +190,86 @@ class FormConfigRepository(BaseRepository):
             
             return created_fields
         
+        if form_type == "order_form":
+            default_fields = [
+                {
+                    "form_type": "order_form",
+                    "field_key": "payment_method",
+                    "field_type": "select",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 0,
+                    "label_en": "Payment Method",
+                    "label_es": "Método de Pago",
+                    "label_zh": "支付方式",
+                    "help_text_en": "Select how you will pay",
+                    "help_text_es": "Selecciona cómo pagarás",
+                    "help_text_zh": "选择您的付款方式",
+                    "options": [
+                        {"value": "bank_transfer", "label_en": "Bank Transfer", "label_es": "Transferencia Bancaria", "label_zh": "银行转账"},
+                        {"value": "yappy", "label_en": "Yappy", "label_es": "Yappy", "label_zh": "Yappy"},
+                        {"value": "cash", "label_en": "Cash", "label_es": "Efectivo", "label_zh": "现金"},
+                        {"value": "other", "label_en": "Other", "label_es": "Otro", "label_zh": "其他"}
+                    ]
+                },
+                {
+                    "form_type": "order_form",
+                    "field_key": "payment_reference",
+                    "field_type": "text",
+                    "is_required": False,
+                    "is_system": False,
+                    "order": 1,
+                    "label_en": "Payment Reference",
+                    "label_es": "Referencia de Pago",
+                    "label_zh": "付款参考号",
+                    "placeholder_en": "e.g., Transaction ID or confirmation number",
+                    "placeholder_es": "ej: ID de transacción o número de confirmación",
+                    "placeholder_zh": "例如：交易ID或确认号",
+                    "help_text_en": "Enter your payment confirmation or reference number",
+                    "help_text_es": "Ingresa tu confirmación o número de referencia de pago",
+                    "help_text_zh": "输入您的付款确认或参考号码"
+                },
+                {
+                    "form_type": "order_form",
+                    "field_key": "payment_receipt",
+                    "field_type": "file",
+                    "is_required": True,
+                    "is_system": True,
+                    "order": 2,
+                    "label_en": "Payment Receipt",
+                    "label_es": "Comprobante de Pago",
+                    "label_zh": "付款收据",
+                    "placeholder_en": "Upload payment receipt",
+                    "placeholder_es": "Subir comprobante de pago",
+                    "placeholder_zh": "上传付款收据",
+                    "help_text_en": "Upload your bank transfer receipt (PDF, JPG, PNG)",
+                    "help_text_es": "Sube tu comprobante de transferencia (PDF, JPG, PNG)",
+                    "help_text_zh": "上传您的银行转账收据 (PDF, JPG, PNG)"
+                },
+                {
+                    "form_type": "order_form",
+                    "field_key": "notes",
+                    "field_type": "textarea",
+                    "is_required": False,
+                    "is_system": False,
+                    "order": 3,
+                    "label_en": "Additional Notes",
+                    "label_es": "Notas Adicionales",
+                    "label_zh": "附加说明",
+                    "placeholder_en": "Any additional information about your order",
+                    "placeholder_es": "Cualquier información adicional sobre tu pedido",
+                    "placeholder_zh": "关于您的订单的任何附加信息",
+                    "max_length": 500
+                }
+            ]
+
+            created_fields = []
+            for field_data in default_fields:
+                created = await self.create(field_data)
+                created_fields.append(created)
+
+            return created_fields
+
         if form_type == "student_linking":
             default_fields = [
                 {
