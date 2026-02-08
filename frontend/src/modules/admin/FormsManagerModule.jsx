@@ -288,8 +288,9 @@ function FormFieldEditor({ formType, onBack }) {
   );
 }
 
-/* ============ Translation Dictionary ============ */
-const TRANSLATIONS = {
+/* ============ Field Form (Add / Edit) — dead code removed, using useAutoTranslate hook ============ */
+/* REMOVED: Local TRANSLATIONS dictionary, autoTranslate(), toFieldKey() — replaced by useAutoTranslate hook */
+const _DEAD_CODE_REMOVED = {
   // Common form fields
   'first name': { es: 'Nombre', zh: '名' },
   'last name': { es: 'Apellido', zh: '姓' },
