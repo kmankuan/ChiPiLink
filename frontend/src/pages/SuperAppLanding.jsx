@@ -618,8 +618,8 @@ export default function SuperAppLanding() {
               case 'announcements':
                 if (!anuncios || anuncios.length === 0) return null;
                 return (
-                  <section key={block.id} data-block="announcements" className="bg-primary/5 rounded-2xl p-4 md:p-6">
-                    <div className="flex items-start gap-4">
+                  <section key={block.id} data-block="announcements" className="mx-4 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+                    <div className="flex items-center gap-2.5">
                       <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
                         <Bell className="h-5 w-5 text-primary" />
                       </div>
