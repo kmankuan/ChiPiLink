@@ -61,7 +61,38 @@ function StyleEditor({ style, onChange, templates, fonts, densityOptions, layout
 
   return (
     <div className="space-y-4">
-      {/* Templates */}
+      {/* Page Layout */}
+      {layouts && layouts.length > 0 && (
+        <div>
+          <Label className="text-xs font-medium mb-2 block flex items-center gap-1">
+            <LayoutGrid className="h-3 w-3" /> Page Layout
+          </Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {layouts.map((layout) => (
+              <button
+                key={layout.id}
+                onClick={() => update('layout', layout.id)}
+                data-testid={`layout-${layout.id}`}
+                className={`relative p-2.5 rounded-xl border-2 transition-all text-left ${
+                  style.layout === layout.id
+                    ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                {style.layout === layout.id && (
+                  <div className="absolute top-1.5 right-1.5">
+                    <Check className="h-3 w-3 text-primary" />
+                  </div>
+                )}
+                <p className="font-medium text-xs">{layout.name}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{layout.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Color Theme */}
       <div>
         <Label className="text-xs font-medium mb-2 block">Color Theme</Label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
