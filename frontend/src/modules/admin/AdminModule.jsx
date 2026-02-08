@@ -29,6 +29,7 @@ import AuthMethodsConfig from './AuthMethodsConfig';
 import DatabaseMigrationModule from './DatabaseMigrationModule';
 import ModuleStatusModule from './ModuleStatusModule';
 import UIStyleModule from './UIStyleModule';
+import WidgetManagerModule from './WidgetManagerModule';
 
 export default function AdminModule() {
   return (
