@@ -33,6 +33,28 @@ AVAILABLE_TEMPLATES = [
 ]
 
 
+AVAILABLE_FONTS = [
+    {"value": "Inter", "label": "Inter", "category": "sans-serif"},
+    {"value": "Poppins", "label": "Poppins", "category": "sans-serif"},
+    {"value": "DM Sans", "label": "DM Sans", "category": "sans-serif"},
+    {"value": "Nunito", "label": "Nunito", "category": "sans-serif"},
+    {"value": "Lora", "label": "Lora", "category": "serif"},
+    {"value": "Source Sans 3", "label": "Source Sans 3", "category": "sans-serif"},
+    {"value": "Noto Sans", "label": "Noto Sans", "category": "sans-serif"},
+    {"value": "Rubik", "label": "Rubik", "category": "sans-serif"},
+    {"value": "Outfit", "label": "Outfit", "category": "sans-serif"},
+    {"value": "Space Grotesk", "label": "Space Grotesk", "category": "sans-serif"},
+    {"value": "Merriweather", "label": "Merriweather", "category": "serif"},
+    {"value": "Playfair Display", "label": "Playfair Display", "category": "serif"},
+]
+
+DENSITY_OPTIONS = [
+    {"value": "compact", "label": "Compact", "description": "Dense layout, smaller spacing — native-app feel"},
+    {"value": "comfortable", "label": "Comfortable", "description": "Balanced spacing — default"},
+    {"value": "spacious", "label": "Spacious", "description": "Generous padding and whitespace"},
+]
+
+
 class UIStyleService:
     """Service for managing UI style/theme configuration"""
 
