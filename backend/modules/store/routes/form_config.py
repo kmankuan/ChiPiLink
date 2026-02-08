@@ -35,6 +35,58 @@ async def get_field_types():
 
 # ============== ADMIN ENDPOINTS ==============
 
+# Form type registry — describes all available form types in the app
+FORM_TYPE_REGISTRY = [
+    {
+        "form_type": "student_linking",
+        "label_en": "Student Linking Form",
+        "label_es": "Formulario de Vinculación de Estudiantes",
+        "label_zh": "学生关联表单",
+        "description_en": "Fields shown when parents link a student to their account",
+        "description_es": "Campos que se muestran cuando los padres vinculan un estudiante",
+        "description_zh": "家长将学生关联到帐户时显示的字段",
+        "icon": "user-plus",
+        "module": "store",
+    },
+    {
+        "form_type": "textbook_access",
+        "label_en": "Textbook Access Request",
+        "label_es": "Solicitud de Acceso a Textos",
+        "label_zh": "教科书访问请求",
+        "description_en": "Fields for the textbook access request form",
+        "description_es": "Campos del formulario de solicitud de acceso a textos",
+        "description_zh": "教科书访问请求表单的字段",
+        "icon": "book-open",
+        "module": "store",
+    },
+    {
+        "form_type": "order_form",
+        "label_en": "Order Form",
+        "label_es": "Formulario de Pedido",
+        "label_zh": "订单表单",
+        "description_en": "Public order form configuration and fields",
+        "description_es": "Configuración y campos del formulario de pedido público",
+        "description_zh": "公共订单表单配置和字段",
+        "icon": "shopping-cart",
+        "module": "store",
+    },
+]
+
+
+@router.get("/admin/form-types/list")
+async def list_form_types(admin: dict = Depends(get_admin_user)):
+    """List all available form types with their metadata and field counts"""
+    result = []
+    for ft in FORM_TYPE_REGISTRY:
+        fields = await form_config_service.get_form_fields(ft["form_type"], include_inactive=True)
+        result.append({
+            **ft,
+            "total_fields": fields.get("total_fields", 0),
+            "required_fields": fields.get("required_fields", 0),
+        })
+    return {"form_types": result}
+
+
 @router.get("/admin/{form_type}")
 async def get_form_config_admin(
     form_type: str,
