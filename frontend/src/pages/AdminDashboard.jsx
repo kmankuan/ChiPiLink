@@ -80,11 +80,17 @@ const navItems = [
 export default function AdminDashboard() {
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, setScope } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Switch to admin theme scope on mount, restore on unmount
+  useEffect(() => {
+    setScope('admin');
+    return () => setScope('public');
+  }, [setScope]);
 
   // Get active module from URL hash (default to 'dashboard')
   const activeModule = location.hash.replace('#', '') || 'dashboard';
