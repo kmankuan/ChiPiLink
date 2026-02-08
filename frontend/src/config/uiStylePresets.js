@@ -265,6 +265,50 @@ const FONT_URLS = {
   'DM Sans': null, // Already loaded in index.css
   'Nunito': 'https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap',
   'Lora': 'https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap',
+  'Source Sans 3': 'https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap',
+  'Noto Sans': 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap',
+  'Rubik': 'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap',
+  'Outfit': 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
+  'Space Grotesk': 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap',
+  'Merriweather': 'https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap',
+  'Playfair Display': 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap',
+};
+
+// Density CSS variable sets
+const DENSITY_VARS = {
+  compact: {
+    '--density-padding': '0.375rem',
+    '--density-padding-lg': '0.75rem',
+    '--density-gap': '0.375rem',
+    '--density-gap-lg': '0.75rem',
+    '--density-text-sm': '0.75rem',
+    '--density-text-base': '0.8125rem',
+    '--density-text-lg': '0.875rem',
+    '--density-line-height': '1.35',
+    '--density-radius-scale': '0.8',
+  },
+  comfortable: {
+    '--density-padding': '0.75rem',
+    '--density-padding-lg': '1.25rem',
+    '--density-gap': '0.5rem',
+    '--density-gap-lg': '1rem',
+    '--density-text-sm': '0.8125rem',
+    '--density-text-base': '0.875rem',
+    '--density-text-lg': '1rem',
+    '--density-line-height': '1.5',
+    '--density-radius-scale': '1',
+  },
+  spacious: {
+    '--density-padding': '1.25rem',
+    '--density-padding-lg': '2rem',
+    '--density-gap': '0.75rem',
+    '--density-gap-lg': '1.5rem',
+    '--density-text-sm': '0.875rem',
+    '--density-text-base': '1rem',
+    '--density-text-lg': '1.125rem',
+    '--density-line-height': '1.65',
+    '--density-radius-scale': '1.2',
+  },
 };
 
 /**
