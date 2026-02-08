@@ -5,6 +5,7 @@ import os
 import json
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
+from core.auth import get_admin_user
 from .service import widget_config_service
 
 router = APIRouter(prefix="/widget", tags=["Widget"])
@@ -19,18 +20,12 @@ async def get_embed_config():
 
 # ── Admin: full config CRUD ─────────────────────────────────
 @router.get("/admin/config")
-async def get_widget_config(request: Request):
-    from core.auth import get_admin_user, get_current_user
-    user = await get_current_user(request)
-    admin = await get_admin_user(user)
+async def get_widget_config(admin: dict = Depends(get_admin_user)):
     return await widget_config_service.get_config()
 
 
 @router.put("/admin/config")
-async def update_widget_config(request: Request):
-    from core.auth import get_admin_user, get_current_user
-    user = await get_current_user(request)
-    admin = await get_admin_user(user)
+async def update_widget_config(request: Request, admin: dict = Depends(get_admin_user)):
     body = await request.json()
     return await widget_config_service.update_config(body, admin.get("user_id"))
 
@@ -118,7 +113,6 @@ LOADER_JS_TEMPLATE = """
 async def widget_loader_js(request: Request):
     """Serve the lightweight widget loader script for external sites."""
     config = await widget_config_service.get_public_config()
-    # Build the public base URL from the incoming request
     scheme = request.headers.get("x-forwarded-proto", "https")
     host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
     base_url = f"{scheme}://{host}"
