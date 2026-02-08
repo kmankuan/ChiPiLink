@@ -9,43 +9,53 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 ├── backend/          # FastAPI + MongoDB
 │   ├── modules/
 │   │   ├── auth/     # Authentication (LaoPan OAuth + Admin login)
-│   │   ├── store/    # Products, Orders, Private Catalog, Textbook Orders, School Year
-│   │   ├── admin/    # Admin routes, migrations
+│   │   ├── store/    # Products, Orders, Private Catalog, Textbook Orders, School Year, Form Config
+│   │   ├── admin/    # Admin routes, UI Style, migrations
+│   │   ├── landing/  # Public routes (UI style, site config)
 │   │   └── pinpanclub/ # Tournament system
 │   └── core/         # Base repository, auth middleware
 └── frontend/         # React + Tailwind + Shadcn UI
     ├── modules/
-    │   ├── account/students/MyStudentsSection.jsx  # ENHANCED - edit profile + lock awareness
-    │   ├── admin/store/TextbookOrdersAdminTab.jsx  # Reorder approval
-    │   ├── unatienda/
-    │   │   ├── tabs/SchoolYearTab.jsx              # School year config
-    │   │   ├── tabs/StudentsTab.jsx                # Admin student lock/unlock
-    │   │   └── UnatiendaModule.jsx
+    │   ├── account/     # User portal (students, profile)
+    │   ├── admin/       # Admin modules (Forms Manager, UI Style, Dictionary, etc.)
+    │   ├── unatienda/   # Store management
     │   └── ...
-    └── pages/Unatienda.jsx  # SchoolTextbooksView with reorder request
+    ├── contexts/        # ThemeContext (scope: public/admin), AuthContext, etc.
+    ├── hooks/           # useAutoTranslate, usePermissions, etc.
+    ├── config/          # uiStylePresets (templates, fonts, density)
+    └── pages/           # Route pages
 ```
 
 ## What's Been Implemented
 
-### February 7, 2026 — Session 3
+### February 8, 2026 — Session 5 (Current)
 
-**User-facing Student Profile Lock/Unlock:**
-- Added edit (pencil) button on approved student cards in My Students section
-- Edit dialog with fields: Full Name, Student Number, Relation
-- When LOCKED: Lock icon in title, amber banner explaining lock, all fields DISABLED, no Save button
-- When UNLOCKED: Pencil icon in title, all fields editable, Guardar (Save) button visible
-- Backend correctly rejects edits to locked profiles with "This student record is locked" error
-- Lock badge (amber) visible on student card when locked
+**UI Theme Enhancement:**
+- Separate Public Site / Admin Panel themes with independent configuration
+- 12 font families: Inter, Poppins, DM Sans, Nunito, Lora, Source Sans 3, Noto Sans, Rubik, Outfit, Space Grotesk, Merriweather, Playfair Display
+- 3 density options: Compact (native-app feel), Comfortable (default), Spacious
+- 5 color templates: Default, Elegant, Warm, Ocean, Minimal
+- ThemeContext supports scope switching (admin pages auto-switch to admin theme)
+- Live preview in admin settings
 
-### February 6, 2026 — Session 2
-- Re-order request flow on locked textbook items
-- Admin School Year configuration tab
-- Admin Student profile lock/unlock management
+**Order Form Seeded in Forms Manager:**
+- 4 default fields: Payment Method (select), Payment Reference (text), Payment Receipt (file), Notes (textarea)
+- Fully multilingual (EN/ES/ZH)
 
-### February 6, 2026 — Session 1
-- Fixed 6 textbook flow bugs
-- Redesigned SchoolTextbooksView with order-aware item statuses
-- Order status correctly "submitted" after any submission
+**Code Cleanup:**
+- Removed dead local TRANSLATIONS dictionary from FormsManagerModule.jsx (replaced by useAutoTranslate hook)
+
+### Earlier Sessions
+- Student Name Refactor (first_name/last_name split)
+- Monday.com Sub-item Workflow
+- Textbook Ordering UI Redesign (accordion-style)
+- Centralized Forms Manager with field CRUD
+- Core Auto-Translate Service (bidirectional EN<>ES<>ZH)
+- Form Manager UX Fixes (inline editor, reset button)
+- User-facing Student Profile Lock/Unlock
+- Re-order request flow, Admin School Year config
+- Textbook flow bug fixes
+- RBAC roles and permissions
 
 ## Business Rules
 1. Each textbook item ordered ONCE per student, locked after purchase
@@ -53,23 +63,15 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 3. Parents can buy partial textbooks, return for remaining
 4. Locked profiles prevent parents from editing student info
 5. Admin can lock/unlock any student profile
+6. Forms are database-driven, configurable via Forms Manager
 
 ## Known Issues
-- P3: Admin Sidebar occasionally disappears (tested OK all sessions)
+- P3: Admin Sidebar occasionally disappears
 - P4: Google Sign-Up OAuth flow broken (long-standing)
 
-## Upcoming Tasks
-1. OneSignal push notifications for order status changes
-2. P3/P4 bug fixes
-
-## Future/Backlog
-- Stripe payment, Google Sheets API, landing page templates
-- Teams/clans with rewards, ChipiPoints as payment
-- Email notifications for role assignments
-
 ## Test Credentials
-- Super Admin: teck@koh.one / Acdb##0897
-- Test Client: test@client.com / password
+- Admin: admin@libreria.com / admin (endpoint: /api/auth-v2/login)
+- Admin Dashboard: /admin/login
 
 ## 3rd Party Integrations
 - i18next/react-i18next, Monday.com, ipapi.co, Yappy Comercial BG, Invision Community/LaoPan OAuth
