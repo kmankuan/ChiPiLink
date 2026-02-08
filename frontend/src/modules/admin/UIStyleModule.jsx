@@ -269,6 +269,8 @@ export default function UIStyleModule() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setHasChanges(false);
+      // Clean up any leftover preview data
+      localStorage.removeItem('chipi_preview_style');
       await refreshUIStyle();
       toast.success('UI style saved and applied!');
     } catch {
@@ -276,6 +278,14 @@ export default function UIStyleModule() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handlePreviewAsUser = () => {
+    // Store the current unsaved public style in localStorage
+    localStorage.setItem('chipi_preview_style', JSON.stringify(fullStyle.public));
+    // Open the public landing page in a new tab with preview flag
+    window.open('/?preview_theme=1', '_blank');
+    toast.success('Preview opened in a new tab. Close the tab when done.');
   };
 
   if (loading || !fullStyle) {
