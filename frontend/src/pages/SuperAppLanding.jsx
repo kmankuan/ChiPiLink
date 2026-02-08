@@ -236,37 +236,25 @@ const EventCard = ({ evento }) => {
   const dateInfo = formatEventDate(evento.fecha_inicio);
 
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer group hover:shadow-lg transition-all"
+    <button
+      className="flex items-center gap-3 p-3 w-full text-left border-b border-border/30 last:border-0 active:bg-muted/30 transition-colors"
       onClick={() => navigate(`/comunidad/evento/${evento.evento_id}`)}
+      data-testid={`event-card-${evento.evento_id}`}
     >
-      <div className="flex">
-        <div className="w-20 flex-shrink-0 bg-primary/10 flex flex-col items-center justify-center p-3">
-          <span className="text-2xl font-bold text-primary">{dateInfo.day}</span>
-          <span className="text-xs font-medium text-primary">{dateInfo.month}</span>
-        </div>
-        <CardContent className="p-4 flex-1">
-          <h3 className="font-semibold line-clamp-1 mb-1 group-hover:text-primary transition-colors">
-            {evento.titulo}
-          </h3>
-          <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-            {evento.description}
-          </p>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {dateInfo.time}
-            </span>
-            {evento.ubicacion && (
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {evento.ubicacion}
-              </span>
-            )}
-          </div>
-        </CardContent>
+      <div className="w-14 h-14 rounded-xl bg-red-50 dark:bg-red-900/20 flex flex-col items-center justify-center flex-shrink-0">
+        <span className="text-lg font-extrabold text-red-600 dark:text-red-400 leading-none">{dateInfo.day}</span>
+        <span className="text-[9px] font-bold text-red-500 dark:text-red-400 uppercase">{dateInfo.month}</span>
       </div>
-    </Card>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-semibold line-clamp-1 tracking-tight">{evento.titulo}</h3>
+        <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{evento.description}</p>
+        <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
+          <span className="flex items-center gap-0.5"><Clock className="h-2.5 w-2.5" />{dateInfo.time}</span>
+          {evento.ubicacion && <span className="flex items-center gap-0.5"><MapPin className="h-2.5 w-2.5" />{evento.ubicacion}</span>}
+        </div>
+      </div>
+      <ChevronRight className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+    </button>
   );
 };
 
