@@ -38,7 +38,7 @@ class FormConfigService(BaseService):
         # Seed default fields if none exist
         fields = await self.repo.get_by_form_type(form_type, include_inactive)
         
-        if not fields and form_type in ("textbook_access", "student_linking"):
+        if not fields and form_type in ("textbook_access", "student_linking", "order_form"):
             fields = await self.repo.seed_default_fields(form_type)
         
         required_count = sum(1 for f in fields if f.get("is_required", False))
