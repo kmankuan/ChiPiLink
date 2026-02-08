@@ -251,6 +251,7 @@ export default function UIStyleModule() {
   const [templates, setTemplates] = useState([]);
   const [fonts, setFonts] = useState([]);
   const [densityOptions, setDensityOptions] = useState([]);
+  const [layouts, setLayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
