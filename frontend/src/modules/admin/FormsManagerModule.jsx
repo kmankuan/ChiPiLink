@@ -348,14 +348,24 @@ const TRANSLATIONS = {
   'required': { es: 'Requerido', zh: '必填' },
 };
 
-function autoTranslate(englishText) {
-  if (!englishText) return { es: '', zh: '' };
-  const key = englishText.trim().toLowerCase();
-  // Exact match
-  if (TRANSLATIONS[key]) return TRANSLATIONS[key];
-  // Try without trailing "s" (simple plural)
-  if (key.endsWith('s') && TRANSLATIONS[key.slice(0, -1)]) return TRANSLATIONS[key.slice(0, -1)];
-  return { es: '', zh: '' };
+function autoTranslate(text, fromLang = 'en') {
+  if (!text) return { en: '', es: '', zh: '' };
+  const key = text.trim().toLowerCase();
+
+  if (fromLang === 'en') {
+    const match = TRANSLATIONS[key] || (key.endsWith('s') ? TRANSLATIONS[key.slice(0, -1)] : null);
+    return match ? { en: text, es: match.es, zh: match.zh } : { en: text, es: '', zh: '' };
+  }
+
+  // Reverse lookup: search by ES or ZH value
+  for (const [enKey, vals] of Object.entries(TRANSLATIONS)) {
+    const matchVal = fromLang === 'es' ? vals.es : vals.zh;
+    if (matchVal && matchVal.toLowerCase() === key) {
+      const enLabel = enKey.replace(/\b\w/g, c => c.toUpperCase());
+      return { en: enLabel, es: vals.es, zh: vals.zh };
+    }
+  }
+  return { en: '', es: '', zh: '' };
 }
 
 function toFieldKey(label) {
