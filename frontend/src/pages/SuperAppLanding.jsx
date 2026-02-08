@@ -112,7 +112,7 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey
   return (
     <button
       onClick={() => navigate(to)}
-      className={`relative flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
+      className={`quick-access-card relative flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
     >
       <Icon className="h-6 w-6 mb-2" />
       <span className="text-xs font-medium text-center">{label}</span>
