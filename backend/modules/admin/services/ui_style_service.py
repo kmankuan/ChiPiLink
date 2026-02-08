@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_STYLE_BASE = {
     "template": "default",
+    "layout": "mobile_app",
     "primary_color": "#16a34a",
     "font_family": "Inter",
     "border_radius": "0.75rem",
