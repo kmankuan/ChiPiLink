@@ -246,7 +246,7 @@ export function Header() {
 
   return (
     <header className="site-header sticky top-0 z-50 w-full bg-background/95 backdrop-blur-lg border-b border-border/30">
-      <div className="max-w-screen-lg mx-auto px-4">
+      <div className="mx-auto px-4 md:px-8">
         <div className="flex h-12 items-center justify-between">
           {/* Left Section: Logo + Breadcrumb with Back */}
           <div className="flex items-center gap-2">
