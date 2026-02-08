@@ -100,11 +100,20 @@ function FormTypesCatalog({ formTypes, loading, onSelectType }) {
 /* ============ Field Editor for a Form Type ============ */
 function FormFieldEditor({ formType, onBack }) {
   const { token } = useAuth();
+  const { i18n } = useTranslation();
+  const lang = i18n?.language?.substring(0, 2) || 'en';
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState(null);
   const [showAddField, setShowAddField] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const texts = {
+    en: { addField: 'Add Field', system: 'System', required: 'Required', disabled: 'Disabled', noFields: 'No fields configured. Click "Add Field" to start.', fieldEnabled: 'Field enabled', fieldDisabled: 'Field disabled', fieldDeleted: 'Field deleted', fieldCreated: 'Field created', fieldUpdated: 'Field updated', deleteConfirm: 'Delete this field permanently?', error: 'Error' },
+    es: { addField: 'Agregar Campo', system: 'Sistema', required: 'Requerido', disabled: 'Desactivado', noFields: 'Sin campos configurados. Haz clic en "Agregar Campo" para comenzar.', fieldEnabled: 'Campo activado', fieldDisabled: 'Campo desactivado', fieldDeleted: 'Campo eliminado', fieldCreated: 'Campo creado', fieldUpdated: 'Campo actualizado', deleteConfirm: '¿Eliminar este campo permanentemente?', error: 'Error' },
+    zh: { addField: '添加字段', system: '系统', required: '必填', disabled: '已禁用', noFields: '未配置字段。点击"添加字段"开始。', fieldEnabled: '字段已启用', fieldDisabled: '字段已禁用', fieldDeleted: '字段已删除', fieldCreated: '字段已创建', fieldUpdated: '字段已更新', deleteConfirm: '永久删除此字段？', error: '错误' },
+  };
+  const t = texts[lang] || texts.en;
 
   const fetchFields = useCallback(async () => {
     try {
