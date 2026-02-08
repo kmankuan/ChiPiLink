@@ -255,23 +255,21 @@ const GalleryCard = ({ album }) => {
   const navigate = useNavigate();
 
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer group"
+    <button 
+      className="aspect-square relative overflow-hidden rounded-sm group"
       onClick={() => navigate(`/comunidad/galeria/${album.album_id}`)}
+      data-testid={`gallery-${album.album_id}`}
     >
-      <div className="aspect-square relative overflow-hidden">
-        <img
-          src={album.portada || album.imagenes?.[0]?.url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
-          alt={album.titulo}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="font-semibold text-white line-clamp-1">{album.titulo}</h3>
-          <p className="text-xs text-white/80">{album.imagenes?.length || 0} fotos</p>
-        </div>
+      <img
+        src={album.portada || album.imagenes?.[0]?.url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'}
+        alt={album.titulo}
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 right-0 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <p className="text-[10px] font-medium text-white line-clamp-1">{album.titulo}</p>
       </div>
-    </Card>
+    </button>
   );
 };
 
