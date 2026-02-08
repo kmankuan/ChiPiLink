@@ -586,7 +586,7 @@ export default function SuperAppLanding() {
           </div>
         )}
 
-        <main className={`max-w-screen-lg mx-auto space-y-0 ${isEditMode ? 'ml-80' : ''}`}>
+        <main className={`mx-auto space-y-0 ${isEditMode ? 'ml-80' : ''}`}>
           {/* Render blocks dynamically based on sortedBlocks order */}
           {sortedBlocks.map((block) => {
             if (!block.visible) return null;
