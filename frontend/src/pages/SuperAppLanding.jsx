@@ -142,10 +142,10 @@ const HeroCarousel = ({ posts }) => {
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="landing-hero relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-        <div className="text-center p-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('landing.hero.title')}</h1>
-          <p className="text-muted-foreground">{t('landing.hero.subtitle')}</p>
+      <div className="landing-hero relative aspect-[2/1] md:aspect-[3/1] overflow-hidden bg-gradient-to-br from-[#C8102E]/90 to-[#006994]/80 flex items-end">
+        <div className="p-5 pb-8 text-white w-full">
+          <h1 className="text-2xl font-extrabold tracking-tight mb-1">{t('landing.hero.title')}</h1>
+          <p className="text-white/70 text-sm">{t('landing.hero.subtitle')}</p>
         </div>
       </div>
     );
@@ -154,40 +154,44 @@ const HeroCarousel = ({ posts }) => {
   const currentPost = posts[currentIndex];
 
   return (
-    <div className="landing-hero relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden group">
+    <div className="landing-hero relative aspect-[2/1] md:aspect-[5/2] overflow-hidden group">
       <img
         src={currentPost.imagen_portada || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200'}
         alt={currentPost.titulo}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
       
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
         {currentPost.categoria && (
-          <Badge className="mb-3">{currentPost.categoria}</Badge>
+          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm text-white mb-2">
+            {currentPost.categoria}
+          </span>
         )}
-        <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 line-clamp-2">
+        <h1 className="text-lg md:text-2xl font-extrabold text-white mb-1 line-clamp-2 tracking-tight">
           {currentPost.titulo}
         </h1>
-        <p className="text-white/80 text-sm md:text-base mb-4 line-clamp-2">
+        <p className="text-white/70 text-xs md:text-sm line-clamp-1 mb-3">
           {currentPost.resumen}
         </p>
         <Button 
           onClick={() => navigate(`/comunidad/post/${currentPost.post_id}`)}
-          className="gap-2"
+          size="sm"
+          className="h-8 text-xs gap-1.5 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-0"
+          data-testid="hero-read-more"
         >
-          {t('common.readMore')} <ChevronRight className="h-4 w-4" />
+          {t('common.readMore')} <ChevronRight className="h-3.5 w-3.5" />
         </Button>
       </div>
 
       {posts.length > 1 && (
-        <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="absolute bottom-3 right-4 flex gap-1.5">
           {posts.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                idx === currentIndex ? 'bg-white w-6' : 'bg-white/50'
+              className={`h-1.5 rounded-full transition-all ${
+                idx === currentIndex ? 'bg-white w-5' : 'bg-white/40 w-1.5'
               }`}
             />
           ))}
