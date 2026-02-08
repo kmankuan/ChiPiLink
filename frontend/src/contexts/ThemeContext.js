@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { applyUIStyle, clearUIStyle } from '@/config/uiStylePresets';
 
@@ -14,7 +14,8 @@ export function ThemeProvider({ children }) {
     return 'light';
   });
 
-  const [uiStyle, setUIStyle] = useState(null);
+  const [uiStyles, setUIStyles] = useState(null); // { public: {...}, admin: {...} }
+  const [scope, setScope] = useState('public'); // 'public' or 'admin'
 
   // Apply dark/light class
   useEffect(() => {
@@ -32,7 +33,12 @@ export function ThemeProvider({ children }) {
     const fetchStyle = async () => {
       try {
         const { data } = await axios.get(`${API_URL}/api/public/ui-style`);
-        setUIStyle(data.style);
+        // Handle both old format ({style: ...}) and new format ({public: ..., admin: ...})
+        if (data.public) {
+          setUIStyles({ public: data.public, admin: data.admin });
+        } else if (data.style) {
+          setUIStyles({ public: data.style, admin: data.style });
+        }
       } catch {
         // Silently fail — defaults from CSS will apply
       }
@@ -40,12 +46,18 @@ export function ThemeProvider({ children }) {
     fetchStyle();
   }, []);
 
-  // Re-apply UI style whenever theme (dark/light) or uiStyle changes
+  // Active style based on scope
+  const activeStyle = useMemo(() => {
+    if (!uiStyles) return null;
+    return uiStyles[scope] || uiStyles.public;
+  }, [uiStyles, scope]);
+
+  // Re-apply UI style whenever theme (dark/light), scope, or uiStyles changes
   useEffect(() => {
-    if (uiStyle) {
-      applyUIStyle(uiStyle, theme);
+    if (activeStyle) {
+      applyUIStyle(activeStyle, theme);
     }
-  }, [uiStyle, theme]);
+  }, [activeStyle, theme]);
 
   // Listen for system preference changes
   useEffect(() => {
@@ -67,14 +79,18 @@ export function ThemeProvider({ children }) {
   const refreshUIStyle = useCallback(async () => {
     try {
       const { data } = await axios.get(`${API_URL}/api/public/ui-style`);
-      setUIStyle(data.style);
+      if (data.public) {
+        setUIStyles({ public: data.public, admin: data.admin });
+      } else if (data.style) {
+        setUIStyles({ public: data.style, admin: data.style });
+      }
     } catch {
       // ignore
     }
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, uiStyle, refreshUIStyle }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, uiStyle: activeStyle, uiStyles, scope, setScope, refreshUIStyle }}>
       {children}
     </ThemeContext.Provider>
   );
