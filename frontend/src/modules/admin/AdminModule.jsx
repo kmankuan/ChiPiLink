@@ -128,6 +128,10 @@ export default function AdminModule() {
         <TabsContent value="ui-style">
           <UIStyleModule />
         </TabsContent>
+
+        <TabsContent value="widget">
+          <WidgetManagerModule />
+        </TabsContent>
       </Tabs>
     </div>
   );
