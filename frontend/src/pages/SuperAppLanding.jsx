@@ -99,12 +99,15 @@ import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 
 const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey, moduleStatuses }) => {
   const navigate = useNavigate();
-  const colorClasses = {
-    primary: 'bg-primary/10 text-primary hover:bg-primary/20',
-    yellow: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
-    orange: 'bg-orange-100 text-orange-700 hover:bg-orange-200',
-    green: 'bg-green-100 text-green-700 hover:bg-green-200',
-    blue: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+  // Squircle icon backgrounds — vibrant, distinct per module
+  const iconBg = {
+    primary: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+    yellow: 'bg-gradient-to-br from-amber-400 to-amber-500',
+    orange: 'bg-gradient-to-br from-orange-500 to-red-500',
+    green: 'bg-gradient-to-br from-teal-400 to-teal-500',
+    blue: 'bg-gradient-to-br from-sky-500 to-blue-600',
+    red: 'bg-gradient-to-br from-rose-500 to-red-600',
+    purple: 'bg-gradient-to-br from-violet-500 to-purple-600',
   };
 
   const modStatus = moduleKey ? (moduleStatuses?.[moduleKey] || DEFAULT_MODULE_STATUS[moduleKey]) : null;
@@ -112,15 +115,14 @@ const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey
   return (
     <button
       onClick={() => navigate(to)}
-      className={`quick-access-card relative flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${colorClasses[color]}`}
+      data-testid={`quick-access-${moduleKey || label}`}
+      className="quick-access-card flex flex-col items-center gap-1.5 py-1 active:scale-95 transition-transform"
     >
-      <Icon className="h-6 w-6 mb-2" />
-      <span className="text-xs font-medium text-center">{label}</span>
-      {modStatus && (
-        <div className="mt-1">
-          <ModuleStatusBadge status={modStatus.status} customLabel={modStatus.customLabel} size="xs" />
-        </div>
-      )}
+      <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shadow-sm ${iconBg[color] || iconBg.primary}`}>
+        <Icon className="h-6 w-6 text-white" />
+      </div>
+      <span className="text-[10px] font-medium text-foreground/80 text-center leading-tight line-clamp-1">{label}</span>
+      {modStatus && <ModuleStatusBadge status={modStatus.status} customLabel={modStatus.customLabel} size="xs" />}
     </button>
   );
 };
