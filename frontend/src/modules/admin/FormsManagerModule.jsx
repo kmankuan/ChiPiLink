@@ -380,6 +380,9 @@ function toFieldKey(label) {
 
 /* ============ Field Form (Add / Edit) ============ */
 function FieldForm({ field, isNew, saving, onSave, onCancel }) {
+  // Use the core auto-translate hook
+  const { translate: coreTranslate, toFieldKey: coreToFieldKey } = useAutoTranslate();
+  
   // Track which fields the user has manually edited (to avoid overwriting)
   const [userEdited, setUserEdited] = useState({ field_key: false, label_es: false, label_zh: false });
 
