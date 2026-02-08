@@ -305,10 +305,15 @@ export default function UIStyleModule() {
           </h2>
           <p className="text-xs text-muted-foreground">Configure separate themes for public site and admin panel</p>
         </div>
-        <Button size="sm" onClick={handleSave} disabled={saving || !hasChanges} data-testid="save-style-btn">
-          {saving ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
-          Save Changes
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={handlePreviewAsUser} data-testid="preview-as-user-btn" className="gap-1.5">
+            <ExternalLink className="h-3.5 w-3.5" /> Preview as User
+          </Button>
+          <Button size="sm" onClick={handleSave} disabled={saving || !hasChanges} data-testid="save-style-btn">
+            {saving ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
+            Save Changes
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="public">
