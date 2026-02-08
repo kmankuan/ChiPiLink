@@ -266,8 +266,9 @@ function AppRouter() {
       {/* Catalog route removed - Now integrated in Admin > Unatienda module */}
       <Route path="/catalogo" element={<Navigate to="/admin" replace />} />
       
-      {/* Embed Route - No header */}
+      {/* Embed Routes - No header */}
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
+      <Route path="/embed/widget" element={<EmbedWidget />} />
       
       {/* Public Checkout Routes */}
       <Route path="/checkout/:pedidoId" element={<><Header /><Checkout /></>} />
