@@ -76,19 +76,12 @@ const formatEventDate = (dateStr) => {
 // ============== REUSABLE COMPONENTS ==============
 
 const SectionHeader = ({ icon: Icon, title, action, actionLink, className = '' }) => (
-  <div className={`flex items-center justify-between mb-6 ${className}`}>
-    <div className="flex items-center gap-3">
-      <div className="p-2 rounded-xl bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-      <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
-    </div>
+  <div className={`flex items-center justify-between px-4 py-3 sticky top-[56px] z-10 bg-background/95 backdrop-blur-sm ${className}`} data-testid={`section-${title}`}>
+    <h2 className="text-base font-bold tracking-tight">{title}</h2>
     {action && (
-      <Link to={actionLink || '#'}>
-        <Button variant="ghost" size="sm" className="text-primary gap-1">
-          {action}
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+      <Link to={actionLink || '#'} className="text-xs font-medium text-primary flex items-center gap-0.5">
+        {action}
+        <ChevronRight className="h-3.5 w-3.5" />
       </Link>
     )}
   </div>
