@@ -41,6 +41,14 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 - 3 embed options: Floating Button (recommended), Full-Page iframe, Sidebar iframe
 - Preview button to test widget in new tab
 
+**Layout Templates System:**
+- 7 public site layouts: Mobile App, Storefront, Portal, Single Page, Chat/App, Card Grid, China-Panama
+- LayoutProvider applies layout-specific CSS dynamically (header, nav, content area behavior)
+- China-Panama cultural layout: lattice-inspired double-frame hero, gold-accented cards, gradient header
+- China-Panama color theme: red/gold primary with Panama blue accent, light and dark modes
+- Layout selector in admin UI Style module (Page Layout section)
+- Each layout changes actual page structure (nav visibility, header style, content width)
+
 **UI Theme Enhancement:**
 - Separate Public Site / Admin Panel themes with independent configuration
 - 12 font families: Inter, Poppins, DM Sans, Nunito, Lora, Source Sans 3, Noto Sans, Rubik, Outfit, Space Grotesk, Merriweather, Playfair Display
