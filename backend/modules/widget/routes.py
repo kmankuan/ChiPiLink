@@ -20,15 +20,17 @@ async def get_embed_config():
 # ── Admin: full config CRUD ─────────────────────────────────
 @router.get("/admin/config")
 async def get_widget_config(request: Request):
-    from core.auth import get_current_admin
-    admin = await get_current_admin(request)
+    from core.auth import get_admin_user, get_current_user
+    user = await get_current_user(request)
+    admin = await get_admin_user(user)
     return await widget_config_service.get_config()
 
 
 @router.put("/admin/config")
 async def update_widget_config(request: Request):
-    from core.auth import get_current_admin
-    admin = await get_current_admin(request)
+    from core.auth import get_admin_user, get_current_user
+    user = await get_current_user(request)
+    admin = await get_admin_user(user)
     body = await request.json()
     return await widget_config_service.update_config(body, admin.get("user_id"))
 
