@@ -93,7 +93,7 @@ export default function AdminModule() {
         </TabsContent>
 
         <TabsContent value="forms">
-          <FormConfigModule />
+          <FormsManagerModule />
         </TabsContent>
 
         <TabsContent value="translations">
