@@ -111,7 +111,8 @@ export function ThemeProvider({ children }) {
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, uiStyle: activeStyle, uiStyles, scope, setScope, refreshUIStyle }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, uiStyle: activeStyle, uiStyles, scope, setScope, refreshUIStyle, isPreviewMode }}>
+      {isPreviewMode && <PreviewBanner />}
       {children}
     </ThemeContext.Provider>
   );
