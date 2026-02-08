@@ -98,7 +98,12 @@ export default function AdminModule() {
         </TabsContent>
 
         <TabsContent value="translations">
-          <TranslationsModule />
+          <div className="space-y-8">
+            <DictionaryManagerModule />
+            <div className="border-t pt-6">
+              <TranslationsModule />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="demo">
