@@ -588,7 +588,7 @@ export default function SuperAppLanding() {
           </div>
         )}
 
-        <main className={`container mx-auto px-4 py-8 space-y-12 ${isEditMode ? 'ml-80' : ''}`}>
+        <main className={`max-w-screen-lg mx-auto space-y-0 ${isEditMode ? 'ml-80' : ''}`}>
           {/* Render blocks dynamically based on sortedBlocks order */}
           {sortedBlocks.map((block) => {
             if (!block.visible) return null;
@@ -603,13 +603,15 @@ export default function SuperAppLanding() {
               
               case 'quickAccess':
                 return (
-                  <section key={block.id} data-block="quickAccess" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Trophy} label="🏆 Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Zap} label="⚡ Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" moduleKey="events" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Image} label="Galería" to="/galeria" moduleKey="gallery" moduleStatuses={moduleStatuses} />
-                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" moduleKey="players" moduleStatuses={moduleStatuses} />
+                  <section key={block.id} data-block="quickAccess" className="px-4 py-4">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
+                      <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
+                      <QuickAccessButton icon={Trophy} label="Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
+                      <QuickAccessButton icon={Zap} label="Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
+                      <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" color="blue" moduleKey="events" moduleStatuses={moduleStatuses} />
+                      <QuickAccessButton icon={Image} label="Galeria" to="/galeria" color="purple" moduleKey="gallery" moduleStatuses={moduleStatuses} />
+                      <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" color="green" moduleKey="players" moduleStatuses={moduleStatuses} />
+                    </div>
                   </section>
                 );
               
