@@ -15,7 +15,8 @@ import {
   Shield,
   ArrowRightLeft,
   LayoutGrid,
-  Paintbrush
+  Paintbrush,
+  Layout
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
