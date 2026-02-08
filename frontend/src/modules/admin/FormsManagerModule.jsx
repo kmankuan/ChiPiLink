@@ -269,8 +269,110 @@ function FormFieldEditor({ formType, onBack }) {
   );
 }
 
+/* ============ Translation Dictionary ============ */
+const TRANSLATIONS = {
+  // Common form fields
+  'first name': { es: 'Nombre', zh: '名' },
+  'last name': { es: 'Apellido', zh: '姓' },
+  'full name': { es: 'Nombre Completo', zh: '全名' },
+  'name': { es: 'Nombre', zh: '名称' },
+  'email': { es: 'Correo Electrónico', zh: '电子邮箱' },
+  'email address': { es: 'Dirección de Correo', zh: '电子邮箱地址' },
+  'phone': { es: 'Teléfono', zh: '电话' },
+  'phone number': { es: 'Número de Teléfono', zh: '电话号码' },
+  'mobile': { es: 'Celular', zh: '手机' },
+  'mobile number': { es: 'Número de Celular', zh: '手机号码' },
+  'whatsapp': { es: 'WhatsApp', zh: 'WhatsApp' },
+  'whatsapp number': { es: 'Número de WhatsApp', zh: 'WhatsApp号码' },
+  'address': { es: 'Dirección', zh: '地址' },
+  'city': { es: 'Ciudad', zh: '城市' },
+  'country': { es: 'País', zh: '国家' },
+  'state': { es: 'Estado/Provincia', zh: '省/州' },
+  'zip code': { es: 'Código Postal', zh: '邮政编码' },
+  'postal code': { es: 'Código Postal', zh: '邮政编码' },
+  'date': { es: 'Fecha', zh: '日期' },
+  'date of birth': { es: 'Fecha de Nacimiento', zh: '出生日期' },
+  'birthday': { es: 'Cumpleaños', zh: '生日' },
+  'age': { es: 'Edad', zh: '年龄' },
+  'gender': { es: 'Género', zh: '性别' },
+  'nationality': { es: 'Nacionalidad', zh: '国籍' },
+  'id number': { es: 'Número de Identificación', zh: '身份证号' },
+  'passport': { es: 'Pasaporte', zh: '护照' },
+  'passport number': { es: 'Número de Pasaporte', zh: '护照号码' },
+  // Education
+  'school': { es: 'Colegio', zh: '学校' },
+  'grade': { es: 'Grado', zh: '年级' },
+  'class': { es: 'Clase', zh: '班级' },
+  'student': { es: 'Estudiante', zh: '学生' },
+  'student name': { es: 'Nombre del Estudiante', zh: '学生姓名' },
+  'student number': { es: 'Número de Estudiante', zh: '学号' },
+  'student id': { es: 'ID del Estudiante', zh: '学生编号' },
+  'teacher': { es: 'Profesor', zh: '教师' },
+  'parent': { es: 'Padre/Madre', zh: '父母' },
+  'guardian': { es: 'Tutor', zh: '监护人' },
+  'relationship': { es: 'Relación', zh: '关系' },
+  'year': { es: 'Año', zh: '年份' },
+  'school year': { es: 'Año Escolar', zh: '学年' },
+  'semester': { es: 'Semestre', zh: '学期' },
+  // Commerce
+  'price': { es: 'Precio', zh: '价格' },
+  'quantity': { es: 'Cantidad', zh: '数量' },
+  'total': { es: 'Total', zh: '总计' },
+  'order': { es: 'Pedido', zh: '订单' },
+  'order number': { es: 'Número de Pedido', zh: '订单号' },
+  'payment': { es: 'Pago', zh: '付款' },
+  'payment method': { es: 'Método de Pago', zh: '支付方式' },
+  'receipt': { es: 'Recibo', zh: '收据' },
+  'invoice': { es: 'Factura', zh: '发票' },
+  'discount': { es: 'Descuento', zh: '折扣' },
+  'notes': { es: 'Notas', zh: '备注' },
+  'comments': { es: 'Comentarios', zh: '评论' },
+  'description': { es: 'Descripción', zh: '描述' },
+  'status': { es: 'Estado', zh: '状态' },
+  'type': { es: 'Tipo', zh: '类型' },
+  'category': { es: 'Categoría', zh: '类别' },
+  'photo': { es: 'Foto', zh: '照片' },
+  'image': { es: 'Imagen', zh: '图片' },
+  'file': { es: 'Archivo', zh: '文件' },
+  'document': { es: 'Documento', zh: '文档' },
+  'attachment': { es: 'Adjunto', zh: '附件' },
+  'signature': { es: 'Firma', zh: '签名' },
+  'company': { es: 'Empresa', zh: '公司' },
+  'occupation': { es: 'Ocupación', zh: '职业' },
+  'website': { es: 'Sitio Web', zh: '网站' },
+  'message': { es: 'Mensaje', zh: '消息' },
+  'subject': { es: 'Asunto', zh: '主题' },
+  'reference': { es: 'Referencia', zh: '参考' },
+  'other': { es: 'Otro', zh: '其他' },
+  'optional': { es: 'Opcional', zh: '可选' },
+  'required': { es: 'Requerido', zh: '必填' },
+};
+
+function autoTranslate(englishText) {
+  if (!englishText) return { es: '', zh: '' };
+  const key = englishText.trim().toLowerCase();
+  // Exact match
+  if (TRANSLATIONS[key]) return TRANSLATIONS[key];
+  // Try without trailing "s" (simple plural)
+  if (key.endsWith('s') && TRANSLATIONS[key.slice(0, -1)]) return TRANSLATIONS[key.slice(0, -1)];
+  return { es: '', zh: '' };
+}
+
+function toFieldKey(label) {
+  if (!label) return '';
+  return label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
 /* ============ Field Form (Add / Edit) ============ */
 function FieldForm({ field, isNew, saving, onSave, onCancel }) {
+  // Track which fields the user has manually edited (to avoid overwriting)
+  const [userEdited, setUserEdited] = useState({ field_key: false, label_es: false, label_zh: false });
+
   const [form, setForm] = useState({
     field_key: field?.field_key || '',
     field_type: field?.field_type || 'text',
@@ -290,6 +392,36 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   const [newOption, setNewOption] = useState({ value: '', label_en: '', label_es: '' });
 
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
+
+  // When English label changes: auto-generate key + auto-translate ES/ZH
+  const handleEnLabelChange = (val) => {
+    const updates = { label_en: val };
+    // Auto-generate field key if user hasn't manually edited it
+    if (isNew && !userEdited.field_key) {
+      updates.field_key = toFieldKey(val);
+    }
+    // Auto-translate if user hasn't manually edited those fields
+    const translations = autoTranslate(val);
+    if (!userEdited.label_es && translations.es) {
+      updates.label_es = translations.es;
+    }
+    if (!userEdited.label_zh && translations.zh) {
+      updates.label_zh = translations.zh;
+    }
+    setForm(p => ({ ...p, ...updates }));
+  };
+
+  // Mark field as manually edited when user changes it directly
+  const handleManualEdit = (key, val) => {
+    setUserEdited(p => ({ ...p, [key]: true }));
+    set(key, val);
+  };
+
+  // Auto-translate option labels when English is typed
+  const handleOptionEnChange = (val) => {
+    const tr = autoTranslate(val);
+    setNewOption(p => ({ ...p, label_en: val, label_es: p.label_es || tr.es || '' }));
+  };
 
   const addOption = () => {
     if (!newOption.value || !newOption.label_en) return;
