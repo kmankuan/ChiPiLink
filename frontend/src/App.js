@@ -355,20 +355,22 @@ function App() {
             <InlineTranslationProvider>
               <CartProvider>
                 <BrowserRouter>
-                  <div className="App min-h-screen bg-background noise-bg pb-14 md:pb-0">
-                    <AppRouter />
-                    <BottomNav />
-                    <CartDrawer />
-                    {/* CXGenie widget removed - access via header support button instead */}
-                    <Toaster 
-                      position="top-right" 
-                      richColors 
-                      closeButton
-                      toastOptions={{
-                        className: 'font-sans'
-                      }}
-                    />
-                  </div>
+                  <LayoutProvider>
+                    <div className="App min-h-screen bg-background noise-bg app-content">
+                      <AppRouter />
+                      <BottomNav />
+                      <CartDrawer />
+                      {/* CXGenie widget removed - access via header support button instead */}
+                      <Toaster 
+                        position="top-right" 
+                        richColors 
+                        closeButton
+                        toastOptions={{
+                          className: 'font-sans'
+                        }}
+                      />
+                    </div>
+                  </LayoutProvider>
                 </BrowserRouter>
               </CartProvider>
             </InlineTranslationProvider>
