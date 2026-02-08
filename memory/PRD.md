@@ -30,6 +30,17 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 
 ### February 8, 2026 — Session 5 (Current)
 
+**Widget Module (Embeddable for laopan.online):**
+- Full mini-dashboard widget embeddable via iframe or floating button
+- 4 feature views: Textbook Orders, My Students, Order Status, Notifications
+- Auto-authenticates via existing LaoPan SSO token from localStorage
+- Login prompt with "Log in with LaoPan" for unauthenticated users
+- PostMessage API for parent↔iframe communication (close, resize)
+- Vanilla JS loader script served at `/api/widget/loader.js` with embedded config
+- Admin Widget Manager: toggle features, customize appearance (colors, font, radius, compact mode), configure placement (position, width, label), manage allowed origins, generate embed code
+- 3 embed options: Floating Button (recommended), Full-Page iframe, Sidebar iframe
+- Preview button to test widget in new tab
+
 **UI Theme Enhancement:**
 - Separate Public Site / Admin Panel themes with independent configuration
 - 12 font families: Inter, Poppins, DM Sans, Nunito, Lora, Source Sans 3, Noto Sans, Rubik, Outfit, Space Grotesk, Merriweather, Playfair Display
