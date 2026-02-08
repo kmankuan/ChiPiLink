@@ -81,6 +81,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">UI Style</span>
             <span className="sm:hidden">Style</span>
           </TabsTrigger>
+          <TabsTrigger value="widget" className="gap-2" data-testid="widget-tab">
+            <Layout className="h-4 w-4" />
+            <span className="hidden sm:inline">Widget</span>
+            <span className="sm:hidden">Widget</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
