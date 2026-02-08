@@ -86,8 +86,11 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 6. Forms are database-driven, configurable via Forms Manager
 
 ## Known Issues
-- P3: Admin Sidebar occasionally disappears
 - P4: Google Sign-Up OAuth flow broken (long-standing)
+
+## Translation Dictionary
+- 104 entries total, including 32 "options" category terms for dropdown auto-translate
+- Common dropdown values: Cash, Bank Transfer, Credit Card, Male, Female, Yes, No, Pending, Approved, etc.
 
 ## Test Credentials
 - Admin: admin@libreria.com / admin (endpoint: /api/auth-v2/login)
