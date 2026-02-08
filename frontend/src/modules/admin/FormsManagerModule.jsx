@@ -490,7 +490,14 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
       <CardContent className="space-y-3">
         {/* Labels — EN first (auto-generates key + translations) */}
         <div className="space-y-1">
-          <Label className="text-xs">Label (EN) * <span className="text-muted-foreground font-normal">— type here first, key + translations auto-fill</span></Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs">Label (EN) * <span className="text-muted-foreground font-normal">— type here first, key + translations auto-fill</span></Label>
+            {(form.label_en || form.label_es || form.label_zh) && (
+              <button onClick={handleReset} className="text-[10px] text-muted-foreground hover:text-destructive transition-colors flex items-center gap-0.5">
+                <X className="h-3 w-3" /> Reset
+              </button>
+            )}
+          </div>
           <Input value={form.label_en} onChange={e => handleEnLabelChange(e.target.value)} placeholder="e.g., Phone Number" className="h-8 text-sm" autoFocus={isNew} />
         </div>
 
