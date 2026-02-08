@@ -268,13 +268,14 @@ export default function UIStyleModule() {
       });
       const style = data.style || {};
       // Ensure public/admin sub-objects
-      const defaultBase = { template: 'default', primary_color: '#16a34a', font_family: 'Inter', border_radius: '0.75rem', card_style: 'elevated', density: 'comfortable' };
+      const defaultBase = { template: 'default', layout: 'mobile_app', primary_color: '#16a34a', font_family: 'Inter', border_radius: '0.75rem', card_style: 'elevated', density: 'comfortable' };
       if (!style.public) style.public = { ...defaultBase };
       if (!style.admin) style.admin = { ...defaultBase, template: 'minimal', density: 'compact' };
       setFullStyle(style);
       setTemplates(data.available_templates || []);
       setFonts(data.available_fonts || [{ value: 'Inter', label: 'Inter', category: 'sans-serif' }]);
       setDensityOptions(data.density_options || [{ value: 'comfortable', label: 'Comfortable' }]);
+      setLayouts(data.available_layouts || []);
     } catch {
       toast.error('Failed to load UI style config');
     } finally {
