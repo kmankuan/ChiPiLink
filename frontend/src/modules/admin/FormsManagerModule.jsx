@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import {
   ArrowLeft, BookOpen, ChevronRight, Edit2, GripVertical, Loader2, Plus,
-  Save, ShoppingCart, Trash2, UserPlus, X, Eye, EyeOff, AlertTriangle,
+  Save, ShoppingCart, Trash2, UserPlus, X, Eye, EyeOff, AlertTriangle, Languages,
 } from 'lucide-react';
 import useAutoTranslate from '@/hooks/useAutoTranslate';
 
