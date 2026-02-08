@@ -56,7 +56,7 @@ export default function BottomNav() {
   const isProfile = path === '/mi-cuenta' || path === '/login';
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom">
+    <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom">
       <div className="flex items-stretch justify-around h-14 max-w-lg mx-auto px-1">
         <NavItem icon={Home} label="Home" to="/" active={isHome} />
         <NavItem icon={Store} label="Store" to="/unatienda" active={isStore} />
