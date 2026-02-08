@@ -42,6 +42,7 @@ export function ThemeProvider({ children }) {
           if (previewRaw) {
             const previewStyle = JSON.parse(previewRaw);
             setUIStyles({ public: previewStyle, admin: previewStyle });
+            setIsPreviewMode(true);
             // Clean up after loading — one-time use
             localStorage.removeItem('chipi_preview_style');
             return;
