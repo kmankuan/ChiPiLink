@@ -16,6 +16,7 @@ export function ThemeProvider({ children }) {
 
   const [uiStyles, setUIStyles] = useState(null); // { public: {...}, admin: {...} }
   const [scope, setScope] = useState('public'); // 'public' or 'admin'
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   // Apply dark/light class
   useEffect(() => {
