@@ -196,12 +196,12 @@ function FormFieldEditor({ formType, onBack }) {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <Icon className="h-5 w-5 text-primary shrink-0" />
           <div className="min-w-0">
-            <h2 className="text-base font-bold truncate">{formType.label_en}</h2>
-            <p className="text-xs text-muted-foreground truncate">{formType.description_en}</p>
+            <h2 className="text-base font-bold truncate">{getLabel(formType, lang)}</h2>
+            <p className="text-xs text-muted-foreground truncate">{getDesc(formType, lang)}</p>
           </div>
         </div>
         <Button size="sm" onClick={() => { setShowAddField(true); setEditingField(null); }} className="gap-1.5 shrink-0">
-          <Plus className="h-3.5 w-3.5" /> Add Field
+          <Plus className="h-3.5 w-3.5" /> {t.addField}
         </Button>
       </div>
 
@@ -213,20 +213,21 @@ function FormFieldEditor({ formType, onBack }) {
               <GripVertical className="h-4 w-4 text-muted-foreground/40 shrink-0 cursor-grab" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm">{field.label_en}</p>
+                  <p className="font-medium text-sm">{getLabel(field, lang)}</p>
                   {field.is_system && (
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-600">System</Badge>
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-300 text-amber-600">{t.system}</Badge>
                   )}
                   {field.is_required && (
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-red-300 text-red-500">Required</Badge>
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-red-300 text-red-500">{t.required}</Badge>
                   )}
                   {!field.is_active && (
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-gray-300 text-gray-500">Disabled</Badge>
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 border-gray-300 text-gray-500">{t.disabled}</Badge>
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground">
                   {field.field_key} &middot; {FIELD_TYPE_LABELS[field.field_type] || field.field_type}
-                  {field.label_es && <span className="ml-1 opacity-60">({field.label_es})</span>}
+                  {lang !== 'en' && field.label_en && <span className="ml-1 opacity-60">({field.label_en})</span>}
+                  {lang === 'en' && field.label_es && <span className="ml-1 opacity-60">({field.label_es})</span>}
                 </p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
