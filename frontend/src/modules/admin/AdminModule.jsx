@@ -20,6 +20,7 @@ import {
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
 import FormConfigModule from './FormConfigModule';
+import FormsManagerModule from './FormsManagerModule';
 import TranslationsModule from './TranslationsModule';
 import DemoDataModule from './DemoDataModule';
 import AuthMethodsConfig from './AuthMethodsConfig';
