@@ -471,16 +471,49 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
     set(key, val);
   };
 
-  // Auto-translate option labels when English is typed
+  // Auto-translate option labels — bidirectional
+  const [optEdited, setOptEdited] = useState({ value: false, label_es: false, label_zh: false });
+
   const handleOptionEnChange = (val) => {
     const tr = coreTranslate(val, 'en');
-    setNewOption(p => ({ ...p, label_en: val, label_es: p.label_es || tr.es || '', label_zh: p.label_zh || tr.zh || '' }));
+    setNewOption(p => ({
+      ...p,
+      label_en: val,
+      value: !optEdited.value ? val.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
+      label_es: !optEdited.label_es && tr.es ? tr.es : p.label_es,
+      label_zh: !optEdited.label_zh && tr.zh ? tr.zh : p.label_zh,
+    }));
+  };
+
+  const handleOptionEsChange = (val) => {
+    setOptEdited(p => ({ ...p, label_es: true }));
+    const tr = coreTranslate(val, 'es');
+    setNewOption(p => ({
+      ...p,
+      label_es: val,
+      label_en: !p.label_en && tr.en ? tr.en : p.label_en,
+      label_zh: !optEdited.label_zh && tr.zh ? tr.zh : p.label_zh,
+      value: !optEdited.value && !p.value && tr.en ? tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
+    }));
+  };
+
+  const handleOptionZhChange = (val) => {
+    setOptEdited(p => ({ ...p, label_zh: true }));
+    const tr = coreTranslate(val, 'zh');
+    setNewOption(p => ({
+      ...p,
+      label_zh: val,
+      label_en: !p.label_en && tr.en ? tr.en : p.label_en,
+      label_es: !optEdited.label_es && tr.es ? tr.es : p.label_es,
+      value: !optEdited.value && !p.value && tr.en ? tr.en.trim().toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '_') : p.value,
+    }));
   };
 
   const addOption = () => {
     if (!newOption.value || !newOption.label_en) return;
     set('options', [...form.options, { ...newOption }]);
     setNewOption({ value: '', label_en: '', label_es: '', label_zh: '' });
+    setOptEdited({ value: false, label_es: false, label_zh: false });
   };
 
   const removeOption = (idx) => {
