@@ -33,6 +33,7 @@ import Orders from '@/pages/Orders';
 import Receipt from '@/pages/Receipt';
 import AdminDashboard from '@/pages/AdminDashboard';
 import EmbedOrderForm from '@/pages/EmbedOrderForm';
+import EmbedWidget from '@/pages/EmbedWidget';
 import Checkout from '@/pages/Checkout';
 import PaymentResult from '@/pages/PaymentResult';
 import Unatienda from '@/pages/Unatienda';
