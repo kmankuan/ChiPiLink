@@ -113,10 +113,13 @@ LOADER_JS_TEMPLATE = """
 
 
 @router.get("/loader.js")
-async def widget_loader_js():
+async def widget_loader_js(request: Request):
     """Serve the lightweight widget loader script for external sites."""
     config = await widget_config_service.get_public_config()
-    api_url = os.environ.get('REACT_APP_BACKEND_URL', '')
+    # Build the public base URL from the incoming request
+    scheme = request.headers.get("x-forwarded-proto", "https")
+    host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
+    base_url = f"{scheme}://{host}"
 
-    js = LOADER_JS_TEMPLATE.replace('__API_URL__', json.dumps(api_url)).replace('__CONFIG__', json.dumps(config))
+    js = LOADER_JS_TEMPLATE.replace('__API_URL__', json.dumps(base_url)).replace('__CONFIG__', json.dumps(config))
     return Response(content=js.strip(), media_type="application/javascript")
