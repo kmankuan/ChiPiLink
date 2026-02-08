@@ -519,8 +519,8 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
             ))}
             <div className="flex gap-2">
               <Input placeholder="value" value={newOption.value} onChange={e => setNewOption(p => ({ ...p, value: e.target.value }))} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label EN" value={newOption.label_en} onChange={e => setNewOption(p => ({ ...p, label_en: e.target.value }))} className="h-7 text-xs flex-1" />
-              <Input placeholder="Label ES" value={newOption.label_es} onChange={e => setNewOption(p => ({ ...p, label_es: e.target.value }))} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label EN (auto-translates)" value={newOption.label_en} onChange={e => handleOptionEnChange(e.target.value)} className="h-7 text-xs flex-1" />
+              <Input placeholder="Label ES (auto)" value={newOption.label_es} onChange={e => setNewOption(p => ({ ...p, label_es: e.target.value }))} className="h-7 text-xs flex-1" />
               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={addOption}>Add</Button>
             </div>
           </div>
