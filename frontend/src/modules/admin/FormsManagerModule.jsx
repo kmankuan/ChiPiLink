@@ -407,6 +407,12 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
+  // Reset labels + key + re-enable auto-translate
+  const handleReset = () => {
+    setForm(p => ({ ...p, label_en: '', label_es: '', label_zh: '', field_key: isNew ? '' : p.field_key }));
+    setUserEdited({ field_key: false, label_es: false, label_zh: false });
+  };
+
   // When English label changes: auto-generate key + auto-translate ES/ZH
   const handleEnLabelChange = (val) => {
     const updates = { label_en: val };
