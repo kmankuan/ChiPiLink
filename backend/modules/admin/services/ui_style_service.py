@@ -82,6 +82,7 @@ class UIStyleService:
             "style": style,
             "available_templates": AVAILABLE_TEMPLATES,
             "available_fonts": AVAILABLE_FONTS,
+            "available_layouts": AVAILABLE_LAYOUTS,
             "density_options": DENSITY_OPTIONS,
         }
 
