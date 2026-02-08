@@ -1,0 +1,95 @@
+{
+  "summary": "Forms Manager Explicit Translate Icon Buttons - All 9 Features Verified. Typing in EN no longer auto-translates. User must click translate icon (Languages lucide icon) to fill ES/ZH. On save, EN is copied to empty ES/ZH as fallback. All data-testid selectors working correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Translate icon (Languages) visible next to Label EN with data-testid='translate-labels-btn'",
+    "Typing 'Gender' in EN does NOT auto-fill ES/ZH (they remain empty)",
+    "Clicking translate icon fills ES='Género', ZH='性别' from dictionary",
+    "Field key auto-generates from EN label (e.g., 'Gender' -> 'gender')",
+    "Reset button clears EN, ES, ZH labels",
+    "Dropdown type shows translate icon for new option (data-testid='translate-new-option-btn')",
+    "Typing 'Cash' and clicking translate fills ES='Efectivo', ZH='现金'",
+    "Existing options have translate icons (data-testid='translate-option-{idx}')",
+    "Saving without translate copies EN to empty ES/ZH as fallback (verified via API)"
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "FormsManagerModule.jsx correctly implements explicit translate buttons with proper data-testid attributes",
+    "handleEnLabelChange only auto-generates field_key, no auto-translate",
+    "handleTranslateLabels/handleTranslateOption/handleTranslateExistingOption use coreTranslate for dictionary lookup",
+    "handleSubmit implements EN->ES/ZH fallback for empty fields before saving",
+    "Languages icon from lucide-react used for all translate buttons"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% (9/9 features verified)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "admin@libreria.com",
+      "password": "admin",
+      "login_endpoint": "POST /api/auth-v2/login"
+    }
+  },
+
+  "seed_data_creation": "Created TEST_FallbackTest field to verify fallback behavior, then deleted it",
+
+  "mocked_apis": {
+    "has_mocked_apis": false,
+    "note": "All APIs are live and functional"
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Forms Manager explicit translate icons fully implemented. Navigation: Admin > Administration sidebar > Forms tab > Order Form. Key test-ids: translate-labels-btn (field labels), translate-new-option-btn (new option row), translate-option-{idx} (existing options). Translation dictionary has 104 entries including Gender->Género/性别 and Cash->Efectivo/现金. The EN->ES/ZH fallback on save is implemented in handleSubmit.",
+
+  "verified_features": {
+    "explicit_translate_buttons": {
+      "field_labels": "data-testid='translate-labels-btn' (Languages icon)",
+      "new_option": "data-testid='translate-new-option-btn'",
+      "existing_options": "data-testid='translate-option-{idx}'",
+      "behavior": "Click to translate, no auto-translate on typing"
+    },
+    "no_auto_translate_on_typing": {
+      "verified": true,
+      "test": "Typed 'Gender' in EN, ES/ZH remained empty until translate click"
+    },
+    "field_key_auto_generation": {
+      "verified": true,
+      "example": "Gender -> gender"
+    },
+    "reset_button": {
+      "verified": true,
+      "clears": ["label_en", "label_es", "label_zh"]
+    },
+    "fallback_on_save": {
+      "verified": true,
+      "behavior": "Empty ES/ZH filled with EN content before save",
+      "api_verification": "GET /api/store/form-config/admin/order_form confirmed fallback values"
+    },
+    "dictionary_translations": {
+      "Gender": {"es": "Género", "zh": "性别"},
+      "Cash": {"es": "Efectivo", "zh": "现金"}
+    }
+  }
+}
