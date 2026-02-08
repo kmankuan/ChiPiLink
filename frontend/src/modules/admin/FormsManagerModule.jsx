@@ -499,15 +499,15 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
         <Separator />
 
-        {/* Translated Labels — auto-populated, editable */}
+        {/* Translated Labels — auto-populated bidirectionally, editable */}
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
             <Label className="text-xs">Label (ES) <span className="text-muted-foreground font-normal">(auto)</span></Label>
-            <Input value={form.label_es} onChange={e => handleManualEdit('label_es', e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
+            <Input value={form.label_es} onChange={e => handleEsLabelChange(e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Label (ZH) <span className="text-muted-foreground font-normal">(auto)</span></Label>
-            <Input value={form.label_zh} onChange={e => handleManualEdit('label_zh', e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
+            <Input value={form.label_zh} onChange={e => handleZhLabelChange(e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
           </div>
         </div>
 
