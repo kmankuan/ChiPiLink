@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from core.database import get_database
-from modules.auth.dependencies import get_admin_user
+from core.auth import get_admin_user
 
 router = APIRouter(prefix="/translations", tags=["Translation Dictionary"])
 
