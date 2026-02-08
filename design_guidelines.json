@@ -1,130 +1,148 @@
 {
-  "identity": {
-    "name": "E1",
-    "role": "Anti-AI Designer",
-    "mission": "Create a textbook store that feels like a curated library, not a spreadsheet."
+  "brand_identity": {
+    "name": "ChiPi Link",
+    "archetype": "SuperApp (WeChat/Alipay style)",
+    "audience": "Chinese-Panamanian Community",
+    "tone": "Functional, Community-Centric, Dense, Vibrant",
+    "theme_preference": "Light Mode (Primary), Dark Mode (Secondary)",
+    "key_principles": [
+      "Density over Whitespace: Use compact rows and grids.",
+      "Separators over Borders: Use 8-12px gray gaps to separate sections instead of 1px borders.",
+      "Native Feel: Sticky headers, edge-to-edge content on mobile.",
+      "Visual Hierarchy: Color > Size. Use color to denote status and category."
+    ]
   },
   "typography": {
-    "fonts": [
-      {
-        "family": "Libre Baskerville",
-        "url": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap",
-        "usage": "Headings (h1, h2, h3)",
-        "class": "font-serif"
-      },
-      {
-        "family": "DM Sans",
-        "url": "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap",
-        "usage": "Body, UI, Buttons",
-        "class": "font-sans"
-      }
-    ],
-    "rules": {
-      "headings": "tracking-tight leading-none font-bold text-primary",
-      "body": "leading-relaxed text-muted-foreground",
-      "overline": "uppercase tracking-[0.2em] text-xs font-bold text-accent"
+    "primary_font": "DM Sans, system-ui, sans-serif",
+    "secondary_font": "Libre Baskerville, serif",
+    "scale": {
+      "xs": "text-[10px] leading-tight",
+      "sm": "text-xs font-medium",
+      "base": "text-sm font-normal leading-relaxed",
+      "lg": "text-base font-semibold",
+      "xl": "text-lg font-bold tracking-tight",
+      "2xl": "text-xl font-bold tracking-tight",
+      "3xl": "text-2xl font-extrabold tracking-tight"
+    },
+    "usage": {
+      "headings": "DM Sans (Bold/ExtraBold), reduce letter spacing (-0.02em)",
+      "body": "DM Sans (Regular/Medium)",
+      "editorial": "Libre Baskerville (for News/Article titles only)"
     }
   },
   "colors": {
-    "palette_name": "Academic Organic",
-    "light_theme": {
-      "background": "40 20% 97%",
-      "foreground": "210 20% 20%",
-      "card": "0 0% 100%",
-      "card_foreground": "210 20% 20%",
-      "popover": "0 0% 100%",
-      "popover_foreground": "210 20% 20%",
-      "primary": "162 63% 18%",
-      "primary_foreground": "60 30% 96%",
-      "secondary": "30 20% 90%",
-      "secondary_foreground": "24 10% 10%",
-      "muted": "30 20% 94%",
-      "muted_foreground": "215 16% 47%",
-      "accent": "24 85% 55%",
-      "accent_foreground": "0 0% 100%",
-      "destructive": "0 84% 60%",
-      "destructive_foreground": "0 0% 98%",
-      "border": "30 10% 85%",
-      "input": "30 10% 85%",
-      "ring": "162 63% 18%",
-      "radius": "0.75rem"
+    "palette": {
+      "primary": {
+        "name": "Imperial Red",
+        "hex": "#C8102E",
+        "tailwind": "bg-red-700 text-white"
+      },
+      "secondary": {
+        "name": "Peacock Blue",
+        "hex": "#006994",
+        "tailwind": "bg-sky-700 text-white"
+      },
+      "accent": {
+        "name": "Imperial Gold",
+        "hex": "#F0D895",
+        "tailwind": "bg-amber-300 text-amber-950"
+      },
+      "background": {
+        "page": "#FFFFFF",
+        "page_secondary": "#F2F4F6",
+        "surface": "#FFFFFF"
+      },
+      "text": {
+        "primary": "#1A1A1A",
+        "secondary": "#666666",
+        "muted": "#999999"
+      }
     },
-    "dark_theme": {
-      "background": "222 47% 11%",
-      "foreground": "210 40% 98%",
-      "card": "222 47% 13%",
-      "card_foreground": "210 40% 98%",
-      "popover": "222 47% 11%",
-      "popover_foreground": "210 40% 98%",
-      "primary": "160 60% 45%",
-      "primary_foreground": "222 47% 11%",
-      "secondary": "217 32% 17%",
-      "secondary_foreground": "210 40% 98%",
-      "muted": "217 32% 17%",
-      "muted_foreground": "215 20% 65%",
-      "accent": "24 85% 55%",
-      "accent_foreground": "0 0% 100%",
-      "destructive": "0 62% 30%",
-      "destructive_foreground": "210 40% 98%",
-      "border": "217 32% 20%",
-      "input": "217 32% 20%",
-      "ring": "160 60% 45%",
-      "radius": "0.75rem"
+    "functional": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#3B82F6",
+      "separator": "#F2F4F6"
     }
   },
-  "visual_enhancers": {
-    "glassmorphism": "bg-white/70 dark:bg-black/60 backdrop-blur-xl border border-white/20 shadow-sm",
-    "tracing_beam": "relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-primary/20 before:to-transparent before:translate-x-[-100%] hover:before:animate-[shimmer_1.5s_infinite]",
-    "noise_texture": "before:fixed before:inset-0 before:z-[-1] before:bg-[url('https://grainy-gradients.vercel.app/noise.svg')] before:opacity-5 before:pointer-events-none",
-    "soft_shadow": "shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow duration-300"
-  },
-  "layout_strategies": {
-    "marketing_grid": "grid grid-cols-1 md:grid-cols-12 gap-8 p-8 md:p-12",
-    "dashboard_grid": "grid grid-cols-1 md:grid-cols-4 gap-6 p-6",
-    "bento_hero": {
-      "hero_item": "col-span-full md:col-span-8 row-span-2 min-h-[400px] rounded-3xl overflow-hidden relative",
-      "side_item": "col-span-full md:col-span-4 row-span-1 min-h-[200px] rounded-3xl bg-secondary p-8",
-      "stat_item": "col-span-6 md:col-span-2 min-h-[150px] rounded-3xl border border-border p-6 flex flex-col justify-between"
+  "layout": {
+    "container": {
+      "mobile": "w-full px-0",
+      "desktop": "max-w-md mx-auto shadow-2xl min-h-screen border-x border-border/50"
+    },
+    "spacing": {
+      "section_gap": "h-2 bg-muted/30",
+      "item_gap": "gap-0",
+      "internal_padding": "p-4"
+    },
+    "grid": {
+      "quick_access": "grid grid-cols-4 gap-y-4 gap-x-2 p-4 bg-background",
+      "bento": "grid grid-cols-2 md:grid-cols-4 gap-2 p-2"
     }
   },
   "components": {
-    "buttons": {
-      "primary": "rounded-full px-8 py-6 text-lg font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300",
-      "secondary": "rounded-full px-6 py-4 bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      "admin_action": "rounded-md px-4 py-2 text-sm font-medium"
+    "HeroCarousel": {
+      "style": "Full width (edge-to-edge), 16:9 aspect ratio.",
+      "overlay": "Gradient from bottom-black/80 to transparent.",
+      "text_position": "Bottom left, white text.",
+      "pagination": "Dots at bottom center."
     },
-    "cards": {
-      "product": "group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-colors duration-300",
-      "dashboard": "bg-card rounded-xl border border-border p-6 shadow-sm"
+    "QuickAccess": {
+      "style": "Icon + Label. Icon in a colored 'squircle' (rounded-2xl) background.",
+      "layout": "4 columns. Dense.",
+      "interaction": "Tap effect (scale down)."
     },
-    "inputs": {
-      "default": "h-12 rounded-lg border-border bg-background/50 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+    "NewsCard": {
+      "style": "Horizontal list item (Left: Text, Right: Image).",
+      "image_size": "w-24 h-24 rounded-lg object-cover",
+      "separator": "border-b border-border/50 last:border-0"
+    },
+    "EventCard": {
+      "style": "Calendar leaf style (Left: Date Box, Right: Details).",
+      "date_box": "bg-red-50 text-red-700 rounded-lg flex-col center p-2 w-16"
+    },
+    "SectionHeader": {
+      "style": "Sticky top, bg-background/95 backdrop-blur-sm, border-b border-border/50.",
+      "typography": "text-lg font-bold flex justify-between items-center px-4 py-3",
+      "action": "text-sm text-primary font-medium"
     }
   },
-  "image_urls": {
-    "hero_background": "https://images.unsplash.com/photo-1531280518436-9f2cc0fff88a?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "student_hero": "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "textbook_stack": "https://images.unsplash.com/photo-1755621394647-25957e4ca958?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "stationery_flatlay": "https://images.unsplash.com/photo-1707413463619-8f4926d225ba?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "admin_login_bg": "https://images.unsplash.com/photo-1715520530023-cc8a1b2044ab?crop=entropy&cs=srgb&fm=jpg&q=85"
+  "images": {
+    "fallbacks": {
+      "community": "https://images.unsplash.com/photo-1767858900678-bfb848b3032f?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "store": "https://images.unsplash.com/photo-1755742319966-f9414dab1234?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "sports": "https://images.unsplash.com/photo-1708268418738-4863baa9cf72?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "events": "https://images.unsplash.com/photo-1764522917137-97616b62d013?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "hero_default": "https://images.unsplash.com/photo-1766974889855-3f7f125f48cd?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure WCAG AA compliance.",
+    "touch_targets": "Min 44x44px for all interactive elements.",
+    "text_scaling": "Support dynamic type."
   },
   "instructions_to_main_agent": [
-    "1. UPDATE /app/frontend/src/index.css with the CSS variables provided in 'colors' section. REPLACE the existing values.",
-    "2. INSTALL fonts by adding the @import or <link> to index.html or index.css.",
-    "3. CONFIGURE tailwind.config.js to extend font families: 'serif': ['Libre Baskerville'], 'sans': ['DM Sans'].",
-    "4. USE 'lucide-react' for icons.",
-    "5. IMPLEMENT the 'bento_hero' grid for the Landing Page.",
-    "6. USE 'sonner' for all toast notifications.",
-    "7. ENSURE all forms (Order, Login) use Shadcn Form components but styled with 'inputs.default' rules.",
-    "8. FORBIDDEN: Do not use default Shadcn card styles for the Product Catalog. Use the 'cards.product' style defined above.",
-    "9. MULTI-LANGUAGE: Ensure all text is wrapped in translation keys (i18n) for Chinese/Spanish toggle.",
-    "10. THEME: Implement the 'Auto-detect' logic in a ThemeProvider."
+    "TRANSFORM the 'SuperAppLanding.jsx' to look like a mobile app feed.",
+    "REMOVE generic shadcn Cards. Use 'List Item' styling with separators.",
+    "IMPLEMENT a 'WeChat-style' header: Minimal, functional.",
+    "USE the color palette: Imperial Red (#C8102E) for primary actions.",
+    "ENSURE the Quick Access grid uses colorful icon backgrounds (Squircle shape).",
+    "ADD 'Section Separators': 8px-12px height blocks of color #F2F4F6 between sections.",
+    "KEEP all existing functionality (Edit Mode, API calls). ONLY change the UI/JSX structure.",
+    "USE 'lucide-react' icons as they are already installed.",
+    "APPLY 'data-testid' to all interactive elements."
   ],
-  "universal_guidelines": [
-    "Avoid 'AI Slop': No generic centered layouts. Use asymmetry.",
-    "Dark colors must be solid or subtle noise, NO gradients.",
-    "Micro-animations on everything: hover, focus, active.",
-    "Spacing: Use p-8 or p-12 where you'd normally use p-4.",
-    "Accessibility: Ensure contrast ratios (APCA) are met. Use data-testid on all interactive elements."
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not get biased or lean towards generic AI designs.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable (except for SuperApp dense lists).",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN"
   ]
 }
