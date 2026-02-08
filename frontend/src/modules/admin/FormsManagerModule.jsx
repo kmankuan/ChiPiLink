@@ -208,7 +208,24 @@ function FormFieldEditor({ formType, onBack }) {
 
       {/* Field List */}
       <div className="space-y-2">
-        {fields.map((field) => (
+        {fields.map((field) => {
+          const isEditing = editingField?.field_id === field.field_id;
+          
+          // Inline edit: replace card with FieldForm
+          if (isEditing) {
+            return (
+              <FieldForm
+                key={field.field_id}
+                field={editingField}
+                isNew={false}
+                saving={saving}
+                onSave={saveField}
+                onCancel={() => setEditingField(null)}
+              />
+            );
+          }
+          
+          return (
           <Card key={field.field_id} className={`${!field.is_active ? 'opacity-50' : ''}`}>
             <CardContent className="flex items-center gap-3 py-3">
               <GripVertical className="h-4 w-4 text-muted-foreground/40 shrink-0 cursor-grab" />
@@ -246,7 +263,8 @@ function FormFieldEditor({ formType, onBack }) {
               </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
         {fields.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
@@ -256,14 +274,14 @@ function FormFieldEditor({ formType, onBack }) {
         )}
       </div>
 
-      {/* Edit / Add Field Panel */}
-      {(editingField || showAddField) && (
+      {/* Add New Field Panel (only for new fields, at the bottom) */}
+      {showAddField && (
         <FieldForm
-          field={editingField}
-          isNew={showAddField}
+          field={null}
+          isNew={true}
           saving={saving}
           onSave={saveField}
-          onCancel={() => { setEditingField(null); setShowAddField(false); }}
+          onCancel={() => setShowAddField(false)}
         />
       )}
     </div>
