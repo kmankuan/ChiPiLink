@@ -253,14 +253,14 @@ export function Header() {
             {/* Logo - always first, links to home */}
             <Link 
               to="/" 
-              className="flex items-center gap-2 group"
+              className="flex items-center gap-1.5 group"
               data-testid="logo-link"
               title="Ir al inicio"
             >
-              <div className="p-2 rounded-xl bg-gradient-to-br from-red-500 to-yellow-500 text-white group-hover:scale-105 transition-transform">
-                <LinkIcon className="h-5 w-5" />
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-red-500 to-yellow-500 text-white group-hover:scale-105 transition-transform">
+                <LinkIcon className="h-4 w-4" />
               </div>
-              <span className="font-serif text-xl font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-red-600 to-yellow-600 bg-clip-text text-transparent">
+              <span className="font-serif text-lg font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-red-600 to-yellow-600 bg-clip-text text-transparent">
                 ChiPi Link
               </span>
             </Link>
