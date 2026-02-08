@@ -452,10 +452,16 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* Labels — EN first (auto-generates key + translations) */}
+        <div className="space-y-1">
+          <Label className="text-xs">Label (EN) * <span className="text-muted-foreground font-normal">— type here first, key + translations auto-fill</span></Label>
+          <Input value={form.label_en} onChange={e => handleEnLabelChange(e.target.value)} placeholder="e.g., Phone Number" className="h-8 text-sm" autoFocus={isNew} />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs">Field Key *</Label>
-            <Input value={form.field_key} onChange={e => set('field_key', e.target.value)} placeholder="e.g., phone_number" className="h-8 text-sm" disabled={!isNew} />
+            <Label className="text-xs">Field Key * <span className="text-muted-foreground font-normal">(auto)</span></Label>
+            <Input value={form.field_key} onChange={e => handleManualEdit('field_key', e.target.value)} placeholder="auto_generated_key" className="h-8 text-sm font-mono" disabled={!isNew} />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Field Type *</Label>
@@ -467,19 +473,15 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
         <Separator />
 
-        {/* Labels */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* Translated Labels — auto-populated, editable */}
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label className="text-xs">Label (EN) *</Label>
-            <Input value={form.label_en} onChange={e => set('label_en', e.target.value)} className="h-8 text-sm" />
+            <Label className="text-xs">Label (ES) <span className="text-muted-foreground font-normal">(auto)</span></Label>
+            <Input value={form.label_es} onChange={e => handleManualEdit('label_es', e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Label (ES)</Label>
-            <Input value={form.label_es} onChange={e => set('label_es', e.target.value)} className="h-8 text-sm" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Label (ZH)</Label>
-            <Input value={form.label_zh} onChange={e => set('label_zh', e.target.value)} className="h-8 text-sm" />
+            <Label className="text-xs">Label (ZH) <span className="text-muted-foreground font-normal">(auto)</span></Label>
+            <Input value={form.label_zh} onChange={e => handleManualEdit('label_zh', e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
           </div>
         </div>
 
