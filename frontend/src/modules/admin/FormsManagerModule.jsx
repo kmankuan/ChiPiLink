@@ -448,7 +448,7 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
   // Auto-translate option labels when English is typed
   const handleOptionEnChange = (val) => {
-    const tr = autoTranslate(val, 'en');
+    const tr = coreTranslate(val, 'en');
     setNewOption(p => ({ ...p, label_en: val, label_es: p.label_es || tr.es || '' }));
   };
 
