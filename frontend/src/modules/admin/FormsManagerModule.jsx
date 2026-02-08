@@ -17,6 +17,7 @@ import {
   ArrowLeft, BookOpen, ChevronRight, Edit2, GripVertical, Loader2, Plus,
   Save, ShoppingCart, Trash2, UserPlus, X, Eye, EyeOff, AlertTriangle,
 } from 'lucide-react';
+import useAutoTranslate from '@/hooks/useAutoTranslate';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
