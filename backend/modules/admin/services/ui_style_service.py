@@ -9,12 +9,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_UI_STYLE = {
+DEFAULT_STYLE_BASE = {
     "template": "default",
     "primary_color": "#16a34a",
     "font_family": "Inter",
     "border_radius": "0.75rem",
     "card_style": "elevated",
+    "density": "comfortable",
+}
+
+DEFAULT_UI_STYLE = {
+    **DEFAULT_STYLE_BASE,
+    "public": {**DEFAULT_STYLE_BASE},
+    "admin": {**DEFAULT_STYLE_BASE, "template": "minimal", "density": "compact"},
 }
 
 AVAILABLE_TEMPLATES = [
