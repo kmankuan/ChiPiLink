@@ -152,7 +152,7 @@ const HeroCarousel = ({ posts }) => {
   const currentPost = posts[currentIndex];
 
   return (
-    <div className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden group">
+    <div className="landing-hero relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden group">
       <img
         src={currentPost.imagen_portada || 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200'}
         alt={currentPost.titulo}
