@@ -372,6 +372,7 @@ export default function UIStyleModule() {
                 templates={templates}
                 fonts={fonts}
                 densityOptions={densityOptions}
+                layouts={layouts}
               />
             </CardContent>
           </Card>
