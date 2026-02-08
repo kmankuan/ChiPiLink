@@ -37,6 +37,7 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 - 5 color templates: Default, Elegant, Warm, Ocean, Minimal
 - ThemeContext supports scope switching (admin pages auto-switch to admin theme)
 - Live preview in admin settings
+- **"Preview as User" button**: Opens public site in new tab with unsaved theme applied + orange preview banner
 
 **Order Form Seeded in Forms Manager:**
 - 4 default fields: Payment Method (select), Payment Reference (text), Payment Receipt (file), Notes (textarea)
