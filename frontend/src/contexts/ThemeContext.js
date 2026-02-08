@@ -6,6 +6,22 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const ThemeContext = createContext(null);
 
+function PreviewBanner() {
+  return (
+    <div
+      data-testid="preview-banner"
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+        background: 'linear-gradient(90deg, #f59e0b, #f97316)',
+        color: '#fff', textAlign: 'center', padding: '6px 16px',
+        fontSize: '13px', fontWeight: 600, letterSpacing: '0.02em',
+      }}
+    >
+      Theme Preview Mode — This is how the public site will look. Close this tab to return to admin.
+    </div>
+  );
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const stored = localStorage.getItem('theme');
