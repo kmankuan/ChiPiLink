@@ -439,15 +439,20 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Labels — EN first (auto-generates key + translations) */}
+        {/* Label EN — type here, then click translate icon */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <Label className="text-xs">Label (EN) * <span className="text-muted-foreground font-normal">— type here first, key + translations auto-fill</span></Label>
-            {(form.label_en || form.label_es || form.label_zh) && (
-              <button onClick={handleReset} className="text-[10px] text-muted-foreground hover:text-destructive transition-colors flex items-center gap-0.5">
-                <X className="h-3 w-3" /> Reset
+            <Label className="text-xs">Label (EN) *</Label>
+            <div className="flex items-center gap-1">
+              <button onClick={handleTranslateLabels} title="Translate to ES & ZH" className="p-1 rounded hover:bg-primary/10 text-primary transition-colors" data-testid="translate-labels-btn">
+                <Languages className="h-3.5 w-3.5" />
               </button>
-            )}
+              {(form.label_en || form.label_es || form.label_zh) && (
+                <button onClick={handleReset} className="text-[10px] text-muted-foreground hover:text-destructive transition-colors flex items-center gap-0.5">
+                  <X className="h-3 w-3" /> Reset
+                </button>
+              )}
+            </div>
           </div>
           <Input value={form.label_en} onChange={e => handleEnLabelChange(e.target.value)} placeholder="e.g., Phone Number" className="h-8 text-sm" autoFocus={isNew} />
         </div>
@@ -455,7 +460,7 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-xs">Field Key * <span className="text-muted-foreground font-normal">(auto)</span></Label>
-            <Input value={form.field_key} onChange={e => handleManualEdit('field_key', e.target.value)} placeholder="auto_generated_key" className="h-8 text-sm font-mono" disabled={!isNew} />
+            <Input value={form.field_key} onChange={e => set('field_key', e.target.value)} placeholder="auto_generated_key" className="h-8 text-sm font-mono" disabled={!isNew} />
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Field Type *</Label>
@@ -467,15 +472,15 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
 
         <Separator />
 
-        {/* Translated Labels — auto-populated bidirectionally, editable */}
+        {/* ES / ZH labels — filled by translate button or manually */}
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label className="text-xs">Label (ES) <span className="text-muted-foreground font-normal">(auto)</span></Label>
-            <Input value={form.label_es} onChange={e => handleEsLabelChange(e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
+            <Label className="text-xs">Label (ES)</Label>
+            <Input value={form.label_es} onChange={e => set('label_es', e.target.value)} placeholder="Spanish label" className="h-8 text-sm" />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Label (ZH) <span className="text-muted-foreground font-normal">(auto)</span></Label>
-            <Input value={form.label_zh} onChange={e => handleZhLabelChange(e.target.value)} placeholder="auto-translated" className="h-8 text-sm" />
+            <Label className="text-xs">Label (ZH)</Label>
+            <Input value={form.label_zh} onChange={e => set('label_zh', e.target.value)} placeholder="Chinese label" className="h-8 text-sm" />
           </div>
         </div>
 
