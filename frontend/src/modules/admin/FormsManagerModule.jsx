@@ -410,9 +410,9 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   const handleEnLabelChange = (val) => {
     const updates = { label_en: val };
     if (isNew && !userEdited.field_key) {
-      updates.field_key = toFieldKey(val);
+      updates.field_key = coreToFieldKey(val);
     }
-    const tr = autoTranslate(val, 'en');
+    const tr = coreTranslate(val, 'en');
     if (!userEdited.label_es && tr.es) updates.label_es = tr.es;
     if (!userEdited.label_zh && tr.zh) updates.label_zh = tr.zh;
     setForm(p => ({ ...p, ...updates }));
@@ -422,10 +422,10 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   const handleEsLabelChange = (val) => {
     setUserEdited(p => ({ ...p, label_es: true }));
     const updates = { label_es: val };
-    const tr = autoTranslate(val, 'es');
+    const tr = coreTranslate(val, 'es');
     if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
     if (tr.zh && !userEdited.label_zh && !form.label_zh) updates.label_zh = tr.zh;
-    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = toFieldKey(tr.en);
+    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = coreToFieldKey(tr.en);
     setForm(p => ({ ...p, ...updates }));
   };
 
@@ -433,10 +433,10 @@ function FieldForm({ field, isNew, saving, onSave, onCancel }) {
   const handleZhLabelChange = (val) => {
     setUserEdited(p => ({ ...p, label_zh: true }));
     const updates = { label_zh: val };
-    const tr = autoTranslate(val, 'zh');
+    const tr = coreTranslate(val, 'zh');
     if (tr.en && !userEdited.label_en && !form.label_en) updates.label_en = tr.en;
     if (tr.es && !userEdited.label_es && !form.label_es) updates.label_es = tr.es;
-    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = toFieldKey(tr.en);
+    if (tr.en && isNew && !userEdited.field_key && !form.field_key) updates.field_key = coreToFieldKey(tr.en);
     setForm(p => ({ ...p, ...updates }));
   };
 
