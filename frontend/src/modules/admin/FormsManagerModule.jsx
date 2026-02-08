@@ -47,13 +47,23 @@ function getHelp(item, lang) {
 
 /* ============ Form Types Catalog ============ */
 function FormTypesCatalog({ formTypes, loading, onSelectType }) {
+  const { i18n } = useTranslation();
+  const lang = i18n?.language?.substring(0, 2) || 'en';
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin" /></div>;
+
+  const texts = {
+    en: { title: 'Forms Manager', desc: 'Configure and customize all application forms', fields: 'fields' },
+    es: { title: 'Gestor de Formularios', desc: 'Configura y personaliza todos los formularios de la aplicación', fields: 'campos' },
+    zh: { title: '表单管理器', desc: '配置和自定义所有应用程序表单', fields: '字段' },
+  };
+  const t = texts[lang] || texts.en;
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-bold">Forms Manager</h2>
-        <p className="text-sm text-muted-foreground">Configure and customize all application forms</p>
+        <h2 className="text-lg font-bold">{t.title}</h2>
+        <p className="text-sm text-muted-foreground">{t.desc}</p>
       </div>
       <div className="grid gap-3">
         {formTypes.map((ft) => {
@@ -69,12 +79,12 @@ function FormTypesCatalog({ formTypes, loading, onSelectType }) {
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">{ft.label_en}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{ft.description_en}</p>
+                  <p className="font-semibold text-sm">{getLabel(ft, lang)}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{getDesc(ft, lang)}</p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <Badge variant="secondary" className="text-[10px]">
-                    {ft.total_fields} fields
+                    {ft.total_fields} {t.fields}
                   </Badge>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
