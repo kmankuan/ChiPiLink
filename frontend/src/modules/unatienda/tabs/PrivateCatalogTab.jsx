@@ -78,8 +78,8 @@ function saveColumnWidths(widths) {
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-/* ── Resizable Header ── */
-function ResizableHeader({ children, columnKey, width, onResize, isSticky = false, className = '', sortKey, sortConfig, onSort }) {
+/* ── Resizable + Draggable Header ── */
+function ResizableHeader({ children, columnKey, width, onResize, isSticky = false, className = '', sortKey, sortConfig, onSort, onDragStart, onDragOver, onDrop, isDragging }) {
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
 
@@ -105,15 +105,22 @@ function ResizableHeader({ children, columnKey, width, onResize, isSticky = fals
 
   return (
     <th
-      className={`relative select-none ${isSticky ? 'sticky left-0 z-30' : ''} bg-muted px-3 py-2 text-left text-sm font-medium border-b ${isSticky ? 'border-r' : ''} ${className}`}
+      className={`relative select-none ${isSticky ? 'sticky left-0 z-30' : ''} bg-muted px-3 py-2 text-left text-sm font-medium border-b ${isSticky ? 'border-r' : ''} ${isDragging ? 'opacity-40' : ''} ${className}`}
       style={{ width: `${width}px`, minWidth: `${width}px` }}
+      draggable={!isSticky}
+      onDragStart={(e) => { if (!isSticky) onDragStart?.(e, columnKey); }}
+      onDragOver={(e) => { e.preventDefault(); onDragOver?.(e, columnKey); }}
+      onDrop={(e) => { e.preventDefault(); onDrop?.(e, columnKey); }}
     >
       <div
         className={`flex items-center justify-between pr-2 ${sortKey ? 'cursor-pointer hover:text-primary' : ''}`}
         onClick={sortKey ? () => onSort(sortKey) : undefined}
         data-testid={sortKey ? `sort-${sortKey}` : undefined}
       >
-        <span className="flex items-center gap-1">{children}</span>
+        <span className="flex items-center gap-1">
+          {!isSticky && <GripVertical className="h-3 w-3 text-muted-foreground/40 cursor-grab shrink-0" />}
+          {children}
+        </span>
         {sortKey && <SortIcon className={`h-3.5 w-3.5 shrink-0 ${isSorted ? 'text-primary' : 'text-muted-foreground/50'}`} />}
       </div>
       <div
