@@ -49,6 +49,16 @@ function LoadingSpinner() {
   );
 }
 
+const WIDGET_STATE_KEY = 'chipi_widget_state';
+
+/* ── State persistence helpers ── */
+function saveWidgetState(state) {
+  try { sessionStorage.setItem(WIDGET_STATE_KEY, JSON.stringify(state)); } catch {}
+}
+function loadWidgetState() {
+  try { return JSON.parse(sessionStorage.getItem(WIDGET_STATE_KEY) || '{}'); } catch { return {}; }
+}
+
 /* ── Login Prompt (LaoPan only — opens popup for OAuth) ── */
 function LoginPrompt({ onAuth }) {
   const [loading, setLoading] = useState(false);
