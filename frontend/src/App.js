@@ -35,6 +35,7 @@ import Receipt from '@/pages/Receipt';
 import AdminDashboard from '@/pages/AdminDashboard';
 import EmbedOrderForm from '@/pages/EmbedOrderForm';
 import EmbedWidget from '@/pages/EmbedWidget';
+import WidgetAuthComplete from '@/pages/WidgetAuthComplete';
 import Checkout from '@/pages/Checkout';
 import PaymentResult from '@/pages/PaymentResult';
 import Unatienda from '@/pages/Unatienda';
