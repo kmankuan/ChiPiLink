@@ -117,7 +117,15 @@ function LoginPrompt({ onAuth }) {
 /* ── Link Student View ── */
 function LinkStudentView({ token, onStudentLinked }) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ first_name: '', last_name: '', grade: '', school_id: '' });
+  const saved = loadWidgetState();
+  const [form, setForm] = useState(saved.linkStudentForm || { first_name: '', last_name: '', grade: '', school_id: '' });
+
+  // Persist form changes
+  const updateForm = (updates) => {
+    const next = { ...form, ...updates };
+    setForm(next);
+    saveWidgetState({ ...loadWidgetState(), linkStudentForm: next });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
