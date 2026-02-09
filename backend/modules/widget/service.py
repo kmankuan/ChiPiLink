@@ -56,6 +56,7 @@ class WidgetConfigService:
         if config and config.get("value"):
             merged = {**DEFAULT_WIDGET_CONFIG, **config["value"]}
             merged["features"] = {**DEFAULT_WIDGET_CONFIG["features"], **(config["value"].get("features") or {})}
+            merged["maintenance"] = {**DEFAULT_WIDGET_CONFIG["maintenance"], **(config["value"].get("maintenance") or {})}
             merged["display"] = {**DEFAULT_WIDGET_CONFIG["display"], **(config["value"].get("display") or {})}
             merged["appearance"] = {**DEFAULT_WIDGET_CONFIG["appearance"], **(config["value"].get("appearance") or {})}
             merged["placement"] = {**DEFAULT_WIDGET_CONFIG["placement"], **(config["value"].get("placement") or {})}
