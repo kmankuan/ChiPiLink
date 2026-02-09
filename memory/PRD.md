@@ -17,6 +17,14 @@
 - Products + Movements views, Stock Adjust Dialog
 - Multi-select, bulk actions, sort, filter, inline edit
 
+## Dynamic & Draggable Columns (Feb 9)
+- Dynamic columns per catalog type: PCA (Book Name, Code, Grade, Subject, Publisher, Price, Stock, Status), Public (Product Name, SKU, Category, Type, Brand, Price, Stock, Status), All/Archived (Name, Code/SKU, Grade, Category, Publisher/Brand, Price, Stock, Status)
+- Native HTML5 drag-and-drop column reordering (except sticky Name column)
+- Column order persisted per catalog type in localStorage (chipi_inv_col_order)
+- Column widths persisted in localStorage (chipi_inv_col_widths)
+- GripVertical icon on draggable headers
+- Tested: iteration 71 — 14/14 features verified, 100% pass
+
 ## Widget System
 - Server-side token relay for cross-origin iframe OAuth
 - In-widget ordering: select textbooks → submit
@@ -37,3 +45,4 @@
 - iter 68: PCA features (13/13)
 - iter 69: Unified inventory (12/12)
 - iter 70: Archive system (12/12)
+- iter 71: Dynamic & Draggable columns (14/14)
