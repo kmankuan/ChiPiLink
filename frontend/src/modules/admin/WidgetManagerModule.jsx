@@ -116,8 +116,7 @@ export default function WidgetManagerModule() {
   };
 
   const previewWidget = () => {
-    const mainUrl = API_URL?.replace('/api', '') || window.location.origin;
-    window.open(`${mainUrl}/embed/widget`, '_blank');
+    window.open(`${siteUrl}/embed/widget`, '_blank');
   };
 
   if (loading || !config) {
