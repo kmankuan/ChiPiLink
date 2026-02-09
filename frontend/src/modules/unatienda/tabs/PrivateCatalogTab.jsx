@@ -895,7 +895,9 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
               </div>
               {selectedIds.size > 0 && (
                 <div className="px-4 pt-2">
-                  <BulkActionBar count={selectedIds.size} onBulkDelete={handleBulkDelete}
+                  <BulkActionBar count={selectedIds.size} isArchiveView={isArchiveView}
+                    onBulkArchive={handleBulkArchive} onBulkRestore={handleBulkRestore}
+                    onBulkPermanentDelete={handleBulkPermanentDelete}
                     onBulkStatusChange={handleBulkStatusChange} onClearSelection={() => setSelectedIds(new Set())} />
                 </div>
               )}
