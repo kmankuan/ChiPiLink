@@ -5,7 +5,7 @@ import sys
 import json
 
 class SpecificTasksTester:
-    def __init__(self, base_url="https://textbook-ordering-ui.preview.emergentagent.com"):
+    def __init__(self, base_url="https://superapp-landing.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0
