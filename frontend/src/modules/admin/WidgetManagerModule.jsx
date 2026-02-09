@@ -34,8 +34,27 @@ const FEATURE_ICONS = {
 const POSITION_OPTIONS = [
   { value: 'bottom-right', label: 'Bottom Right' },
   { value: 'bottom-left', label: 'Bottom Left' },
+  { value: 'bottom-center', label: 'Bottom Center' },
   { value: 'top-right', label: 'Top Right' },
   { value: 'top-left', label: 'Top Left' },
+  { value: 'middle-right', label: 'Middle Right' },
+  { value: 'middle-left', label: 'Middle Left' },
+];
+
+const ICON_OPTIONS = [
+  { value: 'book', label: 'Book' },
+  { value: 'chat', label: 'Chat Bubble' },
+  { value: 'store', label: 'Store' },
+  { value: 'graduation', label: 'Graduation' },
+  { value: 'circle', label: 'Circle' },
+  { value: 'plus', label: 'Plus' },
+];
+
+const STYLE_OPTIONS = [
+  { value: 'pill', label: 'Pill (icon + text)' },
+  { value: 'square', label: 'Rounded Square (icon + text)' },
+  { value: 'icon-only', label: 'Icon Only (rounded)' },
+  { value: 'circle', label: 'Circle (icon only)' },
 ];
 
 export default function WidgetManagerModule() {
