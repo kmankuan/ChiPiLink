@@ -4,13 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import axios from 'axios';
 import {
   BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
-  Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X
+  Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
+  Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
