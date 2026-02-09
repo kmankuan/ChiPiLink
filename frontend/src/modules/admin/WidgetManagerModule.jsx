@@ -321,6 +321,38 @@ export default function WidgetManagerModule() {
               <CardDescription className="text-xs">Control what the widget shows and hides when embedded</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Maintenance Mode */}
+              <div className={`flex items-center justify-between p-2.5 rounded-lg border ${config.maintenance?.active ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20' : ''}`} data-testid="widget-maintenance-toggle">
+                <div>
+                  <p className="text-xs font-medium flex items-center gap-1.5">
+                    {config.maintenance?.active && <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />}
+                    Maintenance Mode
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">Pause the widget — users see a maintenance message instead of the app</p>
+                </div>
+                <Switch
+                  checked={config.maintenance?.active ?? false}
+                  onCheckedChange={(v) => update('maintenance.active', v)}
+                />
+              </div>
+
+              {config.maintenance?.active && (
+                <div className="ml-4 space-y-2">
+                  <div>
+                    <Label className="text-xs">Maintenance Message</Label>
+                    <Input
+                      value={config.maintenance?.message || ''}
+                      onChange={(e) => update('maintenance.message', e.target.value)}
+                      placeholder="We're currently performing maintenance..."
+                      className="h-8 text-xs"
+                      data-testid="widget-maintenance-message"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
               <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-url">
                 <div>
                   <p className="text-xs font-medium">Hide URL / Address Bar</p>
