@@ -118,10 +118,15 @@ LOADER_JS_TEMPLATE = """
 @router.get("/loader.js")
 async def widget_loader_js(request: Request):
     """Serve the lightweight widget loader script for external sites."""
+    full_config = await widget_config_service.get_config()
     config = await widget_config_service.get_public_config()
-    scheme = request.headers.get("x-forwarded-proto", "https")
-    host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
-    base_url = f"{scheme}://{host}"
+    
+    # Use configured site_url, fallback to request host
+    site_url = full_config.get("site_url", "").rstrip("/")
+    if not site_url:
+        scheme = request.headers.get("x-forwarded-proto", "https")
+        host = request.headers.get("x-forwarded-host", request.headers.get("host", ""))
+        site_url = f"{scheme}://{host}"
 
-    js = LOADER_JS_TEMPLATE.replace('__API_URL__', json.dumps(base_url)).replace('__CONFIG__', json.dumps(config))
+    js = LOADER_JS_TEMPLATE.replace('__API_URL__', json.dumps(site_url)).replace('__CONFIG__', json.dumps(config))
     return Response(content=js.strip(), media_type="application/javascript")
