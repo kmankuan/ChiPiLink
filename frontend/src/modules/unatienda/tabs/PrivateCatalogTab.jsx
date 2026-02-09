@@ -577,33 +577,84 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
     } catch (e) { toast.error('Error updating'); throw e; }
   }, [token, onRefresh]);
 
-  const handleDelete = async (book_id) => {
-    if (!confirm('Are you sure you want to deactivate this product?')) return;
+  const handleArchive = async (book_id) => {
+    if (!confirm('Move this product to archive?')) return;
     try {
-      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}`, {
+      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/archive`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) { toast.success('Product archived'); fetchProducts(); onRefresh?.(); }
+    } catch { toast.error('Error archiving'); }
+  };
+
+  const handleRestore = async (book_id) => {
+    try {
+      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/restore`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) { toast.success('Product restored'); fetchProducts(); onRefresh?.(); }
+    } catch { toast.error('Error restoring'); }
+  };
+
+  const handlePermanentDelete = async (book_id) => {
+    if (!confirm('Permanently delete this product? This cannot be undone.')) return;
+    try {
+      const response = await fetch(`${API}/api/store/private-catalog/admin/products/${book_id}/permanent`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.ok) { toast.success('Product deactivated'); fetchProducts(); onRefresh?.(); }
+      if (response.ok) { toast.success('Product permanently deleted'); fetchProducts(); onRefresh?.(); }
     } catch { toast.error('Error deleting'); }
   };
 
   // Bulk operations
-  const handleBulkDelete = async () => {
+  const handleBulkArchive = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`Are you sure you want to deactivate ${selectedIds.size} products?`)) return;
+    if (!confirm(`Archive ${selectedIds.size} products?`)) return;
     let ok = 0, fail = 0;
     for (const id of selectedIds) {
       try {
-        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}`, {
+        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/archive`, {
+          method: 'POST', headers: { Authorization: `Bearer ${token}` }
+        });
+        if (r.ok) ok++; else fail++;
+      } catch { fail++; }
+    }
+    toast.success(`${ok} archived${fail ? `, ${fail} failed` : ''}`);
+    setSelectedIds(new Set());
+    fetchProducts(); onRefresh?.();
+  };
+
+  const handleBulkRestore = async () => {
+    if (selectedIds.size === 0) return;
+    let ok = 0, fail = 0;
+    for (const id of selectedIds) {
+      try {
+        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/restore`, {
+          method: 'POST', headers: { Authorization: `Bearer ${token}` }
+        });
+        if (r.ok) ok++; else fail++;
+      } catch { fail++; }
+    }
+    toast.success(`${ok} restored${fail ? `, ${fail} failed` : ''}`);
+    setSelectedIds(new Set());
+    fetchProducts(); onRefresh?.();
+  };
+
+  const handleBulkPermanentDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Permanently delete ${selectedIds.size} products? This cannot be undone.`)) return;
+    let ok = 0, fail = 0;
+    for (const id of selectedIds) {
+      try {
+        const r = await fetch(`${API}/api/store/private-catalog/admin/products/${id}/permanent`, {
           method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
         });
         if (r.ok) ok++; else fail++;
       } catch { fail++; }
     }
-    toast.success(`${ok} deactivated${fail ? `, ${fail} failed` : ''}`);
+    toast.success(`${ok} permanently deleted${fail ? `, ${fail} failed` : ''}`);
     setSelectedIds(new Set());
-    fetchProducts();
-    onRefresh?.();
+    fetchProducts(); onRefresh?.();
   };
 
   const handleBulkStatusChange = async (active) => {
