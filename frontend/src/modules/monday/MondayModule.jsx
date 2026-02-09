@@ -622,22 +622,12 @@ export default function MondayModule() {
         </TabsContent>
 
         {/* ========== TAB: BOOKS ========== */}
-        <TabsContent value="libros" className="space-y-6 mt-6">
+        <TabsContent value="libros" className="mt-6">
           <BookOrdersMondayTab connected={connected} boards={boards} />
         </TabsContent>
 
-        {/* ========== TAB: GENERAL ========== */}                    <BookOpen className="h-5 w-5" />
-                    Book Orders Board
-                  </CardTitle>
-                  <CardDescription>
-                    Select the board where school book orders (Books de Light) will be synced.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Orders Board</Label>
-                      <Select 
+        {/* ========== TAB: GENERAL ========== */}
+        <TabsContent value="general" className="space-y-6 mt-6">
                         value={storeConfig.board_id || ''} 
                         onValueChange={(v) => setStoreConfig(prev => ({...prev, board_id: v}))}
                       >
