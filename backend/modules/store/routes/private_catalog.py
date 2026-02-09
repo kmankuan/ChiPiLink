@@ -406,3 +406,47 @@ async def admin_delete_private_catalog_product(
             raise HTTPException(status_code=404, detail="Product not found")
     
     return {"success": True, "message": "Product deleted"}
+
+
+@router.post("/admin/products/{book_id}/archive")
+async def admin_archive_product(
+    book_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Archive a product — moves it to the archive layer."""
+    result = await db.store_products.update_one(
+        {"book_id": book_id, "is_private_catalog": True},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"success": True}
+
+
+@router.post("/admin/products/{book_id}/restore")
+async def admin_restore_product(
+    book_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Restore a product from archive."""
+    result = await db.store_products.update_one(
+        {"book_id": book_id, "is_private_catalog": True},
+        {"$set": {"archived": False}, "$unset": {"archived_at": ""}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"success": True}
+
+
+@router.delete("/admin/products/{book_id}/permanent")
+async def admin_permanent_delete(
+    book_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Permanently delete a product (only from archive)."""
+    result = await db.store_products.delete_one(
+        {"book_id": book_id, "is_private_catalog": True, "archived": True}
+    )
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found or not archived")
+    return {"success": True}
