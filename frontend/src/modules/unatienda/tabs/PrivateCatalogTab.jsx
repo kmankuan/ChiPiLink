@@ -905,7 +905,8 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
-                  updateProductField={updateProductField} onDelete={handleDelete} onAdjustStock={setAdjustProduct} />
+                  updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
+                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore} />
               </div>
             </DialogContent>
           </Dialog>
@@ -915,7 +916,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             <CardHeader className="py-3 px-4 border-b">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Showing {sortedProducts.length} books{sortConfig.key ? ` • Sorted by ${sortConfig.key} ${sortConfig.direction}` : ''} • Drag column edges to resize
+                  Showing {sortedProducts.length} {isArchiveView ? 'archived' : ''} items{sortConfig.key ? ` • Sorted by ${sortConfig.key} ${sortConfig.direction}` : ''} • Drag column edges to resize
                 </span>
                 <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-2">
                   <Maximize2 className="h-4 w-4" /> Fullscreen
@@ -927,7 +928,8 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
-                  updateProductField={updateProductField} onDelete={handleDelete} onAdjustStock={setAdjustProduct} />
+                  updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
+                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore} />
               </div>
             </CardContent>
           </Card>
