@@ -15,7 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Loader2, Save, Copy, Check, Settings, Palette, Layout,
-  Shield, Code, BookOpen, Users, Package, Bell, ExternalLink, Eye, RotateCcw
+  Shield, Code, BookOpen, Users, Package, Bell, ExternalLink, Eye, RotateCcw,
+  Wallet, Monitor, Link2
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -27,6 +28,7 @@ const FEATURE_ICONS = {
   my_students: Users,
   order_status: Package,
   notifications: Bell,
+  wallet: Wallet,
 };
 
 const POSITION_OPTIONS = [
