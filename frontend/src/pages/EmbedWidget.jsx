@@ -156,16 +156,6 @@ function TextbookOrdersView({ token, students }) {
   const [order, setOrder] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
 
-  // Auto-select if only one approved student
-  useEffect(() => {
-    const approved = students.filter(s =>
-      s.enrollments?.some(e => e.status === 'approved')
-    );
-    if (approved.length === 1 && !selectedStudent) {
-      selectStudent(approved[0]);
-    }
-  }, [students]);
-
   const selectStudent = useCallback(async (student) => {
     setSelectedStudent(student);
     setLoadingOrder(true);
