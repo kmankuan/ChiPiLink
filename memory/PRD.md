@@ -97,6 +97,8 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 
 ## Known Issues
 - P4: Google Sign-Up OAuth flow broken (long-standing)
+- P3: Hardcoded Spanish text in landing hero (should use i18n t() function)
+- P3: React key prop warning in Unatienda component
 
 ## Translation Dictionary
 - 104 entries total, including 32 "options" category terms for dropdown auto-translate
