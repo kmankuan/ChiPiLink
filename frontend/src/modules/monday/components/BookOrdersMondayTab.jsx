@@ -184,6 +184,32 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   useEffect(() => { loadConfig(); }, []);
 
+  // Load boards if not provided by parent
+  useEffect(() => {
+    if (allBoards?.length > 0) {
+      setBoards(allBoards);
+    } else {
+      loadBoards();
+    }
+  }, [allBoards]);
+
+  const loadBoards = async () => {
+    setLoadingBoards(true);
+    try {
+      const res = await fetch(`${API}/api/monday/boards`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBoards(data.boards || data || []);
+      }
+    } catch (e) {
+      console.error('Error loading boards:', e);
+    } finally {
+      setLoadingBoards(false);
+    }
+  };
+
   useEffect(() => {
     if (ordersBoard) loadBoardDetails(ordersBoard, 'orders');
   }, [ordersBoard]);
