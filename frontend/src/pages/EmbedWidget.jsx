@@ -478,7 +478,12 @@ export default function EmbedWidget() {
 
   // Restore persisted tab
   const saved = loadWidgetState();
-  const [activeTab, setActiveTab] = useState(saved.activeTab || 'textbook_orders');
+  const [activeTab, setActiveTabRaw] = useState(saved.activeTab || 'textbook_orders');
+
+  const setActiveTab = (tab) => {
+    setActiveTabRaw(tab);
+    saveWidgetState({ ...loadWidgetState(), activeTab: tab });
+  };
 
   const display = config?.display || {};
   const streamlined = display.streamlined_flow !== false;
