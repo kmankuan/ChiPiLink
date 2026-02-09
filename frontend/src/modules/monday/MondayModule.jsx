@@ -628,37 +628,7 @@ export default function MondayModule() {
 
         {/* ========== TAB: GENERAL ========== */}
         <TabsContent value="general" className="space-y-6 mt-6">
-                        value={storeConfig.board_id || ''} 
-                        onValueChange={(v) => setStoreConfig(prev => ({...prev, board_id: v}))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a board" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {boards.map((board) => (
-                            <SelectItem key={board.id} value={board.id}>
-                              {board.name} ({board.items_count || 0} items)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {groups.length > 0 && (
-                      <div className="space-y-2">
-                        <Label>Group (optional)</Label>
-                        <Select 
-                          value={storeConfig.group_id || 'none'} 
-                          onValueChange={(v) => setStoreConfig(prev => ({...prev, group_id: v === 'none' ? '' : v}))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a group" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">No specific group</SelectItem>
-                            {groups.map((group) => (
-                              <SelectItem key={group.id} value={group.id}>
-                                {group.title}
+          {/* Status Cards */}                                {group.title}
                               </SelectItem>
                             ))}
                           </SelectContent>
