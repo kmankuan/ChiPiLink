@@ -41,13 +41,21 @@ School management and e-commerce platform for Panama Christian Academy (PCA) wit
 - 3 embed options: Floating Button (recommended), Full-Page iframe, Sidebar iframe
 - Preview button to test widget in new tab
 
-**Layout Templates System:**
-- 7 public site layouts: Mobile App, Storefront, Portal, Single Page, Chat/App, Card Grid, China-Panama
+**Structural Page Layouts (NEW — Feb 9, 2026):**
+- 5 structural layouts that change the actual page component tree (not just CSS):
+  - **Classic** — Hero carousel, icon grid, stacked sections (original)
+  - **Bento Grid** — Asymmetric tile dashboard, no hero, Notion/Apple-inspired
+  - **Tab Hub** — Greeting + horizontal tabs (Services/Community/Events/Gallery), WeChat/Grab-inspired
+  - **Social Feed** — Stories carousel + unified mixed-content timeline, Instagram-inspired
+  - **Magazine** — Featured article + 2-column editorial with sidebar, Medium-inspired
+- Admin UI Style panel shows all 5 with SVG preview thumbnails
+- Shared component library (`landing-layouts/shared.jsx`) for reuse across layouts
+- 6 additional CSS overlay layouts (Storefront, Portal, Single Page, Chat/App, Card Grid, China-Panama) available under "Advanced" collapsible
+
+**Layout Templates System (CSS overlays):**
 - LayoutProvider applies layout-specific CSS dynamically (header, nav, content area behavior)
 - China-Panama cultural layout: lattice-inspired double-frame hero, gold-accented cards, gradient header
 - China-Panama color theme: red/gold primary with Panama blue accent, light and dark modes
-- Layout selector in admin UI Style module (Page Layout section)
-- Each layout changes actual page structure (nav visibility, header style, content width)
 
 **UI Theme Enhancement:**
 - Separate Public Site / Admin Panel themes with independent configuration
