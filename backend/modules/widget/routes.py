@@ -1,14 +1,64 @@
 """
 Widget Routes — Admin config + public embed config endpoints.
+Includes auth relay for cross-origin iframe OAuth.
 """
 import os
 import json
+import uuid
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
 from core.auth import get_admin_user
+from core.database import db
 from .service import widget_config_service
 
 router = APIRouter(prefix="/widget", tags=["Widget"])
+
+# ── Auth Relay: temporary token storage for cross-origin iframe OAuth ──
+
+@router.post("/auth-session")
+async def create_auth_session():
+    """Widget iframe calls this to create a session ID before opening OAuth tab."""
+    session_id = str(uuid.uuid4())
+    await db.widget_auth_sessions.insert_one({
+        "session_id": session_id,
+        "token": None,
+        "created_at": datetime.now(timezone.utc),
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=5),
+    })
+    return {"session_id": session_id}
+
+
+@router.post("/auth-session/{session_id}/token")
+async def store_auth_token(session_id: str, request: Request):
+    """OAuth callback page calls this to store the token for the widget to pick up."""
+    body = await request.json()
+    token = body.get("token")
+    if not token:
+        return {"error": "No token provided"}
+    result = await db.widget_auth_sessions.update_one(
+        {"session_id": session_id, "expires_at": {"$gt": datetime.now(timezone.utc)}},
+        {"$set": {"token": token}}
+    )
+    if result.modified_count == 0:
+        return {"error": "Session not found or expired"}
+    return {"success": True}
+
+
+@router.get("/auth-session/{session_id}/poll")
+async def poll_auth_token(session_id: str):
+    """Widget iframe polls this to check if the token has been stored."""
+    doc = await db.widget_auth_sessions.find_one(
+        {"session_id": session_id, "expires_at": {"$gt": datetime.now(timezone.utc)}},
+        {"_id": 0, "token": 1}
+    )
+    if not doc:
+        return {"status": "expired"}
+    if doc.get("token"):
+        # Clean up after retrieval
+        await db.widget_auth_sessions.delete_one({"session_id": session_id})
+        return {"status": "ready", "token": doc["token"]}
+    return {"status": "waiting"}
 
 
 # ── Public: embed config (no auth) ──────────────────────────
