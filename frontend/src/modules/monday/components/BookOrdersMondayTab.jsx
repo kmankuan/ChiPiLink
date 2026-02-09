@@ -325,7 +325,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   const mappedCount = (fields, mapping) => fields.filter(f => mapping[f.key]).length;
 
-  if (!connected) {
+  if (!connected && boards.length === 0 && !loadingBoards) {
     return (
       <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
         <CardContent className="pt-6">
@@ -333,8 +333,9 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
             <AlertCircle className="h-6 w-6 text-yellow-600" />
             <div>
               <p className="font-medium text-yellow-800">Connection required</p>
-              <p className="text-sm text-yellow-700">Configure a workspace first in the "Workspaces" tab.</p>
+              <p className="text-sm text-yellow-700">Configure a workspace first in the "Workspaces" tab, or the system will use the API key from server config.</p>
             </div>
+            <Button variant="outline" size="sm" onClick={loadBoards}>Retry</Button>
           </div>
         </CardContent>
       </Card>
