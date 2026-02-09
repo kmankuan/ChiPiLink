@@ -182,7 +182,8 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
   const [textbooksSubitemColumns, setTextbooksSubitemColumns] = useState([]);
   const [textbooksSubitemMapping, setTextbooksSubitemMapping] = useState({});
 
-  useEffect(() => { loadConfig(); loadBoards(); }, []);
+  useEffect(() => { loadConfig(); }, []);
+  useEffect(() => { loadBoards(); }, []);
 
   const loadBoards = async () => {
     setLoadingBoards(true);
