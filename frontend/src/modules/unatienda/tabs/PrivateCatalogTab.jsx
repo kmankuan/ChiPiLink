@@ -121,7 +121,7 @@ function EditableCell({ value, onSave, type = 'text', className = '' }) {
 }
 
 /* ── Shared Table Component ── */
-function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete }) {
+function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock }) {
   const totalWidth = Object.values(columnWidths).reduce((s, w) => s + w, 0);
   const allSelected = products.length > 0 && products.every(p => selectedIds.has(p.book_id));
   const someSelected = products.some(p => selectedIds.has(p.book_id)) && !allSelected;
