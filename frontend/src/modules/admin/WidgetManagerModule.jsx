@@ -380,9 +380,9 @@ export default function WidgetManagerModule() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Widget Placement</CardTitle>
-              <CardDescription className="text-xs">Configure how the widget appears on laopan.online</CardDescription>
+              <CardDescription className="text-xs">Configure the floating button position, icon, and style on laopan.online</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
                 <Switch
                   checked={config.placement?.floating_button !== false}
@@ -391,9 +391,13 @@ export default function WidgetManagerModule() {
                 />
                 <Label className="text-xs">Show floating button</Label>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+              <Separator />
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Position & Offset</p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Button Position</Label>
+                  <Label className="text-xs">Position</Label>
                   <select
                     value={config.placement?.floating_position || 'bottom-right'}
                     onChange={(e) => update('placement.floating_position', e.target.value)}
@@ -406,7 +410,59 @@ export default function WidgetManagerModule() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Button Label</Label>
+                  <Label className="text-xs">Horizontal Offset</Label>
+                  <Input
+                    value={config.placement?.floating_offset_x || '20px'}
+                    onChange={(e) => update('placement.floating_offset_x', e.target.value)}
+                    placeholder="20px"
+                    className="h-8 text-xs"
+                    data-testid="widget-offset-x"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Vertical Offset</Label>
+                  <Input
+                    value={config.placement?.floating_offset_y || '20px'}
+                    onChange={(e) => update('placement.floating_offset_y', e.target.value)}
+                    placeholder="20px"
+                    className="h-8 text-xs"
+                    data-testid="widget-offset-y"
+                  />
+                </div>
+              </div>
+
+              <Separator />
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Button Design</p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Icon</Label>
+                  <select
+                    value={config.placement?.floating_icon || 'book'}
+                    onChange={(e) => update('placement.floating_icon', e.target.value)}
+                    className="w-full h-8 px-2 text-xs border rounded-md bg-background"
+                    data-testid="widget-floating-icon"
+                  >
+                    {ICON_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Button Style</Label>
+                  <select
+                    value={config.placement?.floating_style || 'pill'}
+                    onChange={(e) => update('placement.floating_style', e.target.value)}
+                    className="w-full h-8 px-2 text-xs border rounded-md bg-background"
+                    data-testid="widget-floating-style"
+                  >
+                    {STYLE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Label Text</Label>
                   <Input
                     value={config.placement?.floating_label || 'ChiPi Link'}
                     onChange={(e) => update('placement.floating_label', e.target.value)}
@@ -414,6 +470,12 @@ export default function WidgetManagerModule() {
                     data-testid="widget-floating-label"
                   />
                 </div>
+              </div>
+
+              <Separator />
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Panel Sizes</p>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Sidebar Width</Label>
                   <Input
