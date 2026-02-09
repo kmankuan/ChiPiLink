@@ -15,11 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   Loader2, Save, Copy, Check, Settings, Palette, Layout,
-  Shield, Code, BookOpen, Users, Package, Bell, ExternalLink, Eye
+  Shield, Code, BookOpen, Users, Package, Bell, ExternalLink, Eye, RotateCcw
 } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+const DEFAULT_SITE_URL = 'https://chipilink.me';
 
 const FEATURE_ICONS = {
   textbook_orders: BookOpen,
