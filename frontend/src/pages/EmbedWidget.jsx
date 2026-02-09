@@ -206,9 +206,24 @@ function LinkStudentView({ token, onStudentLinked }) {
 
 /* ── Textbook Orders View (streamlined) ── */
 function TextbookOrdersView({ token, students }) {
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  // Restore persisted student selection
+  const savedState = loadWidgetState();
+  const [selectedStudent, setSelectedStudentRaw] = useState(() => {
+    if (savedState.selectedStudentId) {
+      return students.find(s =>
+        (s.student_id || s._id || s.id) === savedState.selectedStudentId
+      ) || null;
+    }
+    return null;
+  });
   const [order, setOrder] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
+
+  const setSelectedStudent = (student) => {
+    setSelectedStudentRaw(student);
+    const sid = student ? (student.student_id || student._id || student.id) : null;
+    saveWidgetState({ ...loadWidgetState(), selectedStudentId: sid });
+  };
 
   const selectStudent = useCallback(async (student) => {
     setSelectedStudent(student);
