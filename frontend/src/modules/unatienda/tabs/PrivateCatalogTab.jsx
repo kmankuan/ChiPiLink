@@ -681,25 +681,45 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
-                <BookOpen className="h-5 w-5 text-white" />
+              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+                <Warehouse className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Private Catalog - PCA</CardTitle>
-                <CardDescription>Textbooks for linked Panama Christian Academy students</CardDescription>
+                <CardTitle>Inventory</CardTitle>
+                <CardDescription>Unified product & textbook management</CardDescription>
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
+              <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')} className="gap-1.5" data-testid="view-table">
+                <BarChart3 className="h-3.5 w-3.5" /> Products
+              </Button>
+              <Button variant={viewMode === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('history')} className="gap-1.5" data-testid="view-history">
+                <History className="h-3.5 w-3.5" /> Movements
+              </Button>
               <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> {translate('common.refresh', 'Refresh')}
               </Button>
               <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} />
-              <Button onClick={() => handleOpenForm()} className="gap-2"><Plus className="h-4 w-4" /> {translate('store.addBook', 'Add Book')}</Button>
+              <Button onClick={() => handleOpenForm()} className="gap-2"><Plus className="h-4 w-4" /> {translate('store.addBook', 'Add Product')}</Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
+            {/* Catalog Type Tabs */}
+            <div className="flex rounded-md border overflow-hidden" data-testid="catalog-type-filter">
+              {[
+                { value: 'all', label: 'All' },
+                { value: 'pca', label: 'PCA Textbooks' },
+                { value: 'public', label: 'Public Store' },
+              ].map(opt => (
+                <button key={opt.value} onClick={() => setCatalogType(opt.value)}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${catalogType === opt.value ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+                  data-testid={`catalog-${opt.value}`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
