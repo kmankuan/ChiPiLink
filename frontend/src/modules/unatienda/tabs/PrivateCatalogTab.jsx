@@ -455,13 +455,33 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      let url = `${API}/api/store/private-catalog/admin/products?limit=200`;
-      if (selectedGrade) url += `&grade=${encodeURIComponent(selectedGrade)}`;
-      if (selectedSubject) url += `&subject=${encodeURIComponent(selectedSubject)}`;
-      const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-      const data = await response.json();
-      setProducts(data.products || []);
-      const all = data.products || [];
+      // Fetch PCA (private) products
+      let pcaUrl = `${API}/api/store/private-catalog/admin/products?limit=500`;
+      if (selectedGrade) pcaUrl += `&grade=${encodeURIComponent(selectedGrade)}`;
+      if (selectedSubject) pcaUrl += `&subject=${encodeURIComponent(selectedSubject)}`;
+      const pcaRes = await fetch(pcaUrl, { headers: { Authorization: `Bearer ${token}` } });
+      const pcaData = await pcaRes.json();
+      const pcaProducts = (pcaData.products || []).map(p => ({ ...p, _catalog: 'pca' }));
+
+      // Fetch public products
+      let pubProducts = [];
+      try {
+        const pubRes = await fetch(`${API}/api/store/products?limit=500`, { headers: { Authorization: `Bearer ${token}` } });
+        const pubData = await pubRes.json();
+        pubProducts = (pubData.products || pubData || []).map(p => ({
+          ...p,
+          book_id: p.product_id || p.book_id || p._id,
+          _catalog: 'public',
+        }));
+      } catch { /* public store may not have products */ }
+
+      // Merge — avoid duplicates by book_id
+      const seen = new Set();
+      const all = [];
+      for (const p of pcaProducts) { seen.add(p.book_id); all.push(p); }
+      for (const p of pubProducts) { if (!seen.has(p.book_id)) all.push(p); }
+
+      setProducts(all);
       setFilters({
         grades: [...new Set(all.map(p => p.grade).filter(Boolean))].sort(),
         subjects: [...new Set(all.map(p => p.subject).filter(Boolean))].sort(),
