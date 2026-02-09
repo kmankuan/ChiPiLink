@@ -784,7 +784,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
       )}
 
       {/* Products Table */}
-      {sortedProducts.length === 0 ? (
+      {viewMode === 'table' && (sortedProducts.length === 0 ? (
         <Card><CardContent className="py-12 text-center">
           <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-muted-foreground">No books match the current filters</p>
