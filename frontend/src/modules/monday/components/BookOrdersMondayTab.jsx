@@ -223,29 +223,6 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
       const res = await fetch(`${API}/api/store/monday/boards/${boardId}/columns`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      const cols = data.columns || [];
-      const grps = data.groups || [];
-      const subCols = data.subitem_columns || [];
-
-      if (target === 'orders') {
-        setOrdersColumns(cols);
-        setOrdersGroups(grps);
-        setOrdersSubitemColumns(subCols);
-      } else {
-        setTextbooksColumns(cols);
-        setTextbooksSubitemColumns(subCols);
-      }
-    } catch (e) {
-      console.error('Error loading board details:', e);
-    }
-  };
-
-  const loadConfig = async () => {
-    try {
-      const res = await fetch(`${API}/api/store/monday/config`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
       if (!res.ok) return;
       const data = await res.json();
       if (!data) return;
