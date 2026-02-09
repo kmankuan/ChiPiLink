@@ -64,8 +64,8 @@ export default function LaoPanCallback() {
         // Redirect to intended page
         const redirectTo = result.redirectAfter || '/';
         
-        // If returning to the widget, skip the toast (widget has its own UI)
-        if (redirectTo === '/embed/widget') {
+        // Widget flow — go to the "complete" page (user will close this tab)
+        if (redirectTo === '/auth/widget-complete' || redirectTo === '/embed/widget') {
           navigate(redirectTo, { replace: true });
           return;
         }
