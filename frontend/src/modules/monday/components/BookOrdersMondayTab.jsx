@@ -196,7 +196,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
   const loadBoards = async () => {
     setLoadingBoards(true);
     try {
-      const res = await fetch(`${API}/api/monday/boards`, {
+      const res = await fetch(`${API}/api/store/monday/boards`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
