@@ -1044,9 +1044,16 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <span className="text-sm text-muted-foreground">
                   Showing {sortedProducts.length} {isArchiveView ? 'archived' : ''} items{sortConfig.key ? ` • Sorted by ${sortConfig.key} ${sortConfig.direction}` : ''} • Drag headers to reorder
                 </span>
-                <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-2">
-                  <Maximize2 className="h-4 w-4" /> Fullscreen
-                </Button>
+                <div className="flex gap-2">
+                  {isColumnOrderCustom && (
+                    <Button variant="ghost" size="sm" onClick={handleResetColumnOrder} className="gap-1.5 text-xs" data-testid="reset-column-order">
+                      <RotateCcw className="h-3.5 w-3.5" /> Reset Columns
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-2">
+                    <Maximize2 className="h-4 w-4" /> Fullscreen
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0 overflow-hidden">
