@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import {
   BookOpen, Users, Package, Bell, ChevronRight, ChevronLeft,
   Loader2, LogIn, X, ShoppingCart, CheckCircle, Clock, AlertCircle,
-  Wallet, UserPlus, GraduationCap, ExternalLink
+  Wallet, UserPlus, GraduationCap
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
