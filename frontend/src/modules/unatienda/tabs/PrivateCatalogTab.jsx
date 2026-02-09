@@ -840,7 +840,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             </CardContent>
           </Card>
         </>
-      )}
+      ))}
 
       {/* Movement History View */}
       {viewMode === 'history' && (
