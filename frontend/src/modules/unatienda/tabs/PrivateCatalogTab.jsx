@@ -1014,9 +1014,16 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                   <h2 className="text-lg font-semibold">Inventory</h2>
                   <p className="text-sm text-muted-foreground">{sortedProducts.length} items • Drag headers to reorder • Click to sort</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
-                  <Minimize2 className="h-4 w-4" /> Exit Fullscreen
-                </Button>
+                <div className="flex gap-2">
+                  {isColumnOrderCustom && (
+                    <Button variant="ghost" size="sm" onClick={handleResetColumnOrder} className="gap-1.5 text-xs" data-testid="reset-column-order-fullscreen">
+                      <RotateCcw className="h-3.5 w-3.5" /> Reset Columns
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
+                    <Minimize2 className="h-4 w-4" /> Exit Fullscreen
+                  </Button>
+                </div>
               </div>
               {selectedIds.size > 0 && (
                 <div className="px-4 pt-2">
