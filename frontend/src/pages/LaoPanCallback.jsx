@@ -23,8 +23,16 @@ export default function LaoPanCallback() {
       const errorParam = searchParams.get('error');
       const errorDesc = searchParams.get('error_description');
 
+      // Detect if opened as popup by widget
+      const isPopup = window.opener != null;
+
       // Handle OAuth error
       if (errorParam) {
+        if (isPopup) {
+          window.opener.postMessage({ type: 'chipi-auth-error', error: errorDesc || errorParam }, '*');
+          window.close();
+          return;
+        }
         setError(errorDesc || errorParam);
         setProcessing(false);
         return;
@@ -32,6 +40,11 @@ export default function LaoPanCallback() {
 
       // Validate required params
       if (!code || !state) {
+        if (isPopup) {
+          window.opener.postMessage({ type: 'chipi-auth-error', error: 'Incomplete authentication' }, '*');
+          window.close();
+          return;
+        }
         setError('Parámetros de autenticación incompletos');
         setProcessing(false);
         return;
@@ -39,6 +52,14 @@ export default function LaoPanCallback() {
 
       try {
         const result = await processLaoPanCallback(code, state);
+
+        if (isPopup) {
+          // Send token back to the widget iframe via the opener (parent page)
+          const token = localStorage.getItem('auth_token');
+          window.opener.postMessage({ type: 'chipi-auth-token', token }, '*');
+          window.close();
+          return;
+        }
         
         toast.success(`¡Bienvenido, ${result.user.name || 'Usuario'}!`);
         
@@ -48,6 +69,11 @@ export default function LaoPanCallback() {
       } catch (err) {
         console.error('LaoPan callback error:', err);
         const message = err.response?.data?.detail || 'Error al procesar la autenticación';
+        if (isPopup) {
+          window.opener.postMessage({ type: 'chipi-auth-error', error: message }, '*');
+          window.close();
+          return;
+        }
         setError(message);
         setProcessing(false);
       }
