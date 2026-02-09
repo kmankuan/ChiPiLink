@@ -787,10 +787,16 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 { value: 'all', label: 'All' },
                 { value: 'pca', label: 'PCA Textbooks' },
                 { value: 'public', label: 'Public Store' },
+                { value: 'archived', label: 'Archived' },
               ].map(opt => (
-                <button key={opt.value} onClick={() => setCatalogType(opt.value)}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${catalogType === opt.value ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
+                <button key={opt.value} onClick={() => { setCatalogType(opt.value); setSelectedIds(new Set()); }}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                    catalogType === opt.value
+                      ? opt.value === 'archived' ? 'bg-amber-500 text-white' : 'bg-primary text-primary-foreground'
+                      : 'bg-background hover:bg-muted'
+                  }`}
                   data-testid={`catalog-${opt.value}`}>
+                  {opt.value === 'archived' && <Archive className="h-3 w-3 inline mr-1" />}
                   {opt.label}
                 </button>
               ))}
