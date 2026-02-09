@@ -182,9 +182,48 @@ function EditableCell({ value, onSave, type = 'text', className = '' }) {
   );
 }
 
-/* ── Shared Table Component ── */
-function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore }) {
-  const totalWidth = Object.values(columnWidths).reduce((s, w) => s + w, 0);
+/* ── Cell Renderer ── */
+function renderCellContent(col, product, { updateProductField, onAdjustStock }) {
+  const bookId = product.book_id;
+  switch (col.key) {
+    case 'price':
+      return (
+        <EditableCell value={product.price?.toFixed(2) || '0.00'}
+          onSave={(v) => updateProductField(bookId, 'price', parseFloat(v) || 0)}
+          type="number" className="justify-end font-medium" />
+      );
+    case 'stock': {
+      const stock = (product.inventory_quantity || 0) - (product.reserved_quantity || 0);
+      const isOut = stock <= 0;
+      const isLow = stock > 0 && stock < 5;
+      return (
+        <div className={`cursor-pointer rounded px-2 py-1 text-center font-semibold
+          ${isOut ? 'bg-red-100 text-red-700 dark:bg-red-900/30' : isLow ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'}
+          hover:ring-2 hover:ring-primary/50 transition-all`}
+          onClick={() => onAdjustStock?.(product)} title="Click to adjust stock">
+          {product.inventory_quantity || 0}
+        </div>
+      );
+    }
+    case 'status':
+      return (
+        <Badge variant={product.active !== false ? "default" : "secondary"} className="cursor-pointer"
+          onClick={() => updateProductField(bookId, 'active', product.active === false)} title="Click to toggle">
+          {product.active !== false ? "Active" : "Inactive"}
+        </Badge>
+      );
+    default:
+      return (
+        <EditableCell value={product[col.key]}
+          onSave={(v) => updateProductField(bookId, col.key, v)}
+          className={col.mono ? 'font-mono text-sm' : col.key === 'name' ? 'font-medium' : ''} />
+      );
+  }
+}
+
+/* ── Shared Table Component (Dynamic Columns) ── */
+function CatalogTable({ products, columns, columnWidths, onResize, sortConfig, onSort, selectedIds, onToggleSelect, onToggleAll, updateProductField, onDelete, onAdjustStock, isArchiveView, onRestore, dragColumn, onDragStart, onDragOver, onDrop }) {
+  const totalWidth = columns.reduce((s, c) => s + (columnWidths[c.key] || c.width), 0) + (columnWidths.select || 40) + (columnWidths.actions || 80);
   const allSelected = products.length > 0 && products.every(p => selectedIds.has(p.book_id));
   const someSelected = products.some(p => selectedIds.has(p.book_id)) && !allSelected;
 
@@ -192,91 +231,43 @@ function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, se
     <table className="border-collapse" style={{ minWidth: `${totalWidth}px`, width: 'max-content', tableLayout: 'fixed' }}>
       <thead className="sticky top-0 z-20 bg-muted">
         <tr>
-          {/* Select All */}
-          <th className="bg-muted px-2 py-2 text-center border-b" style={{ width: `${columnWidths.select}px`, minWidth: `${columnWidths.select}px` }}>
-            <Checkbox
-              checked={allSelected}
+          <th className="bg-muted px-2 py-2 text-center border-b" style={{ width: `${columnWidths.select || 40}px`, minWidth: `${columnWidths.select || 40}px` }}>
+            <Checkbox checked={allSelected}
               ref={(el) => { if (el) el.dataset.indeterminate = someSelected; }}
               className={someSelected ? 'opacity-70' : ''}
-              onCheckedChange={onToggleAll}
-              data-testid="select-all-checkbox"
-            />
+              onCheckedChange={onToggleAll} data-testid="select-all-checkbox" />
           </th>
-          <ResizableHeader columnKey="name" width={columnWidths.name} onResize={onResize} isSticky sortKey="name" sortConfig={sortConfig} onSort={onSort}>
-            Book Name
-          </ResizableHeader>
-          <ResizableHeader columnKey="code" width={columnWidths.code} onResize={onResize} sortKey="code" sortConfig={sortConfig} onSort={onSort}>
-            Code
-          </ResizableHeader>
-          <ResizableHeader columnKey="grade" width={columnWidths.grade} onResize={onResize} sortKey="grade" sortConfig={sortConfig} onSort={onSort}>
-            Grade
-          </ResizableHeader>
-          <ResizableHeader columnKey="subject" width={columnWidths.subject} onResize={onResize} sortKey="subject" sortConfig={sortConfig} onSort={onSort}>
-            Subject
-          </ResizableHeader>
-          <ResizableHeader columnKey="publisher" width={columnWidths.publisher} onResize={onResize} sortKey="publisher" sortConfig={sortConfig} onSort={onSort}>
-            Publisher
-          </ResizableHeader>
-          <ResizableHeader columnKey="price" width={columnWidths.price} onResize={onResize} sortKey="price" sortConfig={sortConfig} onSort={onSort} className="text-right">
-            Price
-          </ResizableHeader>
-          <ResizableHeader columnKey="stock" width={columnWidths.stock} onResize={onResize} sortKey="stock" sortConfig={sortConfig} onSort={onSort} className="text-center">
-            <div className="flex items-center justify-center gap-1"><Package className="h-4 w-4" /> Stock</div>
-          </ResizableHeader>
-          <ResizableHeader columnKey="status" width={columnWidths.status} onResize={onResize} sortKey="status" sortConfig={sortConfig} onSort={onSort}>
-            Status
-          </ResizableHeader>
-          <ResizableHeader columnKey="actions" width={columnWidths.actions} onResize={onResize} className="text-right">
+          {columns.map((col) => (
+            <ResizableHeader key={col.key} columnKey={col.key}
+              width={columnWidths[col.key] || col.width} onResize={onResize}
+              isSticky={col.sticky} sortKey={col.sortKey} sortConfig={sortConfig} onSort={onSort}
+              className={col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}
+              onDragStart={onDragStart} onDragOver={onDragOver} onDrop={onDrop}
+              isDragging={dragColumn === col.key}>
+              {col.isStock ? <span className="flex items-center justify-center gap-1"><Package className="h-4 w-4" /> {col.label}</span> : col.label}
+            </ResizableHeader>
+          ))}
+          <ResizableHeader columnKey="actions" width={columnWidths.actions || 80} onResize={onResize} isSticky={false} className="text-right">
             {isArchiveView ? 'Actions' : 'Archive'}
           </ResizableHeader>
         </tr>
       </thead>
       <tbody>
         {products.map((p) => {
-          const stock = (p.inventory_quantity || 0) - (p.reserved_quantity || 0);
-          const isLow = stock > 0 && stock < 5;
-          const isOut = stock <= 0;
           const isSelected = selectedIds.has(p.book_id);
-
           return (
             <tr key={p.book_id} className={`group border-b hover:bg-muted/30 ${isSelected ? 'bg-primary/5' : ''}`} data-testid={`book-row-${p.book_id}`}>
-              <td className="px-2 py-1 text-center" style={{ width: `${columnWidths.select}px` }}>
+              <td className="px-2 py-1 text-center" style={{ width: `${columnWidths.select || 40}px` }}>
                 <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect(p.book_id)} data-testid={`select-${p.book_id}`} />
               </td>
-              <td className="sticky left-0 z-10 bg-background border-r p-1" style={{ width: `${columnWidths.name}px`, minWidth: `${columnWidths.name}px` }}>
-                <EditableCell value={p.name} onSave={(v) => updateProductField(p.book_id, 'name', v)} className="font-medium" />
-              </td>
-              <td className="p-1" style={{ width: `${columnWidths.code}px` }}>
-                <EditableCell value={p.code} onSave={(v) => updateProductField(p.book_id, 'code', v)} className="font-mono text-sm" />
-              </td>
-              <td className="p-1" style={{ width: `${columnWidths.grade}px` }}>
-                <EditableCell value={p.grade} onSave={(v) => updateProductField(p.book_id, 'grade', v)} />
-              </td>
-              <td className="p-1" style={{ width: `${columnWidths.subject}px` }}>
-                <EditableCell value={p.subject} onSave={(v) => updateProductField(p.book_id, 'subject', v)} />
-              </td>
-              <td className="p-1" style={{ width: `${columnWidths.publisher}px` }}>
-                <EditableCell value={p.publisher} onSave={(v) => updateProductField(p.book_id, 'publisher', v)} />
-              </td>
-              <td className="p-1 text-right" style={{ width: `${columnWidths.price}px` }}>
-                <EditableCell value={p.price?.toFixed(2) || '0.00'} onSave={(v) => updateProductField(p.book_id, 'price', parseFloat(v) || 0)} type="number" className="justify-end font-medium" />
-              </td>
-              <td className="p-1 text-center" style={{ width: `${columnWidths.stock}px` }}>
-                <div className={`cursor-pointer rounded px-2 py-1 text-center font-semibold
-                  ${isOut ? 'bg-red-100 text-red-700 dark:bg-red-900/30' : isLow ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'}
-                  hover:ring-2 hover:ring-primary/50 transition-all`}
-                  onClick={() => onAdjustStock?.(p)}
-                  title="Click to adjust stock">
-                  {p.inventory_quantity || 0}
-                </div>
-              </td>
-              <td className="p-1" style={{ width: `${columnWidths.status}px` }}>
-                <Badge variant={p.active !== false ? "default" : "secondary"} className="cursor-pointer"
-                  onClick={() => updateProductField(p.book_id, 'active', p.active === false)} title="Click to toggle">
-                  {p.active !== false ? "Active" : "Inactive"}
-                </Badge>
-              </td>
-              <td className="p-1 text-right" style={{ width: `${columnWidths.actions}px` }}>
+              {columns.map((col) => (
+                <td key={col.key}
+                  className={`p-1 ${col.sticky ? 'sticky left-0 z-10 bg-background border-r' : ''} ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : ''}`}
+                  style={{ width: `${columnWidths[col.key] || col.width}px`, minWidth: `${columnWidths[col.key] || col.width}px` }}>
+                  {renderCellContent(col, p, { updateProductField, onAdjustStock })}
+                </td>
+              ))}
+              <td className="p-1 text-right" style={{ width: `${columnWidths.actions || 80}px` }}>
                 {isArchiveView ? (
                   <div className="flex gap-0.5 justify-end">
                     <Button size="sm" variant="ghost" onClick={() => onRestore(p.book_id)} className="opacity-50 group-hover:opacity-100" title="Restore">
