@@ -64,7 +64,7 @@ async def create_order_item(order, user_email="", user_phone=""):
     # Add phone if available
     phone = order.get("form_data", {}).get("phone", "")
     if phone:
-        column_values["phone_mm02j3vh"] = {"phone": phone, "countryShortName": "PA"}
+        column_values["phone_mm02j3vh"] = {"phone": phone.replace(" ", ""), "text": phone}
     
     col_json = json.dumps(json.dumps(column_values))
     
