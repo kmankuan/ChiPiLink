@@ -623,27 +623,10 @@ export default function MondayModule() {
 
         {/* ========== TAB: BOOKS ========== */}
         <TabsContent value="libros" className="space-y-6 mt-6">
-          {!connected ? (
-            <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-6 w-6 text-yellow-600" />
-                  <div>
-                    <p className="font-medium text-yellow-800">Connection required</p>
-                    <p className="text-sm text-yellow-700">
-                      First configure a workspace in the &quot;Workspaces&quot; tab to configure book orders.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Board Selection */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
+          <BookOrdersMondayTab connected={connected} boards={boards} />
+        </TabsContent>
+
+        {/* ========== TAB: GENERAL ========== */}                    <BookOpen className="h-5 w-5" />
                     Book Orders Board
                   </CardTitle>
                   <CardDescription>
