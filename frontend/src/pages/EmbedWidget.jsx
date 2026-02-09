@@ -168,7 +168,7 @@ function LinkStudentView({ token, onStudentLinked }) {
             <Label className="text-xs">First Name</Label>
             <Input
               value={form.first_name}
-              onChange={(e) => setForm(p => ({ ...p, first_name: e.target.value }))}
+              onChange={(e) => updateForm({ first_name: e.target.value })}
               className="h-8 text-xs"
               placeholder="First name"
               data-testid="widget-student-first-name"
@@ -178,7 +178,7 @@ function LinkStudentView({ token, onStudentLinked }) {
             <Label className="text-xs">Last Name</Label>
             <Input
               value={form.last_name}
-              onChange={(e) => setForm(p => ({ ...p, last_name: e.target.value }))}
+              onChange={(e) => updateForm({ last_name: e.target.value })}
               className="h-8 text-xs"
               placeholder="Last name"
               data-testid="widget-student-last-name"
@@ -189,7 +189,7 @@ function LinkStudentView({ token, onStudentLinked }) {
           <Label className="text-xs">Grade</Label>
           <Input
             value={form.grade}
-            onChange={(e) => setForm(p => ({ ...p, grade: e.target.value }))}
+            onChange={(e) => updateForm({ grade: e.target.value })}
             className="h-8 text-xs"
             placeholder="e.g. 3, K5"
             data-testid="widget-student-grade"
