@@ -534,7 +534,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
       });
     }
     return result;
-  }, [products, searchTerm, statusFilter, sortConfig]);
+  }, [products, searchTerm, statusFilter, sortConfig, catalogType]);
 
   // Inline update
   const updateProductField = useCallback(async (bookId, field, value) => {
