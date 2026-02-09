@@ -414,7 +414,7 @@ export default function WidgetManagerModule() {
                 </p>
                 <pre className="p-3 rounded-lg bg-muted text-[11px] font-mono overflow-x-auto border">
 {`<iframe
-  src="${API_URL?.replace('/api', '')}/embed/widget"
+  src="${embedUrl}"
   style="width:100%;max-width:${config.placement?.fullpage_max_width || '900px'};height:600px;border:none;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);"
   allow="clipboard-write"
 ></iframe>`}
@@ -431,7 +431,7 @@ export default function WidgetManagerModule() {
                 </p>
                 <pre className="p-3 rounded-lg bg-muted text-[11px] font-mono overflow-x-auto border">
 {`<iframe
-  src="${API_URL?.replace('/api', '')}/embed/widget"
+  src="${embedUrl}"
   style="width:${config.placement?.sidebar_width || '380px'};height:500px;border:none;border-radius:8px;"
   allow="clipboard-write"
 ></iframe>`}
