@@ -101,6 +101,11 @@ export default function LaoPanCallback() {
   }
 
   if (error) {
+    // Check if we came from widget flow
+    const isWidgetFlow = window.location.pathname.includes('embed') || 
+      document.referrer.includes('/embed/') ||
+      sessionStorage.getItem('chipi_widget_state');
+    
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-md w-full text-center space-y-6">
@@ -112,12 +117,14 @@ export default function LaoPanCallback() {
             <p className="text-muted-foreground">{error}</p>
           </div>
           <div className="flex flex-col gap-3">
-            <Button onClick={() => navigate('/login')} className="w-full">
+            <Button onClick={() => navigate(isWidgetFlow ? '/embed/widget' : '/login')} className="w-full">
               Volver a intentar
             </Button>
-            <Button variant="outline" onClick={() => navigate('/')} className="w-full">
-              Ir al inicio
-            </Button>
+            {!isWidgetFlow && (
+              <Button variant="outline" onClick={() => navigate('/')} className="w-full">
+                Ir al inicio
+              </Button>
+            )}
           </div>
         </div>
       </div>
