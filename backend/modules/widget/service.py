@@ -31,7 +31,11 @@ DEFAULT_WIDGET_CONFIG = {
     "placement": {
         "floating_button": True,
         "floating_position": "bottom-right",
+        "floating_offset_x": "20px",
+        "floating_offset_y": "20px",
         "floating_label": "ChiPi Link",
+        "floating_icon": "book",
+        "floating_style": "pill",
         "sidebar_width": "380px",
         "fullpage_max_width": "900px",
     },
