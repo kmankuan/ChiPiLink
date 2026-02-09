@@ -636,28 +636,9 @@ export default function MondayModule() {
                   API Key
                 </CardTitle>
               </CardHeader>
-                      </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { key: 'cantidad', label: 'Quantity', icon: '🔢' },
-                        { key: 'precio_unitario', label: 'Unit Price', icon: '💰' },
-                        { key: 'subtotal', label: 'Subtotal', icon: '💵' },
-                        { key: 'code', label: 'Code/ISBN', icon: '📖' },
-                        { key: 'subject', label: 'Subject/Category', icon: '📚' },
-                        { key: 'estado', label: 'Status', icon: '📋' }
-                      ].map(({ key, label, icon }) => (
-                        <div key={key} className="flex items-center gap-2">
-                          <span className="text-lg">{icon}</span>
-                          <Label className="min-w-[120px]">{label}</Label>
-                          <Select
-                            value={storeConfig.subitem_column_mapping?.[key] || 'none'}
-                            onValueChange={(value) => setStoreConfig(prev => ({
-                              ...prev,
-                              subitem_column_mapping: {
-                                ...prev.subitem_column_mapping,
-                                [key]: value
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  {legacyStatus?.api_key_configured ? (
                               }
                             }))}
                           >
