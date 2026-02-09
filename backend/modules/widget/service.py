@@ -91,6 +91,7 @@ class WidgetConfigService:
         }
         return {
             "enabled": config["enabled"],
+            "maintenance": config.get("maintenance", {}),
             "features": enabled_features,
             "display": config.get("display", {}),
             "appearance": config["appearance"],
