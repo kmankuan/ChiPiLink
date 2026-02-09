@@ -268,7 +268,14 @@ export function Header() {
             {/* Breadcrumb with integrated back navigation */}
             {!isHomePage && (
               <div className="flex items-center">
-                <ChevronRight className="h-4 w-4 text-muted-foreground/50 mx-1" />
+                <button
+                  onClick={() => navigate(-1)}
+                  className="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/50 transition-colors mx-0.5"
+                  data-testid="back-button"
+                  title="Back"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
