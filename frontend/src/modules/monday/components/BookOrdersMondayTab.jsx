@@ -159,6 +159,8 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
   const token = localStorage.getItem('auth_token');
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [boards, setBoards] = useState(allBoards || []);
+  const [loadingBoards, setLoadingBoards] = useState(false);
 
   // Orders board state
   const [ordersBoard, setOrdersBoard] = useState('');
