@@ -992,8 +992,8 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             <DialogContent className="max-w-[95vw] w-[95vw] h-[90vh] p-0 flex flex-col [&>button]:hidden">
               <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
                 <div>
-                  <h2 className="text-lg font-semibold">Private Catalog - PCA</h2>
-                  <p className="text-sm text-muted-foreground">{sortedProducts.length} books • Click headers to sort • Select rows for bulk actions</p>
+                  <h2 className="text-lg font-semibold">Inventory</h2>
+                  <p className="text-sm text-muted-foreground">{sortedProducts.length} items • Drag headers to reorder • Click to sort</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-2">
                   <Minimize2 className="h-4 w-4" /> Exit Fullscreen
@@ -1008,11 +1008,12 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 </div>
               )}
               <div className="scrollable-table-container flex-1" data-testid="pca-table-fullscreen-container">
-                <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
+                <CatalogTable products={sortedProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
-                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore} />
+                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
+                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop} />
               </div>
             </DialogContent>
           </Dialog>
@@ -1022,7 +1023,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             <CardHeader className="py-3 px-4 border-b">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Showing {sortedProducts.length} {isArchiveView ? 'archived' : ''} items{sortConfig.key ? ` • Sorted by ${sortConfig.key} ${sortConfig.direction}` : ''} • Drag column edges to resize
+                  Showing {sortedProducts.length} {isArchiveView ? 'archived' : ''} items{sortConfig.key ? ` • Sorted by ${sortConfig.key} ${sortConfig.direction}` : ''} • Drag headers to reorder
                 </span>
                 <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-2">
                   <Maximize2 className="h-4 w-4" /> Fullscreen
@@ -1031,11 +1032,12 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             </CardHeader>
             <CardContent className="p-0 overflow-hidden">
               <div className="scrollable-table-container h-[500px]" style={{ maxWidth: '100%', width: '100%' }} data-testid="pca-table-scroll-container">
-                <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
+                <CatalogTable products={sortedProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
-                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore} />
+                  onAdjustStock={setAdjustProduct} isArchiveView={isArchiveView} onRestore={handleRestore}
+                  dragColumn={dragColumn} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleColumnDrop} />
               </div>
             </CardContent>
           </Card>
