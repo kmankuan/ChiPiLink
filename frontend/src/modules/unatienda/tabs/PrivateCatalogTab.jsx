@@ -18,18 +18,63 @@ import {
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
-const DEFAULT_COLUMN_WIDTHS = {
-  select: 42,
-  name: 250,
-  code: 100,
-  grade: 80,
-  subject: 120,
-  publisher: 120,
-  price: 100,
-  stock: 100,
-  status: 90,
-  actions: 70
+/* ── Column definitions per catalog type ── */
+const COLUMN_DEFS = {
+  pca: [
+    { key: 'name', label: 'Book Name', width: 250, sortKey: 'name', sticky: true },
+    { key: 'code', label: 'Code', width: 100, sortKey: 'code', mono: true },
+    { key: 'grade', label: 'Grade', width: 80, sortKey: 'grade' },
+    { key: 'subject', label: 'Subject', width: 120, sortKey: 'subject' },
+    { key: 'publisher', label: 'Publisher', width: 120, sortKey: 'publisher' },
+    { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
+    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
+  ],
+  public: [
+    { key: 'name', label: 'Product Name', width: 250, sortKey: 'name', sticky: true },
+    { key: 'code', label: 'SKU', width: 100, sortKey: 'code', mono: true },
+    { key: 'category', label: 'Category', width: 120, sortKey: 'category' },
+    { key: 'product_type', label: 'Type', width: 100, sortKey: 'product_type' },
+    { key: 'brand', label: 'Brand', width: 120, sortKey: 'brand' },
+    { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
+    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
+  ],
+  all: [
+    { key: 'name', label: 'Name', width: 250, sortKey: 'name', sticky: true },
+    { key: 'code', label: 'Code / SKU', width: 100, sortKey: 'code', mono: true },
+    { key: 'grade', label: 'Grade', width: 80, sortKey: 'grade' },
+    { key: 'category', label: 'Category', width: 120, sortKey: 'category' },
+    { key: 'publisher', label: 'Publisher / Brand', width: 130, sortKey: 'publisher' },
+    { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
+    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
+  ],
 };
+COLUMN_DEFS.archived = COLUMN_DEFS.all;
+
+const STORAGE_KEY_COLS = 'chipi_inv_col_order';
+const STORAGE_KEY_WIDTHS = 'chipi_inv_col_widths';
+
+function loadColumnOrder(type) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY_COLS) || '{}');
+    return stored[type] || null;
+  } catch { return null; }
+}
+function saveColumnOrder(type, order) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY_COLS) || '{}');
+    stored[type] = order;
+    localStorage.setItem(STORAGE_KEY_COLS, JSON.stringify(stored));
+  } catch {}
+}
+function loadColumnWidths() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY_WIDTHS) || '{}'); } catch { return {}; }
+}
+function saveColumnWidths(widths) {
+  try { localStorage.setItem(STORAGE_KEY_WIDTHS, JSON.stringify(widths)); } catch {}
+}
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
