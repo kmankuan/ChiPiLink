@@ -639,11 +639,19 @@ export default function MondayModule() {
               <CardContent>
                 <div className="flex items-center gap-2">
                   {legacyStatus?.api_key_configured ? (
-                              }
-                            }))}
-                          >
-                            <SelectTrigger className="flex-1">
-                              <SelectValue placeholder="Select column" />
+                    <>
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      <span className="font-medium text-green-600">Configured</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-5 w-5 text-red-500" />
+                      <span className="font-medium text-red-600">Not configured</span>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="none">Not mapped</SelectItem>
