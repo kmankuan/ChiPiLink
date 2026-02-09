@@ -576,6 +576,25 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
     return ordered;
   }, [catalogType, columnOrders]);
 
+  const isColumnOrderCustom = useMemo(() => {
+    const defaultOrder = (COLUMN_DEFS[catalogType] || COLUMN_DEFS.all).map(c => c.key);
+    const current = columnOrders[catalogType];
+    if (!current) return false;
+    return JSON.stringify(current) !== JSON.stringify(defaultOrder);
+  }, [catalogType, columnOrders]);
+
+  const handleResetColumnOrder = useCallback(() => {
+    const defaultOrder = (COLUMN_DEFS[catalogType] || COLUMN_DEFS.all).map(c => c.key);
+    setColumnOrders(prev => {
+      const updated = { ...prev, [catalogType]: defaultOrder };
+      saveColumnOrder(catalogType, defaultOrder);
+      return updated;
+    });
+    setColumnWidths(DEFAULT_COLUMN_WIDTHS);
+    saveColumnWidths(DEFAULT_COLUMN_WIDTHS);
+    toast.success('Column layout reset to default');
+  }, [catalogType]);
+
   const [formData, setFormData] = useState({
     name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
     price: '', sale_price: '', inventory_quantity: '0', description: '', image_url: '',
