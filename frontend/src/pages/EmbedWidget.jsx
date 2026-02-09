@@ -486,7 +486,7 @@ export default function EmbedWidget() {
     init();
   }, []);
 
-  // Listen for auth from popup
+  // Listen for auth from popup (relayed via parent page's loader.js)
   useEffect(() => {
     const handler = (e) => {
       if (e.data?.type === 'chipi-auth-token' && e.data?.token) {
@@ -495,6 +495,9 @@ export default function EmbedWidget() {
         axios.get(`${API_URL}/api/auth-v2/me`, {
           headers: { Authorization: `Bearer ${e.data.token}` }
         }).then(r => setUser(r.data)).catch(() => {});
+      }
+      if (e.data?.type === 'chipi-auth-error') {
+        toast.error(e.data.error || 'Authentication failed');
       }
     };
     window.addEventListener('message', handler);
