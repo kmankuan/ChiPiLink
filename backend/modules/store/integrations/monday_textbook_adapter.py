@@ -43,23 +43,40 @@ class TextbookMondayAdapter(BaseMondayAdapter):
         item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f}"
         items_text = ", ".join([f"{i['book_name']} (x{i['quantity_ordered']})" for i in selected_items])
 
-        grade = order["grade"]
-        grade_map = {str(i): f"Grade {i}" for i in range(1, 13)}
-        grade_map.update({"K4": "K4", "K5": "K5"})
-        monday_grade = grade_map.get(grade, f"Grade {grade}" if grade.isdigit() else grade)
+        # Grade → Monday.com status label
+        grade = str(order["grade"])
+        grade_label_map = {
+            "1": "1ro", "2": "2do", "3": "3ro", "4": "4to", "5": "5to",
+            "6": "6to", "7": "7mo", "8": "8vo", "9": "9no", "10": "10mo",
+            "11": "11vo", "12": "12vo", "K4": "K4", "K5": "K5",
+        }
+        monday_grade_label = grade_label_map.get(grade, grade)
 
         # Build column values from mapping
         column_values = {}
         field_map = {
             "student": order["student_name"],
             "guardian": f"{user_name} ({user_email})",
-            "grade": {"labels": [monday_grade]},
+            "grade": {"label": monday_grade_label},
             "books": items_text[:2000],
             "total": total,
             "status": {"label": "Working on it"},
             "order_id": order["order_id"],
             "date": {"date": datetime.now(timezone.utc).strftime("%Y-%m-%d")},
+            "notes": order.get("form_data", {}).get("notes", ""),
         }
+        
+        # Handle email column (requires special format)
+        if user_email:
+            field_map["email"] = {"email": user_email, "text": user_email}
+        
+        # Handle phone column (requires E.164 format)
+        import re
+        phone = order.get("form_data", {}).get("phone", "")
+        if phone:
+            clean_phone = re.sub(r'[^\d+]', '', phone)
+            field_map["phone"] = {"phone": clean_phone, "text": phone}
+        
         for field, value in field_map.items():
             col_id = column_mapping.get(field)
             if col_id:
