@@ -842,6 +842,20 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         </>
       )}
 
+      {/* Movement History View */}
+      {viewMode === 'history' && (
+        <MovementHistoryPanel token={token} />
+      )}
+
+      {/* Stock Adjustment Dialog */}
+      <AdjustStockDialog
+        open={!!adjustProduct}
+        onOpenChange={(open) => { if (!open) setAdjustProduct(null); }}
+        product={adjustProduct}
+        token={token}
+        onAdjusted={() => { fetchProducts(); onRefresh?.(); }}
+      />
+
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
