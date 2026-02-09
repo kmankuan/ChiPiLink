@@ -221,9 +221,8 @@ function LinkStudentView({ token, onStudentLinked }) {
   );
 }
 
-/* ── Textbook Orders View (streamlined) ── */
+/* ── Textbook Orders View (streamlined — full ordering inside widget) ── */
 function TextbookOrdersView({ token, students }) {
-  // Restore persisted student selection
   const savedState = loadWidgetState();
   const [selectedStudent, setSelectedStudentRaw] = useState(() => {
     if (savedState.selectedStudentId) {
@@ -235,6 +234,8 @@ function TextbookOrdersView({ token, students }) {
   });
   const [order, setOrder] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
+  const [cart, setCart] = useState({}); // {book_id: quantity}
+  const [submitting, setSubmitting] = useState(false);
 
   const setSelectedStudent = (student) => {
     setSelectedStudentRaw(student);
@@ -245,6 +246,7 @@ function TextbookOrdersView({ token, students }) {
   const selectStudent = useCallback(async (student) => {
     setSelectedStudent(student);
     setLoadingOrder(true);
+    setCart({});
     try {
       const sid = student.student_id || student._id || student.id;
       const { data } = await axios.get(`${API_URL}/api/store/textbook-orders/student/${sid}`, {
@@ -258,7 +260,6 @@ function TextbookOrdersView({ token, students }) {
     }
   }, [token]);
 
-  // Auto-select if only one approved student
   useEffect(() => {
     const approved = students.filter(s =>
       s.enrollments?.some(e => e.status === 'approved')
@@ -267,6 +268,38 @@ function TextbookOrdersView({ token, students }) {
       selectStudent(approved[0]);
     }
   }, [students, selectedStudent, selectStudent]);
+
+  const toggleBook = (bookId) => {
+    setCart(prev => {
+      const next = { ...prev };
+      if (next[bookId]) { delete next[bookId]; } else { next[bookId] = 1; }
+      return next;
+    });
+  };
+
+  const handleSubmitOrder = async () => {
+    const selectedItems = Object.entries(cart).filter(([_, q]) => q > 0);
+    if (selectedItems.length === 0) {
+      toast.error('Please select at least one textbook');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const sid = selectedStudent.student_id || selectedStudent._id || selectedStudent.id;
+      await axios.post(`${API_URL}/api/store/textbook-orders/submit`, {
+        student_id: sid,
+        items: selectedItems.map(([book_id, quantity]) => ({ book_id, quantity }))
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Order submitted successfully!');
+      setCart({});
+      // Reload to show updated status
+      selectStudent(selectedStudent);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to submit order');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Student selection
   if (!selectedStudent) {
@@ -299,9 +332,7 @@ function TextbookOrdersView({ token, students }) {
             >
               <div>
                 <p className="text-xs font-medium">{s.full_name || `${s.first_name} ${s.last_name}`}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  Grade {enrollment?.grade || '—'}
-                </p>
+                <p className="text-[10px] text-muted-foreground">Grade {enrollment?.grade || '—'}</p>
               </div>
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             </button>
@@ -311,19 +342,23 @@ function TextbookOrdersView({ token, students }) {
     );
   }
 
-  // Textbook list for selected student
   if (loadingOrder) return <LoadingSpinner />;
 
   const items = order?.items || [];
   const orderedItems = items.filter(i => i.status === 'ordered');
   const availableItems = items.filter(i => i.status === 'available');
-  const totalOrdered = orderedItems.reduce((s, i) => s + i.price * i.quantity_ordered, 0);
+  const totalOrdered = orderedItems.reduce((s, i) => s + (i.price || 0) * (i.quantity_ordered || 0), 0);
+  const cartTotal = availableItems
+    .filter(i => cart[i.book_id])
+    .reduce((s, i) => s + (i.price || 0) * (cart[i.book_id] || 0), 0);
+  const cartCount = Object.values(cart).filter(q => q > 0).length;
 
   return (
     <div className="space-y-3" data-testid="widget-textbook-list">
       <div className="flex items-center justify-between">
         {students.filter(s => s.enrollments?.some(e => e.status === 'approved')).length > 1 && (
-          <button onClick={() => { setSelectedStudent(null); setOrder(null); }} className="flex items-center gap-1 text-xs text-primary hover:underline" data-testid="widget-back-btn">
+          <button onClick={() => { setSelectedStudent(null); setOrder(null); setCart({}); }}
+            className="flex items-center gap-1 text-xs text-primary hover:underline" data-testid="widget-back-btn">
             <ChevronLeft className="h-3 w-3" /> Back
           </button>
         )}
@@ -334,40 +369,62 @@ function TextbookOrdersView({ token, students }) {
         </div>
       </div>
 
+      {/* Submitted order summary */}
       {order?.status === 'submitted' && orderedItems.length > 0 && (
         <Card className="bg-green-50 border-green-200 p-2.5">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
             <div>
               <p className="text-xs font-medium text-green-800">Order Submitted</p>
-              <p className="text-[10px] text-green-700">{orderedItems.length} books ordered — ${totalOrdered.toFixed(2)}</p>
+              <p className="text-[10px] text-green-700">{orderedItems.length} books — ${totalOrdered.toFixed(2)}</p>
             </div>
           </div>
         </Card>
       )}
 
+      {/* Available textbooks — selectable */}
       {availableItems.length > 0 && (
         <>
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Available Textbooks</p>
-          {availableItems.map((item, i) => (
-            <Card key={i} className="p-2.5" data-testid={`widget-book-${i}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{item.book_name}</p>
-                  {item.book_code && <p className="text-[10px] text-muted-foreground">{item.book_code}</p>}
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+            Select textbooks to order
+          </p>
+          {availableItems.map((item) => {
+            const isInCart = !!cart[item.book_id];
+            return (
+              <button
+                key={item.book_id}
+                onClick={() => toggleBook(item.book_id)}
+                data-testid={`widget-book-${item.book_id}`}
+                className={`w-full text-left p-2.5 rounded-lg border transition-all ${
+                  isInCart
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                    : 'border-border hover:border-primary/30 hover:bg-accent/30'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    isInCart ? 'bg-primary border-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {isInCart && <CheckCircle className="h-3.5 w-3.5 text-primary-foreground" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{item.book_name}</p>
+                    {item.book_code && <p className="text-[10px] text-muted-foreground">{item.book_code}</p>}
+                  </div>
+                  <span className="text-xs font-semibold text-primary ml-1 shrink-0">${item.price?.toFixed(2)}</span>
                 </div>
-                <span className="text-xs font-semibold text-primary ml-2">${item.price?.toFixed(2)}</span>
-              </div>
-            </Card>
-          ))}
+              </button>
+            );
+          })}
         </>
       )}
 
+      {/* Already ordered */}
       {orderedItems.length > 0 && (
         <>
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-2">Ordered</p>
-          {orderedItems.map((item, i) => (
-            <Card key={i} className="p-2.5 opacity-70" data-testid={`widget-ordered-${i}`}>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-2">Already Ordered</p>
+          {orderedItems.map((item) => (
+            <Card key={item.book_id} className="p-2.5 opacity-60" data-testid={`widget-ordered-${item.book_id}`}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{item.book_name}</p>
@@ -387,11 +444,15 @@ function TextbookOrdersView({ token, students }) {
         </div>
       )}
 
-      <Button size="sm" variant="outline" className="w-full mt-2" onClick={() => {
-        window.open(`${API_URL?.replace('/api', '')}/unatienda?tab=private`, '_blank');
-      }} data-testid="widget-go-to-order">
-        <ExternalLink className="h-3.5 w-3.5 mr-1" /> Open Full Order Page
-      </Button>
+      {/* Submit Order Button */}
+      {cartCount > 0 && (
+        <div className="sticky bottom-0 bg-background pt-2 pb-1 border-t mt-2">
+          <Button className="w-full gap-2" onClick={handleSubmitOrder} disabled={submitting} data-testid="widget-submit-order">
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
+            Order {cartCount} {cartCount === 1 ? 'book' : 'books'} — ${cartTotal.toFixed(2)}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
