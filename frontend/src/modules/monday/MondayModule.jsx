@@ -634,15 +634,8 @@ export default function MondayModule() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   API Key
-                  </div>
-                </CardHeader>
-                
-                {storeConfig.subitems_enabled && (
-                  <CardContent className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                      <p className="text-sm text-blue-800 dark:text-blue-200">
-                        Each product in the order will be created as a subitem within the main item.
-                        Make sure the board has subitems enabled in Monday.com.
+                </CardTitle>
+              </CardHeader>
                       </p>
                     </div>
                     
