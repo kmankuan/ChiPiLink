@@ -7,6 +7,7 @@ from core.database import db
 
 DEFAULT_WIDGET_CONFIG = {
     "enabled": True,
+    "site_url": "https://chipilink.me",
     "features": {
         "textbook_orders": {"enabled": True, "label": "Textbook Orders", "order": 0},
         "my_students": {"enabled": True, "label": "My Students", "order": 1},
