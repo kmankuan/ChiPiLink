@@ -62,6 +62,31 @@ async def sync_order_statuses(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+# ========== BOARD LISTING (Admin) ==========
+
+@router.get("/boards")
+async def list_boards(admin: dict = Depends(get_admin_user)):
+    """List all accessible boards from Monday.com."""
+    if not MONDAY_API_KEY:
+        raise HTTPException(status_code=400, detail="Monday.com API key not configured")
+
+    query = '''query { boards(limit: 100) { id name items_count } }'''
+
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                "https://api.monday.com/v2",
+                json={"query": query},
+                headers={"Authorization": str(MONDAY_API_KEY), "Content-Type": "application/json"},
+                timeout=15.0,
+            )
+            data = resp.json()
+            boards = data.get("data", {}).get("boards", [])
+            return {"boards": boards}
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=502, detail=f"Monday.com API error: {e}")
+
+
 # ========== BOARD COLUMN DISCOVERY (Admin) ==========
 
 @router.get("/boards/{board_id}/columns")
