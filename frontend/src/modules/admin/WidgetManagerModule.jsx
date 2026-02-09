@@ -87,7 +87,26 @@ export default function WidgetManagerModule() {
     }
   };
 
-  const embedSnippet = `<!-- ChiPi Link Widget -->\n<script src="${API_URL}/api/widget/loader.js" defer></script>`;
+  const handleReset = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const { data } = await axios.post(`${API_URL}/api/widget/admin/config/reset`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setConfig(data);
+      setHasChanges(false);
+      toast.success('Config reset to defaults');
+    } catch {
+      toast.error('Failed to reset');
+    }
+  };
+
+  // Use the configured site_url or fallback to default production URL
+  const siteUrl = config?.site_url || DEFAULT_SITE_URL;
+  const loaderUrl = `${siteUrl}/api/widget/loader.js`;
+  const embedUrl = `${siteUrl}/embed/widget`;
+
+  const embedSnippet = `<!-- ChiPi Link Widget -->\n<script src="${loaderUrl}" defer></script>`;
 
   const copySnippet = () => {
     navigator.clipboard.writeText(embedSnippet);
