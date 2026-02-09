@@ -418,6 +418,15 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   // Sort
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
+  // Stock adjust dialog
+  const [adjustProduct, setAdjustProduct] = useState(null);
+
+  // View mode: table | history
+  const [viewMode, setViewMode] = useState('table');
+
+  // Catalog type filter
+  const [catalogType, setCatalogType] = useState('all');
+
   const handleColumnResize = useCallback((key, w) => {
     setColumnWidths(prev => ({ ...prev, [key]: w }));
   }, []);
