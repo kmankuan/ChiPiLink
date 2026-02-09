@@ -537,6 +537,45 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
     });
   }, []);
 
+  // Drag-and-drop column reorder
+  const handleDragStart = useCallback((e, columnKey) => {
+    setDragColumn(columnKey);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleColumnDrop = useCallback((e, targetKey) => {
+    e.preventDefault();
+    if (!dragColumn || dragColumn === targetKey) { setDragColumn(null); return; }
+    setColumnOrders(prev => {
+      const order = [...(prev[catalogType] || COLUMN_DEFS[catalogType].map(c => c.key))];
+      const fromIdx = order.indexOf(dragColumn);
+      const toIdx = order.indexOf(targetKey);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      order.splice(fromIdx, 1);
+      order.splice(toIdx, 0, dragColumn);
+      saveColumnOrder(catalogType, order);
+      return { ...prev, [catalogType]: order };
+    });
+    setDragColumn(null);
+  }, [dragColumn, catalogType]);
+
+  // Active columns based on catalog type + saved order
+  const activeColumns = useMemo(() => {
+    const defs = COLUMN_DEFS[catalogType] || COLUMN_DEFS.all;
+    const order = columnOrders[catalogType];
+    if (!order) return defs;
+    const defMap = {};
+    defs.forEach(c => { defMap[c.key] = c; });
+    const ordered = order.map(key => defMap[key]).filter(Boolean);
+    defs.forEach(c => { if (!order.includes(c.key)) ordered.push(c); });
+    return ordered;
+  }, [catalogType, columnOrders]);
+
   const [formData, setFormData] = useState({
     name: '', code: '', isbn: '', publisher: '', grade: '', subject: '',
     price: '', sale_price: '', inventory_quantity: '0', description: '', image_url: '',
