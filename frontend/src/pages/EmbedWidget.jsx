@@ -697,6 +697,30 @@ export default function EmbedWidget() {
     );
   }
 
+  // ── Maintenance mode ──
+  const maintenance = config?.maintenance || {};
+  if (maintenance.active) {
+    return (
+      <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-maintenance">
+        <Toaster position="top-center" richColors />
+        {!hideNavbar && (
+          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} />
+        )}
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 text-center">
+          <div className="p-4 rounded-full bg-amber-100">
+            <AlertCircle className="h-8 w-8 text-amber-600" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold">Under Maintenance</h3>
+            <p className="text-xs text-muted-foreground mt-2 max-w-[260px]">
+              {maintenance.message || "We're currently performing maintenance. Please check back shortly."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Not logged in ──
   if (!token) {
     return (
