@@ -283,11 +283,6 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate(-1)} className="flex items-center gap-2 cursor-pointer">
-                      <ChevronLeft className="h-4 w-4" />
-                      Back
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to="/" className="flex items-center gap-2">
                         <Home className="h-4 w-4" />
