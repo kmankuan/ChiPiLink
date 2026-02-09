@@ -1,139 +1,178 @@
 <analysis>**original_problem_statement:**
-The user wants to progressively enhance the application's UI/UX. The key features and changes requested during this session were:
-1.  **Order Form Seeding**: Populate the order form with initial fields.
-2.  **UI Theme Enhancement**:
-    *   Implement color palettes (Default, Elegant, Warm, Ocean, Minimal).
-    *   Add more font choices.
-    *   Introduce density options (compact/comfortable/spacious).
-    *   Allow separate theme customization for the public site and the admin panel.
-3.  **Preview Theme**: Add a Preview as User button for admins to see unsaved theme changes on the live site.
-4.  **Widget Module**: Create an embeddable widget for an external site () to allow users to order textbooks. This includes an admin UI for configuration and code generation.
-5.  **UI Layout Templates**: Go beyond color changes to implement actual page layout variations.
-    *   Add a custom China-Panamá cultural theme combining color and layout elements.
-6.  **Manual Auto-Translate**: Change the auto-translate feature in the Forms Manager from automatic (on-type) to manual (on-click of a button).
-7.  **Native App Redesign**: Perform a major redesign of the public-facing landing page to make it look and feel more like a modern, borderless native application.
+The user initially wanted to verify and ensure the Monday.com integration was working correctly, specifically for syncing textbook orders. The user then requested a series of significant enhancements to the admin UI and the customer-facing embeddable widget.
+
+PRODUCT REQUIREMENTS:
+1.  **Monday.com Sync:** Verify and fix the sync between textbook orders and the Monday.com Textbooks board. When an order is created, find the matching textbook item and add the student as a subitem. If the textbook doesn't exist, create it.
+2.  **Widget UI Customization:**
+    *   Add admin options to hide the URL bar, navbar, and bottom footer in the widget.
+    *   Streamline the widget flow: show only the Log in with LaoPan button, then the Link Student workflow, and finally the textbook list for the approved student.
+    *   Add an option to display a Wallet feature.
+    *   Allow customization of the widget's floating button position (more options than just bottom-right), including custom X/Y offsets and icon/style selection.
+3.  **In-Widget OAuth:** The LaoPan OAuth process should happen within the widget or in a way that doesn't navigate the user away from the parent site, especially on mobile. The user should return to the widget seamlessly after authentication.
+4.  **Widget State Persistence:** The widget should remember user input (e.g., in forms) and the current view if it's accidentally closed and reopened.
+5.  **Inventory Management Enhancements (Private PCA Table):**
+    *   Add multi-select capabilities for bulk actions (delete, edit).
+    *   Add column sorting.
+    *   Add more powerful filtering (e.g., by status).
+    *   Implement an Archive system instead of direct deletion, allowing items to be moved to an Archived area from which they can be restored or permanently deleted.
+    *   Merge the Private PCA and Inventory tabs into a single, unified inventory management system.
+    *   Implement column reordering (drag-and-drop).
+    *   Support dynamic columns that change based on the catalog type (e.g., Public Store items have different columns than PCA Textbooks).
+6.  **Widget Maintenance Mode:** Add a pause or maintenance mode toggle in the admin panel. When enabled, the widget should display a message indicating it's temporarily unavailable.
+7.  **In-Widget Ordering:** The entire textbook ordering process should happen inside the widget, removing the Open Full Order Page button.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack textbook ordering application built with a FastAPI backend and a React frontend. The application now features a highly customizable UI/UX layer. Key completed features include:
--   An admin-configurable UI Style module with separate controls for the public and admin areas, supporting multiple color themes, layouts, fonts, and density settings.
--   A Preview as User function for admins to test theme changes without saving.
--   A complete Widget Module that allows admins to configure and generate an embeddable script for an external website.
--   A manual, icon-driven translation feature in the Forms Manager.
--   A newly redesigned public landing page with a modern, borderless, native app look and feel.
+The application has a FastAPI backend and a React frontend. Key features include:
+- A fully functional Monday.com integration that syncs textbook orders to two separate boards.
+- An embeddable widget for  with a robust, server-side-relayed OAuth flow that works across different domains and on mobile without storage partitioning issues.
+- A highly customizable admin panel allowing configuration of the widget's appearance, placement, and features.
+- A unified inventory management system that combines the private (PCA Textbooks) and public catalogs. It supports advanced filtering, sorting, bulk actions, and a full archive/restore/permanent-delete lifecycle.
+- A maintenance mode for the widget that can be toggled from the admin panel.
+- The textbook ordering process is now fully contained within the widget.
 
 **Last working item**:
--   **Last item agent was working**: Implementing a major UI redesign of the public-facing landing page (), header (), and related components to match a native app design specification. This involved changing the layout to be full-width, removing borders and card containers, and using more vibrant, icon-centric components.
--   **Status**: TESTING PENDING
--   **Agent Testing Done**: N (Test was initiated, but results have not been reviewed yet).
--   **Which testing method agent to use?** frontend testing agent
--   **User Testing Done**: N
+- Last item agent was working: The agent was about to begin a major refactor of the unified inventory management component () to add two new features requested by the user:
+    1.  **Draggable Columns:** Allow users to reorder the columns in the inventory table.
+    2.  **Dynamic Columns:** Display different sets of columns depending on whether the user is viewing PCA Textbooks or Public Store products.
+    The agent had formed a plan to use the  library and restructure the component to use a dynamic column definition system instead of hardcoded columns.
+- Status: NOT STARTED
+- Agent Testing Done: N
+- Which testing method agent to use? Frontend testing agent
+- User Testing Done: N
 
 **All Pending/In progress Issue list**:
-There are no outstanding issues. The focus is on completing the in-progress task.
+- **Issue 1:** The  component needs a significant refactor to support dynamic and reorderable columns. (Priority: P0)
+  - **Attempted fixes:** None. The agent has only created a plan.
+  - **Next debug checklist:**
+      1.  Install the  library.
+      2.  Refactor  to define columns as a dynamic array of objects instead of hardcoded JSX.
+      3.  Implement a  hook to persist the column order.
+      4.  Create separate column definition arrays for 'PCA' and 'Public' catalog types.
+      5.  Wrap the table headers in , , and  components from .
+      6.  Update the  component to work with the new drag-and-drop functionality.
+      7.  Ensure all existing features (sorting, filtering, bulk actions) continue to work after the refactor.
+  - **Why fix this issue and what will be achieved with the fix?** This will fulfill the user's request for a more flexible and user-friendly inventory management table, allowing them to customize the view to their needs.
+  - **Status:** NOT STARTED
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** frontend
+  - **Blocked on other issue:** None.
 
 **In progress Task List**:
-
--   **Task 1**: Verify the Native App Redesign (Priority: P0)
-    -   **Where to resume**: The agent has just finished the implementation of the redesign and initiated the frontend testing agent (). The next action is to analyze the test report from that run.
-    -   **What will be achieved with this?** This will confirm that the significant visual redesign of the public landing page has not introduced any functional regressions or broken existing features.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Frontend (already initiated).
-    -   **Blocked on something**: No.
+- **Task 1:** Implement draggable columns and dynamic column definitions in the inventory management table. (Priority: P0)
+    - **Where to resume:** Start by installing  and then begin refactoring the  file according to the plan outlined by the previous agent.
+    - **What will be achieved with this?** A more powerful and customizable inventory table that meets the user's requirements.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** frontend
+    - **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
-There are no new pending tasks requested by the user. After verifying the current redesign, the next logical step would be to ask the user for feedback on the latest implementation.
+There are no other pending tasks. The agent has addressed all previous user requests.
 
 **Completed work in this session**
--   **Native App UI Redesign**: Redesigned the public landing page, header, and child components for a borderless, full-width, native app feel. (Files: , , ).
--   **Manual Auto-Translate Button**: Replaced the on-type auto-translate in the Forms Manager with a manual icon button for translating field labels and options. (File: ).
--   **Translation Dictionary Expansion**: Added common form field terms (Cash, Credit Card, Male, Female, etc.) to the translation dictionary to improve auto-translate accuracy.
--   **UI Layout Templates**: Implemented a system for selectable page layouts, including a custom China-Panamá theme. (Files: , ).
--   **Widget Module**: Created the backend API, frontend embeddable app, and admin management UI for the third-party widget. (Files: , , ).
--   **Preview as User Feature**: Added a button for admins to preview unsaved theme changes in a new tab. (Files: , ).
--   **Advanced UI Theme Enhancement**: Added support for separate public/admin themes, more fonts, and density controls. (Files: , ).
--   **Order Form Seeding**: Added default fields to the Order Form on initial database seed. (File: ).
+- **Monday.com Integration Verified:** Created a test script () to confirm that textbook orders correctly sync to the Textbooks board, creating new items or adding students as subitems as required.
+- **In-Widget OAuth Flow:** Implemented a robust, server-side relay mechanism to handle cross-domain authentication in the widget, solving issues with iframes and browser storage partitioning.
+- **Unified Inventory Management:** Merged the Private PCA and Inventory tabs into a single Inventory tab with a unified product list, advanced filters (including catalog type), sorting, and multi-select bulk actions.
+- **Inventory Archive System:** Replaced the delete functionality with a full archive workflow (Archive -> Restore / Permanent Delete) on both the backend and frontend.
+- **In-Widget Ordering Flow:** Removed the Open Full Order Page button and implemented the entire textbook selection and ordering process within the widget.
+- **Widget UI/UX Enhancements:**
+    - Added admin controls to hide the navbar/footer and streamline the login-to-order flow.
+    - Implemented a persistent state for the widget using  to remember form data and user progress.
+- **Widget Appearance Customization:**
+    - Added extensive admin options to control the floating button's position, offset, icon, and style.
+    - Implemented a live preview of the button configuration in the admin panel.
+- **Widget Maintenance Mode:** Added a toggle in the admin panel to enable/disable a maintenance screen for the widget, with a customizable message.
+- **PCA Table Refactor:** The Private Catalog table was significantly improved with multi-select, sorting, and status filters before being merged into the unified inventory system.
 
 **Earlier issues found/mentioned but not fixed**
-None.
+- **Issue 1:** A React warning for a missing dependency in a  hook () was noted in  but was not fixed as the agent moved on to the next user request.
+  - **Debug checklist:** Locate the  hook that filters the products and add  to its dependency array.
+  - **Why to solve this issue and what will be achieved with this?** Fixes a React warning and ensures the filtering logic re-runs correctly when the catalog type changes. This may be resolved as part of the upcoming major refactor.
+  - **Should Test frontend/backend/both after fix:** frontend
+  - **Is recurring issue?** N
 
 **Known issue recurrence from previous fork**
-None.
+- **Issue recurrence in previous fork:** None.
+- **Recurrence count:** 0
+- **Status:** NOT STARTED
 
 **Code Architecture**
-
+archived
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, PostgreSQL, SQLAlchemy, Pydantic
--   **Frontend**: React, React Router, TailwindCSS, Context API
--   **Authentication**: JWT tokens, with an SSO flow for .
--   **Deployment**: Separate services for frontend and backend.
+- **Frontend:** React, Vite, , , .  is planned.
+- **Backend:** Python, FastAPI.
+- **Authentication:** LaoPan OAuth2, JWTs. A custom server-side token relay was built to handle cross-domain iframe authentication.
+- **Database:** PostgreSQL (assumed, via API interactions).
+- **API Integration:** Monday.com API for board and item management.
 
 **key DB schema**
--   **UIStyle**: 
--   **WidgetConfig**: 
--   **Translation**: 
--   **Form**: 
--   **FormField**: 
+-   **private_catalog_items:** { ... , : Boolean, : Boolean, : DateTime }
 
 **changes in tech stack**
--   No changes in the core technology stack.
+- The  library is planned for addition to handle column reordering.
 
 **All files of reference**
--   : Contains the main public-facing landing page, which was heavily redesigned.
--   : The admin UI for managing all theme and layout settings.
--   : The admin UI for managing dynamic forms, updated with the manual translate button.
--   : The new admin UI for managing the embeddable widget.
--   : New React context that provides the selected layout to public pages.
--   : Manages the application's color theme, fonts, and density, and now handles public/admin scopes and preview mode.
--   : New API endpoint that serves the widget configuration and loader script.
--   : Backend service for fetching and updating UI styles, now including layout information.
+-   : The core inventory management component. It was refactored to merge two tabs and add an archive system. It is the target of the next major refactor for draggable/dynamic columns.
+-   : The main entry point for the customer-facing widget. It was heavily modified to implement the server-side auth relay, state persistence, maintenance mode, and in-widget ordering.
+-   : Backend for LaoPan OAuth and Monday.com integration.
+-   : Backend for widget configuration and the server-side auth session relay.
+-   : Frontend page that handles the OAuth callback, modified to redirect correctly for the widget flow.
+-   : Admin UI for configuring the widget, updated with many new options (display, placement, maintenance).
+-   : The parent component that holds the admin tabs; updated to merge the inventory tabs.
+-   : The Pydantic model for catalog items, updated to include the  and  fields.
+
+**Areas that need refactoring**:
+- : This ~1000 line file is the subject of the current task. It needs to be refactored to support dynamic, reorderable columns, which will also improve its structure and maintainability.
 
 **key api endpoints**
--   : Retrieves the active theme and layout for the public site.
--   : Retrieves the complete style configuration for the admin panel.
--   : Updates the style configuration.
--   : Serves the JavaScript loader for the embeddable widget.
--   : Retrieves the widget configuration for the admin panel.
--   : Updates the widget configuration.
+-   : Creates a new session ID for the auth relay.
+-   : Stores the JWT token against a session ID.
+-   : Polled by the widget to retrieve the stored token.
+-   : Archives a single catalog item.
+-   : Archives multiple items.
+-   : Restores an archived item.
+-   : Permanently deletes archived items.
+-   : Submits a textbook order from within the widget.
 
 **Critical Info for New Agent**
--   The user is highly focused on the visual presentation and feel of the application. They may request further aesthetic tweaks after reviewing the latest redesign.
--   The layout templates feature works by applying different CSS classes based on the selected layout, which restyles and repositions existing components. It does not render entirely different component trees. This approach has satisfied the user's request for visual variety.
--   Your immediate first step should be to check the results of the  run that was initiated at the end of the last session to validate the landing page redesign.
+- **Server-Side Auth Relay is Key:** The most complex problem solved was the cross-domain iframe authentication. The current solution uses a server-side session store () where the widget polls for a token that the auth callback page pushes. Do not revert to  or  solutions, as they were proven ineffective due to browser security policies (, storage partitioning).
+- **Inventory Refactor Plan:** The next task is a significant refactor of . The previous agent's plan is solid: use  and a dynamic column definition object to replace the hardcoded table structure. This will enable both column reordering and context-specific columns.
+- **Monday.com APIs are Live:** The tests and development for the Monday.com integration were performed against live boards. Be cautious with any changes to the related services (, ).
 
 **documents and test reports created in this job**
--   
--    (multiple reports generated throughout the session)
+- A test script was created at  to verify the Monday.com integration.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Requested a UI design more like a native app, noting that previous layout templates didn't change the page structure enough.
-2.  **Agent**: Acknowledged the request and initiated a call to the design agent for a proper redesign.
-3.  **Agent**: Shared the design brief.
-4.  **Agent**: Shared the implementation plan.
-5.  **(No User Reply)**
-6.  **Agent**: Started implementing the redesign.
-7.  **Agent**: Continued implementation.
-8.  **Agent**: Shared screenshots, noted imperfections (e.g., layout not being full-width), and applied fixes.
-9.  **Agent**: Shared the final, improved screenshot of the redesigned page.
-10. **Agent**: Initiated the frontend testing agent to verify the changes.
+1.  **User Message:** Asks about maintenance mode. (Completed)
+2.  **User Message:** Asks for column reordering and dynamic columns for the inventory table. (In Progress - This is the current task)
+3.  **User Message:** Agrees with the agent's plan for the inventory table refactor. (Acknowledged)
+4.  **User Message:** Asks why the delete function in the inventory wasn't working and requests an archive system. (Completed)
+5.  **User Message:** Approves the agent's plan to merge inventory tabs but warns not to break existing integrations. (Completed)
+6.  **User Message:** Asks for an analysis of how to merge the Private PCA and Inventory tabs. (Completed)
+7.  **User Message:** Asks for the difference between the Private PCA and Inventory tabs. (Completed)
+8.  **User Message:** Reports that clicking Open Full Order Page takes the user to the wrong site and asks for the flow to stay in the widget. (Completed)
+9.  **User Message:** Reports the widget gets stuck after login. (Completed - This led to the final server-side relay auth solution).
+10. **User Message:** Reports an error after deploying the in-frame auth navigation fix ( issue). (Completed)
 
 **Project Health Check:**
--   **Broken**: None known.
--   **Mocked**: The content for News, Events, and Gallery sections on the landing page is static placeholder data.
+- **Working:** The application is in a stable and working state. All features implemented in this session were tested and verified.
+- **Broken:** Nothing is currently broken.
+- **Mocked:** No components are mocked. The integrations (Monday.com, LaoPan) are live.
 
 **3rd Party Integrations**
--   **LaoPan SSO**: An authentication integration with  exists for user login. The exact protocol (e.g., OAuth2, SAML) is implemented in the auth flow.
+- **LaoPan OAuth:** Used for user authentication in the widget. Requires User API Key configured in the environment.
+- **Monday.com API:** Used for syncing textbook orders and inventory. Uses the Emergent LLM Key (via workspace token).
 
 **Testing status**
--   **Testing agent used after significant changes**: YES
--   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None. The built-in testing agent was used.
--   **Known regressions**: None known. Awaiting results from the last test run.
+- **Testing agent used after significant changes:** YES
+- **Troubleshoot agent used after agent stuck in loop:** YES
+- **Test files created:** 
+- **Known regressions:** None.
 
 **Credentials to test flow:**
-Admin credentials are handled automatically by the agent's tools.
+Credentials for admin login and LaoPan are not available in the history but are configured in the environment.
 
 **What agent forgot to execute**
-The agent successfully addressed all user requests from the session. A previous, less comprehensive implementation of layout templates was correctly identified by the user as insufficient, and the agent pivoted to a full redesign as requested. Nothing was forgotten.</analysis>
+- The agent identified a React warning about a missing  dependency in a  hook within . While noting it, the agent proceeded with the next user request without fixing it. This should be addressed during the upcoming refactor of that same file.</analysis>
