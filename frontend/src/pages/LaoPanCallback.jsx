@@ -61,10 +61,16 @@ export default function LaoPanCallback() {
           return;
         }
         
-        toast.success(`¡Bienvenido, ${result.user.name || 'Usuario'}!`);
-        
-        // Redirect to intended page or home
+        // Redirect to intended page
         const redirectTo = result.redirectAfter || '/';
+        
+        // If returning to the widget, skip the toast (widget has its own UI)
+        if (redirectTo === '/embed/widget') {
+          navigate(redirectTo, { replace: true });
+          return;
+        }
+
+        toast.success(`¡Bienvenido, ${result.user.name || 'Usuario'}!`);
         navigate(redirectTo, { replace: true });
       } catch (err) {
         console.error('LaoPan callback error:', err);
