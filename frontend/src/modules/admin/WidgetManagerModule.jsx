@@ -141,6 +141,9 @@ export default function WidgetManagerModule() {
           <Button size="sm" variant="outline" onClick={previewWidget} data-testid="widget-preview-btn">
             <Eye className="h-3.5 w-3.5 mr-1" /> Preview
           </Button>
+          <Button size="sm" variant="ghost" onClick={handleReset} data-testid="widget-reset-btn" className="text-muted-foreground">
+            <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset
+          </Button>
           <Button size="sm" onClick={handleSave} disabled={saving || !hasChanges} data-testid="widget-save-btn">
             {saving ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
             Save
