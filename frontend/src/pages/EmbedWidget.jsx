@@ -59,23 +59,48 @@ function loadWidgetState() {
   try { return JSON.parse(sessionStorage.getItem(WIDGET_STATE_KEY) || '{}'); } catch { return {}; }
 }
 
-/* ── Login Prompt (LaoPan — opens new tab, detects auth via storage event) ── */
+/* ── Login Prompt (LaoPan — new tab + server-side token relay) ── */
 function LoginPrompt() {
   const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+
+  // Poll server for token once we have a session
+  useEffect(() => {
+    if (!sessionId) return;
+    let active = true;
+    const poll = setInterval(async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/api/widget/auth-session/${sessionId}/poll`);
+        if (!active) return;
+        if (data.status === 'ready' && data.token) {
+          clearInterval(poll);
+          localStorage.setItem('auth_token', data.token);
+          window.location.reload();
+        } else if (data.status === 'expired') {
+          clearInterval(poll);
+          setLoading(false);
+          setSessionId(null);
+        }
+      } catch { /* keep polling */ }
+    }, 2000);
+    return () => { active = false; clearInterval(poll); };
+  }, [sessionId]);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      // Get OAuth URL, redirect back to a special "close this tab" callback
+      const { data: session } = await axios.post(`${API_URL}/api/widget/auth-session`);
+      const sid = session.session_id;
+      setSessionId(sid);
+
       const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`, {
-        params: { redirect: '/auth/widget-complete' }
+        params: { redirect: `/auth/widget-complete?ws=${sid}` }
       });
       if (!data.auth_url) {
         toast.error('OAuth not configured');
         setLoading(false);
         return;
       }
-      // Open OAuth in a new tab (works on mobile — no iframe restriction)
       window.open(data.auth_url, '_blank');
     } catch (err) {
       console.error('OAuth login error:', err);
