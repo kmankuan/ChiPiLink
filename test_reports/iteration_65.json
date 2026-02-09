@@ -1,0 +1,101 @@
+{
+  "summary": "Widget display configuration testing complete. All 7 features verified: Backend APIs return correct display settings, Wallet feature is included, EmbedWidget loads without bottom nav showing only LaoPan login, Admin Widget Manager has Display tab with all toggle switches functional.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "GET /api/widget/embed-config returns 200 with display section",
+    "Display section includes: hide_url_bar, hide_navbar, hide_footer, streamlined_flow (all booleans)",
+    "Wallet feature present in features list with label and order",
+    "All 5 default features present: textbook_orders, my_students, order_status, notifications, wallet",
+    "Admin config endpoint requires authentication (returns 401 without token)",
+    "Admin can update display options via PUT /api/widget/admin/config",
+    "Widget reset endpoint returns config with display defaults",
+    "EmbedWidget page /embed/widget loads without bottom navigation bar",
+    "EmbedWidget shows only LaoPan login button when not authenticated",
+    "Widget Manager UI has Display tab with toggle switches for all display options",
+    "Widget Manager Features tab shows Wallet feature with toggle",
+    "Preview, Reset, Save buttons present in Widget Manager",
+    "Display options: Hide URL toggle found with data-testid",
+    "Display options: Hide Navbar toggle found with data-testid",
+    "Display options: Streamlined flow toggle found with data-testid and flow description"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_widget_display_config.py",
+    "/app/test_reports/pytest/pytest_results_widget_display.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "DEFAULT_WIDGET_CONFIG in service.py correctly defines all display options with sensible defaults (all True)",
+    "get_public_config() correctly exposes display section without security internals",
+    "WidgetManagerModule.jsx properly implements Display tab with all toggle switches",
+    "EmbedWidget.jsx correctly implements streamlined flow logic based on display config",
+    "BottomNav.jsx line 51 correctly hides bottom nav on /embed routes"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_widget_display_config.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (16/16 pytest tests passed)",
+    "frontend": "100% (all Display tab UI elements verified via Playwright)"
+  },
+
+  "test_credentials": {
+    "admin": {
+      "email": "teck@koh.one",
+      "password": "Acdb##0897",
+      "login_endpoint": "POST /api/auth-v2/login"
+    }
+  },
+
+  "seed_data_creation": "",
+
+  "mocked_apis": {
+    "has_mocked_apis": false,
+    "note": "All APIs are live and functional. No mocked endpoints."
+  },
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Widget display configuration features are fully implemented. The EmbedWidget page at /embed/widget shows a clean LaoPan login screen with no bottom nav or header. Admin Widget Manager (under Administration > Widget tab) has Display tab with toggles for hide_url_bar, hide_navbar, hide_footer, and streamlined_flow. Features tab includes Wallet feature. All display defaults are True for maximum widget cleanliness.",
+
+  "verified_features": {
+    "backend_api": {
+      "public_embed_config": "Returns display section with all 4 options",
+      "admin_config": "Returns full config including security section",
+      "admin_update": "Can update display options and changes persist",
+      "admin_reset": "Returns config with correct defaults"
+    },
+    "frontend_embed_widget": {
+      "bottom_nav_hidden": true,
+      "shows_laopan_login_only": true,
+      "widget_shell_present": true,
+      "login_prompt_present": true
+    },
+    "admin_widget_manager": {
+      "display_tab_present": true,
+      "hide_url_toggle": "data-testid='widget-display-hide-url'",
+      "hide_navbar_toggle": "data-testid='widget-display-hide-navbar'",
+      "streamlined_flow_toggle": "data-testid='widget-display-streamlined'",
+      "wallet_feature_toggle": "data-testid='widget-feature-toggle-wallet'",
+      "preview_button": "data-testid='widget-preview-btn'",
+      "reset_button": "data-testid='widget-reset-btn'",
+      "save_button": "data-testid='widget-save-btn'"
+    }
+  }
+}
