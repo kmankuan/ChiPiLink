@@ -385,6 +385,23 @@ export default function WidgetManagerModule() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* Site URL */}
+              <div>
+                <Label className="text-xs font-medium mb-1 block">Site URL</Label>
+                <p className="text-[10px] text-muted-foreground mb-1.5">
+                  Your production domain. All embed codes will use this URL.
+                </p>
+                <Input
+                  value={config?.site_url || DEFAULT_SITE_URL}
+                  onChange={(e) => update('site_url', e.target.value)}
+                  placeholder="https://chipilink.me"
+                  className="h-8 text-xs font-mono"
+                  data-testid="widget-site-url"
+                />
+              </div>
+
+              <Separator />
+
               {/* Floating Button (1 line) */}
               <div>
                 <Label className="text-xs font-medium mb-1 block">Option 1: Floating Button (recommended)</Label>
