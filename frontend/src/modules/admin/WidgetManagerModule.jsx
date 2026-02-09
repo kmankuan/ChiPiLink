@@ -504,6 +504,19 @@ export default function WidgetManagerModule() {
                   />
                 </div>
               </div>
+
+              <Separator />
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Live Preview</p>
+
+              <ButtonPreview
+                position={config.placement?.floating_position || 'bottom-right'}
+                icon={config.placement?.floating_icon || 'book'}
+                style={config.placement?.floating_style || 'pill'}
+                label={config.placement?.floating_label || 'ChiPi Link'}
+                color={config.appearance?.primary_color || '#16a34a'}
+                offsetX={config.placement?.floating_offset_x || '20px'}
+                offsetY={config.placement?.floating_offset_y || '20px'}
+              />
             </CardContent>
           </Card>
         </TabsContent>
