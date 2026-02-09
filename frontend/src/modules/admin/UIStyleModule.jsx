@@ -56,19 +56,125 @@ function TemplateCard({ template, isSelected, onSelect }) {
   );
 }
 
+// Tiny SVG layout previews
+const LAYOUT_PREVIEWS = {
+  mobile_app: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="0" y="0" width="80" height="14" rx="1" className="fill-primary/30" />
+      <rect x="6" y="18" width="10" height="10" rx="3" className="fill-primary/50" />
+      <rect x="20" y="18" width="10" height="10" rx="3" className="fill-primary/40" />
+      <rect x="34" y="18" width="10" height="10" rx="3" className="fill-primary/30" />
+      <rect x="48" y="18" width="10" height="10" rx="3" className="fill-primary/20" />
+      <rect x="2" y="32" width="76" height="4" rx="1" className="fill-muted-foreground/20" />
+      <rect x="2" y="38" width="76" height="4" rx="1" className="fill-muted-foreground/15" />
+      <rect x="2" y="44" width="76" height="4" rx="1" className="fill-muted-foreground/10" />
+    </svg>
+  ),
+  bento_grid: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="2" y="2" width="46" height="22" rx="3" className="fill-primary/30" />
+      <rect x="50" y="2" width="28" height="22" rx="3" className="fill-primary/15" />
+      <rect x="2" y="26" width="28" height="22" rx="3" className="fill-primary/20" />
+      <rect x="32" y="26" width="22" height="22" rx="3" className="fill-primary/10" />
+      <rect x="56" y="26" width="22" height="22" rx="3" className="fill-primary/25" />
+    </svg>
+  ),
+  tab_hub: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="4" y="2" width="30" height="4" rx="1" className="fill-foreground/30" />
+      <rect x="4" y="8" width="20" height="2" rx="1" className="fill-muted-foreground/20" />
+      <rect x="4" y="14" width="16" height="5" rx="2.5" className="fill-primary/60" />
+      <rect x="22" y="14" width="18" height="5" rx="2.5" className="fill-muted-foreground/15" />
+      <rect x="42" y="14" width="14" height="5" rx="2.5" className="fill-muted-foreground/15" />
+      <rect x="58" y="14" width="14" height="5" rx="2.5" className="fill-muted-foreground/15" />
+      <rect x="4" y="23" width="72" height="24" rx="3" className="fill-primary/10" />
+      <rect x="8" y="27" width="14" height="14" rx="3" className="fill-primary/30" />
+      <rect x="26" y="27" width="14" height="14" rx="3" className="fill-primary/25" />
+      <rect x="44" y="27" width="14" height="14" rx="3" className="fill-primary/20" />
+    </svg>
+  ),
+  social_feed: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <circle cx="10" cy="7" r="5" className="fill-primary/40" />
+      <circle cx="24" cy="7" r="5" className="fill-primary/30" />
+      <circle cx="38" cy="7" r="5" className="fill-primary/25" />
+      <circle cx="52" cy="7" r="5" className="fill-primary/20" />
+      <rect x="6" y="16" width="68" height="14" rx="3" className="fill-primary/15" />
+      <rect x="6" y="32" width="68" height="8" rx="2" className="fill-muted-foreground/10" />
+      <rect x="6" y="42" width="68" height="6" rx="2" className="fill-muted-foreground/08" />
+    </svg>
+  ),
+  magazine: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="2" y="2" width="50" height="20" rx="3" className="fill-primary/30" />
+      <rect x="54" y="2" width="24" height="10" rx="2" className="fill-primary/15" />
+      <rect x="54" y="14" width="24" height="8" rx="2" className="fill-primary/10" />
+      <rect x="2" y="24" width="24" height="12" rx="2" className="fill-muted-foreground/15" />
+      <rect x="28" y="24" width="24" height="12" rx="2" className="fill-muted-foreground/12" />
+      <rect x="54" y="24" width="24" height="24" rx="2" className="fill-primary/08" />
+      <rect x="2" y="38" width="50" height="4" rx="1" className="fill-muted-foreground/10" />
+      <rect x="2" y="44" width="50" height="4" rx="1" className="fill-muted-foreground/08" />
+    </svg>
+  ),
+};
+
 function StyleEditor({ style, onChange, templates, fonts, densityOptions, layouts }) {
   const update = (key, value) => onChange({ ...style, [key]: value });
 
+  // Separate structural from CSS-overlay layouts
+  const structuralLayouts = (layouts || []).filter(l => l.category === 'structural');
+  const cssLayouts = (layouts || []).filter(l => l.category === 'css_overlay');
+
   return (
     <div className="space-y-4">
-      {/* Page Layout */}
-      {layouts && layouts.length > 0 && (
+      {/* Page Layout — Structural */}
+      {structuralLayouts.length > 0 && (
         <div>
           <Label className="text-xs font-medium mb-2 block flex items-center gap-1">
             <LayoutGrid className="h-3 w-3" /> Page Layout
           </Label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {layouts.map((layout) => (
+          <p className="text-[10px] text-muted-foreground mb-2">Choose a page structure. Each option renders content in a completely different arrangement.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            {structuralLayouts.map((layout) => (
+              <button
+                key={layout.id}
+                onClick={() => update('layout', layout.id)}
+                data-testid={`layout-${layout.id}`}
+                className={`relative rounded-xl border-2 transition-all text-left overflow-hidden ${
+                  style.layout === layout.id
+                    ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
+                    : 'border-border hover:border-primary/40'
+                }`}
+              >
+                {style.layout === layout.id && (
+                  <div className="absolute top-1.5 right-1.5 z-10">
+                    <Check className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                )}
+                <div className="h-14 p-2 bg-muted/30">
+                  {LAYOUT_PREVIEWS[layout.id] || (
+                    <div className="w-full h-full rounded bg-muted-foreground/10" />
+                  )}
+                </div>
+                <div className="p-2">
+                  <p className="font-medium text-xs">{layout.name}</p>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-2">{layout.description}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* CSS Overlay Layouts (optional tweak) */}
+      {cssLayouts.length > 0 && (
+        <details className="group">
+          <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-foreground transition-colors list-none flex items-center gap-1">
+            <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+            Advanced: CSS overlay tweaks ({cssLayouts.length} options)
+          </summary>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
+            {cssLayouts.map((layout) => (
               <button
                 key={layout.id}
                 onClick={() => update('layout', layout.id)}
@@ -89,7 +195,7 @@ function StyleEditor({ style, onChange, templates, fonts, densityOptions, layout
               </button>
             ))}
           </div>
-        </div>
+        </details>
       )}
 
       {/* Color Theme */}
