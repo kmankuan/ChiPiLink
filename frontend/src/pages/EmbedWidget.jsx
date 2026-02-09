@@ -180,7 +180,13 @@ function TextbookOrdersView({ token, students }) {
     if (approved.length === 1 && !selectedStudent) {
       selectStudent(approved[0]);
     }
-  }, [students, selectedStudent, selectStudent]);    );
+  }, [students, selectedStudent, selectStudent]);
+
+  // Student selection
+  if (!selectedStudent) {
+    const approved = students.filter(s =>
+      s.enrollments?.some(e => e.status === 'approved')
+    );
     if (approved.length === 0) {
       return (
         <div className="text-center py-6 px-4" data-testid="widget-no-approved">
