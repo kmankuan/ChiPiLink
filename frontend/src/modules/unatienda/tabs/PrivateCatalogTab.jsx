@@ -961,7 +961,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         <CardContent className="py-3">
           <div className="flex items-center gap-3 text-sm text-blue-700 dark:text-blue-300">
             <AlertCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
-            <p><strong>Tip:</strong> Click directly on any cell to edit inline. Use checkboxes to select multiple items for bulk actions. Click column headers to sort.</p>
+            <p><strong>Tip:</strong> Click cells to edit inline. Drag column headers to reorder. Use checkboxes for bulk actions. Click headers to sort.</p>
           </div>
         </CardContent>
       </Card>
