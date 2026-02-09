@@ -14,7 +14,7 @@ import axios from 'axios';
 import {
   BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
   Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
-  Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse
+  Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
