@@ -49,11 +49,42 @@ function LoadingSpinner() {
   );
 }
 
-/* ── Login Prompt (LaoPan only) ── */
-function LoginPrompt() {
-  const handleLogin = () => {
-    const mainAppUrl = API_URL?.replace('/api', '') || window.location.origin;
-    window.open(`${mainAppUrl}/login?redirect=${encodeURIComponent(window.location.href)}`, '_blank');
+/* ── Login Prompt (LaoPan only — opens popup for OAuth) ── */
+function LoginPrompt({ onAuth }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      // Get the OAuth URL from the backend
+      const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`);
+      if (!data.auth_url) {
+        toast.error('OAuth not configured');
+        setLoading(false);
+        return;
+      }
+      // Open LaoPan OAuth in a centered popup
+      const w = 500, h = 650;
+      const left = window.screenX + (window.innerWidth - w) / 2;
+      const top = window.screenY + (window.innerHeight - h) / 2;
+      const popup = window.open(
+        data.auth_url,
+        'chipi-laopan-auth',
+        `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`
+      );
+
+      // Poll to detect if user closed popup without completing auth
+      const pollTimer = setInterval(() => {
+        if (popup && popup.closed) {
+          clearInterval(pollTimer);
+          setLoading(false);
+        }
+      }, 500);
+    } catch (err) {
+      console.error('OAuth login error:', err);
+      toast.error('Error starting login');
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,8 +96,9 @@ function LoginPrompt() {
         <h3 className="text-base font-semibold">Welcome</h3>
         <p className="text-xs text-muted-foreground mt-1">Log in with your LaoPan account to continue</p>
       </div>
-      <Button onClick={handleLogin} data-testid="widget-login-btn" className="gap-2">
-        <LogIn className="h-4 w-4" /> Log in with LaoPan
+      <Button onClick={handleLogin} disabled={loading} data-testid="widget-login-btn" className="gap-2">
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+        Log in with LaoPan
       </Button>
     </div>
   );
