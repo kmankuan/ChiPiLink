@@ -228,20 +228,33 @@ function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, se
 }
 
 /* ── Bulk Actions Bar ── */
-function BulkActionBar({ count, onBulkDelete, onBulkStatusChange, onClearSelection }) {
+function BulkActionBar({ count, isArchiveView, onBulkArchive, onBulkRestore, onBulkPermanentDelete, onBulkStatusChange, onClearSelection }) {
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-lg" data-testid="bulk-action-bar">
       <Badge variant="default" className="text-xs">{count} selected</Badge>
       <div className="flex-1" />
-      <Button size="sm" variant="outline" onClick={() => onBulkStatusChange(true)} className="gap-1.5 text-xs h-8" data-testid="bulk-activate">
-        <Edit className="h-3.5 w-3.5" /> Set Active
-      </Button>
-      <Button size="sm" variant="outline" onClick={() => onBulkStatusChange(false)} className="gap-1.5 text-xs h-8" data-testid="bulk-deactivate">
-        <Edit className="h-3.5 w-3.5" /> Set Inactive
-      </Button>
-      <Button size="sm" variant="destructive" onClick={onBulkDelete} className="gap-1.5 text-xs h-8" data-testid="bulk-delete">
-        <Trash2 className="h-3.5 w-3.5" /> Delete Selected
-      </Button>
+      {isArchiveView ? (
+        <>
+          <Button size="sm" variant="outline" onClick={onBulkRestore} className="gap-1.5 text-xs h-8" data-testid="bulk-restore">
+            <RefreshCw className="h-3.5 w-3.5" /> Restore
+          </Button>
+          <Button size="sm" variant="destructive" onClick={onBulkPermanentDelete} className="gap-1.5 text-xs h-8" data-testid="bulk-permanent-delete">
+            <Trash2 className="h-3.5 w-3.5" /> Delete Forever
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button size="sm" variant="outline" onClick={() => onBulkStatusChange(true)} className="gap-1.5 text-xs h-8" data-testid="bulk-activate">
+            <Edit className="h-3.5 w-3.5" /> Set Active
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => onBulkStatusChange(false)} className="gap-1.5 text-xs h-8" data-testid="bulk-deactivate">
+            <Edit className="h-3.5 w-3.5" /> Set Inactive
+          </Button>
+          <Button size="sm" variant="outline" onClick={onBulkArchive} className="gap-1.5 text-xs h-8 text-amber-700 border-amber-300 hover:bg-amber-50" data-testid="bulk-archive">
+            <Archive className="h-3.5 w-3.5" /> Archive
+          </Button>
+        </>
+      )}
       <Button size="sm" variant="ghost" onClick={onClearSelection} className="h-8 px-2" data-testid="bulk-clear">
         <X className="h-4 w-4" />
       </Button>
