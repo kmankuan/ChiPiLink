@@ -654,33 +654,6 @@ export default function MondayModule() {
               </CardContent>
             </Card>
 
-        {/* ========== TAB: GENERAL ========== */}
-        <TabsContent value="general" className="space-y-6 mt-6">
-          {/* Status Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  API Key
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  {legacyStatus?.api_key_configured ? (
-                    <>
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Configured</span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-red-600">Not configured</span>
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
