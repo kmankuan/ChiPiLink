@@ -165,7 +165,7 @@ function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, se
             Status
           </ResizableHeader>
           <ResizableHeader columnKey="actions" width={columnWidths.actions} onResize={onResize} className="text-right">
-            Del
+            {isArchiveView ? 'Actions' : 'Archive'}
           </ResizableHeader>
         </tr>
       </thead>
