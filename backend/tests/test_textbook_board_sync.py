@@ -85,8 +85,6 @@ async def run_test():
     log.info(f"Config OK: board={board_id}, code_col={code_col}\n")
 
     # ── Initialize app DB for the adapter ──
-    import sys
-    sys.path.insert(0, "/app/backend")
     from core import database as _db_mod
     _db_mod.db = mongo[os.environ.get("DB_NAME", "chipilink_prod")]
     from modules.store.integrations.monday_txb_inventory_adapter import txb_inventory_adapter
