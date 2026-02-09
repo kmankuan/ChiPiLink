@@ -203,8 +203,8 @@ function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, se
                 <div className={`cursor-pointer rounded px-2 py-1 text-center font-semibold
                   ${isOut ? 'bg-red-100 text-red-700 dark:bg-red-900/30' : isLow ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'}
                   hover:ring-2 hover:ring-primary/50 transition-all`}
-                  onClick={() => { const q = prompt('Enter new stock quantity:', p.inventory_quantity || 0); if (q !== null && !isNaN(parseInt(q))) updateProductField(p.book_id, 'inventory_quantity', parseInt(q)); }}
-                  title="Click to edit stock">
+                  onClick={() => onAdjustStock?.(p)}
+                  title="Click to adjust stock">
                   {p.inventory_quantity || 0}
                 </div>
               </td>
