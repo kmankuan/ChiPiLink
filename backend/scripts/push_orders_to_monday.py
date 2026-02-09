@@ -30,7 +30,7 @@ async def monday_execute(query, timeout=30.0):
         resp = await client.post(
             MONDAY_API_URL,
             json={"query": query},
-            headers={"Authorization": MONDAY_API_KEY, "Content-Type": "application/json"},
+            headers={"Authorization": str(MONDAY_API_KEY), "Content-Type": "application/json"},
             timeout=timeout,
         )
         data = resp.json()
