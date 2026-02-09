@@ -475,7 +475,10 @@ export default function EmbedWidget() {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState(null); // null = not loaded
-  const [activeTab, setActiveTab] = useState('textbook_orders');
+
+  // Restore persisted tab
+  const saved = loadWidgetState();
+  const [activeTab, setActiveTab] = useState(saved.activeTab || 'textbook_orders');
 
   const display = config?.display || {};
   const streamlined = display.streamlined_flow !== false;
