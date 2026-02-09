@@ -215,9 +215,20 @@ function CatalogTable({ products, columnWidths, onResize, sortConfig, onSort, se
                 </Badge>
               </td>
               <td className="p-1 text-right" style={{ width: `${columnWidths.actions}px` }}>
-                <Button size="sm" variant="ghost" onClick={() => onDelete(p.book_id)} className="opacity-50 group-hover:opacity-100">
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {isArchiveView ? (
+                  <div className="flex gap-0.5 justify-end">
+                    <Button size="sm" variant="ghost" onClick={() => onRestore(p.book_id)} className="opacity-50 group-hover:opacity-100" title="Restore">
+                      <RotateCcw className="h-4 w-4 text-green-600" />
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => onDelete(p.book_id)} className="opacity-50 group-hover:opacity-100" title="Delete forever">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button size="sm" variant="ghost" onClick={() => onDelete(p.book_id)} className="opacity-50 group-hover:opacity-100" title="Archive">
+                    <Archive className="h-4 w-4 text-amber-600" />
+                  </Button>
+                )}
               </td>
             </tr>
           );
