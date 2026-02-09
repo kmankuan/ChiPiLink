@@ -14,7 +14,8 @@ import axios from 'axios';
 import {
   BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
   Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
-  Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw
+  Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw,
+  GripVertical
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
 
@@ -52,6 +53,15 @@ const COLUMN_DEFS = {
   ],
 };
 COLUMN_DEFS.archived = COLUMN_DEFS.all;
+
+function getDefaultWidths() {
+  const widths = { select: 40, actions: 80 };
+  for (const key of ['pca', 'public', 'all']) {
+    COLUMN_DEFS[key].forEach(c => { if (!widths[c.key]) widths[c.key] = c.width; });
+  }
+  return widths;
+}
+const DEFAULT_COLUMN_WIDTHS = getDefaultWidths();
 
 const STORAGE_KEY_COLS = 'chipi_inv_col_order';
 const STORAGE_KEY_WIDTHS = 'chipi_inv_col_widths';
