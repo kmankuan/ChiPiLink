@@ -51,8 +51,8 @@ function ResizableHeader({ children, columnKey, width, onResize, isSticky = fals
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const isSorted = sortConfig?.key === sortKey;
-  const SortIcon = !isSorted ? ArrowUpDown : sortConfig.direction === 'asc' ? ArrowUp : ArrowDown;
+  const isSorted = sortKey && sortConfig?.key === sortKey;
+  const SortIcon = !isSorted ? ArrowUpDown : sortConfig?.direction === 'asc' ? ArrowUp : ArrowDown;
 
   return (
     <th
