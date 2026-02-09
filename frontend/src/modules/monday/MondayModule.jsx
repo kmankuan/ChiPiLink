@@ -630,34 +630,8 @@ export default function MondayModule() {
         <TabsContent value="general" className="space-y-6 mt-6">
           {/* Status Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {['estudiante', 'grade', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
-                        <div key={field} className="space-y-2">
-                          <Label className="capitalize">{field.replace('_', ' ')}</Label>
-                          <Select 
-                            value={storeConfig.column_mapping?.[field] || 'none'} 
-                            onValueChange={(v) => setStoreConfig(prev => ({
-                              ...prev, 
-                              column_mapping: {
-                                ...prev.column_mapping,
-                                [field]: v === 'none' ? '' : v
-                              }
-                            }))}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Column" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Don't map</SelectItem>
-                              {columns.map((col) => (
-                                <SelectItem key={col.id} value={col.id}>
-                                  {col.title} ({col.type})
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      ))}
+            <Card>
+              <CardHeader className="pb-2">
                     </div>
                   </CardContent>
                 </Card>
