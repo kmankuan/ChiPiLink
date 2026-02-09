@@ -21,7 +21,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function UnatiendaModule() {
   const { token } = useAuth();
-  const [activeTab, setActiveTab] = useState('public-catalog');
+  const [activeTab, setActiveTab] = useState('inventory');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
