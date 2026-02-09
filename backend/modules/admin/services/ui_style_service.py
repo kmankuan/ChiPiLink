@@ -35,13 +35,17 @@ AVAILABLE_TEMPLATES = [
 ]
 
 AVAILABLE_LAYOUTS = [
-    {"id": "mobile_app", "name": "Mobile App", "description": "Bottom tab nav, full-width cards, minimal header — native app feel", "icon": "smartphone"},
-    {"id": "storefront", "name": "Storefront", "description": "Top category menu, hero banners, product grid — shopping experience", "icon": "store"},
-    {"id": "portal", "name": "Portal", "description": "Left sidebar nav + top bar, content panels — returning users", "icon": "layout-dashboard"},
-    {"id": "single_page", "name": "Single Page", "description": "Scrollable sections, sticky nav, anchor links — landing/marketing", "icon": "scroll"},
-    {"id": "chat_app", "name": "Chat / App", "description": "Full-height layout, floating action button, swipe panels — community", "icon": "message-circle"},
-    {"id": "card_grid", "name": "Card Grid", "description": "Masonry grid, filter bar, infinite scroll — content discovery", "icon": "grid-3x3"},
-    {"id": "china_panama", "name": "China-Panama", "description": "Cultural fusion — lattice-inspired frames, red lantern accents, balanced symmetry", "icon": "globe"},
+    {"id": "mobile_app", "name": "Classic", "description": "Hero carousel, icon grid, stacked sections — original mobile app feel", "icon": "smartphone", "category": "structural"},
+    {"id": "bento_grid", "name": "Bento Grid", "description": "Asymmetric tile dashboard — no hero, content in varied-size tiles like Notion/Apple", "icon": "layout-grid", "category": "structural"},
+    {"id": "tab_hub", "name": "Tab Hub", "description": "Greeting + horizontal tabs (Services, Community, Events, Gallery) — WeChat/Grab style", "icon": "layout-list", "category": "structural"},
+    {"id": "social_feed", "name": "Social Feed", "description": "Stories carousel + unified mixed-content timeline — Instagram/Twitter style", "icon": "rss", "category": "structural"},
+    {"id": "magazine", "name": "Magazine", "description": "Featured article + 2-column editorial layout with sidebar — Medium/Bloomberg style", "icon": "book-open", "category": "structural"},
+    {"id": "storefront", "name": "Storefront", "description": "Top category menu, hero banners, product grid — shopping experience", "icon": "store", "category": "css_overlay"},
+    {"id": "portal", "name": "Portal", "description": "Left sidebar nav + top bar, content panels — returning users", "icon": "layout-dashboard", "category": "css_overlay"},
+    {"id": "single_page", "name": "Single Page", "description": "Scrollable sections, sticky nav, anchor links — landing/marketing", "icon": "scroll", "category": "css_overlay"},
+    {"id": "chat_app", "name": "Chat / App", "description": "Full-height layout, floating action button, swipe panels — community", "icon": "message-circle", "category": "css_overlay"},
+    {"id": "card_grid", "name": "Card Grid", "description": "Masonry grid, filter bar, infinite scroll — content discovery", "icon": "grid-3x3", "category": "css_overlay"},
+    {"id": "china_panama", "name": "China-Panama", "description": "Cultural fusion — lattice-inspired frames, red lantern accents, balanced symmetry", "icon": "globe", "category": "css_overlay"},
 ]
 
 
