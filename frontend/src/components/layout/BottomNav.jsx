@@ -46,9 +46,10 @@ export default function BottomNav() {
   const { itemCount } = useCart();
   const path = location.pathname;
 
-  // Don't show on admin or embed pages
+  // Don't show on admin, embed, or auth callback pages
   if (path.startsWith('/admin')) return null;
   if (path.startsWith('/embed')) return null;
+  if (path.startsWith('/auth/')) return null;
 
   const isHome = path === '/' || path === '';
   const isStore = path.startsWith('/unatienda');
