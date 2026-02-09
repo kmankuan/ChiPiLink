@@ -113,14 +113,10 @@ export default function UnatiendaModule() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-10 mb-6">
+        <TabsList className="grid w-full grid-cols-9 mb-6">
           <TabsTrigger value="public-catalog" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Public</span>
-          </TabsTrigger>
-          <TabsTrigger value="private-catalog" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            <span className="hidden md:inline">Private PCA</span>
           </TabsTrigger>
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Warehouse className="h-4 w-4" />
@@ -160,12 +156,8 @@ export default function UnatiendaModule() {
           <PublicCatalogTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
-        <TabsContent value="private-catalog">
-          <PrivateCatalogTab token={token} onRefresh={fetchStats} />
-        </TabsContent>
-
         <TabsContent value="inventory">
-          <InventoryTab token={token} />
+          <PrivateCatalogTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
         <TabsContent value="access-requests">
