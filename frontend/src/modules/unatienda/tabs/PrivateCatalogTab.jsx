@@ -250,6 +250,152 @@ function BulkActionBar({ count, onBulkDelete, onBulkStatusChange, onClearSelecti
 }
 
 /* ── Main Component ── */
+
+/* ── Stock Adjustment Dialog ── */
+function AdjustStockDialog({ open, onOpenChange, product, token, onAdjusted }) {
+  const [mode, setMode] = useState('add'); // add | remove
+  const [qty, setQty] = useState('');
+  const [reason, setReason] = useState('restock');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const reasons = mode === 'add'
+    ? ['restock', 'return', 'correction', 'initial_stock', 'other']
+    : ['sold', 'damaged', 'lost', 'correction', 'reserved', 'other'];
+
+  const handleSubmit = async () => {
+    const q = parseInt(qty);
+    if (!q || q <= 0) { toast.error('Enter a valid quantity'); return; }
+    setSaving(true);
+    try {
+      await axios.post(`${API}/api/store/inventory/adjust`, {
+        book_id: product.book_id,
+        quantity_change: mode === 'add' ? q : -q,
+        reason,
+        notes: notes || undefined,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(`Stock ${mode === 'add' ? 'added' : 'removed'}: ${q} units`);
+      setQty(''); setNotes('');
+      onAdjusted();
+      onOpenChange(false);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Error adjusting stock');
+    } finally { setSaving(false); }
+  };
+
+  if (!product) return null;
+
+  const currentStock = (product.inventory_quantity || 0) - (product.reserved_quantity || 0);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-base">Adjust Stock</DialogTitle>
+          <DialogDescription className="text-xs">{product.name} — Current: {currentStock} units</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="flex gap-2">
+            <Button variant={mode === 'add' ? 'default' : 'outline'} size="sm" className="flex-1 gap-1"
+              onClick={() => setMode('add')} data-testid="adjust-mode-add">
+              <Plus className="h-3.5 w-3.5" /> Add Stock
+            </Button>
+            <Button variant={mode === 'remove' ? 'destructive' : 'outline'} size="sm" className="flex-1 gap-1"
+              onClick={() => setMode('remove')} data-testid="adjust-mode-remove">
+              <Minus className="h-3.5 w-3.5" /> Remove Stock
+            </Button>
+          </div>
+          <div>
+            <Label className="text-xs">Quantity</Label>
+            <Input type="number" min="1" value={qty} onChange={(e) => setQty(e.target.value)}
+              placeholder="Enter quantity" data-testid="adjust-qty" />
+          </div>
+          <div>
+            <Label className="text-xs">Reason</Label>
+            <select value={reason} onChange={(e) => setReason(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md bg-background text-sm" data-testid="adjust-reason">
+              {reasons.map(r => <option key={r} value={r}>{r.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>)}
+            </select>
+          </div>
+          <div>
+            <Label className="text-xs">Notes (optional)</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="Additional details..." className="text-xs h-16" data-testid="adjust-notes" />
+          </div>
+          {qty && parseInt(qty) > 0 && (
+            <div className="text-xs text-center p-2 rounded bg-muted">
+              {currentStock} → <strong>{mode === 'add' ? currentStock + parseInt(qty) : Math.max(0, currentStock - parseInt(qty))}</strong> units
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button size="sm" onClick={handleSubmit} disabled={saving}
+            variant={mode === 'remove' ? 'destructive' : 'default'} data-testid="adjust-submit">
+            {saving && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}
+            {mode === 'add' ? 'Add' : 'Remove'} Stock
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ── Movement History Panel ── */
+function MovementHistoryPanel({ token }) {
+  const [movements, setMovements] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data } = await axios.get(`${API}/api/store/inventory/movements?limit=50`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMovements(data.movements || data || []);
+      } catch { /* ignore */ }
+      finally { setLoading(false); }
+    };
+    load();
+  }, [token]);
+
+  if (loading) return <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2"><History className="h-4 w-4" /> Recent Stock Movements</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {movements.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-4">No stock movements recorded yet.</p>
+        ) : (
+          <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
+            {movements.map((m, i) => (
+              <div key={i} className="flex items-center justify-between p-2 rounded border text-xs" data-testid={`movement-${i}`}>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{m.product_name || m.book_id}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {(m.reason || '').replace(/_/g, ' ')} {m.notes ? `— ${m.notes}` : ''}
+                  </p>
+                </div>
+                <div className="text-right ml-2">
+                  <span className={`font-semibold ${m.quantity_change > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    {m.quantity_change > 0 ? '+' : ''}{m.quantity_change}
+                  </span>
+                  <p className="text-[9px] text-muted-foreground">
+                    {m.created_at ? new Date(m.created_at).toLocaleDateString() : ''}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function PrivateCatalogTab({ token, onRefresh }) {
   const navigate = useNavigate();
   const { t: translate } = useTranslation();
