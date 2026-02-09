@@ -59,26 +59,24 @@ function loadWidgetState() {
   try { return JSON.parse(sessionStorage.getItem(WIDGET_STATE_KEY) || '{}'); } catch { return {}; }
 }
 
-/* ── Login Prompt (LaoPan — works on both mobile & desktop) ── */
+/* ── Login Prompt (LaoPan — opens new tab, detects auth via storage event) ── */
 function LoginPrompt() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      // Get the OAuth URL, telling the backend to redirect back to /embed/widget after auth
+      // Get OAuth URL, redirect back to a special "close this tab" callback
       const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`, {
-        params: { redirect: '/embed/widget' }
+        params: { redirect: '/auth/widget-complete' }
       });
       if (!data.auth_url) {
         toast.error('OAuth not configured');
         setLoading(false);
         return;
       }
-      // Navigate the iframe/page directly to LaoPan OAuth
-      // This works on mobile (no popup issues) and desktop
-      // After auth, LaoPanCallback will redirect back to /embed/widget
-      window.location.href = data.auth_url;
+      // Open OAuth in a new tab (works on mobile — no iframe restriction)
+      window.open(data.auth_url, '_blank');
     } catch (err) {
       console.error('OAuth login error:', err);
       toast.error('Error starting login');
@@ -99,6 +97,11 @@ function LoginPrompt() {
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
         Log in with LaoPan
       </Button>
+      {loading && (
+        <p className="text-xs text-muted-foreground animate-pulse">
+          Complete login in the new tab, then return here...
+        </p>
+      )}
     </div>
   );
 }
