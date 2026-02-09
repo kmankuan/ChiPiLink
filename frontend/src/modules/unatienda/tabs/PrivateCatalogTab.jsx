@@ -793,7 +793,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
-                  updateProductField={updateProductField} onDelete={handleDelete} />
+                  updateProductField={updateProductField} onDelete={handleDelete} onAdjustStock={setAdjustProduct} />
               </div>
             </DialogContent>
           </Dialog>
@@ -815,7 +815,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
                 <CatalogTable products={sortedProducts} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
-                  updateProductField={updateProductField} onDelete={handleDelete} />
+                  updateProductField={updateProductField} onDelete={handleDelete} onAdjustStock={setAdjustProduct} />
               </div>
             </CardContent>
           </Card>
