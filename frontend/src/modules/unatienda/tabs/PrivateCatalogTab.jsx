@@ -487,7 +487,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+  const [columnWidths, setColumnWidths] = useState(() => ({ ...DEFAULT_COLUMN_WIDTHS, ...loadColumnWidths() }));
 
   // Multi-select
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -504,8 +504,22 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   // Catalog type filter
   const [catalogType, setCatalogType] = useState('all');
 
+  // Column order per catalog type (persisted)
+  const [columnOrders, setColumnOrders] = useState(() => {
+    const orders = {};
+    for (const type of ['pca', 'public', 'all', 'archived']) {
+      orders[type] = loadColumnOrder(type) || COLUMN_DEFS[type].map(c => c.key);
+    }
+    return orders;
+  });
+  const [dragColumn, setDragColumn] = useState(null);
+
   const handleColumnResize = useCallback((key, w) => {
-    setColumnWidths(prev => ({ ...prev, [key]: w }));
+    setColumnWidths(prev => {
+      const next = { ...prev, [key]: w };
+      saveColumnWidths(next);
+      return next;
+    });
   }, []);
 
   const handleSort = useCallback((key) => {
