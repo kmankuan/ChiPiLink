@@ -166,7 +166,7 @@ function TextbookOrdersView({ token, students }) {
     }
   }, [students]);
 
-  const selectStudent = async (student) => {
+  const selectStudent = useCallback(async (student) => {
     setSelectedStudent(student);
     setLoadingOrder(true);
     try {
