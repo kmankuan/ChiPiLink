@@ -30,6 +30,12 @@ async def update_widget_config(request: Request, admin: dict = Depends(get_admin
     return await widget_config_service.update_config(body, admin.get("user_id"))
 
 
+@router.post("/admin/config/reset")
+async def reset_widget_config(admin: dict = Depends(get_admin_user)):
+    """Reset widget config to defaults."""
+    return await widget_config_service.reset_config(admin.get("user_id"))
+
+
 LOADER_JS_TEMPLATE = """
 (function() {
   'use strict';
