@@ -1,43 +1,39 @@
 /**
  * SuperAppLanding - Main unified landing page for the Super App
- * Combines:
- * - Editable block system (previously in Landing.jsx)
- * - Community content: news, events, gallery (previously in CommunityLanding.jsx)
- * - Hero section, Quick Access, PinPanClub feed
+ * Dynamically renders the selected layout from admin UI Style settings.
+ *
+ * Layouts:
+ *   classic      — Hero carousel, quick access grid, stacked sections (original)
+ *   bento_grid   — Asymmetric tile dashboard
+ *   tab_hub      — Greeting + horizontal tabs
+ *   social_feed  — Stories carousel + mixed-content timeline
+ *   magazine     — Featured article + 2-column editorial
  */
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, lazy, Suspense } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { COMMUNITY_ENDPOINTS, buildUrl } from '@/config/api';
 import {
-  Newspaper,
-  Calendar,
-  Image,
-  Users,
-  ChevronRight,
-  Clock,
-  MapPin,
-  Bell,
-  Store,
-  Trophy,
-  Zap,
-  Loader2,
-  Edit,
-  Save,
-  Plus,
-  GripVertical,
-  Eye,
-  EyeOff,
-  Settings,
-  X
+  Newspaper, Calendar, Image, Users, ChevronRight,
+  Clock, MapPin, Bell, Store, Trophy, Zap,
+  Loader2, Edit, Save, Plus, GripVertical,
+  Eye, EyeOff, Settings, X
 } from 'lucide-react';
 import PinPanClubFeedBlock from '@/components/blocks/PinPanClubFeedBlock';
+import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
+import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
+
+// Layout components
+import BentoGridLanding from './landing-layouts/BentoGridLanding';
+import TabHubLanding from './landing-layouts/TabHubLanding';
+import SocialFeedLanding from './landing-layouts/SocialFeedLanding';
+import MagazineLanding from './landing-layouts/MagazineLanding';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -55,63 +51,50 @@ export const useEditMode = () => useContext(EditModeContext);
 // ============== HELPER FUNCTIONS ==============
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('es-PA', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
+  return new Date(dateStr).toLocaleDateString('es-PA', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 const formatEventDate = (dateStr) => {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
+  if (!dateStr) return {};
+  const d = new Date(dateStr);
   return {
-    day: date.getDate(),
-    month: date.toLocaleDateString('es-PA', { month: 'short' }).toUpperCase(),
-    time: date.toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })
+    day: d.getDate(),
+    month: d.toLocaleDateString('es-PA', { month: 'short' }).toUpperCase(),
+    time: d.toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' }),
   };
 };
 
-// ============== REUSABLE COMPONENTS ==============
-
+// ============== CLASSIC LAYOUT COMPONENTS ==============
 const SectionHeader = ({ icon: Icon, title, action, actionLink, className = '' }) => (
   <div className={`flex items-center justify-between px-4 py-3 sticky top-[56px] z-10 bg-background/95 backdrop-blur-sm ${className}`} data-testid={`section-${title}`}>
     <h2 className="text-base font-bold tracking-tight">{title}</h2>
     {action && (
       <Link to={actionLink || '#'} className="text-xs font-medium text-primary flex items-center gap-0.5">
-        {action}
-        <ChevronRight className="h-3.5 w-3.5" />
+        {action}<ChevronRight className="h-3.5 w-3.5" />
       </Link>
     )}
   </div>
 );
 
-import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
-import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
+const ICON_BG = {
+  primary: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
+  yellow: 'bg-gradient-to-br from-amber-400 to-amber-500',
+  orange: 'bg-gradient-to-br from-orange-500 to-red-500',
+  green: 'bg-gradient-to-br from-teal-400 to-teal-500',
+  blue: 'bg-gradient-to-br from-sky-500 to-blue-600',
+  purple: 'bg-gradient-to-br from-violet-500 to-purple-600',
+};
 
 const QuickAccessButton = ({ icon: Icon, label, to, color = 'primary', moduleKey, moduleStatuses }) => {
   const navigate = useNavigate();
-  // Squircle icon backgrounds — vibrant, distinct per module
-  const iconBg = {
-    primary: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
-    yellow: 'bg-gradient-to-br from-amber-400 to-amber-500',
-    orange: 'bg-gradient-to-br from-orange-500 to-red-500',
-    green: 'bg-gradient-to-br from-teal-400 to-teal-500',
-    blue: 'bg-gradient-to-br from-sky-500 to-blue-600',
-    red: 'bg-gradient-to-br from-rose-500 to-red-600',
-    purple: 'bg-gradient-to-br from-violet-500 to-purple-600',
-  };
-
   const modStatus = moduleKey ? (moduleStatuses?.[moduleKey] || DEFAULT_MODULE_STATUS[moduleKey]) : null;
-
   return (
     <button
       onClick={() => navigate(to)}
       data-testid={`quick-access-${moduleKey || label}`}
       className="quick-access-card flex flex-col items-center gap-1.5 py-1 active:scale-95 transition-transform"
     >
-      <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shadow-sm ${iconBg[color] || iconBg.primary}`}>
+      <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shadow-sm ${ICON_BG[color] || ICON_BG.primary}`}>
         <Icon className="h-6 w-6 text-white" />
       </div>
       <span className="text-[10px] font-medium text-foreground/80 text-center leading-tight line-clamp-1">{label}</span>
@@ -145,7 +128,6 @@ const HeroCarousel = ({ posts }) => {
   }
 
   const currentPost = posts[currentIndex];
-
   return (
     <div className="landing-hero relative aspect-[2/1] md:aspect-[5/2] overflow-hidden group">
       <img
@@ -154,7 +136,6 @@ const HeroCarousel = ({ posts }) => {
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-      
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
         {currentPost.categoria && (
           <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm text-white mb-2">
@@ -167,7 +148,7 @@ const HeroCarousel = ({ posts }) => {
         <p className="text-white/70 text-xs md:text-sm line-clamp-1 mb-3">
           {currentPost.resumen}
         </p>
-        <Button 
+        <Button
           onClick={() => navigate(`/comunidad/post/${currentPost.post_id}`)}
           size="sm"
           className="h-8 text-xs gap-1.5 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-0"
@@ -176,16 +157,13 @@ const HeroCarousel = ({ posts }) => {
           {t('common.readMore')} <ChevronRight className="h-3.5 w-3.5" />
         </Button>
       </div>
-
       {posts.length > 1 && (
         <div className="absolute bottom-3 right-4 flex gap-1.5">
           {posts.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-1.5 rounded-full transition-all ${
-                idx === currentIndex ? 'bg-white w-5' : 'bg-white/40 w-1.5'
-              }`}
+              className={`h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-5' : 'bg-white/40 w-1.5'}`}
             />
           ))}
         </div>
@@ -196,7 +174,6 @@ const HeroCarousel = ({ posts }) => {
 
 const NewsCard = ({ post }) => {
   const navigate = useNavigate();
-  
   return (
     <button
       className="flex items-start gap-3 p-4 w-full text-left border-b border-border/30 last:border-0 active:bg-muted/30 transition-colors"
@@ -204,15 +181,10 @@ const NewsCard = ({ post }) => {
       data-testid={`news-card-${post.post_id}`}
     >
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-semibold line-clamp-2 mb-1 tracking-tight">
-          {post.titulo}
-        </h3>
-        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-          {post.resumen}
-        </p>
+        <h3 className="text-sm font-semibold line-clamp-2 mb-1 tracking-tight">{post.titulo}</h3>
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{post.resumen}</p>
         <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {formatDate(post.fecha_publicacion)}
+          <Clock className="h-3 w-3" />{formatDate(post.fecha_publicacion)}
         </span>
       </div>
       <img
@@ -227,7 +199,6 @@ const NewsCard = ({ post }) => {
 const EventCard = ({ evento }) => {
   const navigate = useNavigate();
   const dateInfo = formatEventDate(evento.fecha_inicio);
-
   return (
     <button
       className="flex items-center gap-3 p-3 w-full text-left border-b border-border/30 last:border-0 active:bg-muted/30 transition-colors"
@@ -253,9 +224,8 @@ const EventCard = ({ evento }) => {
 
 const GalleryCard = ({ album }) => {
   const navigate = useNavigate();
-
   return (
-    <button 
+    <button
       className="aspect-square relative overflow-hidden rounded-sm group"
       onClick={() => navigate(`/comunidad/galeria/${album.album_id}`)}
       data-testid={`gallery-${album.album_id}`}
@@ -273,72 +243,233 @@ const GalleryCard = ({ album }) => {
   );
 };
 
-// ============== EDITABLE BLOCK WRAPPER ==============
-const EditableBlockWrapper = ({ blockId, blockType, children, onDelete }) => {
-  const { isEditMode, editingBlockId, setEditingBlockId, saveBlock } = useEditMode();
-  
-  if (!isEditMode) return children;
-  
-  const isEditing = editingBlockId === blockId;
-  
+// ============== CLASSIC LAYOUT RENDERER ==============
+function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditMode, setIsEditMode, hasChanges, saving, saveAllChanges, toggleBlockVisibility, moveBlock }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { destacados, noticias, anuncios, eventos, galerias } = communityData || {};
+
+  const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order);
+
+  const editModeValue = {
+    isEditMode,
+    editingBlockId: null,
+    setEditingBlockId: () => {},
+    updateBlockConfig: () => {},
+    saveBlock: () => {}
+  };
+
   return (
-    <div className={`relative group ${isEditing ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
-      <div className="absolute -top-3 -left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-background rounded-lg shadow-lg p-1">
-        <Button size="icon" variant="ghost" className="h-7 w-7 cursor-grab">
-          <GripVertical className="h-4 w-4" />
-        </Button>
-        <Button 
-          size="icon" 
-          variant="ghost" 
-          className="h-7 w-7"
-          onClick={() => setEditingBlockId(isEditing ? null : blockId)}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-        {isEditing && (
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="h-7 w-7 text-green-600"
-            onClick={() => saveBlock(blockId)}
-          >
-            <Save className="h-4 w-4" />
+    <EditModeContext.Provider value={editModeValue}>
+      {/* Admin Edit Mode Controls */}
+      {isAdmin && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+          {isEditMode && hasChanges && (
+            <Button onClick={saveAllChanges} disabled={saving} className="shadow-lg">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+              Guardar
+            </Button>
+          )}
+          <Button variant={isEditMode ? "default" : "outline"} onClick={() => setIsEditMode(!isEditMode)} className="shadow-lg">
+            {isEditMode ? <Eye className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+            {isEditMode ? 'Vista previa' : 'Editar'}
           </Button>
+        </div>
+      )}
+
+      {/* Edit Mode Sidebar */}
+      {isAdmin && isEditMode && (
+        <div className="fixed left-6 top-24 z-50 bg-card border rounded-xl shadow-lg p-4 w-72 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Settings className="h-4 w-4" /> Configurar Bloques
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Usa las flechas para reordenar y el ojo para mostrar/ocultar
+          </p>
+          <div className="space-y-2">
+            {sortedBlocks.map((block, idx) => {
+              const IconComponent = block.icon;
+              return (
+                <div
+                  key={block.id}
+                  className={`flex items-center gap-2 p-2 rounded-lg text-sm transition-colors ${
+                    block.visible ? 'bg-primary/10 border border-primary/20' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <div className="flex flex-col">
+                    <button onClick={() => moveBlock(block.id, 'up')} disabled={idx === 0} className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30">
+                      <ChevronRight className="h-3 w-3 -rotate-90" />
+                    </button>
+                    <button onClick={() => moveBlock(block.id, 'down')} disabled={idx === sortedBlocks.length - 1} className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30">
+                      <ChevronRight className="h-3 w-3 rotate-90" />
+                    </button>
+                  </div>
+                  <IconComponent className="h-4 w-4 flex-shrink-0" />
+                  <span className="flex-1 truncate">{block.label}</span>
+                  <button
+                    onClick={() => toggleBlockVisibility(block.id)}
+                    className={`p-1.5 rounded-lg transition-colors ${block.visible ? 'text-primary hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted'}`}
+                  >
+                    {block.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          {hasChanges && (
+            <div className="mt-4 pt-4 border-t">
+              <Button onClick={saveAllChanges} disabled={saving} className="w-full" size="sm">
+                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                Guardar Cambios
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <main className={`mx-auto space-y-0 ${isEditMode ? 'ml-80' : ''}`}>
+        {sortedBlocks.map((block) => {
+          if (!block.visible) return null;
+          switch (block.id) {
+            case 'hero':
+              return (
+                <section key={block.id} data-block="hero">
+                  <HeroCarousel posts={destacados || []} />
+                </section>
+              );
+            case 'quickAccess':
+              return (
+                <section key={block.id} data-block="quickAccess" className="px-4 py-4">
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
+                    <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Trophy} label="Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Zap} label="Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" color="blue" moduleKey="events" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Image} label="Galeria" to="/galeria" color="purple" moduleKey="gallery" moduleStatuses={moduleStatuses} />
+                    <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" color="green" moduleKey="players" moduleStatuses={moduleStatuses} />
+                  </div>
+                </section>
+              );
+            case 'announcements':
+              if (!anuncios || anuncios.length === 0) return null;
+              return (
+                <section key={block.id} data-block="announcements" className="mx-4 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
+                      <Bell className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">{anuncios[0].titulo}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{anuncios[0].resumen || anuncios[0].contenido}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => navigate(`/comunidad/post/${anuncios[0].post_id}`)}>
+                      Ver más
+                    </Button>
+                  </div>
+                </section>
+              );
+            case 'pinpanclub':
+              return (
+                <section key={block.id} data-block="pinpanclub">
+                  <PinPanClubFeedBlock
+                    config={{
+                      titulo: { es: 'Actividad del Club', en: 'Club Activity' },
+                      subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
+                      sections: {
+                        recent_matches: { enabled: true, limit: 5 },
+                        leaderboard: { enabled: true, limit: 10 },
+                        active_challenges: { enabled: true, limit: 4 },
+                        recent_achievements: { enabled: true, limit: 6 },
+                      },
+                      style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' }, cta_url: '/pinpanclub' },
+                    }}
+                  />
+                </section>
+              );
+            case 'news':
+              if (!noticias || noticias.length === 0) return null;
+              return (
+                <section key={block.id} data-block="news" className="bg-card">
+                  <SectionHeader icon={Newspaper} title="Noticias" action="Ver todas" actionLink="/comunidad/noticias" />
+                  <div>
+                    {noticias.slice(0, 5).map((post) => (
+                      <NewsCard key={post.post_id} post={post} />
+                    ))}
+                  </div>
+                </section>
+              );
+            case 'events':
+              if (!eventos || eventos.length === 0) return null;
+              return (
+                <section key={block.id} data-block="events" className="bg-card">
+                  <SectionHeader icon={Calendar} title="Eventos" action="Ver todos" actionLink="/eventos" />
+                  <div>
+                    {eventos.slice(0, 4).map((evento) => (
+                      <EventCard key={evento.evento_id} evento={evento} />
+                    ))}
+                  </div>
+                </section>
+              );
+            case 'gallery':
+              if (!galerias || galerias.length === 0) return null;
+              return (
+                <section key={block.id} data-block="gallery" className="bg-card">
+                  <SectionHeader icon={Image} title="Galeria" action="Ver todo" actionLink="/galeria" />
+                  <div className="grid grid-cols-3 gap-0.5 px-4 pb-4">
+                    {galerias.slice(0, 6).map((album) => (
+                      <GalleryCard key={album.album_id} album={album} />
+                    ))}
+                  </div>
+                </section>
+              );
+            default:
+              return null;
+          }
+        })}
+
+        {/* Empty State */}
+        {!communityData?.destacados?.length && !communityData?.noticias?.length && !communityData?.eventos?.length && !communityData?.galerias?.length && (
+          <div className="text-center py-20">
+            <h2 className="text-2xl font-bold mb-4">{t('landing.hero.title', 'Welcome to ChiPi Link')}</h2>
+            <p className="text-muted-foreground mb-8">{t('landing.hero.subtitle', 'Your community super app')}</p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => navigate('/pinpanclub')}>
+                <Trophy className="h-4 w-4 mr-2" /> Ir a PinPanClub
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/unatienda')}>
+                <Store className="h-4 w-4 mr-2" /> Ver Unatienda
+              </Button>
+            </div>
+          </div>
         )}
-        <Button 
-          size="icon" 
-          variant="ghost" 
-          className="h-7 w-7 text-red-600"
-          onClick={() => onDelete?.(blockId)}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className="text-xs text-muted-foreground absolute -top-6 left-8 opacity-0 group-hover:opacity-100 transition-opacity">
-        {blockType}
-      </div>
-      {children}
-    </div>
+      </main>
+    </EditModeContext.Provider>
   );
+}
+
+// ============== LAYOUT MAP ==============
+const LAYOUT_COMPONENTS = {
+  bento_grid: BentoGridLanding,
+  tab_hub: TabHubLanding,
+  social_feed: SocialFeedLanding,
+  magazine: MagazineLanding,
 };
 
 // ============== MAIN COMPONENT ==============
 export default function SuperAppLanding() {
-  const { t } = useTranslation();
   const { isAuthenticated, isAdmin } = useAuth();
+  const { uiStyle } = useTheme();
   const navigate = useNavigate();
-  
+
   // Community data
   const [communityData, setCommunityData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [moduleStatuses, setModuleStatuses] = useState(null);
-  
-  // Edit mode state
+
+  // Classic layout edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
-  
-  // Block configuration with order
   const [blocks, setBlocks] = useState([
     { id: 'hero', label: 'Hero Carousel', icon: Image, visible: true, order: 0 },
     { id: 'quickAccess', label: 'Acceso Rápido', icon: Zap, visible: true, order: 1 },
@@ -359,8 +490,8 @@ export default function SuperAppLanding() {
     try {
       const { data } = await axios.get(`${API_URL}/api/public/module-status`);
       setModuleStatuses(data.statuses);
-    } catch (err) {
-      // Silently fall back to defaults
+    } catch {
+      // Fall back to defaults
     }
   };
 
@@ -369,8 +500,8 @@ export default function SuperAppLanding() {
       setLoading(true);
       const response = await axios.get(buildUrl(COMMUNITY_ENDPOINTS.landing));
       setCommunityData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    } catch {
+      console.error('Error fetching community data');
     } finally {
       setLoading(false);
     }
@@ -380,11 +511,9 @@ export default function SuperAppLanding() {
     try {
       const token = localStorage.getItem('auth_token');
       if (!token) return;
-      
       const response = await axios.get(`${API_URL}/api/admin/landing-page/config`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
       if (response.data?.blocks) {
         setBlocks(prev => {
           const savedConfig = response.data.blocks;
@@ -395,15 +524,13 @@ export default function SuperAppLanding() {
           })).sort((a, b) => a.order - b.order);
         });
       }
-    } catch (error) {
+    } catch {
       // Config doesn't exist yet, use defaults
     }
   };
 
   const toggleBlockVisibility = (blockId) => {
-    setBlocks(prev => prev.map(b => 
-      b.id === blockId ? { ...b, visible: !b.visible } : b
-    ));
+    setBlocks(prev => prev.map(b => b.id === blockId ? { ...b, visible: !b.visible } : b));
     setHasChanges(true);
   };
 
@@ -411,14 +538,10 @@ export default function SuperAppLanding() {
     setBlocks(prev => {
       const idx = prev.findIndex(b => b.id === blockId);
       if (idx === -1) return prev;
-      
       const newIdx = direction === 'up' ? idx - 1 : idx + 1;
       if (newIdx < 0 || newIdx >= prev.length) return prev;
-      
       const newBlocks = [...prev];
       [newBlocks[idx], newBlocks[newIdx]] = [newBlocks[newIdx], newBlocks[idx]];
-      
-      // Update order values
       return newBlocks.map((b, i) => ({ ...b, order: i }));
     });
     setHasChanges(true);
@@ -429,40 +552,18 @@ export default function SuperAppLanding() {
     try {
       const token = localStorage.getItem('auth_token');
       const config = {};
-      blocks.forEach(b => {
-        config[b.id] = { visible: b.visible, order: b.order };
+      blocks.forEach(b => { config[b.id] = { visible: b.visible, order: b.order }; });
+      await axios.put(`${API_URL}/api/admin/landing-page/config`, { blocks: config }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      
-      await axios.put(`${API_URL}/api/admin/landing-page/config`, 
-        { blocks: config },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       toast.success('Configuración guardada');
       setHasChanges(false);
-    } catch (error) {
-      toast.error('Error guardando - El endpoint será creado próximamente');
+    } catch {
+      toast.error('Error guardando');
       setHasChanges(false);
     } finally {
       setSaving(false);
     }
-  };
-
-  // Get block visibility helper
-  const isBlockVisible = (blockId) => {
-    const block = blocks.find(b => b.id === blockId);
-    return block?.visible ?? true;
-  };
-
-  // Get sorted blocks for rendering
-  const sortedBlocks = [...blocks].sort((a, b) => a.order - b.order);
-
-  // Create edit mode context value
-  const editModeValue = {
-    isEditMode,
-    editingBlockId: null,
-    setEditingBlockId: () => {},
-    updateBlockConfig: () => {},
-    saveBlock: () => {}
   };
 
   if (loading) {
@@ -473,274 +574,29 @@ export default function SuperAppLanding() {
     );
   }
 
-  const { destacados, noticias, anuncios, eventos, galerias } = communityData || {};
+  // Determine which layout to render
+  const selectedLayout = uiStyle?.layout || 'mobile_app';
+  const LayoutComponent = LAYOUT_COMPONENTS[selectedLayout];
 
   return (
-    <EditModeContext.Provider value={editModeValue}>
-      <div className="min-h-screen bg-background">
-        {/* Admin Edit Mode Controls */}
-        {isAdmin && (
-          <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
-            {isEditMode && hasChanges && (
-              <Button 
-                onClick={saveAllChanges} 
-                disabled={saving}
-                className="shadow-lg"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                Guardar
-              </Button>
-            )}
-            <Button
-              variant={isEditMode ? "default" : "outline"}
-              onClick={() => setIsEditMode(!isEditMode)}
-              className="shadow-lg"
-            >
-              {isEditMode ? <Eye className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-              {isEditMode ? 'Vista previa' : 'Editar'}
-            </Button>
-          </div>
-        )}
-
-        {/* Edit Mode Sidebar */}
-        {isAdmin && isEditMode && (
-          <div className="fixed left-6 top-24 z-50 bg-card border rounded-xl shadow-lg p-4 w-72 max-h-[calc(100vh-120px)] overflow-y-auto">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Configurar Bloques
-            </h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              Usa las flechas para reordenar y el ojo para mostrar/ocultar
-            </p>
-            <div className="space-y-2">
-              {sortedBlocks.map((block, idx) => {
-                const IconComponent = block.icon;
-                return (
-                  <div
-                    key={block.id}
-                    className={`flex items-center gap-2 p-2 rounded-lg text-sm transition-colors ${
-                      block.visible 
-                        ? 'bg-primary/10 border border-primary/20' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {/* Move buttons */}
-                    <div className="flex flex-col">
-                      <button
-                        onClick={() => moveBlock(block.id, 'up')}
-                        disabled={idx === 0}
-                        className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30"
-                      >
-                        <ChevronRight className="h-3 w-3 -rotate-90" />
-                      </button>
-                      <button
-                        onClick={() => moveBlock(block.id, 'down')}
-                        disabled={idx === sortedBlocks.length - 1}
-                        className="p-0.5 hover:bg-primary/20 rounded disabled:opacity-30"
-                      >
-                        <ChevronRight className="h-3 w-3 rotate-90" />
-                      </button>
-                    </div>
-                    
-                    {/* Block info */}
-                    <IconComponent className="h-4 w-4 flex-shrink-0" />
-                    <span className="flex-1 truncate">{block.label}</span>
-                    
-                    {/* Visibility toggle */}
-                    <button
-                      onClick={() => toggleBlockVisibility(block.id)}
-                      className={`p-1.5 rounded-lg transition-colors ${
-                        block.visible 
-                          ? 'text-primary hover:bg-primary/20' 
-                          : 'text-muted-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {block.visible ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {hasChanges && (
-              <div className="mt-4 pt-4 border-t">
-                <Button 
-                  onClick={saveAllChanges} 
-                  disabled={saving}
-                  className="w-full"
-                  size="sm"
-                >
-                  {saving ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  Guardar Cambios
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-
-        <main className={`mx-auto space-y-0 ${isEditMode ? 'ml-80' : ''}`}>
-          {/* Render blocks dynamically based on sortedBlocks order */}
-          {sortedBlocks.map((block) => {
-            if (!block.visible) return null;
-            
-            switch (block.id) {
-              case 'hero':
-                return (
-                  <section key={block.id} data-block="hero">
-                    <HeroCarousel posts={destacados || []} />
-                  </section>
-                );
-              
-              case 'quickAccess':
-                return (
-                  <section key={block.id} data-block="quickAccess" className="px-4 py-4">
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-1">
-                      <QuickAccessButton icon={Store} label="Unatienda" to="/unatienda" moduleKey="unatienda" moduleStatuses={moduleStatuses} />
-                      <QuickAccessButton icon={Trophy} label="Super Pin" to="/pinpanclub/superpin/ranking" color="yellow" moduleKey="super_pin" moduleStatuses={moduleStatuses} />
-                      <QuickAccessButton icon={Zap} label="Rapid Pin" to="/rapidpin" color="orange" moduleKey="rapid_pin" moduleStatuses={moduleStatuses} />
-                      <QuickAccessButton icon={Calendar} label="Eventos" to="/eventos" color="blue" moduleKey="events" moduleStatuses={moduleStatuses} />
-                      <QuickAccessButton icon={Image} label="Galeria" to="/galeria" color="purple" moduleKey="gallery" moduleStatuses={moduleStatuses} />
-                      <QuickAccessButton icon={Users} label="Jugadores" to="/pinpanclub/players" color="green" moduleKey="players" moduleStatuses={moduleStatuses} />
-                    </div>
-                  </section>
-                );
-              
-              case 'announcements':
-                if (!anuncios || anuncios.length === 0) return null;
-                return (
-                  <section key={block.id} data-block="announcements" className="mx-4 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-primary/10 flex-shrink-0">
-                        <Bell className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-1">{anuncios[0].titulo}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {anuncios[0].resumen || anuncios[0].contenido}
-                        </p>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => navigate(`/comunidad/post/${anuncios[0].post_id}`)}
-                      >
-                        Ver más
-                      </Button>
-                    </div>
-                  </section>
-                );
-              
-              case 'pinpanclub':
-                return (
-                  <section key={block.id} data-block="pinpanclub">
-                    <PinPanClubFeedBlock 
-                      config={{
-                        titulo: { es: 'Actividad del Club', en: 'Club Activity' },
-                        subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
-                        sections: {
-                          recent_matches: { enabled: true, limit: 5 },
-                          leaderboard: { enabled: true, limit: 10 },
-                          active_challenges: { enabled: true, limit: 4 },
-                          recent_achievements: { enabled: true, limit: 6 }
-                        },
-                        style: {
-                          show_cta: true,
-                          cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' },
-                          cta_url: '/pinpanclub'
-                        }
-                      }}
-                    />
-                  </section>
-                );
-              
-              case 'news':
-                if (!noticias || noticias.length === 0) return null;
-                return (
-                  <section key={block.id} data-block="news" className="bg-card">
-                    <SectionHeader 
-                      icon={Newspaper} 
-                      title="Noticias" 
-                      action="Ver todas"
-                      actionLink="/comunidad/noticias"
-                    />
-                    <div>
-                      {noticias.slice(0, 5).map((post) => (
-                        <NewsCard key={post.post_id} post={post} />
-                      ))}
-                    </div>
-                  </section>
-                );
-              
-              case 'events':
-                if (!eventos || eventos.length === 0) return null;
-                return (
-                  <section key={block.id} data-block="events" className="bg-card">
-                    <SectionHeader 
-                      icon={Calendar} 
-                      title="Eventos" 
-                      action="Ver todos"
-                      actionLink="/eventos"
-                    />
-                    <div>
-                      {eventos.slice(0, 4).map((evento) => (
-                        <EventCard key={evento.evento_id} evento={evento} />
-                      ))}
-                    </div>
-                  </section>
-                );
-              
-              case 'gallery':
-                if (!galerias || galerias.length === 0) return null;
-                return (
-                  <section key={block.id} data-block="gallery" className="bg-card">
-                    <SectionHeader 
-                      icon={Image} 
-                      title="Galeria" 
-                      action="Ver todo"
-                      actionLink="/galeria"
-                    />
-                    <div className="grid grid-cols-3 gap-0.5 px-4 pb-4">
-                      {galerias.slice(0, 6).map((album) => (
-                        <GalleryCard key={album.album_id} album={album} />
-                      ))}
-                    </div>
-                  </section>
-                );
-              
-              default:
-                return null;
-            }
-          })}
-
-          {/* Empty State */}
-          {!destacados?.length && !noticias?.length && !eventos?.length && !galerias?.length && (
-            <div className="text-center py-20">
-              <h2 className="text-2xl font-bold mb-4">Bienvenido a ChiPi Link</h2>
-              <p className="text-muted-foreground mb-8">
-                Tu Super App de comunidad y servicios
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button onClick={() => navigate('/pinpanclub')}>
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Ir a PinPanClub
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/unatienda')}>
-                  <Store className="h-4 w-4 mr-2" />
-                  Ver Unatienda
-                </Button>
-              </div>
-            </div>
-          )}
-        </main>
-      </div>
-    </EditModeContext.Provider>
+    <div className="min-h-screen bg-background">
+      {LayoutComponent ? (
+        <LayoutComponent communityData={communityData} moduleStatuses={moduleStatuses} />
+      ) : (
+        <ClassicLayout
+          communityData={communityData}
+          moduleStatuses={moduleStatuses}
+          blocks={blocks}
+          isAdmin={isAdmin}
+          isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
+          hasChanges={hasChanges}
+          saving={saving}
+          saveAllChanges={saveAllChanges}
+          toggleBlockVisibility={toggleBlockVisibility}
+          moveBlock={moveBlock}
+        />
+      )}
+    </div>
   );
 }
