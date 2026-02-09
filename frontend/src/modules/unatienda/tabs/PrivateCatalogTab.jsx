@@ -494,6 +494,9 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   // Filter + Sort
   const sortedProducts = useMemo(() => {
     let result = products.filter(p => {
+      // Catalog type filter
+      if (catalogType === 'pca' && p._catalog !== 'pca') return false;
+      if (catalogType === 'public' && p._catalog !== 'public') return false;
       // Text search
       if (searchTerm) {
         const t = searchTerm.toLowerCase();
