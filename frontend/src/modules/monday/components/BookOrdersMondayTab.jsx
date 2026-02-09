@@ -317,11 +317,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   const mappedCount = (fields, mapping) => fields.filter(f => mapping[f.key]).length;
 
-  if (!connected && boards.length === 0 && !loadingBoards && !ordersBoard) {
-    // Show warning only if no boards loaded AND no config loaded
-    // This prevents flashing the warning before the initial load
-    return null;
-  }
+  // No gate - component always renders and loads its own data
 
   return (
     <div className="space-y-4">
