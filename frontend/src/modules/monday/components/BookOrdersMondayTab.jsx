@@ -186,7 +186,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   // Load boards if not provided by parent
   useEffect(() => {
-    if (allBoards?.length > 0) {
+    if (allBoards && allBoards.length > 0) {
       setBoards(allBoards);
     } else {
       loadBoards();
