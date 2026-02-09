@@ -523,23 +523,54 @@ export default function EmbedWidget() {
     init();
   }, []);
 
-  // Listen for auth from popup (relayed via parent page's loader.js)
+  // Listen for auth from new tab via localStorage storage event (same origin)
+  // Also handles postMessage relay from loader.js for backward compatibility
   useEffect(() => {
-    const handler = (e) => {
+    const handleAuth = (newToken) => {
+      setToken(newToken);
+      axios.get(`${API_URL}/api/auth-v2/me`, {
+        headers: { Authorization: `Bearer ${newToken}` }
+      }).then(r => setUser(r.data)).catch(() => {});
+    };
+
+    // Storage event fires when another tab/window changes localStorage (same origin)
+    const onStorage = (e) => {
+      if (e.key === 'auth_token' && e.newValue && !token) {
+        handleAuth(e.newValue);
+      }
+    };
+
+    // PostMessage for loader.js relay (desktop popup fallback)
+    const onMessage = (e) => {
       if (e.data?.type === 'chipi-auth-token' && e.data?.token) {
         localStorage.setItem('auth_token', e.data.token);
-        setToken(e.data.token);
-        axios.get(`${API_URL}/api/auth-v2/me`, {
-          headers: { Authorization: `Bearer ${e.data.token}` }
-        }).then(r => setUser(r.data)).catch(() => {});
+        handleAuth(e.data.token);
       }
       if (e.data?.type === 'chipi-auth-error') {
         toast.error(e.data.error || 'Authentication failed');
       }
     };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, []);
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('message', onMessage);
+
+    // Also poll localStorage as fallback (some mobile browsers don't fire storage in iframes)
+    const poll = setInterval(() => {
+      if (!token) {
+        const stored = localStorage.getItem('auth_token');
+        if (stored) {
+          handleAuth(stored);
+          clearInterval(poll);
+        }
+      }
+    }, 1500);
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('message', onMessage);
+      clearInterval(poll);
+    };
+  }, [token]);
 
   // Load students after auth
   useEffect(() => {
