@@ -317,21 +317,10 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   const mappedCount = (fields, mapping) => fields.filter(f => mapping[f.key]).length;
 
-  if (!connected && boards.length === 0 && !loadingBoards) {
-    return (
-      <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="h-6 w-6 text-yellow-600" />
-            <div>
-              <p className="font-medium text-yellow-800">Connection required</p>
-              <p className="text-sm text-yellow-700">Configure a workspace first in the "Workspaces" tab, or the system will use the API key from server config.</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={loadBoards}>Retry</Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  if (!connected && boards.length === 0 && !loadingBoards && !ordersBoard) {
+    // Show warning only if no boards loaded AND no config loaded
+    // This prevents flashing the warning before the initial load
+    return null;
   }
 
   return (
