@@ -8,15 +8,22 @@ Run: cd /app/backend && python tests/test_textbook_board_sync.py
 """
 import asyncio
 import os
+import sys
 import json
 import uuid
 import logging
 import httpx
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env from backend root
+load_dotenv(Path(__file__).parent.parent / ".env")
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 log = logging.getLogger(__name__)
 
-MONDAY_API_KEY = os.environ.get("MONDAY_API_KEY")
+MONDAY_API_KEY = os.environ.get("MONDAY_API_KEY", "").strip('"')
 MONDAY_API_URL = "https://api.monday.com/v2"
 TEXTBOOKS_BOARD_ID = "18397140920"
 
