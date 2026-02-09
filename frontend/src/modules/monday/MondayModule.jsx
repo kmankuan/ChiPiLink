@@ -632,31 +632,8 @@ export default function MondayModule() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Subitems Configuration (Products) */}
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Layers className="h-5 w-5" />
-                        Subitems (Order Products)
-                      </CardTitle>
-                      <CardDescription>
-                        Create a subitem in Monday.com for each product in the order
-                      </CardDescription>
-                    </div>
-                    <Switch
-                      checked={storeConfig.subitems_enabled}
-                      onCheckedChange={(checked) => setStoreConfig(prev => ({
-                        ...prev,
-                        subitems_enabled: checked
-                      }))}
-                    />
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  API Key
                   </div>
                 </CardHeader>
                 
