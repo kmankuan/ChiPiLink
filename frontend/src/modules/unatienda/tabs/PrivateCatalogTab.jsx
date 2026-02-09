@@ -516,8 +516,14 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   useEffect(() => { fetchProducts(); }, [token, selectedGrade, selectedSubject]);
 
   // Filter + Sort
+  const isArchiveView = catalogType === 'archived';
+
   const sortedProducts = useMemo(() => {
     let result = products.filter(p => {
+      // Archive filter
+      const isArchived = !!p.archived;
+      if (catalogType === 'archived') return isArchived;
+      if (isArchived) return false; // hide archived from all other views
       // Catalog type filter
       if (catalogType === 'pca' && p._catalog !== 'pca') return false;
       if (catalogType === 'public' && p._catalog !== 'public') return false;
