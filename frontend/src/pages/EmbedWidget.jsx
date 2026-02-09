@@ -59,37 +59,26 @@ function loadWidgetState() {
   try { return JSON.parse(sessionStorage.getItem(WIDGET_STATE_KEY) || '{}'); } catch { return {}; }
 }
 
-/* ── Login Prompt (LaoPan only — opens popup for OAuth) ── */
-function LoginPrompt({ onAuth }) {
+/* ── Login Prompt (LaoPan — works on both mobile & desktop) ── */
+function LoginPrompt() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      // Get the OAuth URL from the backend
-      const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`);
+      // Get the OAuth URL, telling the backend to redirect back to /embed/widget after auth
+      const { data } = await axios.get(`${API_URL}/api/invision/oauth/login`, {
+        params: { redirect: '/embed/widget' }
+      });
       if (!data.auth_url) {
         toast.error('OAuth not configured');
         setLoading(false);
         return;
       }
-      // Open LaoPan OAuth in a centered popup
-      const w = 500, h = 650;
-      const left = window.screenX + (window.innerWidth - w) / 2;
-      const top = window.screenY + (window.innerHeight - h) / 2;
-      const popup = window.open(
-        data.auth_url,
-        'chipi-laopan-auth',
-        `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`
-      );
-
-      // Poll to detect if user closed popup without completing auth
-      const pollTimer = setInterval(() => {
-        if (popup && popup.closed) {
-          clearInterval(pollTimer);
-          setLoading(false);
-        }
-      }, 500);
+      // Navigate the iframe/page directly to LaoPan OAuth
+      // This works on mobile (no popup issues) and desktop
+      // After auth, LaoPanCallback will redirect back to /embed/widget
+      window.location.href = data.auth_url;
     } catch (err) {
       console.error('OAuth login error:', err);
       toast.error('Error starting login');
