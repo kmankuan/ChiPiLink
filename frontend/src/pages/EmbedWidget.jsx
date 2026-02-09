@@ -180,13 +180,17 @@ function TextbookOrdersView({ token, students }) {
     } finally {
       setLoadingOrder(false);
     }
-  };
+  }, [token]);
 
-  // Student selection
-  if (!selectedStudent) {
+  // Auto-select if only one approved student
+  useEffect(() => {
     const approved = students.filter(s =>
       s.enrollments?.some(e => e.status === 'approved')
     );
+    if (approved.length === 1 && !selectedStudent) {
+      selectStudent(approved[0]);
+    }
+  }, [students, selectedStudent, selectStudent]);    );
     if (approved.length === 0) {
       return (
         <div className="text-center py-6 px-4" data-testid="widget-no-approved">
