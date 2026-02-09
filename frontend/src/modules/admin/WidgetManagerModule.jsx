@@ -221,6 +221,67 @@ export default function WidgetManagerModule() {
           </Card>
         </TabsContent>
 
+        {/* ── Display ── */}
+        <TabsContent value="display">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Display Options</CardTitle>
+              <CardDescription className="text-xs">Control what the widget shows and hides when embedded</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-url">
+                <div>
+                  <p className="text-xs font-medium">Hide URL / Address Bar</p>
+                  <p className="text-[10px] text-muted-foreground">Remove any visible URL or site information from the widget</p>
+                </div>
+                <Switch
+                  checked={config.display?.hide_url_bar ?? true}
+                  onCheckedChange={(v) => update('display.hide_url_bar', v)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-navbar">
+                <div>
+                  <p className="text-xs font-medium">Hide Navbar & Footer</p>
+                  <p className="text-[10px] text-muted-foreground">Remove the top navigation bar and bottom footer from the widget view</p>
+                </div>
+                <Switch
+                  checked={config.display?.hide_navbar ?? true}
+                  onCheckedChange={(v) => { update('display.hide_navbar', v); update('display.hide_footer', v); }}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between p-2.5 rounded-lg border bg-primary/5" data-testid="widget-display-streamlined">
+                <div>
+                  <p className="text-xs font-medium flex items-center gap-1.5">
+                    <Link2 className="h-3.5 w-3.5" /> Streamlined Textbook Flow
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Only show: LaoPan Login &rarr; Link Student &rarr; Textbook Orders (if approved) &rarr; Wallet. Hides all other elements.
+                  </p>
+                </div>
+                <Switch
+                  checked={config.display?.streamlined_flow ?? true}
+                  onCheckedChange={(v) => update('display.streamlined_flow', v)}
+                />
+              </div>
+
+              {config.display?.streamlined_flow && (
+                <div className="ml-4 p-2.5 rounded-lg border border-dashed text-[10px] text-muted-foreground space-y-1">
+                  <p className="font-medium text-foreground text-xs">Streamlined Flow Steps:</p>
+                  <p>1. User sees <strong>Login with LaoPan</strong> button</p>
+                  <p>2. After login, if no students linked &rarr; show <strong>Link Student</strong> workflow</p>
+                  <p>3. If student is approved &rarr; show <strong>Textbook List</strong> for ordering</p>
+                  <p>4. <strong>Wallet</strong> is always accessible</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+
         {/* ── Appearance ── */}
         <TabsContent value="appearance">
           <Card>
