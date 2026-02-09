@@ -173,6 +173,9 @@ export default function WidgetManagerModule() {
           <TabsTrigger value="features" className="gap-1.5" data-testid="widget-tab-features">
             <Settings className="h-3.5 w-3.5" /> Features
           </TabsTrigger>
+          <TabsTrigger value="display" className="gap-1.5" data-testid="widget-tab-display">
+            <Monitor className="h-3.5 w-3.5" /> Display
+          </TabsTrigger>
           <TabsTrigger value="appearance" className="gap-1.5" data-testid="widget-tab-appearance">
             <Palette className="h-3.5 w-3.5" /> Appearance
           </TabsTrigger>
