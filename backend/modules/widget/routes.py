@@ -134,6 +134,11 @@ LOADER_JS_TEMPLATE = """
     if (e.data && e.data.type === 'chipi-widget-resize') {
       frame.style.width = e.data.width || sidebarWidth;
     }
+    // Relay auth messages from OAuth popup to the widget iframe
+    if (e.data && (e.data.type === 'chipi-auth-token' || e.data.type === 'chipi-auth-error')) {
+      frame.contentWindow.postMessage(e.data, '*');
+    }
+    }
   });
 
   if (P.floating_button !== false) document.body.appendChild(btn);
