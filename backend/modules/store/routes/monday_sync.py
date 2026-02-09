@@ -7,9 +7,13 @@ from fastapi.responses import JSONResponse
 import logging
 
 from core.auth import get_current_user, get_admin_user
+from core.config import MONDAY_API_KEY
 from ..services.monday_sync_service import monday_sync_service
 from ..services.monday_config_service import monday_config_service
 from ..models.textbook_order import DEFAULT_STATUS_MAPPING
+
+import httpx
+import json
 
 logger = logging.getLogger(__name__)
 
