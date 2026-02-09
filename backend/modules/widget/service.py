@@ -54,6 +54,15 @@ class WidgetConfigService:
         )
         return await self.get_config()
 
+    async def reset_config(self, admin_id: Optional[str] = None) -> Dict:
+        """Reset widget config to defaults."""
+        await db.app_config.update_one(
+            {"config_key": "widget_config"},
+            {"$set": {"value": DEFAULT_WIDGET_CONFIG, "updated_by": admin_id}},
+            upsert=True,
+        )
+        return DEFAULT_WIDGET_CONFIG
+
     async def get_public_config(self) -> Dict:
         """Return only what the embed script needs (no security internals)."""
         config = await self.get_config()
