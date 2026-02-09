@@ -271,6 +271,7 @@ function AppRouter() {
       {/* Embed Routes - No header */}
       <Route path="/embed/orden" element={<EmbedOrderForm />} />
       <Route path="/embed/widget" element={<EmbedWidget />} />
+      <Route path="/auth/widget-complete" element={<WidgetAuthComplete />} />
       
       {/* Public Checkout Routes */}
       <Route path="/checkout/:pedidoId" element={<><Header /><Checkout /></>} />
