@@ -628,36 +628,8 @@ export default function MondayModule() {
 
         {/* ========== TAB: GENERAL ========== */}
         <TabsContent value="general" className="space-y-6 mt-6">
-          {/* Status Cards */}                                {group.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Switch 
-                      id="auto-sync-libros"
-                      checked={storeConfig.auto_sync}
-                      onCheckedChange={(checked) => setStoreConfig(prev => ({...prev, auto_sync: checked}))}
-                    />
-                    <Label htmlFor="auto-sync-libros">Auto-sync when order status changes</Label>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Column Mapping */}
-              {storeConfig.board_id && columns.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Column Mapping</CardTitle>
-                    <CardDescription>
-                      Associate each order field with a Monday.com column
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+          {/* Status Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {['estudiante', 'grade', 'acudiente', 'libros', 'total', 'estado', 'fecha', 'pedido_id'].map((field) => (
                         <div key={field} className="space-y-2">
