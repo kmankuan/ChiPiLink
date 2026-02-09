@@ -13,6 +13,13 @@ DEFAULT_WIDGET_CONFIG = {
         "my_students": {"enabled": True, "label": "My Students", "order": 1},
         "order_status": {"enabled": True, "label": "Order Status", "order": 2},
         "notifications": {"enabled": True, "label": "Notifications", "order": 3},
+        "wallet": {"enabled": True, "label": "Wallet", "order": 4},
+    },
+    "display": {
+        "hide_url_bar": True,
+        "hide_navbar": True,
+        "hide_footer": True,
+        "streamlined_flow": True,
     },
     "appearance": {
         "primary_color": "#16a34a",
