@@ -193,10 +193,14 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
       });
       if (res.ok) {
         const data = await res.json();
-        setBoards(data.boards || data || []);
+        const boardsList = data.boards || data || [];
+        console.log('[BookOrdersMondayTab] Loaded boards:', boardsList.length);
+        setBoards(boardsList);
+      } else {
+        console.error('[BookOrdersMondayTab] Failed to load boards:', res.status);
       }
     } catch (e) {
-      console.error('Error loading boards:', e);
+      console.error('[BookOrdersMondayTab] Error loading boards:', e);
     } finally {
       setLoadingBoards(false);
     }
