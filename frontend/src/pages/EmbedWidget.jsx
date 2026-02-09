@@ -139,6 +139,10 @@ function LinkStudentView({ token, onStudentLinked }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Student linked successfully!');
+      // Clear saved form state on success
+      const ws = loadWidgetState();
+      delete ws.linkStudentForm;
+      saveWidgetState(ws);
       onStudentLinked();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to link student');
