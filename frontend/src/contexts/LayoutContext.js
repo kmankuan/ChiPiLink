@@ -26,6 +26,21 @@ const LAYOUT_STYLES = {
     [data-layout="mobile_app"] .app-content { padding-bottom: 68px; }
     @media (min-width: 1024px) { [data-layout="mobile_app"] .bottom-nav { display: none; } }
   `,
+  // Structural layouts — minimal CSS, structure handled by JSX components
+  bento_grid: `
+    @media (min-width: 1024px) { [data-layout="bento_grid"] .bottom-nav { display: none; } }
+  `,
+  tab_hub: `
+    [data-layout="tab_hub"] .app-content { padding-bottom: 68px; }
+    @media (min-width: 1024px) { [data-layout="tab_hub"] .bottom-nav { display: none; } }
+  `,
+  social_feed: `
+    [data-layout="social_feed"] .app-content { padding-bottom: 68px; }
+    @media (min-width: 1024px) { [data-layout="social_feed"] .bottom-nav { display: none; } }
+  `,
+  magazine: `
+    @media (min-width: 1024px) { [data-layout="magazine"] .bottom-nav { display: none; } }
+  `,
   storefront: `
     [data-layout="storefront"] .bottom-nav { display: none; }
     @media (min-width: 1024px) {
