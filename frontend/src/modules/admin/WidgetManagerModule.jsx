@@ -66,6 +66,70 @@ const STYLE_OPTIONS = [
   { value: 'circle', label: 'Circle (icon only)' },
 ];
 
+/* ── Live Preview of Floating Button ── */
+function ButtonPreview({ position, icon, style, label, color, offsetX, offsetY }) {
+  const iconEl = ICON_SVGS[icon] || ICON_SVGS.book;
+  const showLabel = style === 'pill' || style === 'square';
+  const isCircle = style === 'circle';
+  const iconSize = isCircle ? 'w-5 h-5' : 'w-4 h-4';
+
+  const btnClasses = [
+    'flex items-center justify-center gap-1.5 text-white font-semibold shadow-lg absolute transition-all duration-300',
+    isCircle ? 'p-3 rounded-full' : '',
+    style === 'icon-only' ? 'p-2.5 rounded-2xl' : '',
+    style === 'pill' ? 'px-3 py-2 rounded-full' : '',
+    style === 'square' ? 'px-3 py-2 rounded-xl' : '',
+  ].join(' ');
+
+  // Map position to CSS for the preview box
+  const ox = parseInt(offsetX) || 20;
+  const oy = parseInt(offsetY) || 20;
+  const scale = 0.6; // Scale offsets for the small preview
+  const px = Math.round(ox * scale);
+  const py = Math.round(oy * scale);
+
+  const posStyle = {};
+  if (position.includes('bottom')) posStyle.bottom = `${py}px`;
+  if (position.includes('top')) posStyle.top = `${py}px`;
+  if (position.includes('right')) posStyle.right = `${px}px`;
+  if (position.includes('left') && !position.includes('center')) posStyle.left = `${px}px`;
+  if (position === 'bottom-center') { posStyle.left = '50%'; posStyle.transform = 'translateX(-50%)'; }
+  if (position === 'middle-right') { posStyle.top = '50%'; posStyle.transform = 'translateY(-50%)'; }
+  if (position === 'middle-left') { posStyle.top = '50%'; posStyle.transform = 'translateY(-50%)'; }
+
+  return (
+    <div
+      className="relative rounded-xl border-2 border-dashed border-muted bg-muted/20 overflow-hidden"
+      style={{ height: 180 }}
+      data-testid="widget-button-preview"
+    >
+      {/* Simulated page content */}
+      <div className="absolute inset-0 p-3 opacity-30">
+        <div className="h-2 w-20 bg-muted rounded mb-2" />
+        <div className="h-1.5 w-32 bg-muted rounded mb-1.5" />
+        <div className="h-1.5 w-28 bg-muted rounded mb-1.5" />
+        <div className="h-1.5 w-36 bg-muted rounded mb-4" />
+        <div className="grid grid-cols-3 gap-2">
+          <div className="h-8 bg-muted rounded" />
+          <div className="h-8 bg-muted rounded" />
+          <div className="h-8 bg-muted rounded" />
+        </div>
+      </div>
+
+      {/* Floating button preview */}
+      <div className={btnClasses} style={{ ...posStyle, backgroundColor: color, fontSize: 11 }}>
+        <span className={iconSize}>{iconEl}</span>
+        {showLabel && <span>{label}</span>}
+      </div>
+
+      {/* Label */}
+      <div className="absolute top-1.5 left-1.5 bg-background/80 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] text-muted-foreground font-medium">
+        Preview — {position}
+      </div>
+    </div>
+  );
+}
+
 export default function WidgetManagerModule() {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
