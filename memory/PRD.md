@@ -47,6 +47,14 @@
 - **Textbook ordering: item preservation fix (Feb 10)** — `_refresh_order_items()` no longer wipes existing items when products can't be found in the catalog. Existing items are preserved and marked as `out_of_stock` instead of being deleted. New catalog items are added to the order.
 - **Widget: error state display (Feb 10)** — Widget now differentiates between "API failed" and "no textbooks exist." Shows actual error message with retry button instead of misleading "No textbooks available" message. Also added Out of Stock section for items with `out_of_stock` status.
 
+## Pre-sale Inventory System (Feb 10)
+- When parent submits textbook order, `reserved_quantity` increments by 1 per item on the product
+- New "Pre-sale" column in inventory table shows pending reservations (amber badge)
+- When admin adds stock via Stock Adjust dialog: pre-sale orders auto-fulfilled first, remaining stock becomes available
+- Stock Adjust dialog shows presale fulfillment preview: "X of Y pre-sale orders will be auto-fulfilled"
+- Available stock = `inventory_quantity - reserved_quantity`
+- Items become "Out of Stock" in widget when available = 0
+
 ## Codebase Cleanup: Spanish → English (Feb 10)
 - Replaced all `libro`/`libros` variable names, comments, and constants with English equivalents
 - Changed book_id prefix from `libro_` to `book_` for new products (existing data unaffected)
