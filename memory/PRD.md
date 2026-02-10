@@ -39,6 +39,9 @@
 - P2: sync-all endpoint broken
 - P3: i18n, board selector UX
 
+## Bug Fixes
+- **Textbook ordering: grade mismatch fix (Feb 10)** — `get_books_for_grade()` no longer requires `is_private_catalog: True`. Now matches any active, non-archived product for the grade. Fixes "No textbooks available" when products exist in the unified inventory without the PCA flag. Also fixed diagnostic endpoint's grade mapping (was missing G7-G12).
+
 ## Test Reports (all passed)
 - iter 65: Widget display (16/16)
 - iter 66: Placement + OAuth (38/38)
