@@ -81,11 +81,10 @@ LEGACY_TO_NEW = {
     "user_sessions": AuthCollections.SESSIONS,
     
     # Store
-    "libros": StoreCollections.PRODUCTS,
-    "pedidos": StoreCollections.ORDERS,
-    "categorys": StoreCollections.CATEGORIES,
-    "estudiantes_sincronizados": StoreCollections.STUDENTS,
-    "synced_students": StoreCollections.STUDENTS,
+    "store_products": StoreCollections.PRODUCTS,
+    "store_orders": StoreCollections.ORDERS,
+    "store_categories": StoreCollections.CATEGORIES,
+    "store_synced_students": StoreCollections.STUDENTS,
     
     # PinpanClub
     "pingpong_players": PinpanClubCollections.PLAYERS,
