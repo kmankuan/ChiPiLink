@@ -47,7 +47,7 @@ export default function AdminWalletTab({ token }) {
     setLoading(true);
     try {
       // Fetch all users
-      const usersRes = await axios.get(`${API_URL}/api/auth-v2/admin/users`, {
+      const usersRes = await axios.get(`${API_URL}/api/auth-v2/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const allUsers = usersRes.data.users || usersRes.data || [];
