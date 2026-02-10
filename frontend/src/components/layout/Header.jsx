@@ -55,7 +55,7 @@ const ROUTE_CONFIG = {
   '/mi-cuenta': { name: 'Mi Cuenta', icon: Wallet },
   '/my-account': { name: 'Mi Cuenta', icon: Wallet },
   '/pedidos': { name: 'Mis Pedidos', icon: ShoppingCart },
-  '/mis-pedidos-libros': { name: 'Mis Libros', icon: BookOpen },
+  '/my-book-orders': { name: 'My Books', icon: BookOpen },
   '/orden': { name: 'Nueva Orden', icon: ShoppingCart },
   '/checkout': { name: 'Pago', icon: CreditCard },
   '/payment': { name: 'Resultado de Pago', icon: CreditCard },
@@ -538,7 +538,7 @@ export function Header() {
                   {/* Mis Libros Escolares - Solo si tiene estudiantes vinculados */}
                   {hasLinkedStudents && (
                     <DropdownMenuItem asChild>
-                      <Link to="/mis-pedidos-libros" className="flex items-center gap-2" data-testid="menu-book-orders">
+                      <Link to="/my-book-orders" className="flex items-center gap-2" data-testid="menu-book-orders">
                         <BookOpen className="h-4 w-4" />
                         Mis Libros Escolares
                       </Link>
