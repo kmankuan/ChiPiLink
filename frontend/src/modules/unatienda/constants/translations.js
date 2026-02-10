@@ -82,7 +82,13 @@ export const schoolTxbTranslations = {
     reorderApproved: 'Re-orden aprobada - Selecciona para ordenar',
     reorderReason: '¿Por qué necesitas re-ordenar?',
     reorderSuccess: 'Solicitud de re-orden enviada',
-    reorderError: 'Error al solicitar re-orden'
+    reorderError: 'Error al solicitar re-orden',
+    walletBalance: 'Saldo de Billetera',
+    payWithWallet: 'Pagar con Billetera',
+    insufficientBalance: 'Saldo insuficiente',
+    insufficientBalanceMsg: 'Tu saldo es insuficiente. Por favor realiza una transferencia bancaria para recargar tu billetera.',
+    paymentSuccess: '¡Pago exitoso! Pedido enviado.',
+    bankTransferInfo: 'Información de Transferencia Bancaria'
   },
   zh: {
     backToStudents: '返回学生列表',
