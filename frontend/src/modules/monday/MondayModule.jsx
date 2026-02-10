@@ -815,6 +815,11 @@ export default function MondayModule() {
           <WebhooksTab />
         </TabsContent>
 
+        {/* ========== TAB: WALLET ========== */}
+        <TabsContent value="wallet" className="mt-6">
+          <WalletMondayTab />
+        </TabsContent>
+
         {/* ========== TAB: STATUS MAPPING ========== */}
         <TabsContent value="status-mapping" className="mt-6">
           <StatusMappingTab />
