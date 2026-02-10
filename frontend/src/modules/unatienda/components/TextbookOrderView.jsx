@@ -267,6 +267,17 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
       }
     }
 
+    // Calculate total
+    const total = textbooks
+      .filter(b => selectedBooks[b.book_id])
+      .reduce((sum, b) => sum + (b.price || 0), 0);
+    
+    // Check wallet balance
+    if (walletBalance !== null && walletBalance < total) {
+      toast.error(te.insufficientBalance);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const orderItems = selectedBookIds.map(bookId => {
@@ -279,21 +290,23 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
         };
       });
 
-      await axios.post(
+      const response = await axios.post(
         `${API_URL}/api/store/textbook-orders/submit`,
         {
           student_id: selectedStudent.student_id,
           items: orderItems,
           form_data: formData,
-          uploaded_files: uploadedFiles
+          uploaded_files: uploadedFiles,
+          payment_method: "wallet"
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success(te.orderSuccess);
+      toast.success(te.paymentSuccess || te.orderSuccess);
+      // Refresh wallet balance after payment
+      fetchWalletBalance();
       fetchStudentOrders();
       setView('students');
-      // Reset form data
       setFormData({});
       setUploadedFiles({});
     } catch (error) {
