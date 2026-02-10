@@ -894,15 +894,15 @@ function WidgetHeader({ user, hideUrl, onClose, onLogout }) {
         <span className="text-sm font-bold">ChiPi Link</span>
       </div>
       <div className="flex items-center gap-1">
-        {user && !hideUrl && (
-          <span className="text-[10px] text-muted-foreground mr-1 hidden sm:inline">
-            {user.display_name || user.nombre || user.email}
-          </span>
-        )}
-        {user && hideUrl && (
-          <span className="text-[10px] text-muted-foreground mr-1 hidden sm:inline">
+        {user && (
+          <span className="text-[10px] text-muted-foreground mr-1 truncate max-w-[120px]">
             {user.display_name || user.nombre || user.email?.split('@')[0]}
           </span>
+        )}
+        {user && onLogout && (
+          <button onClick={onLogout} className="p-1 rounded hover:bg-muted transition-colors" data-testid="widget-logout-btn" title="Logout">
+            <LogOut className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
         )}
         <button onClick={onClose} className="p-1 rounded hover:bg-muted transition-colors" data-testid="widget-close-btn">
           <X className="h-4 w-4" />
