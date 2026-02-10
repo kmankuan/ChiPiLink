@@ -41,6 +41,8 @@
 
 ## Bug Fixes
 - **Textbook ordering: grade mismatch fix (Feb 10)** — `get_books_for_grade()` no longer requires `is_private_catalog: True`. Now matches any active, non-archived product for the grade. Fixes "No textbooks available" when products exist in the unified inventory without the PCA flag. Also fixed diagnostic endpoint's grade mapping (was missing G7-G12).
+- **Textbook ordering: item preservation fix (Feb 10)** — `_refresh_order_items()` no longer wipes existing items when products can't be found in the catalog. Existing items are preserved and marked as `out_of_stock` instead of being deleted. New catalog items are added to the order.
+- **Widget: error state display (Feb 10)** — Widget now differentiates between "API failed" and "no textbooks exist." Shows actual error message with retry button instead of misleading "No textbooks available" message. Also added Out of Stock section for items with `out_of_stock` status.
 
 ## Test Reports (all passed)
 - iter 65: Widget display (16/16)
