@@ -992,7 +992,7 @@ export default function EmbedWidget() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3">
           {activeTab === 'textbook_orders' && students && (
             <TextbookOrdersView token={token} students={students} />
           )}
