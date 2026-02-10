@@ -465,6 +465,15 @@ function TextbookOrdersView({ token, students }) {
         <div className="text-center py-6">
           <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-xs text-muted-foreground">No textbooks available for this grade yet.</p>
+          {order?._debug && (
+            <p className="text-[9px] text-muted-foreground mt-2">
+              Grade: {order._debug.grade_searched} • Products found: {order._debug.catalog_books_found}
+            </p>
+          )}
+          <button onClick={() => selectedStudent && selectStudent(selectedStudent)}
+            className="text-[10px] text-primary hover:underline mt-2">
+            Refresh
+          </button>
         </div>
       )}
 
