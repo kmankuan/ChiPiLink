@@ -230,7 +230,7 @@ export default function StudentsTab({ token }) {
         </Card>
       </div>
 
-      {/* Search + Refresh */}
+      {/* Search + Refresh + Bulk Actions */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -241,10 +241,28 @@ export default function StudentsTab({ token }) {
                 <CardDescription>Manage student profiles, lock/unlock editing access</CardDescription>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-2 shrink-0">
-              <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              {selectedIds.size > 0 && (
+                <>
+                  <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
+                    className="gap-1.5 text-xs border-orange-300 text-orange-700 hover:bg-orange-50" data-testid="bulk-presale-on">
+                    <ShoppingCart className="h-3.5 w-3.5" /> Enable Pre-sale
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
+                    className="gap-1.5 text-xs" data-testid="bulk-presale-off">
+                    Disable Pre-sale
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="text-xs">
+                    Clear
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-2 shrink-0">
+                <RefreshCw className="h-4 w-4" />
+                <span className="hidden sm:inline">Refresh</span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
