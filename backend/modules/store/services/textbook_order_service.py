@@ -98,7 +98,27 @@ class TextbookOrderService(BaseService):
             {"_id": 0}
         ).sort("name", 1).to_list(200)
         
-        logger.info(f"[get_books_for_grade] Found {len(books)} books")
+        # Fuzzy fallback: if strict mapping found nothing, try regex on the grade number
+        if len(books) == 0:
+            import re as _re
+            grade_num = ''.join(c for c in str(grade) if c.isdigit())
+            if grade_num:
+                regex_pattern = f"(^{grade_num}$|^G{grade_num}$|{grade_num}.*[Gg]rado|[Gg]rade.*{grade_num}|^{grade_num}[a-z])"
+                logger.info(f"[get_books_for_grade] Trying fuzzy match: regex={regex_pattern}")
+                books = await db.store_products.find(
+                    {
+                        "active": True,
+                        "archived": {"$ne": True},
+                        "$or": [
+                            {"grade": {"$regex": regex_pattern, "$options": "i"}},
+                            {"grades": {"$regex": regex_pattern, "$options": "i"}}
+                        ]
+                    },
+                    {"_id": 0}
+                ).sort("name", 1).to_list(200)
+                logger.info(f"[get_books_for_grade] Fuzzy match found {len(books)} books")
+        
+        logger.info(f"[get_books_for_grade] Found {len(books)} books total")
         if len(books) > 0:
             logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')}")
         else:
