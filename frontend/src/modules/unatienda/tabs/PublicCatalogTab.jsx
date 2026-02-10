@@ -108,11 +108,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     }
   };
 
-  const filteredProducts = productos.filter(libro => {
-    const matchesSearch = libro.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
+  const filteredProducts = productos.filter(product => {
+    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.subject?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategoria = filterCategoria === 'all' || product.categoria === filterCategoria;
     return matchesSearch && matchesCategoria;
   });
 
@@ -240,10 +240,10 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     }
   };
 
-  const handleDeleteProduct = async (libroId) => {
+  const handleDeleteProduct = async (productId) => {
     if (!confirm('Delete this product?')) return;
     try {
-      const response = await fetch(`${API}/api/store/products/${libroId}`, {
+      const response = await fetch(`${API}/api/store/products/${productId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
