@@ -160,33 +160,33 @@ LOADER_JS_TEMPLATE = """
   frame.src = API_URL + '/embed/widget';
   frame.allow = 'clipboard-write';
   var sidebarPx = parseInt(sidebarWidth) || 380;
-  var isMobile = window.innerWidth <= 480;
-  var actualWidth = isMobile ? '100vw' : sidebarWidth;
-  var actualPx = isMobile ? window.innerWidth : sidebarPx;
-  frame.style.cssText = 'position:fixed; width:' + actualWidth + '; max-width:100vw; height:100vh; top:0; right:-' + (actualPx + 20) + 'px; box-shadow:-4px 0 30px rgba(0,0,0,0.15); border-radius:0;';
 
-  // Update on resize
-  window.addEventListener('resize', function() {
-    var mob = window.innerWidth <= 480;
-    var w = mob ? '100vw' : sidebarWidth;
-    var px = mob ? window.innerWidth : sidebarPx;
-    frame.style.width = w;
-    frame.style.maxWidth = '100vw';
-    if (!open) { frame.style.right = '-' + (px + 20) + 'px'; }
-  });
+  function isMobile() { return window.innerWidth <= 480; }
+
+  function getWidth() { return isMobile() ? window.innerWidth : sidebarPx; }
+
+  frame.style.cssText = 'position:fixed;top:0;height:100%;height:100dvh;border:none;z-index:99999;background:#fff;box-shadow:-4px 0 30px rgba(0,0,0,0.15);transition:right 0.3s cubic-bezier(0.4,0,0.2,1),width 0.3s;';
+  frame.style.width = getWidth() + 'px';
+  frame.style.right = '-' + (getWidth() + 20) + 'px';
 
   var open = false;
+
+  window.addEventListener('resize', function() {
+    var w = getWidth();
+    frame.style.width = w + 'px';
+    if (!open) { frame.style.right = '-' + (w + 20) + 'px'; }
+  });
+
   function toggle() {
-    var mob = window.innerWidth <= 480;
-    var px = mob ? window.innerWidth : sidebarPx;
     open = !open;
+    var w = getWidth();
+    frame.style.width = w + 'px';
     if (open) {
-      frame.style.width = mob ? '100vw' : sidebarWidth;
       frame.style.right = '0';
       overlay.classList.add('active');
       btn.style.transform = 'scale(0.9)';
     } else {
-      frame.style.right = '-' + (px + 20) + 'px';
+      frame.style.right = '-' + (w + 20) + 'px';
       overlay.classList.remove('active');
       btn.style.transform = '';
     }
