@@ -293,7 +293,7 @@ class BulkImportService:
         
         return resultados
     
-    async def preview_libros(
+    async def preview_books(
         self,
         raw_text: str,
         column_mapping: Dict[str, int],
@@ -301,14 +301,14 @@ class BulkImportService:
         grado_default: str = None
     ) -> Dict:
         """
-        Previsualizar datos de libros/productos antes de importar.
+        Preview book/product data before importing.
         
         Args:
             raw_text: Texto pegado desde Google Sheets
             column_mapping: Mapeo de campos a indexs de columna
                 {
-                    "code": 0,           # Code del libro
-                    "name": 1,           # Name ofl libro
+                    "code": 0,           # Product code
+                    "name": 1,           # Product name
                     "price": 2,           # Precio
                     "publisher": 3,        # Editorial (opcional)
                     "isbn": 4,             # ISBN (opcional)
@@ -393,7 +393,7 @@ class BulkImportService:
             "errores": errores
         }
     
-    async def importar_libros(
+    async def import_books(
         self,
         raw_text: str,
         column_mapping: Dict[str, int],
@@ -403,7 +403,7 @@ class BulkImportService:
         admin_id: str = None
     ) -> Dict:
         """
-        Importar libros/productos desde texto pegado.
+        Import books/products from pasted text.
         """
         parsed = self.parse_tsv(raw_text, has_headers=True)
         
@@ -459,7 +459,7 @@ class BulkImportService:
                 
                 existente = await db.store_products.find_one({"code": codigo})
                 
-                libro_data = {
+                book_data = {
                     "code": codigo,
                     "name": nombre,
                     "price": precio,
