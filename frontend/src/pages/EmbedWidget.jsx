@@ -929,6 +929,8 @@ export default function EmbedWidget() {
         <div className="flex-1 overflow-y-auto p-3">
           {activeTab === 'wallet' ? (
             <WalletView token={token} />
+          ) : activeTab === 'orders' ? (
+            <OrdersView token={token} students={students || []} />
           ) : !studentsLoaded ? (
             <LoadingSpinner />
           ) : !hasStudents ? (
