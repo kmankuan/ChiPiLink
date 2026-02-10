@@ -39,7 +39,13 @@ export const schoolTxbTranslations = {
     reorderApproved: 'Reorder approved - Select to order',
     reorderReason: 'Why do you need to reorder?',
     reorderSuccess: 'Reorder request sent',
-    reorderError: 'Error requesting reorder'
+    reorderError: 'Error requesting reorder',
+    walletBalance: 'Wallet Balance',
+    payWithWallet: 'Pay with Wallet',
+    insufficientBalance: 'Insufficient balance',
+    insufficientBalanceMsg: 'Your wallet balance is insufficient. Please make a bank transfer to top up your wallet.',
+    paymentSuccess: 'Payment successful! Order submitted.',
+    bankTransferInfo: 'Bank Transfer Information'
   },
   es: {
     backToStudents: 'Volver a estudiantes',
