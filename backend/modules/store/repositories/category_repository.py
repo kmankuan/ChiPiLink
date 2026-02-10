@@ -21,7 +21,7 @@ class CategoryRepository(BaseRepository):
     
     # Default categories
     DEFAULT_CATEGORIES = [
-        {"category_id": "libros", "name": "Libros", "icono": "📚", "orden": 1, "active": True},
+        {"category_id": "books", "name": "Books", "icono": "📚", "orden": 1, "active": True},
         {"category_id": "snacks", "name": "Snacks", "icono": "🍫", "orden": 2, "active": True},
         {"category_id": "bebidas", "name": "Bebidas", "icono": "🥤", "orden": 3, "active": True},
         {"category_id": "preparados", "name": "Preparados", "icono": "🌭", "orden": 4, "active": True},
