@@ -208,6 +208,16 @@ function renderCellContent(col, product, { updateProductField, onAdjustStock }) 
         </div>
       );
     }
+    case 'presale': {
+      const reserved = product.reserved_quantity || 0;
+      return reserved > 0 ? (
+        <div className="rounded px-2 py-1 text-center font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30" title={`${reserved} pre-sale orders`}>
+          {reserved}
+        </div>
+      ) : (
+        <span className="text-muted-foreground text-center block">—</span>
+      );
+    }
     case 'status':
       return (
         <Badge variant={product.active !== false ? "default" : "secondary"} className="cursor-pointer"
