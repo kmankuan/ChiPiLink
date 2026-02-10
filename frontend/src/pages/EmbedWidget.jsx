@@ -360,8 +360,8 @@ function TextbookOrdersView({ token, students }) {
   const cartCount = Object.values(cart).filter(q => q > 0).length;
 
   return (
-    <div className="space-y-3" data-testid="widget-textbook-list">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3 min-w-0" data-testid="widget-textbook-list">
+      <div className="flex items-center justify-between min-w-0">
         {students.filter(s => s.enrollments?.some(e => e.status === 'approved')).length > 1 && (
           <button onClick={() => { setSelectedStudent(null); setOrder(null); setCart({}); }}
             className="flex items-center gap-1 text-xs text-primary hover:underline" data-testid="widget-back-btn">
