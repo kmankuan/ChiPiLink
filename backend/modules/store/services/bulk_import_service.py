@@ -473,33 +473,33 @@ class BulkImportService:
                     "updated_at": now
                 }
                 
-                # Manejar grados (puede ser uno o varios)
+                # Handle grades (can be one or multiple)
                 if grade:
                     if "," in str(grade):
-                        libro_data["grades"] = [g.strip() for g in str(grade).split(",")]
+                        book_data["grades"] = [g.strip() for g in str(grade).split(",")]
                     else:
-                        libro_data["grade"] = str(grade)
-                        libro_data["grades"] = [str(grade)]
+                        book_data["grade"] = str(grade)
+                        book_data["grades"] = [str(grade)]
                 
                 if catalogo_id:
-                    libro_data["catalogo_id"] = catalogo_id
+                    book_data["catalogo_id"] = catalogo_id
                 
                 if existente:
                     if actualizar_existentes:
                         await db.store_products.update_one(
                             {"book_id": existente["book_id"]},
-                            {"$set": libro_data}
+                            {"$set": book_data}
                         )
                         resultados["actualizados"] += 1
                     else:
                         resultados["omitidos"] += 1
                 else:
-                    libro_data["book_id"] = f"libro_{uuid.uuid4().hex[:12]}"
-                    libro_data["created_at"] = now
-                    libro_data["inventory_quantity"] = 0
-                    libro_data["cantidad_reservada"] = 0
+                    book_data["book_id"] = f"book_{uuid.uuid4().hex[:12]}"
+                    book_data["created_at"] = now
+                    book_data["inventory_quantity"] = 0
+                    book_data["cantidad_reservada"] = 0
                     
-                    await db.store_products.insert_one(libro_data)
+                    await db.store_products.insert_one(book_data)
                     resultados["creados"] += 1
                     
             except Exception as e:
@@ -511,7 +511,7 @@ class BulkImportService:
         # Registrar la import
         import_log = {
             "import_id": import_id,
-            "tipo": "libros",
+            "tipo": "books",
             "admin_id": admin_id,
             "catalogo_id": catalogo_id,
             "grado_default": grado_default,
