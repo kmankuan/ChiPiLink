@@ -77,10 +77,16 @@
 
 ## Wallet Payment System (Feb 10)
 - **Widget Payment Flow**: Users see wallet balance when ordering textbooks. "Pay with Wallet" button charges wallet atomically before creating order. Insufficient balance shows warning + bank transfer info.
-- **Monday.com Webhook**: Board "Customers Admin" (5931665026) triggers wallet top-up. Webhook extracts user email + amount from Monday event, deposits into user's wallet.
-- **Admin Wallet Tab**: New "Wallets" tab in Users module. Shows all users with balances, stats cards (Total Users, Total Balance, With Balance). Top Up / Deduct buttons with confirmation dialog.
-- **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions with description.
-- **Bank Transfer Info**: Configurable via existing Form Config module (info field type). Shown in widget order form.
+- **Monday.com Wallet Adapter** (`modules/users/integrations/monday_wallet_adapter.py`):
+  - Extends `BaseMondayAdapter` (namespace: `users.wallet`)
+  - Board "Customers Admin" (5931665026): Items = customers (email column), Subitems = wallet events
+  - Subitem columns: `Chipi Wallet` (amount), `Chipi Note` (description), `Status` (Add Wallet / Deduct Wallet)
+  - Webhook triggers on subitem status change → deposits or charges user wallet
+  - Config-driven: board_id, column_mapping, subitem_column_mapping stored in `monday_integration_config` collection
+  - Admin config routes: `GET/PUT /api/monday/adapters/wallet/config`
+- **Admin Wallet Tab**: New "Wallets" tab in Users module. Shows all users with balances, stats cards. Top Up / Deduct buttons with confirmation dialog.
+- **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions.
+- **Bank Transfer Info**: Configurable via existing Form Config module (info field type).
 
 ## Upcoming Tasks
 - Transaction history view for clients in the widget
