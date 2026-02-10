@@ -899,7 +899,7 @@ export default function EmbedWidget() {
     const studentsLoaded = students !== null;
 
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
+      <div className={widgetShellClass} data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
           <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
