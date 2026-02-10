@@ -524,7 +524,7 @@ async def admin_adjust_wallet(
             transaction = await wallet_service.deposit(
                 user_id=user_id,
                 amount=data.amount,
-                currency=Currency(data.currency if hasattr(data, 'currency') else "USD"),
+                currency=Currency.USD,
                 payment_method=PaymentMethod.WALLET,
                 description=data.description or f"Admin top-up by {admin.get('name', admin['user_id'])}"
             )
