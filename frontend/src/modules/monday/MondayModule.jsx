@@ -51,7 +51,8 @@ import {
   BookOpen,
   LayoutGrid,
   Plug,
-  Layers
+  Layers,
+  Wallet
 } from 'lucide-react';
 
 import TxbInventoryTab from './components/TxbInventoryTab';
