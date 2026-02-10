@@ -12,6 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+/* Force the widget to never exceed the iframe viewport */
+const widgetShellClass = "h-screen w-screen max-w-[100vw] flex flex-col bg-background text-foreground overflow-hidden box-border";
 import {
   BookOpen, Users, Package, Bell, ChevronRight, ChevronLeft,
   Loader2, LogIn, X, ShoppingCart, CheckCircle, Clock, AlertCircle,
