@@ -283,6 +283,12 @@ class TextbookOrderService(BaseService):
         
         order["items"] = updated_items
         order["total_amount"] = total
+        order["_debug"] = {
+            "catalog_books_found": len(books),
+            "existing_items_preserved": len(existing_items),
+            "final_items": len(updated_items),
+            "grade_searched": grade
+        }
         
         await self.order_repo.update_order(order["order_id"], {
             "items": updated_items,
