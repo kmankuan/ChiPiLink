@@ -294,6 +294,13 @@ export default function StudentsTab({ token }) {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[40px]">
+                      <Checkbox
+                        checked={filteredStudents.length > 0 && filteredStudents.every(s => selectedIds.has(s.student_id || s.sync_id))}
+                        onCheckedChange={toggleAll}
+                        data-testid="select-all-students"
+                      />
+                    </TableHead>
                     <TableHead>Student</TableHead>
                     <TableHead className="hidden sm:table-cell">Grade</TableHead>
                     <TableHead className="hidden md:table-cell">School</TableHead>
