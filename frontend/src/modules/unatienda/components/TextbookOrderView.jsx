@@ -41,6 +41,10 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   const [formData, setFormData] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadingFile, setUploadingFile] = useState(null);
+  
+  // Wallet state
+  const [walletBalance, setWalletBalance] = useState(null);
+  const [loadingWallet, setLoadingWallet] = useState(false);
 
   // Get current language - use i18n translations with fallback to inline
   const lang = i18n.language || 'es';
