@@ -22,7 +22,7 @@ export default function Catalog() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   
-  const [books, setLibros] = useState([]);
+  const [books, setBooks] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,13 +36,13 @@ export default function Catalog() {
 
   const fetchData = async () => {
     try {
-      const [librosRes, gradosRes, materiasRes] = await Promise.all([
+      const [booksRes, gradosRes, materiasRes] = await Promise.all([
         axios.get(buildUrl(STORE_ENDPOINTS.products)),
         axios.get(buildUrl(STORE_ENDPOINTS.grades)),
         axios.get(buildUrl(STORE_ENDPOINTS.subjects))
       ]);
       
-      setLibros(librosRes.data);
+      setBooks(booksRes.data);
       setGrados(gradosRes.data.grades);
       setMaterias(materiasRes.data.subjects);
     } catch (error) {

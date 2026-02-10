@@ -442,7 +442,7 @@ export default function Orders() {
                             <div className="space-y-2">
                               {pedido.items.slice(0, 3).map((item, idx) => (
                                 <div key={idx} className="flex justify-between text-sm">
-                                  <span>{item.name || item.libro_nombre}</span>
+                                  <span>{item.name || item.book_name}</span>
                                   <span className="text-muted-foreground">
                                     {item.cantidad} x ${item.price?.toFixed(2) || '0.00'}
                                   </span>

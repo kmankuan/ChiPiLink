@@ -124,7 +124,7 @@ export default function EmbedOrderForm() {
     } else {
       setCart([...cart, {
         book_id: book.book_id,
-        nombre_libro: book.name,
+        book_name: book.name,
         cantidad: 1,
         precio_unitario: book.price
       }]);
@@ -646,7 +646,7 @@ export default function EmbedOrderForm() {
                           {cart.map((item) => (
                             <div key={item.book_id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">{item.name_libro}</p>
+                                <p className="font-medium text-sm truncate">{item.book_name}</p>
                                 <p className="text-xs text-muted-foreground">
                                   {item.cantidad} × ${item.price_unitario.toFixed(2)}
                                 </p>

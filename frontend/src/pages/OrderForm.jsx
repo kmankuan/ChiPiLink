@@ -38,7 +38,7 @@ export default function OrderForm() {
   const preselectedStudent = searchParams.get('estudiante');
 
   const [estudiantes, setEstudiantes] = useState([]);
-  const [books, setLibros] = useState([]);
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
@@ -64,13 +64,13 @@ export default function OrderForm() {
 
   const fetchData = async () => {
     try {
-      const [estudiantesRes, librosRes] = await Promise.all([
+      const [estudiantesRes, booksRes] = await Promise.all([
         api.get('/estudiantes'),
         api.get('/books')
       ]);
       
       setEstudiantes(estudiantesRes.data);
-      setLibros(librosRes.data);
+      setBooks(booksRes.data);
       
       // If preselected student, set it
       if (preselectedStudent) {
@@ -107,7 +107,7 @@ export default function OrderForm() {
     } else {
       setCart([...cart, {
         book_id: book.book_id,
-        nombre_libro: book.name,
+        book_name: book.name,
         cantidad: 1,
         precio_unitario: book.price,
         max_stock: book.inventory_quantity
@@ -156,7 +156,7 @@ export default function OrderForm() {
         estudiante_id: selectedEstudiante,
         items: cart.map(item => ({
           book_id: item.book_id,
-          nombre_libro: item.name_libro,
+          book_name: item.book_name,
           cantidad: item.cantidad,
           precio_unitario: item.price_unitario
         })),
@@ -441,7 +441,7 @@ export default function OrderForm() {
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">
-                            {item.name_libro}
+                            {item.book_name}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {item.cantidad} x ${item.price_unitario.toFixed(2)}

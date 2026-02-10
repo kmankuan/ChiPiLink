@@ -310,7 +310,7 @@ export default function Dashboard() {
         estudiante_id: selectedStudent.estudiante_id,
         items: selectedBooks.map(book => ({
           book_id: book.book_id,
-          nombre_libro: book.name,
+          book_name: book.name,
           cantidad: 1,
           precio_unitario: book.price
         })),
@@ -487,8 +487,8 @@ export default function Dashboard() {
                             )}
                             <p className="text-xs text-muted-foreground mt-1">
                               {student.es_nuevo ? '🆕 Estudiante Nuevo' : '📚 Estudiante del Año Anterior'}
-                              {student.libros_comprados?.length > 0 && (
-                                <span className="ml-2">• {student.libros_comprados.length} books comprados</span>
+                              {student.purchased_books?.length > 0 && (
+                                <span className="ml-2">• {student.purchased_books.length} purchased</span>
                               )}
                             </p>
                           </div>
@@ -603,7 +603,7 @@ export default function Dashboard() {
                         <div className="flex flex-wrap gap-2">
                           {pedido.items.map((item, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">
-                              {item.name_libro}
+                              {item.book_name}
                             </Badge>
                           ))}
                         </div>
@@ -911,11 +911,11 @@ export default function Dashboard() {
               <div>
                 <h4 className="font-medium mb-2 flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
-                  Books Comprados ({historyStudent.libros_comprados?.length || 0})
+                  Books Comprados ({historyStudent.purchased_books?.length || 0})
                 </h4>
-                {historyStudent.libros_comprados?.length > 0 ? (
+                {historyStudent.purchased_books?.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {historyStudent.libros_comprados.map((bookId, idx) => (
+                    {historyStudent.purchased_books.map((bookId, idx) => (
                       <Badge key={idx} variant="secondary">{bookId}</Badge>
                     ))}
                   </div>

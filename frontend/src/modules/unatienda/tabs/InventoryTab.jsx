@@ -288,10 +288,10 @@ export default function InventoryTab({ token }) {
                     const statusLabel = qty <= 0 ? 'Out' : qty <= 10 ? 'Low' : 'OK';
 
                     return (
-                      <tr key={p.book_id || p.libro_id} className="border-b hover:bg-muted/30">
+                      <tr key={p.book_id || p.book_id} className="border-b hover:bg-muted/30">
                         <td className="p-3">
                           <p className="font-medium text-xs truncate max-w-[200px]">{name}</p>
-                          <p className="text-[10px] text-muted-foreground">{p.code || p.isbn || p.book_id || p.libro_id}</p>
+                          <p className="text-[10px] text-muted-foreground">{p.code || p.isbn || p.book_id || p.book_id}</p>
                         </td>
                         <td className="p-3 text-xs text-muted-foreground">{cat}</td>
                         <td className="p-3 text-right text-xs font-mono">${price.toFixed(2)}</td>
@@ -300,7 +300,7 @@ export default function InventoryTab({ token }) {
                           <Badge variant="outline" className={`text-[10px] ${statusColor}`}>{statusLabel}</Badge>
                         </td>
                         <td className="p-3 text-center">
-                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAdjustProduct({ ...p, inventory_quantity: qty, name, book_id: p.book_id || p.libro_id })}>
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAdjustProduct({ ...p, inventory_quantity: qty, name, book_id: p.book_id || p.book_id })}>
                             <ArrowUpDown className="h-3 w-3 mr-1" /> Adjust
                           </Button>
                         </td>
