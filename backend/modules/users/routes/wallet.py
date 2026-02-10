@@ -547,3 +547,44 @@ async def admin_adjust_wallet(
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@router.get("/admin/all-users")
+async def get_all_users_with_wallets(
+    admin=Depends(get_admin_user)
+):
+    """Get all non-admin users with their wallet info (admin)"""
+    from core.database import db
+    
+    # Fetch non-admin users
+    users_cursor = db.auth_users.find(
+        {"is_admin": {"$ne": True}},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    users = await users_cursor.to_list(length=500)
+    
+    # Fetch all wallets
+    wallets_cursor = db.chipi_wallets.find({}, {"_id": 0})
+    wallets = await wallets_cursor.to_list(length=500)
+    wallet_map = {w["user_id"]: w for w in wallets}
+    
+    # Merge
+    result = []
+    for u in users:
+        if not u.get("email"):
+            continue
+        w = wallet_map.get(u["user_id"])
+        result.append({
+            "user_id": u["user_id"],
+            "email": u.get("email", ""),
+            "name": u.get("name", ""),
+            "wallet": {
+                "balance_usd": w.get("balance_usd", 0) if w else 0,
+                "total_deposited": w.get("total_deposited", 0) if w else 0,
+                "total_spent": w.get("total_spent", 0) if w else 0,
+                "is_locked": w.get("is_locked", False) if w else False,
+            } if w else None
+        })
+    
+    return {"users": result}
