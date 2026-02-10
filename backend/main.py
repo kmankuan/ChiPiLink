@@ -234,13 +234,9 @@ async def startup_event():
     # Initialize Roles module (create default roles)
     await roles_service.initialize_default_roles()
     
-    # Register Monday.com wallet webhook handler
-    from modules.integrations.monday.webhook_router import register_handler
-    from modules.integrations.monday.wallet_webhook_handler import (
-        handle_wallet_topup_webhook, CUSTOMERS_ADMIN_BOARD_ID
-    )
-    register_handler(CUSTOMERS_ADMIN_BOARD_ID, handle_wallet_topup_webhook)
-    logger.info(f"Registered wallet webhook handler for board {CUSTOMERS_ADMIN_BOARD_ID}")
+    # Register Monday.com wallet webhook handler (adapter pattern)
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+    await wallet_monday_adapter.register_webhooks()
     
     logger.info("All modules loaded successfully")
 
