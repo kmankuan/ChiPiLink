@@ -247,6 +247,7 @@ function TextbookOrdersView({ token, students }) {
   const selectStudent = useCallback(async (student) => {
     setSelectedStudent(student);
     setLoadingOrder(true);
+    setOrderError(null);
     setCart({});
     try {
       const sid = student.student_id || student._id || student.id;
@@ -255,7 +256,10 @@ function TextbookOrdersView({ token, students }) {
       });
       setOrder(data);
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to load textbooks');
+      const msg = err.response?.data?.detail || err.message || 'Failed to load textbooks';
+      console.error('[Widget] Failed to load textbooks:', msg, err);
+      setOrderError(msg);
+      toast.error(msg);
     } finally {
       setLoadingOrder(false);
     }
