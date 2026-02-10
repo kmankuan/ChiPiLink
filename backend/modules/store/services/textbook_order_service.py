@@ -491,7 +491,7 @@ class TextbookOrderService(BaseService):
         new_status = OrderStatus.SUBMITTED.value
         
         # Update order
-        await self.order_repo.update_order(order_id, {
+        update_data = {
             "items": items,
             "status": new_status,
             "last_submitted_at": now,
