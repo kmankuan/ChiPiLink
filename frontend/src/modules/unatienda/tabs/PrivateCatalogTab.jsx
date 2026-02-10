@@ -366,13 +366,17 @@ function AdjustStockDialog({ open, onOpenChange, product, token, onAdjusted }) {
   if (!product) return null;
 
   const currentStock = (product.inventory_quantity || 0) - (product.reserved_quantity || 0);
+  const presale = product.reserved_quantity || 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-base">Adjust Stock</DialogTitle>
-          <DialogDescription className="text-xs">{product.name} — Current: {currentStock} units</DialogDescription>
+          <DialogDescription className="text-xs">
+            {product.name} — Available: {currentStock} units
+            {presale > 0 && <span className="text-amber-600 font-medium"> • Pre-sale: {presale}</span>}
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="flex gap-2">
