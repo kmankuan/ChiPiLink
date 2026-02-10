@@ -23,7 +23,7 @@ import FloatingStoreNav from '@/components/store/FloatingStoreNav';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const categoryIcons = {
-  'libros': '📚',
+  'books': '📚',
   'snacks': '🍫',
   'bebidas': '🥤',
   'preparados': '🌭',
@@ -186,12 +186,12 @@ export default function ProductDetail() {
                 <span className="mr-1">{catInfo.icono}</span>
                 {catInfo.nombre}
               </Badge>
-              {product.categoria === 'libros' && product.grade && (
+              {product.categoria === 'books' && product.grade && (
                 <Badge variant="secondary" className="text-sm">
                   {grados.find(g => g.id === product.grade)?.nombre || product.grade}
                 </Badge>
               )}
-              {product.categoria === 'libros' && product.subject && (
+              {product.categoria === 'books' && product.subject && (
                 <Badge variant="outline" className="text-sm">
                   {product.subject}
                 </Badge>
@@ -221,9 +221,9 @@ export default function ProductDetail() {
             )}
 
             {/* Additional Info for Books */}
-            {product.categoria === 'libros' && (product.isbn || product.publisher) && (
+            {product.categoria === 'books' && (product.isbn || product.publisher) && (
               <div className="mb-6 p-4 rounded-xl bg-muted/50">
-                <h3 className="font-semibold mb-3">Información del libro</h3>
+                <h3 className="font-semibold mb-3">Book Information</h3>
                 <div className="space-y-2 text-sm">
                   {product.publisher && (
                     <div className="flex justify-between">
