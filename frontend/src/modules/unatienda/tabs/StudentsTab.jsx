@@ -313,9 +313,14 @@ export default function StudentsTab({ token }) {
                     const id = student.student_id || student.sync_id;
                     const latestEnrollment = (student.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
                     const isLocked = student.is_locked === true;
+                    const isPresale = student.presale_mode === true;
+                    const isSelected = selectedIds.has(id);
 
                     return (
-                      <TableRow key={id} data-testid={`student-row-${id}`}>
+                      <TableRow key={id} className={isSelected ? 'bg-primary/5' : ''} data-testid={`student-row-${id}`}>
+                        <TableCell className="w-[40px]">
+                          <Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(id)} data-testid={`select-student-${id}`} />
+                        </TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium text-sm">{student.full_name}</p>
