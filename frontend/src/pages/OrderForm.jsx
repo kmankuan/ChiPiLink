@@ -38,7 +38,7 @@ export default function OrderForm() {
   const preselectedStudent = searchParams.get('estudiante');
 
   const [estudiantes, setEstudiantes] = useState([]);
-  const [libros, setLibros] = useState([]);
+  const [books, setLibros] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
@@ -66,7 +66,7 @@ export default function OrderForm() {
     try {
       const [estudiantesRes, librosRes] = await Promise.all([
         api.get('/estudiantes'),
-        api.get('/libros')
+        api.get('/books')
       ]);
       
       setEstudiantes(estudiantesRes.data);
@@ -88,16 +88,16 @@ export default function OrderForm() {
     }
   };
 
-  const filteredLibros = libros.filter(libro => 
-    selectedGrado ? libro.grade === selectedGrado : true
+  const filteredLibros = books.filter(book => 
+    selectedGrado ? book.grade === selectedGrado : true
   );
 
-  const addToCart = (libro) => {
-    const existing = cart.find(item => item.book_id === libro.book_id);
+  const addToCart = (book) => {
+    const existing = cart.find(item => item.book_id === book.book_id);
     if (existing) {
-      if (existing.cantidad < libro.inventory_quantity) {
+      if (existing.cantidad < book.inventory_quantity) {
         setCart(cart.map(item => 
-          item.book_id === libro.book_id 
+          item.book_id === book.book_id 
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         ));
@@ -106,18 +106,18 @@ export default function OrderForm() {
       }
     } else {
       setCart([...cart, {
-        book_id: libro.book_id,
-        nombre_libro: libro.name,
+        book_id: book.book_id,
+        nombre_libro: book.name,
         cantidad: 1,
-        precio_unitario: libro.price,
-        max_stock: libro.inventory_quantity
+        precio_unitario: book.price,
+        max_stock: book.inventory_quantity
       }]);
     }
   };
 
-  const updateQuantity = (libroId, delta) => {
+  const updateQuantity = (bookId, delta) => {
     setCart(cart.map(item => {
-      if (item.book_id === libroId) {
+      if (item.book_id === bookId) {
         const newQty = item.cantidad + delta;
         if (newQty <= 0) return null;
         if (newQty > item.max_stock) {
@@ -130,8 +130,8 @@ export default function OrderForm() {
     }).filter(Boolean));
   };
 
-  const removeFromCart = (libroId) => {
-    setCart(cart.filter(item => item.book_id !== libroId));
+  const removeFromCart = (bookId) => {
+    setCart(cart.filter(item => item.book_id !== bookId));
   };
 
   const total = cart.reduce((sum, item) => sum + (item.cantidad * item.price_unitario), 0);
@@ -145,7 +145,7 @@ export default function OrderForm() {
     }
     
     if (cart.length === 0) {
-      toast.error('Agregue al menos un libro');
+      toast.error('Agregue al menos un book');
       return;
     }
     
@@ -301,22 +301,22 @@ export default function OrderForm() {
                 </h2>
                 
                 <div className="space-y-3">
-                  {filteredLibros.map((libro) => {
-                    const inCart = cart.find(item => item.book_id === libro.book_id);
-                    const isOutOfStock = libro.inventory_quantity <= 0;
+                  {filteredLibros.map((book) => {
+                    const inCart = cart.find(item => item.book_id === book.book_id);
+                    const isOutOfStock = book.inventory_quantity <= 0;
                     
                     return (
                       <div 
-                        key={libro.book_id}
+                        key={book.book_id}
                         className={`flex items-center justify-between p-4 rounded-lg border ${
                           inCart ? 'border-primary bg-primary/5' : 'border-border'
                         } ${isOutOfStock ? 'opacity-50' : ''}`}
-                        data-testid={`book-item-${libro.book_id}`}
+                        data-testid={`book-item-${book.book_id}`}
                       >
                         <div className="flex-1">
-                          <p className="font-medium">{libro.name}</p>
+                          <p className="font-medium">{book.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {t(`subjects.${libro.subject}`)} • ${libro.price.toFixed(2)}
+                            {t(`subjects.${book.subject}`)} • ${book.price.toFixed(2)}
                           </p>
                           {isOutOfStock && (
                             <p className="text-xs text-destructive">Agotado</p>
@@ -330,7 +330,7 @@ export default function OrderForm() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => updateQuantity(libro.book_id, -1)}
+                              onClick={() => updateQuantity(book.book_id, -1)}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -342,7 +342,7 @@ export default function OrderForm() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => updateQuantity(libro.book_id, 1)}
+                              onClick={() => updateQuantity(book.book_id, 1)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -352,9 +352,9 @@ export default function OrderForm() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => addToCart(libro)}
+                            onClick={() => addToCart(book)}
                             disabled={isOutOfStock}
-                            data-testid={`add-book-${libro.book_id}`}
+                            data-testid={`add-book-${book.book_id}`}
                           >
                             <Plus className="h-4 w-4 mr-1" />
                             Agregar

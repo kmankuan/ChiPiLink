@@ -316,7 +316,7 @@ export default function TextbookOrderPage({ embedded = false }) {
       {embedded && (
         <div className="flex justify-between items-center">
           <p className="text-muted-foreground">
-            Selecciona los libros para tu estudiante y envía el pedido
+            Selecciona los books para tu estudiante y envía el pedido
           </p>
           <Button variant="outline" size="sm" onClick={fetchOrderHistory} className="gap-2">
             <History className="h-4 w-4" />

@@ -47,13 +47,13 @@ const API = process.env.REACT_APP_BACKEND_URL;
 // Translation keys
 const translations = {
   es: {
-    title: 'Importación Masiva de Libros',
-    subtitle: 'Importar libros al catálogo privado PCA desde datos copiados de hojas de cálculo',
+    title: 'Importación Masiva de Books',
+    subtitle: 'Importar books al catálogo privado PCA desde datos copiados de hojas de cálculo',
     backButton: 'Volver al Catálogo',
     step1: 'Paso 1: Pegar Datos',
     step1Desc: 'Copia las filas desde Google Sheets o Excel y pégalas aquí',
     step2: 'Paso 2: Mapear Columnas',
-    step2Desc: 'Indica en qué columna está cada dato del libro',
+    step2Desc: 'Indica en qué columna está cada dato del book',
     step3: 'Paso 3: Previsualizar',
     step3Desc: 'Revisa los datos antes de importar',
     pasteHere: 'Pega aquí los datos copiados de tu hoja de cálculo...',
@@ -69,9 +69,9 @@ const translations = {
     defaultGrade: 'Grado por defecto',
     defaultGradeDesc: 'Se usará cuando no se especifique grado en los datos',
     updateExisting: 'Actualizar existentes',
-    updateExistingDesc: 'Si un libro ya existe (mismo código), actualizar sus datos',
+    updateExistingDesc: 'Si un book ya existe (mismo código), actualizar sus datos',
     previewButton: 'Previsualizar',
-    importButton: 'Importar Libros',
+    importButton: 'Importar Books',
     previewResults: 'Vista Previa',
     row: 'Fila',
     code: 'Código',
@@ -90,7 +90,7 @@ const translations = {
     created: 'creados',
     updated: 'actualizados',
     helpTitle: 'Ayuda',
-    helpText: 'Para importar libros:\n1. Abre tu hoja de cálculo (Google Sheets, Excel)\n2. Selecciona las filas con los datos\n3. Copia (Ctrl+C o Cmd+C)\n4. Pega en el área de texto arriba\n5. Configura el mapeo de columnas\n6. Previsualiza y luego importa',
+    helpText: 'Para importar books:\n1. Abre tu hoja de cálculo (Google Sheets, Excel)\n2. Selecciona las filas con los datos\n3. Copia (Ctrl+C o Cmd+C)\n4. Pega en el área de texto arriba\n5. Configura el mapeo de columnas\n6. Previsualiza y luego importa',
     noData: 'No hay datos para mostrar',
     pasteDataFirst: 'Pega los datos de la hoja de cálculo primero',
     previewFirst: 'Primero haz clic en "Previsualizar" para revisar los datos',
@@ -254,7 +254,7 @@ export default function BulkImportBooksPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/store/bulk-import/libros/preview`, {
+      const res = await fetch(`${API}/api/store/bulk-import/books/preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ export default function BulkImportBooksPage() {
 
     setImporting(true);
     try {
-      const res = await fetch(`${API}/api/store/bulk-import/libros/import`, {
+      const res = await fetch(`${API}/api/store/bulk-import/books/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -554,15 +554,15 @@ export default function BulkImportBooksPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {preview.preview?.map((libro, idx) => (
+                          {preview.preview?.map((book, idx) => (
                             <TableRow key={idx}>
-                              <TableCell className="font-mono text-xs">{libro.fila}</TableCell>
-                              <TableCell className="font-mono">{libro.code}</TableCell>
-                              <TableCell className="max-w-[200px] truncate">{libro.name}</TableCell>
-                              <TableCell className="text-right">${libro.price}</TableCell>
-                              <TableCell>{libro.grade || '-'}</TableCell>
+                              <TableCell className="font-mono text-xs">{book.fila}</TableCell>
+                              <TableCell className="font-mono">{book.code}</TableCell>
+                              <TableCell className="max-w-[200px] truncate">{book.name}</TableCell>
+                              <TableCell className="text-right">${book.price}</TableCell>
+                              <TableCell>{book.grade || '-'}</TableCell>
                               <TableCell>
-                                {libro.ya_existe ? (
+                                {book.ya_existe ? (
                                   <Badge variant="secondary">{t.update}</Badge>
                                 ) : (
                                   <Badge variant="default">{t.create}</Badge>

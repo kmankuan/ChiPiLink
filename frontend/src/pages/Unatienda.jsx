@@ -162,7 +162,7 @@ export default function Unatienda() {
     if (!selectedCategory) return matchesSearch;
     const matchesCategory = product.categoria === selectedCategory;
 
-    if (selectedSubcategory && (selectedCategory === 'books' || selectedCategory === 'libros')) {
+    if (selectedSubcategory && (selectedCategory === 'books' || selectedCategory === 'books')) {
       const matchesGrade = product.grade === selectedSubcategory || product.grades?.includes(selectedSubcategory);
       return matchesSearch && matchesCategory && matchesGrade;
     }

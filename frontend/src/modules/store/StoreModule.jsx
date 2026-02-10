@@ -65,7 +65,7 @@ const emptyProductRow = {
 export default function StoreModule() {
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [inventario, setInventario] = useState({ libros: [], alertas_bajo_stock: [] });
+  const [inventario, setInventario] = useState({ books: [], alertas_bajo_stock: [] });
   const [categories, setCategorias] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
@@ -115,11 +115,11 @@ export default function StoreModule() {
     }
   };
 
-  const filteredProducts = inventario.libros?.filter(libro => {
-    const matchesSearch = libro.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.subject?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategoria = filterCategoria === 'all' || libro.categoria === filterCategoria;
+  const filteredProducts = inventario.books?.filter(book => {
+    const matchesSearch = book.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.grade?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.subject?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategoria = filterCategoria === 'all' || book.categoria === filterCategoria;
     return matchesSearch && matchesCategoria;
   }) || [];
 
@@ -188,10 +188,10 @@ export default function StoreModule() {
     try {
       setSaving(true);
       if (editingProduct) {
-        await api.put(`/admin/libros/${editingProduct.book_id}`, editForm);
+        await api.put(`/admin/books/${editingProduct.book_id}`, editForm);
         toast.success('Producto actualizado');
       } else {
-        await api.post('/admin/libros', editForm);
+        await api.post('/admin/books', editForm);
         toast.success('Producto creado');
       }
       setEditDialog(false);
@@ -203,10 +203,10 @@ export default function StoreModule() {
     }
   };
 
-  const handleDeleteProduct = async (libroId) => {
+  const handleDeleteProduct = async (bookId) => {
     if (!confirm('¿Eliminar este producto?')) return;
     try {
-      await api.delete(`/admin/libros/${libroId}`);
+      await api.delete(`/admin/books/${bookId}`);
       toast.success('Producto eliminado');
       fetchData();
     } catch (error) {
@@ -214,9 +214,9 @@ export default function StoreModule() {
     }
   };
 
-  const updateInventory = async (libroId, cantidad) => {
+  const updateInventory = async (bookId, cantidad) => {
     try {
-      await api.put(`/admin/inventario/${libroId}`, null, { params: { cantidad } });
+      await api.put(`/admin/inventario/${bookId}`, null, { params: { cantidad } });
       toast.success('Inventario actualizado');
       fetchData();
     } catch (error) {
@@ -242,7 +242,7 @@ export default function StoreModule() {
     setSavingBulk(true);
     try {
       for (const product of validProducts) {
-        await api.post('/admin/libros', {
+        await api.post('/admin/books', {
           ...product,
           precio: parseFloat(product.price),
           inventory_quantity: parseInt(product.inventory_quantity) || 0
@@ -327,16 +327,16 @@ export default function StoreModule() {
           </div>
 
           <div className="grid gap-4">
-            {filteredProducts.map((libro) => {
-              const cat = categories.find(c => c.category_id === libro.categoria);
+            {filteredProducts.map((book) => {
+              const cat = categories.find(c => c.category_id === book.categoria);
               return (
-                <Card key={libro.book_id}>
+                <Card key={book.book_id}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{libro.name}</h3>
-                          {libro.requires_preparation && (
+                          <h3 className="font-semibold">{book.name}</h3>
+                          {book.requires_preparation && (
                             <Badge variant="outline" className="text-orange-600 border-orange-300">
                               <Clock className="h-3 w-3 mr-1" />
                               Preparación
@@ -349,25 +349,25 @@ export default function StoreModule() {
                               {cat.icono} {cat.name}
                             </Badge>
                           )}
-                          {libro.categoria === 'libros' && libro.grade && (
-                            <Badge variant="outline">{libro.grade}</Badge>
+                          {book.categoria === 'books' && book.grade && (
+                            <Badge variant="outline">{book.grade}</Badge>
                           )}
-                          {libro.categoria === 'libros' && libro.subject && (
-                            <Badge variant="secondary">{libro.subject}</Badge>
+                          {book.categoria === 'books' && book.subject && (
+                            <Badge variant="secondary">{book.subject}</Badge>
                           )}
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-lg">${libro.price?.toFixed(2)}</p>
+                        <p className="font-bold text-lg">${book.price?.toFixed(2)}</p>
                         <p className="text-sm text-muted-foreground">
-                          Stock: {libro.inventory_quantity}
+                          Stock: {book.inventory_quantity}
                         </p>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Button size="icon" variant="ghost" onClick={() => openEditDialog(libro)}>
+                        <Button size="icon" variant="ghost" onClick={() => openEditDialog(book)}>
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(libro.book_id)}>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteProduct(book.book_id)}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
@@ -467,7 +467,7 @@ export default function StoreModule() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {inventario.libros?.map((item) => (
+                {inventario.books?.map((item) => (
                   <div key={item.book_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium">{item.name}</p>
@@ -530,7 +530,7 @@ export default function StoreModule() {
             </div>
 
             {/* Grade/Subject - Only for Books */}
-            {editForm.categoria === 'libros' && (
+            {editForm.categoria === 'books' && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Grado</Label>

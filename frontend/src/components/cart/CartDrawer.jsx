@@ -186,7 +186,7 @@ export default function CartDrawer() {
               <div className="flex items-start gap-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                 <Lock className="h-4 w-4 text-purple-600 mt-0.5" />
                 <p className="text-xs text-purple-700 dark:text-purple-300">
-                  Los libros del catálogo privado se procesan como pre-orden
+                  Los books del catálogo privado se procesan como pre-orden
                 </p>
               </div>
             )}

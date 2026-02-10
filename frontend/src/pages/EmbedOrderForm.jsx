@@ -58,7 +58,7 @@ export default function EmbedOrderForm() {
   // Form config and data
   const [formConfig, setFormConfig] = useState(null);
   const [grados, setGrados] = useState([]);
-  const [libros, setLibros] = useState([]);
+  const [books, setLibros] = useState([]);
   const [cart, setCart] = useState([]);
   const [metodoPago, setMetodoPago] = useState('transferencia_bancaria');
   const [notas, setNotas] = useState('');
@@ -105,7 +105,7 @@ export default function EmbedOrderForm() {
       setLibros(response.data);
     } catch (error) {
       console.error('Error fetching books:', error);
-      toast.error('Error cargando libros');
+      toast.error('Error cargando books');
     }
   }, []);
   
@@ -117,25 +117,25 @@ export default function EmbedOrderForm() {
   };
   
   // Cart functions
-  const addToCart = (libro) => {
-    const existing = cart.find(item => item.book_id === libro.book_id);
+  const addToCart = (book) => {
+    const existing = cart.find(item => item.book_id === book.book_id);
     if (existing) {
-      updateQuantity(libro.book_id, 1);
+      updateQuantity(book.book_id, 1);
     } else {
       setCart([...cart, {
-        book_id: libro.book_id,
-        nombre_libro: libro.name,
+        book_id: book.book_id,
+        nombre_libro: book.name,
         cantidad: 1,
-        precio_unitario: libro.price
+        precio_unitario: book.price
       }]);
     }
   };
   
-  const updateQuantity = (libroId, delta) => {
+  const updateQuantity = (bookId, delta) => {
     setCart(cart.map(item => {
-      if (item.book_id === libroId) {
-        const libro = libros.find(l => l.book_id === libroId);
-        const maxQty = libro?.inventory_quantity || 99;
+      if (item.book_id === bookId) {
+        const book = books.find(l => l.book_id === bookId);
+        const maxQty = book?.inventory_quantity || 99;
         const newQty = Math.max(1, Math.min(maxQty, item.cantidad + delta));
         return { ...item, cantidad: newQty };
       }
@@ -143,8 +143,8 @@ export default function EmbedOrderForm() {
     }));
   };
   
-  const removeFromCart = (libroId) => {
-    setCart(cart.filter(item => item.book_id !== libroId));
+  const removeFromCart = (bookId) => {
+    setCart(cart.filter(item => item.book_id !== bookId));
   };
   
   // Calculate total
@@ -274,10 +274,10 @@ export default function EmbedOrderForm() {
             <BookOpen className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {formConfig?.titulo || 'Formulario de Pedido de Libros'}
+            {formConfig?.titulo || 'Formulario de Pedido de Books'}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            {formConfig?.description || 'Complete el formulario para ordenar los libros de texto'}
+            {formConfig?.description || 'Complete el formulario para ordenar los books de texto'}
           </p>
         </div>
         
@@ -369,7 +369,7 @@ export default function EmbedOrderForm() {
                     Datos del Estudiante
                   </CardTitle>
                   <CardDescription>
-                    Información del estudiante que usará los libros
+                    Información del estudiante que usará los books
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -471,47 +471,47 @@ export default function EmbedOrderForm() {
                       <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                         <Book className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
-                      Selección de Libros
+                      Selección de Books
                     </CardTitle>
                     <CardDescription>
-                      Libros disponibles para {grados.find(g => g.id === estudiante.grade)?.nombre || estudiante.grade}
+                      Books disponibles para {grados.find(g => g.id === estudiante.grade)?.nombre || estudiante.grade}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {libros.length === 0 ? (
+                    {books.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Book className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                        <p>No hay libros disponibles para este grado</p>
+                        <p>No hay books disponibles para este grado</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {libros.map((libro) => {
-                          const inCart = cart.find(item => item.book_id === libro.book_id);
+                        {books.map((book) => {
+                          const inCart = cart.find(item => item.book_id === book.book_id);
                           
                           return (
                             <div 
-                              key={libro.book_id}
+                              key={book.book_id}
                               className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
                                 inCart 
                                   ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                                   : 'border-border hover:border-green-300 hover:bg-muted/50'
                               }`}
-                              data-testid={`book-item-${libro.book_id}`}
+                              data-testid={`book-item-${book.book_id}`}
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{libro.name}</p>
+                                <p className="font-medium truncate">{book.name}</p>
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                                    {libro.subject}
+                                    {book.subject}
                                   </span>
                                   {formConfig?.mostrar_precios !== false && (
                                     <span className="text-sm font-semibold text-green-600">
-                                      ${libro.price.toFixed(2)}
+                                      ${book.price.toFixed(2)}
                                     </span>
                                   )}
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                  {libro.inventory_quantity} disponibles
+                                  {book.inventory_quantity} disponibles
                                 </p>
                               </div>
                               
@@ -524,9 +524,9 @@ export default function EmbedOrderForm() {
                                     className="h-8 w-8"
                                     onClick={() => {
                                       if (inCart.cantidad === 1) {
-                                        removeFromCart(libro.book_id);
+                                        removeFromCart(book.book_id);
                                       } else {
-                                        updateQuantity(libro.book_id, -1);
+                                        updateQuantity(book.book_id, -1);
                                       }
                                     }}
                                   >
@@ -540,8 +540,8 @@ export default function EmbedOrderForm() {
                                     variant="outline"
                                     size="icon"
                                     className="h-8 w-8"
-                                    onClick={() => updateQuantity(libro.book_id, 1)}
-                                    disabled={inCart.cantidad >= libro.inventory_quantity}
+                                    onClick={() => updateQuantity(book.book_id, 1)}
+                                    disabled={inCart.cantidad >= book.inventory_quantity}
                                   >
                                     <Plus className="h-4 w-4" />
                                   </Button>
@@ -552,8 +552,8 @@ export default function EmbedOrderForm() {
                                   variant="outline"
                                   size="sm"
                                   className="ml-4 shrink-0"
-                                  onClick={() => addToCart(libro)}
-                                  data-testid={`add-book-${libro.book_id}`}
+                                  onClick={() => addToCart(book)}
+                                  data-testid={`add-book-${book.book_id}`}
                                 >
                                   <Plus className="h-4 w-4 mr-1" />
                                   Agregar
@@ -638,7 +638,7 @@ export default function EmbedOrderForm() {
                     {cart.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <ShoppingCart className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                        <p className="text-sm">Seleccione el grado del estudiante para ver los libros disponibles</p>
+                        <p className="text-sm">Seleccione el grado del estudiante para ver los books disponibles</p>
                       </div>
                     ) : (
                       <>

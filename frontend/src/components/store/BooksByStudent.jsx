@@ -64,7 +64,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
       }
     } catch (error) {
       console.error('Error fetching resumen:', error);
-      toast.error('Error al cargar el resumen de libros');
+      toast.error('Error al cargar el resumen de books');
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
     const products = productsByGrade[grade]?.products || [];
     
     if (products.length === 0) {
-      toast.error('No hay libros disponibles para este grade');
+      toast.error('No hay books disponibles para este grade');
       return;
     }
 
@@ -122,16 +122,16 @@ export default function BooksByStudent({ onNavigateToBook }) {
     setTimeout(() => {
       setAddingAll(prev => ({ ...prev, [student.sync_id]: false }));
       if (added > 0) {
-        toast.success(`${added} libro${added > 1 ? 's' : ''} agregado${added > 1 ? 's' : ''} al carrito para ${student.nombre}`);
+        toast.success(`${added} book${added > 1 ? 's' : ''} agregado${added > 1 ? 's' : ''} al carrito para ${student.nombre}`);
       } else {
-        toast.info('Todos los libros ya están en el carrito');
+        toast.info('Todos los books ya están en el carrito');
       }
     }, 500);
   };
 
   const handleAddSingleBook = (producto) => {
     if (isInCart(producto.book_id)) {
-      toast.info('Este libro ya está en el carrito');
+      toast.info('Este book ya está en el carrito');
       return;
     }
     
@@ -160,7 +160,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
           <GraduationCap className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
           <h3 className="font-semibold mb-2">No hay students vinculados</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Vincula a tus students para ver los libros que necesitan
+            Vincula a tus students para ver los books que necesitan
           </p>
           <Button variant="outline" onClick={() => navigate('/mi-cuenta?tab=exclusive')}>
             Vincular Estudiante
@@ -177,10 +177,10 @@ export default function BooksByStudent({ onNavigateToBook }) {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-purple-500" />
-            Libros por Estudiante
+            Books por Estudiante
           </h2>
           <p className="text-muted-foreground">
-            Encuentra rápidamente todos los libros que necesita cada student
+            Encuentra rápidamente todos los books que necesita cada student
           </p>
         </div>
       </div>
@@ -226,7 +226,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
                   <div className="flex items-center gap-3">
                     <Badge variant="secondary" className="gap-1">
                       <BookOpen className="h-3 w-3" />
-                      {products_disponibles} libros
+                      {products_disponibles} books
                     </Badge>
                     <Badge className="bg-green-100 text-green-700 border-green-200">
                       ${total_estimado.toFixed(2)}
@@ -248,8 +248,8 @@ export default function BooksByStudent({ onNavigateToBook }) {
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-sm text-muted-foreground">
                     {allInCart 
-                      ? '✅ Todos los libros están en el carrito'
-                      : `Agrega todos los libros de ${student.nombre} con un clic`
+                      ? '✅ Todos los books están en el carrito'
+                      : `Agrega todos los books de ${student.nombre} con un clic`
                     }
                   </p>
                   <Button
@@ -287,7 +287,7 @@ export default function BooksByStudent({ onNavigateToBook }) {
                 ) : products.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No hay libros disponibles para este grade</p>
+                    <p>No hay books disponibles para este grade</p>
                   </div>
                 ) : (
                   <div className="grid gap-3">

@@ -187,7 +187,7 @@ export default function Register() {
           </h2>
           <p className="text-lg opacity-90 max-w-md">
             Cree su cuenta y agregue a sus estudiantes para ordenar 
-            libros de texto de manera fácil y rápida.
+            books de texto de manera fácil y rápida.
           </p>
         </div>
       </div>

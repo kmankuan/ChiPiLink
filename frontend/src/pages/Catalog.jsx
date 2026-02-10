@@ -22,7 +22,7 @@ export default function Catalog() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   
-  const [libros, setLibros] = useState([]);
+  const [books, setLibros] = useState([]);
   const [grados, setGrados] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,11 +53,11 @@ export default function Catalog() {
     }
   };
 
-  const filteredLibros = libros.filter(libro => {
-    const matchesSearch = libro.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         libro.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGrado = selectedGrado === 'all' || libro.grade === selectedGrado;
-    const matchesMateria = selectedMateria === 'all' || libro.subject === selectedMateria;
+  const filteredBooks = books.filter(book => {
+    const matchesSearch = book.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         book.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGrado = selectedGrado === 'all' || book.grade === selectedGrado;
+    const matchesMateria = selectedMateria === 'all' || book.subject === selectedMateria;
     
     return matchesSearch && matchesGrado && matchesMateria;
   });
@@ -84,7 +84,7 @@ export default function Catalog() {
           {t('catalog.title')}
         </h1>
         <p className="text-muted-foreground">
-          Encuentre todos los libros de texto organizados por grado y materia
+          Encuentre todos los books de texto organizados por grado y materia
         </p>
       </div>
 
@@ -135,32 +135,32 @@ export default function Catalog() {
 
       {/* Results Count */}
       <p className="text-sm text-muted-foreground mb-6">
-        {filteredLibros.length} libros encontrados
+        {filteredBooks.length} books encontrados
       </p>
 
       {/* Books Grid */}
-      {filteredLibros.length === 0 ? (
+      {filteredBooks.length === 0 ? (
         <div className="text-center py-16 bg-card rounded-xl border border-border">
           <Book className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">{t('common.noResults')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredLibros.map((libro) => {
-            const stockStatus = getStockStatus(libro.inventory_quantity);
+          {filteredBooks.map((book) => {
+            const stockStatus = getStockStatus(book.inventory_quantity);
             
             return (
               <div
-                key={libro.book_id}
+                key={book.book_id}
                 className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-colors duration-300"
-                data-testid={`book-card-${libro.book_id}`}
+                data-testid={`book-card-${book.book_id}`}
               >
                 {/* Book Image/Placeholder */}
                 <div className="aspect-[4/3] bg-secondary flex items-center justify-center overflow-hidden">
-                  {libro.image_url ? (
+                  {book.image_url ? (
                     <img 
-                      src={libro.image_url} 
-                      alt={libro.name}
+                      src={book.image_url} 
+                      alt={book.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
@@ -173,29 +173,29 @@ export default function Catalog() {
                   {/* Badges */}
                   <div className="flex flex-wrap gap-2 mb-3">
                     <Badge variant="secondary" className="text-xs">
-                      {t(`grades.${libro.grade}`)}
+                      {t(`grades.${book.grade}`)}
                     </Badge>
                     <Badge variant="outline" className="text-xs">
-                      {t(`subjects.${libro.subject}`)}
+                      {t(`subjects.${book.subject}`)}
                     </Badge>
                   </div>
                   
                   {/* Title */}
                   <h3 className="font-serif font-bold text-lg mb-2 line-clamp-2">
-                    {libro.name}
+                    {book.name}
                   </h3>
                   
                   {/* Description */}
-                  {libro.description && (
+                  {book.description && (
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {libro.description}
+                      {book.description}
                     </p>
                   )}
                   
                   {/* Publisher */}
-                  {libro.publisher && (
+                  {book.publisher && (
                     <p className="text-xs text-muted-foreground mb-3">
-                      {libro.publisher}
+                      {book.publisher}
                     </p>
                   )}
                   
@@ -203,7 +203,7 @@ export default function Catalog() {
                   <div className="flex items-center justify-between pt-3 border-t border-border">
                     <div>
                       <p className="text-xl font-bold text-primary">
-                        ${libro.price.toFixed(2)}
+                        ${book.price.toFixed(2)}
                       </p>
                       <div className={`flex items-center gap-1 text-xs ${
                         stockStatus.color === 'success' ? 'text-green-600 dark:text-green-400' :
@@ -213,16 +213,16 @@ export default function Catalog() {
                         {stockStatus.color !== 'success' && (
                           <AlertCircle className="h-3 w-3" />
                         )}
-                        {stockStatus.label} ({libro.inventory_quantity})
+                        {stockStatus.label} ({book.inventory_quantity})
                       </div>
                     </div>
                     
-                    {isAuthenticated && libro.inventory_quantity > 0 && (
+                    {isAuthenticated && book.inventory_quantity > 0 && (
                       <Button 
                         size="sm" 
                         className="rounded-full"
-                        onClick={() => toast.info('Agregue este libro desde el formulario de orden')}
-                        data-testid={`add-to-cart-${libro.book_id}`}
+                        onClick={() => toast.info('Agregue este book desde el formulario de orden')}
+                        data-testid={`add-to-cart-${book.book_id}`}
                       >
                         <ShoppingCart className="h-4 w-4" />
                       </Button>

@@ -61,7 +61,7 @@ const translations = {
   },
   es: {
     title: 'Gestión de Escuelas',
-    subtitle: 'Agregue y gestione escuelas disponibles para solicitudes de acceso a libros',
+    subtitle: 'Agregue y gestione escuelas disponibles para solicitudes de acceso a books',
     addSchool: 'Agregar Escuela',
     editSchool: 'Editar Escuela',
     name: 'Nombre de la Escuela',
@@ -69,7 +69,7 @@ const translations = {
     catalogId: 'ID del Catálogo',
     active: 'Activo',
     noSchools: 'No hay escuelas configuradas',
-    noSchoolsDesc: 'Agregue la primera escuela para permitir solicitudes de acceso a libros.',
+    noSchoolsDesc: 'Agregue la primera escuela para permitir solicitudes de acceso a books.',
     save: 'Guardar',
     cancel: 'Cancelar',
     delete: 'Eliminar',

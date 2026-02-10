@@ -256,7 +256,7 @@ export default function Dashboard() {
   // Open purchase dialog
   const openPurchaseDialog = async (student) => {
     if (student.estado_matricula !== 'confirmada') {
-      toast.error('La matrícula debe estar confirmada para comprar libros');
+      toast.error('La matrícula debe estar confirmada para comprar books');
       return;
     }
     
@@ -268,11 +268,11 @@ export default function Dashboard() {
     setPurchaseDialog(true);
     
     try {
-      const response = await api.get(`/estudiantes/${student.estudiante_id}/libros-disponibles`);
-      setAvailableBooks(response.data.libros);
+      const response = await api.get(`/estudiantes/${student.estudiante_id}/books-disponibles`);
+      setAvailableBooks(response.data.books);
     } catch (error) {
       console.error('Error loading books:', error);
-      toast.error('Error al cargar libros disponibles');
+      toast.error('Error al cargar books disponibles');
     } finally {
       setLoadingBooks(false);
     }
@@ -299,7 +299,7 @@ export default function Dashboard() {
   // Submit order
   const handleSubmitOrder = async () => {
     if (selectedBooks.length === 0) {
-      toast.error('Seleccione al menos un libro');
+      toast.error('Seleccione al menos un book');
       return;
     }
     
@@ -358,7 +358,7 @@ export default function Dashboard() {
             Bienvenido, {user?.nombre || 'Usuario'}
           </h1>
           <p className="text-muted-foreground">
-            Gestione los estudiantes y realice pedidos de libros
+            Gestione los estudiantes y realice pedidos de books
           </p>
         </div>
 
@@ -443,7 +443,7 @@ export default function Dashboard() {
                     <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                     <h3 className="font-medium mb-2">No hay estudiantes registrados</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Agregue un estudiante para comenzar a ordenar libros
+                      Agregue un estudiante para comenzar a ordenar books
                     </p>
                     <Button onClick={openAddDialog}>
                       <Plus className="h-4 w-4 mr-2" />
@@ -488,7 +488,7 @@ export default function Dashboard() {
                             <p className="text-xs text-muted-foreground mt-1">
                               {student.es_nuevo ? '🆕 Estudiante Nuevo' : '📚 Estudiante del Año Anterior'}
                               {student.libros_comprados?.length > 0 && (
-                                <span className="ml-2">• {student.libros_comprados.length} libros comprados</span>
+                                <span className="ml-2">• {student.libros_comprados.length} books comprados</span>
                               )}
                             </p>
                           </div>
@@ -510,7 +510,7 @@ export default function Dashboard() {
                                 onClick={() => openPurchaseDialog(student)}
                               >
                                 <ShoppingCart className="h-4 w-4 mr-1" />
-                                Comprar Libros
+                                Comprar Books
                               </Button>
                             </>
                           ) : (
@@ -560,7 +560,7 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle>Historial de Pedidos</CardTitle>
                 <CardDescription>
-                  Todos los pedidos de libros realizados
+                  Todos los pedidos de books realizados
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -597,7 +597,7 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="text-sm text-muted-foreground mb-2">
-                          {pedido.items.length} libro(s) • {pedido.metodo_pago === 'transferencia_bancaria' ? 'Transferencia' : 'Yappy'}
+                          {pedido.items.length} book(s) • {pedido.metodo_pago === 'transferencia_bancaria' ? 'Transferencia' : 'Yappy'}
                         </div>
                         
                         <div className="flex flex-wrap gap-2">
@@ -758,10 +758,10 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Comprar Libros para {selectedStudent?.nombre} {selectedStudent?.apellido}
+              Comprar Books para {selectedStudent?.nombre} {selectedStudent?.apellido}
             </DialogTitle>
             <DialogDescription>
-              {grados.find(g => g.id === selectedStudent?.grade)?.nombre} • Seleccione los libros que desea comprar
+              {grados.find(g => g.id === selectedStudent?.grade)?.nombre} • Seleccione los books que desea comprar
             </DialogDescription>
           </DialogHeader>
           
@@ -850,7 +850,7 @@ export default function Dashboard() {
                   {/* Summary */}
                   <div className="bg-muted/50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-muted-foreground">Libros seleccionados:</span>
+                      <span className="text-muted-foreground">Books seleccionados:</span>
                       <span className="font-medium">{selectedBooks.length}</span>
                     </div>
                     <div className="flex items-center justify-between text-lg">
@@ -902,7 +902,7 @@ export default function Dashboard() {
               Historial de {historyStudent?.nombre} {historyStudent?.apellido}
             </DialogTitle>
             <DialogDescription>
-              Libros comprados y pedidos realizados
+              Books comprados y pedidos realizados
             </DialogDescription>
           </DialogHeader>
           
@@ -911,16 +911,16 @@ export default function Dashboard() {
               <div>
                 <h4 className="font-medium mb-2 flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
-                  Libros Comprados ({historyStudent.libros_comprados?.length || 0})
+                  Books Comprados ({historyStudent.libros_comprados?.length || 0})
                 </h4>
                 {historyStudent.libros_comprados?.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {historyStudent.libros_comprados.map((libroId, idx) => (
-                      <Badge key={idx} variant="secondary">{libroId}</Badge>
+                    {historyStudent.libros_comprados.map((bookId, idx) => (
+                      <Badge key={idx} variant="secondary">{bookId}</Badge>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Aún no ha comprado libros</p>
+                  <p className="text-sm text-muted-foreground">Aún no ha comprado books</p>
                 )}
               </div>
               
@@ -940,7 +940,7 @@ export default function Dashboard() {
                           <Badge variant="outline" className="text-xs">{pedido.estado}</Badge>
                         </div>
                         <div className="flex justify-between">
-                          <span>{pedido.items.length} libro(s)</span>
+                          <span>{pedido.items.length} book(s)</span>
                           <span className="font-bold">${pedido.total.toFixed(2)}</span>
                         </div>
                       </div>
