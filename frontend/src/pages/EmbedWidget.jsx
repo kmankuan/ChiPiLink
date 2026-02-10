@@ -884,7 +884,7 @@ export default function EmbedWidget() {
 }
 
 /* ── Widget Header ── */
-function WidgetHeader({ user, hideUrl, onClose }) {
+function WidgetHeader({ user, hideUrl, onClose, onLogout }) {
   return (
     <div className="flex items-center justify-between px-3 py-2 border-b bg-card" data-testid="widget-header">
       <div className="flex items-center gap-2">
