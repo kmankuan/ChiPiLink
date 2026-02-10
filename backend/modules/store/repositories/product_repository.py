@@ -24,7 +24,7 @@ class ProductRepository(BaseRepository):
     
     async def create(self, product_data: Dict) -> Dict:
         """Create nuevo producto"""
-        product_data["book_id"] = f"libro_{uuid.uuid4().hex[:12]}"
+        product_data["book_id"] = f"book_{uuid.uuid4().hex[:12]}"
         product_data["created_at"] = datetime.now(timezone.utc).isoformat()
         return await self.insert_one(product_data)
     

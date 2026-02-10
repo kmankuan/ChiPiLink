@@ -59,7 +59,7 @@ async def get_platform_products(
     page: int = Query(1, ge=1),
     limit: int = Query(100, ge=1, le=500)
 ):
-    """Get platform store products (uses main libros collection)"""
+    """Get platform store products"""
     query = {"active": {"$ne": False}}
     
     if category:

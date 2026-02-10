@@ -345,7 +345,7 @@ async def admin_create_private_catalog_product(
     
     # Ensure it's private catalog
     product["is_private_catalog"] = True
-    product["book_id"] = product.get("book_id") or f"libro_{uuid.uuid4().hex[:12]}"
+    product["book_id"] = product.get("book_id") or f"book_{uuid.uuid4().hex[:12]}"
     product["active"] = product.get("active", True)
     product["created_at"] = datetime.now(timezone.utc).isoformat()
     

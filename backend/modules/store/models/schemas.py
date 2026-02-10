@@ -40,7 +40,7 @@ class ProductBase(BaseModel):
     """Base product model"""
     name: Optional[str] = None
     description: Optional[str] = None
-    category: Optional[str] = "libros"
+    category: Optional[str] = "books"
     grade: Optional[str] = None
     grades: Optional[List[str]] = None
     subject: Optional[str] = None
