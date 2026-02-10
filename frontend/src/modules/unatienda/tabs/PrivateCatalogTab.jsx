@@ -420,8 +420,13 @@ function AdjustStockDialog({ open, onOpenChange, product, token, onAdjusted }) {
               placeholder="Additional details..." className="text-xs h-16" data-testid="adjust-notes" />
           </div>
           {qty && parseInt(qty) > 0 && (
-            <div className="text-xs text-center p-2 rounded bg-muted">
-              {currentStock} → <strong>{mode === 'add' ? currentStock + parseInt(qty) : Math.max(0, currentStock - parseInt(qty))}</strong> units
+            <div className="text-xs text-center p-2 rounded bg-muted space-y-1">
+              <div>{currentStock} → <strong>{mode === 'add' ? currentStock + parseInt(qty) : Math.max(0, currentStock - parseInt(qty))}</strong> units</div>
+              {mode === 'add' && presale > 0 && (
+                <div className="text-amber-600">
+                  {Math.min(presale, parseInt(qty))} of {presale} pre-sale orders will be auto-fulfilled
+                </div>
+              )}
             </div>
           )}
         </div>
