@@ -50,47 +50,47 @@ async def seed_data(admin: dict = Depends(get_admin_user)):
     cat_count = await db.store_categories.count_documents({})
     if cat_count == 0:
         categorys = [
-            {"category_id": "libros", "name": "Libros", "icono": "\ud83d\udcda", "orden": 1, "active": True},
+            {"category_id": "books", "name": "Books", "icono": "\ud83d\udcda", "orden": 1, "active": True},
             {"category_id": "snacks", "name": "Snacks", "icono": "\ud83c\udf6b", "orden": 2, "active": True},
-            {"category_id": "bebidas", "name": "Bebidas", "icono": "\ud83e\udd64", "orden": 3, "active": True},
-            {"category_id": "preparados", "name": "Preparados", "icono": "\ud83c\udf2d", "orden": 4, "active": True},
-            {"category_id": "uniformes", "name": "Uniformes", "icono": "\ud83d\udc55", "orden": 5, "active": True},
-            {"category_id": "servicios", "name": "Servicios", "icono": "\ud83d\udd27", "orden": 6, "active": True},
+            {"category_id": "beverages", "name": "Beverages", "icono": "\ud83e\udd64", "orden": 3, "active": True},
+            {"category_id": "prepared", "name": "Prepared", "icono": "\ud83c\udf2d", "orden": 4, "active": True},
+            {"category_id": "uniforms", "name": "Uniforms", "icono": "\ud83d\udc55", "orden": 5, "active": True},
+            {"category_id": "services", "name": "Services", "icono": "\ud83d\udd27", "orden": 6, "active": True},
         ]
         await db.store_categories.insert_many(categorys)
         seeded.append("categorys")
     
     # Seed sample products if empty
-    libro_count = await db.store_products.count_documents({})
-    if libro_count == 0:
-        libros = [
+    product_count = await db.store_products.count_documents({})
+    if product_count == 0:
+        sample_products = [
             {
-                "book_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "name": "Matem\u00e1ticas 1",
-                "description": "Libro de matem\u00e1ticas para primer grado",
-                "category": "libros",
+                "book_id": f"book_{uuid.uuid4().hex[:12]}",
+                "name": "Mathematics 1",
+                "description": "Mathematics textbook for first grade",
+                "category": "books",
                 "grade": "1",
-                "subject": "matematicas",
+                "subject": "mathematics",
                 "price": 25.00,
                 "inventory_quantity": 50,
                 "active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "book_id": f"libro_{uuid.uuid4().hex[:12]}",
-                "name": "Espa\u00f1ol 1",
-                "description": "Libro de espa\u00f1ol para primer grado",
-                "category": "libros",
+                "book_id": f"book_{uuid.uuid4().hex[:12]}",
+                "name": "Spanish 1",
+                "description": "Spanish textbook for first grade",
+                "category": "books",
                 "grade": "1",
-                "subject": "espanol",
+                "subject": "spanish",
                 "price": 22.00,
                 "inventory_quantity": 45,
                 "active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
             },
         ]
-        await db.store_products.insert_many(libros)
-        seeded.append("libros")
+        await db.store_products.insert_many(sample_products)
+        seeded.append("products")
     
     return {"success": True, "seeded": seeded}
 
