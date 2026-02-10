@@ -31,6 +31,9 @@
 - In-widget ordering: select textbooks → submit
 - Floating button: 7 positions, 6 icons, 4 styles, live preview
 - State persistence via sessionStorage
+- **Logout button** in widget header (Feb 10)
+- **Orders tab** showing order status per student with status badges (Feb 10)
+- Debug info shown on "No textbooks" screen: grade searched, products found + Refresh button
 
 ## Monday.com
 - Orders + Textbooks Board sync (config-driven)
