@@ -664,8 +664,53 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                   </div>
                 )}
 
-                {/* Submit Button */}
-                <div className="sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t">
+                {/* Wallet Balance & Payment Section */}
+                <div className="sticky bottom-0 bg-background/95 backdrop-blur py-4 border-t space-y-3">
+                  {/* Wallet Balance Card */}
+                  <div className={`flex items-center justify-between p-3 rounded-lg border ${
+                    walletBalance !== null && walletBalance >= selectedTotal
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                      : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <Wallet className={`h-4 w-4 ${
+                        walletBalance !== null && walletBalance >= selectedTotal
+                          ? 'text-green-600' : 'text-amber-600'
+                      }`} />
+                      <span className="text-sm font-medium" data-testid="wallet-balance-label">
+                        {te.walletBalance}:
+                      </span>
+                    </div>
+                    <span className={`font-bold ${
+                      walletBalance !== null && walletBalance >= selectedTotal
+                        ? 'text-green-700' : 'text-amber-700'
+                    }`} data-testid="wallet-balance-amount">
+                      {loadingWallet ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        `$${(walletBalance ?? 0).toFixed(2)}`
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Insufficient Balance Warning */}
+                  {selectedCount > 0 && walletBalance !== null && walletBalance < selectedTotal && (
+                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800" data-testid="insufficient-balance-warning">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                            {te.insufficientBalance}
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                            {te.insufficientBalanceMsg}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Order Summary + Pay Button */}
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">
@@ -675,15 +720,21 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                     </div>
                     <Button 
                       onClick={handleSubmitOrder}
-                      disabled={selectedCount === 0 || submitting}
+                      disabled={
+                        selectedCount === 0 || 
+                        submitting || 
+                        loadingWallet ||
+                        (walletBalance !== null && walletBalance < selectedTotal)
+                      }
                       className="gap-2"
+                      data-testid="pay-with-wallet-btn"
                     >
                       {submitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <ClipboardList className="h-4 w-4" />
+                        <CreditCard className="h-4 w-4" />
                       )}
-                      {te.submitOrder}
+                      {te.payWithWallet}
                     </Button>
                   </div>
                 </div>
