@@ -962,16 +962,16 @@ export default function EmbedWidget() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-shell">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
       <Toaster position="top-center" richColors />
 
       {!hideNavbar && (
-        <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} />
+        <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
       )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Tab Navigation */}
-        <div className="flex border-b bg-card" data-testid="widget-nav">
+        <div className="flex border-b bg-card shrink-0" data-testid="widget-nav">
           {enabledNav.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.key;
