@@ -461,10 +461,21 @@ function TextbookOrdersView({ token, students }) {
         </>
       )}
 
-      {items.length === 0 && (
+      {items.length === 0 && !orderError && (
         <div className="text-center py-6">
           <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-xs text-muted-foreground">No textbooks available for this grade yet.</p>
+        </div>
+      )}
+
+      {orderError && (
+        <div className="text-center py-6" data-testid="widget-order-error">
+          <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-xs text-destructive font-medium mb-2">{orderError}</p>
+          <button onClick={() => selectStudent(selectedStudent)}
+            className="text-xs text-primary hover:underline">
+            Try again
+          </button>
         </div>
       )}
 
