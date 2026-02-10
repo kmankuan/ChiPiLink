@@ -189,12 +189,27 @@ async def adjust_stock(
     old_qty = product.get("inventory_quantity", 0)
     new_qty = max(0, old_qty + adjustment.quantity_change)
 
+    # Auto-fulfill pre-sale reservations when adding stock
+    reserved = product.get("reserved_quantity", 0)
+    fulfilled = 0
+    if adjustment.quantity_change > 0 and reserved > 0:
+        # Fulfill as many reservations as the new stock allows
+        fulfilled = min(reserved, new_qty)
+        new_qty = new_qty - fulfilled
+        new_reserved = reserved - fulfilled
+    else:
+        new_reserved = reserved
+
+    update_fields = {
+        "inventory_quantity": new_qty,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if fulfilled > 0:
+        update_fields["reserved_quantity"] = new_reserved
+
     await db.store_products.update_one(
         {"book_id": adjustment.book_id},
-        {"$set": {
-            "inventory_quantity": new_qty,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-        }}
+        {"$set": update_fields}
     )
 
     # Log movement
