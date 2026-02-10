@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 /* Force the widget to never exceed the iframe viewport */
-const widgetShellClass = "h-screen w-screen max-w-[100vw] flex flex-col bg-background text-foreground overflow-hidden box-border";
+const widgetShellClass = "h-dvh w-full flex flex-col bg-background text-foreground overflow-hidden";
 import {
   BookOpen, Users, Package, Bell, ChevronRight, ChevronLeft,
   Loader2, LogIn, X, ShoppingCart, CheckCircle, Clock, AlertCircle,
