@@ -1,5 +1,5 @@
 /**
- * Private Book Detail - Página de detalle para libros del catálogo privado
+ * Private Book Detail - Product detail page for the private catalog
  * Solo accesible para usuarios con estudiantes vinculados
  */
 import { useState, useEffect } from 'react';
@@ -31,12 +31,12 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PrivateBookDetail() {
-  const { libroId } = useParams();
+  const { bookId } = useParams();
   const navigate = useNavigate();
   const { token, isAuthenticated, user } = useAuth();
   const { addItem, items, openCart } = useCart();
   
-  const [libro, setLibro] = useState(null);
+  const [book, setBook] = useState(null);
   const [acceso, setAcceso] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -44,18 +44,17 @@ export default function PrivateBookDetail() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      toast.error('Debes iniciar sesión para ver este producto');
-      navigate('/login', { state: { from: `/unatienda/libro/${libroId}` } });
+      toast.error('You must log in to view this product');
+      navigate('/login', { state: { from: `/unatienda/book/${bookId}` } });
       return;
     }
-    fetchLibro();
-  }, [libroId, isAuthenticated, token]);
+    fetchBook();
+  }, [bookId, isAuthenticated, token]);
 
-  const fetchLibro = async () => {
+  const fetchBook = async () => {
     try {
-      // Fetch book details and access info in parallel
-      const [libroRes, accesoRes] = await Promise.all([
-        axios.get(`${API_URL}/api/store/private-catalog/products/${libroId}`, {
+      const [bookRes, accesoRes] = await Promise.all([
+        axios.get(`${API_URL}/api/store/private-catalog/products/${bookId}`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get(`${API_URL}/api/store/private-catalog/access`, {
@@ -63,36 +62,35 @@ export default function PrivateBookDetail() {
         })
       ]);
       
-      setLibro(libroRes.data);
+      setBook(bookRes.data);
       setAcceso(accesoRes.data);
     } catch (error) {
-      console.error('Error fetching libro:', error);
+      console.error('Error fetching book:', error);
       if (error.response?.status === 403) {
-        toast.error('No tienes acceso a este catálogo');
+        toast.error('You do not have access to this catalog');
       } else if (error.response?.status === 404) {
-        toast.error('Libro no encontrado');
+        toast.error('Book not found');
       } else {
-        toast.error('Error al cargar el libro');
+        toast.error('Error loading book');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const isInCart = () => items.some(item => item.book_id === libro?.book_id);
+  const isInCart = () => items.some(item => item.book_id === book?.book_id);
   const getCartQuantity = () => {
-    const item = items.find(item => item.book_id === libro?.book_id);
+    const item = items.find(item => item.book_id === book?.book_id);
     return item ? item.quantity : 0;
   };
 
   const handleAddToCart = () => {
-    if (!libro) return;
+    if (!book) return;
     
-    // For private catalog, we add with special flag
     const productToAdd = {
-      ...libro,
+      ...book,
       is_private_catalog: true,
-      inventory_quantity: 999 // Private catalog doesn't have stock limits for ordering
+      inventory_quantity: 999
     };
     
     addItem(productToAdd, quantity);
