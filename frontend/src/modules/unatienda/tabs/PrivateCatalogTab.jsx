@@ -351,7 +351,10 @@ function AdjustStockDialog({ open, onOpenChange, product, token, onAdjusted }) {
         reason,
         notes: notes || undefined,
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success(`Stock ${mode === 'add' ? 'added' : 'removed'}: ${q} units`);
+      const presaleMsg = mode === 'add' && product.reserved_quantity > 0
+        ? ` (${Math.min(product.reserved_quantity, q)} pre-sale orders fulfilled)`
+        : '';
+      toast.success(`Stock ${mode === 'add' ? 'added' : 'removed'}: ${q} units${presaleMsg}`);
       setQty(''); setNotes('');
       onAdjusted();
       onOpenChange(false);
