@@ -62,10 +62,10 @@ def setup_event_handlers():
     @event_bus.subscribe(StoreEvents.ORDER_PAID)
     async def on_order_paid(event: Event):
         """
-        Actualizar libros comprados del estudiante cuando se paga.
+        Update purchased textbooks for the student when payment is made.
         """
         # Este handler se puede extender to update
-        # la lista de libros comprados del estudiante
+        # the list of purchased textbooks for the student
         logger.info(f"Order paid: {event.payload.get('pedido_id')}")
     
     @event_bus.subscribe("store.*")
