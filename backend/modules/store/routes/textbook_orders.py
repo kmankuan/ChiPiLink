@@ -671,7 +671,7 @@ async def diagnostic_order_flow(
     books = await db.store_products.find(
         {
             "active": True,
-            "is_private_catalog": True,
+            "archived": {"$ne": True},
             "$or": [
                 {"grade": {"$in": grade_queries}},
                 {"grades": {"$in": grade_queries}}
