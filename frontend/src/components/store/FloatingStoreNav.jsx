@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const categoryIcons = {
-  'libros': '📚',
+  'books': '📚',
   'snacks': '🍫',
   'bebidas': '🥤',
   'preparados': '🌭',
@@ -262,7 +262,7 @@ export default function FloatingStoreNav({
     navigate('/unatienda');
   };
 
-  const hasSubcategories = selectedCategoria === 'libros';
+  const hasSubcategories = selectedCategoria === 'books';
 
   // Don't render if not scrolled enough
   if (!showFloating) return null;
