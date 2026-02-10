@@ -377,7 +377,7 @@ function TextbookOrdersView({ token, students }) {
 
       {/* Submitted order summary */}
       {order?.status === 'submitted' && orderedItems.length > 0 && (
-        <Card className="bg-green-50 border-green-200 p-2.5">
+        <Card className="bg-green-50 border-green-200 p-2.5 overflow-hidden">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
             <div>
