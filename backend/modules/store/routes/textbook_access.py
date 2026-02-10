@@ -258,8 +258,8 @@ async def bulk_toggle_presale(
     admin: dict = Depends(get_admin_user)
 ):
     """Toggle pre-sale mode for multiple students"""
-    from core.database import get_db
-    db = await get_db()
+    from core.database import get_database
+    db = get_database()
     result = await db.store_students.update_many(
         {"student_id": {"$in": data.student_ids}},
         {"$set": {"presale_mode": data.presale_mode}}
