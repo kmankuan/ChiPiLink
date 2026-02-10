@@ -418,7 +418,7 @@ export default function MondayModule() {
             <Building2 className="h-3.5 w-3.5" />
             Workspaces
           </TabsTrigger>
-          <TabsTrigger value="libros" className="gap-1.5 text-xs">
+          <TabsTrigger value="textbooks" className="gap-1.5 text-xs">
             <BookOpen className="h-3.5 w-3.5" />
             Book Orders
           </TabsTrigger>
@@ -623,7 +623,7 @@ export default function MondayModule() {
         </TabsContent>
 
         {/* ========== TAB: BOOKS ========== */}
-        <TabsContent value="libros" className="mt-6">
+        <TabsContent value="textbooks" className="mt-6">
           <BookOrdersMondayTab connected={connected} boards={boards} />
         </TabsContent>
 
