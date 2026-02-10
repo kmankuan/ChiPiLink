@@ -399,12 +399,18 @@ class TextbookOrderService(BaseService):
         if not new_selected_items:
             raise ValueError("Please select at least one new book to order")
         
-        # Lock newly selected items
+        # Lock newly selected items + reserve stock
         now = datetime.now(timezone.utc).isoformat()
         for item in items:
             if item.get("quantity_ordered", 0) > 0 and item["status"] != OrderItemStatus.ORDERED.value:
                 item["status"] = OrderItemStatus.ORDERED.value
                 item["ordered_at"] = now
+                
+                # Increment reserved_quantity on the product
+                await db.store_products.update_one(
+                    {"book_id": item["book_id"]},
+                    {"$inc": {"reserved_quantity": item.get("quantity_ordered", 1)}}
+                )
         
         # Check if there are still available items that can be ordered later
         available_items = [
