@@ -40,39 +40,37 @@ export const AUTH_ENDPOINTS = {
 // ============== STORE ENDPOINTS ==============
 export const STORE_ENDPOINTS = {
   // Products
-  products: USE_NEW_ENDPOINTS ? '/store/products' : '/libros',
-  productById: (id) => USE_NEW_ENDPOINTS ? `/store/products/${id}` : `/libros/${id}`,
-  featuredProducts: USE_NEW_ENDPOINTS ? '/store/products/featured' : '/libros?destacado=true',
-  promotionalProducts: USE_NEW_ENDPOINTS ? '/store/products/promotions' : '/libros?on_sale=true',
-  newestProducts: USE_NEW_ENDPOINTS ? '/store/products/newest' : '/libros/newest',
-  searchProducts: (q) => USE_NEW_ENDPOINTS ? `/store/products/search?q=${q}` : `/libros/search?q=${q}`,
+  products: '/store/products',
+  productById: (id) => `/store/products/${id}`,
+  featuredProducts: '/store/products/featured',
+  promotionalProducts: '/store/products/promotions',
+  newestProducts: '/store/products/newest',
+  searchProducts: (q) => `/store/products/search?q=${q}`,
   
   // Categories
-  categories: USE_NEW_ENDPOINTS ? '/store/categories' : '/categories',
-  categoryById: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}` : `/categories/${id}`,
-  categoryLanding: (id) => USE_NEW_ENDPOINTS ? `/store/categories/${id}/landing` : `/categories/${id}/landing`,
+  categories: '/store/categories',
+  categoryById: (id) => `/store/categories/${id}`,
+  categoryLanding: (id) => `/store/categories/${id}/landing`,
   
   // Public data
-  grades: USE_NEW_ENDPOINTS ? '/store/public/grades' : '/grados',
-  subjects: USE_NEW_ENDPOINTS ? '/store/public/subjects' : '/materias',
+  grades: '/store/public/grades',
+  subjects: '/store/public/subjects',
   
   // Orders
-  orders: USE_NEW_ENDPOINTS ? '/store/orders' : '/pedidos',
-  orderById: (id) => USE_NEW_ENDPOINTS ? `/store/orders/${id}` : `/pedidos/${id}`,
-  orderPublicById: (id) => USE_NEW_ENDPOINTS ? `/store/public/order/${id}` : `/pedidos/${id}/public`,
-  createOrder: USE_NEW_ENDPOINTS ? '/store/orders' : '/pedidos',
-  publicOrder: USE_NEW_ENDPOINTS ? '/store/public/order' : '/pedidos/publico',
+  orders: '/store/orders',
+  orderById: (id) => `/store/orders/${id}`,
+  orderPublicById: (id) => `/store/public/order/${id}`,
+  createOrder: '/store/orders',
+  publicOrder: '/store/public/order',
   
   // Students
-  students: USE_NEW_ENDPOINTS ? '/store/students' : '/estudiantes',
-  studentById: (id) => USE_NEW_ENDPOINTS ? `/store/students/${id}` : `/estudiantes/${id}`,
-  studentAvailableBooks: (id) => USE_NEW_ENDPOINTS 
-    ? `/store/students/${id}/available-books` 
-    : `/estudiantes/${id}/libros-disponibles`,
+  students: '/store/students',
+  studentById: (id) => `/store/students/${id}`,
+  studentAvailableBooks: (id) => `/store/students/${id}/available-books`,
   
   // Inventory (admin)
-  inventory: USE_NEW_ENDPOINTS ? '/store/inventory' : '/admin/inventario',
-  lowStock: USE_NEW_ENDPOINTS ? '/store/inventory/low-stock' : '/admin/inventario/bajo-stock',
+  inventory: '/store/inventory',
+  lowStock: '/store/inventory/low-stock',
   
   // Landing
   landingCategory: (cat) => USE_NEW_ENDPOINTS 
