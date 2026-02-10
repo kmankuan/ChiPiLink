@@ -2,13 +2,14 @@
  * Students Management Tab (Admin)
  * View all linked students, lock/unlock profiles, manage enrollments
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -29,7 +30,8 @@ import {
   Unlock,
   GraduationCap,
   Eye,
-  Shield
+  Shield,
+  ShoppingCart
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
