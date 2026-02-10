@@ -57,6 +57,7 @@ import {
 import TxbInventoryTab from './components/TxbInventoryTab';
 import WebhooksTab from './components/WebhooksTab';
 import StatusMappingTab from './components/StatusMappingTab';
+import WalletMondayTab from './components/WalletMondayTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
