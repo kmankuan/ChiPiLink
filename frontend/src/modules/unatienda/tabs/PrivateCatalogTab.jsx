@@ -28,7 +28,8 @@ const COLUMN_DEFS = {
     { key: 'subject', label: 'Subject', width: 120, sortKey: 'subject' },
     { key: 'publisher', label: 'Publisher', width: 120, sortKey: 'publisher' },
     { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
-    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'stock', label: 'Stock', width: 80, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'presale', label: 'Pre-sale', width: 80, sortKey: 'presale', align: 'center' },
     { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
   ],
   public: [
@@ -38,7 +39,8 @@ const COLUMN_DEFS = {
     { key: 'product_type', label: 'Type', width: 100, sortKey: 'product_type' },
     { key: 'brand', label: 'Brand', width: 120, sortKey: 'brand' },
     { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
-    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'stock', label: 'Stock', width: 80, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'presale', label: 'Pre-sale', width: 80, sortKey: 'presale', align: 'center' },
     { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
   ],
   all: [
@@ -48,7 +50,8 @@ const COLUMN_DEFS = {
     { key: 'category', label: 'Category', width: 120, sortKey: 'category' },
     { key: 'publisher', label: 'Publisher / Brand', width: 130, sortKey: 'publisher' },
     { key: 'price', label: 'Price', width: 100, sortKey: 'price', align: 'right' },
-    { key: 'stock', label: 'Stock', width: 100, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'stock', label: 'Stock', width: 80, sortKey: 'stock', align: 'center', isStock: true },
+    { key: 'presale', label: 'Pre-sale', width: 80, sortKey: 'presale', align: 'center' },
     { key: 'status', label: 'Status', width: 90, sortKey: 'status', isStatus: true },
   ],
 };
