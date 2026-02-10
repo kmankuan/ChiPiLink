@@ -399,18 +399,35 @@ class TextbookOrderService(BaseService):
         if not new_selected_items:
             raise ValueError("Please select at least one new book to order")
         
-        # Lock newly selected items + reserve stock
+        # Lock newly selected items + handle stock based on presale_mode
         now = datetime.now(timezone.utc).isoformat()
+        
+        # Check if student is in pre-sale mode
+        student_doc = await db.store_students.find_one(
+            {"student_id": student_id},
+            {"_id": 0, "presale_mode": 1}
+        )
+        is_presale = student_doc.get("presale_mode", False) if student_doc else False
+        
         for item in items:
             if item.get("quantity_ordered", 0) > 0 and item["status"] != OrderItemStatus.ORDERED.value:
                 item["status"] = OrderItemStatus.ORDERED.value
                 item["ordered_at"] = now
+                item["is_presale"] = is_presale
                 
-                # Increment reserved_quantity on the product
-                await db.store_products.update_one(
-                    {"book_id": item["book_id"]},
-                    {"$inc": {"reserved_quantity": item.get("quantity_ordered", 1)}}
-                )
+                qty = item.get("quantity_ordered", 1)
+                if is_presale:
+                    # Pre-sale: only increment reserved_quantity (no stock deduction)
+                    await db.store_products.update_one(
+                        {"book_id": item["book_id"]},
+                        {"$inc": {"reserved_quantity": qty}}
+                    )
+                else:
+                    # Normal: deduct from inventory_quantity
+                    await db.store_products.update_one(
+                        {"book_id": item["book_id"]},
+                        {"$inc": {"inventory_quantity": -qty}}
+                    )
         
         # Check if there are still available items that can be ordered later
         available_items = [
