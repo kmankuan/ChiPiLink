@@ -181,7 +181,7 @@ export default function StudentsTab({ token }) {
   return (
     <div className="space-y-6" data-testid="students-tab">
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -200,6 +200,17 @@ export default function StudentsTab({ token }) {
               <div>
                 <p className="text-2xl font-bold">{lockedCount}</p>
                 <p className="text-xs text-muted-foreground">Locked Profiles</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <ShoppingCart className="h-5 w-5 text-orange-600" />
+              <div>
+                <p className="text-2xl font-bold">{presaleCount}</p>
+                <p className="text-xs text-muted-foreground">Pre-sale Active</p>
               </div>
             </div>
           </CardContent>
