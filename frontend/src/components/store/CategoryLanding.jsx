@@ -68,9 +68,9 @@ export default function CategoryLanding({
     }, 1500);
   };
 
-  const isInCart = (libroId) => items.some(item => item.book_id === libroId);
-  const getCartQuantity = (libroId) => {
-    const item = items.find(item => item.book_id === libroId);
+  const isInCart = (bookId) => items.some(item => item.book_id === bookId);
+  const getCartQuantity = (bookId) => {
+    const item = items.find(item => item.book_id === bookId);
     return item ? item.quantity : 0;
   };
 
@@ -278,7 +278,7 @@ export default function CategoryLanding({
       )}
 
       {/* Subcategories Quick Access (for books = grades) */}
-      {categoria === 'libros' && grados.length > 0 && (
+      {categoria === 'books' && grados.length > 0 && (
         <div className="bg-muted/30 rounded-xl p-4">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <Package className="h-4 w-4" />
