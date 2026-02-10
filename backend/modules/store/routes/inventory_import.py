@@ -170,7 +170,7 @@ async def preview_csv_import(
                 errors.append({"row": row_num, "error": f"Invalid price: {row.get('price')}"})
                 continue
             
-            # Check if product exists in the private catalog (libros collection)
+            # Check if product exists in the private catalog
             existing = await db.store_products.find_one(
                 {"code": code, "is_private_catalog": True},
                 {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
@@ -284,7 +284,7 @@ async def execute_csv_import(
                 quantity = int(row.get('quantity', '0').strip() or '0')
                 price = float(row.get('price', '0').strip() or '0')
                 
-                # Check if exists in the private catalog (libros collection)
+                # Check if exists in the private catalog
                 existing = await db.store_products.find_one({"code": code, "is_private_catalog": True})
                 
                 if existing:
@@ -298,7 +298,7 @@ async def execute_csv_import(
                     else:  # ADD
                         new_quantity = existing.get("inventory_quantity", 0) + quantity
                     
-                    # Update existing product in libros collection
+                    # Update existing product
                     await db.store_products.update_one(
                         {"code": code, "is_private_catalog": True},
                         {"$set": {
@@ -317,8 +317,8 @@ async def execute_csv_import(
                     )
                     updated += 1
                 else:
-                    # Create new product in libros collection (private catalog)
-                    book_id = f"libro_{datetime.now().strftime('%Y%m%d%H%M%S')}_{created:04d}"
+                    # Create new product in private catalog
+                    book_id = f"book_{datetime.now().strftime('%Y%m%d%H%M%S')}_{created:04d}"
                     
                     new_product = {
                         "book_id": book_id,
