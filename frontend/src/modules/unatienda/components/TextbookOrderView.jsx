@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import {
   Book, BookOpen, Check, CheckCircle, ChevronLeft, ClipboardList,
   Clock, FileText, GraduationCap, Info, Loader2, Lock, Upload,
-  User, UserPlus, Users
+  User, UserPlus, Users, Wallet, AlertTriangle, CreditCard
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 
