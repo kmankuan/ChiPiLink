@@ -92,7 +92,7 @@ export default function ProductCard({
                 <span className="mr-1">{categoryInfo.icono}</span>
                 {categoryInfo.name}
               </Badge>
-              {(product.categoria === 'libros' || product.categoria === 'books') && product.grade && (
+              {(product.categoria === 'books' || product.category === 'books') && product.grade && (
                 <Badge variant="secondary" className="text-xs">{product.grade}</Badge>
               )}
             </>
