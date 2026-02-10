@@ -73,3 +73,17 @@
 - iter 69: Unified inventory (12/12)
 - iter 70: Archive system (12/12)
 - iter 71: Dynamic & Draggable columns (14/14)
+- iter 73: Wallet Payment System — backend 18/18, frontend 100%
+
+## Wallet Payment System (Feb 10)
+- **Widget Payment Flow**: Users see wallet balance when ordering textbooks. "Pay with Wallet" button charges wallet atomically before creating order. Insufficient balance shows warning + bank transfer info.
+- **Monday.com Webhook**: Board "Customers Admin" (5931665026) triggers wallet top-up. Webhook extracts user email + amount from Monday event, deposits into user's wallet.
+- **Admin Wallet Tab**: New "Wallets" tab in Users module. Shows all users with balances, stats cards (Total Users, Total Balance, With Balance). Top Up / Deduct buttons with confirmation dialog.
+- **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions with description.
+- **Bank Transfer Info**: Configurable via existing Form Config module (info field type). Shown in widget order form.
+
+## Upcoming Tasks
+- Transaction history view for clients in the widget
+- Wallet balance notifications (low balance alerts)
+- P2: sync-all endpoint fix
+- P3: i18n, board selector UX
