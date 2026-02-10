@@ -353,6 +353,11 @@ export default function StudentsTab({ token }) {
                                 Approved
                               </Badge>
                             )}
+                            {isPresale && (
+                              <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
+                                Pre-sale
+                              </Badge>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
