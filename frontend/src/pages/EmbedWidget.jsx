@@ -717,6 +717,14 @@ export default function EmbedWidget() {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState(null); // null = not loaded
 
+  // Force viewport constraints for iframe embedding
+  useEffect(() => {
+    const s = document.createElement('style');
+    s.textContent = 'html,body,#root{width:100%!important;max-width:100%!important;overflow-x:hidden!important;margin:0!important;padding:0!important;}';
+    document.head.appendChild(s);
+    return () => s.remove();
+  }, []);
+
   // Restore persisted tab
   const saved = loadWidgetState();
   const [activeTab, setActiveTabRaw] = useState(saved.activeTab || 'textbook_orders');
