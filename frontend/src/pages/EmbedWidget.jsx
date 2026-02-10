@@ -904,6 +904,15 @@ export default function EmbedWidget() {
           >
             <BookOpen className="h-4 w-4" /> Textbooks
           </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            data-testid="widget-tab-orders"
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors border-b-2 ${
+              activeTab === 'orders' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <ClipboardList className="h-4 w-4" /> Orders
+          </button>
           {config.features?.wallet?.enabled !== false && (
             <button
               onClick={() => setActiveTab('wallet')}
