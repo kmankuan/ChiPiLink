@@ -789,7 +789,7 @@ export default function EmbedWidget() {
       <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
-          <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} />
+          <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
         )}
 
         {/* Streamlined nav: Textbooks + Wallet */}
