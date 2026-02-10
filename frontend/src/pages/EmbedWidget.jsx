@@ -896,14 +896,14 @@ export default function EmbedWidget() {
     const studentsLoaded = students !== null;
 
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-shell">
+      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
           <WidgetHeader user={user} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={handleLogout} />
         )}
 
         {/* Streamlined nav: Textbooks + Wallet */}
-        <div className="flex border-b bg-card" data-testid="widget-nav">
+        <div className="flex border-b bg-card shrink-0" data-testid="widget-nav">
           <button
             onClick={() => setActiveTab('textbook_orders')}
             data-testid="widget-tab-textbooks"
