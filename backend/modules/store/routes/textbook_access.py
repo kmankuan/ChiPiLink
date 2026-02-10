@@ -245,6 +245,33 @@ async def update_student_admin(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+from pydantic import BaseModel as _BaseModel
+
+class BulkPresaleRequest(_BaseModel):
+    student_ids: List[str]
+    presale_mode: bool
+
+
+@router.post("/admin/students/bulk-presale")
+async def bulk_toggle_presale(
+    data: BulkPresaleRequest,
+    admin: dict = Depends(get_admin_user)
+):
+    """Toggle pre-sale mode for multiple students"""
+    from core.database import get_db
+    db = await get_db()
+    result = await db.store_students.update_many(
+        {"student_id": {"$in": data.student_ids}},
+        {"$set": {"presale_mode": data.presale_mode}}
+    )
+    return {
+        "success": True,
+        "modified": result.modified_count,
+        "presale_mode": data.presale_mode
+    }
+
+
+
 # ============== SCHOOL MANAGEMENT (ADMIN) ==============
 
 @router.post("/admin/schools")
