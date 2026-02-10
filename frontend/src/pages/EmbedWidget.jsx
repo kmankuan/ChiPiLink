@@ -438,6 +438,24 @@ function TextbookOrdersView({ token, students }) {
         </>
       )}
 
+      {/* Out of stock items */}
+      {outOfStockItems.length > 0 && (
+        <>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-2">Out of Stock</p>
+          {outOfStockItems.map((item) => (
+            <Card key={item.book_id} className="p-2.5 opacity-40" data-testid={`widget-oos-${item.book_id}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate">{item.book_name}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.book_code}</p>
+                </div>
+                <Badge className="text-[9px] bg-red-100 text-red-700">Out of Stock</Badge>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+
       {items.length === 0 && (
         <div className="text-center py-6">
           <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
