@@ -65,7 +65,23 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   // Fetch form fields configuration
   useEffect(() => {
     fetchFormFields();
+    fetchWalletBalance();
   }, []);
+
+  const fetchWalletBalance = async () => {
+    setLoadingWallet(true);
+    try {
+      const response = await axios.get(`${API_URL}/api/wallet/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setWalletBalance(response.data.wallet?.balance_usd ?? 0);
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      setWalletBalance(0);
+    } finally {
+      setLoadingWallet(false);
+    }
+  };
 
   const fetchFormFields = async () => {
     try {
