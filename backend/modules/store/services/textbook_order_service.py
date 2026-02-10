@@ -403,8 +403,9 @@ class TextbookOrderService(BaseService):
         now = datetime.now(timezone.utc).isoformat()
         
         # Check if student is in pre-sale mode
+        order_student_id = order.get("student_id")
         student_doc = await db.store_students.find_one(
-            {"student_id": student_id},
+            {"student_id": order_student_id},
             {"_id": 0, "presale_mode": 1}
         )
         is_presale = student_doc.get("presale_mode", False) if student_doc else False
