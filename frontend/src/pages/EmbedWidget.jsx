@@ -1018,7 +1018,7 @@ export default function EmbedWidget() {
 /* ── Widget Header ── */
 function WidgetHeader({ user, hideUrl, onClose, onLogout }) {
   return (
-    <div className="flex items-center justify-between px-3 py-2 border-b bg-card" data-testid="widget-header">
+    <div className="flex items-center justify-between px-3 py-2 border-b bg-card shrink-0 min-w-0" data-testid="widget-header">
       <div className="flex items-center gap-2">
         <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
           <BookOpen className="h-3.5 w-3.5 text-primary-foreground" />
