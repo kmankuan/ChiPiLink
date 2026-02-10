@@ -748,7 +748,7 @@ export default function EmbedWidget() {
       <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-maintenance">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
-          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} />
+          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
         )}
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 text-center">
           <div className="p-4 rounded-full bg-amber-100">
@@ -771,7 +771,7 @@ export default function EmbedWidget() {
       <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
-          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} />
+          <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
         )}
         <div className="flex-1">
           <LoginPrompt />
