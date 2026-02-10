@@ -23,13 +23,15 @@ import {
   Settings2,
   School,
   ClipboardList,
-  UserCheck
+  UserCheck,
+  Wallet
 } from 'lucide-react';
 import AdminUsuariosConexiones from './components/AdminUsuariosConexiones';
 import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 import SchoolsManagementTab from './components/SchoolsManagementTab';
 import StudentRequestsTab from './components/StudentRequestsTab';
 import AllStudentsTab from './components/AllStudentsTab';
+import AdminWalletTab from './components/AdminWalletTab';
 
 export default function UsersManagementModule() {
   const [activeTab, setActiveTab] = useState('student-requests');
