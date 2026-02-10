@@ -364,22 +364,22 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredProducts.map((libro) => {
-                        const cat = categories.find(c => c.category_id === libro.categoria);
+                      {filteredProducts.map((product) => {
+                        const cat = categories.find(c => c.category_id === product.categoria);
                         return (
-                          <TableRow key={libro.book_id}>
+                          <TableRow key={product.book_id}>
                             <TableCell>
                               <div className="flex items-center gap-3">
-                                {libro.image_url ? (
-                                  <img src={libro.image_url} alt="" className="w-10 h-10 object-cover rounded" />
+                                {product.image_url ? (
+                                  <img src={product.image_url} alt="" className="w-10 h-10 object-cover rounded" />
                                 ) : (
                                   <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                                     <Package className="h-5 w-5 text-muted-foreground" />
                                   </div>
                                 )}
                                 <div>
-                                  <p className="font-medium">{libro.name}</p>
-                                  {libro.requires_preparation && (
+                                  <p className="font-medium">{product.name}</p>
+                                  {product.requires_preparation && (
                                     <Badge variant="outline" className="text-orange-600 text-xs">
                                       <Clock className="h-3 w-3 mr-1" />
                                       Preparation
@@ -396,19 +396,19 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                               )}
                             </TableCell>
                             <TableCell className="text-right font-medium">
-                              ${libro.price?.toFixed(2)}
+                              ${product.price?.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
-                              <Badge variant={libro.inventory_quantity < 10 ? 'destructive' : 'default'}>
-                                {libro.inventory_quantity}
+                              <Badge variant={product.inventory_quantity < 10 ? 'destructive' : 'default'}>
+                                {product.inventory_quantity}
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
-                                <Button size="sm" variant="ghost" onClick={() => openEditDialog(libro)}>
+                                <Button size="sm" variant="ghost" onClick={() => openEditDialog(product)}>
                                   <Edit2 className="h-4 w-4" />
                                 </Button>
-                                <Button size="sm" variant="ghost" onClick={() => handleDeleteProduct(libro.book_id)}>
+                                <Button size="sm" variant="ghost" onClick={() => handleDeleteProduct(product.book_id)}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
                               </div>
