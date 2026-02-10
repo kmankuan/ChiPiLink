@@ -515,6 +515,8 @@ class TextbookOrderService(BaseService):
         order["submission_total"] = submission_total
         order["items_ordered_now"] = len(new_selected_items)
         order["items_available"] = len(available_items)
+        if is_presale:
+            order["is_presale"] = True
         
         self.log_info(f"Order {order_id} partial submission by user {user_id}: {len(new_selected_items)} items, ${submission_total:.2f}")
         
