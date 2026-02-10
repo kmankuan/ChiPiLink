@@ -499,7 +499,10 @@ class TextbookOrderService(BaseService):
             "notes": notes,
             "total_amount": total_amount,
             "monday_item_ids": order.get("monday_item_ids", []) + ([monday_item_id] if monday_item_id else [])
-        })
+        }
+        if is_presale:
+            update_data["is_presale"] = True
+        await self.order_repo.update_order(order_id, update_data)
         
         # Send notification
         await self._notify_order_submitted(order, user_name, user_email)
