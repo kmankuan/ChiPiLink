@@ -965,7 +965,7 @@ export default function EmbedWidget() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
+    <div className={widgetShellClass} data-testid="widget-shell">
       <Toaster position="top-center" richColors />
 
       {!hideNavbar && (
