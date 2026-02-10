@@ -432,6 +432,10 @@ export default function MondayModule() {
             <Plug className="h-3.5 w-3.5" />
             Webhooks
           </TabsTrigger>
+          <TabsTrigger value="wallet" className="gap-1.5 text-xs">
+            <Wallet className="h-3.5 w-3.5" />
+            Wallet
+          </TabsTrigger>
           <TabsTrigger value="status-mapping" className="gap-1.5 text-xs">
             <Settings className="h-3.5 w-3.5" />
             Status Mapping
