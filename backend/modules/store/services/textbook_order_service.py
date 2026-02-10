@@ -84,11 +84,12 @@ class TextbookOrderService(BaseService):
         
         logger.info(f"[get_books_for_grade] Query grades: {grade_queries}")
         
-        # Query using English field names only
+        # Query active products matching the grade (any catalog type)
+        # Non-textbook products (food, supplies) have grade=N/A/null so won't match
         books = await db.store_products.find(
             {
                 "active": True,
-                "is_private_catalog": True,
+                "archived": {"$ne": True},
                 "$or": [
                     {"grade": {"$in": grade_queries}},
                     {"grades": {"$in": grade_queries}}
@@ -101,10 +102,10 @@ class TextbookOrderService(BaseService):
         if len(books) > 0:
             logger.info(f"[get_books_for_grade] First book: {books[0].get('name')} - grade: {books[0].get('grade')}")
         else:
-            # Debug: check what products exist
-            total_private = await db.store_products.count_documents({"is_private_catalog": True})
+            # Debug: check what products exist for troubleshooting
             total_active = await db.store_products.count_documents({"active": True})
-            logger.warning(f"[get_books_for_grade] No books found! is_private_catalog={total_private}, active={total_active}")
+            grades_available = await db.store_products.distinct("grade", {"active": True})
+            logger.warning(f"[get_books_for_grade] No books found for grade queries {grade_queries}! active={total_active}, grades_in_db={grades_available}")
         
         return books
     
