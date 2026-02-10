@@ -23,9 +23,10 @@ export default function WebhooksTab() {
   const [registering, setRegistering] = useState(false);
   const [removing, setRemoving] = useState(false);
 
-  // Auto-generate webhook URL based on current API
-  const webhookUrl = `${API}/api/store/monday/webhooks/subitem-status`;
-  const universalWebhookUrl = `${API}/api/monday/webhooks/incoming`;
+  // Auto-generate webhook URL based on current domain (works in preview and production)
+  const baseUrl = window.location.origin;
+  const webhookUrl = `${baseUrl}/api/store/monday/webhooks/subitem-status`;
+  const universalWebhookUrl = `${baseUrl}/api/monday/webhooks/incoming`;
 
   const fetchConfig = useCallback(async () => {
     try {
