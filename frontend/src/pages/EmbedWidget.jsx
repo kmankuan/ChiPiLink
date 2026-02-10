@@ -368,8 +368,8 @@ function TextbookOrdersView({ token, students }) {
             <ChevronLeft className="h-3 w-3" /> Back
           </button>
         )}
-        <div className="flex-1 text-right">
-          <p className="text-xs font-semibold">
+        <div className="flex-1 text-center">
+          <p className="text-xs font-semibold truncate px-2">
             {selectedStudent.full_name || `${selectedStudent.first_name} ${selectedStudent.last_name}`}
           </p>
         </div>
