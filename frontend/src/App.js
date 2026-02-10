@@ -257,7 +257,7 @@ function AppRouter() {
         } 
       />
       <Route 
-        path="/mis-pedidos-libros" 
+        path="/my-book-orders" 
         element={<Navigate to="/unatienda?tab=private" replace />}
       />
       
@@ -280,7 +280,7 @@ function AppRouter() {
       {/* Unatienda Store Routes */}
       <Route path="/unatienda" element={<><Header /><Unatienda /></>} />
       <Route path="/unatienda/producto/:productId" element={<><Header /><ProductDetail /></>} />
-      <Route path="/unatienda/libro/:libroId" element={<><Header /><PrivateBookDetail /></>} />
+      <Route path="/unatienda/book/:bookId" element={<><Header /><PrivateBookDetail /></>} />
       <Route path="/unatienda/checkout" element={<><Header /><UnatiendaCheckout /></>} />
       
       {/* Protected Routes */}
