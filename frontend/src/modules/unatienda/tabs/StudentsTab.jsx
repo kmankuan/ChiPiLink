@@ -45,6 +45,8 @@ export default function StudentsTab({ token }) {
   const [unlockReason, setUnlockReason] = useState('');
   const [processing, setProcessing] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
 
   useEffect(() => { fetchStudents(); }, []);
 
