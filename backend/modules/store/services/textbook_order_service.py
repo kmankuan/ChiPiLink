@@ -197,7 +197,8 @@ class TextbookOrderService(BaseService):
         return await self.order_repo.create(order_data)
     
     async def _refresh_order_items(self, order: Dict) -> Dict:
-        """Refresh order items with latest book/inventory data"""
+        """Refresh order items with latest book/inventory data.
+        Preserves existing items even if products are no longer in catalog."""
         grade = order.get("grade", "")
         logger.info(f"[_refresh_order_items] Refreshing order {order.get('order_id')} for grade={grade}")
         
@@ -206,30 +207,40 @@ class TextbookOrderService(BaseService):
         
         books_dict = {b["book_id"]: b for b in books}
         
-        existing_items = {item["book_id"]: item for item in order.get("items", [])}
+        existing_items = order.get("items", [])
+        existing_by_id = {item["book_id"]: item for item in existing_items}
         logger.info(f"[_refresh_order_items] Existing items count: {len(existing_items)}")
         
         updated_items = []
+        seen_ids = set()
         
-        for book_id, book in books_dict.items():
-            inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
+        # First: preserve and update all existing items
+        for item in existing_items:
+            book_id = item["book_id"]
+            seen_ids.add(book_id)
             
-            if book_id in existing_items:
-                item = existing_items[book_id]
-                # Update price and availability
+            if book_id in books_dict:
+                book = books_dict[book_id]
+                inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
                 item["price"] = float(book.get("price", 0))
                 item["book_name"] = book["name"]
                 
-                # Only update status if not already ordered
                 if item["status"] not in [OrderItemStatus.ORDERED.value]:
                     if inventory <= 0:
                         item["status"] = OrderItemStatus.OUT_OF_STOCK.value
                     elif item["status"] == OrderItemStatus.OUT_OF_STOCK.value:
                         item["status"] = OrderItemStatus.AVAILABLE.value
-                
-                updated_items.append(item)
             else:
-                # New book added to catalog
+                # Product no longer in catalog — mark unavailable but keep the item
+                if item["status"] not in [OrderItemStatus.ORDERED.value]:
+                    item["status"] = OrderItemStatus.OUT_OF_STOCK.value
+            
+            updated_items.append(item)
+        
+        # Second: add any NEW books in catalog that aren't in the existing order
+        for book_id, book in books_dict.items():
+            if book_id not in seen_ids:
+                inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
                 status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
                 updated_items.append({
                     "book_id": book_id,
