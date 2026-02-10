@@ -160,17 +160,33 @@ LOADER_JS_TEMPLATE = """
   frame.src = API_URL + '/embed/widget';
   frame.allow = 'clipboard-write';
   var sidebarPx = parseInt(sidebarWidth) || 380;
-  frame.style.cssText = 'position:fixed; width:' + sidebarWidth + '; height:100vh; top:0; right:-' + (sidebarPx + 20) + 'px; box-shadow:-4px 0 30px rgba(0,0,0,0.15); border-radius:0;';
+  var isMobile = window.innerWidth <= 480;
+  var actualWidth = isMobile ? '100vw' : sidebarWidth;
+  var actualPx = isMobile ? window.innerWidth : sidebarPx;
+  frame.style.cssText = 'position:fixed; width:' + actualWidth + '; max-width:100vw; height:100vh; top:0; right:-' + (actualPx + 20) + 'px; box-shadow:-4px 0 30px rgba(0,0,0,0.15); border-radius:0;';
+
+  // Update on resize
+  window.addEventListener('resize', function() {
+    var mob = window.innerWidth <= 480;
+    var w = mob ? '100vw' : sidebarWidth;
+    var px = mob ? window.innerWidth : sidebarPx;
+    frame.style.width = w;
+    frame.style.maxWidth = '100vw';
+    if (!open) { frame.style.right = '-' + (px + 20) + 'px'; }
+  });
 
   var open = false;
   function toggle() {
+    var mob = window.innerWidth <= 480;
+    var px = mob ? window.innerWidth : sidebarPx;
     open = !open;
     if (open) {
+      frame.style.width = mob ? '100vw' : sidebarWidth;
       frame.style.right = '0';
       overlay.classList.add('active');
       btn.style.transform = 'scale(0.9)';
     } else {
-      frame.style.right = '-' + (sidebarPx + 20) + 'px';
+      frame.style.right = '-' + (px + 20) + 'px';
       overlay.classList.remove('active');
       btn.style.transform = '';
     }
