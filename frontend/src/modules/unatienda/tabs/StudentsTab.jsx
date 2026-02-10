@@ -129,6 +129,46 @@ export default function StudentsTab({ token }) {
   });
 
   const lockedCount = students.filter(s => s.is_locked).length;
+  const presaleCount = students.filter(s => s.presale_mode).length;
+
+  const toggleSelect = useCallback((id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    const visibleIds = filteredStudents.map(s => s.student_id || s.sync_id);
+    const allSelected = visibleIds.every(id => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(visibleIds));
+    }
+  }, [filteredStudents, selectedIds]);
+
+  const handleBulkPresale = async (enable) => {
+    if (selectedIds.size === 0) return;
+    setBulkProcessing(true);
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/students/bulk-presale`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_ids: [...selectedIds], presale_mode: enable })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(`Pre-sale ${enable ? 'enabled' : 'disabled'} for ${data.modified} students`);
+        setSelectedIds(new Set());
+        fetchStudents();
+      } else {
+        toast.error('Failed to update pre-sale mode');
+      }
+    } catch { toast.error('Error updating pre-sale mode'); }
+    finally { setBulkProcessing(false); }
+  };
 
   if (loading) {
     return (
