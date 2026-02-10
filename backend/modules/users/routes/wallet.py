@@ -492,3 +492,58 @@ async def unlock_wallet(
         raise HTTPException(status_code=404, detail="Wallet not found")
     
     return {"success": True, "message": "Wallet unlocked"}
+
+
+
+class AdminAdjustRequest(BaseModel):
+    amount: float
+    action: str  # "topup" or "deduct"
+    description: Optional[str] = None
+
+
+@router.post("/admin/adjust/{user_id}")
+async def admin_adjust_wallet(
+    user_id: str,
+    data: AdminAdjustRequest,
+    admin=Depends(get_admin_user)
+):
+    """Top up or deduct from a user's wallet (admin).
+    action: 'topup' adds funds, 'deduct' removes funds.
+    """
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    if data.action not in ("topup", "deduct"):
+        raise HTTPException(status_code=400, detail="Action must be 'topup' or 'deduct'")
+    
+    try:
+        # Ensure wallet exists
+        await wallet_service.get_or_create_wallet(user_id)
+        
+        if data.action == "topup":
+            transaction = await wallet_service.deposit(
+                user_id=user_id,
+                amount=data.amount,
+                currency=Currency(data.currency if hasattr(data, 'currency') else "USD"),
+                payment_method=PaymentMethod.WALLET,
+                description=data.description or f"Admin top-up by {admin.get('name', admin['user_id'])}"
+            )
+        else:
+            transaction = await wallet_service.charge(
+                user_id=user_id,
+                amount=data.amount,
+                currency=Currency("USD"),
+                description=data.description or f"Admin deduction by {admin.get('name', admin['user_id'])}",
+                reference_type="admin_adjustment"
+            )
+        
+        # Get updated wallet
+        wallet = await wallet_service.get_wallet(user_id)
+        
+        return {
+            "success": True,
+            "transaction": transaction,
+            "new_balance": wallet.get("balance_usd", 0) if wallet else 0
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
