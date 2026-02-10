@@ -234,6 +234,7 @@ function TextbookOrdersView({ token, students }) {
   });
   const [order, setOrder] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(null);
   const [cart, setCart] = useState({}); // {book_id: quantity}
   const [submitting, setSubmitting] = useState(false);
 
