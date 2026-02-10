@@ -46,28 +46,11 @@ export default function AdminWalletTab({ token }) {
   const fetchUsersWithWallets = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch all users
-      const usersRes = await axios.get(`${API_URL}/api/auth-v2/users`, {
+      // Fetch all users with wallets in one call
+      const res = await axios.get(`${API_URL}/api/wallet/admin/all-users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const allUsers = usersRes.data.users || usersRes.data || [];
-
-      // Fetch wallets for each user (batch via direct DB query endpoint or individual)
-      const usersWithWallets = await Promise.all(
-        allUsers
-          .filter(u => !u.is_admin)
-          .map(async (user) => {
-            try {
-              const walletRes = await axios.get(
-                `${API_URL}/api/wallet/user/${user.user_id}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
-              return { ...user, wallet: walletRes.data.wallet };
-            } catch {
-              return { ...user, wallet: null };
-            }
-          })
-      );
+      const usersWithWallets = res.data.users || [];
 
       setUsers(usersWithWallets);
 
