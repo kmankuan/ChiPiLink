@@ -1,178 +1,129 @@
 <analysis>**original_problem_statement:**
-The user initially wanted to verify and ensure the Monday.com integration was working correctly, specifically for syncing textbook orders. The user then requested a series of significant enhancements to the admin UI and the customer-facing embeddable widget.
+The user wants to implement a wallet-based payment system for textbook orders within the client widget.
 
-PRODUCT REQUIREMENTS:
-1.  **Monday.com Sync:** Verify and fix the sync between textbook orders and the Monday.com Textbooks board. When an order is created, find the matching textbook item and add the student as a subitem. If the textbook doesn't exist, create it.
-2.  **Widget UI Customization:**
-    *   Add admin options to hide the URL bar, navbar, and bottom footer in the widget.
-    *   Streamline the widget flow: show only the Log in with LaoPan button, then the Link Student workflow, and finally the textbook list for the approved student.
-    *   Add an option to display a Wallet feature.
-    *   Allow customization of the widget's floating button position (more options than just bottom-right), including custom X/Y offsets and icon/style selection.
-3.  **In-Widget OAuth:** The LaoPan OAuth process should happen within the widget or in a way that doesn't navigate the user away from the parent site, especially on mobile. The user should return to the widget seamlessly after authentication.
-4.  **Widget State Persistence:** The widget should remember user input (e.g., in forms) and the current view if it's accidentally closed and reopened.
-5.  **Inventory Management Enhancements (Private PCA Table):**
-    *   Add multi-select capabilities for bulk actions (delete, edit).
-    *   Add column sorting.
-    *   Add more powerful filtering (e.g., by status).
-    *   Implement an Archive system instead of direct deletion, allowing items to be moved to an Archived area from which they can be restored or permanently deleted.
-    *   Merge the Private PCA and Inventory tabs into a single, unified inventory management system.
-    *   Implement column reordering (drag-and-drop).
-    *   Support dynamic columns that change based on the catalog type (e.g., Public Store items have different columns than PCA Textbooks).
-6.  **Widget Maintenance Mode:** Add a pause or maintenance mode toggle in the admin panel. When enabled, the widget should display a message indicating it's temporarily unavailable.
-7.  **In-Widget Ordering:** The entire textbook ordering process should happen inside the widget, removing the Open Full Order Page button.
+**PRODUCT REQUIREMENTS:**
+1.  **Wallet Payment Flow:**
+    *   Client users, after selecting textbooks, should see the total amount to be paid.
+    *   A Pay with Wallet button should be available.
+    *   The order can only be submitted after a successful payment from the user's wallet.
+    *   If the wallet balance is insufficient, the Pay button should be disabled, and a message should prompt the user to make a bank transfer.
+2.  **Wallet Recharge Mechanism:**
+    *   The primary way to recharge a wallet is through a Monday.com automation.
+    *   The workflow is: Client transfers money -> Bank sends an email alert -> Email is redirected to a Monday.com board (BDL Transferencia) -> An automation on this board should trigger a webhook to top up the specific user's wallet in the application.
+3.  **Admin Controls:**
+    *   Admins need the ability to manually Top-Up or Deduct from a user's wallet directly within the admin panel.
+    *   The bank account information shown to the user for transfers must be configurable from the admin panel for flexibility.
+4.  **Monday.com Board:**
+    *   The existing Customers Admin board on Monday.com should be used to manage client payments and trigger the recharge automations.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application has a FastAPI backend and a React frontend. Key features include:
-- A fully functional Monday.com integration that syncs textbook orders to two separate boards.
-- An embeddable widget for  with a robust, server-side-relayed OAuth flow that works across different domains and on mobile without storage partitioning issues.
-- A highly customizable admin panel allowing configuration of the widget's appearance, placement, and features.
-- A unified inventory management system that combines the private (PCA Textbooks) and public catalogs. It supports advanced filtering, sorting, bulk actions, and a full archive/restore/permanent-delete lifecycle.
-- A maintenance mode for the widget that can be toggled from the admin panel.
-- The textbook ordering process is now fully contained within the widget.
+The application has a foundational wallet system. The  model includes a . The backend has API endpoints to get a user's balance (), charge the wallet (), and for an admin to adjust a user's balance (). An existing service for Monday.com integrations () is also present. The agent has explored these files to understand the current implementation before starting the new feature.
 
 **Last working item**:
-- Last item agent was working: The agent was about to begin a major refactor of the unified inventory management component () to add two new features requested by the user:
-    1.  **Draggable Columns:** Allow users to reorder the columns in the inventory table.
-    2.  **Dynamic Columns:** Display different sets of columns depending on whether the user is viewing PCA Textbooks or Public Store products.
-    The agent had formed a plan to use the  library and restructure the component to use a dynamic column definition system instead of hardcoded columns.
-- Status: NOT STARTED
-- Agent Testing Done: N
-- Which testing method agent to use? Frontend testing agent
-- User Testing Done: N
+*   **Last item agent was working:** The agent was in the discovery phase for the new wallet payment feature. The work involved exploring the existing wallet system (, ), user management (, ), and the Monday.com integration () to formulate a concrete implementation plan.
+*   **Status:** NOT STARTED
+*   **Agent Testing Done:** N
+*   **Which testing method agent to use?** both
+*   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1:** The  component needs a significant refactor to support dynamic and reorderable columns. (Priority: P0)
-  - **Attempted fixes:** None. The agent has only created a plan.
-  - **Next debug checklist:**
-      1.  Install the  library.
-      2.  Refactor  to define columns as a dynamic array of objects instead of hardcoded JSX.
-      3.  Implement a  hook to persist the column order.
-      4.  Create separate column definition arrays for 'PCA' and 'Public' catalog types.
-      5.  Wrap the table headers in , , and  components from .
-      6.  Update the  component to work with the new drag-and-drop functionality.
-      7.  Ensure all existing features (sorting, filtering, bulk actions) continue to work after the refactor.
-  - **Why fix this issue and what will be achieved with the fix?** This will fulfill the user's request for a more flexible and user-friendly inventory management table, allowing them to customize the view to their needs.
-  - **Status:** NOT STARTED
-  - **Is recurring issue?** N
-  - **Should Test frontend/backend/both after fix?** frontend
-  - **Blocked on other issue:** None.
+There are no pending or in-progress issues. All previously reported bugs and feature requests have been resolved and completed. The current focus is entirely on the new wallet payment feature.
 
 **In progress Task List**:
-- **Task 1:** Implement draggable columns and dynamic column definitions in the inventory management table. (Priority: P0)
-    - **Where to resume:** Start by installing  and then begin refactoring the  file according to the plan outlined by the previous agent.
-    - **What will be achieved with this?** A more powerful and customizable inventory table that meets the user's requirements.
-    - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** frontend
-    - **Blocked on something:** None.
+There are no tasks currently in progress.
 
 **Upcoming and Future Tasks**
-There are no other pending tasks. The agent has addressed all previous user requests.
+*   **Task 1: Implement Wallet Payment Flow in Widget (P0)**
+    *   **Where to resume**: Modify  and the order submission endpoint in .
+    *   **What will be achieved**: Users will be able to see their wallet balance and pay for textbook orders directly from the widget. The backend will handle the transaction atomically (charge wallet, then create order).
+
+*   **Task 2: Implement Monday.com Webhook for Wallet Recharge (P1)**
+    *   **Where to resume**: Create a new webhook file, likely .
+    *   **What will be achieved**: The system will be able to receive wallet top-up requests from Monday.com automations, enabling a semi-automated recharge process.
+
+*   **Task 3: Implement Admin UI for Wallet Management (P1)**
+    *   **Where to resume**: Modify the admin user details component ( or similar) and create a new admin settings page for bank info configuration.
+    *   **What will be achieved**: Admins will have manual control over user wallets and can configure the bank transfer instructions shown to clients.
 
 **Completed work in this session**
-- **Monday.com Integration Verified:** Created a test script () to confirm that textbook orders correctly sync to the Textbooks board, creating new items or adding students as subitems as required.
-- **In-Widget OAuth Flow:** Implemented a robust, server-side relay mechanism to handle cross-domain authentication in the widget, solving issues with iframes and browser storage partitioning.
-- **Unified Inventory Management:** Merged the Private PCA and Inventory tabs into a single Inventory tab with a unified product list, advanced filters (including catalog type), sorting, and multi-select bulk actions.
-- **Inventory Archive System:** Replaced the delete functionality with a full archive workflow (Archive -> Restore / Permanent Delete) on both the backend and frontend.
-- **In-Widget Ordering Flow:** Removed the Open Full Order Page button and implemented the entire textbook selection and ordering process within the widget.
-- **Widget UI/UX Enhancements:**
-    - Added admin controls to hide the navbar/footer and streamline the login-to-order flow.
-    - Implemented a persistent state for the widget using  to remember form data and user progress.
-- **Widget Appearance Customization:**
-    - Added extensive admin options to control the floating button's position, offset, icon, and style.
-    - Implemented a live preview of the button configuration in the admin panel.
-- **Widget Maintenance Mode:** Added a toggle in the admin panel to enable/disable a maintenance screen for the widget, with a customizable message.
-- **PCA Table Refactor:** The Private Catalog table was significantly improved with multi-select, sorting, and status filters before being merged into the unified inventory system.
+*   **Dynamic & Draggable Inventory Columns**: Implemented draggable and resizable columns with persistent ordering in the admin inventory table ().
+*   **Pre-sale & Reserved Stock System**: Created a complete pre-sale workflow. This includes a  field on products, automatic fulfillment of pre-orders when stock is added, and a Pre-sale column in the inventory.
+*   **Student-Specific Pre-sale Mode**: Built a Students tab in the admin panel allowing admins to enable a Pre-sale Mode for specific students in bulk, which routes their orders to reserve stock instead of using available inventory.
+*   **Code Refactoring (Spanish libro removal)**: Performed a full-stack refactoring to remove all hardcoded Spanish terms like libro and libros from file names, routes, variables, and database prefixes ( -> ).
+*   **Bug Fix (Textbooks Not Showing)**: Resolved a critical bug where textbooks were not appearing in the client widget by removing a restrictive  filter in .
+*   **UI/UX Enhancements**:
+    *   Added a Logout button and an Orders tab to the client widget.
+    *   Improved error handling in the widget with specific messages and a retry button.
+*   **Mobile Responsiveness Overhaul**: Fixed a persistent widget overflow issue on mobile devices by making the embed script fully responsive and applying robust global CSS to constrain the widget's width, ensuring it fits correctly within any viewport.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1:** A React warning for a missing dependency in a  hook () was noted in  but was not fixed as the agent moved on to the next user request.
-  - **Debug checklist:** Locate the  hook that filters the products and add  to its dependency array.
-  - **Why to solve this issue and what will be achieved with this?** Fixes a React warning and ensures the filtering logic re-runs correctly when the catalog type changes. This may be resolved as part of the upcoming major refactor.
-  - **Should Test frontend/backend/both after fix:** frontend
-  - **Is recurring issue?** N
+*   None. All issues identified during the session were addressed.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** None.
-- **Recurrence count:** 0
-- **Status:** NOT STARTED
+*   **Issue recurrence in previous fork**: Widget content overflowing its container on mobile devices.
+*   **Recurrence count**: 3+
+*   **Status**: RESOLVED
+    *   **Note**: This issue was highly persistent. The final fix involved a multi-layered approach: making the parent iframe responsive (), adding global CSS resets (), and wrapping the entire widget in a container with bulletproof styles () to prevent any element from exceeding the viewport width. The next agent should be mindful of this if any new layout components are added.
 
 **Code Architecture**
-archived
+
 
 **Key Technical Concepts**
-- **Frontend:** React, Vite, , , .  is planned.
-- **Backend:** Python, FastAPI.
-- **Authentication:** LaoPan OAuth2, JWTs. A custom server-side token relay was built to handle cross-domain iframe authentication.
-- **Database:** PostgreSQL (assumed, via API interactions).
-- **API Integration:** Monday.com API for board and item management.
+*   **Backend**: FastAPI, Python, MongoDB (with Beanie ODM)
+*   **Frontend**: React, Tailwind CSS
+*   **Deployment**: The frontend is a widget embedded via an iframe into a parent website.
+*   **Architecture**: Monorepo with distinct  and  applications.
 
 **key DB schema**
--   **private_catalog_items:** { ... , : Boolean, : Boolean, : DateTime }
+*   **User**: 
+*   **Product**: 
+*   **Order**: 
+*   **Student**: 
 
 **changes in tech stack**
-- The  library is planned for addition to handle column reordering.
+*   None.
 
 **All files of reference**
--   : The core inventory management component. It was refactored to merge two tabs and add an archive system. It is the target of the next major refactor for draggable/dynamic columns.
--   : The main entry point for the customer-facing widget. It was heavily modified to implement the server-side auth relay, state persistence, maintenance mode, and in-widget ordering.
--   : Backend for LaoPan OAuth and Monday.com integration.
--   : Backend for widget configuration and the server-side auth session relay.
--   : Frontend page that handles the OAuth callback, modified to redirect correctly for the widget flow.
--   : Admin UI for configuring the widget, updated with many new options (display, placement, maintenance).
--   : The parent component that holds the admin tabs; updated to merge the inventory tabs.
--   : The Pydantic model for catalog items, updated to include the  and  fields.
-
-**Areas that need refactoring**:
-- : This ~1000 line file is the subject of the current task. It needs to be refactored to support dynamic, reorderable columns, which will also improve its structure and maintainability.
-
-**key api endpoints**
--   : Creates a new session ID for the auth relay.
--   : Stores the JWT token against a session ID.
--   : Polled by the widget to retrieve the stored token.
--   : Archives a single catalog item.
--   : Archives multiple items.
--   : Restores an archived item.
--   : Permanently deletes archived items.
--   : Submits a textbook order from within the widget.
+*   : Contains core logic for managing wallet balances.
+*   : Handles order submission; will be modified to integrate the payment step.
+*   : The main UI for the textbook ordering widget; will be heavily modified for the new payment flow.
+*   : Directory where the new Monday.com webhook will be created.
+*   : Contains the existing endpoint for an admin to adjust a wallet.
+*   : Directory containing admin panel components where manual wallet controls will be added.
 
 **Critical Info for New Agent**
-- **Server-Side Auth Relay is Key:** The most complex problem solved was the cross-domain iframe authentication. The current solution uses a server-side session store () where the widget polls for a token that the auth callback page pushes. Do not revert to  or  solutions, as they were proven ineffective due to browser security policies (, storage partitioning).
-- **Inventory Refactor Plan:** The next task is a significant refactor of . The previous agent's plan is solid: use  and a dynamic column definition object to replace the hardcoded table structure. This will enable both column reordering and context-specific columns.
-- **Monday.com APIs are Live:** The tests and development for the Monday.com integration were performed against live boards. Be cautious with any changes to the related services (, ).
+*   The user has explicitly approved the agent's proposed plan for the wallet feature. The plan is broken down into three main tasks: widget payment flow, Monday.com webhook, and admin controls.
+*   The payment transaction must be atomic: first, charge the wallet, and only upon success, create the order.
+*   Bank transfer details displayed to the user must not be hardcoded; they should be fetched from a new configuration setting managed by the admin.
+*   The persistent mobile overflow bug was resolved with a robust CSS fix. Be cautious with layout changes to avoid reintroducing it.
 
 **documents and test reports created in this job**
-- A test script was created at  to verify the Monday.com integration.
+*   
+*   Multiple test reports in  from the testing agent.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User Message:** Asks about maintenance mode. (Completed)
-2.  **User Message:** Asks for column reordering and dynamic columns for the inventory table. (In Progress - This is the current task)
-3.  **User Message:** Agrees with the agent's plan for the inventory table refactor. (Acknowledged)
-4.  **User Message:** Asks why the delete function in the inventory wasn't working and requests an archive system. (Completed)
-5.  **User Message:** Approves the agent's plan to merge inventory tabs but warns not to break existing integrations. (Completed)
-6.  **User Message:** Asks for an analysis of how to merge the Private PCA and Inventory tabs. (Completed)
-7.  **User Message:** Asks for the difference between the Private PCA and Inventory tabs. (Completed)
-8.  **User Message:** Reports that clicking Open Full Order Page takes the user to the wrong site and asks for the flow to stay in the widget. (Completed)
-9.  **User Message:** Reports the widget gets stuck after login. (Completed - This led to the final server-side relay auth solution).
-10. **User Message:** Reports an error after deploying the in-frame auth navigation fix ( issue). (Completed)
+1.  **User**: Requested a new wallet payment workflow, with recharges handled by a Monday.com integration triggered by bank transfer confirmation emails. (Status: Pending Implementation)
+2.  **Agent**: Proposed a detailed plan: a new webhook for Monday.com, manual Top Up/Down buttons for admins, and configurable bank info.
+3.  **User**: Agreed with the agent's plan, confirming the use of the Customers Admin board and the need for flexible admin configuration. (Status: Acknowledged)
+4.  **Agent**: Acknowledged the confirmation and began exploring the existing codebase to prepare for implementation. (Status: In Progress - Discovery)
 
 **Project Health Check:**
-- **Working:** The application is in a stable and working state. All features implemented in this session were tested and verified.
-- **Broken:** Nothing is currently broken.
-- **Mocked:** No components are mocked. The integrations (Monday.com, LaoPan) are live.
+*   **Broken**: None.
+*   **Mocked**: None.
 
 **3rd Party Integrations**
-- **LaoPan OAuth:** Used for user authentication in the widget. Requires User API Key configured in the environment.
-- **Monday.com API:** Used for syncing textbook orders and inventory. Uses the Emergent LLM Key (via workspace token).
+*   **Monday.com**: Used for various internal automations. A new webhook will be added to this integration for wallet recharge. This requires a User-provided API Key.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES
-- **Troubleshoot agent used after agent stuck in loop:** YES
-- **Test files created:** 
-- **Known regressions:** None.
+*   **Testing agent used after significant changes**: YES
+*   **Troubleshoot agent used after agent stuck in loop**: NO
+*   **Test files created**: None.
+*   **Known regressions**: None.
 
 **Credentials to test flow:**
-Credentials for admin login and LaoPan are not available in the history but are configured in the environment.
+Admin credentials can be found by reviewing previous logs or user seeding scripts. Client widget functionality is typically tested via JWT token injection, as demonstrated multiple times in the agent's history.
 
 **What agent forgot to execute**
-- The agent identified a React warning about a missing  dependency in a  hook within . While noting it, the agent proceeded with the next user request without fixing it. This should be addressed during the upcoming refactor of that same file.</analysis>
+Nothing. The agent successfully completed all assigned tasks and bug fixes from the user and was in the process of planning the next major feature when the session concluded.</analysis>
