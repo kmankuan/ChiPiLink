@@ -697,6 +697,9 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
         } else if (sortConfig.key === 'stock') {
           aVal = (a.inventory_quantity || 0) - (a.reserved_quantity || 0);
           bVal = (b.inventory_quantity || 0) - (b.reserved_quantity || 0);
+        } else if (sortConfig.key === 'presale') {
+          aVal = a.reserved_quantity || 0;
+          bVal = b.reserved_quantity || 0;
         } else if (sortConfig.key === 'status') {
           aVal = a.active !== false ? 1 : 0; bVal = b.active !== false ? 1 : 0;
         } else {
