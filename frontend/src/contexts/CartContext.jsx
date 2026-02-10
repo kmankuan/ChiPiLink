@@ -73,19 +73,19 @@ export function CartProvider({ children }) {
     });
   };
 
-  const removeItem = (libroId) => {
-    setItems(prev => prev.filter(item => item.book_id !== libroId));
+  const removeItem = (bookId) => {
+    setItems(prev => prev.filter(item => item.book_id !== bookId));
     toast.success('Producto eliminado del carrito');
   };
 
-  const updateQuantity = (libroId, quantity) => {
+  const updateQuantity = (bookId, quantity) => {
     if (quantity < 1) {
-      removeItem(libroId);
+      removeItem(bookId);
       return;
     }
     
     setItems(prev => prev.map(item => {
-      if (item.book_id === libroId) {
+      if (item.book_id === bookId) {
         if (quantity > item.inventory_quantity) {
           toast.error('No hay suficiente stock disponible');
           return item;
