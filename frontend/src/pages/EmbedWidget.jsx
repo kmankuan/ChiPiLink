@@ -492,6 +492,107 @@ function TextbookOrdersView({ token, students }) {
   );
 }
 
+/* ── Orders View ── */
+function OrdersView({ token, students }) {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token || !students?.length) return;
+    const fetchOrders = async () => {
+      try {
+        const allOrders = [];
+        for (const s of students) {
+          const sid = s.student_id || s._id;
+          try {
+            const { data } = await axios.get(`${API_URL}/api/store/textbook-orders/student/${sid}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (data && data.items?.length > 0) {
+              allOrders.push({ ...data, student_name: s.full_name || s.name });
+            }
+          } catch {}
+        }
+        setOrders(allOrders);
+      } catch {} finally { setLoading(false); }
+    };
+    fetchOrders();
+  }, [token, students]);
+
+  if (loading) return <LoadingSpinner />;
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-8" data-testid="widget-no-orders">
+        <ClipboardList className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+        <p className="text-xs text-muted-foreground">No orders yet. Select textbooks first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3" data-testid="widget-orders-list">
+      {orders.map((order) => {
+        const statusInfo = STATUS_MAP[order.status] || STATUS_MAP.draft;
+        const StatusIcon = statusInfo.icon;
+        const orderedItems = order.items.filter(i => i.status === 'ordered');
+        const availableItems = order.items.filter(i => i.status === 'available');
+
+        return (
+          <Card key={order.order_id} className="overflow-hidden" data-testid={`widget-order-${order.order_id}`}>
+            <div className="px-3 py-2 border-b bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold">{order.student_name}</p>
+                  <p className="text-[10px] text-muted-foreground">Grade {order.grade} • {order.year}</p>
+                </div>
+                <Badge className={`text-[9px] gap-1 ${statusInfo.color}`}>
+                  <StatusIcon className="h-3 w-3" /> {statusInfo.label}
+                </Badge>
+              </div>
+            </div>
+            <div className="p-2 space-y-1">
+              {orderedItems.length > 0 && (
+                <>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Ordered</p>
+                  {orderedItems.map(item => (
+                    <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-green-50 dark:bg-green-900/10">
+                      <span className="text-[11px] truncate flex-1">{item.book_name}</span>
+                      <span className="text-[10px] font-medium text-green-700">${item.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {availableItems.length > 0 && (
+                <>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mt-1">Pending Selection</p>
+                  {availableItems.map(item => (
+                    <div key={item.book_id} className="flex items-center justify-between py-1 px-1.5 rounded bg-muted/30">
+                      <span className="text-[11px] truncate flex-1">{item.book_name}</span>
+                      <span className="text-[10px] font-medium">${item.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {order.total_amount > 0 && (
+                <div className="flex justify-between pt-1 mt-1 border-t">
+                  <span className="text-[10px] font-semibold">Total</span>
+                  <span className="text-[10px] font-semibold">${order.total_amount.toFixed(2)}</span>
+                </div>
+              )}
+              {order.submitted_at && (
+                <p className="text-[9px] text-muted-foreground mt-1">
+                  Submitted: {new Date(order.submitted_at).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ── Wallet View ── */
 function WalletView({ token }) {
   const [wallet, setWallet] = useState(null);
