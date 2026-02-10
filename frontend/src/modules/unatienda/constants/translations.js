@@ -119,7 +119,18 @@ export const schoolTxbTranslations = {
     view: '查看',
     noStudentsLinked: '暂无关联学生',
     linkStudent: '关联学生',
-    backToStore: '返回商店'
+    backToStore: '返回商店',
+    reorderButton: '请求重新订购',
+    reorderPending: '重新订购待审批',
+    reorderReason: '为什么需要重新订购？',
+    reorderSuccess: '重新订购请求已发送',
+    reorderError: '请求重新订购失败',
+    walletBalance: '钱包余额',
+    payWithWallet: '使用钱包支付',
+    insufficientBalance: '余额不足',
+    insufficientBalanceMsg: '您的钱包余额不足。请通过银行转账充值您的钱包。',
+    paymentSuccess: '支付成功！订单已提交。',
+    bankTransferInfo: '银行转账信息'
   }
 };
 
