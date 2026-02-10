@@ -347,6 +347,7 @@ function TextbookOrdersView({ token, students }) {
   const items = order?.items || [];
   const orderedItems = items.filter(i => i.status === 'ordered');
   const availableItems = items.filter(i => i.status === 'available');
+  const outOfStockItems = items.filter(i => i.status === 'out_of_stock');
   const totalOrdered = orderedItems.reduce((s, i) => s + (i.price || 0) * (i.quantity_ordered || 0), 0);
   const cartTotal = availableItems
     .filter(i => cart[i.book_id])
