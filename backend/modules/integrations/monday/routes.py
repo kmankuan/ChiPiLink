@@ -211,3 +211,24 @@ async def update_memberships_monday_config(data: dict, admin: dict = Depends(get
     from modules.users.integrations.monday_memberships_adapter import memberships_monday_adapter
     await memberships_monday_adapter.save_config(data.get("config", {}))
     return {"success": True, "message": "Memberships Monday config updated"}
+
+
+# ============== WALLET ADAPTER CONFIG ROUTES ==============
+
+
+@router.get("/adapters/wallet/config")
+async def get_wallet_monday_config(admin: dict = Depends(get_admin_user)):
+    """Get Wallet Monday.com adapter configuration"""
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+    config = await wallet_monday_adapter.get_config()
+    return {"config": config, "module": "wallet"}
+
+
+@router.put("/adapters/wallet/config")
+async def update_wallet_monday_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Update Wallet Monday.com adapter configuration"""
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+    await wallet_monday_adapter.save_config(data.get("config", {}))
+    # Re-register webhook with new board_id
+    await wallet_monday_adapter.register_webhooks()
+    return {"success": True, "message": "Wallet Monday config updated"}
