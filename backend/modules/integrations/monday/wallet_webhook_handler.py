@@ -30,7 +30,6 @@ async def handle_wallet_topup_webhook(event: Dict) -> Dict:
     logger.info(f"[wallet_webhook] Received event: {event}")
     
     pulse_id = event.get("pulseId") or event.get("itemId")
-    board_id = str(event.get("boardId", ""))
     
     if not pulse_id:
         return {"status": "error", "detail": "No pulseId/itemId in event"}
