@@ -110,8 +110,8 @@ export default function PrivateBookDetail() {
 
   // Check if this book is for any of the user's linked students
   const getMatchingStudents = () => {
-    if (!acceso?.estudiantes || !libro?.grade) return [];
-    return acceso.estudiantes.filter(e => e.grade === libro.grade);
+    if (!acceso?.estudiantes || !book?.grade) return [];
+    return acceso.estudiantes.filter(e => e.grade === book.grade);
   };
 
   if (loading) {
@@ -131,7 +131,7 @@ export default function PrivateBookDetail() {
         <h2 className="text-2xl font-bold mb-3">Acceso Restringido</h2>
         <p className="text-muted-foreground mb-6">
           Este catálogo es exclusivo para acudientes con estudiantes vinculados.
-          Vincula a tu estudiante para acceder a los libros de texto.
+          Link your student to access textbooks.
         </p>
         <div className="flex gap-3 justify-center">
           <Button variant="outline" onClick={() => navigate('/unatienda')}>
@@ -145,11 +145,11 @@ export default function PrivateBookDetail() {
     );
   }
 
-  if (!libro) {
+  if (!book) {
     return (
       <div className="container mx-auto px-4 py-16 max-w-lg text-center">
         <BookOpen className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Libro no encontrado</h2>
+        <h2 className="text-xl font-semibold mb-2">Book no encontrado</h2>
         <Button variant="outline" onClick={() => navigate('/unatienda?tab=privado')}>
           Volver al Catálogo
         </Button>
@@ -160,7 +160,7 @@ export default function PrivateBookDetail() {
   const matchingStudents = getMatchingStudents();
   const inCart = isInCart();
   const cartQty = getCartQuantity();
-  const finalPrice = libro.sale_price || libro.price;
+  const finalPrice = book.sale_price || book.price;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
@@ -169,16 +169,16 @@ export default function PrivateBookDetail() {
           {/* Book Image */}
           <div className="space-y-4">
             <div className="aspect-[3/4] bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl flex items-center justify-center overflow-hidden border">
-              {libro.image_url ? (
+              {book.image_url ? (
                 <img 
-                  src={libro.image_url} 
-                  alt={libro.name}
+                  src={book.image_url} 
+                  alt={book.name}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="text-center p-8">
                   <BookOpen className="h-24 w-24 text-purple-400 mx-auto mb-4" />
-                  <p className="text-purple-600 font-medium">{libro.subject || 'Libro de Texto'}</p>
+                  <p className="text-purple-600 font-medium">{book.subject || 'Textbook'}</p>
                 </div>
               )}
             </div>
@@ -198,14 +198,14 @@ export default function PrivateBookDetail() {
             <div className="flex flex-wrap gap-2">
               <Badge className="bg-purple-100 text-purple-700 border-purple-200">
                 <GraduationCap className="h-3 w-3 mr-1" />
-                {libro.grade}
+                {book.grade}
               </Badge>
-              {libro.subject && (
+              {book.subject && (
                 <Badge variant="secondary">
-                  {libro.subject}
+                  {book.subject}
                 </Badge>
               )}
-              {libro.featured && (
+              {book.featured && (
                 <Badge className="bg-amber-100 text-amber-700 border-amber-200">
                   Destacado
                 </Badge>
@@ -214,32 +214,32 @@ export default function PrivateBookDetail() {
 
             {/* Title */}
             <div>
-              <h1 className="text-3xl font-bold mb-2">{libro.name}</h1>
-              {libro.publisher && (
+              <h1 className="text-3xl font-bold mb-2">{book.name}</h1>
+              {book.publisher && (
                 <p className="text-lg text-muted-foreground flex items-center gap-2">
                   <Building2 className="h-4 w-4" />
-                  {libro.publisher}
+                  {book.publisher}
                 </p>
               )}
             </div>
 
             {/* Description */}
-            {libro.description && (
-              <p className="text-muted-foreground">{libro.description}</p>
+            {book.description && (
+              <p className="text-muted-foreground">{book.description}</p>
             )}
 
             {/* Codes */}
             <div className="flex flex-wrap gap-4 text-sm">
-              {libro.code && (
+              {book.code && (
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <Hash className="h-4 w-4" />
-                  <span>Código: {libro.code}</span>
+                  <span>Code: {book.code}</span>
                 </div>
               )}
-              {libro.isbn && (
+              {book.isbn && (
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <Tag className="h-4 w-4" />
-                  <span>ISBN: {libro.isbn}</span>
+                  <span>ISBN: {book.isbn}</span>
                 </div>
               )}
             </div>
@@ -254,7 +254,7 @@ export default function PrivateBookDetail() {
                     <Users className="h-5 w-5 text-green-600 mt-0.5" />
                     <div>
                       <p className="font-medium text-green-700 dark:text-green-300 mb-1">
-                        Este libro es para:
+                        This book is for:
                       </p>
                       <div className="space-y-1">
                         {matchingStudents.map(student => (
@@ -275,15 +275,15 @@ export default function PrivateBookDetail() {
                 <span className="text-4xl font-bold text-primary">
                   ${finalPrice?.toFixed(2)}
                 </span>
-                {libro.sale_price && libro.sale_price < libro.price && (
+                {book.sale_price && book.sale_price < book.price && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${libro.price?.toFixed(2)}
+                    ${book.price?.toFixed(2)}
                   </span>
                 )}
               </div>
-              {libro.sale_price && libro.sale_price < libro.price && (
+              {book.sale_price && book.sale_price < book.price && (
                 <Badge className="bg-green-100 text-green-700">
-                  Ahorras ${(libro.price - libro.sale_price).toFixed(2)}
+                  You save ${(book.price - book.sale_price).toFixed(2)}
                 </Badge>
               )}
             </div>
@@ -368,7 +368,7 @@ export default function PrivateBookDetail() {
                   <div className="text-sm text-muted-foreground">
                     <p className="font-medium text-foreground mb-1">Información de Compra</p>
                     <p>
-                      Los libros del catálogo privado se procesan como pre-orden. 
+                      Private catalog books are processed as pre-orders. 
                       Te contactaremos para coordinar la entrega y el pago una vez confirmado el pedido.
                     </p>
                   </div>
