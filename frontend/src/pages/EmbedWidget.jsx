@@ -707,6 +707,15 @@ export default function EmbedWidget() {
     window.parent.postMessage({ type: 'chipi-widget-close' }, '*');
   };
 
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+    setStudents(null);
+    toast.success('Logged out');
+  }, []);
+
   const reloadStudents = () => {
     if (!token) return;
     axios.get(`${API_URL}/api/store/textbook-access/my-students`, {
