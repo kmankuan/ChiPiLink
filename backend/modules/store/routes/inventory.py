@@ -221,6 +221,7 @@ async def adjust_stock(
         "quantity_change": adjustment.quantity_change,
         "old_quantity": old_qty,
         "new_quantity": new_qty,
+        "presale_fulfilled": fulfilled,
         "reason": adjustment.reason,
         "notes": adjustment.notes,
         "admin_id": admin.get("user_id"),
@@ -229,13 +230,17 @@ async def adjust_stock(
     }
     await db.inventory_movements.insert_one(movement)
 
-    return {
+    result = {
         "success": True,
         "book_id": adjustment.book_id,
         "old_quantity": old_qty,
         "new_quantity": new_qty,
         "movement_id": movement["movement_id"],
     }
+    if fulfilled > 0:
+        result["presale_fulfilled"] = fulfilled
+        result["remaining_presale"] = new_reserved
+    return result
 
 
 @router.post("/adjust/batch")
