@@ -858,7 +858,7 @@ export default function EmbedWidget() {
   const maintenance = config?.maintenance || {};
   if (maintenance.active) {
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden w-full max-w-full" data-testid="widget-maintenance">
+      <div className={widgetShellClass} data-testid="widget-maintenance">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
           <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
@@ -881,7 +881,7 @@ export default function EmbedWidget() {
   // ── Not logged in ──
   if (!token) {
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
+      <div className={widgetShellClass} data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
           <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
