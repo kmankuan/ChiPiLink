@@ -87,6 +87,7 @@ class SubmitOrderRequest(BaseModel):
     form_data: Optional[dict] = None
     uploaded_files: Optional[dict] = None
     notes: Optional[str] = None
+    payment_method: Optional[str] = None  # "wallet" for wallet payment
 
 
 class StudentOrderResponse(BaseModel):
