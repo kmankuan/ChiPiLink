@@ -878,12 +878,12 @@ export default function EmbedWidget() {
   // ── Not logged in ──
   if (!token) {
     return (
-      <div className="h-screen flex flex-col bg-background text-foreground" data-testid="widget-shell">
+      <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full" data-testid="widget-shell">
         <Toaster position="top-center" richColors />
         {!hideNavbar && (
           <WidgetHeader user={null} hideUrl={hideUrlBar} onClose={closeWidget} onLogout={null} />
         )}
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           <LoginPrompt />
         </div>
       </div>
