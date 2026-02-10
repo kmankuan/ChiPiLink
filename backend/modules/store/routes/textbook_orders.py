@@ -437,10 +437,11 @@ async def diagnostic_textbooks(
     with_catalogo = await db.store_products.count_documents({"catalogo_privado": {"$exists": True}})
     with_grado = await db.store_products.count_documents({"grado": {"$exists": True}})
     
-    # Products that should show (active + private catalog)
+    # Products that should show (active, any catalog, with valid grade)
     visible_products = await db.store_products.count_documents({
         "active": True,
-        "is_private_catalog": True
+        "archived": {"$ne": True},
+        "grade": {"$exists": True, "$ne": None, "$ne": "N/A"}
     })
     
     result["products"] = {
