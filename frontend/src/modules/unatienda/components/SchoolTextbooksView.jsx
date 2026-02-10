@@ -251,7 +251,7 @@ export default function SchoolTextbooksView({
       purchased: 'Comprado', reorderPending: 'Reorden pendiente',
       available: 'Disponible', outOfStock: 'Agotado',
       submitOrder: 'Enviar Pedido', orderSuccess: '¡Pedido enviado correctamente!',
-      orderError: 'Error al enviar el pedido', selectAtLeastOne: 'Selecciona al menos un libro',
+      orderError: 'Error submitting order', selectAtLeastOne: 'Select at least one book',
       total: 'Total', itemsOf: 'de',
       requestReorder: 'Solicitar Reorden', reorderReason: 'Motivo de la reorden',
       reorderSuccess: 'Reorden solicitada', reorderError: 'Error al solicitar reorden',
