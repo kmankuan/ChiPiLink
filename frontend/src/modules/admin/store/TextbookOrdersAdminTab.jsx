@@ -679,6 +679,22 @@ export default function TextbookOrdersAdminTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Action Bar — Archive only (orders are financial records) */}
+      <BulkActionBar count={orderSelection.count} onClear={orderSelection.clear}
+        onArchive={() => setConfirmArchive(true)}
+        loading={bulkLoading} />
+
+      <ConfirmDialog
+        open={confirmArchive}
+        onClose={() => setConfirmArchive(false)}
+        onConfirm={handleBulkArchiveOrders}
+        title={`Archive ${orderSelection.count} order(s)?`}
+        description="Archived orders are hidden from view but preserved for records. This can be reversed."
+        variant="warning"
+        confirmLabel="Archive"
+        loading={bulkLoading}
+      />
     </div>
   );
 }
