@@ -69,6 +69,7 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
   { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+  { id: 'wallet', label: 'Wallet', icon: Wallet, permission: 'admin.site_config' },
   { id: 'analytics', label: 'Reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
   { id: 'customers', label: 'Users', icon: Users, permission: 'users.view' },
   { id: 'memberships', label: 'Memberships', icon: CreditCard, permission: 'memberships.view' },
