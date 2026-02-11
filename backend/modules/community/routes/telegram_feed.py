@@ -12,7 +12,7 @@ from core.database import db
 from modules.community.services.telegram_service import telegram_service
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/community", tags=["Community"])
+router = APIRouter(prefix="/feed", tags=["Community Feed"])
 
 
 # ---- Feed ----
