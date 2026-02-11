@@ -129,7 +129,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
             await self._log_event(event, "ignored", msg)
             return {"status": "ignored", "reason": msg}
 
-        # Fetch item data (email, amount, note — all at item level)
+        # Fetch item data (email, amounts — all at item level)
         item_data = await self._fetch_item(item_id, column_mapping)
         if not item_data:
             msg = f"Could not fetch item {item_id}"
@@ -137,8 +137,13 @@ class WalletMondayAdapter(BaseMondayAdapter):
             return {"status": "error", "detail": msg}
 
         email = item_data.get("email")
-        amount = item_data.get("amount")
         note = item_data.get("note", "")
+
+        # Pick amount from the correct column based on action
+        if action == "topup":
+            amount = item_data.get("amount_topup") or item_data.get("amount_deduct")
+        else:
+            amount = item_data.get("amount_deduct") or item_data.get("amount_topup")
 
         if not email:
             msg = f"No email found on item {item_id}"
