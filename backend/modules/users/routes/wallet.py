@@ -643,6 +643,58 @@ async def delete_user(user_id: str, admin=Depends(get_admin_user)):
     return {"status": "deleted", "user_id": user_id, "email": user.get("email")}
 
 
+@router.post("/admin/users/bulk-delete")
+async def bulk_delete_users(data: dict, admin=Depends(get_admin_user)):
+    """Bulk delete non-admin users and their wallet data"""
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+
+    # Exclude admins
+    admins = await db.auth_users.find(
+        {"user_id": {"$in": user_ids}, "is_admin": True}, {"_id": 0, "user_id": 1}
+    ).to_list(100)
+    admin_ids = {a["user_id"] for a in admins}
+    safe_ids = [uid for uid in user_ids if uid not in admin_ids]
+
+    if not safe_ids:
+        raise HTTPException(status_code=403, detail="All selected users are admins")
+
+    r = await db.auth_users.delete_many({"user_id": {"$in": safe_ids}})
+    await db.chipi_wallets.delete_many({"user_id": {"$in": safe_ids}})
+    await db.wallet_transactions.delete_many({"user_id": {"$in": safe_ids}})
+
+    return {"status": "deleted", "count": r.deleted_count, "skipped_admins": len(admin_ids)}
+
+
+@router.post("/admin/users/bulk-archive")
+async def bulk_archive_users(data: dict, admin=Depends(get_admin_user)):
+    """Archive users (soft-delete: marks as archived, preserves data)"""
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+
+    r = await db.auth_users.update_many(
+        {"user_id": {"$in": user_ids}, "is_admin": {"$ne": True}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/transactions/bulk-archive")
+async def bulk_archive_transactions(data: dict, admin=Depends(get_admin_user)):
+    """Archive transactions (soft-delete)"""
+    transaction_ids = data.get("transaction_ids", [])
+    if not transaction_ids:
+        raise HTTPException(status_code=400, detail="No transactions specified")
+
+    r = await db.wallet_transactions.update_many(
+        {"transaction_id": {"$in": transaction_ids}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
+
 
 # ============== BANK INFO ==============
 
