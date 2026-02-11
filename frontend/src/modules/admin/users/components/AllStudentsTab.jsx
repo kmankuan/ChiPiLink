@@ -128,6 +128,8 @@ export default function AllStudentsTab({ token }) {
     return matchesSearch && matchesStatus && matchesSchool;
   });
 
+  const studentSelection = useTableSelection(filteredStudents, 'student_id');
+
   // Stats
   const totalStudents = students.length;
   const approvedCount = students.filter(s => s.status === 'approved').length;
