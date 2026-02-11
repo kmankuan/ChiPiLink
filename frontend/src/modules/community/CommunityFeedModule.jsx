@@ -77,7 +77,7 @@ function PostCard({ post, token, onUpdate }) {
     }
   };
 
-  const mediaUrl = (fileId) => `${API_URL}/api/community-v2/feed/media/${fileId}?token=${token}`;
+  const mediaUrl = (fileId) => `${API_URL}/api/community-v2/feed/media/${fileId}`;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
