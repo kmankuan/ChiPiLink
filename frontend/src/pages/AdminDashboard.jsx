@@ -39,7 +39,8 @@ import {
   QrCode,
   Shield,
   BarChart2,
-  Wallet
+  Wallet,
+  Rss
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
