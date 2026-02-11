@@ -58,10 +58,6 @@ export default function UsersManagementModule() {
             <Settings2 className="h-4 w-4" />
             Config. Formularios
           </TabsTrigger>
-          <TabsTrigger value="wallets" className="gap-2">
-            <Wallet className="h-4 w-4" />
-            Wallets
-          </TabsTrigger>
         </TabsList>
 
         {/* Student Link Requests */}
