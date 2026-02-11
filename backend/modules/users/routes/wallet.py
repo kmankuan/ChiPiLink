@@ -16,6 +16,20 @@ from modules.users.models.wallet_models import (
 router = APIRouter(prefix="/wallet", tags=["Wallet"])
 
 
+DEFAULTS = {
+    "topup": "Wallet top-up",
+    "deduct": "Wallet deduction",
+}
+
+async def _get_default_description(action: str) -> str:
+    """Get the admin-configurable default description for wallet transactions."""
+    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
+    if doc and doc.get("descriptions", {}).get(action):
+        return doc["descriptions"][action]
+    return DEFAULTS.get(action, "Wallet transaction")
+
+
+
 # ============== PYDANTIC MODELS ==============
 
 class DepositRequest(BaseModel):
