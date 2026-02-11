@@ -82,6 +82,8 @@ export default function WalletOverviewTab({ token }) {
       toast.error(error.response?.data?.detail || 'Error adjusting wallet');
     } finally {
       setAdjusting(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!deleteDialog) return;
@@ -97,9 +99,6 @@ export default function WalletOverviewTab({ token }) {
       toast.error(error.response?.data?.detail || 'Error deleting user');
     } finally {
       setDeleting(false);
-    }
-  };
-
     }
   };
 
