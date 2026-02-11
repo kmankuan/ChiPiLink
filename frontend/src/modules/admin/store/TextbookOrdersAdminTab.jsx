@@ -33,6 +33,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
   Package,
@@ -47,8 +48,12 @@ import {
   Search,
   Eye,
   Users,
-  BarChart3
+  BarChart3,
+  Archive
 } from 'lucide-react';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
