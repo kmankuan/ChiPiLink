@@ -35,8 +35,13 @@ import {
   GraduationCap,
   School,
   Filter,
-  Download
+  Download,
+  Archive
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
