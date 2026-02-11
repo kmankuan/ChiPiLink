@@ -100,6 +100,17 @@
 - **Bank Info API**: CRUD at `/api/wallet/admin/bank-info`, public `GET /api/wallet/bank-info/{context}`
 - Old "Wallets" tab removed from Users module
 
+## Monday.com Wallet Webhook Fix (Feb 11)
+- **Root Cause**: DB config pointed to OLD board `5931665026` instead of new "Chipi Wallet" board `18399650704`. Webhook handler was registered for wrong board at startup.
+- **Fixes**:
+  - Updated DB config (board_id, column_mapping, subitem_column_mapping) to new board
+  - Added dynamic webhook handler fallback in `webhook_router.py` — checks wallet config at runtime if no startup match
+  - Added raw request logging (`monday_webhook_raw_logs` collection) — logs every incoming hit including challenges
+  - Added manual "Test Wallet Webhook" admin endpoint (`POST /api/monday/adapters/wallet/test-webhook`)
+  - Added "Raw Incoming Requests" debug section in admin UI
+  - Handler cleanup: `register_webhooks()` now unregisters old handlers before registering new one
+- **User Action Required**: Monday.com automations show 0 sends — user needs to delete & recreate automations to trigger fresh URL challenge verification
+
 ## Upcoming Tasks
 - Transaction history view for clients in the widget
 - Wallet balance notifications (low balance alerts)
