@@ -84,11 +84,6 @@ export default function UsersManagementModule() {
         <TabsContent value="form-config" className="space-y-4">
           <FormFieldsConfigTab token={localStorage.getItem('auth_token')} />
         </TabsContent>
-
-        {/* Wallet Management Tab */}
-        <TabsContent value="wallets" className="space-y-4">
-          <AdminWalletTab token={localStorage.getItem('auth_token')} />
-        </TabsContent>
       </Tabs>
     </div>
   );
