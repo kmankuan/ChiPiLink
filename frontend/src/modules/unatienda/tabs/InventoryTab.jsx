@@ -322,7 +322,7 @@ export default function InventoryTab({ token }) {
                     );
                   })}
                   {products.length === 0 && (
-                    <tr><td colSpan={6} className="text-center text-muted-foreground text-sm py-8">No products found</td></tr>
+                    <tr><td colSpan={7} className="text-center text-muted-foreground text-sm py-8">No products found</td></tr>
                   )}
                 </tbody>
               </table>
