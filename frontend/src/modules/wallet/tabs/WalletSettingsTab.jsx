@@ -31,7 +31,7 @@ export default function WalletSettingsTab() {
 
   const [config, setConfig] = useState({
     board_id: '',
-    column_mapping: { email: '', amount: '', note: '', status: '' },
+    column_mapping: { email: '', amount_topup: '', amount_deduct: '', note: '', status: '' },
     status_labels: { add: 'Added', deduct: 'Deducted', stuck: 'Stuck' },
     enabled: true,
   });
