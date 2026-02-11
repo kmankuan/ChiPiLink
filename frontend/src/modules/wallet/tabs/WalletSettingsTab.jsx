@@ -142,12 +142,13 @@ export default function WalletSettingsTab() {
         <CardContent className="p-4 flex gap-2">
           <Info className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
           <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-            <p className="font-medium">Wallet Top-Up Workflow (Item-Level):</p>
+            <p className="font-medium">How it works (Item-Level Trigger):</p>
             <ol className="list-decimal list-inside space-y-0.5 text-xs">
-              <li>Select the board where wallet transactions are managed</li>
-              <li>Map the columns: Email, Amount, Note, Status</li>
-              <li>Create a Monday.com automation: <strong>"When Status changes to Added → send webhook"</strong></li>
-              <li>Each item = one wallet transaction. Set email, amount, then change Status</li>
+              <li>Each item on the board = one wallet transaction</li>
+              <li>Fill in: Email + Top Up amount (or Deduct amount)</li>
+              <li>Monday.com automation: <strong>"When Status changes to Added → send webhook"</strong></li>
+              <li>Create a second automation: <strong>"When Status changes to Deducted → send webhook"</strong></li>
+              <li>Both automations point to the webhook URL below</li>
             </ol>
           </div>
         </CardContent>
