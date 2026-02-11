@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import {
   ArrowUpCircle, ArrowDownCircle, Search, Loader2,
-  RefreshCw, DollarSign, Users, TrendingUp
+  RefreshCw, DollarSign, Users, TrendingUp, Trash2
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
