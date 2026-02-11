@@ -4,7 +4,6 @@ Monday.com Integration Routes
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timezone
 import httpx
-import logging as _logging
 import json
 import logging
 
