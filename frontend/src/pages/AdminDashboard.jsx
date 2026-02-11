@@ -166,6 +166,8 @@ export default function AdminDashboard() {
         return <RolesModule />;
       case 'admin':
         return <AdminModule />;
+      case 'community':
+        return <CommunityFeedModule />;
       case 'integrations':
         return <IntegrationsModule />;
       default:
