@@ -222,11 +222,11 @@ export default function WalletSettingsTab() {
                     </SelectContent>
                   </Select>
                 </div>
-                {/* Amount */}
+                {/* Top Up Amount */}
                 <div className="space-y-1">
-                  <Label className="text-sm">Amount Column (number)</Label>
-                  <Select value={config.column_mapping?.amount || ''} onValueChange={(v) => updateMapping('amount', v)}>
-                    <SelectTrigger data-testid="amount-column-selector"><SelectValue placeholder="Select amount column" /></SelectTrigger>
+                  <Label className="text-sm">Top Up Amount Column (number)</Label>
+                  <Select value={config.column_mapping?.amount_topup || ''} onValueChange={(v) => updateMapping('amount_topup', v)}>
+                    <SelectTrigger data-testid="topup-column-selector"><SelectValue placeholder="Select top-up amount column" /></SelectTrigger>
                     <SelectContent>
                       {numberColumns.map(c => (
                         <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
@@ -234,12 +234,25 @@ export default function WalletSettingsTab() {
                     </SelectContent>
                   </Select>
                 </div>
-                {/* Note */}
+                {/* Deduct Amount */}
                 <div className="space-y-1">
-                  <Label className="text-sm">Note / Description Column (text)</Label>
-                  <Select value={config.column_mapping?.note || ''} onValueChange={(v) => updateMapping('note', v)}>
-                    <SelectTrigger data-testid="note-column-selector"><SelectValue placeholder="Select note column" /></SelectTrigger>
+                  <Label className="text-sm">Deduct Amount Column (number)</Label>
+                  <Select value={config.column_mapping?.amount_deduct || ''} onValueChange={(v) => updateMapping('amount_deduct', v)}>
+                    <SelectTrigger data-testid="deduct-column-selector"><SelectValue placeholder="Select deduct amount column" /></SelectTrigger>
                     <SelectContent>
+                      {numberColumns.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Note (optional) */}
+                <div className="space-y-1">
+                  <Label className="text-sm">Note Column <span className="text-muted-foreground">(optional)</span></Label>
+                  <Select value={config.column_mapping?.note || 'none'} onValueChange={(v) => updateMapping('note', v === 'none' ? '' : v)}>
+                    <SelectTrigger data-testid="note-column-selector"><SelectValue placeholder="Select note column (optional)" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— None —</SelectItem>
                       {textColumns.map(c => (
                         <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
                       ))}
