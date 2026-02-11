@@ -2,20 +2,21 @@
 Wallet Monday.com Adapter
 Handles wallet top-up / deduction events from the "Customers Admin" board.
 
-Board structure:
-  - Items = Customers (identified by email column)
-  - Subitems = Wallet events (bank transfers, adjustments, etc.)
-    - "Chipi Wallet" column = amount (positive = top-up, negative = deduct)
-    - "Chipi Note" column = description/annotation
-    - Status column = "Add Wallet" or "Deduct Wallet"
+Board structure (Customers Admin - 5931665026):
+  - Items = Customers (email column: "email")
+  - Subitems (Board 6796416579) = Wallet events
+    - "Chipi Wallet" (numeric_mm0ep8ka) = amount
+    - "Wallet Event" (color_mm0ewpq0) = status: "Added", "Deducted", "Stuck"
+    - "Nota" (text_mkwrw3fp) = description
 
 Webhook triggers:
-  - Subitem status change to "Add Wallet" → deposit to user's wallet
-  - Subitem status change to "Deduct Wallet" → charge from user's wallet
+  - Subitem "Wallet Event" status → "Added" = deposit to wallet
+  - Subitem "Wallet Event" status → "Deducted" = charge from wallet
 
 Config namespace: users.wallet.*
 """
 import logging
+from datetime import datetime, timezone
 from typing import Dict, Optional
 
 from modules.integrations.monday.base_adapter import BaseMondayAdapter
@@ -31,35 +32,38 @@ class WalletMondayAdapter(BaseMondayAdapter):
     MODULE = "users"
     ENTITY = "wallet"
 
-    # Status labels that trigger wallet operations
-    STATUS_ADD = "Add Wallet"
-    STATUS_DEDUCT = "Deduct Wallet"
-
-    # Default column mapping (admin can override via config)
+    # Default column IDs (matched to actual board)
     DEFAULT_COLUMN_MAPPING = {
-        "email": "email",           # email column on parent item (customer)
+        "email": "email",
     }
 
     DEFAULT_SUBITEM_COLUMN_MAPPING = {
-        "amount": "chipi_wallet",   # column id for Chipi Wallet (numbers)
-        "note": "chipi_note",       # column id for Chipi Note (text)
-        "status": "status",         # status column
+        "amount": "numeric_mm0ep8ka",     # Chipi Wallet
+        "note": "text_mkwrw3fp",          # Nota
+        "status": "color_mm0ewpq0",       # Wallet Event
+    }
+
+    # Default status labels (configurable)
+    DEFAULT_STATUS_LABELS = {
+        "add": "Added",
+        "deduct": "Deducted",
+        "stuck": "Stuck",
     }
 
     async def get_config(self) -> Dict:
-        """Get full wallet Monday config"""
         board = await self.get_board_config()
         mapping = await self.get_custom_config("column_mapping")
         subitem_mapping = await self.get_custom_config("subitem_column_mapping")
+        status_labels = await self.get_custom_config("status_labels")
         return {
             "board_id": board.get("board_id"),
             "column_mapping": mapping.get("mapping", self.DEFAULT_COLUMN_MAPPING),
             "subitem_column_mapping": subitem_mapping.get("mapping", self.DEFAULT_SUBITEM_COLUMN_MAPPING),
+            "status_labels": status_labels.get("labels", self.DEFAULT_STATUS_LABELS),
             "enabled": board.get("enabled", True),
         }
 
     async def save_config(self, data: Dict) -> bool:
-        """Save full wallet Monday config"""
         await self.save_board_config({
             "board_id": data.get("board_id"),
             "enabled": data.get("enabled", True),
@@ -68,76 +72,107 @@ class WalletMondayAdapter(BaseMondayAdapter):
             await self.save_custom_config("column_mapping", {"mapping": data["column_mapping"]})
         if "subitem_column_mapping" in data:
             await self.save_custom_config("subitem_column_mapping", {"mapping": data["subitem_column_mapping"]})
+        if "status_labels" in data:
+            await self.save_custom_config("status_labels", {"labels": data["status_labels"]})
         return True
+
+    # ---- Webhook Event Logging ----
+
+    async def _log_event(self, event: Dict, status: str, detail: str = "", result: Dict = None):
+        """Log webhook event for admin debugging"""
+        doc = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "event_type": "wallet_webhook",
+            "status": status,
+            "detail": detail,
+            "event_data": {
+                "boardId": event.get("boardId"),
+                "pulseId": event.get("pulseId"),
+                "parentItemId": event.get("parentItemId"),
+                "columnId": event.get("columnId"),
+            },
+            "result": result,
+        }
+        await db.wallet_webhook_logs.insert_one(doc)
 
     # ---- Webhook Handler ----
 
     async def handle_webhook(self, event: Dict) -> Dict:
-        """
-        Handle incoming Monday.com webhook for wallet events.
-        
-        Monday.com sends subitem column change events with:
-          - boardId: main board
-          - pulseId: the subitem ID
-          - parentItemId: the customer item ID
-          - columnId: which column changed
-          - value: new column value
-        """
+        """Handle incoming Monday.com webhook for wallet events."""
         subitem_id = str(event.get("pulseId", ""))
         parent_item_id = str(event.get("parentItemId", ""))
         column_id = event.get("columnId", "")
 
         logger.info(
-            f"[wallet_webhook] Event: subitem={subitem_id}, "
+            f"[wallet_webhook] Event received: subitem={subitem_id}, "
             f"parent={parent_item_id}, column={column_id}"
         )
 
-        # Only process status column changes
         config = await self.get_config()
         subitem_mapping = config.get("subitem_column_mapping", self.DEFAULT_SUBITEM_COLUMN_MAPPING)
-        status_col_id = subitem_mapping.get("status", "status")
+        status_col_id = subitem_mapping.get("status", "color_mm0ewpq0")
+        status_labels = config.get("status_labels", self.DEFAULT_STATUS_LABELS)
 
-        # Check if this is a status change
+        # Only process the wallet event status column
         if column_id and column_id != status_col_id:
-            return {"status": "ignored", "reason": f"Column {column_id} is not the status column"}
+            msg = f"Column {column_id} is not wallet status column ({status_col_id})"
+            logger.info(f"[wallet_webhook] Ignored: {msg}")
+            await self._log_event(event, "ignored", msg)
+            return {"status": "ignored", "reason": msg}
 
         # Determine action from status label
         new_value = event.get("value", {})
         status_label = self._extract_status_label(new_value)
+        logger.info(f"[wallet_webhook] Status label: '{status_label}'")
 
-        if status_label not in (self.STATUS_ADD, self.STATUS_DEDUCT):
-            return {"status": "ignored", "reason": f"Status '{status_label}' is not a wallet action"}
+        add_label = status_labels.get("add", "Added")
+        deduct_label = status_labels.get("deduct", "Deducted")
 
-        action = "topup" if status_label == self.STATUS_ADD else "deduct"
+        if status_label == add_label:
+            action = "topup"
+        elif status_label == deduct_label:
+            action = "deduct"
+        else:
+            msg = f"Status '{status_label}' doesn't match '{add_label}' or '{deduct_label}'"
+            logger.info(f"[wallet_webhook] Ignored: {msg}")
+            await self._log_event(event, "ignored", msg)
+            return {"status": "ignored", "reason": msg}
 
-        # Fetch subitem details to get amount and note
+        # Fetch subitem details
         subitem_data = await self._fetch_subitem(subitem_id, subitem_mapping)
         if not subitem_data:
-            return {"status": "error", "detail": f"Could not fetch subitem {subitem_id}"}
+            msg = f"Could not fetch subitem {subitem_id}"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
 
         amount = subitem_data.get("amount")
         note = subitem_data.get("note", "")
 
         if not amount or amount == 0:
-            return {"status": "error", "detail": "Amount is zero or missing in Chipi Wallet column"}
+            msg = "Amount is zero or missing in Chipi Wallet column"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
 
-        # Use absolute value — the status determines the action
         amount = abs(amount)
 
-        # Fetch parent item to identify the customer
+        # Fetch parent item for customer email
         column_mapping = config.get("column_mapping", self.DEFAULT_COLUMN_MAPPING)
         customer_email = await self._fetch_customer_email(parent_item_id, column_mapping)
         if not customer_email:
-            return {"status": "error", "detail": f"Could not find email for customer item {parent_item_id}"}
+            msg = f"Could not find email for customer item {parent_item_id}"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
 
-        # Find user by email
+        # Find user
         user = await db.auth_users.find_one(
             {"email": {"$regex": f"^{customer_email}$", "$options": "i"}},
             {"_id": 0, "user_id": 1, "email": 1, "name": 1}
         )
         if not user:
-            logger.warning(f"[wallet_webhook] User not found for email: {customer_email}")
-            return {"status": "error", "detail": f"User not found: {customer_email}"}
+            msg = f"User not found: {customer_email}"
+            logger.warning(f"[wallet_webhook] {msg}")
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
 
         user_id = user["user_id"]
 
@@ -162,17 +197,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
                     reference_id=f"monday_subitem_{subitem_id}"
                 )
 
-            logger.info(
-                f"[wallet_webhook] Wallet {action}: user={user_id}, "
-                f"amount=${amount:.2f}, txn={transaction.get('transaction_id')}"
-            )
-
-            # Post confirmation back to Monday.com item
-            await self._post_confirmation(
-                parent_item_id, action, amount, user.get("name", customer_email)
-            )
-
-            return {
+            result = {
                 "status": "success",
                 "action": action,
                 "user_id": user_id,
@@ -181,14 +206,25 @@ class WalletMondayAdapter(BaseMondayAdapter):
                 "transaction_id": transaction.get("transaction_id")
             }
 
+            logger.info(
+                f"[wallet_webhook] Wallet {action}: user={user_id}, "
+                f"amount=${amount:.2f}, txn={transaction.get('transaction_id')}"
+            )
+
+            await self._log_event(event, "success", f"{action} ${amount:.2f} for {customer_email}", result)
+            await self._post_confirmation(parent_item_id, action, amount, user.get("name", customer_email))
+
+            return result
+
         except ValueError as e:
-            logger.error(f"[wallet_webhook] Wallet {action} failed: {e}")
+            msg = f"Wallet {action} failed: {e}"
+            logger.error(f"[wallet_webhook] {msg}")
+            await self._log_event(event, "error", msg)
             return {"status": "error", "detail": str(e)}
 
     # ---- Helper Methods ----
 
     def _extract_status_label(self, value) -> str:
-        """Extract status label text from Monday.com column value"""
         if isinstance(value, dict):
             label = value.get("label", {})
             if isinstance(label, dict):
@@ -209,7 +245,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
         return ""
 
     async def _fetch_subitem(self, subitem_id: str, subitem_mapping: Dict) -> Optional[Dict]:
-        """Fetch subitem column values from Monday.com"""
         try:
             data = await self.client.execute(
                 f"""query {{ items(ids: [{subitem_id}]) {{
@@ -222,27 +257,25 @@ class WalletMondayAdapter(BaseMondayAdapter):
                 return None
 
             result = {"name": items[0].get("name", "")}
-            amount_col = subitem_mapping.get("amount", "chipi_wallet")
-            note_col = subitem_mapping.get("note", "chipi_note")
+            amount_col = subitem_mapping.get("amount", "numeric_mm0ep8ka")
+            note_col = subitem_mapping.get("note", "text_mkwrw3fp")
 
             for col in items[0].get("column_values", []):
                 col_id = col.get("id", "")
-                col_title = (col.get("title") or "").lower()
                 text = col.get("text") or ""
 
-                # Match by column id or title
-                if col_id == amount_col or "chipi wallet" in col_title or "wallet" in col_title:
+                if col_id == amount_col:
                     result["amount"] = self._parse_number(text or col.get("value", ""))
-                elif col_id == note_col or "chipi note" in col_title or "note" in col_title:
+                elif col_id == note_col:
                     result["note"] = text
 
+            logger.info(f"[wallet_webhook] Subitem data: {result}")
             return result
         except Exception as e:
             logger.error(f"[wallet_webhook] Failed to fetch subitem {subitem_id}: {e}")
             return None
 
     async def _fetch_customer_email(self, item_id: str, column_mapping: Dict) -> Optional[str]:
-        """Fetch customer email from parent item"""
         try:
             data = await self.client.execute(
                 f"""query {{ items(ids: [{item_id}]) {{
@@ -258,11 +291,10 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
             for col in items[0].get("column_values", []):
                 col_id = col.get("id", "")
-                col_title = (col.get("title") or "").lower()
                 text = col.get("text") or ""
                 value = col.get("value") or ""
 
-                if col_id == email_col or "email" in col_title or "correo" in col_title:
+                if col_id == email_col:
                     return self._extract_email(text or value)
 
             return None
@@ -271,7 +303,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
             return None
 
     async def _post_confirmation(self, item_id: str, action: str, amount: float, user_name: str):
-        """Post a confirmation update to the Monday.com customer item"""
         try:
             action_text = "topped up" if action == "topup" else "deducted from"
             body = f"Wallet {action_text} ${amount:.2f} for {user_name}"
@@ -281,7 +312,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
     @staticmethod
     def _parse_number(value: str) -> Optional[float]:
-        """Parse a number from a Monday.com column value"""
         import re
         if not value:
             return None
@@ -302,7 +332,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
     @staticmethod
     def _extract_email(value: str) -> Optional[str]:
-        """Extract email from a Monday.com column value"""
         import re
         if not value:
             return None
@@ -320,7 +349,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
     # ---- Registration ----
 
     async def register_webhooks(self):
-        """Register webhook handler for configured board"""
         config = await self.get_config()
         board_id = config.get("board_id")
         if board_id:
