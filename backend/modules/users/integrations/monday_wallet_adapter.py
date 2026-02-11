@@ -81,6 +81,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
                 "boardId": event.get("boardId"),
                 "pulseId": event.get("pulseId"),
                 "columnId": event.get("columnId"),
+                "value": str(event.get("value", ""))[:200],
             },
             "result": result,
         }
