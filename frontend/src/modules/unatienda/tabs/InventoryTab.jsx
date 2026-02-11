@@ -177,6 +177,9 @@ export default function InventoryTab({ token }) {
   const [sortBy, setSortBy] = useState('name');
   const [sortDir, setSortDir] = useState('asc');
   const [adjustProduct, setAdjustProduct] = useState(null);
+  const [confirmBulk, setConfirmBulk] = useState(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const productSelection = useTableSelection(products, 'book_id');
   const [view, setView] = useState('overview'); // overview | history
 
   const headers = { Authorization: `Bearer ${token}` };
