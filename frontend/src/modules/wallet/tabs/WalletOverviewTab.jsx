@@ -234,6 +234,35 @@ export default function WalletOverviewTab({ token }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" /> Delete User
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <p className="text-sm mb-3">Are you sure you want to delete this user? This will permanently remove:</p>
+            <div className="p-3 bg-muted rounded-lg mb-3">
+              <p className="font-medium">{deleteDialog?.name || 'N/A'}</p>
+              <p className="text-sm text-muted-foreground">{deleteDialog?.email}</p>
+            </div>
+            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <li>User account</li>
+              <li>Wallet and balance</li>
+              <li>All transaction history</li>
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialog(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting} data-testid="confirm-delete-btn">
+              {deleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Delete User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
