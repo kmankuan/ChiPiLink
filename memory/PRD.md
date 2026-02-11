@@ -75,6 +75,7 @@
 - iter 71: Dynamic & Draggable columns (14/14)
 - iter 73: Wallet Payment System — backend 18/18, frontend 100%
 - iter 74: Wallet Admin Module — backend 19/19, frontend 100%
+- iter 75: Community Telegram Feed — backend 21/21, frontend 100%
 
 ## Wallet Payment System (Feb 10)
 - **Widget Payment Flow**: Users see wallet balance when ordering textbooks. "Pay with Wallet" button charges wallet atomically before creating order. Insufficient balance shows warning + bank transfer info.
