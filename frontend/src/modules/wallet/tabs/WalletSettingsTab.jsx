@@ -376,6 +376,11 @@ export default function WalletSettingsTab() {
         </Button>
       )}
 
+      {/* Test Webhook */}
+      {config.board_id && (
+        <TestWebhookCard headers={headers} />
+      )}
+
       {/* Webhook Logs */}
       <Card>
         <CardHeader className="pb-3">
@@ -421,6 +426,143 @@ export default function WalletSettingsTab() {
           )}
         </CardContent>
       </Card>
+
+      {/* Raw Request Log */}
+      <RawWebhookLogs headers={headers} />
     </div>
+  );
+}
+
+function TestWebhookCard({ headers }) {
+  const [email, setEmail] = useState('');
+  const [amount, setAmount] = useState('');
+  const [action, setAction] = useState('topup');
+  const [testing, setTesting] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const runTest = async () => {
+    if (!email || !amount) { toast.error('Email and amount are required'); return; }
+    setTesting(true);
+    setResult(null);
+    try {
+      const res = await axios.post(`${API}/api/monday/adapters/wallet/test-webhook`, {
+        email, amount: parseFloat(amount), action
+      }, { headers });
+      setResult(res.data);
+      toast.success(`Test ${action} of $${amount} for ${email} succeeded`);
+    } catch (err) {
+      setResult({ status: 'error', detail: err.response?.data?.detail || err.message });
+      toast.error(err.response?.data?.detail || 'Test failed');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <Card className="border-amber-200">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Search className="h-4 w-4" /> Test Wallet Webhook (Manual)
+        </CardTitle>
+        <CardDescription className="text-xs">
+          Bypass Monday.com and directly test wallet top-up/deduction for a user
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <Label className="text-xs">User Email</Label>
+            <Input value={email} onChange={e => setEmail(e.target.value)} placeholder="user@example.com" className="text-xs" data-testid="test-webhook-email" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Amount ($)</Label>
+            <Input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="10.00" className="text-xs" data-testid="test-webhook-amount" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Action</Label>
+            <Select value={action} onValueChange={setAction}>
+              <SelectTrigger className="text-xs" data-testid="test-webhook-action">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="topup">Top Up</SelectItem>
+                <SelectItem value="deduct">Deduct</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <Button onClick={runTest} disabled={testing} variant="outline" className="w-full gap-2 text-xs" data-testid="test-webhook-btn">
+          {testing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wallet className="h-3 w-3" />}
+          Run Test
+        </Button>
+        {result && (
+          <div className={`p-2 rounded text-xs ${result.status === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+            {result.status === 'success'
+              ? `${result.action} $${result.amount} for ${result.email} — Transaction OK`
+              : `Error: ${result.detail}`}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function RawWebhookLogs({ headers }) {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const fetchRaw = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/api/monday/adapters/wallet/raw-logs?limit=15`, { headers });
+      setLogs(res.data.logs || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { if (expanded) fetchRaw(); }, [expanded]);
+
+  return (
+    <Card>
+      <CardHeader className="pb-3 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-sm text-muted-foreground">
+            Raw Incoming Requests (Debug)
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {expanded && (
+              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); fetchRaw(); }} disabled={loading}>
+                <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
+            )}
+            <span className="text-xs text-muted-foreground">{expanded ? '▼' : '▶'}</span>
+          </div>
+        </div>
+      </CardHeader>
+      {expanded && (
+        <CardContent>
+          {logs.length === 0 ? (
+            <p className="text-center text-xs text-muted-foreground py-4">
+              No raw requests received. Monday.com has not reached this endpoint yet.
+            </p>
+          ) : (
+            <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
+              {logs.map((log, i) => (
+                <div key={i} className="p-2 bg-muted/50 rounded text-[11px] font-mono">
+                  <div className="flex items-center justify-between text-muted-foreground">
+                    <span>{log.has_challenge ? '🔑 Challenge' : `📨 Board: ${log.board_id || 'N/A'}`}</span>
+                    <span>{new Date(log.timestamp).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      )}
+    </Card>
   );
 }
