@@ -351,6 +351,37 @@ export default function AllStudentsTab({ token }) {
           <p className="text-sm text-muted-foreground mt-4">
             Showing {filteredStudents.length} of {totalStudents} students
           </p>
+
+          {/* Bulk Action Bar — Archive only (student data is sensitive) */}
+          <BulkActionBar count={studentSelection.count} onClear={studentSelection.clear}
+            onArchive={() => setConfirmArchive(true)}
+            loading={bulkLoading} />
+
+          <ConfirmDialog
+            open={confirmArchive}
+            onClose={() => setConfirmArchive(false)}
+            onConfirm={async () => {
+              setBulkLoading(true);
+              try {
+                const ids = Array.from(studentSelection.selected);
+                await fetch(`${API}/api/users/admin/bulk-archive`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ user_ids: ids }),
+                });
+                toast.success(`${ids.length} student(s) archived`);
+                studentSelection.clear();
+                setConfirmArchive(false);
+                fetchData();
+              } catch { toast.error('Archive failed'); }
+              finally { setBulkLoading(false); }
+            }}
+            title={`Archive ${studentSelection.count} student(s)?`}
+            description="Student records will be hidden but preserved. This can be reversed."
+            variant="warning"
+            confirmLabel="Archive"
+            loading={bulkLoading}
+          />
         </CardContent>
       </Card>
     </div>
