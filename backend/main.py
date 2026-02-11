@@ -237,6 +237,12 @@ async def startup_event():
     # Register Monday.com wallet webhook handler (adapter pattern)
     from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
     await wallet_monday_adapter.register_webhooks()
+
+    # Start Telegram polling for community feed
+    from modules.community.services.telegram_service import telegram_service
+    if telegram_service.token:
+        await telegram_service.start_polling()
+        logger.info("Telegram community feed polling started")
     
     logger.info("All modules loaded successfully")
 
