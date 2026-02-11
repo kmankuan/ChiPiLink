@@ -53,6 +53,8 @@ export default function AllStudentsTab({ token }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [schoolFilter, setSchoolFilter] = useState('all');
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
