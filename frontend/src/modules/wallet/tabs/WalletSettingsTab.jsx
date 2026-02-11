@@ -99,7 +99,26 @@ export default function WalletSettingsTab() {
     }
   }, [token]);
 
-  useEffect(() => { fetchConfig(); fetchBoards(); fetchLogs(); }, [fetchConfig, fetchLogs]);
+  useEffect(() => { fetchConfig(); fetchBoards(); fetchLogs(); fetchDescriptions(); }, [fetchConfig, fetchLogs]);
+
+  const fetchDescriptions = async () => {
+    try {
+      const res = await axios.get(`${API}/api/wallet/admin/default-descriptions`, { headers });
+      if (res.data.descriptions) setDescriptions(res.data.descriptions);
+    } catch (e) { console.error(e); }
+  };
+
+  const saveDescriptions = async () => {
+    setSavingDesc(true);
+    try {
+      await axios.put(`${API}/api/wallet/admin/default-descriptions`, { descriptions }, { headers });
+      toast.success('Transaction descriptions saved');
+    } catch (e) {
+      toast.error('Error saving descriptions');
+    } finally {
+      setSavingDesc(false);
+    }
+  };
 
   const handleBoardSelect = (boardId) => {
     setConfig(prev => ({ ...prev, board_id: boardId }));
