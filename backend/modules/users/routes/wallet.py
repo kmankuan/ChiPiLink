@@ -568,6 +568,26 @@ async def admin_adjust_wallet(
 
 
 
+@router.get("/admin/default-descriptions")
+async def get_default_descriptions(admin=Depends(get_admin_user)):
+    """Get configurable default descriptions for wallet transactions"""
+    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
+    return {"descriptions": doc.get("descriptions", DEFAULTS) if doc else DEFAULTS}
+
+
+@router.put("/admin/default-descriptions")
+async def update_default_descriptions(data: dict, admin=Depends(get_admin_user)):
+    """Update default descriptions shown to users for wallet transactions"""
+    descriptions = data.get("descriptions", {})
+    await db.wallet_settings.update_one(
+        {"key": "default_descriptions"},
+        {"$set": {"descriptions": descriptions}},
+        upsert=True
+    )
+    return {"status": "updated", "descriptions": descriptions}
+
+
+
 @router.get("/admin/all-users")
 async def get_all_users_with_wallets(
     admin=Depends(get_admin_user)
