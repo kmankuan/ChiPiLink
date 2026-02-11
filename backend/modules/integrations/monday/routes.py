@@ -304,13 +304,13 @@ async def get_board_columns(board_id: str, admin: dict = Depends(get_admin_user)
 
 @router.get("/boards/{board_id}/subitem-columns")
 async def get_subitem_columns(board_id: str, admin: dict = Depends(get_admin_user)):
-    """Get subitem columns for a board (fetches from first subitem's board)"""
+    """Get subitem columns for a board (searches items until one with subitems is found)"""
     from modules.integrations.monday.core_client import monday_client
     try:
         data = await monday_client.execute(f"""
             query {{
                 boards(ids: [{board_id}]) {{
-                    items_page(limit: 1) {{
+                    items_page(limit: 25) {{
                         items {{
                             subitems {{
                                 board {{
