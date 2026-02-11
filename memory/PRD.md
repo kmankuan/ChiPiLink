@@ -105,3 +105,14 @@
 - Wallet balance notifications (low balance alerts)
 - P2: sync-all endpoint fix
 - P3: i18n, board selector UX
+
+## Community Feed Module (Feb 11)
+- **Telegram Integration** (Option C — Hybrid with auto-sync)
+  - Bot: `chili2chipiBot`, token in `TELEGRAM_BOT_TOKEN` env var
+  - Background polling every 120s for new channel posts
+  - Stores metadata in `community_posts` collection (no media files in DB)
+  - Media proxied from Telegram CDN via `/api/community-v2/feed/media/{file_id}`
+- **Features**: Likes (toggle), Comments (add/view), Refresh, Pagination
+- **Admin endpoints**: manual sync, config (poll_interval, visibility, auto_sync), stats
+- **Sidebar**: "Community" menu item with Rss icon
+- **Next**: Bot needs to be added as admin to the private channel to start receiving posts
