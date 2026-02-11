@@ -323,6 +323,9 @@ export default function TextbookOrdersAdminTab() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox checked={orderSelection.allSelected} onCheckedChange={orderSelection.toggleAll} />
+                      </TableHead>
                       <TableHead>Student</TableHead>
                       <TableHead>User</TableHead>
                       <TableHead>Grade</TableHead>
