@@ -135,7 +135,7 @@ async def submit_order_direct(
                         description=f"Refund: order submission failed for {order_id}",
                         reference=wallet_transaction.get("transaction_id")
                     )
-                    logger.info(f"[submit_order_direct] Wallet refunded after order failure")
+                    logger.info("[submit_order_direct] Wallet refunded after order failure")
                 except Exception as refund_error:
                     logger.error(f"[submit_order_direct] CRITICAL: Refund failed: {refund_error}")
             raise submit_error
