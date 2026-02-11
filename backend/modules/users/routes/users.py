@@ -471,3 +471,36 @@ async def admin_update_profile(
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     return {"success": True, "profile": profile}
+
+
+@router.post("/admin/bulk-archive")
+async def bulk_archive_users(data: dict, admin: dict = Depends(get_admin_user)):
+    """Archive users (soft-delete, preserves all data)"""
+    from datetime import datetime, timezone
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+    r = await db.auth_users.update_many(
+        {"user_id": {"$in": user_ids}, "is_admin": {"$ne": True}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
+
+@router.post("/admin/bulk-delete")
+async def bulk_delete_users(data: dict, admin: dict = Depends(get_admin_user)):
+    """Permanently delete users (admin only, excludes other admins)"""
+    from datetime import datetime, timezone
+    user_ids = data.get("user_ids", [])
+    if not user_ids:
+        raise HTTPException(status_code=400, detail="No users specified")
+    admins_cursor = db.auth_users.find(
+        {"user_id": {"$in": user_ids}, "is_admin": True}, {"_id": 0, "user_id": 1}
+    )
+    admin_ids = {a["user_id"] async for a in admins_cursor}
+    safe_ids = [uid for uid in user_ids if uid not in admin_ids]
+    if not safe_ids:
+        raise HTTPException(status_code=403, detail="Cannot delete admin users")
+    r = await db.auth_users.delete_many({"user_id": {"$in": safe_ids}})
+    return {"status": "deleted", "count": r.deleted_count, "skipped_admins": len(admin_ids)}
+
