@@ -337,7 +337,11 @@ export default function TextbookOrdersAdminTab() {
                   </TableHeader>
                   <TableBody>
                     {filteredOrders.map((order) => (
-                      <TableRow key={order.order_id}>
+                      <TableRow key={order.order_id} className={order.archived ? 'opacity-50' : ''}>
+                        <TableCell>
+                          <Checkbox checked={orderSelection.isSelected(order.order_id)}
+                            onCheckedChange={() => orderSelection.toggle(order.order_id)} />
+                        </TableCell>
                         <TableCell className="font-medium">{order.student_name}</TableCell>
                         <TableCell>
                           <div>
