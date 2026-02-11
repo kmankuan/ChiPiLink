@@ -1,5 +1,8 @@
 /**
- * WalletSettingsTab — Dynamic board selector + column mapping + webhook logs
+ * WalletSettingsTab — Dynamic board selector + item-level column mapping + webhook logs
+ * 
+ * Item-level flow: Each Monday.com item = one wallet transaction
+ * Automation: "When Status changes to Added/Deducted → send webhook"
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,41 +29,28 @@ export default function WalletSettingsTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Config state
   const [config, setConfig] = useState({
     board_id: '',
-    column_mapping: { email: '' },
-    subitem_column_mapping: { amount: '', note: '', status: '' },
+    column_mapping: { email: '', amount: '', note: '', status: '' },
     status_labels: { add: 'Added', deduct: 'Deducted', stuck: 'Stuck' },
     enabled: true,
   });
 
-  // Board & column discovery
   const [boards, setBoards] = useState([]);
   const [loadingBoards, setLoadingBoards] = useState(false);
-  const [itemColumns, setItemColumns] = useState([]);
-  const [subitemColumns, setSubitemColumns] = useState([]);
+  const [columns, setColumns] = useState([]);
   const [loadingColumns, setLoadingColumns] = useState(false);
-
-  // Status column labels (from Monday.com)
-  const [statusLabels, setStatusLabels] = useState([]);
-
-  // Webhook logs
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
   const walletWebhookUrl = `${window.location.origin}/api/monday/webhooks/incoming`;
 
-  // Fetch saved config
   const fetchConfig = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/monday/adapters/wallet/config`, { headers });
       if (res.data.config) {
         setConfig(prev => ({ ...prev, ...res.data.config }));
-        // If board_id is set, load its columns
-        if (res.data.config.board_id) {
-          fetchColumns(res.data.config.board_id);
-        }
+        if (res.data.config.board_id) fetchColumns(res.data.config.board_id);
       }
     } catch (e) {
       console.error('Failed to fetch config:', e);
@@ -69,12 +59,10 @@ export default function WalletSettingsTab() {
     }
   }, [token]);
 
-  // Fetch boards
   const fetchBoards = async () => {
     setLoadingBoards(true);
     try {
       const res = await axios.get(`${API}/api/monday/boards`, { headers });
-      // Filter out subitem boards
       const mainBoards = (res.data.boards || []).filter(b => !b.name.startsWith('Subitems of'));
       setBoards(mainBoards);
     } catch {
@@ -84,22 +72,12 @@ export default function WalletSettingsTab() {
     }
   };
 
-  // Fetch columns for a board
   const fetchColumns = async (boardId) => {
     if (!boardId) return;
     setLoadingColumns(true);
     try {
-      const [itemRes, subitemRes] = await Promise.all([
-        axios.get(`${API}/api/monday/boards/${boardId}/columns`, { headers }),
-        axios.get(`${API}/api/monday/boards/${boardId}/subitem-columns`, { headers }),
-      ]);
-      setItemColumns(itemRes.data.columns || []);
-      const subCols = subitemRes.data.columns || [];
-      setSubitemColumns(subCols);
-
-      // Extract status labels from the wallet event column settings
-      const walletStatusCol = subCols.find(c => c.type === 'status' && c.id === config.subitem_column_mapping?.status);
-      // We'll let the user set labels manually since we can't easily get them from the column list
+      const res = await axios.get(`${API}/api/monday/boards/${boardId}/columns`, { headers });
+      setColumns(res.data.columns || []);
     } catch (e) {
       console.error('Error loading columns:', e);
     } finally {
@@ -107,7 +85,6 @@ export default function WalletSettingsTab() {
     }
   };
 
-  // Fetch webhook logs
   const fetchLogs = useCallback(async () => {
     setLogsLoading(true);
     try {
@@ -120,19 +97,20 @@ export default function WalletSettingsTab() {
     }
   }, [token]);
 
-  useEffect(() => {
-    fetchConfig();
-    fetchBoards();
-    fetchLogs();
-  }, [fetchConfig, fetchLogs]);
+  useEffect(() => { fetchConfig(); fetchBoards(); fetchLogs(); }, [fetchConfig, fetchLogs]);
 
-  // Handle board selection
   const handleBoardSelect = (boardId) => {
     setConfig(prev => ({ ...prev, board_id: boardId }));
     fetchColumns(boardId);
   };
 
-  // Handle save
+  const updateMapping = (key, value) => {
+    setConfig(prev => ({
+      ...prev,
+      column_mapping: { ...prev.column_mapping, [key]: value }
+    }));
+  };
+
   const handleSave = async () => {
     if (!config.board_id) { toast.error('Select a board first'); return; }
     setSaving(true);
@@ -150,11 +128,10 @@ export default function WalletSettingsTab() {
   const copyUrl = (url) => { navigator.clipboard.writeText(url); toast.success('URL copied'); };
   const formatDate = (d) => d ? new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
 
-  // Column type filters for dropdowns
-  const emailColumns = itemColumns.filter(c => ['email', 'text', 'mirror'].includes(c.type));
-  const numberColumns = subitemColumns.filter(c => ['numbers', 'numeric'].includes(c.type));
-  const textColumns = subitemColumns.filter(c => ['text', 'long_text'].includes(c.type));
-  const statusColumns = subitemColumns.filter(c => c.type === 'status');
+  const emailColumns = columns.filter(c => ['email', 'text', 'mirror'].includes(c.type));
+  const numberColumns = columns.filter(c => ['numbers', 'numeric'].includes(c.type));
+  const textColumns = columns.filter(c => ['text', 'long_text'].includes(c.type));
+  const statusColumns = columns.filter(c => c.type === 'status');
 
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded-lg" />;
 
@@ -165,12 +142,12 @@ export default function WalletSettingsTab() {
         <CardContent className="p-4 flex gap-2">
           <Info className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
           <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-            <p className="font-medium">Wallet Top-Up Workflow:</p>
+            <p className="font-medium">Wallet Top-Up Workflow (Item-Level):</p>
             <ol className="list-decimal list-inside space-y-0.5 text-xs">
-              <li>Select the board where your customers are managed</li>
-              <li>Map the customer email column and subitem wallet columns</li>
-              <li>Add a <strong>subitem</strong> → set <strong>Chipi Wallet</strong> amount → change <strong>Wallet Event</strong> status</li>
-              <li>Monday.com automation sends webhook → wallet is updated</li>
+              <li>Select the board where wallet transactions are managed</li>
+              <li>Map the columns: Email, Amount, Note, Status</li>
+              <li>Create a Monday.com automation: <strong>"When Status changes to Added → send webhook"</strong></li>
+              <li>Each item = one wallet transaction. Set email, amount, then change Status</li>
             </ol>
           </div>
         </CardContent>
@@ -186,7 +163,7 @@ export default function WalletSettingsTab() {
             <Input value={walletWebhookUrl} readOnly className="text-xs font-mono bg-muted" data-testid="wallet-webhook-url" />
             <Button variant="ghost" size="icon" onClick={() => copyUrl(walletWebhookUrl)}><Copy className="h-3.5 w-3.5" /></Button>
           </div>
-          <p className="text-[10px] text-muted-foreground">Monday.com automation: "When subitem's column changes → Send webhook" to this URL</p>
+          <p className="text-[10px] text-muted-foreground">Monday.com automation: "When Status changes to something → Send webhook" to this URL</p>
         </CardContent>
       </Card>
 
@@ -196,7 +173,7 @@ export default function WalletSettingsTab() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base">1. Choose Board</CardTitle>
-              <CardDescription className="text-xs mt-1">Select the Monday.com board where customers are managed</CardDescription>
+              <CardDescription className="text-xs mt-1">Select the Monday.com board for wallet transactions</CardDescription>
             </div>
             {config.board_id && <Badge className="text-[10px] gap-1"><CheckCircle2 className="h-3 w-3" /> Board selected</Badge>}
           </div>
@@ -217,13 +194,13 @@ export default function WalletSettingsTab() {
         </CardContent>
       </Card>
 
-      {/* Column Mapping - Item (Customer) */}
+      {/* Column Mapping (all at item level) */}
       {config.board_id && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">2. Map Customer Item Columns</CardTitle>
+            <CardTitle className="text-base">2. Map Item Columns</CardTitle>
             <CardDescription className="text-xs mt-1">
-              Map the column that contains the customer's email on the main board items
+              Map the columns on each item: customer email, wallet amount, note, and status trigger
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -232,104 +209,57 @@ export default function WalletSettingsTab() {
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading columns...
               </div>
             ) : (
-              <div className="space-y-2">
-                <Label className="text-sm">Email Column</Label>
-                <Select
-                  value={config.column_mapping?.email || ''}
-                  onValueChange={(v) => setConfig(p => ({ ...p, column_mapping: { ...p.column_mapping, email: v } }))}
-                >
-                  <SelectTrigger data-testid="email-column-selector">
-                    <SelectValue placeholder="Select email column" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {emailColumns.map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id} ({c.type})</span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-4">
+                {/* Email */}
+                <div className="space-y-1">
+                  <Label className="text-sm">Email Column</Label>
+                  <Select value={config.column_mapping?.email || ''} onValueChange={(v) => updateMapping('email', v)}>
+                    <SelectTrigger data-testid="email-column-selector"><SelectValue placeholder="Select email column" /></SelectTrigger>
+                    <SelectContent>
+                      {emailColumns.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id} ({c.type})</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Amount */}
+                <div className="space-y-1">
+                  <Label className="text-sm">Amount Column (number)</Label>
+                  <Select value={config.column_mapping?.amount || ''} onValueChange={(v) => updateMapping('amount', v)}>
+                    <SelectTrigger data-testid="amount-column-selector"><SelectValue placeholder="Select amount column" /></SelectTrigger>
+                    <SelectContent>
+                      {numberColumns.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Note */}
+                <div className="space-y-1">
+                  <Label className="text-sm">Note / Description Column (text)</Label>
+                  <Select value={config.column_mapping?.note || ''} onValueChange={(v) => updateMapping('note', v)}>
+                    <SelectTrigger data-testid="note-column-selector"><SelectValue placeholder="Select note column" /></SelectTrigger>
+                    <SelectContent>
+                      {textColumns.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Status */}
+                <div className="space-y-1">
+                  <Label className="text-sm">Status Column (trigger)</Label>
+                  <Select value={config.column_mapping?.status || ''} onValueChange={(v) => updateMapping('status', v)}>
+                    <SelectTrigger data-testid="status-column-selector"><SelectValue placeholder="Select status column" /></SelectTrigger>
+                    <SelectContent>
+                      {statusColumns.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span></SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Column Mapping - Subitem (Wallet Event) */}
-      {config.board_id && subitemColumns.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">3. Map Subitem Columns</CardTitle>
-            <CardDescription className="text-xs mt-1">
-              Map the subitem columns for wallet amount, notes, and status
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Amount Column */}
-            <div className="space-y-2">
-              <Label className="text-sm">Chipi Wallet (Amount)</Label>
-              <Select
-                value={config.subitem_column_mapping?.amount || ''}
-                onValueChange={(v) => setConfig(p => ({
-                  ...p, subitem_column_mapping: { ...p.subitem_column_mapping, amount: v }
-                }))}
-              >
-                <SelectTrigger data-testid="amount-column-selector">
-                  <SelectValue placeholder="Select amount column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {numberColumns.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Note Column */}
-            <div className="space-y-2">
-              <Label className="text-sm">Note / Description</Label>
-              <Select
-                value={config.subitem_column_mapping?.note || ''}
-                onValueChange={(v) => setConfig(p => ({
-                  ...p, subitem_column_mapping: { ...p.subitem_column_mapping, note: v }
-                }))}
-              >
-                <SelectTrigger data-testid="note-column-selector">
-                  <SelectValue placeholder="Select note column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {textColumns.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Status Column */}
-            <div className="space-y-2">
-              <Label className="text-sm">Wallet Event (Status)</Label>
-              <Select
-                value={config.subitem_column_mapping?.status || ''}
-                onValueChange={(v) => setConfig(p => ({
-                  ...p, subitem_column_mapping: { ...p.subitem_column_mapping, status: v }
-                }))}
-              >
-                <SelectTrigger data-testid="status-column-selector">
-                  <SelectValue placeholder="Select status column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusColumns.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.title} <span className="text-muted-foreground ml-1 text-[10px]">{c.id}</span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </CardContent>
         </Card>
       )}
@@ -338,9 +268,9 @@ export default function WalletSettingsTab() {
       {config.board_id && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">4. Status Labels</CardTitle>
+            <CardTitle className="text-base">3. Status Labels</CardTitle>
             <CardDescription className="text-xs mt-1">
-              Must match exactly what's in your Monday.com "Wallet Event" status column
+              Must match exactly what's in your Monday.com Status column labels
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -377,9 +307,7 @@ export default function WalletSettingsTab() {
       )}
 
       {/* Test Webhook */}
-      {config.board_id && (
-        <TestWebhookCard headers={headers} />
-      )}
+      {config.board_id && <TestWebhookCard headers={headers} />}
 
       {/* Webhook Logs */}
       <Card>
@@ -395,7 +323,7 @@ export default function WalletSettingsTab() {
         <CardContent>
           {logs.length === 0 ? (
             <div className="text-center py-6 text-sm text-muted-foreground">
-              No webhook events received yet. Set up your Monday.com automation to send webhooks.
+              No webhook events received yet.
             </div>
           ) : (
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
@@ -462,10 +390,10 @@ function TestWebhookCard({ headers }) {
     <Card className="border-amber-200">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Search className="h-4 w-4" /> Test Wallet Webhook (Manual)
+          <Search className="h-4 w-4" /> Test Wallet (Manual)
         </CardTitle>
         <CardDescription className="text-xs">
-          Bypass Monday.com and directly test wallet top-up/deduction for a user
+          Bypass Monday.com and directly test wallet top-up/deduction
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -481,9 +409,7 @@ function TestWebhookCard({ headers }) {
           <div className="space-y-1">
             <Label className="text-xs">Action</Label>
             <Select value={action} onValueChange={setAction}>
-              <SelectTrigger className="text-xs" data-testid="test-webhook-action">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="text-xs" data-testid="test-webhook-action"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="topup">Top Up</SelectItem>
                 <SelectItem value="deduct">Deduct</SelectItem>
@@ -554,7 +480,7 @@ function RawWebhookLogs({ headers }) {
               {logs.map((log, i) => (
                 <div key={i} className="p-2 bg-muted/50 rounded text-[11px] font-mono">
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>{log.has_challenge ? '🔑 Challenge' : `📨 Board: ${log.board_id || 'N/A'}`}</span>
+                    <span>{log.has_challenge ? 'Challenge' : `Board: ${log.board_id || 'N/A'}`}</span>
                     <span>{new Date(log.timestamp).toLocaleString()}</span>
                   </div>
                 </div>
