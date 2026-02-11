@@ -248,6 +248,68 @@ async def get_wallet_webhook_logs(
     return {"logs": logs}
 
 
+@router.get("/adapters/wallet/raw-logs")
+async def get_wallet_raw_webhook_logs(
+    limit: int = 30,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get ALL raw incoming webhook requests (including challenges) for debugging."""
+    from core.database import db
+    cursor = db.monday_webhook_raw_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return {"logs": logs}
+
+
+@router.post("/adapters/wallet/test-webhook")
+async def test_wallet_webhook(data: dict, admin: dict = Depends(get_admin_user)):
+    """Simulate a Monday.com webhook event for testing.
+    
+    Body: { "email": "user@example.com", "amount": 10.0, "action": "topup" }
+    This creates a synthetic event and processes it through the wallet adapter.
+    """
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+    from modules.users.services.wallet_service import wallet_service
+    from modules.users.models.wallet_models import Currency, PaymentMethod
+    
+    email = data.get("email", "").strip()
+    amount = float(data.get("amount", 0))
+    action = data.get("action", "topup")
+    note = data.get("note", f"Manual test via admin ({action})")
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    user = await db.auth_users.find_one(
+        {"email": {"$regex": f"^{email}$", "$options": "i"}},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User not found: {email}")
+    
+    try:
+        if action == "topup":
+            tx = await wallet_service.deposit(
+                user_id=user["user_id"], amount=amount,
+                currency=Currency.USD, payment_method=PaymentMethod.BANK_TRANSFER,
+                reference=f"admin_test_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+                description=note
+            )
+        else:
+            tx = await wallet_service.charge(
+                user_id=user["user_id"], amount=amount,
+                currency=Currency.USD, description=note,
+                reference_type="admin_test",
+                reference_id=f"admin_test_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+            )
+        return {"status": "success", "action": action, "email": email, "amount": amount, "transaction": tx}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 # ============== BOARD & COLUMN DISCOVERY ==============
 
 
