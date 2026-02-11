@@ -590,6 +590,24 @@ async def get_all_users_with_wallets(
     return {"users": result}
 
 
+
+@router.delete("/admin/user/{user_id}")
+async def delete_user(user_id: str, admin=Depends(get_admin_user)):
+    """Delete a user and their wallet data (admin only)"""
+    user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0, "email": 1, "is_admin": 1})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Cannot delete admin users")
+
+    await db.auth_users.delete_one({"user_id": user_id})
+    await db.chipi_wallets.delete_one({"user_id": user_id})
+    await db.wallet_transactions.delete_many({"user_id": user_id})
+
+    return {"status": "deleted", "user_id": user_id, "email": user.get("email")}
+
+
+
 # ============== BANK INFO ==============
 
 
