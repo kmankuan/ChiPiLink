@@ -42,7 +42,7 @@ async def get_posts(
             {"user_id": user_id, "post_msg_id": {"$in": msg_ids}},
             {"_id": 0, "post_msg_id": 1}
         ).to_list(length=len(msg_ids))
-        liked_ids = {l["post_msg_id"] for l in user_likes}
+        liked_ids = {lk["post_msg_id"] for lk in user_likes}
 
         for p in posts:
             p["liked_by_me"] = p.get("telegram_msg_id") in liked_ids
