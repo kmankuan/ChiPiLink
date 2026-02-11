@@ -246,3 +246,106 @@ async def get_wallet_webhook_logs(
     ).sort("timestamp", -1).limit(limit)
     logs = await cursor.to_list(length=limit)
     return {"logs": logs}
+
+
+# ============== BOARD & COLUMN DISCOVERY ==============
+
+
+@router.get("/boards")
+async def list_monday_boards(admin: dict = Depends(get_admin_user)):
+    """List all accessible Monday.com boards"""
+    from modules.integrations.monday.core_client import monday_client
+    try:
+        data = await monday_client.execute("""
+            query {
+                boards(limit: 100, order_by: created_at) {
+                    id
+                    name
+                    board_kind
+                    state
+                }
+            }
+        """)
+        boards = data.get("boards", [])
+        # Filter active boards
+        active = [b for b in boards if b.get("state") != "deleted"]
+        return {"boards": active}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/boards/{board_id}/columns")
+async def get_board_columns(board_id: str, admin: dict = Depends(get_admin_user)):
+    """Get all columns of a specific board (item-level)"""
+    from modules.integrations.monday.core_client import monday_client
+    try:
+        data = await monday_client.execute(f"""
+            query {{
+                boards(ids: [{board_id}]) {{
+                    id
+                    name
+                    columns {{
+                        id
+                        title
+                        type
+                    }}
+                }}
+            }}
+        """)
+        boards = data.get("boards", [])
+        if not boards:
+            raise HTTPException(status_code=404, detail="Board not found")
+        return {"board": boards[0]["name"], "columns": boards[0].get("columns", [])}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/boards/{board_id}/subitem-columns")
+async def get_subitem_columns(board_id: str, admin: dict = Depends(get_admin_user)):
+    """Get subitem columns for a board (fetches from first subitem's board)"""
+    from modules.integrations.monday.core_client import monday_client
+    try:
+        data = await monday_client.execute(f"""
+            query {{
+                boards(ids: [{board_id}]) {{
+                    items_page(limit: 1) {{
+                        items {{
+                            subitems {{
+                                board {{
+                                    id
+                                    name
+                                    columns {{
+                                        id
+                                        title
+                                        type
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+        """)
+        boards = data.get("boards", [])
+        if not boards:
+            raise HTTPException(status_code=404, detail="Board not found")
+        
+        items = boards[0].get("items_page", {}).get("items", [])
+        for item in items:
+            subs = item.get("subitems", [])
+            if subs:
+                board_info = subs[0].get("board", {})
+                return {
+                    "subitem_board_id": board_info.get("id"),
+                    "subitem_board_name": board_info.get("name"),
+                    "columns": board_info.get("columns", [])
+                }
+        
+        return {"subitem_board_id": None, "columns": [], "message": "No subitems found. Create at least one subitem first."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
