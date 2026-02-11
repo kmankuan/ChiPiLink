@@ -54,6 +54,7 @@ const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongD
 const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
 const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
 const StoreAnalyticsModule = lazy(() => import('@/modules/admin/store/StoreAnalyticsModule'));
+const WalletModule = lazy(() => import('@/modules/wallet/WalletModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
