@@ -175,6 +175,34 @@ export default function WalletSettingsTab() {
         </CardContent>
       </Card>
 
+      {/* Transaction Descriptions (user-facing) */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base"><Wallet className="h-4 w-4" /> Transaction Descriptions</CardTitle>
+          <CardDescription className="text-xs">
+            Customize the message users see in their wallet transaction history
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-2">
+            <Label className="text-sm">Top-Up Description</Label>
+            <Input value={descriptions.topup || ''} onChange={(e) => setDescriptions(p => ({ ...p, topup: e.target.value }))}
+              placeholder="e.g. Wallet top-up" className="text-sm" data-testid="desc-topup-input" />
+            <p className="text-[10px] text-muted-foreground">Shown when admin adds funds (e.g. "Recarga de billetera")</p>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm">Deduction Description</Label>
+            <Input value={descriptions.deduct || ''} onChange={(e) => setDescriptions(p => ({ ...p, deduct: e.target.value }))}
+              placeholder="e.g. Wallet deduction" className="text-sm" data-testid="desc-deduct-input" />
+            <p className="text-[10px] text-muted-foreground">Shown when admin deducts funds (e.g. "Deduccion de billetera")</p>
+          </div>
+          <Button onClick={saveDescriptions} disabled={savingDesc} variant="outline" className="w-full gap-2" data-testid="save-descriptions-btn">
+            {savingDesc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+            Save Descriptions
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Webhook URL */}
       <Card>
         <CardHeader className="pb-3">
