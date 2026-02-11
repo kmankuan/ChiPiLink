@@ -104,17 +104,11 @@ class WalletMondayAdapter(BaseMondayAdapter):
         status_col_id = column_mapping.get("status", "status")
         status_labels = config.get("status_labels", self.DEFAULT_STATUS_LABELS)
 
-        # Only process the status column trigger
-        if column_id and column_id != status_col_id:
-            msg = f"Column {column_id} != status column ({status_col_id}), ignoring"
-            logger.info(f"[wallet_webhook] {msg}")
-            await self._log_event(event, "ignored", msg)
-            return {"status": "ignored", "reason": msg}
-
-        # Determine action from webhook value
+        # Determine action from webhook value — check status label directly
+        # Don't strictly filter by columnId since Monday.com may use different IDs
         new_value = event.get("value", {})
         status_label = self._extract_status_label(new_value)
-        logger.info(f"[wallet_webhook] Status label: '{status_label}'")
+        logger.info(f"[wallet_webhook] Column={column_id}, Status label='{status_label}'")
 
         add_label = status_labels.get("add", "Added")
         deduct_label = status_labels.get("deduct", "Deducted")
@@ -124,7 +118,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
         elif status_label == deduct_label:
             action = "deduct"
         else:
-            msg = f"Status '{status_label}' not in ['{add_label}', '{deduct_label}']"
+            msg = f"Status '{status_label}' not in ['{add_label}', '{deduct_label}'] (col={column_id})"
             logger.info(f"[wallet_webhook] Ignored: {msg}")
             await self._log_event(event, "ignored", msg)
             return {"status": "ignored", "reason": msg}
