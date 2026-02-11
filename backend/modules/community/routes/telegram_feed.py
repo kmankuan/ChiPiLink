@@ -54,8 +54,8 @@ async def get_posts(
 
 
 @router.get("/media/{file_id}")
-async def proxy_media(file_id: str, token: Optional[str] = None, user=Depends(get_current_user)):
-    """Proxy media files from Telegram CDN"""
+async def proxy_media(file_id: str):
+    """Proxy media files from Telegram CDN (public — file IDs are unguessable)"""
     import httpx
 
     url = await telegram_service.get_file(file_id)
