@@ -213,22 +213,34 @@ class WalletMondayAdapter(BaseMondayAdapter):
     # ---- Helper Methods ----
 
     def _extract_status_label(self, value) -> str:
+        """Extract status label text from Monday.com webhook value.
+        
+        Monday.com sends status changes in various formats:
+        - {"label": {"text": "Added"}}
+        - {"label": "Added"}
+        - {"label": {"index": 0, "text": "Added", ...}}
+        - JSON string of the above
+        - {"name": "Added"}
+        - Plain string "Added"
+        """
         if isinstance(value, dict):
-            label = value.get("label", {})
+            # Direct dict format
+            label = value.get("label") or value.get("name") or value.get("text")
             if isinstance(label, dict):
-                return label.get("text", "")
-            return str(label)
+                return label.get("text") or label.get("name") or ""
+            if label:
+                return str(label)
+            # Try parsing the value itself as JSON if it has a nested structure
+            for key in ("previous_value", "value"):
+                if key in value and isinstance(value[key], dict):
+                    return self._extract_status_label(value[key])
+            return ""
         if isinstance(value, str):
             try:
                 parsed = json.loads(value)
-                if isinstance(parsed, dict):
-                    label = parsed.get("label", {})
-                    if isinstance(label, dict):
-                        return label.get("text", "")
-                    return str(label)
+                return self._extract_status_label(parsed)
             except (json.JSONDecodeError, TypeError):
-                pass
-            return value
+                return value.strip()
         return ""
 
     async def _fetch_item(self, item_id: str, column_mapping: Dict) -> Optional[Dict]:
