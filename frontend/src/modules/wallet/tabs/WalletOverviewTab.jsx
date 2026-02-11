@@ -183,6 +183,10 @@ export default function WalletOverviewTab({ token }) {
                         onClick={() => setAdjustDialog({ user, action: 'deduct' })} data-testid={`deduct-btn-${user.user_id}`}>
                         <ArrowDownCircle className="h-3 w-3" /> Deduct
                       </Button>
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
+                        onClick={() => setDeleteDialog(user)} data-testid={`delete-btn-${user.user_id}`}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
