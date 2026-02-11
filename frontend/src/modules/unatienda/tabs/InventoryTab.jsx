@@ -364,7 +364,7 @@ export default function InventoryTab({ token }) {
           try {
             const ids = Array.from(productSelection.selected);
             const endpoint = confirmBulk === 'archive' ? 'bulk-archive' : 'bulk-delete';
-            await axios.post(`${API_URL}/api/inventory/products/${endpoint}`,
+            await axios.post(`${API_URL}/api/store/inventory/products/${endpoint}`,
               { product_ids: ids }, { headers: { Authorization: `Bearer ${token}` } });
             toast.success(`${ids.length} product(s) ${confirmBulk === 'archive' ? 'archived' : 'deleted'}`);
             productSelection.clear();
