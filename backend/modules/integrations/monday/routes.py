@@ -232,3 +232,17 @@ async def update_wallet_monday_config(data: dict, admin: dict = Depends(get_admi
     # Re-register webhook with new board_id
     await wallet_monday_adapter.register_webhooks()
     return {"success": True, "message": "Wallet Monday config updated"}
+
+
+@router.get("/adapters/wallet/logs")
+async def get_wallet_webhook_logs(
+    limit: int = 30,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get wallet webhook event logs for debugging"""
+    from core.database import db
+    cursor = db.wallet_webhook_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return {"logs": logs}
