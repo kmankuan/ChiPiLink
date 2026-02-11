@@ -31,6 +31,8 @@ export default function WalletOverviewTab({ token }) {
   const [adjustAmount, setAdjustAmount] = useState('');
   const [adjustDescription, setAdjustDescription] = useState('');
   const [adjusting, setAdjusting] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState({ totalUsers: 0, totalBalance: 0, usersWithBalance: 0 });
 
   const fetchUsers = useCallback(async () => {
