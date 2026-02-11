@@ -349,11 +349,17 @@ class WalletMondayAdapter(BaseMondayAdapter):
     # ---- Registration ----
 
     async def register_webhooks(self):
+        from modules.integrations.monday.webhook_router import unregister_handler, get_registered_boards
+        # Unregister any old wallet handlers before registering the new one
+        for old_board in get_registered_boards():
+            unregister_handler(old_board)
         config = await self.get_config()
         board_id = config.get("board_id")
         if board_id:
             register_handler(str(board_id), self.handle_webhook)
             logger.info(f"Wallet registered webhook for board: {board_id}")
+        else:
+            logger.warning("Wallet board_id is not configured, no handler registered")
 
 
 # Singleton
