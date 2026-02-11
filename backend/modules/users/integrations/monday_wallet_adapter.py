@@ -243,7 +243,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
             data = await self.client.execute(
                 f"""query {{ items(ids: [{item_id}]) {{
                     id name
-                    column_values {{ id title text value }}
+                    column_values {{ id text value }}
                 }} }}"""
             )
             items = data.get("items", [])
@@ -252,8 +252,9 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
             result = {"name": items[0].get("name", "")}
             email_col = column_mapping.get("email", "email_mm0f7cg8")
-            amount_col = column_mapping.get("amount", "numeric_mm0fgnq9")
-            note_col = column_mapping.get("note", "text_mm0fpbht")
+            topup_col = column_mapping.get("amount_topup", "numeric_mm0ff8j3")
+            deduct_col = column_mapping.get("amount_deduct", "numeric_mm0f60w7")
+            note_col = column_mapping.get("note", "")
 
             for col in items[0].get("column_values", []):
                 col_id = col.get("id", "")
@@ -262,9 +263,11 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
                 if col_id == email_col:
                     result["email"] = self._extract_email(text or value)
-                elif col_id == amount_col:
-                    result["amount"] = self._parse_number(text or value)
-                elif col_id == note_col:
+                elif col_id == topup_col:
+                    result["amount_topup"] = self._parse_number(text or value)
+                elif col_id == deduct_col:
+                    result["amount_deduct"] = self._parse_number(text or value)
+                elif note_col and col_id == note_col:
                     result["note"] = text
 
             logger.info(f"[wallet_webhook] Item data: {result}")
