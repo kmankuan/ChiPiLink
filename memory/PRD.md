@@ -74,6 +74,7 @@
 - iter 70: Archive system (12/12)
 - iter 71: Dynamic & Draggable columns (14/14)
 - iter 73: Wallet Payment System — backend 18/18, frontend 100%
+- iter 74: Wallet Admin Module — backend 19/19, frontend 100%
 
 ## Wallet Payment System (Feb 10)
 - **Widget Payment Flow**: Users see wallet balance when ordering textbooks. "Pay with Wallet" button charges wallet atomically before creating order. Insufficient balance shows warning + bank transfer info.
@@ -86,9 +87,17 @@
   - Admin config routes: `GET/PUT /api/monday/adapters/wallet/config`
   - **Admin UI**: "Wallet" tab in Monday.com Integration page with board config, column mapping, webhook URL, status label reference
   - **Webhook URLs**: Fixed to use `window.location.origin` (auto-adapts to preview/production domain)
-- **Admin Wallet Tab**: New "Wallets" tab in Users module. Shows all users with balances, stats cards. Top Up / Deduct buttons with confirmation dialog.
 - **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions.
-- **Bank Transfer Info**: Configurable via existing Form Config module (info field type).
+
+## Wallet Admin Module (Feb 11)
+- **Dedicated Sidebar Item**: "Wallet" menu between Orders and Reports
+- **4 Tabs**:
+  - **Overview**: Stats cards + user table with Top Up / Deduct buttons
+  - **Transactions**: Full history with type filter, pagination, user enrichment
+  - **Bank Info**: Multi-context bank configs (e.g. `wallet_general` = Banco General, `pca_private` = BAC Panama). Add/Edit/Delete.
+  - **Settings**: Monday.com webhook config (board ID, column mappings)
+- **Bank Info API**: CRUD at `/api/wallet/admin/bank-info`, public `GET /api/wallet/bank-info/{context}`
+- Old "Wallets" tab removed from Users module
 
 ## Upcoming Tasks
 - Transaction history view for clients in the widget
