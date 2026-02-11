@@ -346,14 +346,43 @@ export default function InventoryTab({ token }) {
 
       {/* Adjust Dialog */}
       {adjustProduct && (
-        <AdjustStockDialog
-          product={adjustProduct}
-          open={!!adjustProduct}
-          onClose={() => setAdjustProduct(null)}
-          onSaved={onAdjusted}
-          token={token}
-        />
+        <AdjustStockDialog product={adjustProduct} open={!!adjustProduct}
+          onClose={() => setAdjustProduct(null)} onSaved={onAdjusted} token={token} />
       )}
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar count={productSelection.count} onClear={productSelection.clear}
+        onArchive={() => setConfirmBulk('archive')}
+        onDelete={() => setConfirmBulk('delete')}
+        loading={bulkLoading} />
+
+      <ConfirmDialog
+        open={!!confirmBulk}
+        onClose={() => setConfirmBulk(null)}
+        onConfirm={async () => {
+          setBulkLoading(true);
+          try {
+            const ids = Array.from(productSelection.selected);
+            const endpoint = confirmBulk === 'archive' ? 'bulk-archive' : 'bulk-delete';
+            await axios.post(`${API_URL}/api/inventory/products/${endpoint}`,
+              { product_ids: ids }, { headers: { Authorization: `Bearer ${token}` } });
+            toast.success(`${ids.length} product(s) ${confirmBulk === 'archive' ? 'archived' : 'deleted'}`);
+            productSelection.clear();
+            setConfirmBulk(null);
+            fetchData();
+          } catch (e) { toast.error(e.response?.data?.detail || 'Operation failed'); }
+          finally { setBulkLoading(false); }
+        }}
+        title={confirmBulk === 'archive'
+          ? `Archive ${productSelection.count} product(s)?`
+          : `Delete ${productSelection.count} product(s)?`}
+        description={confirmBulk === 'archive'
+          ? 'Products will be hidden from the store but data is preserved.'
+          : 'This will permanently remove the selected products and their inventory data.'}
+        variant={confirmBulk === 'archive' ? 'warning' : 'destructive'}
+        confirmLabel={confirmBulk === 'archive' ? 'Archive' : 'Delete Permanently'}
+        loading={bulkLoading}
+      />
     </div>
   );
 }
