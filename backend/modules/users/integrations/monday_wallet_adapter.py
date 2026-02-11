@@ -35,8 +35,9 @@ class WalletMondayAdapter(BaseMondayAdapter):
     # Default column IDs for item-level mapping
     DEFAULT_COLUMN_MAPPING = {
         "email": "email_mm0f7cg8",
-        "amount": "numeric_mm0fgnq9",
-        "note": "text_mm0fpbht",
+        "amount_topup": "numeric_mm0ff8j3",   # Top Up column
+        "amount_deduct": "numeric_mm0f60w7",  # Deduct column
+        "note": "",                            # Optional
         "status": "status",
     }
 
