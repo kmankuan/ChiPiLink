@@ -38,7 +38,8 @@ import {
   CreditCard,
   QrCode,
   Shield,
-  BarChart2
+  BarChart2,
+  Wallet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
