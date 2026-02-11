@@ -344,3 +344,29 @@ async def get_low_stock_alerts(
         "threshold": threshold,
         "count": len(products),
     }
+
+
+@router.post("/products/bulk-delete")
+async def bulk_delete_products(data: dict, admin: dict = Depends(get_admin_user)):
+    """Bulk delete products from inventory"""
+    product_ids = data.get("product_ids", [])
+    if not product_ids:
+        raise HTTPException(status_code=400, detail="No products specified")
+    r = await db.store_products.delete_many({"product_id": {"$in": product_ids}})
+    await db.inventory_items.delete_many({"product_id": {"$in": product_ids}})
+    return {"status": "deleted", "count": r.deleted_count}
+
+
+@router.post("/products/bulk-archive")
+async def bulk_archive_products(data: dict, admin: dict = Depends(get_admin_user)):
+    """Archive products (hide from store but preserve data)"""
+    from datetime import datetime, timezone
+    product_ids = data.get("product_ids", [])
+    if not product_ids:
+        raise HTTPException(status_code=400, detail="No products specified")
+    r = await db.store_products.update_many(
+        {"product_id": {"$in": product_ids}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
