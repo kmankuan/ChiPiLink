@@ -523,19 +523,21 @@ async def admin_adjust_wallet(
         await wallet_service.get_or_create_wallet(user_id)
         
         if data.action == "topup":
+            desc = data.description or await _get_default_description("topup")
             transaction = await wallet_service.deposit(
                 user_id=user_id,
                 amount=data.amount,
                 currency=Currency.USD,
                 payment_method=PaymentMethod.WALLET,
-                description=data.description or f"Admin top-up by {admin.get('name', admin['user_id'])}"
+                description=desc
             )
         else:
+            desc = data.description or await _get_default_description("deduct")
             transaction = await wallet_service.charge(
                 user_id=user_id,
                 amount=data.amount,
                 currency=Currency("USD"),
-                description=data.description or f"Admin deduction by {admin.get('name', admin['user_id'])}",
+                description=desc,
                 reference_type="admin_adjustment"
             )
         
