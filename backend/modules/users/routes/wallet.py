@@ -557,8 +557,6 @@ async def get_all_users_with_wallets(
     admin=Depends(get_admin_user)
 ):
     """Get all non-admin users with their wallet info (admin)"""
-    from core.database import db
-    
     # Fetch non-admin users
     users_cursor = db.auth_users.find(
         {"is_admin": {"$ne": True}},
