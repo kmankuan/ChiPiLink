@@ -1,129 +1,52 @@
 # ChiPi Link - PRD
 
-## Widget Maintenance Mode (Feb 9, 2026)
-- Toggle in admin Display tab: `maintenance.active` boolean
-- Custom message: `maintenance.message` editable text
-- Widget stays visible (floating button), inside shows "Under Maintenance" screen
-- Instant on/off — no deployment needed
+## Original Problem Statement
+Build a comprehensive wallet system with Monday.com integration, Telegram community feed, and admin tools for ChiPi Link community platform.
 
-## Archive System (Feb 9)
-- Archive: products → hidden layer (not deleted)
-- Restore: back to main view
-- Permanent Delete: only from archive (hard delete)
-- Catalog filter: All / PCA / Public / Archived
+## Core Requirements
+1. Wallet system with deposits, charges, transfers
+2. Monday.com webhook integration for automated wallet top-ups
+3. Telegram community feed
+4. Admin panel for wallet management
 
-## Unified Inventory (Feb 9)
-- Merged Private PCA + old Inventory → single "Inventory" tab
-- Products + Movements views, Stock Adjust Dialog
-- Multi-select, bulk actions, sort, filter, inline edit
+## What's Been Implemented
 
-## Dynamic & Draggable Columns (Feb 9)
-- Dynamic columns per catalog type: PCA (Book Name, Code, Grade, Subject, Publisher, Price, Stock, Status), Public (Product Name, SKU, Category, Type, Brand, Price, Stock, Status), All/Archived (Name, Code/SKU, Grade, Category, Publisher/Brand, Price, Stock, Status)
-- Native HTML5 drag-and-drop column reordering (except sticky Name column)
-- Column order persisted per catalog type in localStorage (chipi_inv_col_order)
-- Column widths persisted in localStorage (chipi_inv_col_widths)
-- "Reset Columns" button appears when order has been customized, restores default layout
-- GripVertical icon on draggable headers
-- Tested: iteration 71 — 14/14 features verified, 100% pass
+### Wallet System (DONE)
+- Full wallet CRUD: deposit, charge, transfer, points
+- Admin panel: Overview, Transactions, Bank Info, Settings tabs
+- Manual top-up/deduct from admin UI
+- Delete user functionality (Feb 11)
 
-## Widget System
-- Server-side token relay for cross-origin iframe OAuth
-- In-widget ordering: select textbooks → submit
-- Floating button: 7 positions, 6 icons, 4 styles, live preview
-- State persistence via sessionStorage
-- **Logout button** in widget header (Feb 10)
-- **Orders tab** showing order status per student with status badges (Feb 10)
-- Debug info shown on "No textbooks" screen: grade searched, products found + Refresh button
+### Monday.com Integration (DONE - Reworked Feb 11)
+- **Item-level triggers** (not subitems) — "When Status changes → send webhook"
+- Dual amount columns: Top Up + Deduct
+- Dynamic board/column mapping via admin UI
+- Webhook challenge verification, raw request logging
+- Test webhook button for manual testing
+- Column mapping: email=email_mm0f7cg8, topup=numeric_mm0ff8j3, deduct=numeric_mm0f60w7, status=status
+- Board: Chipi Wallet (18399650704)
 
-## Monday.com
-- Orders + Textbooks Board sync (config-driven)
+### Telegram Community Feed (DONE)
+- Background polling of private Telegram channel
+- Feed display with likes and comments
+- Media proxy for images/videos
 
-## Known Issues
-- P2: sync-all endpoint broken
-- P3: i18n, board selector UX
+### Admin Panel (DONE)
+- Centralized Wallet module with 4 tabs
+- User management with delete functionality
+- Webhook event logs + raw request logs
+- Bank info CRUD
 
-## Bug Fixes
-- **Textbook ordering: grade mismatch fix (Feb 10)** — `get_books_for_grade()` no longer requires `is_private_catalog: True`. Now matches any active, non-archived product for the grade. Fixes "No textbooks available" when products exist in the unified inventory without the PCA flag. Also fixed diagnostic endpoint's grade mapping (was missing G7-G12).
-- **Textbook ordering: item preservation fix (Feb 10)** — `_refresh_order_items()` no longer wipes existing items when products can't be found in the catalog. Existing items are preserved and marked as `out_of_stock` instead of being deleted. New catalog items are added to the order.
-- **Widget: error state display (Feb 10)** — Widget now differentiates between "API failed" and "no textbooks exist." Shows actual error message with retry button instead of misleading "No textbooks available" message. Also added Out of Stock section for items with `out_of_stock` status.
+## Architecture
+- Backend: FastAPI + MongoDB (chipilink_prod)
+- Frontend: React + Shadcn/UI
+- Auth: LaoPan SSO + JWT
+- Integrations: Monday.com GraphQL API, Telegram Bot API
 
-## Pre-sale Inventory System (Feb 10)
-- Admin can toggle "Pre-sale Mode" per student from the Students tab (multi-select + bulk action)
-- When pre-sale is ON for a student: orders increment `reserved_quantity` (Pre-sale column) — stock is NOT deducted
-- When pre-sale is OFF (normal): orders deduct from `inventory_quantity` directly
-- Pre-sale is invisible to the client user — ordering looks identical from the widget
-- New "Pre-sale" column in inventory table shows pending reservations (amber badge)
-- When admin adds stock via Stock Adjust: pre-sale orders auto-fulfilled first, remaining becomes available
-- Students tab: multi-select checkboxes, bulk "Enable/Disable Pre-sale" actions, Pre-sale Active stat card, orange "Pre-sale" badge on student rows
-
-## Codebase Cleanup: Spanish → English (Feb 10)
-- Replaced all `libro`/`libros` variable names, comments, and constants with English equivalents
-- Changed book_id prefix from `libro_` to `book_` for new products (existing data unaffected)
-- Updated category seed data: `libros` → `books`, `bebidas` → `beverages`, etc.
-- Removed `USE_NEW_ENDPOINTS` ternary from store product/category/student API paths in `config/api.js`
-- Cleaned legacy collection mapping in `constants.py`
-- Updated all frontend components: StoreModule, CartDrawer, Dashboard, Catalog, OrderForm, etc.
-- Backend: events, bulk_import_service, admin routes, category repository all use English terms now
-
-## Test Reports (all passed)
-- iter 65: Widget display (16/16)
-- iter 66: Placement + OAuth (38/38)
-- iter 67: Live preview + persistence (14/14)
-- iter 68: PCA features (13/13)
-- iter 69: Unified inventory (12/12)
-- iter 70: Archive system (12/12)
-- iter 71: Dynamic & Draggable columns (14/14)
-- iter 73: Wallet Payment System — backend 18/18, frontend 100%
-- iter 74: Wallet Admin Module — backend 19/19, frontend 100%
-- iter 75: Community Telegram Feed — backend 21/21, frontend 100%
-
-## Wallet Payment System (Feb 10)
-- **Widget Payment Flow**: Users see wallet balance when ordering textbooks. "Pay with Wallet" button charges wallet atomically before creating order. Insufficient balance shows warning + bank transfer info.
-- **Monday.com Wallet Adapter** (`modules/users/integrations/monday_wallet_adapter.py`):
-  - Extends `BaseMondayAdapter` (namespace: `users.wallet`)
-  - Board "Customers Admin" (5931665026): Items = customers (email column), Subitems = wallet events
-  - Subitem columns: `Chipi Wallet` (amount), `Chipi Note` (description), `Status` (Add Wallet / Deduct Wallet)
-  - Webhook triggers on subitem status change → deposits or charges user wallet
-  - Config-driven: board_id, column_mapping, subitem_column_mapping stored in `monday_integration_config` collection
-  - Admin config routes: `GET/PUT /api/monday/adapters/wallet/config`
-  - **Admin UI (Settings tab)**: Dynamic board selector dropdown, column mapping dropdowns (fetched live from Monday.com API), configurable status labels, webhook event log for debugging
-  - Backend discovery endpoints: `GET /api/monday/boards`, `GET /api/monday/boards/{id}/columns`, `GET /api/monday/boards/{id}/subitem-columns`
-- **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions.
-
-## Wallet Admin Module (Feb 11)
-- **Dedicated Sidebar Item**: "Wallet" menu between Orders and Reports
-- **4 Tabs**:
-  - **Overview**: Stats cards + user table with Top Up / Deduct buttons
-  - **Transactions**: Full history with type filter, pagination, user enrichment
-  - **Bank Info**: Multi-context bank configs (e.g. `wallet_general` = Banco General, `pca_private` = BAC Panama). Add/Edit/Delete.
-  - **Settings**: Monday.com webhook config (board ID, column mappings)
-- **Bank Info API**: CRUD at `/api/wallet/admin/bank-info`, public `GET /api/wallet/bank-info/{context}`
-- Old "Wallets" tab removed from Users module
-
-## Monday.com Wallet Webhook Fix (Feb 11)
-- **Root Cause**: DB config pointed to OLD board `5931665026` instead of new "Chipi Wallet" board `18399650704`. Webhook handler was registered for wrong board at startup.
-- **Fixes**:
-  - Updated DB config (board_id, column_mapping, subitem_column_mapping) to new board
-  - Added dynamic webhook handler fallback in `webhook_router.py` — checks wallet config at runtime if no startup match
-  - Added raw request logging (`monday_webhook_raw_logs` collection) — logs every incoming hit including challenges
-  - Added manual "Test Wallet Webhook" admin endpoint (`POST /api/monday/adapters/wallet/test-webhook`)
-  - Added "Raw Incoming Requests" debug section in admin UI
-  - Handler cleanup: `register_webhooks()` now unregisters old handlers before registering new one
-- **User Action Required**: Monday.com automations show 0 sends — user needs to delete & recreate automations to trigger fresh URL challenge verification
-
-## Upcoming Tasks
-- Transaction history view for clients in the widget
-- Wallet balance notifications (low balance alerts)
+## Prioritized Backlog
+- P1: Telegram feed visibility configuration
+- P1: Transaction history view for clients in widget
+- P2: Wallet balance notifications
 - P2: sync-all endpoint fix
-- P3: i18n, board selector UX
-
-## Community Feed Module (Feb 11)
-- **Telegram Integration** (Option C — Hybrid with auto-sync)
-  - Bot: `chili2chipiBot`, token in `TELEGRAM_BOT_TOKEN` env var
-  - Background polling every 120s for new channel posts
-  - Stores metadata in `community_posts` collection (no media files in DB)
-  - Media proxied from Telegram CDN via `/api/community-v2/feed/media/{file_id}`
-- **Features**: Likes (toggle), Comments (add/view), Refresh, Pagination
-- **Admin endpoints**: manual sync, config (poll_interval, visibility, auto_sync), stats
-- **Sidebar**: "Community" menu item with Rss icon
-- **Next**: Bot needs to be added as admin to the private channel to start receiving posts
+- P3: i18n support
+- P3: Board selector UX improvements
