@@ -86,8 +86,8 @@
   - Webhook triggers on subitem status change → deposits or charges user wallet
   - Config-driven: board_id, column_mapping, subitem_column_mapping stored in `monday_integration_config` collection
   - Admin config routes: `GET/PUT /api/monday/adapters/wallet/config`
-  - **Admin UI**: "Wallet" tab in Monday.com Integration page with board config, column mapping, webhook URL, status label reference
-  - **Webhook URLs**: Fixed to use `window.location.origin` (auto-adapts to preview/production domain)
+  - **Admin UI (Settings tab)**: Dynamic board selector dropdown, column mapping dropdowns (fetched live from Monday.com API), configurable status labels, webhook event log for debugging
+  - Backend discovery endpoints: `GET /api/monday/boards`, `GET /api/monday/boards/{id}/columns`, `GET /api/monday/boards/{id}/subitem-columns`
 - **Admin Adjust API**: `POST /api/wallet/admin/adjust/{user_id}` — supports topup and deduct actions.
 
 ## Wallet Admin Module (Feb 11)
