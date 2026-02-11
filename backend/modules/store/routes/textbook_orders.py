@@ -758,3 +758,19 @@ async def diagnostic_order_flow(
         result["issues"].append("No issues detected - order flow should work")
     
     return result
+
+
+@router.post("/admin/bulk-archive")
+async def bulk_archive_orders(data: dict, admin: dict = Depends(get_admin_user)):
+    """Archive orders (soft-delete, preserves data for records)"""
+    from core.database import db
+    from datetime import datetime, timezone
+    order_ids = data.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="No orders specified")
+    r = await db.textbook_orders.update_many(
+        {"order_id": {"$in": order_ids}},
+        {"$set": {"archived": True, "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"status": "archived", "count": r.modified_count}
+
