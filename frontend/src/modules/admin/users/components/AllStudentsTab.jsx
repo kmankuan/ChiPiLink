@@ -298,6 +298,9 @@ export default function AllStudentsTab({ token }) {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox checked={studentSelection.allSelected} onCheckedChange={studentSelection.toggleAll} />
+                    </TableHead>
                     <TableHead>First Name</TableHead>
                     <TableHead>Last Name</TableHead>
                     <TableHead>School</TableHead>
@@ -311,6 +314,10 @@ export default function AllStudentsTab({ token }) {
                 <TableBody>
                   {filteredStudents.map((student) => (
                     <TableRow key={student.student_id}>
+                      <TableCell>
+                        <Checkbox checked={studentSelection.isSelected(student.student_id)}
+                          onCheckedChange={() => studentSelection.toggle(student.student_id)} />
+                      </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium">{student.first_name || student.full_name?.split(' ')[0] || ''}</p>
