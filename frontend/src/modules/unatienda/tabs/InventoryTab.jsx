@@ -300,6 +300,10 @@ export default function InventoryTab({ token }) {
                     return (
                       <tr key={p.book_id || p.book_id} className="border-b hover:bg-muted/30">
                         <td className="p-3">
+                          <Checkbox checked={productSelection.isSelected(p.book_id)}
+                            onCheckedChange={() => productSelection.toggle(p.book_id)} />
+                        </td>
+                        <td className="p-3">
                           <p className="font-medium text-xs truncate max-w-[200px]">{name}</p>
                           <p className="text-[10px] text-muted-foreground">{p.code || p.isbn || p.book_id || p.book_id}</p>
                         </td>
