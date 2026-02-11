@@ -588,3 +588,104 @@ async def get_all_users_with_wallets(
         })
     
     return {"users": result}
+
+
+# ============== BANK INFO ==============
+
+
+class BankInfoRequest(BaseModel):
+    context: str  # e.g. "wallet_general", "pca_private"
+    label: str  # Display name, e.g. "Wallet Recharge", "PCA Private Textbooks"
+    bank_name: str
+    account_holder: str
+    account_number: str
+    account_type: Optional[str] = None
+    routing_number: Optional[str] = None
+    reference_instructions: Optional[str] = None
+    notes: Optional[str] = None
+    is_active: bool = True
+
+
+@router.get("/admin/bank-info")
+async def get_all_bank_info(admin=Depends(get_admin_user)):
+    """Get all bank info configurations (admin)"""
+    cursor = db.wallet_bank_info.find({}, {"_id": 0}).sort("context", 1)
+    items = await cursor.to_list(length=100)
+    return {"bank_info": items}
+
+
+@router.get("/bank-info/{context}")
+async def get_bank_info_by_context(context: str):
+    """Get bank info for a specific context (public — used by widget)"""
+    item = await db.wallet_bank_info.find_one(
+        {"context": context, "is_active": True},
+        {"_id": 0}
+    )
+    return {"bank_info": item}
+
+
+@router.post("/admin/bank-info")
+async def create_bank_info(
+    data: BankInfoRequest,
+    admin=Depends(get_admin_user)
+):
+    """Create or update bank info for a context (admin)"""
+    doc = data.model_dump()
+    doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+    doc["updated_by"] = admin.get("user_id", "")
+
+    await db.wallet_bank_info.update_one(
+        {"context": data.context},
+        {"$set": doc},
+        upsert=True
+    )
+    return {"success": True, "bank_info": doc}
+
+
+@router.delete("/admin/bank-info/{context}")
+async def delete_bank_info(context: str, admin=Depends(get_admin_user)):
+    """Delete bank info for a context (admin)"""
+    result = await db.wallet_bank_info.delete_one({"context": context})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Bank info not found")
+    return {"success": True}
+
+
+# ============== ADMIN TRANSACTIONS ==============
+
+
+@router.get("/admin/transactions")
+async def get_all_transactions(
+    limit: int = 50,
+    offset: int = 0,
+    user_id: Optional[str] = None,
+    admin=Depends(get_admin_user)
+):
+    """Get all wallet transactions (admin)"""
+    query = {}
+    if user_id:
+        query["user_id"] = user_id
+
+    cursor = db.chipi_transactions.find(
+        query, {"_id": 0}
+    ).sort("created_at", -1).skip(offset).limit(limit)
+    transactions = await cursor.to_list(length=limit)
+
+    total = await db.chipi_transactions.count_documents(query)
+
+    # Enrich with user info
+    user_ids = list(set(t.get("user_id") for t in transactions if t.get("user_id")))
+    if user_ids:
+        users_cursor = db.auth_users.find(
+            {"user_id": {"$in": user_ids}},
+            {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+        )
+        users_list = await users_cursor.to_list(length=len(user_ids))
+        user_map = {u["user_id"]: u for u in users_list}
+        for t in transactions:
+            u = user_map.get(t.get("user_id"))
+            if u:
+                t["user_name"] = u.get("name", "")
+                t["user_email"] = u.get("email", "")
+
+    return {"transactions": transactions, "total": total}
