@@ -265,6 +265,9 @@ export default function InventoryTab({ token }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
+                    <th className="p-3 w-10">
+                      <Checkbox checked={productSelection.allSelected} onCheckedChange={productSelection.toggleAll} />
+                    </th>
                     <th className="text-left p-3 font-medium text-xs">
                       <button onClick={() => toggleSort('name')} className="flex items-center gap-1 hover:text-primary">
                         Product <ArrowUpDown className="h-3 w-3" />
