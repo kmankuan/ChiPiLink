@@ -82,6 +82,24 @@ export default function WalletOverviewTab({ token }) {
       toast.error(error.response?.data?.detail || 'Error adjusting wallet');
     } finally {
       setAdjusting(false);
+
+  const handleDelete = async () => {
+    if (!deleteDialog) return;
+    setDeleting(true);
+    try {
+      await axios.delete(`${API_URL}/api/wallet/admin/user/${deleteDialog.user_id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`User ${deleteDialog.name || deleteDialog.email} deleted`);
+      setDeleteDialog(null);
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error deleting user');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
     }
   };
 
