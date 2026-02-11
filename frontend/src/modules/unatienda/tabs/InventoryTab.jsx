@@ -16,9 +16,13 @@ import {
 import { toast } from 'sonner';
 import {
   Package, AlertTriangle, TrendingUp, DollarSign, Search,
-  Plus, Minus, History, Loader2, ArrowUpDown, Filter, BarChart3
+  Plus, Minus, History, Loader2, ArrowUpDown, Filter, BarChart3, Archive, Trash2
 } from 'lucide-react';
 import axios from 'axios';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
