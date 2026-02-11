@@ -78,6 +78,7 @@ const navItems = [
   { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
   { id: 'roles', label: 'Roles & Permissions', icon: Shield, permission: 'roles.view' },
   { id: 'admin', label: 'Administration', icon: Settings, permission: 'admin.site_config' },
+  { id: 'community', label: 'Community', icon: Rss, permission: 'admin.site_config' },
   { id: 'integrations', label: 'Integrations', icon: Plug, permission: 'integrations.access' },
   { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
 ];
