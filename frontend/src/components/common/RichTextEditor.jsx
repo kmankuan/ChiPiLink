@@ -36,6 +36,7 @@ import {
   X,
   Check
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // ToolbarButton component - defined outside MenuBar to avoid recreation on each render
 const ToolbarButton = ({ onClick, isActive, children, title }) => (
@@ -321,6 +322,7 @@ export default function RichTextEditor({
   onImageUpload,
   minHeight = '200px'
 }) {
+  const { t } = useTranslation();
   const editor = useEditor({
     extensions: [
       StarterKit,

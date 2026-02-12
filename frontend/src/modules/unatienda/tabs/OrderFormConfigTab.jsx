@@ -49,6 +49,7 @@ import {
   Save,
   X
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -68,6 +69,7 @@ const fieldTypeIcons = {
 };
 
 export default function OrderFormConfigTab() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [fields, setFields] = useState([]);
   const [fieldTypes, setFieldTypes] = useState([]);

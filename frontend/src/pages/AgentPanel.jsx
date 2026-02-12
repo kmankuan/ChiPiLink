@@ -7,10 +7,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink, MessageSquare, Ticket, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.REACT_APP_BACKEND_URL || '';
 
 export default function AgentPanel() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [panelData, setPanelData] = useState(null);
   const [loading, setLoading] = useState(true);

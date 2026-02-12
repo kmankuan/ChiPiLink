@@ -17,10 +17,12 @@ import {
   AlertTriangle, RefreshCw, Loader2, Download, BarChart3, PieChart,
   ShoppingCart, Calendar, Search, ArrowUp, ArrowDown, AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function StoreAnalyticsModule() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('all');

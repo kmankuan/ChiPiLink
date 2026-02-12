@@ -15,10 +15,12 @@ import {
   Headphones,
   ChevronDown
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function OrderChat({ orderId, studentName, isOpen, onClose, lang = 'es' }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);

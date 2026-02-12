@@ -27,10 +27,12 @@ import {
   Phone
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function Checkout() {
+  const { t } = useTranslation();
   const { pedidoId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);

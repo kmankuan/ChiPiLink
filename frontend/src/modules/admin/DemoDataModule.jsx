@@ -31,8 +31,10 @@ import {
   FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export default function DemoDataModule() {
+  const { t } = useTranslation();
   const { api } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);

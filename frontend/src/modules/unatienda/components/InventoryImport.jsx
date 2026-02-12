@@ -17,10 +17,12 @@ import {
   Download, Upload, FileSpreadsheet, Loader2, CheckCircle2, AlertCircle, 
   Plus, RefreshCw, ArrowRight, Package
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function InventoryImport({ token, onImportComplete }) {
+  const { t } = useTranslation();
   const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);

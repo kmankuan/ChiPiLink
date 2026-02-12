@@ -27,6 +27,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { PINPANCLUB_API } from '../config/api';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -48,6 +49,7 @@ export default function ArbiterPanel({
   onMatchUpdate,
   className = '' 
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [pointType, setPointType] = useState('normal');
 

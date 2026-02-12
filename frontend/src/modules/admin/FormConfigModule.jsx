@@ -14,8 +14,10 @@ import {
 } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Save, Loader2, Copy, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function FormConfigModule() {
+  const { t } = useTranslation();
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

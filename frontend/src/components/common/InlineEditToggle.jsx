@@ -2,12 +2,14 @@ import { useInlineTranslation } from '@/contexts/InlineTranslationContext';
 import { Button } from '@/components/ui/button';
 import { Languages, Edit, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 /**
  * InlineEditToggle - Button to toggle translation edit mode
  * Only visible to admins
  */
 export default function InlineEditToggle() {
+  const { t } = useTranslation();
   const { editMode, toggleEditMode, isAdmin } = useInlineTranslation();
 
   if (!isAdmin) return null;

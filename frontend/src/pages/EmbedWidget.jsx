@@ -20,6 +20,7 @@ import {
   Loader2, LogIn, X, ShoppingCart, CheckCircle, Clock, AlertCircle,
   Wallet, UserPlus, GraduationCap, LogOut, ClipboardList
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -711,6 +712,7 @@ const NAV_ITEMS = [
 
 /* ── Main Widget Shell ── */
 export default function EmbedWidget() {
+  const { t } = useTranslation();
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [config, setConfig] = useState(null);

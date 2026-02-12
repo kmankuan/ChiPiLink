@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import 'react-grid-layout/css/styles.css';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
@@ -23,6 +24,7 @@ const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://')
 const DEFAULT_WIDGET_SIZE = { w: 4, h: 3, minW: 2, minH: 2, maxW: 12, maxH: 8 };
 
 export default function PingPongCanvas() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   

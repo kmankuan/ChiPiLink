@@ -29,10 +29,12 @@ import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletOverviewTab() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('auth_token');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);

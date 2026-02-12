@@ -68,6 +68,7 @@ import {
   ArrowRight,
   Eye
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const MAPEO_CAMPOS = [
   { value: 'nombre', label: 'Nombre del Estudiante' },
@@ -82,6 +83,7 @@ const MAPEO_CAMPOS = [
 ];
 
 export default function GoogleSheetsSync() {
+  const { t } = useTranslation();
   const { api } = useAuth();
   
   // State

@@ -17,6 +17,7 @@ import {
   Trophy, Users, Clock, Zap
 } from 'lucide-react';
 import { PINPANCLUB_API, PINPANCLUB_WS } from '../config/api';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
@@ -31,6 +32,7 @@ const SOUNDS = {
 };
 
 export default function PingPongTV() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   

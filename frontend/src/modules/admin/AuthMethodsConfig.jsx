@@ -34,6 +34,7 @@ import {
   MapPin,
   AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -53,6 +54,7 @@ const METHOD_LABELS = {
 };
 
 export default function AuthMethodsConfig() {
+  const { t } = useTranslation();
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

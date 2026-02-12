@@ -10,6 +10,7 @@ import {
   ChevronUp,
   GripVertical
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const categoryIcons = {
   'books': '📚',
@@ -58,6 +59,7 @@ export default function FloatingStoreNav({
   onSearchChange,
   showBackToStore = false,
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showFloating, setShowFloating] = useState(false);

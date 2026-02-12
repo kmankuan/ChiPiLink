@@ -19,6 +19,7 @@ import {
   Package
 } from 'lucide-react';
 import FloatingStoreNav from '@/components/store/FloatingStoreNav';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -32,6 +33,7 @@ const categoryIcons = {
 };
 
 export default function ProductDetail() {
+  const { t } = useTranslation();
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addItem, items, openCart } = useCart();

@@ -31,10 +31,12 @@ import {
   Sparkles,
   ChevronRight
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function BooksByStudent({ onNavigateToBook }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const { addItem, items } = useCart();
   const navigate = useNavigate();

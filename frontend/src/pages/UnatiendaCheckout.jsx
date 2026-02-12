@@ -30,10 +30,12 @@ import {
   Store
 } from 'lucide-react';
 import YappyButton from '@/components/payment/YappyButton';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function UnatiendaCheckout() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { items, subtotal, updateQuantity, removeItem, clearCart } = useCart();
   

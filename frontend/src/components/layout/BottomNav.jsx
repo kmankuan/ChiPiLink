@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Home, Store, ShoppingCart, User, Trophy, LogIn, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 function NavItem({ icon: Icon, label, to, active, badge, onClick }) {
   const Component = to ? Link : 'button';
@@ -41,6 +42,7 @@ function NavItem({ icon: Icon, label, to, active, badge, onClick }) {
 }
 
 export default function BottomNav() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const { itemCount } = useCart();

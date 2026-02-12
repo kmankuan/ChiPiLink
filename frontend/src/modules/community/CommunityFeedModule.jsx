@@ -13,6 +13,7 @@ import {
   Heart, MessageCircle, Send, Loader2, ChevronDown,
   Image as ImageIcon, Play, FileText, RefreshCw
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -224,6 +225,7 @@ function PostCard({ post, token, onUpdate }) {
 
 
 export default function CommunityFeedModule() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('auth_token');
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);

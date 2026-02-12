@@ -71,6 +71,7 @@ import {
   Link2,
   Upload
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -105,6 +106,7 @@ const BLOCK_COLORS = {
 };
 
 export default function LandingPageEditor() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [blocks, setBlocks] = useState([]);

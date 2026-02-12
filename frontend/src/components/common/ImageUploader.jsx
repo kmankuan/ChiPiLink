@@ -18,6 +18,7 @@ import {
   Check,
   AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -31,6 +32,7 @@ export default function ImageUploader({
   showUrlInput = true,
   placeholder = 'Arrastra una imagen o haz clic para seleccionar'
 }) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);

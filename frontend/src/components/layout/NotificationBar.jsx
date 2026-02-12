@@ -28,6 +28,7 @@ import {
   ChevronRight,
   GraduationCap
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const NOTIFICATION_TYPES = {
   pedido_nuevo: { icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10', label: 'Pedidos Nuevos' },

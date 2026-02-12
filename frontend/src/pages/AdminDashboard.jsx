@@ -44,6 +44,7 @@ import {
   Rss
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 // Lazy load modules for code splitting and better performance
 const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule'));
@@ -85,6 +86,7 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme, setScope } = useTheme();

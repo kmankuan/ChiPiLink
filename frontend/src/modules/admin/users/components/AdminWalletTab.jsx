@@ -30,10 +30,12 @@ import {
   Wallet, ArrowUpCircle, ArrowDownCircle, Search, Loader2,
   RefreshCw, DollarSign, Users, TrendingUp
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AdminWalletTab({ token }) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

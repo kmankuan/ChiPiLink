@@ -6,8 +6,10 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { CheckCircle, XCircle, Clock, ArrowLeft, Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function PaymentResult() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   

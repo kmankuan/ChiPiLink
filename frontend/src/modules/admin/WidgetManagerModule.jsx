@@ -19,6 +19,7 @@ import {
   Wallet, Monitor, Link2
 } from 'lucide-react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const DEFAULT_SITE_URL = 'https://chipilink.me';
@@ -131,6 +132,7 @@ function ButtonPreview({ position, icon, style, label, color, offsetX, offsetY }
 }
 
 export default function WidgetManagerModule() {
+  const { t } = useTranslation();
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

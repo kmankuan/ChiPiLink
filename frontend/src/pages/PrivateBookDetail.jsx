@@ -27,10 +27,12 @@ import {
   AlertCircle,
   Users
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PrivateBookDetail() {
+  const { t } = useTranslation();
   const { bookId } = useParams();
   const navigate = useNavigate();
   const { token, isAuthenticated, user } = useAuth();

@@ -40,6 +40,7 @@ import {
   User,
   RefreshCw
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
@@ -83,6 +84,7 @@ const createApiClient = (token) => {
 };
 
 export default function LinkingPage({ embedded = false }) {
+  const { t } = useTranslation();
   const { token, isAuthenticated, loading: authLoading } = useAuth();
   
   // Data states

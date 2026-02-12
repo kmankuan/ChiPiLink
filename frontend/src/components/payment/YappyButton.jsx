@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -31,6 +32,7 @@ export default function YappyButton({
   disabled = false,
   className = ''
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [yappyActive, setYappyActive] = useState(false);
   const [processing, setProcessing] = useState(false);

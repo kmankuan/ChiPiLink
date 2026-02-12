@@ -61,10 +61,12 @@ import WebhooksTab from './components/WebhooksTab';
 import StatusMappingTab from './components/StatusMappingTab';
 import WalletMondayTab from './components/WalletMondayTab';
 import WalletSyncDashboard from './components/WalletSyncDashboard';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function MondayModule() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('workspaces');
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('auth_token');

@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Percent
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -29,6 +30,7 @@ export default function CategoryLanding({
   onSelectSubcategoria,
   onViewAllProducts 
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addItem, items, openCart } = useCart();
   

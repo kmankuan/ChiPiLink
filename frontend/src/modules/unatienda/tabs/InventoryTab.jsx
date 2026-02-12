@@ -25,6 +25,7 @@ import { usePagination } from '@/hooks/usePagination';
 import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -170,6 +171,7 @@ function MovementHistory({ movements }) {
 }
 
 export default function InventoryTab({ token }) {
+  const { t } = useTranslation();
   const [dashboard, setDashboard] = useState(null);
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);

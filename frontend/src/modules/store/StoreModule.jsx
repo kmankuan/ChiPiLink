@@ -48,6 +48,7 @@ import {
   Clock,
   GripVertical
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const emptyProductRow = {
   nombre: '',
@@ -63,6 +64,7 @@ const emptyProductRow = {
 };
 
 export default function StoreModule() {
+  const { t } = useTranslation();
   const { api } = useAuth();
   const [loading, setLoading] = useState(true);
   const [inventario, setInventario] = useState({ books: [], alertas_bajo_stock: [] });

@@ -16,6 +16,7 @@ import {
   Loader2, Save, Users, Key, ChevronRight, AlertTriangle, RefreshCw,
   History, UserPlus, UserMinus, FileEdit, Clock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -39,6 +40,7 @@ const ACTION_LABELS = {
 };
 
 export default function RolesModule() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);

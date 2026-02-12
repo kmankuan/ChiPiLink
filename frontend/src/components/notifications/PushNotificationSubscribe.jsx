@@ -15,8 +15,10 @@ import {
   Smartphone
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export default function PushNotificationSubscribe({ variant = 'full' }) {
+  const { t } = useTranslation();
   const { 
     isInitialized, 
     isSubscribed, 
