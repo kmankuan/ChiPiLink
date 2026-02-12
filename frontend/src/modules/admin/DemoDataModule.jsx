@@ -223,7 +223,7 @@ export default function DemoDataModule() {
             <div className="grid grid-cols-2 gap-3">
               <StatCard 
                 icon={Users} 
-                title="Jugadores" 
+                title={t("demoData.players")} 
                 value={stats?.pinpanclub?.players || 0}
                 color="bg-blue-500"
               />
@@ -232,30 +232,30 @@ export default function DemoDataModule() {
                 title="Super Pin" 
                 value={stats?.pinpanclub?.superpin_matches || 0}
                 color="bg-green-500"
-                subtitle="partidos"
+                subtitle={t("demoData.matches")}
               />
               <StatCard 
                 icon={Gamepad2} 
                 title="Rapid Pin" 
                 value={stats?.pinpanclub?.rapidpin_matches || 0}
                 color="bg-yellow-500"
-                subtitle="partidos"
+                subtitle={t("demoData.matches")}
               />
               <StatCard 
                 icon={Target} 
-                title="Retos" 
+                title={t("demoData.challenges")} 
                 value={stats?.pinpanclub?.challenges || 0}
                 color="bg-purple-500"
               />
               <StatCard 
                 icon={Medal} 
-                title="Logros" 
+                title={t("demoData.achievements")} 
                 value={stats?.pinpanclub?.achievements || 0}
                 color="bg-pink-500"
               />
               <StatCard 
                 icon={Trophy} 
-                title="Torneos" 
+                title={t("demoData.tournaments")} 
                 value={stats?.pinpanclub?.tournaments || 0}
                 color="bg-orange-500"
               />
