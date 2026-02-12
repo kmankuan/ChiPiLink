@@ -61,9 +61,8 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
     DEFAULT_STATUS_LABELS = {
         "add": "Top Up",
-        "deduct": "Deducted",
+        "deduct": "Deduct",
         "process": "Process",
-        "done": "Done",
         "stuck": "Stuck",
     }
 
