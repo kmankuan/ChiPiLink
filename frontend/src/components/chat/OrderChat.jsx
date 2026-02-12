@@ -28,7 +28,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
   const [sending, setSending] = useState(false);
   const messagesEnd = useRef(null);
 
-  const t = {
+  const labels = {
     en: { title: 'Messages', placeholder: 'Type a message...', send: 'Send', empty: 'No messages yet. Send a message to start the conversation.', staffLabel: 'Staff', youLabel: 'You' },
     es: { title: 'Mensajes', placeholder: 'Escribe un mensaje...', send: 'Enviar', empty: 'Sin mensajes aún. Envía un mensaje para iniciar la conversación.', staffLabel: 'Equipo', youLabel: 'Tú' },
     zh: { title: '消息', placeholder: '输入消息...', send: '发送', empty: '暂无消息。发送消息开始对话。', staffLabel: '团队', youLabel: '你' },
