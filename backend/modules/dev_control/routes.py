@@ -366,7 +366,9 @@ async def get_dependencies(admin: dict = Depends(get_admin_user)):
     # Python
     python_deps = []
     try:
-        result = subprocess.run(["pip", "list", "--format=json"], capture_output=True, text=True, timeout=15)
+        import sys
+        pip_path = os.path.join(os.path.dirname(sys.executable), "pip")
+        result = subprocess.run([pip_path, "list", "--format=json"], capture_output=True, text=True, timeout=15)
         python_deps = json.loads(result.stdout) if result.stdout else []
     except Exception:
         pass
