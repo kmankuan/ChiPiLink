@@ -41,6 +41,9 @@ const ACTION_LABELS_DEF = {
 
 export default function RolesModule() {
   const { t } = useTranslation();
+  const ACTION_LABELS = Object.fromEntries(
+    Object.entries(ACTION_LABELS_DEF).map(([k, v]) => [k, { ...v, label: t(v.labelKey) }])
+  );
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
