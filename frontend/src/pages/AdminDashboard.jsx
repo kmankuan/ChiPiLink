@@ -85,7 +85,7 @@ const navItemsDef = [
 ];
 
 export default function AdminDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navItems = navItemsDef.map(item => ({ ...item, label: t(item.labelKey) }));
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
@@ -128,7 +128,8 @@ export default function AdminDashboard() {
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
-  }, [authLoading, isAdmin, hasPermission, navItems]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, isAdmin, hasPermission, i18n.language]);
 
   // Redirect non-admins away from admin panel (only after auth is loaded)
   useEffect(() => {
