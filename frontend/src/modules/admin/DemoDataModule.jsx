@@ -338,16 +338,16 @@ export default function DemoDataModule() {
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-blue-500" />
-              ¿Qué incluyen los datos demo?
+              {t('demoData.whatIncluded')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>• <strong>12 jugadores</strong> con apodos creativos (El Rayo, La Tigresa, Dragon...)</p>
-            <p>• <strong>50 partidos</strong> con resultados realistas</p>
-            <p>• <strong>Rankings y clasificaciones</strong> generados</p>
-            <p>• <strong>Retos y logros</strong> activos</p>
-            <p>• <strong>1 torneo</strong> con inscripciones abiertas</p>
-            <p>• <strong>3 usuarios demo</strong> con wallets y transacciones</p>
+            <p>• {t('demoData.includes12Players')}</p>
+            <p>• {t('demoData.includes50Matches')}</p>
+            <p>• {t('demoData.includesRankings')}</p>
+            <p>• {t('demoData.includesChallenges')}</p>
+            <p>• {t('demoData.includes1Tournament')}</p>
+            <p>• {t('demoData.includes3Users')}</p>
           </CardContent>
         </Card>
       </div>
