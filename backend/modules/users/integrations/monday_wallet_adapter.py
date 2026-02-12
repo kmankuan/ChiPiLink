@@ -211,7 +211,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
             """)
             subitem_id = data.get("create_subitem", {}).get("id")
             if subitem_id:
-                # Set the event status via change_column_value
+                # Set the event status via change_simple_column_value
                 try:
                     await self.client.execute(f"""
                         mutation {{
@@ -219,7 +219,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
                                 item_id: {subitem_id},
                                 board_id: 18399650846,
                                 column_id: "{event_col}",
-                                value: {json.dumps(json.dumps({"label": event_label}))}
+                                value: {json.dumps(event_label)}
                             ) {{ id }}
                         }}
                     """)
