@@ -324,6 +324,7 @@ export default function TextbookOrdersAdminTab() {
                   No orders found
                 </div>
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -331,23 +332,26 @@ export default function TextbookOrdersAdminTab() {
                         <Checkbox checked={orderSelection.allSelected} onCheckedChange={orderSelection.toggleAll} />
                       </TableHead>
                       <TableHead>Student</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Grade</TableHead>
-                      <TableHead>Items</TableHead>
+                      <TableHead className="hidden sm:table-cell">User</TableHead>
+                      <TableHead className="hidden md:table-cell">Grade</TableHead>
+                      <TableHead className="hidden md:table-cell">Items</TableHead>
                       <TableHead>Total</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredOrders.map((order) => (
+                    {pageOrders.map((order) => (
                       <TableRow key={order.order_id} className={order.archived ? 'opacity-50' : ''}>
                         <TableCell>
                           <Checkbox checked={orderSelection.isSelected(order.order_id)}
                             onCheckedChange={() => orderSelection.toggle(order.order_id)} />
                         </TableCell>
-                        <TableCell className="font-medium">{order.student_name}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium">
+                          {order.student_name}
+                          <div className="text-xs text-muted-foreground sm:hidden">{order.user_email}</div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <div>
                             <p className="font-medium">{order.user_name}</p>
                             <p className="text-xs text-muted-foreground">{order.user_email}</p>
