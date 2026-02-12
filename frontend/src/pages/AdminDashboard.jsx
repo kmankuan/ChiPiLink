@@ -238,7 +238,7 @@ export default function AdminDashboard() {
                 <DropdownMenuItem asChild>
                   <Link to="/" className="flex items-center gap-2">
                     <Home className="h-4 w-4" />
-                    Go to Home
+                    {t('nav.goHome', 'Go to Home')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                   className="text-destructive focus:text-destructive"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Log Out
+                  {t('nav.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -354,15 +354,15 @@ export default function AdminDashboard() {
                 <div>
                   <h1 className="text-2xl font-bold">{currentNavItem?.label || 'Dashboard'}</h1>
                   <p className="text-muted-foreground text-sm">
-                    {activeModule === 'dashboard' && 'Welcome to ChiPi Link administration panel'}
-                    {activeModule === 'unatienda' && 'Manage catalogs, products, students and Unatienda orders'}
-                    {activeModule === 'orders' && 'Manage your customer orders'}
-                    {activeModule === 'customers' && 'Manage users, their exclusive access requests and connections'}
-                    {activeModule === 'memberships' && 'Manage plans, memberships, visits and QR codes'}
-                    {activeModule === 'pinpanclub' && 'Table Tennis Club - Matches, players and tournaments'}
-                    {activeModule === 'roles' && 'Manage user roles and system permissions'}
-                    {activeModule === 'admin' && 'Configure your site and customization'}
-                    {activeModule === 'integrations' && 'Connect with external services'}
+                    {activeModule === 'dashboard' && t('admin.moduleDesc.dashboard', 'Welcome to ChiPi Link administration panel')}
+                    {activeModule === 'unatienda' && t('admin.moduleDesc.unatienda', 'Manage catalogs, products, students and Unatienda orders')}
+                    {activeModule === 'orders' && t('admin.moduleDesc.orders', 'Manage your customer orders')}
+                    {activeModule === 'customers' && t('admin.moduleDesc.users', 'Manage users, their exclusive access requests and connections')}
+                    {activeModule === 'memberships' && t('admin.moduleDesc.memberships', 'Manage plans, memberships, visits and QR codes')}
+                    {activeModule === 'pinpanclub' && t('admin.moduleDesc.pinpanclub', 'Table Tennis Club - Matches, players and tournaments')}
+                    {activeModule === 'roles' && t('admin.moduleDesc.roles', 'Manage user roles and system permissions')}
+                    {activeModule === 'admin' && t('admin.moduleDesc.admin', 'Configure your site and customization')}
+                    {activeModule === 'integrations' && t('admin.moduleDesc.integrations', 'Connect with external services')}
                   </p>
                 </div>
                 {role && (
