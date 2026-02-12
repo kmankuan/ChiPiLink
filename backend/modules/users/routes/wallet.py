@@ -307,6 +307,11 @@ async def charge(
             reference_id=data.reference_id
         )
         
+        asyncio.create_task(_monday_sync_tx(
+            user["user_id"], data.amount, "deduct", data.description or "",
+            data.reference_id or ""
+        ))
+        
         return {"success": True, "transaction": transaction}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
