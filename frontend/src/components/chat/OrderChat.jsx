@@ -103,7 +103,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
               <MessageCircle className="h-4 w-4 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold">{t.title}</h3>
+              <h3 className="text-sm font-semibold">{labels.title}</h3>
               <p className="text-[10px] text-muted-foreground truncate max-w-[200px]">{studentName}</p>
             </div>
           </div>
@@ -121,7 +121,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
           ) : updates.length === 0 ? (
             <div className="text-center py-8">
               <Headphones className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
-              <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">{t.empty}</p>
+              <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">{labels.empty}</p>
             </div>
           ) : (
             updates.map((u, i) => (
@@ -136,7 +136,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
                   </div>
                   <div className={`flex items-center gap-1 mt-0.5 ${u.is_staff ? '' : 'justify-end'}`}>
                     <span className="text-[10px] text-muted-foreground">
-                      {u.is_staff ? u.author || t.staffLabel : t.youLabel}
+                      {u.is_staff ? u.author || labels.staffLabel : labels.youLabel}
                     </span>
                     {u.created_at && (
                       <span className="text-[10px] text-muted-foreground/60">
@@ -159,7 +159,7 @@ export default function OrderChat({ orderId, studentName, isOpen, onClose, lang 
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              placeholder={t.placeholder}
+              placeholder={labels.placeholder}
               className="flex-1 text-sm bg-muted/50 rounded-full px-4 py-2 border-0 outline-none focus:ring-2 focus:ring-purple-500"
               disabled={sending}
               data-testid="chat-input"
