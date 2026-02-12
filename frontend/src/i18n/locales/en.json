@@ -5,18 +5,19 @@
     "description": "The Chinese community super app in Panama"
   },
   "nav": {
-    "home": "Home",
-    "catalog": "Catalog",
-    "orders": "My Orders",
-    "students": "Students",
-    "profile": "Profile",
-    "admin": "Administration",
-    "login": "Login",
-    "register": "Register",
-    "logout": "Logout",
-    "membership": "Membership",
-    "tournaments": "Tournaments",
-    "community": "Community"
+    "dashboard": "Dashboard",
+    "unatienda": "Unatienda",
+    "orders": "Orders",
+    "wallet": "Wallet",
+    "reports": "Reports",
+    "users": "Users",
+    "memberships": "Memberships",
+    "pinpanclub": "PinPanClub",
+    "rolesPermissions": "Roles & Permissions",
+    "administration": "Administration",
+    "community": "Community",
+    "integrations": "Integrations",
+    "ticketsChat": "Tickets/Chat"
   },
   "landing": {
     "hero": {

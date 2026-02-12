@@ -5,18 +5,19 @@
     "description": "巴拿马华人社区超级应用"
   },
   "nav": {
-    "home": "首页",
-    "catalog": "目录",
-    "orders": "我的订单",
-    "students": "学生",
-    "profile": "个人资料",
-    "admin": "管理",
-    "login": "登录",
-    "register": "注册",
-    "logout": "退出",
-    "membership": "会员",
-    "tournaments": "赛事",
-    "community": "社区"
+    "dashboard": "仪表盘",
+    "unatienda": "商店",
+    "orders": "订单",
+    "wallet": "钱包",
+    "reports": "报告",
+    "users": "用户",
+    "memberships": "会员",
+    "pinpanclub": "PinPanClub",
+    "rolesPermissions": "角色和权限",
+    "administration": "管理",
+    "community": "社区",
+    "integrations": "集成",
+    "ticketsChat": "工单/聊天"
   },
   "landing": {
     "hero": {
