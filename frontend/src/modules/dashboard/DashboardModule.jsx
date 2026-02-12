@@ -29,11 +29,11 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function DashboardModule() {
   const { token } = useAuth();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     orders: { total: 0, pending: 0 },
