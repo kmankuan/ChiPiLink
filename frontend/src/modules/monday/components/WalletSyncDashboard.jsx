@@ -166,7 +166,7 @@ export default function WalletSyncDashboard() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Linked Users ({data?.user_items?.length || 0})
+            {t('integrations.linkedUsers')} ({data?.user_items?.length || 0})
           </CardTitle>
           <CardDescription className="text-xs">
             Users with Monday.com parent items on the Chipi Wallet board
@@ -220,7 +220,7 @@ export default function WalletSyncDashboard() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            Recent Webhook Events
+            {t('integrations.recentEvents')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -244,7 +244,7 @@ export default function WalletSyncDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2 text-red-700 dark:text-red-400">
               <XCircle className="h-4 w-4" />
-              Recent Errors ({data.recent_errors.length})
+              {t('integrations.recentErrors')} ({data.recent_errors.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
