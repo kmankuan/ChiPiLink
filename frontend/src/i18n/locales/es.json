@@ -2126,7 +2126,9 @@
     "subtitle": "Completa tu pago de forma segura",
     "subtotal": "Subtotal",
     "tax": "Impuestos",
-    "orderNotFound": "Pedido no encontrado"
+    "orderNotFound": "Pedido no encontrado",
+    "completeYourPurchase": "Completa tu compra",
+    "totalToPay": "Total a pagar"
   },
   "productDetail": {
     "description": "Descripción",

@@ -139,8 +139,8 @@ export default function UnatiendaCheckout() {
               <Store className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Checkout</h1>
-              <p className="text-muted-foreground">Completa tu compra</p>
+              <h1 className="text-2xl font-bold">{t("checkout.title")}</h1>
+              <p className="text-muted-foreground">{t("checkout.completeYourPurchase")}</p>
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function UnatiendaCheckout() {
                 <Separator />
                 
                 <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
+                  <span>{t("common.total")}</span>
                   <span className="text-primary">${subtotal.toFixed(2)}</span>
                 </div>
               </CardContent>
@@ -307,12 +307,12 @@ export default function UnatiendaCheckout() {
                   <>
                     <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span>Subtotal</span>
+                        <span>{t("checkout.subtotal")}</span>
                         <span>${subtotal.toFixed(2)}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between font-bold">
-                        <span>Total a pagar</span>
+                        <span>{t("checkout.totalToPay")}</span>
                         <span>${subtotal.toFixed(2)}</span>
                       </div>
                     </div>
@@ -346,7 +346,7 @@ export default function UnatiendaCheckout() {
                     
                     <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <div className="flex justify-between font-bold">
-                        <span>Total a pagar</span>
+                        <span>{t("checkout.totalToPay")}</span>
                         <span>${subtotal.toFixed(2)}</span>
                       </div>
                     </div>

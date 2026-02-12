@@ -1893,7 +1893,9 @@
     "subtitle": "安全完成您的付款",
     "subtotal": "小计",
     "tax": "税费",
-    "orderNotFound": "未找到订单"
+    "orderNotFound": "未找到订单",
+    "completeYourPurchase": "完成购买",
+    "totalToPay": "应付总额"
   },
   "productDetail": {
     "description": "描述",

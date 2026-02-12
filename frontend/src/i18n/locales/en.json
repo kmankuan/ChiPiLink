@@ -2122,7 +2122,9 @@
     "subtitle": "Complete your payment securely",
     "subtotal": "Subtotal",
     "tax": "Taxes",
-    "orderNotFound": "Order not found"
+    "orderNotFound": "Order not found",
+    "completeYourPurchase": "Complete your purchase",
+    "totalToPay": "Total to pay"
   },
   "productDetail": {
     "description": "Description",
