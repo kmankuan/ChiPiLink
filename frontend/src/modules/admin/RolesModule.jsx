@@ -334,15 +334,15 @@ export default function RolesModule() {
         <TabsList>
           <TabsTrigger value="roles" className="gap-2">
             <Shield className="h-4 w-4" />
-            Roles
+            {t('roles.rolesTab')}
           </TabsTrigger>
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
-            Usuarios
+            {t('roles.usersTab')}
           </TabsTrigger>
           <TabsTrigger value="audit" className="gap-2">
             <History className="h-4 w-4" />
-            Auditoría
+            {t('roles.auditTab')}
           </TabsTrigger>
         </TabsList>
 
@@ -352,7 +352,7 @@ export default function RolesModule() {
             {/* Roles List */}
             <div className="space-y-3">
               <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                Roles del Sistema
+                {t('roles.systemRoles')}
               </h3>
               {roles.map((role) => (
                 <Card 
@@ -391,7 +391,7 @@ export default function RolesModule() {
                         </div>
                       )}
                       {role.es_sistema && (
-                        <Badge variant="secondary" className="text-xs">System</Badge>
+                        <Badge variant="secondary" className="text-xs">{t('common.system')}</Badge>
                       )}
                     </div>
                   </CardContent>
@@ -462,7 +462,7 @@ export default function RolesModule() {
                                     <h5 className="font-medium capitalize mb-2">{module}</h5>
                                     <div className="flex flex-wrap gap-2">
                                       {selectedRole.permisos?.includes(`${module}.*`) ? (
-                                        <Badge variant="default">All permissions</Badge>
+                                        <Badge variant="default">{t('roles.allPermissions')}</Badge>
                                       ) : (
                                         modulePerms.filter(p => selectedRole.permisos?.includes(p)).map(p => (
                                           <Badge key={p} variant="secondary" className="text-xs">
@@ -485,7 +485,7 @@ export default function RolesModule() {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">Select a role to view its details</p>
+                    <p className="text-muted-foreground">{t('roles.selectRoleDetails')}</p>
                   </CardContent>
                 </Card>
               )}
@@ -499,7 +499,7 @@ export default function RolesModule() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users..."
+                placeholder={t('common.searchUsers')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -581,25 +581,25 @@ export default function RolesModule() {
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-2xl font-bold">{auditStats.total_logs || 0}</div>
-                      <p className="text-sm text-muted-foreground">Total de registros</p>
+                      <p className="text-sm text-muted-foreground">{t('roles.totalRecords')}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-2xl font-bold">{auditStats.recent_24h || 0}</div>
-                      <p className="text-sm text-muted-foreground">Últimas 24 horas</p>
+                      <p className="text-sm text-muted-foreground">{t('roles.last24h')}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-2xl font-bold">{auditStats.by_action?.role_assigned || 0}</div>
-                      <p className="text-sm text-muted-foreground">Roles asignados</p>
+                      <p className="text-sm text-muted-foreground">{t('roles.rolesAssigned')}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-2xl font-bold">{auditStats.by_action?.permissions_updated || 0}</div>
-                      <p className="text-sm text-muted-foreground">Permisos actualizados</p>
+                      <p className="text-sm text-muted-foreground">{t('roles.permissionsUpdated')}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -610,7 +610,7 @@ export default function RolesModule() {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder=t("roles.filterByActorTarget")
+                    placeholder={t('roles.filterByActorTarget')}
                     value={auditFilter}
                     onChange={(e) => setAuditFilter(e.target.value)}
                     className="pl-9"
