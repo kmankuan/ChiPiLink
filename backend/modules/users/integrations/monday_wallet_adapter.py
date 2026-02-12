@@ -168,20 +168,24 @@ class WalletMondayAdapter(BaseMondayAdapter):
         # Perform wallet operation
         try:
             if action == "topup":
+                from modules.users.routes.wallet import _get_default_description
+                desc = note or await _get_default_description("monday_topup")
                 transaction = await wallet_service.deposit(
                     user_id=user_id,
                     amount=amount,
                     currency=Currency.USD,
                     payment_method=PaymentMethod.BANK_TRANSFER,
                     reference=f"monday_item_{item_id}",
-                    description=note or f"Wallet top-up via Monday.com (Item #{item_id})"
+                    description=desc
                 )
             else:
+                from modules.users.routes.wallet import _get_default_description
+                desc = note or await _get_default_description("monday_deduct")
                 transaction = await wallet_service.charge(
                     user_id=user_id,
                     amount=amount,
                     currency=Currency.USD,
-                    description=note or f"Wallet deduction via Monday.com (Item #{item_id})",
+                    description=desc,
                     reference_type="monday_webhook",
                     reference_id=f"monday_item_{item_id}"
                 )
