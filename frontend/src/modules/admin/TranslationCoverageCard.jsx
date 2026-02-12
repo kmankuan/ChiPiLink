@@ -209,6 +209,19 @@ export default function TranslationCoverageCard() {
                           <TooltipContent>{t('translations.viewMissing')}</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+                      {canManage && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 text-xs gap-1 border-violet-300 text-violet-600 hover:bg-violet-50"
+                          onClick={() => autoTranslate(lang)}
+                          disabled={translating}
+                          data-testid={`auto-translate-${lang}`}
+                        >
+                          {translating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                          {t('translations.autoTranslate')}
+                        </Button>
+                      )}
                     )}
                   </div>
                   <span className="text-muted-foreground tabular-nums">
