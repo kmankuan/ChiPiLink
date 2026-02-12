@@ -4,11 +4,12 @@
  */
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wallet, ArrowLeftRight, Building2, Settings } from 'lucide-react';
+import { Wallet, ArrowLeftRight, Building2, Settings, FileText } from 'lucide-react';
 import WalletOverviewTab from './tabs/WalletOverviewTab';
 import WalletTransactionsTab from './tabs/WalletTransactionsTab';
 import BankInfoTab from './tabs/BankInfoTab';
 import WalletSettingsTab from './tabs/WalletSettingsTab';
+import BankAlertTab from './tabs/BankAlertTab';
 
 export default function WalletModule() {
   const token = localStorage.getItem('auth_token');
