@@ -826,6 +826,11 @@ export default function MondayModule() {
           <WalletMondayTab />
         </TabsContent>
 
+        {/* ========== TAB: SYNC DASHBOARD ========== */}
+        <TabsContent value="sync-dashboard" className="mt-6">
+          <WalletSyncDashboard />
+        </TabsContent>
+
         {/* ========== TAB: STATUS MAPPING ========== */}
         <TabsContent value="status-mapping" className="mt-6">
           <StatusMappingTab />
