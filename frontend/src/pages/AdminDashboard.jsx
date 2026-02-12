@@ -42,7 +42,8 @@ import {
   BarChart2,
   Wallet,
   Rss,
-  Code2
+  Code2,
+  BellRing
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
