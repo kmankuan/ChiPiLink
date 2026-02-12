@@ -635,7 +635,7 @@ export default function TextbookAccessAdminTab({ token }) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {requests.map((request, idx) => (
+                      {pageRequests.map((request, idx) => (
                         <TableRow key={`${request.student_id}-${request.year}-${idx}`}>
                           <TableCell>
                             <div>
