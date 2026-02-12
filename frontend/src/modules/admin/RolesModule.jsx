@@ -683,7 +683,7 @@ export default function RolesModule() {
                                     </span>
                                   </div>
                                   <p className="mt-1 text-sm">
-                                    <strong>{log.actor_nombre || log.actor_email || 'Sistema'}</strong>
+                                    <strong>{log.actor_nombre || log.actor_email || t('common.system')}</strong>
                                     {' '}
                                     {log.target_type === 'user' ? (
                                       <>modificó el rol de <strong>{log.target_nombre || log.target_id}</strong></>
