@@ -244,7 +244,7 @@ export function NotificationBar() {
               </PopoverTrigger>
               <PopoverContent align="end" className="w-80 p-0">
                 <div className="flex items-center justify-between p-3 border-b border-border">
-                  <h4 className="font-medium text-sm">Notificaciones</h4>
+                  <h4 className="font-medium text-sm">{t('common.notifications')}</h4>
                   {visibleCount > 0 && (
                     <Button 
                       variant="ghost" 
@@ -253,7 +253,7 @@ export function NotificationBar() {
                       onClick={markAllAsRead}
                     >
                       <Check className="h-3 w-3 mr-1" />
-                      Marcar todas
+                      {t('notifBar.markAll')}
                     </Button>
                   )}
                 </div>

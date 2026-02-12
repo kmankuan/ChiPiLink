@@ -313,15 +313,15 @@ export default function RolesModule() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Roles y Permisos</CardTitle>
+                <CardTitle>{t('roles.title')}</CardTitle>
                 <CardDescription>
-                  Gestiona los roles del sistema y asigna permisos a usuarios
+                  {t('roles.titleDesc')}
                 </CardDescription>
               </div>
             </div>
             <Button onClick={() => handleOpenRoleForm()} className="gap-2">
               <Plus className="h-4 w-4" />
-              Nuevo Rol
+              {t('roles.newRole')}
             </Button>
           </div>
         </CardHeader>
