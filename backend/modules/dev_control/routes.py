@@ -482,11 +482,12 @@ async def _gather_app_context() -> str:
 
     # Recent git commits
     try:
-        result = subprocess.run(
-            ["git", "log", "--oneline", "-10", "--format=%ai %s"], capture_output=True, text=True, cwd="/app", timeout=5
-        )
-        if result.stdout.strip():
-            context_parts.append("## Recent Changes (last 10 commits)\n" + result.stdout.strip())
+        if _git_available():
+            result = subprocess.run(
+                ["git", "log", "--oneline", "-10", "--format=%ai %s"], capture_output=True, text=True, cwd="/app", timeout=5
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                context_parts.append("## Recent Changes (last 10 commits)\n" + result.stdout.strip())
     except Exception:
         pass
 
