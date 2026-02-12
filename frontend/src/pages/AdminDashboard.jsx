@@ -41,7 +41,8 @@ import {
   Shield,
   BarChart2,
   Wallet,
-  Rss
+  Rss,
+  Code2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,7 @@ const RolesModule = lazy(() => import('@/modules/admin/RolesModule'));
 const StoreAnalyticsModule = lazy(() => import('@/modules/admin/store/StoreAnalyticsModule'));
 const WalletModule = lazy(() => import('@/modules/wallet/WalletModule'));
 const CommunityFeedModule = lazy(() => import('@/modules/community/CommunityFeedModule'));
+const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
@@ -81,6 +83,7 @@ const navItemsDef = [
   { id: 'admin', labelKey: 'nav.administration', icon: Settings, permission: 'admin.site_config' },
   { id: 'community', labelKey: 'nav.community', icon: Rss, permission: 'admin.site_config' },
   { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
+  { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
   { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
 ];
 
@@ -174,6 +177,8 @@ export default function AdminDashboard() {
         return <CommunityFeedModule />;
       case 'integrations':
         return <IntegrationsModule />;
+      case 'devcontrol':
+        return <DevControlModule />;
       default:
         return <DashboardModule />;
     }
