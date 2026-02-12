@@ -43,6 +43,17 @@ function TreeNode({ node, depth = 0 }) {
   );
 }
 
+// ─── Not Available Banner ────────────────────────────────────
+function NotAvailableBanner({ message }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center gap-3 text-muted-foreground">
+      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center"><X className="h-5 w-5" /></div>
+      <p className="text-sm font-medium">{message || 'Not available in this environment'}</p>
+      <p className="text-xs max-w-md">This feature requires access to local development tools (git, filesystem). It works in the development preview environment.</p>
+    </div>
+  );
+}
+
 // ─── Architecture Tab ───────────────────────────────────────
 function ArchitectureTab() {
   const [data, setData] = useState(null);
