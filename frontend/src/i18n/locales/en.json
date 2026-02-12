@@ -18,7 +18,9 @@
     "community": "Community",
     "integrations": "Integrations",
     "ticketsChat": "Tickets/Chat",
-    "login": "Login"
+    "login": "Login",
+    "admin": "Admin Panel",
+    "logout": "Logout"
   },
   "landing": {
     "hero": {
