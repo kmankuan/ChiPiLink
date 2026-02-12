@@ -618,7 +618,7 @@ function WalletView({ token }) {
           axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(`${API_URL}/api/wallet/transactions?limit=10`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
-        setWallet(walletRes.data);
+        setWallet(walletRes.data?.wallet || walletRes.data);
         setTransactions(txRes.data?.transactions || txRes.data || []);
       } catch {
         // Wallet may not exist yet
