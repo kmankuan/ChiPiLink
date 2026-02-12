@@ -86,6 +86,7 @@ const navItemsDef = [
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
+  const navItems = navItemsDef.map(item => ({ ...item, label: t(item.labelKey) }));
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme, setScope } = useTheme();
