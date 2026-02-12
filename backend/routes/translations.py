@@ -1,6 +1,6 @@
 """
 Translation Management Routes for ChiPi Link
-Allows admins to manage translations dynamically
+Permission-gated: users with translations.* permissions can contribute.
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional, List, Dict
@@ -12,24 +12,48 @@ router = APIRouter(prefix="/translations", tags=["translations"])
 # These will be set by the main server
 db = None
 get_admin_user = None
+get_current_user_dep = None
+_require_permission = None
+
 
 def init_routes(_db, _get_admin_user, _get_current_user):
-    global db, get_admin_user
+    global db, get_admin_user, get_current_user_dep, _require_permission
     db = _db
     get_admin_user = _get_admin_user
+    get_current_user_dep = _get_current_user
+
+    # Import require_permission from core.auth
+    from core.auth import require_permission
+    _require_permission = require_permission
+
+
+# ==================== Helpers ====================
+
+def _get_viewer():
+    """Require translations.view or admin"""
+    return Depends(lambda: _require_permission("translations.view"))
+
+
+def _get_editor():
+    """Require translations.edit or admin"""
+    return Depends(lambda: _require_permission("translations.edit"))
+
+
+def _get_manager():
+    """Require translations.manage or admin"""
+    return Depends(lambda: _require_permission("translations.manage"))
+
 
 # ==================== PUBLIC ENDPOINTS ====================
 
 @router.get("/all")
 async def get_all_translations(lang: Optional[str] = None):
     """Get all translations, optionally filtered by language"""
-    # First get base translations from DB
     translations = await db.translations.find({}, {"_id": 0}).to_list(5000)
-    
+
     if not translations:
         return {}
-    
-    # Group by key
+
     result = {}
     for t in translations:
         key = t.get("key")
@@ -37,12 +61,12 @@ async def get_all_translations(lang: Optional[str] = None):
             if key not in result:
                 result[key] = {"key": key, "es": "", "zh": "", "en": ""}
             result[key][t.get("lang", "es")] = t.get("value", "")
-    
+
     if lang:
-        # Return flat structure for specific language
         return {k: v.get(lang, v.get("es", "")) for k, v in result.items()}
-    
+
     return list(result.values())
+
 
 @router.get("/by-key/{key}")
 async def get_translation_by_key(key: str):
@@ -51,12 +75,13 @@ async def get_translation_by_key(key: str):
         {"key": key},
         {"_id": 0}
     ).to_list(3)
-    
+
     result = {"key": key, "es": "", "zh": "", "en": ""}
     for t in translations:
         result[t.get("lang", "es")] = t.get("value", "")
-    
+
     return result
+
 
 @router.get("/locale/{lang}")
 async def get_locale(lang: str):
@@ -65,14 +90,12 @@ async def get_locale(lang: str):
         {"lang": lang},
         {"_id": 0}
     ).to_list(5000)
-    
-    # Build nested structure from dot-notation keys
+
     result = {}
     for t in translations:
         key = t.get("key", "")
         value = t.get("value", "")
-        
-        # Handle dot notation (e.g., "nav.home" -> {nav: {home: value}})
+
         parts = key.split(".")
         current = result
         for i, part in enumerate(parts[:-1]):
@@ -81,10 +104,11 @@ async def get_locale(lang: str):
             current = current[part]
         if parts:
             current[parts[-1]] = value
-    
+
     return result
 
-# ==================== ADMIN ENDPOINTS ====================
+
+# ==================== PERMISSION-GATED ENDPOINTS ====================
 
 @router.get("/admin/list")
 async def admin_list_translations(
@@ -93,10 +117,9 @@ async def admin_list_translations(
     missing_only: bool = False,
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=50, le=200),
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.view"))
 ):
-    """List all translations with search and filter (admin)"""
-    # Get all unique keys
+    """List all translations with search and filter (requires translations.view)"""
     pipeline = [
         {"$group": {
             "_id": "$key",
@@ -106,10 +129,9 @@ async def admin_list_translations(
         }},
         {"$sort": {"_id": 1}}
     ]
-    
+
     results = await db.translations.aggregate(pipeline).to_list(5000)
-    
-    # Transform to unified format
+
     items = []
     for r in results:
         key = r["_id"]
@@ -122,27 +144,25 @@ async def admin_list_translations(
         }
         for t in r.get("translations", []):
             item[t["lang"]] = t["value"]
-        
-        # Apply filters
+
         if search and search.lower() not in key.lower() and \
            search.lower() not in item["es"].lower() and \
            search.lower() not in item["zh"].lower() and \
            search.lower() not in item["en"].lower():
             continue
-        
+
         if category and item["category"] != category:
             continue
-        
+
         if missing_only and item["es"] and item["zh"] and item["en"]:
             continue
-        
+
         items.append(item)
-    
-    # Pagination
+
     total = len(items)
     start = (page - 1) * limit
     end = start + limit
-    
+
     return {
         "items": items[start:end],
         "total": total,
@@ -151,24 +171,25 @@ async def admin_list_translations(
         "categories": list(set(i["category"] for i in items))
     }
 
+
 @router.post("/admin/update")
 async def admin_update_translation(
     key: str,
     lang: str,
     value: str,
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.edit"))
 ):
-    """Update a single translation (admin)"""
+    """Update a single translation (requires translations.edit)"""
     if lang not in ["es", "zh", "en"]:
         raise HTTPException(status_code=400, detail="Invalid language")
-    
-    # Upsert the translation
+
     await db.translations.update_one(
         {"key": key, "lang": lang},
         {
             "$set": {
                 "value": value,
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_by": user.get("user_id", "unknown"),
             },
             "$setOnInsert": {
                 "key": key,
@@ -178,21 +199,22 @@ async def admin_update_translation(
         },
         upsert=True
     )
-    
+
     return {"success": True}
+
 
 @router.post("/admin/bulk-update")
 async def admin_bulk_update(
     translations: List[Dict],
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.edit"))
 ):
-    """Bulk update translations (admin)"""
+    """Bulk update translations (requires translations.edit)"""
     updated = 0
     for t in translations:
         key = t.get("key")
         if not key:
             continue
-        
+
         for lang in ["es", "zh", "en"]:
             if lang in t and t[lang]:
                 await db.translations.update_one(
@@ -200,7 +222,8 @@ async def admin_bulk_update(
                     {
                         "$set": {
                             "value": t[lang],
-                            "updated_at": datetime.now(timezone.utc).isoformat()
+                            "updated_at": datetime.now(timezone.utc).isoformat(),
+                            "updated_by": user.get("user_id", "unknown"),
                         },
                         "$setOnInsert": {
                             "key": key,
@@ -211,19 +234,20 @@ async def admin_bulk_update(
                     upsert=True
                 )
                 updated += 1
-    
+
     return {"success": True, "updated": updated}
+
 
 @router.post("/admin/import")
 async def admin_import_translations(
     data: Dict,
     lang: str,
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.manage"))
 ):
-    """Import translations from JSON structure (admin)"""
+    """Import translations from JSON structure (requires translations.manage)"""
     if lang not in ["es", "zh", "en"]:
         raise HTTPException(status_code=400, detail="Invalid language")
-    
+
     def flatten_dict(d, parent_key=''):
         items = []
         for k, v in d.items():
@@ -233,9 +257,9 @@ async def admin_import_translations(
             else:
                 items.append((new_key, str(v)))
         return items
-    
+
     flat = flatten_dict(data)
-    
+
     for key, value in flat:
         await db.translations.update_one(
             {"key": key, "lang": lang},
@@ -252,36 +276,40 @@ async def admin_import_translations(
             },
             upsert=True
         )
-    
+
     return {"success": True, "imported": len(flat)}
+
 
 @router.delete("/admin/delete/{key}")
 async def admin_delete_translation(
     key: str,
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.manage"))
 ):
-    """Delete a translation key (all languages) (admin)"""
+    """Delete a translation key (all languages) (requires translations.manage)"""
     result = await db.translations.delete_many({"key": key})
     return {"success": True, "deleted": result.deleted_count}
+
 
 @router.get("/admin/export")
 async def admin_export_translations(
     lang: Optional[str] = None,
-    admin = Depends(lambda: get_admin_user)
+    user=Depends(lambda: _require_permission("translations.view"))
 ):
-    """Export all translations (admin)"""
+    """Export all translations (requires translations.view)"""
     if lang:
         return await get_locale(lang)
-    
-    # Export all languages
+
     result = {}
     for l in ["es", "zh", "en"]:
         result[l] = await get_locale(l)
-    
+
     return result
 
+
 @router.get("/admin/coverage")
-async def admin_translation_coverage(admin = Depends(lambda: get_admin_user)):
+async def admin_translation_coverage(
+    user=Depends(lambda: _require_permission("translations.view"))
+):
     """Analyze translation coverage across all locale files"""
     import os
 
@@ -311,13 +339,11 @@ async def admin_translation_coverage(admin = Depends(lambda: get_admin_user)):
             locale_keys[lang] = set()
             locale_counts[lang] = 0
 
-    # Use EN as the reference (source of truth)
     all_keys = set()
     for keys in locale_keys.values():
         all_keys.update(keys)
     reference_keys = locale_keys.get("en", all_keys)
 
-    # Per-language analysis
     languages = {}
     for lang in ["en", "es", "zh"]:
         present = locale_keys.get(lang, set())
@@ -334,7 +360,6 @@ async def admin_translation_coverage(admin = Depends(lambda: get_admin_user)):
             "coverage_pct": pct,
         }
 
-    # Category breakdown (group by first segment of dot-notation key)
     categories = {}
     for key in reference_keys:
         cat = key.split(".")[0] if "." in key else "general"
@@ -354,20 +379,21 @@ async def admin_translation_coverage(admin = Depends(lambda: get_admin_user)):
 
 
 @router.post("/admin/sync-from-files")
-async def admin_sync_from_files(admin = Depends(lambda: get_admin_user)):
-    """Sync translations from JSON files to database (admin)"""
+async def admin_sync_from_files(
+    user=Depends(lambda: _require_permission("translations.manage"))
+):
+    """Sync translations from JSON files to database (requires translations.manage)"""
     import os
-    
+
     base_path = "/app/frontend/src/i18n/locales"
     synced = 0
-    
+
     for lang in ["es", "zh", "en"]:
         file_path = f"{base_path}/{lang}.json"
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            
-            # Import to DB
+
             def flatten_dict(d, parent_key=''):
                 items = []
                 for k, v in d.items():
@@ -377,9 +403,9 @@ async def admin_sync_from_files(admin = Depends(lambda: get_admin_user)):
                     else:
                         items.append((new_key, str(v)))
                 return items
-            
+
             flat = flatten_dict(data)
-            
+
             for key, value in flat:
                 await db.translations.update_one(
                     {"key": key, "lang": lang},
@@ -394,5 +420,5 @@ async def admin_sync_from_files(admin = Depends(lambda: get_admin_user)):
                     upsert=True
                 )
                 synced += 1
-    
+
     return {"success": True, "synced": synced}
