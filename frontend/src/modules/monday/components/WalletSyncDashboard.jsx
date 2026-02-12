@@ -93,9 +93,9 @@ export default function WalletSyncDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold">Sync Dashboard</h3>
+          <h3 className="text-base font-semibold">{t('integrations.syncDashboard')}</h3>
           <p className="text-xs text-muted-foreground">
-            Real-time sync status between the app and Monday.com
+            {t('integrations.realTimeSync')}
           </p>
         </div>
         <div className="flex gap-2">
