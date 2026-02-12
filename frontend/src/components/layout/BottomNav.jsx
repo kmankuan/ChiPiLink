@@ -62,18 +62,18 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-xl border-t border-border/20 safe-area-bottom">
       <div className="flex items-stretch justify-around h-14 max-w-lg mx-auto px-1">
-        <NavItem icon={Home} label="Home" to="/" active={isHome} />
-        <NavItem icon={Store} label="Store" to="/unatienda" active={isStore} />
-        <NavItem icon={ShoppingCart} label="Cart" to="/unatienda" active={false} badge={itemCount} />
+        <NavItem icon={Home} label={t('common.home')} to="/" active={isHome} />
+        <NavItem icon={Store} label={t('common.store')} to="/unatienda" active={isStore} />
+        <NavItem icon={ShoppingCart} label={t('common.cart')} to="/unatienda" active={false} badge={itemCount} />
         {isAuthenticated ? (
           <>
             {user?.tiene_membresia_activa && (
-              <NavItem icon={Trophy} label=t("common.club") to="/pinpanclub" active={isClub} />
+              <NavItem icon={Trophy} label={t('common.club')} to="/pinpanclub" active={isClub} />
             )}
-            <NavItem icon={User} label="Me" to="/mi-cuenta" active={isProfile} />
+            <NavItem icon={User} label={t('common.me')} to="/mi-cuenta" active={isProfile} />
           </>
         ) : (
-          <NavItem icon={LogIn} label="Login" to="/login" active={isProfile} />
+          <NavItem icon={LogIn} label={t('common.login')} to="/login" active={isProfile} />
         )}
       </div>
     </nav>

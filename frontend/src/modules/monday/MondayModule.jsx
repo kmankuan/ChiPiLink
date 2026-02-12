@@ -187,7 +187,7 @@ export default function MondayModule() {
 
   const handleAddWorkspace = async () => {
     if (!apiKeyInput.trim()) {
-      toast.error('Enter a valid API Key');
+      toast.error(t('monday.enterValidKey'));
       return;
     }
     
@@ -229,7 +229,7 @@ export default function MondayModule() {
       
       if (!res.ok) throw new Error('Error activating workspace');
       
-      toast.success('Workspace activated');
+      toast.success(t('monday.workspaceActivated'));
       await loadWorkspaces();
       await testConnection();
     } catch (err) {
@@ -248,7 +248,7 @@ export default function MondayModule() {
       
       if (!res.ok) throw new Error('Error deleting workspace');
       
-      toast.success('Workspace deleted');
+      toast.success(t('monday.workspaceDeleted'));
       await loadWorkspaces();
     } catch (err) {
       toast.error(err.message);
