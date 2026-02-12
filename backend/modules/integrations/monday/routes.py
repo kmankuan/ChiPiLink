@@ -310,6 +310,103 @@ async def test_wallet_webhook(data: dict, admin: dict = Depends(get_admin_user))
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.get("/adapters/wallet/sync-dashboard")
+async def get_wallet_sync_dashboard(admin: dict = Depends(get_admin_user)):
+    """Get sync dashboard data: stats, recent events, errors, linked users."""
+    from core.database import db
+
+    # Count linked users (have a monday item)
+    linked_users = await db.monday_user_items.count_documents({})
+
+    # Count processed subitems
+    processed_subitems = await db.monday_processed_subitems.count_documents({})
+
+    # Recent webhook logs (last 20)
+    logs_cursor = db.wallet_webhook_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(20)
+    recent_logs = await logs_cursor.to_list(length=20)
+
+    # Error logs only
+    error_logs_cursor = db.wallet_webhook_logs.find(
+        {"status": "error"}, {"_id": 0}
+    ).sort("timestamp", -1).limit(10)
+    recent_errors = await error_logs_cursor.to_list(length=10)
+
+    # Recent user-item mappings
+    user_items_cursor = db.monday_user_items.find(
+        {}, {"_id": 0}
+    ).sort("created_at", -1).limit(20)
+    user_items = await user_items_cursor.to_list(length=20)
+
+    # Stats
+    success_count = await db.wallet_webhook_logs.count_documents({"status": "success"})
+    error_count = await db.wallet_webhook_logs.count_documents({"status": "error"})
+    ignored_count = await db.wallet_webhook_logs.count_documents({"status": "ignored"})
+
+    return {
+        "stats": {
+            "linked_users": linked_users,
+            "processed_subitems": processed_subitems,
+            "webhook_success": success_count,
+            "webhook_errors": error_count,
+            "webhook_ignored": ignored_count,
+        },
+        "recent_logs": recent_logs,
+        "recent_errors": recent_errors,
+        "user_items": user_items,
+    }
+
+
+@router.post("/adapters/wallet/resync-user/{user_id}")
+async def resync_user_to_monday(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Manually re-sync a user to Monday.com (create/update parent item)."""
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+
+    user = await db.auth_users.find_one(
+        {"user_id": user_id}, {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Remove existing mapping so it creates fresh
+    await db.monday_user_items.delete_one({"user_id": user_id})
+
+    item_id = await wallet_monday_adapter.sync_user_to_monday(
+        user_id, user.get("name", ""), user["email"]
+    )
+    if item_id:
+        return {"status": "success", "monday_item_id": item_id, "email": user["email"]}
+    raise HTTPException(status_code=500, detail="Failed to sync user to Monday.com")
+
+
+@router.post("/adapters/wallet/sync-all-users")
+async def sync_all_users_to_monday(admin: dict = Depends(get_admin_user)):
+    """Sync ALL non-admin users to Monday.com (creates parent items for unlinked users)."""
+    from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+
+    users_cursor = db.auth_users.find(
+        {"is_admin": {"$ne": True}},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    users = await users_cursor.to_list(length=500)
+
+    synced = 0
+    failed = 0
+    for u in users:
+        if not u.get("email"):
+            continue
+        item_id = await wallet_monday_adapter.sync_user_to_monday(
+            u["user_id"], u.get("name", ""), u["email"]
+        )
+        if item_id:
+            synced += 1
+        else:
+            failed += 1
+
+    return {"status": "success", "synced": synced, "failed": failed, "total": len(users)}
+
+
 # ============== BOARD & COLUMN DISCOVERY ==============
 
 
