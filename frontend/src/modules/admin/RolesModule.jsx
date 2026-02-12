@@ -507,7 +507,7 @@ export default function RolesModule() {
             </div>
             <Button variant="outline" onClick={fetchUsers} disabled={loadingUsers}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loadingUsers ? 'animate-spin' : ''}`} />
-              Actualizar
+              {t('common.refresh')}
             </Button>
           </div>
 
@@ -618,7 +618,7 @@ export default function RolesModule() {
                 </div>
                 <Button variant="outline" onClick={fetchAuditLogs} disabled={loadingAudit}>
                   <RefreshCw className={`h-4 w-4 mr-2 ${loadingAudit ? 'animate-spin' : ''}`} />
-                  Actualizar
+                  {t('common.refresh')}
                 </Button>
               </div>
 
@@ -627,10 +627,10 @@ export default function RolesModule() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <History className="h-5 w-5" />
-                    Historial de Cambios
+                    {t('roles.changeHistory')}
                   </CardTitle>
                   <CardDescription>
-                    Registro de todas las acciones realizadas sobre roles y permisos
+                    {t('roles.changeHistoryDesc')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -639,7 +639,7 @@ export default function RolesModule() {
                       {auditLogs.length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
                           <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>No hay registros de auditoría aún</p>
+                          <p>{t('roles.noAuditRecords')}</p>
                         </div>
                       ) : (
                         auditLogs
