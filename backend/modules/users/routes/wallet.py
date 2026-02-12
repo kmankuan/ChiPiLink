@@ -19,6 +19,11 @@ router = APIRouter(prefix="/wallet", tags=["Wallet"])
 DEFAULTS = {
     "topup": "Wallet top-up",
     "deduct": "Wallet deduction",
+    "monday_topup": "Wallet top-up (Monday.com)",
+    "monday_deduct": "Wallet deduction (Monday.com)",
+    "purchase": "Purchase",
+    "transfer_sent": "Transfer sent",
+    "transfer_received": "Transfer received",
 }
 
 async def _get_default_description(action: str) -> str:
@@ -27,6 +32,12 @@ async def _get_default_description(action: str) -> str:
     if doc and doc.get("descriptions", {}).get(action):
         return doc["descriptions"][action]
     return DEFAULTS.get(action, "Wallet transaction")
+
+async def _get_all_descriptions() -> dict:
+    """Get all configurable descriptions with defaults."""
+    doc = await db.wallet_settings.find_one({"key": "default_descriptions"}, {"_id": 0})
+    saved = doc.get("descriptions", {}) if doc else {}
+    return {k: saved.get(k, v) for k, v in DEFAULTS.items()}
 
 
 
