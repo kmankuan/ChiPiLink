@@ -93,7 +93,7 @@ function ArchitectureTab() {
 function ModulesTab() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { axios.get(`${API}/api/dev-control/modules`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/modules`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ modules: [], tag_counts: {} })).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
   const sc = { active: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400', placeholder: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' };
