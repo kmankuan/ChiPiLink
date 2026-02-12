@@ -42,7 +42,15 @@ export default function WalletSettingsTab() {
   const [loadingColumns, setLoadingColumns] = useState(false);
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
-  const [descriptions, setDescriptions] = useState({ topup: 'Wallet top-up', deduct: 'Wallet deduction' });
+  const [descriptions, setDescriptions] = useState({
+    topup: 'Wallet top-up',
+    deduct: 'Wallet deduction',
+    monday_topup: 'Wallet top-up (Monday.com)',
+    monday_deduct: 'Wallet deduction (Monday.com)',
+    purchase: 'Purchase',
+    transfer_sent: 'Transfer sent',
+    transfer_received: 'Transfer received',
+  });
   const [savingDesc, setSavingDesc] = useState(false);
 
   const walletWebhookUrl = `${window.location.origin}/api/monday/webhooks/incoming`;
