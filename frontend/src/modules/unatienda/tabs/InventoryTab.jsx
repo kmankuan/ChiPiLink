@@ -277,7 +277,7 @@ export default function InventoryTab({ token }) {
                         Product <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </th>
-                    <th className="text-left p-3 font-medium text-xs">Category</th>
+                    <th className="text-left p-3 font-medium text-xs hidden sm:table-cell">Category</th>
                     <th className="text-right p-3 font-medium text-xs">
                       <button onClick={() => toggleSort('price')} className="flex items-center gap-1 ml-auto hover:text-primary">
                         Price <ArrowUpDown className="h-3 w-3" />
@@ -288,15 +288,15 @@ export default function InventoryTab({ token }) {
                         Stock <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </th>
-                    <th className="text-center p-3 font-medium text-xs">Status</th>
+                    <th className="text-center p-3 font-medium text-xs hidden sm:table-cell">Status</th>
                     <th className="text-center p-3 font-medium text-xs">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => {
+                  {pageProducts.map((p) => {
                     const qty = p.inventory_quantity ?? p.cantidad_inventario ?? 0;
                     const name = p.name || p.nombre || 'Unnamed';
-                    const cat = p.category || p.categoria || '—';
+                    const cat = p.category || p.categoria || '\u2014';
                     const price = p.price ?? p.precio ?? 0;
                     const statusColor = qty <= 0 ? 'bg-red-100 text-red-700' : qty <= 10 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
                     const statusLabel = qty <= 0 ? 'Out' : qty <= 10 ? 'Low' : 'OK';
@@ -310,29 +310,34 @@ export default function InventoryTab({ token }) {
                         <td className="p-3">
                           <p className="font-medium text-xs truncate max-w-[200px]">{name}</p>
                           <p className="text-[10px] text-muted-foreground">{p.code || p.isbn || p.book_id || p.book_id}</p>
+                          <p className="text-[10px] text-muted-foreground sm:hidden">{cat}</p>
                         </td>
-                        <td className="p-3 text-xs text-muted-foreground">{cat}</td>
+                        <td className="p-3 text-xs text-muted-foreground hidden sm:table-cell">{cat}</td>
                         <td className="p-3 text-right text-xs font-mono">${price.toFixed(2)}</td>
                         <td className="p-3 text-right text-xs font-mono font-bold">{qty}</td>
-                        <td className="p-3 text-center">
+                        <td className="p-3 text-center hidden sm:table-cell">
                           <Badge variant="outline" className={`text-[10px] ${statusColor}`}>{statusLabel}</Badge>
                         </td>
                         <td className="p-3 text-center">
                           <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAdjustProduct({ ...p, inventory_quantity: qty, name, book_id: p.book_id || p.book_id })}>
-                            <ArrowUpDown className="h-3 w-3 mr-1" /> Adjust
+                            <ArrowUpDown className="h-3 w-3 mr-1" /> <span className="hidden sm:inline">Adjust</span>
                           </Button>
                         </td>
                       </tr>
                     );
                   })}
-                  {products.length === 0 && (
+                  {pageProducts.length === 0 && (
                     <tr><td colSpan={7} className="text-center text-muted-foreground text-sm py-8">No products found</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
-            <div className="p-3 border-t text-xs text-muted-foreground">
-              Showing {products.length} of {total} products
+            <div className="p-3 border-t">
+              <TablePagination
+                page={productPagination.page} totalPages={productPagination.totalPages} totalItems={productPagination.totalItems}
+                pageSize={productPagination.pageSize} onPageChange={productPagination.setPage} onPageSizeChange={productPagination.setPageSize}
+                canPrev={productPagination.canPrev} canNext={productPagination.canNext}
+              />
             </div>
           </CardContent>
         </Card>
