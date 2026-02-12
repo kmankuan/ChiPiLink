@@ -134,7 +134,7 @@ class MondayCoreClient:
 
     async def create_update(self, item_id: str, body: str) -> Optional[str]:
         """Add an Update (comment) to an item. Returns update_id."""
-        escaped = body.replace('"', '\\"')
+        escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
         query = f'mutation {{ create_update (item_id: {item_id}, body: "{escaped}") {{ id }} }}'
         data = await self.execute(query)
         return data.get("create_update", {}).get("id")
