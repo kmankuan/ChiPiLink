@@ -721,6 +721,9 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
     return result;
   }, [products, searchTerm, statusFilter, sortConfig, catalogType]);
 
+  const catalogPagination = usePagination(sortedProducts, 50);
+  const pageProducts = catalogPagination.paginated;
+
   // Inline update
   const updateProductField = useCallback(async (bookId, field, value) => {
     try {
