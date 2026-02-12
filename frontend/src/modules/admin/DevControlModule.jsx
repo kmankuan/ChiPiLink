@@ -324,7 +324,7 @@ function ChangesLogTab() {
   const [loading, setLoading] = useState(true);
   const [expandedCommit, setExpandedCommit] = useState(null);
   const [commitFiles, setCommitFiles] = useState({});
-  useEffect(() => { axios.get(`${API}/api/dev-control/changes-log`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/changes-log`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ commits: [], total: 0, available: false, reason: 'Failed to connect' })).finally(() => setLoading(false)); }, []);
   const loadFiles = async (hash) => {
     if (commitFiles[hash]) { setExpandedCommit(expandedCommit === hash ? null : hash); return; }
     try {
