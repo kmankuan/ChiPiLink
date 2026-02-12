@@ -234,7 +234,7 @@ export default function DashboardModule() {
 
       {/* Quick Access */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Quick Access</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('dashboard.quickAccess')}</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {quickAccessModules.map((module) => {
             const Icon = module.icon;
