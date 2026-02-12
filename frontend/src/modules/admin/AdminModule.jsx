@@ -24,6 +24,7 @@ import FormConfigModule from './FormConfigModule';
 import FormsManagerModule from './FormsManagerModule';
 import DictionaryManagerModule from './DictionaryManagerModule';
 import TranslationsModule from './TranslationsModule';
+import TranslationCoverageCard from './TranslationCoverageCard';
 import DemoDataModule from './DemoDataModule';
 import AuthMethodsConfig from './AuthMethodsConfig';
 import DatabaseMigrationModule from './DatabaseMigrationModule';
@@ -108,6 +109,7 @@ export default function AdminModule() {
 
         <TabsContent value="translations">
           <div className="space-y-8">
+            <TranslationCoverageCard />
             <DictionaryManagerModule />
             <div className="border-t pt-6">
               <TranslationsModule />
