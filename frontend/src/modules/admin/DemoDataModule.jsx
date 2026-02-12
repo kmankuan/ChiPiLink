@@ -138,7 +138,7 @@ export default function DemoDataModule() {
               <div>
                 <CardTitle>{t("demoData.title")}</CardTitle>
                 <CardDescription>
-                  Genera datos ficticios para probar y demostrar la aplicación
+                  {t('demoData.titleDesc')}
                 </CardDescription>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function DemoDataModule() {
               disabled={loading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Actualizar
+              {t('common.refresh')}
             </Button>
           </div>
         </CardHeader>
@@ -164,12 +164,12 @@ export default function DemoDataModule() {
               {seeding ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creando datos...
+                  {t('demoData.creatingData')}
                 </>
               ) : (
                 <>
                   <Play className="h-4 w-4 mr-2" />
-                  Crear Datos Demo
+                  {t('demoData.createDemoData')}
                 </>
               )}
             </Button>
@@ -183,12 +183,12 @@ export default function DemoDataModule() {
               {clearing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Eliminando...
+                  {t('demoData.deleting')}
                 </>
               ) : (
                 <>
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Limpiar Datos Demo
+                  {t('demoData.clearDemoData')}
                 </>
               )}
             </Button>
@@ -201,10 +201,10 @@ export default function DemoDataModule() {
         <Alert className="border-green-500 bg-green-50 dark:bg-green-950/20">
           <CheckCircle2 className="h-4 w-4 text-green-500" />
           <AlertDescription className="text-green-700 dark:text-green-400">
-            <strong>Datos creados:</strong>{' '}
-            {lastResult.pinpanclub?.players_created || 0} jugadores, {' '}
-            {(lastResult.pinpanclub?.superpin_matches_created || 0) + (lastResult.pinpanclub?.rapidpin_matches_created || 0)} partidos, {' '}
-            {lastResult.users_wallets?.users_created || 0} usuarios demo
+            <strong>{t('demoData.dataCreated')}:</strong>{' '}
+            {lastResult.pinpanclub?.players_created || 0} {t('demoData.players')}, {' '}
+            {(lastResult.pinpanclub?.superpin_matches_created || 0) + (lastResult.pinpanclub?.rapidpin_matches_created || 0)} {t('demoData.matches')}, {' '}
+            {lastResult.users_wallets?.users_created || 0} {t('demoData.demoUsers')}
           </AlertDescription>
         </Alert>
       )}
