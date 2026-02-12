@@ -358,3 +358,133 @@ async def admin_sync_from_files(
                 synced += 1
 
     return {"success": True, "synced": synced}
+
+
+@router.post("/admin/auto-translate")
+async def admin_auto_translate(
+    target_lang: str,
+    keys: Optional[List[str]] = None,
+    user: dict = Depends(get_authenticated_user)
+):
+    """Auto-translate missing keys using LLM (requires translations.manage)"""
+    await _check_permission(user, "translations.manage")
+
+    if target_lang not in ["es", "zh"]:
+        raise HTTPException(status_code=400, detail="Target must be 'es' or 'zh'")
+
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    api_key = os.environ.get("EMERGENT_LLM_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="LLM key not configured")
+
+    # Load English locale as source
+    base_path = "/app/frontend/src/i18n/locales"
+    with open(f"{base_path}/en.json", "r", encoding="utf-8") as f:
+        en_data = json.load(f)
+
+    def flatten_dict(d, parent_key=''):
+        items = []
+        for k, v in d.items():
+            new_key = f"{parent_key}.{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(flatten_dict(v, new_key))
+            else:
+                items.append((new_key, str(v)))
+        return items
+
+    en_flat = {k: v for k, v in flatten_dict(en_data)}
+
+    # Load target locale to find missing keys
+    target_path = f"{base_path}/{target_lang}.json"
+    if os.path.exists(target_path):
+        with open(target_path, "r", encoding="utf-8") as f:
+            target_data = json.load(f)
+        target_flat = {k for k, v in flatten_dict(target_data) if v.strip()}
+    else:
+        target_flat = set()
+
+    # Determine which keys to translate
+    if keys:
+        to_translate = {k: en_flat[k] for k in keys if k in en_flat and k not in target_flat}
+    else:
+        to_translate = {k: v for k, v in en_flat.items() if k not in target_flat}
+
+    if not to_translate:
+        return {"success": True, "translated": 0, "message": "No missing keys to translate"}
+
+    lang_name = "Spanish" if target_lang == "es" else "Chinese (Simplified Mandarin)"
+
+    # Batch in groups of 40 to avoid token limits
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    import uuid
+
+    all_translated = {}
+    items = list(to_translate.items())
+    batch_size = 40
+
+    for i in range(0, len(items), batch_size):
+        batch = items[i:i + batch_size]
+        batch_dict = {k: v for k, v in batch}
+
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=str(uuid.uuid4()),
+            system_message=f"""You are a professional translator. Translate UI strings from English to {lang_name}.
+Rules:
+- Return ONLY valid JSON with the same keys
+- Keep proper nouns, brand names (ChiPi, PinPan, Unatienda) unchanged
+- Keep technical terms accurate
+- Match the tone and formality of the source
+- Do NOT add explanations, just return the JSON"""
+        )
+        chat.with_model("openai", "gpt-4.1-mini")
+
+        prompt = f"Translate these UI strings to {lang_name}. Return JSON with same keys:\n{json.dumps(batch_dict, ensure_ascii=False, indent=2)}"
+
+        msg = UserMessage(text=prompt)
+        response = await chat.send_message(msg)
+
+        # Parse the LLM response
+        try:
+            # Strip markdown code fences if present
+            text = response.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+                if text.endswith("```"):
+                    text = text[:-3]
+                text = text.strip()
+            translated = json.loads(text)
+            all_translated.update(translated)
+        except json.JSONDecodeError:
+            continue
+
+    # Write translations to the locale file
+    if all_translated:
+        with open(target_path, "r", encoding="utf-8") as f:
+            locale_data = json.load(f)
+
+        def set_nested(d, key_path, value):
+            parts = key_path.split(".")
+            current = d
+            for part in parts[:-1]:
+                if part not in current:
+                    current[part] = {}
+                current = current[part]
+            current[parts[-1]] = value
+
+        for key, value in all_translated.items():
+            if isinstance(value, str) and value.strip():
+                set_nested(locale_data, key, value)
+
+        with open(target_path, "w", encoding="utf-8") as f:
+            json.dump(locale_data, f, ensure_ascii=False, indent=2)
+
+    return {
+        "success": True,
+        "translated": len(all_translated),
+        "total_missing": len(to_translate),
+    }
+
