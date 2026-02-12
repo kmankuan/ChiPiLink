@@ -22,7 +22,8 @@
     "admin": "管理面板",
     "logout": "退出登录",
     "goHome": "返回首页",
-    "devControl": "开发控制"
+    "devControl": "开发控制",
+    "paymentAlerts": "支付提醒"
   },
   "landing": {
     "hero": {
@@ -211,7 +212,8 @@
       "roles": "管理用户角色和系统权限",
       "admin": "配置您的网站和自定义选项",
       "integrations": "连接外部服务",
-      "devcontrol": "架构、API参考、路线图和开发注释"
+      "devcontrol": "架构、API参考、路线图和开发注释",
+      "paymentAlerts": "银行支付检测、审批队列和邮件规则"
     }
   },
   "common": {
@@ -2220,6 +2222,13 @@
       "dbExplorer": "数据库",
       "changes": "变更",
       "dependencies": "依赖"
+    }
+  },
+  "paymentAlerts": {
+    "tabs": {
+      "pending": "待处理队列",
+      "rules": "邮件规则",
+      "settings": "设置"
     }
   }
 }

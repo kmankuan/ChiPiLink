@@ -22,7 +22,8 @@
     "admin": "Admin Panel",
     "logout": "Logout",
     "goHome": "Go to Home",
-    "devControl": "Dev Control"
+    "devControl": "Dev Control",
+    "paymentAlerts": "Payment Alerts"
   },
   "landing": {
     "hero": {
@@ -211,7 +212,8 @@
       "roles": "Manage user roles and system permissions",
       "admin": "Configure your site and customization",
       "integrations": "Connect with external services",
-      "devcontrol": "Architecture, API reference, roadmap & dev annotations"
+      "devcontrol": "Architecture, API reference, roadmap & dev annotations",
+      "paymentAlerts": "Bank payment detection, approval queue & email rules"
     }
   },
   "common": {
@@ -2220,6 +2222,13 @@
       "dbExplorer": "Database",
       "changes": "Changes",
       "dependencies": "Dependencies"
+    }
+  },
+  "paymentAlerts": {
+    "tabs": {
+      "pending": "Pending Queue",
+      "rules": "Email Rules",
+      "settings": "Settings"
     }
   }
 }

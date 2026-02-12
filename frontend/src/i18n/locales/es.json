@@ -22,7 +22,8 @@
     "admin": "Panel Admin",
     "logout": "Cerrar Sesión",
     "goHome": "Ir al Inicio",
-    "devControl": "Control Dev"
+    "devControl": "Control Dev",
+    "paymentAlerts": "Alertas de Pago"
   },
   "landing": {
     "hero": {
@@ -211,7 +212,8 @@
       "roles": "Gestiona roles de usuario y permisos del sistema",
       "admin": "Configura tu sitio y personalización",
       "integrations": "Conecta con servicios externos",
-      "devcontrol": "Arquitectura, referencia API, hoja de ruta y anotaciones de desarrollo"
+      "devcontrol": "Arquitectura, referencia API, hoja de ruta y anotaciones de desarrollo",
+      "paymentAlerts": "Deteccion de pagos bancarios, cola de aprobacion y reglas de email"
     }
   },
   "common": {
@@ -2224,6 +2226,13 @@
       "dbExplorer": "Base de Datos",
       "changes": "Cambios",
       "dependencies": "Dependencias"
+    }
+  },
+  "paymentAlerts": {
+    "tabs": {
+      "pending": "Cola Pendientes",
+      "rules": "Reglas de Email",
+      "settings": "Configuracion"
     }
   }
 }
