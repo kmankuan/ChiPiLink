@@ -360,15 +360,21 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
                 results.append({"sub_id": sub_id, "action": action, "amount": amount, "status": "success"})
 
-                # Mark subitem as "Done"
-                await self._mark_subitem_done(sub_id, sub_mapping, done_label)
+                # Track as processed in DB
+                await db.monday_processed_subitems.insert_one({
+                    "subitem_id": sub_id,
+                    "parent_item_id": parent_item_id,
+                    "action": action,
+                    "amount": amount,
+                    "processed_at": datetime.now(timezone.utc).isoformat(),
+                })
 
             except ValueError as e:
                 results.append({"sub_id": sub_id, "action": action, "error": str(e)})
 
-        # Update parent status to "Done"
-        await self._set_parent_status(parent_item_id, config, done_label)
-        await self._post_confirmation_subitems(parent_item_id, results, user.get("name", email))
+        # Post confirmation update on the Monday item
+        if results:
+            await self._post_confirmation_subitems(parent_item_id, results, user.get("name", email))
 
         summary = f"Processed {len(results)} subitems for {email}"
         await self._log_event(event, "success", summary, {"results": results, "email": email})
