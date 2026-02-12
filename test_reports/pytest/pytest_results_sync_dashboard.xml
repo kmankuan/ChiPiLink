@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="9" failures="0" skipped="0" tests="9" time="2.571" timestamp="2026-02-12T11:06:46.156256+00:00" hostname="agent-env-d10ea1ba-b66c-4ce1-9cf8-8f9e5dfd25ff"><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_01_sync_dashboard_returns_data" time="0.325"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_02_sync_dashboard_user_items_structure" time="0.263"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_03_sync_dashboard_logs_structure" time="0.264"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_04_sync_dashboard_requires_auth" time="0.261"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_05_resync_user_endpoint" time="0.260"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_06_resync_nonexistent_user" time="0.261"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_07_resync_user_requires_auth" time="0.261"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_08_sync_all_users_endpoint" time="0.262"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase><testcase classname="backend.tests.test_sync_dashboard.TestSyncDashboard" name="test_09_sync_all_users_requires_auth" time="0.260"><error message="failed on setup with &quot;AssertionError: No access_token in login response&#10;assert None&quot;">backend/tests/test_sync_dashboard.py:38: in setup
+    assert token, "No access_token in login response"
+E   AssertionError: No access_token in login response
+E   assert None</error></testcase></testsuite></testsuites>
