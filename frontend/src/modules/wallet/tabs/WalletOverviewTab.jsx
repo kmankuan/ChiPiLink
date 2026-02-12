@@ -53,6 +53,8 @@ export default function WalletOverviewTab() {
   });
 
   const selection = useTableSelection(filtered, 'user_id');
+  const pagination = usePagination(filtered, 25);
+  const pageItems = pagination.paginated;
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
