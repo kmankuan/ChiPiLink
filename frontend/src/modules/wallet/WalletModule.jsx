@@ -3,6 +3,7 @@
  * Tabs: Overview, Transactions, Bank Info, Settings
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, ArrowLeftRight, Building2, Settings } from 'lucide-react';
 import WalletOverviewTab from './tabs/WalletOverviewTab';
@@ -13,31 +14,32 @@ import WalletSettingsTab from './tabs/WalletSettingsTab';
 export default function WalletModule() {
   const token = localStorage.getItem('auth_token');
   const [activeTab, setActiveTab] = useState('overview');
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Wallet Management</h1>
-        <p className="text-sm text-muted-foreground">Manage user wallets, transactions, and bank info</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('wallet.walletManagement')}</h1>
+        <p className="text-sm text-muted-foreground">{t('wallet.manageWallets')}</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview" className="gap-1.5 text-xs">
             <Wallet className="h-3.5 w-3.5" />
-            Overview
+            {t('wallet.overview')}
           </TabsTrigger>
           <TabsTrigger value="transactions" className="gap-1.5 text-xs">
             <ArrowLeftRight className="h-3.5 w-3.5" />
-            Transactions
+            {t('wallet.transactions')}
           </TabsTrigger>
           <TabsTrigger value="bank-info" className="gap-1.5 text-xs">
             <Building2 className="h-3.5 w-3.5" />
-            Bank Info
+            {t('wallet.bankInfo')}
           </TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 text-xs">
             <Settings className="h-3.5 w-3.5" />
-            Settings
+            {t('wallet.settings')}
           </TabsTrigger>
         </TabsList>
 
