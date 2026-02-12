@@ -17,7 +17,8 @@
     "administration": "管理",
     "community": "社区",
     "integrations": "集成",
-    "ticketsChat": "工单/聊天"
+    "ticketsChat": "工单/聊天",
+    "login": "登录"
   },
   "landing": {
     "hero": {

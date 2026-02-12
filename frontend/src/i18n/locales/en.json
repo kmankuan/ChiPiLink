@@ -17,7 +17,8 @@
     "administration": "Administration",
     "community": "Community",
     "integrations": "Integrations",
-    "ticketsChat": "Tickets/Chat"
+    "ticketsChat": "Tickets/Chat",
+    "login": "Login"
   },
   "landing": {
     "hero": {
