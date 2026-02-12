@@ -128,7 +128,7 @@ function ModulesTab() {
 function PrinciplesTab() {
   const [principles, setPrinciples] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { axios.get(`${API}/api/dev-control/principles`, { headers: hdrs() }).then(r => setPrinciples(r.data.principles)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/principles`, { headers: hdrs() }).then(r => setPrinciples(r.data.principles)).catch(() => setPrinciples([])).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   return (
     <div className="space-y-4">
