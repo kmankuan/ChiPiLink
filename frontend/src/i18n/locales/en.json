@@ -54,7 +54,12 @@
       "registerButton": "Don't have an account? Register on LaoPan",
       "description": "Sign in or register on LaoPan.online to access",
       "connecting": "Connecting..."
-    }
+    },
+    "processing": "Processing authentication...",
+    "pleaseWait": "Please wait while we verify your account",
+    "authError": "Authentication error",
+    "completingLogin": "Completing login...",
+    "loginSuccess": "Login Successful!"
   },
   "membership": {
     "title": "Club Membership",

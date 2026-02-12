@@ -54,7 +54,12 @@
       "registerButton": "没有账户？在 LaoPan 注册",
       "description": "登录或注册 LaoPan.online 以访问",
       "connecting": "连接中..."
-    }
+    },
+    "processing": "正在处理认证...",
+    "pleaseWait": "请稍候，我们正在验证您的账户",
+    "authError": "认证错误",
+    "completingLogin": "正在完成登录...",
+    "loginSuccess": "登录成功！"
   },
   "membership": {
     "title": "俱乐部会员",

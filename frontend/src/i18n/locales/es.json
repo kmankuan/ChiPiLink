@@ -54,7 +54,12 @@
       "registerButton": "¿No tienes cuenta? Regístrate en LaoPan",
       "description": "Inicia sesión o regístrate en LaoPan.online para acceder",
       "connecting": "Conectando..."
-    }
+    },
+    "processing": "Procesando autenticación...",
+    "pleaseWait": "Por favor espere mientras verificamos su cuenta",
+    "authError": "Error de autenticación",
+    "completingLogin": "Completando inicio de sesión...",
+    "loginSuccess": "¡Inicio de sesión exitoso!"
   },
   "membership": {
     "title": "Membresía del Club",
