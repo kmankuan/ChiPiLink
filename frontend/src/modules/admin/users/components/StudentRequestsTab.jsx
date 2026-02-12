@@ -17,6 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { usePagination } from '@/hooks/usePagination';
+import { TablePagination } from '@/components/shared/TablePagination';
 import {
   DropdownMenu,
   DropdownMenuContent,
