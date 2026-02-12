@@ -155,7 +155,7 @@ function ApiReferenceTab() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [expanded, setExpanded] = useState({});
-  useEffect(() => { axios.get(`${API}/api/dev-control/endpoints`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/endpoints`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ groups: {}, total: 0 })).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
   const mc = { GET: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400', POST: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-400', PUT: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400', DELETE: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400', PATCH: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-400' };
