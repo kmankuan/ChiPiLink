@@ -2215,7 +2215,11 @@
       "modules": "Modules",
       "principles": "Principles",
       "api": "API Reference",
-      "roadmap": "Roadmap"
+      "roadmap": "Roadmap",
+      "aiHelper": "AI Dev Helper",
+      "dbExplorer": "Database",
+      "changes": "Changes",
+      "dependencies": "Dependencies"
     }
   }
 }

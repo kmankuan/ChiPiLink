@@ -2215,7 +2215,11 @@
       "modules": "模块",
       "principles": "原则",
       "api": "API参考",
-      "roadmap": "路线图"
+      "roadmap": "路线图",
+      "aiHelper": "AI开发助手",
+      "dbExplorer": "数据库",
+      "changes": "变更",
+      "dependencies": "依赖"
     }
   }
 }

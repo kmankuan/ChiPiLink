@@ -2219,7 +2219,11 @@
       "modules": "Modulos",
       "principles": "Principios",
       "api": "Referencia API",
-      "roadmap": "Hoja de Ruta"
+      "roadmap": "Hoja de Ruta",
+      "aiHelper": "Asistente IA Dev",
+      "dbExplorer": "Base de Datos",
+      "changes": "Cambios",
+      "dependencies": "Dependencias"
     }
   }
 }
