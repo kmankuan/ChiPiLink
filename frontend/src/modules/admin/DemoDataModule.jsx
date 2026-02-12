@@ -366,10 +366,10 @@ export default function DemoDataModule() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowClearDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleClearData}>
-              Sí, Eliminar
+              {t('demoData.yesDelete')}
             </Button>
           </DialogFooter>
         </DialogContent>
