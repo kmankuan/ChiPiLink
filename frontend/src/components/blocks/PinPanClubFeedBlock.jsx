@@ -265,7 +265,7 @@ export default function PinPanClubFeedBlock({ config, isEditMode, onUpdateConfig
             <CardContent className="pt-4 text-center">
               <Trophy className="h-8 w-8 mx-auto mb-2 text-purple-600" />
               <p className="text-3xl font-bold text-purple-700">{feedData.stats.total_matches}</p>
-              <p className="text-sm text-purple-600">Total</p>
+              <p className="text-sm text-purple-600">{t('common.total')}</p>
             </CardContent>
           </Card>
         </div>
