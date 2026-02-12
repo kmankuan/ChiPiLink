@@ -282,7 +282,7 @@ function DbExplorerTab() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [expandedCol, setExpandedCol] = useState(null);
-  useEffect(() => { axios.get(`${API}/api/dev-control/db-explorer`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/db-explorer`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ collections: [], total_collections: 0 })).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
   const cols = data.collections.filter(c => !filter || c.name.toLowerCase().includes(filter.toLowerCase()));
