@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import WeeklyChallenges from '../components/WeeklyChallenges';
+import { useTranslation } from 'react-i18next';
 
 export default function WeeklyChallengesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const currentUserId = user?.user_id || null;

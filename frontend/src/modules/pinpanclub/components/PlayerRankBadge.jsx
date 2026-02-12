@@ -11,7 +11,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Rank definitions with thresholds and styling

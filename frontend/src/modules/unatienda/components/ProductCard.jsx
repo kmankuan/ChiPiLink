@@ -5,6 +5,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Clock, GraduationCap, Plus, ShoppingCart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProductCard({
   product,
@@ -19,6 +20,7 @@ export default function ProductCard({
   onAddToCart,
   onOpenCart,
 }) {
+  const { t } = useTranslation();
   return (
     <div
       data-testid={`product-card-${product.book_id}`}

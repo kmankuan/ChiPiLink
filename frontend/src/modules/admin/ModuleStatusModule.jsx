@@ -11,7 +11,9 @@ import { toast } from 'sonner';
 import { Loader2, Save, RotateCcw, Construction, Clock, Wrench, Rocket, Info } from 'lucide-react';
 import axios from 'axios';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const STATUS_OPTIONS = [

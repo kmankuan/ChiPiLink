@@ -12,7 +12,9 @@ import {
   ChevronDown, ChevronUp, Move, Copy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const POSITION_OPTIONS = [

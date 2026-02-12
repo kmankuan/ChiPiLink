@@ -10,7 +10,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AnalyticsSummary() {

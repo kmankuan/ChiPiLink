@@ -11,7 +11,9 @@ import {
   RefreshCw, Loader2, Users, ArrowUpDown, CheckCircle2,
   XCircle, AlertTriangle, RotateCcw, Upload, Clock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletSyncDashboard() {

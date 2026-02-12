@@ -45,7 +45,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ScoreBoard from '../components/ScoreBoard';
 import { PINPANCLUB_API, API_BASE } from '../config/api';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongDashboard() {

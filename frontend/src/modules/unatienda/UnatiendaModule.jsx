@@ -16,7 +16,9 @@ import TextbookAccessAdminTab from '@/modules/admin/users/components/StudentRequ
 import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab';
 import OrderFormConfigTab from './tabs/OrderFormConfigTab';
 import SchoolYearTab from './tabs/SchoolYearTab';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function UnatiendaModule() {

@@ -7,8 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import WeeklyChallenges from '../../components/WeeklyChallenges';
+import { useTranslation } from 'react-i18next';
 
 export default function ChallengesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentUserId, setCurrentUserId] = useState(null);
 

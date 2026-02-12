@@ -10,7 +10,9 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { ArrowLeft, Loader2, Maximize2, RefreshCw } from 'lucide-react';
 import ScoreBoard from '../components/ScoreBoard';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongSpectator() {

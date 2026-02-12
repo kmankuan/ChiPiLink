@@ -17,7 +17,9 @@ import axios from 'axios';
 import {
   Building2, Plus, Edit, Trash2, Loader2, Save, Info
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const EMPTY_FORM = {

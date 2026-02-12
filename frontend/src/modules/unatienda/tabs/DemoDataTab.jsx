@@ -8,7 +8,9 @@ import {
   Database, Play, Trash2, Loader2, RefreshCw, CheckCircle2, AlertCircle,
   BookOpen, Users, ShoppingCart
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function DemoDataTab({ token, onRefresh }) {

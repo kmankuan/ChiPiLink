@@ -19,7 +19,9 @@ import {
   Wallet, Copy, Loader2, Save, CheckCircle2, Info,
   RefreshCw, AlertTriangle, Clock, ScrollText, Search
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletSettingsTab() {

@@ -21,6 +21,7 @@ import {
   Loader2,
   Trophy
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -57,6 +58,7 @@ const BLOCK_COLORS = {
 };
 
 export function AddBlockDialog({ open, onOpenChange, onBlockAdded }) {
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState({});
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(null);

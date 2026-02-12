@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Settings, Store, CreditCard, Loader2, Save, ExternalLink, Plug } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function ConfiguracionTab({ token }) {

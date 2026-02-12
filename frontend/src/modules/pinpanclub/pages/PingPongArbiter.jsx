@@ -10,7 +10,9 @@ import axios from 'axios';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import ScoreBoard from '../components/ScoreBoard';
 import ArbiterPanel from '../components/ArbiterPanel';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongArbiter() {

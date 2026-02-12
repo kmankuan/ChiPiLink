@@ -30,8 +30,10 @@ import FormFieldsConfigTab from './components/FormFieldsConfigTab';
 import SchoolsManagementTab from './components/SchoolsManagementTab';
 import StudentRequestsTab from './components/StudentRequestsTab';
 import AllStudentsTab from './components/AllStudentsTab';
+import { useTranslation } from 'react-i18next';
 
 export default function UsersManagementModule() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('student-requests');
 
   return (

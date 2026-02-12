@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import GoogleSheetsSync from '@/components/admin/GoogleSheetsSync';
 import MondayModule from '@/modules/monday/MondayModule';
+import { useTranslation } from 'react-i18next';
 
 export default function IntegrationsModule() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <Tabs defaultValue="monday">

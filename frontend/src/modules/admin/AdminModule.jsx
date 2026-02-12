@@ -30,8 +30,10 @@ import DatabaseMigrationModule from './DatabaseMigrationModule';
 import ModuleStatusModule from './ModuleStatusModule';
 import UIStyleModule from './UIStyleModule';
 import WidgetManagerModule from './WidgetManagerModule';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminModule() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <Tabs defaultValue="site">

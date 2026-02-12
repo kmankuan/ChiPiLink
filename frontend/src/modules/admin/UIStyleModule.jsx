@@ -13,7 +13,9 @@ import { toast } from 'sonner';
 import { Loader2, Save, Check, Palette, Type, RectangleHorizontal, SquareStack, Minimize2, Globe, Shield, ExternalLink, LayoutGrid, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const RADIUS_OPTIONS = [

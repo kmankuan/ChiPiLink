@@ -27,7 +27,9 @@ import {
   User, GraduationCap, Mail, Phone, DollarSign, FileText,
   Hash, CalendarDays, Tag, Columns3, Package,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 // Fields for the Orders board

@@ -33,7 +33,9 @@ import {
   Shield,
   ShoppingCart
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function StudentsTab({ token }) {

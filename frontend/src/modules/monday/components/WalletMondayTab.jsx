@@ -12,7 +12,9 @@ import { toast } from 'sonner';
 import {
   Wallet, Copy, RefreshCw, Loader2, Save, CheckCircle2, Info
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletMondayTab() {
