@@ -231,7 +231,7 @@ export default function WidgetManagerModule() {
           <h2 className="text-lg font-bold flex items-center gap-2">
             <Layout className="h-5 w-5" /> Widget Manager
           </h2>
-          <p className="text-xs text-muted-foreground">Configure the embeddable widget for laopan.online</p>
+          <p className="text-xs text-muted-foreground">{t("widgetManager.titleDesc")}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={previewWidget} data-testid="widget-preview-btn">
@@ -330,7 +330,7 @@ export default function WidgetManagerModule() {
                     {config.maintenance?.active && <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />}
                     Maintenance Mode
                   </p>
-                  <p className="text-[10px] text-muted-foreground">Pause the widget — users see a maintenance message instead of the app</p>
+                  <p className="text-[10px] text-muted-foreground">{t("widgetManager.maintenanceModeDesc")}</p>
                 </div>
                 <Switch
                   checked={config.maintenance?.active ?? false}
@@ -357,7 +357,7 @@ export default function WidgetManagerModule() {
 
               <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-url">
                 <div>
-                  <p className="text-xs font-medium">Hide URL / Address Bar</p>
+                  <p className="text-xs font-medium">{t("widgetManager.hideUrlBar")}</p>
                   <p className="text-[10px] text-muted-foreground">{t("widgetManager.hideUrlBarDesc")}</p>
                 </div>
                 <Switch
@@ -368,7 +368,7 @@ export default function WidgetManagerModule() {
 
               <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-navbar">
                 <div>
-                  <p className="text-xs font-medium">Hide Navbar & Footer</p>
+                  <p className="text-xs font-medium">{t("widgetManager.hideNavbarFooter")}</p>
                   <p className="text-[10px] text-muted-foreground">{t("widgetManager.hideNavbarFooterDesc")}</p>
                 </div>
                 <Switch
@@ -476,7 +476,7 @@ export default function WidgetManagerModule() {
                   onCheckedChange={(v) => update('appearance.compact_mode', v)}
                   data-testid="widget-compact-mode"
                 />
-                <Label className="text-xs">Compact Mode (reduced padding, smaller text)</Label>
+                <Label className="text-xs">{t("widgetManager.compactMode")}</Label>
               </div>
             </CardContent>
           </Card>
@@ -487,7 +487,7 @@ export default function WidgetManagerModule() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">{t("widgetManager.widgetPlacement")}</CardTitle>
-              <CardDescription className="text-xs">Configure the floating button position, icon, and style on laopan.online</CardDescription>
+              <CardDescription className="text-xs">{t("widgetManager.widgetPlacementDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
@@ -500,7 +500,7 @@ export default function WidgetManagerModule() {
               </div>
 
               <Separator />
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Position & Offset</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">{t("widgetManager.positionOffset")}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
@@ -539,11 +539,11 @@ export default function WidgetManagerModule() {
               </div>
 
               <Separator />
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Button Design</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">{t("widgetManager.buttonDesign")}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Icon</Label>
+                  <Label className="text-xs">{t("widgetManager.icon")}</Label>
                   <select
                     value={config.placement?.floating_icon || 'book'}
                     onChange={(e) => update('placement.floating_icon', e.target.value)}
@@ -556,7 +556,7 @@ export default function WidgetManagerModule() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Button Style</Label>
+                  <Label className="text-xs">{t("widgetManager.buttonStyle")}</Label>
                   <select
                     value={config.placement?.floating_style || 'pill'}
                     onChange={(e) => update('placement.floating_style', e.target.value)}
@@ -569,7 +569,7 @@ export default function WidgetManagerModule() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Label Text</Label>
+                  <Label className="text-xs">{t("widgetManager.labelText")}</Label>
                   <Input
                     value={config.placement?.floating_label || 'ChiPi Link'}
                     onChange={(e) => update('placement.floating_label', e.target.value)}
@@ -580,11 +580,11 @@ export default function WidgetManagerModule() {
               </div>
 
               <Separator />
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Panel Sizes</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">{t("widgetManager.panelSizes")}</p>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Sidebar Width</Label>
+                  <Label className="text-xs">{t("widgetManager.sidebarWidth")}</Label>
                   <Input
                     value={config.placement?.sidebar_width || '380px'}
                     onChange={(e) => update('placement.sidebar_width', e.target.value)}
@@ -593,7 +593,7 @@ export default function WidgetManagerModule() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Full-page Max Width</Label>
+                  <Label className="text-xs">{t("widgetManager.fullPageMaxWidth")}</Label>
                   <Input
                     value={config.placement?.fullpage_max_width || '900px'}
                     onChange={(e) => update('placement.fullpage_max_width', e.target.value)}
@@ -604,7 +604,7 @@ export default function WidgetManagerModule() {
               </div>
 
               <Separator />
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Live Preview</p>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">{t("widgetManager.livePreview")}</p>
 
               <ButtonPreview
                 position={config.placement?.floating_position || 'bottom-right'}
@@ -627,7 +627,7 @@ export default function WidgetManagerModule() {
               <CardDescription className="text-xs">Manage allowed origins that can embed the widget</CardDescription>
             </CardHeader>
             <CardContent>
-              <Label className="text-xs mb-1.5 block">Allowed Origins (one per line)</Label>
+              <Label className="text-xs mb-1.5 block">{t("widgetManager.allowedOrigins")}</Label>
               <textarea
                 value={(config.security?.allowed_origins || []).join('\n')}
                 onChange={(e) => update('security.allowed_origins', e.target.value.split('\n').map(s => s.trim()).filter(Boolean))}
@@ -654,7 +654,7 @@ export default function WidgetManagerModule() {
             <CardContent className="space-y-3">
               {/* Site URL */}
               <div>
-                <Label className="text-xs font-medium mb-1 block">Site URL</Label>
+                <Label className="text-xs font-medium mb-1 block">{t("widgetManager.siteUrl")}</Label>
                 <p className="text-[10px] text-muted-foreground mb-1.5">
                   Your production domain. All embed codes will use this URL.
                 </p>
