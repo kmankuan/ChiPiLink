@@ -622,6 +622,7 @@ export default function PaymentAlertsModule() {
         <TabsContent value="pending"><PendingQueueTab /></TabsContent>
         <TabsContent value="rules"><RulesConfigTab /></TabsContent>
         <TabsContent value="settings"><SettingsTab /></TabsContent>
+        <TabsContent value="log"><ProcessingLogTab /></TabsContent>
       </Tabs>
     </div>
   );
