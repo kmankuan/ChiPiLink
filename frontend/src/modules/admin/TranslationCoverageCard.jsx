@@ -34,6 +34,7 @@ import {
   Check,
   Edit2,
   X,
+  Sparkles,
 } from 'lucide-react';
 
 const LANG_META = {
