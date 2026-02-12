@@ -1107,6 +1107,12 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
               </div>
             </CardContent>
           </Card>
+          <TablePagination
+            page={catalogPagination.page} totalPages={catalogPagination.totalPages} totalItems={catalogPagination.totalItems}
+            pageSize={catalogPagination.pageSize} onPageChange={catalogPagination.setPage} onPageSizeChange={catalogPagination.setPageSize}
+            canPrev={catalogPagination.canPrev} canNext={catalogPagination.canNext}
+            pageSizeOptions={[25, 50, 100, 200]}
+          />
         </>
       ))}
 
