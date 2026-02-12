@@ -240,7 +240,7 @@ export default function AuthMethodsConfig() {
                     <Input
                       value={methodConfig.label || ''}
                       onChange={(e) => updateMethodLabel(methodId, e.target.value)}
-                      placeholder=t("authConfig.buttonText")
+                      placeholder={t("authConfig.buttonText")}
                       className="w-48"
                     />
                   )}
