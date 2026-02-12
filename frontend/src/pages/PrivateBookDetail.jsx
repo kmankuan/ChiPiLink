@@ -130,7 +130,7 @@ export default function PrivateBookDetail() {
         <div className="p-4 rounded-full bg-amber-100 dark:bg-amber-900/30 w-fit mx-auto mb-6">
           <Lock className="h-12 w-12 text-amber-600" />
         </div>
-        <h2 className="text-2xl font-bold mb-3">Acceso Restringido</h2>
+        <h2 className="text-2xl font-bold mb-3">{t("productDetail.restrictedAccess")}</h2>
         <p className="text-muted-foreground mb-6">
           Este catálogo es exclusivo para acudientes con estudiantes vinculados.
           Link your student to access textbooks.
@@ -151,7 +151,7 @@ export default function PrivateBookDetail() {
     return (
       <div className="container mx-auto px-4 py-16 max-w-lg text-center">
         <BookOpen className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Book no encontrado</h2>
+        <h2 className="text-xl font-semibold mb-2">{t("productDetail.bookNotFound")}</h2>
         <Button variant="outline" onClick={() => navigate('/unatienda?tab=privado')}>
           Volver al Catálogo
         </Button>
@@ -296,7 +296,7 @@ export default function PrivateBookDetail() {
             <div className="space-y-4">
               {/* Quantity Selector */}
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">Cantidad:</span>
+                <span className="text-sm font-medium">{t("productDetail.quantity")}</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -368,7 +368,7 @@ export default function PrivateBookDetail() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div className="text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground mb-1">Información de Compra</p>
+                    <p className="font-medium text-foreground mb-1">{t("productDetail.purchaseInfo")}</p>
                     <p>
                       Private catalog books are processed as pre-orders. 
                       Te contactaremos para coordinar la entrega y el pago una vez confirmado el pedido.

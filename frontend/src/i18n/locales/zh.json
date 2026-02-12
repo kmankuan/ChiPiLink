@@ -1530,7 +1530,10 @@
   },
   "community": {
     "title": "社区",
-    "refresh": "刷新"
+    "refresh": "刷新",
+    "noComments": "暂无评论",
+    "loadingFeed": "正在加载动态...",
+    "noPosts": "暂无帖子"
   },
   "storeManager": {
     "productsTab": "产品",
@@ -1884,5 +1887,22 @@
     "markAll": "标记全部",
     "noNotifications": "没有通知",
     "now": "刚刚"
+  },
+  "checkout": {
+    "title": "结账",
+    "subtitle": "安全完成您的付款",
+    "subtotal": "小计",
+    "tax": "税费",
+    "orderNotFound": "未找到订单"
+  },
+  "productDetail": {
+    "description": "描述",
+    "bookInfo": "书籍信息",
+    "publisher": "出版社：",
+    "quantity": "数量：",
+    "purchaseInfo": "购买信息",
+    "notFound": "未找到产品",
+    "restrictedAccess": "受限访问",
+    "bookNotFound": "未找到书籍"
   }
 }

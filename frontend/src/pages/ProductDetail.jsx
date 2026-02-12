@@ -127,7 +127,7 @@ export default function ProductDetail() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <Package className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Producto no encontrado</h2>
+        <h2 className="text-xl font-semibold mb-2">{t("productDetail.notFound")}</h2>
         <Button variant="outline" onClick={() => navigate('/unatienda')}>
           Volver a la tienda
         </Button>
@@ -215,7 +215,7 @@ export default function ProductDetail() {
             {/* Description */}
             {product.description && (
               <div className="mb-6">
-                <h3 className="font-semibold mb-2">Descripción</h3>
+                <h3 className="font-semibold mb-2">{t("productDetail.description")}</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {product.description}
                 </p>
@@ -225,11 +225,11 @@ export default function ProductDetail() {
             {/* Additional Info for Books */}
             {product.categoria === 'books' && (product.isbn || product.publisher) && (
               <div className="mb-6 p-4 rounded-xl bg-muted/50">
-                <h3 className="font-semibold mb-3">Book Information</h3>
+                <h3 className="font-semibold mb-3">{t("productDetail.bookInfo")}</h3>
                 <div className="space-y-2 text-sm">
                   {product.publisher && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Editorial:</span>
+                      <span className="text-muted-foreground">{t("productDetail.publisher")}</span>
                       <span className="font-medium">{product.publisher}</span>
                     </div>
                   )}

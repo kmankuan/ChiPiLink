@@ -1802,7 +1802,10 @@
   },
   "community": {
     "title": "Comunidad",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "noComments": "Sin comentarios aún",
+    "loadingFeed": "Cargando feed...",
+    "noPosts": "Sin publicaciones aún"
   },
   "storeManager": {
     "productsTab": "Productos",
@@ -2117,5 +2120,22 @@
     "markAll": "Marcar todas",
     "noNotifications": "No hay notificaciones",
     "now": "Ahora"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Completa tu pago de forma segura",
+    "subtotal": "Subtotal",
+    "tax": "Impuestos",
+    "orderNotFound": "Pedido no encontrado"
+  },
+  "productDetail": {
+    "description": "Descripción",
+    "bookInfo": "Información del Libro",
+    "publisher": "Editorial:",
+    "quantity": "Cantidad:",
+    "purchaseInfo": "Información de Compra",
+    "notFound": "Producto no encontrado",
+    "restrictedAccess": "Acceso Restringido",
+    "bookNotFound": "Libro no encontrado"
   }
 }

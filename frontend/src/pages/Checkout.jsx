@@ -115,7 +115,7 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
         <XCircle className="h-12 w-12 text-red-500" />
-        <h1 className="text-xl font-semibold">Pedido no encontrado</h1>
+        <h1 className="text-xl font-semibold">{t("checkout.orderNotFound")}</h1>
         <Button onClick={() => navigate('/')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Volver al inicio
@@ -131,8 +131,8 @@ export default function Checkout() {
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Checkout</h1>
-          <p className="text-muted-foreground">Completa tu pago de forma segura</p>
+          <h1 className="text-2xl font-bold">{t("checkout.title")}</h1>
+          <p className="text-muted-foreground">{t("checkout.subtitle")}</p>
         </div>
 
         {/* Order Summary */}
@@ -164,12 +164,12 @@ export default function Checkout() {
             
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Subtotal</span>
+                <span>{t("checkout.subtotal")}</span>
                 <span>${order.subtotal?.toFixed(2) || order.total?.toFixed(2)}</span>
               </div>
               {order.impuestos > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span>Impuestos</span>
+                  <span>{t("checkout.tax")}</span>
                   <span>${order.impuestos?.toFixed(2)}</span>
                 </div>
               )}

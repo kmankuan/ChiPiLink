@@ -176,7 +176,7 @@ function PostCard({ post, token, onUpdate }) {
             ) : (
               <>
                 {comments.length === 0 && (
-                  <p className="text-xs text-muted-foreground text-center py-2">No comments yet</p>
+                  <p className="text-xs text-muted-foreground text-center py-2">{t("community.noComments")}</p>
                 )}
                 {comments.map((c, i) => (
                   <div key={i} className="flex gap-2">
@@ -264,7 +264,7 @@ export default function CommunityFeedModule() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Community</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("community.title")}</h1>
           <p className="text-sm text-muted-foreground">
             {total > 0 ? `${total} posts from our channel` : 'Stay connected with the community'}
           </p>
@@ -279,14 +279,14 @@ export default function CommunityFeedModule() {
       {loading ? (
         <div className="flex flex-col items-center py-16 gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Loading feed...</p>
+          <p className="text-sm text-muted-foreground">{t("community.loadingFeed")}</p>
         </div>
       ) : posts.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center space-y-3">
             <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto" />
             <div>
-              <p className="font-medium">No posts yet</p>
+              <p className="font-medium">{t("community.noPosts")}</p>
               <p className="text-sm text-muted-foreground">
                 Content from the Telegram channel will appear here once synced.
               </p>
