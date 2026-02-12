@@ -268,32 +268,32 @@ export default function DemoDataModule() {
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-green-500" />
-              <CardTitle className="text-lg">Usuarios & Wallets</CardTitle>
+              <CardTitle className="text-lg">{t('demoData.usersWallets')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
               <StatCard 
                 icon={Users} 
-                title="Perfiles" 
+                title={t("demoData.profiles")} 
                 value={stats?.users_wallets?.profiles || 0}
                 color="bg-blue-500"
               />
               <StatCard 
                 icon={Wallet} 
-                title="Wallets" 
+                title={t("demoData.wallets")} 
                 value={stats?.users_wallets?.wallets || 0}
                 color="bg-green-500"
               />
               <StatCard 
                 icon={RefreshCw} 
-                title="Transacciones" 
+                title={t("demoData.transactions")} 
                 value={stats?.users_wallets?.transactions || 0}
                 color="bg-purple-500"
               />
               <StatCard 
                 icon={Bell} 
-                title="Posts" 
+                title={t("demoData.posts")} 
                 value={stats?.notifications?.posts || 0}
                 color="bg-orange-500"
               />
