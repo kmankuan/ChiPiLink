@@ -67,22 +67,21 @@ const ModuleLoader = () => (
   </div>
 );
 
-// Navigation items with required permissions
-// Each item can have: permission (single), permissions (array), requireAll (bool)
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
-  { id: 'unatienda', label: 'Unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
-  { id: 'orders', label: 'Orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
-  { id: 'wallet', label: 'Wallet', icon: Wallet, permission: 'admin.site_config' },
-  { id: 'analytics', label: 'Reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
-  { id: 'customers', label: 'Users', icon: Users, permission: 'users.view' },
-  { id: 'memberships', label: 'Memberships', icon: CreditCard, permission: 'memberships.view' },
-  { id: 'pinpanclub', label: 'PinpanClub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
-  { id: 'roles', label: 'Roles & Permissions', icon: Shield, permission: 'roles.view' },
-  { id: 'admin', label: 'Administration', icon: Settings, permission: 'admin.site_config' },
-  { id: 'community', label: 'Community', icon: Rss, permission: 'admin.site_config' },
-  { id: 'integrations', label: 'Integrations', icon: Plug, permission: 'integrations.access' },
-  { id: 'tickets', label: 'Tickets/Chat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
+// Navigation items with required permissions (labelKey for i18n)
+const navItemsDef = [
+  { id: 'dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
+  { id: 'unatienda', labelKey: 'nav.unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
+  { id: 'orders', labelKey: 'nav.orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+  { id: 'wallet', labelKey: 'nav.wallet', icon: Wallet, permission: 'admin.site_config' },
+  { id: 'analytics', labelKey: 'nav.reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
+  { id: 'customers', labelKey: 'nav.users', icon: Users, permission: 'users.view' },
+  { id: 'memberships', labelKey: 'nav.memberships', icon: CreditCard, permission: 'memberships.view' },
+  { id: 'pinpanclub', labelKey: 'nav.pinpanclub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
+  { id: 'roles', labelKey: 'nav.rolesPermissions', icon: Shield, permission: 'roles.view' },
+  { id: 'admin', labelKey: 'nav.administration', icon: Settings, permission: 'admin.site_config' },
+  { id: 'community', labelKey: 'nav.community', icon: Rss, permission: 'admin.site_config' },
+  { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
+  { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
 ];
 
 export default function AdminDashboard() {
