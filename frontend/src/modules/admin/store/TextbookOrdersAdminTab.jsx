@@ -357,8 +357,8 @@ export default function TextbookOrdersAdminTab() {
                             <p className="text-xs text-muted-foreground">{order.user_email}</p>
                           </div>
                         </TableCell>
-                        <TableCell>{order.grade}</TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell">{order.grade}</TableCell>
+                        <TableCell className="hidden md:table-cell">
                           {order.items?.filter(i => i.quantity_ordered > 0).length || 0}
                         </TableCell>
                         <TableCell className="font-semibold">
@@ -369,7 +369,7 @@ export default function TextbookOrdersAdminTab() {
                             value={order.status}
                             onValueChange={(value) => handleUpdateStatus(order.order_id, value)}
                           >
-                            <SelectTrigger className={`w-[130px] ${STATUS_COLORS[order.status]}`}>
+                            <SelectTrigger className={`w-[110px] text-xs ${STATUS_COLORS[order.status]}`}>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -395,7 +395,13 @@ export default function TextbookOrdersAdminTab() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
+              <TablePagination
+                page={orderPagination.page} totalPages={orderPagination.totalPages} totalItems={orderPagination.totalItems}
+                pageSize={orderPagination.pageSize} onPageChange={orderPagination.setPage} onPageSizeChange={orderPagination.setPageSize}
+                canPrev={orderPagination.canPrev} canNext={orderPagination.canNext}
+              />
             </CardContent>
           </Card>
         </TabsContent>
