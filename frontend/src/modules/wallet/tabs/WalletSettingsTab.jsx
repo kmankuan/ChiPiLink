@@ -188,22 +188,57 @@ export default function WalletSettingsTab() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base"><Wallet className="h-4 w-4" /> Transaction Descriptions</CardTitle>
           <CardDescription className="text-xs">
-            Customize the message users see in their wallet transaction history
+            Customize messages users see in their wallet transaction history (widget + app)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="space-y-2">
-            <Label className="text-sm">Top-Up Description</Label>
-            <Input value={descriptions.topup || ''} onChange={(e) => setDescriptions(p => ({ ...p, topup: e.target.value }))}
-              placeholder="e.g. Wallet top-up" className="text-sm" data-testid="desc-topup-input" />
-            <p className="text-[10px] text-muted-foreground">Shown when admin adds funds (e.g. "Recarga de billetera")</p>
+        <CardContent className="space-y-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Admin Actions</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Manual Top-Up</Label>
+              <Input value={descriptions.topup || ''} onChange={(e) => setDescriptions(p => ({ ...p, topup: e.target.value }))}
+                placeholder="e.g. Recarga de billetera" className="text-sm" data-testid="desc-topup-input" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Manual Deduction</Label>
+              <Input value={descriptions.deduct || ''} onChange={(e) => setDescriptions(p => ({ ...p, deduct: e.target.value }))}
+                placeholder="e.g. Deduccion de billetera" className="text-sm" data-testid="desc-deduct-input" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm">Deduction Description</Label>
-            <Input value={descriptions.deduct || ''} onChange={(e) => setDescriptions(p => ({ ...p, deduct: e.target.value }))}
-              placeholder="e.g. Wallet deduction" className="text-sm" data-testid="desc-deduct-input" />
-            <p className="text-[10px] text-muted-foreground">Shown when admin deducts funds (e.g. "Deduccion de billetera")</p>
+
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Monday.com Automations</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Monday.com Top-Up</Label>
+              <Input value={descriptions.monday_topup || ''} onChange={(e) => setDescriptions(p => ({ ...p, monday_topup: e.target.value }))}
+                placeholder="e.g. Recarga via Monday" className="text-sm" data-testid="desc-monday-topup" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Monday.com Deduction</Label>
+              <Input value={descriptions.monday_deduct || ''} onChange={(e) => setDescriptions(p => ({ ...p, monday_deduct: e.target.value }))}
+                placeholder="e.g. Deduccion via Monday" className="text-sm" data-testid="desc-monday-deduct" />
+            </div>
           </div>
+
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Other Transactions</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Purchase</Label>
+              <Input value={descriptions.purchase || ''} onChange={(e) => setDescriptions(p => ({ ...p, purchase: e.target.value }))}
+                placeholder="e.g. Compra" className="text-sm" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Transfer Sent</Label>
+              <Input value={descriptions.transfer_sent || ''} onChange={(e) => setDescriptions(p => ({ ...p, transfer_sent: e.target.value }))}
+                placeholder="e.g. Transferencia enviada" className="text-sm" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Transfer Received</Label>
+              <Input value={descriptions.transfer_received || ''} onChange={(e) => setDescriptions(p => ({ ...p, transfer_received: e.target.value }))}
+                placeholder="e.g. Transferencia recibida" className="text-sm" />
+            </div>
+          </div>
+
           <Button onClick={saveDescriptions} disabled={savingDesc} variant="outline" className="w-full gap-2" data-testid="save-descriptions-btn">
             {savingDesc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
             Save Descriptions
