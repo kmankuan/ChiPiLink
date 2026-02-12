@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -29,9 +31,10 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
+  Check,
+  Edit2,
+  X,
 } from 'lucide-react';
-
-const API = process.env.REACT_APP_BACKEND_URL;
 
 const LANG_META = {
   en: { flag: '\u{1F1FA}\u{1F1F8}', label: 'English', color: 'bg-blue-500' },
@@ -42,10 +45,19 @@ const LANG_META = {
 export default function TranslationCoverageCard() {
   const { t } = useTranslation();
   const { api } = useAuth();
+  const { hasPermission, isSuperAdmin } = usePermissions();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [missingDialog, setMissingDialog] = useState({ open: false, lang: '', keys: [] });
+
+  // Quick edit state
+  const [editingKey, setEditingKey] = useState(null);
+  const [editValue, setEditValue] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+  const editRef = useRef(null);
+
+  const canEdit = hasPermission('translations.edit') || isSuperAdmin;
 
   const fetchCoverage = async () => {
     setLoading(true);
@@ -59,9 +71,11 @@ export default function TranslationCoverageCard() {
     }
   };
 
+  useEffect(() => { fetchCoverage(); }, []);
+
   useEffect(() => {
-    fetchCoverage();
-  }, []);
+    if (editingKey && editRef.current) editRef.current.focus();
+  }, [editingKey]);
 
   const copyKey = (key) => {
     navigator.clipboard.writeText(key);
@@ -76,6 +90,35 @@ export default function TranslationCoverageCard() {
       lang,
       keys: langData?.missing_keys || [],
     });
+    setEditingKey(null);
+  };
+
+  const startQuickEdit = (key) => {
+    setEditingKey(key);
+    setEditValue('');
+  };
+
+  const saveQuickEdit = async () => {
+    if (!editingKey || !missingDialog.lang) return;
+    setSavingEdit(true);
+    try {
+      await api.post('/translations/admin/update', null, {
+        params: { key: editingKey, lang: missingDialog.lang, value: editValue }
+      });
+      toast.success(t('translationsMgmt.saved'));
+      // Remove from missing keys list
+      setMissingDialog(prev => ({
+        ...prev,
+        keys: prev.keys.filter(k => k !== editingKey),
+      }));
+      setEditingKey(null);
+      // Refresh coverage data
+      fetchCoverage();
+    } catch {
+      toast.error(t('common.error'));
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   if (loading) {
@@ -222,10 +265,13 @@ export default function TranslationCoverageCard() {
         </div>
       </CardContent>
 
-      {/* Missing Keys Dialog */}
+      {/* Missing Keys Dialog with Quick Edit */}
       <Dialog
         open={missingDialog.open}
-        onOpenChange={(open) => setMissingDialog((p) => ({ ...p, open }))}
+        onOpenChange={(open) => {
+          setMissingDialog((p) => ({ ...p, open }));
+          if (!open) setEditingKey(null);
+        }}
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -242,19 +288,63 @@ export default function TranslationCoverageCard() {
             ) : (
               <div className="space-y-1">
                 {missingDialog.keys.map((key) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between p-2 rounded hover:bg-muted/50 group"
-                  >
-                    <code className="text-xs break-all">{key}</code>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                      onClick={() => copyKey(key)}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
+                  <div key={key} className="p-2 rounded hover:bg-muted/50 group">
+                    {editingKey === key ? (
+                      <div className="space-y-2">
+                        <code className="text-xs break-all text-primary">{key}</code>
+                        <div className="flex items-center gap-1">
+                          <Input
+                            ref={editRef}
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveQuickEdit();
+                              if (e.key === 'Escape') setEditingKey(null);
+                            }}
+                            placeholder={t('translationsMgmt.quickEdit')}
+                            className="h-8 text-sm"
+                            disabled={savingEdit}
+                          />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 shrink-0"
+                            onClick={saveQuickEdit}
+                            disabled={savingEdit || !editValue.trim()}
+                          >
+                            {savingEdit ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3 text-green-600" />}
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditingKey(null)}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <code className="text-xs break-all">{key}</code>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {canEdit && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 shrink-0"
+                              onClick={() => startQuickEdit(key)}
+                              data-testid={`quick-edit-${key}`}
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={() => copyKey(key)}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
