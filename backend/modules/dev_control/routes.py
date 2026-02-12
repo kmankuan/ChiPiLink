@@ -53,9 +53,13 @@ def _scan_tree(root: str, prefix: str = "", depth: int = 0, max_depth: int = 3):
 
 @router.get("/architecture")
 async def get_architecture(admin: dict = Depends(get_admin_user)):
-    backend_tree = _scan_tree("/app/backend", "backend", max_depth=3)
-    frontend_tree = _scan_tree("/app/frontend/src", "frontend/src", max_depth=3)
-    return {"backend": backend_tree, "frontend": frontend_tree}
+    backend_tree = _scan_tree("/app/backend", "backend", max_depth=3) if os.path.isdir("/app/backend") else []
+    frontend_tree = _scan_tree("/app/frontend/src", "frontend/src", max_depth=3) if os.path.isdir("/app/frontend/src") else []
+    return {
+        "backend": backend_tree,
+        "frontend": frontend_tree,
+        "available": bool(backend_tree or frontend_tree),
+    }
 
 
 # ============== ENDPOINT DISCOVERY ==============
