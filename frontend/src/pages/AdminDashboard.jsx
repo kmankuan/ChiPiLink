@@ -164,6 +164,8 @@ export default function AdminDashboard() {
         return <TextbookOrdersAdminTab />;
       case 'wallet':
         return <WalletModule />;
+      case 'payment-alerts':
+        return <PaymentAlertsModule />;
       case 'analytics':
         return <StoreAnalyticsModule />;
       case 'customers':
