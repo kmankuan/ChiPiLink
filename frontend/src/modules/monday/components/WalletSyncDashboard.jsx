@@ -125,35 +125,35 @@ export default function WalletSyncDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <StatCard
-          label="Linked Users"
+          label={t('integrations.linkedUsers')}
           value={stats.linked_users || 0}
           icon={<Users className="h-4 w-4" />}
           color="text-blue-600"
           bg="bg-blue-50 dark:bg-blue-950/30"
         />
         <StatCard
-          label="Processed Tx"
+          label={t('integrations.processedTx')}
           value={stats.processed_subitems || 0}
           icon={<ArrowUpDown className="h-4 w-4" />}
           color="text-purple-600"
           bg="bg-purple-50 dark:bg-purple-950/30"
         />
         <StatCard
-          label="Webhook OK"
+          label={t('integrations.webhookOK')}
           value={stats.webhook_success || 0}
           icon={<CheckCircle2 className="h-4 w-4" />}
           color="text-green-600"
           bg="bg-green-50 dark:bg-green-950/30"
         />
         <StatCard
-          label="Errors"
+          label={t('integrations.errors')}
           value={stats.webhook_errors || 0}
           icon={<XCircle className="h-4 w-4" />}
           color="text-red-600"
           bg="bg-red-50 dark:bg-red-950/30"
         />
         <StatCard
-          label="Ignored"
+          label={t('integrations.ignored')}
           value={stats.webhook_ignored || 0}
           icon={<AlertTriangle className="h-4 w-4" />}
           color="text-amber-600"
