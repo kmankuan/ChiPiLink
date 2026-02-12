@@ -86,7 +86,7 @@ export default function AuthMethodsConfig() {
       }
     } catch (error) {
       console.error('Error loading auth config:', error);
-      toast.error('Error al cargar configuración');
+      toast.error(t("authConfig.configLoadError"));
     } finally {
       setLoading(false);
     }
@@ -96,10 +96,10 @@ export default function AuthMethodsConfig() {
     try {
       setSaving(true);
       await api.put('/auth-v2/auth-config/methods', config);
-      toast.success('Configuración guardada');
+      toast.success(t("authConfig.configSaved"));
     } catch (error) {
       console.error('Error saving config:', error);
-      toast.error('Error al guardar');
+      toast.error(t("authConfig.saveError"));
     } finally {
       setSaving(false);
     }
@@ -240,7 +240,7 @@ export default function AuthMethodsConfig() {
                     <Input
                       value={methodConfig.label || ''}
                       onChange={(e) => updateMethodLabel(methodId, e.target.value)}
-                      placeholder="Texto del botón (opcional)"
+                      placeholder=t("authConfig.buttonText")
                       className="w-48"
                     />
                   )}

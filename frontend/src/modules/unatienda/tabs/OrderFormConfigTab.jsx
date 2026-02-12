@@ -117,7 +117,7 @@ export default function OrderFormConfigTab() {
       setFieldTypes(typesRes.data.types || []);
     } catch (error) {
       console.error('Error fetching form config:', error);
-      toast.error('Error al cargar configuración');
+      toast.error(t("orderFormConfig.configLoadError"));
     } finally {
       setLoading(false);
     }
@@ -173,7 +173,7 @@ export default function OrderFormConfigTab() {
 
   const handleSaveField = async () => {
     if (!fieldForm.label) {
-      toast.error('El nombre del campo es requerido');
+      toast.error(t("orderFormConfig.fieldNameRequired"));
       return;
     }
 

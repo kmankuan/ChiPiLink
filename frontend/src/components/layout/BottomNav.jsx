@@ -68,7 +68,7 @@ export default function BottomNav() {
         {isAuthenticated ? (
           <>
             {user?.tiene_membresia_activa && (
-              <NavItem icon={Trophy} label="Club" to="/pinpanclub" active={isClub} />
+              <NavItem icon={Trophy} label=t("common.club") to="/pinpanclub" active={isClub} />
             )}
             <NavItem icon={User} label="Me" to="/mi-cuenta" active={isProfile} />
           </>

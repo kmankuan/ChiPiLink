@@ -69,10 +69,10 @@ export default function DemoDataModule() {
       
       if (response.data.success) {
         setLastResult(response.data.results);
-        toast.success('¡Datos demo creados exitosamente!');
+        toast.success(t("demoData.demoCreatedSuccess"));
         fetchStats();
       } else {
-        toast.error('Error al crear datos demo');
+        toast.error(t("demoData.createError"));
       }
     } catch (error) {
       console.error('Error seeding data:', error);
@@ -90,7 +90,7 @@ export default function DemoDataModule() {
       const response = await api.delete('/seed/demo-data');
       
       if (response.data.success) {
-        toast.success('Datos demo eliminados');
+        toast.success(t("demoData.demoDeletedSuccess"));
         setLastResult(null);
         fetchStats();
       } else {

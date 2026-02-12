@@ -52,9 +52,9 @@ export default function FormConfigModule() {
     try {
       setSaving(true);
       await api.put('/admin/config-formulario', config);
-      toast.success('Configuración guardada');
+      toast.success(t("formConfig.configSaved"));
     } catch (error) {
-      toast.error('Error al guardar');
+      toast.error(t("formConfig.saveError"));
     } finally {
       setSaving(false);
     }
@@ -63,7 +63,7 @@ export default function FormConfigModule() {
   const copyEmbedUrl = () => {
     const url = `${window.location.origin}/embed/orden`;
     navigator.clipboard.writeText(url);
-    toast.success('URL copiada');
+    toast.success(t("formConfig.urlCopied"));
   };
 
   if (loading) {

@@ -111,7 +111,7 @@ export default function StoreModule() {
       setGrados(gradosRes.data.grades);
       setMaterias(materiasRes.data.subjects);
     } catch (error) {
-      toast.error('Error al cargar datos');
+      toast.error(t("storeManager.loadError"));
     } finally {
       setLoading(false);
     }
@@ -161,10 +161,10 @@ export default function StoreModule() {
     try {
       if (editingCategory) {
         await api.put(`/admin/categories/${editingCategory.category_id}`, categoryForm);
-        toast.success('Categoría actualizada');
+        toast.success(t("storeManager.categoryUpdated"));
       } else {
         await api.post('/admin/categories', categoryForm);
-        toast.success('Categoría creada');
+        toast.success(t("storeManager.categoryCreated"));
       }
       setCategoryDialog(false);
       fetchData();
@@ -179,7 +179,7 @@ export default function StoreModule() {
     if (!confirm('¿Eliminar esta categoría?')) return;
     try {
       await api.delete(`/admin/categories/${categoriaId}`);
-      toast.success('Categoría eliminada');
+      toast.success(t("storeManager.categoryDeleted"));
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al eliminar');
@@ -191,10 +191,10 @@ export default function StoreModule() {
       setSaving(true);
       if (editingProduct) {
         await api.put(`/admin/books/${editingProduct.book_id}`, editForm);
-        toast.success('Producto actualizado');
+        toast.success(t("storeManager.productUpdated"));
       } else {
         await api.post('/admin/books', editForm);
-        toast.success('Producto creado');
+        toast.success(t("storeManager.productCreated"));
       }
       setEditDialog(false);
       fetchData();
@@ -209,7 +209,7 @@ export default function StoreModule() {
     if (!confirm('¿Eliminar este producto?')) return;
     try {
       await api.delete(`/admin/books/${bookId}`);
-      toast.success('Producto eliminado');
+      toast.success(t("storeManager.productDeleted"));
       fetchData();
     } catch (error) {
       toast.error('Error al eliminar');
@@ -294,7 +294,7 @@ export default function StoreModule() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar productos..."
+                  placeholder=t("storeManager.searchProducts")
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"

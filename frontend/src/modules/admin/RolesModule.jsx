@@ -95,7 +95,7 @@ export default function RolesModule() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Error al cargar datos');
+      toast.error(t("roles.loadError"));
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export default function RolesModule() {
       setAuditStats(statsData);
     } catch (error) {
       console.error('Error fetching audit logs:', error);
-      toast.error('Error al cargar logs de auditoría');
+      toast.error(t("roles.auditLoadError"));
     } finally {
       setLoadingAudit(false);
     }
@@ -201,7 +201,7 @@ export default function RolesModule() {
       const data = await response.json();
       
       if (data.success || response.ok) {
-        toast.success(editingRole ? 'Rol actualizado' : 'Rol creado');
+        toast.success(editingRole ? t("roles.roleUpdated") : t("roles.roleCreated"));
         setShowRoleForm(false);
         fetchData();
       } else {
@@ -224,7 +224,7 @@ export default function RolesModule() {
       });
       
       if (response.ok) {
-        toast.success('Rol eliminado');
+        toast.success(t("roles.roleDeleted"));
         fetchData();
       } else {
         const data = await response.json();
@@ -247,7 +247,7 @@ export default function RolesModule() {
       const data = await response.json();
       
       if (data.success) {
-        toast.success('Rol asignado correctamente');
+        toast.success(t("roles.roleAssigned"));
         setShowAssignDialog(false);
         setSelectedUserForRole(null);
         fetchUsers();
@@ -610,7 +610,7 @@ export default function RolesModule() {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Filtrar por actor o destino..."
+                    placeholder=t("roles.filterByActorTarget")
                     value={auditFilter}
                     onChange={(e) => setAuditFilter(e.target.value)}
                     className="pl-9"
@@ -746,7 +746,7 @@ export default function RolesModule() {
                   <Input
                     value={formData.nombre}
                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    placeholder="Ej: Editor de Contenido"
+                    placeholder=t("roles.roleNamePlaceholder")
                   />
                 </div>
                 <div className="col-span-2">
@@ -754,7 +754,7 @@ export default function RolesModule() {
                   <Input
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                    placeholder="Breve descripción del rol"
+                    placeholder=t("roles.roleDescPlaceholder")
                   />
                 </div>
                 <div>
