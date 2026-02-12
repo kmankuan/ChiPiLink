@@ -312,50 +312,67 @@ def _serialize(val):
 
 # ============== CHANGES LOG (GIT) ==============
 
+def _git_available() -> bool:
+    """Check if git is available and repo exists."""
+    import shutil
+    if not shutil.which("git"):
+        return False
+    if not os.path.isdir("/app/.git"):
+        return False
+    return True
+
+
 @router.get("/changes-log")
 async def get_changes_log(admin: dict = Depends(get_admin_user)):
     """Return recent git commit history."""
+    if not _git_available():
+        return {"commits": [], "total": 0, "available": False, "reason": "Git not available in this environment"}
     try:
         result = subprocess.run(
             ["git", "log", "--oneline", "--no-merges", "-50", "--format=%H|%an|%ai|%s"],
             capture_output=True, text=True, cwd="/app", timeout=10
         )
         commits = []
-        for line in result.stdout.strip().split("\n"):
-            if not line:
-                continue
-            parts = line.split("|", 3)
-            if len(parts) == 4:
-                commits.append({
-                    "hash": parts[0][:8],
-                    "full_hash": parts[0],
-                    "author": parts[1],
-                    "date": parts[2],
-                    "message": parts[3],
-                })
-        return {"commits": commits, "total": len(commits)}
+        if result.returncode == 0 and result.stdout.strip():
+            for line in result.stdout.strip().split("\n"):
+                if not line:
+                    continue
+                parts = line.split("|", 3)
+                if len(parts) == 4:
+                    commits.append({
+                        "hash": parts[0][:8],
+                        "full_hash": parts[0],
+                        "author": parts[1],
+                        "date": parts[2],
+                        "message": parts[3],
+                    })
+        return {"commits": commits, "total": len(commits), "available": True}
     except Exception as e:
-        return {"commits": [], "total": 0, "error": str(e)}
+        logger.warning(f"Git log failed: {e}")
+        return {"commits": [], "total": 0, "available": False, "reason": str(e)}
 
 
 @router.get("/changes-log/{commit_hash}")
 async def get_commit_detail(commit_hash: str, admin: dict = Depends(get_admin_user)):
     """Get files changed in a specific commit."""
+    if not _git_available():
+        return {"files": [], "available": False}
     try:
         result = subprocess.run(
             ["git", "diff-tree", "--no-commit-id", "-r", "--name-status", commit_hash],
             capture_output=True, text=True, cwd="/app", timeout=10
         )
         files = []
-        for line in result.stdout.strip().split("\n"):
-            if not line:
-                continue
-            parts = line.split("\t", 1)
-            if len(parts) == 2:
-                files.append({"status": parts[0], "file": parts[1]})
-        return {"files": files, "hash": commit_hash}
+        if result.returncode == 0:
+            for line in result.stdout.strip().split("\n"):
+                if not line:
+                    continue
+                parts = line.split("\t", 1)
+                if len(parts) == 2:
+                    files.append({"status": parts[0], "file": parts[1]})
+        return {"files": files, "hash": commit_hash, "available": True}
     except Exception as e:
-        return {"files": [], "error": str(e)}
+        return {"files": [], "available": False}
 
 
 # ============== DEPENDENCIES ==============
