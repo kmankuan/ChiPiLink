@@ -372,35 +372,43 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
           ) : (
             <Card>
               <CardContent className="p-0">
-                <ScrollArea className="h-[400px]">
+                <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-10">
+                          <Checkbox checked={productSelection.allSelected} onCheckedChange={productSelection.toggleAll} />
+                        </TableHead>
                         <TableHead>Product</TableHead>
-                        <TableHead>Category</TableHead>
+                        <TableHead className="hidden sm:table-cell">Category</TableHead>
                         <TableHead className="text-right">Price</TableHead>
-                        <TableHead className="text-right">Stock</TableHead>
+                        <TableHead className="text-right hidden sm:table-cell">Stock</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredProducts.map((product) => {
+                      {pageProducts.map((product) => {
                         const cat = categories.find(c => c.category_id === product.categoria);
                         return (
                           <TableRow key={product.book_id}>
                             <TableCell>
+                              <Checkbox checked={productSelection.isSelected(product.book_id)}
+                                onCheckedChange={() => productSelection.toggle(product.book_id)} />
+                            </TableCell>
+                            <TableCell>
                               <div className="flex items-center gap-3">
                                 {product.image_url ? (
-                                  <img src={product.image_url} alt="" className="w-10 h-10 object-cover rounded" />
+                                  <img src={product.image_url} alt="" className="w-10 h-10 object-cover rounded shrink-0" />
                                 ) : (
-                                  <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
+                                  <div className="w-10 h-10 bg-muted rounded flex items-center justify-center shrink-0">
                                     <Package className="h-5 w-5 text-muted-foreground" />
                                   </div>
                                 )}
-                                <div>
-                                  <p className="font-medium">{product.name}</p>
+                                <div className="min-w-0">
+                                  <p className="font-medium truncate">{product.name}</p>
+                                  {cat && <p className="text-xs text-muted-foreground sm:hidden">{cat.icono} {cat.name}</p>}
                                   {product.requires_preparation && (
-                                    <Badge variant="outline" className="text-orange-600 text-xs">
+                                    <Badge variant="outline" className="text-orange-600 text-xs mt-0.5">
                                       <Clock className="h-3 w-3 mr-1" />
                                       Preparation
                                     </Badge>
@@ -408,7 +416,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                                 </div>
                               </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="hidden sm:table-cell">
                               {cat && (
                                 <Badge variant="secondary">
                                   {cat.icono} {cat.name}
@@ -418,7 +426,7 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                             <TableCell className="text-right font-medium">
                               ${product.price?.toFixed(2)}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right hidden sm:table-cell">
                               <Badge variant={product.inventory_quantity < 10 ? 'destructive' : 'default'}>
                                 {product.inventory_quantity}
                               </Badge>
@@ -438,10 +446,25 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
                       })}
                     </TableBody>
                   </Table>
-                </ScrollArea>
+                </div>
+                <div className="p-3 border-t">
+                  <TablePagination
+                    page={productPagination.page} totalPages={productPagination.totalPages} totalItems={productPagination.totalItems}
+                    pageSize={productPagination.pageSize} onPageChange={productPagination.setPage} onPageSizeChange={productPagination.setPageSize}
+                    canPrev={productPagination.canPrev} canNext={productPagination.canNext}
+                  />
+                </div>
               </CardContent>
             </Card>
           )}
+
+          <BulkActionBar count={productSelection.count} onClear={productSelection.clear}
+            actions={[{ label: 'Delete', variant: 'destructive', onClick: () => setConfirmBulkDelete(true) }]}
+          />
+          <ConfirmDialog open={confirmBulkDelete} onOpenChange={setConfirmBulkDelete}
+            title="Delete Selected Products" description={`Permanently delete ${productSelection.count} product(s)?`}
+            confirmLabel="Delete" variant="destructive" onConfirm={handleBulkDelete}
+          />
         </TabsContent>
 
         {/* Categories Tab */}
