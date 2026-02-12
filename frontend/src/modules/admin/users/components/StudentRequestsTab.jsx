@@ -620,7 +620,7 @@ export default function TextbookAccessAdminTab({ token }) {
 
               {/* Desktop Table View */}
               <Card className="hidden sm:block">
-                <ScrollArea className="max-h-[600px]">
+                <div className="overflow-x-auto max-h-[600px]">
                   <Table>
                     <TableHeader>
                       <TableRow>
