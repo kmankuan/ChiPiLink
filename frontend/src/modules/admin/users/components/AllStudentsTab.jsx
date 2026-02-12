@@ -298,25 +298,24 @@ export default function AllStudentsTab({ token }) {
               </p>
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-10">
                       <Checkbox checked={studentSelection.allSelected} onCheckedChange={studentSelection.toggleAll} />
                     </TableHead>
-                    <TableHead>First Name</TableHead>
-                    <TableHead>Last Name</TableHead>
-                    <TableHead>School</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead>Year</TableHead>
-                    <TableHead>Relationship</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden sm:table-cell">School</TableHead>
+                    <TableHead className="hidden md:table-cell">Grade</TableHead>
+                    <TableHead className="hidden md:table-cell">Year</TableHead>
+                    <TableHead className="hidden lg:table-cell">Relationship</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead className="hidden sm:table-cell">Created</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredStudents.map((student) => (
+                  {pageStudents.map((student) => (
                     <TableRow key={student.student_id}>
                       <TableCell>
                         <Checkbox checked={studentSelection.isSelected(student.student_id)}
@@ -324,25 +323,26 @@ export default function AllStudentsTab({ token }) {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{student.first_name || student.full_name?.split(' ')[0] || ''}</p>
+                          <p className="font-medium">
+                            {student.first_name || student.full_name?.split(' ')[0] || ''}{' '}
+                            {student.last_name || (student.full_name?.split(' ').slice(1).join(' ')) || ''}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {student.student_number || student.student_id}
                           </p>
+                          <p className="text-xs text-muted-foreground sm:hidden">{student.school_name}</p>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <p className="font-medium">{student.last_name || (student.full_name?.split(' ').slice(1).join(' ')) || ''}</p>
-                      </TableCell>
-                      <TableCell>{student.school_name}</TableCell>
-                      <TableCell>{student.grade}</TableCell>
-                      <TableCell>{student.year}</TableCell>
-                      <TableCell className="capitalize">
+                      <TableCell className="hidden sm:table-cell">{student.school_name}</TableCell>
+                      <TableCell className="hidden md:table-cell">{student.grade}</TableCell>
+                      <TableCell className="hidden md:table-cell">{student.year}</TableCell>
+                      <TableCell className="capitalize hidden lg:table-cell">
                         {student.relation_type === 'other' 
                           ? student.relation_other || 'Other'
                           : student.relation_type}
                       </TableCell>
                       <TableCell>{getStatusBadge(student.status)}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
+                      <TableCell className="text-muted-foreground text-sm hidden sm:table-cell">
                         {new Date(student.created_at).toLocaleDateString()}
                       </TableCell>
                     </TableRow>
@@ -352,9 +352,11 @@ export default function AllStudentsTab({ token }) {
             </div>
           )}
 
-          <p className="text-sm text-muted-foreground mt-4">
-            Showing {filteredStudents.length} of {totalStudents} students
-          </p>
+          <TablePagination
+            page={studentPagination.page} totalPages={studentPagination.totalPages} totalItems={studentPagination.totalItems}
+            pageSize={studentPagination.pageSize} onPageChange={studentPagination.setPage} onPageSizeChange={studentPagination.setPageSize}
+            canPrev={studentPagination.canPrev} canNext={studentPagination.canNext}
+          />
 
           {/* Bulk Action Bar — Archive only (student data is sensitive) */}
           <BulkActionBar count={studentSelection.count} onClear={studentSelection.clear}
