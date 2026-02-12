@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       if (!item.permission) return true;
       return hasPermission(item.permission);
     });
-  }, [authLoading, isAdmin, hasPermission]);
+  }, [authLoading, isAdmin, hasPermission, navItems]);
 
   // Redirect non-admins away from admin panel (only after auth is loaded)
   useEffect(() => {
