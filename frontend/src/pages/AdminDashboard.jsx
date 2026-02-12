@@ -77,6 +77,7 @@ const navItemsDef = [
   { id: 'unatienda', labelKey: 'nav.unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
   { id: 'orders', labelKey: 'nav.orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
   { id: 'wallet', labelKey: 'nav.wallet', icon: Wallet, permission: 'admin.site_config' },
+  { id: 'payment-alerts', labelKey: 'nav.paymentAlerts', icon: BellRing, permission: 'admin.site_config', adminOnly: true },
   { id: 'analytics', labelKey: 'nav.reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
   { id: 'customers', labelKey: 'nav.users', icon: Users, permission: 'users.view' },
   { id: 'memberships', labelKey: 'nav.memberships', icon: CreditCard, permission: 'memberships.view' },
