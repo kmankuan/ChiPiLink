@@ -358,7 +358,13 @@
     "withBalance": "With Balance",
     "totalDeposited": "Total Deposited",
     "totalSpent": "Total Spent",
-    "importCSV": "Import CSV"
+    "importCSV": "Import CSV",
+    "fillRequired": "Please fill all required fields",
+    "completeAllFields": "Complete all fields",
+    "networkError": "Network error",
+    "urlCopied": "URL copied",
+    "processingAuth": "Processing authentication...",
+    "waitVerifying": "Please wait while we verify your account"
   },
   "status": {
     "pending": "Pending",
@@ -1987,7 +1993,16 @@
     "testIntegration": "Test Integration",
     "openMonday": "Open Monday.com",
     "booksConfigSaved": "Books configuration saved",
-    "syncResult": "Synced: {{synced}}, Failed: {{failed}}"
+    "syncResult": "Synced: {{synced}}, Failed: {{failed}}",
+    "boardIdRequired": "Board ID is required",
+    "walletConfigSaved": "Wallet integration config saved",
+    "networkError": "Network error",
+    "urlCopied": "URL copied",
+    "failedToSave": "Failed to save",
+    "selectOrdersBoard": "Select an Orders board first",
+    "mondayConfigSaved": "Monday.com configuration saved",
+    "enterBoardId": "Please enter a Board ID",
+    "boardIdSaved": "Board ID saved successfully"
   },
   "widgetManager": {
     "title": "Widget Manager",

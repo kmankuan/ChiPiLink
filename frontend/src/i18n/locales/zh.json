@@ -358,7 +358,13 @@
     "withBalance": "有余额",
     "totalDeposited": "总充值",
     "totalSpent": "总消费",
-    "importCSV": "导入CSV"
+    "importCSV": "导入CSV",
+    "fillRequired": "请填写所有必填字段",
+    "completeAllFields": "请完成所有字段",
+    "networkError": "网络错误",
+    "urlCopied": "链接已复制",
+    "processingAuth": "正在处理认证...",
+    "waitVerifying": "请稍候，正在验证您的账户"
   },
   "status": {
     "pending": "待处理",
@@ -1758,7 +1764,16 @@
     "testIntegration": "测试集成",
     "openMonday": "打开Monday.com",
     "booksConfigSaved": "书籍配置已保存",
-    "syncResult": "已同步：{{synced}}，失败：{{failed}}"
+    "syncResult": "已同步：{{synced}}，失败：{{failed}}",
+    "boardIdRequired": "看板ID为必填项",
+    "walletConfigSaved": "钱包集成配置已保存",
+    "networkError": "网络错误",
+    "urlCopied": "链接已复制",
+    "failedToSave": "保存失败",
+    "selectOrdersBoard": "请先选择订单看板",
+    "mondayConfigSaved": "Monday.com配置已保存",
+    "enterBoardId": "请输入看板ID",
+    "boardIdSaved": "看板ID保存成功"
   },
   "widgetManager": {
     "title": "小部件管理器",

@@ -358,7 +358,13 @@
     "withBalance": "Con Saldo",
     "totalDeposited": "Total Depositado",
     "totalSpent": "Total Gastado",
-    "importCSV": "Importar CSV"
+    "importCSV": "Importar CSV",
+    "fillRequired": "Por favor completa todos los campos requeridos",
+    "completeAllFields": "Completa todos los campos",
+    "networkError": "Error de red",
+    "urlCopied": "URL copiada",
+    "processingAuth": "Procesando autenticación...",
+    "waitVerifying": "Por favor espere mientras verificamos su cuenta"
   },
   "status": {
     "pending": "Pendiente",
@@ -1991,7 +1997,16 @@
     "testIntegration": "Probar Integración",
     "openMonday": "Abrir Monday.com",
     "booksConfigSaved": "Configuración de libros guardada",
-    "syncResult": "Sincronizados: {{synced}}, Fallidos: {{failed}}"
+    "syncResult": "Sincronizados: {{synced}}, Fallidos: {{failed}}",
+    "boardIdRequired": "El Board ID es requerido",
+    "walletConfigSaved": "Configuración de wallet guardada",
+    "networkError": "Error de red",
+    "urlCopied": "URL copiada",
+    "failedToSave": "Error al guardar",
+    "selectOrdersBoard": "Selecciona un board de pedidos primero",
+    "mondayConfigSaved": "Configuración de Monday.com guardada",
+    "enterBoardId": "Ingresa un Board ID",
+    "boardIdSaved": "Board ID guardado exitosamente"
   },
   "widgetManager": {
     "title": "Administrador de Widget",
