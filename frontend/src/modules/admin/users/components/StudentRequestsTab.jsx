@@ -734,6 +734,11 @@ export default function TextbookAccessAdminTab({ token }) {
                   </Table>
                 </ScrollArea>
               </Card>
+              <TablePagination
+                page={requestsPagination.page} totalPages={requestsPagination.totalPages} totalItems={requestsPagination.totalItems}
+                pageSize={requestsPagination.pageSize} onPageChange={requestsPagination.setPage} onPageSizeChange={requestsPagination.setPageSize}
+                canPrev={requestsPagination.canPrev} canNext={requestsPagination.canNext}
+              />
             </>
           )}
         </TabsContent>
