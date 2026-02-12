@@ -267,6 +267,14 @@ export default function SchoolsManagementTab({ token }) {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Search */}
+          {schools.length > 0 && (
+            <div className="relative mb-4">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input value={search} onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search schools..." className="pl-8 h-9 text-sm" data-testid="search-schools" />
+            </div>
+          )}
           {schools.length === 0 ? (
             <div className="text-center py-12">
               <School className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -278,22 +286,26 @@ export default function SchoolsManagementTab({ token }) {
               </Button>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t.name}</TableHead>
-                  <TableHead>{t.shortName}</TableHead>
-                  <TableHead>{t.catalogId}</TableHead>
+                  <TableHead className="hidden sm:table-cell">{t.shortName}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t.catalogId}</TableHead>
                   <TableHead className="text-center">{t.active}</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {schools.map((school) => (
+                {schools.filter(s => !search || s.name?.toLowerCase().includes(search.toLowerCase()) || s.short_name?.toLowerCase().includes(search.toLowerCase())).map((school) => (
                   <TableRow key={school.school_id}>
-                    <TableCell className="font-medium">{school.name}</TableCell>
-                    <TableCell>{school.short_name}</TableCell>
-                    <TableCell className="text-muted-foreground">{school.catalog_id}</TableCell>
+                    <TableCell className="font-medium">
+                      {school.name}
+                      <p className="text-xs text-muted-foreground sm:hidden">{school.short_name}</p>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{school.short_name}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{school.catalog_id}</TableCell>
                     <TableCell className="text-center">
                       {school.is_active ? (
                         <CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" />
