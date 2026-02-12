@@ -11,6 +11,7 @@ Build a comprehensive admin dashboard for the "Chipi Wallet" application with:
 - **Admin**: Manages wallets, users, orders, roles, integrations, site config
 - **Parent/Guardian (Acudido)**: Links students, places textbook orders, manages wallet
 - **Student**: Views catalog, uses wallet for purchases
+- **Translator**: Bilingual community member who contributes translations (via roles)
 
 ## Core Requirements
 - All code and agent communication in English
@@ -23,20 +24,27 @@ Build a comprehensive admin dashboard for the "Chipi Wallet" application with:
 ### Completed (P0)
 - **2-Way Monday.com Wallet Sync**: User creation, transaction logging, webhook processing, idempotency
 - **Monday.com Sync Dashboard**: UI + API for monitoring sync status, logs, manual re-sync
-- **Admin Table Consistency Refactor**: All major admin tables standardized (mobile-first, pagination, bulk actions)
-- **Redundant Bank Alert Parser Removal**: Cleaned from frontend and backend
-- **P0 i18n Full Rollout (95%+ coverage)**:
-  - 163/180 frontend files now use `useTranslation` hook
-  - 2100+ translation keys in each locale file (en.json, es.json, zh.json)
-  - Admin sidebar navigation, all admin modules, shared components, toast messages, page titles all translated
-  - Language selector in admin header works across EN/ES/ZH
-  - Remaining 7 files are utility/callback/third-party components with no translatable UI
+- **Admin Table Consistency Refactor**: All major admin tables standardized
+- **P0 i18n Full Rollout (95%+ coverage)**: 2000+ translation keys in en/es/zh
 - **Translation Coverage Indicator (Feb 12, 2026)**:
-  - New backend API: GET /api/translations/admin/coverage (analyzes locale files, returns per-language coverage %, missing keys, category breakdown)
-  - New TranslationCoverageCard component in Admin > Administration > Translations tab
-  - Shows progress bars per language, clickable missing-keys badges, expandable category breakdown table
-  - Fixed sidebar useMemo dependency to properly re-render on language change
-  - Fixed hardcoded strings: Admin module descriptions, "Go to Home"/"Log Out", PinPanClubFeedBlock "Total"
+  - Backend: `GET /api/translations/admin/coverage` - coverage stats per language, missing keys, category breakdown
+  - Frontend: TranslationCoverageCard with progress bars, clickable missing-key badges, category breakdown table
+  - Quick-edit on missing keys: inline editing directly in the missing keys dialog
+  - Fixed sidebar useMemo dependency for proper language switching
+
+- **Permission-Gated Translation Management (Feb 12, 2026)**:
+  - Added `translations` permission group: `translations.view`, `translations.edit`, `translations.manage`
+  - Admins get `translations.*` by default
+  - Backend endpoints use `get_authenticated_user` wrapper + `_check_permission()` for proper auth
+  - All endpoints return 401 without token, 403 without required permission
+  - Rewritten TranslationsModule with:
+    - Full i18n (all UI text via `t()` calls)
+    - Search, category filter, missing-only filter
+    - Inline cell editing (click to edit, Enter to save, Escape to cancel)
+    - Permission-aware UI (edit/delete buttons only shown if user has permission)
+    - Sync from files, new key creation, key deletion
+    - Pagination with proper page controls
+  - 100% backend tests passed (11/11), 100% frontend verified
 
 ### Architecture
 - **Backend**: FastAPI, SQLAlchemy, MongoDB
@@ -62,6 +70,3 @@ Build a comprehensive admin dashboard for the "Chipi Wallet" application with:
 - Email Notifications
 - Landing Page Templates
 - sync-all endpoint fix
-- Multi-tenant support
-- Advanced reporting dashboard
-- Mobile app (React Native)
