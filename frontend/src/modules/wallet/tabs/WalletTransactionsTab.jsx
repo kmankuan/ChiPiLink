@@ -62,9 +62,8 @@ export default function WalletTransactionsTab() {
     return matchSearch && matchType && matchArchived;
   });
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
+  const pagination = usePagination(filtered, 25);
+  const paginated = pagination.paginated;
   const selection = useTableSelection(paginated, 'transaction_id');
 
   const handleBulkArchive = () => {
