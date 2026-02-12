@@ -19,11 +19,13 @@ import {
   ArrowUpCircle, ArrowDownCircle, Search, RefreshCw, Loader2, Archive
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { usePagination } from '@/hooks/usePagination';
 import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
+import { TablePagination } from '@/components/shared/TablePagination';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-const PAGE_SIZE = 20;
 
 export default function WalletTransactionsTab() {
   const token = localStorage.getItem('auth_token');
