@@ -57,7 +57,15 @@ export default function WalletOverviewTab() {
       const res = await axios.get(`${API_URL}/api/wallet/admin/all-users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const data = res.data.users || [];
+      const raw = res.data.users || [];
+      // Flatten wallet data into user object for easy access
+      const data = raw.map(u => ({
+        ...u,
+        balance: u.wallet?.balance_usd || 0,
+        total_deposited: u.wallet?.total_deposited || 0,
+        total_spent: u.wallet?.total_spent || 0,
+        is_locked: u.wallet?.is_locked || false,
+      }));
       setUsers(data);
       const active = data.filter(u => !u.archived);
       setStats({
