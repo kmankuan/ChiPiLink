@@ -212,6 +212,7 @@ export default function AdminDashboard() {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             {/* Theme Toggle */}
+            <LanguageSelector variant="ghost" />
             <Button
               variant="ghost"
               size="icon"
