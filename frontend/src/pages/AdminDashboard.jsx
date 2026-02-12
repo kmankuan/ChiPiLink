@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { LanguageSelector } from '@/components/common/LanguageSelector';
+import LanguageSelector from '@/components/common/LanguageSelector';
 import {
   DropdownMenu,
   DropdownMenuContent,
