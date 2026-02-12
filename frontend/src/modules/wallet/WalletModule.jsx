@@ -61,6 +61,10 @@ export default function WalletModule() {
         <TabsContent value="settings" className="mt-4">
           <WalletSettingsTab />
         </TabsContent>
+
+        <TabsContent value="bank-alerts" className="mt-4">
+          <BankAlertTab token={token} />
+        </TabsContent>
       </Tabs>
     </div>
   );
