@@ -1976,5 +1976,10 @@
     "inlineEditHint": "点击单元格进行编辑",
     "enterKey": "请输入键",
     "quickEdit": "快速编辑"
+  },
+  "acudidos": {
+    "birthDate": "出生日期",
+    "gender": "性别",
+    "addAcudido": "添加受抚养人"
   }
 }
