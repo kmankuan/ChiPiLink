@@ -129,6 +129,7 @@ export default function SchoolsManagementTab({ token }) {
   const [showDialog, setShowDialog] = useState(false);
   const [editingSchool, setEditingSchool] = useState(null);
   const [formData, setFormData] = useState(defaultFormData);
+  const [search, setSearch] = useState('');
 
   const fetchSchools = useCallback(async () => {
     setLoading(true);
