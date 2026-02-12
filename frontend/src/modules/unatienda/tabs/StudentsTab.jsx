@@ -35,10 +35,10 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function StudentsTab({ token }) {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

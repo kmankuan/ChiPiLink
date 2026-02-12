@@ -24,7 +24,6 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const emptyProductRow = {
@@ -42,6 +41,7 @@ const emptyProductRow = {
 };
 
 export default function CatalogoPublicoTab({ token, onRefresh }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [categories, setCategorias] = useState([]);

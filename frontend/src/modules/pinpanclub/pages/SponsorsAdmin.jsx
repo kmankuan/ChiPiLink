@@ -14,7 +14,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const POSITION_OPTIONS = [
@@ -40,6 +39,7 @@ const SIZE_OPTIONS = [
 ];
 
 export default function SponsorsAdmin() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [sponsors, setSponsors] = useState([]);
   const [loading, setLoading] = useState(true);

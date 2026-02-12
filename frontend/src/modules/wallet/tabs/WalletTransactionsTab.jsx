@@ -26,10 +26,10 @@ import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletTransactionsTab() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('auth_token');
   const headers = { Authorization: `Bearer ${token}` };
 

@@ -58,7 +58,6 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const ORDER_STATUSES = [
@@ -80,6 +79,7 @@ const STATUS_COLORS = {
 };
 
 export default function TextbookOrdersAdminTab() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [stats, setStats] = useState(null);

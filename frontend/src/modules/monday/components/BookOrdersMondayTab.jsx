@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 // Fields for the Orders board
@@ -73,6 +72,7 @@ const TEXTBOOK_SUBITEM_FIELDS = [
 ];
 
 function ColumnMapper({ fields, mapping, onChange, columns, label }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">{label}</p>

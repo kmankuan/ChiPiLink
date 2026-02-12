@@ -18,10 +18,10 @@ import OrderFormConfigTab from './tabs/OrderFormConfigTab';
 import SchoolYearTab from './tabs/SchoolYearTab';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function UnatiendaModule() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('inventory');
   const [stats, setStats] = useState(null);

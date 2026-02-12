@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Rarity configurations
@@ -50,6 +49,7 @@ const rarityConfig = {
 
 // Single Achievement Badge with animation
 function AchievementBadge({ achievement, index, showNew = false }) {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const rarity = rarityConfig[achievement.achievement_info?.rarity || achievement.rarity] || rarityConfig.common;
   const isLegendary = (achievement.achievement_info?.rarity || achievement.rarity) === 'legendary';

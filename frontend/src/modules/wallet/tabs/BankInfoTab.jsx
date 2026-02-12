@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const EMPTY_FORM = {
@@ -34,6 +33,7 @@ const CONTEXT_PRESETS = [
 ];
 
 export default function BankInfoTab({ token }) {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editDialog, setEditDialog] = useState(null); // null | form object

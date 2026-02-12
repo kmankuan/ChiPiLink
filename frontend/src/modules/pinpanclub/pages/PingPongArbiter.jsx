@@ -12,10 +12,10 @@ import ScoreBoard from '../components/ScoreBoard';
 import ArbiterPanel from '../components/ArbiterPanel';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PingPongArbiter() {
+  const { t } = useTranslation();
   const { matchId } = useParams();
   const navigate = useNavigate();
   const [match, setMatch] = useState(null);

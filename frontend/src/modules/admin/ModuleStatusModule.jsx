@@ -13,7 +13,6 @@ import axios from 'axios';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const STATUS_OPTIONS = [
@@ -24,6 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 function ModuleRow({ moduleKey, moduleName, statusData, onChange }) {
+  const { t } = useTranslation();
   const currentStatus = statusData?.status || 'production';
   const customLabel = statusData?.customLabel || '';
 

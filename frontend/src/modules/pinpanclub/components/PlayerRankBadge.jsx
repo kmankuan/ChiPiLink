@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Rank definitions with thresholds and styling
@@ -113,6 +112,7 @@ const RANKS = [
 
 // Get rank by points
 function getRankByPoints(points) {
+  const { t } = useTranslation();
   for (let i = RANKS.length - 1; i >= 0; i--) {
     if (points >= RANKS[i].minPoints) {
       return { ...RANKS[i], index: i };

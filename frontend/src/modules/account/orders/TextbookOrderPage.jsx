@@ -44,7 +44,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const STATUS_CONFIG = {
@@ -65,6 +64,7 @@ const ORDER_STATUS_CONFIG = {
 };
 
 export default function TextbookOrderPage({ embedded = false }) {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);

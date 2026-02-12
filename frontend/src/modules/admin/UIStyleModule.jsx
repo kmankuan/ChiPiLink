@@ -15,7 +15,6 @@ import axios from 'axios';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const RADIUS_OPTIONS = [
@@ -32,6 +31,7 @@ const CARD_STYLE_OPTIONS = [
 ];
 
 function TemplateCard({ template, isSelected, onSelect }) {
+  const { t } = useTranslation();
   return (
     <button
       onClick={() => onSelect(template.id)}

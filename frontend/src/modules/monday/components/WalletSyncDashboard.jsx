@@ -13,10 +13,10 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function WalletSyncDashboard() {
+  const { t } = useTranslation();
   const token = localStorage.getItem('auth_token');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);

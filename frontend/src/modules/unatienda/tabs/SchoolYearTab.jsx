@@ -39,7 +39,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const { t } = useTranslation();
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const MONTHS = [
@@ -48,6 +47,7 @@ const MONTHS = [
 ];
 
 export default function SchoolYearTab({ token }) {
+  const { t } = useTranslation();
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
