@@ -306,26 +306,26 @@ export default function DemoDataModule() {
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-500" />
-              <CardTitle className="text-lg">Membresías</CardTitle>
+              <CardTitle className="text-lg">{t('demoData.memberships')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-3">
               <StatCard 
                 icon={FileText} 
-                title="Planes" 
+                title={t("demoData.plans")} 
                 value={stats?.memberships?.plans || 0}
                 color="bg-blue-500"
               />
               <StatCard 
                 icon={Users} 
-                title="Membresías" 
+                title={t("demoData.memberships")} 
                 value={stats?.memberships?.memberships || 0}
                 color="bg-green-500"
               />
               <StatCard 
                 icon={CheckCircle2} 
-                title="Visitas" 
+                title={t("demoData.visits")} 
                 value={stats?.memberships?.visits || 0}
                 color="bg-purple-500"
               />
