@@ -190,7 +190,7 @@ function ApiReferenceTab() {
 function RoadmapTab() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { axios.get(`${API}/api/dev-control/roadmap`, { headers: hdrs() }).then(r => setItems(r.data.items)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/roadmap`, { headers: hdrs() }).then(r => setItems(r.data.items)).catch(() => setItems([])).finally(() => setLoading(false)); }, []);
   const updateStatus = async (id, s) => { try { await axios.put(`${API}/api/dev-control/roadmap/${id}`, { status: s }, { headers: hdrs() }); setItems(p => p.map(it => it.id === id ? { ...it, status: s } : it)); toast.success('Updated'); } catch { toast.error('Failed'); } };
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   const pc = { P0: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800', P1: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400 border-amber-200 dark:border-amber-800', P2: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-400 border-sky-200 dark:border-sky-800', P3: 'bg-slate-100 text-slate-700 dark:bg-slate-800/40 dark:text-slate-400 border-slate-200 dark:border-slate-700' };
