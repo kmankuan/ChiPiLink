@@ -372,7 +372,7 @@ function DependenciesTab() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('node');
   const [filter, setFilter] = useState('');
-  useEffect(() => { axios.get(`${API}/api/dev-control/dependencies`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/dependencies`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ python: { packages: [], total: 0, available: false }, node: { dependencies: {}, devDependencies: {}, total: 0, available: false } })).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
   return (
