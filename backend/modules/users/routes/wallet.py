@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Optional
 from datetime import datetime, timezone
 from pydantic import BaseModel
+import asyncio
 
 from core.auth import get_current_user, get_admin_user
 from core.database import db
