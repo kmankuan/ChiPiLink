@@ -471,7 +471,7 @@ export default function MondayModule() {
                     <>
                       <CheckCircle2 className="h-6 w-6 text-green-500" />
                       <div>
-                        <p className="font-medium text-green-600">Connected</p>
+                        <p className="font-medium text-green-600">{t('common.connected')}</p>
                         {connectionInfo?.user && (
                           <p className="text-sm text-muted-foreground">
                             {connectionInfo.user.name} ({connectionInfo.user.email})
@@ -483,7 +483,7 @@ export default function MondayModule() {
                     <>
                       <XCircle className="h-6 w-6 text-red-500" />
                       <div>
-                        <p className="font-medium text-red-600">Not connected</p>
+                        <p className="font-medium text-red-600">{t('common.notConnected')}</p>
                         <p className="text-sm text-muted-foreground">
                           {connectionInfo?.error || 'Add a workspace with a valid API Key'}
                         </p>
@@ -544,7 +544,7 @@ export default function MondayModule() {
                           </p>
                         </div>
                         {ws.workspace_id === activeWorkspaceId && (
-                          <Badge variant="default" className="ml-2">Active</Badge>
+                          <Badge variant="default" className="ml-2">{t('authConfig.activeStatus')}</Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
@@ -576,7 +576,7 @@ export default function MondayModule() {
               {/* Add new workspace */}
               {showApiKeyInput ? (
                 <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
-                  <Label>Monday.com API Key</Label>
+                  <Label>{t('monday.mondayApiKey')}</Label>
                   <p className="text-sm text-muted-foreground">
                     Get your API Key from: Monday.com → Your profile → Admin → API → Personal API tokens
                   </p>
@@ -626,11 +626,11 @@ export default function MondayModule() {
             </CardHeader>
             <CardContent className="text-sm text-blue-700 dark:text-blue-300">
               <ol className="list-decimal list-inside space-y-2">
-                <li>Log in to Monday.com</li>
-                <li>Click your profile picture (top right corner)</li>
-                <li>Go to <strong>Administration</strong> → <strong>Developers</strong></li>
-                <li>In the <strong>My access tokens</strong> section, click <strong>Show</strong></li>
-                <li>Copy your personal token and paste it here</li>
+                <li>{t('monday.step1')}</li>
+                <li>{t('monday.step2')}</li>
+                <li>{t('monday.step3')}</li>
+                <li>{t('monday.step4')}</li>
+                <li>{t('monday.step5')}</li>
               </ol>
             </CardContent>
           </Card>
@@ -661,7 +661,7 @@ export default function MondayModule() {
                   ) : (
                     <>
                       <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-red-600">Not configured</span>
+                      <span className="font-medium text-red-600">{t('common.notConfigured')}</span>
                     </>
                   )}
                 </div>
@@ -684,7 +684,7 @@ export default function MondayModule() {
                   ) : (
                     <>
                       <AlertCircle className="h-5 w-5 text-yellow-500" />
-                      <span className="font-medium text-yellow-600">Pending</span>
+                      <span className="font-medium text-yellow-600">{t('common.pending')}</span>
                     </>
                   )}
                 </div>
@@ -707,12 +707,12 @@ export default function MondayModule() {
                   {legacyStatus?.connected ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Connected</span>
+                      <span className="font-medium text-green-600">{t('common.connected')}</span>
                     </>
                   ) : (
                     <>
                       <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium text-red-600">Disconnected</span>
+                      <span className="font-medium text-red-600">{t('common.disconnected')}</span>
                     </>
                   )}
                 </div>
@@ -724,7 +724,7 @@ export default function MondayModule() {
           {legacyStatus?.connected && legacyStatus?.boards?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Available Boards</CardTitle>
+                <CardTitle>{t('monday.availableBoards')}</CardTitle>
                 <CardDescription>
                   Select a board as general destination for integrations
                 </CardDescription>
@@ -758,7 +758,7 @@ export default function MondayModule() {
           {/* Manual Board ID Input */}
           <Card>
             <CardHeader>
-              <CardTitle>Manual Configuration</CardTitle>
+              <CardTitle>{t('monday.manualConfig')}</CardTitle>
               <CardDescription>
                 Enter the Board ID manually if it doesn't appear in the list
               </CardDescription>
