@@ -671,9 +671,9 @@ export default function WidgetManagerModule() {
 
               {/* Floating Button (1 line) */}
               <div>
-                <Label className="text-xs font-medium mb-1 block">Option 1: Floating Button (recommended)</Label>
+                <Label className="text-xs font-medium mb-1 block">{t("widgetManager.floatingButton")}</Label>
                 <p className="text-[10px] text-muted-foreground mb-1.5">
-                  Adds a floating button to the page that opens the widget as a slide-out panel.
+                  {t("widgetManager.floatingButtonDesc")}
                 </p>
                 <div className="relative">
                   <pre className="p-3 rounded-lg bg-muted text-[11px] font-mono overflow-x-auto border">
@@ -695,9 +695,9 @@ export default function WidgetManagerModule() {
 
               {/* Full Page Embed */}
               <div>
-                <Label className="text-xs font-medium mb-1 block">Option 2: Full Page Embed</Label>
+                <Label className="text-xs font-medium mb-1 block">{t("widgetManager.fullPageEmbed")}</Label>
                 <p className="text-[10px] text-muted-foreground mb-1.5">
-                  Embed the widget directly in an Invision Pages block or custom page as a full component.
+                  {t("widgetManager.fullPageEmbedDesc")}
                 </p>
                 <pre className="p-3 rounded-lg bg-muted text-[11px] font-mono overflow-x-auto border">
 {`<iframe
@@ -712,9 +712,9 @@ export default function WidgetManagerModule() {
 
               {/* Sidebar Embed */}
               <div>
-                <Label className="text-xs font-medium mb-1 block">Option 3: Sidebar Embed</Label>
+                <Label className="text-xs font-medium mb-1 block">{t("widgetManager.sidebarEmbed")}</Label>
                 <p className="text-[10px] text-muted-foreground mb-1.5">
-                  Add to a sidebar or narrow container on laopan.online.
+                  {t("widgetManager.sidebarEmbedDesc")}
                 </p>
                 <pre className="p-3 rounded-lg bg-muted text-[11px] font-mono overflow-x-auto border">
 {`<iframe
