@@ -199,6 +199,10 @@ api_router.include_router(widget_router)
 from modules.dev_control import dev_control_router
 api_router.include_router(dev_control_router)
 
+# Wallet Topups Module
+from modules.wallet_topups import wallet_topups_router
+api_router.include_router(wallet_topups_router)
+
 # Include main router in app
 app.include_router(api_router)
 
