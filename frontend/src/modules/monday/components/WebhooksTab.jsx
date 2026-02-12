@@ -44,7 +44,7 @@ export default function WebhooksTab() {
   useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
   const handleRegister = async () => {
-    if (!boardId) { toast.error('Board ID is required'); return; }
+    if (!boardId) { toast.error(t('monday.boardIdRequired')); return; }
     setRegistering(true);
     try {
       const res = await fetch(`${API}/api/store/monday/webhooks/register`, {
@@ -60,7 +60,7 @@ export default function WebhooksTab() {
         toast.error(err.detail || 'Failed to register webhook');
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setRegistering(false);
     }
@@ -78,7 +78,7 @@ export default function WebhooksTab() {
         setConfig({});
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setRemoving(false);
     }
@@ -86,7 +86,7 @@ export default function WebhooksTab() {
 
   const copyUrl = (url) => {
     navigator.clipboard.writeText(url);
-    toast.success('URL copied');
+    toast.success(t('monday.urlCopied'));
   };
 
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded-lg" />;

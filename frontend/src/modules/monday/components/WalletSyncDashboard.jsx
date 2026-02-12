@@ -54,7 +54,7 @@ export default function WalletSyncDashboard() {
         toast.error(result.detail || 'Sync failed');
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setSyncing(false);
     }
@@ -74,7 +74,7 @@ export default function WalletSyncDashboard() {
         toast.error(result.detail || 'Re-sync failed');
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     }
   };
 

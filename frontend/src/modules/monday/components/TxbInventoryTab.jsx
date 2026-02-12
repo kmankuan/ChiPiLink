@@ -80,7 +80,7 @@ export default function TxbInventoryTab() {
         toast.error(t('admin.configError', 'Failed to save configuration'));
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setSaving(false);
     }

@@ -61,9 +61,9 @@ export default function StatusMappingTab() {
         body: JSON.stringify({ mapping }),
       });
       if (res.ok) toast.success(t('admin.mappingSaved', 'Status mapping saved'));
-      else toast.error('Failed to save');
+      else toast.error(t('monday.failedToSave'));
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setSaving(false);
     }

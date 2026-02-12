@@ -317,7 +317,7 @@ export default function MondayModule() {
       });
       
       if (!res.ok) throw new Error('Error saving configuration');
-      toast.success('Books configuration saved');
+      toast.success(t('monday.booksConfigSaved'));
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -361,7 +361,7 @@ export default function MondayModule() {
 
   const handleSaveLegacyBoard = async () => {
     if (!legacyBoardId.trim()) {
-      toast.error('Please enter a Board ID');
+      toast.error(t('monday.enterBoardId'));
       return;
     }
 
@@ -372,7 +372,7 @@ export default function MondayModule() {
         { board_id: legacyBoardId.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success('Board ID saved successfully');
+      toast.success(t('monday.boardIdSaved'));
       loadLegacyStatus();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error saving configuration');

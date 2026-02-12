@@ -56,7 +56,7 @@ export default function WalletMondayTab() {
 
   const handleSave = async () => {
     if (!config.board_id) {
-      toast.error('Board ID is required');
+      toast.error(t('monday.boardIdRequired'));
       return;
     }
     setSaving(true);
@@ -70,14 +70,14 @@ export default function WalletMondayTab() {
         body: JSON.stringify({ config }),
       });
       if (res.ok) {
-        toast.success('Wallet integration config saved');
+        toast.success(t('monday.walletConfigSaved'));
         fetchConfig();
       } else {
         const err = await res.json();
         toast.error(err.detail || 'Failed to save config');
       }
     } catch {
-      toast.error('Network error');
+      toast.error(t('monday.networkError'));
     } finally {
       setSaving(false);
     }
@@ -85,7 +85,7 @@ export default function WalletMondayTab() {
 
   const copyUrl = (url) => {
     navigator.clipboard.writeText(url);
-    toast.success('URL copied');
+    toast.success(t('monday.urlCopied'));
   };
 
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded-lg" />;

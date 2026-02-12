@@ -269,7 +269,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
 
   const handleSave = async () => {
     if (!ordersBoard) {
-      toast.error('Select an Orders board first');
+      toast.error(t('monday.selectOrdersBoard'));
       return;
     }
     setSaving(true);
@@ -294,7 +294,7 @@ export default function BookOrdersMondayTab({ connected, boards: allBoards }) {
         body: JSON.stringify(config),
       });
       if (!res.ok) throw new Error('Error saving');
-      toast.success('Monday.com configuration saved');
+      toast.success(t('monday.mondayConfigSaved'));
     } catch (e) {
       toast.error(e.message);
     } finally {
