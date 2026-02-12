@@ -14,13 +14,13 @@ class TestTranslationCoverageAPI:
     @pytest.fixture(scope="class")
     def admin_token(self):
         """Get admin authentication token"""
-        login_response = requests.post(f"{BASE_URL}/api/admin/login", json={
+        login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "teck@koh.one",
             "password": "Acdb##0897"
         })
         if login_response.status_code == 200:
             return login_response.json().get("token")
-        pytest.skip("Admin authentication failed")
+        pytest.skip(f"Admin authentication failed: {login_response.status_code}")
     
     def test_coverage_endpoint_exists(self, admin_token):
         """Test that coverage API endpoint returns valid response"""
@@ -148,13 +148,13 @@ class TestTranslationAdminEndpoints:
     @pytest.fixture(scope="class")
     def admin_token(self):
         """Get admin authentication token"""
-        login_response = requests.post(f"{BASE_URL}/api/admin/login", json={
+        login_response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "teck@koh.one",
             "password": "Acdb##0897"
         })
         if login_response.status_code == 200:
             return login_response.json().get("token")
-        pytest.skip("Admin authentication failed")
+        pytest.skip(f"Admin authentication failed: {login_response.status_code}")
     
     def test_translation_list_endpoint(self, admin_token):
         """Test GET /api/translations/admin/list"""
