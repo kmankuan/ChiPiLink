@@ -728,11 +728,11 @@ export default function RolesModule() {
       <Dialog open={showRoleForm} onOpenChange={setShowRoleForm}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingRole ? 'Editar Rol' : 'Nuevo Rol'}</DialogTitle>
+            <DialogTitle>{editingRole ? t('roles.editRole') : t('roles.newRole')}</DialogTitle>
             <DialogDescription>
               {editingRole?.es_sistema 
-                ? 'Solo puedes modificar los permisos de roles de sistema'
-                : 'Configura el nombre, nivel y permisos del rol'
+                ? t('roles.onlySystemPermsEditable')
+                : t('roles.configurePerms')
               }
             </DialogDescription>
           </DialogHeader>
@@ -742,23 +742,23 @@ export default function RolesModule() {
             {!editingRole?.es_sistema && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <Label>Nombre del Rol</Label>
+                  <Label>{t('roles.roleName')}</Label>
                   <Input
                     value={formData.nombre}
                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    placeholder=t("roles.roleNamePlaceholder")
+                    placeholder={t('roles.roleNamePlaceholder')}
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label>Descripción</Label>
+                  <Label>{t('roles.roleDescription')}</Label>
                   <Input
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                    placeholder=t("roles.roleDescPlaceholder")
+                    placeholder={t('roles.roleDescPlaceholder')}
                   />
                 </div>
                 <div>
-                  <Label>Color</Label>
+                  <Label>{t('common.color')}</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
@@ -774,7 +774,7 @@ export default function RolesModule() {
                   </div>
                 </div>
                 <div>
-                  <Label>Nivel Jerárquico</Label>
+                  <Label>{t('roles.hierarchyLevel')}</Label>
                   <Input
                     type="number"
                     value={formData.nivel}
@@ -783,7 +783,7 @@ export default function RolesModule() {
                     max={99}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Mayor nivel = más privilegios (1-99)
+                    {t('roles.hierarchyDesc')}
                   </p>
                 </div>
               </div>
@@ -791,7 +791,7 @@ export default function RolesModule() {
 
             {/* Permissions */}
             <div>
-              <Label className="text-base font-semibold">Permisos</Label>
+              <Label className="text-base font-semibold">{t('common.permissions')}</Label>
               <ScrollArea className="h-[300px] mt-3 border rounded-lg p-4">
                 <div className="space-y-4">
                   {Object.entries(availablePermissions).map(([module, perms]) => (
@@ -806,7 +806,7 @@ export default function RolesModule() {
                           variant="ghost"
                           onClick={() => toggleModulePermissions(module)}
                         >
-                          Todos
+                          {t('roles.selectAll')}
                         </Button>
                       </div>
                       <div className="grid grid-cols-2 gap-2 pl-6">
@@ -843,11 +843,11 @@ export default function RolesModule() {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRoleForm(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleSaveRole} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingRole ? 'Guardar Cambios' : 'Crear Rol'}
+              {editingRole ? t('roles.saveChanges') : t('roles.createRole')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -857,9 +857,9 @@ export default function RolesModule() {
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Asignar Rol</DialogTitle>
+            <DialogTitle>{t('roles.assignRole')}</DialogTitle>
             <DialogDescription>
-              Selecciona el rol para {selectedUserForRole?.nombre || selectedUserForRole?.email}
+              {t('roles.assignRoleDesc')} {selectedUserForRole?.nombre || selectedUserForRole?.email}
             </DialogDescription>
           </DialogHeader>
           
@@ -896,17 +896,17 @@ export default function RolesModule() {
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
               <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
-                El rol Super Admin otorga acceso total al sistema
+                {t('roles.superAdminWarning')}
               </p>
             </div>
           )}
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAssignDialog(false)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleAssignRole}>
-              Asignar Rol
+              {t('roles.assignRole')}
             </Button>
           </DialogFooter>
         </DialogContent>
