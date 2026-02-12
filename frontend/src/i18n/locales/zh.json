@@ -2228,7 +2228,8 @@
     "tabs": {
       "pending": "待处理队列",
       "rules": "邮件规则",
-      "settings": "设置"
+      "settings": "设置",
+      "log": "处理日志"
     }
   }
 }

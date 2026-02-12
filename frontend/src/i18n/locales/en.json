@@ -2228,7 +2228,8 @@
     "tabs": {
       "pending": "Pending Queue",
       "rules": "Email Rules",
-      "settings": "Settings"
+      "settings": "Settings",
+      "log": "Processing Log"
     }
   }
 }
