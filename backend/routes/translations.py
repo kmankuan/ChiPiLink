@@ -2,24 +2,34 @@
 Translation Management Routes for ChiPi Link
 Permission-gated: users with translations.* permissions can contribute.
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Optional, List, Dict
 from datetime import datetime, timezone
 import json
 
 router = APIRouter(prefix="/translations", tags=["translations"])
+security = HTTPBearer(auto_error=False)
 
 # These will be set by the main server
 db = None
-get_admin_user = None
-get_current_user = None
+_get_admin_user = None
+_get_current_user_fn = None
 
 
-def init_routes(_db, _get_admin_user, _get_current_user):
-    global db, get_admin_user, get_current_user
+def init_routes(_db, admin_fn, current_user_fn):
+    global db, _get_admin_user, _get_current_user_fn
     db = _db
-    get_admin_user = _get_admin_user
-    get_current_user = _get_current_user
+    _get_admin_user = admin_fn
+    _get_current_user_fn = current_user_fn
+
+
+async def get_authenticated_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+) -> dict:
+    """Resolve the current user using the auth module's function"""
+    return await _get_current_user_fn(request, credentials)
 
 
 async def _check_permission(user: dict, permission: str):
@@ -93,7 +103,7 @@ async def admin_list_translations(
     missing_only: bool = False,
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=50, le=200),
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """List translations (requires translations.view)"""
     await _check_permission(user, "translations.view")
@@ -146,7 +156,7 @@ async def admin_list_translations(
 @router.post("/admin/update")
 async def admin_update_translation(
     key: str, lang: str, value: str,
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Update a single translation (requires translations.edit)"""
     await _check_permission(user, "translations.edit")
@@ -175,7 +185,7 @@ async def admin_update_translation(
 @router.post("/admin/bulk-update")
 async def admin_bulk_update(
     translations: List[Dict],
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Bulk update translations (requires translations.edit)"""
     await _check_permission(user, "translations.edit")
@@ -209,7 +219,7 @@ async def admin_bulk_update(
 @router.delete("/admin/delete/{key}")
 async def admin_delete_translation(
     key: str,
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Delete a translation key (requires translations.manage)"""
     await _check_permission(user, "translations.manage")
@@ -220,7 +230,7 @@ async def admin_delete_translation(
 @router.get("/admin/export")
 async def admin_export_translations(
     lang: Optional[str] = None,
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Export translations (requires translations.view)"""
     await _check_permission(user, "translations.view")
@@ -235,7 +245,7 @@ async def admin_export_translations(
 
 @router.get("/admin/coverage")
 async def admin_translation_coverage(
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Analyze translation coverage across all locale files"""
     await _check_permission(user, "translations.view")
@@ -276,7 +286,6 @@ async def admin_translation_coverage(
     for lang in ["en", "es", "zh"]:
         present = locale_keys.get(lang, set())
         missing = sorted(reference_keys - present)
-        extra = sorted(present - reference_keys)
         total_ref = len(reference_keys) if reference_keys else 1
         pct = round(len(present & reference_keys) / total_ref * 100, 1)
         languages[lang] = {
@@ -284,7 +293,7 @@ async def admin_translation_coverage(
             "translated": len(present & reference_keys),
             "missing_count": len(missing),
             "missing_keys": missing[:200],
-            "extra_count": len(extra),
+            "extra_count": len(sorted(present - reference_keys)),
             "coverage_pct": pct,
         }
 
@@ -308,7 +317,7 @@ async def admin_translation_coverage(
 
 @router.post("/admin/sync-from-files")
 async def admin_sync_from_files(
-    user: dict = Depends(lambda: get_current_user)
+    user: dict = Depends(get_authenticated_user)
 ):
     """Sync translations from JSON files to database (requires translations.manage)"""
     await _check_permission(user, "translations.manage")
