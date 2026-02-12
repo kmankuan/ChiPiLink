@@ -107,7 +107,7 @@ export default function WalletSyncDashboard() {
             data-testid="refresh-sync-dashboard"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
+            {t('common.refresh')}
           </Button>
           <Button
             size="sm"
@@ -117,7 +117,7 @@ export default function WalletSyncDashboard() {
             data-testid="sync-all-users-btn"
           >
             {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-            Sync All Users
+            {t('integrations.syncAllUsers')}
           </Button>
         </div>
       </div>
