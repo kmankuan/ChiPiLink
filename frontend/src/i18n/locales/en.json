@@ -20,7 +20,8 @@
     "ticketsChat": "Tickets/Chat",
     "login": "Login",
     "admin": "Admin Panel",
-    "logout": "Logout"
+    "logout": "Logout",
+    "goHome": "Go to Home"
   },
   "landing": {
     "hero": {
@@ -198,7 +199,18 @@
     "productsLowStock": "products with low stock",
     "viewInventory": "View inventory",
     "activitySummary": "Activity Summary",
-    "systemStatus": "System overall status"
+    "systemStatus": "System overall status",
+    "moduleDesc": {
+      "dashboard": "Welcome to ChiPi Link administration panel",
+      "unatienda": "Manage catalogs, products, students and Unatienda orders",
+      "orders": "Manage your customer orders",
+      "users": "Manage users, their exclusive access requests and connections",
+      "memberships": "Manage plans, memberships, visits and QR codes",
+      "pinpanclub": "Table Tennis Club - Matches, players and tournaments",
+      "roles": "Manage user roles and system permissions",
+      "admin": "Configure your site and customization",
+      "integrations": "Connect with external services"
+    }
   },
   "common": {
     "save": "Save",
@@ -2139,5 +2151,20 @@
     "notFound": "Product not found",
     "restrictedAccess": "Restricted Access",
     "bookNotFound": "Book not found"
+  },
+  "translations": {
+    "progressTitle": "Translation Coverage",
+    "progressDesc": "Monitor i18n completion across all languages",
+    "coverage": "Coverage",
+    "missingKeys": "Missing Keys",
+    "totalKeys": "Total Keys",
+    "translated": "Translated",
+    "viewMissing": "View Missing",
+    "categoryBreakdown": "Category Breakdown",
+    "category": "Category",
+    "noMissingKeys": "All keys are translated!",
+    "missingKeysFor": "Missing Keys for",
+    "copyKey": "Copy Key",
+    "keyCopied": "Key copied to clipboard"
   }
 }

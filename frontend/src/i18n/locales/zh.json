@@ -20,7 +20,8 @@
     "ticketsChat": "工单/聊天",
     "login": "登录",
     "admin": "管理面板",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "goHome": "返回首页"
   },
   "landing": {
     "hero": {
@@ -198,7 +199,18 @@
     "productsLowStock": "产品库存不足",
     "viewInventory": "查看库存",
     "activitySummary": "活动概览",
-    "systemStatus": "系统总体状态"
+    "systemStatus": "系统总体状态",
+    "moduleDesc": {
+      "dashboard": "欢迎来到 ChiPi Link 管理面板",
+      "unatienda": "管理目录、产品、学生和 Unatienda 订单",
+      "orders": "管理客户订单",
+      "users": "管理用户、独家访问请求和连接",
+      "memberships": "管理计划、会员、访问和二维码",
+      "pinpanclub": "乒乓球俱乐部 - 比赛、球员和锦标赛",
+      "roles": "管理用户角色和系统权限",
+      "admin": "配置您的网站和自定义选项",
+      "integrations": "连接外部服务"
+    }
   },
   "common": {
     "save": "保存",
@@ -1910,5 +1922,20 @@
     "notFound": "未找到产品",
     "restrictedAccess": "受限访问",
     "bookNotFound": "未找到书籍"
+  },
+  "translations": {
+    "progressTitle": "翻译覆盖率",
+    "progressDesc": "监控所有语言的 i18n 完成情况",
+    "coverage": "覆盖率",
+    "missingKeys": "缺失键",
+    "totalKeys": "总键数",
+    "translated": "已翻译",
+    "viewMissing": "查看缺失",
+    "categoryBreakdown": "分类明细",
+    "category": "分类",
+    "noMissingKeys": "所有键都已翻译！",
+    "missingKeysFor": "缺失的键",
+    "copyKey": "复制键",
+    "keyCopied": "键已复制到剪贴板"
   }
 }

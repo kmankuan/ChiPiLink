@@ -20,7 +20,8 @@
     "ticketsChat": "Tickets/Chat",
     "login": "Iniciar Sesión",
     "admin": "Panel Admin",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "goHome": "Ir al Inicio"
   },
   "landing": {
     "hero": {
@@ -198,7 +199,18 @@
     "productsLowStock": "productos con stock bajo",
     "viewInventory": "Ver inventario",
     "activitySummary": "Resumen de Actividad",
-    "systemStatus": "Estado general del sistema"
+    "systemStatus": "Estado general del sistema",
+    "moduleDesc": {
+      "dashboard": "Bienvenido al panel de administración de ChiPi Link",
+      "unatienda": "Gestiona catálogos, productos, estudiantes y pedidos de Unatienda",
+      "orders": "Gestiona los pedidos de tus clientes",
+      "users": "Gestiona usuarios, solicitudes de acceso exclusivo y conexiones",
+      "memberships": "Gestiona planes, membresías, visitas y códigos QR",
+      "pinpanclub": "Club de Tenis de Mesa - Partidos, jugadores y torneos",
+      "roles": "Gestiona roles de usuario y permisos del sistema",
+      "admin": "Configura tu sitio y personalización",
+      "integrations": "Conecta con servicios externos"
+    }
   },
   "common": {
     "save": "Guardar",
@@ -2143,5 +2155,20 @@
     "notFound": "Producto no encontrado",
     "restrictedAccess": "Acceso Restringido",
     "bookNotFound": "Libro no encontrado"
+  },
+  "translations": {
+    "progressTitle": "Cobertura de Traducción",
+    "progressDesc": "Monitorea la completitud de i18n en todos los idiomas",
+    "coverage": "Cobertura",
+    "missingKeys": "Claves Faltantes",
+    "totalKeys": "Total de Claves",
+    "translated": "Traducidas",
+    "viewMissing": "Ver Faltantes",
+    "categoryBreakdown": "Desglose por Categoría",
+    "category": "Categoría",
+    "noMissingKeys": "¡Todas las claves están traducidas!",
+    "missingKeysFor": "Claves faltantes para",
+    "copyKey": "Copiar Clave",
+    "keyCopied": "Clave copiada al portapapeles"
   }
 }
