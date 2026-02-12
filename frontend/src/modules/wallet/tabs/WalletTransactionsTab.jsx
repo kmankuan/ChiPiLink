@@ -56,7 +56,7 @@ export default function WalletTransactionsTab() {
     const matchSearch = !search || tx.description?.toLowerCase().includes(search.toLowerCase())
       || tx.user_email?.toLowerCase().includes(search.toLowerCase())
       || tx.user_name?.toLowerCase().includes(search.toLowerCase());
-    const matchType = typeFilter === 'all' || tx.type === typeFilter;
+    const matchType = typeFilter === 'all' || tx.transaction_type === typeFilter || tx.type === typeFilter;
     const matchArchived = showArchived || !tx.archived;
     return matchSearch && matchType && matchArchived;
   });
