@@ -1,65 +1,53 @@
 <analysis>An analysis of the user's requests and the AI's actions has been completed. Here is the summary to assist the next agent.
 
 **original_problem_statement:**
-The user initially requested a wallet system with Monday.com integration for top-ups. This has since evolved into a request for a full **2-way synchronization** with their Chipi Wallet board on Monday.com.
+The user's primary goal is to build a comprehensive admin dashboard for their Chipi Wallet application. The core requirements are:
+1.  **Full 2-Way Monday.com Sync:** Establish a real-time, two-way synchronization between the application's wallet and a Chipi Wallet board on Monday.com. This includes creating user items on registration, creating transaction subitems, and processing top-up/deduction requests initiated from Monday.com via webhooks.
+2.  **Admin Table Consistency:** Ensure all admin-facing data tables are standardized with a consistent set of features: mobile-first responsive design, global search, filtering, pagination, and bulk actions (archive, delete).
+3.  **Full Internationalization (i18n):** The entire application must support three languages: English, Spanish, and Chinese (Mandarin).
+4.  **Future Goal (AI-driven Parsing):** A backlog item to guide the user in setting up a Monday.com AI column to parse bank transfer notifications and automatically trigger the wallet top-up automation via the existing 2-way sync.
 
-**PRODUCT REQUIREMENTS:**
-1.  **App -> Monday.com Sync:**
-    *   When a new user registers in the application, a corresponding parent item must be created on the Chipi Wallet board, containing the user's name and email.
-    *   When any wallet transaction (e.g., admin top-up, deduction, purchase) occurs in the app, a corresponding subitem must be created under that user's parent item on the board. This subitem should detail the transaction (amount, note, status).
-2.  **Monday.com -> App Sync:**
-    *   The system must process webhooks from Monday.com. When a subitem is added to a user's parent item with a specific status (e.g., Add Wallet), it should trigger the corresponding wallet top-up or deduction in the application.
-3.  **Future Goal (AI-driven Parsing):**
-    *   The user has expressed interest in a future enhancement where a Monday.com AI column could parse bank transfer notifications, extract the customer's email and the amount, and automatically trigger the wallet top-up automation. This is a backlog item.
-
-**User's preferred language**: English
+**User's preferred language**: The user communicates in both Spanish and English but has explicitly instructed the agent to **respond and write all code in English only**. The application itself must support English, Spanish, and Chinese.
 
 **what currently exists?**
-The application has a robust admin dashboard with a centralized Wallet module for managing user balances, transactions, and settings. A Telegram community feed is also integrated. Most admin tables have been enhanced with global, reusable components for bulk actions like multi-select, archive, and delete. The Monday.com integration, which was previously a one-way, item-level trigger, is currently being refactored to support the new 2-way synchronization requirement. All previously reported bugs concerning balance display and webhook processing have been resolved.
+The application features a robust admin dashboard with a fully functional, tested, and idempotent 2-way wallet synchronization with Monday.com. A dedicated Sync Dashboard provides visibility and control over this integration. A major refactor has been completed to standardize all primary admin tables with a consistent, mobile-first design, including features like pagination, bulk actions, and search. An app-wide internationalization (i18n) effort is well underway, with ~82% of the frontend modules now supporting English, Spanish, and Chinese, and a language selector is present in the main admin header.
 
 **Last working item**:
-- **Last item agent was working:** The agent was actively implementing the 2-way wallet synchronization between the application and the Monday.com Chipi Wallet board. This involves a major refactor of the Monday.com integration logic.
+- **Last item agent was working:** The agent was executing the **P0 i18n Full Rollout**, aiming for 100% language coverage. It had successfully added translation keys and  hooks to 35 modules, bringing the total coverage to 82%. The work focused on the most visible admin areas like the main dashboard, integrations module, and the Monday.com Sync Dashboard.
 - **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** both
-    - **Backend:** Use  to test the new adapter functions for creating Monday.com items/subitems and simulating incoming webhooks.
-    - **E2E:** Once the backend logic is complete, guide the user to perform manual E2E tests:
-        1. Register a new user in the app and verify the parent item appears on the Monday board.
-        2. Perform a wallet top-up in the app and verify the transaction subitem appears on the board.
-        3. Create a transaction subitem on the board and verify the user's wallet balance updates in the app.
+- **Agent Testing Done:** Y (A comprehensive testing agent run confirmed the table consistency refactor and the initial i18n rollout were successful.)
+- **Which testing method agent to use?** Frontend testing agent. The agent should be instructed to audit the application for any remaining hardcoded English strings in the UI and ensure they are correctly translated in all three languages (EN, ES, ZH).
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-There are no pending bugs. The current focus is on a new feature implementation.
+There are no pending bugs.
 
 **In progress Task List**:
-- **Task 1: Complete the 2-Way Wallet Sync with Monday.com (P0)**
-  - **Where to resume:** The agent has started rewriting the adapter in . The next steps are:
-      1.  Finalize the implementation of the functions for creating parent items () and subitems ().
-      2.  Modify the user registration endpoint to call  upon new user creation.
-      3.  Modify the core wallet logic in  (e.g., in ,  methods) to call  after a transaction is successfully completed.
-      4.  Update the webhook handler ( in the adapter) to correctly process incoming subitem-based events from Monday.com to update user wallets in the app.
-      5.  Thoroughly test all parts of the sync.
-  - **What will be achieved with this?** This will establish a seamless, real-time, two-way connection between the app's wallet system and the user's operational workflow in Monday.com, fulfilling a core business requirement.
-  - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on something:** No
+- **Task 1: Complete P0 i18n Full Rollout (P0)**
+    - **Where to resume:** The i18n coverage is at 82%. The agent needs to audit the ~20 remaining modules that lack i18n. The next steps are:
+        1.  Identify all remaining hardcoded strings in the UI.
+        2.  Add corresponding translation keys to the locale files ().
+        3.  Apply the  function from  to replace the hardcoded strings in the relevant React components.
+    - **What will be achieved with this?** The application will be 100% internationalized, fulfilling a core user requirement and making it ready for a global user base.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** Frontend
+    - **Blocked on something:** No
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **P1 - Advanced Bank Transfer Parsing:** Implement the user's idea of using a Monday.com AI column to parse bank transfer alerts and automate wallet top-ups. This should be tackled after the 2-way sync is stable.
+    *   **P1 - Guide Monday.com AI Parser Setup:** The app-side webhook infrastructure is ready. This task involves providing clear instructions to the user on how to configure their Monday.com board to:
+        1.  Use a Monday.com AI column to parse bank transfer alert text.
+        2.  Extract the customer's email and the top-up amount into dedicated columns.
+        3.  Use a status change automation to trigger the existing webhook, which will then process the top-up.
 *   **Future Tasks:**
-    *   **P2 - Telegram Feed Visibility:** Add admin controls to configure which users or roles can view the Telegram Community feed.
+    *   **P2 - Telegram Feed Visibility Controls:** Add admin settings to configure which user roles can view the integrated Telegram Community feed.
 
 **Completed work in this session**
-- **Global Table Enhancements (DONE):** Implemented app-wide, reusable components for multi-select, bulk archive, and bulk delete functionality across all major admin tables (Wallets, Transactions, Orders, Inventory, Students). This standardized the UI/UX as requested.
-- **Configurable Transaction Descriptions (DONE):** Created a system allowing admins to customize the text for different transaction types (e.g., Admin Top-Up, Monday.com Top-Up, Purchase) that appears in the user-facing transaction history.
-- **Wallet Balance Display Bugs (FIXED):**
-  - Resolved a bug where the Admin Wallet Overview showed /bin/bash.00 balances by correcting the frontend data mapping ().
-  - Fixed an identical bug causing a /bin/bash.00 balance in the wallet widget embedded on an external site ().
-- **Delete User Functionality (DONE):** Added a new endpoint and a UI button with a confirmation dialog to allow admins to delete users and their associated wallets from the Wallet Overview tab.
-- **Monday.com Webhook Debugging (RESOLVED):** Diagnosed and fixed several issues with the one-way Monday.com integration, including incorrect board ID configuration, overly strict webhook handlers, and mismatched status labels. This investigation directly led to the user's request for the more robust 2-way sync.
-- **Frontend Crash (FIXED):** Fixed a critical JavaScript syntax error that was causing the entire Wallet module to show a blank white page.
+- **2-Way Monday.com Wallet Sync (DONE):** Successfully implemented and tested the full bidirectional sync, including user creation, transaction logging, webhook processing, and ensuring idempotency by tracking processed events in the database.
+- **Monday.com Sync Dashboard (DONE):** Built a dedicated UI () and corresponding backend API () for monitoring sync status, viewing logs, and triggering manual re-syncs.
+- **Admin Table Consistency Refactor (DONE):** Overhauled all major admin tables (, , , , , , , , ) to provide a consistent, mobile-first user experience with universal search, pagination, and bulk actions.
+- **Redundant Feature Removal (DONE):** A Bank Alert Parser feature built in the admin panel was identified as redundant by the user and was completely removed from both the frontend and backend codebase.
+- **Partial i18n Rollout (DONE):** Increased i18n coverage from 63% to 82%, added a language selector to the admin header, and translated all newly refactored table components and key admin modules.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -72,74 +60,75 @@ N/A
 
 **Key Technical Concepts**
 - **Backend:** FastAPI, SQLAlchemy
-- **Frontend:** React, Material-UI (MUI), TanStack Table
+- **Frontend:** React, Material-UI (MUI), TanStack Table, 
 - **Integrations:** Monday.com (GraphQL API, Webhooks), Telegram Bot API
-- **Architecture:** The agent has introduced a more reusable frontend architecture with shared hooks () and components (, ) for table management.
+- **Architecture:** The agent enforced a highly reusable and consistent architecture.
+    - **Frontend:** Standardized admin tables using shared hooks (, ) and components (, , ). Mobile-first design is now a standard.  is the standard for internationalization.
+    - **Backend:** Utilizes an event-driven pattern for decoupling services (e.g., user registration event triggers Monday.com sync). A new DB model was added for webhook idempotency.
 
 **key DB schema**
-No schema changes were made, but the  field is now actively used by the new bulk archive endpoints across multiple tables.
+- ****: A new table managed via SQLAlchemy in  to ensure webhooks are only processed once. Columns: uid=0(root) gid=0(root) groups=0(root) (PK),  (indexed).
 
 **changes in tech stack**
-None.
+None.  was already present but its usage was significantly expanded to become a core architectural component.
 
 **All files of reference**
-*   ****: The primary file for the current in-progress task. It is being refactored for the 2-way sync.
-*   ****: Will need modification to trigger the sync. Contains new bulk action endpoints.
-*   **User Registration Endpoint File**: The agent needs to locate this file (likely in ) to add the hook for creating a Monday.com parent item.
-*   ****: New reusable hook for managing table row selections.
-*   ****: New reusable component for displaying bulk action controls.
-*   ****: Recently modified to fix a critical balance display bug.
+*   **i18n:**  (contains , , ).
+*   **Table Consistency:** , , and all refactored admin table components in .
+*   **Sync Logic:** .
+*   **Sync Dashboard:**  and .
+*   **Language Selector:** .
 
 **Areas that need refactoring**:
-The  is currently in the middle of a planned refactoring.
+The remaining 18% of the application that still has hardcoded strings needs to be refactored to use the  framework.
 
 **key api endpoints**
-*   **Bulk Actions (New):**
-    *   
-    *   
-    *   
-    *   
-    *   
-*   **Transaction Descriptions (New):**
-    *   
-    *   
-*   **User Management (New):**
-    *   
+*   **** (New)
+*   **** (New)
+*   **** (New)
+*   **REMOVED:** , 
 
 **Critical Info for New Agent**
-The highest priority is completing the user-approved 2-way sync feature. Do not get sidetracked. The plan is clear: hook into user registration to create a parent item on Monday.com, hook into wallet transactions to create subitems, and update the webhook handler to process subitem events from Monday.com. The previous integration logic in  should be replaced with this new, more robust 2-way sync logic. After implementation, testing will be crucial, and you will need to coordinate with the user to verify the end-to-end flow.
+- **Adhere to User's Directives:** The user prioritizes engineering discipline.
+    1.  **Language:** All code and agent communication **must be in English**. The app UI must support EN, ES, and ZH.
+    2.  **Consistency:** New features must follow the established patterns for tables (mobile-first, pagination, etc.) and i18n.
+    3.  **Proactive Engineering:** Act as a senior engineer by proposing well-structured, non-redundant solutions and applying principles like i18n globally.
+- **Do Not Rebuild the Bank Parser:** The user's workflow for bank alerts is now entirely on Monday.com, leveraging the 2-way sync. Do not build any related parsing tools inside the app's admin panel.
+- **Priority:** The immediate and highest priority is completing the P0 i18n rollout to achieve 100% translation coverage.
 
 **documents and test reports created in this job**
--  (updated)
+*    (updated)
+*    (2-way sync)
+*    (Sync Dashboard)
+*    (Table Consistency)
+*    (i18n Rollout)
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User (Msg 978):** **Confirmed and approved the 2-way sync plan.** Specifically: 1) Create Monday item on user registration. 2) Use subitems for transaction triggers. (Status: Addressed, implementation in progress).
-- **User (Msg 975):** Proposed the idea of creating a Monday item on user registration and using subitems for sync. (Status: Addressed).
-- **User (Msg 972):** Asked for advice on 2-way sync and an AI-parsing feature. (Status: Addressed).
-- **User (Msg 949):** Pointed out non-editable descriptions in the widget. (Status: Completed).
-- **User (Msg 932):** Reported the widget balance was /bin/bash. (Status: Completed).
-- **User (Msg 853):** Reported the admin panel balance was /bin/bash. (Status: Completed).
-- **User (Msg 662):** Gave requirements for the global table enhancement (archive feature). (Status: Completed).
-- **User (Msg 659):** Requested global table enhancements for consistency. (Status: Completed).
-- **User (Msg 652):** Reported Monday.com top-up failure with a Top Up status label. (Status: Completed).
-- **User (Msg 615):** Requested editable transaction descriptions. (Status: Completed).
+- **User (Msg 834-836):** Confirmed to continue with the P0 i18n rollout. (Status: In Progress)
+- **User (Msg 661):** Agreed to the plan for completing table consistency and i18n. (Status: In Progress)
+- **User (Msg 523):** Stated priorities: 1) Table consistency & mobile-first. 2) Agent must use English, but app must support EN/ES/ZH. (Status: Addressed, In Progress)
+- **User (Msg 516):** Corrected the agent's misunderstanding about the bank alert parser, stating it's redundant. Criticized the agent for inconsistent table implementations and not making i18n a core feature from the start. (Status: Addressed)
+- **User (Msg 509):** Questioned why the agent wasn't following the principles laid out in the PRD. (Status: Addressed)
+- **User (Msg 506):** Pointed out that the bank alert parsing should happen on Monday.com, not in the app's admin panel. (Status: Addressed)
+- **User (Msg 473):** Provided details on the bank alert format and the desired workflow, clarifying it's a Monday.com-centric process. (Status: Addressed)
 
 **Project Health Check:**
 *   **Running:** All services are operational.
-*   **Broken:** The Monday.com integration is intentionally broken as it is in the middle of a major refactor for the 2-way sync feature.
+*   **Broken:** None.
 
 **3rd Party Integrations**
-- **Monday.com API v2 (GraphQL):** Requires a user-provided API key. Heavily used for the current task.
-- **Telegram Bot API:** Uses the  key.
+*   **Monday.com API v2 (GraphQL):** Requires a user-provided API key. Used for wallet sync.
+*   **Telegram Bot API:** Requires .
+*   **react-i18next:** Integrated for frontend internationalization.
 
 **Testing status**
-- **Testing agent used after significant changes:** NO (not in this session)
+- **Testing agent used after significant changes:** YES. The testing agent was used successfully after the 2-way sync implementation, Sync Dashboard creation, table consistency refactor, and the initial i18n rollout.
 - **Troubleshoot agent used after agent stuck in loop:** NO
 - **Test files created:** []
 - **Known regressions:** None.
 
 **Credentials to test flow:**
-N/A. The agent uses the keys provided in the environment.
+N/A. The agent uses keys provided in the environment.
 
 **What agent forgot to execute**
-The agent has not forgotten anything. It is in the middle of executing a large, user-approved feature request. The path forward is clear.</analysis>
+The agent initially misinterpreted the bank alert parsing requirement and built a redundant feature, which was subsequently removed after user correction. The agent also initially failed to apply consistent engineering standards (table features, i18n), but this was corrected and became a primary focus of the work session.</analysis>
