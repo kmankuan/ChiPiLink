@@ -656,7 +656,7 @@ export default function MondayModule() {
                   {legacyStatus?.api_key_configured ? (
                     <>
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="font-medium text-green-600">Configured</span>
+                      <span className="font-medium text-green-600">{t('common.configured')}</span>
                     </>
                   ) : (
                     <>
