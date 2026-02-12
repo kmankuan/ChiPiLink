@@ -195,6 +195,10 @@ api_router.include_router(roles_router)
 from modules.widget import widget_router
 api_router.include_router(widget_router)
 
+# Dev Control Module
+from modules.dev_control import dev_control_router
+api_router.include_router(dev_control_router)
+
 # Include main router in app
 app.include_router(api_router)
 
