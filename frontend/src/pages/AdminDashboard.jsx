@@ -62,6 +62,7 @@ const StoreAnalyticsModule = lazy(() => import('@/modules/admin/store/StoreAnaly
 const WalletModule = lazy(() => import('@/modules/wallet/WalletModule'));
 const CommunityFeedModule = lazy(() => import('@/modules/community/CommunityFeedModule'));
 const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
+const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
