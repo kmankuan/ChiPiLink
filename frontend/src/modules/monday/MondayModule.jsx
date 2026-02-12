@@ -405,14 +405,14 @@ export default function MondayModule() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Monday.com Integration</h2>
+          <h2 className="text-2xl font-serif font-bold">{t('integrations.mondayIntegration')}</h2>
           <p className="text-muted-foreground">
-            Configure connection and sync with Monday.com for different modules
+            {t('integrations.configureSync')}
           </p>
         </div>
         <Button variant="outline" onClick={loadAllData} className="gap-2">
           <RefreshCw className="h-4 w-4" />
-          Refresh
+          {t('common.refresh')}
         </Button>
       </div>
 
