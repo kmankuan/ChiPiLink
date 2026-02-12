@@ -52,6 +52,13 @@ class WalletMondayAdapter(BaseMondayAdapter):
         "date": "date0",
     }
 
+    # Subitem status labels (different from parent board)
+    DEFAULT_SUBITEM_STATUS_LABELS = {
+        "add": "Added",
+        "deduct": "Deducted",
+        "stuck": "Stuck",
+    }
+
     DEFAULT_STATUS_LABELS = {
         "add": "Top Up",
         "deduct": "Deducted",
