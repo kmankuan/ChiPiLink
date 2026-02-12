@@ -79,14 +79,14 @@ export default function FormConfigModule() {
       {/* Form Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Configuración del Formulario</CardTitle>
+          <CardTitle>{t("formConfig.title")}</CardTitle>
           <CardDescription>
             Personaliza el formulario de pedidos público
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>Título del Formulario</Label>
+            <Label>{t("formConfig.formTitle")}</Label>
             <Input
               value={config.titulo}
               onChange={(e) => setConfig({ ...config, titulo: e.target.value })}
@@ -94,7 +94,7 @@ export default function FormConfigModule() {
           </div>
           
           <div>
-            <Label>Descripción</Label>
+            <Label>{t("formConfig.formDescription")}</Label>
             <Textarea
               value={config.description}
               onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}
@@ -113,8 +113,8 @@ export default function FormConfigModule() {
           
           <div className="flex items-center justify-between">
             <div>
-              <Label>Mostrar Precios</Label>
-              <p className="text-sm text-muted-foreground">Muestra los precios en el formulario</p>
+              <Label>{t("formConfig.showPrices")}</Label>
+              <p className="text-sm text-muted-foreground">{t("formConfig.showPricesDesc")}</p>
             </div>
             <Switch
               checked={config.mostrar_precios}
@@ -123,7 +123,7 @@ export default function FormConfigModule() {
           </div>
           
           <div>
-            <Label>Color Primario</Label>
+            <Label>{t("formConfig.primaryColor")}</Label>
             <div className="flex gap-2">
               <Input
                 type="color"
@@ -143,7 +143,7 @@ export default function FormConfigModule() {
       {/* Embed URL */}
       <Card>
         <CardHeader>
-          <CardTitle>URL del Formulario</CardTitle>
+          <CardTitle>{t("formConfig.formUrl")}</CardTitle>
           <CardDescription>
             Comparte esta URL o incrústala en tu sitio web
           </CardDescription>
