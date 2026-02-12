@@ -382,32 +382,45 @@ async def get_dependencies(admin: dict = Depends(get_admin_user)):
     """Return Python and Node.js dependencies."""
     # Python
     python_deps = []
+    python_available = True
     try:
         import sys
         pip_path = os.path.join(os.path.dirname(sys.executable), "pip")
+        if not os.path.exists(pip_path):
+            import shutil
+            pip_path = shutil.which("pip") or shutil.which("pip3") or "pip"
         result = subprocess.run([pip_path, "list", "--format=json"], capture_output=True, text=True, timeout=15)
-        python_deps = json.loads(result.stdout) if result.stdout else []
-    except Exception:
-        pass
+        if result.returncode == 0 and result.stdout.strip():
+            python_deps = json.loads(result.stdout)
+    except Exception as e:
+        logger.warning(f"pip list failed: {e}")
+        python_available = False
 
     # Node
     node_deps = {}
+    node_available = True
     try:
-        with open("/app/frontend/package.json", "r") as f:
-            pkg = json.load(f)
-            node_deps = {
-                "dependencies": pkg.get("dependencies", {}),
-                "devDependencies": pkg.get("devDependencies", {}),
-            }
-    except Exception:
-        pass
+        pkg_path = "/app/frontend/package.json"
+        if os.path.exists(pkg_path):
+            with open(pkg_path, "r") as f:
+                pkg = json.load(f)
+                node_deps = {
+                    "dependencies": pkg.get("dependencies", {}),
+                    "devDependencies": pkg.get("devDependencies", {}),
+                }
+        else:
+            node_available = False
+    except Exception as e:
+        logger.warning(f"package.json read failed: {e}")
+        node_available = False
 
     return {
-        "python": {"packages": python_deps, "total": len(python_deps)},
+        "python": {"packages": python_deps, "total": len(python_deps), "available": python_available},
         "node": {
             "dependencies": node_deps.get("dependencies", {}),
             "devDependencies": node_deps.get("devDependencies", {}),
             "total": len(node_deps.get("dependencies", {})) + len(node_deps.get("devDependencies", {})),
+            "available": node_available,
         },
     }
 
