@@ -358,11 +358,10 @@ export default function DemoDataModule() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <Trash2 className="h-5 w-5" />
-              Confirmar Eliminación
+              {t('demoData.confirmDeleteTitle')}
             </DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que deseas eliminar todos los datos de demostración?
-              Esta acción eliminará jugadores demo, partidos ficticios y usuarios de prueba.
+              {t('demoData.confirmDeleteDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
