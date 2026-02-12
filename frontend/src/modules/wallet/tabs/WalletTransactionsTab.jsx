@@ -159,18 +159,18 @@ export default function WalletTransactionsTab() {
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`gap-1 text-[10px] ${
-                    tx.type === 'deposit' ? 'text-green-700 border-green-300' : 'text-red-700 border-red-300'
+                    tx.transaction_type === 'deposit' ? 'text-green-700 border-green-300' : 'text-red-700 border-red-300'
                   }`}>
-                    {tx.type === 'deposit'
+                    {tx.transaction_type === 'deposit'
                       ? <><ArrowUpCircle className="h-3 w-3" /> Deposit</>
                       : <><ArrowDownCircle className="h-3 w-3" /> Charge</>}
                   </Badge>
                   {tx.archived && <Badge variant="outline" className="ml-1 text-[10px]">Archived</Badge>}
                 </TableCell>
                 <TableCell className={`text-right font-semibold ${
-                  tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                  tx.transaction_type === 'deposit' ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {tx.type === 'deposit' ? '+' : '-'}${(tx.amount || 0).toFixed(2)}
+                  {tx.transaction_type === 'deposit' ? '+' : '-'}${(tx.amount || 0).toFixed(2)}
                 </TableCell>
                 <TableCell className="text-sm max-w-[200px] truncate">{tx.description || '—'}</TableCell>
                 <TableCell>
