@@ -2,70 +2,66 @@
 
 ## Original Problem Statement
 Build a comprehensive admin dashboard for the "Chipi Wallet" application with:
-1. Full 2-Way Monday.com Sync (wallet, users, transactions)
-2. Admin table consistency (mobile-first, search, filters, pagination, bulk actions)
+1. Full 2-Way Monday.com Sync
+2. Admin table consistency
 3. Full Internationalization (EN/ES/ZH)
 4. AI-driven bank alert parsing via Monday.com
-5. Development Control section with AI Dev Helper for architecture monitoring and dev management
-
-## User Personas
-- **Admin**: Manages wallets, users, orders, roles, integrations, site config, dev control, AI assistant
-- **Parent/Guardian (Acudido)**: Links students, places textbook orders, manages wallet
-- **Student**: Views catalog, uses wallet for purchases
+5. Development Control section with AI Dev Helper
+6. Gmail-to-Wallet payment pipeline with admin approval
 
 ## Core Requirements
 - All code and agent communication in English
 - App UI supports EN, ES, ZH (react-i18next)
 - Mobile-first responsive design
-- Consistent table patterns across admin
 
 ## What's Been Implemented
 
-### Completed (P0)
-- **2-Way Monday.com Wallet Sync**: User creation, transaction logging, webhook processing
-- **Monday.com Sync Dashboard**: UI + API for monitoring sync status, logs, manual re-sync
-- **Admin Table Consistency Refactor**: All major admin tables standardized
-- **i18n Full Rollout**: All 3 languages at 100% coverage (2005+ keys)
-- **Translation Management Suite**: Coverage card, dictionary manager, auto-translate (GPT-4o)
-- **Dev Control Section** (Feb 12, 2026):
-  - 10-tab admin module: AI Helper, Annotations, DB Explorer, Changes, Architecture, Modules, Dependencies, Principles, API Reference, Roadmap
-  - Architecture: Dynamic file tree introspection with filter
-  - API Reference: 782 auto-discovered endpoints, grouped by tag, color-coded methods
-  - Annotations: Full CRUD with categories, pinning, search (MongoDB-persisted)
-  - Roadmap: P0-P3 items with editable status
-- **AI Dev Helper** (Feb 12, 2026):
-  - Dual-model auto-routing: GPT-4o (general/security/strategy) + Claude Sonnet 4.5 (code review/architecture)
-  - Real-time app context injection: DB collections, endpoint counts, modules, git history, env vars
-  - Quick actions: Health Check, Security Scan, Architecture Review, Dependency Audit
-  - Session-based chat with MongoDB persistence (dev_ai_sessions, dev_ai_messages)
-  - System prompt: CTO-level advisor with full knowledge of ChiPi's tech stack
-- **Database Explorer** (Feb 12, 2026): 123 collections with doc counts, field lists, sample documents
-- **Changes Log** (Feb 12, 2026): Git commit history with expandable file diffs
-- **Dependencies Viewer** (Feb 12, 2026): 129 Python + 77 Node packages with versions
-- **Dynamic Modules Detection** (Feb 12, 2026): 26 modules auto-detected from filesystem
+### Dev Control Section (Feb 12, 2026) - DONE
+- 10-tab admin module: AI Helper, Annotations, DB Explorer, Changes, Architecture, Modules, Dependencies, Principles, API Reference, Roadmap
+- **AI Dev Helper**: Dual-model (GPT-4o + Claude Sonnet 4.5, auto-routed by query type)
+- Real-time app context injection, 4 quick actions, session persistence
+- DB Explorer (123 collections), Changes Log (git history), Dependencies (129 Python + 77 Node)
+- Production resilience fix: all system-introspection endpoints gracefully handle missing git/filesystem
 
-### Architecture
-- **Backend**: FastAPI, MongoDB (Motor async), Modular Monolith (26 modules)
-- **Frontend**: React, Shadcn/UI, TanStack Table, react-i18next
-- **LLM**: GPT-4o + Claude Sonnet 4.5 via emergentintegrations (Emergent Universal Key)
-- **Integrations**: Monday.com (GraphQL + Webhooks), Telegram Bot API
+### Payment Alerts System - Step 1 (Feb 12, 2026) - DONE
+- **Pending Approval Queue**: Create, list, approve, reject pending top-ups with full audit trail
+- **Email Rules Engine**: Sender whitelist, must-contain/must-not-contain keywords, amount thresholds (auto-approve below X, reject above Y)
+- **Admin Settings**: Gmail connection status, polling mode (real-time/polling/manual), auto-process, require-approval toggles
+- **Stats Dashboard**: Pending/approved/rejected counts, total approved amount
+- **Manual Entry**: Test flow for creating pending top-ups without email integration
+- New sidebar nav "Alertas de Pago" with 3 tabs
+- MongoDB: wallet_pending_topups, wallet_topup_rules, wallet_topup_settings
+- Testing: 100% (27/27 backend, all frontend verified)
+- **MOCKED**: Monday.com sync for pending items (placeholder), wallet credit depends on user existence
+
+### Previously Completed
+- 2-Way Monday.com Wallet Sync
+- Monday.com Sync Dashboard
+- Admin Table Consistency Refactor
+- i18n Full Rollout (EN/ES/ZH at 100%)
+- Translation Management Suite (coverage, dictionary, auto-translate GPT-4o)
+
+## Architecture
+- Backend: FastAPI, MongoDB (Motor async), 26+ modules
+- Frontend: React, Shadcn/UI, Tailwind, react-i18next
+- LLM: GPT-4o + Claude Sonnet 4.5 via emergentintegrations
+- Integrations: Monday.com, Telegram Bot API
 
 ## Prioritized Backlog
 
+### P0 - In Progress (Payment Pipeline)
+- **Step 2**: Gmail API integration (Google OAuth for inbox access, email polling/push)
+- **Step 3**: AI email parsing (GPT-4o) + rule engine integration
+- **Step 4**: Monday.com sync for pending top-ups (create items, 2-way approval)
+- **Step 5**: User notifications (pending/approved/rejected)
+
 ### P1 - Upcoming
-- Guide Monday.com AI Parser Setup (documentation)
-- Telegram Feed Visibility Controls (admin role-based settings)
+- Telegram Feed Visibility Controls
 
 ### P2 - Future
 - OneSignal Push Notifications
 - Stripe Payment Integration
 - Google Sheets Integration
-- Transaction history view for clients in widget
-- Wallet balance notifications
 
 ### P3 - Backlog
-- ChipiPoints System
-- Teams/Clans System
-- Email Notifications
-- Landing Page Templates
-- sync-all endpoint fix
+- ChipiPoints System, Teams/Clans, Email Notifications, Landing Page Templates
