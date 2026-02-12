@@ -12,14 +12,15 @@ export function ConfirmDialog({
   open,
   onClose,
   onConfirm,
-  title = 'Confirm Action',
+  title,
   description,
-  confirmLabel = 'Confirm',
-  variant = 'destructive', // 'destructive' | 'warning' | 'default'
+  confirmLabel,
+  variant = 'destructive',
   loading = false,
   icon,
   children,
 }) {
+  const { t } = useTranslation();
   const icons = {
     destructive: Trash2,
     warning: Archive,
@@ -46,10 +47,10 @@ export function ConfirmDialog({
           {children}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>Cancel</Button>
+          <Button variant="outline" onClick={onClose} disabled={loading}>{t('common.cancel')}</Button>
           <Button variant={variant} onClick={onConfirm} disabled={loading} data-testid="confirm-action-btn">
             {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            {confirmLabel}
+            {confirmLabel || t('common.confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

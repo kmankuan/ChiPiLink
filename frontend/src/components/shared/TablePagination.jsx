@@ -21,11 +21,12 @@ export function TablePagination({
   pageSizeOptions = [10, 25, 50, 100],
 }) {
   if (totalItems <= pageSizeOptions[0]) return null;
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 text-xs text-muted-foreground" data-testid="table-pagination">
       <div className="flex items-center gap-2">
-        <span>Rows per page</span>
+        <span>{t('common.rowsPerPage')}</span>
         <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
           <SelectTrigger className="h-7 w-16 text-xs" data-testid="page-size-select">
             <SelectValue />
