@@ -149,7 +149,7 @@ export default function WidgetManagerModule() {
       });
       setConfig(data);
     } catch {
-      toast.error('Failed to load widget config');
+      toast.error(t('widgetManager.loadError'));
     } finally {
       setLoading(false);
     }
@@ -175,9 +175,9 @@ export default function WidgetManagerModule() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setHasChanges(false);
-      toast.success('Widget config saved!');
+      toast.success(t('widgetManager.configSaved'));
     } catch {
-      toast.error('Failed to save');
+      toast.error(t('widgetManager.saveError'));
     } finally {
       setSaving(false);
     }
@@ -191,9 +191,9 @@ export default function WidgetManagerModule() {
       });
       setConfig(data);
       setHasChanges(false);
-      toast.success('Config reset to defaults');
+      toast.success(t('widgetManager.configReset'));
     } catch {
-      toast.error('Failed to reset');
+      toast.error(t('widgetManager.resetError'));
     }
   };
 
@@ -207,7 +207,7 @@ export default function WidgetManagerModule() {
   const copySnippet = () => {
     navigator.clipboard.writeText(embedSnippet);
     setCopied(true);
-    toast.success('Embed code copied!');
+    toast.success(t('widgetManager.embedCopied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -251,8 +251,8 @@ export default function WidgetManagerModule() {
       <Card className="p-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold">Widget Enabled</p>
-            <p className="text-xs text-muted-foreground">Turn the widget on or off globally</p>
+            <p className="text-sm font-semibold">{t("widgetManager.widgetEnabled")}</p>
+            <p className="text-xs text-muted-foreground">{t("widgetManager.widgetEnabledDesc")}</p>
           </div>
           <Switch
             checked={config.enabled}
@@ -288,8 +288,8 @@ export default function WidgetManagerModule() {
         <TabsContent value="features">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Widget Features</CardTitle>
-              <CardDescription className="text-xs">Toggle which features are available in the widget</CardDescription>
+              <CardTitle className="text-sm">{t("widgetManager.widgetFeatures")}</CardTitle>
+              <CardDescription className="text-xs">{t("widgetManager.widgetFeaturesDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {Object.entries(config.features || {}).map(([key, feat]) => {
@@ -319,8 +319,8 @@ export default function WidgetManagerModule() {
         <TabsContent value="display">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Display Options</CardTitle>
-              <CardDescription className="text-xs">Control what the widget shows and hides when embedded</CardDescription>
+              <CardTitle className="text-sm">{t("widgetManager.displayOptions")}</CardTitle>
+              <CardDescription className="text-xs">{t("widgetManager.displayOptionsDesc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Maintenance Mode */}
@@ -341,7 +341,7 @@ export default function WidgetManagerModule() {
               {config.maintenance?.active && (
                 <div className="ml-4 space-y-2">
                   <div>
-                    <Label className="text-xs">Maintenance Message</Label>
+                    <Label className="text-xs">{t("widgetManager.maintenanceMessage")}</Label>
                     <Input
                       value={config.maintenance?.message || ''}
                       onChange={(e) => update('maintenance.message', e.target.value)}
@@ -358,7 +358,7 @@ export default function WidgetManagerModule() {
               <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-url">
                 <div>
                   <p className="text-xs font-medium">Hide URL / Address Bar</p>
-                  <p className="text-[10px] text-muted-foreground">Remove any visible URL or site information from the widget</p>
+                  <p className="text-[10px] text-muted-foreground">{t("widgetManager.hideUrlBarDesc")}</p>
                 </div>
                 <Switch
                   checked={config.display?.hide_url_bar ?? true}
@@ -369,7 +369,7 @@ export default function WidgetManagerModule() {
               <div className="flex items-center justify-between p-2.5 rounded-lg border" data-testid="widget-display-hide-navbar">
                 <div>
                   <p className="text-xs font-medium">Hide Navbar & Footer</p>
-                  <p className="text-[10px] text-muted-foreground">Remove the top navigation bar and bottom footer from the widget view</p>
+                  <p className="text-[10px] text-muted-foreground">{t("widgetManager.hideNavbarFooterDesc")}</p>
                 </div>
                 <Switch
                   checked={config.display?.hide_navbar ?? true}
@@ -412,13 +412,13 @@ export default function WidgetManagerModule() {
         <TabsContent value="appearance">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Widget Appearance</CardTitle>
-              <CardDescription className="text-xs">Customize how the widget looks</CardDescription>
+              <CardTitle className="text-sm">{t("widgetManager.widgetAppearance")}</CardTitle>
+              <CardDescription className="text-xs">{t("widgetManager.widgetAppearanceDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Primary Color</Label>
+                  <Label className="text-xs">{t("widgetManager.primaryColorLabel")}</Label>
                   <div className="flex items-center gap-1.5">
                     <input
                       type="color"
@@ -435,7 +435,7 @@ export default function WidgetManagerModule() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Accent Color</Label>
+                  <Label className="text-xs">{t("widgetManager.accentColorLabel")}</Label>
                   <div className="flex items-center gap-1.5">
                     <input
                       type="color"
@@ -452,7 +452,7 @@ export default function WidgetManagerModule() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Font Family</Label>
+                  <Label className="text-xs">{t("widgetManager.fontFamily")}</Label>
                   <Input
                     value={config.appearance?.font_family || 'Inter'}
                     onChange={(e) => update('appearance.font_family', e.target.value)}
@@ -461,7 +461,7 @@ export default function WidgetManagerModule() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Border Radius</Label>
+                  <Label className="text-xs">{t("widgetManager.borderRadius")}</Label>
                   <Input
                     value={config.appearance?.border_radius || '0.75rem'}
                     onChange={(e) => update('appearance.border_radius', e.target.value)}
@@ -486,7 +486,7 @@ export default function WidgetManagerModule() {
         <TabsContent value="placement">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Widget Placement</CardTitle>
+              <CardTitle className="text-sm">{t("widgetManager.widgetPlacement")}</CardTitle>
               <CardDescription className="text-xs">Configure the floating button position, icon, and style on laopan.online</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -496,7 +496,7 @@ export default function WidgetManagerModule() {
                   onCheckedChange={(v) => update('placement.floating_button', v)}
                   data-testid="widget-floating-toggle"
                 />
-                <Label className="text-xs">Show floating button</Label>
+                <Label className="text-xs">{t("widgetManager.showFloatingButton")}</Label>
               </div>
 
               <Separator />
@@ -504,7 +504,7 @@ export default function WidgetManagerModule() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Position</Label>
+                  <Label className="text-xs">{t("widgetManager.position")}</Label>
                   <select
                     value={config.placement?.floating_position || 'bottom-right'}
                     onChange={(e) => update('placement.floating_position', e.target.value)}
@@ -517,7 +517,7 @@ export default function WidgetManagerModule() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Horizontal Offset</Label>
+                  <Label className="text-xs">{t("widgetManager.horizontalOffset")}</Label>
                   <Input
                     value={config.placement?.floating_offset_x || '20px'}
                     onChange={(e) => update('placement.floating_offset_x', e.target.value)}
@@ -527,7 +527,7 @@ export default function WidgetManagerModule() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Vertical Offset</Label>
+                  <Label className="text-xs">{t("widgetManager.verticalOffset")}</Label>
                   <Input
                     value={config.placement?.floating_offset_y || '20px'}
                     onChange={(e) => update('placement.floating_offset_y', e.target.value)}
@@ -623,7 +623,7 @@ export default function WidgetManagerModule() {
         <TabsContent value="security">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Security</CardTitle>
+              <CardTitle className="text-sm">{t("widgetManager.securityTitle")}</CardTitle>
               <CardDescription className="text-xs">Manage allowed origins that can embed the widget</CardDescription>
             </CardHeader>
             <CardContent>
@@ -646,7 +646,7 @@ export default function WidgetManagerModule() {
         <TabsContent value="embed">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Embed Code</CardTitle>
+              <CardTitle className="text-sm">{t("widgetManager.embedTitle")}</CardTitle>
               <CardDescription className="text-xs">
                 Copy this code and paste it into your laopan.online site (Invision Pages block or custom HTML)
               </CardDescription>

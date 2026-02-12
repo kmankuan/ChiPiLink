@@ -76,7 +76,7 @@ export default function DemoDataModule() {
       }
     } catch (error) {
       console.error('Error seeding data:', error);
-      toast.error('Error al crear datos demo');
+      toast.error(t('demoData.createError'));
     } finally {
       setSeeding(false);
     }
@@ -94,7 +94,7 @@ export default function DemoDataModule() {
         setLastResult(null);
         fetchStats();
       } else {
-        toast.error('Error al eliminar datos');
+        toast.error(t('demoData.deleteError'));
       }
     } catch (error) {
       console.error('Error clearing data:', error);
@@ -136,7 +136,7 @@ export default function DemoDataModule() {
                 <Database className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle>Datos de Demostración</CardTitle>
+                <CardTitle>{t("demoData.title")}</CardTitle>
                 <CardDescription>
                   Genera datos ficticios para probar y demostrar la aplicación
                 </CardDescription>

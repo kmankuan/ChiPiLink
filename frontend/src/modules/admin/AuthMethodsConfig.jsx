@@ -221,9 +221,9 @@ export default function AuthMethodsConfig() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{METHOD_LABELS[methodId]}</span>
                       {isEnabled ? (
-                        <Badge variant="default" className="bg-green-500">Activo</Badge>
+                        <Badge variant="default" className="bg-green-500">{t("authConfig.activeStatus")}</Badge>
                       ) : (
-                        <Badge variant="secondary">Deshabilitado</Badge>
+                        <Badge variant="secondary">{t("authConfig.disabledStatus")}</Badge>
                       )}
                     </div>
                     {methodId === 'google' && !isEnabled && (
@@ -297,10 +297,10 @@ export default function AuthMethodsConfig() {
                     </span>
                     <div className="flex gap-1 mt-0.5">
                       {isRequired && (
-                        <Badge variant="outline" className="text-xs">Requerido</Badge>
+                        <Badge variant="outline" className="text-xs">{t("common.required")}</Badge>
                       )}
                       {isEssential && (
-                        <Badge variant="secondary" className="text-xs">Esencial</Badge>
+                        <Badge variant="secondary" className="text-xs">{t("authConfig.essential")}</Badge>
                       )}
                       {fieldId === 'direccion' && !isVisible && (
                         <Badge variant="outline" className="text-xs text-blue-600">
@@ -324,7 +324,7 @@ export default function AuthMethodsConfig() {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <Label className="text-xs text-muted-foreground">Visible</Label>
+                    <Label className="text-xs text-muted-foreground">{t("common.visible")}</Label>
                     <Switch
                       checked={isVisible}
                       onCheckedChange={() => toggleFieldVisibility(fieldId)}
