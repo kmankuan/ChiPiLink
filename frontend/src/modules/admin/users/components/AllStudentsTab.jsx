@@ -130,7 +130,9 @@ export default function AllStudentsTab({ token }) {
     return matchesSearch && matchesStatus && matchesSchool;
   });
 
-  const studentSelection = useTableSelection(filteredStudents, 'student_id');
+  const studentPagination = usePagination(filteredStudents, 25);
+  const pageStudents = studentPagination.paginated;
+  const studentSelection = useTableSelection(pageStudents, 'student_id');
 
   // Stats
   const totalStudents = students.length;
