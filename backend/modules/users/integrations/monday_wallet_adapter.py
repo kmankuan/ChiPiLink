@@ -510,7 +510,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
                 mutation {{ change_simple_column_value(
                     item_id: {subitem_id}, board_id: 18399650846,
                     column_id: "{event_col}",
-                    value: {json.dumps(json.dumps({"label": done_label}))}
+                    value: {json.dumps(done_label)}
                 ) {{ id }} }}
             """)
         except Exception as e:
@@ -524,7 +524,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
                 mutation {{ change_simple_column_value(
                     item_id: {item_id}, board_id: {board_id},
                     column_id: "{status_col}",
-                    value: {json.dumps(json.dumps({"label": label}))}
+                    value: {json.dumps(label)}
                 ) {{ id }} }}
             """)
         except Exception as e:
