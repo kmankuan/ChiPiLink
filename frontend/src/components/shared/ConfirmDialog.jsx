@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Loader2, AlertTriangle, Archive, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function ConfirmDialog({
   open,
