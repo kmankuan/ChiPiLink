@@ -34,8 +34,8 @@ class TestSyncDashboard:
         )
         assert login_response.status_code == 200, f"Admin login failed: {login_response.text}"
         
-        token = login_response.json().get("access_token")
-        assert token, "No access_token in login response"
+        token = login_response.json().get("token")
+        assert token, "No token in login response"
         
         self.session.headers.update({"Authorization": f"Bearer {token}"})
         yield
