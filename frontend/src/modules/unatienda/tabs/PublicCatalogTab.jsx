@@ -122,6 +122,20 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     return matchesSearch && matchesCategoria;
   });
 
+  const productPagination = usePagination(filteredProducts, 25);
+  const pageProducts = productPagination.paginated;
+  const productSelection = useTableSelection(pageProducts, 'book_id');
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+
+  const handleBulkDelete = async () => {
+    const ids = productSelection.selectedIds();
+    for (const id of ids) {
+      await handleDeleteProduct(id);
+    }
+    productSelection.clear();
+    setConfirmBulkDelete(false);
+  };
+
   const openEditDialog = (product = null) => {
     if (product) {
       setEditingProduct(product);
