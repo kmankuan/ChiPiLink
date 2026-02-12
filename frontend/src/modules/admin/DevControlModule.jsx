@@ -59,9 +59,10 @@ function ArchitectureTab() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
-  useEffect(() => { axios.get(`${API}/api/dev-control/architecture`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  useEffect(() => { axios.get(`${API}/api/dev-control/architecture`, { headers: hdrs() }).then(r => setData(r.data)).catch(() => setData({ backend: [], frontend: [], available: false })).finally(() => setLoading(false)); }, []);
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
+  if (data.available === false) return <NotAvailableBanner message="Filesystem not accessible in this environment" />;
   const filterTree = (nodes, q) => {
     if (!q) return nodes;
     return nodes.reduce((acc, n) => {
