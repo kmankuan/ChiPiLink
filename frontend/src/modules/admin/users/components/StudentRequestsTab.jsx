@@ -535,7 +535,7 @@ export default function TextbookAccessAdminTab({ token }) {
             <>
               {/* Mobile Card View */}
               <div className="block sm:hidden space-y-3">
-                {requests.map((request, idx) => (
+                {pageRequests.map((request, idx) => (
                   <Card key={`mobile-${request.student_id}-${request.year}-${idx}`} className="border-l-4 border-l-primary">
                     <CardContent className="p-4">
                       {/* Header: Student Name + Status */}
