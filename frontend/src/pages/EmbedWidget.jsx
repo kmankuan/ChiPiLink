@@ -631,7 +631,7 @@ function WalletView({ token }) {
 
   if (loading) return <LoadingSpinner />;
 
-  const balance = wallet?.balance ?? wallet?.saldo ?? 0;
+  const balance = wallet?.balance_usd ?? wallet?.balance ?? wallet?.saldo ?? 0;
 
   return (
     <div className="space-y-3" data-testid="widget-wallet">
