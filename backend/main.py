@@ -234,9 +234,10 @@ async def startup_event():
     # Initialize Roles module (create default roles)
     await roles_service.initialize_default_roles()
     
-    # Register Monday.com wallet webhook handler (adapter pattern)
+    # Register Monday.com wallet webhook handler + event subscriptions
     from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
     await wallet_monday_adapter.register_webhooks()
+    wallet_monday_adapter.init_event_handlers()
 
     # Start Telegram polling for community feed
     from modules.community.services.telegram_service import telegram_service
