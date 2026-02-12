@@ -373,8 +373,8 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
                 <section key={block.id} data-block="pinpanclub">
                   <PinPanClubFeedBlock
                     config={{
-                      titulo: { es: 'Actividad del Club', en: 'Club Activity' },
-                      subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
+                      titulo: { es: 'Actividad del Club', en: 'Club Activity', zh: '俱乐部动态' },
+                      subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub', zh: 'PinPanClub最新动态' },
                       sections: {
                         recent_matches: { enabled: true, limit: 5 },
                         leaderboard: { enabled: true, limit: 10 },
