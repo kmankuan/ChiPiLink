@@ -42,9 +42,9 @@ export default function StoreAnalyticsModule() {
         const result = await res.json();
         setData(result);
       } else if (res.status === 403) {
-        toast.error('Access denied. Super admin required.');
+        toast.error(t('analytics.accessDenied'));
       } else {
-        toast.error('Error loading analytics');
+        toast.error(t('analytics.loadError'));
       }
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -117,11 +117,11 @@ export default function StoreAnalyticsModule() {
               <SelectValue placeholder="Period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="all">{t("common.allTime")}</SelectItem>
               <SelectItem value="week">Last 7 Days</SelectItem>
               <SelectItem value="month">Last 30 Days</SelectItem>
               <SelectItem value="quarter">Last 90 Days</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="year">{t("common.thisYear")}</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" onClick={fetchAnalytics} disabled={loading}>
@@ -160,27 +160,27 @@ export default function StoreAnalyticsModule() {
         <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-1">
           <TabsTrigger value="overview" className="gap-1">
             <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Overview</span>
+            <span className="hidden sm:inline">{t("analytics.overviewTab")}</span>
           </TabsTrigger>
           <TabsTrigger value="revenue" className="gap-1">
             <DollarSign className="h-4 w-4" />
-            <span className="hidden sm:inline">Revenue</span>
+            <span className="hidden sm:inline">{t("analytics.revenueTab")}</span>
           </TabsTrigger>
           <TabsTrigger value="inventory" className="gap-1">
             <Package className="h-4 w-4" />
-            <span className="hidden sm:inline">Inventory</span>
+            <span className="hidden sm:inline">{t("analytics.inventoryTab")}</span>
           </TabsTrigger>
           <TabsTrigger value="books" className="gap-1">
             <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Books</span>
+            <span className="hidden sm:inline">{t("analytics.booksTab")}</span>
           </TabsTrigger>
           <TabsTrigger value="clients" className="gap-1">
             <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Clients</span>
+            <span className="hidden sm:inline">{t("analytics.clientsTab")}</span>
           </TabsTrigger>
           <TabsTrigger value="grades" className="gap-1">
             <GraduationCap className="h-4 w-4" />
-            <span className="hidden sm:inline">Grades</span>
+            <span className="hidden sm:inline">{t("analytics.gradesTab")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -195,7 +195,7 @@ export default function StoreAnalyticsModule() {
                     <DollarSign className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-sm text-muted-foreground">{t("common.totalRevenue")}</p>
                     <p className="text-2xl font-bold">${data?.revenue?.total?.toLocaleString() || 0}</p>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export default function StoreAnalyticsModule() {
                     <ShoppingCart className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Orders</p>
+                    <p className="text-sm text-muted-foreground">{t("common.totalOrders")}</p>
                     <p className="text-2xl font-bold">{data?.revenue?.order_count || 0}</p>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export default function StoreAnalyticsModule() {
                     <TrendingUp className="h-6 w-6 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Avg Order Value</p>
+                    <p className="text-sm text-muted-foreground">{t("common.avgOrderValue")}</p>
                     <p className="text-2xl font-bold">${data?.revenue?.average_order_value?.toFixed(2) || 0}</p>
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export default function StoreAnalyticsModule() {
                     <Package className="h-6 w-6 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Inventory Value</p>
+                    <p className="text-sm text-muted-foreground">{t("common.inventoryValue")}</p>
                     <p className="text-2xl font-bold">${data?.inventory?.inventory_value?.toLocaleString() || 0}</p>
                   </div>
                 </div>
@@ -251,7 +251,7 @@ export default function StoreAnalyticsModule() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Products</p>
+                    <p className="text-sm text-muted-foreground">{t("common.totalProducts")}</p>
                     <p className="text-3xl font-bold">{data?.inventory?.total_products || 0}</p>
                   </div>
                   <Package className="h-8 w-8 text-muted-foreground" />
@@ -263,7 +263,7 @@ export default function StoreAnalyticsModule() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Low Stock</p>
+                    <p className="text-sm text-muted-foreground">{t("common.lowStock")}</p>
                     <p className="text-3xl font-bold text-amber-600">{data?.inventory?.low_stock_count || 0}</p>
                   </div>
                   <AlertTriangle className="h-8 w-8 text-amber-500" />
@@ -275,7 +275,7 @@ export default function StoreAnalyticsModule() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Out of Stock</p>
+                    <p className="text-sm text-muted-foreground">{t("common.outOfStock")}</p>
                     <p className="text-3xl font-bold text-red-600">{data?.inventory?.out_of_stock_count || 0}</p>
                   </div>
                   <AlertCircle className="h-8 w-8 text-red-500" />
@@ -300,11 +300,11 @@ export default function StoreAnalyticsModule() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Book</TableHead>
-                      <TableHead className="text-right">Current Stock</TableHead>
-                      <TableHead className="text-right">Monthly Avg Sales</TableHead>
-                      <TableHead className="text-right">Recommended Purchase</TableHead>
-                      <TableHead>Reason</TableHead>
+                      <TableHead>{t("analytics.book")}</TableHead>
+                      <TableHead className="text-right">{t("analytics.currentStockCol")}</TableHead>
+                      <TableHead className="text-right">{t("analytics.monthlyAvgSales")}</TableHead>
+                      <TableHead className="text-right">{t("analytics.recommendedPurchase")}</TableHead>
+                      <TableHead>{t("common.reason")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -333,14 +333,14 @@ export default function StoreAnalyticsModule() {
           {data?.trends?.monthly?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Trends</CardTitle>
+                <CardTitle>{t("analytics.monthlyTrends")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead className="text-right">Orders</TableHead>
+                      <TableHead>{t("analytics.month")}</TableHead>
+                      <TableHead className="text-right">{t("analytics.orders")}</TableHead>
                       <TableHead className="text-right">Revenue</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -364,13 +364,13 @@ export default function StoreAnalyticsModule() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Revenue by Order Status</CardTitle>
+                <CardTitle>{t("analytics.revenueByStatus")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t("common.status")}</TableHead>
                       <TableHead className="text-right">Orders</TableHead>
                       <TableHead className="text-right">Revenue</TableHead>
                     </TableRow>
@@ -398,7 +398,7 @@ export default function StoreAnalyticsModule() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Revenue Summary</CardTitle>
+                <CardTitle>{t("analytics.revenueSummary")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -406,7 +406,7 @@ export default function StoreAnalyticsModule() {
                   <p className="text-3xl font-bold text-green-600">${data?.revenue?.total?.toLocaleString() || 0}</p>
                 </div>
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Average Order</p>
+                  <p className="text-sm text-muted-foreground">{t("analytics.averageOrder")}</p>
                   <p className="text-2xl font-bold text-blue-600">${data?.revenue?.average_order_value?.toFixed(2) || 0}</p>
                 </div>
                 <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -446,13 +446,13 @@ export default function StoreAnalyticsModule() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">In Stock</TableHead>
-                    <TableHead className="text-right">Reserved</TableHead>
-                    <TableHead className="text-right">Available</TableHead>
-                    <TableHead className="text-right">Total Sold</TableHead>
+                    <TableHead>{t("inventoryMgmt.product")}</TableHead>
+                    <TableHead>{t("storeManager.grade")}</TableHead>
+                    <TableHead className="text-right">{t("common.price")}</TableHead>
+                    <TableHead className="text-right">{t("analytics.inStockStatus")}</TableHead>
+                    <TableHead className="text-right">{t("analytics.reserved")}</TableHead>
+                    <TableHead className="text-right">{t("analytics.available")}</TableHead>
+                    <TableHead className="text-right">{t("analytics.totalSold")}</TableHead>
                     <TableHead className="text-right">Revenue</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
@@ -509,9 +509,9 @@ export default function StoreAnalyticsModule() {
                   <TableRow>
                     <TableHead>Book</TableHead>
                     <TableHead>Grades</TableHead>
-                    <TableHead className="text-right">Units Sold</TableHead>
+                    <TableHead className="text-right">{t("analytics.unitsSold")}</TableHead>
                     <TableHead className="text-right">Orders</TableHead>
-                    <TableHead className="text-right">Students</TableHead>
+                    <TableHead className="text-right">{t("analytics.students")}</TableHead>
                     <TableHead className="text-right">Revenue</TableHead>
                     <TableHead className="text-right">Stock</TableHead>
                   </TableRow>
@@ -566,10 +566,10 @@ export default function StoreAnalyticsModule() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Client</TableHead>
+                    <TableHead>{t("analytics.client")}</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead className="text-right">Orders</TableHead>
-                    <TableHead className="text-right">Total Spent</TableHead>
+                    <TableHead className="text-right">{t("analytics.totalSpentCol")}</TableHead>
                     <TableHead>Students</TableHead>
                   </TableRow>
                 </TableHeader>
