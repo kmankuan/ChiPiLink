@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 export function AdminTableToolbar({
   search,
   onSearchChange,
-  placeholder = 'Search...',
+  placeholder,
   totalCount = 0,
   filteredCount,
   showArchived,
@@ -20,6 +20,8 @@ export function AdminTableToolbar({
   loading = false,
   children,
 }) {
+  const { t } = useTranslation();
+  const searchPlaceholder = placeholder || t('common.search') + '...';
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4" data-testid="admin-table-toolbar">
       <div className="relative flex-1 min-w-0">
@@ -28,7 +30,7 @@ export function AdminTableToolbar({
           data-testid="table-search-input"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           className="pl-8 h-9 text-sm"
         />
       </div>
@@ -43,7 +45,7 @@ export function AdminTableToolbar({
             data-testid="toggle-archived-btn"
           >
             <Archive className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Archived</span>
+            <span className="hidden sm:inline">{t('common.archived')}</span>
           </Button>
         )}
 
@@ -59,7 +61,7 @@ export function AdminTableToolbar({
             data-testid="table-refresh-btn"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-            <span className="hidden sm:inline">Refresh</span>
+            <span className="hidden sm:inline">{t('common.refresh')}</span>
           </Button>
         )}
 
