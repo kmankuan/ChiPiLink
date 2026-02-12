@@ -438,6 +438,10 @@ export default function MondayModule() {
             <Wallet className="h-3.5 w-3.5" />
             Wallet
           </TabsTrigger>
+          <TabsTrigger value="sync-dashboard" className="gap-1.5 text-xs">
+            <Activity className="h-3.5 w-3.5" />
+            Sync Dashboard
+          </TabsTrigger>
           <TabsTrigger value="status-mapping" className="gap-1.5 text-xs">
             <Settings className="h-3.5 w-3.5" />
             Status Mapping
