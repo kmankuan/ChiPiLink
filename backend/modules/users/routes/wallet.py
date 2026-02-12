@@ -41,6 +41,17 @@ async def _get_all_descriptions() -> dict:
     return {k: saved.get(k, v) for k, v in DEFAULTS.items()}
 
 
+async def _monday_sync_tx(user_id: str, amount: float, action: str, description: str = "", reference: str = ""):
+    """Fire-and-forget sync of a wallet transaction to Monday.com."""
+    try:
+        from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
+        await wallet_monday_adapter.sync_transaction_if_not_from_monday(
+            user_id, amount, action, description, reference
+        )
+    except Exception:
+        pass  # Non-critical: Monday sync failure should never block wallet operations
+
+
 
 # ============== PYDANTIC MODELS ==============
 
