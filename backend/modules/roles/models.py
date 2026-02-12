@@ -105,6 +105,13 @@ AVAILABLE_PERMISSIONS = {
         "respond": "Responder tickets",
         "manage": "Gestionar tickets",
     },
+
+    # Translations
+    "translations": {
+        "view": "View translation keys and coverage",
+        "edit": "Edit translation values",
+        "manage": "Create/delete keys and sync from files",
+    },
 }
 
 
@@ -122,6 +129,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "integrations.*",
         "customers.*",
         "tickets.*",
+        "translations.*",
     ],
     
     DefaultRoles.MODERATOR: [
