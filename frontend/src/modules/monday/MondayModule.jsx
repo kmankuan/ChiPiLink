@@ -52,7 +52,8 @@ import {
   LayoutGrid,
   Plug,
   Layers,
-  Wallet
+  Wallet,
+  Activity
 } from 'lucide-react';
 
 import TxbInventoryTab from './components/TxbInventoryTab';
