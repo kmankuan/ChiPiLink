@@ -193,35 +193,37 @@ export default function TranslationCoverageCard() {
                     {isComplete ? (
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
                     ) : (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Badge
-                              variant="outline"
-                              className="text-xs cursor-pointer border-amber-300 text-amber-600 hover:bg-amber-50"
-                              onClick={() => openMissingDialog(lang)}
-                              data-testid={`missing-badge-${lang}`}
-                            >
-                              <AlertTriangle className="h-3 w-3 mr-1" />
-                              {info.missing_count} {t('translations.missingKeys').toLowerCase()}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent>{t('translations.viewMissing')}</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      {canManage && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-6 text-xs gap-1 border-violet-300 text-violet-600 hover:bg-violet-50"
-                          onClick={() => autoTranslate(lang)}
-                          disabled={translating}
-                          data-testid={`auto-translate-${lang}`}
-                        >
-                          {translating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                          {t('translations.autoTranslate')}
-                        </Button>
-                      )}
+                      <>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant="outline"
+                                className="text-xs cursor-pointer border-amber-300 text-amber-600 hover:bg-amber-50"
+                                onClick={() => openMissingDialog(lang)}
+                                data-testid={`missing-badge-${lang}`}
+                              >
+                                <AlertTriangle className="h-3 w-3 mr-1" />
+                                {info.missing_count} {t('translations.missingKeys').toLowerCase()}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>{t('translations.viewMissing')}</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        {canManage && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 text-xs gap-1 border-violet-300 text-violet-600 hover:bg-violet-50"
+                            onClick={() => autoTranslate(lang)}
+                            disabled={translating}
+                            data-testid={`auto-translate-${lang}`}
+                          >
+                            {translating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                            {t('translations.autoTranslate')}
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                   <span className="text-muted-foreground tabular-nums">
