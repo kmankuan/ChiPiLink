@@ -374,6 +374,7 @@ export default function AdminDashboard() {
                     {activeModule === 'roles' && t('admin.moduleDesc.roles', 'Manage user roles and system permissions')}
                     {activeModule === 'admin' && t('admin.moduleDesc.admin', 'Configure your site and customization')}
                     {activeModule === 'integrations' && t('admin.moduleDesc.integrations', 'Connect with external services')}
+                    {activeModule === 'payment-alerts' && t('admin.moduleDesc.paymentAlerts', 'Bank payment detection, approval queue & email rules')}
                     {activeModule === 'devcontrol' && t('admin.moduleDesc.devcontrol', 'Architecture, API reference, roadmap & dev annotations')}
                   </p>
                 </div>
