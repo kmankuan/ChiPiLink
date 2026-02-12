@@ -14,9 +14,11 @@ import {
 import { toast } from 'sonner';
 import { Save, Loader2, Globe, Palette } from 'lucide-react';
 import ImageUploader from '@/components/common/ImageUploader';
+import { useTranslation } from 'react-i18next';
 
 export default function SiteConfigModule() {
   const { api } = useAuth();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState({
@@ -73,9 +75,9 @@ export default function SiteConfigModule() {
     try {
       setSaving(true);
       await api.put('/admin/site-config', config);
-      toast.success('Configuración guardada');
+      toast.success(t('siteConfig.configSaved'));
     } catch (error) {
-      toast.error('Error al guardar');
+      toast.error(t('siteConfig.saveError'));
     } finally {
       setSaving(false);
     }
@@ -96,16 +98,16 @@ export default function SiteConfigModule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Globe className="h-5 w-5" />
-            Información General
+            {t('siteConfig.title')}
           </CardTitle>
           <CardDescription>
-            Configura el nombre y descripción de tu sitio
+            {t('siteConfig.titleDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Nombre del Sitio</Label>
+              <Label>{t('siteConfig.siteName')}</Label>
               <Input
                 value={config.site_name || ''}
                 onChange={(e) => setConfig({ ...config, site_name: e.target.value })}
@@ -113,7 +115,7 @@ export default function SiteConfigModule() {
               />
             </div>
             <div>
-              <Label>Email de Contacto</Label>
+              <Label>{t('siteConfig.contactEmail')}</Label>
               <Input
                 type="email"
                 value={config.email_contacto || ''}
@@ -124,18 +126,18 @@ export default function SiteConfigModule() {
           </div>
           
           <div>
-            <Label>Descripción</Label>
+            <Label>{t('siteConfig.description')}</Label>
             <Textarea
               value={config.description || ''}
               onChange={(e) => setConfig({ ...config, descripcion: e.target.value })}
-              placeholder="Descripción de tu sitio"
+              placeholder={t('siteConfig.descPlaceholder')}
               rows={3}
             />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Teléfono de Contacto</Label>
+              <Label>{t('siteConfig.contactPhone')}</Label>
               <Input
                 value={config.telefono_contacto || ''}
                 onChange={(e) => setConfig({ ...config, telefono_contacto: e.target.value })}
@@ -143,7 +145,7 @@ export default function SiteConfigModule() {
               />
             </div>
             <div>
-              <Label>Dirección</Label>
+              <Label>{t('siteConfig.address')}</Label>
               <Input
                 value={config.direccion || ''}
                 onChange={(e) => setConfig({ ...config, direccion: e.target.value })}
@@ -153,7 +155,7 @@ export default function SiteConfigModule() {
           </div>
           
           <div>
-            <Label>Texto del Footer</Label>
+            <Label>{t('siteConfig.footerText')}</Label>
             <Input
               value={config.footer_texto || ''}
               onChange={(e) => setConfig({ ...config, footer_texto: e.target.value })}
@@ -168,23 +170,23 @@ export default function SiteConfigModule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Marca y Colores
+            {t('siteConfig.brandTitle')}
           </CardTitle>
           <CardDescription>
-            Personaliza la apariencia de tu sitio
+            {t('siteConfig.brandDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ImageUploader
-              label="Logo del Sitio"
+              label={t('siteConfig.siteLogo')}
               value={config.logo_url}
               onChange={(url) => setConfig({ ...config, logo_url: url })}
               aspectRatio="4/1"
               maxSize={2}
             />
             <ImageUploader
-              label="Favicon (Icono de pestaña)"
+              label={t('siteConfig.favicon')}
               value={config.favicon_url}
               onChange={(url) => setConfig({ ...config, favicon_url: url })}
               aspectRatio="1/1"
@@ -194,7 +196,7 @@ export default function SiteConfigModule() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Color Primario</Label>
+              <Label>{t('siteConfig.primaryColor')}</Label>
               <div className="flex gap-2">
                 <Input
                   type="color"
@@ -210,7 +212,7 @@ export default function SiteConfigModule() {
               </div>
             </div>
             <div>
-              <Label>Color Secundario</Label>
+              <Label>{t('siteConfig.secondaryColor')}</Label>
               <div className="flex gap-2">
                 <Input
                   type="color"
@@ -232,7 +234,7 @@ export default function SiteConfigModule() {
       {/* Save Button */}
       <Button onClick={saveConfig} disabled={saving} className="w-full gap-2">
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-        Guardar Configuración
+        {t('siteConfig.saveConfig')}
       </Button>
     </div>
   );
