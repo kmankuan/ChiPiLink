@@ -719,6 +719,139 @@ async def bulk_archive_users(data: dict, admin=Depends(get_admin_user)):
     return {"status": "archived", "count": r.modified_count}
 
 
+# ============== BANK ALERT PARSER ==============
+
+import re as _re
+
+def _parse_bank_alert(text: str) -> dict:
+    """Parse a bank transfer alert and extract amount, email, sender, product number."""
+    result = {"raw": text, "amount": None, "email": None, "sender": None, "product": None, "description": None}
+
+    # Extract amount: US$386.55 or USD 386.55 or $386.55
+    amount_match = _re.search(r'(?:US\$|USD\s*|B/\.?\s*|\$)\s*([\d,]+\.?\d*)', text)
+    if amount_match:
+        result["amount"] = float(amount_match.group(1).replace(',', ''))
+
+    # Extract email from description line (user puts "recarga email@domain.com")
+    email_match = _re.search(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}', text)
+    if email_match:
+        result["email"] = email_match.group(0).lower()
+
+    # Extract sender name: "XXX te envió" pattern
+    sender_match = _re.search(r'(?:^|\n)\s*(.+?)\s+te\s+envi[óo]', text, _re.IGNORECASE)
+    if sender_match:
+        result["sender"] = sender_match.group(1).strip()
+
+    # Extract product/account number: "Terminación de producto: XXXX"
+    product_match = _re.search(r'(?:Terminaci[oó]n\s+de\s+producto|Terminaci[oó]n)[:\s]*(\d+)', text, _re.IGNORECASE)
+    if product_match:
+        result["product"] = product_match.group(1)
+
+    # Extract description line
+    desc_match = _re.search(r'Descripci[oó]n[:\s]*(.+?)(?:\n|$)', text, _re.IGNORECASE)
+    if desc_match:
+        result["description"] = desc_match.group(1).strip()
+
+    return result
+
+
+class BankAlertRequest(BaseModel):
+    alert_text: str
+
+class ProcessBankAlertRequest(BaseModel):
+    alert_text: str
+    email: str
+    amount: float
+    description: Optional[str] = None
+
+
+@router.post("/admin/parse-bank-alert")
+async def parse_bank_alert(data: BankAlertRequest, admin=Depends(get_admin_user)):
+    """Parse a bank transfer alert text and extract structured data."""
+    parsed = _parse_bank_alert(data.alert_text)
+
+    # If email found, check if user exists
+    user_match = None
+    if parsed["email"]:
+        user = await db.auth_users.find_one(
+            {"email": {"$regex": f'^{_re.escape(parsed["email"])}$', "$options": "i"}},
+            {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+        )
+        if user:
+            wallet = await wallet_service.get_wallet(user["user_id"])
+            user_match = {
+                "user_id": user["user_id"],
+                "email": user["email"],
+                "name": user.get("name", ""),
+                "current_balance": wallet.get("balance_usd", 0) if wallet else 0,
+            }
+
+    return {
+        "parsed": parsed,
+        "user_match": user_match,
+    }
+
+
+@router.post("/admin/process-bank-alert")
+async def process_bank_alert(data: ProcessBankAlertRequest, admin=Depends(get_admin_user)):
+    """Process a parsed bank alert: find user by email and top-up their wallet."""
+    # Find user
+    user = await db.auth_users.find_one(
+        {"email": {"$regex": f'^{_re.escape(data.email)}$', "$options": "i"}},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User not found: {data.email}")
+
+    desc = data.description or await _get_default_description("topup")
+    reference = f"bank_alert_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+
+    transaction = await wallet_service.deposit(
+        user_id=user["user_id"],
+        amount=data.amount,
+        currency=Currency.USD,
+        payment_method=PaymentMethod.BANK_TRANSFER,
+        reference=reference,
+        description=desc,
+    )
+
+    # Sync to Monday.com (fire-and-forget)
+    asyncio.create_task(_monday_sync_tx(
+        user["user_id"], data.amount, "topup", desc, reference
+    ))
+
+    wallet = await wallet_service.get_wallet(user["user_id"])
+
+    # Log the alert processing
+    await db.bank_alert_logs.insert_one({
+        "alert_text": data.alert_text,
+        "email": data.email,
+        "amount": data.amount,
+        "user_id": user["user_id"],
+        "transaction_id": transaction.get("transaction_id"),
+        "processed_by": admin.get("user_id"),
+        "processed_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "success": True,
+        "user": {"user_id": user["user_id"], "email": user["email"], "name": user.get("name", "")},
+        "transaction": transaction,
+        "new_balance": wallet.get("balance_usd", 0) if wallet else 0,
+    }
+
+
+@router.get("/admin/bank-alert-logs")
+async def get_bank_alert_logs(
+    limit: int = Query(default=20, le=100),
+    admin=Depends(get_admin_user)
+):
+    """Get recent bank alert processing logs."""
+    cursor = db.bank_alert_logs.find({}, {"_id": 0}).sort("processed_at", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return {"logs": logs}
+
+
 @router.post("/admin/transactions/bulk-archive")
 async def bulk_archive_transactions(data: dict, admin=Depends(get_admin_user)):
     """Archive transactions (soft-delete)"""
