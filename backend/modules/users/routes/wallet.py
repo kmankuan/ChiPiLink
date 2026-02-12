@@ -275,6 +275,10 @@ async def admin_deposit(
             description=data.description
         )
         
+        asyncio.create_task(_monday_sync_tx(
+            user_id, data.amount, "topup", data.description or "", data.reference or ""
+        ))
+        
         return {"success": True, "transaction": transaction}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
