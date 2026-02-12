@@ -194,7 +194,7 @@ export default function DashboardModule() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.notifications?.unread || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {(stats.notifications?.unread || 0) > 0 ? 'Unread' : 'All read'}
+              {(stats.notifications?.unread || 0) > 0 ? t('dashboard.unread') : 'All read'}
             </p>
           </CardContent>
         </Card>
@@ -280,7 +280,7 @@ export default function DashboardModule() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <AlertTriangle className="h-5 w-5" />
-              Alerts
+              {t('dashboard.alerts')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -295,7 +295,7 @@ export default function DashboardModule() {
                   size="sm"
                   onClick={() => window.location.hash = 'unatienda'}
                 >
-                  View inventory
+                  {t('dashboard.viewInventory')}
                 </Button>
               </div>
             )}
@@ -323,7 +323,7 @@ export default function DashboardModule() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Activity Summary
+            {t('dashboard.activitySummary')}
           </CardTitle>
           <CardDescription>
             System overall status
