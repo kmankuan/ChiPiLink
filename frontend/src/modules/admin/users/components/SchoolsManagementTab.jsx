@@ -336,6 +336,7 @@ export default function SchoolsManagementTab({ token }) {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
