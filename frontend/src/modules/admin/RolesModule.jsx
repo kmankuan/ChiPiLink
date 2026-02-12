@@ -28,15 +28,15 @@ const ROLE_ICONS = {
 };
 
 // Action type labels and colors
-const ACTION_LABELS = {
-  'role_created': { label: 'Rol Creado', icon: Plus, color: 'bg-green-100 text-green-700' },
-  'role_updated': { label: 'Rol Actualizado', icon: FileEdit, color: 'bg-blue-100 text-blue-700' },
-  'role_deleted': { label: 'Rol Eliminado', icon: Trash2, color: 'bg-red-100 text-red-700' },
-  'role_assigned': { label: 'Rol Asignado', icon: UserPlus, color: 'bg-purple-100 text-purple-700' },
-  'role_removed': { label: 'Rol Removido', icon: UserMinus, color: 'bg-orange-100 text-orange-700' },
-  'permission_added': { label: 'Permiso Agregado', icon: Key, color: 'bg-cyan-100 text-cyan-700' },
-  'permission_removed': { label: 'Permiso Removido', icon: Key, color: 'bg-amber-100 text-amber-700' },
-  'permissions_updated': { label: 'Permisos Actualizados', icon: Shield, color: 'bg-indigo-100 text-indigo-700' },
+const ACTION_LABELS_DEF = {
+  'role_created': { labelKey: 'roles.roleCreated', icon: Plus, color: 'bg-green-100 text-green-700' },
+  'role_updated': { labelKey: 'roles.roleUpdated', icon: FileEdit, color: 'bg-blue-100 text-blue-700' },
+  'role_deleted': { labelKey: 'roles.roleDeleted', icon: Trash2, color: 'bg-red-100 text-red-700' },
+  'role_assigned': { labelKey: 'roles.roleAssigned', icon: UserPlus, color: 'bg-purple-100 text-purple-700' },
+  'role_removed': { labelKey: 'roles.removed', icon: UserMinus, color: 'bg-orange-100 text-orange-700' },
+  'permission_added': { labelKey: 'roles.added', icon: Key, color: 'bg-cyan-100 text-cyan-700' },
+  'permission_removed': { labelKey: 'roles.removed', icon: Key, color: 'bg-amber-100 text-amber-700' },
+  'permissions_updated': { labelKey: 'roles.permissionsUpdated', icon: Shield, color: 'bg-indigo-100 text-indigo-700' },
 };
 
 export default function RolesModule() {
