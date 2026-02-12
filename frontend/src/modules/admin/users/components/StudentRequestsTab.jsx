@@ -286,6 +286,9 @@ export default function TextbookAccessAdminTab({ token }) {
   const t = translations[i18n.language] || translations.en;
   const quickRejectReasons = QUICK_REJECT_REASONS[i18n.language] || QUICK_REJECT_REASONS.en;
 
+  const requestsPagination = usePagination(requests, 25);
+  const pageRequests = requestsPagination.paginated;
+
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
