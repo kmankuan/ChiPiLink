@@ -40,6 +40,10 @@ export default function WalletModule() {
             <Settings className="h-3.5 w-3.5" />
             Settings
           </TabsTrigger>
+          <TabsTrigger value="bank-alerts" className="gap-1.5 text-xs">
+            <FileText className="h-3.5 w-3.5" />
+            Bank Alerts
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4">
