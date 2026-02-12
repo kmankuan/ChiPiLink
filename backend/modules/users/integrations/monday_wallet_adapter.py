@@ -182,14 +182,14 @@ class WalletMondayAdapter(BaseMondayAdapter):
 
         parent_id = user_item["monday_item_id"]
         sub_mapping = config.get("subitem_mapping", self.DEFAULT_SUBITEM_MAPPING)
-        status_labels = config.get("status_labels", self.DEFAULT_STATUS_LABELS)
+        sub_status_labels = config.get("subitem_status_labels", self.DEFAULT_SUBITEM_STATUS_LABELS)
 
         amount_col = sub_mapping.get("amount", "numeric_mm0fgnq9")
         note_col = sub_mapping.get("note", "text_mm0fpbht")
         event_col = sub_mapping.get("event", "status")
         date_col = sub_mapping.get("date", "date0")
 
-        event_label = status_labels.get("add", "Top Up") if action == "topup" else status_labels.get("deduct", "Deducted")
+        event_label = sub_status_labels.get("add", "Added") if action == "topup" else sub_status_labels.get("deduct", "Deducted")
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         try:
