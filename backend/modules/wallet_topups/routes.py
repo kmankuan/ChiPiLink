@@ -321,6 +321,107 @@ async def get_stats(admin: dict = Depends(get_admin_user)):
     }
 
 
+# ============== GMAIL INTEGRATION ==============
+
+@router.get("/gmail/status")
+async def gmail_status(admin: dict = Depends(get_admin_user)):
+    """Check Gmail connection status."""
+    from .gmail_service import gmail_service
+    result = gmail_service.test_connection()
+    # Update settings with connection status
+    await db[SETTINGS_COL].update_one(
+        {"id": "default"},
+        {"$set": {"gmail_connected": result["connected"], "gmail_email": result.get("email", "")}},
+        upsert=True
+    )
+    return result
+
+
+@router.get("/gmail/emails")
+async def list_gmail_emails(limit: int = 20, admin: dict = Depends(get_admin_user)):
+    """Fetch recent emails from Gmail inbox."""
+    from .gmail_service import gmail_service
+    if not gmail_service.is_configured:
+        raise HTTPException(status_code=400, detail="Gmail not configured")
+    emails = gmail_service.fetch_recent_emails(limit=limit)
+    return {"emails": emails, "total": len(emails)}
+
+
+@router.post("/gmail/process")
+async def process_gmail_emails(data: dict = None, admin: dict = Depends(get_admin_user)):
+    """Scan Gmail inbox, parse bank alerts with AI, apply rules, create pending top-ups."""
+    data = data or {}
+    limit = data.get("limit", 20)
+
+    from .gmail_service import gmail_service, process_email
+
+    if not gmail_service.is_configured:
+        raise HTTPException(status_code=400, detail="Gmail not configured")
+
+    emails = gmail_service.fetch_recent_emails(limit=limit)
+    results = {"processed": 0, "created": 0, "skipped": 0, "rejected": 0, "errors": 0, "details": []}
+
+    for em in emails:
+        try:
+            result = await process_email(em)
+            results["processed"] += 1
+            if result.get("skipped"):
+                results["skipped"] += 1
+            elif result.get("rejected"):
+                results["rejected"] += 1
+            elif result.get("created"):
+                results["created"] += 1
+                # Sync to Monday.com
+                asyncio.create_task(_sync_pending_to_monday(result["topup"]))
+            results["details"].append({
+                "subject": em.get("subject", "")[:80],
+                "from": em.get("from", ""),
+                "result": "created" if result.get("created") else "rejected" if result.get("rejected") else "skipped",
+                "reason": result.get("reason", ""),
+            })
+        except Exception as e:
+            results["errors"] += 1
+            results["details"].append({
+                "subject": em.get("subject", "")[:80],
+                "from": em.get("from", ""),
+                "result": "error",
+                "reason": str(e),
+            })
+
+    return results
+
+
+@router.post("/gmail/process-single")
+async def process_single_email(data: dict, admin: dict = Depends(get_admin_user)):
+    """Process a single email by providing its content directly (for testing)."""
+    from .gmail_service import parse_email_with_ai, apply_rules
+
+    body = data.get("body", "")
+    subject = data.get("subject", "")
+    from_addr = data.get("from", "")
+
+    if not body:
+        raise HTTPException(status_code=400, detail="Email body required")
+
+    parsed = await parse_email_with_ai(body, subject, from_addr)
+    email_data = {"from": from_addr, "subject": subject, "body": body}
+    rule_result = await apply_rules(email_data, parsed) if parsed.get("parsed") else {"pass": False, "reason": "Parse failed"}
+
+    return {
+        "parsed_data": parsed,
+        "rule_result": rule_result,
+    }
+
+
+@router.get("/gmail/processed")
+async def list_processed_emails(limit: int = 50, admin: dict = Depends(get_admin_user)):
+    """List recently processed emails (processing log)."""
+    items = await db["wallet_processed_emails"].find(
+        {}, {"_id": 0}
+    ).sort("processed_at", -1).to_list(limit)
+    return {"items": items, "total": len(items)}
+
+
 # ============== MONDAY.COM SYNC HELPERS ==============
 
 async def _sync_pending_to_monday(topup: dict):
