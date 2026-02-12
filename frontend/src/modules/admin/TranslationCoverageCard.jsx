@@ -59,6 +59,10 @@ export default function TranslationCoverageCard() {
   const editRef = useRef(null);
 
   const canEdit = hasPermission('translations.edit') || isSuperAdmin;
+  const canManage = hasPermission('translations.manage') || isSuperAdmin;
+
+  // Auto-translate state
+  const [translating, setTranslating] = useState(false);
 
   const fetchCoverage = async () => {
     setLoading(true);
