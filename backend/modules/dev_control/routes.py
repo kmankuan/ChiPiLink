@@ -493,9 +493,12 @@ async def _gather_app_context() -> str:
 
     # Python deps summary
     try:
-        result = subprocess.run(["pip", "list", "--format=columns"], capture_output=True, text=True, timeout=10)
-        lines = result.stdout.strip().split("\n")
-        context_parts.append(f"## Python Packages: {len(lines) - 2} installed")
+        import sys as _sys
+        pip_path = os.path.join(os.path.dirname(_sys.executable), "pip")
+        if os.path.exists(pip_path):
+            result = subprocess.run([pip_path, "list", "--format=columns"], capture_output=True, text=True, timeout=10)
+            lines = result.stdout.strip().split("\n")
+            context_parts.append(f"## Python Packages: {max(len(lines) - 2, 0)} installed")
     except Exception:
         pass
 
