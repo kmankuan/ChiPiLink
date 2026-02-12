@@ -11,11 +11,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
   Package, Plus, Edit2, Trash2, Search, Save, Upload, Loader2, 
-  AlertTriangle, Box, Tags, Clock, Store, RefreshCw, ShoppingBag
+  AlertTriangle, Box, Tags, Clock, Store, RefreshCw, ShoppingBag, Archive
 } from 'lucide-react';
+import { useTableSelection } from '@/hooks/useTableSelection';
+import { usePagination } from '@/hooks/usePagination';
+import { BulkActionBar } from '@/components/shared/BulkActionBar';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { TablePagination } from '@/components/shared/TablePagination';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
