@@ -72,11 +72,13 @@ class WalletMondayAdapter(BaseMondayAdapter):
         mapping = await self.get_custom_config("column_mapping")
         sub_mapping = await self.get_custom_config("subitem_column_mapping")
         status_labels = await self.get_custom_config("status_labels")
+        sub_status_labels = await self.get_custom_config("subitem_status_labels")
         return {
             "board_id": board.get("board_id"),
             "column_mapping": mapping.get("mapping", self.DEFAULT_COLUMN_MAPPING),
             "subitem_mapping": sub_mapping.get("mapping", self.DEFAULT_SUBITEM_MAPPING),
             "status_labels": status_labels.get("labels", self.DEFAULT_STATUS_LABELS),
+            "subitem_status_labels": sub_status_labels.get("labels", self.DEFAULT_SUBITEM_STATUS_LABELS),
             "enabled": board.get("enabled", True),
         }
 
