@@ -286,7 +286,6 @@ class WalletMondayAdapter(BaseMondayAdapter):
         """Process all unprocessed subitems under a parent item."""
         col_mapping = config.get("column_mapping", self.DEFAULT_COLUMN_MAPPING)
         sub_mapping = config.get("subitem_mapping", self.DEFAULT_SUBITEM_MAPPING)
-        status_labels = config.get("status_labels", self.DEFAULT_STATUS_LABELS)
 
         # Fetch parent item email
         email = await self._get_item_email(parent_item_id, col_mapping)
