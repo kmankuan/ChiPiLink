@@ -732,7 +732,7 @@ export default function TextbookAccessAdminTab({ token }) {
                       ))}
                     </TableBody>
                   </Table>
-                </ScrollArea>
+                </div>
               </Card>
               <TablePagination
                 page={requestsPagination.page} totalPages={requestsPagination.totalPages} totalItems={requestsPagination.totalItems}
