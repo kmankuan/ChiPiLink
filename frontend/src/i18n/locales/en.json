@@ -21,7 +21,8 @@
     "login": "Login",
     "admin": "Admin Panel",
     "logout": "Logout",
-    "goHome": "Go to Home"
+    "goHome": "Go to Home",
+    "devControl": "Dev Control"
   },
   "landing": {
     "hero": {
@@ -209,7 +210,8 @@
       "pinpanclub": "Table Tennis Club - Matches, players and tournaments",
       "roles": "Manage user roles and system permissions",
       "admin": "Configure your site and customization",
-      "integrations": "Connect with external services"
+      "integrations": "Connect with external services",
+      "devcontrol": "Architecture, API reference, roadmap & dev annotations"
     }
   },
   "common": {
@@ -2205,5 +2207,15 @@
     "inlineEditHint": "Click a cell to edit inline",
     "enterKey": "Enter a key",
     "quickEdit": "Quick Edit"
+  },
+  "devControl": {
+    "tabs": {
+      "annotations": "Annotations",
+      "architecture": "Architecture",
+      "modules": "Modules",
+      "principles": "Principles",
+      "api": "API Reference",
+      "roadmap": "Roadmap"
+    }
   }
 }

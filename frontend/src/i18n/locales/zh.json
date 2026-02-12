@@ -21,7 +21,8 @@
     "login": "登录",
     "admin": "管理面板",
     "logout": "退出登录",
-    "goHome": "返回首页"
+    "goHome": "返回首页",
+    "devControl": "开发控制"
   },
   "landing": {
     "hero": {
@@ -209,7 +210,8 @@
       "pinpanclub": "乒乓球俱乐部 - 比赛、球员和锦标赛",
       "roles": "管理用户角色和系统权限",
       "admin": "配置您的网站和自定义选项",
-      "integrations": "连接外部服务"
+      "integrations": "连接外部服务",
+      "devcontrol": "架构、API参考、路线图和开发注释"
     }
   },
   "common": {
@@ -2205,5 +2207,15 @@
     "viewPlans": "查看套餐",
     "subscribe": "订阅",
     "learnMore": "了解更多"
+  },
+  "devControl": {
+    "tabs": {
+      "annotations": "注释",
+      "architecture": "架构",
+      "modules": "模块",
+      "principles": "原则",
+      "api": "API参考",
+      "roadmap": "路线图"
+    }
   }
 }

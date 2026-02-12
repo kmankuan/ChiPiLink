@@ -21,7 +21,8 @@
     "login": "Iniciar Sesión",
     "admin": "Panel Admin",
     "logout": "Cerrar Sesión",
-    "goHome": "Ir al Inicio"
+    "goHome": "Ir al Inicio",
+    "devControl": "Control Dev"
   },
   "landing": {
     "hero": {
@@ -209,7 +210,8 @@
       "pinpanclub": "Club de Tenis de Mesa - Partidos, jugadores y torneos",
       "roles": "Gestiona roles de usuario y permisos del sistema",
       "admin": "Configura tu sitio y personalización",
-      "integrations": "Conecta con servicios externos"
+      "integrations": "Conecta con servicios externos",
+      "devcontrol": "Arquitectura, referencia API, hoja de ruta y anotaciones de desarrollo"
     }
   },
   "common": {
@@ -2209,5 +2211,15 @@
     "inlineEditHint": "Haz clic en una celda para editar",
     "enterKey": "Ingresa una clave",
     "quickEdit": "Edición Rápida"
+  },
+  "devControl": {
+    "tabs": {
+      "annotations": "Anotaciones",
+      "architecture": "Arquitectura",
+      "modules": "Modulos",
+      "principles": "Principios",
+      "api": "Referencia API",
+      "roadmap": "Hoja de Ruta"
+    }
   }
 }
