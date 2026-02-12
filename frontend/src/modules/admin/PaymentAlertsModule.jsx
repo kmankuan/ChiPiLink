@@ -373,6 +373,10 @@ function SettingsTab() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [gmailStatus, setGmailStatus] = useState(null);
+  const [checkingGmail, setCheckingGmail] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
 
   useEffect(() => { axios.get(`${API}/api/wallet-topups/settings`, { headers: hdrs() }).then(r => setSettings(r.data)).catch(() => setSettings({})).finally(() => setLoading(false)); }, []);
 
@@ -386,6 +390,29 @@ function SettingsTab() {
     finally { setSaving(false); }
   };
 
+  const checkGmail = async () => {
+    setCheckingGmail(true);
+    try {
+      const r = await axios.get(`${API}/api/wallet-topups/gmail/status`, { headers: hdrs() });
+      setGmailStatus(r.data);
+      if (r.data.connected) toast.success(`Gmail connected: ${r.data.email}`);
+      else toast.error(r.data.error || 'Connection failed');
+    } catch (e) { toast.error(e.response?.data?.detail || 'Failed'); }
+    finally { setCheckingGmail(false); }
+  };
+
+  const scanNow = async () => {
+    setScanning(true);
+    setScanResult(null);
+    try {
+      const r = await axios.post(`${API}/api/wallet-topups/gmail/process`, { limit: 20 }, { headers: hdrs() });
+      setScanResult(r.data);
+      if (r.data.created > 0) toast.success(`Found ${r.data.created} new payment(s)!`);
+      else toast.info(`Scanned ${r.data.processed} emails, no new payments found`);
+    } catch (e) { toast.error(e.response?.data?.detail || 'Scan failed'); }
+    finally { setScanning(false); }
+  };
+
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!settings) return null;
 
@@ -396,20 +423,65 @@ function SettingsTab() {
         <CardHeader className="py-3 px-4">
           <CardTitle className="text-sm flex items-center gap-2"><Mail className="h-4 w-4 text-red-500" /> Gmail Connection</CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-3">
-          {settings.gmail_connected ? (
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
-              <span className="text-sm">Connected: {settings.gmail_email}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
-              <div>
-                <p className="text-sm font-medium">Gmail not connected</p>
-                <p className="text-xs text-muted-foreground">Google OAuth setup required. Contact your developer to configure Gmail API credentials.</p>
+        <CardContent className="px-4 pb-3 space-y-3">
+          <div className="flex items-center gap-3">
+            {gmailStatus?.connected || settings.gmail_connected ? (
+              <div className="flex items-center gap-2 flex-1">
+                <CheckCircle className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm font-medium">Connected: {gmailStatus?.email || settings.gmail_email}</span>
+                {gmailStatus?.total_emails !== undefined && <Badge variant="outline" className="text-[10px]">{gmailStatus.total_emails} emails in inbox</Badge>}
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-1">
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                <span className="text-sm">Not connected yet</span>
+              </div>
+            )}
+            <Button size="sm" variant="outline" onClick={checkGmail} disabled={checkingGmail} className="text-xs h-8" data-testid="check-gmail-btn">
+              {checkingGmail ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <RefreshCw className="h-3 w-3 mr-1" />}
+              Test Connection
+            </Button>
+          </div>
+          {gmailStatus?.error && <p className="text-xs text-red-600">{gmailStatus.error}</p>}
+        </CardContent>
+      </Card>
+
+      {/* Scan Now */}
+      <Card>
+        <CardHeader className="py-3 px-4">
+          <CardTitle className="text-sm flex items-center gap-2"><Play className="h-4 w-4 text-emerald-500" /> Scan Emails Now</CardTitle>
+          <p className="text-xs text-muted-foreground">Manually trigger email scan — fetches recent emails, parses with AI, applies rules</p>
+        </CardHeader>
+        <CardContent className="px-4 pb-3 space-y-3">
+          <Button onClick={scanNow} disabled={scanning} data-testid="scan-now-btn">
+            {scanning ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Mail className="h-4 w-4 mr-1" />}
+            {scanning ? 'Scanning...' : 'Scan Gmail Inbox'}
+          </Button>
+          {scanResult && (
+            <Card className="bg-muted/30">
+              <CardContent className="p-3">
+                <div className="flex gap-4 text-xs mb-2">
+                  <span>Processed: <strong>{scanResult.processed}</strong></span>
+                  <span className="text-emerald-600">Created: <strong>{scanResult.created}</strong></span>
+                  <span className="text-muted-foreground">Skipped: <strong>{scanResult.skipped}</strong></span>
+                  <span className="text-red-600">Rejected: <strong>{scanResult.rejected}</strong></span>
+                  {scanResult.errors > 0 && <span className="text-amber-600">Errors: <strong>{scanResult.errors}</strong></span>}
+                </div>
+                {scanResult.details?.length > 0 && (
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {scanResult.details.map((d, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[10px] py-0.5">
+                        <Badge variant="outline" className={`text-[9px] w-14 justify-center ${d.result === 'created' ? 'border-emerald-300 text-emerald-700' : d.result === 'rejected' ? 'border-red-300 text-red-700' : 'border-slate-300 text-slate-600'}`}>
+                          {d.result}
+                        </Badge>
+                        <span className="truncate flex-1">{d.subject || '(no subject)'}</span>
+                        {d.reason && <span className="text-muted-foreground truncate max-w-40">{d.reason}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </CardContent>
       </Card>
@@ -422,9 +494,9 @@ function SettingsTab() {
         <CardContent className="px-4 pb-3 space-y-3">
           <div className="flex gap-3">
             {[
-              { value: 'realtime', label: 'Real-time', desc: 'Push notifications (recommended)' },
+              { value: 'realtime', label: 'Real-time', desc: 'Push notifications (coming soon)' },
               { value: 'polling', label: 'Polling', desc: 'Check at intervals' },
-              { value: 'manual', label: 'Manual', desc: 'Only process on demand' },
+              { value: 'manual', label: 'Manual', desc: 'Only scan on demand' },
             ].map(opt => (
               <label key={opt.value} className={`flex-1 p-3 border rounded-lg cursor-pointer transition-colors ${settings.polling_mode === opt.value ? 'border-primary bg-primary/5' : 'hover:bg-accent/30'}`}>
                 <input type="radio" name="polling_mode" value={opt.value} checked={settings.polling_mode === opt.value} onChange={e => setSettings(s => ({ ...s, polling_mode: e.target.value }))} className="sr-only" />
@@ -471,6 +543,49 @@ function SettingsTab() {
           Save Settings
         </Button>
       </div>
+    </div>
+  );
+}
+
+// ─── Processing Log Tab ─────────────────────────────────────
+function ProcessingLogTab() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { axios.get(`${API}/api/wallet-topups/gmail/processed?limit=50`, { headers: hdrs() }).then(r => setItems(r.data.items)).catch(() => setItems([])).finally(() => setLoading(false)); }, []);
+
+  if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
+
+  const resultBadge = (r) => {
+    const styles = {
+      created_pending: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400',
+      rejected_by_rules: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400',
+      skipped_not_transaction: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+    };
+    return <Badge className={`text-[9px] ${styles[r] || ''}`}>{r?.replace(/_/g, ' ')}</Badge>;
+  };
+
+  return (
+    <div className="space-y-2" data-testid="processing-log">
+      <p className="text-xs text-muted-foreground">{items.length} processed emails</p>
+      {items.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">No emails processed yet. Use "Scan Gmail Inbox" in Settings to start.</div>}
+      {items.map((item, i) => (
+        <Card key={i}>
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              {resultBadge(item.result)}
+              <span className="text-xs text-muted-foreground">{new Date(item.processed_at).toLocaleString()}</span>
+              {item.reason && <span className="text-[10px] text-muted-foreground">- {item.reason}</span>}
+            </div>
+            {item.parsed_data && (
+              <div className="text-[10px] text-muted-foreground mt-1">
+                {item.parsed_data.amount > 0 && <span className="mr-3">Amount: ${item.parsed_data.amount}</span>}
+                {item.parsed_data.sender_name && <span className="mr-3">From: {item.parsed_data.sender_name}</span>}
+                {item.parsed_data.confidence > 0 && <span>Confidence: {item.parsed_data.confidence}%</span>}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
