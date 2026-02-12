@@ -148,15 +148,15 @@ export default function BentoGridLanding({ communityData, moduleStatuses }) {
       <div className="rounded-2xl border border-border/50 overflow-hidden">
         <PinPanClubFeedBlock
           config={{
-            titulo: { es: 'Actividad del Club', en: 'Club Activity' },
-            subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub' },
+            titulo: { es: 'Actividad del Club', en: 'Club Activity', zh: '俱乐部动态' },
+            subtitulo: { es: 'Lo último en PinPanClub', en: 'Latest from PinPanClub', zh: 'PinPanClub最新动态' },
             sections: {
               recent_matches: { enabled: true, limit: 5 },
               leaderboard: { enabled: true, limit: 10 },
               active_challenges: { enabled: true, limit: 4 },
               recent_achievements: { enabled: true, limit: 6 },
             },
-            style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub' }, cta_url: '/pinpanclub' },
+            style: { show_cta: true, cta_text: { es: 'Ver más en PinPanClub', en: 'See more in PinPanClub', zh: '查看PinPanClub更多' }, cta_url: '/pinpanclub' },
           }}
         />
       </div>
