@@ -2169,7 +2169,10 @@
     "noMissingKeys": "¡Todas las claves están traducidas!",
     "missingKeysFor": "Claves faltantes para",
     "copyKey": "Copiar Clave",
-    "keyCopied": "Clave copiada al portapapeles"
+    "keyCopied": "Clave copiada al portapapeles",
+    "autoTranslate": "Auto-traducir",
+    "autoTranslateSuccess": "Traducidas {{count}} de {{total}} claves faltantes",
+    "autoTranslating": "La IA está traduciendo..."
   },
   "translationsMgmt": {
     "title": "Gestión de Traducciones",

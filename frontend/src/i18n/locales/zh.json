@@ -1936,7 +1936,10 @@
     "noMissingKeys": "所有键都已翻译！",
     "missingKeysFor": "缺失的键",
     "copyKey": "复制键",
-    "keyCopied": "键已复制到剪贴板"
+    "keyCopied": "键已复制到剪贴板",
+    "autoTranslate": "自动翻译",
+    "autoTranslateSuccess": "已翻译 {{count}}/{{total}} 个缺失键",
+    "autoTranslating": "AI 正在翻译..."
   },
   "translationsMgmt": {
     "title": "翻译管理",

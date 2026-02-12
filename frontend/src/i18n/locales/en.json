@@ -2165,7 +2165,10 @@
     "noMissingKeys": "All keys are translated!",
     "missingKeysFor": "Missing Keys for",
     "copyKey": "Copy Key",
-    "keyCopied": "Key copied to clipboard"
+    "keyCopied": "Key copied to clipboard",
+    "autoTranslate": "Auto-translate",
+    "autoTranslateSuccess": "Translated {{count}} of {{total}} missing keys",
+    "autoTranslating": "AI is translating..."
   },
   "translationsMgmt": {
     "title": "Translation Management",
