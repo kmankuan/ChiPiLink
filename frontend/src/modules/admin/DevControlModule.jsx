@@ -335,6 +335,7 @@ function ChangesLogTab() {
   };
   if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
   if (!data) return null;
+  if (data.available === false) return <NotAvailableBanner message={data.reason || 'Git history not available in this environment'} />;
   const statusLabel = { A: 'Added', M: 'Modified', D: 'Deleted', R: 'Renamed' };
   const statusColor = { A: 'text-emerald-600', M: 'text-amber-600', D: 'text-red-600', R: 'text-sky-600' };
   return (
