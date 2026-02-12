@@ -133,7 +133,7 @@ export default function AdminWalletTab({ token }) {
           <CardContent className="p-4 flex items-center gap-3">
             <Users className="h-8 w-8 text-blue-500" />
             <div>
-              <p className="text-sm text-muted-foreground">Total Users</p>
+              <p className="text-sm text-muted-foreground">{t("common.users")}</p>
               <p className="text-2xl font-bold" data-testid="total-users-stat">{stats.totalUsers}</p>
             </div>
           </CardContent>
@@ -142,7 +142,7 @@ export default function AdminWalletTab({ token }) {
           <CardContent className="p-4 flex items-center gap-3">
             <DollarSign className="h-8 w-8 text-green-500" />
             <div>
-              <p className="text-sm text-muted-foreground">Total Balance</p>
+              <p className="text-sm text-muted-foreground">{t("common.totalBalance")}</p>
               <p className="text-2xl font-bold" data-testid="total-balance-stat">${stats.totalBalance.toFixed(2)}</p>
             </div>
           </CardContent>
@@ -151,7 +151,7 @@ export default function AdminWalletTab({ token }) {
           <CardContent className="p-4 flex items-center gap-3">
             <TrendingUp className="h-8 w-8 text-purple-500" />
             <div>
-              <p className="text-sm text-muted-foreground">With Balance</p>
+              <p className="text-sm text-muted-foreground">{t("common.withBalance")}</p>
               <p className="text-2xl font-bold" data-testid="users-with-balance-stat">{stats.usersWithBalance}</p>
             </div>
           </CardContent>
@@ -185,12 +185,12 @@ export default function AdminWalletTab({ token }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
+                <TableHead>{t("common.users")}</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead className="text-right">Balance</TableHead>
-                <TableHead className="text-right">Total Deposited</TableHead>
-                <TableHead className="text-right">Total Spent</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="text-right">{t("common.balance")}</TableHead>
+                <TableHead className="text-right">{t("common.totalDeposited")}</TableHead>
+                <TableHead className="text-right">{t("common.totalSpent")}</TableHead>
+                <TableHead className="text-center">{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

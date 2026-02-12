@@ -168,15 +168,15 @@ export default function WalletOverviewTab() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card><CardContent className="p-4 flex items-center gap-3">
           <Users className="h-8 w-8 text-blue-600 shrink-0" />
-          <div><p className="text-xs text-muted-foreground">Total Users</p><p className="text-2xl font-bold">{stats.totalUsers}</p></div>
+          <div><p className="text-xs text-muted-foreground">{t("common.users")}</p><p className="text-2xl font-bold">{stats.totalUsers}</p></div>
         </CardContent></Card>
         <Card><CardContent className="p-4 flex items-center gap-3">
           <DollarSign className="h-8 w-8 text-green-600 shrink-0" />
-          <div><p className="text-xs text-muted-foreground">Total Balance</p><p className="text-2xl font-bold">${stats.totalBalance.toFixed(2)}</p></div>
+          <div><p className="text-xs text-muted-foreground">{t("common.totalBalance")}</p><p className="text-2xl font-bold">${stats.totalBalance.toFixed(2)}</p></div>
         </CardContent></Card>
         <Card><CardContent className="p-4 flex items-center gap-3">
           <TrendingUp className="h-8 w-8 text-purple-600 shrink-0" />
-          <div><p className="text-xs text-muted-foreground">With Balance</p><p className="text-2xl font-bold">{stats.usersWithBalance}</p></div>
+          <div><p className="text-xs text-muted-foreground">{t("common.withBalance")}</p><p className="text-2xl font-bold">{stats.usersWithBalance}</p></div>
         </CardContent></Card>
       </div>
 
@@ -204,12 +204,12 @@ export default function WalletOverviewTab() {
                   ref={(el) => { if (el) el.dataset.indeterminate = selection.someSelected; }}
                   data-testid="select-all-users" />
               </TableHead>
-              <TableHead>User</TableHead>
+              <TableHead>{t("common.users")}</TableHead>
               <TableHead className="hidden sm:table-cell">Email</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
-              <TableHead className="text-right hidden md:table-cell">Deposited</TableHead>
-              <TableHead className="text-right hidden md:table-cell">Spent</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
+              <TableHead className="text-right">{t("common.balance")}</TableHead>
+              <TableHead className="text-right hidden md:table-cell">{t("common.totalDeposited")}</TableHead>
+              <TableHead className="text-right hidden md:table-cell">{t("common.totalSpent")}</TableHead>
+              <TableHead className="text-center">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -223,7 +223,7 @@ export default function WalletOverviewTab() {
                 <TableCell className="font-medium">
                   <div>{user.name || 'N/A'}</div>
                   <div className="text-xs text-muted-foreground sm:hidden">{user.email}</div>
-                  {user.archived && <Badge variant="outline" className="mt-0.5 text-[10px]">Archived</Badge>}
+                  {user.archived && <Badge variant="outline" className="mt-0.5 text-[10px]">{t("common.archived")}</Badge>}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{user.email}</TableCell>
                 <TableCell className="text-right">
@@ -237,11 +237,11 @@ export default function WalletOverviewTab() {
                   <div className="flex items-center justify-center gap-1">
                     <Button variant="outline" size="sm" className="gap-1 text-green-700 border-green-300 hover:bg-green-50"
                       onClick={() => setAdjustDialog({ user, action: 'topup' })} data-testid={`topup-btn-${user.user_id}`}>
-                      <ArrowUpCircle className="h-3 w-3" /> <span className="hidden sm:inline">Top Up</span>
+                      <ArrowUpCircle className="h-3 w-3" /> <span className="hidden sm:inline">{t("common.topUp")}</span>
                     </Button>
                     <Button variant="outline" size="sm" className="gap-1 text-red-700 border-red-300 hover:bg-red-50"
                       onClick={() => setAdjustDialog({ user, action: 'deduct' })} data-testid={`deduct-btn-${user.user_id}`}>
-                      <ArrowDownCircle className="h-3 w-3" /> <span className="hidden sm:inline">Deduct</span>
+                      <ArrowDownCircle className="h-3 w-3" /> <span className="hidden sm:inline">{t("common.deduct")}</span>
                     </Button>
                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
                       onClick={() => handleSingleDelete(user)} data-testid={`delete-btn-${user.user_id}`}>
@@ -252,7 +252,7 @@ export default function WalletOverviewTab() {
               </TableRow>
             ))}
             {pageItems.length === 0 && (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No users found</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{t("common.noUsersFound")}</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
@@ -299,7 +299,7 @@ export default function WalletOverviewTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAdjustDialog(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAdjustDialog(null)}>{t("common.cancel")}</Button>
             <Button onClick={handleAdjust} disabled={adjusting || !adjustAmount}
               variant={adjustDialog?.action === 'topup' ? 'default' : 'destructive'}
               data-testid="confirm-adjust-btn">
