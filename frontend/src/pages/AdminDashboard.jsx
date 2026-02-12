@@ -369,6 +369,7 @@ export default function AdminDashboard() {
                     {activeModule === 'roles' && t('admin.moduleDesc.roles', 'Manage user roles and system permissions')}
                     {activeModule === 'admin' && t('admin.moduleDesc.admin', 'Configure your site and customization')}
                     {activeModule === 'integrations' && t('admin.moduleDesc.integrations', 'Connect with external services')}
+                    {activeModule === 'devcontrol' && t('admin.moduleDesc.devcontrol', 'Architecture, API reference, roadmap & dev annotations')}
                   </p>
                 </div>
                 {role && (
