@@ -395,7 +395,7 @@ export default function FloatingStoreNav({
                 <Input
                   ref={inputRef}
                   type="text"
-                  placeholder="Buscar productos..."
+                  placeholder={t("common.searchProducts")}
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
                   className="h-9 pl-8 pr-3 text-sm rounded-full"
