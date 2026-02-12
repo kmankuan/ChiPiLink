@@ -280,6 +280,79 @@ async def admin_export_translations(
     
     return result
 
+@router.get("/admin/coverage")
+async def admin_translation_coverage(admin = Depends(lambda: get_admin_user)):
+    """Analyze translation coverage across all locale files"""
+    import os
+
+    base_path = "/app/frontend/src/i18n/locales"
+
+    def flatten_dict(d, parent_key=''):
+        items = []
+        for k, v in d.items():
+            new_key = f"{parent_key}.{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(flatten_dict(v, new_key))
+            else:
+                items.append((new_key, str(v)))
+        return items
+
+    locale_keys = {}
+    locale_counts = {}
+    for lang in ["en", "es", "zh"]:
+        file_path = f"{base_path}/{lang}.json"
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            flat = flatten_dict(data)
+            locale_keys[lang] = {k for k, v in flat if v.strip()}
+            locale_counts[lang] = len(flat)
+        else:
+            locale_keys[lang] = set()
+            locale_counts[lang] = 0
+
+    # Use EN as the reference (source of truth)
+    all_keys = set()
+    for keys in locale_keys.values():
+        all_keys.update(keys)
+    reference_keys = locale_keys.get("en", all_keys)
+
+    # Per-language analysis
+    languages = {}
+    for lang in ["en", "es", "zh"]:
+        present = locale_keys.get(lang, set())
+        missing = sorted(reference_keys - present)
+        extra = sorted(present - reference_keys)
+        total_ref = len(reference_keys) if reference_keys else 1
+        pct = round(len(present & reference_keys) / total_ref * 100, 1)
+        languages[lang] = {
+            "total_keys": locale_counts.get(lang, 0),
+            "translated": len(present & reference_keys),
+            "missing_count": len(missing),
+            "missing_keys": missing[:100],
+            "extra_count": len(extra),
+            "coverage_pct": pct,
+        }
+
+    # Category breakdown (group by first segment of dot-notation key)
+    categories = {}
+    for key in reference_keys:
+        cat = key.split(".")[0] if "." in key else "general"
+        if cat not in categories:
+            categories[cat] = {"total": 0, "en": 0, "es": 0, "zh": 0}
+        categories[cat]["total"] += 1
+        for lang in ["en", "es", "zh"]:
+            if key in locale_keys.get(lang, set()):
+                categories[cat][lang] += 1
+
+    return {
+        "reference_lang": "en",
+        "total_reference_keys": len(reference_keys),
+        "languages": languages,
+        "categories": dict(sorted(categories.items())),
+    }
+
+
 @router.post("/admin/sync-from-files")
 async def admin_sync_from_files(admin = Depends(lambda: get_admin_user)):
     """Sync translations from JSON files to database (admin)"""
