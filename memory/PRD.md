@@ -1,59 +1,49 @@
 # ChiPi Link - PRD
 
 ## Original Problem Statement
-Build a comprehensive wallet system with Monday.com integration, Telegram community feed, and admin tools for ChiPi Link community platform. Full 2-way synchronization with "Chipi Wallet" Monday.com board.
+Build a comprehensive admin dashboard for the "Chipi Wallet" application with:
+1. Full 2-Way Monday.com Sync (wallet, users, transactions)
+2. Admin table consistency (mobile-first, search, filters, pagination, bulk actions)
+3. Full Internationalization (EN/ES/ZH)
+4. AI-driven bank alert parsing via Monday.com
 
-## Engineering Principles (Core Rules)
-1. **English codebase** — all code, comments, variable names in English
-2. **i18n as core feature** — all UI strings externalized via react-i18next, support EN/ES/ZH
-3. **Table consistency** — all admin data tables MUST have: search, bulk select, archive, pagination, mobile-responsive columns
-4. **Mobile-first** — responsive design is the default, not optional
-5. **No redundancy** — don't build features that duplicate existing capabilities
+## User Personas
+- **Admin**: Manages wallets, users, orders, roles, integrations, site config
+- **Parent/Guardian (Acudido)**: Links students, places textbook orders, manages wallet
+- **Student**: Views catalog, uses wallet for purchases
+
+## Core Requirements
+- All code and agent communication in English
+- App UI supports EN, ES, ZH (react-i18next)
+- Mobile-first responsive design
+- Consistent table patterns across admin
 
 ## What's Been Implemented
 
-### i18n Full Rollout (Feb 12) ✅
-- react-i18next with EN/ES/ZH locale files (~1400+ lines each)
-- Language switcher added to admin header (LanguageSelector component)
-- WalletModule fully translated (tabs, labels)
-- 78/123 modules with i18n hooks, with translation keys for common, wallet, admin, store, nav
-- Infrastructure ready for incremental rollout to remaining modules
+### Completed (P0)
+- **2-Way Monday.com Wallet Sync**: User creation, transaction logging, webhook processing, idempotency
+- **Monday.com Sync Dashboard**: UI + API for monitoring sync status, logs, manual re-sync
+- **Admin Table Consistency Refactor**: All major admin tables standardized (mobile-first, pagination, bulk actions)
+- **Redundant Bank Alert Parser Removal**: Cleaned from frontend and backend
+- **P0 i18n Full Rollout (95%+ coverage)**: 
+  - 163/180 frontend files now use `useTranslation` hook
+  - 2100+ translation keys in each locale file (en.json, es.json, zh.json)
+  - Admin sidebar navigation, all admin modules, shared components, toast messages, page titles all translated
+  - Language selector in admin header works across EN/ES/ZH
+  - Remaining 7 files are utility/callback/third-party components with no translatable UI
 
-### Table Consistency + Mobile-First (Feb 12) ✅
-**Shared infrastructure:**
-- `AdminTableToolbar` — search, archive toggle, refresh, count badge
-- `TablePagination` — page size selector, prev/next, item count
-- `usePagination` hook — client-side pagination
-
-**Applied to ALL admin data tables:**
-- Wallet Overview: pagination + mobile + i18n
-- Wallet Transactions: consistent toolbar + pagination + mobile
-- Textbook Orders: pagination + mobile column hiding
-- All Students: pagination + mobile column hiding
-- Inventory: pagination + mobile column hiding
-- Private Catalog (PCA): pagination (50/page)
-- Public Catalog: bulk select + pagination + mobile
-- Schools Management: search + mobile
-- Student Requests: pagination + mobile (card view on small screens)
-
-### 2-Way Monday.com Wallet Sync (Feb 12) ✅
-- App → Monday.com: registration creates parent item, transactions create subitems
-- Monday.com → App: webhook processes subitems, idempotent via DB tracking
-- Sync Dashboard: admin panel with stats, linked users, re-sync, event timeline
-
-### Wallet System (DONE) ✅
-- Full CRUD: deposit, charge, transfer, points
-- Admin panel: Overview, Transactions, Bank Info, Settings
-- Customizable transaction descriptions, delete user
-
-### Global Table Enhancement (Feb 11) ✅
-- Reusable useTableSelection hook, BulkActionBar, ConfirmDialog
-
-### Telegram Community Feed (DONE) ✅
+### Architecture
+- **Backend**: FastAPI, SQLAlchemy, MongoDB
+- **Frontend**: React, Shadcn/UI, TanStack Table, react-i18next
+- **Integrations**: Monday.com (GraphQL + Webhooks), Telegram Bot API
 
 ## Prioritized Backlog
-- P0: Continue i18n rollout to remaining 45 modules (incremental, as modules are edited)
-- P1: Telegram feed visibility configuration
-- P1: Transaction history view for clients in widget
-- P2: Wallet balance notifications
-- P3: sync-all endpoint fix
+
+### P1 - Upcoming
+- Guide Monday.com AI Parser Setup (documentation for user)
+- Telegram Feed Visibility Controls (admin role-based settings)
+
+### P2 - Future
+- Transaction history view for clients in widget
+- Wallet balance notifications
+- sync-all endpoint fix
