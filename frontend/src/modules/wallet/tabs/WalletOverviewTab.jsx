@@ -24,8 +24,11 @@ import {
   RefreshCw, DollarSign, Users, TrendingUp, Trash2, Archive
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
+import { usePagination } from '@/hooks/usePagination';
 import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { AdminTableToolbar } from '@/components/shared/AdminTableToolbar';
+import { TablePagination } from '@/components/shared/TablePagination';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
