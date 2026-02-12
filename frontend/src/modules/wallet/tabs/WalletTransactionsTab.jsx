@@ -35,7 +35,6 @@ export default function WalletTransactionsTab() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [page, setPage] = useState(1);
   const [showArchived, setShowArchived] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
