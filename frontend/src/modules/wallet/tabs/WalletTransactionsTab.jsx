@@ -95,15 +95,20 @@ export default function WalletTransactionsTab() {
 
   return (
     <div className="space-y-4">
-      {/* Controls */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search by user, email, or description..." className="pl-8" data-testid="txn-search" />
-        </div>
-        <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setPage(1); }}>
-          <SelectTrigger className="w-[140px]" data-testid="txn-type-filter">
+      {/* Toolbar */}
+      <AdminTableToolbar
+        search={search}
+        onSearchChange={setSearch}
+        placeholder="Search by user, email, or description..."
+        totalCount={transactions.length}
+        filteredCount={filtered.length}
+        showArchived={showArchived}
+        onToggleArchived={() => setShowArchived(!showArchived)}
+        onRefresh={fetchTransactions}
+        loading={loading}
+      >
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-[120px] h-9 text-xs" data-testid="txn-type-filter">
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
@@ -112,19 +117,10 @@ export default function WalletTransactionsTab() {
             <SelectItem value="charge">Charges</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant={showArchived ? "default" : "outline"} size="sm" className="gap-1.5"
-          onClick={() => setShowArchived(!showArchived)} data-testid="toggle-archived-txns">
-          <Archive className="h-3.5 w-3.5" /> {showArchived ? 'Hide' : 'Show'} Archived
-        </Button>
-        <Button variant="outline" size="icon" onClick={fetchTransactions} data-testid="refresh-txns">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </div>
-
-      <p className="text-xs text-muted-foreground">{filtered.length} transaction(s) found</p>
+      </AdminTableToolbar>
 
       {/* Table */}
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -133,12 +129,12 @@ export default function WalletTransactionsTab() {
                   onCheckedChange={selection.toggleAll}
                   data-testid="select-all-txns" />
               </TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden sm:table-cell">Date</TableHead>
               <TableHead>User</TableHead>
               <TableHead>Type</TableHead>
               <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="hidden md:table-cell">Description</TableHead>
+              <TableHead className="hidden sm:table-cell">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,13 +144,14 @@ export default function WalletTransactionsTab() {
                   <Checkbox checked={selection.isSelected(tx.transaction_id)}
                     onCheckedChange={() => selection.toggle(tx.transaction_id)} />
                 </TableCell>
-                <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                <TableCell className="text-xs text-muted-foreground whitespace-nowrap hidden sm:table-cell">
                   {formatDate(tx.created_at || tx.completed_at)}
                 </TableCell>
                 <TableCell>
                   <div>
                     <p className="text-sm font-medium">{tx.user_name || 'N/A'}</p>
                     <p className="text-[11px] text-muted-foreground">{tx.user_email}</p>
+                    <p className="text-[10px] text-muted-foreground sm:hidden">{formatDate(tx.created_at || tx.completed_at)}</p>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -172,8 +169,8 @@ export default function WalletTransactionsTab() {
                 }`}>
                   {tx.transaction_type === 'deposit' ? '+' : '-'}${(tx.amount || 0).toFixed(2)}
                 </TableCell>
-                <TableCell className="text-sm max-w-[200px] truncate">{tx.description || '—'}</TableCell>
-                <TableCell>
+                <TableCell className="text-sm max-w-[200px] truncate hidden md:table-cell">{tx.description || '\u2014'}</TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge variant="outline" className="text-[10px]">{tx.status || 'completed'}</Badge>
                 </TableCell>
               </TableRow>
@@ -186,15 +183,11 @@ export default function WalletTransactionsTab() {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Page {page} of {totalPages}</span>
-          <div className="flex gap-1">
-            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</Button>
-            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
-          </div>
-        </div>
-      )}
+      <TablePagination
+        page={pagination.page} totalPages={pagination.totalPages} totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize} onPageChange={pagination.setPage} onPageSizeChange={pagination.setPageSize}
+        canPrev={pagination.canPrev} canNext={pagination.canNext}
+      />
 
       {/* Bulk Action Bar — Archive only (no delete for financial records) */}
       <BulkActionBar count={selection.count} onClear={selection.clear}
