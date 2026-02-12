@@ -103,6 +103,21 @@ export default function TranslationCoverageCard() {
     setEditValue('');
   };
 
+  const autoTranslate = async (lang) => {
+    setTranslating(true);
+    try {
+      const res = await api.post(`/translations/admin/auto-translate?target_lang=${lang}`);
+      const { translated, total_missing } = res.data;
+      toast.success(t('translations.autoTranslateSuccess', { count: translated, total: total_missing }));
+      fetchCoverage();
+      setMissingDialog(prev => ({ ...prev, open: false }));
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || t('common.error'));
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const saveQuickEdit = async () => {
     if (!editingKey || !missingDialog.lang) return;
     setSavingEdit(true);
