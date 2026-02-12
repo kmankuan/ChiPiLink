@@ -1098,7 +1098,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             </CardHeader>
             <CardContent className="p-0 overflow-hidden">
               <div className="scrollable-table-container h-[500px]" style={{ maxWidth: '100%', width: '100%' }} data-testid="pca-table-scroll-container">
-                <CatalogTable products={sortedProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
+                <CatalogTable products={pageProducts} columns={activeColumns} columnWidths={columnWidths} onResize={handleColumnResize}
                   sortConfig={sortConfig} onSort={handleSort} selectedIds={selectedIds}
                   onToggleSelect={toggleSelect} onToggleAll={toggleAll}
                   updateProductField={updateProductField} onDelete={isArchiveView ? handlePermanentDelete : handleArchive}
