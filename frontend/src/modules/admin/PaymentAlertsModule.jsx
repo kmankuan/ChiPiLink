@@ -613,6 +613,11 @@ export default function PaymentAlertsModule() {
             <span className="hidden sm:inline">{t('paymentAlerts.tabs.settings', 'Settings')}</span>
             <span className="sm:hidden">Config</span>
           </TabsTrigger>
+          <TabsTrigger value="log" className="gap-1.5 text-xs" data-testid="tab-log">
+            <FileText className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{t('paymentAlerts.tabs.log', 'Processing Log')}</span>
+            <span className="sm:hidden">Log</span>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="pending"><PendingQueueTab /></TabsContent>
         <TabsContent value="rules"><RulesConfigTab /></TabsContent>
