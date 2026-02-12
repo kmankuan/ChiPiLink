@@ -219,7 +219,7 @@ function AnnotationsTab() {
   const [form, setForm] = useState({ title: '', content: '', category: 'general', pinned: false });
   const [filterCat, setFilterCat] = useState('all');
   const [search, setSearch] = useState('');
-  const fetch_ = useCallback(() => { setLoading(true); axios.get(`${API}/api/dev-control/annotations`, { headers: hdrs() }).then(r => setAnnotations(r.data.annotations)).catch(() => toast.error('Failed')).finally(() => setLoading(false)); }, []);
+  const fetch_ = useCallback(() => { setLoading(true); axios.get(`${API}/api/dev-control/annotations`, { headers: hdrs() }).then(r => setAnnotations(r.data.annotations)).catch(() => setAnnotations([])).finally(() => setLoading(false)); }, []);
   useEffect(() => { fetch_(); }, [fetch_]);
   const reset = () => { setForm({ title: '', content: '', category: 'general', pinned: false }); setShowForm(false); setEditingId(null); };
   const save = async () => { if (!form.content.trim()) { toast.error('Content required'); return; } try { editingId ? await axios.put(`${API}/api/dev-control/annotations/${editingId}`, form, { headers: hdrs() }) : await axios.post(`${API}/api/dev-control/annotations`, form, { headers: hdrs() }); toast.success(editingId ? 'Updated' : 'Created'); reset(); fetch_(); } catch { toast.error('Failed'); } };
