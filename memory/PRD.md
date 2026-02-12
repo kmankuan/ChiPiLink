@@ -5,59 +5,39 @@ Build a comprehensive wallet system with Monday.com integration, Telegram commun
 
 ## What's Been Implemented
 
+### Sync Dashboard (Feb 12) ✅
+- Admin panel under Integrations > Monday.com > Sync Dashboard tab
+- Real-time stats: linked users, processed transactions, webhook OK/errors/ignored
+- Linked users list with per-user re-sync button
+- Recent webhook events timeline with success/error badges
+- Bulk "Sync All Users" action
+- Backend endpoints: GET sync-dashboard, POST resync-user, POST sync-all-users
+
 ### 2-Way Monday.com Wallet Sync (Feb 12) ✅
 **App → Monday.com:**
-- User registration automatically creates a parent item on the Chipi Wallet board (Name + Email)
-- Wallet transactions (top-up/deduct) create subitems under the user's parent item
-- Subitems include amount, note, date, and status label (Added/Deducted)
-- Uses event bus subscription (`auth.user.registered`) for registration sync
-- Uses `asyncio.create_task()` for non-blocking transaction sync
+- User registration creates parent item on Chipi Wallet board (Name + Email)
+- Wallet transactions (top-up/deduct) create subitems with correct status labels (Added/Deducted)
+- Event bus subscription + asyncio.create_task for non-blocking sync
 
 **Monday.com → App:**
-- Webhook endpoint at `/api/monday/webhooks/incoming` receives Monday.com events
-- Status="Process" on parent item triggers processing of all unprocessed subitems
-- Subitem status "Added" → wallet top-up, "Deducted" → wallet deduction
-- Idempotency via `monday_processed_subitems` DB collection prevents duplicate processing
-- Confirmation update posted as comment on Monday item after processing
+- Webhook processes subitems when parent status = "Process"
+- Idempotency via `monday_processed_subitems` DB collection
+- Confirmation update posted as comment on Monday item
 
-**Key files:**
-- `/app/backend/modules/users/integrations/monday_wallet_adapter.py` - Main adapter
-- `/app/backend/modules/users/routes/wallet.py` - Route-level sync hooks
-- `/app/backend/modules/integrations/monday/webhook_router.py` - Webhook dispatch
-- `/app/backend/modules/integrations/monday/core_client.py` - GraphQL client
+### Global Table Enhancement (Feb 11) ✅
+- Reusable `useTableSelection` hook, `BulkActionBar`, `ConfirmDialog`
+- Applied to: Wallet Overview, Transactions, Orders, Inventory, Students
 
-### Global Table Enhancement (Feb 11)
-Reusable components for consistent table features across all admin modules:
-- `useTableSelection` hook — multi-select with toggle all/single
-- `BulkActionBar` — floating bar with archive/delete actions + count
-- `ConfirmDialog` — reusable confirmation with destructive/warning variants
+### Wallet System (DONE) ✅
+- Full CRUD: deposit, charge, transfer, points
+- Admin panel: Overview, Transactions, Bank Info, Settings
+- Customizable transaction descriptions, delete user functionality
 
-**Applied to:**
-| Module | Multi-Select | Archive | Delete | Search |
-|--------|:-:|:-:|:-:|:-:|
-| Wallet Overview | Yes | Yes | Yes | Yes |
-| Wallet Transactions | Yes | Yes | No | Yes |
-| Textbook Orders | Yes | Yes | No | Yes |
-| Inventory/Products | Yes | Yes | Yes | Yes |
-| All Students | Yes | Yes | No | Yes |
-
-### Wallet System (DONE)
-- Full wallet CRUD: deposit, charge, transfer, points
-- Admin panel: Overview, Transactions, Bank Info, Settings tabs
-- Customizable transaction descriptions (admin-configurable)
-- Delete user functionality
-
-### Monday.com Integration (DONE - 2-Way Sync)
-- Board: Chipi Wallet (18399650704)
-- Parent items = Users, Subitems = Transactions
-- Dual direction: App→Monday + Monday→App
-- Board status labels: Parent (Top Up / Deduct / Stuck), Subitems (Added / Deducted / Stuck)
-
-### Telegram Community Feed (DONE)
+### Telegram Community Feed (DONE) ✅
 - Background polling, feed with likes/comments, media proxy
 
 ## Prioritized Backlog
-- P1: Advanced Bank Transfer Parsing (AI column on Monday.com to parse bank transfer notifications)
+- P1: Advanced Bank Transfer Parsing (AI column on Monday.com)
 - P1: Telegram feed visibility configuration
 - P1: Transaction history view for clients in widget
 - P2: Wallet balance notifications
