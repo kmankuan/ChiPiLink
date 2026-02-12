@@ -163,39 +163,36 @@ export default function WalletOverviewTab() {
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card><CardContent className="p-4 flex items-center gap-3">
-          <Users className="h-8 w-8 text-blue-600" />
+          <Users className="h-8 w-8 text-blue-600 shrink-0" />
           <div><p className="text-xs text-muted-foreground">Total Users</p><p className="text-2xl font-bold">{stats.totalUsers}</p></div>
         </CardContent></Card>
         <Card><CardContent className="p-4 flex items-center gap-3">
-          <DollarSign className="h-8 w-8 text-green-600" />
+          <DollarSign className="h-8 w-8 text-green-600 shrink-0" />
           <div><p className="text-xs text-muted-foreground">Total Balance</p><p className="text-2xl font-bold">${stats.totalBalance.toFixed(2)}</p></div>
         </CardContent></Card>
         <Card><CardContent className="p-4 flex items-center gap-3">
-          <TrendingUp className="h-8 w-8 text-purple-600" />
+          <TrendingUp className="h-8 w-8 text-purple-600 shrink-0" />
           <div><p className="text-xs text-muted-foreground">With Balance</p><p className="text-2xl font-bold">{stats.usersWithBalance}</p></div>
         </CardContent></Card>
       </div>
 
-      {/* Search + Controls */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search users by name or email..." className="pl-8" data-testid="user-search" />
-        </div>
-        <Button variant={showArchived ? "default" : "outline"} size="sm" className="gap-1.5"
-          onClick={() => setShowArchived(!showArchived)} data-testid="toggle-archived">
-          <Archive className="h-3.5 w-3.5" /> {showArchived ? 'Hide' : 'Show'} Archived
-        </Button>
-        <Button variant="outline" size="icon" onClick={fetchUsers} data-testid="refresh-users">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </div>
+      {/* Toolbar */}
+      <AdminTableToolbar
+        search={search}
+        onSearchChange={setSearch}
+        placeholder="Search users by name or email..."
+        totalCount={users.length}
+        filteredCount={filtered.length}
+        showArchived={showArchived}
+        onToggleArchived={() => setShowArchived(!showArchived)}
+        onRefresh={fetchUsers}
+        loading={loading}
+      />
 
       {/* Table */}
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -206,15 +203,15 @@ export default function WalletOverviewTab() {
                   data-testid="select-all-users" />
               </TableHead>
               <TableHead>User</TableHead>
-              <TableHead>Email</TableHead>
+              <TableHead className="hidden sm:table-cell">Email</TableHead>
               <TableHead className="text-right">Balance</TableHead>
-              <TableHead className="text-right">Deposited</TableHead>
-              <TableHead className="text-right">Spent</TableHead>
+              <TableHead className="text-right hidden md:table-cell">Deposited</TableHead>
+              <TableHead className="text-right hidden md:table-cell">Spent</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map(user => (
+            {pageItems.map(user => (
               <TableRow key={user.user_id} className={user.archived ? 'opacity-50' : ''} data-testid={`user-row-${user.user_id}`}>
                 <TableCell>
                   <Checkbox checked={selection.isSelected(user.user_id)}
@@ -222,26 +219,27 @@ export default function WalletOverviewTab() {
                     data-testid={`select-user-${user.user_id}`} />
                 </TableCell>
                 <TableCell className="font-medium">
-                  {user.name || 'N/A'}
-                  {user.archived && <Badge variant="outline" className="ml-2 text-[10px]">Archived</Badge>}
+                  <div>{user.name || 'N/A'}</div>
+                  <div className="text-xs text-muted-foreground sm:hidden">{user.email}</div>
+                  {user.archived && <Badge variant="outline" className="mt-0.5 text-[10px]">Archived</Badge>}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{user.email}</TableCell>
+                <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{user.email}</TableCell>
                 <TableCell className="text-right">
                   <span className={`font-semibold ${(user.balance || 0) > 0 ? 'text-green-600' : ''}`}>
                     ${(user.balance || 0).toFixed(2)}
                   </span>
                 </TableCell>
-                <TableCell className="text-right text-sm">${(user.total_deposited || 0).toFixed(2)}</TableCell>
-                <TableCell className="text-right text-sm">${(user.total_spent || 0).toFixed(2)}</TableCell>
+                <TableCell className="text-right text-sm hidden md:table-cell">${(user.total_deposited || 0).toFixed(2)}</TableCell>
+                <TableCell className="text-right text-sm hidden md:table-cell">${(user.total_spent || 0).toFixed(2)}</TableCell>
                 <TableCell>
                   <div className="flex items-center justify-center gap-1">
                     <Button variant="outline" size="sm" className="gap-1 text-green-700 border-green-300 hover:bg-green-50"
                       onClick={() => setAdjustDialog({ user, action: 'topup' })} data-testid={`topup-btn-${user.user_id}`}>
-                      <ArrowUpCircle className="h-3 w-3" /> Top Up
+                      <ArrowUpCircle className="h-3 w-3" /> <span className="hidden sm:inline">Top Up</span>
                     </Button>
                     <Button variant="outline" size="sm" className="gap-1 text-red-700 border-red-300 hover:bg-red-50"
                       onClick={() => setAdjustDialog({ user, action: 'deduct' })} data-testid={`deduct-btn-${user.user_id}`}>
-                      <ArrowDownCircle className="h-3 w-3" /> Deduct
+                      <ArrowDownCircle className="h-3 w-3" /> <span className="hidden sm:inline">Deduct</span>
                     </Button>
                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-600 hover:bg-red-50"
                       onClick={() => handleSingleDelete(user)} data-testid={`delete-btn-${user.user_id}`}>
@@ -251,12 +249,19 @@ export default function WalletOverviewTab() {
                 </TableCell>
               </TableRow>
             ))}
-            {filtered.length === 0 && (
+            {pageItems.length === 0 && (
               <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No users found</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      <TablePagination
+        page={pagination.page} totalPages={pagination.totalPages} totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize} onPageChange={pagination.setPage} onPageSizeChange={pagination.setPageSize}
+        canPrev={pagination.canPrev} canNext={pagination.canNext}
+      />
 
       {/* Bulk Action Bar */}
       <BulkActionBar count={selection.count} onClear={selection.clear}
