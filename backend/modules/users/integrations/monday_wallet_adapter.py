@@ -313,8 +313,9 @@ class WalletMondayAdapter(BaseMondayAdapter):
             await self._log_event(event, "error", msg)
             return {"status": "error", "detail": msg}
 
-        add_label = status_labels.get("add", "Top Up")
-        deduct_label = status_labels.get("deduct", "Deducted")
+        sub_status_labels = config.get("subitem_status_labels", self.DEFAULT_SUBITEM_STATUS_LABELS)
+        add_label = sub_status_labels.get("add", "Added")
+        deduct_label = sub_status_labels.get("deduct", "Deducted")
         done_label = status_labels.get("done", "Done")
         results = []
 
