@@ -589,7 +589,7 @@ class WalletMondayAdapter(BaseMondayAdapter):
         return match.group(0) if match else value.strip()
 
     # ================================================================
-    # REGISTRATION
+    # REGISTRATION & EVENT HANDLERS
     # ================================================================
 
     async def register_webhooks(self):
@@ -603,6 +603,35 @@ class WalletMondayAdapter(BaseMondayAdapter):
             logger.info(f"Wallet registered webhook for board: {board_id}")
         else:
             logger.warning("Wallet board_id not configured")
+
+    def init_event_handlers(self):
+        """Subscribe to app events for App→Monday.com sync."""
+        from core.events import event_bus, AuthEvents
+        event_bus.subscribe_handler(AuthEvents.USER_REGISTERED, self._on_user_registered)
+        logger.info("[monday_sync] Subscribed to auth.user.registered event")
+
+    async def _on_user_registered(self, event):
+        """Event handler: create Monday.com parent item when user registers."""
+        try:
+            payload = event.payload
+            user_id = payload.get("user_id")
+            email = payload.get("email")
+            name = payload.get("name", "")
+            if user_id and email:
+                await self.sync_user_to_monday(user_id, name, email)
+        except Exception as e:
+            logger.error(f"[monday_sync] Failed to sync new user to Monday.com: {e}")
+
+    async def sync_transaction_if_not_from_monday(
+        self, user_id: str, amount: float, action: str, description: str = "", reference: str = ""
+    ):
+        """Sync a wallet transaction to Monday.com, skipping if it originated from Monday.com."""
+        if reference and "monday_" in reference:
+            return
+        try:
+            await self.sync_transaction_to_monday(user_id, amount, action, description)
+        except Exception as e:
+            logger.error(f"[monday_sync] Background tx sync failed: {e}")
 
 
 # Singleton
