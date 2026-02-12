@@ -591,6 +591,8 @@ async def admin_adjust_wallet(
                 reference_type="admin_adjustment"
             )
         
+        asyncio.create_task(_monday_sync_tx(user_id, data.amount, data.action, desc))
+        
         # Get updated wallet
         wallet = await wallet_service.get_wallet(user_id)
         
