@@ -311,10 +311,15 @@ class WalletMondayAdapter(BaseMondayAdapter):
             await self._log_event(event, "error", msg)
             return {"status": "error", "detail": msg}
 
+        # Get already-processed subitem IDs from DB to avoid re-processing
+        processed_cursor = db.monday_processed_subitems.find(
+            {"parent_item_id": parent_item_id}, {"_id": 0, "subitem_id": 1}
+        )
+        processed_ids = {doc["subitem_id"] async for doc in processed_cursor}
+
         sub_status_labels = config.get("subitem_status_labels", self.DEFAULT_SUBITEM_STATUS_LABELS)
         add_label = sub_status_labels.get("add", "Added")
         deduct_label = sub_status_labels.get("deduct", "Deducted")
-        done_label = status_labels.get("done", "Done")
         results = []
 
         for sub in subitems:
@@ -324,9 +329,10 @@ class WalletMondayAdapter(BaseMondayAdapter):
             sub_id = sub.get("id")
 
             # Skip already processed or non-actionable subitems
-            if sub_event == done_label or (sub_event != add_label and sub_event != deduct_label):
+            if sub_id in processed_ids:
                 continue
-
+            if sub_event != add_label and sub_event != deduct_label:
+                continue
             if not amount or amount == 0:
                 continue
 
