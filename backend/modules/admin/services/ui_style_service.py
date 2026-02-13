@@ -43,6 +43,7 @@ AVAILABLE_LAYOUTS = [
     {"id": "living_grid", "name": "Living Grid", "description": "Bento-style tiles with time greeting, cultural identity — modern dashboard feel", "icon": "layout-grid", "category": "structural"},
     {"id": "cinematic", "name": "Cinematic", "description": "Full-screen dark hero with parallax, bold typography — dramatic editorial", "icon": "film", "category": "structural"},
     {"id": "horizon", "name": "Horizon", "description": "Split-screen hero, horizontal pill nav, warm cream tones — editorial meets app store", "icon": "sunrise", "category": "structural"},
+    {"id": "mosaic_community", "name": "Mosaic Community", "description": "Cultural mosaic grid — no hero, blends ping-pong, chess, kids, Chinese/Panamanian/Christian heritage", "icon": "grid-2x2", "category": "structural"},
     {"id": "storefront", "name": "Storefront", "description": "Top category menu, hero banners, product grid — shopping experience", "icon": "store", "category": "css_overlay"},
     {"id": "portal", "name": "Portal", "description": "Left sidebar nav + top bar, content panels — returning users", "icon": "layout-dashboard", "category": "css_overlay"},
     {"id": "single_page", "name": "Single Page", "description": "Scrollable sections, sticky nav, anchor links — landing/marketing", "icon": "scroll", "category": "css_overlay"},

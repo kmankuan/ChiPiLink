@@ -37,6 +37,7 @@ import MagazineLanding from './landing-layouts/MagazineLanding';
 import LivingGridLanding from './landing-layouts/LivingGridLanding';
 import CinematicLanding from './landing-layouts/CinematicLanding';
 import HorizonLanding from './landing-layouts/HorizonLanding';
+import MosaicCommunityLanding from './landing-layouts/MosaicCommunityLanding';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -456,6 +457,7 @@ const LAYOUT_COMPONENTS = {
   mobile_app: CinematicLanding,
   living_grid: LivingGridLanding,
   horizon: HorizonLanding,
+  mosaic_community: MosaicCommunityLanding,
   bento_grid: BentoGridLanding,
   tab_hub: TabHubLanding,
   social_feed: SocialFeedLanding,
