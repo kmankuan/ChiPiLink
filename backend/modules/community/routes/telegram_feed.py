@@ -226,6 +226,7 @@ class ConfigUpdateRequest(BaseModel):
     auto_sync: Optional[bool] = None
     poll_interval: Optional[int] = None
     visibility: Optional[str] = None
+    allowed_roles: Optional[List[str]] = None
 
 
 @router.put("/admin/config")
