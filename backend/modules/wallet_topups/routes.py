@@ -440,7 +440,90 @@ async def list_processed_emails(limit: int = 50, admin: dict = Depends(get_admin
     return {"items": items, "total": len(items)}
 
 
-# ============== MONDAY.COM SYNC HELPERS ==============
+# ============== MONDAY.COM BOARD CONFIGURATION ==============
+
+MONDAY_CONFIG_COL = "wallet_topup_monday_config"
+
+@router.get("/monday/config")
+async def get_monday_config(admin: dict = Depends(get_admin_user)):
+    """Get Monday.com board & column mapping configuration."""
+    config = await db[MONDAY_CONFIG_COL].find_one({"id": "default"}, {"_id": 0})
+    if not config:
+        config = {
+            "id": "default",
+            "board_id": "",
+            "board_name": "",
+            "group_id": "",
+            "column_mapping": {
+                "amount": "",
+                "sender_name": "",
+                "status": "",
+                "warning": "",
+                "bank_reference": "",
+                "email_date": "",
+                "source": "",
+                "confidence": "",
+            },
+            "post_email_as_update": True,
+            "enabled": False,
+        }
+        await db[MONDAY_CONFIG_COL].insert_one({**config})
+        config.pop("_id", None)
+    return config
+
+
+@router.put("/monday/config")
+async def update_monday_config(data: dict, admin: dict = Depends(get_admin_user)):
+    """Save Monday.com board & column mapping."""
+    update_fields = {}
+    for field in ["board_id", "board_name", "group_id", "column_mapping", "post_email_as_update", "enabled"]:
+        if field in data:
+            update_fields[field] = data[field]
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No valid fields")
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_fields["updated_by"] = admin.get("email", "admin")
+
+    existing = await db[MONDAY_CONFIG_COL].find_one({"id": "default"})
+    if not existing:
+        await db[MONDAY_CONFIG_COL].insert_one({"id": "default", **update_fields})
+    else:
+        await db[MONDAY_CONFIG_COL].update_one({"id": "default"}, {"$set": update_fields})
+    return await db[MONDAY_CONFIG_COL].find_one({"id": "default"}, {"_id": 0})
+
+
+@router.get("/monday/boards")
+async def list_monday_boards(admin: dict = Depends(get_admin_user)):
+    """Fetch all Monday.com boards."""
+    try:
+        from modules.integrations.monday.core_client import monday_client
+        boards = await monday_client.get_boards()
+        return {"boards": [{"id": b["id"], "name": b["name"]} for b in boards]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/monday/boards/{board_id}/columns")
+async def get_board_columns(board_id: str, admin: dict = Depends(get_admin_user)):
+    """Fetch columns for a specific Monday.com board."""
+    try:
+        from modules.integrations.monday.core_client import monday_client
+        columns = await monday_client.get_board_columns(board_id)
+        groups = await monday_client.get_board_groups(board_id)
+        return {"columns": columns, "groups": groups}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/monday/test")
+async def test_monday_connection(admin: dict = Depends(get_admin_user)):
+    """Test Monday.com API connection."""
+    try:
+        from modules.integrations.monday.core_client import monday_client
+        result = await monday_client.test_connection()
+        return result
+    except Exception as e:
+        return {"connected": False, "error": str(e)}
 
 async def _sync_pending_to_monday(topup: dict, dedup_result: dict = None):
     """Create a Monday.com item for a new pending top-up."""
