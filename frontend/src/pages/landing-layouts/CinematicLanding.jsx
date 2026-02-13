@@ -16,9 +16,6 @@ import {
   ArrowRight, ChevronDown, LogIn, Rss
 } from 'lucide-react';
 
-const LANTERNS = landingImages.lanterns;
-  const SPORTS = landingImages.pinpanclub;
-
 const MODULES = [
   { key: 'unatienda', icon: Store, label: 'Unatienda', to: '/unatienda', accent: '#059669' },
   { key: 'super_pin', icon: Trophy, label: 'Super Pin', to: '/pinpanclub/superpin/ranking', accent: '#d97706' },
