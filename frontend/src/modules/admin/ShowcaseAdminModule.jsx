@@ -613,6 +613,102 @@ export default function ShowcaseAdminModule() {
                   Save Monday.com Config
                 </Button>
 
+                {/* Auto-Sync Settings */}
+                <div className="border rounded-xl p-4 space-y-3 bg-muted/20" data-testid="auto-sync-panel">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className={`h-4 w-4 ${autoSync.enabled && autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'text-green-500' : 'text-muted-foreground'}`} />
+                      <div>
+                        <h4 className="text-xs font-bold">Auto-Sync</h4>
+                        <p className="text-[9px] text-muted-foreground">Automatically sync banners from Monday.com</p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant={autoSync.enabled && autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'default' : 'outline'}
+                      className="text-[9px]"
+                      data-testid="auto-sync-status-badge"
+                    >
+                      {autoSync.enabled && autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'Active' : 'Off'}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-3 py-2 border-y">
+                    <label className="flex items-center gap-2 text-xs cursor-pointer" data-testid="auto-sync-toggle">
+                      <input
+                        type="checkbox"
+                        checked={autoSync.enabled || false}
+                        onChange={e => {
+                          const newVal = e.target.checked;
+                          setAutoSync(prev => ({ ...prev, enabled: newVal }));
+                          saveAutoSync({ enabled: newVal });
+                        }}
+                        className="rounded"
+                      />
+                      <span className="font-bold">Enable Auto-Sync</span>
+                    </label>
+                  </div>
+
+                  {autoSync.enabled && (
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-[10px]">Sync Every (minutes)</Label>
+                        <div className="flex gap-2 mt-1 items-center">
+                          <select
+                            value={autoSync.interval_minutes || 10}
+                            onChange={e => setAutoSync(prev => ({ ...prev, interval_minutes: parseInt(e.target.value) }))}
+                            className="h-8 rounded-lg border bg-background px-2 text-xs flex-1"
+                            data-testid="auto-sync-interval"
+                          >
+                            <option value={1}>1 min</option>
+                            <option value={2}>2 min</option>
+                            <option value={5}>5 min</option>
+                            <option value={10}>10 min</option>
+                            <option value={15}>15 min</option>
+                            <option value={30}>30 min</option>
+                            <option value={60}>1 hour</option>
+                            <option value={120}>2 hours</option>
+                            <option value={360}>6 hours</option>
+                            <option value={720}>12 hours</option>
+                            <option value={1440}>24 hours</option>
+                          </select>
+                          <Button
+                            size="sm"
+                            onClick={() => saveAutoSync()}
+                            disabled={savingAutoSync}
+                            className="h-8 text-xs gap-1"
+                            data-testid="save-auto-sync-btn"
+                          >
+                            {savingAutoSync ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                            Apply
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Status info */}
+                      <div className="bg-background rounded-lg p-2.5 space-y-1 text-[10px]">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Status</span>
+                          <span className={`font-bold ${autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            {autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'Running' : 'Paused'}
+                          </span>
+                        </div>
+                        {autoSync.scheduler?.next_run && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Next sync</span>
+                            <span className="font-mono">{new Date(autoSync.scheduler.next_run).toLocaleString()}</span>
+                          </div>
+                        )}
+                        {autoSync.last_sync && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Last sync</span>
+                            <span className="font-mono">{new Date(autoSync.last_sync).toLocaleString()}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Workflow guide */}
                 <div className="bg-muted/30 rounded-xl p-3 space-y-1.5">
                   <h4 className="text-[10px] font-bold">Workflow: Canva → Monday.com → App</h4>
