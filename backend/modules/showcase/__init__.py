@@ -337,7 +337,7 @@ async def sync_monday_banners():
     """Admin: Manually trigger sync from Monday.com banner board."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
     db = get_db()
-    result = await monday_banner_adapter.sync_from_monday(db)
+    result = await monday_banner_adapter.sync_from_monday(db, trigger="manual")
     return result
 
 
