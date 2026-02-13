@@ -165,6 +165,10 @@ export default function AdminModule() {
         <TabsContent value="layouts">
           <LayoutPreviewModule />
         </TabsContent>
+
+        <TabsContent value="showcase">
+          <ShowcaseAdminModule />
+        </TabsContent>
       </Tabs>
     </div>
   );
