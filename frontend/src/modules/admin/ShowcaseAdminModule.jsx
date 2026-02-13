@@ -702,8 +702,8 @@ export default function ShowcaseAdminModule() {
                     <div className="flex items-center gap-2">
                       <RefreshCw className={`h-4 w-4 ${autoSync.enabled && autoSync.scheduler?.running && !autoSync.scheduler?.paused ? 'text-green-500' : 'text-muted-foreground'}`} />
                       <div>
-                        <h4 className="text-xs font-bold">Auto-Sync</h4>
-                        <p className="text-[9px] text-muted-foreground">Automatically sync banners from Monday.com</p>
+                        <h4 className="text-xs font-bold">Scheduled Sync (Fallback)</h4>
+                        <p className="text-[9px] text-muted-foreground">Periodic polling as a safety net — use if webhook not available</p>
                       </div>
                     </div>
                     <Badge
