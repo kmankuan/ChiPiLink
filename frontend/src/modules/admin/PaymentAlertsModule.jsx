@@ -106,6 +106,14 @@ function PendingQueueTab() {
     return <Badge className={`text-[10px] ${styles[status] || ''}`}>{status}</Badge>;
   };
 
+  const riskBadge = (risk) => {
+    if (!risk || risk === 'clear') return <Badge variant="outline" className="text-[9px] border-emerald-300 text-emerald-700">No Risk</Badge>;
+    if (risk === 'duplicate') return <Badge className="text-[9px] bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400">DUPLICATE</Badge>;
+    if (risk === 'potential_duplicate') return <Badge className="text-[9px] bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400">POTENTIAL DUPLICATE</Badge>;
+    if (risk === 'low_risk') return <Badge className="text-[9px] bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-400">Low Risk</Badge>;
+    return null;
+  };
+
   const filtered = items.filter(i =>
     !search || i.sender_name?.toLowerCase().includes(search.toLowerCase()) ||
     i.bank_reference?.toLowerCase().includes(search.toLowerCase()) ||
