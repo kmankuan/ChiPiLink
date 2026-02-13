@@ -16,7 +16,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
   BookOpen, Check, ChevronRight, Clock, GraduationCap,
-  Loader2, Lock, Package, Plus, Send, User, UserPlus, X
+  Loader2, Lock, Package, Plus, Send, User, UserPlus, X,
+  Wallet, AlertTriangle
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 
