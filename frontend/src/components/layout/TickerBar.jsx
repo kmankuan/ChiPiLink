@@ -103,6 +103,15 @@ export default function TickerBar() {
 
   const Icon = ICON_MAP[current.icon] || Megaphone;
 
+  // Map activity type to a readable source label
+  const SOURCE_LABELS = {
+    match: 'PinPanClub', new_user: 'Members', order: 'Store',
+    community: 'Community', transaction: 'Wallet', custom: 'News'
+  };
+  const sourceLabel = current._type === 'sponsor'
+    ? (current.name || 'Sponsor')
+    : (SOURCE_LABELS[current.type] || current.type);
+
   return (
     <div
       className="ticker-bar sticky top-0 z-[60] w-full flex items-center justify-center overflow-hidden select-none"
@@ -111,18 +120,17 @@ export default function TickerBar() {
       onMouseLeave={() => setIsPaused(false)}
       data-testid="ticker-bar"
     >
-      {/* Progress dots */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1">
-        {items.slice(0, Math.min(items.length, 8)).map((_, i) => (
-          <span
-            key={i}
-            className="w-1 h-1 rounded-full transition-all duration-300"
-            style={{
-              background: i === currentIndex % Math.min(items.length, 8) ? accentColor : `${textColor}30`,
-              transform: i === currentIndex % Math.min(items.length, 8) ? 'scale(1.5)' : 'scale(1)'
-            }}
-          />
-        ))}
+      {/* Source label badge */}
+      <div
+        className={`absolute left-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1.5 transition-all duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+        data-testid="ticker-source-label"
+      >
+        <span
+          className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+          style={{ background: current.color || accentColor, color: '#fff' }}
+        >
+          {sourceLabel}
+        </span>
       </div>
 
       {/* Content */}
