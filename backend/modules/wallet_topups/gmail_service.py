@@ -286,6 +286,10 @@ async def process_email(email_data: dict) -> dict:
         })
         return {"skipped": False, "rejected": True, "reason": rule_result["reason"], "parsed": parsed}
 
+    # Run dedup engine (4 layers)
+    from .dedup_engine import check_duplicate
+    dedup_result = await check_duplicate(parsed, email_data)
+
     # Create pending top-up
     doc = {
         "id": str(uuid.uuid4()),
@@ -304,6 +308,10 @@ async def process_email(email_data: dict) -> dict:
         "ai_parsed_data": parsed,
         "ai_confidence": parsed.get("confidence", 0),
         "rule_match": rule_result["reason"],
+        "risk_level": dedup_result.get("risk_level", "clear"),
+        "warning_text": dedup_result.get("warning_text", ""),
+        "dedup_warnings": dedup_result.get("warnings", []),
+        "dedup_matched_items": dedup_result.get("matched_items", []),
         "notes": parsed.get("summary", ""),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat(),
