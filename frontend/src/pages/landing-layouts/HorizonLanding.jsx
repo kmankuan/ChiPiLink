@@ -17,7 +17,7 @@ import {
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1656259541897-a13b22104214?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80';
 const LANTERNS_IMG = 'https://images.unsplash.com/photo-1762889583592-2dda392f5431?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
-const PINGPONG_IMG = 'https://images.unsplash.com/photo-1767022894200-419082de2c3e?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
+const PINGPONG_IMG = 'https://static.prod-images.emergentagent.com/jobs/0e997fa5-7870-4ad7-bfea-6491d7259a17/images/78c324677f3f701890649f9b0d24726815dbbe5114bad3d87b0f6adb5437aab7.png';
 const COMMUNITY_IMG = 'https://images.unsplash.com/photo-1758275557161-f117d724d769?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
 
 function formatDate(dateStr) {

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1633060622821-a35c3f664426?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwxfHxwYW5hbWElMjBjaXR5JTIwc2t5bGluZSUyMG1vZGVybnxlbnwwfHx8fDE3NzA5NTE3NTJ8MA&ixlib=rb-4.1.0&q=85&w=1200';
-const SPORTS_IMG = 'https://images.unsplash.com/photo-1573988127517-7a9794fac0a6?crop=entropy&cs=srgb&fm=jpg&w=600&q=80';
+const SPORTS_IMG = 'https://static.prod-images.emergentagent.com/jobs/0e997fa5-7870-4ad7-bfea-6491d7259a17/images/78c324677f3f701890649f9b0d24726815dbbe5114bad3d87b0f6adb5437aab7.png';
 const COMMUNITY_IMG = 'https://images.unsplash.com/photo-1766470612292-929a0553da8b?crop=entropy&cs=srgb&fm=jpg&w=600&q=80';
 const FESTIVAL_IMG = 'https://images.unsplash.com/photo-1766470611896-8f719ff4f89e?crop=entropy&cs=srgb&fm=jpg&w=600&q=80';
 
