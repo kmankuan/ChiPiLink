@@ -104,7 +104,7 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
             testId="tile-hero"
             className="col-span-2 row-span-2"
           >
-            <img src={HERO_IMG} alt="Panama" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={landingImages.hero} alt="Panama" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="relative h-full flex flex-col justify-end p-5">
               <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1">Community</p>
@@ -146,7 +146,7 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
             testId="tile-pinpanclub"
             className="col-span-2 row-span-1"
           >
-            <img src={SPORTS_IMG} alt="PinPanClub" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={landingImages.pinpanclub} alt="PinPanClub" className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
             <div className="relative h-full flex items-center p-5 gap-4">
               <div className="flex-1">
