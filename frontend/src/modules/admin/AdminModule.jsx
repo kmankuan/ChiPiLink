@@ -35,6 +35,7 @@ import UIStyleModule from './UIStyleModule';
 import WidgetManagerModule from './WidgetManagerModule';
 import TickerAdminModule from './TickerAdminModule';
 import LayoutPreviewModule from './LayoutPreviewModule';
+import ShowcaseAdminModule from './ShowcaseAdminModule';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminModule() {
