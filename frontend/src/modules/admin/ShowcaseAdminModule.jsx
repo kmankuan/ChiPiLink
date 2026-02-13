@@ -449,6 +449,160 @@ export default function ShowcaseAdminModule() {
           )}
         </TabsContent>
 
+        {/* ═══ MONDAY.COM SYNC TAB ═══ */}
+        <TabsContent value="monday" className="space-y-4 mt-4">
+          <div className="border rounded-xl p-4 space-y-4 bg-card" data-testid="monday-sync-panel">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Plug className="h-4 w-4 text-primary" />
+                <div>
+                  <h3 className="text-sm font-bold">Monday.com → Banner Sync</h3>
+                  <p className="text-[10px] text-muted-foreground">
+                    Design in Canva, paste URL in Monday.com, control schedule from the board
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {mondayConfig?.enabled && (
+                  <Button size="sm" variant="outline" onClick={syncFromMonday} disabled={syncing} className="h-7 text-xs gap-1" data-testid="sync-monday-btn">
+                    {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+                    Sync Now
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Enable toggle */}
+            <div className="flex items-center gap-3 py-2 border-y">
+              <label className="flex items-center gap-2 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mondayConfig?.enabled || false}
+                  onChange={e => setMondayConfig({ ...mondayConfig, enabled: e.target.checked })}
+                  className="rounded"
+                />
+                <span className="font-bold">Enable Monday.com Banner Sync</span>
+              </label>
+              {mondayConfig?.last_sync && (
+                <span className="text-[9px] text-muted-foreground ml-auto">
+                  Last sync: {new Date(mondayConfig.last_sync).toLocaleString()}
+                </span>
+              )}
+            </div>
+
+            {mondayConfig?.enabled && (
+              <>
+                {/* Board selection */}
+                <div>
+                  <Label className="text-[10px]">Monday.com Board</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      value={mondayConfig?.board_id || ''}
+                      onChange={e => setMondayConfig({ ...mondayConfig, board_id: e.target.value })}
+                      placeholder="Board ID"
+                      className="h-8 text-xs flex-1"
+                      data-testid="monday-board-id"
+                    />
+                    <Button size="sm" variant="outline" onClick={loadMondayBoards} className="h-8 text-xs gap-1" data-testid="load-boards-btn">
+                      <RefreshCw className="h-3 w-3" /> Load Boards
+                    </Button>
+                  </div>
+                  {mondayBoards.length > 0 && (
+                    <div className="mt-2 max-h-32 overflow-y-auto border rounded-lg divide-y">
+                      {mondayBoards.map(board => (
+                        <button
+                          key={board.id}
+                          onClick={() => {
+                            setMondayConfig({ ...mondayConfig, board_id: board.id });
+                            toast.success(`Selected: ${board.name}`);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-muted/50 transition-colors flex justify-between ${mondayConfig?.board_id === board.id ? 'bg-primary/5 font-bold' : ''}`}
+                        >
+                          <span>{board.name}</span>
+                          <span className="text-muted-foreground">ID: {board.id}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Column mappings */}
+                <div>
+                  <h4 className="text-xs font-bold mb-2 flex items-center gap-1">
+                    <CalendarDays className="h-3 w-3" /> Column Mappings
+                  </h4>
+                  <p className="text-[9px] text-muted-foreground mb-2">
+                    Map Monday.com column IDs to banner fields. Select a board and check its columns above.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { key: 'canva_url', label: 'Canva/Image URL', hint: 'Link column with Canva design URL' },
+                      { key: 'text', label: 'Banner Text', hint: 'Text column for message' },
+                      { key: 'bg_color', label: 'Background Color', hint: 'Color column' },
+                      { key: 'link_url', label: 'Click Link', hint: 'Link column' },
+                      { key: 'start_date', label: 'Start Date', hint: 'Date column' },
+                      { key: 'end_date', label: 'End Date', hint: 'Date column' },
+                      { key: 'status', label: 'Status', hint: 'Status column (Active/Paused)' },
+                      { key: 'banner_type', label: 'Type', hint: 'Status: Image/Text' },
+                    ].map(({ key, label, hint }) => (
+                      <div key={key}>
+                        <Label className="text-[9px]">{label}</Label>
+                        <Input
+                          value={mondayConfig?.columns?.[key] || ''}
+                          onChange={e => setMondayConfig({
+                            ...mondayConfig,
+                            columns: { ...(mondayConfig?.columns || {}), [key]: e.target.value }
+                          })}
+                          placeholder={hint}
+                          className="h-7 text-[10px]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Show columns of selected board */}
+                  {mondayConfig?.board_id && mondayBoards.length > 0 && (() => {
+                    const board = mondayBoards.find(b => b.id === mondayConfig.board_id);
+                    if (!board?.columns) return null;
+                    return (
+                      <details className="mt-2">
+                        <summary className="text-[9px] font-bold cursor-pointer text-primary">
+                          View columns of "{board.name}"
+                        </summary>
+                        <div className="mt-1 text-[9px] bg-muted/30 rounded-lg p-2 max-h-32 overflow-y-auto space-y-0.5">
+                          {board.columns.filter(c => c.id !== 'name').map(col => (
+                            <div key={col.id} className="flex justify-between">
+                              <span><code className="bg-muted px-1 rounded">{col.id}</code> — {col.title}</span>
+                              <span className="text-muted-foreground">{col.type}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    );
+                  })()}
+                </div>
+
+                <Button onClick={saveMondayConfig} disabled={savingMonday} size="sm" className="w-full h-8 text-xs gap-1" data-testid="save-monday-config">
+                  {savingMonday ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                  Save Monday.com Config
+                </Button>
+
+                {/* Workflow guide */}
+                <div className="bg-muted/30 rounded-xl p-3 space-y-1.5">
+                  <h4 className="text-[10px] font-bold">Workflow: Canva → Monday.com → App</h4>
+                  <ol className="text-[9px] text-muted-foreground space-y-1 list-decimal ml-3">
+                    <li>Design your banner in <strong>Canva</strong> and get the share/download link</li>
+                    <li>Create a new item on your <strong>Monday.com board</strong></li>
+                    <li>Paste the Canva URL in the image column, set dates for scheduling</li>
+                    <li>Set status to <strong>Active</strong> when ready to publish</li>
+                    <li>Click <strong>"Sync Now"</strong> or wait for auto-sync</li>
+                  </ol>
+                </div>
+              </>
+            )}
+          </div>
+        </TabsContent>
+
         {/* ═══ MEDIA PLAYER TAB ═══ */}
         <TabsContent value="media" className="space-y-4 mt-4">
           {/* Google Photos Album URL */}
