@@ -203,6 +203,11 @@ api_router.include_router(dev_control_router)
 from modules.wallet_topups import wallet_topups_router
 api_router.include_router(wallet_topups_router)
 
+# Ticker Module (Activity feed + Sponsor banners)
+from modules.ticker.routes import router as ticker_router, admin_router as ticker_admin_router
+api_router.include_router(ticker_router)
+api_router.include_router(ticker_admin_router)
+
 # Include main router in app
 app.include_router(api_router)
 
