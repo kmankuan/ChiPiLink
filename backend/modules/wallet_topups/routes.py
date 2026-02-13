@@ -76,8 +76,25 @@ async def create_pending_topup(data: dict, admin: dict = Depends(get_admin_user)
     await db[PENDING_COL].insert_one(doc)
     doc.pop("_id", None)
 
+    # Run dedup check
+    from .dedup_engine import check_duplicate
+    dedup_result = await check_duplicate(
+        {"amount": doc["amount"], "sender_name": doc["sender_name"], "bank_reference": doc["bank_reference"]},
+        {}
+    )
+    doc["risk_level"] = dedup_result.get("risk_level", "clear")
+    doc["warning_text"] = dedup_result.get("warning_text", "")
+    doc["dedup_warnings"] = dedup_result.get("warnings", [])
+    doc["dedup_matched_items"] = dedup_result.get("matched_items", [])
+    await db[PENDING_COL].update_one({"id": doc["id"]}, {"$set": {
+        "risk_level": doc["risk_level"],
+        "warning_text": doc["warning_text"],
+        "dedup_warnings": doc["dedup_warnings"],
+        "dedup_matched_items": doc["dedup_matched_items"],
+    }})
+
     # Sync to Monday.com
-    asyncio.create_task(_sync_pending_to_monday(doc))
+    asyncio.create_task(_sync_pending_to_monday(doc, dedup_result))
 
     return doc
 
