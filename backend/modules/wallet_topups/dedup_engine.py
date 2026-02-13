@@ -63,8 +63,11 @@ async def check_duplicate(parsed_data: dict, email_data: dict, exclude_id: str =
         # Also check just amount match in last 2 hours (without sender match)
         if risk_level == "clear" and amount > 0:
             cutoff_2h = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+            recent_query = {"amount": amount, "status": {"$in": ["pending", "approved"]}, "created_at": {"$gte": cutoff_2h}}
+            if exclude_id:
+                recent_query["id"] = {"$ne": exclude_id}
             recent_same_amount = await db[PENDING_COL].find_one(
-                {"amount": amount, "status": {"$in": ["pending", "approved"]}, "created_at": {"$gte": cutoff_2h}},
+                recent_query,
                 {"_id": 0, "id": 1, "amount": 1, "sender_name": 1, "status": 1, "created_at": 1}
             )
             if recent_same_amount:
