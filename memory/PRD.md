@@ -1,50 +1,51 @@
 # ChiPi Link - PRD
 
 ## Original Problem Statement
-Build a comprehensive admin dashboard for "Chipi Wallet" — evolved from backend integrations to a full-featured community app with dynamic, admin-configurable UI elements, landing page customization, and rich media support.
+Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full-featured community app with dynamic, admin-configurable UI elements, landing page customization, rich media, and Monday.com workflow integration.
 
 ## What's Been Implemented
 
+### Scheduled Banners & Monday.com Sync (Feb 13, 2026) - COMPLETE
+- **Scheduled banners**: start_date/end_date fields — banners auto-show/hide based on dates
+- **Monday.com → App sync**: Canva design URL → Monday.com board → auto-sync to app banner carousel
+- **Admin panel**: 3-tab layout (Banners, Monday.com, Media Player)
+- Monday.com tab: enable toggle, board selector (lists all boards), 8 column mappings (canva_url, text, bg_color, link_url, start_date, end_date, status, banner_type)
+- Workflow guide: Canva → Monday.com → App
+- Sync now button + last sync timestamp
+- Banners from Monday.com show "Synced from Monday.com" badge
+- **Tested: 100% (12 backend, 10 frontend code review + landing page verified)**
+
 ### Banner Carousel & Media Player (Feb 13, 2026) - COMPLETE
-- **Banner Carousel** replaces top brand header — supports image banners (overlay text + click links) and Facebook-style text banners (colored backgrounds, gradients, rich text, responsive)
-- **Media Player** — hero-sized 16:9 auto-playing slideshow below icon nav. Supports images (smooth transitions) and videos (autoplay muted). Google Photos album URL fetcher + manual URL entry.
-- **Admin Panel** — new "Banners & Media" tab with:
-  - Banner CRUD: add/edit/delete, toggle active, image/text type selector
-  - Color presets for text banners (8 gradient presets + custom picker)
-  - Media Player: Google Photos album URL fetch, manual item add, player settings (interval, autoplay, controls)
-  - Media items grid view with delete
-- **Backend**: Full CRUD at `/api/showcase/banners` and `/api/showcase/media-player`
-- **Tested: 100% (21 backend, 14 frontend)**
+- Banner carousel (image + text/Facebook-style with colors/gradients)
+- Media player: hero-sized 16:9 auto-slideshow, Google Photos URL fetch + manual add
+- Full admin CRUD
 
-### Custom Cultural Icon Images (Feb 13, 2026) - COMPLETE
-- 6 AI-generated mosaic-style icons: PinPan, Tienda, Ranking, Aprender, Cultura, Fe
-- Stored in layout_icons config, admin-customizable via Layouts & Icons tab
-
+### Custom Cultural Icons (Feb 13, 2026) - COMPLETE
 ### Layout Preview & Icon Customization (Feb 13, 2026) - COMPLETE
-- Admin tab with 4 layout preview cards, one-click activate, icon picker (50+ Lucide + custom image URLs)
-
 ### Mosaic Community Landing Page (Feb 13, 2026) - COMPLETE
-- 4th landing page layout with cultural mosaic grid
-
-### Previous Features - ALL COMPLETE
-- Activity Ticker, Header/Nav redesign, Landing Pages (4 selectable), Gmail Pipeline, Telegram Feed, Dev Control
+### All Previous Features - COMPLETE
 
 ## Key API Endpoints
-- `GET /api/showcase/banners` — Active banners for carousel
+### Showcase
+- `GET /api/showcase/banners` — Schedule-filtered active banners
 - `POST/PUT/DELETE /api/admin/showcase/banners` — Banner CRUD
-- `GET /api/showcase/media-player` — Media player config + items
-- `PUT /api/admin/showcase/media-player` — Update player settings
+- `GET /api/showcase/media-player` — Media player config
 - `POST /api/admin/showcase/media-player/add-item` — Add media item
-- `DELETE /api/admin/showcase/media-player/items/{id}` — Remove item
-- `POST /api/admin/showcase/media-player/fetch-album` — Fetch from Google Photos URL
+- `POST /api/admin/showcase/media-player/fetch-album` — Google Photos fetch
+### Monday.com Banner Sync
+- `GET /api/admin/showcase/monday-banners/config` — Sync config
+- `PUT /api/admin/showcase/monday-banners/config` — Save config
+- `GET /api/admin/showcase/monday-banners/boards` — List boards + columns
+- `POST /api/admin/showcase/monday-banners/sync` — Trigger sync
 
 ## Key Files
-- `/app/backend/modules/showcase/__init__.py` — Banner + Media Player APIs
-- `/app/frontend/src/components/BannerCarousel.jsx` — Banner carousel component
-- `/app/frontend/src/components/MediaPlayer.jsx` — Media player component
-- `/app/frontend/src/modules/admin/ShowcaseAdminModule.jsx` — Admin panel
+- `/app/backend/modules/showcase/__init__.py` — All showcase API routes
+- `/app/backend/modules/showcase/monday_banner_adapter.py` — Monday.com sync adapter
+- `/app/frontend/src/components/BannerCarousel.jsx` — Banner carousel
+- `/app/frontend/src/components/MediaPlayer.jsx` — Media player
+- `/app/frontend/src/modules/admin/ShowcaseAdminModule.jsx` — Admin panel (3 tabs)
 
-## Prioritized Backlog
+## Backlog
 ### P1 - User Chooses Final Landing Page Design
 ### P2 - On-Demand Landing Page Redesign via Admin
-### P2 - Other integrations: OneSignal Push, Stripe, Google Sheets, ChipiPoints, Teams/Clans
+### P2 - OneSignal Push, Stripe, Google Sheets, ChipiPoints, Teams/Clans
