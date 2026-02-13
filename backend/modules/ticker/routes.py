@@ -333,3 +333,53 @@ async def delete_sponsor(sponsor_id: str):
         {"$set": {"value.sponsors": sponsors}}
     )
     return {"status": "ok"}
+
+
+
+# ═══ LANDING PAGE IMAGES CONFIG ═══
+
+DEFAULT_LANDING_IMAGES = {
+    "hero": "https://images.unsplash.com/photo-1656259541897-a13b22104214?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80",
+    "pinpanclub": "https://static.prod-images.emergentagent.com/jobs/0e997fa5-7870-4ad7-bfea-6491d7259a17/images/78c324677f3f701890649f9b0d24726815dbbe5114bad3d87b0f6adb5437aab7.png",
+    "lanterns": "https://images.unsplash.com/photo-1762889583592-2dda392f5431?crop=entropy&cs=srgb&fm=jpg&w=800&q=80",
+    "community": "https://images.unsplash.com/photo-1758275557161-f117d724d769?crop=entropy&cs=srgb&fm=jpg&w=800&q=80"
+}
+
+
+@router.get("/landing-images")
+async def get_landing_images():
+    """Public: get customized landing page images."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    images = doc.get("value", DEFAULT_LANDING_IMAGES) if doc else DEFAULT_LANDING_IMAGES
+    return {**DEFAULT_LANDING_IMAGES, **images}
+
+
+@admin_router.get("/landing-images")
+async def get_landing_images_admin():
+    """Admin: get landing images config with defaults."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    custom = doc.get("value", {}) if doc else {}
+    return {"defaults": DEFAULT_LANDING_IMAGES, "custom": custom, "resolved": {**DEFAULT_LANDING_IMAGES, **custom}}
+
+
+@admin_router.put("/landing-images")
+async def update_landing_images(body: dict):
+    """Admin: update landing page images (partial update)."""
+    db = get_db()
+    current_doc = db.app_config.find_one({"config_key": "landing_images"}, {"_id": 0})
+    current = current_doc.get("value", {}) if current_doc else {}
+    updated = {**current, **body}
+    db.app_config.update_one(
+        {"config_key": "landing_images"},
+        {"$set": {"config_key": "landing_images", "value": updated, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True
+    )
+    return {"status": "ok", "resolved": {**DEFAULT_LANDING_IMAGES, **updated}}
+
+
+@admin_router.post("/landing-images/upload")
+async def upload_landing_image(image_key: str = "pinpanclub"):
+    """Admin: placeholder for image upload — use image URL for now."""
+    return {"status": "info", "message": "Provide an image URL in PUT /admin/ticker/landing-images. Example: {\"pinpanclub\": \"https://your-image-url.com/image.jpg\"}"}
