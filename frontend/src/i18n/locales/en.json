@@ -1821,7 +1821,9 @@
     "refresh": "Refresh",
     "noComments": "No comments yet",
     "loadingFeed": "Loading feed...",
-    "noPosts": "No posts yet"
+    "noPosts": "No posts yet",
+    "accessDenied": "Feed restricted",
+    "accessDeniedDesc": "This feed is currently restricted. Contact an administrator for access."
   },
   "storeManager": {
     "productsTab": "Products",
