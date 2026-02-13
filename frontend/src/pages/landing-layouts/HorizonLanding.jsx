@@ -26,7 +26,6 @@ export default function HorizonLanding({ communityData }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const landingImages = useLandingImages();
-  const navigate = useNavigate();
   const [heroVisible, setHeroVisible] = useState(false);
   const [cardsVisible, setCardsVisible] = useState(false);
 
