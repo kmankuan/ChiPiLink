@@ -360,6 +360,14 @@ export default function SchoolTextbooksView({
     const selectedList = availableItems.filter(i => books[i.book_id]);
     
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
+
+    // Calculate total and check wallet balance
+    const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
+    if (walletBalance !== null && walletBalance < total) {
+      toast.error(lang === 'es' ? 'Saldo insuficiente en billetera' : 'Insufficient wallet balance');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await axios.post(
@@ -367,11 +375,16 @@ export default function SchoolTextbooksView({
         {
           student_id: studentId,
           items: selectedList.map(b => ({ book_id: b.book_id, quantity: 1 })),
+          payment_method: 'wallet',
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(t.orderSuccess);
       setSelectedBooks(prev => ({ ...prev, [studentId]: {} }));
+      // Refresh wallet balance after payment
+      axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
+        .catch(() => {});
       await fetchOrderForStudent(studentId);
     } catch (error) {
       toast.error(error.response?.data?.detail || t.orderError);
