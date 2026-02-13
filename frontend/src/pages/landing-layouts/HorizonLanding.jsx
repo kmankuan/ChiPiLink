@@ -9,16 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { useLandingImages } from '@/hooks/useLandingImages';
 import {
   ArrowRight, LogIn, Heart, MessageCircle, Star,
   TrendingUp, Sparkles, Search, Bell, ChevronRight,
   Clock, Play, ShoppingBag, Trophy
 } from 'lucide-react';
-
-const HERO_IMG = 'https://images.unsplash.com/photo-1656259541897-a13b22104214?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80';
-const LANTERNS_IMG = 'https://images.unsplash.com/photo-1762889583592-2dda392f5431?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
-const PINGPONG_IMG = 'https://static.prod-images.emergentagent.com/jobs/0e997fa5-7870-4ad7-bfea-6491d7259a17/images/78c324677f3f701890649f9b0d24726815dbbe5114bad3d87b0f6adb5437aab7.png';
-const COMMUNITY_IMG = 'https://images.unsplash.com/photo-1758275557161-f117d724d769?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
 
 function formatDate(dateStr) {
   if (!dateStr) return '';
@@ -28,6 +24,8 @@ function formatDate(dateStr) {
 export default function HorizonLanding({ communityData }) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const landingImages = useLandingImages();
   const navigate = useNavigate();
   const [heroVisible, setHeroVisible] = useState(false);
   const [cardsVisible, setCardsVisible] = useState(false);
