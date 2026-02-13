@@ -728,6 +728,39 @@ export default function ShowcaseAdminModule() {
                     <li>Click <strong>"Sync Now"</strong> for instant sync, or enable <strong>Auto-Sync</strong> above</li>
                   </ol>
                 </div>
+
+                {/* Sync History Log */}
+                {syncHistory.length > 0 && (
+                  <div className="border rounded-xl p-4 space-y-3 bg-card" data-testid="sync-history-panel">
+                    <div className="flex items-center gap-2">
+                      <History className="h-4 w-4 text-primary" />
+                      <h4 className="text-xs font-bold">Sync History</h4>
+                      <span className="text-[9px] text-muted-foreground ml-auto">{syncHistory.length} recent</span>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto space-y-1.5">
+                      {syncHistory.map((entry, i) => (
+                        <div key={i} className="flex items-center gap-2 text-[10px] py-1.5 px-2 rounded-lg bg-muted/30" data-testid={`sync-history-entry-${i}`}>
+                          {entry.status === 'success' ? (
+                            <CheckCircle className="h-3 w-3 text-green-500 shrink-0" />
+                          ) : (
+                            <XCircle className="h-3 w-3 text-destructive shrink-0" />
+                          )}
+                          <span className="font-mono text-muted-foreground shrink-0">
+                            {new Date(entry.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <Badge variant={entry.trigger === 'auto' ? 'secondary' : 'outline'} className="text-[8px] h-4 shrink-0">
+                            {entry.trigger === 'auto' ? 'Auto' : 'Manual'}
+                          </Badge>
+                          {entry.status === 'success' ? (
+                            <span className="text-muted-foreground">{entry.items_synced} banners synced</span>
+                          ) : (
+                            <span className="text-destructive truncate">{entry.error || 'Failed'}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
