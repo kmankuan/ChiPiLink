@@ -303,6 +303,14 @@ export default function SchoolTextbooksView({
     }
   }, [isAuthenticated, hasAccess, validatedStudents.length, fetchAllStudents]);
 
+  // Fetch wallet balance
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
+      .catch(() => setWalletBalance(0));
+  }, [token]);
+
   // Fetch order for a specific student (with caching)
   const fetchOrderForStudent = useCallback(async (studentId) => {
     if (!studentId || !token) return;
