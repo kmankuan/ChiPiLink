@@ -87,7 +87,7 @@ class MondayBannerAdapter:
                 return str(value_raw)
         return ""
 
-    async def sync_from_monday(self, db) -> dict:
+    async def sync_from_monday(self, db, trigger: str = "manual") -> dict:
         """
         Fetch all items from the configured banner board,
         create/update banners in the local DB.
@@ -121,6 +121,7 @@ class MondayBannerAdapter:
 
             boards = data.get("boards", [])
             if not boards:
+                self._log_sync(db, trigger, "error", 0, "Board not found")
                 return {"status": "error", "message": "Board not found"}
 
             items = boards[0].get("items_page", {}).get("items", [])
@@ -192,11 +193,39 @@ class MondayBannerAdapter:
             config["sync_count"] = config.get("sync_count", 0) + 1
             await self.save_config(db, config)
 
+            self._log_sync(db, trigger, "success", synced)
             return {"status": "ok", "synced": synced, "skipped": skipped, "total_items": len(items)}
 
         except Exception as e:
             logger.error(f"Monday.com banner sync error: {e}")
+            self._log_sync(db, trigger, "error", 0, str(e))
             return {"status": "error", "message": str(e)}
+
+    def _log_sync(self, db, trigger: str, status: str, items_synced: int, error: str = ""):
+        """Append a sync event to the history log. Keeps last 50 entries."""
+        entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "trigger": trigger,
+            "status": status,
+            "items_synced": items_synced,
+            "error": error,
+        }
+        db.showcase_sync_history.insert_one(entry)
+        # Prune old entries — keep only the latest 50
+        count = db.showcase_sync_history.count_documents({})
+        if count > 50:
+            oldest = list(db.showcase_sync_history.find({}, {"_id": 1}).sort("timestamp", 1).limit(count - 50))
+            if oldest:
+                db.showcase_sync_history.delete_many({"_id": {"$in": [o["_id"] for o in oldest]}})
+
+    def get_sync_history(self, db, limit: int = 20) -> list:
+        """Get recent sync history entries."""
+        entries = list(
+            db.showcase_sync_history.find({}, {"_id": 0})
+            .sort("timestamp", -1)
+            .limit(limit)
+        )
+        return entries
 
 
 monday_banner_adapter = MondayBannerAdapter()
