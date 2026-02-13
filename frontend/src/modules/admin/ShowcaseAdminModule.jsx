@@ -335,6 +335,58 @@ export default function ShowcaseAdminModule() {
     }
   };
 
+  // Monday.com sync functions
+  const loadMondayBoards = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/monday-banners/boards`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMondayBoards(data.boards || []);
+      }
+    } catch (e) {
+      toast.error('Failed to load boards');
+    }
+  };
+
+  const saveMondayConfig = async () => {
+    setSavingMonday(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/monday-banners/config`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(mondayConfig)
+      });
+      if (res.ok) toast.success('Monday.com config saved');
+    } catch (e) {
+      toast.error('Failed to save');
+    } finally {
+      setSavingMonday(false);
+    }
+  };
+
+  const syncFromMonday = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/monday-banners/sync`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        toast.success(`Synced ${data.synced} banners from Monday.com!`);
+        fetchData();
+      } else {
+        toast.info(data.message || 'Sync skipped');
+      }
+    } catch (e) {
+      toast.error('Sync failed');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const savePlayerSettings = async () => {
     try {
       const res = await fetch(`${API_URL}/api/admin/showcase/media-player`, {
