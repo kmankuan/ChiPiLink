@@ -118,6 +118,40 @@ const LAYOUT_PREVIEWS = {
       <rect x="2" y="44" width="50" height="4" rx="1" className="fill-muted-foreground/08" />
     </svg>
   ),
+  living_grid: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="2" y="2" width="38" height="20" rx="3" className="fill-primary/35" />
+      <rect x="42" y="2" width="17" height="9" rx="2" className="fill-emerald-500/30" />
+      <rect x="61" y="2" width="17" height="9" rx="2" className="fill-amber-500/30" />
+      <rect x="42" y="13" width="17" height="9" rx="2" className="fill-red-500/25" />
+      <rect x="61" y="13" width="17" height="9" rx="2" className="fill-sky-500/25" />
+      <rect x="2" y="24" width="38" height="10" rx="2" className="fill-muted-foreground/15" />
+      <rect x="42" y="24" width="17" height="10" rx="2" className="fill-violet-500/20" />
+      <rect x="61" y="24" width="17" height="10" rx="2" className="fill-teal-500/20" />
+      <rect x="2" y="36" width="76" height="12" rx="2" className="fill-muted-foreground/10" />
+    </svg>
+  ),
+  cinematic: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="0" y="0" width="80" height="50" rx="0" className="fill-foreground/80" />
+      <rect x="6" y="28" width="30" height="3" rx="1" className="fill-white/40" />
+      <rect x="6" y="33" width="20" height="2" rx="1" className="fill-white/20" />
+      <rect x="6" y="38" width="14" height="5" rx="2" className="fill-white/30" />
+      <circle cx="40" cy="46" r="1.5" className="fill-white/15" />
+    </svg>
+  ),
+  horizon: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="0" y="0" width="80" height="50" rx="0" fill="#FAF7F2" />
+      <rect x="4" y="8" width="25" height="3" rx="1" className="fill-foreground/30" />
+      <rect x="4" y="13" width="18" height="2" rx="1" className="fill-foreground/15" />
+      <rect x="4" y="18" width="12" height="4" rx="2" fill="#C8102E" fillOpacity="0.5" />
+      <rect x="44" y="4" width="32" height="32" rx="4" className="fill-primary/15" />
+      <rect x="4" y="40" width="16" height="6" rx="3" className="fill-muted-foreground/15" />
+      <rect x="22" y="40" width="16" height="6" rx="3" className="fill-muted-foreground/12" />
+      <rect x="40" y="40" width="16" height="6" rx="3" className="fill-muted-foreground/10" />
+    </svg>
+  ),
 };
 
 function StyleEditor({ style, onChange, templates, fonts, densityOptions, layouts }) {
