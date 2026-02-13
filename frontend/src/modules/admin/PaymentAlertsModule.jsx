@@ -173,6 +173,7 @@ function PendingQueueTab() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-bold">${item.amount?.toLocaleString()}</span>
                   {statusBadge(item.status)}
+                  {riskBadge(item.risk_level)}
                   <Badge variant="outline" className="text-[9px]">{item.source || 'manual'}</Badge>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5">
