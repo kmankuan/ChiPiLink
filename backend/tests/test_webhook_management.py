@@ -174,7 +174,7 @@ class TestExistingAutoSyncEndpoints:
     
     def test_get_auto_sync_config_still_works(self, api_client):
         """GET /api/admin/showcase/monday-banners/auto-sync should still work."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/auto-sync")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/auto-sync"))
         assert response.status_code == 200
         data = response.json()
         assert "enabled" in data
@@ -185,14 +185,14 @@ class TestExistingAutoSyncEndpoints:
     def test_put_auto_sync_config_still_works(self, api_client):
         """PUT /api/admin/showcase/monday-banners/auto-sync should still work."""
         # Get current state
-        get_resp = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/auto-sync")
+        get_resp = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/auto-sync"))
         original = get_resp.json()
         
         # Update
-        response = api_client.put(
+        response = retry_request(lambda: api_client.put(
             f"{BASE_URL}/api/admin/showcase/monday-banners/auto-sync",
             json={"enabled": False, "interval_minutes": 10}
-        )
+        ))
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "ok"
