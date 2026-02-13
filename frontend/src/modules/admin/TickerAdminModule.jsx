@@ -65,7 +65,16 @@ export default function TickerAdminModule() {
     } catch (e) { /* silent */ }
   }, []);
 
-  useEffect(() => { fetchConfig(); fetchPreview(); }, [fetchConfig, fetchPreview]);
+  const fetchLandingImages = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/ticker/landing-images`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      if (res.ok) setLandingImages(await res.json());
+    } catch (e) { /* silent */ }
+  }, []);
+
+  useEffect(() => { fetchConfig(); fetchPreview(); fetchLandingImages(); }, [fetchConfig, fetchPreview, fetchLandingImages]);
 
   const saveConfig = async (updates) => {
     setSaving(true);
