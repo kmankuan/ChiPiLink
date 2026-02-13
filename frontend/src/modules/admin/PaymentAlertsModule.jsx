@@ -532,6 +532,17 @@ function SettingsTab() {
               <Input type="number" min={1} max={60} value={settings.polling_interval_minutes || 5} onChange={e => setSettings(s => ({ ...s, polling_interval_minutes: parseInt(e.target.value) || 5 }))} className="h-8 text-sm w-32" data-testid="polling-interval" />
             </div>
           )}
+          {pollingStatus && (
+            <div className="flex items-center gap-3 pt-2 border-t text-xs" data-testid="polling-status">
+              <span className={`inline-flex items-center gap-1.5 ${pollingStatus.poller_running ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                <span className={`w-2 h-2 rounded-full ${pollingStatus.poller_running ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                {pollingStatus.poller_running ? 'Background scanner active' : 'Scanner inactive'}
+              </span>
+              {pollingStatus.last_auto_scan && (
+                <span className="text-muted-foreground">Last scan: {new Date(pollingStatus.last_auto_scan).toLocaleTimeString()}</span>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
