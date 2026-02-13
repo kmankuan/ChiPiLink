@@ -489,7 +489,7 @@ export default function SchoolTextbooksView({
       )}
       
       {/* Student Accordion Cards */}
-      <div className="space-y-3" data-testid="student-accordion">
+      <div className="space-y-3 pb-24" data-testid="student-accordion">
         {validatedStudents.map((student) => {
           const studentId = student.student_id || student.sync_id;
           const isExpanded = expandedStudentId === studentId;
