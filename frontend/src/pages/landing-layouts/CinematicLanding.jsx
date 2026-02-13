@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
+import { useLandingImages } from '@/hooks/useLandingImages';
 import {
   Store, Trophy, Zap, Calendar, Image, Users,
   ArrowRight, ChevronDown, LogIn, Rss
