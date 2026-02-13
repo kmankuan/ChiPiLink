@@ -195,6 +195,14 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
         </div>
       </nav>
 
+      {/* ═══ MEDIA PLAYER — Google Photos album slideshow ═══ */}
+      <section
+        className={`px-4 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        data-testid="media-player-section"
+      >
+        <MediaPlayer />
+      </section>
+
       {/* ═══ MOSAIC GRID — the core visual mosaic ═══ */}
       <section
         className={`px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-200 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
