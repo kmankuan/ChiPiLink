@@ -220,6 +220,7 @@ export default function SchoolTextbooksView({
   const [requestingReorder, setRequestingReorder] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [allStudents, setAllStudents] = useState(null);
+  const [walletBalance, setWalletBalance] = useState(null);
   
   const texts = {
     en: {
