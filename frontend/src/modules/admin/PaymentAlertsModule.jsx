@@ -510,8 +510,7 @@ function SettingsTab() {
         <CardContent className="px-4 pb-3 space-y-3">
           <div className="flex gap-3">
             {[
-              { value: 'realtime', label: 'Real-time', desc: 'Push notifications (coming soon)' },
-              { value: 'polling', label: 'Polling', desc: 'Check at intervals' },
+              { value: 'realtime', label: 'Real-time', desc: 'Auto-scan every N minutes in background' },
               { value: 'manual', label: 'Manual', desc: 'Only scan on demand' },
             ].map(opt => (
               <label key={opt.value} className={`flex-1 p-3 border rounded-lg cursor-pointer transition-colors ${settings.polling_mode === opt.value ? 'border-primary bg-primary/5' : 'hover:bg-accent/30'}`}>
@@ -521,7 +520,7 @@ function SettingsTab() {
               </label>
             ))}
           </div>
-          {settings.polling_mode === 'polling' && (
+          {settings.polling_mode === 'realtime' && (
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Check every (minutes)</label>
               <Input type="number" min={1} max={60} value={settings.polling_interval_minutes || 5} onChange={e => setSettings(s => ({ ...s, polling_interval_minutes: parseInt(e.target.value) || 5 }))} className="h-8 text-sm w-32" data-testid="polling-interval" />
