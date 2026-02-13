@@ -164,35 +164,12 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #FBF7F0 0%, #F5EDE0 100%)' }} data-testid="mosaic-landing">
 
-      {/* ═══ WELCOME STRIP — replaces hero with a warm cultural greeting ═══ */}
+      {/* ═══ BANNER CAROUSEL — Ad/announcement container (replaces brand header) ═══ */}
       <header
-        className={`px-4 sm:px-8 pt-6 pb-4 max-w-7xl mx-auto transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-4 sm:px-8 pt-4 pb-2 max-w-7xl mx-auto transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="mosaic-header"
       >
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-1" style={{ color: '#b8956a' }}>
-              Comunidad Mosaico
-            </p>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ color: '#2d2217', fontFamily: "'DM Sans', system-ui" }}>
-              ChiPi Link
-            </h1>
-            <p className="text-xs mt-1" style={{ color: '#8b7b6b' }}>
-              {t('landing.mosaic.tagline', 'Where cultures meet, learn & play together')}
-            </p>
-          </div>
-          {!isAuthenticated && (
-            <Button
-              onClick={() => navigate('/login')}
-              className="rounded-full px-5 gap-2 font-bold shadow-md text-xs"
-              style={{ background: '#C8102E' }}
-              data-testid="mosaic-login-btn"
-            >
-              <LogIn className="h-3.5 w-3.5" />
-              {t('common.login', 'Sign In')}
-            </Button>
-          )}
-        </div>
+        <BannerCarousel />
       </header>
 
       {/* ═══ CULTURAL ICON NAV — dynamic from admin config ═══ */}
