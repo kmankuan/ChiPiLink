@@ -387,3 +387,62 @@ async def update_landing_images(body: dict):
 async def upload_landing_image(image_key: str = "pinpanclub"):
     """Admin: placeholder for image upload — use image URL for now."""
     return {"status": "info", "message": "Provide an image URL in PUT /admin/ticker/landing-images. Example: {\"pinpanclub\": \"https://your-image-url.com/image.jpg\"}"}
+
+
+# ═══ LAYOUT ICONS CONFIG ═══
+
+DEFAULT_LAYOUT_ICONS = {
+    "mosaic_community": [
+        {"key": "pinpan", "label": "PinPan", "to": "/pinpanclub", "type": "lucide", "icon": "Gamepad2", "image_url": "", "accent": "#d97706", "accent_bg": "#FFF7ED"},
+        {"key": "tienda", "label": "Tienda", "to": "/unatienda", "type": "lucide", "icon": "Store", "image_url": "", "accent": "#059669", "accent_bg": "#ECFDF5"},
+        {"key": "ranking", "label": "Ranking", "to": "/pinpanclub/superpin/ranking", "type": "lucide", "icon": "Trophy", "image_url": "", "accent": "#C8102E", "accent_bg": "#FFF1F2"},
+        {"key": "aprender", "label": "Aprender", "to": "/comunidad", "type": "lucide", "icon": "GraduationCap", "image_url": "", "accent": "#7c3aed", "accent_bg": "#F5F3FF"},
+        {"key": "cultura", "label": "Cultura", "to": "/galeria", "type": "lucide", "icon": "Globe", "image_url": "", "accent": "#0284c7", "accent_bg": "#F0F9FF"},
+        {"key": "fe", "label": "Fe", "to": "/comunidad", "type": "lucide", "icon": "Heart", "image_url": "", "accent": "#ec4899", "accent_bg": "#FDF2F8"},
+    ],
+    "living_grid": [],
+    "cinematic": [],
+    "horizon": [],
+}
+
+
+@router.get("/layout-icons")
+async def get_layout_icons():
+    """Public: get icon config for all layouts."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    custom = doc.get("value", {}) if doc else {}
+    merged = {**DEFAULT_LAYOUT_ICONS}
+    for layout_id, icons in custom.items():
+        if icons:
+            merged[layout_id] = icons
+    return merged
+
+
+@admin_router.get("/layout-icons")
+async def get_layout_icons_admin():
+    """Admin: get all layout icon configs with defaults."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    custom = doc.get("value", {}) if doc else {}
+    merged = {**DEFAULT_LAYOUT_ICONS}
+    for layout_id, icons in custom.items():
+        if icons:
+            merged[layout_id] = icons
+    return {"defaults": DEFAULT_LAYOUT_ICONS, "custom": custom, "resolved": merged}
+
+
+@admin_router.put("/layout-icons/{layout_id}")
+async def update_layout_icons(layout_id: str, body: dict):
+    """Admin: update icon config for a specific layout."""
+    db = get_db()
+    icons = body.get("icons", [])
+    current_doc = db.app_config.find_one({"config_key": "layout_icons"}, {"_id": 0})
+    current = current_doc.get("value", {}) if current_doc else {}
+    current[layout_id] = icons
+    db.app_config.update_one(
+        {"config_key": "layout_icons"},
+        {"$set": {"config_key": "layout_icons", "value": current, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True
+    )
+    return {"status": "ok", "layout_id": layout_id, "icons": icons}
