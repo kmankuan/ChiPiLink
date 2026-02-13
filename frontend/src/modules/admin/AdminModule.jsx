@@ -105,6 +105,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Layouts & Icons</span>
             <span className="sm:hidden">Layouts</span>
           </TabsTrigger>
+          <TabsTrigger value="showcase" className="gap-2" data-testid="showcase-tab">
+            <Megaphone className="h-4 w-4" />
+            <span className="hidden sm:inline">Banners & Media</span>
+            <span className="sm:hidden">Showcase</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
