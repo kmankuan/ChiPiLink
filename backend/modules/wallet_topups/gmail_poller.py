@@ -69,7 +69,7 @@ class GmailPoller:
                     self._running = False
                     break
 
-                interval_minutes = settings.get("polling_interval_minutes", 5)
+                interval_minutes = settings.get("polling_interval_minutes", 1)
 
                 # Run the scan
                 await self._scan_once()
