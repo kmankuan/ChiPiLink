@@ -5,6 +5,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Automated Monday.com Banner Sync (Feb 13, 2026) - COMPLETE
+- **Background scheduler** using APScheduler: auto-syncs banners from Monday.com at configurable intervals
+- **Default 10-minute interval**, admin-configurable (1 min to 24 hours)
+- Admin UI: enable/disable toggle, interval dropdown selector, real-time status display (Running/Paused, next sync, last sync)
+- Scheduler starts on app startup, pauses when not configured, resumes when both Monday integration and auto-sync enabled
+- **Tested: 100% (13/13 backend tests passed)**
+
 ### Scheduled Banners & Monday.com Sync (Feb 13, 2026) - COMPLETE
 - **Scheduled banners**: start_date/end_date fields — banners auto-show/hide based on dates
 - **Monday.com → App sync**: Canva design URL → Monday.com board → auto-sync to app banner carousel
@@ -36,14 +43,18 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - `GET /api/admin/showcase/monday-banners/config` — Sync config
 - `PUT /api/admin/showcase/monday-banners/config` — Save config
 - `GET /api/admin/showcase/monday-banners/boards` — List boards + columns
-- `POST /api/admin/showcase/monday-banners/sync` — Trigger sync
+- `POST /api/admin/showcase/monday-banners/sync` — Trigger manual sync
+### Auto-Sync
+- `GET /api/admin/showcase/monday-banners/auto-sync` — Auto-sync config + scheduler status
+- `PUT /api/admin/showcase/monday-banners/auto-sync` — Enable/disable auto-sync, set interval
 
 ## Key Files
-- `/app/backend/modules/showcase/__init__.py` — All showcase API routes
+- `/app/backend/modules/showcase/__init__.py` — All showcase API routes (banners, media, monday, auto-sync)
 - `/app/backend/modules/showcase/monday_banner_adapter.py` — Monday.com sync adapter
+- `/app/backend/modules/showcase/scheduler.py` — APScheduler-based auto-sync scheduler
 - `/app/frontend/src/components/BannerCarousel.jsx` — Banner carousel
 - `/app/frontend/src/components/MediaPlayer.jsx` — Media player
-- `/app/frontend/src/modules/admin/ShowcaseAdminModule.jsx` — Admin panel (3 tabs)
+- `/app/frontend/src/modules/admin/ShowcaseAdminModule.jsx` — Admin panel (3 tabs + auto-sync controls)
 
 ## Backlog
 ### P1 - User Chooses Final Landing Page Design
