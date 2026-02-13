@@ -233,6 +233,9 @@ export default function ShowcaseAdminModule() {
   const [mondayBoards, setMondayBoards] = useState([]);
   const [syncing, setSyncing] = useState(false);
   const [savingMonday, setSavingMonday] = useState(false);
+  // Auto-sync state
+  const [autoSync, setAutoSync] = useState({ enabled: false, interval_minutes: 10, scheduler: { running: false, next_run: null }, last_sync: null });
+  const [savingAutoSync, setSavingAutoSync] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
