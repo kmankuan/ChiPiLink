@@ -1825,7 +1825,9 @@
     "refresh": "Actualizar",
     "noComments": "Sin comentarios aún",
     "loadingFeed": "Cargando feed...",
-    "noPosts": "Sin publicaciones aún"
+    "noPosts": "Sin publicaciones aún",
+    "accessDenied": "Feed restringido",
+    "accessDeniedDesc": "Este feed está actualmente restringido. Contacta a un administrador para obtener acceso."
   },
   "storeManager": {
     "productsTab": "Productos",
