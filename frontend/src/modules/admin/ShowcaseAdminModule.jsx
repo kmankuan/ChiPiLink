@@ -717,7 +717,7 @@ export default function ShowcaseAdminModule() {
                     <li>Create a new item on your <strong>Monday.com board</strong></li>
                     <li>Paste the Canva URL in the image column, set dates for scheduling</li>
                     <li>Set status to <strong>Active</strong> when ready to publish</li>
-                    <li>Click <strong>"Sync Now"</strong> or wait for auto-sync</li>
+                    <li>Click <strong>"Sync Now"</strong> for instant sync, or enable <strong>Auto-Sync</strong> above</li>
                   </ol>
                 </div>
               </>
