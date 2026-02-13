@@ -331,7 +331,7 @@ async def process_email(email_data: dict) -> dict:
         "parsed_data": parsed,
     })
 
-    return {"created": True, "topup": doc, "parsed": parsed, "auto_approve": rule_result.get("auto_approve", False)}
+    return {"created": True, "topup": doc, "parsed": parsed, "auto_approve": rule_result.get("auto_approve", False), "dedup": dedup_result}
 
 
 gmail_service = GmailService()
