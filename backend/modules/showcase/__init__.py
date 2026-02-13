@@ -308,3 +308,54 @@ async def fetch_google_photos_album(body: dict):
             "items": [],
             "album_url": album_url
         }
+
+
+# ═══════════════════════════════════════════
+# MONDAY.COM BANNER SYNC
+# ═══════════════════════════════════════════
+
+@admin_router.get("/monday-banners/config")
+async def get_monday_banner_config():
+    """Admin: Get Monday.com banner sync configuration."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    config = await monday_banner_adapter.get_config(db)
+    return config
+
+
+@admin_router.put("/monday-banners/config")
+async def update_monday_banner_config(body: dict):
+    """Admin: Update Monday.com banner sync configuration (board_id, column mappings)."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    await monday_banner_adapter.save_config(db, body)
+    return {"status": "ok", "config": body}
+
+
+@admin_router.post("/monday-banners/sync")
+async def sync_monday_banners():
+    """Admin: Manually trigger sync from Monday.com banner board."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    result = await monday_banner_adapter.sync_from_monday(db)
+    return result
+
+
+@admin_router.get("/monday-banners/boards")
+async def list_monday_boards_for_banners():
+    """Admin: List available Monday.com boards for banner sync."""
+    from modules.integrations.monday.core_client import monday_client
+    try:
+        data = await monday_client.execute("""
+            query {
+                boards(limit: 100, order_by: created_at) {
+                    id
+                    name
+                    columns { id title type }
+                }
+            }
+        """)
+        return {"boards": data.get("boards", [])}
+    except Exception as e:
+        return {"boards": [], "error": str(e)}
+
