@@ -371,8 +371,8 @@ async def process_gmail_emails(data: dict = None, admin: dict = Depends(get_admi
                 results["rejected"] += 1
             elif result.get("created"):
                 results["created"] += 1
-                # Sync to Monday.com
-                asyncio.create_task(_sync_pending_to_monday(result["topup"]))
+                # Sync to Monday.com with dedup warnings
+                asyncio.create_task(_sync_pending_to_monday(result["topup"], result.get("dedup")))
             results["details"].append({
                 "subject": em.get("subject", "")[:80],
                 "from": em.get("from", ""),
