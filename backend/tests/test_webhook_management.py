@@ -20,6 +20,26 @@ import time
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 
+
+def retry_request(func, max_retries=3, delay=2):
+    """Retry request function on 5xx errors (Cloudflare intermittent issues)."""
+    for attempt in range(max_retries):
+        try:
+            response = func()
+            if response.status_code < 500:
+                return response
+            if attempt < max_retries - 1:
+                print(f"Got {response.status_code}, retrying in {delay}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(delay)
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"Request failed: {e}, retrying...")
+                time.sleep(delay)
+            else:
+                raise
+    return response
+
+
 @pytest.fixture(scope="module")
 def api_client():
     """Shared requests session."""
