@@ -393,8 +393,12 @@ function SettingsTab() {
   const [checkingGmail, setCheckingGmail] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
+  const [pollingStatus, setPollingStatus] = useState(null);
 
-  useEffect(() => { axios.get(`${API}/api/wallet-topups/settings`, { headers: hdrs() }).then(r => setSettings(r.data)).catch(() => setSettings({})).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    axios.get(`${API}/api/wallet-topups/settings`, { headers: hdrs() }).then(r => setSettings(r.data)).catch(() => setSettings({})).finally(() => setLoading(false));
+    axios.get(`${API}/api/wallet-topups/polling/status`, { headers: hdrs() }).then(r => setPollingStatus(r.data)).catch(() => {});
+  }, []);
 
   const save = async () => {
     setSaving(true);
