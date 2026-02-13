@@ -5,7 +5,7 @@ import sys
 import json
 
 class SpecificTasksTester:
-    def __init__(self, base_url="https://showcase-hub-31.preview.emergentagent.com"):
+    def __init__(self, base_url="https://chipi-wallet-fix.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0
