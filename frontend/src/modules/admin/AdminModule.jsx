@@ -91,6 +91,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Widget</span>
             <span className="sm:hidden">Widget</span>
           </TabsTrigger>
+          <TabsTrigger value="ticker" className="gap-2" data-testid="ticker-tab">
+            <Radio className="h-4 w-4" />
+            <span className="hidden sm:inline">Activity Ticker</span>
+            <span className="sm:hidden">Ticker</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
