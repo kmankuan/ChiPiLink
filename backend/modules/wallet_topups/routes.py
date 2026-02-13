@@ -260,7 +260,7 @@ DEFAULT_SETTINGS = {
     "gmail_connected": False,
     "gmail_email": "",
     "polling_mode": "realtime",
-    "polling_interval_minutes": 5,
+    "polling_interval_minutes": 1,
     "auto_process": True,
     "require_approval": True,
     "updated_at": None,
@@ -321,7 +321,7 @@ async def get_polling_status(admin: dict = Depends(get_admin_user)):
     return {
         "poller_running": gmail_poller.is_running,
         "polling_mode": settings.get("polling_mode", "manual") if settings else "manual",
-        "polling_interval_minutes": settings.get("polling_interval_minutes", 5) if settings else 5,
+        "polling_interval_minutes": settings.get("polling_interval_minutes", 1) if settings else 1,
         "last_auto_scan": settings.get("last_auto_scan") if settings else None,
         "last_scan_created": settings.get("last_scan_created", 0) if settings else 0,
     }
