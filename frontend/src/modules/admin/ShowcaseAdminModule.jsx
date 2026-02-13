@@ -652,7 +652,51 @@ export default function ShowcaseAdminModule() {
                   Save Monday.com Config
                 </Button>
 
-                {/* Auto-Sync Settings */}
+                {/* Real-Time Webhook */}
+                <div className="border rounded-xl p-4 space-y-3 bg-muted/20" data-testid="webhook-panel">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Zap className={`h-4 w-4 ${webhookStatus.registered ? 'text-amber-500' : 'text-muted-foreground'}`} />
+                      <div>
+                        <h4 className="text-xs font-bold">Real-Time Sync</h4>
+                        <p className="text-[9px] text-muted-foreground">Instant sync via Monday.com webhook — changes reflect immediately</p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant={webhookStatus.registered ? 'default' : 'outline'}
+                      className={`text-[9px] ${webhookStatus.registered ? 'bg-amber-500/90' : ''}`}
+                      data-testid="webhook-status-badge"
+                    >
+                      {webhookStatus.registered ? 'Connected' : 'Off'}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant={webhookStatus.registered ? 'outline' : 'default'}
+                      onClick={toggleWebhook}
+                      disabled={togglingWebhook || !mondayConfig?.board_id}
+                      className="h-8 text-xs gap-1 flex-1"
+                      data-testid="toggle-webhook-btn"
+                    >
+                      {togglingWebhook ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : webhookStatus.registered ? (
+                        <ZapOff className="h-3 w-3" />
+                      ) : (
+                        <Zap className="h-3 w-3" />
+                      )}
+                      {webhookStatus.registered ? 'Disconnect Webhook' : 'Connect Real-Time Webhook'}
+                    </Button>
+                  </div>
+                  {webhookStatus.registered && webhookStatus.registered_at && (
+                    <p className="text-[9px] text-muted-foreground">
+                      Connected since {new Date(webhookStatus.registered_at).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+
+                {/* Auto-Sync Settings (Fallback) */}
                 <div className="border rounded-xl p-4 space-y-3 bg-muted/20" data-testid="auto-sync-panel">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
