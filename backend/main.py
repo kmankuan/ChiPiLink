@@ -208,6 +208,11 @@ from modules.ticker.routes import router as ticker_router, admin_router as ticke
 api_router.include_router(ticker_router)
 api_router.include_router(ticker_admin_router)
 
+# Showcase Module (Banners + Media Player)
+from modules.showcase import router as showcase_router, admin_router as showcase_admin_router
+api_router.include_router(showcase_router)
+api_router.include_router(showcase_admin_router)
+
 # Include main router in app
 app.include_router(api_router)
 
