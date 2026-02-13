@@ -368,6 +368,18 @@ export default function CommunityFeedModule() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check access + admin status
+  useEffect(() => {
+    axios.get(`${API_URL}/api/community-v2/feed/access`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(r => {
+      setIsAdmin(r.data.is_admin || false);
+      if (!r.data.has_access) setAccessDenied(true);
+    }).catch(() => {});
+  }, [token]);
 
   const fetchPosts = useCallback(async (pageNum = 1, append = false) => {
     if (pageNum === 1) setLoading(true);
@@ -376,6 +388,12 @@ export default function CommunityFeedModule() {
         params: { page: pageNum, limit: 20 },
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (res.data.access_denied) {
+        setAccessDenied(true);
+        setPosts([]);
+        setTotal(0);
+        return;
+      }
       const newPosts = res.data.posts || [];
       setPosts(prev => append ? [...prev, ...newPosts] : newPosts);
       setTotal(res.data.total || 0);
@@ -387,7 +405,7 @@ export default function CommunityFeedModule() {
     }
   }, [token]);
 
-  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+  useEffect(() => { if (!accessDenied) fetchPosts(); }, [fetchPosts, accessDenied]);
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -397,6 +415,9 @@ export default function CommunityFeedModule() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
+      {/* Admin Visibility Controls */}
+      {isAdmin && <VisibilityPanel token={token} />}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -405,42 +426,63 @@ export default function CommunityFeedModule() {
             {total > 0 ? `${total} posts from our channel` : 'Stay connected with the community'}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => { setPage(1); fetchPosts(1); }}
-          data-testid="refresh-feed-btn" className="gap-1.5">
-          <RefreshCw className="h-3.5 w-3.5" /> Refresh
-        </Button>
+        {!accessDenied && (
+          <Button variant="outline" size="sm" onClick={() => { setPage(1); fetchPosts(1); }}
+            data-testid="refresh-feed-btn" className="gap-1.5">
+            <RefreshCw className="h-3.5 w-3.5" /> Refresh
+          </Button>
+        )}
       </div>
 
-      {/* Feed */}
-      {loading ? (
-        <div className="flex flex-col items-center py-16 gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">{t("community.loadingFeed")}</p>
-        </div>
-      ) : posts.length === 0 ? (
-        <Card>
+      {/* Access Denied Message */}
+      {accessDenied && !isAdmin && (
+        <Card data-testid="access-denied-card">
           <CardContent className="py-16 text-center space-y-3">
-            <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto" />
+            <EyeOff className="h-12 w-12 text-muted-foreground mx-auto" />
             <div>
-              <p className="font-medium">{t("community.noPosts")}</p>
+              <p className="font-medium">{t("community.accessDenied", "Feed restricted")}</p>
               <p className="text-sm text-muted-foreground">
-                Content from the Telegram channel will appear here once synced.
+                {t("community.accessDeniedDesc", "This feed is currently restricted. Contact an administrator for access.")}
               </p>
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <>
-          {posts.map((post) => (
-            <PostCard key={post.telegram_msg_id} post={post} token={token} />
-          ))}
+      )}
 
-          {hasMore && (
-            <div className="flex justify-center py-4">
-              <Button variant="outline" onClick={loadMore} className="gap-2" data-testid="load-more-btn">
-                <ChevronDown className="h-4 w-4" /> Load More
-              </Button>
+      {/* Feed */}
+      {!accessDenied && (
+        <>
+          {loading ? (
+            <div className="flex flex-col items-center py-16 gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">{t("community.loadingFeed")}</p>
             </div>
+          ) : posts.length === 0 ? (
+            <Card>
+              <CardContent className="py-16 text-center space-y-3">
+                <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto" />
+                <div>
+                  <p className="font-medium">{t("community.noPosts")}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Content from the Telegram channel will appear here once synced.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {posts.map((post) => (
+                <PostCard key={post.telegram_msg_id} post={post} token={token} />
+              ))}
+
+              {hasMore && (
+                <div className="flex justify-center py-4">
+                  <Button variant="outline" onClick={loadMore} className="gap-2" data-testid="load-more-btn">
+                    <ChevronDown className="h-4 w-4" /> Load More
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
