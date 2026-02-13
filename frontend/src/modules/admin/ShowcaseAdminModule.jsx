@@ -237,6 +237,8 @@ export default function ShowcaseAdminModule() {
   // Auto-sync state
   const [autoSync, setAutoSync] = useState({ enabled: false, interval_minutes: 10, scheduler: { running: false, next_run: null }, last_sync: null });
   const [savingAutoSync, setSavingAutoSync] = useState(false);
+  // Sync history
+  const [syncHistory, setSyncHistory] = useState([]);
 
   const fetchData = useCallback(async () => {
     try {
