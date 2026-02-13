@@ -854,11 +854,17 @@ export default function PaymentAlertsModule() {
             <span className="hidden sm:inline">{t('paymentAlerts.tabs.log', 'Processing Log')}</span>
             <span className="sm:hidden">Log</span>
           </TabsTrigger>
+          <TabsTrigger value="monday" className="gap-1.5 text-xs" data-testid="tab-monday">
+            <LayoutGrid className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{t('paymentAlerts.tabs.monday', 'Monday.com Config')}</span>
+            <span className="sm:hidden">Monday</span>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="pending"><PendingQueueTab /></TabsContent>
         <TabsContent value="rules"><RulesConfigTab /></TabsContent>
         <TabsContent value="settings"><SettingsTab /></TabsContent>
         <TabsContent value="log"><ProcessingLogTab /></TabsContent>
+        <TabsContent value="monday"><MondayConfigTab /></TabsContent>
       </Tabs>
     </div>
   );
