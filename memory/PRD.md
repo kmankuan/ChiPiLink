@@ -5,21 +5,28 @@ Build a comprehensive admin dashboard for "Chipi Wallet" with Gmail-to-Wallet pa
 
 ## What's Been Implemented
 
-### Gmail-to-Wallet Payment Pipeline (Feb 12-13, 2026) - Steps 1-5 COMPLETE
-- **Step 1**: Pending queue, approve/reject workflow, manual entry, stats dashboard
-- **Step 2**: Gmail IMAP (toolskoh@gmail.com), inbox scan, email fetching
-- **Step 3**: GPT-4o email parsing (amount, sender, reference, confidence), rule engine (whitelist, keywords, thresholds)
-- **Step 4**: Monday.com sync - creates items with mapped columns + posts email summary as item Update
-- **Step 5**: Monday.com Configuration UI - admin can select board, map columns, toggle sync, test connection
-- **4-Layer Deduplication**: Message-ID, bank reference match, amount+sender fingerprint (24h), low-risk same-amount (2h)
-- **Warning System**: Clear/Low Risk/Potential Duplicate/Duplicate badges on each item
-- **Processing Log**: All scanned emails tracked with results
-- **Monday.com Config**: Board selection (Recharge Approval ID:18399959471), column mapping, group selection, save/test
-- MongoDB: wallet_pending_topups, wallet_topup_rules, wallet_topup_settings, wallet_processed_emails, monday_topup_items, wallet_topup_monday_config
-- Testing: 100% iterations 84-88
+### Gmail-to-Wallet Payment Pipeline (Feb 12-13, 2026) - COMPLETE
+- **Pending queue**: approve/reject workflow, manual entry, stats dashboard
+- **Gmail IMAP**: inbox scan, email fetching (toolskoh@gmail.com)
+- **GPT-4o parsing**: amount, sender, reference, confidence, rule engine
+- **Monday.com sync**: creates items with mapped columns + email summary as Updates
+- **Monday.com Configuration UI**: admin selects board, maps columns, toggles sync, tests connection
+- **4-Layer Deduplication**: Message-ID, bank reference, fingerprint (24h), same-amount (2h)
+- **E2E Verified**: Manual entry -> Monday sync -> Approve/Reject -> Monday status update (Pending/Approved/Decline)
+- Board ID: 18399959471 (Recharge Approval)
+
+### Telegram Feed Visibility Controls (Feb 13, 2026) - COMPLETE
+- **Backend**: Role-based access check on `/feed/posts`, admin visibility endpoints (`GET/PUT /admin/visibility`)
+- **Frontend**: Collapsible Visibility Panel for admins with 3 modes:
+  - All Users (default) - everyone logged in
+  - Admins Only - only administrators
+  - Specific Roles - checkbox selection from configured roles (Super Admin, Admin, Moderator, User)
+- **Permissions**: Added `community.feed_view` and `community.feed_admin` to role permissions
+- **i18n**: EN/ES/ZH translations for access denied messages
+- **Testing**: 100% pass (15 backend + all frontend tests, iteration 89)
 
 ### Dev Control Section - DONE
-- 10-tab module: AI Helper (GPT-4o + Claude), Annotations, DB Explorer, Changes, Architecture, Modules, Dependencies, Principles, API Reference, Roadmap
+- 10-tab observability module: AI Helper (GPT-4o + Claude), Annotations, DB Explorer, Architecture, etc.
 
 ### Previously Completed
 - 2-Way Monday.com Wallet Sync + Dashboard
@@ -32,10 +39,6 @@ Build a comprehensive admin dashboard for "Chipi Wallet" with Gmail-to-Wallet pa
 - Integrations: Monday.com, Telegram Bot, Gmail IMAP
 
 ## Prioritized Backlog
-### P0 - Next
-- End-to-end verification: Gmail scan -> pending item -> Monday.com sync -> approve -> status update in Monday
-### P1 - Upcoming
-- Telegram Feed Visibility Controls
 ### P2 - Future
 - OneSignal Push, Stripe Payments, Google Sheets
 ### P3 - Backlog
