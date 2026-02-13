@@ -606,6 +606,226 @@ function ProcessingLogTab() {
   );
 }
 
+// ─── Monday.com Config Tab ──────────────────────────────────
+function MondayConfigTab() {
+  const [config, setConfig] = useState(null);
+  const [boards, setBoards] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [connStatus, setConnStatus] = useState(null);
+  const [loadingCols, setLoadingCols] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      axios.get(`${API}/api/wallet-topups/monday/config`, { headers: hdrs() }).then(r => setConfig(r.data)).catch(() => {}),
+      axios.get(`${API}/api/wallet-topups/monday/boards`, { headers: hdrs() }).then(r => setBoards(r.data.boards || [])).catch(() => setBoards([])),
+    ]).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (config?.board_id) loadColumns(config.board_id);
+  }, [config?.board_id]);
+
+  const loadColumns = async (boardId) => {
+    if (!boardId) return;
+    setLoadingCols(true);
+    try {
+      const r = await axios.get(`${API}/api/wallet-topups/monday/boards/${boardId}/columns`, { headers: hdrs() });
+      setColumns(r.data.columns || []);
+      setGroups(r.data.groups || []);
+    } catch { setColumns([]); setGroups([]); }
+    finally { setLoadingCols(false); }
+  };
+
+  const testConn = async () => {
+    setTesting(true);
+    try {
+      const r = await axios.post(`${API}/api/wallet-topups/monday/test`, {}, { headers: hdrs() });
+      setConnStatus(r.data);
+      if (r.data.connected) toast.success(`Connected: ${r.data.user} (${r.data.account})`);
+      else toast.error(r.data.error || 'Connection failed');
+    } catch (e) { toast.error('Failed'); }
+    finally { setTesting(false); }
+  };
+
+  const selectBoard = async (boardId) => {
+    const board = boards.find(b => b.id === boardId);
+    setConfig(c => ({ ...c, board_id: boardId, board_name: board?.name || '' }));
+    if (boardId) loadColumns(boardId);
+  };
+
+  const setMapping = (field, colId) => {
+    setConfig(c => ({ ...c, column_mapping: { ...c.column_mapping, [field]: colId } }));
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const r = await axios.put(`${API}/api/wallet-topups/monday/config`, config, { headers: hdrs() });
+      setConfig(r.data);
+      toast.success('Monday.com configuration saved');
+    } catch { toast.error('Failed to save'); }
+    finally { setSaving(false); }
+  };
+
+  if (loading) return <Loader2 className="h-5 w-5 animate-spin mx-auto mt-8" />;
+  if (!config) return null;
+
+  const mappingFields = [
+    { key: 'amount', label: 'Amount', desc: 'Column for the transaction amount' },
+    { key: 'sender_name', label: 'Sender Name', desc: 'Who sent the payment' },
+    { key: 'status', label: 'Status', desc: 'Pending/Approved/Rejected status' },
+    { key: 'warning', label: 'Warning/Risk', desc: 'Duplicate detection warning level' },
+    { key: 'bank_reference', label: 'Bank Reference', desc: 'Transaction reference number' },
+    { key: 'email_date', label: 'Email Date & Time', desc: 'When the email was received' },
+    { key: 'source', label: 'Source', desc: 'gmail / manual' },
+    { key: 'confidence', label: 'AI Confidence', desc: 'How confident the AI parsing was' },
+  ];
+
+  return (
+    <div className="space-y-4" data-testid="monday-config">
+      {/* Connection Test */}
+      <Card>
+        <CardHeader className="py-3 px-4">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <img src="https://cdn.monday.com/images/favicon-v2/32.png" alt="" className="h-4 w-4" />
+            Monday.com Connection
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-3">
+          <div className="flex items-center gap-3">
+            {connStatus?.connected ? (
+              <div className="flex items-center gap-2 flex-1">
+                <CheckCircle className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm">Connected: {connStatus.user} ({connStatus.account})</span>
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground flex-1">Click "Test" to verify connection</span>
+            )}
+            <Button size="sm" variant="outline" onClick={testConn} disabled={testing} className="text-xs h-8" data-testid="test-monday-btn">
+              {testing ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <RefreshCw className="h-3 w-3 mr-1" />}
+              Test
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Enable Toggle */}
+      <Card>
+        <CardContent className="p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold">Sync to Monday.com Board</p>
+            <p className="text-xs text-muted-foreground">Create items on Monday.com when payment alerts are detected</p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={config.enabled} onChange={e => setConfig(c => ({ ...c, enabled: e.target.checked }))} className="rounded" />
+            <span className="text-xs font-medium">{config.enabled ? 'Enabled' : 'Disabled'}</span>
+          </label>
+        </CardContent>
+      </Card>
+
+      {/* Board Selection */}
+      <Card>
+        <CardHeader className="py-3 px-4">
+          <CardTitle className="text-sm">Select Board</CardTitle>
+          <p className="text-xs text-muted-foreground">Choose which Monday.com board to sync payment alerts to</p>
+        </CardHeader>
+        <CardContent className="px-4 pb-3 space-y-2">
+          <select
+            value={config.board_id || ''}
+            onChange={e => selectBoard(e.target.value)}
+            className="h-9 w-full px-3 text-sm border rounded-md bg-background"
+            data-testid="select-board"
+          >
+            <option value="">-- Select a board --</option>
+            {boards.map(b => <option key={b.id} value={b.id}>{b.name} (ID: {b.id})</option>)}
+          </select>
+          {config.board_id && config.board_name && (
+            <p className="text-xs text-muted-foreground">Selected: <strong>{config.board_name}</strong></p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Group Selection */}
+      {config.board_id && groups.length > 0 && (
+        <Card>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-sm">Select Group (Optional)</CardTitle>
+            <p className="text-xs text-muted-foreground">Which group on the board should items be created in?</p>
+          </CardHeader>
+          <CardContent className="px-4 pb-3">
+            <select
+              value={config.group_id || ''}
+              onChange={e => setConfig(c => ({ ...c, group_id: e.target.value }))}
+              className="h-9 w-full px-3 text-sm border rounded-md bg-background"
+              data-testid="select-group"
+            >
+              <option value="">-- Default (first group) --</option>
+              {groups.map(g => <option key={g.id} value={g.id}>{g.title}</option>)}
+            </select>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Column Mapping */}
+      {config.board_id && (
+        <Card>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-sm">Column Mapping</CardTitle>
+            <p className="text-xs text-muted-foreground">Map payment alert fields to Monday.com board columns</p>
+            {loadingCols && <Loader2 className="h-3 w-3 animate-spin" />}
+          </CardHeader>
+          <CardContent className="px-4 pb-3">
+            <div className="space-y-3">
+              {mappingFields.map(field => (
+                <div key={field.key} className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="sm:w-40 shrink-0">
+                    <p className="text-xs font-semibold">{field.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{field.desc}</p>
+                  </div>
+                  <select
+                    value={config.column_mapping?.[field.key] || ''}
+                    onChange={e => setMapping(field.key, e.target.value)}
+                    className="h-8 flex-1 px-2 text-xs border rounded-md bg-background"
+                    data-testid={`map-${field.key}`}
+                  >
+                    <option value="">-- Not mapped --</option>
+                    {columns.map(c => (
+                      <option key={c.id} value={c.id}>{c.title} ({c.type})</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Post Email as Update */}
+      <Card>
+        <CardContent className="p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold">Post email summary as item Update</p>
+            <p className="text-[10px] text-muted-foreground">The full email content and risk assessment will be posted as a comment on the Monday.com item</p>
+          </div>
+          <input type="checkbox" checked={config.post_email_as_update !== false} onChange={e => setConfig(c => ({ ...c, post_email_as_update: e.target.checked }))} className="rounded" />
+        </CardContent>
+      </Card>
+
+      {/* Save */}
+      <div className="flex justify-end">
+        <Button onClick={save} disabled={saving} data-testid="save-monday-config-btn">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <CheckCircle className="h-4 w-4 mr-1" />}
+          Save Configuration
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Module ────────────────────────────────────────────
 export default function PaymentAlertsModule() {
   const { t } = useTranslation();
