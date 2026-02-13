@@ -424,13 +424,18 @@ async def list_processed_emails(limit: int = 50, admin: dict = Depends(get_admin
 
 # ============== MONDAY.COM SYNC HELPERS ==============
 
-async def _sync_pending_to_monday(topup: dict):
+async def _sync_pending_to_monday(topup: dict, dedup_result: dict = None):
     """Create a Monday.com item for a new pending top-up."""
     try:
-        from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
-        # This will use the existing Monday.com integration
-        # Create as a new item with "Pending Approval" status
-        logger.info(f"Syncing pending topup {topup['id']} to Monday.com")
+        from .monday_sync import payment_alerts_monday
+        item_id = await payment_alerts_monday.create_topup_item(topup, dedup_result)
+        if item_id:
+            logger.info(f"Synced topup {topup.get('id', '')[:8]} to Monday.com item {item_id}")
+            # Store Monday.com item ID on the topup
+            await db[PENDING_COL].update_one(
+                {"id": topup.get("id", "")},
+                {"$set": {"monday_item_id": item_id}}
+            )
     except Exception as e:
         logger.warning(f"Monday.com sync for pending topup failed: {e}")
 
@@ -438,7 +443,11 @@ async def _sync_pending_to_monday(topup: dict):
 async def _update_monday_status(topup: dict, new_status: str):
     """Update Monday.com item status when approved/rejected."""
     try:
-        from modules.users.integrations.monday_wallet_adapter import wallet_monday_adapter
-        logger.info(f"Updating Monday.com status for topup {topup['id']} to {new_status}")
+        from .monday_sync import payment_alerts_monday
+        await payment_alerts_monday.update_item_status(
+            topup.get("id", ""),
+            new_status,
+            topup.get("reviewed_by", "admin")
+        )
     except Exception as e:
         logger.warning(f"Monday.com status update failed: {e}")
