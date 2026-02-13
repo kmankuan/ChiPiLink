@@ -11,19 +11,19 @@ Build a comprehensive admin dashboard for "Chipi Wallet" with Gmail-to-Wallet pa
 - **GPT-4o parsing**: amount, sender, reference, confidence, rule engine
 - **Monday.com sync**: creates items with mapped columns + email summary as Updates
 - **Monday.com Configuration UI**: admin selects board, maps columns, toggles sync, tests connection
-- **4-Layer Deduplication**: Message-ID, bank reference, fingerprint (24h), same-amount (2h)
-- **E2E Verified**: Manual entry -> Monday sync -> Approve/Reject -> Monday status update (Pending/Approved/Decline)
+- **4-Layer Deduplication**: Message-ID, bank reference match, amount+sender fingerprint (24h), low-risk same-amount (2h)
+- **Real-time Background Polling**: Gmail poller auto-starts at server startup, scans every N minutes (configurable)
+  - Starts/stops automatically based on settings (realtime vs manual mode)
+  - Shows live status indicator in Settings tab ("Background scanner active" with green pulse)
+  - Logs last scan timestamp and new items found
+- **E2E Verified**: Manual entry -> Monday sync -> Approve (Approved) / Reject (Decline) -> Monday status update
 - Board ID: 18399959471 (Recharge Approval)
 
 ### Telegram Feed Visibility Controls (Feb 13, 2026) - COMPLETE
-- **Backend**: Role-based access check on `/feed/posts`, admin visibility endpoints (`GET/PUT /admin/visibility`)
-- **Frontend**: Collapsible Visibility Panel for admins with 3 modes:
-  - All Users (default) - everyone logged in
-  - Admins Only - only administrators
-  - Specific Roles - checkbox selection from configured roles (Super Admin, Admin, Moderator, User)
-- **Permissions**: Added `community.feed_view` and `community.feed_admin` to role permissions
-- **i18n**: EN/ES/ZH translations for access denied messages
-- **Testing**: 100% pass (15 backend + all frontend tests, iteration 89)
+- **Backend**: Role-based access check on `/feed/posts`, admin visibility endpoints
+- **Frontend**: Collapsible Visibility Panel with 3 modes: All Users, Admins Only, Specific Roles
+- **Permissions**: `community.feed_view` and `community.feed_admin` added to role system
+- Testing: 100% pass (iteration 89)
 
 ### Dev Control Section - DONE
 - 10-tab observability module: AI Helper (GPT-4o + Claude), Annotations, DB Explorer, Architecture, etc.
@@ -37,6 +37,14 @@ Build a comprehensive admin dashboard for "Chipi Wallet" with Gmail-to-Wallet pa
 - Frontend: React, Shadcn/UI, Tailwind, react-i18next
 - LLM: GPT-4o + Claude Sonnet 4.5 via emergentintegrations
 - Integrations: Monday.com, Telegram Bot, Gmail IMAP
+
+## Key Files
+- `/app/backend/modules/wallet_topups/gmail_poller.py` - Background polling service
+- `/app/backend/modules/wallet_topups/routes.py` - All payment alerts endpoints
+- `/app/backend/modules/wallet_topups/monday_sync.py` - Monday.com sync logic
+- `/app/backend/modules/community/routes/telegram_feed.py` - Feed visibility
+- `/app/frontend/src/modules/admin/PaymentAlertsModule.jsx` - Payment alerts UI
+- `/app/frontend/src/modules/community/CommunityFeedModule.jsx` - Community feed UI
 
 ## Prioritized Backlog
 ### P2 - Future
