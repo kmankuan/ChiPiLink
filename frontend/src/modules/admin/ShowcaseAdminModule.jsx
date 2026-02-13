@@ -1,0 +1,527 @@
+/**
+ * ShowcaseAdminModule — Admin panel for managing:
+ * 1. Banner Carousel (image + text banners)
+ * 2. Media Player (photos/videos from Google Photos or manual URLs)
+ */
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import {
+  Image, Film, Plus, Trash2, Save, Loader2, Eye, EyeOff,
+  ChevronUp, ChevronDown, Type, Link2, Palette, GripVertical,
+  Play, Globe, Upload
+} from 'lucide-react';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+const getToken = () => localStorage.getItem('auth_token');
+
+// Color presets for text banners (Facebook-style)
+const COLOR_PRESETS = [
+  { bg: '#C8102E', grad: 'linear-gradient(135deg, #C8102E 0%, #8B0000 100%)' },
+  { bg: '#16a34a', grad: 'linear-gradient(135deg, #16a34a 0%, #0d6e3a 100%)' },
+  { bg: '#d97706', grad: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)' },
+  { bg: '#7c3aed', grad: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)' },
+  { bg: '#0284c7', grad: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' },
+  { bg: '#dc2626', grad: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' },
+  { bg: '#1e293b', grad: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' },
+  { bg: '#ec4899', grad: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)' },
+];
+
+function BannerEditor({ banner, onSave, onDelete }) {
+  const [data, setData] = useState(banner);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const method = banner.banner_id ? 'PUT' : 'POST';
+      const url = banner.banner_id
+        ? `${API_URL}/api/admin/showcase/banners/${banner.banner_id}`
+        : `${API_URL}/api/admin/showcase/banners`;
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        onSave(saved);
+        toast.success('Banner saved');
+      }
+    } catch (e) {
+      toast.error('Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="border rounded-xl p-4 space-y-3 bg-card" data-testid={`banner-editor-${banner.banner_id || 'new'}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Badge variant={data.type === 'image' ? 'default' : 'secondary'} className="text-[9px]">
+            {data.type === 'image' ? 'Image' : 'Text'}
+          </Badge>
+          <Badge variant={data.active ? 'default' : 'outline'} className="text-[9px]">
+            {data.active ? 'Active' : 'Hidden'}
+          </Badge>
+        </div>
+        <div className="flex gap-1">
+          <Button size="sm" variant="ghost" onClick={() => setData({ ...data, active: !data.active })} className="h-7 w-7 p-0">
+            {data.active ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={onDelete} className="h-7 w-7 p-0 text-destructive">
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Type selector */}
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant={data.type === 'image' ? 'default' : 'outline'}
+          onClick={() => setData({ ...data, type: 'image' })}
+          className="h-7 text-xs gap-1 flex-1"
+        >
+          <Image className="h-3 w-3" /> Image Banner
+        </Button>
+        <Button
+          size="sm"
+          variant={data.type === 'text' ? 'default' : 'outline'}
+          onClick={() => setData({ ...data, type: 'text' })}
+          className="h-7 text-xs gap-1 flex-1"
+        >
+          <Type className="h-3 w-3" /> Text Banner
+        </Button>
+      </div>
+
+      {data.type === 'image' ? (
+        <div className="space-y-2">
+          <div>
+            <Label className="text-[10px]">Image URL</Label>
+            <Input value={data.image_url || ''} onChange={e => setData({ ...data, image_url: e.target.value })} className="h-8 text-xs" placeholder="https://..." />
+          </div>
+          <div>
+            <Label className="text-[10px]">Overlay Text (optional)</Label>
+            <Input value={data.overlay_text || ''} onChange={e => setData({ ...data, overlay_text: e.target.value })} className="h-8 text-xs" />
+          </div>
+          <div>
+            <Label className="text-[10px]">Click Link (optional)</Label>
+            <Input value={data.link_url || ''} onChange={e => setData({ ...data, link_url: e.target.value })} className="h-8 text-xs" placeholder="/pinpanclub or https://..." />
+          </div>
+          {data.image_url && (
+            <img src={data.image_url} alt="Preview" className="w-full h-20 object-cover rounded-lg" />
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div>
+            <Label className="text-[10px]">Message Text</Label>
+            <textarea
+              value={data.text || ''}
+              onChange={e => setData({ ...data, text: e.target.value })}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-xs min-h-[60px] resize-none"
+              placeholder="Type your announcement..."
+            />
+          </div>
+          <div>
+            <Label className="text-[10px]">Background Color / Gradient</Label>
+            <div className="flex gap-1.5 flex-wrap mt-1">
+              {COLOR_PRESETS.map((preset, i) => (
+                <button
+                  key={i}
+                  onClick={() => setData({ ...data, bg_color: preset.bg, bg_gradient: preset.grad })}
+                  className={`w-8 h-8 rounded-lg border-2 transition-all ${data.bg_color === preset.bg ? 'border-foreground scale-110' : 'border-transparent'}`}
+                  style={{ background: preset.grad }}
+                />
+              ))}
+              <div className="flex items-center gap-1 ml-1">
+                <input
+                  type="color"
+                  value={data.bg_color || '#16a34a'}
+                  onChange={e => setData({ ...data, bg_color: e.target.value, bg_gradient: '' })}
+                  className="w-8 h-8 rounded border-0 cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <Label className="text-[10px]">Background Image URL (optional)</Label>
+            <Input value={data.bg_image_url || ''} onChange={e => setData({ ...data, bg_image_url: e.target.value })} className="h-8 text-xs" placeholder="https://..." />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Label className="text-[10px]">Font Size</Label>
+              <select
+                value={data.font_size || 'lg'}
+                onChange={e => setData({ ...data, font_size: e.target.value })}
+                className="w-full h-8 rounded-lg border bg-background px-2 text-xs"
+              >
+                <option value="sm">Small</option>
+                <option value="md">Medium</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra Large</option>
+              </select>
+            </div>
+            <div>
+              <Label className="text-[10px]">Text Color</Label>
+              <input type="color" value={data.text_color || '#ffffff'} onChange={e => setData({ ...data, text_color: e.target.value })} className="w-8 h-8 rounded border-0 cursor-pointer" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-[10px]">Click Link (optional)</Label>
+            <Input value={data.link_url || ''} onChange={e => setData({ ...data, link_url: e.target.value })} className="h-8 text-xs" placeholder="/eventos or https://..." />
+          </div>
+          {/* Live preview */}
+          <div
+            className="rounded-xl px-4 py-4 text-center min-h-[50px] flex items-center justify-center relative overflow-hidden"
+            style={{
+              background: data.bg_gradient || data.bg_color || '#16a34a',
+              ...(data.bg_image_url ? { backgroundImage: `url(${data.bg_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {})
+            }}
+          >
+            {data.bg_image_url && <div className="absolute inset-0 bg-black/30" />}
+            <p className={`relative font-bold text-${data.font_size || 'lg'} leading-snug`} style={{ color: data.text_color || '#fff' }}>
+              {data.text || 'Preview'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <Button onClick={save} disabled={saving} size="sm" className="w-full h-8 text-xs gap-1" data-testid="save-banner-btn">
+        {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+        Save Banner
+      </Button>
+    </div>
+  );
+}
+
+
+export default function ShowcaseAdminModule() {
+  const [banners, setBanners] = useState([]);
+  const [mediaConfig, setMediaConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [albumUrl, setAlbumUrl] = useState('');
+  const [fetching, setFetching] = useState(false);
+  const [newItemUrl, setNewItemUrl] = useState('');
+  const [newItemType, setNewItemType] = useState('image');
+  const [newItemCaption, setNewItemCaption] = useState('');
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [bannersRes, mediaRes] = await Promise.all([
+        fetch(`${API_URL}/api/admin/showcase/banners`, { headers: { Authorization: `Bearer ${getToken()}` } }),
+        fetch(`${API_URL}/api/admin/showcase/media-player`, { headers: { Authorization: `Bearer ${getToken()}` } }),
+      ]);
+      if (bannersRes.ok) setBanners(await bannersRes.json());
+      if (mediaRes.ok) {
+        const mc = await mediaRes.json();
+        setMediaConfig(mc);
+        setAlbumUrl(mc.album_url || '');
+      }
+    } catch (e) {
+      toast.error('Failed to load');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const addBanner = () => {
+    setBanners(prev => [...prev, {
+      type: 'text', text: '', bg_color: '#16a34a', bg_gradient: 'linear-gradient(135deg, #16a34a 0%, #0d6e3a 100%)',
+      text_color: '#ffffff', font_size: 'lg', image_url: '', link_url: '', overlay_text: '', bg_image_url: '',
+      active: true, order: prev.length,
+    }]);
+  };
+
+  const deleteBanner = async (bannerId, index) => {
+    if (bannerId) {
+      await fetch(`${API_URL}/api/admin/showcase/banners/${bannerId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+    }
+    setBanners(prev => prev.filter((_, i) => i !== index));
+    toast.success('Banner deleted');
+  };
+
+  const saveBannerInList = (index, saved) => {
+    setBanners(prev => prev.map((b, i) => i === index ? saved : b));
+  };
+
+  const fetchAlbum = async () => {
+    if (!albumUrl) return;
+    setFetching(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/media-player/fetch-album`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ album_url: albumUrl })
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        toast.success(`Found ${data.items_added} media items!`);
+        fetchData();
+      } else {
+        toast.info(data.message || 'No items found. Try adding manually.');
+      }
+    } catch (e) {
+      toast.error('Failed to fetch album');
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const addManualItem = async () => {
+    if (!newItemUrl) return;
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/media-player/add-item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ type: newItemType, url: newItemUrl, caption: newItemCaption })
+      });
+      if (res.ok) {
+        toast.success('Item added');
+        setNewItemUrl('');
+        setNewItemCaption('');
+        fetchData();
+      }
+    } catch (e) {
+      toast.error('Failed to add item');
+    }
+  };
+
+  const deleteMediaItem = async (itemId) => {
+    try {
+      await fetch(`${API_URL}/api/admin/showcase/media-player/items/${itemId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      toast.success('Item removed');
+      fetchData();
+    } catch (e) {
+      toast.error('Failed to remove');
+    }
+  };
+
+  const savePlayerSettings = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/media-player`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(mediaConfig)
+      });
+      if (res.ok) toast.success('Settings saved');
+    } catch (e) {
+      toast.error('Failed to save');
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  }
+
+  const items = mediaConfig?.items || [];
+
+  return (
+    <div className="space-y-6" data-testid="showcase-admin">
+      <Tabs defaultValue="banners">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="banners" className="gap-1.5 text-xs" data-testid="banners-tab">
+            <Type className="h-3.5 w-3.5" /> Banners & Ads
+          </TabsTrigger>
+          <TabsTrigger value="media" className="gap-1.5 text-xs" data-testid="media-tab">
+            <Film className="h-3.5 w-3.5" /> Media Player
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ═══ BANNERS TAB ═══ */}
+        <TabsContent value="banners" className="space-y-4 mt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold">Banner Carousel</h3>
+              <p className="text-[10px] text-muted-foreground">Image or text banners — auto-rotates on the landing page</p>
+            </div>
+            <Button size="sm" onClick={addBanner} className="h-7 text-xs gap-1" data-testid="add-banner-btn">
+              <Plus className="h-3 w-3" /> Add Banner
+            </Button>
+          </div>
+
+          {banners.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-8">No banners yet. Click "Add Banner" to create one.</p>
+          ) : (
+            <div className="space-y-3">
+              {banners.map((banner, i) => (
+                <BannerEditor
+                  key={banner.banner_id || i}
+                  banner={banner}
+                  onSave={(saved) => saveBannerInList(i, saved)}
+                  onDelete={() => deleteBanner(banner.banner_id, i)}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* ═══ MEDIA PLAYER TAB ═══ */}
+        <TabsContent value="media" className="space-y-4 mt-4">
+          {/* Google Photos Album URL */}
+          <div className="border rounded-xl p-4 space-y-3 bg-card">
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-bold">Google Photos Album</h3>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Paste a shared Google Photos album URL to import photos/videos automatically
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={albumUrl}
+                onChange={e => setAlbumUrl(e.target.value)}
+                placeholder="https://photos.app.goo.gl/... or https://photos.google.com/share/..."
+                className="h-8 text-xs flex-1"
+                data-testid="album-url-input"
+              />
+              <Button
+                size="sm"
+                onClick={fetchAlbum}
+                disabled={fetching || !albumUrl}
+                className="h-8 text-xs gap-1"
+                data-testid="fetch-album-btn"
+              >
+                {fetching ? <Loader2 className="h-3 w-3 animate-spin" /> : <Globe className="h-3 w-3" />}
+                Fetch
+              </Button>
+            </div>
+          </div>
+
+          {/* Add Manual Item */}
+          <div className="border rounded-xl p-4 space-y-3 bg-card">
+            <div className="flex items-center gap-2">
+              <Upload className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-bold">Add Media Manually</h3>
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={newItemType}
+                onChange={e => setNewItemType(e.target.value)}
+                className="h-8 rounded-lg border bg-background px-2 text-xs w-24"
+              >
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+              </select>
+              <Input
+                value={newItemUrl}
+                onChange={e => setNewItemUrl(e.target.value)}
+                placeholder="Media URL (image or video)"
+                className="h-8 text-xs flex-1"
+                data-testid="manual-media-url"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newItemCaption}
+                onChange={e => setNewItemCaption(e.target.value)}
+                placeholder="Caption (optional)"
+                className="h-8 text-xs flex-1"
+              />
+              <Button
+                size="sm"
+                onClick={addManualItem}
+                disabled={!newItemUrl}
+                className="h-8 text-xs gap-1"
+                data-testid="add-media-btn"
+              >
+                <Plus className="h-3 w-3" /> Add
+              </Button>
+            </div>
+          </div>
+
+          {/* Player Settings */}
+          <div className="border rounded-xl p-4 space-y-3 bg-card">
+            <h3 className="text-sm font-bold">Player Settings</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div>
+                <Label className="text-[10px]">Slide Interval (ms)</Label>
+                <Input
+                  type="number"
+                  value={mediaConfig?.interval_ms || 5000}
+                  onChange={e => setMediaConfig({ ...mediaConfig, interval_ms: parseInt(e.target.value) || 5000 })}
+                  className="h-8 text-xs"
+                />
+              </div>
+              <div className="flex items-end gap-2">
+                <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={mediaConfig?.autoplay !== false}
+                    onChange={e => setMediaConfig({ ...mediaConfig, autoplay: e.target.checked })}
+                    className="rounded"
+                  />
+                  Autoplay
+                </label>
+              </div>
+              <div className="flex items-end gap-2">
+                <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={mediaConfig?.show_controls !== false}
+                    onChange={e => setMediaConfig({ ...mediaConfig, show_controls: e.target.checked })}
+                    className="rounded"
+                  />
+                  Show Controls
+                </label>
+              </div>
+            </div>
+            <Button size="sm" onClick={savePlayerSettings} className="h-7 text-xs gap-1" data-testid="save-player-settings">
+              <Save className="h-3 w-3" /> Save Settings
+            </Button>
+          </div>
+
+          {/* Media Items List */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold">{items.length} Media Items</h3>
+            </div>
+            {items.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-8">
+                No media items. Paste a Google Photos album URL or add items manually above.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {items.map(item => (
+                  <div key={item.item_id} className="relative group rounded-xl overflow-hidden border" data-testid={`media-item-${item.item_id}`}>
+                    {item.type === 'video' ? (
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <Play className="h-6 w-6 text-muted-foreground" />
+                        <p className="text-[9px] text-muted-foreground absolute bottom-1 left-1">Video</p>
+                      </div>
+                    ) : (
+                      <img src={item.url} alt={item.caption || 'Media'} className="aspect-video object-cover w-full" />
+                    )}
+                    {item.caption && (
+                      <p className="text-[9px] p-1.5 truncate text-muted-foreground">{item.caption}</p>
+                    )}
+                    <button
+                      onClick={() => deleteMediaItem(item.item_id)}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-destructive/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
