@@ -2233,7 +2233,8 @@
       "pending": "Cola Pendientes",
       "rules": "Reglas de Email",
       "settings": "Configuracion",
-      "log": "Registro de Procesamiento"
+      "log": "Registro de Procesamiento",
+      "monday": "Config Monday.com"
     }
   }
 }

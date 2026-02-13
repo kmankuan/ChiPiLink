@@ -2229,7 +2229,8 @@
       "pending": "Pending Queue",
       "rules": "Email Rules",
       "settings": "Settings",
-      "log": "Processing Log"
+      "log": "Processing Log",
+      "monday": "Monday.com Config"
     }
   }
 }

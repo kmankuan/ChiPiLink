@@ -2229,7 +2229,8 @@
       "pending": "待处理队列",
       "rules": "邮件规则",
       "settings": "设置",
-      "log": "处理日志"
+      "log": "处理日志",
+      "monday": "Monday.com 配置"
     }
   }
 }
