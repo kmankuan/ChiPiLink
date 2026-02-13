@@ -194,6 +194,22 @@ function BannerEditor({ banner, onSave, onDelete }) {
         </div>
       )}
 
+      {/* Schedule fields */}
+      <div className="flex gap-2 items-end border-t pt-2 mt-1">
+        <CalendarDays className="h-3.5 w-3.5 text-muted-foreground mb-1" />
+        <div className="flex-1">
+          <Label className="text-[10px]">Start Date</Label>
+          <Input type="date" value={data.start_date || ''} onChange={e => setData({ ...data, start_date: e.target.value })} className="h-7 text-xs" />
+        </div>
+        <div className="flex-1">
+          <Label className="text-[10px]">End Date</Label>
+          <Input type="date" value={data.end_date || ''} onChange={e => setData({ ...data, end_date: e.target.value })} className="h-7 text-xs" />
+        </div>
+      </div>
+      {data.source === 'monday' && (
+        <Badge variant="outline" className="text-[9px] gap-1"><Plug className="h-2.5 w-2.5" /> Synced from Monday.com</Badge>
+      )}
+
       <Button onClick={save} disabled={saving} size="sm" className="w-full h-8 text-xs gap-1" data-testid="save-banner-btn">
         {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
         Save Banner
