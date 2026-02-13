@@ -9,8 +9,9 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - **Background scheduler** using APScheduler: auto-syncs banners from Monday.com at configurable intervals
 - **Default 10-minute interval**, admin-configurable (1 min to 24 hours)
 - Admin UI: enable/disable toggle, interval dropdown selector, real-time status display (Running/Paused, next sync, last sync)
+- **Sync History Log**: timeline of past syncs showing status (success/error), trigger (auto/manual), items synced count, timestamps. Capped at 50 entries.
 - Scheduler starts on app startup, pauses when not configured, resumes when both Monday integration and auto-sync enabled
-- **Tested: 100% (13/13 backend tests passed)**
+- **Tested: 100% (13 auto-sync + 14 history = 27 backend tests passed)**
 
 ### Scheduled Banners & Monday.com Sync (Feb 13, 2026) - COMPLETE
 - **Scheduled banners**: start_date/end_date fields — banners auto-show/hide based on dates
@@ -47,6 +48,7 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 ### Auto-Sync
 - `GET /api/admin/showcase/monday-banners/auto-sync` — Auto-sync config + scheduler status
 - `PUT /api/admin/showcase/monday-banners/auto-sync` — Enable/disable auto-sync, set interval
+- `GET /api/admin/showcase/monday-banners/sync-history` — Recent sync history log (last 20)
 
 ## Key Files
 - `/app/backend/modules/showcase/__init__.py` — All showcase API routes (banners, media, monday, auto-sync)
