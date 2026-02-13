@@ -34,6 +34,7 @@ import BentoGridLanding from './landing-layouts/BentoGridLanding';
 import TabHubLanding from './landing-layouts/TabHubLanding';
 import SocialFeedLanding from './landing-layouts/SocialFeedLanding';
 import MagazineLanding from './landing-layouts/MagazineLanding';
+import LivingGridLanding from './landing-layouts/LivingGridLanding';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -449,6 +450,7 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
 
 // ============== LAYOUT MAP ==============
 const LAYOUT_COMPONENTS = {
+  living_grid: LivingGridLanding,
   bento_grid: BentoGridLanding,
   tab_hub: TabHubLanding,
   social_feed: SocialFeedLanding,
