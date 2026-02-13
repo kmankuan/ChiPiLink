@@ -288,7 +288,7 @@ async def process_email(email_data: dict) -> dict:
 
     # Run dedup engine (4 layers)
     from .dedup_engine import check_duplicate
-    dedup_result = await check_duplicate(parsed, email_data)
+    dedup_result = await check_duplicate(parsed, email_data, exclude_id=doc["id"])
 
     # Create pending top-up
     doc = {
