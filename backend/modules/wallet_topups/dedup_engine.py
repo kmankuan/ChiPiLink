@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 PENDING_COL = "wallet_pending_topups"
 
 
-async def check_duplicate(parsed_data: dict, email_data: dict) -> dict:
+async def check_duplicate(parsed_data: dict, email_data: dict, exclude_id: str = None) -> dict:
     """Run all 4 dedup layers. Returns warning classification."""
     amount = parsed_data.get("amount", 0)
     sender = (parsed_data.get("sender_name", "") or "").strip().lower()
@@ -24,10 +24,14 @@ async def check_duplicate(parsed_data: dict, email_data: dict) -> dict:
     risk_level = "clear"
     matched_items = []
 
+    # Base query to exclude current item
+    base_exclude = {"id": {"$ne": exclude_id}} if exclude_id else {}
+
     # Layer 2: Bank reference match
     if bank_ref:
+        query = {"bank_reference": bank_ref, "status": {"$in": ["pending", "approved"]}, **base_exclude}
         existing = await db[PENDING_COL].find_one(
-            {"bank_reference": bank_ref, "status": {"$in": ["pending", "approved"]}},
+            query,
             {"_id": 0, "id": 1, "amount": 1, "status": 1, "created_at": 1, "sender_name": 1}
         )
         if existing:
