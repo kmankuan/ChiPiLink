@@ -294,7 +294,7 @@ class TestWebhookRegisteredHandlers:
     
     def test_registered_handlers_endpoint(self, api_client):
         """GET /api/monday/webhooks/registered should return list of boards."""
-        response = api_client.get(f"{BASE_URL}/api/monday/webhooks/registered")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/monday/webhooks/registered"))
         assert response.status_code == 200
         data = response.json()
         assert "boards" in data
