@@ -116,7 +116,7 @@ export default function HorizonLanding({ communityData }) {
           <div className={`relative hidden md:flex items-center justify-center p-8 transition-all duration-1000 delay-200 ease-out ${heroVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
             <div className="relative w-full max-w-lg">
               <div className="rounded-3xl overflow-hidden shadow-2xl aspect-[3/4]">
-                <img src={HERO_IMG} alt="Panama City" className="w-full h-full object-cover" />
+                <img src={landingImages.hero} alt="Panama City" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -left-8 bottom-16 bg-white rounded-2xl shadow-xl p-4 w-48 border border-black/5 animate-float" data-testid="hero-float-card">
                 <div className="flex items-center gap-2 mb-2">
@@ -128,7 +128,7 @@ export default function HorizonLanding({ communityData }) {
                 <p className="text-[10px] text-[#999] leading-relaxed">{t('landing.community.subtitle', 'News, updates & Telegram feed')}</p>
               </div>
               <div className="absolute -right-4 top-12 rounded-2xl overflow-hidden shadow-xl w-28 h-36 border-2 border-white animate-float-delay">
-                <img src={LANTERNS_IMG} alt="Lanterns" className="w-full h-full object-cover" />
+                <img src={landingImages.lanterns} alt="Lanterns" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function HorizonLanding({ communityData }) {
 
         {/* Mobile hero */}
         <div className="md:hidden relative mx-4 -mt-4 rounded-2xl overflow-hidden shadow-xl aspect-[16/9] mb-6">
-          <img src={HERO_IMG} alt="Panama City" className="w-full h-full object-cover" />
+          <img src={landingImages.hero} alt="Panama City" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2] via-transparent to-transparent" />
         </div>
       </section>
@@ -216,7 +216,7 @@ export default function HorizonLanding({ communityData }) {
             <div className="grid md:grid-cols-5 gap-0">
               {/* Image */}
               <div className="md:col-span-2 relative min-h-[240px] md:min-h-[320px]">
-                <img src={PINGPONG_IMG} alt="Kids playing table tennis" className="absolute inset-0 w-full h-full object-cover" />
+                <img src={landingImages.pinpanclub} alt="Kids playing table tennis" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#FFF7ED] hidden md:block" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#FFF7ED] to-transparent md:hidden" />
               </div>
@@ -364,7 +364,7 @@ export default function HorizonLanding({ communityData }) {
               </div>
               {/* Image */}
               <div className="relative hidden md:block min-h-[300px]">
-                <img src={COMMUNITY_IMG} alt="Community" className="absolute inset-0 w-full h-full object-cover" />
+                <img src={landingImages.community} alt="Community" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-l from-transparent to-[#C8102E]/80" />
               </div>
             </div>
