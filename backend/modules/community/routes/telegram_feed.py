@@ -1,18 +1,63 @@
 """
 Community Feed API Routes
 Serves Telegram channel content with likes and comments.
+Includes role-based visibility controls.
 """
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends, Response
 from pydantic import BaseModel
-from core.auth import get_current_user, get_admin_user
+from core.auth import get_current_user, get_admin_user, get_user_permissions, check_permission_match
 from core.database import db
 from modules.community.services.telegram_service import telegram_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/feed", tags=["Community Feed"])
+
+
+# ---- Visibility Check Helper ----
+
+async def _check_feed_access(user: dict) -> bool:
+    """Check if user has access to the community feed based on visibility settings."""
+    # Admins always have access
+    if user.get("is_admin"):
+        return True
+
+    config = await telegram_service.get_config()
+    visibility = config.get("visibility", "all_users")
+
+    if visibility == "all_users":
+        return True
+
+    if visibility == "admin_only":
+        return False
+
+    if visibility == "specific_roles":
+        allowed_roles = config.get("allowed_roles", [])
+        if not allowed_roles:
+            return True  # No roles specified = allow all
+
+        # Get user's role
+        user_role = await db.user_roles.find_one({"user_id": user["user_id"]}, {"_id": 0})
+        role_id = user_role.get("role_id") if user_role else "user"
+        return role_id in allowed_roles
+
+    return True
+
+
+# ---- Feed Access Check ----
+
+@router.get("/access")
+async def check_access(user=Depends(get_current_user)):
+    """Check if current user can view the community feed."""
+    has_access = await _check_feed_access(user)
+    config = await telegram_service.get_config()
+    return {
+        "has_access": has_access,
+        "visibility": config.get("visibility", "all_users"),
+        "is_admin": user.get("is_admin", False),
+    }
 
 
 # ---- Feed ----
