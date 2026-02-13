@@ -18,7 +18,8 @@ import {
   Paintbrush,
   Layout,
   Radio,
-  Layers
+  Layers,
+  Megaphone
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
