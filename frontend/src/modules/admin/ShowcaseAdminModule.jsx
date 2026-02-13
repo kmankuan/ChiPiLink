@@ -409,9 +409,12 @@ export default function ShowcaseAdminModule() {
   return (
     <div className="space-y-6" data-testid="showcase-admin">
       <Tabs defaultValue="banners">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="banners" className="gap-1.5 text-xs" data-testid="banners-tab">
-            <Type className="h-3.5 w-3.5" /> Banners & Ads
+            <Type className="h-3.5 w-3.5" /> Banners
+          </TabsTrigger>
+          <TabsTrigger value="monday" className="gap-1.5 text-xs" data-testid="monday-tab">
+            <Plug className="h-3.5 w-3.5" /> Monday.com
           </TabsTrigger>
           <TabsTrigger value="media" className="gap-1.5 text-xs" data-testid="media-tab">
             <Film className="h-3.5 w-3.5" /> Media Player
