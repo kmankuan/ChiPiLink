@@ -183,18 +183,26 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
         </div>
       </header>
 
-      {/* ═══ CULTURAL ICON NAV — replaces traditional menu ═══ */}
+      {/* ═══ CULTURAL ICON NAV — dynamic from admin config ═══ */}
       <nav
         className={`px-4 sm:px-8 py-4 max-w-7xl mx-auto transition-all duration-700 delay-100 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="cultural-nav"
       >
         <div className="flex justify-between sm:justify-start sm:gap-6 overflow-x-auto scrollbar-hide">
-          <CulturalNav icon={Gamepad2} label="PinPan" to="/pinpanclub" accent="#d97706" accentBg="#FFF7ED" />
-          <CulturalNav icon={Store} label="Tienda" to="/unatienda" accent="#059669" accentBg="#ECFDF5" />
-          <CulturalNav icon={Trophy} label="Ranking" to="/pinpanclub/superpin/ranking" accent="#C8102E" accentBg="#FFF1F2" />
-          <CulturalNav icon={GraduationCap} label="Aprender" to="/comunidad" accent="#7c3aed" accentBg="#F5F3FF" />
-          <CulturalNav icon={Globe} label="Cultura" to="/galeria" accent="#0284c7" accentBg="#F0F9FF" />
-          <CulturalNav icon={Heart} label="Fe" to="/comunidad" accent="#ec4899" accentBg="#FDF2F8" />
+          {(dynamicIcons.length > 0 ? dynamicIcons : DEFAULT_NAV_ICONS).map((ic, i) => {
+            const IconComponent = ICON_CATALOG[ic.icon] || Gamepad2;
+            return (
+              <CulturalNav
+                key={ic.key || i}
+                icon={IconComponent}
+                label={ic.label}
+                to={ic.to}
+                accent={ic.accent}
+                accentBg={ic.accent_bg}
+                imageUrl={ic.type === 'image' ? ic.image_url : null}
+              />
+            );
+          })}
         </div>
       </nav>
 
