@@ -228,6 +228,11 @@ export default function ShowcaseAdminModule() {
   const [newItemUrl, setNewItemUrl] = useState('');
   const [newItemType, setNewItemType] = useState('image');
   const [newItemCaption, setNewItemCaption] = useState('');
+  // Monday.com sync state
+  const [mondayConfig, setMondayConfig] = useState(null);
+  const [mondayBoards, setMondayBoards] = useState([]);
+  const [syncing, setSyncing] = useState(false);
+  const [savingMonday, setSavingMonday] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
