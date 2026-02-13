@@ -39,7 +39,8 @@ export default function TickerAdminModule() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(null);
-  const [expandedSections, setExpandedSections] = useState({ sources: true, sponsors: true, style: false, pages: false });
+  const [landingImages, setLandingImages] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({ sources: true, sponsors: true, style: false, pages: false, images: false });
 
   const fetchConfig = useCallback(async () => {
     try {
