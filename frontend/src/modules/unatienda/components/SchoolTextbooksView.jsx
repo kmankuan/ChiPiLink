@@ -637,8 +637,8 @@ export default function SchoolTextbooksView({
                       
                       {/* Submit bar */}
                       {availableItems.length > 0 && (
-                        <div className="border-t px-4 py-3 bg-muted/10" data-testid={`order-bar-${studentId}`}>
-                          <div className="flex items-center justify-between gap-3">
+                        <div className="sticky bottom-0 z-10 border-t px-4 py-3 bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.15)]" data-testid={`order-bar-${studentId}`}>
+                          <div className="flex items-center justify-between gap-3 pb-safe">
                             <div className="text-sm">
                               <span className="text-muted-foreground">{selectedList.length} {lang === 'es' ? 'seleccionado(s)' : 'selected'}</span>
                               {selectedTotal > 0 && (
