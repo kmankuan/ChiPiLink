@@ -505,6 +505,83 @@ export default function TickerAdminModule() {
           </div>
         </div>
       </CollapsibleSection>
+
+      {/* ─── Landing Page Images ─── */}
+      <CollapsibleSection
+        title="Landing Page Images" icon={Image}
+        open={expandedSections.images} onToggle={() => toggleSection('images')}
+      >
+        {landingImages ? (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">Paste image URLs to customize landing page images. Leave empty to use defaults.</p>
+            {Object.entries(landingImages.defaults || {}).map(([key, defaultUrl]) => {
+              const customUrl = landingImages.custom?.[key] || '';
+              const resolvedUrl = landingImages.resolved?.[key] || defaultUrl;
+              return (
+                <div key={key} className="p-3 rounded-lg bg-muted/30 border border-border/50 space-y-2">
+                  <div className="flex items-center gap-3">
+                    <img src={resolvedUrl} alt={key} className="w-16 h-12 rounded-lg object-cover flex-shrink-0 border" />
+                    <div className="flex-1 min-w-0">
+                      <Label className="text-xs font-semibold capitalize">{key.replace(/_/g, ' ')}</Label>
+                      <Input
+                        value={customUrl}
+                        onChange={(e) => {
+                          setLandingImages(prev => ({
+                            ...prev,
+                            custom: { ...prev.custom, [key]: e.target.value },
+                            resolved: { ...prev.resolved, [key]: e.target.value || defaultUrl }
+                          }));
+                        }}
+                        className="h-7 text-xs mt-1"
+                        placeholder={`Default: ${defaultUrl.substring(0, 50)}...`}
+                      />
+                    </div>
+                    {customUrl && (
+                      <button
+                        onClick={() => {
+                          setLandingImages(prev => {
+                            const newCustom = { ...prev.custom };
+                            delete newCustom[key];
+                            return { ...prev, custom: newCustom, resolved: { ...prev.resolved, [key]: defaultUrl } };
+                          });
+                        }}
+                        className="text-destructive hover:bg-destructive/10 p-1 rounded self-end"
+                        title="Reset to default"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            <Button
+              size="sm"
+              onClick={async () => {
+                try {
+                  const res = await fetch(`${API_URL}/api/admin/ticker/landing-images`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                    body: JSON.stringify(landingImages.custom || {})
+                  });
+                  if (res.ok) {
+                    toast.success('Landing images saved');
+                    fetchLandingImages();
+                  }
+                } catch (e) {
+                  toast.error('Failed to save images');
+                }
+              }}
+              className="gap-1 w-full"
+              data-testid="save-landing-images"
+            >
+              <Save className="h-3.5 w-3.5" />Save Images
+            </Button>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground py-4 text-center">Loading images config...</p>
+        )}
+      </CollapsibleSection>
     </div>
   );
 }
