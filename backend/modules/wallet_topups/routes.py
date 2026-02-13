@@ -280,7 +280,7 @@ async def get_settings(admin: dict = Depends(get_admin_user)):
 
 @router.put("/settings")
 async def update_settings(data: dict, admin: dict = Depends(get_admin_user)):
-    """Update processing settings."""
+    """Update processing settings. Restarts/stops Gmail poller as needed."""
     update_fields = {}
     allowed = [
         "polling_mode", "polling_interval_minutes",
@@ -300,7 +300,31 @@ async def update_settings(data: dict, admin: dict = Depends(get_admin_user)):
     else:
         await db[SETTINGS_COL].update_one({"id": "default"}, {"$set": update_fields})
 
-    return await db[SETTINGS_COL].find_one({"id": "default"}, {"_id": 0})
+    # Restart or stop Gmail poller based on new settings
+    from .gmail_poller import gmail_poller
+    if "polling_mode" in update_fields:
+        if update_fields["polling_mode"] == "realtime":
+            await gmail_poller.stop()
+            await gmail_poller.start()
+        else:
+            await gmail_poller.stop()
+
+    result = await db[SETTINGS_COL].find_one({"id": "default"}, {"_id": 0})
+    return result
+
+
+@router.get("/polling/status")
+async def get_polling_status(admin: dict = Depends(get_admin_user)):
+    """Check the Gmail background polling status."""
+    from .gmail_poller import gmail_poller
+    settings = await db[SETTINGS_COL].find_one({"id": "default"}, {"_id": 0})
+    return {
+        "poller_running": gmail_poller.is_running,
+        "polling_mode": settings.get("polling_mode", "manual") if settings else "manual",
+        "polling_interval_minutes": settings.get("polling_interval_minutes", 5) if settings else 5,
+        "last_auto_scan": settings.get("last_auto_scan") if settings else None,
+        "last_scan_created": settings.get("last_scan_created", 0) if settings else 0,
+    }
 
 
 # ============== STATS ==============
