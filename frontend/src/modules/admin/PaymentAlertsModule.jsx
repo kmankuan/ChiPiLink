@@ -10,7 +10,7 @@ import {
   Loader2, CheckCircle, XCircle, Clock, AlertTriangle,
   Plus, Search, Mail, DollarSign, Filter, Settings,
   ListChecks, Eye, ChevronDown, ChevronRight, Trash2,
-  Shield, Zap, RefreshCw, Play, FileText
+  Shield, Zap, RefreshCw, Play, FileText, LayoutGrid
 } from 'lucide-react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
