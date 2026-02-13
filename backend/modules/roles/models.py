@@ -136,6 +136,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "customers.*",
         "tickets.*",
         "translations.*",
+        "community.*",
     ],
     
     DefaultRoles.MODERATOR: [
@@ -157,6 +158,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "customers.view",
         "customers.edit",
         "tickets.*",
+        "community.feed_view",
     ],
     
     DefaultRoles.USER: [
@@ -165,6 +167,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         "pinpanclub.access",
         "pinpanclub.view_rankings",
         "pinpanclub.create_match",
+        "community.feed_view",
     ],
 }
 
