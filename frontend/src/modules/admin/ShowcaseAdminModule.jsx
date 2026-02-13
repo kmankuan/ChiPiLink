@@ -426,6 +426,32 @@ export default function ShowcaseAdminModule() {
     }
   };
 
+  const toggleWebhook = async () => {
+    setTogglingWebhook(true);
+    const action = webhookStatus.registered ? 'unregister' : 'register';
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/monday-banners/webhook/${action}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        toast.success(action === 'register' ? 'Real-time webhook connected!' : 'Webhook disconnected');
+        // Refresh webhook status
+        const statusRes = await fetch(`${API_URL}/api/admin/showcase/monday-banners/webhook/status`, {
+          headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        if (statusRes.ok) setWebhookStatus(await statusRes.json());
+      } else {
+        toast.error(data.message || `Failed to ${action} webhook`);
+      }
+    } catch (e) {
+      toast.error(`Failed to ${action} webhook`);
+    } finally {
+      setTogglingWebhook(false);
+    }
+  };
+
   const savePlayerSettings = async () => {
     try {
       const res = await fetch(`${API_URL}/api/admin/showcase/media-player`, {
