@@ -17,7 +17,8 @@ import {
   LayoutGrid,
   Paintbrush,
   Layout,
-  Radio
+  Radio,
+  Layers
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
@@ -33,6 +34,7 @@ import ModuleStatusModule from './ModuleStatusModule';
 import UIStyleModule from './UIStyleModule';
 import WidgetManagerModule from './WidgetManagerModule';
 import TickerAdminModule from './TickerAdminModule';
+import LayoutPreviewModule from './LayoutPreviewModule';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminModule() {
@@ -96,6 +98,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Activity Ticker</span>
             <span className="sm:hidden">Ticker</span>
           </TabsTrigger>
+          <TabsTrigger value="layouts" className="gap-2" data-testid="layouts-tab">
+            <Layers className="h-4 w-4" />
+            <span className="hidden sm:inline">Layouts & Icons</span>
+            <span className="sm:hidden">Layouts</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
@@ -146,6 +153,10 @@ export default function AdminModule() {
 
         <TabsContent value="ticker">
           <TickerAdminModule />
+        </TabsContent>
+
+        <TabsContent value="layouts">
+          <LayoutPreviewModule />
         </TabsContent>
       </Tabs>
     </div>
