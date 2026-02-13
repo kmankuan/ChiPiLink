@@ -3,6 +3,11 @@ Monday.com Banner Adapter
 Syncs banner items from a dedicated Monday.com board.
 Flow: Canva design URL → Monday.com board item → App banner carousel
 
+Supports:
+- Webhook-based real-time sync (primary)
+- Scheduled polling sync (fallback safety net)
+- Manual sync via admin panel
+
 Each Monday.com item maps to a banner with:
 - Name → overlay_text or title
 - Canva URL column → image_url
@@ -14,6 +19,7 @@ Each Monday.com item maps to a banner with:
 """
 import logging
 import json
+import os
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -47,6 +53,7 @@ class MondayBannerAdapter:
             },
             "last_sync": None,
             "sync_count": 0,
+            "webhook": {"registered": False, "webhook_id": None},
         }
 
     async def save_config(self, db, config: dict):
@@ -59,6 +66,100 @@ class MondayBannerAdapter:
             }},
             upsert=True
         )
+
+    # ─── Webhook handling ────────────────────────────────
+
+    async def register_webhook(self, db) -> dict:
+        """Register a webhook with Monday.com for real-time banner sync."""
+        config = await self.get_config(db)
+        board_id = config.get("board_id")
+        if not board_id:
+            return {"status": "error", "message": "No board_id configured"}
+
+        # Build the webhook URL
+        base_url = os.environ.get("FRONTEND_URL", "").rstrip("/")
+        if not base_url:
+            return {"status": "error", "message": "FRONTEND_URL not configured"}
+        webhook_url = f"{base_url}/api/monday/webhooks/incoming"
+
+        try:
+            # Register with Monday.com for any column value changes
+            webhook_id = await monday_client.register_webhook(
+                board_id=board_id,
+                url=webhook_url,
+                event="change_column_value"
+            )
+            if webhook_id:
+                config["webhook"] = {
+                    "registered": True,
+                    "webhook_id": webhook_id,
+                    "url": webhook_url,
+                    "registered_at": datetime.now(timezone.utc).isoformat(),
+                }
+                await self.save_config(db, config)
+
+                # Also register the local handler in the webhook router
+                from modules.integrations.monday.webhook_router import register_handler
+                register_handler(board_id, self.handle_webhook)
+
+                logger.info(f"Monday.com banner webhook registered: {webhook_id}")
+                return {"status": "ok", "webhook_id": webhook_id}
+            return {"status": "error", "message": "No webhook_id returned"}
+        except Exception as e:
+            logger.error(f"Failed to register banner webhook: {e}")
+            return {"status": "error", "message": str(e)}
+
+    async def unregister_webhook(self, db) -> dict:
+        """Remove the webhook from Monday.com."""
+        config = await self.get_config(db)
+        webhook_info = config.get("webhook", {})
+        webhook_id = webhook_info.get("webhook_id")
+        board_id = config.get("board_id")
+
+        if webhook_id:
+            try:
+                await monday_client.delete_webhook(webhook_id)
+            except Exception as e:
+                logger.warning(f"Failed to delete webhook from Monday: {e}")
+
+        if board_id:
+            from modules.integrations.monday.webhook_router import unregister_handler
+            unregister_handler(board_id)
+
+        config["webhook"] = {"registered": False, "webhook_id": None}
+        await self.save_config(db, config)
+        return {"status": "ok"}
+
+    async def handle_webhook(self, event: dict) -> dict:
+        """
+        Handle incoming Monday.com webhook events for the banner board.
+        Triggers a full sync when any item changes.
+        """
+        logger.info(f"[banner_webhook] Received event: type={event.get('type')}, item={event.get('pulseId')}")
+
+        def _get_db():
+            from pymongo import MongoClient
+            client = MongoClient(os.environ.get("MONGO_URL"))
+            return client[os.environ.get("DB_NAME", "chipilink_prod")]
+
+        db = _get_db()
+        result = await self.sync_from_monday(db, trigger="webhook")
+        return {"status": "synced", "result": result}
+
+    def ensure_local_handler(self, db):
+        """Register the local webhook handler if a board is configured (called on startup)."""
+        config_doc = db.app_config.find_one({"config_key": CONFIG_KEY}, {"_id": 0})
+        if not config_doc:
+            return
+        config = config_doc.get("value", {})
+        board_id = config.get("board_id")
+        webhook_info = config.get("webhook", {})
+        if board_id and config.get("enabled") and webhook_info.get("registered"):
+            from modules.integrations.monday.webhook_router import register_handler
+            register_handler(board_id, self.handle_webhook)
+            logger.info(f"Banner webhook handler re-registered for board {board_id}")
+
+    # ─── Column value parsing ────────────────────────────
 
     def _parse_column_value(self, col_value: dict) -> str:
         """Extract usable value from Monday.com column_values entry"""
