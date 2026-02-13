@@ -1,9 +1,10 @@
 /**
  * CommunityFeedModule — Telegram Channel Feed
  * Displays posts from a private Telegram channel with likes and comments.
+ * Includes admin visibility controls.
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,11 +12,146 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import {
   Heart, MessageCircle, Send, Loader2, ChevronDown,
-  Image as ImageIcon, Play, FileText, RefreshCw
+  Image as ImageIcon, Play, FileText, RefreshCw,
+  Eye, EyeOff, Shield, Settings, Users, Check
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// ─── Visibility Admin Panel ─────────────────────────────────
+function VisibilityPanel({ token }) {
+  const [visibility, setVisibility] = useState('all_users');
+  const [allowedRoles, setAllowedRoles] = useState([]);
+  const [availableRoles, setAvailableRoles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/api/community-v2/feed/admin/visibility`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(r => {
+      setVisibility(r.data.visibility || 'all_users');
+      setAllowedRoles(r.data.allowed_roles || []);
+      setAvailableRoles(r.data.available_roles || []);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [token]);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/community-v2/feed/admin/visibility`, {
+        visibility,
+        allowed_roles: allowedRoles,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Visibility settings saved');
+    } catch { toast.error('Failed to save'); }
+    finally { setSaving(false); }
+  };
+
+  const toggleRole = (roleId) => {
+    setAllowedRoles(prev =>
+      prev.includes(roleId) ? prev.filter(r => r !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const modeLabel = { all_users: 'All Users', admin_only: 'Admins Only', specific_roles: 'Specific Roles' };
+  const modeIcon = { all_users: Eye, admin_only: Shield, specific_roles: Users };
+
+  if (loading) return null;
+
+  return (
+    <Card className="border-dashed" data-testid="visibility-panel">
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between cursor-pointer" onClick={() => setOpen(!open)} data-testid="visibility-toggle">
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Feed Visibility</span>
+            <Badge variant="outline" className="text-[10px] gap-1">
+              {(() => { const Icon = modeIcon[visibility]; return <Icon className="h-2.5 w-2.5" />; })()}
+              {modeLabel[visibility]}
+            </Badge>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        </div>
+
+        {open && (
+          <div className="mt-3 space-y-3 pt-3 border-t">
+            <p className="text-xs text-muted-foreground">Control which users can see the Telegram community feed.</p>
+
+            {/* Mode Selector */}
+            <div className="grid sm:grid-cols-3 gap-2">
+              {(['all_users', 'admin_only', 'specific_roles']).map(mode => {
+                const Icon = modeIcon[mode];
+                const isActive = visibility === mode;
+                return (
+                  <label
+                    key={mode}
+                    className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      isActive ? 'border-primary bg-primary/5' : 'hover:bg-accent/30'
+                    }`}
+                    data-testid={`visibility-mode-${mode}`}
+                  >
+                    <input type="radio" name="visibility" value={mode} checked={isActive}
+                      onChange={() => setVisibility(mode)} className="sr-only" />
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="text-xs font-semibold">{modeLabel[mode]}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {mode === 'all_users' && 'Everyone who is logged in'}
+                        {mode === 'admin_only' && 'Only administrators'}
+                        {mode === 'specific_roles' && 'Select which roles can view'}
+                      </p>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Role Selection */}
+            {visibility === 'specific_roles' && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold">Allowed Roles</p>
+                {availableRoles.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No roles configured. Create roles in "Roles & Permissions".</p>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {availableRoles.map(role => {
+                      const checked = allowedRoles.includes(role.role_id);
+                      return (
+                        <label
+                          key={role.role_id}
+                          className={`flex items-center gap-2 p-2 border rounded-md cursor-pointer text-xs transition-colors ${
+                            checked ? 'border-primary bg-primary/5' : 'hover:bg-accent/30'
+                          }`}
+                          data-testid={`role-${role.role_id}`}
+                        >
+                          <input type="checkbox" checked={checked} onChange={() => toggleRole(role.role_id)} className="rounded" />
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: role.color || '#6366f1' }} />
+                            <span className="font-medium">{role.name}</span>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <Button size="sm" onClick={save} disabled={saving} data-testid="save-visibility-btn">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Check className="h-3.5 w-3.5 mr-1" />}
+                Save
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 function PostCard({ post, token, onUpdate }) {
   const [liked, setLiked] = useState(post.liked_by_me || false);
