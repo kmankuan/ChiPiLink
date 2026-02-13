@@ -115,13 +115,13 @@ class TestWebhookUnregister:
     
     def test_webhook_unregister_endpoint_returns_200(self, api_client):
         """Webhook unregister endpoint should return 200."""
-        response = api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister")
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        response = retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister"))
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
         print(f"Webhook unregister returned 200")
     
     def test_webhook_unregister_returns_ok_status(self, api_client):
         """Webhook unregister should return status=ok."""
-        response = api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister")
+        response = retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister"))
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "ok", f"Expected status=ok. Got: {data}"
@@ -130,10 +130,10 @@ class TestWebhookUnregister:
     def test_webhook_status_after_unregister_shows_not_registered(self, api_client):
         """After unregister, webhook status should show registered=False."""
         # First unregister
-        api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister")
+        retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/unregister"))
         
         # Then check status
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status"))
         assert response.status_code == 200
         data = response.json()
         assert data.get("registered") == False, f"Expected registered=False after unregister. Got: {data}"
