@@ -403,3 +403,13 @@ async def update_auto_sync_config(body: dict):
     status = banner_sync_scheduler.get_status()
     return {"status": "ok", "auto_sync": config["auto_sync"], "scheduler": status}
 
+
+
+@admin_router.get("/monday-banners/sync-history")
+async def get_sync_history():
+    """Admin: Get recent sync history log entries."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    history = monday_banner_adapter.get_sync_history(db, limit=20)
+    return {"history": history}
+
