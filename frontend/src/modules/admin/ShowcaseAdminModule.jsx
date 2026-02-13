@@ -236,9 +236,10 @@ export default function ShowcaseAdminModule() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [bannersRes, mediaRes] = await Promise.all([
+      const [bannersRes, mediaRes, mondayRes] = await Promise.all([
         fetch(`${API_URL}/api/admin/showcase/banners`, { headers: { Authorization: `Bearer ${getToken()}` } }),
         fetch(`${API_URL}/api/admin/showcase/media-player`, { headers: { Authorization: `Bearer ${getToken()}` } }),
+        fetch(`${API_URL}/api/admin/showcase/monday-banners/config`, { headers: { Authorization: `Bearer ${getToken()}` } }),
       ]);
       if (bannersRes.ok) setBanners(await bannersRes.json());
       if (mediaRes.ok) {
@@ -246,6 +247,7 @@ export default function ShowcaseAdminModule() {
         setMediaConfig(mc);
         setAlbumUrl(mc.album_url || '');
       }
+      if (mondayRes.ok) setMondayConfig(await mondayRes.json());
     } catch (e) {
       toast.error('Failed to load');
     } finally {
