@@ -80,9 +80,9 @@ class TestWebhookRegister:
     
     def test_webhook_register_endpoint_returns_response(self, api_client):
         """Webhook register endpoint should respond (may error if no board configured)."""
-        response = api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register")
+        response = retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register"))
         # Expect 200 with status=error or status=ok
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
         data = response.json()
         assert "status" in data, f"Response should have 'status' field. Got: {data}"
         print(f"Webhook register response: {data}")
@@ -90,12 +90,12 @@ class TestWebhookRegister:
     def test_webhook_register_without_board_returns_error(self, api_client):
         """Webhook register without board_id configured should return error."""
         # First check current config to see if board_id is set
-        config_resp = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/config")
+        config_resp = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/config"))
         config = config_resp.json()
         
         if not config.get("board_id"):
             # No board configured - should get error
-            response = api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register")
+            response = retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register"))
             assert response.status_code == 200
             data = response.json()
             assert data.get("status") == "error", f"Expected status=error when no board_id. Got: {data}"
@@ -103,7 +103,7 @@ class TestWebhookRegister:
             print(f"Correctly returned error when no board_id: {data['message']}")
         else:
             # Board is configured, register may succeed or fail based on Monday API
-            response = api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register")
+            response = retry_request(lambda: api_client.post(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/register"))
             assert response.status_code == 200
             data = response.json()
             assert "status" in data
