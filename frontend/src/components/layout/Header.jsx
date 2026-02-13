@@ -178,7 +178,9 @@ export function Header() {
   }, []);
 
   return (
-    <header className="site-header sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/10" data-testid="app-header">
+    <>
+      <TickerBar />
+      <header className="site-header sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/10" data-testid="app-header">
       <div className="mx-auto px-4 md:px-8">
         <div className="flex h-14 items-center justify-between">
           {/* Left: Logo + Breadcrumb */}
