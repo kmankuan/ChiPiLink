@@ -239,6 +239,9 @@ export default function ShowcaseAdminModule() {
   const [savingAutoSync, setSavingAutoSync] = useState(false);
   // Sync history
   const [syncHistory, setSyncHistory] = useState([]);
+  // Webhook state
+  const [webhookStatus, setWebhookStatus] = useState({ registered: false, webhook_id: null });
+  const [togglingWebhook, setTogglingWebhook] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
