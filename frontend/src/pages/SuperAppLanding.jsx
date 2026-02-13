@@ -36,6 +36,7 @@ import SocialFeedLanding from './landing-layouts/SocialFeedLanding';
 import MagazineLanding from './landing-layouts/MagazineLanding';
 import LivingGridLanding from './landing-layouts/LivingGridLanding';
 import CinematicLanding from './landing-layouts/CinematicLanding';
+import HorizonLanding from './landing-layouts/HorizonLanding';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
