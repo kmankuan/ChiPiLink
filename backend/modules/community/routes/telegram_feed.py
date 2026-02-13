@@ -268,11 +268,11 @@ async def get_stats(admin=Depends(get_admin_user)):
 async def get_visibility(admin=Depends(get_admin_user)):
     """Get current visibility settings for the community feed."""
     config = await telegram_service.get_config()
-    roles = await db.roles.find({}, {"_id": 0, "role_id": 1, "name": 1, "description": 1, "color": 1}).to_list(50)
+    roles = await db.roles.find({}, {"_id": 0, "role_id": 1, "nombre": 1, "descripcion": 1, "color": 1}).to_list(50)
     return {
         "visibility": config.get("visibility", "all_users"),
         "allowed_roles": config.get("allowed_roles", []),
-        "available_roles": roles,
+        "available_roles": [{"role_id": r["role_id"], "name": r.get("nombre", r["role_id"]), "description": r.get("descripcion", ""), "color": r.get("color", "#6366f1")} for r in roles],
     }
 
 
