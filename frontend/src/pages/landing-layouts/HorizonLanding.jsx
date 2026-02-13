@@ -17,7 +17,7 @@ import {
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1656259541897-a13b22104214?crop=entropy&cs=srgb&fm=jpg&w=1200&q=80';
 const LANTERNS_IMG = 'https://images.unsplash.com/photo-1762889583592-2dda392f5431?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
-const PINGPONG_IMG = 'https://images.unsplash.com/photo-1615177981645-51107b202210?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
+const PINGPONG_IMG = 'https://images.unsplash.com/photo-1767022894200-419082de2c3e?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
 const COMMUNITY_IMG = 'https://images.unsplash.com/photo-1758275557161-f117d724d769?crop=entropy&cs=srgb&fm=jpg&w=800&q=80';
 
 function formatDate(dateStr) {
