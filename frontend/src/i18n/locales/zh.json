@@ -1553,7 +1553,9 @@
     "refresh": "刷新",
     "noComments": "暂无评论",
     "loadingFeed": "正在加载动态...",
-    "noPosts": "暂无帖子"
+    "noPosts": "暂无帖子",
+    "accessDenied": "动态受限",
+    "accessDeniedDesc": "此动态目前受限。请联系管理员获取访问权限。"
   },
   "storeManager": {
     "productsTab": "产品",
