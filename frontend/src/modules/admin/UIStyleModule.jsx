@@ -152,6 +152,26 @@ const LAYOUT_PREVIEWS = {
       <rect x="40" y="40" width="16" height="6" rx="3" className="fill-muted-foreground/10" />
     </svg>
   ),
+  mosaic_community: (
+    <svg viewBox="0 0 80 50" className="w-full h-full">
+      <rect x="0" y="0" width="80" height="50" rx="0" fill="#FBF7F0" />
+      <circle cx="10" cy="6" r="3.5" fill="#d97706" fillOpacity="0.2" />
+      <circle cx="22" cy="6" r="3.5" fill="#059669" fillOpacity="0.2" />
+      <circle cx="34" cy="6" r="3.5" fill="#C8102E" fillOpacity="0.2" />
+      <circle cx="46" cy="6" r="3.5" fill="#7c3aed" fillOpacity="0.2" />
+      <circle cx="58" cy="6" r="3.5" fill="#0284c7" fillOpacity="0.2" />
+      <circle cx="70" cy="6" r="3.5" fill="#ec4899" fillOpacity="0.2" />
+      <rect x="2" y="12" width="36" height="16" rx="3" fill="#C8102E" fillOpacity="0.15" />
+      <rect x="40" y="12" width="18" height="7" rx="2" fill="#d97706" fillOpacity="0.2" />
+      <rect x="60" y="12" width="18" height="7" rx="2" fill="#059669" fillOpacity="0.12" />
+      <rect x="40" y="21" width="18" height="7" rx="2" fill="#0284c7" fillOpacity="0.15" />
+      <rect x="60" y="21" width="18" height="7" rx="2" fill="#dc2626" fillOpacity="0.12" />
+      <rect x="2" y="30" width="36" height="8" rx="2" fill="#7c3aed" fillOpacity="0.1" />
+      <rect x="40" y="30" width="18" height="8" rx="2" fill="#0284c7" fillOpacity="0.1" />
+      <rect x="60" y="30" width="18" height="8" rx="2" fill="#0d9488" fillOpacity="0.1" />
+      <rect x="2" y="40" width="76" height="8" rx="3" fill="#C8102E" fillOpacity="0.08" />
+    </svg>
+  ),
 };
 
 function StyleEditor({ style, onChange, templates, fonts, densityOptions, layouts }) {
