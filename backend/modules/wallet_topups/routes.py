@@ -76,11 +76,12 @@ async def create_pending_topup(data: dict, admin: dict = Depends(get_admin_user)
     await db[PENDING_COL].insert_one(doc)
     doc.pop("_id", None)
 
-    # Run dedup check
+    # Run dedup check (run against items created BEFORE this one)
     from .dedup_engine import check_duplicate
     dedup_result = await check_duplicate(
         {"amount": doc["amount"], "sender_name": doc["sender_name"], "bank_reference": doc["bank_reference"]},
-        {}
+        {},
+        exclude_id=doc["id"]
     )
     doc["risk_level"] = dedup_result.get("risk_level", "clear")
     doc["warning_text"] = dedup_result.get("warning_text", "")
