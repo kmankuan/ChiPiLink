@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useLandingImages } from '@/hooks/useLandingImages';
+import { useLayoutIcons } from '@/hooks/useLayoutIcons';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 import {
