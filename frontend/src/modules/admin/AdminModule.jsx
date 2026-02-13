@@ -32,6 +32,7 @@ import DatabaseMigrationModule from './DatabaseMigrationModule';
 import ModuleStatusModule from './ModuleStatusModule';
 import UIStyleModule from './UIStyleModule';
 import WidgetManagerModule from './WidgetManagerModule';
+import TickerAdminModule from './TickerAdminModule';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminModule() {
