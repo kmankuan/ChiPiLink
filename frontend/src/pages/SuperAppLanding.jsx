@@ -451,7 +451,7 @@ function ClassicLayout({ communityData, moduleStatuses, blocks, isAdmin, isEditM
 // ============== LAYOUT MAP ==============
 const LAYOUT_COMPONENTS = {
   living_grid: LivingGridLanding,
-  mobile_app: LivingGridLanding,
+  cinematic: null, // placeholder, will be replaced
   bento_grid: BentoGridLanding,
   tab_hub: TabHubLanding,
   social_feed: SocialFeedLanding,
