@@ -38,7 +38,7 @@ class BannerSyncScheduler:
             if not auto_cfg.get("enabled", False):
                 logger.info("Monday banner auto-sync skipped — auto-sync disabled")
                 return
-            result = await monday_banner_adapter.sync_from_monday(db)
+            result = await monday_banner_adapter.sync_from_monday(db, trigger="auto")
             logger.info(f"Auto-sync completed: {result}")
         except Exception as e:
             logger.error(f"Auto-sync error: {e}")
