@@ -359,3 +359,47 @@ async def list_monday_boards_for_banners():
     except Exception as e:
         return {"boards": [], "error": str(e)}
 
+
+# ═══════════════════════════════════════════
+# AUTO-SYNC CONFIGURATION
+# ═══════════════════════════════════════════
+
+@admin_router.get("/monday-banners/auto-sync")
+async def get_auto_sync_config():
+    """Admin: Get auto-sync configuration and scheduler status."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    from modules.showcase.scheduler import banner_sync_scheduler
+    db = get_db()
+    config = await monday_banner_adapter.get_config(db)
+    auto_sync = config.get("auto_sync", {
+        "enabled": False,
+        "interval_minutes": 10,
+    })
+    status = banner_sync_scheduler.get_status()
+    return {**auto_sync, "scheduler": status, "last_sync": config.get("last_sync")}
+
+
+@admin_router.put("/monday-banners/auto-sync")
+async def update_auto_sync_config(body: dict):
+    """Admin: Enable/disable auto-sync and set interval."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    from modules.showcase.scheduler import banner_sync_scheduler
+    db = get_db()
+    config = await monday_banner_adapter.get_config(db)
+
+    enabled = body.get("enabled", False)
+    interval = max(1, min(body.get("interval_minutes", 10), 1440))  # 1 min to 24 hours
+
+    config["auto_sync"] = {"enabled": enabled, "interval_minutes": interval}
+    await monday_banner_adapter.save_config(db, config)
+
+    # Update scheduler
+    if enabled and config.get("enabled") and config.get("board_id"):
+        banner_sync_scheduler.resume(interval)
+        banner_sync_scheduler.update_interval(interval)
+    else:
+        banner_sync_scheduler.pause()
+
+    status = banner_sync_scheduler.get_status()
+    return {"status": "ok", "auto_sync": config["auto_sync"], "scheduler": status}
+
