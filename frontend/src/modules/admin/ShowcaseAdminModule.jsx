@@ -15,7 +15,7 @@ import {
   Image, Film, Plus, Trash2, Save, Loader2, Eye, EyeOff,
   ChevronUp, ChevronDown, Type, Link2, Palette, GripVertical,
   Play, Globe, Upload, RefreshCw, CalendarDays, Plug,
-  History, CheckCircle, XCircle, Clock
+  History, CheckCircle, XCircle, Clock, Zap, ZapOff
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
