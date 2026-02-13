@@ -1,7 +1,8 @@
 /**
  * ShowcaseAdminModule — Admin panel for managing:
- * 1. Banner Carousel (image + text banners)
+ * 1. Banner Carousel (image + text banners with scheduling)
  * 2. Media Player (photos/videos from Google Photos or manual URLs)
+ * 3. Monday.com Banner Sync (Canva → Monday.com → App)
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import { toast } from 'sonner';
 import {
   Image, Film, Plus, Trash2, Save, Loader2, Eye, EyeOff,
   ChevronUp, ChevronDown, Type, Link2, Palette, GripVertical,
-  Play, Globe, Upload
+  Play, Globe, Upload, RefreshCw, CalendarDays, Plug
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
