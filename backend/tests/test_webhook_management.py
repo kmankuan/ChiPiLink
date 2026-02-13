@@ -217,7 +217,7 @@ class TestExistingBannerCRUD:
     
     def test_get_banners_admin_still_works(self, api_client):
         """GET /api/admin/showcase/banners should still work."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/banners")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/banners"))
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
@@ -226,7 +226,7 @@ class TestExistingBannerCRUD:
     def test_banner_crud_flow(self, api_client):
         """Create, read, delete banner flow should work."""
         # Create
-        create_resp = api_client.post(
+        create_resp = retry_request(lambda: api_client.post(
             f"{BASE_URL}/api/admin/showcase/banners",
             json={
                 "type": "text",
@@ -234,7 +234,7 @@ class TestExistingBannerCRUD:
                 "bg_color": "#3b82f6",
                 "active": True
             }
-        )
+        ))
         assert create_resp.status_code == 200
         created = create_resp.json()
         banner_id = created.get("banner_id")
@@ -242,7 +242,7 @@ class TestExistingBannerCRUD:
         print(f"Created test banner: {banner_id}")
         
         # Read
-        read_resp = api_client.get(f"{BASE_URL}/api/admin/showcase/banners")
+        read_resp = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/banners"))
         assert read_resp.status_code == 200
         banners = read_resp.json()
         found = any(b.get("banner_id") == banner_id for b in banners)
@@ -250,7 +250,7 @@ class TestExistingBannerCRUD:
         print(f"Verified banner exists in list")
         
         # Delete (cleanup)
-        delete_resp = api_client.delete(f"{BASE_URL}/api/admin/showcase/banners/{banner_id}")
+        delete_resp = retry_request(lambda: api_client.delete(f"{BASE_URL}/api/admin/showcase/banners/{banner_id}"))
         assert delete_resp.status_code == 200
         print(f"Deleted test banner: {banner_id}")
 
