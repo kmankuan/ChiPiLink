@@ -32,6 +32,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const landingImages = useLandingImages();
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef(null);
 
