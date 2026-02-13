@@ -25,13 +25,24 @@ def get_db():
 
 @router.get("/banners")
 async def get_banners():
-    """Public: Get all active banners ordered by position."""
+    """Public: Get all active banners, filtered by schedule dates."""
     db = get_db()
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     banners = list(db.showcase_banners.find(
         {"active": True},
         {"_id": 0}
     ).sort("order", 1))
-    return banners
+    # Filter by schedule: only show if within start_date/end_date range (or no dates set)
+    visible = []
+    for b in banners:
+        start = b.get("start_date", "")
+        end = b.get("end_date", "")
+        if start and start > now:
+            continue  # Not started yet
+        if end and end < now:
+            continue  # Already ended
+        visible.append(b)
+    return visible
 
 
 @admin_router.get("/banners")
