@@ -582,7 +582,7 @@ export default function SuperAppLanding() {
   }
 
   // Determine which layout to render
-  const selectedLayout = uiStyle?.layout || 'horizon';
+  const selectedLayout = uiStyle?.layout || 'living_grid';
   const LayoutComponent = LAYOUT_COMPONENTS[selectedLayout];
 
   return (
