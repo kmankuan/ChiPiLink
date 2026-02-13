@@ -258,5 +258,44 @@ async def get_stats(admin=Depends(get_admin_user)):
         "channel_id": config.get("channel_id"),
         "channel_title": config.get("channel_title", ""),
         "auto_sync": config.get("auto_sync", True),
-        "last_update_id": config.get("last_update_id", 0)
+        "last_update_id": config.get("last_update_id", 0),
+        "visibility": config.get("visibility", "all_users"),
+        "allowed_roles": config.get("allowed_roles", []),
+    }
+
+
+@router.get("/admin/visibility")
+async def get_visibility(admin=Depends(get_admin_user)):
+    """Get current visibility settings for the community feed."""
+    config = await telegram_service.get_config()
+    roles = await db.roles.find({}, {"_id": 0, "role_id": 1, "name": 1, "description": 1, "color": 1}).to_list(50)
+    return {
+        "visibility": config.get("visibility", "all_users"),
+        "allowed_roles": config.get("allowed_roles", []),
+        "available_roles": roles,
+    }
+
+
+class VisibilityUpdateRequest(BaseModel):
+    visibility: str  # all_users, admin_only, specific_roles
+    allowed_roles: Optional[List[str]] = None
+
+
+@router.put("/admin/visibility")
+async def update_visibility(data: VisibilityUpdateRequest, admin=Depends(get_admin_user)):
+    """Update feed visibility settings."""
+    if data.visibility not in ("all_users", "admin_only", "specific_roles"):
+        raise HTTPException(status_code=400, detail="Invalid visibility mode")
+
+    config = await telegram_service.get_config()
+    config["visibility"] = data.visibility
+    config["allowed_roles"] = data.allowed_roles or []
+    config["visibility_updated_at"] = datetime.now(timezone.utc).isoformat()
+    config["visibility_updated_by"] = admin.get("email", "admin")
+    await telegram_service.save_config(config)
+
+    return {
+        "success": True,
+        "visibility": config["visibility"],
+        "allowed_roles": config["allowed_roles"],
     }
