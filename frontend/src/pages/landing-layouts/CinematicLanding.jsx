@@ -47,7 +47,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
       {/* ═══ HERO: Full-screen cinematic ═══ */}
       <section ref={heroRef} className="relative h-screen flex items-end overflow-hidden" data-testid="cinematic-hero">
         <img
-          src={LANTERNS}
+          src={landingImages.lanterns}
           alt="Chinese lanterns"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: `translateY(${parallax}px)` }}
@@ -177,7 +177,7 @@ export default function CinematicLanding({ communityData, moduleStatuses }) {
             </div>
           </div>
           <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-            <img src={SPORTS} alt="Table tennis" className="w-full h-full object-cover" />
+            <img src={landingImages.pinpanclub} alt="Table tennis" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 to-transparent" />
             {communityData?.stats && (
               <div className="absolute bottom-4 left-4 right-4 flex gap-3">
