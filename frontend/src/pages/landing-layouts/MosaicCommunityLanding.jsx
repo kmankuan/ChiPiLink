@@ -55,8 +55,8 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('es-PA', { day: 'numeric', month: 'short' });
 }
 
-// Cultural icon button used for navigation
-function CulturalNav({ icon: Icon, label, to, accent, accentBg }) {
+// Cultural icon button used for navigation — supports Lucide icons or custom images
+function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl }) {
   const navigate = useNavigate();
   return (
     <button
@@ -65,10 +65,14 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg }) {
       data-testid={`cultural-nav-${label.toLowerCase().replace(/\s/g, '-')}`}
     >
       <div
-        className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
+        className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg overflow-hidden"
         style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
       >
-        <Icon className="h-6 w-6 sm:h-7 sm:w-7" style={{ color: accent }} />
+        {imageUrl ? (
+          <img src={imageUrl} alt={label} className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+        ) : (
+          <Icon className="h-6 w-6 sm:h-7 sm:w-7" style={{ color: accent }} />
+        )}
       </div>
       <span className="text-[10px] sm:text-xs font-bold tracking-tight" style={{ color: '#5a4a3a' }}>
         {label}
