@@ -47,6 +47,7 @@ async def check_duplicate(parsed_data: dict, email_data: dict, exclude_id: str =
                 "amount": amount,
                 "status": {"$in": ["pending", "approved"]},
                 "created_at": {"$gte": cutoff},
+                **({"id": {"$ne": exclude_id}} if exclude_id else {}),
             }},
             {"$project": {"_id": 0, "id": 1, "amount": 1, "sender_name": 1, "status": 1, "created_at": 1, "bank_reference": 1}}
         ]
