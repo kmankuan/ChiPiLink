@@ -73,7 +73,7 @@ export default function HorizonLanding({ communityData, moduleStatuses }) {
               className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-5"
               style={{ color: '#1A1A1A', fontFamily: "'DM Sans', system-ui, sans-serif" }}
             >
-              {t('landing.hero.title', 'Welcome to')}{' '}
+              {t('landing.horizon.welcome', 'Welcome to')}{' '}
               <span className="relative inline-block">
                 ChiPi Link
                 <span className="absolute -bottom-1 left-0 right-0 h-3 bg-[#C8102E]/15 -skew-x-3 rounded-sm" />
