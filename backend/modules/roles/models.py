@@ -112,6 +112,12 @@ AVAILABLE_PERMISSIONS = {
         "edit": "Edit translation values",
         "manage": "Create/delete keys and sync from files",
     },
+
+    # Community Feed
+    "community": {
+        "feed_view": "View the Telegram community feed",
+        "feed_admin": "Manage community feed settings and visibility",
+    },
 }
 
 
