@@ -22,8 +22,25 @@ import {
   Store, Trophy, Zap, Calendar, Image, Users,
   ArrowRight, LogIn, BookOpen, Heart, Music,
   Gamepad2, GraduationCap, Globe, ChevronRight,
-  Rss, Clock
+  Rss, Clock, Star, Crown, Flame, Sun, Moon, Coffee,
+  Utensils, Palette, Camera, MapPin, Flag, Anchor, Ship,
+  Shirt, Dumbbell, Target, Medal, Swords, Dice1,
+  Baby, School, Sparkles, Gem, Flower2, Cross,
+  MessageCircle, ShoppingBag, Wallet, Bell, Home,
+  Search, Settings, Play, Monitor, Smartphone, Tv,
+  Headphones, Mic, Church
 } from 'lucide-react';
+
+// Lucide icon catalog for dynamic rendering
+const ICON_CATALOG = {
+  Store, Trophy, Zap, Calendar, Image, Users, Heart, Globe,
+  GraduationCap, Gamepad2, Music, BookOpen, Church, Crown,
+  Flame, Star, Sun, Moon, Coffee, Utensils, Palette, Camera,
+  MapPin, Flag, Anchor, Ship, Shirt, Dumbbell, Target, Medal,
+  Swords, Dice1, Baby, School, Sparkles, Gem, Flower2, Cross,
+  MessageCircle, Rss, ShoppingBag, Wallet, Bell, Home, Search,
+  Settings, Play, Monitor, Smartphone, Tv, Headphones, Mic
+};
 
 // Default mosaic images — overridable from admin
 const MOSAIC_DEFAULTS = {
