@@ -413,3 +413,35 @@ async def get_sync_history():
     history = monday_banner_adapter.get_sync_history(db, limit=20)
     return {"history": history}
 
+
+
+# ═══════════════════════════════════════════
+# WEBHOOK MANAGEMENT
+# ═══════════════════════════════════════════
+
+@admin_router.post("/monday-banners/webhook/register")
+async def register_banner_webhook():
+    """Admin: Register a real-time webhook with Monday.com for the banner board."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    result = await monday_banner_adapter.register_webhook(db)
+    return result
+
+
+@admin_router.post("/monday-banners/webhook/unregister")
+async def unregister_banner_webhook():
+    """Admin: Remove the Monday.com webhook."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    result = await monday_banner_adapter.unregister_webhook(db)
+    return result
+
+
+@admin_router.get("/monday-banners/webhook/status")
+async def get_banner_webhook_status():
+    """Admin: Get current webhook registration status."""
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    db = get_db()
+    config = await monday_banner_adapter.get_config(db)
+    return config.get("webhook", {"registered": False, "webhook_id": None})
+
