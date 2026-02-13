@@ -266,7 +266,25 @@ async def startup_event():
     # Start Gmail background polling for payment alerts
     from modules.wallet_topups.gmail_poller import gmail_poller
     await gmail_poller.start()
-    
+
+    # Start Monday.com banner auto-sync scheduler
+    from modules.showcase.scheduler import banner_sync_scheduler, _get_db
+    from modules.showcase.monday_banner_adapter import monday_banner_adapter
+    try:
+        sdb = _get_db()
+        sync_config = await monday_banner_adapter.get_config(sdb)
+        auto_sync = sync_config.get("auto_sync", {})
+        if auto_sync.get("enabled") and sync_config.get("enabled") and sync_config.get("board_id"):
+            interval = auto_sync.get("interval_minutes", 10)
+            banner_sync_scheduler.start(interval)
+            logger.info(f"Monday banner auto-sync started (every {interval} min)")
+        else:
+            banner_sync_scheduler.start(10)
+            banner_sync_scheduler.pause()
+            logger.info("Monday banner auto-sync initialized (paused — not enabled)")
+    except Exception as e:
+        logger.warning(f"Could not initialize banner auto-sync: {e}")
+
     logger.info("All modules loaded successfully")
 
 @app.on_event("shutdown")
