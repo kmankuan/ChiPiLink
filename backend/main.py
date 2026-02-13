@@ -272,6 +272,10 @@ async def startup_event():
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
     try:
         sdb = _get_db()
+
+        # Re-register local webhook handler if previously configured
+        monday_banner_adapter.ensure_local_handler(sdb)
+
         sync_config = await monday_banner_adapter.get_config(sdb)
         auto_sync = sync_config.get("auto_sync", {})
         if auto_sync.get("enabled") and sync_config.get("enabled") and sync_config.get("board_id"):
