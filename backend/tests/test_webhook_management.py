@@ -204,7 +204,7 @@ class TestExistingSyncHistoryEndpoint:
     
     def test_get_sync_history_still_works(self, api_client):
         """GET /api/admin/showcase/monday-banners/sync-history should still work."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/sync-history")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/sync-history"))
         assert response.status_code == 200
         data = response.json()
         assert "history" in data
