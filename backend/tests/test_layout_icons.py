@@ -115,6 +115,48 @@ class TestUIStyleLayout:
         print("✓ Active layout is 'mosaic_community'")
 
 
+class TestPutLayoutIconsAPI:
+    """PUT endpoint: PUT /api/admin/ticker/layout-icons/{layout_id}"""
+    
+    def test_put_layout_icons_returns_200(self):
+        """PUT /api/admin/ticker/layout-icons/mosaic_community should return 200 with status ok"""
+        test_icons = [
+            {"key": "test_icon", "label": "Test", "to": "/test", "type": "lucide", "icon": "Star", "image_url": "", "accent": "#000000", "accent_bg": "#FFFFFF"}
+        ]
+        response = requests.put(
+            f"{BASE_URL}/api/admin/ticker/layout-icons/mosaic_community",
+            json={"icons": test_icons}
+        )
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        assert data.get('status') == 'ok', "Expected status 'ok'"
+        assert data.get('layout_id') == 'mosaic_community', "Expected layout_id 'mosaic_community'"
+        print("✓ PUT /api/admin/ticker/layout-icons/mosaic_community returns 200 with status ok")
+    
+    def test_put_layout_icons_persists_changes(self):
+        """PUT should persist icon changes and reflect in GET"""
+        # First restore original icons
+        original_icons = [
+            {"key": "pinpan", "label": "PinPan", "to": "/pinpanclub", "type": "lucide", "icon": "Gamepad2", "image_url": "", "accent": "#d97706", "accent_bg": "#FFF7ED"},
+            {"key": "tienda", "label": "Tienda", "to": "/unatienda", "type": "lucide", "icon": "Store", "image_url": "", "accent": "#059669", "accent_bg": "#ECFDF5"},
+            {"key": "ranking", "label": "Ranking", "to": "/pinpanclub/superpin/ranking", "type": "lucide", "icon": "Trophy", "image_url": "", "accent": "#C8102E", "accent_bg": "#FFF1F2"},
+            {"key": "aprender", "label": "Aprender", "to": "/comunidad", "type": "lucide", "icon": "GraduationCap", "image_url": "", "accent": "#7c3aed", "accent_bg": "#F5F3FF"},
+            {"key": "cultura", "label": "Cultura", "to": "/galeria", "type": "lucide", "icon": "Globe", "image_url": "", "accent": "#0284c7", "accent_bg": "#F0F9FF"},
+            {"key": "fe", "label": "Fe", "to": "/comunidad", "type": "lucide", "icon": "Heart", "image_url": "", "accent": "#ec4899", "accent_bg": "#FDF2F8"},
+        ]
+        put_response = requests.put(
+            f"{BASE_URL}/api/admin/ticker/layout-icons/mosaic_community",
+            json={"icons": original_icons}
+        )
+        assert put_response.status_code == 200, f"Expected 200, got {put_response.status_code}"
+        
+        # Verify via GET
+        get_response = requests.get(f"{BASE_URL}/api/ticker/layout-icons")
+        data = get_response.json()
+        assert len(data.get('mosaic_community', [])) == 6, "Expected 6 icons after PUT"
+        print("✓ PUT persists changes and GET reflects updated icons")
+
+
 class TestLandingPageIntegration:
     """Test landing page loads with dynamic icons"""
     
