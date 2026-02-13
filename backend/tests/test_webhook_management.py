@@ -147,11 +147,11 @@ class TestWebhookIncomingChallenge:
     def test_webhook_incoming_challenge_returns_challenge(self, api_client):
         """Webhook incoming endpoint should echo back challenge for verification."""
         challenge_value = "test_challenge_12345"
-        response = api_client.post(
+        response = retry_request(lambda: api_client.post(
             f"{BASE_URL}/api/monday/webhooks/incoming",
             json={"challenge": challenge_value}
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        ))
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
         data = response.json()
         assert "challenge" in data, f"Response should contain 'challenge'. Got: {data}"
         assert data["challenge"] == challenge_value, f"Challenge should be echoed back. Expected: {challenge_value}, Got: {data['challenge']}"
@@ -159,10 +159,10 @@ class TestWebhookIncomingChallenge:
     
     def test_webhook_incoming_no_event_returns_no_event(self, api_client):
         """Webhook incoming without event should return no_event status."""
-        response = api_client.post(
+        response = retry_request(lambda: api_client.post(
             f"{BASE_URL}/api/monday/webhooks/incoming",
             json={"some_field": "value"}
-        )
+        ))
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "no_event", f"Expected status=no_event. Got: {data}"
