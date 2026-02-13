@@ -263,6 +263,8 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     logger.info("ChiPi Link API shutting down...")
+    from modules.wallet_topups.gmail_poller import gmail_poller
+    await gmail_poller.stop()
     await close_database()
     logger.info("Database connection closed")
 
