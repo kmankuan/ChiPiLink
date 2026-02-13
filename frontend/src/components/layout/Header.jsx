@@ -46,7 +46,7 @@ import {
 } from 'lucide-react';
 import LanguageSelector from '@/components/common/LanguageSelector';
 
-// Breadcrumb configuration - maps routes to display names and icons
+// Breadcrumb configuration
 const ROUTE_CONFIG = {
   '/': { name: 'Inicio', icon: Home },
   '/unatienda': { name: 'Unatienda', icon: Store },
@@ -60,39 +60,35 @@ const ROUTE_CONFIG = {
   '/checkout': { name: 'Pago', icon: CreditCard },
   '/payment': { name: 'Resultado de Pago', icon: CreditCard },
   '/recibo': { name: 'Recibo', icon: CreditCard },
-  // PinpanClub
   '/pinpanclub': { name: 'PinpanClub', icon: Trophy },
   '/pinpanclub/match': { name: 'Partido', icon: Trophy },
-  '/pinpanclub/arbiter': { name: 'Árbitro', icon: Trophy },
+  '/pinpanclub/arbiter': { name: 'Arbitro', icon: Trophy },
   '/pinpanclub/spectator': { name: 'Espectador', icon: Trophy },
-  '/pinpanclub/mobile-arbiter': { name: 'Árbitro Móvil', icon: Trophy },
+  '/pinpanclub/mobile-arbiter': { name: 'Arbitro Movil', icon: Trophy },
   '/pinpanclub/superpin': { name: 'Super Pin', icon: Trophy },
   '/pinpanclub/rapidpin': { name: 'Rapid Pin', icon: Zap },
   '/pinpanclub/seasons': { name: 'Temporadas', icon: Calendar },
-  '/pinpanclub/challenges': { name: 'Desafíos', icon: Trophy },
-  '/pinpanclub/analytics': { name: 'Estadísticas', icon: Trophy },
+  '/pinpanclub/challenges': { name: 'Desafios', icon: Trophy },
+  '/pinpanclub/analytics': { name: 'Estadisticas', icon: Trophy },
   '/pinpanclub/sponsors': { name: 'Patrocinadores', icon: Trophy },
   '/pinpanclub/monday': { name: 'Monday.com', icon: LinkIcon },
   '/rapidpin': { name: 'Rapid Pin', icon: Zap },
   '/tv': { name: 'TV', icon: Trophy },
-  // Community
   '/comunidad': { name: 'Comunidad', icon: Users },
   '/eventos': { name: 'Eventos', icon: Calendar },
-  '/galeria': { name: 'Galería', icon: Store },
-  // Admin Routes
-  '/admin': { name: 'Administración', icon: Settings },
+  '/galeria': { name: 'Galeria', icon: Store },
+  '/admin': { name: 'Administracion', icon: Settings },
   '/admin/notifications': { name: 'Notificaciones', icon: MessageCircle },
   '/admin/posts': { name: 'Publicaciones', icon: BookOpen },
   '/admin/memberships': { name: 'Membresías', icon: CreditCard },
   '/admin/book-orders': { name: 'Pedidos de Libros', icon: Book },
   '/admin/chat': { name: 'Chat de Soporte', icon: MessageCircle },
-  // Auth
-  '/login': { name: 'Iniciar Sesión', icon: User },
+  '/login': { name: 'Iniciar Sesion', icon: User },
   '/registro': { name: 'Registrarse', icon: User },
 };
 
 export function Header() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { totalUnread } = useNotifications();
   const { hasPermission, isAdmin: hasAdminAccess, loading: permissionsLoading } = usePermissions();
@@ -101,39 +97,21 @@ export function Header() {
   const { itemCount, openCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasLinkedStudents, setHasLinkedStudents] = useState(false);
 
   const isUnatiendaPage = location.pathname.startsWith('/unatienda');
   const isHomePage = location.pathname === '/';
-
-  // Helper to determine if user can access admin panel
   const canAccessAdmin = isAdmin || hasAdminAccess;
 
-  // Get current page info for breadcrumb
   const currentPageInfo = useMemo(() => {
     const path = location.pathname;
-    
-    // Check exact match first
-    if (ROUTE_CONFIG[path]) {
-      return ROUTE_CONFIG[path];
-    }
-    
-    // Check for partial matches (e.g., /admin#something, /unatienda/producto/123)
+    if (ROUTE_CONFIG[path]) return ROUTE_CONFIG[path];
     for (const [route, config] of Object.entries(ROUTE_CONFIG)) {
-      if (route !== '/' && path.startsWith(route)) {
-        return config;
-      }
+      if (route !== '/' && path.startsWith(route)) return config;
     }
-    
-    // Default fallback
-    return { name: 'Página', icon: Home };
+    return { name: 'Pagina', icon: Home };
   }, [location.pathname]);
 
-  // Check if we can go back (not on home page and have history)
-  const canGoBack = !isHomePage;
-
-  // Check if user has linked students for book orders
   useEffect(() => {
     const checkLinkedStudents = async () => {
       try {
@@ -150,11 +128,7 @@ export function Header() {
         console.error('Error checking linked students:', error);
       }
     };
-
-    // Use English field name user_id
-    if (isAuthenticated && user?.user_id) {
-      checkLinkedStudents();
-    }
+    if (isAuthenticated && user?.user_id) checkLinkedStudents();
   }, [isAuthenticated, user?.user_id]);
 
   const handleLogout = async () => {
@@ -162,180 +136,96 @@ export function Header() {
     navigate('/');
   };
 
-  // Function to toggle CXGenie chat widget
   const toggleSupportChat = () => {
     try {
-      // CXGenie widget from emergent-main.js exposes window.CXGenie or similar
-      if (window.CXGenie?.toggle) {
-        window.CXGenie.toggle();
-      } else if (window.Emergent?.openChat) {
-        window.Emergent.openChat();
-      } else {
-        // Fallback: try to find and click the widget button
+      if (window.CXGenie?.toggle) window.CXGenie.toggle();
+      else if (window.Emergent?.openChat) window.Emergent.openChat();
+      else {
         const widgetButton = document.querySelector('[data-cxgenie-trigger], .cxgenie-widget-button, [class*="cxgenie"]');
-        if (widgetButton) {
-          widgetButton.click();
-        } else {
-          // Last resort: dispatch custom event
-          window.dispatchEvent(new CustomEvent('cxgenie:toggle'));
-        }
+        if (widgetButton) widgetButton.click();
+        else window.dispatchEvent(new CustomEvent('cxgenie:toggle'));
       }
     } catch (error) {
       console.warn('Support chat not available:', error);
     }
   };
 
-  // Hide floating widget on mount and continuously monitor for dynamic injections
+  // Hide floating widget
   useEffect(() => {
     const hideFloatingWidget = () => {
-      // Inject CSS to hide any floating widgets
       if (!document.getElementById('cxgenie-hide-floating')) {
         const style = document.createElement('style');
         style.id = 'cxgenie-hide-floating';
         style.innerHTML = `
-          /* Hide CXGenie and similar floating widgets */
-          [class*="cxgenie"],
-          [id*="cxgenie"],
-          [data-cxgenie],
-          [data-bid],
-          [data-aid],
-          iframe[src*="cxgenie"],
-          iframe[src*="widget"],
+          [class*="cxgenie"], [id*="cxgenie"], [data-cxgenie], [data-bid], [data-aid],
+          iframe[src*="cxgenie"], iframe[src*="widget"],
           div[style*="position: fixed"][style*="z-index: 9999"]:not(#root):not(.toast),
           div[style*="position: fixed"][style*="z-index: 99999"] {
-            display: none !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
+            display: none !important; visibility: hidden !important; pointer-events: none !important;
           }
         `;
         document.head.appendChild(style);
       }
-      
-      // Also try to remove any dynamically injected elements
-      const selectors = [
-        '[data-bid]',
-        '[data-aid]',
-        'iframe[src*="cxgenie"]',
-        'iframe[src*="widget.cxgenie"]',
-        '[class*="cxgenie"]',
-        '[id*="cxgenie"]'
-      ];
-      
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-        });
+      ['[data-bid]','[data-aid]','iframe[src*="cxgenie"]','iframe[src*="widget.cxgenie"]','[class*="cxgenie"]','[id*="cxgenie"]'].forEach(s => {
+        document.querySelectorAll(s).forEach(el => { el.style.display = 'none'; el.style.visibility = 'hidden'; });
       });
     };
-    
-    // Run immediately
     hideFloatingWidget();
-    
-    // Run periodically to catch async-loaded widgets
     const interval = setInterval(hideFloatingWidget, 1000);
-    
-    // Stop after 10 seconds
     const timeout = setTimeout(() => clearInterval(interval), 10000);
-    
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
+    return () => { clearInterval(interval); clearTimeout(timeout); };
   }, []);
 
   return (
-    <header className="site-header sticky top-0 z-50 w-full bg-background/95 backdrop-blur-lg border-b border-border/30">
+    <header className="site-header sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/10" data-testid="app-header">
       <div className="mx-auto px-4 md:px-8">
-        <div className="flex h-12 items-center justify-between">
-          {/* Left Section: Logo + Breadcrumb with Back */}
-          <div className="flex items-center gap-2">
-            {/* Logo - always first, links to home */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-1.5 group"
-              data-testid="logo-link"
-              title="Ir al inicio"
-            >
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-red-500 to-yellow-500 text-white group-hover:scale-105 transition-transform">
-                <LinkIcon className="h-4 w-4" />
+        <div className="flex h-14 items-center justify-between">
+          {/* Left: Logo + Breadcrumb */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 group" data-testid="logo-link" title="Home">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <LinkIcon className="h-4 w-4 text-white" />
               </div>
-              <span className="font-serif text-lg font-bold tracking-tight hidden sm:inline bg-gradient-to-r from-red-600 to-yellow-600 bg-clip-text text-transparent">
+              <span className="text-base font-black tracking-tight hidden sm:inline">
                 ChiPi Link
               </span>
             </Link>
 
-            {/* Breadcrumb with integrated back navigation */}
             {!isHomePage && (
-              <div className="flex items-center">
+              <div className="flex items-center gap-0.5">
+                <span className="text-muted-foreground/30 hidden sm:inline">/</span>
                 <button
                   onClick={() => navigate(-1)}
-                  className="p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/50 transition-colors mx-0.5"
+                  className="p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-colors sm:hidden"
                   data-testid="back-button"
-                  title="Back"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="gap-1.5 text-muted-foreground hover:text-foreground h-8 px-2"
-                      data-testid="breadcrumb-trigger"
-                    >
-                      {currentPageInfo.icon && <currentPageInfo.icon className="h-4 w-4" />}
-                      <span className="text-sm font-medium">{currentPageInfo.name}</span>
-                      <ChevronRight className="h-3 w-3 rotate-90" />
+                    <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-foreground h-7 px-2 text-sm" data-testid="breadcrumb-trigger">
+                      {currentPageInfo.icon && <currentPageInfo.icon className="h-3.5 w-3.5" />}
+                      <span className="font-medium">{currentPageInfo.name}</span>
+                      <ChevronRight className="h-3 w-3 rotate-90 opacity-40" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-48">
-                    <DropdownMenuItem asChild>
-                      <Link to="/" className="flex items-center gap-2">
-                        <Home className="h-4 w-4" />
-                        Inicio
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/unatienda" className="flex items-center gap-2">
-                        <Store className="h-4 w-4" />
-                        Tienda
-                      </Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/" className="flex items-center gap-2"><Home className="h-4 w-4" />Inicio</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/unatienda" className="flex items-center gap-2"><Store className="h-4 w-4" />Tienda</Link></DropdownMenuItem>
                     {isAuthenticated && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link to="/mi-cuenta" className="flex items-center gap-2">
-                            <Wallet className="h-4 w-4" />
-                            Mi Cuenta
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/pedidos" className="flex items-center gap-2">
-                            <ShoppingCart className="h-4 w-4" />
-                            Mis Pedidos
-                          </Link>
-                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2"><Wallet className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link to="/pedidos" className="flex items-center gap-2"><ShoppingCart className="h-4 w-4" />Mis Pedidos</Link></DropdownMenuItem>
                         {user?.tiene_membresia_activa && (
-                          <DropdownMenuItem asChild>
-                            <Link to="/pinpanclub" className="flex items-center gap-2">
-                              <Trophy className="h-4 w-4" />
-                              PinpanClub
-                            </Link>
-                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild><Link to="/pinpanclub" className="flex items-center gap-2"><Trophy className="h-4 w-4" />PinpanClub</Link></DropdownMenuItem>
                         )}
                       </>
                     )}
                     {canAccessAdmin && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin" className="flex items-center gap-2 text-accent">
-                            <Settings className="h-4 w-4" />
-                            Administración
-                          </Link>
-                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link to="/admin" className="flex items-center gap-2 text-accent"><Settings className="h-4 w-4" />Admin</Link></DropdownMenuItem>
                       </>
                     )}
                   </DropdownMenuContent>
@@ -344,247 +234,83 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Navigation - hide current page since breadcrumb shows it */}
-          <nav className="hidden md:flex items-center gap-6">
-            {/* Unatienda - Public store link (hide when on Unatienda since breadcrumb shows it) */}
-            {!isUnatiendaPage && (
-              <Link 
-                to="/unatienda" 
-                className="text-sm font-medium transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
-                data-testid="unatienda-nav-link"
-              >
-                <Store className="h-4 w-4" />
-                Unatienda
-              </Link>
-            )}
-
-            {/* PinPanClub Quick Access - Solo visible para usuarios con membresía activa o admins */}
-            {(user?.tiene_membresia_activa || canAccessAdmin) && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button 
-                    className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                      location.pathname.startsWith('/pinpanclub')
-                        ? 'text-primary' 
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                    data-testid="pinpanclub-dropdown"
-                  >
-                    <Trophy className="h-4 w-4" />
-                    PinPanClub
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem asChild>
-                    <Link to="/pinpanclub/superpin/ranking" className="flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-yellow-500" />
-                      🏆 Super Pin
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/rapidpin" className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-orange-500" />
-                      ⚡ Rapid Pin
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/pinpanclub/players" className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      Jugadores
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/pinpanclub/tournaments" className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Torneos
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {/* Catalog link removed - now integrated in Admin > Unatienda */}
-            
-            {isAuthenticated && (
-              <>
-                {/* Mis Pedidos - visible para todos los usuarios autenticados */}
-                <Link 
-                  to="/pedidos" 
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  data-testid="orders-nav-link"
-                >
-                  {t('nav.orders')}
-                </Link>
-              </>
-            )}
-            
-            {isAdmin && (
-              <Link 
-                to="/admin" 
-                className="text-sm font-medium text-accent hover:text-accent/80 transition-colors"
-                data-testid="admin-nav-link"
-              >
-                {t('nav.admin')}
-              </Link>
-            )}
-          </nav>
-
-          {/* Right side actions */}
-          <div className="flex items-center gap-2">
-            {/* Support Chat Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSupportChat}
-              className="h-9 w-9 rounded-full"
-              data-testid="support-chat-button"
-              title="Soporte"
-            >
+          {/* Right: Compact action bar */}
+          <div className="flex items-center gap-1">
+            {/* Support Chat */}
+            <Button variant="ghost" size="icon" onClick={toggleSupportChat} className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground" data-testid="support-chat-button">
               <MessageCircle className="h-4 w-4" />
-              <span className="sr-only">Soporte</span>
             </Button>
 
-            {/* Notifications Bell — unread order messages */}
+            {/* Notifications */}
             {isAuthenticated && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/pedidos')}
-                className="h-9 w-9 rounded-full relative"
-                data-testid="notifications-bell"
-                title="Notifications"
-              >
+              <Button variant="ghost" size="icon" onClick={() => navigate('/pedidos')} className="h-8 w-8 rounded-full relative text-muted-foreground hover:text-foreground" data-testid="notifications-bell">
                 <Bell className="h-4 w-4" />
                 {totalUnread > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
+                  <span className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white px-0.5">
                     {totalUnread > 99 ? '99+' : totalUnread}
                   </span>
                 )}
               </Button>
             )}
 
-            {/* Cart Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={openCart}
-              className="h-9 w-9 rounded-full relative"
-              data-testid="cart-button"
-            >
+            {/* Cart */}
+            <Button variant="ghost" size="icon" onClick={openCart} className="h-8 w-8 rounded-full relative text-muted-foreground hover:text-foreground" data-testid="cart-button">
               <ShoppingCart className="h-4 w-4" />
               {itemCount > 0 && (
-                <Badge 
-                  variant="default" 
-                  className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                >
+                <span className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white px-0.5">
                   {itemCount > 9 ? '9+' : itemCount}
-                </Badge>
+                </span>
               )}
-              <span className="sr-only">Carrito</span>
             </Button>
 
-            {/* Language Selector */}
+            {/* Language */}
             <LanguageSelector />
 
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-9 w-9 rounded-full"
-              data-testid="theme-toggle"
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-              <span className="sr-only">Toggle theme</span>
+            {/* Theme */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground" data-testid="theme-toggle">
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
 
-            {/* User Menu or Auth Buttons */}
+            {/* User */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="h-9 px-3 rounded-full gap-2"
-                    data-testid="user-menu-trigger"
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline max-w-[100px] truncate">
-                      {user?.nombre?.split(' ')[0] || 'Usuario'}
-                    </span>
+                  <Button variant="ghost" className="h-8 w-8 rounded-full p-0" data-testid="user-menu-trigger">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white text-xs font-bold">
+                      {(user?.nombre || 'U')[0].toUpperCase()}
+                    </div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  {/* Mi Cuenta - Siempre visible para usuarios autenticados */}
-                  <DropdownMenuItem asChild>
-                    <Link to="/mi-cuenta" className="flex items-center gap-2" data-testid="menu-my-account">
-                      <Wallet className="h-4 w-4" />
-                      Mi Cuenta
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  {/* Mis Pedidos - Siempre visible para usuarios autenticados */}
-                  <DropdownMenuItem asChild>
-                    <Link to="/pedidos" className="flex items-center gap-2" data-testid="menu-orders">
-                      <ShoppingCart className="h-4 w-4" />
-                      {t('nav.orders')}
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  {/* Mis Libros Escolares - Solo si tiene estudiantes vinculados */}
+                  <div className="px-2 py-1.5 border-b border-border/50 mb-1">
+                    <p className="text-sm font-semibold truncate">{user?.nombre || 'User'}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                  <DropdownMenuItem asChild><Link to="/mi-cuenta" className="flex items-center gap-2" data-testid="menu-my-account"><Wallet className="h-4 w-4" />Mi Cuenta</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/pedidos" className="flex items-center gap-2" data-testid="menu-orders"><ShoppingCart className="h-4 w-4" />{t('nav.orders')}</Link></DropdownMenuItem>
                   {hasLinkedStudents && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/my-book-orders" className="flex items-center gap-2" data-testid="menu-book-orders">
-                        <BookOpen className="h-4 w-4" />
-                        Mis Libros Escolares
-                      </Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/my-book-orders" className="flex items-center gap-2" data-testid="menu-book-orders"><BookOpen className="h-4 w-4" />Mis Libros</Link></DropdownMenuItem>
                   )}
-                  
-                  {/* PinpanClub - Solo si tiene membresía activa */}
                   {user?.tiene_membresia_activa && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong">
-                        <Trophy className="h-4 w-4" />
-                        PinpanClub
-                      </Link>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link to="/pinpanclub" className="flex items-center gap-2" data-testid="menu-pingpong"><Trophy className="h-4 w-4" />PinpanClub</Link></DropdownMenuItem>
                   )}
-                  
-                  {/* Admin Section - Solo para admins */}
                   {canAccessAdmin && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin" className="flex items-center gap-2 text-accent" data-testid="menu-admin">
-                          <Settings className="h-4 w-4" />
-                          {t('nav.admin')}
-                        </Link>
-                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild><Link to="/admin" className="flex items-center gap-2 text-accent" data-testid="menu-admin"><Settings className="h-4 w-4" />{t('nav.admin')}</Link></DropdownMenuItem>
                     </>
                   )}
-                  
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={handleLogout}
-                    className="text-destructive focus:text-destructive"
-                    data-testid="menu-logout"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {t('nav.logout')}
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive" data-testid="menu-logout">
+                    <LogOut className="h-4 w-4 mr-2" />{t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                variant="ghost" 
+              <Button
                 size="sm"
                 onClick={() => navigate('/login')}
-                className="hidden md:inline-flex"
+                className="h-8 rounded-full px-4 text-xs font-bold"
                 data-testid="login-button"
               >
                 {t('nav.login')}
