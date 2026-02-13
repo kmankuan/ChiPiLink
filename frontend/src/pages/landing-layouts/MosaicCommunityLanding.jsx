@@ -50,6 +50,16 @@ const MOSAIC_DEFAULTS = {
   mosaic_gathering: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/0416cce781984810906e615303474bfe2089c65f53db816a6bf448f34cbd3bda.png',
 };
 
+// Default nav icons when no backend config is available
+const DEFAULT_NAV_ICONS = [
+  { key: 'pinpan', label: 'PinPan', to: '/pinpanclub', type: 'lucide', icon: 'Gamepad2', accent: '#d97706', accent_bg: '#FFF7ED' },
+  { key: 'tienda', label: 'Tienda', to: '/unatienda', type: 'lucide', icon: 'Store', accent: '#059669', accent_bg: '#ECFDF5' },
+  { key: 'ranking', label: 'Ranking', to: '/pinpanclub/superpin/ranking', type: 'lucide', icon: 'Trophy', accent: '#C8102E', accent_bg: '#FFF1F2' },
+  { key: 'aprender', label: 'Aprender', to: '/comunidad', type: 'lucide', icon: 'GraduationCap', accent: '#7c3aed', accent_bg: '#F5F3FF' },
+  { key: 'cultura', label: 'Cultura', to: '/galeria', type: 'lucide', icon: 'Globe', accent: '#0284c7', accent_bg: '#F0F9FF' },
+  { key: 'fe', label: 'Fe', to: '/comunidad', type: 'lucide', icon: 'Heart', accent: '#ec4899', accent_bg: '#FDF2F8' },
+];
+
 function formatDate(dateStr) {
   if (!dateStr) return '';
   return new Date(dateStr).toLocaleDateString('es-PA', { day: 'numeric', month: 'short' });
