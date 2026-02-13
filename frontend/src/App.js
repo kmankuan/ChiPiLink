@@ -18,7 +18,6 @@ import { OneSignalProvider } from '@/contexts/OneSignalContext';
 import { Header } from '@/components/layout/Header';
 import { NotificationBar } from '@/components/layout/NotificationBar';
 import BottomNav from '@/components/layout/BottomNav';
-import TickerBar from '@/components/layout/TickerBar';
 
 // Pages
 import SuperAppLanding from '@/pages/SuperAppLanding';
