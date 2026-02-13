@@ -143,6 +143,10 @@ export default function AdminModule() {
         <TabsContent value="widget">
           <WidgetManagerModule />
         </TabsContent>
+
+        <TabsContent value="ticker">
+          <TickerAdminModule />
+        </TabsContent>
       </Tabs>
     </div>
   );
