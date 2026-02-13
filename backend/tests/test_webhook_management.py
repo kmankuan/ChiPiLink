@@ -53,13 +53,13 @@ class TestWebhookStatus:
     
     def test_webhook_status_endpoint_returns_200(self, api_client):
         """Webhook status endpoint should return 200."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status")
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status"))
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text[:500]}"
         print(f"Webhook status endpoint returned 200")
     
     def test_webhook_status_returns_registered_field(self, api_client):
         """Webhook status should include 'registered' boolean."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status"))
         assert response.status_code == 200
         data = response.json()
         assert "registered" in data, f"'registered' field missing. Got: {data}"
@@ -68,7 +68,7 @@ class TestWebhookStatus:
     
     def test_webhook_status_returns_webhook_id_field(self, api_client):
         """Webhook status should include 'webhook_id' field."""
-        response = api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status")
+        response = retry_request(lambda: api_client.get(f"{BASE_URL}/api/admin/showcase/monday-banners/webhook/status"))
         assert response.status_code == 200
         data = response.json()
         assert "webhook_id" in data, f"'webhook_id' field missing. Got: {data}"
