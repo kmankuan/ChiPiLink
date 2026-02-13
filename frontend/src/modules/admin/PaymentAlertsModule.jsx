@@ -406,6 +406,8 @@ function SettingsTab() {
       const r = await axios.put(`${API}/api/wallet-topups/settings`, settings, { headers: hdrs() });
       setSettings(r.data);
       toast.success('Settings saved');
+      // Refresh polling status after save
+      axios.get(`${API}/api/wallet-topups/polling/status`, { headers: hdrs() }).then(r => setPollingStatus(r.data)).catch(() => {});
     } catch { toast.error('Failed'); }
     finally { setSaving(false); }
   };
