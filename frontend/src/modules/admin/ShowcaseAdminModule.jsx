@@ -245,12 +245,13 @@ export default function ShowcaseAdminModule() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [bannersRes, mediaRes, mondayRes, autoSyncRes, historyRes] = await Promise.all([
+      const [bannersRes, mediaRes, mondayRes, autoSyncRes, historyRes, webhookRes] = await Promise.all([
         fetch(`${API_URL}/api/admin/showcase/banners`, { headers: { Authorization: `Bearer ${getToken()}` } }),
         fetch(`${API_URL}/api/admin/showcase/media-player`, { headers: { Authorization: `Bearer ${getToken()}` } }),
         fetch(`${API_URL}/api/admin/showcase/monday-banners/config`, { headers: { Authorization: `Bearer ${getToken()}` } }),
         fetch(`${API_URL}/api/admin/showcase/monday-banners/auto-sync`, { headers: { Authorization: `Bearer ${getToken()}` } }),
         fetch(`${API_URL}/api/admin/showcase/monday-banners/sync-history`, { headers: { Authorization: `Bearer ${getToken()}` } }),
+        fetch(`${API_URL}/api/admin/showcase/monday-banners/webhook/status`, { headers: { Authorization: `Bearer ${getToken()}` } }),
       ]);
       if (bannersRes.ok) setBanners(await bannersRes.json());
       if (mediaRes.ok) {
@@ -264,6 +265,7 @@ export default function ShowcaseAdminModule() {
         const hd = await historyRes.json();
         setSyncHistory(hd.history || []);
       }
+      if (webhookRes.ok) setWebhookStatus(await webhookRes.json());
     } catch (e) {
       toast.error('Failed to load');
     } finally {
