@@ -16,6 +16,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useLandingImages } from '@/hooks/useLandingImages';
 import { useLayoutIcons } from '@/hooks/useLayoutIcons';
+import BannerCarousel from '@/components/BannerCarousel';
+import MediaPlayer from '@/components/MediaPlayer';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 import {
