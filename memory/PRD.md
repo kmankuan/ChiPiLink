@@ -6,12 +6,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 ## What's Been Implemented
 
 ### Automated Monday.com Banner Sync (Feb 13, 2026) - COMPLETE
-- **Background scheduler** using APScheduler: auto-syncs banners from Monday.com at configurable intervals
-- **Default 10-minute interval**, admin-configurable (1 min to 24 hours)
-- Admin UI: enable/disable toggle, interval dropdown selector, real-time status display (Running/Paused, next sync, last sync)
-- **Sync History Log**: timeline of past syncs showing status (success/error), trigger (auto/manual), items synced count, timestamps. Capped at 50 entries.
-- Scheduler starts on app startup, pauses when not configured, resumes when both Monday integration and auto-sync enabled
-- **Tested: 100% (13 auto-sync + 14 history = 27 backend tests passed)**
+- **Webhook-based real-time sync (Primary):** Instant sync via Monday.com webhooks — changes reflect immediately when board items are created/updated
+- **Scheduled polling sync (Fallback):** APScheduler-based background job, default 10 min, admin-configurable (1 min to 24 hours)
+- Admin UI: webhook connect/disconnect button, auto-sync enable/disable toggle, interval dropdown, status displays
+- **Sync History Log**: timeline of past syncs showing status (success/error), trigger (webhook/auto/manual), items synced count, timestamps. Capped at 50 entries.
+- Scheduler starts on app startup, webhook handler re-registered on restart
+- **Tested: 100% (13 auto-sync + 14 history + 17 webhook = 44 backend tests passed)**
 
 ### Scheduled Banners & Monday.com Sync (Feb 13, 2026) - COMPLETE
 - **Scheduled banners**: start_date/end_date fields — banners auto-show/hide based on dates
@@ -45,10 +45,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - `PUT /api/admin/showcase/monday-banners/config` — Save config
 - `GET /api/admin/showcase/monday-banners/boards` — List boards + columns
 - `POST /api/admin/showcase/monday-banners/sync` — Trigger manual sync
-### Auto-Sync
+### Auto-Sync & Webhooks
 - `GET /api/admin/showcase/monday-banners/auto-sync` — Auto-sync config + scheduler status
 - `PUT /api/admin/showcase/monday-banners/auto-sync` — Enable/disable auto-sync, set interval
 - `GET /api/admin/showcase/monday-banners/sync-history` — Recent sync history log (last 20)
+- `POST /api/admin/showcase/monday-banners/webhook/register` — Register real-time webhook with Monday.com
+- `POST /api/admin/showcase/monday-banners/webhook/unregister` — Remove webhook
+- `GET /api/admin/showcase/monday-banners/webhook/status` — Webhook connection status
 
 ## Key Files
 - `/app/backend/modules/showcase/__init__.py` — All showcase API routes (banners, media, monday, auto-sync)
