@@ -5,7 +5,7 @@ import sys
 import json
 
 class FrontendMigrationTester:
-    def __init__(self, base_url="https://mosaic-community-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://showcase-hub-31.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0

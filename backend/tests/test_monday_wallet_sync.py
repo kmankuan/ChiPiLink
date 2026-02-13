@@ -20,7 +20,7 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://mosaic-community-1.preview.emergentagent.com"
+    BASE_URL = "https://showcase-hub-31.preview.emergentagent.com"
 
 # Admin credentials
 ADMIN_EMAIL = "teck@koh.one"
