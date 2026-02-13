@@ -392,6 +392,27 @@ export default function ShowcaseAdminModule() {
     }
   };
 
+  const saveAutoSync = async (overrides = {}) => {
+    setSavingAutoSync(true);
+    const payload = { ...autoSync, ...overrides };
+    try {
+      const res = await fetch(`${API_URL}/api/admin/showcase/monday-banners/auto-sync`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ enabled: payload.enabled, interval_minutes: payload.interval_minutes })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAutoSync(prev => ({ ...prev, ...data.auto_sync, scheduler: data.scheduler }));
+        toast.success(payload.enabled ? 'Auto-sync enabled' : 'Auto-sync disabled');
+      }
+    } catch (e) {
+      toast.error('Failed to save auto-sync settings');
+    } finally {
+      setSavingAutoSync(false);
+    }
+  };
+
   const savePlayerSettings = async () => {
     try {
       const res = await fetch(`${API_URL}/api/admin/showcase/media-player`, {
