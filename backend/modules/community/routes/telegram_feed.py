@@ -69,7 +69,12 @@ async def get_posts(
     limit: int = 20,
     user=Depends(get_current_user)
 ):
-    """Get paginated feed of community posts"""
+    """Get paginated feed of community posts (respects visibility settings)"""
+    # Check visibility access
+    has_access = await _check_feed_access(user)
+    if not has_access:
+        return {"posts": [], "total": 0, "page": page, "limit": limit, "access_denied": True}
+
     user_id = user["user_id"]
     skip = (page - 1) * limit
 
