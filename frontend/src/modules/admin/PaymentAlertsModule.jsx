@@ -206,6 +206,13 @@ function PendingQueueTab() {
                   {item.reject_reason && <div className="text-red-600"><span className="font-semibold">Reject reason:</span> {item.reject_reason}</div>}
                   {item.notes && <div><span className="font-semibold">Notes:</span> {item.notes}</div>}
                 </div>
+                {/* Warning Details */}
+                {item.warning_text && item.risk_level !== 'clear' && (
+                  <div className="mt-2 p-2 rounded border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+                    <p className="text-xs font-semibold text-amber-800 dark:text-amber-400 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {item.warning_text}</p>
+                    {item.dedup_warnings?.map((w, i) => <p key={i} className="text-[10px] text-amber-700 dark:text-amber-500 mt-0.5">{w}</p>)}
+                  </div>
+                )}
                 {item.email_body_preview && (
                   <div className="mt-2">
                     <p className="text-[10px] font-semibold text-muted-foreground mb-1">Email Preview:</p>
