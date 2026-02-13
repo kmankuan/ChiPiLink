@@ -56,6 +56,7 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const landingImages = useLandingImages();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
