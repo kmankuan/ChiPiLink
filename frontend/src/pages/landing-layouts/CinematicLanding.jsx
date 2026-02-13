@@ -16,8 +16,8 @@ import {
   ArrowRight, ChevronDown, LogIn, Rss
 } from 'lucide-react';
 
-const LANTERNS = 'https://images.unsplash.com/photo-1683304290583-897712dc5446?crop=entropy&cs=srgb&fm=jpg&w=1400&q=80';
-const SPORTS = 'https://static.prod-images.emergentagent.com/jobs/0e997fa5-7870-4ad7-bfea-6491d7259a17/images/78c324677f3f701890649f9b0d24726815dbbe5114bad3d87b0f6adb5437aab7.png';
+const LANTERNS = landingImages.lanterns;
+  const SPORTS = landingImages.pinpanclub;
 
 const MODULES = [
   { key: 'unatienda', icon: Store, label: 'Unatienda', to: '/unatienda', accent: '#059669' },
