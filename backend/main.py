@@ -252,6 +252,10 @@ async def startup_event():
     if telegram_service.token:
         await telegram_service.start_polling()
         logger.info("Telegram community feed polling started")
+
+    # Start Gmail background polling for payment alerts
+    from modules.wallet_topups.gmail_poller import gmail_poller
+    await gmail_poller.start()
     
     logger.info("All modules loaded successfully")
 
