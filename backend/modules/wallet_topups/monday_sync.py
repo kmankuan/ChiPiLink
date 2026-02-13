@@ -65,7 +65,7 @@ class PaymentAlertsMondaySync:
             if col_map.get("sender_name"):
                 col_values[col_map["sender_name"]] = sender
             if col_map.get("status"):
-                col_values[col_map["status"]] = {"label": "Pending Approval"}
+                col_values[col_map["status"]] = {"label": "Pending"}
             if col_map.get("warning"):
                 col_values[col_map["warning"]] = risk_label
             if col_map.get("bank_reference"):
@@ -135,7 +135,7 @@ class PaymentAlertsMondaySync:
         try:
             # Update status column if mapped
             if col_map.get("status"):
-                label = "Approved" if new_status == "approved" else "Rejected"
+                label = "Approved" if new_status == "approved" else "Decline"
                 col_values = {col_map["status"]: {"label": label}}
                 col_json = json.dumps(json.dumps(col_values))
                 await monday_client.execute(f"""
