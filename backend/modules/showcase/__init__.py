@@ -73,6 +73,11 @@ async def create_banner(body: dict):
         "text_color": body.get("text_color", "#ffffff"),
         "font_size": body.get("font_size", "lg"),
         "bg_image_url": body.get("bg_image_url", ""),
+        # Schedule fields
+        "start_date": body.get("start_date", ""),
+        "end_date": body.get("end_date", ""),
+        # Source tracking
+        "source": body.get("source", "manual"),
         # Common fields
         "active": body.get("active", True),
         "order": body.get("order", count),
