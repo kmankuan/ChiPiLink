@@ -583,7 +583,11 @@ export default function SchoolTextbooksView({
                                 ${isSelected ? 'bg-purple-50 dark:bg-purple-900/20' : ''}
                                 ${isAvailable && !isSelected ? 'hover:bg-muted/50 cursor-pointer' : ''}
                               `}
-                              onClick={() => isAvailable && toggleBook(studentId, item.book_id)}
+                              onClick={(e) => {
+                                if (isAvailable && e.target.tagName !== 'INPUT') {
+                                  toggleBook(studentId, item.book_id);
+                                }
+                              }}
                             >
                               {/* Selection / Status indicator */}
                               <div className="shrink-0 w-5 flex justify-center">
