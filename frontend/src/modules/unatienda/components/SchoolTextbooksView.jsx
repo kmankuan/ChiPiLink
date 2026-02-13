@@ -661,6 +661,25 @@ export default function SchoolTextbooksView({
                       {/* Submit bar */}
                       {availableItems.length > 0 && (
                         <div className="sticky bottom-0 z-10 border-t px-4 py-3 bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.15)]" data-testid={`order-bar-${studentId}`}>
+                          {/* Wallet balance row */}
+                          <div className={`flex items-center justify-between mb-2 px-2 py-1.5 rounded-lg text-xs ${
+                            walletBalance !== null && walletBalance >= selectedTotal
+                              ? 'bg-green-50 dark:bg-green-900/20 text-green-700'
+                              : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700'
+                          }`} data-testid={`wallet-balance-${studentId}`}>
+                            <span className="flex items-center gap-1.5">
+                              <Wallet className="h-3.5 w-3.5" />
+                              {lang === 'es' ? 'Saldo:' : 'Balance:'}
+                            </span>
+                            <span className="font-bold">${(walletBalance ?? 0).toFixed(2)}</span>
+                          </div>
+                          {/* Insufficient balance warning */}
+                          {selectedList.length > 0 && walletBalance !== null && walletBalance < selectedTotal && (
+                            <div className="flex items-center gap-1.5 mb-2 px-2 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 text-[10px]" data-testid={`insufficient-warning-${studentId}`}>
+                              <AlertTriangle className="h-3 w-3 shrink-0" />
+                              {lang === 'es' ? 'Saldo insuficiente para completar el pedido' : 'Insufficient balance to complete order'}
+                            </div>
+                          )}
                           <div className="flex items-center justify-between gap-3 pb-safe">
                             <div className="text-sm">
                               <span className="text-muted-foreground">{selectedList.length} {lang === 'es' ? 'seleccionado(s)' : 'selected'}</span>
@@ -670,7 +689,7 @@ export default function SchoolTextbooksView({
                             </div>
                             <Button
                               onClick={() => handleSubmit(student)}
-                              disabled={submitting || selectedList.length === 0}
+                              disabled={submitting || selectedList.length === 0 || (walletBalance !== null && walletBalance < selectedTotal)}
                               className="gap-1.5 bg-purple-600 hover:bg-purple-700 shrink-0"
                               size="sm"
                               data-testid={`submit-order-btn-${studentId}`}
