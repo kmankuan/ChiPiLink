@@ -128,6 +128,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const landingImages = useLandingImages();
+  const dynamicIcons = useLayoutIcons('mosaic_community');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
