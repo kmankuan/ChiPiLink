@@ -455,6 +455,7 @@ const LAYOUT_COMPONENTS = {
   cinematic: CinematicLanding,
   mobile_app: CinematicLanding,
   living_grid: LivingGridLanding,
+  horizon: HorizonLanding,
   bento_grid: BentoGridLanding,
   tab_hub: TabHubLanding,
   social_feed: SocialFeedLanding,
