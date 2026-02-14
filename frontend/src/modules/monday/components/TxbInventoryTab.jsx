@@ -207,6 +207,26 @@ export default function TxbInventoryTab() {
     }
   };
 
+  const handleSyncColumn = async (columnKey, label) => {
+    setSyncingColumn(columnKey);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/sync-column/${columnKey}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`${label} synced! Updated: ${data.updated}, Skipped: ${data.skipped}, Failed: ${data.failed}`);
+      } else {
+        toast.error(data.detail || `Failed to sync ${label}`);
+      }
+    } catch {
+      toast.error('Network error during column sync');
+    } finally {
+      setSyncingColumn(null);
+    }
+  };
+
   const updateMapping = (key, value) => {
     setConfig(prev => ({
       ...prev,
