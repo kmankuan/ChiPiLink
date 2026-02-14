@@ -395,10 +395,12 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   // Textbooks View for selected student
   if (view === 'textbooks' && selectedStudent) {
     const orderStatus = getStudentOrderStatus(selectedStudent.student_id);
-    // Available books: not ordered OR reorder approved (can order again)
-    const availableBooks = textbooks.filter(b => !b.already_ordered || b.can_reorder);
+    // Available books: not ordered OR reorder approved (can order again), AND not out of stock
+    const availableBooks = textbooks.filter(b => (!b.already_ordered || b.can_reorder) && b.status !== 'out_of_stock');
     // Ordered books: already ordered AND not reorder approved (can't order again unless approved)
     const orderedBooks = textbooks.filter(b => b.already_ordered && !b.can_reorder);
+    // Out of stock books: show separately
+    const outOfStockBooks = textbooks.filter(b => b.status === 'out_of_stock' && !b.already_ordered);
     const selectedCount = Object.values(selectedBooks).filter(Boolean).length;
     const selectedTotal = textbooks
       .filter(b => selectedBooks[b.book_id])
