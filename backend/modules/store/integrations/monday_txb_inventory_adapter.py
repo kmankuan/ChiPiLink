@@ -172,11 +172,36 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         return sync_stats
 
-    def _build_column_values(self, book: Dict, col_map: Dict) -> Dict:
+    async def _get_board_column_types(self, board_id: str) -> Dict[str, str]:
+        """Fetch column types from Monday.com board. Returns {column_id: column_type}."""
+        try:
+            data = await self.client.execute(
+                f'query {{ boards(ids: [{board_id}]) {{ columns {{ id type }} }} }}'
+            )
+            boards = data.get("boards", [])
+            if boards:
+                return {c["id"]: c["type"] for c in boards[0].get("columns", [])}
+        except Exception as e:
+            logger.warning(f"Failed to fetch column types for board {board_id}: {e}")
+        return {}
+
+    def _format_column_value(self, value, col_type: str):
+        """Format a value according to its Monday.com column type."""
+        if not value and value != 0:
+            return value
+        if col_type in ("dropdown", "color"):
+            # Dropdown/status columns need {"labels": ["value"]}
+            return {"labels": [str(value)]}
+        if col_type == "status":
+            return {"label": str(value)}
+        # Text, numbers, etc. — pass as string
+        return str(value) if value is not None else value
+
+    def _build_column_values(self, book: Dict, col_map: Dict, col_types: Dict = None) -> Dict:
         """Build Monday.com column values from a textbook document.
-        Only includes text/number columns — status column handled separately."""
+        Handles different column types (text, number, dropdown, status)."""
         values = {}
-        # Stock column: handle both legacy 'stock' and new 'stock_quantity' keys
+        col_types = col_types or {}
         stock_col = col_map.get("stock_quantity") or col_map.get("stock")
 
         field_map = {
@@ -191,18 +216,40 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         for field, value in field_map.items():
             col_id = col_map.get(field)
             if col_id and value is not None:
-                values[col_id] = value
+                ct = col_types.get(col_id, "text")
+                values[col_id] = self._format_column_value(value, ct)
 
         # Stock quantity — set as number
         if stock_col:
             values[stock_col] = str(book.get("inventory_quantity", 0))
 
-        # Status column — only set if labels are explicitly configured
-        # Skip status on creation to avoid label mismatch errors;
-        # admin should configure labels on Monday.com board first
-        # Status auto-set is best done after item creation or via column update
-
         return values
+
+    def _build_single_column_value(self, book: Dict, column_key: str, col_map: Dict, col_types: Dict = None) -> Dict:
+        """Build Monday.com value for a single column from a textbook."""
+        col_types = col_types or {}
+        col_id = col_map.get(column_key)
+        if not col_id:
+            return {}
+
+        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+        ct = col_types.get(col_id, "text")
+
+        field_source = {
+            "code": book.get("code", book.get("book_id", "")),
+            "name": book.get("name", ""),
+            "grade": book.get("grade", ""),
+            "publisher": book.get("publisher", ""),
+            "subject": book.get("subject", ""),
+            "unit_price": str(book.get("price", 0)),
+            "stock_quantity": str(book.get("inventory_quantity", 0)),
+        }
+
+        value = field_source.get(column_key)
+        if value is None:
+            return {}
+
+        return {col_id: self._format_column_value(value, ct)}
 
     async def _get_or_create_grade_groups(self, board_id: str, textbooks: List[Dict]) -> Dict:
         """Get or create Monday.com groups by grade. Returns {grade: group_id}."""
