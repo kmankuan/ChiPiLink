@@ -5,18 +5,13 @@ Banners & Media Player Module
 """
 from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
-from bson import ObjectId
-import os
 import re
 import httpx
 
+from core.database import db
+
 router = APIRouter(prefix="/showcase", tags=["Showcase"])
 admin_router = APIRouter(prefix="/admin/showcase", tags=["Showcase Admin"])
-
-def get_db():
-    from pymongo import MongoClient
-    client = MongoClient(os.environ.get("MONGO_URL"))
-    return client[os.environ.get("DB_NAME", "chipilink_prod")]
 
 
 # ═══════════════════════════════════════════
@@ -26,21 +21,19 @@ def get_db():
 @router.get("/banners")
 async def get_banners():
     """Public: Get all active banners, filtered by schedule dates."""
-    db = get_db()
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    banners = list(db.showcase_banners.find(
+    banners = await db.showcase_banners.find(
         {"active": True},
         {"_id": 0}
-    ).sort("order", 1))
-    # Filter by schedule: only show if within start_date/end_date range (or no dates set)
+    ).sort("order", 1).to_list(None)
     visible = []
     for b in banners:
         start = b.get("start_date", "")
         end = b.get("end_date", "")
         if start and start > now:
-            continue  # Not started yet
+            continue
         if end and end < now:
-            continue  # Already ended
+            continue
         visible.append(b)
     return visible
 
@@ -48,43 +41,36 @@ async def get_banners():
 @admin_router.get("/banners")
 async def get_banners_admin():
     """Admin: Get all banners (including inactive)."""
-    db = get_db()
-    banners = list(db.showcase_banners.find({}, {"_id": 0}).sort("order", 1))
+    banners = await db.showcase_banners.find({}, {"_id": 0}).sort("order", 1).to_list(None)
     return banners
 
 
 @admin_router.post("/banners")
 async def create_banner(body: dict):
     """Admin: Create a new banner."""
-    db = get_db()
     banner_id = f"banner_{int(datetime.now(timezone.utc).timestamp() * 1000)}"
-    count = db.showcase_banners.count_documents({})
+    count = await db.showcase_banners.count_documents({})
     banner = {
         "banner_id": banner_id,
-        "type": body.get("type", "image"),  # 'image' or 'text'
-        # Image banner fields
+        "type": body.get("type", "image"),
         "image_url": body.get("image_url", ""),
         "link_url": body.get("link_url", ""),
         "overlay_text": body.get("overlay_text", ""),
-        # Text banner fields (Facebook-style)
         "text": body.get("text", ""),
         "bg_color": body.get("bg_color", "#16a34a"),
         "bg_gradient": body.get("bg_gradient", ""),
         "text_color": body.get("text_color", "#ffffff"),
         "font_size": body.get("font_size", "lg"),
         "bg_image_url": body.get("bg_image_url", ""),
-        # Schedule fields
         "start_date": body.get("start_date", ""),
         "end_date": body.get("end_date", ""),
-        # Source tracking
         "source": body.get("source", "manual"),
-        # Common fields
         "active": body.get("active", True),
         "order": body.get("order", count),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
-    db.showcase_banners.insert_one(banner)
+    await db.showcase_banners.insert_one(banner)
     banner.pop("_id", None)
     return banner
 
@@ -92,25 +78,23 @@ async def create_banner(body: dict):
 @admin_router.put("/banners/{banner_id}")
 async def update_banner(banner_id: str, body: dict):
     """Admin: Update an existing banner."""
-    db = get_db()
     body.pop("banner_id", None)
     body.pop("_id", None)
     body["updated_at"] = datetime.now(timezone.utc).isoformat()
-    result = db.showcase_banners.update_one(
+    result = await db.showcase_banners.update_one(
         {"banner_id": banner_id},
         {"$set": body}
     )
     if result.matched_count == 0:
         raise HTTPException(404, "Banner not found")
-    updated = db.showcase_banners.find_one({"banner_id": banner_id}, {"_id": 0})
+    updated = await db.showcase_banners.find_one({"banner_id": banner_id}, {"_id": 0})
     return updated
 
 
 @admin_router.delete("/banners/{banner_id}")
 async def delete_banner(banner_id: str):
     """Admin: Delete a banner."""
-    db = get_db()
-    result = db.showcase_banners.delete_one({"banner_id": banner_id})
+    result = await db.showcase_banners.delete_one({"banner_id": banner_id})
     if result.deleted_count == 0:
         raise HTTPException(404, "Banner not found")
     return {"status": "deleted", "banner_id": banner_id}
@@ -133,8 +117,7 @@ DEFAULT_PLAYER_CONFIG = {
 @router.get("/media-player")
 async def get_media_player():
     """Public: Get media player config and items."""
-    db = get_db()
-    doc = db.app_config.find_one({"config_key": "media_player"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "media_player"}, {"_id": 0})
     if doc:
         return doc.get("value", DEFAULT_PLAYER_CONFIG)
     return DEFAULT_PLAYER_CONFIG
@@ -143,8 +126,7 @@ async def get_media_player():
 @admin_router.get("/media-player")
 async def get_media_player_admin():
     """Admin: Get full media player config."""
-    db = get_db()
-    doc = db.app_config.find_one({"config_key": "media_player"}, {"_id": 0})
+    doc = await db.app_config.find_one({"config_key": "media_player"}, {"_id": 0})
     config = doc.get("value", DEFAULT_PLAYER_CONFIG) if doc else DEFAULT_PLAYER_CONFIG
     return config
 
@@ -152,9 +134,8 @@ async def get_media_player_admin():
 @admin_router.put("/media-player")
 async def update_media_player(body: dict):
     """Admin: Update media player config (items, settings)."""
-    db = get_db()
     body.pop("_id", None)
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "media_player"},
         {"$set": {
             "config_key": "media_player",
@@ -169,16 +150,15 @@ async def update_media_player(body: dict):
 @admin_router.post("/media-player/add-item")
 async def add_media_item(body: dict):
     """Admin: Add a single media item to the player."""
-    db = get_db()
     item = {
         "item_id": f"media_{int(datetime.now(timezone.utc).timestamp() * 1000)}",
-        "type": body.get("type", "image"),  # 'image' or 'video'
+        "type": body.get("type", "image"),
         "url": body.get("url", ""),
         "thumbnail_url": body.get("thumbnail_url", ""),
         "caption": body.get("caption", ""),
         "added_at": datetime.now(timezone.utc).isoformat(),
     }
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "media_player"},
         {
             "$push": {"value.items": item},
@@ -193,8 +173,7 @@ async def add_media_item(body: dict):
 @admin_router.delete("/media-player/items/{item_id}")
 async def delete_media_item(item_id: str):
     """Admin: Remove a media item from the player."""
-    db = get_db()
-    db.app_config.update_one(
+    await db.app_config.update_one(
         {"config_key": "media_player"},
         {"$pull": {"value.items": {"item_id": item_id}}}
     )
