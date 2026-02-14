@@ -46,6 +46,7 @@ export default function TxbInventoryTab() {
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [registeringWebhook, setRegisteringWebhook] = useState(false);
+  const [registeringCreateWh, setRegisteringCreateWh] = useState(false);
   const [config, setConfig] = useState({
     board_id: '',
     enabled: false,
@@ -54,6 +55,7 @@ export default function TxbInventoryTab() {
     column_mapping: {},
     subitem_column_mapping: {},
     webhook_config: {},
+    create_item_webhook_config: {},
     last_full_sync: null,
     sync_stats: {},
   });
