@@ -5,6 +5,14 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Monday.com Create-Item Auto-Import (Feb 14, 2026) - COMPLETE
+- New `create_item` webhook handler: when items are added on Monday.com board, they auto-import into private catalog
+- Fetches column values from Monday.com API and maps to product fields (name, code, grade, price, stock)
+- Deduplication: checks by `monday_item_id` and `code` before creating
+- New registration endpoints: register/unregister create-item webhook
+- Frontend: "Auto-Import New Items" card in TXB Inventory admin tab
+- **Tested: 100%** — Backend (15/15) + Frontend (all) (iteration_115)
+
 ### Monday.com Sync Dashboard Widget (Feb 14, 2026) - COMPLETE
 - **Unified widget** on admin dashboard home showing real-time sync health across all 3 Monday.com boards
 - **Board status cards:** TXB Inventory (healthy), Textbook Orders (healthy), Wallet Recharge (degraded)
