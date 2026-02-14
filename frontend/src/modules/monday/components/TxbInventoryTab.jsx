@@ -215,14 +215,42 @@ export default function TxbInventoryTab() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok) {
-        toast.success(`${label} synced! Updated: ${data.updated}, Skipped: ${data.skipped}, Failed: ${data.failed}`);
-      } else {
+      if (!res.ok) {
         toast.error(data.detail || `Failed to sync ${label}`);
+        setSyncingColumn(null);
+        return;
       }
+
+      if (data.status === 'already_running') {
+        toast.info(`${label} sync is already running`);
+      } else {
+        toast.info(`${label} sync started...`);
+      }
+
+      // Poll for completion
+      const poll = async () => {
+        try {
+          const sr = await fetch(`${API}/api/store/monday/txb-inventory/sync-column-status/${columnKey}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!sr.ok) { setSyncingColumn(null); return; }
+          const status = await sr.json();
+          if (status.status === 'completed') {
+            toast.success(`${label} synced! Updated: ${status.updated}, Skipped: ${status.skipped}, Failed: ${status.failed}`);
+            setSyncingColumn(null);
+          } else if (status.status === 'error') {
+            toast.error(`${label} sync failed: ${status.error || 'Unknown error'}`);
+            setSyncingColumn(null);
+          } else {
+            setTimeout(poll, 2000);
+          }
+        } catch {
+          setSyncingColumn(null);
+        }
+      };
+      setTimeout(poll, 2000);
     } catch {
-      toast.error('Network error during column sync');
-    } finally {
+      toast.error('Network error starting column sync');
       setSyncingColumn(null);
     }
   };
