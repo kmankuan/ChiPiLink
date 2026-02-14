@@ -112,6 +112,11 @@ export default function AdminModule() {
             <span className="hidden sm:inline">Banners & Media</span>
             <span className="sm:hidden">Showcase</span>
           </TabsTrigger>
+          <TabsTrigger value="telegram" className="gap-2" data-testid="telegram-tab">
+            <Send className="h-4 w-4" />
+            <span className="hidden sm:inline">Telegram</span>
+            <span className="sm:hidden">TG</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="site">
@@ -170,6 +175,10 @@ export default function AdminModule() {
 
         <TabsContent value="showcase">
           <ShowcaseAdminModule />
+        </TabsContent>
+
+        <TabsContent value="telegram">
+          <TelegramAdminModule />
         </TabsContent>
       </Tabs>
     </div>
