@@ -147,26 +147,25 @@ export default function AdminDashboard() {
    * This is the most reliable check since it comes directly from the login response.
    * The RBAC system is used for more granular permissions within modules.
    */
-  const filteredNavItems = useMemo(() => {
-    // If auth is still loading, show all items to prevent flash
-    if (authLoading) {
-      return navItems;
-    }
+  const filteredNavGroups = useMemo(() => {
+    if (authLoading) return navGroups.map(g => ({ ...g, items: g.items.map(i => ({ ...i, label: t(i.labelKey) })) }));
     
-    // Admin users see all navigation items
-    if (isAdmin) {
-      return navItems;
-    }
-    
-    // Non-admin users: filter by specific permissions and exclude adminOnly items
-    return navItems.filter(item => {
-      // Skip admin-only items for non-admins
-      if (item.adminOnly) return false;
-      if (!item.permission) return true;
-      return hasPermission(item.permission);
-    });
+    return navGroups.map(g => ({
+      ...g,
+      items: g.items
+        .filter(item => {
+          if (isAdmin) return true;
+          if (item.adminOnly) return false;
+          if (!item.permission) return true;
+          return hasPermission(item.permission);
+        })
+        .map(i => ({ ...i, label: t(i.labelKey) })),
+    })).filter(g => g.items.length > 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, isAdmin, hasPermission, i18n.language]);
+
+  // Flat list for lookups
+  const filteredNavItems = useMemo(() => filteredNavGroups.flatMap(g => g.items), [filteredNavGroups]);
 
   // Redirect non-admins away from admin panel (only after auth is loaded)
   useEffect(() => {
