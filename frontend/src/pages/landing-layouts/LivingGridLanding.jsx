@@ -224,6 +224,11 @@ export default function LivingGridLanding({ communityData, moduleStatuses }) {
           </div>
         )}
 
+        {/* ═══ TELEGRAM FEED — Community channel preview ═══ */}
+        <div className="mt-4 px-1">
+          <TelegramFeedCard />
+        </div>
+
         {/* Bottom spacer */}
         <div className="h-8" />
       </div>
