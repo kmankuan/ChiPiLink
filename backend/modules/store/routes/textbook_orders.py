@@ -149,6 +149,13 @@ async def submit_order_direct(
             }
         
         logger.info(f"[submit_order_direct] Order submitted successfully: {result.get('order_id')}")
+        
+        # Include warnings for partially failed items
+        if update_errors:
+            result["warnings"] = update_errors
+            result["items_failed"] = len(update_errors)
+            result["items_succeeded"] = update_count
+        
         return result
     except ValueError as e:
         logger.error(f"[submit_order_direct] ValueError: {e}")
