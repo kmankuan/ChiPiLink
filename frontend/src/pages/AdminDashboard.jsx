@@ -305,32 +305,46 @@ export default function AdminDashboard() {
           )}
         >
           <ScrollArea className="flex-1 py-2">
-            <nav className="px-2 space-y-1">
-              {filteredNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeModule === item.id;
-                
-                return (
-                  <Button
-                    key={item.id}
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full justify-start gap-3 h-10",
-                      collapsed && "justify-center px-2"
-                    )}
-                    onClick={() => {
-                      if (item.isExternal && item.path) {
-                        navigate(item.path);
-                      } else {
-                        setActiveModule(item.id);
-                      }
-                    }}
-                  >
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    {!collapsed && <span className="text-sm">{item.label}</span>}
-                  </Button>
-                );
-              })}
+            <nav className="px-2 space-y-0.5">
+              {filteredNavGroups.map((group) => (
+                <div key={group.group} className="mb-1">
+                  {!collapsed && (
+                    <button
+                      onClick={() => setOpenGroups(prev => ({ ...prev, [group.group]: !prev[group.group] }))}
+                      className="w-full flex items-center justify-between px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                    >
+                      {group.group}
+                      {openGroups[group.group] !== false
+                        ? <ChevronDown className="h-3 w-3" />
+                        : <ChevronRight className="h-3 w-3" />}
+                    </button>
+                  )}
+                  {(collapsed || openGroups[group.group] !== false) && group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeModule === item.id;
+                    return (
+                      <Button
+                        key={item.id}
+                        variant={isActive ? "secondary" : "ghost"}
+                        className={cn(
+                          "w-full justify-start gap-3 h-9",
+                          collapsed && "justify-center px-2"
+                        )}
+                        onClick={() => {
+                          if (item.isExternal && item.path) {
+                            navigate(item.path);
+                          } else {
+                            setActiveModule(item.id);
+                          }
+                        }}
+                      >
+                        <Icon className="h-4 w-4 flex-shrink-0" />
+                        {!collapsed && <span className="text-sm">{item.label}</span>}
+                      </Button>
+                    );
+                  })}
+                </div>
+              ))}
             </nav>
           </ScrollArea>
           
