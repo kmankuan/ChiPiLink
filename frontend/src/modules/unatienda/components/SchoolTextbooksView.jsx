@@ -621,9 +621,10 @@ export default function SchoolTextbooksView({
                                 ) : (
                                   <input
                                     type="checkbox"
-                                    checked={isSelected}
-                                    onChange={() => toggleBook(studentId, item.book_id)}
-                                    className="h-4 w-4 rounded border-2 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                    checked={isSelected && isAvailable}
+                                    disabled={!isAvailable}
+                                    onChange={() => { if (isAvailable) toggleBook(studentId, item.book_id); }}
+                                    className={`h-4 w-4 rounded border-2 focus:ring-purple-500 ${isAvailable ? 'text-purple-600 cursor-pointer' : 'text-gray-300 cursor-not-allowed opacity-50'}`}
                                   />
                                 )}
                               </div>
