@@ -51,17 +51,24 @@ class MondayConfigService:
             "board_id": config.get("board_id"),
             "enabled": config.get("enabled", False),
             "group_id": config.get("group_id"),
+            "use_grade_groups": config.get("use_grade_groups", False),
             "column_mapping": config.get("column_mapping", {
                 "code": None,
                 "name": None,
                 "grade": None,
                 "publisher": None,
                 "unit_price": None,
+                "stock_quantity": None,
+                "subject": None,
+                "status": None,
             }),
             "subitem_column_mapping": config.get("subitem_column_mapping", {
                 "quantity": None,
                 "date": None,
             }),
+            "webhook_config": config.get("webhook_config", {}),
+            "last_full_sync": config.get("last_full_sync"),
+            "sync_stats": config.get("sync_stats", {}),
         }
 
     async def save_inventory_config(self, config: Dict) -> bool:
