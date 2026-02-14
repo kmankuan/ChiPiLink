@@ -151,6 +151,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - Confirmed no leftover imports in the codebase
 - **Tested: 100%** — Admin panel verified working after deletion (iteration_110)
 
+### Order Summary Preview Modal (Feb 14, 2026) - COMPLETE
+- **New component** `OrderSummaryModal.jsx`: confirmation dialog before textbook order submission
+- Shows: student name, selected books with prices, form data, total, wallet balance, remaining balance
+- Integrated into both `SchoolTextbooksView` and `TextbookOrderView` — submit buttons now open the modal first
+- **Backend config** `GET/PUT /api/store/order-summary-config`: admin can toggle which sections appear (show_student_info, show_book_list, show_form_data, show_wallet_balance, show_total)
+- All sections default to visible; admin can customize via PUT
+- **Tested: 100%** — Backend API + frontend code review verified (iteration_111)
+
 ## Backlog
-### P1 - Evolve Landing Page Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
