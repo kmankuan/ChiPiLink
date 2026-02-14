@@ -146,8 +146,10 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                         group_id = grade_group_map.get(grade, config.get("group_id"))
 
                     item_name = book.get("name", book_code)
+                    needs_labels = self._needs_create_labels(col_values, col_types)
                     item_id = await self.client.create_item(
-                        board_id, item_name, col_values, group_id
+                        board_id, item_name, col_values, group_id,
+                        create_labels_if_missing=needs_labels
                     )
                     if item_id:
                         created += 1
