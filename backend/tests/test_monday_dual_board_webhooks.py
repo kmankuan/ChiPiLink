@@ -35,7 +35,7 @@ class TestHealthAndAuth:
         """POST /api/auth-v2/login with teck@koh.one / admin should work"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "contrasena": "admin"},
+            json={"email": "teck@koh.one", "password": "admin"},
             timeout=15
         )
         print(f"Login response: {response.status_code} - {response.text[:300]}")
