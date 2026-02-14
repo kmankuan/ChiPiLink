@@ -128,16 +128,14 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - Both levels support mobile responsive views with hamburger/dropdown navigation
 - **Tested: 100%** — 27/27 tests passed on desktop + mobile (iteration_107)
 
-### Sidebar Search/Filter (Feb 14, 2026) - COMPLETE
-- Added search bar to both Level 1 (dashboard sidebar) and Level 2 (administration sub-panel)
-- Filters by item ID, translated label, and group name (works in any language)
-- Auto-expands matching groups during search, restores on clear
-- **Tested: 100%** — 20/20 tests passed (iteration_108)
-
-### Mobile Full-Bleed Layout (Feb 14, 2026) - COMPLETE
-- Banner carousel and media player now go edge-to-edge on mobile (0px padding, no rounded corners)
-- Desktop maintains 32px padding and 16px border-radius
-- **Tested: 100%** — Verified at 375px and 1920px viewports (iteration_108)
+### Admin Single-Level Navigation (Feb 14, 2026) - COMPLETE
+- Flattened 2-level navigation into single-level sidebar
+- Removed "Administración" intermediate page; promoted all 14 sub-items directly into main sidebar
+- 8 groups: Overview, Commerce, Community, Management, Configuration, Content, Integrations, Developer
+- New groups start collapsed; original groups expanded by default
+- Search filter works across all items (by id, label, group name)
+- All 14 new translation keys added (en, es, zh)
+- **Tested: 100%** — 18/18 tests passed (iteration_109)
 
 ## Backlog
 ### P1 - Evolve Landing Page Layout
