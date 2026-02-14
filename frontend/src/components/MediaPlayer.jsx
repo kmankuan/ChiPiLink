@@ -131,12 +131,29 @@ export default function MediaPlayer() {
     }
   }, [current, muted, playing]);
 
+  // Parallax scroll effect
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const rect = el.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      const center = rect.top + rect.height / 2;
+      const offset = (center - viewH / 2) / viewH;
+      setParallaxY(offset * -20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loaded]);
+
   if (!loaded || items.length === 0) return null;
 
   const item = items[current];
 
   return (
     <div
+      ref={containerRef}
       className="relative w-full rounded-2xl overflow-hidden bg-black/5 group"
       style={{ aspectRatio: '16/9' }}
       onTouchStart={handleTouchStart}
