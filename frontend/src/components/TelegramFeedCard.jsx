@@ -372,7 +372,6 @@ function FeedContainer({ container, onVideoPlay }) {
 
 function ExpandedPostRow({ post, onVideoPlay, accentColor }) {
   const media = post.media || [];
-  const isAlbum = post.is_album && media.length > 1;
 
   return (
     <div
@@ -380,59 +379,17 @@ function ExpandedPostRow({ post, onVideoPlay, accentColor }) {
       style={{ borderColor: 'rgba(0,0,0,0.06)' }}
       data-testid={`telegram-post-${post.telegram_msg_id}`}
     >
-      {/* Always show media at full width for expanded style */}
+      {/* Media thumbnails grid — all sizes equal, fit as many as row allows */}
       {media.length > 0 && (
-        isAlbum ? (
-          <AlbumCarousel media={media} onVideoPlay={onVideoPlay} accentColor={accentColor} />
-        ) : (
-          <SingleMediaExpanded media={media[0]} onVideoPlay={onVideoPlay} />
-        )
+        <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
       )}
-      <div className={media.length > 0 ? 'mt-2' : ''}>
-        <p className="text-sm leading-snug line-clamp-3" style={{ color: '#2d2217' }}>
-          {post.text || fallbackText(media)}
+      {/* Description below media */}
+      {post.text && (
+        <p className={`text-sm leading-snug line-clamp-3 ${media.length > 0 ? 'mt-2' : ''}`} style={{ color: '#2d2217' }}>
+          {post.text}
         </p>
-        <PostMeta post={post} />
-      </div>
-    </div>
-  );
-}
-
-function SingleMediaExpanded({ media, onVideoPlay }) {
-  const isVideo = media.type === 'video' || media.type === 'animation';
-  const thumbSrc = media.type === 'photo' ? mediaUrl(media.file_id)
-    : media.thumb_file_id ? mediaUrl(media.thumb_file_id)
-    : null;
-
-  return (
-    <div className="relative w-full rounded-xl overflow-hidden bg-black/5" style={{ aspectRatio: '16/10' }}>
-      {thumbSrc ? (
-        <img
-          src={thumbSrc}
-          alt=""
-          className="w-full h-full object-cover"
-          loading="lazy"
-          onClick={() => isVideo && media.file_id && onVideoPlay(media.file_id)}
-        />
-      ) : isVideo ? (
-        <div
-          className="w-full h-full flex items-center justify-center cursor-pointer"
-          style={{ background: '#1a1a2e' }}
-          onClick={() => media.file_id && onVideoPlay(media.file_id)}
-        >
-          <Play className="h-10 w-10 text-white/60 fill-white/60" />
-        </div>
-      ) : null}
-      {isVideo && (
-        <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={() => media.file_id && onVideoPlay(media.file_id)}
-        >
-          <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-            <Play className="h-5 w-5 text-white fill-white ml-0.5" />
-          </div>
-        </div>
       )}
+      <PostMeta post={post} />
     </div>
   );
 }
