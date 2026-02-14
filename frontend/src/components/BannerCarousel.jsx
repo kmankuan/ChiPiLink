@@ -71,7 +71,7 @@ export default function BannerCarousel() {
     setCurrent(prev => (prev + dir + activeBanners.length) % activeBanners.length);
   }, [activeBanners.length]);
 
-  const banner = banners[current];
+  const banner = activeBanners[current];
 
   return (
     <div
@@ -91,7 +91,7 @@ export default function BannerCarousel() {
       </div>
 
       {/* Navigation arrows */}
-      {banners.length > 1 && (
+      {activeBanners.length > 1 && (
         <>
           <button
             onClick={() => go(-1)}
@@ -111,9 +111,9 @@ export default function BannerCarousel() {
       )}
 
       {/* Dots */}
-      {banners.length > 1 && (
+      {activeBanners.length > 1 && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {banners.map((_, i) => (
+          {activeBanners.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
