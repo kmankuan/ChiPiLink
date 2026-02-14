@@ -257,6 +257,19 @@ async def startup_event():
     await wallet_monday_adapter.register_webhooks()
     wallet_monday_adapter.init_event_handlers()
 
+    # Register Recharge Approval board webhook handler
+    from modules.wallet_topups.monday_sync import recharge_approval_handler
+    from modules.integrations.monday.webhook_router import register_handler as register_wh
+    recharge_board_config = await db['wallet_topup_monday_config'].find_one(
+        {"id": "default"}, {"_id": 0, "board_id": 1, "enabled": 1}
+    )
+    if recharge_board_config and recharge_board_config.get("board_id") and recharge_board_config.get("enabled"):
+        recharge_board_id = str(recharge_board_config["board_id"])
+        register_wh(recharge_board_id, recharge_approval_handler.handle_webhook)
+        logger.info(f"Recharge Approval webhook registered for board: {recharge_board_id}")
+    else:
+        logger.info("Recharge Approval board not configured or disabled, skipping webhook")
+
     # Start Telegram polling for community feed
     from modules.community.services.telegram_service import telegram_service
     if telegram_service.token:
