@@ -1,9 +1,10 @@
 """
 Community Feed API Routes
 Serves Telegram channel content with likes and comments.
-Includes role-based visibility controls.
+Includes role-based visibility controls and multi-container feed system.
 """
 import logging
+import uuid
 from datetime import datetime, timezone
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends, Response
@@ -14,6 +15,33 @@ from modules.community.services.telegram_service import telegram_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/feed", tags=["Community Feed"])
+
+
+# ---- Helper: Group posts by media_group_id ----
+
+def _group_posts_by_media(posts: list) -> list:
+    """Merge posts sharing the same media_group_id into a single album post."""
+    grouped = []
+    media_groups = {}  # media_group_id -> index in grouped
+
+    for post in posts:
+        mg_id = post.get("media_group_id")
+        if mg_id and mg_id in media_groups:
+            # Append media to existing album
+            idx = media_groups[mg_id]
+            grouped[idx]["media"].extend(post.get("media", []))
+            # Use text from whichever post has it
+            if not grouped[idx].get("text") and post.get("text"):
+                grouped[idx]["text"] = post["text"]
+        elif mg_id:
+            # First post in this media group
+            media_groups[mg_id] = len(grouped)
+            grouped.append({**post, "is_album": True})
+        else:
+            # Standalone post
+            grouped.append({**post, "is_album": False})
+
+    return grouped
 
 
 # ---- Visibility Check Helper ----
