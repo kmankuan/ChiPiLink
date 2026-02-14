@@ -1,7 +1,7 @@
 """
 Monday.com Banner Adapter
 Syncs banner items from a dedicated Monday.com board.
-Flow: Canva design URL → Monday.com board item → App banner carousel
+Flow: Canva design URL -> Monday.com board item -> App banner carousel
 
 Supports:
 - Webhook-based real-time sync (primary)
@@ -9,33 +9,32 @@ Supports:
 - Manual sync via admin panel
 
 Each Monday.com item maps to a banner with:
-- Name → overlay_text or title
-- Canva URL column → image_url
-- Text column → banner text (for text-type banners)
-- Background color column → bg_color
-- Start Date column → schedule start
-- End Date column → schedule end
-- Status column → active/paused
+- Name -> overlay_text or title
+- Canva URL column -> image_url
+- Text column -> banner text (for text-type banners)
+- Background color column -> bg_color
+- Start Date column -> schedule start
+- End Date column -> schedule end
+- Status column -> active/paused
 """
 import logging
 import json
 import os
 from datetime import datetime, timezone
-from typing import Optional
 
+from core.database import db
 from modules.integrations.monday.core_client import monday_client
 
 logger = logging.getLogger(__name__)
 
-# Config key in app_config collection
 CONFIG_KEY = "monday_banner_config"
 
 
 class MondayBannerAdapter:
     """Syncs banners from Monday.com board to showcase_banners collection"""
 
-    async def get_config(self, db) -> dict:
-        doc = db.app_config.find_one({"config_key": CONFIG_KEY}, {"_id": 0})
+    async def get_config(self) -> dict:
+        doc = await db.app_config.find_one({"config_key": CONFIG_KEY}, {"_id": 0})
         if doc:
             return doc.get("value", {})
         return {
@@ -56,8 +55,8 @@ class MondayBannerAdapter:
             "webhook": {"registered": False, "webhook_id": None},
         }
 
-    async def save_config(self, db, config: dict):
-        db.app_config.update_one(
+    async def save_config(self, config: dict):
+        await db.app_config.update_one(
             {"config_key": CONFIG_KEY},
             {"$set": {
                 "config_key": CONFIG_KEY,
@@ -67,23 +66,21 @@ class MondayBannerAdapter:
             upsert=True
         )
 
-    # ─── Webhook handling ────────────────────────────────
+    # --- Webhook handling ---
 
-    async def register_webhook(self, db) -> dict:
+    async def register_webhook(self) -> dict:
         """Register a webhook with Monday.com for real-time banner sync."""
-        config = await self.get_config(db)
+        config = await self.get_config()
         board_id = config.get("board_id")
         if not board_id:
             return {"status": "error", "message": "No board_id configured"}
 
-        # Build the webhook URL
         base_url = os.environ.get("FRONTEND_URL", "").rstrip("/")
         if not base_url:
             return {"status": "error", "message": "FRONTEND_URL not configured"}
         webhook_url = f"{base_url}/api/monday/webhooks/incoming"
 
         try:
-            # Register with Monday.com for any column value changes
             webhook_id = await monday_client.register_webhook(
                 board_id=board_id,
                 url=webhook_url,
@@ -96,9 +93,8 @@ class MondayBannerAdapter:
                     "url": webhook_url,
                     "registered_at": datetime.now(timezone.utc).isoformat(),
                 }
-                await self.save_config(db, config)
+                await self.save_config(config)
 
-                # Also register the local handler in the webhook router
                 from modules.integrations.monday.webhook_router import register_handler
                 register_handler(board_id, self.handle_webhook)
 
@@ -109,9 +105,9 @@ class MondayBannerAdapter:
             logger.error(f"Failed to register banner webhook: {e}")
             return {"status": "error", "message": str(e)}
 
-    async def unregister_webhook(self, db) -> dict:
+    async def unregister_webhook(self) -> dict:
         """Remove the webhook from Monday.com."""
-        config = await self.get_config(db)
+        config = await self.get_config()
         webhook_info = config.get("webhook", {})
         webhook_id = webhook_info.get("webhook_id")
         board_id = config.get("board_id")
@@ -127,7 +123,7 @@ class MondayBannerAdapter:
             unregister_handler(board_id)
 
         config["webhook"] = {"registered": False, "webhook_id": None}
-        await self.save_config(db, config)
+        await self.save_config(config)
         return {"status": "ok"}
 
     async def handle_webhook(self, event: dict) -> dict:
@@ -136,19 +132,12 @@ class MondayBannerAdapter:
         Triggers a full sync when any item changes.
         """
         logger.info(f"[banner_webhook] Received event: type={event.get('type')}, item={event.get('pulseId')}")
-
-        def _get_db():
-            from pymongo import MongoClient
-            client = MongoClient(os.environ.get("MONGO_URL"))
-            return client[os.environ.get("DB_NAME", "chipilink_prod")]
-
-        db = _get_db()
-        result = await self.sync_from_monday(db, trigger="webhook")
+        result = await self.sync_from_monday(trigger="webhook")
         return {"status": "synced", "result": result}
 
-    def ensure_local_handler(self, db):
+    async def ensure_local_handler(self):
         """Register the local webhook handler if a board is configured (called on startup)."""
-        config_doc = db.app_config.find_one({"config_key": CONFIG_KEY}, {"_id": 0})
+        config_doc = await db.app_config.find_one({"config_key": CONFIG_KEY}, {"_id": 0})
         if not config_doc:
             return
         config = config_doc.get("value", {})
@@ -159,7 +148,7 @@ class MondayBannerAdapter:
             register_handler(board_id, self.handle_webhook)
             logger.info(f"Banner webhook handler re-registered for board {board_id}")
 
-    # ─── Column value parsing ────────────────────────────
+    # --- Column value parsing ---
 
     def _parse_column_value(self, col_value: dict) -> str:
         """Extract usable value from Monday.com column_values entry"""
@@ -171,16 +160,12 @@ class MondayBannerAdapter:
             try:
                 parsed = json.loads(value_raw)
                 if isinstance(parsed, dict):
-                    # Status columns
                     if "label" in parsed:
                         return parsed["label"]
-                    # Date columns
                     if "date" in parsed:
                         return parsed["date"]
-                    # Color columns
                     if "color" in parsed:
                         return parsed["color"]
-                    # Link columns
                     if "url" in parsed:
                         return parsed["url"]
                 return str(parsed)
@@ -188,12 +173,12 @@ class MondayBannerAdapter:
                 return str(value_raw)
         return ""
 
-    async def sync_from_monday(self, db, trigger: str = "manual") -> dict:
+    async def sync_from_monday(self, trigger: str = "manual") -> dict:
         """
         Fetch all items from the configured banner board,
         create/update banners in the local DB.
         """
-        config = await self.get_config(db)
+        config = await self.get_config()
         if not config.get("enabled") or not config.get("board_id"):
             return {"status": "skipped", "message": "Monday.com banner sync not configured"}
 
@@ -201,7 +186,6 @@ class MondayBannerAdapter:
         col_map = config.get("columns", {})
 
         try:
-            # Fetch all items from the board
             data = await monday_client.execute(f"""
                 query {{
                     boards(ids: [{board_id}]) {{
@@ -222,7 +206,7 @@ class MondayBannerAdapter:
 
             boards = data.get("boards", [])
             if not boards:
-                self._log_sync(db, trigger, "error", 0, "Board not found")
+                await self._log_sync(trigger, "error", 0, "Board not found")
                 return {"status": "error", "message": "Board not found"}
 
             items = boards[0].get("items_page", {}).get("items", [])
@@ -234,7 +218,6 @@ class MondayBannerAdapter:
                 item_name = item["name"]
                 cols = {cv["id"]: cv for cv in item.get("column_values", [])}
 
-                # Parse column values based on config mapping
                 canva_url = self._parse_column_value(cols.get(col_map.get("canva_url", ""), {}))
                 text = self._parse_column_value(cols.get(col_map.get("text", ""), {}))
                 bg_color = self._parse_column_value(cols.get(col_map.get("bg_color", ""), {}))
@@ -244,7 +227,6 @@ class MondayBannerAdapter:
                 status = self._parse_column_value(cols.get(col_map.get("status", ""), {}))
                 banner_type = self._parse_column_value(cols.get(col_map.get("banner_type", ""), {}))
 
-                # Determine type
                 b_type = "image" if (canva_url and not text) else "text"
                 if banner_type:
                     bt_lower = banner_type.lower()
@@ -253,7 +235,6 @@ class MondayBannerAdapter:
                     elif "text" in bt_lower or "texto" in bt_lower:
                         b_type = "text"
 
-                # Determine active status
                 is_active = True
                 if status:
                     s_lower = status.lower()
@@ -281,28 +262,26 @@ class MondayBannerAdapter:
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 }
 
-                # Upsert by monday item id
-                db.showcase_banners.update_one(
+                await db.showcase_banners.update_one(
                     {"monday_item_id": monday_id},
                     {"$set": banner_data, "$setOnInsert": {"created_at": datetime.now(timezone.utc).isoformat()}},
                     upsert=True
                 )
                 synced += 1
 
-            # Update sync timestamp
             config["last_sync"] = datetime.now(timezone.utc).isoformat()
             config["sync_count"] = config.get("sync_count", 0) + 1
-            await self.save_config(db, config)
+            await self.save_config(config)
 
-            self._log_sync(db, trigger, "success", synced)
+            await self._log_sync(trigger, "success", synced)
             return {"status": "ok", "synced": synced, "skipped": skipped, "total_items": len(items)}
 
         except Exception as e:
             logger.error(f"Monday.com banner sync error: {e}")
-            self._log_sync(db, trigger, "error", 0, str(e))
+            await self._log_sync(trigger, "error", 0, str(e))
             return {"status": "error", "message": str(e)}
 
-    def _log_sync(self, db, trigger: str, status: str, items_synced: int, error: str = ""):
+    async def _log_sync(self, trigger: str, status: str, items_synced: int, error: str = ""):
         """Append a sync event to the history log. Keeps last 50 entries."""
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -311,21 +290,16 @@ class MondayBannerAdapter:
             "items_synced": items_synced,
             "error": error,
         }
-        db.showcase_sync_history.insert_one(entry)
-        # Prune old entries — keep only the latest 50
-        count = db.showcase_sync_history.count_documents({})
+        await db.showcase_sync_history.insert_one(entry)
+        count = await db.showcase_sync_history.count_documents({})
         if count > 50:
-            oldest = list(db.showcase_sync_history.find({}, {"_id": 1}).sort("timestamp", 1).limit(count - 50))
+            oldest = await db.showcase_sync_history.find({}, {"_id": 1}).sort("timestamp", 1).limit(count - 50).to_list(None)
             if oldest:
-                db.showcase_sync_history.delete_many({"_id": {"$in": [o["_id"] for o in oldest]}})
+                await db.showcase_sync_history.delete_many({"_id": {"$in": [o["_id"] for o in oldest]}})
 
-    def get_sync_history(self, db, limit: int = 20) -> list:
+    async def get_sync_history(self, limit: int = 20) -> list:
         """Get recent sync history entries."""
-        entries = list(
-            db.showcase_sync_history.find({}, {"_id": 0})
-            .sort("timestamp", -1)
-            .limit(limit)
-        )
+        entries = await db.showcase_sync_history.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(None)
         return entries
 
 
