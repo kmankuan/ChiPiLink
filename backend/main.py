@@ -281,15 +281,13 @@ async def startup_event():
     await gmail_poller.start()
 
     # Start Monday.com banner auto-sync scheduler
-    from modules.showcase.scheduler import banner_sync_scheduler, _get_db
+    from modules.showcase.scheduler import banner_sync_scheduler
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
     try:
-        sdb = _get_db()
-
         # Re-register local webhook handler if previously configured
-        monday_banner_adapter.ensure_local_handler(sdb)
+        await monday_banner_adapter.ensure_local_handler()
 
-        sync_config = await monday_banner_adapter.get_config(sdb)
+        sync_config = await monday_banner_adapter.get_config()
         auto_sync = sync_config.get("auto_sync", {})
         if auto_sync.get("enabled") and sync_config.get("enabled") and sync_config.get("board_id"):
             interval = auto_sync.get("interval_minutes", 10)
