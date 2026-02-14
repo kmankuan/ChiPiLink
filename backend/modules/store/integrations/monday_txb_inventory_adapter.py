@@ -339,10 +339,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         """Format a value according to its Monday.com column type."""
         if not value and value != 0:
             return value
-        if col_type in ("dropdown", "color"):
-            # Dropdown/status columns need {"labels": ["value"]}
+        if col_type == "dropdown":
+            # Dropdown columns: use {"labels": ["value"]} with create_labels_if_missing
             return {"labels": [str(value)]}
-        if col_type == "status":
+        if col_type in ("color", "status"):
+            # Status columns: use {"label": "value"}
             return {"label": str(value)}
         # Text, numbers, etc. — pass as string
         return str(value) if value is not None else value
