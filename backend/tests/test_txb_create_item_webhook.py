@@ -254,7 +254,8 @@ class TestSyncDashboardStillWorks:
         
         data = resp.json()
         boards = data.get("boards", [])
-        txb_board = next((b for b in boards if b.get("board_id") == "txb_inventory"), None)
+        # Board ID is in "id" field, not "board_id" (which is the Monday.com numeric ID)
+        txb_board = next((b for b in boards if b.get("id") == "txb_inventory"), None)
         
-        assert txb_board is not None, "TXB Inventory board not found in dashboard"
+        assert txb_board is not None, f"TXB Inventory board not found in dashboard boards: {[b.get('id') for b in boards]}"
         print(f"PASS: TXB Inventory in dashboard, health: {txb_board.get('health')}")
