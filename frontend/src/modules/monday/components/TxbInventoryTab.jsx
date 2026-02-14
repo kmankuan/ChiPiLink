@@ -75,6 +75,7 @@ export default function TxbInventoryTab() {
           column_mapping: data.column_mapping || {},
           subitem_column_mapping: data.subitem_column_mapping || {},
           webhook_config: data.webhook_config || {},
+          create_item_webhook_config: data.create_item_webhook_config || {},
           last_full_sync: data.last_full_sync || null,
           sync_stats: data.sync_stats || {},
         });
