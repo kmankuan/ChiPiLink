@@ -45,7 +45,7 @@
   ],
 
   "action_items": [
-    "CONFIGURATION REQUIRED: Register redirect_uri 'https://layout-engine-1.preview.emergentagent.com/auth/laopan/callback' in LaoPan.online OAuth application settings to complete OAuth flow"
+    "CONFIGURATION REQUIRED: Register redirect_uri 'https://async-task-mgmt.preview.emergentagent.com/auth/laopan/callback' in LaoPan.online OAuth application settings to complete OAuth flow"
   ],
 
   "critical_code_review_comments": [
@@ -102,5 +102,5 @@
   "retest_needed": false,
   "should_main_agent_self_test": false,
 
-  "context_for_next_testing_agent": "LaoPan OAuth integration fully tested. Backend APIs at /api/invision/oauth/* all working. Frontend shows LaoPan button as primary login with collapsible admin form. OAuth flow redirects correctly to LaoPan.online. The redirect_uri 'https://layout-engine-1.preview.emergentagent.com/auth/laopan/callback' needs to be registered in LaoPan.online OAuth app settings to complete the full OAuth flow."
+  "context_for_next_testing_agent": "LaoPan OAuth integration fully tested. Backend APIs at /api/invision/oauth/* all working. Frontend shows LaoPan button as primary login with collapsible admin form. OAuth flow redirects correctly to LaoPan.online. The redirect_uri 'https://async-task-mgmt.preview.emergentagent.com/auth/laopan/callback' needs to be registered in LaoPan.online OAuth app settings to complete the full OAuth flow."
 }
