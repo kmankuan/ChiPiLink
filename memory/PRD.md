@@ -101,6 +101,27 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - Works on button clicks, swipe gestures, and auto-rotate
 - **Tested: 100%** — 14/14 frontend tests passed (iteration_105)
 
+### Telegram Feed Card Video/Media Support (Feb 14, 2026) - COMPLETE
+- Rewritten TelegramFeedCard to handle photo, video, animation, and document media types
+- Video posts show thumbnails with play icon overlay and duration badge
+- Tap video thumbnail opens expanded modal player with controls
+- Fallback text: "Shared a video", "Shared a photo", "Shared a GIF" instead of generic "New post"
+- **Tested: 100%** — (iteration_106)
+
+### MediaPlayer Parallax Depth Effect (Feb 14, 2026) - COMPLETE
+- Caption, controls, and progress dots shift subtly based on scroll position
+- Creates immersive depth effect as user scrolls past the media player
+- **Tested: 100%** — Parallax transform values verified (iteration_106)
+
+### Telegram Admin Configuration Panel (Feb 14, 2026) - COMPLETE
+- New "Telegram" tab in admin dashboard (TelegramAdminModule.jsx)
+- Shows stats: total posts, likes, comments
+- Channel settings: ID (auto-detected), title, auto-sync toggle, poll interval
+- Manual sync button for on-demand pulls from Telegram
+- Visibility controls: all users / admin only / specific roles
+- Bot connection status indicator
+- **Tested: 100%** — All admin UI elements and backend APIs verified (iteration_106)
+
 ## Backlog
 ### P1 - Evolve Landing Page Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
