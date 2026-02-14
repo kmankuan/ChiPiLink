@@ -55,7 +55,6 @@ const DashboardModule = lazy(() => import('@/modules/dashboard/DashboardModule')
 const UnatiendaModule = lazy(() => import('@/modules/unatienda/UnatiendaModule'));
 const TextbookOrdersAdminTab = lazy(() => import('@/modules/admin/store/TextbookOrdersAdminTab'));
 const UsersManagementModule = lazy(() => import('@/modules/admin/users/UsersManagementModule'));
-const AdminModule = lazy(() => import('@/modules/admin/AdminModule'));
 const IntegrationsModule = lazy(() => import('@/modules/integrations/IntegrationsModule'));
 const PinpanClubModule = lazy(() => import('@/modules/pinpanclub/pages/PingPongDashboard'));
 const AdminMemberships = lazy(() => import('@/modules/admin/users/components/AdminMemberships'));
@@ -65,6 +64,24 @@ const WalletModule = lazy(() => import('@/modules/wallet/WalletModule'));
 const CommunityFeedModule = lazy(() => import('@/modules/community/CommunityFeedModule'));
 const DevControlModule = lazy(() => import('@/modules/admin/DevControlModule'));
 const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModule'));
+
+// Administration sub-modules (previously nested inside AdminModule)
+const SiteConfigModule = lazy(() => import('@/modules/admin/SiteConfigModule'));
+const AuthMethodsConfig = lazy(() => import('@/modules/admin/AuthMethodsConfig'));
+const UIStyleModule = lazy(() => import('@/modules/admin/UIStyleModule'));
+const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
+const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
+const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModule'));
+const TickerAdminModule = lazy(() => import('@/modules/admin/TickerAdminModule'));
+const WidgetManagerModule = lazy(() => import('@/modules/admin/WidgetManagerModule'));
+const TelegramAdminModule = lazy(() => import('@/modules/admin/TelegramAdminModule'));
+const FormsManagerModule = lazy(() => import('@/modules/admin/FormsManagerModule'));
+const TranslationsPanel = lazy(() => import('@/modules/admin/TranslationsModule'));
+const DictionaryManagerModule = lazy(() => import('@/modules/admin/DictionaryManagerModule'));
+const TranslationCoverageCard = lazy(() => import('@/modules/admin/TranslationCoverageCard'));
+const DemoDataModule = lazy(() => import('@/modules/admin/DemoDataModule'));
+const DatabaseMigrationModule = lazy(() => import('@/modules/admin/DatabaseMigrationModule'));
+const ModuleStatusModule = lazy(() => import('@/modules/admin/ModuleStatusModule'));
 
 // Loading component for Suspense
 const ModuleLoader = () => (
