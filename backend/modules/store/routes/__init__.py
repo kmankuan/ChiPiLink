@@ -27,6 +27,7 @@ from .inventory_import import router as inventory_import_router
 from .analytics import router as analytics_router
 from .store_config import router as store_config_router
 from .monday_sync import router as monday_sync_router
+from .order_summary_config import router as order_summary_config_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -48,6 +49,7 @@ router.include_router(inventory_import_router)
 router.include_router(analytics_router)
 router.include_router(store_config_router)
 router.include_router(monday_sync_router)
+router.include_router(order_summary_config_router)
 
 # Re-export for compatibility
 store_refactored_router = router
