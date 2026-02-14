@@ -197,11 +197,7 @@ async def fetch_google_photos_album(body: dict):
             })
             html = resp.text
 
-        # Extract media URLs from Google Photos page data
         items = []
-
-        # Pattern 1: Look for image URLs in the page data
-        # Google Photos embeds URLs in AF_initDataCallback or data attributes
         img_patterns = [
             r'(https://lh3\.googleusercontent\.com/[a-zA-Z0-9_\-/]+)',
             r'(https://lh[0-9]*\.googleusercontent\.com/[a-zA-Z0-9_\-/=]+)',
@@ -211,10 +207,8 @@ async def fetch_google_photos_album(body: dict):
         for pattern in img_patterns:
             matches = re.findall(pattern, html)
             for url in matches:
-                # Filter out tiny thumbnails and UI elements
                 if len(url) > 60 and url not in seen_urls:
                     seen_urls.add(url)
-                    # Append size parameter for high quality
                     full_url = url if '=' in url.split('/')[-1] else f"{url}=w1200"
                     items.append({
                         "item_id": f"gp_{len(items)}_{int(datetime.now(timezone.utc).timestamp())}",
@@ -226,7 +220,6 @@ async def fetch_google_photos_album(body: dict):
                         "source": "google_photos"
                     })
 
-        # Check for video URLs
         video_patterns = [
             r'(https://video\.googleusercontent\.com/[a-zA-Z0-9_\-/=&?]+)',
         ]
@@ -253,9 +246,7 @@ async def fetch_google_photos_album(body: dict):
                 "album_url": album_url
             }
 
-        # Save album URL and fetched items
-        db = get_db()
-        db.app_config.update_one(
+        await db.app_config.update_one(
             {"config_key": "media_player"},
             {
                 "$set": {
