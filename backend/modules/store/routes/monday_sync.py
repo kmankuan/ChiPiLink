@@ -372,6 +372,29 @@ async def unregister_txb_inventory_webhook(admin: dict = Depends(get_admin_user)
     return await txb_inventory_adapter.unregister_stock_webhook()
 
 
+@router.post("/txb-inventory/create-item-webhook/register")
+async def register_txb_create_item_webhook(
+    body: dict, admin: dict = Depends(get_admin_user)
+):
+    """Register a webhook for new item creation on the TXB inventory board"""
+    webhook_url = body.get("webhook_url")
+    if not webhook_url:
+        raise HTTPException(status_code=400, detail="webhook_url is required")
+
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    result = await txb_inventory_adapter.register_create_item_webhook(webhook_url)
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+@router.delete("/txb-inventory/create-item-webhook")
+async def unregister_txb_create_item_webhook(admin: dict = Depends(get_admin_user)):
+    """Remove the TXB inventory create-item webhook"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    return await txb_inventory_adapter.unregister_create_item_webhook()
+
+
 # ========== WEBHOOK MANAGEMENT (Admin) ==========
 
 @router.post("/webhooks/register")
