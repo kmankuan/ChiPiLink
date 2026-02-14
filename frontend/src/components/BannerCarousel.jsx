@@ -93,7 +93,7 @@ export default function BannerCarousel() {
 
   return (
     <div
-      className="group relative w-full overflow-hidden rounded-2xl"
+      className="group relative w-full overflow-hidden rounded-none sm:rounded-2xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={handleTouchStart}

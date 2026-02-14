@@ -154,7 +154,7 @@ export default function MediaPlayer() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-2xl overflow-hidden bg-black/5 group"
+      className="relative w-full rounded-none sm:rounded-2xl overflow-hidden bg-black/5 group"
       style={{ aspectRatio: '16/9' }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
