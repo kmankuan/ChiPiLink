@@ -251,7 +251,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
     }));
   };
 
-  const handleSubmitOrder = async () => {
+  const handleSubmitOrder = () => {
     const selectedBookIds = Object.entries(selectedBooks)
       .filter(([_, selected]) => selected)
       .map(([bookId]) => bookId);
@@ -279,6 +279,14 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
       toast.error(te.insufficientBalance);
       return;
     }
+
+    setShowSummary(true);
+  };
+
+  const handleConfirmSubmitOrder = async () => {
+    const selectedBookIds = Object.entries(selectedBooks)
+      .filter(([_, selected]) => selected)
+      .map(([bookId]) => bookId);
 
     setSubmitting(true);
     try {
