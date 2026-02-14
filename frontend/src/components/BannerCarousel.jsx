@@ -222,7 +222,6 @@ function TextBanner({ banner, navigate }) {
   };
 
   return (
-    <>
     <div
       onClick={banner.link_url ? handleClick : undefined}
       className={`relative rounded-2xl overflow-hidden px-5 py-5 sm:py-6 flex items-center justify-center min-h-[80px] ${banner.link_url ? 'cursor-pointer' : ''}`}
