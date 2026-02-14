@@ -153,7 +153,7 @@ export default function AdminModule() {
       .map(sec => ({
         ...sec,
         items: sec.items.filter(i =>
-          i.label.toLowerCase().includes(q) || sec.group.toLowerCase().includes(q)
+          i.label.toLowerCase().includes(q) || i.id.toLowerCase().includes(q) || sec.group.toLowerCase().includes(q)
         ),
       }))
       .filter(sec => sec.items.length > 0);
