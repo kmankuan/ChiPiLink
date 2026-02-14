@@ -653,6 +653,9 @@ export default function SchoolTextbooksView({
                                 {isPending && (
                                   <span className="text-[10px] text-amber-600 font-medium">{t.reorderPending}</span>
                                 )}
+                                {item.status === 'out_of_stock' && (
+                                  <span className="text-[10px] text-red-500 font-medium">{t.outOfStock}</span>
+                                )}
                               </div>
                             </div>
                           );
