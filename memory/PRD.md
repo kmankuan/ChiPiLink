@@ -1,67 +1,100 @@
 # ChiPi Link - PRD
 
 ## Original Problem Statement
-Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full-featured community app with dynamic, admin-configurable UI elements, landing page customization, rich media, and Monday.com workflow integration.
+Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-featured community app with dynamic, admin-configurable UI elements, landing page customization, rich media, and Monday.com workflow integration.
 
 ## What's Been Implemented
 
-### Automated Monday.com Banner Sync (Feb 13, 2026) - COMPLETE
-- **Webhook-based real-time sync (Primary):** Instant sync via Monday.com webhooks — changes reflect immediately when board items are created/updated
-- **Scheduled polling sync (Fallback):** APScheduler-based background job, default 10 min, admin-configurable (1 min to 24 hours)
-- Admin UI: webhook connect/disconnect button, auto-sync enable/disable toggle, interval dropdown, status displays
-- **Sync History Log**: timeline of past syncs showing status (success/error), trigger (webhook/auto/manual), items synced count, timestamps. Capped at 50 entries.
-- Scheduler starts on app startup, webhook handler re-registered on restart
-- **Tested: 100% (13 auto-sync + 14 history + 17 webhook = 44 backend tests passed)**
+### Wallet + Monday.com Dual Board Integration (Feb 14, 2026) - COMPLETE
+**Two separate Monday.com integrations for the wallet system:**
 
-### Scheduled Banners & Monday.com Sync (Feb 13, 2026) - COMPLETE
-- **Scheduled banners**: start_date/end_date fields — banners auto-show/hide based on dates
-- **Monday.com → App sync**: Canva design URL → Monday.com board → auto-sync to app banner carousel
-- **Admin panel**: 3-tab layout (Banners, Monday.com, Media Player)
-- Monday.com tab: enable toggle, board selector (lists all boards), 8 column mappings (canva_url, text, bg_color, link_url, start_date, end_date, status, banner_type)
-- Workflow guide: Canva → Monday.com → App
-- Sync now button + last sync timestamp
-- Banners from Monday.com show "Synced from Monday.com" badge
-- **Tested: 100% (12 backend, 10 frontend code review + landing page verified)**
+1. **Chipi Wallet Board (18399650704)** - 2-way sync:
+   - Each item = a user, subitems = wallet transactions (top-up/deduct)
+   - App -> Monday.com: User registration creates parent item; wallet transactions create subitems
+   - Monday.com -> App: Admin adds subitems, changes parent status to "Process" -> webhook fires -> backend processes subitems
+   - 24 users linked, 4 processed subitems
+   - Dynamic subitem board ID detection (removed hardcoded values)
 
-### Banner Carousel & Media Player (Feb 13, 2026) - COMPLETE
-- Banner carousel (image + text/Facebook-style with colors/gradients)
-- Media player: hero-sized 16:9 auto-slideshow, Google Photos URL fetch + manual add
-- Full admin CRUD
+2. **Recharge Approval Board (18399959471)** - 2-way sync:
+   - App -> Monday.com: Gmail payment alerts create pending topups -> synced as Monday.com items
+   - Monday.com -> App: Admin changes status to "Approved"/"Decline" -> webhook fires -> wallet credited/rejected
+   - Both directions working and tested
 
-### Custom Cultural Icons (Feb 13, 2026) - COMPLETE
-### Layout Preview & Icon Customization (Feb 13, 2026) - COMPLETE
-### Mosaic Community Landing Page (Feb 13, 2026) - COMPLETE
-### All Previous Features - COMPLETE
+**Key fixes applied:**
+- Fixed critical server hang: synchronous IMAP calls in gmail_poller.py blocking async event loop (wrapped with asyncio.to_thread)
+- Implemented RechargeApprovalWebhookHandler (was completely missing)
+- Fixed hardcoded subitem board ID in wallet adapter
+- Fixed blocking Gmail calls in wallet-topups API routes
+- Fixed process_email() bug referencing doc["id"] before doc was defined
+- Fixed React Hook violations in PlayerRankBadge.jsx and ScoreBoard.jsx
+
+**Tested: 100% (13/13 backend + frontend homepage)**
+
+### Previous Features - ALL COMPLETE
+- Automated Monday.com Banner Sync (webhooks + polling fallback + sync history)
+- Scheduled Banners with start/end dates
+- Banner Carousel & Media Player
+- Custom Cultural Icons & Layout Preview
+- Mosaic Community Landing Page
+- Wallet Payment Workflow for textbook orders
+- SchoolTextbooksView UI fixes
 
 ## Key API Endpoints
+
+### Wallet Monday.com Integration
+- `GET /api/monday/adapters/wallet/sync-dashboard` -- Chipi Wallet board stats
+- `GET /api/monday/adapters/wallet/logs` -- Wallet webhook logs
+- `POST /api/monday/adapters/wallet/test-webhook` -- Test wallet webhook
+- `POST /api/monday/adapters/wallet/resync-user/{user_id}` -- Re-sync single user
+- `POST /api/monday/adapters/wallet/sync-all-users` -- Sync all users
+
+### Recharge Approval Integration
+- `GET /api/monday/adapters/recharge-approval/dashboard` -- Recharge approval stats
+- `GET /api/monday/adapters/recharge-approval/logs` -- Approval webhook logs
+- `GET /api/monday/adapters/recharge-approval/config` -- Board config
+
+### Webhook
+- `POST /api/monday/webhooks/incoming` -- Receives all Monday.com webhooks, routes by boardId
+- `GET /api/monday/webhooks/registered` -- Lists registered boards
+
+### Wallet Topups
+- `POST /api/wallet-topups/pending` -- Create pending topup
+- `PUT /api/wallet-topups/pending/{id}/approve` -- Approve from app
+- `PUT /api/wallet-topups/pending/{id}/reject` -- Reject from app
+- `GET /api/wallet-topups/gmail/status` -- Gmail connection check
+
 ### Showcase
-- `GET /api/showcase/banners` — Schedule-filtered active banners
-- `POST/PUT/DELETE /api/admin/showcase/banners` — Banner CRUD
-- `GET /api/showcase/media-player` — Media player config
-- `POST /api/admin/showcase/media-player/add-item` — Add media item
-- `POST /api/admin/showcase/media-player/fetch-album` — Google Photos fetch
-### Monday.com Banner Sync
-- `GET /api/admin/showcase/monday-banners/config` — Sync config
-- `PUT /api/admin/showcase/monday-banners/config` — Save config
-- `GET /api/admin/showcase/monday-banners/boards` — List boards + columns
-- `POST /api/admin/showcase/monday-banners/sync` — Trigger manual sync
-### Auto-Sync & Webhooks
-- `GET /api/admin/showcase/monday-banners/auto-sync` — Auto-sync config + scheduler status
-- `PUT /api/admin/showcase/monday-banners/auto-sync` — Enable/disable auto-sync, set interval
-- `GET /api/admin/showcase/monday-banners/sync-history` — Recent sync history log (last 20)
-- `POST /api/admin/showcase/monday-banners/webhook/register` — Register real-time webhook with Monday.com
-- `POST /api/admin/showcase/monday-banners/webhook/unregister` — Remove webhook
-- `GET /api/admin/showcase/monday-banners/webhook/status` — Webhook connection status
+- `GET /api/showcase/banners` -- Active banners
+- Banner CRUD, Media Player, Monday.com Banner Sync endpoints (unchanged)
 
 ## Key Files
-- `/app/backend/modules/showcase/__init__.py` — All showcase API routes (banners, media, monday, auto-sync)
-- `/app/backend/modules/showcase/monday_banner_adapter.py` — Monday.com sync adapter
-- `/app/backend/modules/showcase/scheduler.py` — APScheduler-based auto-sync scheduler
-- `/app/frontend/src/components/BannerCarousel.jsx` — Banner carousel
-- `/app/frontend/src/components/MediaPlayer.jsx` — Media player
-- `/app/frontend/src/modules/admin/ShowcaseAdminModule.jsx` — Admin panel (3 tabs + auto-sync controls)
+- `/app/backend/modules/wallet_topups/monday_sync.py` -- PaymentAlertsMondaySync + RechargeApprovalWebhookHandler
+- `/app/backend/modules/users/integrations/monday_wallet_adapter.py` -- Chipi Wallet board adapter
+- `/app/backend/modules/integrations/monday/webhook_router.py` -- Webhook routing by board ID
+- `/app/backend/modules/integrations/monday/routes.py` -- All Monday.com REST endpoints
+- `/app/backend/modules/wallet_topups/routes.py` -- Wallet topup routes
+- `/app/backend/modules/wallet_topups/gmail_poller.py` -- Gmail background poller
+- `/app/backend/main.py` -- Startup: registers both webhook handlers
+
+## Database Collections
+- `monday_user_items` -- User <-> Monday.com Chipi Wallet item mappings
+- `monday_processed_subitems` -- Processed subitems from Chipi Wallet board
+- `wallet_webhook_logs` -- Chipi Wallet webhook event logs
+- `monday_topup_items` -- Pending topup <-> Monday.com Recharge Approval item mappings
+- `wallet_pending_topups` -- All pending top-ups (gmail/manual)
+- `recharge_approval_webhook_logs` -- Recharge Approval webhook event logs
+- `wallet_topup_monday_config` -- Recharge Approval board configuration
+- `chipi_wallets` -- User wallets
+- `chipi_transactions` -- Wallet transactions
+
+## 3rd Party Integrations
+- Monday.com API v2 (GraphQL) -- Env: MONDAY_API_KEY
+- Gmail (IMAP) -- Env: GMAIL_EMAIL, GMAIL_APP_PASSWORD
+- Telegram Bot API -- Env: TELEGRAM_BOT_TOKEN
+- OpenAI GPT-4o / Anthropic Claude Sonnet 4.5 -- Emergent LLM Key
+- Google Photos -- Public URLs
 
 ## Backlog
-### P1 - User Chooses Final Landing Page Design
+### P1 - Evolve Mosaic Grid Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
-### P2 - OneSignal Push, Stripe, Google Sheets, ChipiPoints, Teams/Clans
+### P3 - Refactor AdminModule.jsx into sidebar navigation
