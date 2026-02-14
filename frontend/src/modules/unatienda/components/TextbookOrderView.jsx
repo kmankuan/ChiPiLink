@@ -531,6 +531,33 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                   ))}
                 </div>
 
+                {/* Out of Stock Books */}
+                {outOfStockBooks.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-red-600 text-sm">
+                      <AlertTriangle className="h-4 w-4" />
+                      {te.outOfStock || 'Out of Stock'} ({outOfStockBooks.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {outOfStockBooks.map(book => (
+                        <div
+                          key={book.book_id}
+                          className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 border-border opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center opacity-50" />
+                            <div>
+                              <p className="font-medium text-muted-foreground">{book.name || book.book_name}</p>
+                              <p className="text-sm text-muted-foreground">{book.subject}</p>
+                            </div>
+                          </div>
+                          <span className="font-semibold text-muted-foreground">${book.price?.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Dynamic Form Fields */}
                 {formFields.length > 0 && (
                   <div className="mt-6 space-y-4 p-4 bg-muted/50 rounded-lg border">
