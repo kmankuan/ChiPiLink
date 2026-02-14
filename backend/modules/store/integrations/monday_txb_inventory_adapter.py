@@ -270,16 +270,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         try:
             col_values = {stock_col: str(new_quantity)}
-            # Also update status if mapped
-            status_col = col_map.get("status")
-            if status_col:
-                if new_quantity <= 0:
-                    col_values[status_col] = {"label": "Out of Stock"}
-                elif new_quantity <= 10:
-                    col_values[status_col] = {"label": "Low Stock"}
-                else:
-                    col_values[status_col] = {"label": "In Stock"}
-
             await self.client.update_column_values(board_id, monday_item_id, col_values)
             logger.info(f"Stock synced to Monday: {book_id} = {new_quantity}")
             return {"synced": True, "monday_item_id": monday_item_id}
