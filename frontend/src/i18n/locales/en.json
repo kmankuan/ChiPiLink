@@ -23,7 +23,21 @@
     "logout": "Logout",
     "goHome": "Go to Home",
     "devControl": "Dev Control",
-    "paymentAlerts": "Payment Alerts"
+    "paymentAlerts": "Payment Alerts",
+    "siteConfig": "Site Config",
+    "authentication": "Authentication",
+    "uiStyle": "UI Style",
+    "translations": "Translations",
+    "landingPage": "Landing Page",
+    "bannersMedia": "Banners & Media",
+    "layoutsIcons": "Layouts & Icons",
+    "activityTicker": "Activity Ticker",
+    "widget": "Widget",
+    "telegram": "Telegram",
+    "forms": "Forms",
+    "demoData": "Demo Data",
+    "migration": "Migration",
+    "moduleStatus": "Module Status"
   },
   "landing": {
     "hero": {

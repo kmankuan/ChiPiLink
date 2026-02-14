@@ -23,7 +23,21 @@
     "logout": "退出登录",
     "goHome": "返回首页",
     "devControl": "开发控制",
-    "paymentAlerts": "支付提醒"
+    "paymentAlerts": "支付提醒",
+    "siteConfig": "站点配置",
+    "authentication": "认证",
+    "uiStyle": "UI样式",
+    "translations": "翻译",
+    "landingPage": "首页",
+    "bannersMedia": "横幅和媒体",
+    "layoutsIcons": "布局和图标",
+    "activityTicker": "活动滚动条",
+    "widget": "小组件",
+    "telegram": "Telegram",
+    "forms": "表单",
+    "demoData": "演示数据",
+    "migration": "迁移",
+    "moduleStatus": "模块状态"
   },
   "landing": {
     "hero": {

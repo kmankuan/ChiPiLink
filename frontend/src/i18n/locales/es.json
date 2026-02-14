@@ -23,7 +23,21 @@
     "logout": "Cerrar Sesión",
     "goHome": "Ir al Inicio",
     "devControl": "Control Dev",
-    "paymentAlerts": "Alertas de Pago"
+    "paymentAlerts": "Alertas de Pago",
+    "siteConfig": "Config. del Sitio",
+    "authentication": "Autenticación",
+    "uiStyle": "Estilo UI",
+    "translations": "Traducciones",
+    "landingPage": "Página Principal",
+    "bannersMedia": "Banners y Medios",
+    "layoutsIcons": "Diseños e Iconos",
+    "activityTicker": "Ticker de Actividad",
+    "widget": "Widget",
+    "telegram": "Telegram",
+    "forms": "Formularios",
+    "demoData": "Datos Demo",
+    "migration": "Migración",
+    "moduleStatus": "Estado de Módulos"
   },
   "landing": {
     "hero": {
