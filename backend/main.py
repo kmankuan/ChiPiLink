@@ -242,6 +242,10 @@ async def startup_event():
     await seed_site_config()
     await seed_translations()
     await seed_landing_page()
+
+    # Seed showcase defaults (banners + media player)
+    from modules.showcase import seed_showcase_defaults
+    await seed_showcase_defaults()
     
     # Initialize Users module (async init)
     await init_users()
