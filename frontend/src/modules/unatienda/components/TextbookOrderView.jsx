@@ -46,6 +46,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   // Wallet state
   const [walletBalance, setWalletBalance] = useState(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   // Get current language - use i18n translations with fallback to inline
   const lang = i18n.language || 'es';
