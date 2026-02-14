@@ -5,6 +5,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 
 ## What's Been Implemented
 
+### Telegram Feed Card on Landing Page (Feb 14, 2026) - COMPLETE
+- Added public endpoint `GET /api/community-v2/feed/public/recent` (no auth required)
+- Created `TelegramFeedCard.jsx` component showing latest Telegram channel posts with thumbnails, timestamps, likes/comments
+- Replaced the mosaic grid with the Telegram Feed Card as the 3rd landing page section
+- Landing page layout: Banner Carousel → Cultural Icons → Media Player → Telegram Feed → CTA → Footer
+- **Tested: 100%** — Backend (7/7) + Frontend (all UI elements + navigation) verified (iteration_103)
+
 ### Landing Page Fallback Content Fix (Feb 14, 2026) - COMPLETE
 **Root cause:** Production database had no banner/media player data, causing both components to render nothing.
 **Fix applied (two-layer safeguard):**
