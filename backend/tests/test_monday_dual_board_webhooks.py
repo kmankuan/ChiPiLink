@@ -148,7 +148,7 @@ class TestWalletSyncDashboard:
         """Get auth token for admin requests"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "contrasena": "admin"},
+            json={"email": "teck@koh.one", "password": "admin"},
             timeout=15
         )
         if response.status_code == 200:
@@ -193,7 +193,7 @@ class TestRechargeApprovalDashboard:
         """Get auth token for admin requests"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "contrasena": "admin"},
+            json={"email": "teck@koh.one", "password": "admin"},
             timeout=15
         )
         if response.status_code == 200:
@@ -237,7 +237,7 @@ class TestGmailIntegration:
         """Get auth token for admin requests"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "contrasena": "admin"},
+            json={"email": "teck@koh.one", "password": "admin"},
             timeout=15
         )
         if response.status_code == 200:
@@ -269,7 +269,7 @@ class TestRawWebhookLogs:
         """Get auth token for admin requests"""
         response = requests.post(
             f"{BASE_URL}/api/auth-v2/login",
-            json={"email": "teck@koh.one", "contrasena": "admin"},
+            json={"email": "teck@koh.one", "password": "admin"},
             timeout=15
         )
         if response.status_code == 200:
