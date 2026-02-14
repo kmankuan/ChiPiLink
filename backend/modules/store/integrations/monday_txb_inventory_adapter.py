@@ -180,86 +180,147 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         return sync_stats
 
-    # ──────────── Per-Column Sync ────────────
+    # ──────────── Per-Column Sync (Background Task) ────────────
 
-    async def sync_single_column(self, column_key: str) -> Dict:
-        """Sync a single column across all textbooks to Monday.com.
-        Only updates items that already exist on Monday.com (have monday_item_id)."""
+    async def start_column_sync(self, column_key: str) -> Dict:
+        """Start a per-column sync as a background task. Returns immediately."""
+        global _column_sync_tasks
+
+        # Pre-validate before launching background task
         config = await self.get_txb_inventory_config()
         board_id = config.get("board_id")
         enabled = config.get("enabled", False)
         col_map = config.get("column_mapping", {})
 
         if not enabled or not board_id:
-            return {"error": "TXB inventory board not configured or disabled", "synced": 0}
+            return {"error": "TXB inventory board not configured or disabled"}
 
         col_id = col_map.get(column_key)
-        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
         if column_key in ("stock_quantity", "stock"):
-            col_id = stock_col
-
+            col_id = col_map.get("stock_quantity") or col_map.get("stock")
         if not col_id:
-            return {"error": f"Column '{column_key}' is not mapped", "synced": 0}
+            return {"error": f"Column '{column_key}' is not mapped"}
 
         code_col = col_map.get("code")
         if not code_col:
-            return {"error": "Book code column not mapped", "synced": 0}
+            return {"error": "Book code column not mapped"}
 
-        textbooks = await db.store_products.find(
-            {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
-            {"_id": 0}
-        ).to_list(500)
+        # Check if already running
+        existing = _column_sync_tasks.get(column_key)
+        if existing and not existing.done():
+            return {"status": "already_running", "column": column_key}
 
-        if not textbooks:
-            return {"synced": 0, "message": "No active textbooks found"}
+        # Set initial status in DB
+        await db.monday_column_sync_status.update_one(
+            {"column_key": column_key},
+            {"$set": {
+                "column_key": column_key,
+                "status": "running",
+                "updated": 0, "skipped": 0, "failed": 0, "total": 0,
+                "started_at": datetime.now(timezone.utc).isoformat(),
+                "finished_at": None, "error": None,
+            }},
+            upsert=True,
+        )
 
-        col_types = await self._get_board_column_types(board_id)
+        # Launch background task
+        task = asyncio.create_task(self._run_column_sync(column_key))
+        _column_sync_tasks[column_key] = task
 
-        updated = 0
-        skipped = 0
-        failed = 0
+        return {"status": "started", "column": column_key}
 
-        for book in textbooks:
-            book_code = book.get("code", "") or book.get("book_id", "")
-            monday_item_id = book.get("monday_item_id")
+    async def get_column_sync_status(self, column_key: str = None) -> Dict:
+        """Get status of a running or completed column sync."""
+        if column_key:
+            doc = await db.monday_column_sync_status.find_one(
+                {"column_key": column_key}, {"_id": 0}
+            )
+            return doc or {"status": "idle", "column_key": column_key}
+        # Return all
+        docs = await db.monday_column_sync_status.find({}, {"_id": 0}).to_list(20)
+        return {"syncs": docs}
 
-            if not monday_item_id:
-                # Try to find by code on Monday.com
+    async def _run_column_sync(self, column_key: str):
+        """Background task: sync a single column across all textbooks."""
+        try:
+            config = await self.get_txb_inventory_config()
+            board_id = config.get("board_id")
+            col_map = config.get("column_mapping", {})
+            code_col = col_map.get("code")
+
+            textbooks = await db.store_products.find(
+                {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+                {"_id": 0}
+            ).to_list(500)
+
+            total = len(textbooks)
+            await db.monday_column_sync_status.update_one(
+                {"column_key": column_key},
+                {"$set": {"total": total}},
+            )
+
+            if not textbooks:
+                await self._finish_column_sync(column_key, 0, 0, 0, total)
+                return
+
+            col_types = await self._get_board_column_types(board_id)
+
+            updated = 0
+            skipped = 0
+            failed = 0
+
+            for book in textbooks:
+                book_code = book.get("code", "") or book.get("book_id", "")
+                monday_item_id = book.get("monday_item_id")
+
+                if not monday_item_id:
+                    try:
+                        found = await self.client.search_items_by_column(board_id, code_col, book_code)
+                        if found:
+                            monday_item_id = found[0]["id"]
+                            await db.store_products.update_one(
+                                {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                                {"$set": {"monday_item_id": str(monday_item_id)}}
+                            )
+                    except Exception:
+                        pass
+
+                if not monday_item_id:
+                    skipped += 1
+                    continue
+
+                col_values = self._build_single_column_value(book, column_key, col_map, col_types)
+                if not col_values:
+                    skipped += 1
+                    continue
+
                 try:
-                    found = await self.client.search_items_by_column(board_id, code_col, book_code)
-                    if found:
-                        monday_item_id = found[0]["id"]
-                        await db.store_products.update_one(
-                            {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
-                            {"$set": {"monday_item_id": str(monday_item_id)}}
-                        )
-                except Exception:
-                    pass
+                    await self.client.update_column_values(board_id, monday_item_id, col_values)
+                    updated += 1
+                    logger.info(f"Column sync '{column_key}': updated '{book_code}' (item {monday_item_id})")
+                except Exception as e:
+                    failed += 1
+                    logger.error(f"Column sync '{column_key}' error for '{book_code}': {e}")
 
-            if not monday_item_id:
-                skipped += 1
-                continue
+            await self._finish_column_sync(column_key, updated, skipped, failed, total)
 
-            col_values = self._build_single_column_value(book, column_key, col_map, col_types)
-            if not col_values:
-                skipped += 1
-                continue
+        except Exception as e:
+            logger.error(f"Column sync '{column_key}' background task error: {e}")
+            await db.monday_column_sync_status.update_one(
+                {"column_key": column_key},
+                {"$set": {"status": "error", "error": str(e),
+                          "finished_at": datetime.now(timezone.utc).isoformat()}},
+            )
 
-            try:
-                await self.client.update_column_values(board_id, monday_item_id, col_values)
-                updated += 1
-                logger.info(f"Column sync '{column_key}': updated '{book_code}' (item {monday_item_id})")
-            except Exception as e:
-                failed += 1
-                logger.error(f"Column sync '{column_key}' error for '{book_code}': {e}")
-
-        return {
-            "column": column_key,
-            "updated": updated,
-            "skipped": skipped,
-            "failed": failed,
-            "total_textbooks": len(textbooks),
-        }
+    async def _finish_column_sync(self, column_key, updated, skipped, failed, total):
+        await db.monday_column_sync_status.update_one(
+            {"column_key": column_key},
+            {"$set": {
+                "status": "completed",
+                "updated": updated, "skipped": skipped, "failed": failed, "total": total,
+                "finished_at": datetime.now(timezone.utc).isoformat(),
+            }},
+        )
 
     async def _get_board_column_types(self, board_id: str) -> Dict[str, str]:
         """Fetch column types from Monday.com board. Returns {column_id: column_type}."""
