@@ -8,12 +8,14 @@ Features:
 - Stock column sync: app → Monday.com when stock changes
 - Webhook handler: Monday.com → app when stock column changes
 - Grade-based grouping on Monday.com
+- Per-column sync: sync individual columns to Monday.com
 
 Config namespace: store.textbook_orders.txb_inventory
 """
 from typing import Dict, List, Optional
 import logging
 import json
+import asyncio
 from datetime import datetime, timezone
 
 from modules.integrations.monday.base_adapter import BaseMondayAdapter
@@ -23,6 +25,9 @@ from core.database import db
 logger = logging.getLogger(__name__)
 
 TXB_INVENTORY_KEY = "store.textbook_orders.txb_inventory"
+
+# In-memory tracking for background column sync tasks
+_column_sync_tasks: Dict[str, asyncio.Task] = {}
 
 
 class TxbInventoryAdapter(BaseMondayAdapter):
