@@ -193,18 +193,24 @@ export default function MediaPlayer() {
       {/* Gradient overlay for controls */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-      {/* Caption */}
+      {/* Caption — with parallax */}
       {item.caption && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+        <div
+          className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent transition-transform duration-100"
+          style={{ transform: `translateY(${parallaxY * 0.5}px)` }}
+        >
           <p className="text-white text-xs sm:text-sm font-bold tracking-tight" data-testid="media-caption">
             {item.caption}
           </p>
         </div>
       )}
 
-      {/* Controls — show on hover */}
+      {/* Controls — show on hover, with parallax */}
       {config?.show_controls && (
-        <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div
+          className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{ transform: `translateY(${parallaxY * 0.3}px)` }}
+        >
           <div className="flex items-center gap-2">
             {/* Play/Pause */}
             <button
