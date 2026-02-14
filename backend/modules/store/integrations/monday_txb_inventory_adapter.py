@@ -392,7 +392,157 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "new_stock": new_stock,
         }
 
-    # ──────────── Register/Unregister Webhook ────────────
+    # ──────────── Webhook: Monday.com → App (new item created) ────────────
+
+    async def handle_create_item_webhook(self, event: dict) -> Dict:
+        """Process Monday.com webhook for create_item events on the TXB board.
+        Fetches the new item's column values and creates a product in the private catalog."""
+        import uuid
+
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        col_map = config.get("column_mapping", {})
+
+        if not board_id:
+            return {"processed": False, "reason": "Not configured"}
+
+        pulse_id = str(event.get("pulseId", ""))
+        pulse_name = event.get("pulseName", "")
+
+        if not pulse_id:
+            return {"processed": False, "reason": "No pulseId in event"}
+
+        # Check if product already exists with this monday_item_id
+        existing = await db.store_products.find_one(
+            {"monday_item_id": pulse_id, "is_private_catalog": True},
+            {"_id": 0, "book_id": 1}
+        )
+        if existing:
+            return {"processed": True, "skipped": True, "reason": "Item already exists", "book_id": existing["book_id"]}
+
+        # Fetch item's column values from Monday.com
+        try:
+            data = await self.client.execute(
+                f'query {{ items(ids: [{pulse_id}]) {{ name group {{ id title }} column_values {{ id text value type }} }} }}'
+            )
+            items = data.get("items", [])
+            if not items:
+                return {"processed": False, "reason": f"Item {pulse_id} not found on Monday.com"}
+
+            item = items[0]
+            item_name = item.get("name", pulse_name)
+            col_values = {c["id"]: c.get("text", "") for c in item.get("column_values", [])}
+            group = item.get("group", {})
+        except Exception as e:
+            logger.error(f"Create item webhook - failed to fetch item {pulse_id}: {e}")
+            return {"processed": False, "reason": f"API error: {e}"}
+
+        # Build reverse column mapping: monday_col_id → field_name
+        reverse_map = {v: k for k, v in col_map.items() if v}
+
+        # Extract product fields from column values
+        product_data = {
+            "name": item_name,
+            "book_id": f"txb_{uuid.uuid4().hex[:8]}",
+            "is_private_catalog": True,
+            "active": True,
+            "archived": False,
+            "monday_item_id": pulse_id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "source": "monday_webhook",
+        }
+
+        for col_id, text_value in col_values.items():
+            field = reverse_map.get(col_id)
+            if not field or not text_value:
+                continue
+
+            if field == "code":
+                product_data["code"] = text_value
+            elif field == "grade":
+                product_data["grade"] = text_value
+            elif field == "publisher":
+                product_data["publisher"] = text_value
+            elif field == "subject":
+                product_data["subject"] = text_value
+            elif field in ("unit_price", "price"):
+                try:
+                    product_data["price"] = float(text_value.replace(",", "").replace("$", ""))
+                except (ValueError, TypeError):
+                    pass
+            elif field in ("stock_quantity", "stock"):
+                try:
+                    product_data["inventory_quantity"] = int(float(text_value))
+                except (ValueError, TypeError):
+                    product_data["inventory_quantity"] = 0
+
+        # If code column was found, also check for existing product by code
+        if product_data.get("code"):
+            existing_by_code = await db.store_products.find_one(
+                {"code": product_data["code"], "is_private_catalog": True},
+                {"_id": 0, "book_id": 1}
+            )
+            if existing_by_code:
+                # Link existing product instead of creating duplicate
+                await db.store_products.update_one(
+                    {"book_id": existing_by_code["book_id"]},
+                    {"$set": {"monday_item_id": pulse_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                return {
+                    "processed": True,
+                    "action": "linked",
+                    "book_id": existing_by_code["book_id"],
+                    "product_name": item_name,
+                }
+
+        # Extract grade from group title if not found in columns
+        if not product_data.get("grade") and group:
+            group_title = group.get("title", "")
+            if group_title.startswith("Grade "):
+                product_data["grade"] = group_title.replace("Grade ", "")
+            elif group_title.startswith("G"):
+                product_data["grade"] = group_title
+
+        # Set defaults
+        product_data.setdefault("inventory_quantity", 0)
+        product_data.setdefault("price", 0)
+        product_data.setdefault("code", product_data["book_id"])
+
+        # Insert into database
+        await db.store_products.insert_one(product_data)
+        # Remove _id from inserted doc side-effect
+        product_data.pop("_id", None)
+
+        # Log the import as an inventory movement
+        movement = {
+            "movement_id": str(uuid.uuid4())[:12],
+            "book_id": product_data["book_id"],
+            "product_name": product_data["name"],
+            "type": "import",
+            "quantity_change": product_data.get("inventory_quantity", 0),
+            "old_quantity": 0,
+            "new_quantity": product_data.get("inventory_quantity", 0),
+            "reason": "monday_webhook",
+            "notes": f"New textbook imported from Monday.com (item {pulse_id})",
+            "admin_id": "monday_webhook",
+            "admin_name": "Monday.com",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.inventory_movements.insert_one(movement)
+
+        logger.info(f"Create item webhook: imported '{item_name}' as {product_data['book_id']}")
+
+        return {
+            "processed": True,
+            "action": "created",
+            "book_id": product_data["book_id"],
+            "product_name": product_data["name"],
+            "grade": product_data.get("grade"),
+            "stock": product_data.get("inventory_quantity", 0),
+        }
+
+    # ──────────── Register/Unregister Webhooks ────────────
 
     async def register_stock_webhook(self, webhook_url: str) -> Dict:
         """Register a webhook for column value changes on the TXB inventory board."""
@@ -419,6 +569,31 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         except Exception as e:
             return {"error": str(e)}
 
+    async def register_create_item_webhook(self, webhook_url: str) -> Dict:
+        """Register a webhook for create_item events on the TXB inventory board."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+
+        if not board_id:
+            return {"error": "Board not configured"}
+
+        try:
+            wh_id = await self.client.register_webhook(
+                board_id, webhook_url, event="create_item"
+            )
+            if wh_id:
+                config.setdefault("create_item_webhook_config", {})
+                config["create_item_webhook_config"] = {
+                    "webhook_id": wh_id,
+                    "webhook_url": webhook_url,
+                    "registered_at": datetime.now(timezone.utc).isoformat(),
+                }
+                await self.save_txb_inventory_config(config)
+                return {"success": True, "webhook_id": wh_id}
+            return {"error": "Failed to register webhook"}
+        except Exception as e:
+            return {"error": str(e)}
+
     async def unregister_stock_webhook(self) -> Dict:
         """Remove the stock change webhook."""
         config = await self.get_txb_inventory_config()
@@ -432,6 +607,22 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "webhook_id": None,
             "webhook_url": None,
             "stock_column_id": None,
+        }
+        await self.save_txb_inventory_config(config)
+        return {"success": True}
+
+    async def unregister_create_item_webhook(self) -> Dict:
+        """Remove the create_item webhook."""
+        config = await self.get_txb_inventory_config()
+        wh_config = config.get("create_item_webhook_config", {})
+        wh_id = wh_config.get("webhook_id")
+
+        if wh_id:
+            await self.client.delete_webhook(wh_id)
+
+        config["create_item_webhook_config"] = {
+            "webhook_id": None,
+            "webhook_url": None,
         }
         await self.save_txb_inventory_config(config)
         return {"success": True}
