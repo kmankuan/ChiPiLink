@@ -78,23 +78,15 @@ class TestShowcaseAdminEndpoints:
     
     @pytest.fixture(autouse=True)
     def setup_auth(self):
-        """Get auth token before each test"""
+        """Get auth token before each test using teck@koh.one admin account"""
         login_response = requests.post(
-            f"{BASE_URL}/api/auth/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            f"{BASE_URL}/api/auth-v2/login",
+            json={"email": "teck@koh.one", "password": "admin"}
         )
         if login_response.status_code == 200:
             self.token = login_response.json().get("token")
         else:
-            # Try alternative auth endpoint
-            login_response = requests.post(
-                f"{BASE_URL}/api/auth-v2/login",
-                json={"email": "admin@chipi.co", "password": "admin"}
-            )
-            if login_response.status_code == 200:
-                self.token = login_response.json().get("token")
-            else:
-                pytest.skip(f"Auth failed: {login_response.status_code}")
+            pytest.skip(f"Auth failed: {login_response.status_code} - {login_response.text}")
         
         self.headers = {"Authorization": f"Bearer {self.token}"}
         print(f"✓ Authenticated as admin")
@@ -363,22 +355,15 @@ class TestCleanup:
     
     @pytest.fixture(autouse=True)
     def setup_auth(self):
-        """Get auth token"""
+        """Get auth token using teck@koh.one admin account"""
         login_response = requests.post(
-            f"{BASE_URL}/api/auth/login",
-            json={"email": "admin@chipi.co", "password": "admin"}
+            f"{BASE_URL}/api/auth-v2/login",
+            json={"email": "teck@koh.one", "password": "admin"}
         )
         if login_response.status_code == 200:
             self.token = login_response.json().get("token")
         else:
-            login_response = requests.post(
-                f"{BASE_URL}/api/auth-v2/login",
-                json={"email": "admin@chipi.co", "password": "admin"}
-            )
-            if login_response.status_code == 200:
-                self.token = login_response.json().get("token")
-            else:
-                pytest.skip("Auth failed")
+            pytest.skip("Auth failed")
         self.headers = {"Authorization": f"Bearer {self.token}"}
 
     def test_cleanup_test_banners(self):
