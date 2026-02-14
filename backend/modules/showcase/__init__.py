@@ -336,8 +336,7 @@ async def get_auto_sync_config():
     """Admin: Get auto-sync configuration and scheduler status."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
     from modules.showcase.scheduler import banner_sync_scheduler
-    db = get_db()
-    config = await monday_banner_adapter.get_config(db)
+    config = await monday_banner_adapter.get_config()
     auto_sync = config.get("auto_sync", {
         "enabled": False,
         "interval_minutes": 10,
@@ -351,16 +350,14 @@ async def update_auto_sync_config(body: dict):
     """Admin: Enable/disable auto-sync and set interval."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
     from modules.showcase.scheduler import banner_sync_scheduler
-    db = get_db()
-    config = await monday_banner_adapter.get_config(db)
+    config = await monday_banner_adapter.get_config()
 
     enabled = body.get("enabled", False)
-    interval = max(1, min(body.get("interval_minutes", 10), 1440))  # 1 min to 24 hours
+    interval = max(1, min(body.get("interval_minutes", 10), 1440))
 
     config["auto_sync"] = {"enabled": enabled, "interval_minutes": interval}
-    await monday_banner_adapter.save_config(db, config)
+    await monday_banner_adapter.save_config(config)
 
-    # Update scheduler
     if enabled and config.get("enabled") and config.get("board_id"):
         banner_sync_scheduler.resume(interval)
         banner_sync_scheduler.update_interval(interval)
@@ -376,8 +373,7 @@ async def update_auto_sync_config(body: dict):
 async def get_sync_history():
     """Admin: Get recent sync history log entries."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
-    db = get_db()
-    history = monday_banner_adapter.get_sync_history(db, limit=20)
+    history = await monday_banner_adapter.get_sync_history(limit=20)
     return {"history": history}
 
 
