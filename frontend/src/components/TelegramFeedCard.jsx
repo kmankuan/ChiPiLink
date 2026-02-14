@@ -48,120 +48,73 @@ function fallbackText(media) {
   }
 }
 
-/* ────────────────── Album Carousel ────────────────── */
+/* ────────────────── Media Thumbnail Grid ────────────────── */
 
-function AlbumCarousel({ media, onVideoPlay, accentColor }) {
-  const [current, setCurrent] = useState(0);
-  const total = media.length;
-  const touchRef = useRef({ startX: 0 });
-
-  const goTo = useCallback((idx) => {
-    setCurrent(Math.max(0, Math.min(idx, total - 1)));
-  }, [total]);
-
-  const handleTouchStart = (e) => { touchRef.current.startX = e.touches[0].clientX; };
-  const handleTouchEnd = (e) => {
-    const diff = touchRef.current.startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
-  };
-
-  const item = media[current];
-  const isVideo = item?.type === 'video' || item?.type === 'animation';
-  const thumbSrc = item?.type === 'photo' ? mediaUrl(item.file_id)
-    : item?.thumb_file_id ? mediaUrl(item.thumb_file_id)
-    : null;
+function MediaGrid({ media, onVideoPlay }) {
+  if (!media || media.length === 0) return null;
 
   return (
     <div
-      className="relative w-full rounded-xl overflow-hidden bg-black/5"
-      style={{ aspectRatio: '16/10' }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      data-testid="album-carousel"
+      className="grid gap-1.5"
+      style={{
+        gridTemplateColumns: media.length === 1
+          ? '1fr'
+          : media.length === 2
+          ? '1fr 1fr'
+          : `repeat(${Math.min(media.length, 3)}, 1fr)`,
+      }}
+      data-testid="media-grid"
     >
-      {/* Media display */}
+      {media.map((item, idx) => (
+        <MediaThumb key={idx} item={item} onVideoPlay={onVideoPlay} />
+      ))}
+    </div>
+  );
+}
+
+function MediaThumb({ item, onVideoPlay }) {
+  const isVideo = item?.type === 'video' || item?.type === 'animation';
+  const thumbSrc = item?.type === 'photo'
+    ? mediaUrl(item.file_id)
+    : item?.thumb_file_id
+    ? mediaUrl(item.thumb_file_id)
+    : null;
+
+  const handleClick = () => {
+    if (isVideo && item?.file_id) onVideoPlay(item.file_id);
+  };
+
+  return (
+    <div
+      className="relative rounded-lg overflow-hidden bg-black/5 cursor-pointer"
+      style={{ aspectRatio: '1/1' }}
+      onClick={handleClick}
+      data-testid="media-thumb"
+    >
       {thumbSrc ? (
-        <img
-          src={thumbSrc}
-          alt=""
-          className="w-full h-full object-cover transition-opacity duration-300"
-          loading="lazy"
-          onClick={() => isVideo && item?.file_id && onVideoPlay(item.file_id)}
-        />
+        <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
+      ) : isVideo ? (
+        <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
+          <Play className="h-6 w-6 text-white/60 fill-white/60" />
+        </div>
       ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ background: '#1a1a2e' }}
-          onClick={() => isVideo && item?.file_id && onVideoPlay(item.file_id)}
-        >
-          {isVideo ? <Play className="h-10 w-10 text-white/60 fill-white/60" /> : <ImageIcon className="h-10 w-10 text-white/30" />}
+        <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
+          <ImageIcon className="h-6 w-6 text-slate-400" />
         </div>
       )}
-
-      {/* Video play overlay */}
       {isVideo && (
-        <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
-          onClick={() => item?.file_id && onVideoPlay(item.file_id)}
-        >
-          <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-            <Play className="h-5 w-5 text-white fill-white ml-0.5" />
+        <>
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+              <Play className="h-3.5 w-3.5 text-white fill-white ml-0.5" />
+            </div>
           </div>
           {item.duration > 0 && (
-            <span className="absolute bottom-2 right-2 text-[10px] text-white font-bold bg-black/60 px-1.5 py-0.5 rounded">
+            <span className="absolute bottom-1 right-1 text-[8px] text-white font-bold bg-black/60 px-1 py-0.5 rounded">
               {formatDuration(item.duration)}
             </span>
           )}
-        </div>
-      )}
-
-      {/* Arrows */}
-      {total > 1 && (
-        <>
-          <button
-            onClick={(e) => { e.stopPropagation(); goTo(current - 1); }}
-            className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white transition-opacity hover:bg-black/60 disabled:opacity-0"
-            disabled={current === 0}
-            data-testid="album-prev"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); goTo(current + 1); }}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white transition-opacity hover:bg-black/60 disabled:opacity-0"
-            disabled={current === total - 1}
-            data-testid="album-next"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </>
-      )}
-
-      {/* Dot indicators */}
-      {total > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5" data-testid="album-dots">
-          {media.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={(e) => { e.stopPropagation(); goTo(idx); }}
-              className="transition-all duration-200"
-              style={{
-                width: idx === current ? 16 : 6,
-                height: 6,
-                borderRadius: 3,
-                background: idx === current ? (accentColor || '#0088cc') : 'rgba(255,255,255,0.5)',
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Album badge */}
-      {total > 1 && (
-        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-          <Layers className="h-3 w-3" />
-          {current + 1}/{total}
-        </div>
       )}
     </div>
   );
