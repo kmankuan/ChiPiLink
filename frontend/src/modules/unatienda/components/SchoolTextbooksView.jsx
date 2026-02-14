@@ -222,6 +222,7 @@ export default function SchoolTextbooksView({
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [allStudents, setAllStudents] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
+  const [summaryStudent, setSummaryStudent] = useState(null); // student object for summary modal
   
   const texts = {
     en: {
