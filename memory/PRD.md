@@ -5,6 +5,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Per-Column Sync & Grade Fix (Feb 14, 2026) - COMPLETE
+- **Grade column fix:** `_format_column_value` now detects Monday.com column types (dropdown, status, text) and formats values accordingly — dropdowns use `{labels: [value]}`, status uses `{label: value}`
+- **Per-column sync:** New endpoint `POST /api/store/monday/txb-inventory/sync-column/{column_key}` syncs a single column across all textbooks
+- **Frontend:** Each column mapping field now has an individual "Sync" button to push just that column
+- **Valid column keys:** code, name, grade, publisher, subject, unit_price, stock_quantity
+- **Tested: 100%** — Backend (5/5) + Frontend code review (iteration_116)
+
 ### Monday.com Create-Item Auto-Import (Feb 14, 2026) - COMPLETE
 - New `create_item` webhook handler: when items are added on Monday.com board, they auto-import into private catalog
 - Fetches column values from Monday.com API and maps to product fields (name, code, grade, price, stock)
