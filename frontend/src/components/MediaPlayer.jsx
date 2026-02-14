@@ -142,7 +142,11 @@ export default function MediaPlayer() {
       data-testid="media-player"
     >
       {/* Media content */}
-      <div className="absolute inset-0">
+      <div
+        key={slideKey}
+        className="absolute inset-0"
+        style={{ animation: `media-slide-${slideDir.current > 0 ? 'left' : 'right'} 0.35s cubic-bezier(0.25,0.46,0.45,0.94)` }}
+      >
         {item.type === 'video' ? (
           <video
             ref={videoRef}
