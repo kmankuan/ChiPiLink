@@ -234,7 +234,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         board_id = config.get("board_id")
         enabled = config.get("enabled", False)
         col_map = config.get("column_mapping", {})
-        stock_col = col_map.get("stock_quantity")
 
         if not enabled or not board_id:
             return {"synced": False, "reason": "Not configured"}
