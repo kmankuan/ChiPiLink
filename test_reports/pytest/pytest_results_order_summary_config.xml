@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="3" failures="1" skipped="1" tests="8" time="28.549" timestamp="2026-02-14T17:56:04.314732+00:00" hostname="agent-env-f2dd2c2f-8bc5-418d-8944-9d3a72658a14"><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_get_config_public_access" time="27.680" /><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_get_config_default_all_enabled" time="0.143" /><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_put_config_admin_success" time="0.286"><error message="failed on setup with &quot;AssertionError: Admin login failed: {&quot;detail&quot;:&quot;Not Found&quot;}&#10;assert 404 == 200&#10; +  where 404 = &lt;Response [404]&gt;.status_code&quot;">tests/test_order_summary_config.py:25: in admin_token
+    assert response.status_code == 200, f"Admin login failed: {response.text}"
+E   AssertionError: Admin login failed: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404]&gt;.status_code</error></testcase><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_put_config_multiple_fields" time="0.000"><error message="failed on setup with &quot;AssertionError: Admin login failed: {&quot;detail&quot;:&quot;Not Found&quot;}&#10;assert 404 == 200&#10; +  where 404 = &lt;Response [404]&gt;.status_code&quot;">tests/test_order_summary_config.py:25: in admin_token
+    assert response.status_code == 200, f"Admin login failed: {response.text}"
+E   AssertionError: Admin login failed: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404]&gt;.status_code</error></testcase><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_put_config_rejects_unauthenticated" time="0.110" /><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_put_config_rejects_non_admin" time="0.119"><skipped type="pytest.skip" message="Could not create non-admin test user">/app/backend/tests/test_order_summary_config.py:157: Could not create non-admin test user</skipped></testcase><testcase classname="tests.test_order_summary_config.TestOrderSummaryConfig" name="test_put_config_ignores_invalid_fields" time="0.000"><error message="failed on setup with &quot;AssertionError: Admin login failed: {&quot;detail&quot;:&quot;Not Found&quot;}&#10;assert 404 == 200&#10; +  where 404 = &lt;Response [404]&gt;.status_code&quot;">tests/test_order_summary_config.py:25: in admin_token
+    assert response.status_code == 200, f"Admin login failed: {response.text}"
+E   AssertionError: Admin login failed: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404]&gt;.status_code</error></testcase><testcase classname="tests.test_order_summary_config.TestAdminLogin" name="test_admin_login" time="0.113"><failure message="AssertionError: Admin login failed: {&quot;detail&quot;:&quot;Not Found&quot;}&#10;assert 404 == 200&#10; +  where 404 = &lt;Response [404]&gt;.status_code">tests/test_order_summary_config.py:206: in test_admin_login
+    assert response.status_code == 200, f"Admin login failed: {response.text}"
+E   AssertionError: Admin login failed: {"detail":"Not Found"}
+E   assert 404 == 200
+E    +  where 404 = &lt;Response [404]&gt;.status_code</failure></testcase></testsuite></testsuites>
