@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                         : <ChevronRight className="h-3 w-3" />}
                     </button>
                   )}
-                  {(collapsed || openGroups[group.group] !== false) && group.items.map((item) => {
+                  {(collapsed || sidebarSearch.trim() || openGroups[group.group] !== false) && group.items.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeModule === item.id;
                     return (
