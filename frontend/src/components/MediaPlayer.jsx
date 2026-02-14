@@ -82,6 +82,8 @@ export default function MediaPlayer() {
     if (item?.type === 'video') return; // videos advance on ended
 
     timerRef.current = setTimeout(() => {
+      slideDir.current = 1;
+      setSlideKey(k => k + 1);
       setCurrent(prev => (prev + 1) % items.length);
     }, intervalMs);
 
@@ -90,6 +92,8 @@ export default function MediaPlayer() {
 
   const goTo = useCallback((dir) => {
     clearTimeout(timerRef.current);
+    slideDir.current = dir;
+    setSlideKey(k => k + 1);
     setCurrent(prev => (prev + dir + items.length) % items.length);
   }, [items.length]);
 
@@ -107,6 +111,8 @@ export default function MediaPlayer() {
 
   const handleVideoEnd = useCallback(() => {
     if (items.length > 1) {
+      slideDir.current = 1;
+      setSlideKey(k => k + 1);
       setCurrent(prev => (prev + 1) % items.length);
     }
   }, [items.length]);
