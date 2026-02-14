@@ -47,6 +47,8 @@ export default function BannerCarousel() {
   const [banners, setBanners] = useState([]);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+  const slideDir = useRef(1);
+  const [slideKey, setSlideKey] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,6 +70,8 @@ export default function BannerCarousel() {
   }, [activeBanners.length, paused]);
 
   const go = useCallback((dir) => {
+    slideDir.current = dir;
+    setSlideKey(k => k + 1);
     setCurrent(prev => (prev + dir + activeBanners.length) % activeBanners.length);
   }, [activeBanners.length]);
 
@@ -96,7 +100,11 @@ export default function BannerCarousel() {
       style={{ minHeight: '80px' }}
     >
       {/* Banner content */}
-      <div className="relative transition-all duration-500 ease-out">
+      <div
+        key={slideKey}
+        className="relative"
+        style={{ animation: `banner-slide-${slideDir.current > 0 ? 'left' : 'right'} 0.35s cubic-bezier(0.25,0.46,0.45,0.94)` }}
+      >
         {banner.type === 'image' ? (
           <ImageBanner banner={banner} navigate={navigate} />
         ) : (
@@ -203,6 +211,7 @@ function TextBanner({ banner, navigate }) {
   };
 
   return (
+    <>
     <div
       onClick={banner.link_url ? handleClick : undefined}
       className={`relative rounded-2xl overflow-hidden px-5 py-5 sm:py-6 flex items-center justify-center min-h-[80px] ${banner.link_url ? 'cursor-pointer' : ''}`}
