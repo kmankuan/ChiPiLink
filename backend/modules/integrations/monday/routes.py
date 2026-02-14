@@ -508,3 +508,63 @@ async def get_subitem_columns(board_id: str, admin: dict = Depends(get_admin_use
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
+# ============== RECHARGE APPROVAL ADAPTER ==============
+
+
+@router.get("/adapters/recharge-approval/logs")
+async def get_recharge_approval_logs(
+    limit: int = 30,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get Recharge Approval webhook event logs."""
+    cursor = db.recharge_approval_webhook_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
+    return {"logs": logs}
+
+
+@router.get("/adapters/recharge-approval/config")
+async def get_recharge_approval_config(admin: dict = Depends(get_admin_user)):
+    """Get Recharge Approval board config."""
+    config = await db['wallet_topup_monday_config'].find_one({"id": "default"}, {"_id": 0})
+    return {"config": config or {}}
+
+
+@router.get("/adapters/recharge-approval/dashboard")
+async def get_recharge_approval_dashboard(admin: dict = Depends(get_admin_user)):
+    """Get Recharge Approval sync dashboard."""
+    from modules.integrations.monday.webhook_router import get_registered_boards
+
+    # Topup items synced to Monday
+    topup_items = await db.monday_topup_items.count_documents({})
+
+    # Pending topups by status
+    pending = await db.wallet_pending_topups.count_documents({"status": "pending"})
+    approved = await db.wallet_pending_topups.count_documents({"status": "approved"})
+    rejected = await db.wallet_pending_topups.count_documents({"status": "rejected"})
+
+    # Recent webhook logs
+    logs_cursor = db.recharge_approval_webhook_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(10)
+    recent_logs = await logs_cursor.to_list(length=10)
+
+    # Check if webhook handler is registered
+    config = await db['wallet_topup_monday_config'].find_one({"id": "default"}, {"_id": 0})
+    board_id = config.get("board_id", "") if config else ""
+    registered = board_id in get_registered_boards()
+
+    return {
+        "stats": {
+            "monday_items": topup_items,
+            "pending": pending,
+            "approved": approved,
+            "rejected": rejected,
+        },
+        "board_id": board_id,
+        "webhook_registered": registered,
+        "recent_logs": recent_logs,
+    }
