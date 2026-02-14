@@ -20,6 +20,7 @@ import {
   User, UserPlus, Users, Wallet, AlertTriangle, CreditCard
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
+import { OrderSummaryModal } from './OrderSummaryModal';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
