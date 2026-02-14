@@ -223,6 +223,7 @@ export default function TxbInventoryTab() {
   if (loading) return <div className="animate-pulse h-40 bg-muted rounded-lg" />;
 
   const hasWebhook = !!config.webhook_config?.webhook_id;
+  const hasCreateItemWh = !!config.create_item_webhook_config?.webhook_id;
   const stats = config.sync_stats || {};
 
   return (
