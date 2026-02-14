@@ -1,733 +1,67 @@
 <analysis>**original_problem_statement:**
 The user's initial goal was to enhance the Chipi Wallet admin dashboard by creating a Mosaic Community landing page with a banner carousel and media player, allowing customizable navigation icons, and integrating with Monday.com to manage banner content.
 
-Subsequently, the user reported two issues in a different part of the application:
-1.  A UI bug on the textbook selection screen () where the selection counter was not updating and a bottom bar was overlapping content.
-2.  A request to verify and fix the pay with wallet workflow, which was not functioning correctly from that same textbook selection screen.
-
-Most recently, the user reported a critical issue: The production site currently is facing loading issue, the page continue opening but never loaded.
+Over time, the scope expanded to address several critical issues:
+1.  UI bugs and a broken pay with wallet workflow on the textbook selection screen.
+2.  A site-wide production loading failure that rendered the application unusable.
+3.  A request to verify and fix two complex, two-way wallet top-up integrations with different Monday.com boards (Chipi Wallet and Recharge Approval).
+4.  Most recently, a new issue where the main landing page is not displaying the banner ad and Google Photos album.
 
 **User's preferred language**: The user communicates in English. You **MUST** continue to respond in English.
 
 **what currently exists?**
-The application is a full-stack React/FastAPI project. The following features are implemented:
-- **Mosaic Community Module:** A dynamic landing page with a banner carousel, Google Photos player, and customizable icons, all managed from the admin panel.
-- **Monday.com Integration:** A robust, two-pronged integration for syncing banner content from a Monday.com board. It supports both real-time updates via webhooks (primary) and periodic polling via a background scheduler (fallback).
-- **Sync History Log:** An admin-visible log that records the status of every manual or automatic sync attempt with Monday.com.
-- **Textbook Order UI/UX Fix:** The UI bug on the textbook selection screen has been fixed (selection counter and layout overlap).
-- **Wallet Payment Workflow Fix:** The pay with wallet functionality has been correctly implemented for textbook orders from the  component, including UI for balance display and an insufficient funds warning.
+The application is a full-stack React/FastAPI project. The following work has been completed and verified:
+-   **Production Server Hang:** A critical server-wide freeze caused by blocking synchronous I/O calls () in the Gmail service has been resolved by refactoring the code to be asynchronous using .
+-   **Monday.com Wallet Integrations:** Two separate, complex integrations for wallet management have been fixed and verified.
+    -   **Recharge Approval:** A missing webhook handler was created from scratch, enabling a complete workflow where status changes in Monday.com automatically credit user wallets in the application.
+    -   **Chipi Wallet:** A hardcoded board ID was replaced with a dynamic lookup, making the integration more robust.
+-   **Frontend Stability:** React Hook errors that were causing the frontend to crash have been fixed.
+-   **Previous Fixes:** All previously reported issues with the textbook ordering UI and initial pay with wallet flow have been resolved.
+-   **Testing:** The latest integration fixes were validated with the testing agent, which reported a 100% success rate across all tests.
 
 **Last working item**:
-- **Last item agent was working:** Investigating a critical production issue where the application page hangs and never finishes loading. The agent had just started the investigation by planning to examine frontend entry points, main components, and backend logs.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** backend testing agent to check service health and logs (==> /var/log/supervisor/backend.err.log <==
-2026-02-13 23:29:49,155 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:33:50,573 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:37:56,496 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:42:03,962 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:46:18,828 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:50:35,746 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [48] using WatchFiles
-2026-02-13 23:52:36,804 - core.events.event_bus - INFO - EventBus initialized
-
-==> /var/log/supervisor/backend.out.log <==
-INFO:     10.64.133.74:36614 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:48714 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:53878 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:44932 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:41316 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:43616 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:55790 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:56016 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:48716 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:49088 - "GET /api/ticker/feed HTTP/1.1" 200 OK and ==> /var/log/supervisor/frontend.err.log <==
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-(node:84) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:84) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-
-==> /var/log/supervisor/frontend.out.log <==
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-yarn run v1.22.22
-$ craco start). The screenshot tool will also be necessary to observe the frontend's state.
-- **User Testing Done:** N
+-   **Last item agent was working:** The user reported a new issue: the main landing page is not displaying the Google Photos album and the banner/text ad. The investigation has not yet started.
+-   **Status:** NOT STARTED
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** frontend testing agent. The investigation should start by taking a screenshot to confirm the issue, then examining the landing page's frontend component (e.g., ) and its corresponding backend data source () to diagnose why the content is not rendering.
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Production Site Loading Failure (Priority: P0 - CRITICAL)**
-  - **Description:** The user reported that the production site is stuck in a loading state and never becomes interactive. This is a site-wide outage and is the highest priority.
-  - **Attempted fixes:** None. The investigation has just begun.
-  - **Next debug checklist:**
-    1.  Check backend logs for any startup errors, crashes, or continuous error loops: ==> /var/log/supervisor/backend.err.log <==
-2026-02-13 22:00:57,623 - users.service - INFO - [users] Initialized 0 profile fields
-2026-02-13 22:00:57,624 - users.service - INFO - [users] Initialized 0 earn rules
-2026-02-13 22:00:57,628 - modules.users.services.connections_service - INFO - Configuraciones by default inicializadas
-2026-02-13 22:00:57,636 - modules.integrations.monday.webhook_router - INFO - Registered Monday.com webhook handler for board 18399650704
-2026-02-13 22:00:57,636 - modules.users.integrations.monday_wallet_adapter - INFO - Wallet registered webhook for board: 18399650704
-2026-02-13 22:00:57,636 - modules.users.integrations.monday_wallet_adapter - INFO - [monday_sync] Subscribed to auth.user.registered event
-2026-02-13 22:00:57,636 - modules.community.services.telegram_service - INFO - Telegram polling started
-2026-02-13 22:00:57,636 - main - INFO - Telegram community feed polling started
-2026-02-13 22:00:57,637 - modules.wallet_topups.gmail_poller - INFO - [GmailPoller] Background polling started
-2026-02-13 22:00:57,662 - apscheduler.scheduler - INFO - Scheduler started
-2026-02-13 22:00:57,662 - apscheduler.scheduler - INFO - Added job "Monday.com Banner Auto-Sync" to job store "default"
-2026-02-13 22:00:57,662 - modules.showcase.scheduler - INFO - Banner auto-sync scheduled every 10 minutes
-2026-02-13 22:00:57,662 - modules.showcase.scheduler - INFO - Banner auto-sync paused
-2026-02-13 22:00:57,662 - main - INFO - Monday banner auto-sync initialized (paused — not enabled)
-2026-02-13 22:00:57,662 - main - INFO - All modules loaded successfully
-INFO:     Application startup complete.
-2026-02-13 22:02:48,809 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Incoming request: keys=['challenge']
-2026-02-13 22:02:48,840 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Challenge received: test_challenge_12345
-2026-02-13 22:02:48,929 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Incoming request: keys=['some_field']
-2026-02-13 22:02:48,930 - modules.integrations.monday.webhook_router - INFO - [webhook_router] No event in body
-2026-02-13 22:02:49,225 - modules.showcase.scheduler - INFO - Banner auto-sync paused
-2026-02-13 22:02:49,291 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:03:12,889 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Incoming request: keys=['challenge']
-2026-02-13 22:03:12,890 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Challenge received: test123
-WARNING:  WatchFiles detected changes in 'tests/test_webhook_management.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-2026-02-13 22:03:30,634 - main - INFO - ChiPi Link API shutting down...
-2026-02-13 22:03:30,634 - modules.wallet_topups.gmail_poller - INFO - [GmailPoller] Background polling stopped
-2026-02-13 22:03:30,634 - modules.showcase.scheduler - INFO - Banner auto-sync scheduler stopped
-2026-02-13 22:03:30,635 - main - INFO - Database connection closed
-2026-02-13 22:03:30,635 - apscheduler.scheduler - INFO - Scheduler has been shut down
-INFO:     Application shutdown complete.
-INFO:     Finished server process [1027]
-2026-02-13 22:03:31,634 - core.events.event_bus - INFO - EventBus initialized
-2026-02-13 22:03:32,300 - modules.pinpanclub.events.handlers - INFO - PinpanClub event handlers configured
-2026-02-13 22:03:32,301 - modules.store.events.handlers - INFO - Store event handlers configured
-2026-02-13 22:03:32,301 - modules.auth.events.handlers - INFO - Auth event handlers configured
-2026-02-13 22:03:32,301 - modules.community.events.handlers - INFO - Community event handlers configured
-INFO:     Started server process [1484]
-INFO:     Waiting for application startup.
-2026-02-13 22:03:32,765 - main - INFO - ChiPi Link API starting up...
-2026-02-13 22:03:32,765 - main - INFO - Database: chipilink_prod
-2026-02-13 22:03:32,772 - users.service - INFO - [users] Initialized 0 user types
-2026-02-13 22:03:32,774 - users.service - INFO - [users] Initialized 0 profile fields
-2026-02-13 22:03:32,775 - users.service - INFO - [users] Initialized 0 earn rules
-2026-02-13 22:03:32,779 - modules.users.services.connections_service - INFO - Configuraciones by default inicializadas
-2026-02-13 22:03:32,786 - modules.integrations.monday.webhook_router - INFO - Registered Monday.com webhook handler for board 18399650704
-2026-02-13 22:03:32,786 - modules.users.integrations.monday_wallet_adapter - INFO - Wallet registered webhook for board: 18399650704
-2026-02-13 22:03:32,786 - modules.users.integrations.monday_wallet_adapter - INFO - [monday_sync] Subscribed to auth.user.registered event
-2026-02-13 22:03:32,786 - modules.community.services.telegram_service - INFO - Telegram polling started
-2026-02-13 22:03:32,786 - main - INFO - Telegram community feed polling started
-2026-02-13 22:03:32,787 - modules.wallet_topups.gmail_poller - INFO - [GmailPoller] Background polling started
-2026-02-13 22:03:32,805 - apscheduler.scheduler - INFO - Scheduler started
-2026-02-13 22:03:32,806 - apscheduler.scheduler - INFO - Added job "Monday.com Banner Auto-Sync" to job store "default"
-2026-02-13 22:03:32,806 - modules.showcase.scheduler - INFO - Banner auto-sync scheduled every 10 minutes
-2026-02-13 22:03:32,806 - modules.showcase.scheduler - INFO - Banner auto-sync paused
-2026-02-13 22:03:32,806 - main - INFO - Monday banner auto-sync initialized (paused — not enabled)
-2026-02-13 22:03:32,806 - main - INFO - All modules loaded successfully
-INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'tests/test_webhook_management.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for connections to close. (CTRL+C to force quit)
-2026-02-13 22:05:29,435 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-INFO:     Waiting for application shutdown.
-2026-02-13 22:05:33,288 - main - INFO - ChiPi Link API shutting down...
-2026-02-13 22:05:33,288 - modules.wallet_topups.gmail_poller - INFO - [GmailPoller] Background polling stopped
-2026-02-13 22:05:33,288 - modules.showcase.scheduler - INFO - Banner auto-sync scheduler stopped
-2026-02-13 22:05:33,289 - main - INFO - Database connection closed
-2026-02-13 22:05:33,289 - apscheduler.scheduler - INFO - Scheduler has been shut down
-INFO:     Application shutdown complete.
-INFO:     Finished server process [1484]
-WARNING:  WatchFiles detected changes in 'tests/test_webhook_management.py'. Reloading...
-2026-02-13 22:05:34,660 - core.events.event_bus - INFO - EventBus initialized
-2026-02-13 22:05:35,334 - modules.pinpanclub.events.handlers - INFO - PinpanClub event handlers configured
-2026-02-13 22:05:35,334 - modules.store.events.handlers - INFO - Store event handlers configured
-2026-02-13 22:05:35,334 - modules.auth.events.handlers - INFO - Auth event handlers configured
-2026-02-13 22:05:35,334 - modules.community.events.handlers - INFO - Community event handlers configured
-INFO:     Started server process [1762]
-INFO:     Waiting for application startup.
-2026-02-13 22:05:35,798 - main - INFO - ChiPi Link API starting up...
-2026-02-13 22:05:35,798 - main - INFO - Database: chipilink_prod
-2026-02-13 22:05:35,807 - users.service - INFO - [users] Initialized 0 user types
-2026-02-13 22:05:35,809 - users.service - INFO - [users] Initialized 0 profile fields
-2026-02-13 22:05:35,810 - users.service - INFO - [users] Initialized 0 earn rules
-2026-02-13 22:05:35,815 - modules.users.services.connections_service - INFO - Configuraciones by default inicializadas
-2026-02-13 22:05:35,824 - modules.integrations.monday.webhook_router - INFO - Registered Monday.com webhook handler for board 18399650704
-2026-02-13 22:05:35,824 - modules.users.integrations.monday_wallet_adapter - INFO - Wallet registered webhook for board: 18399650704
-2026-02-13 22:05:35,824 - modules.users.integrations.monday_wallet_adapter - INFO - [monday_sync] Subscribed to auth.user.registered event
-2026-02-13 22:05:35,824 - modules.community.services.telegram_service - INFO - Telegram polling started
-2026-02-13 22:05:35,824 - main - INFO - Telegram community feed polling started
-2026-02-13 22:05:35,825 - modules.wallet_topups.gmail_poller - INFO - [GmailPoller] Background polling started
-2026-02-13 22:05:35,844 - apscheduler.scheduler - INFO - Scheduler started
-2026-02-13 22:05:35,844 - apscheduler.scheduler - INFO - Added job "Monday.com Banner Auto-Sync" to job store "default"
-2026-02-13 22:05:35,844 - modules.showcase.scheduler - INFO - Banner auto-sync scheduled every 10 minutes
-2026-02-13 22:05:35,844 - modules.showcase.scheduler - INFO - Banner auto-sync paused
-2026-02-13 22:05:35,844 - main - INFO - Monday banner auto-sync initialized (paused — not enabled)
-2026-02-13 22:05:35,844 - main - INFO - All modules loaded successfully
-INFO:     Application startup complete.
-2026-02-13 22:07:32,534 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:07:33,087 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Incoming request: keys=['challenge']
-2026-02-13 22:07:33,088 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Challenge received: test_challenge_12345
-2026-02-13 22:07:33,149 - modules.integrations.monday.webhook_router - INFO - [webhook_router] Incoming request: keys=['some_field']
-2026-02-13 22:07:33,150 - modules.integrations.monday.webhook_router - INFO - [webhook_router] No event in body
-2026-02-13 22:07:33,345 - modules.showcase.scheduler - INFO - Banner auto-sync paused
-2026-02-13 22:10:30,742 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:13:30,425 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:16:31,628 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:19:36,207 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:22:44,044 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:25:51,043 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:29:03,822 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:32:16,309 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:35:46,125 - modules.community.services.telegram_service - ERROR - Telegram poll error: 
-2026-02-13 22:38:50,117 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:42:08,405 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:45:28,426 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:48:54,806 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:52:23,280 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:55:55,303 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:56:12,047 - core.auth - INFO - [auth] Looking up user_id from token: admin_940d8c6a
-2026-02-13 22:56:20,216 - core.auth - INFO - [auth] Looking up user_id from token: admin_940d8c6a
-2026-02-13 22:56:20,217 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] user_id=admin_940d8c6a, student_id=std_e32ae7fae07a
-2026-02-13 22:56:20,217 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found student: TEST_Test Other Relation, user_id=admin_940d8c6a
-2026-02-13 22:56:20,217 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Current year=2026, enrollments count=1
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Enrollments: [{'year': 2026, 'grade': '3', 'is_editable': True, 'status': 'approved', 'approved_at': '2026-01-21T04:40:18.828910+00:00', 'approved_by': 'admin_940d8c6a', 'rejection_reason': None, 'admin_notes': 'Test approval'}]
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found enrollment - grade=3, year=2026
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found existing order: ord_4fd66064c3bd
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Refreshing order ord_4fd66064c3bd for grade=3
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Looking for books for grade: 3
-2026-02-13 22:56:20,218 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Query grades: ['3', 'G3', '3rd Grade', '3er Grado', 'Grade 3', 'Grado 3']
-2026-02-13 22:56:20,219 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Found 4 books total
-2026-02-13 22:56:20,219 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] First book: Ciencias Naturales 3er Grado - grade: G3
-2026-02-13 22:56:20,219 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Found 4 books for grade 3
-2026-02-13 22:56:20,219 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Existing items count: 4
-2026-02-13 22:56:26,571 - core.auth - INFO - [auth] Looking up user_id from token: admin_940d8c6a
-2026-02-13 22:56:26,574 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] user_id=admin_940d8c6a, student_id=std_e32ae7fae07a, payment=wallet
-2026-02-13 22:56:26,574 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Request items count: 1
-2026-02-13 22:56:26,574 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Request item: book_id=book_3b61a9ad39f7, qty=1
-2026-02-13 22:56:26,574 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] user_id=admin_940d8c6a, student_id=std_e32ae7fae07a
-2026-02-13 22:56:26,574 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found student: TEST_Test Other Relation, user_id=admin_940d8c6a
-2026-02-13 22:56:26,574 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Current year=2026, enrollments count=1
-2026-02-13 22:56:26,574 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Enrollments: [{'year': 2026, 'grade': '3', 'is_editable': True, 'status': 'approved', 'approved_at': '2026-01-21T04:40:18.828910+00:00', 'approved_by': 'admin_940d8c6a', 'rejection_reason': None, 'admin_notes': 'Test approval'}]
-2026-02-13 22:56:26,574 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found enrollment - grade=3, year=2026
-2026-02-13 22:56:26,575 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found existing order: ord_4fd66064c3bd
-2026-02-13 22:56:26,575 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Refreshing order ord_4fd66064c3bd for grade=3
-2026-02-13 22:56:26,575 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Looking for books for grade: 3
-2026-02-13 22:56:26,575 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Query grades: ['3', 'G3', '3rd Grade', '3er Grado', 'Grade 3', 'Grado 3']
-2026-02-13 22:56:26,576 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Found 4 books total
-2026-02-13 22:56:26,576 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] First book: Ciencias Naturales 3er Grado - grade: G3
-2026-02-13 22:56:26,576 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Found 4 books for grade 3
-2026-02-13 22:56:26,576 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Existing items count: 4
-2026-02-13 22:56:26,576 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Got order: ord_4fd66064c3bd
-2026-02-13 22:56:26,576 - modules.store.routes.textbook_orders - WARNING - [submit_order_direct] Could not update item book_3b61a9ad39f7: Access denied
-2026-02-13 22:56:26,577 - modules.store.routes.textbook_orders - ERROR - [submit_order_direct] ValueError: No items could be updated. Errors: Could not update item book_3b61a9ad39f7: Access denied
-2026-02-13 22:59:27,300 - core.auth - INFO - [auth] Looking up user_id from token: 62157036-6aae-41bc-96fc-f4c37aef94e9
-2026-02-13 22:59:27,314 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] user_id=chipi-wallet-fix, student_id=std_13260a30ba9c, payment=wallet
-2026-02-13 22:59:27,314 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Request items count: 1
-2026-02-13 22:59:27,314 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Request item: book_id=book_1dceffd38889, qty=1
-2026-02-13 22:59:27,314 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] user_id=chipi-wallet-fix, student_id=std_13260a30ba9c
-2026-02-13 22:59:27,335 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found student: John Smith, user_id=chipi-wallet-fix
-2026-02-13 22:59:27,335 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Current year=2026, enrollments count=1
-2026-02-13 22:59:27,335 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Enrollments: [{'year': 2026, 'grade': '5', 'is_editable': False, 'status': 'approved', 'approved_at': '2026-02-07T22:49:32.610550+00:00', 'approved_by': '62157036-6aae-41bc-96fc-f4c37aef94e9', 'rejection_reason': None, 'admin_notes': None}]
-2026-02-13 22:59:27,335 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found enrollment - grade=5, year=2026
-2026-02-13 22:59:27,336 - modules.store.services.textbook_order_service - INFO - [get_or_create_order] Found existing order: ord_ffcd75228bf0
-2026-02-13 22:59:27,336 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Refreshing order ord_ffcd75228bf0 for grade=5
-2026-02-13 22:59:27,336 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Looking for books for grade: 5
-2026-02-13 22:59:27,336 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Query grades: ['5', 'G5', '5th Grade', '5to Grado', 'Grade 5', 'Grado 5']
-2026-02-13 22:59:27,337 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] Found 3 books total
-2026-02-13 22:59:27,337 - modules.store.services.textbook_order_service - INFO - [get_books_for_grade] First book: Ciencias 5to Grado - Discovery - grade: G5
-2026-02-13 22:59:27,337 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Found 3 books for grade 5
-2026-02-13 22:59:27,337 - modules.store.services.textbook_order_service - INFO - [_refresh_order_items] Existing items count: 1
-2026-02-13 22:59:27,338 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Got order: ord_ffcd75228bf0
-2026-02-13 22:59:27,349 - users.service - INFO - [users] Completed transaction txn_3c38de21
-2026-02-13 22:59:27,349 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Wallet charged: $45.99, txn=txn_3c38de21
-2026-02-13 22:59:27,982 - httpx - INFO - HTTP Request: POST https://api.monday.com/v2 "HTTP/1.1 200 OK"
-2026-02-13 22:59:27,983 - modules.integrations.monday.core_client - ERROR - Monday.com API error: [{'message': "This status label doesn't exist, possible statuses are: {0: G3, 1: G4, 2: G5, 3: K5, 4: G6, 5: G2, 6: G7, 7: G8, 8: G9, 9: G10, 10: G11, 11: G12, 105: K4, 156: G1}", 'locations': [{'line': 1, 'column': 12}], 'path': ['create_item'], 'extensions': {'code': 'ColumnValueException', 'status_code': 200, 'error_data': {'column_type': 'color', 'column_id': 'color_mm02xhw1', 'column_value': '{"label" => "5to"}', 'column_validation_error_code': 'missingLabel', 'column_name': 'Grado'}, 'service': 'monolith'}}]
-2026-02-13 22:59:27,983 - modules.store.services.textbook_order_service - ERROR - Failed to send to Monday.com: Monday.com error: [{'message': "This status label doesn't exist, possible statuses are: {0: G3, 1: G4, 2: G5, 3: K5, 4: G6, 5: G2, 6: G7, 7: G8, 8: G9, 9: G10, 10: G11, 11: G12, 105: K4, 156: G1}", 'locations': [{'line': 1, 'column': 12}], 'path': ['create_item'], 'extensions': {'code': 'ColumnValueException', 'status_code': 200, 'error_data': {'column_type': 'color', 'column_id': 'color_mm02xhw1', 'column_value': '{"label" => "5to"}', 'column_validation_error_code': 'missingLabel', 'column_name': 'Grado'}, 'service': 'monolith'}}]
-2026-02-13 22:59:27,990 - modules.store.services.textbook_order_service - INFO - Order submitted notification: Admin ha enviado un pedido para John Smith (5)
-2026-02-13 22:59:27,991 - textbook_order.service - INFO - [textbook_order] Order ord_ffcd75228bf0 partial submission by user 62157036-6aae-41bc-96fc-f4c37aef94e9: 1 items, $45.99
-2026-02-13 22:59:27,991 - modules.store.routes.textbook_orders - INFO - [submit_order_direct] Order submitted successfully: ord_ffcd75228bf0
-2026-02-13 22:59:28,675 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 22:59:34,853 - core.auth - INFO - [auth] Looking up user_id from token: 62157036-6aae-41bc-96fc-f4c37aef94e9
-2026-02-13 23:03:06,419 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:06:46,450 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:10:30,697 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:14:18,515 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:18:05,539 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:21:57,312 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:25:50,618 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:29:49,155 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:33:50,573 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:37:56,496 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:42:03,962 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:46:18,828 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-2026-02-13 23:50:35,746 - httpx - INFO - HTTP Request: GET https://api.telegram.org/bot8570389871:AAEfRrW61WwfFYKwy4KhliQ0wpeazSPlceM/getUpdates?offset=0&limit=100&timeout=1 "HTTP/1.1 200 OK"
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [48] using WatchFiles
-2026-02-13 23:52:36,804 - core.events.event_bus - INFO - EventBus initialized
-
-==> /var/log/supervisor/backend.out.log <==
-INFO:     10.64.132.147:40736 - "GET /api/admin/showcase/monday-banners/sync-history HTTP/1.1" 200 OK
-INFO:     10.64.132.108:52652 - "POST /api/admin/showcase/monday-banners/sync HTTP/1.1" 200 OK
-INFO:     10.64.132.147:40736 - "GET /api/admin/showcase/monday-banners/sync-history HTTP/1.1" 200 OK
-INFO:     10.64.132.147:40736 - "GET /api/monday/webhooks/registered HTTP/1.1" 200 OK
-INFO:     10.64.132.134:59860 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:54350 - "GET /api/admin/showcase/monday-banners/webhook/status HTTP/1.1" 200 OK
-INFO:     10.64.132.108:39884 - "POST /api/admin/showcase/monday-banners/webhook/register HTTP/1.1" 200 OK
-INFO:     10.64.129.70:54350 - "POST /api/admin/showcase/monday-banners/webhook/unregister HTTP/1.1" 200 OK
-INFO:     10.64.132.134:46426 - "POST /api/monday/webhooks/incoming HTTP/1.1" 200 OK
-INFO:     10.64.132.108:59342 - "GET /api/monday/webhooks/registered HTTP/1.1" 200 OK
-INFO:     10.64.132.108:38718 - "GET /api/admin/showcase/monday-banners/auto-sync HTTP/1.1" 200 OK
-INFO:     10.64.132.108:38718 - "GET /api/admin/showcase/monday-banners/sync-history HTTP/1.1" 200 OK
-INFO:     10.64.132.134:46436 - "GET /api/admin/showcase/banners HTTP/1.1" 200 OK
-🏓 PinpanClub module initialized
-🛒 Store module initialized
-🔐 Auth module initialized
-🏘️ Community module initialized
-⚠️ Error creating indexes (may already exist): An existing index has the same name as the requested index. When index names are not specified, they are auto generated and can cause conflicts. Please refer to our documentation. Requested index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1" }, existing index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1", sparse: true }, full error: {'ok': 0.0, 'errmsg': 'An existing index has the same name as the requested index. When index names are not specified, they are auto generated and can cause conflicts. Please refer to our documentation. Requested index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1" }, existing index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1", sparse: true }', 'code': 86, 'codeName': 'IndexKeySpecsConflict'}
-✅ Admin user already exists: teck@koh.one
-✅ Site config already exists
-✅ Translations already synced (366 entries)
-✅ Landing page already has 3 blocks
-[Users Module] Initializing...
-[MembershipService] Initialized 0 membership plans
-[Users Module] Initialized successfully
-[Notifications Module] Initializing...
-[PushNotificationService] Initialized 0 notification categories
-[PushNotificationService] Initialized 0 notification templates
-[PushNotificationService] Mock provider loaded (no providers configured)
-[PushNotificationService] Service initialized
-[Notifications Module] Initialized successfully
-INFO:     10.64.132.147:51716 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:60432 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:60444 - "GET /api/admin/showcase/monday-banners/webhook/status HTTP/1.1" 200 OK
-INFO:     10.64.132.147:60444 - "GET /api/admin/showcase/monday-banners/webhook/status HTTP/1.1" 200 OK
-INFO:     10.64.132.147:60444 - "GET /api/admin/showcase/monday-banners/webhook/status HTTP/1.1" 200 OK
-🏓 PinpanClub module initialized
-🛒 Store module initialized
-🔐 Auth module initialized
-🏘️ Community module initialized
-⚠️ Error creating indexes (may already exist): An existing index has the same name as the requested index. When index names are not specified, they are auto generated and can cause conflicts. Please refer to our documentation. Requested index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1" }, existing index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1", sparse: true }, full error: {'ok': 0.0, 'errmsg': 'An existing index has the same name as the requested index. When index names are not specified, they are auto generated and can cause conflicts. Please refer to our documentation. Requested index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1" }, existing index: { v: 2, unique: true, key: { user_id: 1 }, name: "user_id_1", sparse: true }', 'code': 86, 'codeName': 'IndexKeySpecsConflict'}
-✅ Admin user already exists: teck@koh.one
-✅ Site config already exists
-✅ Translations already synced (366 entries)
-✅ Landing page already has 3 blocks
-[Users Module] Initializing...
-[MembershipService] Initialized 0 membership plans
-[Users Module] Initialized successfully
-[Notifications Module] Initializing...
-[PushNotificationService] Initialized 0 notification categories
-[PushNotificationService] Initialized 0 notification templates
-[PushNotificationService] Mock provider loaded (no providers configured)
-[PushNotificationService] Service initialized
-[Notifications Module] Initialized successfully
-INFO:     10.64.129.70:38668 - "POST /api/admin/showcase/monday-banners/webhook/register HTTP/1.1" 200 OK
-INFO:     10.64.132.108:60486 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:44858 - "POST /api/admin/showcase/monday-banners/webhook/register HTTP/1.1" 200 OK
-INFO:     10.64.133.74:33596 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "POST /api/admin/showcase/monday-banners/webhook/register HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "GET /api/admin/showcase/monday-banners/config HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54554 - "POST /api/admin/showcase/monday-banners/webhook/register HTTP/1.1" 200 OK
-INFO:     10.64.132.134:53510 - "POST /api/admin/showcase/monday-banners/webhook/unregister HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "POST /api/admin/showcase/monday-banners/webhook/unregister HTTP/1.1" 200 OK
-INFO:     10.64.132.134:53510 - "POST /api/admin/showcase/monday-banners/webhook/unregister HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54554 - "GET /api/admin/showcase/monday-banners/webhook/status HTTP/1.1" 200 OK
-INFO:     10.64.132.147:52804 - "POST /api/monday/webhooks/incoming HTTP/1.1" 200 OK
-INFO:     10.64.132.147:52804 - "POST /api/monday/webhooks/incoming HTTP/1.1" 200 OK
-INFO:     10.64.132.147:52804 - "GET /api/admin/showcase/monday-banners/auto-sync HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "GET /api/admin/showcase/monday-banners/auto-sync HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54554 - "PUT /api/admin/showcase/monday-banners/auto-sync HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "GET /api/admin/showcase/monday-banners/sync-history HTTP/1.1" 200 OK
-INFO:     10.64.129.70:43178 - "GET /api/admin/showcase/banners HTTP/1.1" 200 OK
-INFO:     10.64.132.134:53510 - "POST /api/admin/showcase/banners HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54554 - "GET /api/admin/showcase/banners HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54554 - "DELETE /api/admin/showcase/banners/banner_1771020453538 HTTP/1.1" 200 OK
-INFO:     10.64.132.134:53510 - "POST /api/admin/showcase/monday-banners/sync HTTP/1.1" 200 OK
-INFO:     10.64.132.147:52804 - "GET /api/monday/webhooks/registered HTTP/1.1" 200 OK
-INFO:     10.64.133.74:36232 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:33468 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:45020 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:58056 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:50858 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:58896 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:43380 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:45802 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:33460 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:57252 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:49082 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:45902 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:50952 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:58814 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:39488 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:49254 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:59818 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:36580 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.129.70:44170 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:59856 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:47476 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:41112 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:37420 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:50052 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40260 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:46570 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.130.9:47138 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:34174 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:49498 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55484 - "GET /api/health HTTP/1.1" 200 OK
-INFO:     10.64.132.134:34544 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:42790 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.130.9:48052 - "GET /api/invision/oauth/config HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40664 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:37808 - "GET /api/invision/oauth/config HTTP/1.1" 200 OK
-INFO:     10.64.133.74:42806 - "GET /api/public/module-status HTTP/1.1" 200 OK
-INFO:     10.64.132.147:35206 - "GET /api/public/site-config HTTP/1.1" 200 OK
-INFO:     10.64.130.9:48044 - "GET /api/public/ui-style HTTP/1.1" 200 OK
-INFO:     10.64.132.134:51950 - "GET /api/public/site-config HTTP/1.1" 200 OK
-INFO:     10.64.132.108:37802 - "GET /api/public/ui-style HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40658 - "GET /api/public/module-status HTTP/1.1" 200 OK
-INFO:     10.64.132.108:42668 - "GET /api/community-v2/landing HTTP/1.1" 200 OK
-INFO:     10.64.132.147:44398 - "GET /api/community-v2/landing HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40664 - "GET /api/showcase/banners HTTP/1.1" 200 OK
-INFO:     10.64.130.9:48044 - "GET /api/showcase/media-player HTTP/1.1" 200 OK
-INFO:     10.64.132.147:44398 - "GET /api/ticker/landing-images HTTP/1.1" 200 OK
-INFO:     10.64.132.147:35206 - "GET /api/ticker/layout-icons HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40664 - "GET /api/showcase/banners HTTP/1.1" 200 OK
-INFO:     10.64.130.9:48044 - "GET /api/showcase/media-player HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40664 - "GET /api/ticker/layout-icons HTTP/1.1" 200 OK
-INFO:     10.64.130.9:48052 - "GET /api/ticker/landing-images HTTP/1.1" 200 OK
-INFO:     10.64.132.147:37962 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:49334 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:37920 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:59238 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:47908 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:52188 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:38952 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:53690 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:59360 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:38702 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     127.0.0.1:45934 - "GET /api/wallet/me HTTP/1.1" 401 Unauthorized
-INFO:     10.64.130.9:42218 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     127.0.0.1:41354 - "GET /api/wallet/me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:41360 - "GET /api/store/textbook-orders/student/std_e32ae7fae07a HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59120 - "POST /api/store/textbook-orders/submit HTTP/1.1" 400 Bad Request
-INFO:     10.64.133.74:54190 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:35944 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:52036 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     127.0.0.1:47628 - "POST /api/store/textbook-orders/submit HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48704 - "GET /api/wallet/me HTTP/1.1" 200 OK
-INFO:     10.64.132.134:36550 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.130.9:49938 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.130.9:47182 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:59946 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:37598 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:55854 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:33736 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:40728 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:35172 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:34450 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:50494 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:54164 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:57740 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:36770 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:58930 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:56136 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:41250 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:37478 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.147:57782 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:41006 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:54976 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:50362 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:35074 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:32774 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:42842 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:48796 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:39534 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:59196 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:36250 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.134:42684 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:36848 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:49806 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:47364 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:34528 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:39244 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:52954 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:47014 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:35664 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:54766 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:37314 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:34092 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:48890 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:36614 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:48714 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:53878 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:44932 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:41316 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.133.74:43616 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:55790 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.131.24:56016 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:48716 - "GET /api/ticker/feed HTTP/1.1" 200 OK
-INFO:     10.64.132.108:49088 - "GET /api/ticker/feed HTTP/1.1" 200 OK.
-    2.  Check frontend logs for compilation errors or runtime exceptions: ==> /var/log/supervisor/frontend.err.log <==
-warning ../package.json: No license field
-(node:250) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:250) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:86) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-(node:84) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-(node:84) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
-warning ../package.json: No license field
-
-==> /var/log/supervisor/frontend.out.log <==
-  Line 43:6:  React Hook useEffect has a missing dependency: 'fetchStats'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/unatienda/tabs/OrderFormConfigTab.jsx
-  Line 105:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/unatienda/tabs/PrivateCatalogTab.jsx
-  Line 668:41:  React Hook useEffect has a missing dependency: 'fetchProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/unatienda/tabs/PublicCatalogTab.jsx
-  Line 69:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/unatienda/tabs/SchoolYearTab.jsx
-  Line 62:37:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/unatienda/tabs/StudentsTab.jsx
-  Line 53:41:  React Hook useEffect has a missing dependency: 'fetchStudents'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/modules/wallet/tabs/WalletSettingsTab.jsx
-  Line 72:6:    React Hook useCallback has missing dependencies: 'fetchColumns' and 'headers'. Either include them or remove the dependency array         react-hooks/exhaustive-deps
-  Line 110:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                              react-hooks/exhaustive-deps
-  Line 112:88:  React Hook useEffect has missing dependencies: 'fetchBoards' and 'fetchDescriptions'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-  Line 561:50:  React Hook useEffect has a missing dependency: 'fetchRaw'. Either include it or remove the dependency array                               react-hooks/exhaustive-deps
-
-src/modules/wallet/tabs/WalletTransactionsTab.jsx
-  Line 54:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/AuthCallback.jsx
-  Line 44:6:  React Hook useEffect has missing dependencies: 'location.hash', 'navigate', and 'processGoogleCallback'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/Checkout.jsx
-  Line 47:6:  React Hook useEffect has a missing dependency: 'fetchOrder'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  Line 55:6:  React Hook useEffect has a missing dependency: 'fetchOrder'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/Dashboard.jsx
-  Line 146:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/OrderForm.jsx
-  Line 54:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/Orders.jsx
-  Line 47:6:  React Hook useEffect has missing dependencies: 'fetchPedidos' and 'fetchTextbookOrders'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/PrivateBookDetail.jsx
-  Line 54:6:  React Hook useEffect has missing dependencies: 'fetchBook' and 'navigate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/ProductDetail.jsx
-  Line 50:6:  React Hook useEffect has a missing dependency: 'fetchProduct'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-src/pages/RapidPinPublicPage.jsx
-  Line 160:6:  React Hook useCallback has a missing dependency: 'fetchMyChallenges'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  Line 177:6:  React Hook useEffect has a missing dependency: 'fetchMyChallenges'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
-
-src/pages/Receipt.jsx
-  Line 48:6:  React Hook useEffect has a missing dependency: 'fetchReceipt'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  Line 54:6:  React Hook useEffect has a missing dependency: 'handlePrint'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
-
-src/pages/Unatienda.jsx
-  Line 118:6:  React Hook useEffect has a missing dependency: 'checkPrivateCatalogAccess'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-
-ERROR in [eslint] 
-src/modules/pinpanclub/components/PlayerRankBadge.jsx
-  Line 115:17:  React Hook "useTranslation" is called in function "getRankByPoints" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
-
-src/modules/pinpanclub/components/ScoreBoard.jsx
-  Line 88:25:  React Hook "useTranslation" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
-
-Search for the keywords to learn more about each error.
-
-webpack compiled with 1 error and 1 warning
-yarn run v1.22.22
-$ craco start
-Attempting to bind to HOST environment variable: 0.0.0.0
-If this was unintentional, check that you haven't mistakenly set it in your shell.
-Learn more here: https://cra.link/advanced-config
-
-Starting the development server...
-
-Compiled successfully!
-
-You can now view frontend in the browser.
-
-  Local:            http://localhost:3000
-  On Your Network:  http://10.64.134.99:3000
-
-Note that the development build is not optimized.
-To create a production build, use yarn build.
-
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-yarn run v1.22.22
-$ craco start
-Attempting to bind to HOST environment variable: 0.0.0.0
-If this was unintentional, check that you haven't mistakenly set it in your shell.
-Learn more here: https://cra.link/advanced-config
-
-Starting the development server...
-
-Compiled successfully!
-
-You can now view frontend in the browser.
-
-  Local:            http://localhost:3000
-  On Your Network:  http://10.64.131.74:3000
-
-Note that the development build is not optimized.
-To create a production build, use yarn build.
-
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-yarn run v1.22.22
-$ craco start
-Attempting to bind to HOST environment variable: 0.0.0.0
-If this was unintentional, check that you haven't mistakenly set it in your shell.
-Learn more here: https://cra.link/advanced-config
-
-Starting the development server...
-
-Compiled successfully!
-
-You can now view frontend in the browser.
-
-  Local:            http://localhost:3000
-  On Your Network:  http://10.64.131.249:3000
-
-Note that the development build is not optimized.
-To create a production build, use yarn build.
-
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-Compiling...
-Compiled successfully!
-webpack compiled successfully
-yarn run v1.22.22
-$ craco start.
-    3.  Use  to check if the backend API is responsive. Start with a simple, unauthenticated endpoint like the root path.
-    4.  Take a screenshot of the application's current state to visually confirm the stuck loading issue.
-    5.  Inspect the browser console for JavaScript errors if possible (though agent tools are server-side).
-    6.  Review the most recent changes, particularly those in  and related wallet/order logic, as they were the last functional modifications before the issue was reported.
-  - **Why fix this issue and what will be achieved with the fix?** The application is currently unusable. Fixing this will restore basic functionality for all users.
-  - **Status:** IN PROGRESS
-  - **Is recurring issue?** N
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on other issue:** None. This is the primary blocker.
+-   **Issue 1: Landing Page Content Not Displaying (Priority: P0 - CRITICAL)**
+    -   **Description:** The user reports that two key features of the Mosaic Community landing page, the Google Photos album and the banner ad, are not visible on the production site.
+    -   **Attempted fixes:** None. This is a newly reported issue.
+    -   **Next debug checklist:**
+        1.  Take a screenshot of the landing page to visually confirm the missing elements.
+        2.  Inspect the primary landing page component (likely  or similar) to analyze its data fetching and conditional rendering logic.
+        3.  Use  to call the backend endpoint that provides data to this page (e.g., ) and verify the content of the response.
+        4.  Examine the related backend logic in  to ensure data is being correctly retrieved from the database and serialized.
+        5.  Check the  collection in the database to confirm that the expected banner and Google Photos configuration data exists.
+    -   **Why fix this issue and what will be achieved with the fix?** This bug breaks the main user-facing landing page. Fixing it will restore core functionality and visual components of the application.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Blocked on other issue:** None. This is the highest priority.
 
 **In progress Task List**:
 None.
 
 **Upcoming and Future Tasks**
-- **Future Tasks:**
-    - **P1 - Evolve Mosaic Grid Layout:** The user has indicated that the grid layout on the Mosaic Community page will be changed in the future.
-    - **P2 - On-Demand Landing Page Redesign:** A previously deferred request to allow admins to request new landing page designs directly from the admin panel remains in the backlog.
-    - **P3 - Refactor AdminModule.jsx:** The agent noted that the admin module is getting crowded and could be refactored into a sidebar navigation for better scalability.
+-   **Future Tasks:**
+    -   **P1 - Evolve Mosaic Grid Layout:** The user has indicated a future desire to change the grid layout on the Mosaic Community page.
+    -   **P2 - On-Demand Landing Page Redesign:** A deferred request to allow admins to request new landing page designs directly from the admin panel.
+    -   **P3 - Refactor AdminModule.jsx:** The agent previously noted that the admin module is getting crowded and could be refactored into a sidebar navigation for better scalability.
 
 **Completed work in this session**
-- **Real-time Monday.com Webhook Sync (DONE):**
-  - Implemented real-time banner updates using Monday.com webhooks, which the agent correctly identified as a superior solution to the initial polling implementation.
-  - Modified  and .
-- **Automated Polling Sync & Sync History (DONE):**
-  - Implemented a fallback polling mechanism using  and added a complete sync history log.
-  - Modified  to add UI controls for both features.
-- ** UI Bug Fix (DONE):**
-  - Fixed a double-toggle bug preventing item selection and a layout overlap issue.
-  - Modified .
-- **Pay with Wallet Workflow Fix (DONE):**
-  - Corrected the textbook order submission to include the wallet payment method and added wallet balance display to the UI.
-  - Modified  and tested against .
+-   **Production Server Hang Fix (DONE):**
+    -   Identified and resolved a server-blocking issue in  by converting synchronous  calls to non-blocking with .
+-   **Monday.com Wallet Integrations Fix (DONE):**
+    -   **Recharge Approval Workflow:** Implemented a new webhook handler in  and registered it in  to enable automated wallet top-ups from Monday.com.
+    -   **Chipi Wallet Workflow:** Replaced a hardcoded board ID in  with a dynamic lookup.
+    -   Refactored blocking Gmail calls in  to be asynchronous.
+-   **Frontend Loading Fix (DONE):**
+    -   Resolved crashing React Hook errors in .
+-   **Comprehensive Integration Testing (DONE):**
+    -   Successfully executed an end-to-end test suite for both Monday.com wallet integrations using the testing agent, confirming all fixes.
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -739,80 +73,64 @@ N/A
 
 
 **Key Technical Concepts**
-- **Background Jobs:** Use of  for periodic tasks (polling sync).
-- **Webhooks:** Implementation of real-time updates from Monday.com, including webhook creation/deletion via their API.
-- **Graceful Degradation:** The system now uses webhooks as the primary sync method, with polling as a scheduled fallback, making the integration more resilient.
-- **Event Propagation:** Debugged and fixed a React event bug by using  to prevent a single click from firing two conflicting event handlers.
-- **State-Driven UI:** Added wallet balance display and conditional UI (e.g., Insufficient Funds warning) based on fetched data in React.
+-   **Asyncio in FastAPI:** Resolved a server-wide freeze by understanding and fixing the misuse of blocking I/O within an async event loop, using  as the solution.
+-   **Webhook Implementation:** Architected and implemented a new webhook handler for a third-party service (Monday.com), including endpoint creation, business logic, and registration.
+-   **Dynamic Configuration:** Improved integration resilience by replacing hardcoded IDs with dynamic API lookups.
+-   **End-to-End Testing:** Systematically tested a complex multi-service workflow (App <> Monday.com <> Webhook) to validate functionality.
 
 **key DB schema**
-- **** (New): 
-- **** (Modified): Added , , .
+-   ****: 
+-   ****: 
 
 **changes in tech stack**
-- Added  to .
+None in the last session.
 
 **All files of reference**
--  (File with most recent functional changes)
--  (Core logic for all new sync features)
--  (UI for all new sync features)
--  (Backend logic for the fixed wallet payment flow)
--  (Critical for debugging the current issue)
--  (Critical for debugging the current issue)
+-    (Primary file to investigate for the current issue)
+-    (Backend logic for the current issue)
+-    (New file for the fixed integration)
+-    (File where the server hang was fixed)
+-    (Latest test report showing successful integration tests)
 
 **Areas that need refactoring**:
-- The main  is becoming crowded with tabs. It could be beneficial to refactor the admin navigation into a sidebar for better scalability.
+-   The main admin UI () could be refactored from a tab-based layout to a sidebar for better scalability as more modules are added.
 
 **key api endpoints**
-- : Manages polling configuration.
-- : Retrieves the banner sync log.
-- : Creates/deletes the Monday.com webhook for real-time sync.
-- : The public endpoint that Monday.com calls for real-time updates.
-- : Processes textbook orders, now correctly handling .
+-   : **(NEW)** Endpoint for Monday.com to trigger wallet top-ups.
+-   : Fetches content for the main landing page (banner, Google Photos).
 
 **Critical Info for New Agent**
-- **IMMEDIATE PRIORITY:** You must immediately investigate and resolve the production loading issue. All other tasks are secondary. Follow the debug checklist provided in the All Pending/In progress Issue list section.
-- **Context for Bug:** The last functional change was fixing the pay with wallet flow in . While the changes were tested, it's the most likely area to have introduced an unintended side effect causing the current site-wide issue. Start your investigation there after checking the logs.
+-   **IMMEDIATE PRIORITY:** Your first and only task is to investigate why the landing page is not displaying the Google Photos album and banner ad. This is a critical user-facing bug. Follow the debug checklist provided in the All Pending/In progress Issue list section.
+-   **Context:** The agent just completed a major effort to fix a server hang and two complex Monday.com wallet integrations. These fixes were tested and are considered stable. The new landing page issue is the current top priority.
 
 **documents and test reports created in this job**
--  (Updated)
-- 
-- 
-- 
+-    (Updated)
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** history log is good, go ahead - Status: **Completed**. (Agent implemented sync history).
-2.  **Agent:** Finished sync history task, proposed webhook enhancement.
-3.  **User:** Yes, webhook-based real-time is better, why you was not act as expert and implement that way from the begining? - Status: **Actioned**. (Agent acknowledged mistake and proceeded to implement webhooks).
-4.  **Agent:** Completed webhook implementation and testing.
-5.  **User:** see screenshot, issues - Status: **Actioned**. (User reported UI bugs in textbook view).
-6.  **Agent:** Fixed the reported UI bugs.
-7.  **User:** Additional of this issue that should be resolved with your last effort, could you check if the pay with walllet workflow does working too? - Status: **Actioned**. (Agent verified and fixed wallet payment flow).
-8.  **Agent:** Completed wallet workflow fix and testing.
-9.  **User:** The production site currently is facing loading issue, the page continue opening but never loaded - Status: **Pending Investigation (CURRENT TASK)**.
-10. **Agent:** Acknowledged the critical issue and began investigation.
+1.  **User:** check if the workflow to top up wallet is well setup... (Redirected agent to check Monday.com wallet integrations). Status: **Completed**.
+2.  **User:** Provided detailed requirements for the two wallet integrations (Chipi Wallet and Recharge Approval). Status: **Completed**.
+3.  **User:** Current production landing page do not show the 2 new implementation, one is to display Google Photos album, another is to display banner and text message ad - Status: **Pending Investigation (CURRENT TASK)**.
 
 **Project Health Check:**
-- **Broken:** The application is non-functional due to a site-wide loading issue.
+-   **Broken:** While the backend is stable, the main landing page is missing critical functionality, making the application's front door appear broken to users.
 
 **3rd Party Integrations**
-*   **Monday.com API v2 (GraphQL):** Used for banner sync via webhooks and API calls. Requires a User API Key.
-*   **Google Photos:** Content fetched via public URLs.
-*   **Telegram Bot API:** Requires .
-*   **OpenAI GPT-4o / Anthropic Claude Sonnet 4.5:** Uses **Emergent LLM Key**.
-*   **Gmail (IMAP):** Requires user's email and an App Password.
-*   **OpenAI Image Generation (DALL-E 3):** Used via .
+*   **Monday.com API v2 (GraphQL):** Used for two-way sync for banner content and wallet management.
+*   **Google Photos:** Content fetched via public URLs for the landing page.
+*   **Gmail (IMAP):** Used to detect bank payment alerts for wallet top-ups.
+*   **Telegram Bot API, OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation.**
 
 **Testing status**
-- **Testing agent used after significant changes:** YES, used multiple times for the sync features.
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** None.
-- **Known regressions:** A major, site-wide regression (loading issue) has just been reported.
+-   **Testing agent used after significant changes:** YES, used to successfully validate the wallet integration fixes. Report is at .
+-   **Troubleshoot agent used after agent stuck in loop:** NO.
+-   **Test files created:** None.
+-   **Known regressions:** The main landing page is not rendering key content (banners, Google Photos).
 
 **Credentials to test flow:**
 -   **Email:** 
 -   **Password:** 
--   (SSO login also exists for )
+-   **SSO login:** 
 
 **What agent forgot to execute**
-The agent initially implemented a polling solution for Monday.com sync instead of the more efficient webhook method that the codebase already had infrastructure for. The user pointed this out, and the agent corrected the implementation by adding webhook support as the primary method. This has since been resolved.</analysis>
+The agent has successfully addressed all user requests from the previous session, including complex debugging and implementation tasks. Nothing was forgotten.</analysis>
