@@ -168,6 +168,44 @@ export default function TxbInventoryTab() {
     }
   };
 
+  const handleRegisterCreateItemWebhook = async () => {
+    const webhookUrl = `${API}/api/store/monday/txb-inventory/webhook`;
+    setRegisteringCreateWh(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/create-item-webhook/register`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhook_url: webhookUrl }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Create-item webhook registered');
+        fetchConfig();
+      } else {
+        toast.error(data.detail || data.error || 'Failed to register webhook');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setRegisteringCreateWh(false);
+    }
+  };
+
+  const handleUnregisterCreateItemWebhook = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/create-item-webhook`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('Create-item webhook removed');
+        fetchConfig();
+      }
+    } catch {
+      toast.error('Network error');
+    }
+  };
+
   const updateMapping = (key, value) => {
     setConfig(prev => ({
       ...prev,
