@@ -33,7 +33,7 @@ class TestOrderSummaryConfig:
         import uuid
         test_email = f"test_user_{uuid.uuid4().hex[:8]}@test.com"
         # First register a new user
-        reg_response = requests.post(f"{BASE_URL}/api/auth/register", json={
+        reg_response = requests.post(f"{BASE_URL}/api/auth-v2/register", json={
             "email": test_email,
             "password": "testpassword123",
             "name": "Test User"
