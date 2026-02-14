@@ -189,7 +189,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [openGroups, setOpenGroups] = useState({ Overview: true, Commerce: true, Community: true, Management: true, System: true });
+  const [openGroups, setOpenGroups] = useState({ Overview: true, Commerce: true, Community: true, Management: true, Configuration: false, Content: false, Integrations: false, Developer: false });
   const [sidebarSearch, setSidebarSearch] = useState('');
 
   // Switch to admin theme scope on mount, restore on unmount
