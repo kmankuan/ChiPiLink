@@ -236,8 +236,13 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         col_map = config.get("column_mapping", {})
         stock_col = col_map.get("stock_quantity")
 
-        if not enabled or not board_id or not stock_col:
+        if not enabled or not board_id:
             return {"synced": False, "reason": "Not configured"}
+
+        # Handle both legacy 'stock' and new 'stock_quantity' keys
+        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+        if not stock_col:
+            return {"synced": False, "reason": "Stock column not mapped"}
 
         # Get product's monday_item_id
         product = await db.store_products.find_one(
