@@ -137,6 +137,20 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - All 14 new translation keys added (en, es, zh)
 - **Tested: 100%** — 18/18 tests passed (iteration_109)
 
+### Textbook Multi-Select Bug Fix (Feb 14, 2026) - COMPLETE
+- **Root cause:** Out-of-stock textbook items displayed active/clickable checkboxes. Users could visually select them, but the counter and submission only processed 'available' items — causing mismatch (e.g., "5 checked but counter shows 2").
+- **Fix applied:**
+  1. `SchoolTextbooksView.jsx`: Checkbox disabled for non-available items with proper disabled styling + out-of-stock label added
+  2. `TextbookOrderView.jsx`: Out-of-stock items filtered into a separate non-selectable section
+  3. Backend `textbook_orders.py`: Submit endpoint now returns `warnings`, `items_failed`, `items_succeeded` fields
+  4. Frontend shows warning toast when some items fail on submission
+- **Tested: 100%** — Backend + Frontend verified (iteration_110)
+
+### AdminModule.jsx Cleanup (Feb 14, 2026) - COMPLETE
+- Deleted `/app/frontend/src/modules/admin/AdminModule.jsx` (dead code after nav refactor to AdminDashboard.jsx)
+- Confirmed no leftover imports in the codebase
+- **Tested: 100%** — Admin panel verified working after deletion (iteration_110)
+
 ## Backlog
 ### P1 - Evolve Landing Page Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
