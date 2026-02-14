@@ -85,7 +85,6 @@ export default function ScoreBoard({
     return situation.map((sit, idx) => {
       switch (sit.type) {
         case 'match_point':
-          const { t } = useTranslation();
           return (
             <Badge key={idx} className="bg-red-500 text-white animate-pulse gap-1">
               <Trophy className="h-3 w-3" />

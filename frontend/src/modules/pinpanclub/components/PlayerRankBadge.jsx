@@ -112,7 +112,6 @@ const RANKS = [
 
 // Get rank by points
 function getRankByPoints(points) {
-  const { t } = useTranslation();
   for (let i = RANKS.length - 1; i >= 0; i--) {
     if (points >= RANKS[i].minPoints) {
       return { ...RANKS[i], index: i };
