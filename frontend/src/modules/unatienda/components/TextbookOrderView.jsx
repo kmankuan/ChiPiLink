@@ -925,6 +925,22 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
           </CardContent>
         </Card>
       )}
+
+      {/* Order Summary Preview Modal */}
+      <OrderSummaryModal
+        open={showSummary}
+        onOpenChange={setShowSummary}
+        onConfirm={handleConfirmSubmitOrder}
+        studentName={selectedStudent?.full_name || selectedStudent?.name || `${selectedStudent?.first_name || ''} ${selectedStudent?.last_name || ''}`.trim()}
+        selectedBooks={textbooks.filter(b => selectedBooks[b.book_id]).map(b => ({ book_id: b.book_id, book_name: b.name || b.book_name, name: b.name || b.book_name, price: b.price }))}
+        formData={formData}
+        formFields={formFields}
+        total={textbooks.filter(b => selectedBooks[b.book_id]).reduce((s, b) => s + (b.price || 0), 0)}
+        walletBalance={walletBalance}
+        submitting={submitting}
+        lang={lang}
+        getLocalizedText={getLocalizedText}
+      />
     </>
   );
 }
