@@ -144,6 +144,20 @@ function SidebarSection({ group, items, active, onSelect, defaultOpen }) {
 export default function AdminModule() {
   const [active, setActive] = useState('site');
   const [mobileNav, setMobileNav] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const displaySections = useMemo(() => {
+    if (!search.trim()) return SECTIONS;
+    const q = search.toLowerCase();
+    return SECTIONS
+      .map(sec => ({
+        ...sec,
+        items: sec.items.filter(i =>
+          i.label.toLowerCase().includes(q) || sec.group.toLowerCase().includes(q)
+        ),
+      }))
+      .filter(sec => sec.items.length > 0);
+  }, [search]);
 
   const activeItem = SECTIONS.flatMap(s => s.items).find(i => i.id === active);
   const ActiveIcon = activeItem?.icon || Settings;
