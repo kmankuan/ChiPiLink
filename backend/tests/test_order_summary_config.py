@@ -18,7 +18,7 @@ class TestOrderSummaryConfig:
     @pytest.fixture(scope="class")
     def admin_token(self):
         """Get admin authentication token"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
             "password": "admin"
         })
@@ -198,7 +198,7 @@ class TestAdminLogin:
     
     def test_admin_login(self):
         """Test: Admin login with correct credentials"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
             "password": "admin"
         })
