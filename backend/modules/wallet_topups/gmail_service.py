@@ -286,13 +286,16 @@ async def process_email(email_data: dict) -> dict:
         })
         return {"skipped": False, "rejected": True, "reason": rule_result["reason"], "parsed": parsed}
 
+    # Create pending top-up ID first
+    topup_id = str(uuid.uuid4())
+
     # Run dedup engine (4 layers)
     from .dedup_engine import check_duplicate
-    dedup_result = await check_duplicate(parsed, email_data, exclude_id=doc["id"])
+    dedup_result = await check_duplicate(parsed, email_data, exclude_id=topup_id)
 
     # Create pending top-up
     doc = {
-        "id": str(uuid.uuid4()),
+        "id": topup_id,
         "status": "pending",
         "amount": float(parsed.get("amount", 0)),
         "currency": parsed.get("currency", "USD"),

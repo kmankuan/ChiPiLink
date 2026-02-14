@@ -91,7 +91,7 @@ class GmailPoller:
             if not gmail_service.is_configured:
                 return
 
-            emails = gmail_service.fetch_recent_emails(limit=20)
+            emails = await asyncio.to_thread(gmail_service.fetch_recent_emails, 20)
             created = 0
             skipped = 0
 
