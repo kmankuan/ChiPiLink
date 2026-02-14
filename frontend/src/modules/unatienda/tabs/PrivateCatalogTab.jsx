@@ -644,9 +644,9 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
       try {
         const pubRes = await fetch(`${API}/api/store/products?limit=500`, { headers: { Authorization: `Bearer ${token}` } });
         const pubData = await pubRes.json();
-        pubProducts = (pubData.products || pubData || []).map(p => ({
+        pubProducts = (pubData.products || pubData || []).map((p, idx) => ({
           ...p,
-          book_id: p.product_id || p.book_id || p._id,
+          book_id: p.product_id && p.product_id !== p.name ? p.product_id : (p.book_id || `pub_${idx}`),
           _catalog: 'public',
         }));
       } catch { /* public store may not have products */ }
@@ -655,7 +655,12 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
       const seen = new Set();
       const all = [];
       for (const p of pcaProducts) { seen.add(p.book_id); all.push(p); }
-      for (const p of pubProducts) { if (!seen.has(p.book_id)) all.push(p); }
+      for (const p of pubProducts) {
+        let id = p.book_id;
+        if (seen.has(id)) { id = `${id}_pub_${seen.size}`; p.book_id = id; }
+        seen.add(id);
+        all.push(p);
+      }
 
       setProducts(all);
       setFilters({
