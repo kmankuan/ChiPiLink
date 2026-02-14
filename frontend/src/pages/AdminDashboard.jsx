@@ -71,23 +71,48 @@ const ModuleLoader = () => (
   </div>
 );
 
-// Navigation items with required permissions (labelKey for i18n)
-const navItemsDef = [
-  { id: 'dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
-  { id: 'unatienda', labelKey: 'nav.unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
-  { id: 'orders', labelKey: 'nav.orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
-  { id: 'wallet', labelKey: 'nav.wallet', icon: Wallet, permission: 'admin.site_config' },
-  { id: 'payment-alerts', labelKey: 'nav.paymentAlerts', icon: BellRing, permission: 'admin.site_config', adminOnly: true },
-  { id: 'analytics', labelKey: 'nav.reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
-  { id: 'customers', labelKey: 'nav.users', icon: Users, permission: 'users.view' },
-  { id: 'memberships', labelKey: 'nav.memberships', icon: CreditCard, permission: 'memberships.view' },
-  { id: 'pinpanclub', labelKey: 'nav.pinpanclub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
-  { id: 'roles', labelKey: 'nav.rolesPermissions', icon: Shield, permission: 'roles.view' },
-  { id: 'admin', labelKey: 'nav.administration', icon: Settings, permission: 'admin.site_config' },
-  { id: 'community', labelKey: 'nav.community', icon: Rss, permission: 'admin.site_config' },
-  { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
-  { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
-  { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
+// Navigation items with required permissions, grouped (labelKey for i18n)
+const navGroups = [
+  {
+    group: 'Overview',
+    items: [
+      { id: 'dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
+    ],
+  },
+  {
+    group: 'Commerce',
+    items: [
+      { id: 'unatienda', labelKey: 'nav.unatienda', icon: ShoppingBag, permission: 'unatienda.access' },
+      { id: 'orders', labelKey: 'nav.orders', icon: ShoppingCart, permission: 'unatienda.manage_orders' },
+      { id: 'wallet', labelKey: 'nav.wallet', icon: Wallet, permission: 'admin.site_config' },
+      { id: 'payment-alerts', labelKey: 'nav.paymentAlerts', icon: BellRing, permission: 'admin.site_config', adminOnly: true },
+      { id: 'analytics', labelKey: 'nav.reports', icon: BarChart2, permission: 'admin.site_config', adminOnly: true },
+    ],
+  },
+  {
+    group: 'Community',
+    items: [
+      { id: 'pinpanclub', labelKey: 'nav.pinpanclub', icon: Trophy, permission: 'pinpanclub.admin_panel' },
+      { id: 'community', labelKey: 'nav.community', icon: Rss, permission: 'admin.site_config' },
+      { id: 'tickets', labelKey: 'nav.ticketsChat', icon: MessageSquare, permission: 'tickets.access', isExternal: true, path: '/admin/chat' },
+    ],
+  },
+  {
+    group: 'Management',
+    items: [
+      { id: 'customers', labelKey: 'nav.users', icon: Users, permission: 'users.view' },
+      { id: 'memberships', labelKey: 'nav.memberships', icon: CreditCard, permission: 'memberships.view' },
+      { id: 'roles', labelKey: 'nav.rolesPermissions', icon: Shield, permission: 'roles.view' },
+    ],
+  },
+  {
+    group: 'System',
+    items: [
+      { id: 'admin', labelKey: 'nav.administration', icon: Settings, permission: 'admin.site_config' },
+      { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
+      { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
+    ],
+  },
 ];
 
 export default function AdminDashboard() {
