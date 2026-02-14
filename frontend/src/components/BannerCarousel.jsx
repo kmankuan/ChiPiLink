@@ -64,6 +64,8 @@ export default function BannerCarousel() {
   useEffect(() => {
     if (activeBanners.length <= 1 || paused) return;
     const timer = setInterval(() => {
+      slideDir.current = 1;
+      setSlideKey(k => k + 1);
       setCurrent(prev => (prev + 1) % activeBanners.length);
     }, 4500);
     return () => clearInterval(timer);
