@@ -8,7 +8,7 @@ from typing import Optional
 from core.database import db
 from modules.auth.dependencies import get_current_user, require_admin
 
-router = APIRouter(prefix="/api/store/order-summary-config", tags=["Order Summary Config"])
+router = APIRouter(prefix="/order-summary-config", tags=["Order Summary Config"])
 
 COLLECTION = "order_summary_config"
 CONFIG_ID = "default"
