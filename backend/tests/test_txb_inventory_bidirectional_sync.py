@@ -55,7 +55,7 @@ class TestEnhancedTxbInventoryConfig:
 
     def test_get_config_can_save_subject_in_column_mapping(self, admin_token):
         """PUT/GET can save and retrieve subject in column_mapping"""
-        # First GET current config
+        # First GET current config to use as baseline for restore
         get_resp = requests.get(
             f"{BASE_URL}/api/store/monday/txb-inventory-config",
             headers={"Authorization": f"Bearer {admin_token}"}
@@ -63,11 +63,13 @@ class TestEnhancedTxbInventoryConfig:
         assert get_resp.status_code == 200
         original_config = get_resp.json()
         
-        # Add subject to column_mapping
-        test_config = {**original_config}
-        col_map = test_config.get("column_mapping", {})
-        col_map["subject"] = "test_subject_field"
-        test_config["column_mapping"] = col_map
+        # Create test config with subject - use a deep copy of column_mapping
+        test_col_map = dict(original_config.get("column_mapping", {}))
+        test_col_map["subject"] = "test_subject_field_temp"
+        test_config = {
+            **original_config,
+            "column_mapping": test_col_map
+        }
         
         # PUT with subject
         put_resp = requests.put(
@@ -86,10 +88,27 @@ class TestEnhancedTxbInventoryConfig:
         verify_data = verify_resp.json()
         assert "subject" in verify_data["column_mapping"], "subject should be saved in column_mapping"
         
-        # Restore original config
+        # IMPORTANT: Restore original config to avoid polluting other tests
+        # Remove test fields before restoring
+        clean_config = {
+            "board_id": original_config.get("board_id", "18397140920"),
+            "enabled": original_config.get("enabled", True),
+            "group_id": original_config.get("group_id", "topics"),
+            "use_grade_groups": original_config.get("use_grade_groups", False),
+            "column_mapping": {
+                "code": original_config.get("column_mapping", {}).get("code", "text_mm02vh63"),
+                "status": original_config.get("column_mapping", {}).get("status", "status"),
+                "stock": original_config.get("column_mapping", {}).get("stock", "numeric_mm025r1m"),
+                "date": original_config.get("column_mapping", {}).get("date", "date4"),
+            },
+            "subitem_column_mapping": original_config.get("subitem_column_mapping", {
+                "quantity": "numeric_mm02sj3t",
+                "date": "date0"
+            })
+        }
         requests.put(
             f"{BASE_URL}/api/store/monday/txb-inventory-config",
-            json=original_config,
+            json=clean_config,
             headers={"Authorization": f"Bearer {admin_token}"}
         )
 
