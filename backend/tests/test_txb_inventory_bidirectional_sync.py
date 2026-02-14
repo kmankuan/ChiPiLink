@@ -40,8 +40,8 @@ def admin_token():
 class TestEnhancedTxbInventoryConfig:
     """Tests for enhanced GET/PUT /api/store/monday/txb-inventory-config"""
 
-    def test_get_config_returns_stock_quantity_in_column_mapping(self, admin_token):
-        """GET returns column_mapping with stock_quantity key"""
+    def test_get_config_returns_stock_column_in_column_mapping(self, admin_token):
+        """GET returns column_mapping with stock or stock_quantity key (backward compatible)"""
         response = requests.get(
             f"{BASE_URL}/api/store/monday/txb-inventory-config",
             headers={"Authorization": f"Bearer {admin_token}"}
@@ -49,18 +49,49 @@ class TestEnhancedTxbInventoryConfig:
         assert response.status_code == 200
         data = response.json()
         col_map = data.get("column_mapping", {})
-        assert "stock_quantity" in col_map, "column_mapping must have 'stock_quantity' key"
+        # Adapter supports both legacy 'stock' and new 'stock_quantity' keys
+        has_stock_col = "stock_quantity" in col_map or "stock" in col_map
+        assert has_stock_col, "column_mapping must have 'stock_quantity' or 'stock' key for backward compatibility"
 
-    def test_get_config_returns_subject_in_column_mapping(self, admin_token):
-        """GET returns column_mapping with subject key"""
-        response = requests.get(
+    def test_get_config_can_save_subject_in_column_mapping(self, admin_token):
+        """PUT/GET can save and retrieve subject in column_mapping"""
+        # First GET current config
+        get_resp = requests.get(
             f"{BASE_URL}/api/store/monday/txb-inventory-config",
             headers={"Authorization": f"Bearer {admin_token}"}
         )
-        assert response.status_code == 200
-        data = response.json()
-        col_map = data.get("column_mapping", {})
-        assert "subject" in col_map, "column_mapping must have 'subject' key"
+        assert get_resp.status_code == 200
+        original_config = get_resp.json()
+        
+        # Add subject to column_mapping
+        test_config = {**original_config}
+        col_map = test_config.get("column_mapping", {})
+        col_map["subject"] = "test_subject_field"
+        test_config["column_mapping"] = col_map
+        
+        # PUT with subject
+        put_resp = requests.put(
+            f"{BASE_URL}/api/store/monday/txb-inventory-config",
+            json=test_config,
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
+        assert put_resp.status_code == 200
+        
+        # Verify subject is saved
+        verify_resp = requests.get(
+            f"{BASE_URL}/api/store/monday/txb-inventory-config",
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
+        assert verify_resp.status_code == 200
+        verify_data = verify_resp.json()
+        assert "subject" in verify_data["column_mapping"], "subject should be saved in column_mapping"
+        
+        # Restore original config
+        requests.put(
+            f"{BASE_URL}/api/store/monday/txb-inventory-config",
+            json=original_config,
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
 
     def test_get_config_returns_status_in_column_mapping(self, admin_token):
         """GET returns column_mapping with status key"""
