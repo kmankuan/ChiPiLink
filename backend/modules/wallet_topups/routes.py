@@ -369,7 +369,7 @@ async def get_stats(admin: dict = Depends(get_admin_user)):
 async def gmail_status(admin: dict = Depends(get_admin_user)):
     """Check Gmail connection status."""
     from .gmail_service import gmail_service
-    result = gmail_service.test_connection()
+    result = await asyncio.to_thread(gmail_service.test_connection)
     # Update settings with connection status
     await db[SETTINGS_COL].update_one(
         {"id": "default"},
@@ -385,7 +385,7 @@ async def list_gmail_emails(limit: int = 20, admin: dict = Depends(get_admin_use
     from .gmail_service import gmail_service
     if not gmail_service.is_configured:
         raise HTTPException(status_code=400, detail="Gmail not configured")
-    emails = gmail_service.fetch_recent_emails(limit=limit)
+    emails = await asyncio.to_thread(gmail_service.fetch_recent_emails, limit)
     return {"emails": emails, "total": len(emails)}
 
 
@@ -400,7 +400,7 @@ async def process_gmail_emails(data: dict = None, admin: dict = Depends(get_admi
     if not gmail_service.is_configured:
         raise HTTPException(status_code=400, detail="Gmail not configured")
 
-    emails = gmail_service.fetch_recent_emails(limit=limit)
+    emails = await asyncio.to_thread(gmail_service.fetch_recent_emails, limit)
     results = {"processed": 0, "created": 0, "skipped": 0, "rejected": 0, "errors": 0, "details": []}
 
     for em in emails:
