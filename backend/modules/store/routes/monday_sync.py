@@ -270,8 +270,9 @@ async def save_textbook_board_config(
 
 @router.get("/txb-inventory-config")
 async def get_txb_inventory_config(admin: dict = Depends(get_admin_user)):
-    """Get TXB (textbook) inventory board configuration"""
-    return await monday_config_service.get_inventory_config()
+    """Get TXB (textbook) inventory board configuration — enhanced with stock sync"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    return await txb_inventory_adapter.get_txb_inventory_config()
 
 
 @router.put("/txb-inventory-config")
@@ -279,10 +280,88 @@ async def save_txb_inventory_config(
     config: dict, admin: dict = Depends(get_admin_user)
 ):
     """Save TXB inventory board configuration"""
-    success = await monday_config_service.save_inventory_config(config)
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    success = await txb_inventory_adapter.save_txb_inventory_config(config)
     if success:
         return {"success": True}
     raise HTTPException(status_code=500, detail="Failed to save configuration")
+
+
+# ========== TXB INVENTORY FULL SYNC (Admin) ==========
+
+@router.post("/txb-inventory/full-sync")
+async def txb_inventory_full_sync(admin: dict = Depends(get_admin_user)):
+    """Push all textbooks to Monday.com board (create or update)"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    result = await txb_inventory_adapter.full_sync()
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+@router.post("/txb-inventory/sync-stock/{book_id}")
+async def txb_sync_stock(book_id: str, admin: dict = Depends(get_admin_user)):
+    """Push a single product's stock to Monday.com"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    product = await db.store_products.find_one(
+        {"book_id": book_id, "is_private_catalog": True}, {"_id": 0}
+    )
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    result = await txb_inventory_adapter.sync_stock_to_monday(
+        book_id, product.get("inventory_quantity", 0)
+    )
+    return result
+
+
+# ========== TXB INVENTORY STOCK WEBHOOK ==========
+
+@router.post("/txb-inventory/webhook")
+async def txb_inventory_webhook(request: Request):
+    """Receive Monday.com webhook for stock column changes on TXB board.
+    Updates local inventory when stock is changed from Monday.com."""
+    body = await request.json()
+
+    # Monday.com challenge verification
+    if "challenge" in body:
+        logger.info("TXB Inventory webhook challenge received")
+        return JSONResponse(content={"challenge": body["challenge"]})
+
+    event = body.get("event", {})
+    if not event:
+        return {"status": "no_event"}
+
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    try:
+        result = await txb_inventory_adapter.handle_stock_webhook(event)
+        logger.info(f"TXB Inventory webhook processed: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"TXB Inventory webhook error: {e}")
+        return {"status": "error", "detail": str(e)}
+
+
+@router.post("/txb-inventory/webhook/register")
+async def register_txb_inventory_webhook(
+    body: dict, admin: dict = Depends(get_admin_user)
+):
+    """Register a webhook for stock changes on the TXB inventory board"""
+    webhook_url = body.get("webhook_url")
+    if not webhook_url:
+        raise HTTPException(status_code=400, detail="webhook_url is required")
+
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    result = await txb_inventory_adapter.register_stock_webhook(webhook_url)
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+@router.delete("/txb-inventory/webhook")
+async def unregister_txb_inventory_webhook(admin: dict = Depends(get_admin_user)):
+    """Remove the TXB inventory stock webhook"""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    return await txb_inventory_adapter.unregister_stock_webhook()
 
 
 # ========== WEBHOOK MANAGEMENT (Admin) ==========
