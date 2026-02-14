@@ -315,6 +315,23 @@ async def txb_sync_stock(book_id: str, admin: dict = Depends(get_admin_user)):
     return result
 
 
+# ========== TXB INVENTORY PER-COLUMN SYNC (Admin) ==========
+
+@router.post("/txb-inventory/sync-column/{column_key}")
+async def txb_sync_column(column_key: str, admin: dict = Depends(get_admin_user)):
+    """Sync a single column across all textbooks to Monday.com.
+    Valid column_key values: code, name, grade, publisher, subject, unit_price, stock_quantity"""
+    valid_keys = {"code", "name", "grade", "publisher", "subject", "unit_price", "stock_quantity", "stock"}
+    if column_key not in valid_keys:
+        raise HTTPException(status_code=400, detail=f"Invalid column key. Valid: {', '.join(sorted(valid_keys))}")
+
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    result = await txb_inventory_adapter.sync_single_column(column_key)
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
 # ========== TXB INVENTORY STOCK WEBHOOK ==========
 
 @router.post("/txb-inventory/webhook")
