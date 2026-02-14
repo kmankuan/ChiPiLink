@@ -1,24 +1,32 @@
 """
 TXB (Textbook) Inventory — Monday.com Adapter
-Handles textbooks board sync: find textbook by code, create subitem per student order.
-Each subitem = one student who ordered that textbook. Monday.com auto-counts subitems.
+Full bidirectional sync between app inventory and Monday.com board.
+
+Features:
+- Full sync: push all textbooks to Monday.com (create or update)
+- Per-student order subitems (existing behavior)
+- Stock column sync: app → Monday.com when stock changes
+- Webhook handler: Monday.com → app when stock column changes
+- Grade-based grouping on Monday.com
+
 Config namespace: store.textbook_orders.txb_inventory
 """
-from typing import Dict, List
+from typing import Dict, List, Optional
 import logging
 import json
+from datetime import datetime, timezone
 
 from modules.integrations.monday.base_adapter import BaseMondayAdapter
 from modules.integrations.monday.config_manager import monday_config
+from core.database import db
 
 logger = logging.getLogger(__name__)
 
-# Config key for TXB inventory
 TXB_INVENTORY_KEY = "store.textbook_orders.txb_inventory"
 
 
 class TxbInventoryAdapter(BaseMondayAdapter):
-    """Adapter for textbook inventory board — creates subitems per student order"""
+    """Adapter for textbook inventory board — bidirectional sync with Monday.com"""
 
     MODULE = "store"
     ENTITY = "textbook_orders"
@@ -30,22 +38,409 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "board_id": config.get("board_id"),
             "enabled": config.get("enabled", False),
             "group_id": config.get("group_id"),
+            "use_grade_groups": config.get("use_grade_groups", False),
             "column_mapping": config.get("column_mapping", {
                 "code": None,
                 "name": None,
                 "grade": None,
                 "publisher": None,
                 "unit_price": None,
+                "stock_quantity": None,
+                "subject": None,
+                "status": None,
             }),
             "subitem_column_mapping": config.get("subitem_column_mapping", {
                 "quantity": None,
                 "date": None,
             }),
+            "webhook_config": config.get("webhook_config", {
+                "webhook_id": None,
+                "webhook_url": None,
+                "stock_column_id": None,
+            }),
+            "last_full_sync": config.get("last_full_sync"),
+            "sync_stats": config.get("sync_stats", {}),
         }
 
     async def save_txb_inventory_config(self, data: Dict) -> bool:
         """Save TXB inventory board configuration"""
         return await monday_config.save(TXB_INVENTORY_KEY, data)
+
+    # ──────────── Full Sync: Push all textbooks to Monday.com ────────────
+
+    async def full_sync(self) -> Dict:
+        """Push all private catalog textbooks to Monday.com board.
+        Creates new items or updates existing ones. Returns sync stats."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        enabled = config.get("enabled", False)
+        col_map = config.get("column_mapping", {})
+        use_grade_groups = config.get("use_grade_groups", False)
+
+        if not enabled or not board_id:
+            return {"error": "TXB inventory board not configured or disabled", "synced": 0}
+
+        code_col = col_map.get("code")
+        if not code_col:
+            return {"error": "Book code column not mapped", "synced": 0}
+
+        # Fetch all private catalog textbooks
+        textbooks = await db.store_products.find(
+            {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+            {"_id": 0}
+        ).sort([("grade", 1), ("name", 1)]).to_list(500)
+
+        if not textbooks:
+            return {"synced": 0, "message": "No active textbooks found"}
+
+        # If using grade groups, fetch existing groups from the board
+        grade_group_map = {}
+        if use_grade_groups:
+            grade_group_map = await self._get_or_create_grade_groups(board_id, textbooks)
+
+        created = 0
+        updated = 0
+        failed = 0
+        items_map = {}  # book_code -> monday_item_id
+
+        for book in textbooks:
+            book_code = book.get("code", "")
+            if not book_code:
+                book_code = book.get("book_id", "")
+
+            try:
+                # Search for existing item
+                found = await self.client.search_items_by_column(board_id, code_col, book_code)
+
+                # Build column values
+                col_values = self._build_column_values(book, col_map)
+
+                if found:
+                    # Update existing item
+                    item_id = found[0]["id"]
+                    await self.client.update_column_values(board_id, item_id, col_values)
+                    updated += 1
+                    items_map[book_code] = item_id
+                    logger.info(f"TXB Sync: updated '{book_code}' (item {item_id})")
+                else:
+                    # Create new item
+                    group_id = None
+                    if use_grade_groups:
+                        grade = book.get("grade", "Other")
+                        group_id = grade_group_map.get(grade, config.get("group_id"))
+
+                    item_name = book.get("name", book_code)
+                    item_id = await self.client.create_item(
+                        board_id, item_name, col_values, group_id
+                    )
+                    if item_id:
+                        created += 1
+                        items_map[book_code] = item_id
+                        logger.info(f"TXB Sync: created '{book_code}' (item {item_id})")
+                    else:
+                        failed += 1
+                        logger.error(f"TXB Sync: failed to create '{book_code}'")
+
+            except Exception as e:
+                failed += 1
+                logger.error(f"TXB Sync error for '{book_code}': {e}")
+
+        # Store sync results
+        sync_stats = {
+            "created": created,
+            "updated": updated,
+            "failed": failed,
+            "total_textbooks": len(textbooks),
+            "synced_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await monday_config.save(TXB_INVENTORY_KEY, {
+            **config,
+            "last_full_sync": datetime.now(timezone.utc).isoformat(),
+            "sync_stats": sync_stats,
+        })
+
+        # Save monday_item_id references on products for future updates
+        for book_code, item_id in items_map.items():
+            await db.store_products.update_one(
+                {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                {"$set": {"monday_item_id": str(item_id)}}
+            )
+
+        return sync_stats
+
+    def _build_column_values(self, book: Dict, col_map: Dict) -> Dict:
+        """Build Monday.com column values from a textbook document"""
+        values = {}
+        field_map = {
+            "code": book.get("code", book.get("book_id", "")),
+            "name": book.get("name", ""),
+            "grade": book.get("grade", ""),
+            "publisher": book.get("publisher", ""),
+            "subject": book.get("subject", ""),
+            "unit_price": str(book.get("price", 0)),
+            "stock_quantity": str(book.get("inventory_quantity", 0)),
+        }
+
+        # Status mapping for Monday.com
+        stock = book.get("inventory_quantity", 0)
+        if col_map.get("status"):
+            if stock <= 0:
+                field_map["status"] = {"label": "Out of Stock"}
+            elif stock <= 10:
+                field_map["status"] = {"label": "Low Stock"}
+            else:
+                field_map["status"] = {"label": "In Stock"}
+
+        for field, value in field_map.items():
+            col_id = col_map.get(field)
+            if col_id and value is not None:
+                values[col_id] = value
+
+        return values
+
+    async def _get_or_create_grade_groups(self, board_id: str, textbooks: List[Dict]) -> Dict:
+        """Get or create Monday.com groups by grade. Returns {grade: group_id}."""
+        grades = sorted(set(b.get("grade", "Other") for b in textbooks if b.get("grade")))
+        existing_groups = await self.client.get_board_groups(board_id)
+        group_map = {g["title"]: g["id"] for g in existing_groups}
+
+        result = {}
+        for grade in grades:
+            grade_label = f"Grade {grade}" if not grade.startswith("G") else grade
+            if grade_label in group_map:
+                result[grade] = group_map[grade_label]
+            else:
+                # Create new group
+                try:
+                    data = await self.client.execute(
+                        f'mutation {{ create_group (board_id: {board_id}, group_name: "{grade_label}") {{ id }} }}'
+                    )
+                    gid = data.get("create_group", {}).get("id")
+                    if gid:
+                        result[grade] = gid
+                        logger.info(f"Created Monday.com group '{grade_label}' ({gid})")
+                except Exception as e:
+                    logger.warning(f"Failed to create group '{grade_label}': {e}")
+
+        return result
+
+    # ──────────── Stock Sync: App → Monday.com ────────────
+
+    async def sync_stock_to_monday(self, book_id: str, new_quantity: int) -> Dict:
+        """Push a stock change from the app to Monday.com."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        enabled = config.get("enabled", False)
+        col_map = config.get("column_mapping", {})
+        stock_col = col_map.get("stock_quantity")
+
+        if not enabled or not board_id or not stock_col:
+            return {"synced": False, "reason": "Not configured"}
+
+        # Get product's monday_item_id
+        product = await db.store_products.find_one(
+            {"book_id": book_id, "is_private_catalog": True},
+            {"_id": 0, "monday_item_id": 1, "code": 1, "name": 1}
+        )
+        if not product:
+            return {"synced": False, "reason": "Product not found"}
+
+        monday_item_id = product.get("monday_item_id")
+        if not monday_item_id:
+            # Try to find by code
+            code_col = col_map.get("code")
+            book_code = product.get("code", book_id)
+            if code_col and book_code:
+                found = await self.client.search_items_by_column(board_id, code_col, book_code)
+                if found:
+                    monday_item_id = found[0]["id"]
+                    await db.store_products.update_one(
+                        {"book_id": book_id},
+                        {"$set": {"monday_item_id": str(monday_item_id)}}
+                    )
+
+        if not monday_item_id:
+            return {"synced": False, "reason": "No Monday.com item linked"}
+
+        try:
+            col_values = {stock_col: str(new_quantity)}
+            # Also update status if mapped
+            status_col = col_map.get("status")
+            if status_col:
+                if new_quantity <= 0:
+                    col_values[status_col] = {"label": "Out of Stock"}
+                elif new_quantity <= 10:
+                    col_values[status_col] = {"label": "Low Stock"}
+                else:
+                    col_values[status_col] = {"label": "In Stock"}
+
+            await self.client.update_column_values(board_id, monday_item_id, col_values)
+            logger.info(f"Stock synced to Monday: {book_id} = {new_quantity}")
+            return {"synced": True, "monday_item_id": monday_item_id}
+        except Exception as e:
+            logger.error(f"Stock sync to Monday failed for {book_id}: {e}")
+            return {"synced": False, "reason": str(e)}
+
+    # ──────────── Webhook: Monday.com → App (stock changes) ────────────
+
+    async def handle_stock_webhook(self, event: dict) -> Dict:
+        """Process Monday.com webhook for column value changes on the TXB board.
+        Updates local inventory when stock is changed on Monday.com."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        col_map = config.get("column_mapping", {})
+        stock_col = col_map.get("stock_quantity")
+
+        if not board_id or not stock_col:
+            return {"processed": False, "reason": "Not configured"}
+
+        # Extract event data
+        pulse_id = str(event.get("pulseId", ""))
+        column_id = event.get("columnId", "")
+        column_value = event.get("value", {})
+
+        # Only process changes to the stock column
+        if column_id != stock_col:
+            return {"processed": False, "reason": f"Column {column_id} is not stock column"}
+
+        # Parse new stock value
+        new_stock = 0
+        if isinstance(column_value, dict):
+            # Number column value format
+            raw = column_value.get("value") or column_value.get("text", "0")
+            try:
+                new_stock = int(float(str(raw)))
+            except (ValueError, TypeError):
+                return {"processed": False, "reason": f"Invalid stock value: {raw}"}
+        elif isinstance(column_value, (int, float)):
+            new_stock = int(column_value)
+        elif isinstance(column_value, str):
+            try:
+                new_stock = int(float(column_value))
+            except (ValueError, TypeError):
+                return {"processed": False, "reason": f"Invalid stock value: {column_value}"}
+
+        # Find the product by monday_item_id
+        product = await db.store_products.find_one(
+            {"monday_item_id": pulse_id, "is_private_catalog": True},
+            {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
+        )
+
+        if not product:
+            # Fallback: search by looking up the item code from Monday.com
+            code_col = col_map.get("code")
+            if code_col:
+                try:
+                    items = await self.client.execute(
+                        f'query {{ items(ids: [{pulse_id}]) {{ column_values {{ id text }} }} }}'
+                    )
+                    item_cols = items.get("items", [{}])[0].get("column_values", [])
+                    code_value = next((c["text"] for c in item_cols if c["id"] == code_col), None)
+                    if code_value:
+                        product = await db.store_products.find_one(
+                            {"code": code_value, "is_private_catalog": True},
+                            {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
+                        )
+                        if product:
+                            # Link for future lookups
+                            await db.store_products.update_one(
+                                {"book_id": product["book_id"]},
+                                {"$set": {"monday_item_id": pulse_id}}
+                            )
+                except Exception as e:
+                    logger.error(f"Webhook lookup error: {e}")
+
+        if not product:
+            return {"processed": False, "reason": f"No product found for Monday item {pulse_id}"}
+
+        old_stock = product.get("inventory_quantity", 0)
+        book_id = product["book_id"]
+
+        if old_stock == new_stock:
+            return {"processed": True, "no_change": True, "book_id": book_id}
+
+        # Update stock in the app
+        await db.store_products.update_one(
+            {"book_id": book_id},
+            {"$set": {
+                "inventory_quantity": new_stock,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }}
+        )
+
+        # Log the movement
+        import uuid
+        movement = {
+            "movement_id": str(uuid.uuid4())[:12],
+            "book_id": book_id,
+            "product_name": product.get("name", "Unknown"),
+            "type": "addition" if new_stock > old_stock else "removal",
+            "quantity_change": new_stock - old_stock,
+            "old_quantity": old_stock,
+            "new_quantity": new_stock,
+            "reason": "monday_webhook",
+            "notes": f"Stock updated via Monday.com (item {pulse_id})",
+            "admin_id": "monday_webhook",
+            "admin_name": "Monday.com",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.inventory_movements.insert_one(movement)
+
+        logger.info(f"Stock webhook: {book_id} '{product.get('name')}' {old_stock} → {new_stock}")
+
+        return {
+            "processed": True,
+            "book_id": book_id,
+            "product_name": product.get("name"),
+            "old_stock": old_stock,
+            "new_stock": new_stock,
+        }
+
+    # ──────────── Register/Unregister Webhook ────────────
+
+    async def register_stock_webhook(self, webhook_url: str) -> Dict:
+        """Register a webhook for column value changes on the TXB inventory board."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+
+        if not board_id:
+            return {"error": "Board not configured"}
+
+        try:
+            wh_id = await self.client.register_webhook(
+                board_id, webhook_url, event="change_column_value"
+            )
+            if wh_id:
+                config["webhook_config"] = {
+                    "webhook_id": wh_id,
+                    "webhook_url": webhook_url,
+                    "stock_column_id": config.get("column_mapping", {}).get("stock_quantity"),
+                    "registered_at": datetime.now(timezone.utc).isoformat(),
+                }
+                await self.save_txb_inventory_config(config)
+                return {"success": True, "webhook_id": wh_id}
+            return {"error": "Failed to register webhook"}
+        except Exception as e:
+            return {"error": str(e)}
+
+    async def unregister_stock_webhook(self) -> Dict:
+        """Remove the stock change webhook."""
+        config = await self.get_txb_inventory_config()
+        wh_config = config.get("webhook_config", {})
+        wh_id = wh_config.get("webhook_id")
+
+        if wh_id:
+            await self.client.delete_webhook(wh_id)
+
+        config["webhook_config"] = {
+            "webhook_id": None,
+            "webhook_url": None,
+            "stock_column_id": None,
+        }
+        await self.save_txb_inventory_config(config)
+        return {"success": True}
+
+    # ──────────── Existing: Per-student order subitem creation ────────────
 
     async def update_inventory(
         self,
@@ -70,15 +465,12 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         if not code_col:
             return {"subitems_created": 0, "items_created": 0, "error": "Column mapping incomplete (need code)"}
 
-        # Build subitem name: "Student Name - ORD-XXXX"
         subitem_name = student_name
         if order_reference:
             subitem_name = f"{student_name} - {order_reference}"
 
         items_created = 0
         subitems_created = 0
-
-        from datetime import datetime, timezone
 
         for item in ordered_items:
             book_code = item.get("book_code", "")
@@ -90,14 +482,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 continue
 
             try:
-                # 1. Search for existing textbook item by book code
                 found = await self.client.search_items_by_column(board_id, code_col, book_code)
 
                 if found:
                     parent_item_id = found[0]["id"]
-                    logger.info(f"TXB Inventory: found '{book_code}' as item {parent_item_id}")
                 else:
-                    # 2. Create new textbook item if not found
                     new_values = {}
                     if code_col:
                         new_values[code_col] = book_code
@@ -119,9 +508,8 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                         logger.error(f"TXB Inventory: failed to create item for '{book_code}'")
                         continue
                     items_created += 1
-                    logger.info(f"TXB Inventory: created '{book_code}' as item {parent_item_id}")
 
-                # 3. Create subitem under the textbook item with student name
+                # Create subitem
                 subitem_values = {}
                 qty_col = sub_col_map.get("quantity")
                 if qty_col:
@@ -135,7 +523,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 )
                 if sub_id:
                     subitems_created += 1
-                    logger.info(f"TXB Inventory: created subitem '{subitem_name}' under '{book_code}'")
                 else:
                     logger.error(f"TXB Inventory: failed to create subitem for '{book_code}'")
 
