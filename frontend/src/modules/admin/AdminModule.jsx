@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Settings,
   Palette,
@@ -16,6 +16,7 @@ import {
   Send,
   ChevronDown,
   ChevronRight,
+  Search,
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
