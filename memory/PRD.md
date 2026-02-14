@@ -92,4 +92,6 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 ### P1 - General Unatienda Inventory -> Monday.com (Bidirectional)
 - New board for public catalog products
 - Full CRUD sync + stock bidirectional
-### P2 - Fix React "unique key prop" warning
+### P2 - Fix React "unique key prop" warning - DONE (Feb 14, 2026)
+- Root cause: Duplicate `product_id` on public products ("Updated Test Book", "Hotdog Especial") caused duplicate keys in CatalogTable
+- Fix: Added fallback ID generation and dedup logic in `PrivateCatalogTab.jsx` line 647-660
