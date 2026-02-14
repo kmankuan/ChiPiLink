@@ -400,6 +400,7 @@ export default function SchoolTextbooksView({
         toast.success(t.orderSuccess);
       }
       setSelectedBooks(prev => ({ ...prev, [studentId]: {} }));
+      setSummaryStudent(null);
       // Refresh wallet balance after payment
       axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(res => setWalletBalance(res.data.wallet?.balance_usd ?? 0))
