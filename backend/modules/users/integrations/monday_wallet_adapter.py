@@ -150,6 +150,32 @@ class WalletMondayAdapter(BaseMondayAdapter):
             logger.error(f"[monday_sync] Failed to create item for {email}: {e}")
             return None
 
+    async def _get_subitem_board_id(self) -> str:
+        """Get the subitem board ID dynamically. Falls back to fetching from Monday.com API."""
+        config = await self.get_config()
+        sub_board = config.get("subitem_board_id")
+        if sub_board:
+            return sub_board
+        # Fallback: try to detect from first user's subitems
+        board_id = config.get("board_id")
+        if board_id:
+            try:
+                data = await self.client.execute(f"""
+                    query {{ boards(ids: [{board_id}]) {{ columns {{ id type settings_str }} }} }}
+                """)
+                for col in data.get("boards", [{}])[0].get("columns", []):
+                    if col.get("type") == "subtasks":
+                        import json as _json
+                        settings = _json.loads(col.get("settings_str", "{}"))
+                        bid = settings.get("boardIds", [None])[0]
+                        if bid:
+                            # Cache it
+                            await self.save_custom_config("subitem_board_id", {"board_id": str(bid)})
+                            return str(bid)
+            except Exception as e:
+                logger.warning(f"[monday_sync] Could not detect subitem board: {e}")
+        return ""
+
     async def sync_transaction_to_monday(
         self, user_id: str, amount: float, action: str, description: str = ""
     ) -> Optional[str]:
