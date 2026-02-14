@@ -401,9 +401,22 @@ export default function AdminDashboard() {
               onClick={() => setMobileMenuOpen(false)}
             />
             <aside className="absolute left-0 top-14 h-[calc(100%-56px)] w-64 bg-card border-r shadow-lg">
+              <div className="px-2 pt-2 pb-1">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
+                  <input
+                    type="text"
+                    value={sidebarSearch}
+                    onChange={(e) => setSidebarSearch(e.target.value)}
+                    placeholder="Search..."
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-accent/50 border-0 outline-none focus:bg-accent placeholder:text-muted-foreground/40 transition-colors"
+                    data-testid="sidebar-search-mobile"
+                  />
+                </div>
+              </div>
               <ScrollArea className="h-full py-2">
                 <nav className="px-2 space-y-0.5">
-                  {filteredNavGroups.map((group) => (
+                  {displayNavGroups.map((group) => (
                     <div key={group.group} className="mb-1">
                       <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
                         {group.group}
