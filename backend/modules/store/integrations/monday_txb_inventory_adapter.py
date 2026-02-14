@@ -175,6 +175,87 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
         return sync_stats
 
+    # ──────────── Per-Column Sync ────────────
+
+    async def sync_single_column(self, column_key: str) -> Dict:
+        """Sync a single column across all textbooks to Monday.com.
+        Only updates items that already exist on Monday.com (have monday_item_id)."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        enabled = config.get("enabled", False)
+        col_map = config.get("column_mapping", {})
+
+        if not enabled or not board_id:
+            return {"error": "TXB inventory board not configured or disabled", "synced": 0}
+
+        col_id = col_map.get(column_key)
+        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+        if column_key in ("stock_quantity", "stock"):
+            col_id = stock_col
+
+        if not col_id:
+            return {"error": f"Column '{column_key}' is not mapped", "synced": 0}
+
+        code_col = col_map.get("code")
+        if not code_col:
+            return {"error": "Book code column not mapped", "synced": 0}
+
+        textbooks = await db.store_products.find(
+            {"is_private_catalog": True, "active": True, "archived": {"$ne": True}},
+            {"_id": 0}
+        ).to_list(500)
+
+        if not textbooks:
+            return {"synced": 0, "message": "No active textbooks found"}
+
+        col_types = await self._get_board_column_types(board_id)
+
+        updated = 0
+        skipped = 0
+        failed = 0
+
+        for book in textbooks:
+            book_code = book.get("code", "") or book.get("book_id", "")
+            monday_item_id = book.get("monday_item_id")
+
+            if not monday_item_id:
+                # Try to find by code on Monday.com
+                try:
+                    found = await self.client.search_items_by_column(board_id, code_col, book_code)
+                    if found:
+                        monday_item_id = found[0]["id"]
+                        await db.store_products.update_one(
+                            {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
+                            {"$set": {"monday_item_id": str(monday_item_id)}}
+                        )
+                except Exception:
+                    pass
+
+            if not monday_item_id:
+                skipped += 1
+                continue
+
+            col_values = self._build_single_column_value(book, column_key, col_map, col_types)
+            if not col_values:
+                skipped += 1
+                continue
+
+            try:
+                await self.client.update_column_values(board_id, monday_item_id, col_values)
+                updated += 1
+                logger.info(f"Column sync '{column_key}': updated '{book_code}' (item {monday_item_id})")
+            except Exception as e:
+                failed += 1
+                logger.error(f"Column sync '{column_key}' error for '{book_code}': {e}")
+
+        return {
+            "column": column_key,
+            "updated": updated,
+            "skipped": skipped,
+            "failed": failed,
+            "total_textbooks": len(textbooks),
+        }
+
     async def _get_board_column_types(self, board_id: str) -> Dict[str, str]:
         """Fetch column types from Monday.com board. Returns {column_id: column_type}."""
         try:
