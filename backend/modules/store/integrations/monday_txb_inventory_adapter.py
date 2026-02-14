@@ -348,6 +348,14 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         # Text, numbers, etc. — pass as string
         return str(value) if value is not None else value
 
+    def _needs_create_labels(self, col_values: Dict, col_types: Dict) -> bool:
+        """Check if any column value is a dropdown/status type needing create_labels_if_missing."""
+        for col_id in col_values:
+            ct = col_types.get(col_id, "text")
+            if ct in ("dropdown", "color", "status"):
+                return True
+        return False
+
     def _build_column_values(self, book: Dict, col_map: Dict, col_types: Dict = None) -> Dict:
         """Build Monday.com column values from a textbook document.
         Handles different column types (text, number, dropdown, status)."""
