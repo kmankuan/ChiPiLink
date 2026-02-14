@@ -19,7 +19,8 @@ import {
   Layout,
   Radio,
   Layers,
-  Megaphone
+  Megaphone,
+  Send
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
@@ -37,6 +38,7 @@ import WidgetManagerModule from './WidgetManagerModule';
 import TickerAdminModule from './TickerAdminModule';
 import LayoutPreviewModule from './LayoutPreviewModule';
 import ShowcaseAdminModule from './ShowcaseAdminModule';
+import TelegramAdminModule from './TelegramAdminModule';
 import { useTranslation } from 'react-i18next';
 
 export default function AdminModule() {
