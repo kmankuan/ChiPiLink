@@ -99,6 +99,19 @@ async def get_posts(
 
     return {"posts": posts, "total": total, "page": page, "limit": limit}
 
+# ---- Public Feed Preview (no auth) ----
+
+@router.get("/public/recent")
+async def get_recent_posts_public(limit: int = 5):
+    """Public: Get latest posts for landing page preview (no auth required)."""
+    posts = await db.community_posts.find(
+        {}, {"_id": 0}
+    ).sort("date", -1).limit(min(limit, 10)).to_list(None)
+    total = await db.community_posts.count_documents({})
+    return {"posts": posts, "total": total}
+
+
+
 
 # ---- Media Proxy ----
 
