@@ -386,8 +386,7 @@ async def get_sync_history():
 async def register_banner_webhook():
     """Admin: Register a real-time webhook with Monday.com for the banner board."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
-    db = get_db()
-    result = await monday_banner_adapter.register_webhook(db)
+    result = await monday_banner_adapter.register_webhook()
     return result
 
 
@@ -395,8 +394,7 @@ async def register_banner_webhook():
 async def unregister_banner_webhook():
     """Admin: Remove the Monday.com webhook."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
-    db = get_db()
-    result = await monday_banner_adapter.unregister_webhook(db)
+    result = await monday_banner_adapter.unregister_webhook()
     return result
 
 
@@ -404,7 +402,6 @@ async def unregister_banner_webhook():
 async def get_banner_webhook_status():
     """Admin: Get current webhook registration status."""
     from modules.showcase.monday_banner_adapter import monday_banner_adapter
-    db = get_db()
-    config = await monday_banner_adapter.get_config(db)
+    config = await monday_banner_adapter.get_config()
     return config.get("webhook", {"registered": False, "webhook_id": None})
 
