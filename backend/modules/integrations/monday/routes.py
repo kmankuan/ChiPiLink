@@ -568,3 +568,163 @@ async def get_recharge_approval_dashboard(admin: dict = Depends(get_admin_user))
         "webhook_registered": registered,
         "recent_logs": recent_logs,
     }
+
+
+
+# ========== UNIFIED SYNC DASHBOARD ==========
+
+@router.get("/sync-dashboard")
+async def get_unified_sync_dashboard(admin: dict = Depends(get_admin_user)):
+    """Aggregated sync status across all Monday.com boards.
+    Returns health, last sync, stats, and recent activity for each board."""
+    from modules.integrations.monday.config_manager import monday_config
+    from modules.integrations.monday.webhook_router import get_registered_boards
+
+    boards = []
+
+    # --- 1. TXB Inventory Board ---
+    txb_config = await monday_config.get("store.textbook_orders.txb_inventory")
+    txb_board_id = txb_config.get("board_id")
+    txb_enabled = txb_config.get("enabled", False)
+    txb_sync_stats = txb_config.get("sync_stats", {})
+    txb_last_sync = txb_config.get("last_full_sync")
+    txb_webhook = txb_config.get("webhook_config", {})
+
+    # Recent inventory movements from Monday webhook
+    txb_movements = await db.inventory_movements.find(
+        {"reason": "monday_webhook"}, {"_id": 0}
+    ).sort("timestamp", -1).limit(5).to_list(5)
+
+    txb_health = "inactive"
+    if txb_enabled and txb_board_id:
+        failed = txb_sync_stats.get("failed", 0)
+        total = txb_sync_stats.get("total_textbooks", 0)
+        if failed > 0 and total > 0 and (failed / total) > 0.3:
+            txb_health = "degraded"
+        elif txb_last_sync:
+            txb_health = "healthy"
+        else:
+            txb_health = "not_synced"
+
+    boards.append({
+        "id": "txb_inventory",
+        "name": "TXB Inventory",
+        "board_id": txb_board_id,
+        "enabled": txb_enabled,
+        "health": txb_health,
+        "last_sync": txb_last_sync,
+        "sync_stats": txb_sync_stats,
+        "webhook_active": bool(txb_webhook.get("webhook_id")),
+        "recent_activity": txb_movements,
+    })
+
+    # --- 2. Textbook Orders Board ---
+    orders_config = await monday_config.get("store.textbook_orders.board")
+    orders_board_id = orders_config.get("board_id")
+    orders_auto_sync = orders_config.get("auto_sync", False)
+
+    # Count recent synced orders
+    synced_orders = await db.store_textbook_orders.count_documents(
+        {"monday_item_id": {"$exists": True, "$ne": None}}
+    )
+    unsynced_orders = await db.store_textbook_orders.count_documents(
+        {"$or": [{"monday_item_id": None}, {"monday_item_id": {"$exists": False}}],
+         "status": {"$nin": ["cancelled", "draft"]}}
+    )
+
+    # Check webhook status
+    orders_wh_config = await db.monday_configs.find_one(
+        {"key": "store.textbook_orders.webhooks"}, {"_id": 0}
+    )
+    orders_webhook_active = bool(orders_wh_config.get("data", {}).get("webhook_id")) if orders_wh_config else False
+
+    orders_health = "inactive"
+    if orders_board_id:
+        if unsynced_orders > 5:
+            orders_health = "degraded"
+        elif synced_orders > 0:
+            orders_health = "healthy"
+        else:
+            orders_health = "not_synced"
+
+    boards.append({
+        "id": "textbook_orders",
+        "name": "Textbook Orders",
+        "board_id": orders_board_id,
+        "enabled": bool(orders_board_id),
+        "health": orders_health,
+        "last_sync": None,
+        "sync_stats": {
+            "synced_orders": synced_orders,
+            "unsynced_orders": unsynced_orders,
+            "auto_sync": orders_auto_sync,
+        },
+        "webhook_active": orders_webhook_active,
+        "recent_activity": [],
+    })
+
+    # --- 3. Wallet Recharge Approval Board ---
+    wallet_config = await db.wallet_topup_monday_config.find_one(
+        {"id": "default"}, {"_id": 0}
+    )
+    wallet_board_id = wallet_config.get("board_id", "") if wallet_config else ""
+    wallet_enabled = wallet_config.get("enabled", False) if wallet_config else False
+
+    # Stats
+    topup_items = await db.monday_topup_items.count_documents({})
+    wallet_pending = await db.wallet_pending_topups.count_documents({"status": "pending"})
+    wallet_approved = await db.wallet_pending_topups.count_documents({"status": "approved"})
+    wallet_webhook_registered = wallet_board_id in get_registered_boards() if wallet_board_id else False
+
+    # Recent wallet webhook logs
+    wallet_logs = await db.wallet_webhook_logs.find(
+        {}, {"_id": 0}
+    ).sort("timestamp", -1).limit(5).to_list(5)
+    wallet_errors = await db.wallet_webhook_logs.count_documents({"status": "error"})
+
+    wallet_health = "inactive"
+    if wallet_enabled and wallet_board_id:
+        if wallet_errors > 3:
+            wallet_health = "degraded"
+        elif topup_items > 0 or wallet_approved > 0:
+            wallet_health = "healthy"
+        else:
+            wallet_health = "not_synced"
+
+    boards.append({
+        "id": "wallet_recharge",
+        "name": "Wallet Recharge",
+        "board_id": wallet_board_id,
+        "enabled": wallet_enabled,
+        "health": wallet_health,
+        "last_sync": None,
+        "sync_stats": {
+            "monday_items": topup_items,
+            "pending": wallet_pending,
+            "approved": wallet_approved,
+            "webhook_errors": wallet_errors,
+        },
+        "webhook_active": wallet_webhook_registered,
+        "recent_activity": wallet_logs,
+    })
+
+    # --- Overall health ---
+    active_boards = [b for b in boards if b["enabled"]]
+    degraded = [b for b in active_boards if b["health"] == "degraded"]
+    healthy = [b for b in active_boards if b["health"] == "healthy"]
+
+    overall = "inactive"
+    if active_boards:
+        if degraded:
+            overall = "degraded"
+        elif healthy:
+            overall = "healthy"
+        else:
+            overall = "partial"
+
+    return {
+        "overall_health": overall,
+        "active_boards": len(active_boards),
+        "total_boards": len(boards),
+        "boards": boards,
+    }
