@@ -75,7 +75,7 @@ export default function BannerCarousel() {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-2xl"
+      className="group relative w-full overflow-hidden rounded-2xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       data-testid="banner-carousel"
@@ -90,22 +90,22 @@ export default function BannerCarousel() {
         )}
       </div>
 
-      {/* Navigation arrows */}
+      {/* Navigation arrows — hidden on mobile, subtle on desktop hover */}
       {activeBanners.length > 1 && (
         <>
           <button
             onClick={() => go(-1)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/40 transition-all"
+            className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hidden sm:flex items-center justify-center text-white/60 opacity-0 group-hover:opacity-100 hover:bg-white/25 transition-all duration-200"
             data-testid="banner-prev"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => go(1)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/40 transition-all"
+            className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hidden sm:flex items-center justify-center text-white/60 opacity-0 group-hover:opacity-100 hover:bg-white/25 transition-all duration-200"
             data-testid="banner-next"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </>
       )}
