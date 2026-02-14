@@ -317,6 +317,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
       if (response.data?.warnings?.length > 0) {
         toast.warning(`${response.data.items_failed} ${te.itemsUnavailable || 'item(s) could not be processed'}`);
       }
+      setShowSummary(false);
       // Refresh wallet balance after payment
       fetchWalletBalance();
       fetchStudentOrders();
