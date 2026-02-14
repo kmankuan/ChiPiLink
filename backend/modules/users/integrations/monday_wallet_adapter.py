@@ -238,16 +238,18 @@ class WalletMondayAdapter(BaseMondayAdapter):
             if subitem_id:
                 # Set the event status via change_simple_column_value
                 try:
-                    await self.client.execute(f"""
-                        mutation {{
-                            change_simple_column_value(
-                                item_id: {subitem_id},
-                                board_id: 18399650846,
-                                column_id: "{event_col}",
-                                value: {json.dumps(event_label)}
-                            ) {{ id }}
-                        }}
-                    """)
+                    sub_board_id = await self._get_subitem_board_id()
+                    if sub_board_id:
+                        await self.client.execute(f"""
+                            mutation {{
+                                change_simple_column_value(
+                                    item_id: {subitem_id},
+                                    board_id: {sub_board_id},
+                                    column_id: "{event_col}",
+                                    value: {json.dumps(event_label)}
+                                ) {{ id }}
+                            }}
+                        """)
                 except Exception:
                     pass  # Non-critical: subitem still created
                 logger.info(f"[monday_sync] Created subitem {subitem_id} under item {parent_id}")
