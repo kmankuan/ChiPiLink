@@ -90,7 +90,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - OpenAI GPT-4o / Anthropic Claude Sonnet 4.5 -- Emergent LLM Key
 - Google Photos -- Public URLs
 
+### Touch-Swipe Gestures for Carousels (Feb 14, 2026) - COMPLETE
+- Added native touch-swipe support to BannerCarousel and MediaPlayer
+- Swipe left = next slide, swipe right = previous slide (50px threshold)
+- **Tested: 100%** — 11/11 frontend tests passed on both desktop and mobile (375x812) viewports (iteration_104)
+
 ## Backlog
-### P1 - Evolve Mosaic Grid Layout
+### P1 - Evolve Landing Page Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
 ### P3 - Refactor AdminModule.jsx into sidebar navigation
