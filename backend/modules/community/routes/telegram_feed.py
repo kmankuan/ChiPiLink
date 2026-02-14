@@ -130,13 +130,178 @@ async def get_posts(
 # ---- Public Feed Preview (no auth) ----
 
 @router.get("/public/recent")
-async def get_recent_posts_public(limit: int = 5):
-    """Public: Get latest posts for landing page preview (no auth required)."""
-    posts = await db.community_posts.find(
+async def get_recent_posts_public(limit: int = 5, channel_id: Optional[int] = None):
+    """Public: Get latest posts for landing page preview (no auth required).
+    Groups posts with the same media_group_id into albums."""
+    query = {}
+    if channel_id:
+        query["channel_id"] = channel_id
+    # Fetch more than limit to account for grouping
+    raw_posts = await db.community_posts.find(
+        query, {"_id": 0}
+    ).sort("date", -1).limit(min(limit * 3, 30)).to_list(None)
+    total = await db.community_posts.count_documents(query)
+    grouped = _group_posts_by_media(raw_posts)
+    return {"posts": grouped[:limit], "total": total}
+
+
+# ---- Feed Containers (Multi-channel support) ----
+
+DEFAULT_CONTAINER = {
+    "title": "Community Channel",
+    "subtitle": "Latest updates",
+    "channel_id": None,
+    "post_limit": 5,
+    "bg_color": "#ffffff",
+    "accent_color": "#0088cc",
+    "header_bg": "#E8F4FE",
+    "icon_color": "#0088cc",
+    "card_style": "compact",  # compact | expanded | minimal
+    "show_footer": True,
+    "cta_text": "Open Community Feed",
+    "cta_link": "/comunidad",
+    "border_radius": "2xl",
+    "show_post_count": True,
+    "show_media_count": True,
+    "order": 0,
+    "is_active": True,
+}
+
+
+@router.get("/public/containers")
+async def get_public_containers():
+    """Public: Get all active feed containers with their recent posts."""
+    containers = await db.telegram_feed_containers.find(
+        {"is_active": True}, {"_id": 0}
+    ).sort("order", 1).to_list(20)
+
+    if not containers:
+        # Return default container if none configured
+        config = await telegram_service.get_config()
+        containers = [{
+            **DEFAULT_CONTAINER,
+            "container_id": "default",
+            "channel_id": config.get("channel_id"),
+            "title": config.get("channel_title") or "Community Channel",
+        }]
+
+    result = []
+    for container in containers:
+        limit = container.get("post_limit", 5)
+        query = {}
+        if container.get("channel_id"):
+            query["channel_id"] = container["channel_id"]
+        raw_posts = await db.community_posts.find(
+            query, {"_id": 0}
+        ).sort("date", -1).limit(min(limit * 3, 30)).to_list(None)
+        total = await db.community_posts.count_documents(query)
+        grouped = _group_posts_by_media(raw_posts)
+        result.append({
+            **container,
+            "posts": grouped[:limit],
+            "total_posts": total,
+        })
+
+    return {"containers": result}
+
+
+class ContainerCreate(BaseModel):
+    title: str = "New Feed"
+    subtitle: str = "Latest updates"
+    channel_id: Optional[int] = None
+    post_limit: int = 5
+    bg_color: str = "#ffffff"
+    accent_color: str = "#0088cc"
+    header_bg: str = "#E8F4FE"
+    icon_color: str = "#0088cc"
+    card_style: str = "compact"
+    show_footer: bool = True
+    cta_text: str = "Open Community Feed"
+    cta_link: str = "/comunidad"
+    border_radius: str = "2xl"
+    show_post_count: bool = True
+    show_media_count: bool = True
+    is_active: bool = True
+
+
+class ContainerUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    channel_id: Optional[int] = None
+    post_limit: Optional[int] = None
+    bg_color: Optional[str] = None
+    accent_color: Optional[str] = None
+    header_bg: Optional[str] = None
+    icon_color: Optional[str] = None
+    card_style: Optional[str] = None
+    show_footer: Optional[bool] = None
+    cta_text: Optional[str] = None
+    cta_link: Optional[str] = None
+    border_radius: Optional[str] = None
+    show_post_count: Optional[bool] = None
+    show_media_count: Optional[bool] = None
+    order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+@router.get("/admin/containers")
+async def get_admin_containers(admin=Depends(get_admin_user)):
+    """Admin: List all feed containers."""
+    containers = await db.telegram_feed_containers.find(
         {}, {"_id": 0}
-    ).sort("date", -1).limit(min(limit, 10)).to_list(None)
-    total = await db.community_posts.count_documents({})
-    return {"posts": posts, "total": total}
+    ).sort("order", 1).to_list(50)
+    return {"containers": containers}
+
+
+@router.post("/admin/containers")
+async def create_container(data: ContainerCreate, admin=Depends(get_admin_user)):
+    """Admin: Create a new feed container."""
+    count = await db.telegram_feed_containers.count_documents({})
+    doc = {
+        "container_id": str(uuid.uuid4())[:8],
+        **data.model_dump(),
+        "order": count,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": admin.get("email", "admin"),
+    }
+    await db.telegram_feed_containers.insert_one(doc)
+    del doc["_id"]
+    return {"success": True, "container": doc}
+
+
+@router.put("/admin/containers/{container_id}")
+async def update_container(container_id: str, data: ContainerUpdate, admin=Depends(get_admin_user)):
+    """Admin: Update a feed container."""
+    updates = {k: v for k, v in data.model_dump().items() if v is not None}
+    if not updates:
+        return {"success": True}
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    result = await db.telegram_feed_containers.update_one(
+        {"container_id": container_id}, {"$set": updates}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Container not found")
+    return {"success": True}
+
+
+@router.delete("/admin/containers/{container_id}")
+async def delete_container(container_id: str, admin=Depends(get_admin_user)):
+    """Admin: Delete a feed container."""
+    result = await db.telegram_feed_containers.delete_one({"container_id": container_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Container not found")
+    return {"success": True}
+
+
+@router.post("/admin/containers/reorder")
+async def reorder_containers(data: dict, admin=Depends(get_admin_user)):
+    """Admin: Reorder containers. Expects {'order': ['id1', 'id2', ...]}"""
+    order_list = data.get("order", [])
+    for idx, cid in enumerate(order_list):
+        await db.telegram_feed_containers.update_one(
+            {"container_id": cid}, {"$set": {"order": idx}}
+        )
+    return {"success": True}
 
 
 
