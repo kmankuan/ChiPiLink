@@ -303,6 +303,10 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
       );
 
       toast.success(te.paymentSuccess || te.orderSuccess);
+      // Show warnings if some items failed
+      if (response.data?.warnings?.length > 0) {
+        toast.warning(`${response.data.items_failed} ${te.itemsUnavailable || 'item(s) could not be processed'}`);
+      }
       // Refresh wallet balance after payment
       fetchWalletBalance();
       fetchStudentOrders();
