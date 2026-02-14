@@ -261,6 +261,14 @@ export default function MediaPlayer() {
           to { opacity: 1; transform: scale(1); }
         }
         .animate-fade-in { animation: fade-in 0.6s ease-out; }
+        @keyframes media-slide-left {
+          from { opacity: 0; transform: translateX(30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes media-slide-right {
+          from { opacity: 0; transform: translateX(-30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
       `}</style>
     </div>
   );
