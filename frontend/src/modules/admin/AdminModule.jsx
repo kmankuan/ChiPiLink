@@ -1,15 +1,8 @@
 import { useState } from 'react';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
-import {
   Settings,
   Palette,
   FileText,
-  Users,
   Languages,
   Database,
   Shield,
@@ -20,11 +13,12 @@ import {
   Radio,
   Layers,
   Megaphone,
-  Send
+  Send,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import LandingPageEditor from '@/components/admin/LandingPageEditor';
 import SiteConfigModule from './SiteConfigModule';
-import FormConfigModule from './FormConfigModule';
 import FormsManagerModule from './FormsManagerModule';
 import DictionaryManagerModule from './DictionaryManagerModule';
 import TranslationsModule from './TranslationsModule';
@@ -39,148 +33,172 @@ import TickerAdminModule from './TickerAdminModule';
 import LayoutPreviewModule from './LayoutPreviewModule';
 import ShowcaseAdminModule from './ShowcaseAdminModule';
 import TelegramAdminModule from './TelegramAdminModule';
-import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+
+const SECTIONS = [
+  {
+    group: 'General',
+    items: [
+      { id: 'site', label: 'Site Config', icon: Settings },
+      { id: 'auth', label: 'Authentication', icon: Shield },
+      { id: 'ui-style', label: 'UI Style', icon: Paintbrush },
+    ],
+  },
+  {
+    group: 'Content',
+    items: [
+      { id: 'landing', label: 'Landing Page', icon: Palette },
+      { id: 'showcase', label: 'Banners & Media', icon: Megaphone },
+      { id: 'layouts', label: 'Layouts & Icons', icon: Layers },
+      { id: 'ticker', label: 'Activity Ticker', icon: Radio },
+      { id: 'widget', label: 'Widget', icon: Layout },
+    ],
+  },
+  {
+    group: 'Community',
+    items: [
+      { id: 'telegram', label: 'Telegram', icon: Send },
+      { id: 'forms', label: 'Forms', icon: FileText },
+    ],
+  },
+  {
+    group: 'Data & System',
+    items: [
+      { id: 'translations', label: 'Translations', icon: Languages },
+      { id: 'demo', label: 'Demo Data', icon: Database },
+      { id: 'migration', label: 'Migration', icon: ArrowRightLeft },
+      { id: 'modules', label: 'Module Status', icon: LayoutGrid },
+    ],
+  },
+];
+
+const PANELS = {
+  site: () => <SiteConfigModule />,
+  auth: () => <AuthMethodsConfig />,
+  'ui-style': () => <UIStyleModule />,
+  landing: () => <LandingPageEditor />,
+  showcase: () => <ShowcaseAdminModule />,
+  layouts: () => <LayoutPreviewModule />,
+  ticker: () => <TickerAdminModule />,
+  widget: () => <WidgetManagerModule />,
+  telegram: () => <TelegramAdminModule />,
+  forms: () => <FormsManagerModule />,
+  translations: () => (
+    <div className="space-y-8">
+      <TranslationCoverageCard />
+      <DictionaryManagerModule />
+      <div className="border-t pt-6">
+        <TranslationsModule />
+      </div>
+    </div>
+  ),
+  demo: () => <DemoDataModule />,
+  migration: () => <DatabaseMigrationModule />,
+  modules: () => <ModuleStatusModule />,
+};
+
+function SidebarSection({ group, items, active, onSelect, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const hasActive = items.some(i => i.id === active);
+
+  return (
+    <div className="mb-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md hover:bg-accent/50 transition-colors"
+        style={{ color: hasActive ? '#8B6914' : '#94a3b8' }}
+        data-testid={`admin-section-${group.toLowerCase().replace(/\s+/g, '-')}`}
+      >
+        {group}
+        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+      </button>
+      {open && (
+        <div className="mt-0.5 space-y-0.5">
+          {items.map(item => {
+            const Icon = item.icon;
+            const isActive = active === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelect(item.id)}
+                className={cn(
+                  'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all',
+                  isActive
+                    ? 'bg-accent font-semibold text-foreground'
+                    : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                )}
+                data-testid={`admin-nav-${item.id}`}
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminModule() {
-  const { t } = useTranslation();
+  const [active, setActive] = useState('site');
+  const [mobileNav, setMobileNav] = useState(false);
+
+  const activeItem = SECTIONS.flatMap(s => s.items).find(i => i.id === active);
+  const ActiveIcon = activeItem?.icon || Settings;
+  const Renderer = PANELS[active];
+
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="site">
-        <TabsList className="flex-wrap h-auto gap-1">
-          <TabsTrigger value="site" className="gap-2">
-            <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">Site Config</span>
-            <span className="sm:hidden">Config</span>
-          </TabsTrigger>
-          <TabsTrigger value="auth" className="gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Authentication</span>
-            <span className="sm:hidden">Auth</span>
-          </TabsTrigger>
-          <TabsTrigger value="landing" className="gap-2">
-            <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">Landing Page</span>
-            <span className="sm:hidden">Landing</span>
-          </TabsTrigger>
-          <TabsTrigger value="forms" className="gap-2">
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Forms</span>
-            <span className="sm:hidden">Forms</span>
-          </TabsTrigger>
-          <TabsTrigger value="translations" className="gap-2">
-            <Languages className="h-4 w-4" />
-            <span className="hidden sm:inline">Translations</span>
-            <span className="sm:hidden">i18n</span>
-          </TabsTrigger>
-          <TabsTrigger value="demo" className="gap-2" data-testid="demo-data-tab">
-            <Database className="h-4 w-4" />
-            <span className="hidden sm:inline">Demo Data</span>
-            <span className="sm:hidden">Demo</span>
-          </TabsTrigger>
-          <TabsTrigger value="migration" className="gap-2" data-testid="migration-tab">
-            <ArrowRightLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Migration</span>
-            <span className="sm:hidden">Migrate</span>
-          </TabsTrigger>
-          <TabsTrigger value="modules" className="gap-2" data-testid="modules-tab">
-            <LayoutGrid className="h-4 w-4" />
-            <span className="hidden sm:inline">Module Status</span>
-            <span className="sm:hidden">Modules</span>
-          </TabsTrigger>
-          <TabsTrigger value="ui-style" className="gap-2" data-testid="ui-style-tab">
-            <Paintbrush className="h-4 w-4" />
-            <span className="hidden sm:inline">UI Style</span>
-            <span className="sm:hidden">Style</span>
-          </TabsTrigger>
-          <TabsTrigger value="widget" className="gap-2" data-testid="widget-tab">
-            <Layout className="h-4 w-4" />
-            <span className="hidden sm:inline">Widget</span>
-            <span className="sm:hidden">Widget</span>
-          </TabsTrigger>
-          <TabsTrigger value="ticker" className="gap-2" data-testid="ticker-tab">
-            <Radio className="h-4 w-4" />
-            <span className="hidden sm:inline">Activity Ticker</span>
-            <span className="sm:hidden">Ticker</span>
-          </TabsTrigger>
-          <TabsTrigger value="layouts" className="gap-2" data-testid="layouts-tab">
-            <Layers className="h-4 w-4" />
-            <span className="hidden sm:inline">Layouts & Icons</span>
-            <span className="sm:hidden">Layouts</span>
-          </TabsTrigger>
-          <TabsTrigger value="showcase" className="gap-2" data-testid="showcase-tab">
-            <Megaphone className="h-4 w-4" />
-            <span className="hidden sm:inline">Banners & Media</span>
-            <span className="sm:hidden">Showcase</span>
-          </TabsTrigger>
-          <TabsTrigger value="telegram" className="gap-2" data-testid="telegram-tab">
-            <Send className="h-4 w-4" />
-            <span className="hidden sm:inline">Telegram</span>
-            <span className="sm:hidden">TG</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="site">
-          <SiteConfigModule />
-        </TabsContent>
-
-        <TabsContent value="auth">
-          <AuthMethodsConfig />
-        </TabsContent>
-
-        <TabsContent value="landing">
-          <LandingPageEditor />
-        </TabsContent>
-
-        <TabsContent value="forms">
-          <FormsManagerModule />
-        </TabsContent>
-
-        <TabsContent value="translations">
-          <div className="space-y-8">
-            <TranslationCoverageCard />
-            <DictionaryManagerModule />
-            <div className="border-t pt-6">
-              <TranslationsModule />
-            </div>
+    <div className="flex gap-0 min-h-[60vh]" data-testid="admin-module">
+      {/* Mobile nav toggle */}
+      <div className="lg:hidden mb-4 w-full">
+        <button
+          onClick={() => setMobileNav(!mobileNav)}
+          className="w-full flex items-center justify-between px-4 py-3 rounded-xl border bg-card text-sm font-medium"
+          data-testid="admin-mobile-nav-toggle"
+        >
+          <span className="flex items-center gap-2">
+            <ActiveIcon className="h-4 w-4" />
+            {activeItem?.label || 'Site Config'}
+          </span>
+          <ChevronDown className={cn('h-4 w-4 transition-transform', mobileNav && 'rotate-180')} />
+        </button>
+        {mobileNav && (
+          <div className="mt-2 p-2 rounded-xl border bg-card shadow-lg">
+            {SECTIONS.map(sec => (
+              <SidebarSection
+                key={sec.group}
+                group={sec.group}
+                items={sec.items}
+                active={active}
+                onSelect={(id) => { setActive(id); setMobileNav(false); }}
+                defaultOpen={true}
+              />
+            ))}
           </div>
-        </TabsContent>
+        )}
+      </div>
 
-        <TabsContent value="demo">
-          <DemoDataModule />
-        </TabsContent>
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:block w-52 flex-shrink-0 pr-4 border-r" data-testid="admin-sidebar">
+        <nav className="sticky top-4 space-y-1 py-1">
+          {SECTIONS.map((sec, i) => (
+            <SidebarSection
+              key={sec.group}
+              group={sec.group}
+              items={sec.items}
+              active={active}
+              onSelect={setActive}
+              defaultOpen={i < 2}
+            />
+          ))}
+        </nav>
+      </aside>
 
-        <TabsContent value="migration">
-          <DatabaseMigrationModule />
-        </TabsContent>
-
-        <TabsContent value="modules">
-          <ModuleStatusModule />
-        </TabsContent>
-
-        <TabsContent value="ui-style">
-          <UIStyleModule />
-        </TabsContent>
-
-        <TabsContent value="widget">
-          <WidgetManagerModule />
-        </TabsContent>
-
-        <TabsContent value="ticker">
-          <TickerAdminModule />
-        </TabsContent>
-
-        <TabsContent value="layouts">
-          <LayoutPreviewModule />
-        </TabsContent>
-
-        <TabsContent value="showcase">
-          <ShowcaseAdminModule />
-        </TabsContent>
-
-        <TabsContent value="telegram">
-          <TelegramAdminModule />
-        </TabsContent>
-      </Tabs>
+      {/* Content panel */}
+      <div className="flex-1 lg:pl-6 min-w-0">
+        {Renderer ? <Renderer /> : <SiteConfigModule />}
+      </div>
     </div>
   );
 }
