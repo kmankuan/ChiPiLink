@@ -55,6 +55,9 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## Key API Endpoints
 
+### TXB Inventory Per-Column Sync
+- `POST /api/store/monday/txb-inventory/sync-column/{column_key}` — Sync a single column across all textbooks (grade, stock, price, etc.)
+
 ### Monday.com Sync Dashboard
 - `GET /api/monday/sync-dashboard` — Unified sync health across all boards
 
