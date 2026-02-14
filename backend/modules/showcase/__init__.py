@@ -14,6 +14,123 @@ router = APIRouter(prefix="/showcase", tags=["Showcase"])
 admin_router = APIRouter(prefix="/admin/showcase", tags=["Showcase Admin"])
 
 
+async def seed_showcase_defaults():
+    """Seed default banners and media player items if none exist."""
+    # Seed banners
+    banner_count = await db.showcase_banners.count_documents({})
+    if banner_count == 0:
+        default_banners = [
+            {
+                "banner_id": "banner_demo_1",
+                "type": "text",
+                "image_url": "",
+                "link_url": "",
+                "overlay_text": "",
+                "text": "Welcome to ChiPi Link Community! Join us for weekend tournaments.",
+                "bg_color": "#C8102E",
+                "bg_gradient": "linear-gradient(135deg, #C8102E 0%, #8B0000 100%)",
+                "text_color": "#ffffff",
+                "font_size": "lg",
+                "bg_image_url": "",
+                "start_date": "",
+                "end_date": "",
+                "source": "seed",
+                "active": True,
+                "order": 0,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            },
+            {
+                "banner_id": "banner_demo_2",
+                "type": "image",
+                "image_url": "https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png",
+                "link_url": "/pinpanclub",
+                "overlay_text": "PinPanClub — New Season Starting!",
+                "text": "",
+                "bg_color": "",
+                "bg_gradient": "",
+                "text_color": "#ffffff",
+                "font_size": "lg",
+                "bg_image_url": "",
+                "start_date": "",
+                "end_date": "",
+                "source": "seed",
+                "active": True,
+                "order": 1,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            },
+            {
+                "banner_id": "banner_demo_3",
+                "type": "text",
+                "image_url": "",
+                "link_url": "",
+                "overlay_text": "",
+                "text": "Chinese New Year Festival — Special menu & cultural activities for the whole family.",
+                "bg_color": "#d97706",
+                "bg_gradient": "linear-gradient(135deg, #d97706 0%, #b45309 100%)",
+                "text_color": "#ffffff",
+                "font_size": "lg",
+                "bg_image_url": "",
+                "start_date": "",
+                "end_date": "",
+                "source": "seed",
+                "active": True,
+                "order": 2,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            },
+        ]
+        await db.showcase_banners.insert_many(default_banners)
+
+    # Seed media player
+    media_config = await db.app_config.find_one({"config_key": "media_player"})
+    if not media_config:
+        default_media = {
+            "config_key": "media_player",
+            "value": {
+                "album_url": "",
+                "autoplay": True,
+                "interval_ms": 6000,
+                "loop": True,
+                "show_controls": True,
+                "items": [
+                    {
+                        "item_id": "media_demo_1",
+                        "type": "image",
+                        "url": "https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png",
+                        "thumbnail_url": "",
+                        "caption": "PinPanClub Training Day",
+                    },
+                    {
+                        "item_id": "media_demo_2",
+                        "type": "image",
+                        "url": "https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/3eaf9b70f2c8a242db6fd32a793b16c215104f30755b70c8b63aa38dd331f753.png",
+                        "thumbnail_url": "",
+                        "caption": "Kids Learning Together",
+                    },
+                    {
+                        "item_id": "media_demo_3",
+                        "type": "image",
+                        "url": "https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/535181b7a5a2144892c75ca15c73f9320f5739017de399d05ced0e60170f39e7.png",
+                        "thumbnail_url": "",
+                        "caption": "Chinese-Panamanian Heritage",
+                    },
+                    {
+                        "item_id": "media_demo_4",
+                        "type": "image",
+                        "url": "https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/0416cce781984810906e615303474bfe2089c65f53db816a6bf448f34cbd3bda.png",
+                        "thumbnail_url": "",
+                        "caption": "Community Gathering",
+                    },
+                ],
+            },
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.app_config.insert_one(default_media)
+
+
+
 # ═══════════════════════════════════════════
 # BANNERS — Ad / Announcement carousel
 # ═══════════════════════════════════════════
