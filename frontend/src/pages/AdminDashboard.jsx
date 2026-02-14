@@ -44,7 +44,8 @@ import {
   Rss,
   Code2,
   BellRing,
-  ChevronDown
+  ChevronDown,
+  Search
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
