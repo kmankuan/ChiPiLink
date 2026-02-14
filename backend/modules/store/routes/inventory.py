@@ -240,6 +240,16 @@ async def adjust_stock(
     if fulfilled > 0:
         result["presale_fulfilled"] = fulfilled
         result["remaining_presale"] = new_reserved
+
+    # Sync stock to Monday.com (non-blocking, only for private catalog textbooks)
+    if product.get("is_private_catalog"):
+        try:
+            from modules.store.integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+            sync_result = await txb_inventory_adapter.sync_stock_to_monday(adjustment.book_id, new_qty)
+            result["monday_sync"] = sync_result
+        except Exception as e:
+            logger.warning(f"Monday.com stock sync failed (non-blocking): {e}")
+
     return result
 
 
