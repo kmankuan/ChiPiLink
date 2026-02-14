@@ -5,7 +5,7 @@
  * 2. Text banners: Facebook-style colored text cards with rich content
  * Auto-rotates, responsive, admin-configurable.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 
@@ -71,6 +71,18 @@ export default function BannerCarousel() {
     setCurrent(prev => (prev + dir + activeBanners.length) % activeBanners.length);
   }, [activeBanners.length]);
 
+  // Touch-swipe support
+  const touchStartX = useRef(null);
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(diff) > 50) go(diff < 0 ? 1 : -1);
+    touchStartX.current = null;
+  }, [go]);
+
   const banner = activeBanners[current];
 
   return (
@@ -78,6 +90,8 @@ export default function BannerCarousel() {
       className="group relative w-full overflow-hidden rounded-2xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       data-testid="banner-carousel"
       style={{ minHeight: '80px' }}
     >

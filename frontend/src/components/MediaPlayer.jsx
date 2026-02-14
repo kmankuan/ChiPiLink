@@ -91,6 +91,18 @@ export default function MediaPlayer() {
     setCurrent(prev => (prev + dir + items.length) % items.length);
   }, [items.length]);
 
+  // Touch-swipe support
+  const touchStartX = useRef(null);
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(diff) > 50) goTo(diff < 0 ? 1 : -1);
+    touchStartX.current = null;
+  }, [goTo]);
+
   const handleVideoEnd = useCallback(() => {
     if (items.length > 1) {
       setCurrent(prev => (prev + 1) % items.length);
@@ -117,6 +129,8 @@ export default function MediaPlayer() {
     <div
       className="relative w-full rounded-2xl overflow-hidden bg-black/5 group"
       style={{ aspectRatio: '16/9' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       data-testid="media-player"
     >
       {/* Media content */}
