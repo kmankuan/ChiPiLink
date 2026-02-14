@@ -1,75 +1,84 @@
 <analysis>**original_problem_statement:**
-The user initially reported a bug where selecting more than two items in the Textbooks ordering workflow only registered two selections. After fixing this, the user requested a new feature: an Order Summary preview modal to be shown before submitting a textbook order.
+The user initially requested an enhancement to the Telegram feed on the landing page to group multiple media files into a navigable album and add admin controls for the feed container. After the agent planned this feature, the user interrupted to define a future task: an On-Demand Landing Page Redesign feature with AI layout generation and drag-and-drop capabilities.
 
-The latest user request is to enhance the Telegram feed on the landing page. Specifically:
-1.  When a single Telegram post contains multiple videos or a mix of photos and videos, they should be displayed as a single post/album on the frontend.
-2.  This album should have navigation arrows to cycle through the media files.
-3.  The admin panel should have new configuration options to change the title and UI of the Telegram feed container.
+The user then pivoted again, putting the landing page feature on hold and requesting a new, higher-priority feature: integrating the private Textbooks Inventory system with Monday.com for bidirectional stock synchronization. This includes a full sync from the app to Monday.com, and webhook integration for updates from Monday.com back to the app.
+
+After the successful implementation of the Monday.com integration, the user confirmed to proceed with the previously defined On-Demand Landing Page Redesign enhancement.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Bug Fix:** Resolve the multi-select issue in the textbook ordering workflow.
-2.  **Feature:** Implement a pre-submission Order Summary preview modal.
-3.  **Feature:** Enhance the Telegram feed to display media groups as a single, navigable album.
-4.  **Feature:** Add admin controls for the Telegram feed container's title and UI.
-5.  **Refactor:** Clean up unused files ().
-6.  **Future:** Evolve the landing page layout.
+1.  **Feature (Completed):** Enhance the Telegram feed to display media groups as a single, navigable album.
+2.  **Feature (Completed):** Add admin controls for creating and managing multiple Telegram feed containers.
+3.  **Feature (Completed):** Implement bidirectional stock synchronization between the application's private textbooks inventory and a dedicated Monday.com board.
+4.  **Feature (Upcoming):** Build an On-Demand Landing Page Redesign tool in the admin panel.
+    -   Admins should be able to choose a base layout.
+    -   The tool should allow AI-powered generation of new layout variations.
+    -   It should include drag-and-drop functionality for admins to customize component placement.
+    -   Changes should apply across all layout types.
+5.  **Feature (Future):** Extend the Monday.com integration to the general (non-textbook) inventory.
 
 **User's preferred language**: The user communicates in English. You **MUST** continue to respond in English.
 
 **what currently exists?**
-The application is a stable full-stack React/FastAPI project.
-- The critical bug in the textbook ordering workflow has been fixed. Users can now correctly select multiple available textbooks. Out-of-stock items are visually disabled and cannot be selected.
-- A new Order Summary modal has been implemented. It appears before final submission in both the  and , showing the user a preview of their order.
-- A new backend API () exists to manage the content of this summary modal, though no admin UI has been built for it yet.
-- The codebase has been cleaned up by removing the obsolete  file.
-- The Telegram feed currently displays posts but renders each media file as a separate post.
+- The Telegram feed on the landing page is fully enhanced. It now supports multiple, independent feed containers, each configurable from the admin panel. Posts with multiple media files are correctly grouped and displayed in a navigable album/carousel on the frontend.
+- A full, bidirectional synchronization for the private textbooks inventory with Monday.com has been implemented and tested.
+    - **App -> Monday.com:** A Full Sync button in the admin panel pushes all textbook data to the Monday.com board. Stock adjustments made within the app are automatically pushed to the corresponding item on Monday.com.
+    - **Monday.com -> App:** A webhook is in place to listen for stock quantity changes on the Monday.com board and update the application's database in real-time.
+- The admin panel has been updated with UIs to manage both the Telegram feed containers and the Monday.com textbook inventory integration (trigger sync, map columns, manage webhooks).
 
 **Last working item**:
--   **Last item agent was working:** The user requested a new feature for the Telegram feed: group multiple media files from a single post into a single, navigable album display. They also asked for more admin customization options for the feed's container.
--   **Status:** NOT STARTED
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** This is a frontend-heavy feature.
-    1.  First, use  to inspect the data from the  endpoint to see how media groups are represented.
-    2.  Modify the backend if necessary to pass a structured list of media.
-    3.  Implement the album/carousel UI in .
-    4.  Use the  tool to verify the new album UI and navigation arrows.
-    5.  After implementation, use the  to run a regression test on the landing page and test the new admin configuration for the feed.
+-   **Last item agent was working:** The agent completed the implementation and testing of the bidirectional Monday.com synchronization for the private textbooks inventory.
+-   **Status:** USER VERIFICATION PENDING
+-   **Agent Testing Done:** Y
+-   **Which testing method agent to use?** Manual testing by user. The user should be instructed to:
+    1.  Go to the Admin Panel -> Integrations -> Monday.com -> TXB Inventory tab.
+    2.  Configure the Board ID and Stock Column ID.
+    3.  Click the Full Sync button and verify the items appear on their Monday.com board.
+    4.  Change a textbook's stock in the app's inventory and verify it updates on Monday.com.
+    5.  Change the stock of an item on Monday.com and verify the change is reflected in the app's database.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-None.
+-   **Issue 1:** A minor, pre-existing console warning about a unique key prop in React was observed in a previous session. It does not block functionality but should be addressed for code quality.
+    -   **Attempted fixes:** None.
+    -   **Next debug checklist:** Inspect child components rendered within  loops in files like  and  to ensure the top-level element has a unique  prop.
+    -   **Why fix this issue and what will be achieved with the fix?** Resolves a React warning and can prevent potential rendering bugs during list updates.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+    -   **Blocked on other issue:** None
 
 **In progress Task List**:
 None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P0 - Telegram Feed Album View:** Modify the Telegram feed to group multiple media files (videos/photos) from a single post into a unified album or carousel with navigation arrows.
-        -   **Files to check:** , .
-    -   **P0 - Telegram Feed Admin Configuration:** Create a new section in the admin panel to allow administrators to change the title and other UI aspects of the Telegram feed container on the landing page.
-        -   **Files to check:** , .
+    -   **P0 - On-Demand Landing Page Redesign:** The user has approved starting work on this feature. The goal is to build a tool in the admin panel for dynamic landing page customization.
+        -   **Plan:**
+            1.  **Backend:**
+                -   Create new API endpoints to fetch available layout components and save customized page configurations.
+                -   Develop a service for AI-powered layout suggestions (this may require calling the  for an appropriate LLM).
+            2.  **Frontend:**
+                -   Build a new admin module for the layout editor.
+                -   Integrate a drag-and-drop library (e.g., ).
+                -   Create a preview mode to see changes before publishing.
+                -   Modify the main  or root component to dynamically render layouts based on the saved admin configuration instead of the hardcoded active layout.
 -   **Future Tasks:**
-    -   **P1 - Evolve Landing Page Layout:** Further refine the landing page design based on user feedback.
-    -   **P2 - On-Demand Landing Page Redesign:** Allow admins to request new landing page designs from the admin panel.
+    -   **P1 - General Inventory Monday.com Sync:** Extend the bidirectional synchronization logic created for textbooks to the main product inventory.
 
 **Completed work in this session**
--   **Bug Fix - Textbook Multi-Select (DONE):**
-    -   Fixed the logic in  and  to prevent the selection of  items and correctly count selected available items.
-    -   Added a disabled state and an Out of stock badge for unavailable textbooks for better UX.
-    -   Improved backend error handling in  to return clear warnings if a user tries to order an unavailable item.
--   **Feature - Order Summary Preview (DONE):**
-    -   Created a reusable  component.
-    -   Integrated the modal into  and  to show a preview before order submission.
-    -   Created a new backend endpoint  to provide default configuration for the modal's content.
--   **Refactoring (DONE):**
-    -   Deleted the unused and obsolete  file.
+-   **Feature - Telegram Feed Enhancement (DONE):**
+    -   Implemented a backend service to group Telegram posts by  into albums.
+    -   Created a multi-container system allowing admins to manage multiple, independent feeds via new CRUD endpoints ().
+    -   Rewrote  to render a navigable album carousel for posts with multiple media items.
+    -   Updated the admin panel with a UI for managing Telegram feed containers.
+-   **Feature - Bidirectional Monday.com Inventory Sync (DONE):**
+    -   Enhanced  to handle full bidirectional synchronization of stock levels for private textbooks.
+    -   Added API endpoints for full sync () and a webhook listener ().
+    -   Integrated stock updates from the app to be pushed to Monday.com automatically.
+    -   Created a robust frontend admin tab () for configuration, sync triggering, and webhook management.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1:** A minor, pre-existing console warning about a unique key prop was observed during development. The agent noted it was not caused by the recent changes and did not block functionality.
-    -   **Debug checklist:** Inspect the child components rendered within loops in  and  to ensure the top-level element of any mapped component has a unique  prop.
-    -   **Why to solve this issue and what will be achieved with this?** Resolves a React warning and can prevent potential rendering bugs during list updates.
-    -   **Should Test frontend/backend/both after fix:** Frontend.
-    -   **Is recurring issue?** Y
+-   **Issue 1:** React unique key prop warning. (Details in All Pending/In progress Issue list).
 
 **Known issue recurrence from previous fork**
 None.
@@ -78,82 +87,78 @@ None.
 
 
 **Key Technical Concepts**
--   **Frontend State Management:** Using  to manage complex UI interactions like modal visibility, selection lists, and data for preview components.
--   **Conditional Rendering:** Disabling UI elements () and showing different components () based on data state (e.g., item availability).
--   **Modal Implementation:** Creating and integrating a reusable modal component () triggered by user actions before a final API call.
--   **API Error Handling:** Refactoring backend endpoints to return partial success/failure messages, and updating the frontend to display these messages to the user.
--   **Dynamic Configuration API:** Creating a backend endpoint to fetch UI configuration, allowing for future admin control without frontend redeployment.
+-   **Bidirectional Data Sync:** Implemented a full loop for data synchronization between a local DB and a third-party API (Monday.com), including app-initiated pushes and webhook-driven updates.
+-   **Webhook Implementation:** Created a secure webhook endpoint in FastAPI that handles challenge verification and processes incoming data payloads from an external service.
+-   **Service-Oriented Refactoring:** Created dedicated service files (, ) to encapsulate complex business logic, separating it from the API route handlers.
+-   **Dynamic Frontend Components:** Built frontend components () that adapt their rendering based on the data structure (e.g., showing a single image vs. a multi-item carousel).
+-   **Stateful UI Carousel:** Used React's  hook to manage the active slide and navigation within a custom carousel component.
+-   **Dynamic Configuration Management:** Created a system where frontend components are rendered and configured based on settings fetched from a database, managed by an admin panel, rather than being hardcoded.
 
 **key DB schema**
--   ** (NEW)**: 
--   ****: 
--   : 
-
-**changes in tech stack**
-None.
+-   ** (NEW):** 
+-   ** (MODIFIED):** Added fields like  and .
+-   ** (MODIFIED):** Now includes  to link to Monday.com.
+-   **:** No change to schema, but now records movements from monday_webhook.
 
 **All files of reference**
--    (Bug fix, Modal integration)
--    (Bug fix, Modal integration)
--    (New feature)
--    (Backend error handling)
--    (New feature backend)
--    (Next task)
--    (Next task)
--    (Next task)
+-    (Core sync logic)
+-    (Admin UI for sync)
+-    (Webhook and sync routes)
+-    (Telegram container logic)
+-    (Album carousel UI)
+-    (Admin UI for containers)
 
 **Areas that need refactoring**:
-None. The requested refactoring was completed.
+None.
 
 **key api endpoints**
--   : **(NEW)** Fetches the configuration for the order summary modal.
--   : **(NEW)** Updates the order summary modal configuration (admin-only).
--   : **(MODIFIED)** Now returns warnings for partially failed updates.
+-   : **(NEW)** Fetches active Telegram feed containers for the landing page.
+-   : **(NEW)** CRUD endpoints for managing Telegram feed containers.
+-   : **(NEW)** Triggers a full push of textbook inventory to Monday.com.
+-   : **(NEW)** Listens for stock updates from Monday.com.
 
 **Critical Info for New Agent**
--   Your first task is to implement the **Telegram Feed Album View**.
--   **Implementation Plan:**
-    1.  Start by investigating the current API response from . You need to understand how posts with multiple media files (media groups) are structured in the data received from the Telegram API.
-    2.  Modify  to process these media groups. Instead of creating a separate post for each media file, it should return a single post object with an array of media URLs (e.g., ).
-    3.  In the frontend, update . Add logic to detect if a post has multiple media URLs. If so, render a simple carousel/slider component instead of a single image/video.
-    4.  Implement next/previous arrows for the carousel to allow navigation.
-    5.  Once the album view is working, implement the second part of the request: add admin controls for the feed's title and UI. This will involve creating new endpoints in  and a new settings section in .
+-   Your first priority is to begin work on the **On-Demand Landing Page Redesign** feature. The user has explicitly approved this as the next task.
+-   Refer to the plan outlined in the Upcoming and Future Tasks section.
+-   The first step will be to design the backend APIs to support fetching components and saving custom layouts.
+-   You will likely need to use  to select and integrate an LLM for the AI-powered layout suggestions part of the feature. You should also research and select a suitable drag-and-drop library for React.
 
 **documents and test reports created in this job**
+-    (Monday.com Sync Feature Test)
+-    (Telegram Feed Enhancement Test)
 -    (Updated)
--    (Test report for Order Summary Modal feature)
--    (Test report for Textbook Multi-Select Bug Fix)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requested to group multiple media files in a Telegram post into a single album with navigation, and asked for admin controls for the feed's title/UI. - **Status: Pending (Next Task)**.
-2.  **User:** Approved the Order Summary Preview feature and asked for details on the Evolve Landing Page Layout task. - **Status: Completed**.
-3.  **Agent:** Finished the Order Summary feature and proposed next steps. - **Status: Completed**.
-4.  **User:** Clarified requirements for the Order Summary: drop one field and include form data by default, with admin configuration for later. - **Status: Completed**.
-5.  **Agent:** Proposed a plan for the Order Summary feature with two options for data inclusion. - **Status: Completed**.
-6.  **Agent:** Finished the multi-select bug fix and proposed the next task (Order Summary Preview). - **Status: Completed**.
-7.  **User:** Confirmed the location of the bug (Textbooks ordering workflow) and approved continuing with P1 tasks. - **Status: Completed**.
-8.  **Agent:** Acknowledged the bug report from the previous session and asked the user for the location of the issue. - **Status: Completed**.
-9.  **User (from previous session):** See screenshot, more than 2 items selected, but only detect 2 items - **Status: Resolved**. This was the bug that was fixed.
+1.  **User:** Approved the plan to enhance the Monday.com integration. - **Status: Completed**.
+2.  **Agent:** Provided a detailed analysis and plan for the Monday.com integration. - **Status: Completed**.
+3.  **User:** Pivoted from the landing page feature to a new request for Monday.com textbook inventory management. - **Status: Completed**.
+4.  **Agent:** Proposed a detailed plan for the On-Demand Landing Page Redesign feature. - **Status: Completed**.
+5.  **User:** Provided requirements for the On-Demand Landing Page Redesign feature (AI-gen, drag-and-drop). - **Status: Completed**.
+6.  **Agent:** Clarified what the On-Demand Landing Page task was. - **Status: Completed**.
+7.  **User:** Asked what the On-Demand Landing Page task is. - **Status: Completed**.
+8.  **Agent:** Finished the Telegram Feed feature and was about to sign off. - **Status: Completed**.
+9.  **Agent:** Ran final tests with the testing agent, which all passed. - **Status: Completed**.
+10. **User:** Good, let go with the enhancement - **This confirms the user wants to proceed with the  feature next.** - **Status: Pending (Next Task)**.
 
 **Project Health Check:**
--   **Healthy:** The application is stable. A critical bug was fixed, and a new user-requested feature was successfully implemented and tested. The project is ready for the next feature development cycle.
+-   **Healthy:** The application is stable and two significant, complex features (Telegram albums and Monday.com sync) were successfully implemented and tested in this session. The codebase is clean and ready for the next feature.
 
 **3rd Party Integrations**
-*   Monday.com API v2 (GraphQL)
+*   **Monday.com API v2 (GraphQL):** Heavily modified to support bidirectional inventory sync.
 *   Google Photos
 *   Gmail (IMAP)
 *   Telegram Bot API
 *   OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES. The agent used the testing agent to verify both the bug fix and the new Order Summary feature, ensuring stability and correctness.
+-   **Testing agent used after significant changes:** YES. The agent used the testing agent to verify both the Telegram enhancement and the Monday.com integration. All tests passed.
 -   **Troubleshoot agent used after agent stuck in loop:** NO.
 -   **Test files created:** None.
--   **Known regressions:** None. The latest tests passed successfully.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
 -   **Email:** 
 -   **Password:** 
 
 **What agent forgot to execute**
-Nothing was forgotten. All user requests from the session were addressed and completed.</analysis>
+Nothing. The agent successfully handled user pivots and completed all requested tasks before moving to the next approved item.</analysis>
