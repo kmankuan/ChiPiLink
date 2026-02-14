@@ -15,6 +15,7 @@ import {
   Store, Trophy, Zap, Calendar, Image, Users,
   ArrowRight, ChevronRight, Rss, LogIn
 } from 'lucide-react';
+import TelegramFeedCard from '@/components/TelegramFeedCard';
 
 const COMMUNITY_IMG = 'https://images.unsplash.com/photo-1766470612292-929a0553da8b?crop=entropy&cs=srgb&fm=jpg&w=600&q=80';
 const FESTIVAL_IMG = 'https://images.unsplash.com/photo-1766470611896-8f719ff4f89e?crop=entropy&cs=srgb&fm=jpg&w=600&q=80';
