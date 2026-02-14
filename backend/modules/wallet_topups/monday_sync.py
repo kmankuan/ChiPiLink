@@ -203,3 +203,187 @@ class PaymentAlertsMondaySync:
 
 
 payment_alerts_monday = PaymentAlertsMondaySync()
+
+
+class RechargeApprovalWebhookHandler:
+    """Handles incoming webhooks from the Recharge Approval board.
+    When admin changes status on Monday.com → finds matching topup → credits/rejects wallet.
+    """
+
+    # Status labels expected on the Recharge Approval board
+    APPROVED_LABELS = {"approved", "approve", "aprobado"}
+    REJECTED_LABELS = {"decline", "declined", "rejected", "reject", "rechazado"}
+
+    async def handle_webhook(self, event: dict) -> dict:
+        """Handle status change events from the Recharge Approval board."""
+        item_id = str(event.get("pulseId", ""))
+        column_id = event.get("columnId", "")
+        new_value = event.get("value", {})
+
+        status_label = self._extract_status_label(new_value)
+        logger.info(f"[recharge_webhook] Event: item={item_id}, col={column_id}, label='{status_label}'")
+
+        if not status_label:
+            return {"status": "ignored", "reason": "No status label"}
+
+        label_lower = status_label.lower().strip()
+
+        if label_lower in self.APPROVED_LABELS:
+            return await self._process_approval(item_id, status_label, event)
+        elif label_lower in self.REJECTED_LABELS:
+            return await self._process_rejection(item_id, status_label, event)
+        else:
+            msg = f"Status '{status_label}' not actionable"
+            logger.info(f"[recharge_webhook] Ignored: {msg}")
+            await self._log_event(event, "ignored", msg)
+            return {"status": "ignored", "reason": msg}
+
+    async def _process_approval(self, monday_item_id: str, label: str, event: dict) -> dict:
+        """Approve a pending topup: find it by Monday.com item ID, credit the wallet."""
+        # Find the pending topup linked to this Monday.com item
+        mapping = await db[MONDAY_TOPUP_COL].find_one(
+            {"monday_item_id": monday_item_id}, {"_id": 0}
+        )
+        if not mapping:
+            msg = f"No topup linked to Monday item {monday_item_id}"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
+
+        topup_id = mapping["topup_id"]
+        topup = await db["wallet_pending_topups"].find_one({"id": topup_id}, {"_id": 0})
+        if not topup:
+            msg = f"Topup {topup_id} not found in DB"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
+
+        if topup["status"] != "pending":
+            msg = f"Topup {topup_id} already {topup['status']}"
+            await self._log_event(event, "ignored", msg)
+            return {"status": "ignored", "reason": msg}
+
+        # Update topup status
+        now = datetime.now(timezone.utc).isoformat()
+        await db["wallet_pending_topups"].update_one(
+            {"id": topup_id},
+            {"$set": {
+                "status": "approved",
+                "reviewed_by": "monday.com",
+                "reviewed_at": now,
+                "updated_at": now,
+                "review_notes": f"Approved via Monday.com (status: {label})",
+            }}
+        )
+
+        # Credit the wallet if target user is assigned
+        credited = False
+        target_user = topup.get("target_user_id")
+        if target_user:
+            try:
+                from modules.users.services.wallet_service import wallet_service
+                from modules.users.models.wallet_models import Currency, PaymentMethod
+                tx = await wallet_service.deposit(
+                    user_id=target_user,
+                    amount=topup["amount"],
+                    currency=Currency(topup.get("currency", "USD")),
+                    payment_method=PaymentMethod("bank_transfer"),
+                    reference=topup.get("bank_reference", topup_id),
+                    description=f"Bank transfer from {topup.get('sender_name', 'unknown')} (approved via Monday.com)"
+                )
+                credited = True
+                logger.info(f"[recharge_webhook] Credited ${topup['amount']} to user {target_user}")
+
+                # Sync wallet tx to Chipi Wallet board
+                try:
+                    from modules.users.routes.wallet import _monday_sync_tx
+                    import asyncio
+                    asyncio.create_task(_monday_sync_tx(
+                        target_user, topup["amount"], "topup",
+                        f"Bank transfer (approved via Monday.com)", topup.get("bank_reference", "")
+                    ))
+                except Exception:
+                    pass
+            except Exception as e:
+                logger.error(f"[recharge_webhook] Failed to credit wallet: {e}")
+                await db["wallet_pending_topups"].update_one(
+                    {"id": topup_id}, {"$set": {"credit_error": str(e)}}
+                )
+
+        result = {
+            "topup_id": topup_id,
+            "action": "approved",
+            "amount": topup["amount"],
+            "target_user": target_user,
+            "credited": credited,
+        }
+        await self._log_event(event, "success", f"Approved topup {topup_id[:8]}, credited={credited}", result)
+        return {"status": "success", **result}
+
+    async def _process_rejection(self, monday_item_id: str, label: str, event: dict) -> dict:
+        """Reject a pending topup from Monday.com."""
+        mapping = await db[MONDAY_TOPUP_COL].find_one(
+            {"monday_item_id": monday_item_id}, {"_id": 0}
+        )
+        if not mapping:
+            msg = f"No topup linked to Monday item {monday_item_id}"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
+
+        topup_id = mapping["topup_id"]
+        topup = await db["wallet_pending_topups"].find_one({"id": topup_id}, {"_id": 0})
+        if not topup:
+            msg = f"Topup {topup_id} not found in DB"
+            await self._log_event(event, "error", msg)
+            return {"status": "error", "detail": msg}
+
+        if topup["status"] != "pending":
+            msg = f"Topup {topup_id} already {topup['status']}"
+            await self._log_event(event, "ignored", msg)
+            return {"status": "ignored", "reason": msg}
+
+        now = datetime.now(timezone.utc).isoformat()
+        await db["wallet_pending_topups"].update_one(
+            {"id": topup_id},
+            {"$set": {
+                "status": "rejected",
+                "reviewed_by": "monday.com",
+                "reviewed_at": now,
+                "updated_at": now,
+                "reject_reason": f"Rejected via Monday.com (status: {label})",
+            }}
+        )
+
+        result = {"topup_id": topup_id, "action": "rejected", "amount": topup["amount"]}
+        await self._log_event(event, "success", f"Rejected topup {topup_id[:8]}", result)
+        return {"status": "success", **result}
+
+    def _extract_status_label(self, value) -> str:
+        if isinstance(value, dict):
+            label = value.get("label") or value.get("name") or value.get("text")
+            if isinstance(label, dict):
+                return label.get("text") or label.get("name") or ""
+            return str(label) if label else ""
+        if isinstance(value, str):
+            try:
+                return self._extract_status_label(json.loads(value))
+            except (json.JSONDecodeError, TypeError):
+                return value.strip()
+        return ""
+
+    async def _log_event(self, event: dict, status: str, detail: str = "", result: dict = None):
+        doc = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "event_type": "recharge_approval_webhook",
+            "status": status,
+            "detail": detail,
+            "event_data": {
+                "boardId": event.get("boardId"),
+                "pulseId": event.get("pulseId"),
+                "columnId": event.get("columnId"),
+                "value": str(event.get("value", ""))[:200],
+            },
+            "result": result,
+        }
+        await db.recharge_approval_webhook_logs.insert_one(doc)
+
+
+recharge_approval_handler = RechargeApprovalWebhookHandler()
