@@ -167,7 +167,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ BANNER CAROUSEL — Ad/announcement container (replaces brand header) ═══ */}
       <header
-        className={`px-4 sm:px-8 pt-4 pb-2 max-w-7xl mx-auto transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-0 sm:px-8 pt-2 sm:pt-4 pb-2 max-w-7xl mx-auto transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="mosaic-header"
       >
         <BannerCarousel />
@@ -198,7 +198,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ MEDIA PLAYER — Google Photos album slideshow ═══ */}
       <section
-        className={`px-4 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-0 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="media-player-section"
       >
         <MediaPlayer />
