@@ -133,13 +133,13 @@ function PostRow({ post, onVideoPlay, accentColor }) {
         style={{ borderColor: 'rgba(0,0,0,0.06)' }}
         data-testid={`telegram-post-${post.telegram_msg_id}`}
       >
-        <AlbumCarousel media={media} onVideoPlay={onVideoPlay} accentColor={accentColor} />
-        <div className="mt-2">
-          <p className="text-sm leading-snug line-clamp-2" style={{ color: '#2d2217' }}>
-            {post.text || fallbackText(media)}
+        <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
+        {post.text && (
+          <p className="text-sm leading-snug line-clamp-2 mt-2" style={{ color: '#2d2217' }}>
+            {post.text}
           </p>
-          <PostMeta post={post} />
-        </div>
+        )}
+        <PostMeta post={post} />
       </div>
     );
   }
