@@ -295,7 +295,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                     continue
 
                 try:
-                    await self.client.update_column_values(board_id, monday_item_id, col_values)
+                    needs_labels = self._needs_create_labels(col_values, col_types)
+                    await self.client.update_column_values(
+                        board_id, monday_item_id, col_values,
+                        create_labels_if_missing=needs_labels
+                    )
                     updated += 1
                     logger.info(f"Column sync '{column_key}': updated '{book_code}' (item {monday_item_id})")
                 except Exception as e:
