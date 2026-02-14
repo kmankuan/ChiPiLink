@@ -90,22 +90,22 @@ export default function BannerCarousel() {
         )}
       </div>
 
-      {/* Navigation arrows — hidden on mobile, subtle on desktop hover */}
+      {/* Navigation arrows — bottom corners, very subtle */}
       {activeBanners.length > 1 && (
         <>
           <button
             onClick={() => go(-1)}
-            className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hidden sm:flex items-center justify-center text-white/60 opacity-0 group-hover:opacity-100 hover:bg-white/25 transition-all duration-200"
+            className="absolute left-1.5 bottom-1.5 w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-white/40 active:bg-black/20 transition-all"
             data-testid="banner-prev"
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            <ChevronLeft className="h-3 w-3" />
           </button>
           <button
             onClick={() => go(1)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hidden sm:flex items-center justify-center text-white/60 opacity-0 group-hover:opacity-100 hover:bg-white/25 transition-all duration-200"
+            className="absolute right-1.5 bottom-1.5 w-5 h-5 rounded-full bg-black/10 flex items-center justify-center text-white/40 active:bg-black/20 transition-all"
             data-testid="banner-next"
           >
-            <ChevronRight className="h-3.5 w-3.5" />
+            <ChevronRight className="h-3 w-3" />
           </button>
         </>
       )}
