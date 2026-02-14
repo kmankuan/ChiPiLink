@@ -319,8 +319,8 @@ async def txb_sync_stock(book_id: str, admin: dict = Depends(get_admin_user)):
 
 @router.post("/txb-inventory/webhook")
 async def txb_inventory_webhook(request: Request):
-    """Receive Monday.com webhook for stock column changes on TXB board.
-    Updates local inventory when stock is changed from Monday.com."""
+    """Receive Monday.com webhook for TXB board events.
+    Handles both stock column changes and new item creation."""
     body = await request.json()
 
     # Monday.com challenge verification
@@ -333,9 +333,16 @@ async def txb_inventory_webhook(request: Request):
         return {"status": "no_event"}
 
     from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+
+    event_type = event.get("type", "")
+
     try:
-        result = await txb_inventory_adapter.handle_stock_webhook(event)
-        logger.info(f"TXB Inventory webhook processed: {result}")
+        if event_type == "create_item":
+            result = await txb_inventory_adapter.handle_create_item_webhook(event)
+            logger.info(f"TXB Inventory create_item webhook processed: {result}")
+        else:
+            result = await txb_inventory_adapter.handle_stock_webhook(event)
+            logger.info(f"TXB Inventory stock webhook processed: {result}")
         return result
     except Exception as e:
         logger.error(f"TXB Inventory webhook error: {e}")
