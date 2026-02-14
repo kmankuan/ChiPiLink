@@ -169,8 +169,12 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         return sync_stats
 
     def _build_column_values(self, book: Dict, col_map: Dict) -> Dict:
-        """Build Monday.com column values from a textbook document"""
+        """Build Monday.com column values from a textbook document.
+        Only includes text/number columns — status column handled separately."""
         values = {}
+        # Stock column: handle both legacy 'stock' and new 'stock_quantity' keys
+        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+
         field_map = {
             "code": book.get("code", book.get("book_id", "")),
             "name": book.get("name", ""),
@@ -178,23 +182,21 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "publisher": book.get("publisher", ""),
             "subject": book.get("subject", ""),
             "unit_price": str(book.get("price", 0)),
-            "stock_quantity": str(book.get("inventory_quantity", 0)),
         }
-
-        # Status mapping for Monday.com
-        stock = book.get("inventory_quantity", 0)
-        if col_map.get("status"):
-            if stock <= 0:
-                field_map["status"] = {"label": "Out of Stock"}
-            elif stock <= 10:
-                field_map["status"] = {"label": "Low Stock"}
-            else:
-                field_map["status"] = {"label": "In Stock"}
 
         for field, value in field_map.items():
             col_id = col_map.get(field)
             if col_id and value is not None:
                 values[col_id] = value
+
+        # Stock quantity — set as number
+        if stock_col:
+            values[stock_col] = str(book.get("inventory_quantity", 0))
+
+        # Status column — only set if labels are explicitly configured
+        # Skip status on creation to avoid label mismatch errors;
+        # admin should configure labels on Monday.com board first
+        # Status auto-set is best done after item creation or via column update
 
         return values
 
