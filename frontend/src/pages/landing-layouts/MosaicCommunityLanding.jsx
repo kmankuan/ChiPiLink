@@ -204,102 +204,12 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
         <MediaPlayer />
       </section>
 
-      {/* ═══ MOSAIC GRID — the core visual mosaic ═══ */}
+      {/* ═══ TELEGRAM FEED — Community channel preview ═══ */}
       <section
-        className={`px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-200 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-        data-testid="mosaic-grid"
+        className={`px-4 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-200 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        data-testid="telegram-feed-section"
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[140px] sm:auto-rows-[160px] md:auto-rows-[180px]">
-
-          {/* Ping-pong & Chess — wide */}
-          <MosaicTile
-            image={img.mosaic_pingpong_chess}
-            title={t('landing.mosaic.pingpong_chess', 'Play & Compete')}
-            subtitle={t('landing.mosaic.pingpong_chess_sub', 'Table tennis & chess for all ages')}
-            onClick={() => navigate('/pinpanclub')}
-            span="col-span-2 row-span-2"
-            testId="mosaic-tile-pingpong-chess"
-            badge="PinPanClub"
-          />
-
-          {/* Kids Learning */}
-          <MosaicTile
-            image={img.mosaic_kids_learning}
-            title={t('landing.mosaic.kids', 'Kids Corner')}
-            subtitle={t('landing.mosaic.kids_sub', 'Learn, play & grow')}
-            onClick={() => navigate('/comunidad')}
-            span="col-span-1 row-span-1"
-            testId="mosaic-tile-kids"
-            overlay="from-black/70 via-black/20 to-transparent"
-          />
-
-          {/* Store card */}
-          <InfoCard
-            icon={Store}
-            title={t('modules.unatienda', 'Unatienda')}
-            desc={t('landing.shop.hint', 'Browse & order')}
-            accent="#059669"
-            accentBg="#ECFDF5"
-            onClick={() => navigate('/unatienda')}
-            testId="mosaic-card-store"
-          />
-
-          {/* Culture Fusion */}
-          <MosaicTile
-            image={img.mosaic_culture}
-            title={t('landing.mosaic.culture', 'Our Roots')}
-            subtitle={t('landing.mosaic.culture_sub', 'Chinese-Panamanian heritage')}
-            onClick={() => navigate('/galeria')}
-            span="col-span-1 row-span-1"
-            testId="mosaic-tile-culture"
-            overlay="from-black/70 via-black/20 to-transparent"
-            badge="Heritage"
-          />
-
-          {/* Rapid Pin card */}
-          <InfoCard
-            icon={Zap}
-            title="Rapid Pin"
-            desc={t('landing.rapid.hint', 'Quick matches')}
-            accent="#dc2626"
-            accentBg="#FFF1F2"
-            onClick={() => navigate('/rapidpin')}
-            testId="mosaic-card-rapid"
-          />
-
-          {/* Community Gathering — wide */}
-          <MosaicTile
-            image={img.mosaic_gathering}
-            title={t('landing.mosaic.gathering', 'Community')}
-            subtitle={t('landing.mosaic.gathering_sub', 'Together we are stronger')}
-            onClick={() => navigate('/comunidad')}
-            span="col-span-2 row-span-1"
-            testId="mosaic-tile-gathering"
-            badge="Feed"
-          />
-
-          {/* Events card */}
-          <InfoCard
-            icon={Calendar}
-            title={t('modules.events', 'Eventos')}
-            desc={t('landing.events.hint', 'Upcoming gatherings')}
-            accent="#0284c7"
-            accentBg="#F0F9FF"
-            onClick={() => navigate('/eventos')}
-            testId="mosaic-card-events"
-          />
-
-          {/* Players card */}
-          <InfoCard
-            icon={Users}
-            title={t('modules.players', 'Jugadores')}
-            desc={t('landing.players.hint', 'Find your rivals')}
-            accent="#0d9488"
-            accentBg="#F0FDFA"
-            onClick={() => navigate('/pinpanclub/players')}
-            testId="mosaic-card-players"
-          />
-        </div>
+        <TelegramFeedCard />
       </section>
 
       {/* ═══ ACTIVITY RIBBON — latest posts as horizontal scroll ═══ */}
