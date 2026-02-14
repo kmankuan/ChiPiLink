@@ -130,7 +130,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 if found:
                     # Update existing item
                     item_id = found[0]["id"]
-                    await self.client.update_column_values(board_id, item_id, col_values)
+                    needs_labels = self._needs_create_labels(col_values, col_types)
+                    await self.client.update_column_values(
+                        board_id, item_id, col_values,
+                        create_labels_if_missing=needs_labels
+                    )
                     updated += 1
                     items_map[book_code] = item_id
                     logger.info(f"TXB Sync: updated '{book_code}' (item {item_id})")
