@@ -280,14 +280,50 @@ export default function AdminDashboard() {
         return <PinpanClubModule />;
       case 'roles':
         return <RolesModule />;
-      case 'admin':
-        return <AdminModule />;
       case 'community':
         return <CommunityFeedModule />;
       case 'integrations':
         return <IntegrationsModule />;
       case 'devcontrol':
         return <DevControlModule />;
+      // Configuration
+      case 'site-config':
+        return <SiteConfigModule />;
+      case 'auth-config':
+        return <AuthMethodsConfig />;
+      case 'ui-style':
+        return <UIStyleModule />;
+      case 'translations':
+        return (
+          <div className="space-y-8">
+            <TranslationCoverageCard />
+            <DictionaryManagerModule />
+            <div className="border-t pt-6"><TranslationsPanel /></div>
+          </div>
+        );
+      // Content
+      case 'landing':
+        return <LandingPageEditor />;
+      case 'showcase':
+        return <ShowcaseAdminModule />;
+      case 'layouts':
+        return <LayoutPreviewModule />;
+      case 'ticker':
+        return <TickerAdminModule />;
+      case 'widget':
+        return <WidgetManagerModule />;
+      // Integrations
+      case 'telegram':
+        return <TelegramAdminModule />;
+      case 'forms':
+        return <FormsManagerModule />;
+      // Developer
+      case 'demo':
+        return <DemoDataModule />;
+      case 'migration':
+        return <DatabaseMigrationModule />;
+      case 'modules':
+        return <ModuleStatusModule />;
       default:
         return <DashboardModule />;
     }
