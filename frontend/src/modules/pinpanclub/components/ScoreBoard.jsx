@@ -14,8 +14,6 @@ import {
   Target,
   Zap
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-
 export default function ScoreBoard({ 
   match, 
   size = 'large', // 'small', 'medium', 'large', 'tv'
