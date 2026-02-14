@@ -257,9 +257,12 @@ export default function MediaPlayer() {
         </div>
       )}
 
-      {/* Progress dots */}
+      {/* Progress dots — with parallax */}
       {items.length > 1 && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1">
+        <div
+          className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1 transition-transform duration-100"
+          style={{ transform: `translateX(-50%) translateY(${parallaxY * -0.4}px)` }}
+        >
           {items.map((_, i) => (
             <button
               key={i}
