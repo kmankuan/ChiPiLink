@@ -6,18 +6,11 @@ Default interval: 10 minutes, configurable from admin panel.
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-import os
 
 logger = logging.getLogger(__name__)
 
 JOB_ID = "monday_banner_auto_sync"
 DEFAULT_INTERVAL_MINUTES = 10
-
-
-def _get_db():
-    from pymongo import MongoClient
-    client = MongoClient(os.environ.get("MONGO_URL"))
-    return client[os.environ.get("DB_NAME", "chipilink_prod")]
 
 
 class BannerSyncScheduler:
@@ -28,9 +21,8 @@ class BannerSyncScheduler:
     async def _run_sync(self):
         """Execute the Monday.com banner sync job."""
         from modules.showcase.monday_banner_adapter import monday_banner_adapter
-        db = _get_db()
         try:
-            config = await monday_banner_adapter.get_config(db)
+            config = await monday_banner_adapter.get_config()
             if not config.get("enabled"):
                 logger.info("Monday banner sync skipped — integration disabled")
                 return
@@ -38,7 +30,7 @@ class BannerSyncScheduler:
             if not auto_cfg.get("enabled", False):
                 logger.info("Monday banner auto-sync skipped — auto-sync disabled")
                 return
-            result = await monday_banner_adapter.sync_from_monday(db, trigger="auto")
+            result = await monday_banner_adapter.sync_from_monday(trigger="auto")
             logger.info(f"Auto-sync completed: {result}")
         except Exception as e:
             logger.error(f"Auto-sync error: {e}")
