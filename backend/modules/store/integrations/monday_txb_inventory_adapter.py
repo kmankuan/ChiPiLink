@@ -58,6 +58,10 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 "webhook_url": None,
                 "stock_column_id": None,
             }),
+            "create_item_webhook_config": config.get("create_item_webhook_config", {
+                "webhook_id": None,
+                "webhook_url": None,
+            }),
             "last_full_sync": config.get("last_full_sync"),
             "sync_stats": config.get("sync_stats", {}),
         }
