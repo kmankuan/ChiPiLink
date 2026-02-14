@@ -95,6 +95,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 - Swipe left = next slide, swipe right = previous slide (50px threshold)
 - **Tested: 100%** — 11/11 frontend tests passed on both desktop and mobile (375x812) viewports (iteration_104)
 
+### Slide Transition Animations (Feb 14, 2026) - COMPLETE
+- Added smooth 0.35s slide-in animations to both BannerCarousel and MediaPlayer
+- Direction-aware: slides animate from the right when going forward, from the left when going backward
+- Works on button clicks, swipe gestures, and auto-rotate
+- **Tested: 100%** — 14/14 frontend tests passed (iteration_105)
+
 ## Backlog
 ### P1 - Evolve Landing Page Layout
 ### P2 - On-Demand Landing Page Redesign via Admin
