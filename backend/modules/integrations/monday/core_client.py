@@ -174,14 +174,17 @@ class MondayCoreClient:
         return data.get("items_page_by_column_values", {}).get("items", [])
 
     async def update_column_values(
-        self, board_id: str, item_id: str, column_values: dict
+        self, board_id: str, item_id: str, column_values: dict,
+        create_labels_if_missing: bool = False
     ) -> bool:
-        """Update multiple column values on an item"""
+        """Update multiple column values on an item.
+        Set create_labels_if_missing=True when updating dropdown/status columns by label text."""
         col_json = json.dumps(json.dumps(column_values))
+        labels_flag = ", create_labels_if_missing: true" if create_labels_if_missing else ""
         query = f'''mutation {{
             change_multiple_column_values (
                 board_id: {board_id}, item_id: {item_id},
-                column_values: {col_json}
+                column_values: {col_json}{labels_flag}
             ) {{ id }}
         }}'''
         data = await self.execute(query)
