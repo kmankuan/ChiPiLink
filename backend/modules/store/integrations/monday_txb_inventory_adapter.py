@@ -313,10 +313,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         """Build Monday.com value for a single column from a textbook."""
         col_types = col_types or {}
         col_id = col_map.get(column_key)
+        if column_key in ("stock_quantity", "stock"):
+            col_id = col_map.get("stock_quantity") or col_map.get("stock")
         if not col_id:
             return {}
 
-        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
         ct = col_types.get(col_id, "text")
 
         field_source = {
