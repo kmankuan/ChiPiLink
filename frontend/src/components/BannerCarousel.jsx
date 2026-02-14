@@ -13,6 +13,36 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const FONT_SIZES = { sm: 'text-sm', md: 'text-base', lg: 'text-lg', xl: 'text-xl' };
 
+const DEFAULT_BANNERS = [
+  {
+    banner_id: 'default_1',
+    type: 'text',
+    text: 'Welcome to ChiPi Link Community! Join us for weekend tournaments.',
+    bg_color: '#C8102E',
+    bg_gradient: 'linear-gradient(135deg, #C8102E 0%, #8B0000 100%)',
+    text_color: '#ffffff',
+    font_size: 'lg',
+    link_url: '/comunidad',
+  },
+  {
+    banner_id: 'default_2',
+    type: 'image',
+    image_url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png',
+    link_url: '/pinpanclub',
+    overlay_text: 'PinPanClub — New Season Starting!',
+  },
+  {
+    banner_id: 'default_3',
+    type: 'text',
+    text: 'Chinese New Year Festival — Special menu & cultural activities for the whole family.',
+    bg_color: '#d97706',
+    bg_gradient: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+    text_color: '#ffffff',
+    font_size: 'lg',
+    link_url: '/eventos',
+  },
+];
+
 export default function BannerCarousel() {
   const [banners, setBanners] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -22,24 +52,24 @@ export default function BannerCarousel() {
   useEffect(() => {
     fetch(`${API_URL}/api/showcase/banners`)
       .then(r => r.ok ? r.json() : [])
-      .then(setBanners)
-      .catch(() => {});
+      .then(data => setBanners(data.length > 0 ? data : DEFAULT_BANNERS))
+      .catch(() => setBanners(DEFAULT_BANNERS));
   }, []);
+
+  const activeBanners = banners.length > 0 ? banners : DEFAULT_BANNERS;
 
   // Auto-rotate
   useEffect(() => {
-    if (banners.length <= 1 || paused) return;
+    if (activeBanners.length <= 1 || paused) return;
     const timer = setInterval(() => {
-      setCurrent(prev => (prev + 1) % banners.length);
+      setCurrent(prev => (prev + 1) % activeBanners.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [banners.length, paused]);
+  }, [activeBanners.length, paused]);
 
   const go = useCallback((dir) => {
-    setCurrent(prev => (prev + dir + banners.length) % banners.length);
-  }, [banners.length]);
-
-  if (banners.length === 0) return null;
+    setCurrent(prev => (prev + dir + activeBanners.length) % activeBanners.length);
+  }, [activeBanners.length]);
 
   const banner = banners[current];
 
