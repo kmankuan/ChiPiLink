@@ -45,7 +45,19 @@ import {
   Code2,
   BellRing,
   ChevronDown,
-  Search
+  Search,
+  Paintbrush,
+  Palette,
+  Languages,
+  Database,
+  ArrowRightLeft,
+  LayoutGrid,
+  Layout,
+  Radio,
+  Layers,
+  Megaphone,
+  Send,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
