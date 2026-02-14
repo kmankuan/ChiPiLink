@@ -97,17 +97,19 @@ class MondayCoreClient:
 
     async def create_item(
         self, board_id: str, item_name: str,
-        column_values: dict = None, group_id: str = None
+        column_values: dict = None, group_id: str = None,
+        create_labels_if_missing: bool = False
     ) -> Optional[str]:
         """Create an item on a board. Returns item_id."""
         col_json = json.dumps(json.dumps(column_values)) if column_values else '"{}"'
         group_part = f', group_id: "{group_id}"' if group_id else ""
+        labels_flag = ", create_labels_if_missing: true" if create_labels_if_missing else ""
 
         query = f'''mutation {{
             create_item (
                 board_id: {board_id},
                 item_name: "{item_name}"{group_part},
-                column_values: {col_json}
+                column_values: {col_json}{labels_flag}
             ) {{ id }}
         }}'''
 
