@@ -52,6 +52,8 @@ export default function MediaPlayer() {
   const [loaded, setLoaded] = useState(false);
   const videoRef = useRef(null);
   const timerRef = useRef(null);
+  const slideDir = useRef(1);
+  const [slideKey, setSlideKey] = useState(0);
 
   useEffect(() => {
     fetch(`${API_URL}/api/showcase/media-player`)
