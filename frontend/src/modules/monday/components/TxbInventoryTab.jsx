@@ -486,7 +486,7 @@ export default function TxbInventoryTab() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Textbook Item Columns</CardTitle>
           <CardDescription className="text-xs">
-            Map Monday.com column IDs for the main textbook items
+            Map Monday.com column IDs for the main textbook items. Use the sync button to push a specific column to Monday.com.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -496,13 +496,29 @@ export default function TxbInventoryTab() {
                 {label}
                 {required && <span className="text-red-500 text-xs">*</span>}
               </Label>
-              <Input
-                placeholder={`Monday.com column ID for ${key}`}
-                value={config.column_mapping[key] || ''}
-                onChange={(e) => updateMapping(key, e.target.value)}
-                className="text-sm"
-                data-testid={`col-${key}`}
-              />
+              <div className="flex gap-2">
+                <Input
+                  placeholder={`Monday.com column ID for ${key}`}
+                  value={config.column_mapping[key] || ''}
+                  onChange={(e) => updateMapping(key, e.target.value)}
+                  className="text-sm flex-1"
+                  data-testid={`col-${key}`}
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 px-2.5 gap-1 text-xs shrink-0"
+                  disabled={!config.column_mapping[key] || !config.enabled || !config.board_id || syncingColumn === key}
+                  onClick={() => handleSyncColumn(key, label)}
+                  title={`Sync ${label} column to Monday.com`}
+                  data-testid={`sync-col-${key}`}
+                >
+                  {syncingColumn === key
+                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    : <ArrowUpFromLine className="h-3.5 w-3.5" />}
+                  Sync
+                </Button>
+              </div>
               <p className="text-[10px] text-muted-foreground">{description}</p>
             </div>
           ))}
