@@ -370,7 +370,7 @@ export default function SchoolTextbooksView({
 
     setSubmitting(true);
     try {
-      await axios.post(
+      const res = await axios.post(
         `${API_URL}/api/store/textbook-orders/submit`,
         {
           student_id: studentId,
@@ -379,7 +379,12 @@ export default function SchoolTextbooksView({
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success(t.orderSuccess);
+      // Show warnings if some items failed
+      if (res.data?.warnings?.length > 0) {
+        toast.warning(`${t.orderSuccess} (${res.data.items_failed} ${lang === 'es' ? 'libro(s) no disponible(s)' : 'book(s) unavailable'})`);
+      } else {
+        toast.success(t.orderSuccess);
+      }
       setSelectedBooks(prev => ({ ...prev, [studentId]: {} }));
       // Refresh wallet balance after payment
       axios.get(`${API_URL}/api/wallet/me`, { headers: { Authorization: `Bearer ${token}` } })
