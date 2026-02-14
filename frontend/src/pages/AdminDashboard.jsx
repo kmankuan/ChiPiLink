@@ -117,7 +117,12 @@ const navGroups = [
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
-  const navItems = navItemsDef.map(item => ({ ...item, label: t(item.labelKey) }));
+  // Flatten all items with translated labels for lookups
+  const allNavItems = useMemo(() =>
+    navGroups.flatMap(g => g.items.map(item => ({ ...item, label: t(item.labelKey), group: g.group }))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [i18n.language]
+  );
   const { isAdmin, user, logout, loading: authLoading } = useAuth();
   const { hasPermission, role } = usePermissions();
   const { theme, toggleTheme, setScope } = useTheme();
@@ -125,6 +130,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState({ Overview: true, Commerce: true, Community: true, Management: true, System: true });
 
   // Switch to admin theme scope on mount, restore on unmount
   useEffect(() => {
