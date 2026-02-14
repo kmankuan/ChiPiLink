@@ -773,6 +773,29 @@ export default function SchoolTextbooksView({
           </div>
         </div>
       )}
+
+      {/* Order Summary Preview Modal */}
+      {summaryStudent && (() => {
+        const sid = summaryStudent.student_id || summaryStudent.sync_id;
+        const bks = getStudentBooks(sid);
+        const od = getStudentOrder(sid);
+        const itms = od?.items || [];
+        const avail = itms.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+        const sel = avail.filter(i => bks[i.book_id]);
+        return (
+          <OrderSummaryModal
+            open={!!summaryStudent}
+            onOpenChange={(v) => { if (!v) setSummaryStudent(null); }}
+            onConfirm={handleConfirmOrder}
+            studentName={summaryStudent.full_name || `${summaryStudent.first_name || ''} ${summaryStudent.last_name || ''}`.trim()}
+            selectedBooks={sel.map(b => ({ book_id: b.book_id, book_name: b.book_name, name: b.book_name, price: b.price }))}
+            total={sel.reduce((s, b) => s + (b.price || 0), 0)}
+            walletBalance={walletBalance}
+            submitting={submitting}
+            lang={lang}
+          />
+        );
+      })()}
     </div>
   );
 }
