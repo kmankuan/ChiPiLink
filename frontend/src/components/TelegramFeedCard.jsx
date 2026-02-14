@@ -3,11 +3,11 @@
  * Supports album/carousel view for media groups, configurable container UI,
  * and multi-container rendering for different channels.
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
-  Film, FileText, Image as ImageIcon, Layers
+  MessageCircle, Heart, ChevronRight, Play, X,
+  Film, FileText, Image as ImageIcon
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
