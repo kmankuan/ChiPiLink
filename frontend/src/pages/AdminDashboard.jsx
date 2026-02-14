@@ -169,6 +169,20 @@ export default function AdminDashboard() {
   // Flat list for lookups
   const filteredNavItems = useMemo(() => filteredNavGroups.flatMap(g => g.items), [filteredNavGroups]);
 
+  // Search-filtered groups for sidebar display
+  const displayNavGroups = useMemo(() => {
+    if (!sidebarSearch.trim()) return filteredNavGroups;
+    const q = sidebarSearch.toLowerCase();
+    return filteredNavGroups
+      .map(g => ({
+        ...g,
+        items: g.items.filter(i =>
+          i.label.toLowerCase().includes(q) || g.group.toLowerCase().includes(q)
+        ),
+      }))
+      .filter(g => g.items.length > 0);
+  }, [filteredNavGroups, sidebarSearch]);
+
   // Redirect non-admins away from admin panel (only after auth is loaded)
   useEffect(() => {
     if (!authLoading && !isAdmin) {
