@@ -125,10 +125,38 @@ const navGroups = [
     ],
   },
   {
-    group: 'System',
+    group: 'Configuration',
     items: [
-      { id: 'admin', labelKey: 'nav.administration', icon: Settings, permission: 'admin.site_config' },
+      { id: 'site-config', labelKey: 'nav.siteConfig', icon: Settings, permission: 'admin.site_config' },
+      { id: 'auth-config', labelKey: 'nav.authentication', icon: Shield, permission: 'admin.site_config' },
+      { id: 'ui-style', labelKey: 'nav.uiStyle', icon: Paintbrush, permission: 'admin.site_config' },
+      { id: 'translations', labelKey: 'nav.translations', icon: Languages, permission: 'admin.site_config' },
+    ],
+  },
+  {
+    group: 'Content',
+    items: [
+      { id: 'landing', labelKey: 'nav.landingPage', icon: Palette, permission: 'admin.site_config' },
+      { id: 'showcase', labelKey: 'nav.bannersMedia', icon: Megaphone, permission: 'admin.site_config' },
+      { id: 'layouts', labelKey: 'nav.layoutsIcons', icon: Layers, permission: 'admin.site_config' },
+      { id: 'ticker', labelKey: 'nav.activityTicker', icon: Radio, permission: 'admin.site_config' },
+      { id: 'widget', labelKey: 'nav.widget', icon: Layout, permission: 'admin.site_config' },
+    ],
+  },
+  {
+    group: 'Integrations',
+    items: [
+      { id: 'telegram', labelKey: 'nav.telegram', icon: Send, permission: 'admin.site_config' },
+      { id: 'forms', labelKey: 'nav.forms', icon: FileText, permission: 'admin.site_config' },
       { id: 'integrations', labelKey: 'nav.integrations', icon: Plug, permission: 'integrations.access' },
+    ],
+  },
+  {
+    group: 'Developer',
+    items: [
+      { id: 'demo', labelKey: 'nav.demoData', icon: Database, permission: 'admin.site_config', adminOnly: true },
+      { id: 'migration', labelKey: 'nav.migration', icon: ArrowRightLeft, permission: 'admin.site_config', adminOnly: true },
+      { id: 'modules', labelKey: 'nav.moduleStatus', icon: LayoutGrid, permission: 'admin.site_config', adminOnly: true },
       { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
     ],
   },
