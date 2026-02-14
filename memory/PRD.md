@@ -5,6 +5,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" -- evolved into a full-
 
 ## What's Been Implemented
 
+### Landing Page Fallback Content Fix (Feb 14, 2026) - COMPLETE
+**Root cause:** Production database had no banner/media player data, causing both components to render nothing.
+**Fix applied (two-layer safeguard):**
+1. **Frontend fallback:** BannerCarousel and MediaPlayer now have DEFAULT_BANNERS and DEFAULT_MEDIA_ITEMS constants — they always display content even if the API returns empty.
+2. **Backend seed:** `seed_showcase_defaults()` seeds 3 default banners and 4 media player items on startup if none exist.
+- **Tested: 100%** — All API endpoints + frontend rendering verified on both desktop and mobile viewports (iteration_102)
+
 ### Landing Page Showcase Module - Async Refactoring (Feb 14, 2026) - COMPLETE
 **Root cause fix:** The showcase module (banners + media player) was using synchronous PyMongo inside async handlers, blocking the FastAPI event loop. This is the same pattern that previously caused a server-wide hang with the Gmail service.
 - Migrated `showcase/__init__.py` from sync PyMongo to async motor (`from core.database import db`)
