@@ -541,12 +541,15 @@ class WalletMondayAdapter(BaseMondayAdapter):
             logger.error(f"[monday_sync] Failed to fetch item {item_id}: {e}")
             return None
 
-    async def _mark_subitem_done(self, subitem_id: str, sub_mapping: Dict, done_label: str):
+    async def _mark_subitem_done(self, subitem_id: str, sub_mapping: dict, done_label: str):
         event_col = sub_mapping.get("event", "status")
         try:
+            sub_board_id = await self._get_subitem_board_id()
+            if not sub_board_id:
+                return
             await self.client.execute(f"""
                 mutation {{ change_simple_column_value(
-                    item_id: {subitem_id}, board_id: 18399650846,
+                    item_id: {subitem_id}, board_id: {sub_board_id},
                     column_id: "{event_col}",
                     value: {json.dumps(done_label)}
                 ) {{ id }} }}
