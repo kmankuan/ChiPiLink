@@ -97,6 +97,9 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         if not textbooks:
             return {"synced": 0, "message": "No active textbooks found"}
 
+        # Fetch column types for proper value formatting
+        col_types = await self._get_board_column_types(board_id)
+
         # If using grade groups, fetch existing groups from the board
         grade_group_map = {}
         if use_grade_groups:
@@ -117,7 +120,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 found = await self.client.search_items_by_column(board_id, code_col, book_code)
 
                 # Build column values
-                col_values = self._build_column_values(book, col_map)
+                col_values = self._build_column_values(book, col_map, col_types)
 
                 if found:
                     # Update existing item
