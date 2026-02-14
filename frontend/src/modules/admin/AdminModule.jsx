@@ -180,7 +180,20 @@ export default function AdminModule() {
         </button>
         {mobileNav && (
           <div className="mt-2 p-2 rounded-xl border bg-card shadow-lg">
-            {SECTIONS.map(sec => (
+            <div className="pb-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg text-xs bg-accent/50 border-0 outline-none focus:bg-accent placeholder:text-muted-foreground/40 transition-colors"
+                  data-testid="admin-module-search-mobile"
+                />
+              </div>
+            </div>
+            {displaySections.map(sec => (
               <SidebarSection
                 key={sec.group}
                 group={sec.group}
