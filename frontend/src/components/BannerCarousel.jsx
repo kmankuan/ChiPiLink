@@ -147,6 +147,17 @@ export default function BannerCarousel() {
           ))}
         </div>
       )}
+
+      <style>{`
+        @keyframes banner-slide-left {
+          from { opacity: 0; transform: translateX(30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes banner-slide-right {
+          from { opacity: 0; transform: translateX(-30px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
