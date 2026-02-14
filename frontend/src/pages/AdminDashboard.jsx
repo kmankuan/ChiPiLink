@@ -178,7 +178,7 @@ export default function AdminDashboard() {
       .map(g => ({
         ...g,
         items: g.items.filter(i =>
-          i.label.toLowerCase().includes(q) || g.group.toLowerCase().includes(q)
+          i.label.toLowerCase().includes(q) || i.id.toLowerCase().includes(q) || g.group.toLowerCase().includes(q)
         ),
       }))
       .filter(g => g.items.length > 0);
