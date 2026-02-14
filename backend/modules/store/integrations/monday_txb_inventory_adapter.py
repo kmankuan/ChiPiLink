@@ -285,7 +285,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         config = await self.get_txb_inventory_config()
         board_id = config.get("board_id")
         col_map = config.get("column_mapping", {})
-        stock_col = col_map.get("stock_quantity")
+        stock_col = col_map.get("stock_quantity") or col_map.get("stock")
 
         if not board_id or not stock_col:
             return {"processed": False, "reason": "Not configured"}
