@@ -397,6 +397,69 @@ export default function TxbInventoryTab() {
         </CardContent>
       </Card>
 
+      {/* Monday.com → App: New Item Import */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Package className="h-4 w-4" />
+            Auto-Import New Items
+          </CardTitle>
+          <CardDescription className="text-xs">
+            When a new textbook is added directly on Monday.com, it will be automatically imported into the private catalog.
+            Column mappings above are used to extract name, code, grade, price, and stock.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-lg p-3 flex items-center justify-between" style={{
+            background: hasCreateItemWh ? '#ecfdf5' : '#fef3c7',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            <div className="flex items-center gap-2">
+              {hasCreateItemWh ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <Webhook className="h-4 w-4 text-amber-600" />
+              )}
+              <div>
+                <p className="text-xs font-medium" style={{ color: hasCreateItemWh ? '#065f46' : '#92400e' }}>
+                  {hasCreateItemWh ? 'Auto-Import Active' : 'Auto-Import Not Active'}
+                </p>
+                <p className="text-[10px]" style={{ color: hasCreateItemWh ? '#047857' : '#b45309' }}>
+                  {hasCreateItemWh
+                    ? `New items on Monday.com will be imported (ID: ${config.create_item_webhook_config.webhook_id})`
+                    : 'Register webhook to auto-import new items from Monday.com'}
+                </p>
+              </div>
+            </div>
+            {hasCreateItemWh ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleUnregisterCreateItemWebhook}
+                className="text-xs text-red-500 hover:text-red-700"
+                data-testid="unregister-create-wh-btn"
+              >
+                Remove
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={handleRegisterCreateItemWebhook}
+                disabled={registeringCreateWh || !config.enabled || !config.board_id}
+                className="text-xs gap-1"
+                data-testid="register-create-wh-btn"
+              >
+                {registeringCreateWh ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3" />}
+                Register
+              </Button>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Uses the same webhook endpoint. Imported items will use the column mappings above to extract product details.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Item Column Mapping */}
       <Card>
         <CardHeader className="pb-3">
