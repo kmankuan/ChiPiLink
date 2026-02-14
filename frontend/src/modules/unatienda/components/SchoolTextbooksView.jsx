@@ -353,22 +353,34 @@ export default function SchoolTextbooksView({
     }));
   };
   
-  const handleSubmit = async (student) => {
+  const handleSubmit = (student) => {
     const studentId = student.student_id || student.sync_id;
-    const orderData = getStudentOrder(studentId);
     const books = getStudentBooks(studentId);
+    const orderData = getStudentOrder(studentId);
     const items = orderData?.items || [];
     const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
     const selectedList = availableItems.filter(i => books[i.book_id]);
     
     if (selectedList.length === 0) { toast.error(t.selectAtLeastOne); return; }
 
-    // Calculate total and check wallet balance
     const total = selectedList.reduce((sum, b) => sum + (b.price || 0), 0);
     if (walletBalance !== null && walletBalance < total) {
       toast.error(lang === 'es' ? 'Saldo insuficiente en billetera' : 'Insufficient wallet balance');
       return;
     }
+
+    setSummaryStudent(student);
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!summaryStudent) return;
+    const student = summaryStudent;
+    const studentId = student.student_id || student.sync_id;
+    const orderData = getStudentOrder(studentId);
+    const books = getStudentBooks(studentId);
+    const items = orderData?.items || [];
+    const availableItems = items.filter(i => i.status === 'available' || i.status === 'reorder_approved');
+    const selectedList = availableItems.filter(i => books[i.book_id]);
 
     setSubmitting(true);
     try {
