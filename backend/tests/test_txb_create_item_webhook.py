@@ -30,7 +30,7 @@ class TestTxbCreateItemWebhookEndpoints:
             "password": "admin"
         })
         assert login_resp.status_code == 200, f"Login failed: {login_resp.text}"
-        self.token = login_resp.json().get("access_token")
+        self.token = login_resp.json().get("token")
         self.headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"}
     
     # ===== Config endpoint returns create_item_webhook_config =====
@@ -234,7 +234,7 @@ class TestSyncDashboardStillWorks:
             "password": "admin"
         })
         assert login_resp.status_code == 200
-        self.token = login_resp.json().get("access_token")
+        self.token = login_resp.json().get("token")
         self.headers = {"Authorization": f"Bearer {self.token}"}
     
     def test_sync_dashboard_endpoint_works(self):
