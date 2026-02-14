@@ -9,6 +9,41 @@ import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Maximize, Ima
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const DEFAULT_MEDIA_ITEMS = [
+  {
+    item_id: 'default_1',
+    type: 'image',
+    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png',
+    caption: 'PinPanClub Training Day',
+  },
+  {
+    item_id: 'default_2',
+    type: 'image',
+    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/3eaf9b70f2c8a242db6fd32a793b16c215104f30755b70c8b63aa38dd331f753.png',
+    caption: 'Kids Learning Together',
+  },
+  {
+    item_id: 'default_3',
+    type: 'image',
+    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/535181b7a5a2144892c75ca15c73f9320f5739017de399d05ced0e60170f39e7.png',
+    caption: 'Chinese-Panamanian Heritage',
+  },
+  {
+    item_id: 'default_4',
+    type: 'image',
+    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/0416cce781984810906e615303474bfe2089c65f53db816a6bf448f34cbd3bda.png',
+    caption: 'Community Gathering',
+  },
+];
+
+const DEFAULT_CONFIG = {
+  autoplay: true,
+  interval_ms: 5000,
+  loop: true,
+  show_controls: true,
+  items: DEFAULT_MEDIA_ITEMS,
+};
+
 export default function MediaPlayer() {
   const [config, setConfig] = useState(null);
   const [current, setCurrent] = useState(0);
@@ -24,10 +59,15 @@ export default function MediaPlayer() {
       .then(data => {
         if (data && data.items && data.items.length > 0) {
           setConfig(data);
-          setLoaded(true);
+        } else {
+          setConfig(DEFAULT_CONFIG);
         }
+        setLoaded(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        setConfig(DEFAULT_CONFIG);
+        setLoaded(true);
+      });
   }, []);
 
   const items = config?.items || [];
