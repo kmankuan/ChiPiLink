@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional
 from core.database import db
-from modules.auth.dependencies import get_current_user, require_admin
+from core.auth import get_admin_user
 
 router = APIRouter(prefix="/order-summary-config", tags=["Order Summary Config"])
 
@@ -49,7 +49,7 @@ async def get_order_summary_config():
 @router.put("")
 async def update_order_summary_config(
     body: UpdateOrderSummaryConfig,
-    current_user=Depends(require_admin),
+    current_user=Depends(get_admin_user),
 ):
     """Admin: update order summary modal configuration."""
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
