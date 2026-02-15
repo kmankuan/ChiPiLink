@@ -239,8 +239,10 @@ function PostMeta({ post }) {
 
 function MediaGalleryModal({ media, startIndex, caption, onClose }) {
   const [current, setCurrent] = useState(startIndex || 0);
+  const [autoPlay, setAutoPlay] = useState(true);
   const videoRef = useRef(null);
   const hasAdvancedRef = useRef(false);
+  const timerRef = useRef(null);
 
   const item = media[current];
   const isVideo = item?.type === 'video' || item?.type === 'animation';
@@ -253,6 +255,7 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight' && current < total - 1) goNext();
       if (e.key === 'ArrowLeft' && current > 0) goPrev();
+      if (e.key === ' ') { e.preventDefault(); setAutoPlay(a => !a); }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
@@ -263,10 +266,26 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
     hasAdvancedRef.current = false;
   }, [current]);
 
+  // Auto-advance photos when autoPlay is on
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (!isVideo && autoPlay && total > 1) {
+      timerRef.current = setTimeout(() => {
+        if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+      }, 4000);
+    }
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [current, isVideo, autoPlay, isLast, total]);
+
   const goNext = () => {
     if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
   };
   const goPrev = () => { if (current > 0) setCurrent(c => c - 1); };
+
+  // Toggle auto-play on tap (for photos only)
+  const handleMediaTap = () => {
+    if (!isVideo) setAutoPlay(a => !a);
+  };
 
   // Video ended handler — advance or close
   const handleVideoEnded = () => {
@@ -289,17 +308,35 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
         <span className="text-white/70 text-xs font-medium">
           {current + 1} / {total}
         </span>
-        <button
-          onClick={onClose}
-          className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20"
-          data-testid="gallery-close"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          {!isVideo && total > 1 && (
+            <button
+              onClick={() => setAutoPlay(a => !a)}
+              className="px-2 py-1 rounded-full bg-white/10 flex items-center gap-1 text-white text-[10px] active:bg-white/20"
+              data-testid="gallery-autoplay-toggle"
+            >
+              {autoPlay ? (
+                <><Play className="h-2.5 w-2.5 fill-white" /> Auto</>
+              ) : (
+                <><span className="w-2.5 h-2.5 flex items-center justify-center font-bold">||</span> Paused</>
+              )}
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20"
+            data-testid="gallery-close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Media area — edge to edge */}
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+      <div
+        className="flex-1 relative flex items-center justify-center overflow-hidden"
+        onClick={handleMediaTap}
+      >
         {isVideo && src ? (
           <video
             ref={videoRef}
