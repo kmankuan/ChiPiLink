@@ -79,6 +79,7 @@ function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20', onClick }) {
     : null;
 
   const handleClick = () => {
+    if (onClick) { onClick(); return; }
     if (isVideo && item?.file_id) onVideoPlay(item.file_id);
   };
 
