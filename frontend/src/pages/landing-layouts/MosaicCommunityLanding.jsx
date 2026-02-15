@@ -9,7 +9,7 @@
  * with cultural icon navigation. Feels like an art gallery
  * meets community bulletin board.
  */
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
