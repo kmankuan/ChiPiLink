@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  MessageCircle, Heart, ChevronRight, Play, X,
+  MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
   Film, FileText, Image as ImageIcon
 } from 'lucide-react';
 
