@@ -688,6 +688,108 @@ export default function LayoutPreviewModule() {
           </div>
         </div>
       )}
+
+      {/* Status Manager */}
+      <div className="rounded-2xl border border-border/50 bg-card p-4 space-y-3" data-testid="status-manager">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setShowStatusManager(!showStatusManager)}
+            className="flex items-center gap-2 text-left"
+          >
+            <Settings className="h-4 w-4 text-primary" />
+            <div>
+              <h3 className="text-sm font-bold tracking-tight">Custom Statuses</h3>
+              <p className="text-[10px] text-muted-foreground">
+                {statusOptions.length} statuses — Create and customize status indicators
+              </p>
+            </div>
+            {showStatusManager ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          </button>
+          {showStatusManager && (
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={addCustomStatus} className="h-7 text-xs gap-1" data-testid="add-status-btn">
+                <Plus className="h-3 w-3" /> Add Status
+              </Button>
+              <Button size="sm" onClick={saveStatuses} disabled={savingStatuses} className="h-7 text-xs gap-1" data-testid="save-statuses-btn">
+                {savingStatuses ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                Save
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {showStatusManager && (
+          <div className="space-y-2">
+            {statusOptions.map((st, idx) => (
+              <div
+                key={st.value}
+                className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 border border-border/30"
+                data-testid={`status-row-${st.value}`}
+              >
+                <input
+                  type="color"
+                  value={st.color || '#666'}
+                  onChange={(e) => updateStatus(idx, 'color', e.target.value)}
+                  className="w-7 h-7 rounded cursor-pointer border-0 shrink-0"
+                />
+                <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div>
+                    <Label className="text-[9px] text-muted-foreground">ID</Label>
+                    <Input
+                      value={st.value}
+                      onChange={(e) => updateStatus(idx, 'value', e.target.value.toLowerCase().replace(/\s+/g, '_'))}
+                      className="h-7 text-xs font-mono"
+                      data-testid={`status-id-${idx}`}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[9px] text-muted-foreground">Display Name</Label>
+                    <Input
+                      value={st.label}
+                      onChange={(e) => updateStatus(idx, 'label', e.target.value)}
+                      className="h-7 text-xs"
+                      data-testid={`status-label-${idx}`}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[9px] text-muted-foreground">Animation</Label>
+                    <select
+                      value={st.animation || 'none'}
+                      onChange={(e) => updateStatus(idx, 'animation', e.target.value)}
+                      className="h-7 w-full px-2 text-xs border rounded-md bg-background"
+                    >
+                      {ANIMATION_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {st.animation === 'custom_gif' && (
+                    <div>
+                      <Label className="text-[9px] text-muted-foreground">GIF/Image URL</Label>
+                      <Input
+                        value={st.gif_url || ''}
+                        onChange={(e) => updateStatus(idx, 'gif_url', e.target.value)}
+                        className="h-7 text-xs"
+                        placeholder="https://...gif"
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* Preview */}
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center overflow-hidden" title="Preview">
+                  <StatusAnimationPreview animation={st.animation} color={st.color} gifUrl={st.gif_url} />
+                </div>
+                <button
+                  onClick={() => removeStatus(idx)}
+                  className="text-destructive hover:bg-destructive/10 p-1.5 rounded-lg shrink-0"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
