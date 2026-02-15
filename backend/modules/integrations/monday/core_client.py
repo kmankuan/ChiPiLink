@@ -213,6 +213,27 @@ class MondayCoreClient:
         except Exception:
             return False
 
+    async def get_board_items(self, board_id: str, limit: int = 50) -> list:
+        """Fetch items from a board with all column values"""
+        data = await self.execute(
+            f'''query {{
+                boards(ids: [{board_id}]) {{
+                    items_page(limit: {limit}) {{
+                        items {{
+                            id name group {{ id title }}
+                            column_values {{ id text value type }}
+                        }}
+                    }}
+                }}
+            }}''',
+            timeout=30.0
+        )
+        boards = data.get("boards", [])
+        if not boards:
+            return []
+        return boards[0].get("items_page", {}).get("items", [])
+
+
 
 # Singleton
 monday_client = MondayCoreClient()
