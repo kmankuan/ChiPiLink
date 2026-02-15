@@ -279,7 +279,11 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 await self._finish_column_sync(column_key, 0, 0, 0, total)
                 return
 
-            col_types = await self._get_board_column_types(board_id)
+            try:
+                col_types = await self._get_board_column_types(board_id)
+            except Exception as e:
+                logger.error(f"Column sync '{column_key}': failed to get column types: {e}")
+                col_types = {}
 
             updated = 0
             skipped = 0
@@ -298,8 +302,8 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                                 {"$or": [{"code": book_code}, {"book_id": book_code}], "is_private_catalog": True},
                                 {"$set": {"monday_item_id": str(monday_item_id)}}
                             )
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.warning(f"Column sync '{column_key}': lookup failed for '{book_code}': {e}")
 
                 if not monday_item_id:
                     skipped += 1
@@ -317,20 +321,23 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                         create_labels_if_missing=needs_labels
                     )
                     updated += 1
-                    logger.info(f"Column sync '{column_key}': updated '{book_code}' (item {monday_item_id})")
                 except Exception as e:
                     failed += 1
-                    logger.error(f"Column sync '{column_key}' error for '{book_code}': {e}")
+                    logger.error(f"Column sync '{column_key}' API error for '{book_code}' (item {monday_item_id}): {e}. Values sent: {col_values}")
 
             await self._finish_column_sync(column_key, updated, skipped, failed, total)
+            logger.info(f"Column sync '{column_key}' done: updated={updated}, skipped={skipped}, failed={failed}, total={total}")
 
         except Exception as e:
-            logger.error(f"Column sync '{column_key}' background task error: {e}")
-            await db.monday_column_sync_status.update_one(
-                {"column_key": column_key},
-                {"$set": {"status": "error", "error": str(e),
-                          "finished_at": datetime.now(timezone.utc).isoformat()}},
-            )
+            logger.error(f"Column sync '{column_key}' background task error: {e}", exc_info=True)
+            try:
+                await db.monday_column_sync_status.update_one(
+                    {"column_key": column_key},
+                    {"$set": {"status": "error", "error": str(e),
+                              "finished_at": datetime.now(timezone.utc).isoformat()}},
+                )
+            except Exception:
+                pass
 
     async def _finish_column_sync(self, column_key, updated, skipped, failed, total):
         await db.monday_column_sync_status.update_one(
