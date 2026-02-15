@@ -81,70 +81,69 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
     }
   };
 
-  // Status badge colors and labels
-  const STATUS_CONFIG = {
-    ready: { label: '', color: 'bg-green-500', show: false },
-    building: { label: '', color: 'bg-amber-500', show: true, animated: true },
-    coming_soon: { label: 'Pronto', color: 'bg-blue-500', show: true },
-    maintenance: { label: '', color: 'bg-red-500', show: true },
-  };
-
-  const statusInfo = STATUS_CONFIG[status] || STATUS_CONFIG.building;
+  const isBuilding = status === 'building';
+  const isComingSoon = status === 'coming_soon';
+  const isMaintenance = status === 'maintenance';
 
   return (
     <button
       onClick={handleClick}
       disabled={!hasLink}
-      className={`group flex flex-col items-center gap-0.5 transition-transform ${hasLink ? 'active:scale-95 cursor-pointer' : 'cursor-default'}`}
+      className={`group flex flex-col items-center gap-1 transition-transform ${hasLink ? 'active:scale-95 cursor-pointer' : 'cursor-default'}`}
       data-testid={`cultural-nav-${label.toLowerCase().replace(/\s/g, '-')}`}
     >
-      <div className="relative">
-        <div
-          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden ${hasLink ? 'group-hover:scale-110 group-hover:shadow-lg' : 'grayscale-[30%]'}`}
-          style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
-        >
+      {/* Icon container with internal status indicator */}
+      <div
+        className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 overflow-hidden ${hasLink ? 'group-hover:scale-110 group-hover:shadow-lg' : 'grayscale-[30%]'}`}
+        style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
+      >
+        {/* Icon shifted up when building */}
+        <div className={`flex items-center justify-center ${isBuilding ? '-mt-1' : ''}`}>
           {imageUrl ? (
-            <img src={imageUrl} alt={label} className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+            <img src={imageUrl} alt={label} className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
           ) : (
             <Icon className="h-6 w-6 sm:h-7 sm:w-7" style={{ color: accent }} />
           )}
         </div>
+        
+        {/* Building animation inside icon box at bottom */}
+        {isBuilding && (
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-[2px] items-end h-2">
+            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '0ms', height: '4px' }}></span>
+            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '100ms', height: '7px' }}></span>
+            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '200ms', height: '5px' }}></span>
+            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '300ms', height: '4px' }}></span>
+          </div>
+        )}
+        
+        {/* Coming soon indicator inside icon */}
+        {isComingSoon && (
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+            <span className="text-[6px] font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded-full whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
+        )}
+        
+        {/* Maintenance indicator inside icon */}
+        {isMaintenance && (
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
+            <span className="text-[6px] font-bold text-red-600 bg-red-100 px-1 py-0.5 rounded-full whitespace-nowrap">
+              Mant.
+            </span>
+          </div>
+        )}
       </div>
       
+      {/* Label below icon */}
       <span className="text-[10px] sm:text-xs font-bold tracking-tight" style={{ color: '#5a4a3a' }}>
         {label}
       </span>
-
-      {/* Status indicator below label */}
-      {statusInfo.show && status === 'building' && (
-        <div className="flex items-center gap-0.5 mt-0.5">
-          <div className="flex gap-[3px] items-end h-3">
-            <span className="w-[3px] bg-amber-500 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '0ms', height: '6px' }}></span>
-            <span className="w-[3px] bg-amber-500 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '100ms', height: '10px' }}></span>
-            <span className="w-[3px] bg-amber-500 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '200ms', height: '8px' }}></span>
-            <span className="w-[3px] bg-amber-500 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '300ms', height: '6px' }}></span>
-          </div>
-        </div>
-      )}
-      
-      {/* Coming soon badge */}
-      {statusInfo.show && status === 'coming_soon' && (
-        <span className="text-[8px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full whitespace-nowrap mt-0.5">
-          Pronto
-        </span>
-      )}
-      
-      {/* Maintenance badge */}
-      {statusInfo.show && status === 'maintenance' && (
-        <span className="text-[8px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded-full whitespace-nowrap mt-0.5">
-          Mant.
-        </span>
-      )}
       
       {/* CSS for building animation */}
       <style>{`
         @keyframes building {
-          0%, 100% { transform: scaleY(0.6); opacity: 0.7; }
+          0%, 100% { transform: scaleY(0.6); opacity: 0.6; }
           50% { transform: scaleY(1); opacity: 1; }
         }
       `}</style>
