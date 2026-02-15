@@ -446,3 +446,44 @@ async def update_layout_icons(layout_id: str, body: dict):
         upsert=True
     )
     return {"status": "ok", "layout_id": layout_id, "icons": icons}
+
+
+# ─── Custom Icon Statuses ───
+
+DEFAULT_ICON_STATUSES = [
+    {"value": "ready", "label": "Ready", "color": "#22c55e", "animation": "none", "gif_url": ""},
+    {"value": "building", "label": "Building", "color": "#f59e0b", "animation": "building_bars", "gif_url": ""},
+    {"value": "coming_soon", "label": "Coming Soon", "color": "#3b82f6", "animation": "pulse", "gif_url": ""},
+    {"value": "maintenance", "label": "Maintenance", "color": "#ef4444", "animation": "wrench", "gif_url": ""},
+]
+
+
+@router.get("/icon-statuses")
+async def get_icon_statuses_public():
+    """Public: get available icon statuses."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
+    statuses = doc.get("value", DEFAULT_ICON_STATUSES) if doc else DEFAULT_ICON_STATUSES
+    return {"statuses": statuses}
+
+
+@admin_router.get("/icon-statuses")
+async def get_icon_statuses_admin():
+    """Admin: get icon statuses config."""
+    db = get_db()
+    doc = db.app_config.find_one({"config_key": "icon_statuses"}, {"_id": 0})
+    statuses = doc.get("value", DEFAULT_ICON_STATUSES) if doc else DEFAULT_ICON_STATUSES
+    return {"statuses": statuses, "defaults": DEFAULT_ICON_STATUSES}
+
+
+@admin_router.put("/icon-statuses")
+async def update_icon_statuses(body: dict):
+    """Admin: update custom icon statuses."""
+    db = get_db()
+    statuses = body.get("statuses", [])
+    db.app_config.update_one(
+        {"config_key": "icon_statuses"},
+        {"$set": {"config_key": "icon_statuses", "value": statuses, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True
+    )
+    return {"status": "ok", "statuses": statuses}
