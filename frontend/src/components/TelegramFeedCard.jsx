@@ -50,7 +50,7 @@ function fallbackText(media) {
 
 /* ────────────────── Media Thumbnail Grid ────────────────── */
 
-function MediaGrid({ media, onVideoPlay, compact = false }) {
+function MediaGrid({ media, onVideoPlay, compact = false, onOpenGallery }) {
   if (!media || media.length === 0) return null;
 
   const size = compact ? 'w-14 h-14' : 'w-[72px] h-[72px]';
@@ -58,13 +58,19 @@ function MediaGrid({ media, onVideoPlay, compact = false }) {
   return (
     <div className="flex gap-1 flex-shrink-0" data-testid="media-grid">
       {media.map((item, idx) => (
-        <MediaThumb key={idx} item={item} onVideoPlay={onVideoPlay} size={size} />
+        <MediaThumb
+          key={idx}
+          item={item}
+          onVideoPlay={onVideoPlay}
+          size={size}
+          onClick={() => onOpenGallery ? onOpenGallery(idx) : (item?.type === 'video' || item?.type === 'animation') && item?.file_id && onVideoPlay(item.file_id)}
+        />
       ))}
     </div>
   );
 }
 
-function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20' }) {
+function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20', onClick }) {
   const isVideo = item?.type === 'video' || item?.type === 'animation';
   const thumbSrc = item?.type === 'photo'
     ? mediaUrl(item.file_id)
