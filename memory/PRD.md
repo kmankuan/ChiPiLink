@@ -5,102 +5,66 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Horizontal Telegram Feed Redesign (Feb 15, 2026) - COMPLETE
+- Redesigned Telegram feed from vertical list to horizontal scrollable carousel
+- Cards display media thumbnail, truncated description, time ago, likes/comments
+- Clicking a card opens a detail modal with full text and media gallery navigation
+- "Load older" button at end of scroll to fetch more posts
+- Configurable from admin panel: layout_mode (horizontal/vertical), card_width, card_height, description_max_lines
+- Backend ContainerCreate/ContainerUpdate models extended with new fields
+- i18n translations added for en/es/zh (telegramFeed.seeAll, loadOlder, noPosts, seeMore, close)
+- Files: `frontend/src/components/TelegramFeedCard.jsx`, `frontend/src/modules/admin/TelegramAdminModule.jsx`, `backend/modules/community/routes/telegram_feed.py`, i18n locales
+
 ### Module Icon Status Indicators (Feb 15, 2026) - COMPLETE
 - Admin-configurable status for each landing page icon (Ready, Building, Coming Soon, Maintenance)
 - Animated "building" indicator (pulsing amber bars) below icon labels
-- Icons with empty routes are disabled (not clickable, slight grayscale)
-- Status dropdown added to Layouts & Icons admin panel (LayoutPreviewModule.jsx)
-- 4 status types:
-  - `ready` - No indicator shown, fully clickable
-  - `building` - Animated amber bars (current default for all icons)
-  - `coming_soon` - "Pronto" badge
-  - `maintenance` - "Mant." badge
-- Files: `frontend/src/modules/admin/LayoutPreviewModule.jsx`, `frontend/src/pages/landing-layouts/MosaicCommunityLanding.jsx`
 
 ### Privacy Settings Module (Feb 15, 2026) - COMPLETE
 - Admin-configurable search engine indexing control
 - Dynamic robots.txt generation at `/robots.txt`
-- Block/allow toggle for search engines (default: blocked for private community)
-- Custom path rules (allow/disallow specific paths)
-- Custom robots.txt override option
-- Real-time preview of robots.txt content
-- Backend endpoints: `GET/PUT /api/admin/privacy`, `POST /api/admin/privacy/reset`
-- Public endpoints: `GET /robots.txt`, `GET /privacy/meta-robots`
-- Files: `backend/modules/admin/privacy_routes.py`, `frontend/src/modules/admin/PrivacyModule.jsx`
 
 ### Monday.com Public Board Widget (Feb 15, 2026) - COMPLETE
 - Admin-configurable landing page widget showing Monday.com board content
-- Backend: Cached data with configurable refresh interval, public (no auth) endpoint
-- Admin panel: Board selection, column picker (chips UI), group filter, display style (cards/table/list), max items, refresh interval
-- Frontend: `MondayBoardWidget` component with 3 display modes, auto-cache refresh
-- Endpoints: `GET/PUT /api/monday/public-board-widget/config`, `POST /refresh`, `GET /api/monday/public-board-widget` (public)
-- Files: `backend/modules/integrations/monday/public_board_widget.py`, `frontend/src/components/MondayBoardWidget.jsx`, `frontend/src/modules/monday/components/PublicBoardWidgetTab.jsx`
 
 ### Media Gallery Player (Feb 15, 2026) - COMPLETE
-- Edge-to-edge fullscreen gallery replacing old rounded video modal
-- Left/right arrows for navigation, dot indicators, counter
-- Photos auto-advance (4s), pause on touch, resume on touch again
-- Videos auto-advance on finish, gallery auto-closes after last file
+- Edge-to-edge fullscreen gallery with auto-advance
 
 ### PinPanClub Super Pin Ranking Layout Fix (Feb 15, 2026) - COMPLETE
 - Fixed mobile layout overflow in "Super Pin Ranking" banner section
-- Made title/description responsive with `text-lg sm:text-2xl`
-- Buttons now stack properly on mobile with shortened labels ("Ranking", "Admin")
-- Uses `flex-col sm:flex-row` for proper responsive stacking
 
 ### Banner & Telegram Feed UI Fixes (Feb 15, 2026) - COMPLETE
 - Banner: No rounded corners, no gap between ticker and banner
 - Telegram feed: Edge-to-edge on mobile, consistent 72px thumbnails
-- Thumbnails + description inline layout (flex, text beside thumbnails)
 
 ### Per-Column Sync Bug Fix (Feb 15, 2026) - COMPLETE
 - Fixed "Server error (400)" — route handler uses JSONResponse + try/except
-- Better error logging with stack traces in background tasks
 
-### Earlier Features - ALL COMPLETE
-- Column Matcher UI, Telegram Feed Album Carousel
-- Order Summary Preview Modal, Textbook Multi-Select Bug Fix
-- Touch-Swipe Gestures, Admin Panel Refactor, Monday.com Dual Board Integration
-- Banner Carousel & Media Player, Wallet Payment Workflow
+## Prioritized Backlog
 
-## Key API Endpoints
+### P1: Implement "Stop" Button for Full Sync
+- Refactor full_sync into cancellable background task
+- Add stop button in UI
 
-### Monday.com Public Board Widget
-- `GET /api/monday/public-board-widget` — Public cached board data (no auth)
-- `GET /api/monday/public-board-widget/config` — Admin config
-- `PUT /api/monday/public-board-widget/config` — Save config
-- `POST /api/monday/public-board-widget/refresh` — Force cache refresh
+### P2: On-Demand Landing Page Redesign Tool
+- Build admin panel tool for layout/component customization
 
-### TXB Inventory Per-Column Sync
-- `POST /api/store/monday/txb-inventory/sync-column/{column_key}` — Sync single column
-- `GET /api/store/monday/txb-inventory/sync-column-status/{column_key}` — Poll status
+### P3: General Inventory Monday.com Sync
+- Extend Monday.com sync to general (non-textbook) inventory
 
-### Other Core Endpoints
-- `GET /api/monday/sync-dashboard` — Unified sync health
-- `GET /api/store/monday/txb-inventory-config` — TXB config
-- `PUT /api/store/monday/txb-inventory-config` — Save TXB config
+## Architecture
 
-## Database Collections
-- `monday_public_board_widget` — Widget config
-- `monday_public_board_cache` — Cached board items
-- `monday_integration_config` — Monday.com integration configs
-- `monday_column_sync_status` — Per-column sync tracking
-- `store_products` — Products
-- `telegram_feed_containers` — Feed container configs
+### Backend
+- FastAPI with MongoDB (Motor async driver)
+- Modular route structure under `/app/backend/modules/`
+- Telegram Bot API integration for channel sync
 
-## 3rd Party Integrations
-- Monday.com API v2 (GraphQL)
-- Telegram Bot API
-- OpenAI GPT-4o / Anthropic Claude Sonnet 4.5 — Emergent LLM Key
-- Gmail (IMAP)
+### Frontend
+- React with react-i18next for i18n (en, es, zh)
+- Shadcn/UI components
+- Multiple landing page layouts (living_grid, mosaic, cinematic, etc.)
+- Admin dashboard with modular tabs
 
-## Backlog
-### P1 - Stop Sync Button (Upcoming)
-- Cancel in-progress Full Sync to Monday.com
-
-### P2 - On-Demand Landing Page Designer (Planned)
-- Layout switcher, section manager, live preview
-- Theme/color customizer, AI-generated suggestions
-
-### P3 - General Inventory Monday.com Sync (Future)
-- New board for public catalog products
+### Key DB Collections
+- `telegram_feed_containers`: Feed container configs with layout_mode, card_width, card_height, description_max_lines
+- `community_posts`: Telegram channel posts
+- `app_settings`: Site-wide settings (privacy, etc.)
