@@ -70,8 +70,8 @@ function formatDate(dateStr) {
 }
 
 // Cultural icon button used for navigation — supports Lucide icons or custom images
-// Now includes status indicator (ready, building, coming_soon, maintenance)
-function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status = 'building' }) {
+// Now includes dynamic status indicator with multiple animation types and custom GIF support
+function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status = 'building', statusAnimation, statusGifUrl, statusColor, statusLabel }) {
   const navigate = useNavigate();
   const hasLink = to && to.trim() !== '';
   
@@ -81,9 +81,9 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
     }
   };
 
-  const isBuilding = status === 'building';
-  const isComingSoon = status === 'coming_soon';
-  const isMaintenance = status === 'maintenance';
+  const anim = statusAnimation || (status === 'building' ? 'building_bars' : status === 'coming_soon' ? 'pulse' : status === 'maintenance' ? 'wrench' : 'none');
+  const sColor = statusColor || (status === 'building' ? '#f59e0b' : status === 'coming_soon' ? '#3b82f6' : status === 'maintenance' ? '#ef4444' : '#22c55e');
+  const isReady = status === 'ready' && anim === 'none';
 
   return (
     <button
@@ -97,8 +97,8 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
         className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 overflow-hidden ${hasLink ? 'group-hover:scale-110 group-hover:shadow-lg' : 'grayscale-[30%]'}`}
         style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
       >
-        {/* Icon shifted up when building */}
-        <div className={`flex items-center justify-center ${isBuilding ? '-mt-1' : ''}`}>
+        {/* Icon (shifted up if animation below) */}
+        <div className={`flex items-center justify-center ${!isReady ? '-mt-1' : ''}`}>
           {imageUrl ? (
             <img src={imageUrl} alt={label} className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
           ) : (
@@ -106,31 +106,10 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
           )}
         </div>
         
-        {/* Building animation inside icon box at bottom */}
-        {isBuilding && (
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-[2px] items-end h-2">
-            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '0ms', height: '4px' }}></span>
-            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '100ms', height: '7px' }}></span>
-            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '200ms', height: '5px' }}></span>
-            <span className="w-[3px] bg-amber-500/80 rounded-sm animate-[building_0.5s_ease-in-out_infinite]" style={{ animationDelay: '300ms', height: '4px' }}></span>
-          </div>
-        )}
-        
-        {/* Coming soon indicator inside icon */}
-        {isComingSoon && (
+        {/* Status animations (inside icon box at bottom) */}
+        {!isReady && (
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-            <span className="text-[6px] font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded-full whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
-        )}
-        
-        {/* Maintenance indicator inside icon */}
-        {isMaintenance && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-            <span className="text-[6px] font-bold text-red-600 bg-red-100 px-1 py-0.5 rounded-full whitespace-nowrap">
-              Mant.
-            </span>
+            <StatusAnimation type={anim} color={sColor} gifUrl={statusGifUrl} />
           </div>
         )}
       </div>
@@ -140,15 +119,94 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
         {label}
       </span>
       
-      {/* CSS for building animation */}
+      {/* Status label if custom */}
+      {statusLabel && (
+        <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full -mt-0.5" style={{ background: `${sColor}18`, color: sColor }}>
+          {statusLabel}
+        </span>
+      )}
+      
+      {/* All animation keyframes */}
       <style>{`
         @keyframes building {
           0%, 100% { transform: scaleY(0.6); opacity: 0.6; }
           50% { transform: scaleY(1); opacity: 1; }
         }
+        @keyframes blocks {
+          0% { transform: scaleY(0.3); opacity: 0.4; }
+          50% { transform: scaleY(1.2); opacity: 1; }
+          100% { transform: scaleY(0.3); opacity: 0.4; }
+        }
+        @keyframes wave {
+          0%, 100% { transform: scaleY(0.5); }
+          50% { transform: scaleY(1.4); }
+        }
+        @keyframes hammer {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(-30deg); }
+        }
+        @keyframes rocket {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        @keyframes statusBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes statusPulse {
+          0%, 100% { transform: scale(0.8); opacity: 0.5; }
+          50% { transform: scale(1.2); opacity: 1; }
+        }
       `}</style>
     </button>
   );
+}
+
+// Animation renderer used inside icon and in admin preview
+function StatusAnimation({ type, color, gifUrl }) {
+  const c = color || '#f59e0b';
+  switch (type) {
+    case 'building_bars':
+      return (
+        <div className="flex gap-[2px] items-end h-2">
+          {[4,7,5,4].map((h,i) => (
+            <span key={i} className="w-[3px] rounded-sm" style={{ background: `${c}cc`, height: `${h}px`, animation: `building 0.5s ease-in-out ${i*100}ms infinite` }} />
+          ))}
+        </div>
+      );
+    case 'blocks':
+      return (
+        <div className="flex gap-[1px] items-end h-2.5">
+          {[3,5,7,4,6].map((h,i) => (
+            <span key={i} className="w-[2.5px] rounded-sm" style={{ background: `${c}cc`, height: `${h}px`, animation: `blocks 1.2s ease ${i*150}ms infinite` }} />
+          ))}
+        </div>
+      );
+    case 'pulse':
+      return <div className="w-3 h-3 rounded-full" style={{ background: c, animation: 'statusPulse 1.5s ease-in-out infinite' }} />;
+    case 'bounce':
+      return <div className="w-2.5 h-2.5 rounded-full" style={{ background: c, animation: 'statusBounce 0.6s ease-in-out infinite' }} />;
+    case 'spinner':
+      return <div className="w-3 h-3 rounded-full border-[2px] border-transparent" style={{ borderTopColor: c, animation: 'spin 0.8s linear infinite' }} />;
+    case 'hammer':
+      return <span className="text-[10px] inline-block" style={{ animation: 'hammer 0.6s ease-in-out infinite alternate', transformOrigin: 'bottom right' }}>&#128296;</span>;
+    case 'wrench':
+      return <span className="text-[10px] inline-block" style={{ animation: 'spin 2s linear infinite' }}>&#128295;</span>;
+    case 'rocket':
+      return <span className="text-[10px] inline-block" style={{ animation: 'rocket 1s ease-in-out infinite' }}>&#128640;</span>;
+    case 'wave':
+      return (
+        <div className="flex gap-[1px] items-center h-2">
+          {[0,1,2,3,4].map(i => (
+            <span key={i} className="w-[2px] rounded-full" style={{ background: `${c}cc`, height: '6px', animation: `wave 1s ease-in-out ${i*120}ms infinite` }} />
+          ))}
+        </div>
+      );
+    case 'custom_gif':
+      return gifUrl ? <img src={gifUrl} alt="" className="w-6 h-6 object-contain" /> : null;
+    default:
+      return null;
+  }
 }
 
 // Mosaic tile — image-backed block
