@@ -517,7 +517,7 @@ function ExpandedPostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
 export default function TelegramFeedCard() {
   const [containers, setContainers] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  const [videoModal, setVideoModal] = useState(null);
+  const [galleryModal, setGalleryModal] = useState(null);
 
   useEffect(() => {
     fetch(`${API_URL}/api/community-v2/feed/public/containers`)
@@ -532,6 +532,10 @@ export default function TelegramFeedCard() {
   if (!loaded) return null;
   if (containers.length === 0) return null;
 
+  const openGallery = (media, startIndex, caption) => {
+    setGalleryModal({ media, startIndex, caption });
+  };
+
   return (
     <>
       <div className="space-y-4" data-testid="telegram-feed-section">
@@ -539,17 +543,18 @@ export default function TelegramFeedCard() {
           <FeedContainer
             key={container.container_id || idx}
             container={container}
-            onVideoPlay={(fileId, caption) => setVideoModal({ fileId, caption })}
+            onVideoPlay={(fileId, caption) => openGallery([{ type: 'video', file_id: fileId }], 0, caption)}
+            onOpenGallery={openGallery}
           />
         ))}
       </div>
 
-      {/* Video Modal */}
-      {videoModal && (
-        <VideoModal
-          fileId={videoModal.fileId}
-          caption={videoModal.caption}
-          onClose={() => setVideoModal(null)}
+      {galleryModal && (
+        <MediaGalleryModal
+          media={galleryModal.media}
+          startIndex={galleryModal.startIndex}
+          caption={galleryModal.caption}
+          onClose={() => setGalleryModal(null)}
         />
       )}
     </>
