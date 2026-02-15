@@ -379,9 +379,9 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
         </div>
       );
     case 'pulse':
-      return <div className="w-4 h-4 rounded-full" style={{ background: c, animation: 'pulse 1.5s ease-in-out infinite' }} />;
+      return <div className="w-4 h-4 rounded-full" style={{ background: c, animation: 'statusPulse 1.5s ease-in-out infinite' }} />;
     case 'bounce':
-      return <div className="w-3 h-3 rounded-full" style={{ background: c, animation: 'bounce 0.6s ease-in-out infinite alternate' }} />;
+      return <div className="w-3 h-3 rounded-full" style={{ background: c, animation: 'statusBounce 0.6s ease-in-out infinite' }} />;
     case 'spinner':
       return <div className="w-4 h-4 rounded-full border-2 border-transparent" style={{ borderTopColor: c, animation: 'spin 0.8s linear infinite' }} />;
     case 'blocks':
@@ -406,6 +406,84 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
           ))}
         </div>
       );
+
+    /* ── NEW animations ── */
+    case 'lantern':
+      return <div className="text-[16px]" style={{ animation: 'lanternGlow 2s ease-in-out infinite', transformOrigin: 'top center' }}>&#127982;</div>;
+    case 'dragon':
+      return <div className="text-[16px]" style={{ animation: 'dragonFloat 2.5s ease-in-out infinite' }}>&#128009;</div>;
+    case 'crane':
+      return (
+        <div className="relative w-7 h-5">
+          <div className="absolute bottom-0 left-1/2 w-[2px] h-5 -translate-x-1/2" style={{ background: `${c}99` }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px]" style={{ background: `${c}cc`, transformOrigin: 'center', animation: 'craneHook 2s ease-in-out infinite' }} />
+          <div className="absolute top-[2px] right-0 w-[2px] h-[6px]" style={{ background: c, animation: 'statusBounce 1s ease-in-out infinite' }} />
+        </div>
+      );
+    case 'bamboo':
+      return (
+        <div className="flex gap-[4px] items-end h-5">
+          {[0,1,2].map(i => (
+            <div key={i} className="flex flex-col items-center gap-[1px]">
+              <span className="w-[3px] rounded-full" style={{ background: '#22c55e', height: `${8+i*3}px`, animation: `bambooGrow 2s ease-out ${i*400}ms infinite`, transformOrigin: 'bottom' }} />
+              <span className="w-[6px] h-[2px] rounded-full" style={{ background: '#16a34a80' }} />
+            </div>
+          ))}
+        </div>
+      );
+    case 'fireworks':
+      return (
+        <div className="relative w-7 h-5">
+          {[0,1,2,3,4,5].map(i => {
+            const angle = i * 60;
+            const rad = angle * Math.PI / 180;
+            const x = 14 + Math.cos(rad) * 8;
+            const y = 10 + Math.sin(rad) * 8;
+            return <span key={i} className="absolute w-[3px] h-[3px] rounded-full" style={{
+              left: `${x}px`, top: `${y}px`,
+              background: i % 2 === 0 ? '#ef4444' : '#f59e0b',
+              animation: `fireworkBurst 1.5s ease-out ${i*100}ms infinite`,
+            }} />;
+          })}
+          <span className="absolute left-[12px] top-[8px] w-[4px] h-[4px] rounded-full" style={{ background: c, animation: 'statusPulse 1.5s ease-in-out infinite' }} />
+        </div>
+      );
+    case 'coding':
+      return (
+        <div className="flex items-center gap-[2px] h-4">
+          <span className="text-[10px] font-mono font-bold" style={{ color: `${c}cc` }}>&lt;/&gt;</span>
+          <span className="w-[2px] h-[10px]" style={{ background: c, animation: 'typingCursor 0.8s step-end infinite' }} />
+        </div>
+      );
+    case 'data_sync':
+      return (
+        <div className="relative w-5 h-5">
+          <div className="absolute inset-0 rounded-full border-2 border-transparent" style={{ borderTopColor: c, borderRightColor: `${c}60`, animation: 'dataOrbit 1.2s linear infinite' }} />
+          <div className="absolute inset-[5px] rounded-full" style={{ background: `${c}40` }} />
+        </div>
+      );
+    case 'progress_bar':
+      return (
+        <div className="w-8 h-[4px] rounded-full overflow-hidden" style={{ background: `${c}25` }}>
+          <div className="h-full rounded-full" style={{ background: c, animation: 'progressFill 2.5s ease-in-out infinite' }} />
+        </div>
+      );
+    case 'temple':
+      return (
+        <div className="flex flex-col items-center gap-[1px]">
+          <span className="w-4 h-[3px] rounded-t-sm" style={{ background: `${c}bb`, animation: 'templeStack 2s ease-out 0ms infinite' }} />
+          <span className="w-5 h-[3px]" style={{ background: `${c}99`, animation: 'templeStack 2s ease-out 300ms infinite' }} />
+          <span className="w-7 h-[3px] rounded-b-sm" style={{ background: `${c}77`, animation: 'templeStack 2s ease-out 600ms infinite' }} />
+        </div>
+      );
+    case 'sparkle':
+      return (
+        <div className="relative w-6 h-5 flex items-center justify-center">
+          <span className="text-[14px] inline-block" style={{ color: c, animation: 'sparkleRotate 2s linear infinite' }}>&#10024;</span>
+          <span className="absolute -right-0.5 top-0 text-[8px]" style={{ color: `${c}80`, animation: 'sparkleRotate 3s linear 0.5s infinite' }}>&#10024;</span>
+        </div>
+      );
+
     case 'custom_gif':
       return gifUrl ? <img src={gifUrl} alt="status" className="w-8 h-8 object-contain" /> : <span className="text-[8px] text-muted-foreground">No GIF</span>;
     default:
