@@ -173,7 +173,7 @@ function PostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
     >
       {/* Thumbnail */}
       {thumbSrc ? (
-        <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer" onClick={handleThumbClick}>
+        <div className="relative w-[72px] h-[72px] rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" onClick={handleThumbClick}>
           <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
           {isPlayable && (
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -187,19 +187,19 @@ function PostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
           )}
         </div>
       ) : firstMedia?.type === 'video' ? (
-        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1a1a2e' }} onClick={handleThumbClick}>
+        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1a1a2e' }} onClick={handleThumbClick}>
           <Play className="h-5 w-5 text-white/70 fill-white/70" />
         </div>
       ) : firstMedia?.type === 'animation' ? (
-        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1e293b' }} onClick={handleThumbClick}>
+        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1e293b' }} onClick={handleThumbClick}>
           <Film className="h-5 w-5 text-white/60" />
         </div>
       ) : firstMedia?.type === 'document' ? (
-        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ background: '#f0f4f8' }}>
+        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: '#f0f4f8' }}>
           <FileText className="h-5 w-5" style={{ color: '#64748b' }} />
         </div>
       ) : (
-        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center" style={{ background: '#f5ede0' }}>
+        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: '#f5ede0' }}>
           <MessageCircle className="h-5 w-5" style={{ color: '#c4b5a0' }} />
         </div>
       )}
