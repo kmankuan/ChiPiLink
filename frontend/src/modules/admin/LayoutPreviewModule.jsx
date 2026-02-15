@@ -372,6 +372,20 @@ function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
 }
 
 
+// Lottie animation loader for admin preview
+function LottiePreview({ url, size = 32 }) {
+  const [animData, setAnimData] = useState(null);
+  useEffect(() => {
+    if (!url) return;
+    fetch(url)
+      .then(r => r.json())
+      .then(setAnimData)
+      .catch(() => setAnimData(null));
+  }, [url]);
+  if (!animData) return <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />;
+  return <Lottie animationData={animData} loop autoplay style={{ width: size, height: size }} />;
+}
+
 // Animation preview for status manager
 function StatusAnimationPreview({ animation, color, gifUrl }) {
   const c = color || '#f59e0b';
