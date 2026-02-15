@@ -252,10 +252,15 @@ export default function TxbInventoryTab() {
       });
 
       let data;
-      try { data = await res.json(); } catch { data = { detail: `Server error (${res.status})` }; }
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text().catch(() => '');
+        data = { detail: `Server returned non-JSON (${res.status}): ${text.slice(0, 100) || 'empty body'}` };
+      }
 
       if (!res.ok) {
-        toast.error(data.detail || `Failed to sync ${label}`);
+        toast.error(data.detail || `Failed to sync ${label} (${res.status})`);
         setSyncingColumn(null);
         return;
       }
