@@ -3,46 +3,35 @@
  * Displays media items from Google Photos albums or manual URLs.
  * Images cycle with smooth transitions, videos autoplay muted.
  * Hero-sized card with rounded corners and responsive design.
+ *
+ * Admin-configurable: dots, shuffle, video handling, interval, etc.
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Maximize, Image } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Play, Pause, ChevronLeft, ChevronRight, Volume2, VolumeX, Image } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-
-const DEFAULT_MEDIA_ITEMS = [
-  {
-    item_id: 'default_1',
-    type: 'image',
-    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/5040d9d6499bad13e30dd00fe426cdce65332c563ef20104137ceb126b095e4b.png',
-    caption: 'PinPanClub Training Day',
-  },
-  {
-    item_id: 'default_2',
-    type: 'image',
-    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/3eaf9b70f2c8a242db6fd32a793b16c215104f30755b70c8b63aa38dd331f753.png',
-    caption: 'Kids Learning Together',
-  },
-  {
-    item_id: 'default_3',
-    type: 'image',
-    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/535181b7a5a2144892c75ca15c73f9320f5739017de399d05ced0e60170f39e7.png',
-    caption: 'Chinese-Panamanian Heritage',
-  },
-  {
-    item_id: 'default_4',
-    type: 'image',
-    url: 'https://static.prod-images.emergentagent.com/jobs/4a122f12-33f9-4f93-9123-84c6a2cb3907/images/0416cce781984810906e615303474bfe2089c65f53db816a6bf448f34cbd3bda.png',
-    caption: 'Community Gathering',
-  },
-];
 
 const DEFAULT_CONFIG = {
   autoplay: true,
   interval_ms: 5000,
   loop: true,
   show_controls: true,
-  items: DEFAULT_MEDIA_ITEMS,
+  show_dots: true,
+  dot_style: 'auto',   // 'auto' | 'dots' | 'progress_bar' | 'counter' | 'none'
+  shuffle: false,
+  video_autoplay: true,
+  video_max_duration_ms: 30000, // max time to show a video before advancing
+  items: [],
 };
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default function MediaPlayer() {
   const [config, setConfig] = useState(null);
@@ -50,8 +39,10 @@ export default function MediaPlayer() {
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
   const timerRef = useRef(null);
+  const videoTimerRef = useRef(null);
   const slideDir = useRef(1);
   const [slideKey, setSlideKey] = useState(0);
   const containerRef = useRef(null);
@@ -62,7 +53,7 @@ export default function MediaPlayer() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data && data.items && data.items.length > 0) {
-          setConfig(data);
+          setConfig({ ...DEFAULT_CONFIG, ...data });
         } else {
           setConfig(DEFAULT_CONFIG);
         }
@@ -74,14 +65,32 @@ export default function MediaPlayer() {
       });
   }, []);
 
-  const items = config?.items || [];
+  // Shuffled items (memoized, only shuffle once on load)
+  const items = useMemo(() => {
+    const raw = config?.items || [];
+    if (!raw.length) return raw;
+    if (config?.shuffle) return shuffleArray(raw);
+    return raw;
+  }, [config?.items, config?.shuffle]);
+
   const intervalMs = config?.interval_ms || 5000;
+  const showDots = config?.show_dots !== false;
+  const dotStyle = config?.dot_style || 'auto';
+  const videoAutoplay = config?.video_autoplay !== false;
+  const videoMaxMs = config?.video_max_duration_ms || 30000;
+
+  // Resolve dot display mode
+  const effectiveDotStyle = useMemo(() => {
+    if (!showDots || dotStyle === 'none') return 'none';
+    if (dotStyle === 'auto') return items.length > 10 ? 'progress_bar' : 'dots';
+    return dotStyle;
+  }, [showDots, dotStyle, items.length]);
 
   // Auto-advance for images
   useEffect(() => {
     if (!loaded || items.length <= 1 || !playing) return;
     const item = items[current];
-    if (item?.type === 'video') return; // videos advance on ended
+    if (item?.type === 'video' && videoAutoplay && !videoError) return; // videos advance on ended or max timer
 
     timerRef.current = setTimeout(() => {
       slideDir.current = 1;
@@ -90,12 +99,31 @@ export default function MediaPlayer() {
     }, intervalMs);
 
     return () => clearTimeout(timerRef.current);
-  }, [current, loaded, items, intervalMs, playing]);
+  }, [current, loaded, items, intervalMs, playing, videoAutoplay, videoError]);
+
+  // Video max duration safety timer
+  useEffect(() => {
+    if (!loaded || items.length === 0) return;
+    const item = items[current];
+    if (item?.type !== 'video' || !videoAutoplay) return;
+
+    clearTimeout(videoTimerRef.current);
+    videoTimerRef.current = setTimeout(() => {
+      // Force advance if video runs too long
+      slideDir.current = 1;
+      setSlideKey(k => k + 1);
+      setCurrent(prev => (prev + 1) % items.length);
+    }, videoMaxMs);
+
+    return () => clearTimeout(videoTimerRef.current);
+  }, [current, loaded, items, videoAutoplay, videoMaxMs]);
 
   const goTo = useCallback((dir) => {
     clearTimeout(timerRef.current);
+    clearTimeout(videoTimerRef.current);
     slideDir.current = dir;
     setSlideKey(k => k + 1);
+    setVideoError(false);
     setCurrent(prev => (prev + dir + items.length) % items.length);
   }, [items.length]);
 
@@ -112,6 +140,7 @@ export default function MediaPlayer() {
   }, [goTo]);
 
   const handleVideoEnd = useCallback(() => {
+    clearTimeout(videoTimerRef.current);
     if (items.length > 1) {
       slideDir.current = 1;
       setSlideKey(k => k + 1);
@@ -119,17 +148,30 @@ export default function MediaPlayer() {
     }
   }, [items.length]);
 
+  const handleVideoError = useCallback(() => {
+    setVideoError(true);
+    // Skip to next after a brief delay
+    setTimeout(() => {
+      if (items.length > 1) {
+        slideDir.current = 1;
+        setSlideKey(k => k + 1);
+        setCurrent(prev => (prev + 1) % items.length);
+      }
+    }, 2000);
+  }, [items.length]);
+
   // Sync video element
   useEffect(() => {
+    setVideoError(false);
     if (videoRef.current) {
       videoRef.current.muted = muted;
-      if (playing) {
-        videoRef.current.play().catch(() => {});
+      if (playing && videoAutoplay) {
+        videoRef.current.play().catch(() => setVideoError(true));
       } else {
         videoRef.current.pause();
       }
     }
-  }, [current, muted, playing]);
+  }, [current, muted, playing, videoAutoplay]);
 
   // Parallax scroll effect
   useEffect(() => {
@@ -171,11 +213,12 @@ export default function MediaPlayer() {
             ref={videoRef}
             key={item.url}
             src={item.url}
-            autoPlay
+            autoPlay={videoAutoplay}
             muted={muted}
             playsInline
             loop={items.length === 1}
             onEnded={handleVideoEnd}
+            onError={handleVideoError}
             className="w-full h-full object-cover"
             data-testid="media-video"
           />
@@ -187,6 +230,12 @@ export default function MediaPlayer() {
             className="w-full h-full object-cover animate-fade-in"
             data-testid="media-image"
           />
+        )}
+        {/* Video error overlay */}
+        {item.type === 'video' && videoError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+            <p className="text-white/70 text-xs">Video unavailable — skipping...</p>
+          </div>
         )}
       </div>
 
@@ -205,7 +254,7 @@ export default function MediaPlayer() {
         </div>
       )}
 
-      {/* Controls — show on hover, with parallax */}
+      {/* Controls — show on hover/touch */}
       {config?.show_controls && (
         <div
           className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -257,21 +306,41 @@ export default function MediaPlayer() {
         </div>
       )}
 
-      {/* Progress dots — with parallax */}
-      {items.length > 1 && (
+      {/* Dots / Progress Indicator */}
+      {items.length > 1 && effectiveDotStyle !== 'none' && (
         <div
-          className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1 transition-transform duration-100"
+          className="absolute top-3 left-1/2 -translate-x-1/2 transition-transform duration-100"
           style={{ transform: `translateX(-50%) translateY(${parallaxY * -0.4}px)` }}
         >
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === current ? 'w-5 h-1 bg-white' : 'w-1 h-1 bg-white/40'
-              }`}
-            />
-          ))}
+          {effectiveDotStyle === 'dots' && (
+            <div className="flex gap-1">
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setVideoError(false); setCurrent(i); setSlideKey(k => k + 1); }}
+                  className={`rounded-full transition-all duration-300 ${
+                    i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'
+                  }`}
+                  data-testid={`media-dot-${i}`}
+                />
+              ))}
+            </div>
+          )}
+          {effectiveDotStyle === 'progress_bar' && (
+            <div className="w-32 sm:w-48 h-1 rounded-full bg-white/20 overflow-hidden" data-testid="media-progress-bar">
+              <div
+                className="h-full rounded-full bg-white transition-all duration-300"
+                style={{ width: `${((current + 1) / items.length) * 100}%` }}
+              />
+            </div>
+          )}
+          {effectiveDotStyle === 'counter' && (
+            <div className="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-sm" data-testid="media-counter">
+              <span className="text-white text-[10px] font-bold">
+                {current + 1} / {items.length}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
