@@ -918,7 +918,7 @@ export default function ShowcaseAdminModule() {
           {/* Player Settings */}
           <div className="border rounded-xl p-4 space-y-3 bg-card">
             <h3 className="text-sm font-bold">Player Settings</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
                 <Label className="text-[10px]">Slide Interval (ms)</Label>
                 <Input
@@ -928,7 +928,31 @@ export default function ShowcaseAdminModule() {
                   className="h-8 text-xs"
                 />
               </div>
-              <div className="flex items-end gap-2">
+              <div>
+                <Label className="text-[10px]">Dot Style</Label>
+                <select
+                  value={mediaConfig?.dot_style || 'auto'}
+                  onChange={e => setMediaConfig({ ...mediaConfig, dot_style: e.target.value })}
+                  className="h-8 w-full rounded-lg border bg-background px-2 text-xs"
+                  data-testid="dot-style-select"
+                >
+                  <option value="auto">Auto (dots if few, bar if many)</option>
+                  <option value="dots">Always Dots</option>
+                  <option value="progress_bar">Progress Bar</option>
+                  <option value="counter">Counter (1/20)</option>
+                  <option value="none">Hide All</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-[10px]">Video Max Duration (ms)</Label>
+                <Input
+                  type="number"
+                  value={mediaConfig?.video_max_duration_ms || 30000}
+                  onChange={e => setMediaConfig({ ...mediaConfig, video_max_duration_ms: parseInt(e.target.value) || 30000 })}
+                  className="h-8 text-xs"
+                />
+              </div>
+              <div className="flex flex-col gap-2 justify-end">
                 <label className="flex items-center gap-1.5 text-xs cursor-pointer">
                   <input
                     type="checkbox"
@@ -938,8 +962,6 @@ export default function ShowcaseAdminModule() {
                   />
                   Autoplay
                 </label>
-              </div>
-              <div className="flex items-end gap-2">
                 <label className="flex items-center gap-1.5 text-xs cursor-pointer">
                   <input
                     type="checkbox"
@@ -950,6 +972,38 @@ export default function ShowcaseAdminModule() {
                   Show Controls
                 </label>
               </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mediaConfig?.show_dots !== false}
+                  onChange={e => setMediaConfig({ ...mediaConfig, show_dots: e.target.checked })}
+                  className="rounded"
+                  data-testid="show-dots-checkbox"
+                />
+                Show Dots/Indicator
+              </label>
+              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mediaConfig?.shuffle === true}
+                  onChange={e => setMediaConfig({ ...mediaConfig, shuffle: e.target.checked })}
+                  className="rounded"
+                  data-testid="shuffle-checkbox"
+                />
+                Shuffle (Random Order)
+              </label>
+              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mediaConfig?.video_autoplay !== false}
+                  onChange={e => setMediaConfig({ ...mediaConfig, video_autoplay: e.target.checked })}
+                  className="rounded"
+                  data-testid="video-autoplay-checkbox"
+                />
+                Video Autoplay
+              </label>
             </div>
             <Button size="sm" onClick={savePlayerSettings} className="h-7 text-xs gap-1" data-testid="save-player-settings">
               <Save className="h-3 w-3" /> Save Settings
