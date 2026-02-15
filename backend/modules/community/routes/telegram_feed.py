@@ -169,6 +169,8 @@ DEFAULT_CONTAINER = {
     "card_width": 220,
     "card_height": 300,
     "description_max_lines": 2,
+    "autoplay": True,
+    "autoplay_interval": 4,
 }
 
 
