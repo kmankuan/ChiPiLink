@@ -247,10 +247,11 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
                 key={ic.key || i}
                 icon={IconComponent}
                 label={ic.label}
-                to={ic.to}
+                to={ic.to || ''}
                 accent={ic.accent}
                 accentBg={ic.accent_bg}
                 imageUrl={ic.type === 'image' ? ic.image_url : null}
+                status={ic.status || 'building'}
               />
             );
           })}
