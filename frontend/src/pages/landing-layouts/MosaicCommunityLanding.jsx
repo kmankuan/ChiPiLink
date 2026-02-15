@@ -237,6 +237,20 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
   );
 }
 
+// Lottie animation loader — fetches JSON from URL and renders via lottie-react
+function LottieAnimation({ url, size = 24 }) {
+  const [animData, setAnimData] = useState(null);
+  useEffect(() => {
+    if (!url) return;
+    fetch(url)
+      .then(r => r.json())
+      .then(setAnimData)
+      .catch(() => setAnimData(null));
+  }, [url]);
+  if (!animData) return <div className="w-3 h-3 rounded-full border border-current animate-spin" />;
+  return <Lottie animationData={animData} loop autoplay style={{ width: size, height: size }} />;
+}
+
 // Animation renderer used inside icon and in admin preview
 function StatusAnimation({ type, color, gifUrl }) {
   const c = color || '#f59e0b';
