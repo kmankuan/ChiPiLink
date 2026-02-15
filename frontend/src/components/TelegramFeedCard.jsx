@@ -120,7 +120,7 @@ function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20', onClick }) {
 
 /* ────────────────── Post Row ────────────────── */
 
-function PostRow({ post, onVideoPlay, accentColor }) {
+function PostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
   const media = post.media || [];
   const isAlbum = post.is_album && media.length > 1;
 
@@ -132,7 +132,11 @@ function PostRow({ post, onVideoPlay, accentColor }) {
         data-testid={`telegram-post-${post.telegram_msg_id}`}
       >
         <div className="flex gap-2.5 items-start">
-          <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
+          <MediaGrid
+            media={media}
+            onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)}
+            onOpenGallery={(idx) => onOpenGallery(media, idx, post.text)}
+          />
           <div className="flex-1 min-w-0">
             {post.text && (
               <p className="text-sm leading-snug" style={{ color: '#2d2217' }}>
