@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import Lottie from 'lottie-react';
 import {
   Check, Save, Loader2, Plus, Trash2, ExternalLink, Image,
   ChevronDown, ChevronUp, Pencil, Eye,
