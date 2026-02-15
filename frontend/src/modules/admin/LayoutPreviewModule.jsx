@@ -345,9 +345,9 @@ function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
               ))}
             </select>
           </div>
-          {(item.status_animation === 'custom_gif' || currentStatus?.animation === 'custom_gif') && (
+          {(item.status_animation === 'custom_gif' || item.status_animation === 'lottie_url' || currentStatus?.animation === 'custom_gif' || currentStatus?.animation === 'lottie_url') && (
             <div>
-              <Label className="text-[9px] text-muted-foreground">GIF/Image URL</Label>
+              <Label className="text-[9px] text-muted-foreground">{item.status_animation === 'lottie_url' ? 'Lottie JSON URL' : 'GIF/Image URL'}</Label>
               <Input
                 value={item.status_gif_url || ''}
                 onChange={(e) => onUpdate(index, { ...item, status_gif_url: e.target.value })}
