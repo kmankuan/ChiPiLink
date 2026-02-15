@@ -56,12 +56,12 @@ const MOSAIC_DEFAULTS = {
 
 // Default nav icons when no backend config is available
 const DEFAULT_NAV_ICONS = [
-  { key: 'pinpan', label: 'PinPan', to: '/pinpanclub', type: 'lucide', icon: 'Gamepad2', accent: '#d97706', accent_bg: '#FFF7ED' },
-  { key: 'tienda', label: 'Tienda', to: '/unatienda', type: 'lucide', icon: 'Store', accent: '#059669', accent_bg: '#ECFDF5' },
-  { key: 'ranking', label: 'Ranking', to: '/pinpanclub/superpin/ranking', type: 'lucide', icon: 'Trophy', accent: '#C8102E', accent_bg: '#FFF1F2' },
-  { key: 'aprender', label: 'Aprender', to: '/comunidad', type: 'lucide', icon: 'GraduationCap', accent: '#7c3aed', accent_bg: '#F5F3FF' },
-  { key: 'cultura', label: 'Cultura', to: '/galeria', type: 'lucide', icon: 'Globe', accent: '#0284c7', accent_bg: '#F0F9FF' },
-  { key: 'fe', label: 'Fe', to: '/comunidad', type: 'lucide', icon: 'Heart', accent: '#ec4899', accent_bg: '#FDF2F8' },
+  { key: 'pinpan', label: 'PinPan', to: '', type: 'lucide', icon: 'Gamepad2', accent: '#d97706', accent_bg: '#FFF7ED', status: 'building' },
+  { key: 'tienda', label: 'Tienda', to: '', type: 'lucide', icon: 'Store', accent: '#059669', accent_bg: '#ECFDF5', status: 'building' },
+  { key: 'ranking', label: 'Ranking', to: '', type: 'lucide', icon: 'Trophy', accent: '#C8102E', accent_bg: '#FFF1F2', status: 'building' },
+  { key: 'aprender', label: 'Aprender', to: '', type: 'lucide', icon: 'GraduationCap', accent: '#7c3aed', accent_bg: '#F5F3FF', status: 'building' },
+  { key: 'cultura', label: 'Cultura', to: '', type: 'lucide', icon: 'Globe', accent: '#0284c7', accent_bg: '#F0F9FF', status: 'building' },
+  { key: 'fe', label: 'Fe', to: '', type: 'lucide', icon: 'Heart', accent: '#ec4899', accent_bg: '#FDF2F8', status: 'building' },
 ];
 
 function formatDate(dateStr) {
