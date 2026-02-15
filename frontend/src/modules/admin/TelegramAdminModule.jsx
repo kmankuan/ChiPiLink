@@ -160,6 +160,83 @@ function ContainerEditor({ container, onSave, onDelete, onDuplicate, isNew }) {
             </div>
           </div>
 
+          {/* Layout Mode */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Layout className="h-3.5 w-3.5" style={{ color: '#8B6914' }} />
+              <span className="text-xs font-bold" style={{ color: '#2d2217' }}>Layout Mode</span>
+            </div>
+            <div className="flex gap-2">
+              {['horizontal', 'vertical'].map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => update('layout_mode', mode)}
+                  className="flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-center"
+                  style={{
+                    background: (data.layout_mode || 'horizontal') === mode ? '#2d2217' : '#f5f5f5',
+                    color: (data.layout_mode || 'horizontal') === mode ? '#fff' : '#666',
+                  }}
+                  data-testid={`layout-mode-${mode}`}
+                >
+                  {mode === 'horizontal' ? 'Horizontal Scroll' : 'Vertical List'}
+                </button>
+              ))}
+            </div>
+
+            {/* Horizontal-specific settings */}
+            {(data.layout_mode || 'horizontal') === 'horizontal' && (
+              <div className="space-y-3 pt-2 pl-2 border-l-2" style={{ borderColor: '#e5ddd0' }}>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium mb-1" style={{ color: '#8B6914' }}>Card Width (px)</label>
+                    <input
+                      type="number"
+                      min={150}
+                      max={400}
+                      value={data.card_width || 220}
+                      onChange={(e) => update('card_width', parseInt(e.target.value) || 220)}
+                      className="w-full px-3 py-2 rounded-lg text-sm border"
+                      style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                      data-testid="container-card-width"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium mb-1" style={{ color: '#8B6914' }}>Card Height (px)</label>
+                    <input
+                      type="number"
+                      min={200}
+                      max={500}
+                      value={data.card_height || 300}
+                      onChange={(e) => update('card_height', parseInt(e.target.value) || 300)}
+                      className="w-full px-3 py-2 rounded-lg text-sm border"
+                      style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                      data-testid="container-card-height"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium mb-1" style={{ color: '#8B6914' }}>Description Max Lines</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4].map(n => (
+                      <button
+                        key={n}
+                        onClick={() => update('description_max_lines', n)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                        style={{
+                          background: (data.description_max_lines || 2) === n ? '#2d2217' : '#f5f5f5',
+                          color: (data.description_max_lines || 2) === n ? '#fff' : '#666',
+                        }}
+                        data-testid={`max-lines-${n}`}
+                      >
+                        {n} {n === 1 ? 'line' : 'lines'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Appearance */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
