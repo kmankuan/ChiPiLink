@@ -323,20 +323,37 @@ async def txb_sync_column(column_key: str, admin: dict = Depends(get_admin_user)
     Returns 202 immediately. Poll /sync-column-status/{column_key} for progress."""
     valid_keys = {"code", "name", "grade", "publisher", "subject", "unit_price", "stock_quantity", "stock"}
     if column_key not in valid_keys:
-        raise HTTPException(status_code=400, detail=f"Invalid column key. Valid: {', '.join(sorted(valid_keys))}")
+        return JSONResponse(
+            content={"detail": f"Invalid column key. Valid: {', '.join(sorted(valid_keys))}"},
+            status_code=400,
+        )
 
-    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
-    result = await txb_inventory_adapter.start_column_sync(column_key)
-    if result.get("error"):
-        raise HTTPException(status_code=400, detail=result["error"])
-    return JSONResponse(content=result, status_code=202)
+    try:
+        from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+        result = await txb_inventory_adapter.start_column_sync(column_key)
+        if result.get("error"):
+            return JSONResponse(content={"detail": result["error"]}, status_code=400)
+        return JSONResponse(content=result, status_code=202)
+    except Exception as e:
+        logger.error(f"sync-column/{column_key} unexpected error: {e}", exc_info=True)
+        return JSONResponse(
+            content={"detail": f"Internal error starting sync: {str(e)}"},
+            status_code=500,
+        )
 
 
 @router.get("/txb-inventory/sync-column-status/{column_key}")
 async def txb_sync_column_status(column_key: str, admin: dict = Depends(get_admin_user)):
     """Check status of a per-column sync task."""
-    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
-    return await txb_inventory_adapter.get_column_sync_status(column_key)
+    try:
+        from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+        return await txb_inventory_adapter.get_column_sync_status(column_key)
+    except Exception as e:
+        logger.error(f"sync-column-status/{column_key} error: {e}", exc_info=True)
+        return JSONResponse(
+            content={"status": "error", "error": str(e), "column_key": column_key},
+            status_code=200,
+        )
 
 
 # ========== TXB INVENTORY STOCK WEBHOOK ==========
