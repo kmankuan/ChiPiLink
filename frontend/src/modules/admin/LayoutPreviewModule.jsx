@@ -992,9 +992,9 @@ export default function LayoutPreviewModule() {
                       ))}
                     </select>
                   </div>
-                  {st.animation === 'custom_gif' && (
+                  {(st.animation === 'custom_gif' || st.animation === 'lottie_url') && (
                     <div>
-                      <Label className="text-[9px] text-muted-foreground">GIF/Image URL</Label>
+                      <Label className="text-[9px] text-muted-foreground">{st.animation === 'lottie_url' ? 'Lottie JSON URL' : 'GIF/Image URL'}</Label>
                       <Input
                         value={st.gif_url || ''}
                         onChange={(e) => updateStatus(idx, 'gif_url', e.target.value)}
