@@ -5,6 +5,10 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Banner UI Fix (Feb 15, 2026) - COMPLETE
+- Removed rounded corners from banner carousel (container, image, text banners all `rounded-none`)
+- Removed gap between ticker bar and banner (zeroed padding on parent header wrapper)
+
 ### Per-Column Sync Bug Fix (Feb 15, 2026) - COMPLETE
 - **Root cause:** Route handler used `HTTPException` which could return non-JSON on some proxies. Frontend catch block showed generic "Server error (400)" instead of actual error.
 - **Fix:** Route handler now uses `JSONResponse` + try/except for all error paths, guaranteeing JSON responses
