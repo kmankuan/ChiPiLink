@@ -356,12 +356,16 @@ export default function LayoutPreviewModule() {
   const [saving, setSaving] = useState(false);
   const [editingLayout, setEditingLayout] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [statusOptions, setStatusOptions] = useState(DEFAULT_STATUS_OPTIONS);
+  const [showStatusManager, setShowStatusManager] = useState(false);
+  const [savingStatuses, setSavingStatuses] = useState(false);
 
   const fetchConfig = useCallback(async () => {
     try {
-      const [iconsRes, styleRes] = await Promise.all([
+      const [iconsRes, styleRes, statusRes] = await Promise.all([
         fetch(`${API_URL}/api/admin/ticker/layout-icons`, { headers: { Authorization: `Bearer ${getToken()}` } }),
-        fetch(`${API_URL}/api/public/ui-style`)
+        fetch(`${API_URL}/api/public/ui-style`),
+        fetch(`${API_URL}/api/admin/ticker/icon-statuses`, { headers: { Authorization: `Bearer ${getToken()}` } }),
       ]);
       if (iconsRes.ok) {
         const data = await iconsRes.json();
@@ -370,6 +374,12 @@ export default function LayoutPreviewModule() {
       if (styleRes.ok) {
         const styleData = await styleRes.json();
         setActiveLayout(styleData?.public?.layout || styleData?.layout || 'living_grid');
+      }
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        if (statusData.statuses?.length > 0) {
+          setStatusOptions(statusData.statuses);
+        }
       }
     } catch (e) {
       toast.error('Failed to load layout config');
