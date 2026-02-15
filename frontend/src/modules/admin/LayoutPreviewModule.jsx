@@ -173,15 +173,23 @@ function IconPicker({ value, onChange, onClose }) {
   );
 }
 
+// Status options for module icons
+const STATUS_OPTIONS = [
+  { value: 'ready', label: 'Ready', color: 'bg-green-500' },
+  { value: 'building', label: 'Building', color: 'bg-amber-500' },
+  { value: 'coming_soon', label: 'Coming Soon', color: 'bg-blue-500' },
+  { value: 'maintenance', label: 'Maintenance', color: 'bg-red-500' },
+];
+
 // Single icon editor row
 function IconRow({ item, index, onUpdate, onRemove }) {
   const [showPicker, setShowPicker] = useState(false);
   const Icon = ICON_CATALOG[item.icon] || Store;
 
   return (
-    <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/50" data-testid={`icon-row-${item.key}`}>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/50" data-testid={`icon-row-${item.key}`}>
       {/* Icon preview */}
-      <div className="relative">
+      <div className="relative shrink-0">
         <button
           onClick={() => setShowPicker(!showPicker)}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110"
@@ -204,7 +212,7 @@ function IconRow({ item, index, onUpdate, onRemove }) {
       </div>
 
       {/* Fields */}
-      <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2">
         <div>
           <Label className="text-[9px] text-muted-foreground">Label</Label>
           <Input
@@ -215,12 +223,25 @@ function IconRow({ item, index, onUpdate, onRemove }) {
           />
         </div>
         <div>
-          <Label className="text-[9px] text-muted-foreground">Route</Label>
+          <Label className="text-[9px] text-muted-foreground">Route (optional)</Label>
           <Input
             value={item.to || ''}
             onChange={(e) => onUpdate(index, { ...item, to: e.target.value })}
             className="h-7 text-xs font-mono"
+            placeholder="Leave empty to disable"
           />
+        </div>
+        <div>
+          <Label className="text-[9px] text-muted-foreground">Status</Label>
+          <select
+            value={item.status || 'building'}
+            onChange={(e) => onUpdate(index, { ...item, status: e.target.value })}
+            className="h-7 w-full px-2 text-xs border rounded-md bg-background"
+          >
+            {STATUS_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </div>
         <div>
           <Label className="text-[9px] text-muted-foreground">Image URL (optional)</Label>
@@ -256,7 +277,7 @@ function IconRow({ item, index, onUpdate, onRemove }) {
       {/* Remove */}
       <button
         onClick={() => onRemove(index)}
-        className="text-destructive hover:bg-destructive/10 p-1.5 rounded-lg self-center"
+        className="text-destructive hover:bg-destructive/10 p-1.5 rounded-lg self-center shrink-0"
         data-testid={`icon-remove-${item.key}`}
       >
         <Trash2 className="h-3.5 w-3.5" />
