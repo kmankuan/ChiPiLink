@@ -173,12 +173,26 @@ function IconPicker({ value, onChange, onClose }) {
   );
 }
 
-// Status options for module icons
-const STATUS_OPTIONS = [
-  { value: 'ready', label: 'Ready', color: 'bg-green-500' },
-  { value: 'building', label: 'Building', color: 'bg-amber-500' },
-  { value: 'coming_soon', label: 'Coming Soon', color: 'bg-blue-500' },
-  { value: 'maintenance', label: 'Maintenance', color: 'bg-red-500' },
+// Status options loaded from backend (with fallbacks)
+const DEFAULT_STATUS_OPTIONS = [
+  { value: 'ready', label: 'Ready', color: '#22c55e', animation: 'none', gif_url: '' },
+  { value: 'building', label: 'Building', color: '#f59e0b', animation: 'building_bars', gif_url: '' },
+  { value: 'coming_soon', label: 'Coming Soon', color: '#3b82f6', animation: 'pulse', gif_url: '' },
+  { value: 'maintenance', label: 'Maintenance', color: '#ef4444', animation: 'wrench', gif_url: '' },
+];
+
+const ANIMATION_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'building_bars', label: 'Building bars' },
+  { value: 'pulse', label: 'Pulse glow' },
+  { value: 'bounce', label: 'Bounce' },
+  { value: 'spinner', label: 'Spinner' },
+  { value: 'blocks', label: 'Stacking blocks' },
+  { value: 'hammer', label: 'Hammer' },
+  { value: 'wrench', label: 'Wrench spin' },
+  { value: 'rocket', label: 'Rocket' },
+  { value: 'wave', label: 'Wave' },
+  { value: 'custom_gif', label: 'Custom GIF/Image' },
 ];
 
 // Single icon editor row
