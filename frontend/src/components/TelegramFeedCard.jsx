@@ -480,7 +480,7 @@ function FeedContainer({ container, onVideoPlay }) {
 
 /* ────────────────── Expanded Post Style ────────────────── */
 
-function ExpandedPostRow({ post, onVideoPlay, accentColor }) {
+function ExpandedPostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
   const media = post.media || [];
 
   return (
@@ -491,7 +491,11 @@ function ExpandedPostRow({ post, onVideoPlay, accentColor }) {
     >
       <div className="flex gap-2.5 items-start">
         {media.length > 0 && (
-          <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
+          <MediaGrid
+            media={media}
+            onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)}
+            onOpenGallery={(idx) => onOpenGallery(media, idx, post.text)}
+          />
         )}
         <div className="flex-1 min-w-0">
           {post.text && (
