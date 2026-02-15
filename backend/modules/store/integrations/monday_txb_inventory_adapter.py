@@ -193,7 +193,12 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         global _column_sync_tasks
 
         # Pre-validate before launching background task
-        config = await self.get_txb_inventory_config()
+        try:
+            config = await self.get_txb_inventory_config()
+        except Exception as e:
+            logger.error(f"start_column_sync: failed to get config: {e}")
+            return {"error": f"Failed to load config: {e}"}
+
         board_id = config.get("board_id")
         enabled = config.get("enabled", False)
         col_map = config.get("column_mapping", {})
@@ -205,7 +210,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         if column_key in ("stock_quantity", "stock"):
             col_id = col_map.get("stock_quantity") or col_map.get("stock")
         if not col_id:
-            return {"error": f"Column '{column_key}' is not mapped"}
+            return {"error": f"Column '{column_key}' is not mapped. Please map it in column settings and save."}
 
         code_col = col_map.get("code")
         if not code_col:
@@ -217,22 +222,27 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             return {"status": "already_running", "column": column_key}
 
         # Set initial status in DB
-        await db.monday_column_sync_status.update_one(
-            {"column_key": column_key},
-            {"$set": {
-                "column_key": column_key,
-                "status": "running",
-                "updated": 0, "skipped": 0, "failed": 0, "total": 0,
-                "started_at": datetime.now(timezone.utc).isoformat(),
-                "finished_at": None, "error": None,
-            }},
-            upsert=True,
-        )
+        try:
+            await db.monday_column_sync_status.update_one(
+                {"column_key": column_key},
+                {"$set": {
+                    "column_key": column_key,
+                    "status": "running",
+                    "updated": 0, "skipped": 0, "failed": 0, "total": 0,
+                    "started_at": datetime.now(timezone.utc).isoformat(),
+                    "finished_at": None, "error": None,
+                }},
+                upsert=True,
+            )
+        except Exception as e:
+            logger.error(f"start_column_sync: failed to set initial status: {e}")
+            return {"error": f"Database error: {e}"}
 
         # Launch background task
         task = asyncio.create_task(self._run_column_sync(column_key))
         _column_sync_tasks[column_key] = task
 
+        logger.info(f"Column sync '{column_key}' started (board={board_id}, col_id={col_id})")
         return {"status": "started", "column": column_key}
 
     async def get_column_sync_status(self, column_key: str = None) -> Dict:
