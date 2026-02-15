@@ -2249,5 +2249,12 @@
       "log": "Processing Log",
       "monday": "Monday.com Config"
     }
+  },
+  "telegramFeed": {
+    "seeAll": "See all",
+    "seeMore": "See more",
+    "loadOlder": "Load older",
+    "noPosts": "No posts yet",
+    "close": "Close"
   }
 }

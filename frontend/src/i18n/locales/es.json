@@ -2253,5 +2253,12 @@
       "log": "Registro de Procesamiento",
       "monday": "Config Monday.com"
     }
+  },
+  "telegramFeed": {
+    "seeAll": "Ver todo",
+    "seeMore": "Ver mas",
+    "loadOlder": "Cargar anteriores",
+    "noPosts": "Sin publicaciones",
+    "close": "Cerrar"
   }
 }

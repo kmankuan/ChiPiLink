@@ -2248,5 +2248,12 @@
       "log": "处理日志",
       "monday": "Monday.com 配置"
     }
+  },
+  "telegramFeed": {
+    "seeAll": "查看全部",
+    "seeMore": "查看更多",
+    "loadOlder": "加载更早的",
+    "noPosts": "暂无帖子",
+    "close": "关闭"
   }
 }
