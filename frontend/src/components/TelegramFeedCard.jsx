@@ -459,6 +459,7 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
   } = container;
 
   const intervalMs = (autoplay_interval || 4) * 1000;
+  const imageHeight = Math.round(card_height * 0.55);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
