@@ -61,6 +61,7 @@ import WebhooksTab from './components/WebhooksTab';
 import StatusMappingTab from './components/StatusMappingTab';
 import WalletMondayTab from './components/WalletMondayTab';
 import WalletSyncDashboard from './components/WalletSyncDashboard';
+import PublicBoardWidgetTab from './components/PublicBoardWidgetTab';
 import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -451,6 +452,10 @@ export default function MondayModule() {
           <TabsTrigger value="general" className="gap-1.5 text-xs">
             <LayoutGrid className="h-3.5 w-3.5" />
             General
+          </TabsTrigger>
+          <TabsTrigger value="public-widget" className="gap-1.5 text-xs">
+            <Eye className="h-3.5 w-3.5" />
+            Public Widget
           </TabsTrigger>
         </TabsList>
 
