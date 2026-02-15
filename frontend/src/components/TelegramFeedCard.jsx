@@ -384,7 +384,7 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
 
 /* ────────────────── Single Feed Container ────────────────── */
 
-function FeedContainer({ container, onVideoPlay }) {
+function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
   const navigate = useNavigate();
   const {
     title = 'Community Channel',
