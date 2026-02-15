@@ -198,7 +198,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ MEDIA PLAYER — Google Photos album slideshow ═══ */}
       <section
-        className={`px-0 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-0 sm:px-8 pb-0 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="media-player-section"
       >
         <MediaPlayer />
@@ -206,7 +206,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ TELEGRAM FEED — Community channel preview ═══ */}
       <section
-        className={`px-4 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-200 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-0 sm:px-8 pb-3 max-w-7xl mx-auto transition-all duration-700 delay-200 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="telegram-feed-section"
       >
         <TelegramFeedCard />
