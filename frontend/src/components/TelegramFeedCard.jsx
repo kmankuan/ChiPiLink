@@ -448,6 +448,7 @@ function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
               key={post.telegram_msg_id}
               post={post}
               onVideoPlay={(fileId, caption) => onVideoPlay(fileId, caption)}
+              onOpenGallery={(media, idx, caption) => onOpenGallery(media, idx, caption)}
               accentColor={accent_color}
             />
           ))
@@ -457,6 +458,7 @@ function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
               key={post.telegram_msg_id}
               post={post}
               onVideoPlay={(fileId, caption) => onVideoPlay(fileId, caption)}
+              onOpenGallery={(media, idx, caption) => onOpenGallery(media, idx, caption)}
               accentColor={accent_color}
             />
           ))
