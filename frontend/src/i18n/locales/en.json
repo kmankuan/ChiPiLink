@@ -2255,6 +2255,8 @@
     "seeMore": "See more",
     "loadOlder": "Load older",
     "noPosts": "No posts yet",
-    "close": "Close"
+    "close": "Close",
+    "autoplayOn": "Autoplay on",
+    "autoplayOff": "Autoplay off"
   }
 }

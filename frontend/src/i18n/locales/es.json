@@ -2259,6 +2259,8 @@
     "seeMore": "Ver mas",
     "loadOlder": "Cargar anteriores",
     "noPosts": "Sin publicaciones",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "autoplayOn": "Autoplay activo",
+    "autoplayOff": "Autoplay desactivado"
   }
 }

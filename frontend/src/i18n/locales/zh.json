@@ -2254,6 +2254,8 @@
     "seeMore": "查看更多",
     "loadOlder": "加载更早的",
     "noPosts": "暂无帖子",
-    "close": "关闭"
+    "close": "关闭",
+    "autoplayOn": "自动播放开启",
+    "autoplayOff": "自动播放关闭"
   }
 }
