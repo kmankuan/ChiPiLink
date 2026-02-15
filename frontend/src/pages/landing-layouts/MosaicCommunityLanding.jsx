@@ -365,6 +365,70 @@ function StatusAnimation({ type, color, gifUrl }) {
         </div>
       );
 
+    /* ── Coding Scene: person at laptop ── */
+    case 'coding_scene':
+      return (
+        <div className="relative w-8 h-5" style={{ animation: 'personBob 2s ease-in-out infinite' }}>
+          {/* Person head */}
+          <div className="absolute left-[5px] top-0 w-[4px] h-[4px] rounded-full" style={{ background: c }} />
+          {/* Person body */}
+          <div className="absolute left-[5.5px] top-[4px] w-[3px] h-[4px] rounded-sm" style={{ background: `${c}cc` }} />
+          {/* Laptop base */}
+          <div className="absolute left-[10px] top-[5px] w-[10px] h-[1.5px] rounded-sm" style={{ background: `${c}88` }} />
+          {/* Laptop screen */}
+          <div className="absolute left-[10px] top-[1px] w-[10px] h-[4px] rounded-t-sm overflow-hidden" style={{ background: '#1a1a2e', border: `0.5px solid ${c}44` }}>
+            {/* Code lines typing */}
+            <div className="absolute left-[1px] top-[0.5px] h-[1px] rounded-full" style={{ background: '#4ade80', animation: 'codingType 1.5s ease-in-out infinite', width: '6px' }} />
+            <div className="absolute left-[1px] top-[2px] h-[1px] rounded-full" style={{ background: '#60a5fa', animation: 'codingType 1.8s ease-in-out 0.3s infinite', width: '4px' }} />
+          </div>
+          {/* Screen glow */}
+          <div className="absolute left-[12px] top-[0px] w-[6px] h-[6px] rounded-full" style={{ background: `${c}15`, animation: 'codingScreenGlow 2s ease-in-out infinite' }} />
+          {/* Desk */}
+          <div className="absolute bottom-0 left-[2px] w-[22px] h-[1px]" style={{ background: `${c}44` }} />
+        </div>
+      );
+
+    /* ── Building Progress: 0% to 100% ── */
+    case 'building_progress':
+      return (
+        <div className="relative w-7 h-6">
+          {/* Building outline */}
+          <div className="absolute bottom-0 left-[2px] w-[12px] h-[16px] rounded-t-sm overflow-hidden" style={{ border: `0.5px solid ${c}44`, borderBottom: 'none' }}>
+            {/* Fill progress */}
+            <div className="absolute bottom-0 left-0 w-full" style={{ background: `${c}55`, animation: 'buildProgress 3s ease-in-out infinite' }} />
+            {/* Floor lines */}
+            {[0,1,2,3].map(i => (
+              <div key={i} className="absolute w-full h-[0.5px]" style={{ bottom: `${i * 25}%`, background: `${c}33` }} />
+            ))}
+            {/* Windows */}
+            {[0,1,2].map(row => (
+              [0,1].map(col => (
+                <div key={`${row}-${col}`} className="absolute w-[2px] h-[2px] rounded-[0.5px]" style={{ 
+                  bottom: `${10 + row * 30}%`, 
+                  left: `${25 + col * 40}%`,
+                  background: `${c}66`,
+                  animation: `buildFloor 3s ease-out ${(2-row) * 0.8}s infinite`,
+                  transformOrigin: 'bottom'
+                }} />
+              ))
+            ))}
+          </div>
+          {/* Mini crane */}
+          <div className="absolute top-0 right-[2px]" style={{ transformOrigin: 'bottom center', animation: 'buildCraneSwing 2s ease-in-out infinite' }}>
+            <div className="w-[1.5px] h-[10px]" style={{ background: `${c}88` }} />
+            <div className="absolute top-0 left-[-3px] w-[6px] h-[1px]" style={{ background: `${c}66` }} />
+          </div>
+          {/* Progress percentage text */}
+          <div className="absolute bottom-[-1px] right-0 text-[5px] font-bold font-mono" style={{ color: c, animation: 'codingScreenGlow 3s ease-in-out infinite' }}>
+            %
+          </div>
+        </div>
+      );
+
+    /* ── Lottie URL animation ── */
+    case 'lottie_url':
+      return gifUrl ? <LottieAnimation url={gifUrl} size={24} /> : <span className="text-[6px] text-muted-foreground">No URL</span>;
+
     case 'custom_gif':
       return gifUrl ? <img src={gifUrl} alt="" className="w-6 h-6 object-contain" /> : null;
     default:
