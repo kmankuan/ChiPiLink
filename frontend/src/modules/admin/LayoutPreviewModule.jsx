@@ -948,7 +948,15 @@ export default function LayoutPreviewModule() {
         </div>
 
         {showStatusManager && (
-          <div className="space-y-2">
+          <div className="space-y-3">
+            {/* How-to-use info */}
+            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/30 dark:border-blue-800 dark:text-blue-300" data-testid="status-howto">
+              <ArrowRight className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <p className="text-[10px] leading-relaxed">
+                <strong>How to apply:</strong> Click the <strong>"Icons"</strong> button on a layout card above, then set the <strong>"Status"</strong> dropdown on each icon to one of these statuses. The animation will appear on the landing page icons.
+              </p>
+            </div>
+
             {statusOptions.map((st, idx) => (
               <div
                 key={st.value}
