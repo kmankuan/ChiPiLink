@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://async-task-mgmt.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://column-matcher-1.preview.emergentagent.com')
 
 # Test credentials
 CLIENT_EMAIL = "test@client.com"
