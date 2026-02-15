@@ -149,7 +149,7 @@ async def get_robots_txt():
 
 # ============== META TAG HELPER ENDPOINT ==============
 
-@public_router.get("/api/privacy/meta-robots")
+@public_router.get("/privacy/meta-robots")
 async def get_meta_robots():
     """
     Returns the appropriate meta robots directive.
