@@ -263,16 +263,6 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
     hasAdvancedRef.current = false;
   }, [current]);
 
-  // Auto-advance photos after 3s
-  useEffect(() => {
-    if (!isVideo && total > 1) {
-      const timer = setTimeout(() => {
-        if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [current, isVideo, isLast, total]);
-
   const goNext = () => {
     if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
   };
