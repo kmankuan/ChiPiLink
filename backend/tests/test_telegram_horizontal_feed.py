@@ -59,7 +59,7 @@ class TestTelegramFeedAdminAPI:
     @pytest.fixture
     def auth_token(self):
         """Login and get auth token"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
             "password": "admin"
         })
@@ -185,7 +185,7 @@ class TestTelegramFeedStats:
     @pytest.fixture
     def auth_token(self):
         """Login and get auth token"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = requests.post(f"{BASE_URL}/api/auth-v2/login", json={
             "email": "admin@chipi.co",
             "password": "admin"
         })
