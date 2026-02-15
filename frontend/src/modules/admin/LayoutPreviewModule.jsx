@@ -681,6 +681,7 @@ export default function LayoutPreviewModule() {
                   index={i}
                   onUpdate={(idx, updated) => updateIcon(editingLayout, idx, updated)}
                   onRemove={(idx) => removeIcon(editingLayout, idx)}
+                  statusOptions={statusOptions}
                 />
               ))
             )}
