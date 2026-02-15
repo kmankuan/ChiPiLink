@@ -292,6 +292,8 @@ export default function AdminDashboard() {
       // Configuration
       case 'site-config':
         return <SiteConfigModule />;
+      case 'privacy':
+        return <PrivacyModule />;
       case 'auth-config':
         return <AuthMethodsConfig />;
       case 'ui-style':
