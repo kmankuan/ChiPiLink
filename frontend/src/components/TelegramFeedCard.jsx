@@ -124,12 +124,14 @@ function PostRow({ post, onVideoPlay, accentColor }) {
         style={{ borderColor: 'rgba(0,0,0,0.06)' }}
         data-testid={`telegram-post-${post.telegram_msg_id}`}
       >
-        <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
-        {post.text && (
-          <p className="text-sm leading-snug line-clamp-2 mt-2" style={{ color: '#2d2217' }}>
-            {post.text}
-          </p>
-        )}
+        <div className="flex gap-3 items-start flex-wrap">
+          <MediaGrid media={media} onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)} />
+          {post.text && (
+            <p className="text-sm leading-snug flex-1 min-w-[120px]" style={{ color: '#2d2217' }}>
+              {post.text}
+            </p>
+          )}
+        </div>
         <PostMeta post={post} />
       </div>
     );
