@@ -165,6 +165,10 @@ DEFAULT_CONTAINER = {
     "show_media_count": True,
     "order": 0,
     "is_active": True,
+    "layout_mode": "horizontal",  # horizontal | vertical
+    "card_width": 220,
+    "card_height": 300,
+    "description_max_lines": 2,
 }
 
 
