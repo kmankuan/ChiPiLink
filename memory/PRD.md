@@ -5,75 +5,59 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
-### Banner UI Fix (Feb 15, 2026) - COMPLETE
-- Removed rounded corners from banner carousel (container, image, text banners all `rounded-none`)
-- Removed gap between ticker bar and banner (zeroed padding on parent header wrapper)
+### Monday.com Public Board Widget (Feb 15, 2026) - COMPLETE
+- Admin-configurable landing page widget showing Monday.com board content
+- Backend: Cached data with configurable refresh interval, public (no auth) endpoint
+- Admin panel: Board selection, column picker (chips UI), group filter, display style (cards/table/list), max items, refresh interval
+- Frontend: `MondayBoardWidget` component with 3 display modes, auto-cache refresh
+- Endpoints: `GET/PUT /api/monday/public-board-widget/config`, `POST /refresh`, `GET /api/monday/public-board-widget` (public)
+- Files: `backend/modules/integrations/monday/public_board_widget.py`, `frontend/src/components/MondayBoardWidget.jsx`, `frontend/src/modules/monday/components/PublicBoardWidgetTab.jsx`
+
+### Media Gallery Player (Feb 15, 2026) - COMPLETE
+- Edge-to-edge fullscreen gallery replacing old rounded video modal
+- Left/right arrows for navigation, dot indicators, counter
+- Photos auto-advance (4s), pause on touch, resume on touch again
+- Videos auto-advance on finish, gallery auto-closes after last file
+
+### Banner & Telegram Feed UI Fixes (Feb 15, 2026) - COMPLETE
+- Banner: No rounded corners, no gap between ticker and banner
+- Telegram feed: Edge-to-edge on mobile, consistent 72px thumbnails
+- Thumbnails + description inline layout (flex, text beside thumbnails)
 
 ### Per-Column Sync Bug Fix (Feb 15, 2026) - COMPLETE
-- **Root cause:** Route handler used `HTTPException` which could return non-JSON on some proxies. Frontend catch block showed generic "Server error (400)" instead of actual error.
-- **Fix:** Route handler now uses `JSONResponse` + try/except for all error paths, guaranteeing JSON responses
-- **Backend:** `start_column_sync()` wrapped in try/except at every level, detailed logging with exc_info
-- **Frontend:** `handleSyncColumn` now shows actual server response body on error, not generic message
-- **Also fixed:** `_build_single_column_value` now correctly handles `stock` as alias for `stock_quantity`
-- **Tested: 100%** — Backend (11/11) + Frontend UI verified (iteration_117)
+- Fixed "Server error (400)" — route handler uses JSONResponse + try/except
+- Better error logging with stack traces in background tasks
 
-### Per-Column Sync & Grade Fix (Feb 14, 2026) - COMPLETE
-- Grade column fix: `_format_column_value` detects Monday.com column types (dropdown, status, text)
-- Per-column sync: `POST /api/store/monday/txb-inventory/sync-column/{column_key}` syncs a single column
-- Frontend: Each column mapping field has an individual "Sync" button
-- **Tested: 100%** — Backend (5/5) + Frontend (iteration_116)
-
-### Monday.com Create-Item Auto-Import (Feb 14, 2026) - COMPLETE
-- New `create_item` webhook handler: items added on Monday.com auto-import into private catalog
-- Frontend: "Auto-Import New Items" card in TXB Inventory admin tab
-- **Tested: 100%** — Backend (15/15) + Frontend (iteration_115)
-
-### Monday.com Sync Dashboard Widget (Feb 14, 2026) - COMPLETE
-- Unified widget on admin dashboard showing real-time sync health across all 3 Monday.com boards
-- **Tested: 100%** — Backend (18/18) + Frontend (iteration_114)
-
-### TXB Inventory Bidirectional Monday.com Sync (Feb 14, 2026) - COMPLETE
-- Full Sync, App->Monday, Monday->App, Per-student order subitems, Grade-based grouping
-- **Tested: 100%** — 23/23 backend tests (iteration_113)
-
-### Previous Features - ALL COMPLETE
-- Telegram Feed Album Carousel & Multi-Container System
+### Earlier Features - ALL COMPLETE
+- Column Matcher UI, Telegram Feed Album Carousel
 - Order Summary Preview Modal, Textbook Multi-Select Bug Fix
-- Touch-Swipe Gestures, Slide Animations, Parallax
-- Admin Panel Refactor, Monday.com Dual Board Integration
+- Touch-Swipe Gestures, Admin Panel Refactor, Monday.com Dual Board Integration
 - Banner Carousel & Media Player, Wallet Payment Workflow
 
 ## Key API Endpoints
 
+### Monday.com Public Board Widget
+- `GET /api/monday/public-board-widget` — Public cached board data (no auth)
+- `GET /api/monday/public-board-widget/config` — Admin config
+- `PUT /api/monday/public-board-widget/config` — Save config
+- `POST /api/monday/public-board-widget/refresh` — Force cache refresh
+
 ### TXB Inventory Per-Column Sync
-- `POST /api/store/monday/txb-inventory/sync-column/{column_key}` — Sync a single column (returns 202, polls status)
-- `GET /api/store/monday/txb-inventory/sync-column-status/{column_key}` — Poll sync progress
+- `POST /api/store/monday/txb-inventory/sync-column/{column_key}` — Sync single column
+- `GET /api/store/monday/txb-inventory/sync-column-status/{column_key}` — Poll status
 
-### Monday.com Sync Dashboard
-- `GET /api/monday/sync-dashboard` — Unified sync health across all boards
-
-### TXB Inventory Monday.com Sync
-- `GET /api/store/monday/txb-inventory-config` — Config with column mappings
-- `PUT /api/store/monday/txb-inventory-config` — Save config
-- `POST /api/store/monday/txb-inventory/full-sync` — Push all textbooks
-- `POST /api/store/monday/txb-inventory/webhook` — Monday.com webhook handler
-- `POST /api/store/monday/txb-inventory/webhook/register` — Register webhook
-- `DELETE /api/store/monday/txb-inventory/webhook` — Unregister webhook
-
-## Key Files
-- `/app/backend/modules/store/routes/monday_sync.py` — Sync routes + webhook
-- `/app/backend/modules/store/integrations/monday_txb_inventory_adapter.py` — Full sync adapter
-- `/app/frontend/src/modules/monday/components/TxbInventoryTab.jsx` — Admin UI
-- `/app/backend/modules/integrations/monday/core_client.py` — Monday.com API client
-- `/app/backend/modules/integrations/monday/routes.py` — Monday.com integration routes
+### Other Core Endpoints
+- `GET /api/monday/sync-dashboard` — Unified sync health
+- `GET /api/store/monday/txb-inventory-config` — TXB config
+- `PUT /api/store/monday/txb-inventory-config` — Save TXB config
 
 ## Database Collections
+- `monday_public_board_widget` — Widget config
+- `monday_public_board_cache` — Cached board items
 - `monday_integration_config` — Monday.com integration configs
-- `monday_column_sync_status` — Per-column sync task tracking
-- `store_products` — Products (with `monday_item_id` for linked items)
-- `inventory_movements` — Stock change log
+- `monday_column_sync_status` — Per-column sync tracking
+- `store_products` — Products
 - `telegram_feed_containers` — Feed container configs
-- `community_posts` — Telegram posts
 
 ## 3rd Party Integrations
 - Monday.com API v2 (GraphQL)
@@ -84,14 +68,10 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 ## Backlog
 ### P1 - Stop Sync Button (Upcoming)
 - Cancel in-progress Full Sync to Monday.com
-- Background task refactoring with cancellation support
 
 ### P2 - On-Demand Landing Page Designer (Planned)
-- Phase 1: Layout switcher, section manager, live preview
-- Phase 2: Theme/color customizer, per-section config
-- Phase 3: AI-generated layout suggestions
-- Phase 4: Drag-and-drop page builder
+- Layout switcher, section manager, live preview
+- Theme/color customizer, AI-generated suggestions
 
 ### P3 - General Inventory Monday.com Sync (Future)
 - New board for public catalog products
-- Full CRUD sync + stock bidirectional
