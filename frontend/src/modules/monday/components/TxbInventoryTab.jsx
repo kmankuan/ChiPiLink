@@ -644,13 +644,37 @@ export default function TxbInventoryTab() {
           {SUBITEM_FIELDS.map(({ key, label, description }) => (
             <div key={key} className="space-y-1">
               <Label className="text-sm">{label}</Label>
-              <Input
-                placeholder={`Monday.com column ID for ${key}`}
-                value={config.subitem_column_mapping[key] || ''}
-                onChange={(e) => updateSubitemMapping(key, e.target.value)}
-                className="text-sm"
-                data-testid={`subcol-${key}`}
-              />
+              {subitemColumns.length > 0 ? (
+                <Select
+                  value={config.subitem_column_mapping[key] || ''}
+                  onValueChange={(v) => updateSubitemMapping(key, v === '__none__' ? null : v)}
+                >
+                  <SelectTrigger className="text-sm h-9" data-testid={`subcol-${key}`}>
+                    <SelectValue placeholder="Select subitem column..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">
+                      <span className="text-muted-foreground">-- None --</span>
+                    </SelectItem>
+                    {subitemColumns.map((col) => (
+                      <SelectItem key={col.id} value={col.id}>
+                        <span className="flex items-center gap-2">
+                          {col.title}
+                          <span className="text-[10px] text-muted-foreground">({col.type})</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  placeholder={`Monday.com subitem column ID for ${key}`}
+                  value={config.subitem_column_mapping[key] || ''}
+                  onChange={(e) => updateSubitemMapping(key, e.target.value)}
+                  className="text-sm"
+                  data-testid={`subcol-${key}`}
+                />
+              )}
               <p className="text-[10px] text-muted-foreground">{description}</p>
             </div>
           ))}
