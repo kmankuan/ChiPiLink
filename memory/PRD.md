@@ -10,9 +10,10 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - Cards display media thumbnail, truncated description, time ago, likes/comments
 - Clicking a card opens a detail modal with full text and media gallery navigation
 - "Load older" button at end of scroll to fetch more posts
-- Configurable from admin panel: layout_mode (horizontal/vertical), card_width, card_height, description_max_lines
+- **Autoplay**: Cards auto-scroll like stories with configurable interval (default 4s), pauses on hover, loops back to start
+- Configurable from admin panel: layout_mode (horizontal/vertical), card_width, card_height, description_max_lines, autoplay, autoplay_interval
 - Backend ContainerCreate/ContainerUpdate models extended with new fields
-- i18n translations added for en/es/zh (telegramFeed.seeAll, loadOlder, noPosts, seeMore, close)
+- i18n translations added for en/es/zh (telegramFeed.seeAll, loadOlder, noPosts, seeMore, close, autoplayOn, autoplayOff)
 - Files: `frontend/src/components/TelegramFeedCard.jsx`, `frontend/src/modules/admin/TelegramAdminModule.jsx`, `backend/modules/community/routes/telegram_feed.py`, i18n locales
 
 ### Module Icon Status Indicators (Feb 15, 2026) - COMPLETE
