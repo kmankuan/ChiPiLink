@@ -42,8 +42,15 @@ class TestIconStatusesPublic:
         response = requests.get(f"{BASE_URL}/api/ticker/icon-statuses")
         assert response.status_code == 200
         
-        valid_animations = ['none', 'building_bars', 'pulse', 'bounce', 'spinner', 
-                           'blocks', 'hammer', 'wrench', 'rocket', 'wave', 'custom_gif']
+        # Updated: 21 animation types (none + 10 original + 10 new)
+        valid_animations = [
+            'none', 'building_bars', 'pulse', 'bounce', 'spinner', 
+            'blocks', 'hammer', 'wrench', 'rocket', 'wave',
+            # NEW animations
+            'lantern', 'dragon', 'crane', 'bamboo', 'fireworks',
+            'coding', 'data_sync', 'progress_bar', 'temple', 'sparkle',
+            'custom_gif'
+        ]
         
         for status in response.json()["statuses"]:
             assert status["animation"] in valid_animations, f"Invalid animation: {status['animation']}"
@@ -75,8 +82,8 @@ class TestIconStatusesAdmin:
         assert "statuses" in data
         assert "defaults" in data  # Admin endpoint also returns defaults
         
-        # Defaults should have 4 built-in statuses
-        assert len(data["defaults"]) == 4
+        # Defaults should have 10 built-in statuses (updated from 4)
+        assert len(data["defaults"]) == 10
     
     def test_create_custom_status(self, admin_token):
         """PUT /api/admin/ticker/icon-statuses creates custom status"""
