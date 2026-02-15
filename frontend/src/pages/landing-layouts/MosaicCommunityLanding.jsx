@@ -157,6 +157,54 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
           0%, 100% { transform: scale(0.8); opacity: 0.5; }
           50% { transform: scale(1.2); opacity: 1; }
         }
+        @keyframes lanternGlow {
+          0%, 100% { filter: brightness(0.8); transform: rotate(-3deg); }
+          50% { filter: brightness(1.3); transform: rotate(3deg); }
+        }
+        @keyframes dragonFloat {
+          0% { transform: translateX(-2px) translateY(0); }
+          25% { transform: translateX(2px) translateY(-1px); }
+          50% { transform: translateX(0px) translateY(-2px); }
+          75% { transform: translateX(-1px) translateY(-1px); }
+          100% { transform: translateX(-2px) translateY(0); }
+        }
+        @keyframes craneHook {
+          0%, 100% { transform: rotate(-8deg); }
+          50% { transform: rotate(8deg); }
+        }
+        @keyframes bambooGrow {
+          0% { transform: scaleY(0); opacity: 0; }
+          60% { transform: scaleY(1); opacity: 1; }
+          100% { transform: scaleY(1); opacity: 1; }
+        }
+        @keyframes fireworkBurst {
+          0% { transform: scale(0); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(0.6); opacity: 0; }
+        }
+        @keyframes typingCursor {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        @keyframes dataOrbit {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes progressFill {
+          0% { width: 0%; }
+          80% { width: 100%; }
+          100% { width: 100%; opacity: 0.5; }
+        }
+        @keyframes templeStack {
+          0% { transform: translateY(4px); opacity: 0; }
+          40% { transform: translateY(0); opacity: 1; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes sparkleRotate {
+          0% { transform: rotate(0deg) scale(0.8); opacity: 0.6; }
+          50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+          100% { transform: rotate(360deg) scale(0.8); opacity: 0.6; }
+        }
       `}</style>
     </button>
   );
