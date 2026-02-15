@@ -82,6 +82,7 @@ const PaymentAlertsModule = lazy(() => import('@/modules/admin/PaymentAlertsModu
 const SiteConfigModule = lazy(() => import('@/modules/admin/SiteConfigModule'));
 const AuthMethodsConfig = lazy(() => import('@/modules/admin/AuthMethodsConfig'));
 const UIStyleModule = lazy(() => import('@/modules/admin/UIStyleModule'));
+const PrivacyModule = lazy(() => import('@/modules/admin/PrivacyModule'));
 const LandingPageEditor = lazy(() => import('@/components/admin/LandingPageEditor'));
 const ShowcaseAdminModule = lazy(() => import('@/modules/admin/ShowcaseAdminModule'));
 const LayoutPreviewModule = lazy(() => import('@/modules/admin/LayoutPreviewModule'));
