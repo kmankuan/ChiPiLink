@@ -9,8 +9,13 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - Added admin-configurable settings: `show_dots`, `dot_style` (auto/dots/progress_bar/counter/none), `shuffle` (random order), `video_autoplay`, `video_max_duration_ms`
 - **Dot Style 'auto'**: Shows individual dots for <=10 items, switches to compact progress bar for >10 items
 - **Shuffle**: Fisher-Yates randomization on load
-- **Video fix**: Added error handling for broken videos (shows "unavailable" overlay, auto-skips after 2s), max duration timer to prevent stuck videos
-- Admin panel: New controls in Banners y Medios > Media Player tab
+- **Video autoplay fix**: Uses `onLoadedData`/`onCanPlay` events to trigger play with `muted=true` for browser autoplay policy compliance. Retries once if play fails. Safety timer advances after max duration.
+- **Disable Swipe / Lock Navigation**: `disable_swipe` setting removes touch handlers, hides prev/next arrows, disables dot clicks — for random-only display mode
+- **Image Fit Mode**: `fit_mode` setting with 3 modes:
+  - `smart` (default): Detects portrait images and pairs consecutive portraits side-by-side with blurred background fill
+  - `contain`: Shows full image with blurred background behind
+  - `cover`: Crops image to fill the container (classic behavior)
+- Admin panel: New controls in Banners y Medios > Media Player tab (Fit Mode dropdown, Lock Navigation checkbox)
 - Files: `frontend/src/components/MediaPlayer.jsx`, `frontend/src/modules/admin/ShowcaseAdminModule.jsx`, `backend/modules/showcase/__init__.py`
 
 ### New Animation Types & Lottie Support (Feb 15, 2026) - COMPLETE
