@@ -250,7 +250,10 @@ export default function TxbInventoryTab() {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
+
+      let data;
+      try { data = await res.json(); } catch { data = { detail: `Server error (${res.status})` }; }
+
       if (!res.ok) {
         toast.error(data.detail || `Failed to sync ${label}`);
         setSyncingColumn(null);
@@ -285,8 +288,8 @@ export default function TxbInventoryTab() {
         }
       };
       setTimeout(poll, 2000);
-    } catch {
-      toast.error('Network error starting column sync');
+    } catch (err) {
+      toast.error(`Column sync error: ${err.message || 'Network error'}`);
       setSyncingColumn(null);
     }
   };
