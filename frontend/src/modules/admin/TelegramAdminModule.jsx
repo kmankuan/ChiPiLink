@@ -601,7 +601,7 @@ export default function TelegramAdminModule() {
                 title: 'New Feed',
                 subtitle: 'Latest updates',
                 channel_id: null,
-                post_limit: 5,
+                post_limit: 10,
                 bg_color: '#ffffff',
                 accent_color: '#0088cc',
                 header_bg: '#E8F4FE',
@@ -614,6 +614,10 @@ export default function TelegramAdminModule() {
                 show_post_count: true,
                 show_media_count: true,
                 is_active: true,
+                layout_mode: 'horizontal',
+                card_width: 220,
+                card_height: 300,
+                description_max_lines: 2,
               }}
               onSave={handleContainerSave}
               onDelete={() => setShowNewContainer(false)}
