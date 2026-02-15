@@ -221,6 +221,10 @@ api_router.include_router(showcase_admin_router)
 # Include main router in app
 app.include_router(api_router)
 
+# Register public endpoints that need to be at root level (no /api prefix)
+# robots.txt must be at /robots.txt for search engines
+app.include_router(privacy_public_router)
+
 # ============== MIDDLEWARE ==============
 
 app.add_middleware(
