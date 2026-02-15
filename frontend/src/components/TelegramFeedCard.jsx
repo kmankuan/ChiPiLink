@@ -158,7 +158,11 @@ function PostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
   const isPlayable = firstMedia?.type === 'video' || firstMedia?.type === 'animation';
 
   const handleThumbClick = () => {
-    if (isPlayable && firstMedia?.file_id) onVideoPlay(firstMedia.file_id, post.text);
+    if (media.length > 0) {
+      onOpenGallery(media, 0, post.text);
+    } else if (isPlayable && firstMedia?.file_id) {
+      onVideoPlay(firstMedia.file_id, post.text);
+    }
   };
 
   return (
