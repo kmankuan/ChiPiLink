@@ -316,42 +316,12 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
         </section>
       )}
 
-      {/* ═══ CTA BANNER — community call to action ═══ */}
+      {/* ═══ MONDAY.COM BOARD WIDGET — replaces CTA when configured ═══ */}
       <section
-        className={`py-6 sm:py-8 px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
-        data-testid="mosaic-cta"
+        className={`px-0 sm:px-8 max-w-7xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
+        data-testid="monday-widget-section"
       >
-        <div className="relative rounded-3xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #C8102E 0%, #8B0000 100%)' }}>
-          <div className="px-6 sm:px-10 py-8 sm:py-10 flex flex-col sm:flex-row items-center gap-6">
-            <div className="flex-1 text-center sm:text-left">
-              <div className="flex items-center gap-2 justify-center sm:justify-start mb-2">
-                <Rss className="h-4 w-4 text-white/60" />
-                <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60">
-                  {t('community.title', 'Community')}
-                </span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
-                {t('landing.mosaic.cta_title', 'Join the Mosaic')}
-              </h2>
-              <p className="text-xs text-white/50 max-w-md leading-relaxed">
-                {t('landing.mosaic.cta_desc', 'Connect with families, share stories, celebrate our diverse heritage together.')}
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate(isAuthenticated ? '/comunidad' : '/login')}
-              className="bg-white hover:bg-white/90 font-bold px-7 py-3 h-auto rounded-full gap-2 shadow-lg shrink-0"
-              style={{ color: '#C8102E' }}
-              data-testid="mosaic-cta-btn"
-            >
-              {isAuthenticated ? t('landing.community.cta', 'Open Feed') : t('common.login', 'Sign In')}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          {/* Decorative mosaic dots */}
-          <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full opacity-10 bg-white pointer-events-none" />
-          <div className="absolute -left-6 -bottom-6 w-24 h-24 rounded-full opacity-10 bg-white pointer-events-none" />
-          <div className="absolute right-20 bottom-3 w-8 h-8 rounded-lg opacity-10 bg-white pointer-events-none rotate-12" />
-        </div>
+        <MondayBoardWidget />
       </section>
 
       {/* ═══ FOOTER ═══ */}
