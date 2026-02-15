@@ -462,13 +462,57 @@ export default function LayoutPreviewModule() {
       image_url: '',
       accent: '#6366f1',
       accent_bg: '#EEF2FF',
-      status: 'building'
+      status: 'building',
+      status_animation: 'building_bars',
+      status_gif_url: '',
+      status_color: '#f59e0b',
+      status_label: '',
     };
     setIconConfig(prev => ({
       ...prev,
       [layoutId]: [...(prev[layoutId] || []), newIcon]
     }));
     setHasChanges(true);
+  };
+
+  // Status management
+  const addCustomStatus = () => {
+    const id = `custom_${Date.now()}`;
+    setStatusOptions(prev => [...prev, {
+      value: id,
+      label: 'New Status',
+      color: '#8b5cf6',
+      animation: 'pulse',
+      gif_url: '',
+    }]);
+  };
+
+  const updateStatus = (idx, field, val) => {
+    setStatusOptions(prev => {
+      const copy = [...prev];
+      copy[idx] = { ...copy[idx], [field]: val };
+      return copy;
+    });
+  };
+
+  const removeStatus = (idx) => {
+    setStatusOptions(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const saveStatuses = async () => {
+    setSavingStatuses(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/ticker/icon-statuses`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ statuses: statusOptions }),
+      });
+      if (res.ok) toast.success('Statuses saved');
+    } catch {
+      toast.error('Failed to save statuses');
+    } finally {
+      setSavingStatuses(false);
+    }
   };
 
   if (loading) {
