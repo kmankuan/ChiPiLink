@@ -206,6 +206,32 @@ function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status
           50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
           100% { transform: rotate(360deg) scale(0.8); opacity: 0.6; }
         }
+        @keyframes codingType {
+          0%, 100% { width: 0; }
+          50% { width: 100%; }
+        }
+        @keyframes codingScreenGlow {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        @keyframes personBob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-1px); }
+        }
+        @keyframes buildFloor {
+          0% { transform: scaleY(0); opacity: 0; }
+          50% { transform: scaleY(1); opacity: 1; }
+          100% { transform: scaleY(1); opacity: 1; }
+        }
+        @keyframes buildCraneSwing {
+          0%, 100% { transform: rotate(-5deg); }
+          50% { transform: rotate(5deg); }
+        }
+        @keyframes buildProgress {
+          0% { height: 0%; }
+          85% { height: 100%; }
+          100% { height: 100%; }
+        }
       `}</style>
     </button>
   );
