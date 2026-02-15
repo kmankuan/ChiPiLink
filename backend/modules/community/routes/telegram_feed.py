@@ -213,7 +213,7 @@ class ContainerCreate(BaseModel):
     title: str = "New Feed"
     subtitle: str = "Latest updates"
     channel_id: Optional[int] = None
-    post_limit: int = 5
+    post_limit: int = 10
     bg_color: str = "#ffffff"
     accent_color: str = "#0088cc"
     header_bg: str = "#E8F4FE"
@@ -226,6 +226,10 @@ class ContainerCreate(BaseModel):
     show_post_count: bool = True
     show_media_count: bool = True
     is_active: bool = True
+    layout_mode: str = "horizontal"
+    card_width: int = 220
+    card_height: int = 300
+    description_max_lines: int = 2
 
 
 class ContainerUpdate(BaseModel):
@@ -246,6 +250,10 @@ class ContainerUpdate(BaseModel):
     show_media_count: Optional[bool] = None
     order: Optional[int] = None
     is_active: Optional[bool] = None
+    layout_mode: Optional[str] = None
+    card_width: Optional[int] = None
+    card_height: Optional[int] = None
+    description_max_lines: Optional[int] = None
 
 
 @router.get("/admin/containers")
