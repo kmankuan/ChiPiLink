@@ -19,6 +19,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - Photos auto-advance (4s), pause on touch, resume on touch again
 - Videos auto-advance on finish, gallery auto-closes after last file
 
+### PinPanClub Super Pin Ranking Layout Fix (Feb 15, 2026) - COMPLETE
+- Fixed mobile layout overflow in "Super Pin Ranking" banner section
+- Made title/description responsive with `text-lg sm:text-2xl`
+- Buttons now stack properly on mobile with shortened labels ("Ranking", "Admin")
+- Uses `flex-col sm:flex-row` for proper responsive stacking
+
 ### Banner & Telegram Feed UI Fixes (Feb 15, 2026) - COMPLETE
 - Banner: No rounded corners, no gap between ticker and banner
 - Telegram feed: Edge-to-edge on mobile, consistent 72px thumbnails
