@@ -196,12 +196,13 @@ const ANIMATION_OPTIONS = [
 ];
 
 // Single icon editor row
-function IconRow({ item, index, onUpdate, onRemove }) {
+function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
   const [showPicker, setShowPicker] = useState(false);
   const Icon = ICON_CATALOG[item.icon] || Store;
+  const currentStatus = statusOptions.find(s => s.value === item.status) || statusOptions[0];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-lg bg-muted/30 border border-border/50" data-testid={`icon-row-${item.key}`}>
+    <div className="flex flex-col sm:flex-row sm:items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border/50" data-testid={`icon-row-${item.key}`}>
       {/* Icon preview */}
       <div className="relative shrink-0">
         <button
@@ -226,65 +227,112 @@ function IconRow({ item, index, onUpdate, onRemove }) {
       </div>
 
       {/* Fields */}
-      <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 gap-2">
-        <div>
-          <Label className="text-[9px] text-muted-foreground">Label</Label>
-          <Input
-            value={item.label || ''}
-            onChange={(e) => onUpdate(index, { ...item, label: e.target.value })}
-            className="h-7 text-xs"
-            data-testid={`icon-label-${item.key}`}
-          />
-        </div>
-        <div>
-          <Label className="text-[9px] text-muted-foreground">Route (optional)</Label>
-          <Input
-            value={item.to || ''}
-            onChange={(e) => onUpdate(index, { ...item, to: e.target.value })}
-            className="h-7 text-xs font-mono"
-            placeholder="Leave empty to disable"
-          />
-        </div>
-        <div>
-          <Label className="text-[9px] text-muted-foreground">Status</Label>
-          <select
-            value={item.status || 'building'}
-            onChange={(e) => onUpdate(index, { ...item, status: e.target.value })}
-            className="h-7 w-full px-2 text-xs border rounded-md bg-background"
-          >
-            {STATUS_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <Label className="text-[9px] text-muted-foreground">Image URL (optional)</Label>
-          <Input
-            value={item.image_url || ''}
-            onChange={(e) => onUpdate(index, { ...item, image_url: e.target.value, type: e.target.value ? 'image' : 'lucide' })}
-            className="h-7 text-xs"
-            placeholder="https://..."
-          />
-        </div>
-        <div className="flex items-end gap-1">
+      <div className="flex-1 space-y-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div>
-            <Label className="text-[9px] text-muted-foreground">Color</Label>
-            <input
-              type="color"
-              value={item.accent || '#666666'}
-              onChange={(e) => onUpdate(index, { ...item, accent: e.target.value })}
-              className="w-7 h-7 rounded cursor-pointer border-0"
+            <Label className="text-[9px] text-muted-foreground">Label</Label>
+            <Input
+              value={item.label || ''}
+              onChange={(e) => onUpdate(index, { ...item, label: e.target.value })}
+              className="h-7 text-xs"
+              data-testid={`icon-label-${item.key}`}
             />
           </div>
           <div>
-            <Label className="text-[9px] text-muted-foreground">BG</Label>
-            <input
-              type="color"
-              value={item.accent_bg || '#f5f5f5'}
-              onChange={(e) => onUpdate(index, { ...item, accent_bg: e.target.value })}
-              className="w-7 h-7 rounded cursor-pointer border-0"
+            <Label className="text-[9px] text-muted-foreground">Route (optional)</Label>
+            <Input
+              value={item.to || ''}
+              onChange={(e) => onUpdate(index, { ...item, to: e.target.value })}
+              className="h-7 text-xs font-mono"
+              placeholder="Leave empty to disable"
             />
           </div>
+          <div>
+            <Label className="text-[9px] text-muted-foreground">Status</Label>
+            <select
+              value={item.status || 'building'}
+              onChange={(e) => {
+                const s = statusOptions.find(o => o.value === e.target.value);
+                onUpdate(index, {
+                  ...item,
+                  status: e.target.value,
+                  status_animation: s?.animation || 'none',
+                  status_gif_url: s?.gif_url || '',
+                  status_color: s?.color || '#666',
+                });
+              }}
+              className="h-7 w-full px-2 text-xs border rounded-md bg-background"
+              data-testid={`icon-status-${item.key}`}
+            >
+              {statusOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label className="text-[9px] text-muted-foreground">Status Label (override)</Label>
+            <Input
+              value={item.status_label || ''}
+              onChange={(e) => onUpdate(index, { ...item, status_label: e.target.value })}
+              className="h-7 text-xs"
+              placeholder={currentStatus?.label || 'Auto'}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <Label className="text-[9px] text-muted-foreground">Image URL (optional)</Label>
+            <Input
+              value={item.image_url || ''}
+              onChange={(e) => onUpdate(index, { ...item, image_url: e.target.value, type: e.target.value ? 'image' : 'lucide' })}
+              className="h-7 text-xs"
+              placeholder="https://..."
+            />
+          </div>
+          <div className="flex items-end gap-1">
+            <div>
+              <Label className="text-[9px] text-muted-foreground">Color</Label>
+              <input
+                type="color"
+                value={item.accent || '#666666'}
+                onChange={(e) => onUpdate(index, { ...item, accent: e.target.value })}
+                className="w-7 h-7 rounded cursor-pointer border-0"
+              />
+            </div>
+            <div>
+              <Label className="text-[9px] text-muted-foreground">BG</Label>
+              <input
+                type="color"
+                value={item.accent_bg || '#f5f5f5'}
+                onChange={(e) => onUpdate(index, { ...item, accent_bg: e.target.value })}
+                className="w-7 h-7 rounded cursor-pointer border-0"
+              />
+            </div>
+          </div>
+          <div>
+            <Label className="text-[9px] text-muted-foreground">Status Animation</Label>
+            <select
+              value={item.status_animation || currentStatus?.animation || 'none'}
+              onChange={(e) => onUpdate(index, { ...item, status_animation: e.target.value })}
+              className="h-7 w-full px-2 text-xs border rounded-md bg-background"
+              data-testid={`icon-anim-${item.key}`}
+            >
+              {ANIMATION_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+          {(item.status_animation === 'custom_gif' || currentStatus?.animation === 'custom_gif') && (
+            <div>
+              <Label className="text-[9px] text-muted-foreground">GIF/Image URL</Label>
+              <Input
+                value={item.status_gif_url || ''}
+                onChange={(e) => onUpdate(index, { ...item, status_gif_url: e.target.value })}
+                className="h-7 text-xs"
+                placeholder="https://...gif"
+              />
+            </div>
+          )}
         </div>
       </div>
 
