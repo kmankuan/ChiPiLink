@@ -5,6 +5,14 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Media Player Controls & Video Fix (Feb 15, 2026) - COMPLETE
+- Added admin-configurable settings: `show_dots`, `dot_style` (auto/dots/progress_bar/counter/none), `shuffle` (random order), `video_autoplay`, `video_max_duration_ms`
+- **Dot Style 'auto'**: Shows individual dots for <=10 items, switches to compact progress bar for >10 items
+- **Shuffle**: Fisher-Yates randomization on load
+- **Video fix**: Added error handling for broken videos (shows "unavailable" overlay, auto-skips after 2s), max duration timer to prevent stuck videos
+- Admin panel: New controls in Banners y Medios > Media Player tab
+- Files: `frontend/src/components/MediaPlayer.jsx`, `frontend/src/modules/admin/ShowcaseAdminModule.jsx`, `backend/modules/showcase/__init__.py`
+
 ### New Animation Types & Lottie Support (Feb 15, 2026) - COMPLETE
 - Added 3 new animation types: `coding_scene` (person at laptop), `building_progress` (building 0-100%), `lottie_url` (Lottie JSON from URL)
 - `coding_scene`: CSS-animated scene showing person sitting at laptop with typing code lines and screen glow
