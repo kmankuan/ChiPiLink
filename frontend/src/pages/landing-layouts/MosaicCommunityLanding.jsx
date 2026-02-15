@@ -19,6 +19,7 @@ import { useLayoutIcons } from '@/hooks/useLayoutIcons';
 import BannerCarousel from '@/components/BannerCarousel';
 import MediaPlayer from '@/components/MediaPlayer';
 import TelegramFeedCard from '@/components/TelegramFeedCard';
+import MondayBoardWidget from '@/components/MondayBoardWidget';
 import ModuleStatusBadge from '@/components/ui/ModuleStatusBadge';
 import { DEFAULT_MODULE_STATUS } from '@/config/moduleStatus';
 import {
