@@ -54,6 +54,7 @@ function fallbackText(media) {
 function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetail, onOpenGallery }) {
   const media = post.media || [];
   const firstMedia = media[0] || null;
+  const isAlbum = media.length > 1;
   const isPlayable = firstMedia?.type === 'video' || firstMedia?.type === 'animation';
   const thumbSrc = firstMedia?.type === 'photo'
     ? mediaUrl(firstMedia.file_id)
@@ -71,12 +72,18 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
     }
   };
 
+  // Get thumb src for any media item
+  const getThumb = (item) => {
+    if (item?.type === 'photo') return mediaUrl(item.file_id);
+    if (item?.thumb_file_id) return mediaUrl(item.thumb_file_id);
+    return null;
+  };
+
   return (
     <div
       className="flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group transition-shadow hover:shadow-md"
       style={{
         width: cardWidth,
-        minHeight: cardHeight,
         background: '#fff',
         border: '1px solid rgba(0,0,0,0.07)',
       }}
@@ -89,7 +96,48 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
         style={{ height: imageHeight }}
         onClick={handleMediaClick}
       >
-        {thumbSrc ? (
+        {isAlbum ? (
+          /* Album grid: show 2-4 thumbnails */
+          <div className="w-full h-full grid gap-[1px]" style={{
+            gridTemplateColumns: media.length >= 3 ? '1fr 1fr' : '1fr 1fr',
+            gridTemplateRows: media.length >= 3 ? '1fr 1fr' : '1fr',
+          }}>
+            {media.slice(0, 4).map((item, idx) => {
+              const src = getThumb(item);
+              const isItemVideo = item?.type === 'video' || item?.type === 'animation';
+              // First item spans full left column for 3+ items
+              const span = idx === 0 && media.length >= 3 ? { gridRow: '1 / -1' } : {};
+              return (
+                <div key={idx} className="relative overflow-hidden bg-neutral-200" style={span}>
+                  {src ? (
+                    <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  ) : isItemVideo ? (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
+                      <Play className="h-4 w-4 text-white/60 fill-white/60" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
+                      <ImageIcon className="h-4 w-4 text-slate-400" />
+                    </div>
+                  )}
+                  {isItemVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-6 h-6 rounded-full bg-black/40 flex items-center justify-center">
+                        <Play className="h-2.5 w-2.5 text-white fill-white ml-0.5" />
+                      </div>
+                    </div>
+                  )}
+                  {/* Extra count overlay on last visible cell */}
+                  {idx === 3 && media.length > 4 && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">+{media.length - 4}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : thumbSrc ? (
           <img
             src={thumbSrc}
             alt=""
@@ -110,20 +158,13 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
           </div>
         )}
 
-        {/* Video play overlay */}
-        {isPlayable && thumbSrc && (
+        {/* Video play overlay (single media only) */}
+        {!isAlbum && isPlayable && thumbSrc && (
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
               <Play className="h-4 w-4 text-white fill-white ml-0.5" />
             </div>
           </div>
-        )}
-
-        {/* Album badge */}
-        {media.length > 1 && (
-          <span className="absolute top-2 right-2 text-[9px] font-bold text-white bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
-            {media.length}
-          </span>
         )}
 
         {/* Duration badge */}
@@ -134,8 +175,8 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
         )}
       </div>
 
-      {/* Content area */}
-      <div className="p-3 flex flex-col justify-between" style={{ minHeight: cardHeight - imageHeight }}>
+      {/* Content area — compact, no fixed min-height */}
+      <div className="p-2.5">
         <p
           className="text-xs leading-snug"
           style={{
@@ -148,18 +189,15 @@ function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetai
         >
           {text}
         </p>
-
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[9px]" style={{ color: '#b8956a' }}>
-              {formatTimeAgo(post.date)}
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="text-[9px]" style={{ color: '#b8956a' }}>
+            {formatTimeAgo(post.date)}
+          </span>
+          {post.likes_count > 0 && (
+            <span className="text-[9px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
+              <Heart className="h-2.5 w-2.5" /> {post.likes_count}
             </span>
-            {post.likes_count > 0 && (
-              <span className="text-[9px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
-                <Heart className="h-2.5 w-2.5" /> {post.likes_count}
-              </span>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
