@@ -183,15 +183,32 @@ const DEFAULT_STATUS_OPTIONS = [
 
 const ANIMATION_OPTIONS = [
   { value: 'none', label: 'None' },
-  { value: 'building_bars', label: 'Building bars' },
-  { value: 'pulse', label: 'Pulse glow' },
+  // Original
+  { value: 'building_bars', label: 'Building Bars' },
+  { value: 'pulse', label: 'Pulse Glow' },
   { value: 'bounce', label: 'Bounce' },
   { value: 'spinner', label: 'Spinner' },
-  { value: 'blocks', label: 'Stacking blocks' },
+  { value: 'blocks', label: 'Stacking Blocks' },
   { value: 'hammer', label: 'Hammer' },
-  { value: 'wrench', label: 'Wrench spin' },
+  { value: 'wrench', label: 'Wrench Spin' },
   { value: 'rocket', label: 'Rocket' },
   { value: 'wave', label: 'Wave' },
+  // NEW: Chinese / Cultural
+  { value: 'lantern', label: 'Lantern (Chinese)' },
+  { value: 'dragon', label: 'Dragon (Chinese)' },
+  { value: 'bamboo', label: 'Bamboo Growth' },
+  { value: 'temple', label: 'Temple / Pagoda' },
+  { value: 'sparkle', label: 'Sparkle' },
+  // NEW: Construction
+  { value: 'crane', label: 'Crane' },
+  // NEW: Tech / Digital
+  { value: 'coding', label: 'Coding' },
+  { value: 'data_sync', label: 'Data Sync' },
+  // NEW: Celebration
+  { value: 'fireworks', label: 'Fireworks' },
+  // NEW: Progress
+  { value: 'progress_bar', label: 'Progress Bar' },
+  // Custom
   { value: 'custom_gif', label: 'Custom GIF/Image' },
 ];
 
