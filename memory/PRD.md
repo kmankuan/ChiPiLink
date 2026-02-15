@@ -5,6 +5,17 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Custom Icon Statuses & Animations (Feb 15, 2026) - COMPLETE
+- Replaced fixed 4-status dropdown with fully customizable status system
+- Admin can create/edit/delete custom statuses with: ID, display name, color, animation type
+- 11 animation types: none, building_bars, pulse, bounce, spinner, blocks, hammer, wrench, rocket, wave, custom_gif
+- Custom GIF/image URL support for status animations (paste any GIF URL)
+- Status label override per icon (e.g. "En progreso", "Phase 2", etc.)
+- StatusAnimation preview in admin status manager rows
+- CulturalNav updated to render all animation types inside icon box
+- Backend CRUD API: GET/PUT /api/ticker/icon-statuses + admin variants
+- Files: `LayoutPreviewModule.jsx`, `MosaicCommunityLanding.jsx`, `backend/modules/ticker/routes.py`
+
 ### Horizontal Telegram Feed Redesign (Feb 15, 2026) - COMPLETE
 - Redesigned Telegram feed from vertical list to horizontal scrollable carousel
 - Cards display media thumbnail, truncated description, time ago, likes/comments
