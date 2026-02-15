@@ -330,34 +330,37 @@ export default function PingPongDashboard() {
         {/* Super Pin Banner */}
         <section>
           <Card className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 border-0 overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-yellow-500/20 rounded-xl">
-                    <Trophy className="h-10 w-10 text-yellow-400" />
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 bg-yellow-500/20 rounded-xl shrink-0">
+                    <Trophy className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <div className="min-w-0">
+                    <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
                       🏆 Super Pin Ranking
                     </h2>
-                    <p className="text-green-200">Sistema de ranking individual con ligas y temporadas</p>
+                    <p className="text-green-200 text-sm sm:text-base">Sistema de ranking individual con ligas y temporadas</p>
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3 shrink-0">
                   <Button 
                     variant="outline" 
-                    className="border-white/30 text-white hover:bg-white/10"
+                    size="sm"
+                    className="border-white/30 text-white hover:bg-white/10 sm:size-default"
                     onClick={() => navigate('/pinpanclub/superpin/ranking')}
                   >
-                    <Medal className="h-4 w-4 mr-2" />
-                    Ver Ranking
+                    <Medal className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Ver </span>Ranking
                   </Button>
                   <Button 
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                    size="sm"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black sm:size-default"
                     onClick={() => navigate('/pinpanclub/superpin/admin')}
                   >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Administrar
+                    <Settings className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Administrar</span>
+                    <span className="sm:hidden">Admin</span>
                   </Button>
                 </div>
               </div>
