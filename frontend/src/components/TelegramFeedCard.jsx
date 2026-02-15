@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
-  Film, FileText, Image as ImageIcon, ChevronDown, Loader2
+  Film, FileText, Image as ImageIcon, ChevronDown, Loader2, Pause
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
