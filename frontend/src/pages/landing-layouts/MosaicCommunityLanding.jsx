@@ -70,27 +70,87 @@ function formatDate(dateStr) {
 }
 
 // Cultural icon button used for navigation — supports Lucide icons or custom images
-function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl }) {
+// Now includes status indicator (ready, building, coming_soon, maintenance)
+function CulturalNav({ icon: Icon, label, to, accent, accentBg, imageUrl, status = 'building' }) {
   const navigate = useNavigate();
+  const hasLink = to && to.trim() !== '';
+  
+  const handleClick = () => {
+    if (hasLink) {
+      navigate(to);
+    }
+  };
+
+  // Status badge colors and labels
+  const STATUS_CONFIG = {
+    ready: { label: '', color: 'bg-green-500', show: false },
+    building: { label: '', color: 'bg-amber-500', show: true, animated: true },
+    coming_soon: { label: 'Pronto', color: 'bg-blue-500', show: true },
+    maintenance: { label: '', color: 'bg-red-500', show: true },
+  };
+
+  const statusInfo = STATUS_CONFIG[status] || STATUS_CONFIG.building;
+
   return (
     <button
-      onClick={() => navigate(to)}
-      className="group flex flex-col items-center gap-2 transition-transform active:scale-95"
+      onClick={handleClick}
+      disabled={!hasLink}
+      className={`group flex flex-col items-center gap-1 transition-transform ${hasLink ? 'active:scale-95 cursor-pointer' : 'cursor-default opacity-90'}`}
       data-testid={`cultural-nav-${label.toLowerCase().replace(/\s/g, '-')}`}
     >
-      <div
-        className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg overflow-hidden"
-        style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
-      >
-        {imageUrl ? (
-          <img src={imageUrl} alt={label} className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
-        ) : (
-          <Icon className="h-6 w-6 sm:h-7 sm:w-7" style={{ color: accent }} />
+      <div className="relative">
+        <div
+          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden ${hasLink ? 'group-hover:scale-110 group-hover:shadow-lg' : ''}`}
+          style={{ background: accentBg, boxShadow: `0 4px 14px ${accent}30` }}
+        >
+          {imageUrl ? (
+            <img src={imageUrl} alt={label} className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+          ) : (
+            <Icon className="h-6 w-6 sm:h-7 sm:w-7" style={{ color: accent }} />
+          )}
+        </div>
+        
+        {/* Status indicator - animated building indicator */}
+        {statusInfo.show && status === 'building' && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5">
+            <div className="flex gap-[2px]">
+              <span className="w-1 h-2 bg-amber-500 rounded-sm animate-[building_0.6s_ease-in-out_infinite]" style={{ animationDelay: '0ms' }}></span>
+              <span className="w-1 h-3 bg-amber-500 rounded-sm animate-[building_0.6s_ease-in-out_infinite]" style={{ animationDelay: '150ms' }}></span>
+              <span className="w-1 h-2 bg-amber-500 rounded-sm animate-[building_0.6s_ease-in-out_infinite]" style={{ animationDelay: '300ms' }}></span>
+            </div>
+          </div>
+        )}
+        
+        {/* Coming soon badge */}
+        {statusInfo.show && status === 'coming_soon' && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <span className="text-[8px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
+        )}
+        
+        {/* Maintenance badge */}
+        {statusInfo.show && status === 'maintenance' && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+            <span className="text-[8px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+              Mant.
+            </span>
+          </div>
         )}
       </div>
-      <span className="text-[10px] sm:text-xs font-bold tracking-tight" style={{ color: '#5a4a3a' }}>
+      
+      <span className="text-[10px] sm:text-xs font-bold tracking-tight mt-1" style={{ color: '#5a4a3a' }}>
         {label}
       </span>
+      
+      {/* CSS for building animation */}
+      <style>{`
+        @keyframes building {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(1.5); }
+        }
+      `}</style>
     </button>
   );
 }
