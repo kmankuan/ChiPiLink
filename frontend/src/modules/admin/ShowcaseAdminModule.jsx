@@ -974,6 +974,19 @@ export default function ShowcaseAdminModule() {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <Label className="text-[10px]">Image Fit Mode</Label>
+                <select
+                  value={mediaConfig?.fit_mode || 'smart'}
+                  onChange={e => setMediaConfig({ ...mediaConfig, fit_mode: e.target.value })}
+                  className="h-8 w-full rounded-lg border bg-background px-2 text-xs"
+                  data-testid="fit-mode-select"
+                >
+                  <option value="smart">Smart (pair portraits, blur bg)</option>
+                  <option value="contain">Contain (full image, blur bg)</option>
+                  <option value="cover">Cover (crop to fill)</option>
+                </select>
+              </div>
               <label className="flex items-center gap-1.5 text-xs cursor-pointer">
                 <input
                   type="checkbox"
@@ -1003,6 +1016,18 @@ export default function ShowcaseAdminModule() {
                   data-testid="video-autoplay-checkbox"
                 />
                 Video Autoplay
+              </label>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mediaConfig?.disable_swipe === true}
+                  onChange={e => setMediaConfig({ ...mediaConfig, disable_swipe: e.target.checked })}
+                  className="rounded"
+                  data-testid="disable-swipe-checkbox"
+                />
+                Lock Navigation (random only)
               </label>
             </div>
             <Button size="sm" onClick={savePlayerSettings} className="h-7 text-xs gap-1" data-testid="save-player-settings">
