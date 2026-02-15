@@ -220,49 +220,149 @@ function PostMeta({ post }) {
   );
 }
 
-/* ────────────────── Video Modal ────────────────── */
+/* ────────────────── Media Gallery Modal (edge-to-edge, auto-advance) ────────────────── */
 
-function VideoModal({ fileId, caption, onClose }) {
+function MediaGalleryModal({ media, startIndex, caption, onClose }) {
+  const [current, setCurrent] = useState(startIndex || 0);
   const videoRef = useRef(null);
+  const hasAdvancedRef = useRef(false);
 
+  const item = media[current];
+  const isVideo = item?.type === 'video' || item?.type === 'animation';
+  const isLast = current >= media.length - 1;
+  const total = media.length;
+
+  // Keyboard navigation
   useEffect(() => {
-    const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && current < total - 1) goNext();
+      if (e.key === 'ArrowLeft' && current > 0) goPrev();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [current, total]);
+
+  // Reset advance flag on slide change
+  useEffect(() => {
+    hasAdvancedRef.current = false;
+  }, [current]);
+
+  // Auto-advance photos after 3s
+  useEffect(() => {
+    if (!isVideo && total > 1) {
+      const timer = setTimeout(() => {
+        if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [current, isVideo, isLast, total]);
+
+  const goNext = () => {
+    if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+  };
+  const goPrev = () => { if (current > 0) setCurrent(c => c - 1); };
+
+  // Video ended handler — advance or close
+  const handleVideoEnded = () => {
+    if (!hasAdvancedRef.current) {
+      hasAdvancedRef.current = true;
+      if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+    }
+  };
+
+  const src = item?.file_id ? mediaUrl(item.file_id) : null;
+  const thumbSrc = item?.thumb_file_id ? mediaUrl(item.thumb_file_id) : null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-      onClick={onClose}
-      data-testid="video-modal"
+      className="fixed inset-0 z-50 flex flex-col bg-black"
+      data-testid="media-gallery-modal"
     >
-      <div
-        className="relative w-[90vw] max-w-lg rounded-2xl overflow-hidden bg-black"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-black/80 z-10">
+        <span className="text-white/70 text-xs font-medium">
+          {current + 1} / {total}
+        </span>
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition"
-          data-testid="video-modal-close"
+          className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20"
+          data-testid="gallery-close"
         >
           <X className="h-4 w-4" />
         </button>
-        <video
-          ref={videoRef}
-          src={mediaUrl(fileId)}
-          controls
-          autoPlay
-          playsInline
-          className="w-full max-h-[70vh] object-contain"
-          data-testid="video-modal-player"
-        />
-        {caption && (
-          <div className="px-4 py-3 bg-black/90">
-            <p className="text-white text-xs leading-snug line-clamp-3">{caption}</p>
-          </div>
+      </div>
+
+      {/* Media area — edge to edge */}
+      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+        {isVideo && src ? (
+          <video
+            ref={videoRef}
+            key={`v-${current}`}
+            src={src}
+            controls
+            autoPlay
+            playsInline
+            onEnded={handleVideoEnded}
+            className="w-full h-full object-contain"
+            data-testid="gallery-video"
+          />
+        ) : src ? (
+          <img
+            key={`i-${current}`}
+            src={src}
+            alt=""
+            className="w-full h-full object-contain"
+            data-testid="gallery-image"
+          />
+        ) : thumbSrc ? (
+          <img key={`t-${current}`} src={thumbSrc} alt="" className="w-full h-full object-contain" />
+        ) : (
+          <div className="text-white/40 text-sm">No preview</div>
+        )}
+
+        {/* Left arrow */}
+        {current > 0 && (
+          <button
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/60"
+            data-testid="gallery-prev"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        )}
+
+        {/* Right arrow */}
+        {!isLast && (
+          <button
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/60"
+            data-testid="gallery-next"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         )}
       </div>
+
+      {/* Caption bar */}
+      {caption && (
+        <div className="px-4 py-3 bg-black/90">
+          <p className="text-white text-xs leading-snug line-clamp-3">{caption}</p>
+        </div>
+      )}
+
+      {/* Dots indicator */}
+      {total > 1 && (
+        <div className="flex justify-center gap-1.5 pb-4 pt-2 bg-black/90">
+          {media.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`rounded-full transition-all ${i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30'}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
