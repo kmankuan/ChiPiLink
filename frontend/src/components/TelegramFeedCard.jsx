@@ -391,12 +391,16 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const scrollRef = useRef(null);
+  const autoplayTimerRef = useRef(null);
+  const progressRef = useRef(null);
   const [detailPost, setDetailPost] = useState(null);
   const [posts, setPosts] = useState(container.posts || []);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState((container.total_posts || 0) > (container.posts || []).length);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isAutoplay, setIsAutoplay] = useState(container.autoplay !== false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const {
     title = 'Community Channel',
@@ -408,12 +412,15 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
     card_width = 220,
     card_height = 300,
     description_max_lines = 2,
+    autoplay_interval = 4,
     cta_link = '/comunidad',
     show_post_count = true,
     total_posts = 0,
     container_id,
     channel_id,
   } = container;
+
+  const intervalMs = (autoplay_interval || 4) * 1000;
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
@@ -430,6 +437,51 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
     return () => el.removeEventListener('scroll', updateScrollState);
   }, [updateScrollState, posts]);
 
+  // Autoplay: scroll one card to the right every interval
+  useEffect(() => {
+    if (!isAutoplay || isPaused || posts.length <= 1) {
+      if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current);
+      return;
+    }
+
+    autoplayTimerRef.current = setInterval(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 10;
+      if (atEnd) {
+        // Loop back to start
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: card_width + 12, behavior: 'smooth' });
+      }
+    }, intervalMs);
+
+    return () => { if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current); };
+  }, [isAutoplay, isPaused, posts.length, card_width, intervalMs]);
+
+  // Progress bar animation
+  useEffect(() => {
+    const bar = progressRef.current;
+    if (!bar) return;
+    if (!isAutoplay || isPaused || posts.length <= 1) {
+      bar.style.animation = 'none';
+      bar.style.width = '0%';
+      return;
+    }
+    bar.style.animation = 'none';
+    // Force reflow
+    void bar.offsetWidth;
+    bar.style.animation = `feedAutoplayProgress ${intervalMs}ms linear infinite`;
+  }, [isAutoplay, isPaused, posts.length, intervalMs]);
+
+  const handleMouseEnter = () => { if (isAutoplay) setIsPaused(true); };
+  const handleMouseLeave = () => { if (isAutoplay) setIsPaused(false); };
+
+  const toggleAutoplay = () => {
+    setIsAutoplay(prev => !prev);
+    setIsPaused(false);
+  };
+
   const scroll = (dir) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -440,7 +492,6 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
   const loadOlder = async () => {
     setLoadingMore(true);
     try {
-      const oldestDate = posts.length > 0 ? posts[posts.length - 1].date : null;
       const limit = container.post_limit || 10;
       const url = new URL(`${API_URL}/api/community-v2/feed/public/recent`);
       url.searchParams.set('limit', limit);
@@ -468,8 +519,25 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
+      {/* Autoplay progress bar */}
+      <style>{`
+        @keyframes feedAutoplayProgress {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}</style>
+      {isAutoplay && posts.length > 1 && (
+        <div className="h-[2px] w-full bg-transparent relative overflow-hidden">
+          <div
+            ref={progressRef}
+            className="h-full absolute left-0 top-0"
+            style={{ background: accent_color, opacity: isPaused ? 0.3 : 0.6 }}
+          />
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: header_bg }}>
             <MessageCircle className="h-4 w-4" style={{ color: icon_color }} />
@@ -481,18 +549,43 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => navigate(cta_link)}
-          className="text-[10px] font-bold flex items-center gap-0.5 transition-all hover:gap-1.5"
-          style={{ color: accent_color }}
-          data-testid="telegram-see-all"
-        >
-          {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Autoplay toggle */}
+          {posts.length > 1 && (
+            <button
+              onClick={toggleAutoplay}
+              className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold transition-colors"
+              style={{
+                background: isAutoplay ? `${accent_color}12` : 'rgba(0,0,0,0.04)',
+                color: isAutoplay ? accent_color : '#b8956a',
+              }}
+              data-testid="autoplay-toggle-btn"
+              title={isAutoplay ? t('telegramFeed.autoplayOn', 'Autoplay on') : t('telegramFeed.autoplayOff', 'Autoplay off')}
+            >
+              {isAutoplay ? (
+                <><Play className="h-2.5 w-2.5 fill-current" /> Auto</>
+              ) : (
+                <><Pause className="h-2.5 w-2.5" /> Off</>
+              )}
+            </button>
+          )}
+          <button
+            onClick={() => navigate(cta_link)}
+            className="text-[10px] font-bold flex items-center gap-0.5 transition-all hover:gap-1.5"
+            style={{ color: accent_color }}
+            data-testid="telegram-see-all"
+          >
+            {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
+          </button>
+        </div>
       </div>
 
       {/* Horizontal Scroll Area */}
-      <div className="relative group/scroll">
+      <div
+        className="relative group/scroll"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {/* Left arrow */}
         {canScrollLeft && (
           <button
