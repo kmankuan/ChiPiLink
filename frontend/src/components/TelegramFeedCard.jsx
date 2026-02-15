@@ -294,7 +294,7 @@ function FeedContainer({ container, onVideoPlay }) {
     container_id,
   } = container;
 
-  const radiusClass = border_radius === '2xl' ? 'rounded-2xl' : border_radius === 'xl' ? 'rounded-xl' : border_radius === 'lg' ? 'rounded-lg' : border_radius === 'none' ? 'rounded-none' : 'rounded-2xl';
+  const radiusClass = `rounded-none sm:${border_radius === '2xl' ? 'rounded-2xl' : border_radius === 'xl' ? 'rounded-xl' : border_radius === 'lg' ? 'rounded-lg' : border_radius === 'none' ? 'rounded-none' : 'rounded-2xl'}`;
 
   return (
     <div
