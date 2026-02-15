@@ -93,7 +93,7 @@ export default function BannerCarousel() {
 
   return (
     <div
-      className="group relative w-full overflow-hidden rounded-none sm:rounded-2xl"
+      className="group relative w-full overflow-hidden rounded-none"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={handleTouchStart}
@@ -178,7 +178,7 @@ function ImageBanner({ banner, navigate }) {
   return (
     <div
       onClick={banner.link_url ? handleClick : undefined}
-      className={`relative aspect-[3.5/1] sm:aspect-[4/1] overflow-hidden rounded-2xl ${banner.link_url ? 'cursor-pointer' : ''}`}
+      className={`relative aspect-[3.5/1] sm:aspect-[4/1] overflow-hidden rounded-none ${banner.link_url ? 'cursor-pointer' : ''}`}
       data-testid="banner-image"
     >
       <img
@@ -226,7 +226,7 @@ function TextBanner({ banner, navigate }) {
   return (
     <div
       onClick={banner.link_url ? handleClick : undefined}
-      className={`relative rounded-2xl overflow-hidden px-5 py-5 sm:py-6 flex items-center justify-center min-h-[80px] ${banner.link_url ? 'cursor-pointer' : ''}`}
+      className={`relative rounded-none overflow-hidden px-5 py-5 sm:py-6 flex items-center justify-center min-h-[80px] ${banner.link_url ? 'cursor-pointer' : ''}`}
       style={bgStyle}
       data-testid="banner-text"
     >
