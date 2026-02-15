@@ -100,6 +100,32 @@ export default function TxbInventoryTab() {
 
   useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
+  const fetchBoardColumns = useCallback(async (boardId) => {
+    if (!boardId) return;
+    setLoadingColumns(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/boards/${boardId}/columns`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBoardColumns(data.columns || []);
+        setSubitemColumns(data.subitem_columns || []);
+      } else {
+        toast.error('Failed to load board columns');
+      }
+    } catch {
+      toast.error('Network error loading columns');
+    } finally {
+      setLoadingColumns(false);
+    }
+  }, [token]);
+
+  // Auto-load columns when board_id is set
+  useEffect(() => {
+    if (config.board_id && !loading) fetchBoardColumns(config.board_id);
+  }, [config.board_id, loading, fetchBoardColumns]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
