@@ -5,6 +5,18 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Module Icon Status Indicators (Feb 15, 2026) - COMPLETE
+- Admin-configurable status for each landing page icon (Ready, Building, Coming Soon, Maintenance)
+- Animated "building" indicator (pulsing amber bars) below icon labels
+- Icons with empty routes are disabled (not clickable, slight grayscale)
+- Status dropdown added to Layouts & Icons admin panel (LayoutPreviewModule.jsx)
+- 4 status types:
+  - `ready` - No indicator shown, fully clickable
+  - `building` - Animated amber bars (current default for all icons)
+  - `coming_soon` - "Pronto" badge
+  - `maintenance` - "Mant." badge
+- Files: `frontend/src/modules/admin/LayoutPreviewModule.jsx`, `frontend/src/pages/landing-layouts/MosaicCommunityLanding.jsx`
+
 ### Privacy Settings Module (Feb 15, 2026) - COMPLETE
 - Admin-configurable search engine indexing control
 - Dynamic robots.txt generation at `/robots.txt`
