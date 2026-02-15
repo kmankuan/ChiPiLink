@@ -50,29 +50,21 @@ function fallbackText(media) {
 
 /* ────────────────── Media Thumbnail Grid ────────────────── */
 
-function MediaGrid({ media, onVideoPlay }) {
+function MediaGrid({ media, onVideoPlay, compact = false }) {
   if (!media || media.length === 0) return null;
 
+  const size = compact ? 'w-16 h-16' : 'w-20 h-20';
+
   return (
-    <div
-      className="grid gap-1.5"
-      style={{
-        gridTemplateColumns: media.length === 1
-          ? '1fr'
-          : media.length === 2
-          ? '1fr 1fr'
-          : `repeat(${Math.min(media.length, 3)}, 1fr)`,
-      }}
-      data-testid="media-grid"
-    >
+    <div className="flex gap-1.5 flex-wrap" data-testid="media-grid">
       {media.map((item, idx) => (
-        <MediaThumb key={idx} item={item} onVideoPlay={onVideoPlay} />
+        <MediaThumb key={idx} item={item} onVideoPlay={onVideoPlay} size={size} />
       ))}
     </div>
   );
 }
 
-function MediaThumb({ item, onVideoPlay }) {
+function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20' }) {
   const isVideo = item?.type === 'video' || item?.type === 'animation';
   const thumbSrc = item?.type === 'photo'
     ? mediaUrl(item.file_id)
@@ -86,8 +78,7 @@ function MediaThumb({ item, onVideoPlay }) {
 
   return (
     <div
-      className="relative rounded-lg overflow-hidden bg-black/5 cursor-pointer"
-      style={{ aspectRatio: '1/1' }}
+      className={`relative ${size} rounded-lg overflow-hidden bg-black/5 cursor-pointer flex-shrink-0`}
       onClick={handleClick}
       data-testid="media-thumb"
     >
@@ -95,22 +86,22 @@ function MediaThumb({ item, onVideoPlay }) {
         <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
       ) : isVideo ? (
         <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
-          <Play className="h-6 w-6 text-white/60 fill-white/60" />
+          <Play className="h-5 w-5 text-white/60 fill-white/60" />
         </div>
       ) : (
         <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
-          <ImageIcon className="h-6 w-6 text-slate-400" />
+          <ImageIcon className="h-5 w-5 text-slate-400" />
         </div>
       )}
       {isVideo && (
         <>
           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-              <Play className="h-3.5 w-3.5 text-white fill-white ml-0.5" />
+            <div className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+              <Play className="h-3 w-3 text-white fill-white ml-0.5" />
             </div>
           </div>
           {item.duration > 0 && (
-            <span className="absolute bottom-1 right-1 text-[8px] text-white font-bold bg-black/60 px-1 py-0.5 rounded">
+            <span className="absolute bottom-0.5 right-0.5 text-[7px] text-white font-bold bg-black/60 px-1 py-0.5 rounded">
               {formatDuration(item.duration)}
             </span>
           )}
