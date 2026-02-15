@@ -306,6 +306,10 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
                 accentBg={ic.accent_bg}
                 imageUrl={ic.type === 'image' ? ic.image_url : null}
                 status={ic.status || 'building'}
+                statusAnimation={ic.status_animation}
+                statusGifUrl={ic.status_gif_url}
+                statusColor={ic.status_color}
+                statusLabel={ic.status_label}
               />
             );
           })}
