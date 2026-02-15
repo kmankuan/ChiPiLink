@@ -455,6 +455,12 @@ DEFAULT_ICON_STATUSES = [
     {"value": "building", "label": "Building", "color": "#f59e0b", "animation": "building_bars", "gif_url": ""},
     {"value": "coming_soon", "label": "Coming Soon", "color": "#3b82f6", "animation": "pulse", "gif_url": ""},
     {"value": "maintenance", "label": "Maintenance", "color": "#ef4444", "animation": "wrench", "gif_url": ""},
+    {"value": "lantern", "label": "Lantern", "color": "#dc2626", "animation": "lantern", "gif_url": ""},
+    {"value": "dragon", "label": "Dragon", "color": "#059669", "animation": "dragon", "gif_url": ""},
+    {"value": "bamboo", "label": "Growing", "color": "#16a34a", "animation": "bamboo", "gif_url": ""},
+    {"value": "coding", "label": "In Development", "color": "#6366f1", "animation": "coding", "gif_url": ""},
+    {"value": "fireworks", "label": "Celebration", "color": "#f43f5e", "animation": "fireworks", "gif_url": ""},
+    {"value": "progress", "label": "In Progress", "color": "#0ea5e9", "animation": "progress_bar", "gif_url": ""},
 ]
 
 
