@@ -414,9 +414,12 @@ class TxbInventoryAdapter(BaseMondayAdapter):
     def _build_single_column_value(self, book: Dict, column_key: str, col_map: Dict, col_types: Dict = None) -> Dict:
         """Build Monday.com value for a single column from a textbook."""
         col_types = col_types or {}
-        col_id = col_map.get(column_key)
+
+        # Resolve column ID - handle stock_quantity/stock aliasing
         if column_key in ("stock_quantity", "stock"):
             col_id = col_map.get("stock_quantity") or col_map.get("stock")
+        else:
+            col_id = col_map.get(column_key)
         if not col_id:
             return {}
 
@@ -430,6 +433,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             "subject": book.get("subject", ""),
             "unit_price": str(book.get("price", 0)),
             "stock_quantity": str(book.get("inventory_quantity", 0)),
+            "stock": str(book.get("inventory_quantity", 0)),
         }
 
         value = field_source.get(column_key)
