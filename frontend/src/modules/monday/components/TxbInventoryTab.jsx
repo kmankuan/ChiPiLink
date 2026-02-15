@@ -548,10 +548,25 @@ export default function TxbInventoryTab() {
       {/* Item Column Mapping */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Textbook Item Columns</CardTitle>
-          <CardDescription className="text-xs">
-            Map Monday.com column IDs for the main textbook items. Use the sync button to push a specific column to Monday.com.
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Textbook Item Columns</CardTitle>
+              <CardDescription className="text-xs">
+                Match Monday.com board columns to textbook fields. Use the sync button to push a specific column.
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs gap-1 h-7"
+              disabled={!config.board_id || loadingColumns}
+              onClick={() => fetchBoardColumns(config.board_id)}
+              data-testid="refresh-columns-btn"
+            >
+              {loadingColumns ? <Loader2 className="h-3 w-3 animate-spin" /> : <Search className="h-3 w-3" />}
+              {boardColumns.length ? 'Refresh' : 'Load'} Columns
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {COLUMN_FIELDS.map(({ key, label, description, required }) => (
@@ -561,13 +576,38 @@ export default function TxbInventoryTab() {
                 {required && <span className="text-red-500 text-xs">*</span>}
               </Label>
               <div className="flex gap-2">
-                <Input
-                  placeholder={`Monday.com column ID for ${key}`}
-                  value={config.column_mapping[key] || ''}
-                  onChange={(e) => updateMapping(key, e.target.value)}
-                  className="text-sm flex-1"
-                  data-testid={`col-${key}`}
-                />
+                {boardColumns.length > 0 ? (
+                  <Select
+                    value={config.column_mapping[key] || ''}
+                    onValueChange={(v) => updateMapping(key, v === '__none__' ? null : v)}
+                    data-testid={`col-${key}`}
+                  >
+                    <SelectTrigger className="text-sm flex-1 h-9" data-testid={`col-${key}`}>
+                      <SelectValue placeholder="Select column..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">
+                        <span className="text-muted-foreground">— None —</span>
+                      </SelectItem>
+                      {boardColumns.map((col) => (
+                        <SelectItem key={col.id} value={col.id}>
+                          <span className="flex items-center gap-2">
+                            {col.title}
+                            <span className="text-[10px] text-muted-foreground">({col.type})</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    placeholder={`Monday.com column ID for ${key}`}
+                    value={config.column_mapping[key] || ''}
+                    onChange={(e) => updateMapping(key, e.target.value)}
+                    className="text-sm flex-1"
+                    data-testid={`col-${key}`}
+                  />
+                )}
                 <Button
                   size="sm"
                   variant="outline"
