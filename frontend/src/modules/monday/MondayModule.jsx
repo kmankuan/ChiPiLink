@@ -53,7 +53,8 @@ import {
   Plug,
   Layers,
   Wallet,
-  Activity
+  Activity,
+  Eye
 } from 'lucide-react';
 
 import TxbInventoryTab from './components/TxbInventoryTab';
