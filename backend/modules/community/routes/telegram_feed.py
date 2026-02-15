@@ -232,6 +232,8 @@ class ContainerCreate(BaseModel):
     card_width: int = 220
     card_height: int = 300
     description_max_lines: int = 2
+    autoplay: bool = True
+    autoplay_interval: int = 4
 
 
 class ContainerUpdate(BaseModel):
@@ -256,6 +258,8 @@ class ContainerUpdate(BaseModel):
     card_width: Optional[int] = None
     card_height: Optional[int] = None
     description_max_lines: Optional[int] = None
+    autoplay: Optional[bool] = None
+    autoplay_interval: Optional[int] = None
 
 
 @router.get("/admin/containers")
