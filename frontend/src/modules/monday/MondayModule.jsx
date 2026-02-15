@@ -843,6 +843,11 @@ export default function MondayModule() {
         <TabsContent value="status-mapping" className="mt-6">
           <StatusMappingTab />
         </TabsContent>
+
+        {/* ========== TAB: PUBLIC WIDGET ========== */}
+        <TabsContent value="public-widget" className="mt-6">
+          <PublicBoardWidgetTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
