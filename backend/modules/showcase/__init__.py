@@ -227,6 +227,11 @@ DEFAULT_PLAYER_CONFIG = {
     "interval_ms": 5000,
     "loop": True,
     "show_controls": True,
+    "show_dots": True,
+    "dot_style": "auto",
+    "shuffle": False,
+    "video_autoplay": True,
+    "video_max_duration_ms": 30000,
     "items": [],
 }
 
