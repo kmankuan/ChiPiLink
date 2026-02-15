@@ -680,8 +680,8 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
                 <div
                   className="flex-shrink-0 snap-start rounded-xl flex items-center justify-center cursor-pointer transition-colors hover:bg-neutral-50"
                   style={{
-                    width: Math.round(card_width * 0.6),
-                    minHeight: card_height,
+                    width: Math.round(card_width * 0.5),
+                    height: imageHeight + 60,
                     border: '1px dashed rgba(0,0,0,0.12)',
                   }}
                   onClick={loadOlder}
