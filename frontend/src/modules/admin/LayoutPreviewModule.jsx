@@ -504,6 +504,53 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
         </div>
       );
 
+    /* ── Coding Scene ── */
+    case 'coding_scene':
+      return (
+        <div className="relative w-10 h-7" style={{ animation: 'statusBounce 3s ease-in-out infinite' }}>
+          {/* Person */}
+          <div className="absolute left-[4px] top-[2px] w-[6px] h-[6px] rounded-full" style={{ background: c }} />
+          <div className="absolute left-[5px] top-[8px] w-[4px] h-[6px] rounded-sm" style={{ background: `${c}cc` }} />
+          {/* Laptop */}
+          <div className="absolute left-[14px] top-[8px] w-[14px] h-[2px] rounded-sm" style={{ background: `${c}88` }} />
+          <div className="absolute left-[14px] top-[2px] w-[14px] h-[6px] rounded-t-sm overflow-hidden" style={{ background: '#1a1a2e', border: `1px solid ${c}44` }}>
+            <div className="absolute left-[2px] top-[1px] h-[1.5px] rounded-full" style={{ background: '#4ade80', animation: 'progressFill 1.5s ease-in-out infinite', maxWidth: '8px' }} />
+            <div className="absolute left-[2px] top-[3px] h-[1.5px] rounded-full" style={{ background: '#60a5fa', animation: 'progressFill 1.8s ease-in-out 0.3s infinite', maxWidth: '6px' }} />
+          </div>
+          <div className="absolute bottom-0 left-[2px] w-[26px] h-[1px]" style={{ background: `${c}33` }} />
+        </div>
+      );
+
+    /* ── Building Progress 0-100% ── */
+    case 'building_progress':
+      return (
+        <div className="relative w-10 h-8">
+          {/* Building */}
+          <div className="absolute bottom-0 left-[2px] w-[16px] h-[22px] rounded-t-sm overflow-hidden" style={{ border: `1px solid ${c}44`, borderBottom: 'none' }}>
+            <div className="absolute bottom-0 left-0 w-full" style={{ background: `${c}55`, animation: 'progressFill 3s ease-in-out infinite' }} />
+            {[0,1,2,3].map(i => (
+              <div key={i} className="absolute w-full h-[0.5px]" style={{ bottom: `${i * 25}%`, background: `${c}33` }} />
+            ))}
+            {[0,1,2].map(r => [0,1].map(col => (
+              <div key={`${r}-${col}`} className="absolute w-[3px] h-[3px] rounded-[0.5px]" style={{
+                bottom: `${10 + r * 30}%`, left: `${20 + col * 45}%`,
+                background: `${c}66`,
+              }} />
+            )))}
+          </div>
+          {/* Crane */}
+          <div className="absolute top-0 right-[4px]" style={{ transformOrigin: 'bottom center', animation: 'craneHook 2s ease-in-out infinite' }}>
+            <div className="w-[2px] h-[14px]" style={{ background: `${c}88` }} />
+            <div className="absolute top-0 left-[-4px] w-[8px] h-[1.5px]" style={{ background: `${c}66` }} />
+          </div>
+          <div className="absolute bottom-0 right-0 text-[7px] font-bold font-mono" style={{ color: c }}>%</div>
+        </div>
+      );
+
+    /* ── Lottie URL ── */
+    case 'lottie_url':
+      return gifUrl ? <LottiePreview url={gifUrl} size={32} /> : <span className="text-[8px] text-muted-foreground">No URL</span>;
+
     case 'custom_gif':
       return gifUrl ? <img src={gifUrl} alt="status" className="w-8 h-8 object-contain" /> : <span className="text-[8px] text-muted-foreground">No GIF</span>;
     default:
