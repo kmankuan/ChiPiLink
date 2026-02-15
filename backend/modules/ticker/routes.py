@@ -461,6 +461,8 @@ DEFAULT_ICON_STATUSES = [
     {"value": "coding", "label": "In Development", "color": "#6366f1", "animation": "coding", "gif_url": ""},
     {"value": "fireworks", "label": "Celebration", "color": "#f43f5e", "animation": "fireworks", "gif_url": ""},
     {"value": "progress", "label": "In Progress", "color": "#0ea5e9", "animation": "progress_bar", "gif_url": ""},
+    {"value": "coding_scene", "label": "Person Coding", "color": "#8b5cf6", "animation": "coding_scene", "gif_url": ""},
+    {"value": "building_progress", "label": "Building 0-100%", "color": "#d97706", "animation": "building_progress", "gif_url": ""},
 ]
 
 
