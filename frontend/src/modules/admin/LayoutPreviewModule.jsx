@@ -349,6 +349,53 @@ function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
 }
 
 
+// Animation preview for status manager
+function StatusAnimationPreview({ animation, color, gifUrl }) {
+  const c = color || '#f59e0b';
+  switch (animation) {
+    case 'building_bars':
+      return (
+        <div className="flex gap-[2px] items-end h-3">
+          {[4,7,5,4].map((h,i) => (
+            <span key={i} className="w-[3px] rounded-sm" style={{ background: c, height: `${h}px`, animation: `building 0.5s ease-in-out ${i*100}ms infinite` }} />
+          ))}
+        </div>
+      );
+    case 'pulse':
+      return <div className="w-4 h-4 rounded-full" style={{ background: c, animation: 'pulse 1.5s ease-in-out infinite' }} />;
+    case 'bounce':
+      return <div className="w-3 h-3 rounded-full" style={{ background: c, animation: 'bounce 0.6s ease-in-out infinite alternate' }} />;
+    case 'spinner':
+      return <div className="w-4 h-4 rounded-full border-2 border-transparent" style={{ borderTopColor: c, animation: 'spin 0.8s linear infinite' }} />;
+    case 'blocks':
+      return (
+        <div className="flex gap-[1px] items-end h-4">
+          {[3,5,7,4,6].map((h,i) => (
+            <span key={i} className="w-[3px] rounded-sm" style={{ background: c, animation: `blocks 1.2s ease ${i*150}ms infinite`, height: `${h}px` }} />
+          ))}
+        </div>
+      );
+    case 'hammer':
+      return <div className="text-[14px]" style={{ animation: 'hammer 0.6s ease-in-out infinite alternate', transformOrigin: 'bottom right' }}>&#128296;</div>;
+    case 'wrench':
+      return <div className="text-[14px]" style={{ animation: 'spin 2s linear infinite' }}>&#128295;</div>;
+    case 'rocket':
+      return <div className="text-[14px]" style={{ animation: 'rocket 1s ease-in-out infinite' }}>&#128640;</div>;
+    case 'wave':
+      return (
+        <div className="flex gap-[1px] items-center h-3">
+          {[0,1,2,3,4].map(i => (
+            <span key={i} className="w-[2px] rounded-full" style={{ background: c, height: '8px', animation: `wave 1s ease-in-out ${i*120}ms infinite` }} />
+          ))}
+        </div>
+      );
+    case 'custom_gif':
+      return gifUrl ? <img src={gifUrl} alt="status" className="w-8 h-8 object-contain" /> : <span className="text-[8px] text-muted-foreground">No GIF</span>;
+    default:
+      return <div className="w-3 h-3 rounded-full" style={{ background: c }} />;
+  }
+}
+
 export default function LayoutPreviewModule() {
   const [iconConfig, setIconConfig] = useState(null);
   const [activeLayout, setActiveLayout] = useState(null);
