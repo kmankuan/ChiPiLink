@@ -1,0 +1,76 @@
+{
+  "summary": "TXB Per-Column Sync Bug Fix Verified. All 11 backend tests passed (100%). Frontend UI tested - per-column Sync buttons present with correct data-testid attributes, proper disabled state for unmapped columns, and success toast messages working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "Backend: POST /api/store/monday/txb-inventory/sync-column/grade returns JSON 400 with 'not mapped' error",
+    "Backend: POST /api/store/monday/txb-inventory/sync-column/invalid_key returns JSON 400 with valid keys list",
+    "Backend: POST /api/store/monday/txb-inventory/sync-column/code returns 202 and starts background sync",
+    "Backend: POST /api/store/monday/txb-inventory/sync-column/stock returns 202 and starts sync",
+    "Backend: GET /api/store/monday/txb-inventory/sync-column-status/code returns correct status (running/completed)",
+    "Backend: sync-column endpoint requires authentication (401 without token)",
+    "Backend: sync-column-status endpoint requires authentication (401 without token)",
+    "Backend: Full end-to-end column sync flow works (start -> poll -> completed)",
+    "Frontend: TxbInventoryTab has per-column Sync buttons with data-testid='sync-col-{key}'",
+    "Frontend: Sync buttons correctly disabled when column is not mapped",
+    "Frontend: Toast shows 'Book Code sync started...' on successful sync trigger"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_txb_column_sync_bugfix.py",
+    "/app/test_reports/pytest/pytest_results_txb_column_sync_bugfix.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Bug fix verified: Route handler at line 320-342 now uses JSONResponse with try/except instead of HTTPException",
+    "start_column_sync method (lines 191-246) correctly validates column mapping before launching background task",
+    "_run_column_sync background task (lines 259-340) has proper error handling with DB status updates",
+    "Frontend handleSyncColumn (lines 246-300) correctly parses JSON responses and shows appropriate toast messages"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_txb_column_sync_bugfix.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 tests passed)",
+    "frontend": "100% (UI elements verified via Playwright)"
+  },
+  "test_credentials": {
+    "admin_email": "admin@chipi.co",
+    "admin_password": "admin"
+  },
+  "seed_data_creation": "None - used existing 15 textbooks in private catalog",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Per-column sync bug fix is fully verified. The endpoint POST /api/store/monday/txb-inventory/sync-column/{column_key} now returns proper JSON for all scenarios: (1) Invalid column key - 400 JSON, (2) Unmapped column - 400 JSON, (3) Valid mapped column - 202 JSON. Frontend TxbInventoryTab shows toast messages correctly. All Sync buttons have data-testid='sync-col-{key}' attributes. Mapped columns in this env: code, stock, status, date.",
+  "verified_ui_elements": {
+    "sync_col_buttons": [
+      "data-testid='sync-col-code' (enabled)",
+      "data-testid='sync-col-name' (disabled)",
+      "data-testid='sync-col-grade' (disabled)",
+      "data-testid='sync-col-publisher' (disabled)",
+      "data-testid='sync-col-subject' (disabled)",
+      "data-testid='sync-col-unit_price' (disabled)",
+      "data-testid='sync-col-stock_quantity' (disabled)",
+      "data-testid='sync-col-status' (enabled)"
+    ],
+    "toast_messages": "Success toast 'Book Code sync started...' shown correctly"
+  },
+  "api_endpoints_tested": {
+    "sync_column_code": "POST /api/store/monday/txb-inventory/sync-column/code - 202 JSON {status: started}",
+    "sync_column_grade": "POST /api/store/monday/txb-inventory/sync-column/grade - 400 JSON {detail: Column 'grade' is not mapped...}",
+    "sync_column_invalid": "POST /api/store/monday/txb-inventory/sync-column/invalid_key - 400 JSON {detail: Invalid column key...}",
+    "sync_column_stock": "POST /api/store/monday/txb-inventory/sync-column/stock - 202 JSON {status: started}",
+    "sync_status_code": "GET /api/store/monday/txb-inventory/sync-column-status/code - 200 JSON with status/progress"
+  },
+  "bug_fix_verification": {
+    "original_issue": "Server error (400) when syncing individual columns - backend returned non-JSON 400 responses",
+    "fix_applied": "Route handler uses JSONResponse + try/except instead of HTTPException",
+    "fix_verified": "All error scenarios now return proper JSON responses with Content-Type: application/json"
+  }
+}
