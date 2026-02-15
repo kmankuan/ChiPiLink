@@ -1,13 +1,14 @@
 /**
- * TelegramFeedCard — Landing page feed showing Telegram channel posts.
- * Supports album/carousel view for media groups, configurable container UI,
- * and multi-container rendering for different channels.
+ * TelegramFeedCard — Landing page Telegram feed with horizontal scroll.
+ * Supports configurable card size, truncated descriptions, "See more" modal,
+ * and "Load older" posts.
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   MessageCircle, Heart, ChevronRight, ChevronLeft, Play, X,
-  Film, FileText, Image as ImageIcon
+  Film, FileText, Image as ImageIcon, ChevronDown, Loader2
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -17,7 +18,7 @@ function formatTimeAgo(dateStr) {
   const d = new Date(dateStr);
   const now = new Date();
   const diff = (now - d) / 1000;
-  if (diff < 60) return 'just now';
+  if (diff < 60) return 'now';
   if (diff < 3600) return `${Math.floor(diff / 60)}m`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
@@ -38,209 +39,266 @@ function formatDuration(sec) {
 function fallbackText(media) {
   if (!media || media.length === 0) return 'New post';
   const first = media[0];
-  if (media.length > 1) return `Album (${media.length} items)`;
+  if (media.length > 1) return `Album (${media.length})`;
   switch (first.type) {
-    case 'video': return 'Shared a video';
-    case 'animation': return 'Shared a GIF';
-    case 'photo': return 'Shared a photo';
-    case 'document': return `Shared: ${first.file_name || 'file'}`;
+    case 'video': return 'Video';
+    case 'animation': return 'GIF';
+    case 'photo': return 'Photo';
+    case 'document': return first.file_name || 'File';
     default: return 'New post';
   }
 }
 
-/* ────────────────── Media Thumbnail Grid ────────────────── */
+/* ────────── Horizontal Post Card ────────── */
 
-function MediaGrid({ media, onVideoPlay, compact = false, onOpenGallery }) {
-  if (!media || media.length === 0) return null;
-
-  const size = compact ? 'w-14 h-14' : 'w-[72px] h-[72px]';
-
-  return (
-    <div className="flex gap-1 flex-shrink-0" data-testid="media-grid">
-      {media.map((item, idx) => (
-        <MediaThumb
-          key={idx}
-          item={item}
-          onVideoPlay={onVideoPlay}
-          size={size}
-          onClick={() => onOpenGallery ? onOpenGallery(idx) : (item?.type === 'video' || item?.type === 'animation') && item?.file_id && onVideoPlay(item.file_id)}
-        />
-      ))}
-    </div>
-  );
-}
-
-function MediaThumb({ item, onVideoPlay, size = 'w-20 h-20', onClick }) {
-  const isVideo = item?.type === 'video' || item?.type === 'animation';
-  const thumbSrc = item?.type === 'photo'
-    ? mediaUrl(item.file_id)
-    : item?.thumb_file_id
-    ? mediaUrl(item.thumb_file_id)
-    : null;
-
-  const handleClick = () => {
-    if (onClick) { onClick(); return; }
-    if (isVideo && item?.file_id) onVideoPlay(item.file_id);
-  };
-
-  return (
-    <div
-      className={`relative ${size} rounded-lg overflow-hidden bg-black/5 cursor-pointer flex-shrink-0`}
-      onClick={handleClick}
-      data-testid="media-thumb"
-    >
-      {thumbSrc ? (
-        <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
-      ) : isVideo ? (
-        <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
-          <Play className="h-5 w-5 text-white/60 fill-white/60" />
-        </div>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
-          <ImageIcon className="h-5 w-5 text-slate-400" />
-        </div>
-      )}
-      {isVideo && (
-        <>
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <div className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-              <Play className="h-3 w-3 text-white fill-white ml-0.5" />
-            </div>
-          </div>
-          {item.duration > 0 && (
-            <span className="absolute bottom-0.5 right-0.5 text-[7px] text-white font-bold bg-black/60 px-1 py-0.5 rounded">
-              {formatDuration(item.duration)}
-            </span>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-/* ────────────────── Post Row ────────────────── */
-
-function PostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
+function HorizontalPostCard({ post, cardWidth, cardHeight, maxLines, onOpenDetail, onOpenGallery }) {
   const media = post.media || [];
-  const isAlbum = post.is_album && media.length > 1;
-
-  if (isAlbum) {
-    return (
-      <div
-        className="py-3 border-b last:border-b-0"
-        style={{ borderColor: 'rgba(0,0,0,0.06)' }}
-        data-testid={`telegram-post-${post.telegram_msg_id}`}
-      >
-        <div className="flex gap-2.5 items-start">
-          <MediaGrid
-            media={media}
-            onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)}
-            onOpenGallery={(idx) => onOpenGallery(media, idx, post.text)}
-          />
-          <div className="flex-1 min-w-0">
-            {post.text && (
-              <p className="text-sm leading-snug" style={{ color: '#2d2217' }}>
-                {post.text}
-              </p>
-            )}
-            <PostMeta post={post} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Single media or text-only post
   const firstMedia = media[0] || null;
-  const thumbSrc = firstMedia?.type === 'photo' ? mediaUrl(firstMedia.file_id)
-    : firstMedia?.type === 'video' && firstMedia.thumb_file_id ? mediaUrl(firstMedia.thumb_file_id)
-    : null;
   const isPlayable = firstMedia?.type === 'video' || firstMedia?.type === 'animation';
+  const thumbSrc = firstMedia?.type === 'photo'
+    ? mediaUrl(firstMedia.file_id)
+    : firstMedia?.thumb_file_id
+      ? mediaUrl(firstMedia.thumb_file_id)
+      : null;
 
-  const handleThumbClick = () => {
+  const imageHeight = Math.round(cardHeight * 0.55);
+  const text = post.text || fallbackText(media);
+
+  const handleMediaClick = (e) => {
+    e.stopPropagation();
     if (media.length > 0) {
       onOpenGallery(media, 0, post.text);
-    } else if (isPlayable && firstMedia?.file_id) {
-      onVideoPlay(firstMedia.file_id, post.text);
     }
   };
 
   return (
     <div
-      className="flex gap-3 items-start py-3 border-b last:border-b-0"
-      style={{ borderColor: 'rgba(0,0,0,0.06)' }}
-      data-testid={`telegram-post-${post.telegram_msg_id}`}
+      className="flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer group transition-shadow hover:shadow-md"
+      style={{
+        width: cardWidth,
+        minHeight: cardHeight,
+        background: '#fff',
+        border: '1px solid rgba(0,0,0,0.07)',
+      }}
+      onClick={() => onOpenDetail(post)}
+      data-testid={`h-post-${post.telegram_msg_id}`}
     >
-      {/* Thumbnail */}
-      {thumbSrc ? (
-        <div className="relative w-[72px] h-[72px] rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" onClick={handleThumbClick}>
-          <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
-          {isPlayable && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-              <Play className="h-5 w-5 text-white fill-white" />
-              {firstMedia.duration > 0 && (
-                <span className="absolute bottom-0.5 right-1 text-[8px] text-white font-bold bg-black/50 px-1 rounded">
-                  {formatDuration(firstMedia.duration)}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      ) : firstMedia?.type === 'video' ? (
-        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1a1a2e' }} onClick={handleThumbClick}>
-          <Play className="h-5 w-5 text-white/70 fill-white/70" />
-        </div>
-      ) : firstMedia?.type === 'animation' ? (
-        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ background: '#1e293b' }} onClick={handleThumbClick}>
-          <Film className="h-5 w-5 text-white/60" />
-        </div>
-      ) : firstMedia?.type === 'document' ? (
-        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: '#f0f4f8' }}>
-          <FileText className="h-5 w-5" style={{ color: '#64748b' }} />
-        </div>
-      ) : (
-        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: '#f5ede0' }}>
-          <MessageCircle className="h-5 w-5" style={{ color: '#c4b5a0' }} />
-        </div>
-      )}
+      {/* Media area */}
+      <div
+        className="relative overflow-hidden bg-neutral-100"
+        style={{ height: imageHeight }}
+        onClick={handleMediaClick}
+      >
+        {thumbSrc ? (
+          <img
+            src={thumbSrc}
+            alt=""
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : firstMedia?.type === 'video' || firstMedia?.type === 'animation' ? (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: '#1a1a2e' }}>
+            <Play className="h-8 w-8 text-white/50 fill-white/50" />
+          </div>
+        ) : firstMedia?.type === 'document' ? (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: '#f0f4f8' }}>
+            <FileText className="h-8 w-8 text-slate-400" />
+          </div>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: '#f5ede0' }}>
+            <MessageCircle className="h-8 w-8" style={{ color: '#c4b5a0' }} />
+          </div>
+        )}
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm leading-snug line-clamp-2" style={{ color: '#2d2217' }}>
-          {post.text || fallbackText(media)}
+        {/* Video play overlay */}
+        {isPlayable && thumbSrc && (
+          <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+              <Play className="h-4 w-4 text-white fill-white ml-0.5" />
+            </div>
+          </div>
+        )}
+
+        {/* Album badge */}
+        {media.length > 1 && (
+          <span className="absolute top-2 right-2 text-[9px] font-bold text-white bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+            {media.length}
+          </span>
+        )}
+
+        {/* Duration badge */}
+        {isPlayable && firstMedia?.duration > 0 && (
+          <span className="absolute bottom-1.5 right-1.5 text-[9px] text-white font-bold bg-black/60 px-1.5 py-0.5 rounded">
+            {formatDuration(firstMedia.duration)}
+          </span>
+        )}
+      </div>
+
+      {/* Content area */}
+      <div className="p-3 flex flex-col justify-between" style={{ minHeight: cardHeight - imageHeight }}>
+        <p
+          className="text-xs leading-snug"
+          style={{
+            color: '#2d2217',
+            display: '-webkit-box',
+            WebkitLineClamp: maxLines,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {text}
         </p>
-        <PostMeta post={post} />
+
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px]" style={{ color: '#b8956a' }}>
+              {formatTimeAgo(post.date)}
+            </span>
+            {post.likes_count > 0 && (
+              <span className="text-[9px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
+                <Heart className="h-2.5 w-2.5" /> {post.likes_count}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function PostMeta({ post }) {
+/* ────────── Post Detail Modal ────────── */
+
+function PostDetailModal({ post, onClose }) {
+  const { t } = useTranslation();
+  const media = post?.media || [];
+  const [currentMedia, setCurrentMedia] = useState(0);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onClose]);
+
+  if (!post) return null;
+
+  const item = media[currentMedia];
+  const isVideo = item?.type === 'video' || item?.type === 'animation';
+  const src = item?.file_id ? mediaUrl(item.file_id) : null;
+
   return (
-    <div className="flex items-center gap-3 mt-1">
-      <span className="text-[10px]" style={{ color: '#b8956a' }}>
-        {formatTimeAgo(post.date)}
-      </span>
-      {post.likes_count > 0 && (
-        <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
-          <Heart className="h-2.5 w-2.5" /> {post.likes_count}
-        </span>
-      )}
-      {post.comments_count > 0 && (
-        <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
-          <MessageCircle className="h-2.5 w-2.5" /> {post.comments_count}
-        </span>
-      )}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
+      data-testid="post-detail-modal"
+    >
+      <div
+        className="relative bg-white rounded-2xl overflow-hidden max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+          data-testid="modal-close-btn"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Media */}
+        {media.length > 0 && (
+          <div className="relative bg-black aspect-video flex items-center justify-center flex-shrink-0">
+            {isVideo && src ? (
+              <video
+                key={`v-${currentMedia}`}
+                src={src}
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-contain"
+                data-testid="modal-video"
+              />
+            ) : src ? (
+              <img
+                key={`i-${currentMedia}`}
+                src={src}
+                alt=""
+                className="w-full h-full object-contain"
+                data-testid="modal-image"
+              />
+            ) : (
+              <div className="text-white/40 text-sm">No preview</div>
+            )}
+
+            {/* Nav arrows */}
+            {currentMedia > 0 && (
+              <button
+                onClick={() => setCurrentMedia(c => c - 1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white"
+                data-testid="modal-prev"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            )}
+            {currentMedia < media.length - 1 && (
+              <button
+                onClick={() => setCurrentMedia(c => c + 1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white"
+                data-testid="modal-next"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
+
+            {/* Dots */}
+            {media.length > 1 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                {media.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentMedia(i)}
+                    className={`rounded-full transition-all ${i === currentMedia ? 'w-4 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Text content */}
+        <div className="p-5 overflow-y-auto flex-1">
+          {post.text && (
+            <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: '#2d2217' }}>
+              {post.text}
+            </p>
+          )}
+          <div className="flex items-center gap-3 mt-3 pt-3 border-t" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+            <span className="text-[10px]" style={{ color: '#b8956a' }}>
+              {formatTimeAgo(post.date)}
+            </span>
+            {post.likes_count > 0 && (
+              <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
+                <Heart className="h-2.5 w-2.5" /> {post.likes_count}
+              </span>
+            )}
+            {post.comments_count > 0 && (
+              <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
+                <MessageCircle className="h-2.5 w-2.5" /> {post.comments_count}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ────────────────── Media Gallery Modal (edge-to-edge, auto-advance) ────────────────── */
+/* ────────── Media Gallery Modal ────────── */
 
 function MediaGalleryModal({ media, startIndex, caption, onClose }) {
   const [current, setCurrent] = useState(startIndex || 0);
   const [autoPlay, setAutoPlay] = useState(true);
-  const videoRef = useRef(null);
   const hasAdvancedRef = useRef(false);
   const timerRef = useRef(null);
 
@@ -249,159 +307,77 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
   const isLast = current >= media.length - 1;
   const total = media.length;
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight' && current < total - 1) goNext();
-      if (e.key === 'ArrowLeft' && current > 0) goPrev();
-      if (e.key === ' ') { e.preventDefault(); setAutoPlay(a => !a); }
+      if (e.key === 'ArrowRight' && !isLast) setCurrent(c => c + 1);
+      if (e.key === 'ArrowLeft' && current > 0) setCurrent(c => c - 1);
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [current, total]);
+  }, [current, isLast, onClose]);
 
-  // Reset advance flag on slide change
-  useEffect(() => {
-    hasAdvancedRef.current = false;
-  }, [current]);
+  useEffect(() => { hasAdvancedRef.current = false; }, [current]);
 
-  // Auto-advance photos when autoPlay is on
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!isVideo && autoPlay && total > 1) {
       timerRef.current = setTimeout(() => {
-        if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+        if (isLast) onClose(); else setCurrent(c => c + 1);
       }, 4000);
     }
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [current, isVideo, autoPlay, isLast, total]);
+  }, [current, isVideo, autoPlay, isLast, total, onClose]);
 
-  const goNext = () => {
-    if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
-  };
-  const goPrev = () => { if (current > 0) setCurrent(c => c - 1); };
-
-  // Toggle auto-play on tap (for photos only)
-  const handleMediaTap = () => {
-    if (!isVideo) setAutoPlay(a => !a);
-  };
-
-  // Video ended handler — advance or close
   const handleVideoEnded = () => {
     if (!hasAdvancedRef.current) {
       hasAdvancedRef.current = true;
-      if (isLast) { onClose(); } else { setCurrent(c => c + 1); }
+      if (isLast) onClose(); else setCurrent(c => c + 1);
     }
   };
 
   const src = item?.file_id ? mediaUrl(item.file_id) : null;
-  const thumbSrc = item?.thumb_file_id ? mediaUrl(item.thumb_file_id) : null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col bg-black"
-      data-testid="media-gallery-modal"
-    >
-      {/* Top bar */}
+    <div className="fixed inset-0 z-50 flex flex-col bg-black" data-testid="media-gallery-modal">
       <div className="flex items-center justify-between px-4 py-3 bg-black/80 z-10">
-        <span className="text-white/70 text-xs font-medium">
-          {current + 1} / {total}
-        </span>
-        <div className="flex items-center gap-2">
-          {!isVideo && total > 1 && (
-            <button
-              onClick={() => setAutoPlay(a => !a)}
-              className="px-2 py-1 rounded-full bg-white/10 flex items-center gap-1 text-white text-[10px] active:bg-white/20"
-              data-testid="gallery-autoplay-toggle"
-            >
-              {autoPlay ? (
-                <><Play className="h-2.5 w-2.5 fill-white" /> Auto</>
-              ) : (
-                <><span className="w-2.5 h-2.5 flex items-center justify-center font-bold">||</span> Paused</>
-              )}
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20"
-            data-testid="gallery-close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        <span className="text-white/70 text-xs font-medium">{current + 1} / {total}</span>
+        <button
+          onClick={onClose}
+          className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"
+          data-testid="gallery-close"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
-
-      {/* Media area — edge to edge */}
-      <div
-        className="flex-1 relative flex items-center justify-center overflow-hidden"
-        onClick={handleMediaTap}
-      >
+      <div className="flex-1 relative flex items-center justify-center overflow-hidden" onClick={() => !isVideo && setAutoPlay(a => !a)}>
         {isVideo && src ? (
-          <video
-            ref={videoRef}
-            key={`v-${current}`}
-            src={src}
-            controls
-            autoPlay
-            playsInline
-            onEnded={handleVideoEnded}
-            className="w-full h-full object-contain"
-            data-testid="gallery-video"
-          />
+          <video key={`v-${current}`} src={src} controls autoPlay playsInline onEnded={handleVideoEnded} className="w-full h-full object-contain" data-testid="gallery-video" />
         ) : src ? (
-          <img
-            key={`i-${current}`}
-            src={src}
-            alt=""
-            className="w-full h-full object-contain"
-            data-testid="gallery-image"
-          />
-        ) : thumbSrc ? (
-          <img key={`t-${current}`} src={thumbSrc} alt="" className="w-full h-full object-contain" />
+          <img key={`i-${current}`} src={src} alt="" className="w-full h-full object-contain" data-testid="gallery-image" />
         ) : (
           <div className="text-white/40 text-sm">No preview</div>
         )}
-
-        {/* Left arrow */}
         {current > 0 && (
-          <button
-            onClick={(e) => { e.stopPropagation(); goPrev(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/60"
-            data-testid="gallery-prev"
-          >
+          <button onClick={(e) => { e.stopPropagation(); setCurrent(c => c - 1); }} className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white" data-testid="gallery-prev">
             <ChevronLeft className="h-5 w-5" />
           </button>
         )}
-
-        {/* Right arrow */}
         {!isLast && (
-          <button
-            onClick={(e) => { e.stopPropagation(); goNext(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white active:bg-black/60"
-            data-testid="gallery-next"
-          >
+          <button onClick={(e) => { e.stopPropagation(); setCurrent(c => c + 1); }} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white" data-testid="gallery-next">
             <ChevronRight className="h-5 w-5" />
           </button>
         )}
       </div>
-
-      {/* Caption bar */}
       {caption && (
         <div className="px-4 py-3 bg-black/90">
           <p className="text-white text-xs leading-snug line-clamp-3">{caption}</p>
         </div>
       )}
-
-      {/* Dots indicator */}
       {total > 1 && (
         <div className="flex justify-center gap-1.5 pb-4 pt-2 bg-black/90">
           {media.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`rounded-full transition-all ${i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30'}`}
-            />
+            <button key={i} onClick={() => setCurrent(i)} className={`rounded-full transition-all ${i === current ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/30'}`} />
           ))}
         </div>
       )}
@@ -409,33 +385,86 @@ function MediaGalleryModal({ media, startIndex, caption, onClose }) {
   );
 }
 
-/* ────────────────── Single Feed Container ────────────────── */
+/* ────────── Horizontal Feed Container ────────── */
 
-function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
+function HorizontalFeedContainer({ container, onOpenGallery }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const scrollRef = useRef(null);
+  const [detailPost, setDetailPost] = useState(null);
+  const [posts, setPosts] = useState(container.posts || []);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState((container.total_posts || 0) > (container.posts || []).length);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
   const {
     title = 'Community Channel',
     subtitle = 'Latest updates',
-    posts = [],
-    total_posts = 0,
     bg_color = '#ffffff',
-    accent_color = '#0088cc',
+    accent_color = '#C8102E',
     header_bg = '#E8F4FE',
     icon_color = '#0088cc',
-    card_style = 'compact',
-    show_footer = true,
-    cta_text = 'Open Community Feed',
+    card_width = 220,
+    card_height = 300,
+    description_max_lines = 2,
     cta_link = '/comunidad',
-    border_radius = '2xl',
     show_post_count = true,
+    total_posts = 0,
     container_id,
+    channel_id,
   } = container;
 
-  const radiusClass = `rounded-none sm:${border_radius === '2xl' ? 'rounded-2xl' : border_radius === 'xl' ? 'rounded-xl' : border_radius === 'lg' ? 'rounded-lg' : border_radius === 'none' ? 'rounded-none' : 'rounded-2xl'}`;
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    return () => el.removeEventListener('scroll', updateScrollState);
+  }, [updateScrollState, posts]);
+
+  const scroll = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = dir === 'left' ? -(card_width + 12) * 2 : (card_width + 12) * 2;
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  };
+
+  const loadOlder = async () => {
+    setLoadingMore(true);
+    try {
+      const oldestDate = posts.length > 0 ? posts[posts.length - 1].date : null;
+      const limit = container.post_limit || 10;
+      const url = new URL(`${API_URL}/api/community-v2/feed/public/recent`);
+      url.searchParams.set('limit', limit);
+      if (channel_id) url.searchParams.set('channel_id', channel_id);
+
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        const existingIds = new Set(posts.map(p => p.telegram_msg_id));
+        const newPosts = (data.posts || []).filter(p => !existingIds.has(p.telegram_msg_id));
+        if (newPosts.length > 0) {
+          setPosts(prev => [...prev, ...newPosts]);
+        }
+        setHasMore(newPosts.length > 0);
+      }
+    } catch {
+      /* ignore */
+    }
+    setLoadingMore(false);
+  };
 
   return (
     <div
-      className={`${radiusClass} overflow-hidden shadow-sm`}
+      className="rounded-none sm:rounded-2xl overflow-hidden"
       style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
       data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
     >
@@ -458,41 +487,213 @@ function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
           style={{ color: accent_color }}
           data-testid="telegram-see-all"
         >
-          See all <ChevronRight className="h-3 w-3" />
+          {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
         </button>
       </div>
 
-      {/* Posts */}
+      {/* Horizontal Scroll Area */}
+      <div className="relative group/scroll">
+        {/* Left arrow */}
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity"
+            data-testid="scroll-left-btn"
+          >
+            <ChevronLeft className="h-4 w-4 text-neutral-700" />
+          </button>
+        )}
+
+        {/* Right arrow */}
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity"
+            data-testid="scroll-right-btn"
+          >
+            <ChevronRight className="h-4 w-4 text-neutral-700" />
+          </button>
+        )}
+
+        <div
+          ref={scrollRef}
+          className="flex gap-3 overflow-x-auto px-4 pb-4 pt-1 scroll-smooth snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          data-testid="horizontal-scroll-area"
+        >
+          <style>{`[data-testid="horizontal-scroll-area"]::-webkit-scrollbar { display: none; }`}</style>
+
+          {posts.length === 0 ? (
+            <div className="flex items-center justify-center w-full py-8">
+              <div className="text-center">
+                <ImageIcon className="h-8 w-8 mx-auto mb-2" style={{ color: '#d4c5b0' }} />
+                <p className="text-xs" style={{ color: '#b8956a' }}>{t('telegramFeed.noPosts', 'No posts yet')}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {posts.map(post => (
+                <HorizontalPostCard
+                  key={post.telegram_msg_id}
+                  post={post}
+                  cardWidth={card_width}
+                  cardHeight={card_height}
+                  maxLines={description_max_lines}
+                  onOpenDetail={setDetailPost}
+                  onOpenGallery={onOpenGallery}
+                />
+              ))}
+
+              {/* Load older button */}
+              {hasMore && (
+                <div
+                  className="flex-shrink-0 snap-start rounded-xl flex items-center justify-center cursor-pointer transition-colors hover:bg-neutral-50"
+                  style={{
+                    width: Math.round(card_width * 0.6),
+                    minHeight: card_height,
+                    border: '1px dashed rgba(0,0,0,0.12)',
+                  }}
+                  onClick={loadOlder}
+                  data-testid="load-older-btn"
+                >
+                  {loadingMore ? (
+                    <Loader2 className="h-5 w-5 animate-spin" style={{ color: '#b8956a' }} />
+                  ) : (
+                    <div className="text-center px-2">
+                      <ChevronDown className="h-5 w-5 mx-auto mb-1" style={{ color: '#b8956a' }} />
+                      <span className="text-[10px] font-bold" style={{ color: '#8B6914' }}>
+                        {t('telegramFeed.loadOlder', 'Load older')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Detail Modal */}
+      {detailPost && (
+        <PostDetailModal
+          post={detailPost}
+          onClose={() => setDetailPost(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ────────── Vertical Feed (Legacy) ────────── */
+
+function PostRow({ post, onVideoPlay, onOpenGallery }) {
+  const media = post.media || [];
+  const firstMedia = media[0] || null;
+  const thumbSrc = firstMedia?.type === 'photo'
+    ? mediaUrl(firstMedia.file_id)
+    : firstMedia?.thumb_file_id ? mediaUrl(firstMedia.thumb_file_id) : null;
+  const isPlayable = firstMedia?.type === 'video' || firstMedia?.type === 'animation';
+
+  return (
+    <div
+      className="flex gap-3 items-start py-3 border-b last:border-b-0"
+      style={{ borderColor: 'rgba(0,0,0,0.06)' }}
+      data-testid={`telegram-post-${post.telegram_msg_id}`}
+    >
+      {thumbSrc ? (
+        <div className="relative w-[72px] h-[72px] rounded-lg overflow-hidden flex-shrink-0 cursor-pointer" onClick={() => onOpenGallery(media, 0, post.text)}>
+          <img src={thumbSrc} alt="" className="w-full h-full object-cover" loading="lazy" />
+          {isPlayable && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <Play className="h-5 w-5 text-white fill-white" />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="w-[72px] h-[72px] rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: '#f5ede0' }}>
+          <MessageCircle className="h-5 w-5" style={{ color: '#c4b5a0' }} />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm leading-snug line-clamp-2" style={{ color: '#2d2217' }}>
+          {post.text || fallbackText(media)}
+        </p>
+        <div className="flex items-center gap-3 mt-1">
+          <span className="text-[10px]" style={{ color: '#b8956a' }}>{formatTimeAgo(post.date)}</span>
+          {post.likes_count > 0 && (
+            <span className="text-[10px] flex items-center gap-0.5" style={{ color: '#b8956a' }}>
+              <Heart className="h-2.5 w-2.5" /> {post.likes_count}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VerticalFeedContainer({ container, onOpenGallery }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const {
+    title = 'Community Channel',
+    subtitle = 'Latest updates',
+    posts = [],
+    total_posts = 0,
+    bg_color = '#ffffff',
+    accent_color = '#0088cc',
+    header_bg = '#E8F4FE',
+    icon_color = '#0088cc',
+    show_footer = true,
+    cta_text = 'Open Community Feed',
+    cta_link = '/comunidad',
+    show_post_count = true,
+    container_id,
+  } = container;
+
+  return (
+    <div
+      className="rounded-none sm:rounded-2xl overflow-hidden shadow-sm"
+      style={{ background: bg_color, border: '1px solid rgba(0,0,0,0.06)' }}
+      data-testid={`telegram-feed-card${container_id ? `-${container_id}` : ''}`}
+    >
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: header_bg }}>
+            <MessageCircle className="h-4 w-4" style={{ color: icon_color }} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold tracking-tight" style={{ color: '#2d2217' }}>{title}</h3>
+            <p className="text-[10px]" style={{ color: '#b8956a' }}>
+              {show_post_count && total_posts > 0 ? `${total_posts} posts` : subtitle}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate(cta_link)}
+          className="text-[10px] font-bold flex items-center gap-0.5 transition-all hover:gap-1.5"
+          style={{ color: accent_color }}
+          data-testid="telegram-see-all"
+        >
+          {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
+        </button>
+      </div>
       <div className="px-4 pb-3">
         {posts.length === 0 ? (
           <div className="py-8 text-center">
             <ImageIcon className="h-8 w-8 mx-auto mb-2" style={{ color: '#d4c5b0' }} />
-            <p className="text-xs" style={{ color: '#b8956a' }}>Channel posts will appear here</p>
+            <p className="text-xs" style={{ color: '#b8956a' }}>{t('telegramFeed.noPosts', 'No posts yet')}</p>
           </div>
-        ) : card_style === 'expanded' ? (
-          posts.map(post => (
-            <ExpandedPostRow
-              key={post.telegram_msg_id}
-              post={post}
-              onVideoPlay={(fileId, caption) => onVideoPlay(fileId, caption)}
-              onOpenGallery={(media, idx, caption) => onOpenGallery(media, idx, caption)}
-              accentColor={accent_color}
-            />
-          ))
         ) : (
           posts.map(post => (
             <PostRow
               key={post.telegram_msg_id}
               post={post}
-              onVideoPlay={(fileId, caption) => onVideoPlay(fileId, caption)}
+              onVideoPlay={(fileId, caption) => onOpenGallery([{ type: 'video', file_id: fileId }], 0, caption)}
               onOpenGallery={(media, idx, caption) => onOpenGallery(media, idx, caption)}
-              accentColor={accent_color}
             />
           ))
         )}
       </div>
-
-      {/* Footer CTA */}
       {show_footer && posts.length > 0 && (
         <button
           onClick={() => navigate(cta_link)}
@@ -507,39 +708,7 @@ function FeedContainer({ container, onVideoPlay, onOpenGallery }) {
   );
 }
 
-/* ────────────────── Expanded Post Style ────────────────── */
-
-function ExpandedPostRow({ post, onVideoPlay, onOpenGallery, accentColor }) {
-  const media = post.media || [];
-
-  return (
-    <div
-      className="py-3 border-b last:border-b-0"
-      style={{ borderColor: 'rgba(0,0,0,0.06)' }}
-      data-testid={`telegram-post-${post.telegram_msg_id}`}
-    >
-      <div className="flex gap-2.5 items-start">
-        {media.length > 0 && (
-          <MediaGrid
-            media={media}
-            onVideoPlay={(fileId) => onVideoPlay(fileId, post.text)}
-            onOpenGallery={(idx) => onOpenGallery(media, idx, post.text)}
-          />
-        )}
-        <div className="flex-1 min-w-0">
-          {post.text && (
-            <p className="text-sm leading-snug" style={{ color: '#2d2217' }}>
-              {post.text}
-            </p>
-          )}
-          <PostMeta post={post} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ────────────────── Main Export: Multi-Container Feed ────────────────── */
+/* ────────── Main Export ────────── */
 
 export default function TelegramFeedCard() {
   const [containers, setContainers] = useState([]);
@@ -566,14 +735,25 @@ export default function TelegramFeedCard() {
   return (
     <>
       <div className="space-y-4" data-testid="telegram-feed-section">
-        {containers.map((container, idx) => (
-          <FeedContainer
-            key={container.container_id || idx}
-            container={container}
-            onVideoPlay={(fileId, caption) => openGallery([{ type: 'video', file_id: fileId }], 0, caption)}
-            onOpenGallery={openGallery}
-          />
-        ))}
+        {containers.map((container, idx) => {
+          const layoutMode = container.layout_mode || 'horizontal';
+          if (layoutMode === 'vertical') {
+            return (
+              <VerticalFeedContainer
+                key={container.container_id || idx}
+                container={container}
+                onOpenGallery={openGallery}
+              />
+            );
+          }
+          return (
+            <HorizontalFeedContainer
+              key={container.container_id || idx}
+              container={container}
+              onOpenGallery={openGallery}
+            />
+          );
+        })}
       </div>
 
       {galleryModal && (
