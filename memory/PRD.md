@@ -5,6 +5,17 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Privacy Settings Module (Feb 15, 2026) - COMPLETE
+- Admin-configurable search engine indexing control
+- Dynamic robots.txt generation at `/robots.txt`
+- Block/allow toggle for search engines (default: blocked for private community)
+- Custom path rules (allow/disallow specific paths)
+- Custom robots.txt override option
+- Real-time preview of robots.txt content
+- Backend endpoints: `GET/PUT /api/admin/privacy`, `POST /api/admin/privacy/reset`
+- Public endpoints: `GET /robots.txt`, `GET /privacy/meta-robots`
+- Files: `backend/modules/admin/privacy_routes.py`, `frontend/src/modules/admin/PrivacyModule.jsx`
+
 ### Monday.com Public Board Widget (Feb 15, 2026) - COMPLETE
 - Admin-configurable landing page widget showing Monday.com board content
 - Backend: Cached data with configurable refresh interval, public (no auth) endpoint
