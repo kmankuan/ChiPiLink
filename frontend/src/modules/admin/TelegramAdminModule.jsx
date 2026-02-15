@@ -233,6 +233,34 @@ function ContainerEditor({ container, onSave, onDelete, onDuplicate, isNew }) {
                     ))}
                   </div>
                 </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-medium" style={{ color: '#8B6914' }}>Autoplay</span>
+                    <p className="text-[9px]" style={{ color: '#b8956a' }}>Auto-scroll cards like stories</p>
+                  </div>
+                  <button
+                    onClick={() => update('autoplay', !(data.autoplay !== false))}
+                    className={`w-10 h-5 rounded-full transition-colors relative ${data.autoplay !== false ? 'bg-green-500' : 'bg-gray-300'}`}
+                    data-testid="toggle-autoplay"
+                  >
+                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${data.autoplay !== false ? 'left-5' : 'left-0.5'}`} />
+                  </button>
+                </div>
+                {data.autoplay !== false && (
+                  <div>
+                    <label className="block text-[11px] font-medium mb-1" style={{ color: '#8B6914' }}>Autoplay Interval (seconds)</label>
+                    <input
+                      type="number"
+                      min={2}
+                      max={15}
+                      value={data.autoplay_interval || 4}
+                      onChange={(e) => update('autoplay_interval', parseInt(e.target.value) || 4)}
+                      className="w-full px-3 py-2 rounded-lg text-sm border"
+                      style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                      data-testid="container-autoplay-interval"
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
