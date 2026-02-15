@@ -384,12 +384,13 @@ export default function LayoutPreviewModule() {
     const newIcon = {
       key: `icon_${Date.now()}`,
       label: 'New',
-      to: '/',
+      to: '',
       type: 'lucide',
       icon: 'Star',
       image_url: '',
       accent: '#6366f1',
-      accent_bg: '#EEF2FF'
+      accent_bg: '#EEF2FF',
+      status: 'building'
     };
     setIconConfig(prev => ({
       ...prev,
