@@ -646,6 +646,8 @@ export default function TelegramAdminModule() {
                 card_width: 220,
                 card_height: 300,
                 description_max_lines: 2,
+                autoplay: true,
+                autoplay_interval: 4,
               }}
               onSave={handleContainerSave}
               onDelete={() => setShowNewContainer(false)}
