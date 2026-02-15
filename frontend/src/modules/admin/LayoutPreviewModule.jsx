@@ -209,6 +209,11 @@ const ANIMATION_OPTIONS = [
   { value: 'fireworks', label: 'Fireworks' },
   // NEW: Progress
   { value: 'progress_bar', label: 'Progress Bar' },
+  // NEW: Scene-based
+  { value: 'coding_scene', label: 'Person Coding (Scene)' },
+  { value: 'building_progress', label: 'Building Progress 0-100%' },
+  // Lottie
+  { value: 'lottie_url', label: 'Lottie Animation (URL)' },
   // Custom
   { value: 'custom_gif', label: 'Custom GIF/Image' },
 ];
