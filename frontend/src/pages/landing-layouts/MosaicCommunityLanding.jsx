@@ -232,7 +232,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ CULTURAL ICON NAV — dynamic from admin config ═══ */}
       <nav
-        className={`px-4 sm:px-8 py-4 max-w-7xl mx-auto transition-all duration-700 delay-100 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-4 sm:px-8 pt-3 pb-1 max-w-7xl mx-auto transition-all duration-700 delay-100 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="cultural-nav"
       >
         <div className="flex justify-between sm:justify-start sm:gap-6 overflow-x-auto scrollbar-hide">
@@ -256,7 +256,7 @@ export default function MosaicCommunityLanding({ communityData, moduleStatuses }
 
       {/* ═══ MEDIA PLAYER — Google Photos album slideshow ═══ */}
       <section
-        className={`px-0 sm:px-8 pb-0 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+        className={`px-0 sm:px-8 pt-1 pb-0 max-w-7xl mx-auto transition-all duration-700 delay-150 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
         data-testid="media-player-section"
       >
         <MediaPlayer />
