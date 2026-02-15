@@ -230,8 +230,10 @@ DEFAULT_PLAYER_CONFIG = {
     "show_dots": True,
     "dot_style": "auto",
     "shuffle": False,
+    "disable_swipe": False,
     "video_autoplay": True,
     "video_max_duration_ms": 30000,
+    "fit_mode": "smart",
     "items": [],
 }
 
