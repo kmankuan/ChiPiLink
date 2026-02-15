@@ -161,7 +161,6 @@ api_router.include_router(admin_router)
 api_router.include_router(seed_demo_router)  # Demo data seeding
 api_router.include_router(migrations_router)  # Database migrations
 api_router.include_router(privacy_router)  # Privacy settings
-api_router.include_router(privacy_public_router)  # Public robots.txt helper
 api_router.include_router(invision_router)
 
 # Register new modules (placeholders)
