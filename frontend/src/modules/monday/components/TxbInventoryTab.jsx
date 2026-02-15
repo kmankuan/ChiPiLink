@@ -18,8 +18,15 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
   Save, Package, RefreshCw, Users, Upload, Webhook, ArrowLeftRight,
-  CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine
+  CheckCircle, AlertCircle, Clock, Loader2, Link2, ArrowUpFromLine, Search
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
