@@ -53,10 +53,10 @@ function fallbackText(media) {
 function MediaGrid({ media, onVideoPlay, compact = false }) {
   if (!media || media.length === 0) return null;
 
-  const size = compact ? 'w-16 h-16' : 'w-20 h-20';
+  const size = compact ? 'w-14 h-14' : 'w-[72px] h-[72px]';
 
   return (
-    <div className="flex gap-1.5 flex-wrap" data-testid="media-grid">
+    <div className="flex gap-1 flex-shrink-0" data-testid="media-grid">
       {media.map((item, idx) => (
         <MediaThumb key={idx} item={item} onVideoPlay={onVideoPlay} size={size} />
       ))}
