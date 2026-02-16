@@ -15,7 +15,7 @@ router = APIRouter(prefix="/presale-import", tags=["Store - Pre-Sale Import"])
 @router.get("/preview")
 async def preview_import(admin: dict = Depends(get_admin_user)):
     """Preview items from Monday.com that are ready to import (trigger column set)"""
-    board_config = await monday_config_service.get_textbook_board_config()
+    board_config = await monday_config_service.get_config()
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
@@ -26,7 +26,7 @@ async def preview_import(admin: dict = Depends(get_admin_user)):
 @router.post("/execute")
 async def execute_import(admin: dict = Depends(get_admin_user)):
     """Import pre-sale orders from Monday.com into the app as awaiting_link orders"""
-    board_config = await monday_config_service.get_textbook_board_config()
+    board_config = await monday_config_service.get_config()
     board_id = board_config.get("board_id")
     if not board_id:
         raise HTTPException(400, "Textbook Orders Monday.com board not configured")
