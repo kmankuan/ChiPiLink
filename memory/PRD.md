@@ -44,6 +44,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - **Landing page integration**: `MosaicCommunityLanding.jsx` StatusAnimation renders progress icons via `isProgressAnimation()` adapter
 - Files: `ProgressIcons.jsx`, `LayoutPreviewModule.jsx`, `MosaicCommunityLanding.jsx`
 
+### Unatienda Admin UI Reorganization (Feb 16, 2026) - COMPLETE
+- **Grouped navigation**: 10 flat tabs reorganized into 4 logical groups (Catalog, Orders, School, Settings) with visual dividers
+- **Compact stats**: Module-level 4 large stat cards → 4 inline badges; Inventory tab 6 stat cards → inline badge row
+- **Reduced visual noise**: Removed info banner, compacted toolbar buttons, smaller filters
+- Files: `UnatiendaModule.jsx`, `PrivateCatalogTab.jsx`
+
 ## Prioritized Backlog
 
 ### P1: Implement "Stop" Button for Full Sync
