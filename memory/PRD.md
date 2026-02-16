@@ -45,17 +45,12 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - Files: `ProgressIcons.jsx`, `LayoutPreviewModule.jsx`, `MosaicCommunityLanding.jsx`
 
 ### Pre-Sale Import from Monday.com (Feb 16, 2026) - COMPLETE
-- **Backend**: 4 API endpoints (`/api/store/presale-import/` — preview, execute, orders, link)
-  - Imports orders from Monday.com Textbook Orders board using sync trigger column (`color_mm0mnmrs`)
-  - Creates `awaiting_link` orders with student name, grade, book items (matched to inventory)
-  - Auto-links orders when student is registered (fuzzy name + grade matching in `textbook_access.py`)
-  - Admin can manually link unmatched orders to students
-- **Frontend**: New "Pre-Sale Import" tab in Unatienda ORDERS group
-  - Preview Import → shows what will be imported from Monday.com
-  - Compact stats, status filters (All/Unlinked/Linked), search, sorting, pagination
-  - Order detail dialog with book match status; manual link dialog with student search
-- **Monday.com columns**: `text_mm026sg3` (Estudiante), `color_mm02xhw1` (Grado), `color_mm0mnmrs` (sync trigger)
-- Files: `presale_import_service.py`, `presale_import.py` (routes), `PreSaleImportTab.jsx`, `textbook_access.py` (auto-link hook)
+- **Backend**: 7 API endpoints (`/api/store/presale-import/` — preview, execute, orders, link, unlink, suggestions, confirm, reject)
+  - Imports orders from Monday.com using sync trigger column (`color_mm0mnmrs`)
+  - **Suggestion-based linking**: student registration creates suggestions for admin to confirm/reject (not auto-link)
+  - Admin can manually link, **unlink** wrongly linked orders
+- **Frontend**: "Pre-Sale Import" tab with suggestions panel (Confirm/Reject), unlink button, stats, filters
+- Files: `presale_import_service.py`, `presale_import.py`, `PreSaleImportTab.jsx`, `textbook_access.py`
 
 ### Status Packs — One-Click Themed Icon Assignment (Feb 16, 2026) - COMPLETE
 - **5 themed packs**: Chinese New Year, Construction Progress, Nature Journey, Celestial Night, Calligraphy Master
