@@ -53,6 +53,7 @@ router.include_router(store_config_router)
 router.include_router(monday_sync_router)
 router.include_router(order_summary_config_router)
 router.include_router(stock_orders_router)
+router.include_router(presale_import_router)
 
 # Re-export for compatibility
 store_refactored_router = router
