@@ -11,6 +11,11 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import Lottie from 'lottie-react';
 import {
+  ProgressIcon, ProgressIconPreview, LottieProgressIcon,
+  PROGRESS_THEMES, PROGRESS_LEVELS,
+  isProgressAnimation, parseProgressAnimation, getProgressAnimationType,
+} from '@/components/ui/ProgressIcons';
+import {
   Check, Save, Loader2, Plus, Trash2, ExternalLink, Image,
   ChevronDown, ChevronUp, Pencil, Eye,
   // Lucide icon library for the picker
