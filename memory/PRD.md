@@ -5,51 +5,46 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
-### Stock Workflows: Catalog Type Separation (Feb 16, 2026) - COMPLETE
-- **Catalog filter tabs**: "All", "PCA Textbooks", "Public Store" at the top of the Workflows view with counts
-- **Explicit catalog selection**: Shipment and Adjustment creation dialogs include a CatalogTypeSelector (Public Store / PCA Textbooks)
+### Stock Movements: Naming Update & Summary Cards (Feb 16, 2026) - COMPLETE
+- **Renamed "Workflows" tab → "Stock Mov."** (tab) / "Stock Movements" (heading) — better describes the feature
+- **Renamed "PCA Textbooks" → "School Textbooks"** throughout the entire app (StockOrdersTab, UnatiendaModule, PrivateCatalogTab, DashboardModule, LinkingPage)
+- **Badge label**: "PCA" → "Textbooks" (purple), "Public" stays as-is (green)
+- **Summary cards added**: Dynamic stats at top of Stock Movements view — Total Orders, Pending, Completed, and type breakdown (Ship/Ret/Adj). All update based on selected catalog filter.
+- Files changed: `StockOrdersTab.jsx`, `UnatiendaModule.jsx`, `PrivateCatalogTab.jsx`, `DashboardModule.jsx`, `LinkingPage.jsx`
+
+### Stock Movements: Catalog Type Separation (Feb 16, 2026) - COMPLETE
+- **Catalog filter tabs**: "All", "School Textbooks", "Public Store" at the top of the Stock Movements view with counts
+- **Explicit catalog selection**: Shipment and Adjustment creation dialogs include a CatalogTypeSelector (Public Store / School Textbooks)
 - **Scoped product search**: ProductPicker filters products by `is_private_catalog` based on selected catalog type
-- **Returns default to PCA**: Return workflow shows "PCA Textbooks Inventory" indicator; always tagged as PCA since returns are from linked student orders
-- **Visual badges**: Each order row shows a PCA (purple) or Public (green) badge
+- **Returns default to Textbooks**: Return workflow shows "School Textbooks Inventory" indicator; always tagged as `pca` since returns are from linked student orders
+- **Visual badges**: Each order row shows a Textbooks (purple) or Public (green) badge
 - **Order detail**: Shows catalog type in detail dialog
-- **Backend**: `catalog_type` field added to stock orders; list API supports `catalog_type` filter; `catalog_counts` aggregation in response
-- **Backend**: `GET /api/store/inventory/products` supports `catalog_type=pca|public` filter
+- **Backend**: `catalog_type` field on stock orders; list API supports `catalog_type` filter; `catalog_counts` aggregation
+- **Backend**: `GET /api/store/inventory/products` supports `catalog_type=pca|public` filtering
 - **Migration**: Existing orders migrated to `pca` catalog_type
-- Frontend: `StockOrdersTab.jsx` — Full redesign with catalog separation
-- Backend: `stock_orders.py` — Updated models and list endpoint
-- Backend: `inventory.py` — Updated products endpoint with catalog filter
+- Frontend: `StockOrdersTab.jsx`, Backend: `stock_orders.py`, `inventory.py`
 
-### Stock Workflows System (Feb 16, 2026) - COMPLETE
+### Stock Movements System (Feb 16, 2026) - COMPLETE
 - **3 workflow types**: Shipment (draft → confirmed → received), Customer Return (registered → inspected → approved|rejected), Stock Adjustment (requested → applied)
-- **Stock integrity**: Inventory only updates at terminal workflow steps — not on direct manual edits
-- **Customer Returns linked to orders**: Search existing textbook orders and link returns to them
-- **Audit trail**: Full status history with timestamps and user info on each transition
-- **Step indicator UI**: Visual workflow progress bar for each order
-- **Product search**: Autocomplete search for adding products to orders with stock levels
-- Backend: `/app/backend/modules/store/routes/stock_orders.py` — CRUD + transitions + summary
-- Frontend: `/app/frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` — Full UI with dialogs
-- Admin tab: Unatienda > Workflows
+- **Stock integrity**: Inventory only updates at terminal workflow steps
+- **Customer Returns linked to orders**: Search existing textbook orders and link returns
+- **Audit trail**: Full status history with timestamps and user info
 
-### Media Player Mute Configuration (Feb 16, 2026) - COMPLETE
-- **Default with sound**: Videos now play with sound by default (unmuted). If browser blocks unmuted autoplay, automatically falls back to muted playback
-- **Admin setting**: New "Video Default Muted" toggle in admin panel (Content > Banners y Medios > Media Player tab)
-- **User control**: Mute/unmute button on video slides allows users to toggle audio
-- Backend: Added `video_default_muted` field to `DEFAULT_PLAYER_CONFIG`
-- Frontend: Updated `MediaPlayer.jsx` with try-with-sound-then-fallback-to-muted logic
-- Admin UI: Added checkbox in `ShowcaseAdminModule.jsx`
+### Media Player Features (Feb 15-16, 2026) - COMPLETE
+- Video autoplay with unmute/mute fallback, admin-configurable default muted setting
+- Smart portrait image pairing, shuffle, fit modes, dot styles, lock navigation
 
-### Media Player Video Autoplay & Portrait Pairing Fix (Feb 16, 2026) - COMPLETE
-### Media Player Controls & Video Fix (Feb 15, 2026) - COMPLETE
-### New Animation Types & Lottie Support (Feb 15, 2026) - COMPLETE
-### Custom Icon Statuses & Animations (Feb 15, 2026) - COMPLETE
-### Horizontal Telegram Feed Redesign (Feb 15, 2026) - COMPLETE
-### Module Icon Status Indicators (Feb 15, 2026) - COMPLETE
-### Privacy Settings Module (Feb 15, 2026) - COMPLETE
-### Monday.com Public Board Widget (Feb 15, 2026) - COMPLETE
-### Media Gallery Player (Feb 15, 2026) - COMPLETE
-### PinPanClub Super Pin Ranking Layout Fix (Feb 15, 2026) - COMPLETE
-### Banner & Telegram Feed UI Fixes (Feb 15, 2026) - COMPLETE
-### Per-Column Sync Bug Fix (Feb 15, 2026) - COMPLETE
+### Other Completed Features
+- New Animation Types & Lottie Support
+- Custom Icon Statuses & Animations (24 types)
+- Horizontal Telegram Feed Redesign
+- Module Icon Status Indicators
+- Privacy Settings Module
+- Monday.com Public Board Widget
+- Media Gallery Player
+- PinPanClub Super Pin Ranking Layout Fix
+- Banner & Telegram Feed UI Fixes
+- Per-Column Sync Bug Fix
 
 ## Prioritized Backlog
 
@@ -68,26 +63,18 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 ### Backend
 - FastAPI with MongoDB (Motor async driver)
 - Modular route structure under `/app/backend/modules/`
-- Telegram Bot API integration for channel sync
 
 ### Frontend
 - React with react-i18next for i18n (en, es, zh)
-- Shadcn/UI components
-- lottie-react for Lottie animations
-- Multiple landing page layouts (living_grid, mosaic, cinematic, etc.)
-- Admin dashboard with modular tabs
+- Shadcn/UI components, lottie-react for animations
 
 ### Key DB Collections
-- `app_config` with keys: `ticker_config`, `landing_images`, `layout_icons`, `icon_statuses`
-- `store_products` with `is_private_catalog: bool` for catalog type separation
-- `stock_orders` with `catalog_type: "public"|"pca"` for workflow catalog separation
-- `users`, `community_posts`, `store_textbook_orders`, `pinpanclub_matches`
+- `store_products` with `is_private_catalog: bool` for catalog type
+- `stock_orders` with `catalog_type: "public"|"pca"` for movement catalog separation
+- `app_config`, `users`, `store_textbook_orders`, `inventory_movements`
 
 ### Key Files
-- `frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` - Stock Workflows with catalog separation
-- `backend/modules/store/routes/stock_orders.py` - Stock Orders API with catalog_type
+- `frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` - Stock Movements with catalog separation
+- `backend/modules/store/routes/stock_orders.py` - Stock Orders API
 - `backend/modules/store/routes/inventory.py` - Product inventory API with catalog filter
-- `frontend/src/components/MediaPlayer.jsx` - Media player with smart layout
-- `frontend/src/modules/admin/tabs/layouts/LayoutPreviewModule.jsx` - Admin status/icon management
-- `backend/modules/ticker/routes.py` - Ticker, icon, status API endpoints
-- `backend/modules/showcase/__init__.py` - Media player config API
+- `frontend/src/modules/unatienda/UnatiendaModule.jsx` - Unatienda main module
