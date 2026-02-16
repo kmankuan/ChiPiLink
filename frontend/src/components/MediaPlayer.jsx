@@ -306,7 +306,7 @@ export default function MediaPlayer() {
               key={first.url}
               src={first.url}
               autoPlay
-              muted
+              muted={muted}
               playsInline
               preload="auto"
               loop={slides.length === 1}
