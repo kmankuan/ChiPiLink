@@ -249,7 +249,7 @@ export default function StudentsTab({ token }) {
 
       {/* Row count */}
       <div className="text-[11px] text-muted-foreground">
-        Showing {pagination.currentItems.length} of {sortedStudents.length} students
+        Showing {paginated.length} of {sortedStudents.length} students
         {searchTerm && ` (filtered from ${students.length})`}
       </div>
 
