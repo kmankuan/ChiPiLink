@@ -32,6 +32,7 @@ const TAB_GROUPS = [
     tabs: [
       { id: 'textbook-orders', label: 'Textbook Orders', icon: Package },
       { id: 'access-requests', label: 'Access Requests', icon: ClipboardList },
+      { id: 'presale-import', label: 'Pre-Sale Import', icon: Truck, testId: 'presale-import-tab-trigger' },
     ],
   },
   {
