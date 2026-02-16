@@ -127,7 +127,6 @@ class PreSaleImportService:
         for si in subitems:
             si_name = si.get("name", "").strip()
             si_id = str(si.get("id", ""))
-            si_cols = {c["id"]: c for c in si.get("column_values", [])}
 
             # Parse book code + name from subitem name
             book_code, book_name = self._parse_subitem_name(si_name)
