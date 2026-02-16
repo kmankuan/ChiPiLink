@@ -26,6 +26,7 @@ export default function Orders() {
   const { t, i18n } = useTranslation();
   const { api, token } = useAuth();
   const { perOrder, markOrderRead, refreshUnread } = useNotifications();
+  const { perStudent: crmPerStudent, markStudentRead, refreshUnread: refreshCrmUnread } = useCrmNotifications();
   
   const [pedidos, setPedidos] = useState([]);
   const [textbookOrders, setTextbookOrders] = useState([]);
