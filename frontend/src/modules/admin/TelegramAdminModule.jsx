@@ -377,6 +377,73 @@ function ContainerEditor({ container, onSave, onDelete, onDuplicate, isNew }) {
             ))}
           </div>
 
+          {/* Header Link Buttons */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Link2 className="h-3.5 w-3.5" style={{ color: '#8B6914' }} />
+              <span className="text-xs font-bold" style={{ color: '#2d2217' }}>Header Links</span>
+            </div>
+            <p className="text-[9px]" style={{ color: '#b8956a' }}>Add link buttons next to the title. Use full URLs for external or paths like /store for internal.</p>
+            {(data.header_links || []).map((link, idx) => (
+              <div key={idx} className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-medium mb-0.5" style={{ color: '#8B6914' }}>Label</label>
+                  <input
+                    type="text"
+                    value={link.label || ''}
+                    onChange={(e) => {
+                      const links = [...(data.header_links || [])];
+                      links[idx] = { ...links[idx], label: e.target.value };
+                      update('header_links', links);
+                    }}
+                    className="w-full px-2 py-1.5 rounded-lg text-xs border"
+                    style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                    placeholder="e.g. Join Channel"
+                    data-testid={`header-link-label-${idx}`}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-[10px] font-medium mb-0.5" style={{ color: '#8B6914' }}>URL</label>
+                  <input
+                    type="text"
+                    value={link.url || ''}
+                    onChange={(e) => {
+                      const links = [...(data.header_links || [])];
+                      links[idx] = { ...links[idx], url: e.target.value };
+                      update('header_links', links);
+                    }}
+                    className="w-full px-2 py-1.5 rounded-lg text-xs border"
+                    style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#2d2217' }}
+                    placeholder="https://... or /page"
+                    data-testid={`header-link-url-${idx}`}
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    const links = (data.header_links || []).filter((_, i) => i !== idx);
+                    update('header_links', links);
+                  }}
+                  className="px-2 py-1.5 rounded-lg text-xs text-red-500 hover:bg-red-50 transition-colors"
+                  data-testid={`header-link-remove-${idx}`}
+                  title="Remove link"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => {
+                const links = [...(data.header_links || []), { label: '', url: '' }];
+                update('header_links', links);
+              }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-colors"
+              style={{ background: '#f0f4f8', color: '#64748b' }}
+              data-testid="add-header-link-btn"
+            >
+              <Plus className="h-3 w-3" /> Add Link Button
+            </button>
+          </div>
+
           {/* Actions */}
           <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
             <button
