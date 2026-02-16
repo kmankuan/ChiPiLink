@@ -447,6 +447,11 @@ function StatusAnimation({ type, color, gifUrl }) {
     case 'custom_gif':
       return gifUrl ? <img src={gifUrl} alt="" className="w-6 h-6 object-contain" /> : null;
     default:
+      // Check if it's a progress animation type (e.g., progress_journey_starting)
+      if (isProgressAnimation(type)) {
+        const parsed = parseProgressAnimation(type);
+        if (parsed) return <ProgressIcon level={parsed.level} theme={parsed.theme} size={20} color={color} />;
+      }
       return null;
   }
 }
