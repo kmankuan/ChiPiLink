@@ -177,6 +177,7 @@ async def list_stock_orders(
     order_type: Optional[str] = Query(None, description="shipment|return|adjustment"),
     status: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
+    catalog_type: Optional[str] = Query(None, description="public|pca"),
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     admin: dict = Depends(get_admin_user),
@@ -187,6 +188,8 @@ async def list_stock_orders(
         query["type"] = order_type
     if status:
         query["status"] = status
+    if catalog_type:
+        query["catalog_type"] = catalog_type
     if search:
         query["$or"] = [
             {"order_id": {"$regex": search, "$options": "i"}},
@@ -198,17 +201,28 @@ async def list_stock_orders(
     total = await db.stock_orders.count_documents(query)
     orders = await db.stock_orders.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
 
-    # Count by status for quick filters
+    # Count by type+status for quick filters
     counts_pipeline = [
         {"$group": {"_id": {"type": "$type", "status": "$status"}, "count": {"$sum": 1}}}
     ]
+    if catalog_type:
+        counts_pipeline.insert(0, {"$match": {"catalog_type": catalog_type}})
     counts_raw = await db.stock_orders.aggregate(counts_pipeline).to_list(50)
     counts = {}
     for c in counts_raw:
         key = f"{c['_id']['type']}_{c['_id']['status']}"
         counts[key] = c["count"]
 
-    return {"orders": orders, "total": total, "skip": skip, "limit": limit, "counts": counts}
+    # Count by catalog_type for the filter tabs
+    catalog_counts_pipeline = [
+        {"$group": {"_id": "$catalog_type", "count": {"$sum": 1}}}
+    ]
+    catalog_raw = await db.stock_orders.aggregate(catalog_counts_pipeline).to_list(10)
+    catalog_counts = {}
+    for c in catalog_raw:
+        catalog_counts[c["_id"] or "unknown"] = c["count"]
+
+    return {"orders": orders, "total": total, "skip": skip, "limit": limit, "counts": counts, "catalog_counts": catalog_counts}
 
 
 @router.get("/{order_id}")
