@@ -114,6 +114,137 @@ class TestPreSaleImportAPI:
             print(f"✓ {method} {url.split('/api')[-1]} correctly requires auth")
 
 
+class TestSuggestionBasedLinking:
+    """Tests for suggestion-based linking workflow: suggestions, confirm, reject, unlink"""
+    
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        """Setup test with admin token"""
+        self.session = requests.Session()
+        self.session.headers.update({"Content-Type": "application/json"})
+        
+        # Login as admin
+        login_resp = self.session.post(f"{BASE_URL}/api/auth-v2/login", json={
+            "email": "admin@chipi.co",
+            "password": "admin"
+        })
+        assert login_resp.status_code == 200, f"Admin login failed: {login_resp.text}"
+        data = login_resp.json()
+        self.token = data.get("token") or data.get("access_token")
+        assert self.token, "No token returned from login"
+        self.session.headers.update({"Authorization": f"Bearer {self.token}"})
+    
+    def test_suggestions_endpoint(self):
+        """Test GET /api/store/presale-import/suggestions returns {suggestions, count, pending_count}"""
+        response = self.session.get(f"{BASE_URL}/api/store/presale-import/suggestions")
+        print(f"Suggestions response status: {response.status_code}")
+        print(f"Suggestions response body: {response.text[:500]}")
+        
+        assert response.status_code == 200, f"Suggestions endpoint failed: {response.text}"
+        data = response.json()
+        
+        # Validate response structure
+        assert "suggestions" in data, "Response missing 'suggestions' field"
+        assert "count" in data, "Response missing 'count' field"
+        assert "pending_count" in data, "Response missing 'pending_count' field"
+        assert isinstance(data["suggestions"], list), "suggestions should be list"
+        assert isinstance(data["count"], int), "count should be integer"
+        assert isinstance(data["pending_count"], int), "pending_count should be integer"
+        
+        print(f"Suggestions: total={data['count']}, pending={data['pending_count']}")
+    
+    def test_suggestions_with_status_filter(self):
+        """Test GET /api/store/presale-import/suggestions?status=pending"""
+        response = self.session.get(f"{BASE_URL}/api/store/presale-import/suggestions?status=pending")
+        print(f"Pending suggestions response status: {response.status_code}")
+        
+        assert response.status_code == 200, f"Filtered suggestions endpoint failed: {response.text}"
+        data = response.json()
+        assert "suggestions" in data
+        assert "count" in data
+        assert "pending_count" in data
+        print(f"Pending suggestions: {data['count']}")
+    
+    def test_confirm_nonexistent_suggestion(self):
+        """Test POST /api/store/presale-import/suggestions/fake/confirm returns error"""
+        response = self.session.post(f"{BASE_URL}/api/store/presale-import/suggestions/fake/confirm")
+        print(f"Confirm fake suggestion status: {response.status_code}")
+        print(f"Confirm fake suggestion body: {response.text}")
+        
+        # Should return 400 with "Suggestion not found" error
+        assert response.status_code == 400, f"Expected 400 for non-existent suggestion, got {response.status_code}"
+        data = response.json()
+        assert "detail" in data, "Error response should have 'detail' field"
+        assert "not found" in data["detail"].lower(), f"Error should mention 'not found': {data['detail']}"
+        print(f"✓ Correctly returns error: {data['detail']}")
+    
+    def test_reject_nonexistent_suggestion(self):
+        """Test POST /api/store/presale-import/suggestions/fake/reject returns error"""
+        response = self.session.post(f"{BASE_URL}/api/store/presale-import/suggestions/fake/reject")
+        print(f"Reject fake suggestion status: {response.status_code}")
+        print(f"Reject fake suggestion body: {response.text}")
+        
+        # Should return 400 with "Suggestion not found" error
+        assert response.status_code == 400, f"Expected 400 for non-existent suggestion, got {response.status_code}"
+        data = response.json()
+        assert "detail" in data, "Error response should have 'detail' field"
+        assert "not found" in data["detail"].lower(), f"Error should mention 'not found': {data['detail']}"
+        print(f"✓ Correctly returns error: {data['detail']}")
+    
+    def test_unlink_nonexistent_order(self):
+        """Test POST /api/store/presale-import/unlink with fake order_id returns 'Order not found'"""
+        response = self.session.post(
+            f"{BASE_URL}/api/store/presale-import/unlink",
+            json={"order_id": "fake"}
+        )
+        print(f"Unlink fake order status: {response.status_code}")
+        print(f"Unlink fake order body: {response.text}")
+        
+        # Should return 400 with "Order not found" error
+        assert response.status_code == 400, f"Expected 400 for non-existent order, got {response.status_code}"
+        data = response.json()
+        assert "detail" in data, "Error response should have 'detail' field"
+        assert "not found" in data["detail"].lower(), f"Error should mention 'not found': {data['detail']}"
+        print(f"✓ Correctly returns error: {data['detail']}")
+    
+    def test_unlink_missing_order_id(self):
+        """Test POST /api/store/presale-import/unlink without order_id returns error"""
+        response = self.session.post(
+            f"{BASE_URL}/api/store/presale-import/unlink",
+            json={}
+        )
+        print(f"Unlink without order_id status: {response.status_code}")
+        
+        # Should return 400 with "order_id is required" error
+        assert response.status_code == 400, f"Expected 400 for missing order_id, got {response.status_code}"
+        data = response.json()
+        assert "detail" in data, "Error response should have 'detail' field"
+        print(f"✓ Correctly returns error: {data['detail']}")
+    
+    def test_suggestions_endpoints_require_auth(self):
+        """Test that all suggestion endpoints require admin authentication"""
+        no_auth_session = requests.Session()
+        no_auth_session.headers.update({"Content-Type": "application/json"})
+        
+        endpoints = [
+            ("GET", f"{BASE_URL}/api/store/presale-import/suggestions"),
+            ("POST", f"{BASE_URL}/api/store/presale-import/suggestions/fake/confirm"),
+            ("POST", f"{BASE_URL}/api/store/presale-import/suggestions/fake/reject"),
+            ("POST", f"{BASE_URL}/api/store/presale-import/unlink"),
+        ]
+        
+        for method, url in endpoints:
+            if method == "GET":
+                response = no_auth_session.get(url)
+            else:
+                response = no_auth_session.post(url, json={"order_id": "fake"})
+            
+            # Should return 401 or 403 without auth
+            assert response.status_code in [401, 403], \
+                f"Endpoint {method} {url} should require auth, got {response.status_code}"
+            print(f"✓ {method} {url.split('/api')[-1]} correctly requires auth")
+
+
 class TestTextbookOrdersAwaitingLinkStatus:
     """Test that awaiting_link status is handled correctly"""
     
