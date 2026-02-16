@@ -908,10 +908,12 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                 except (ValueError, TypeError):
                     pass
             elif field in ("stock_quantity", "stock"):
+                # Stock is managed through Stock Movements, not synced directly
+                # Store the Monday.com value as reference but don't set inventory
                 try:
-                    product_data["inventory_quantity"] = int(float(text_value))
+                    product_data["monday_initial_stock"] = int(float(text_value))
                 except (ValueError, TypeError):
-                    product_data["inventory_quantity"] = 0
+                    product_data["monday_initial_stock"] = 0
 
         # If code column was found, also check for existing product by code
         if product_data.get("code"):
