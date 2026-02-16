@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import {
   Download, Eye, Link2, Loader2, RefreshCw, Search, ShoppingCart,
   AlertTriangle, CheckCircle, Clock, Package, Users, ArrowUpDown,
-  ArrowUp, ArrowDown, Unlink, ExternalLink
+  ArrowUp, ArrowDown, Unlink, ExternalLink, ArrowRight
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
