@@ -310,9 +310,49 @@ function CrmConfigPanel({ token }) {
             )}
           </div>
         </div>
-        <Button size="sm" onClick={handleSave} disabled={saving} className="text-xs" data-testid="save-crm-config">
-          {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />} Save
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={handleSave} disabled={saving} className="text-xs" data-testid="save-crm-config">
+            {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />} Save
+          </Button>
+          <Button
+            size="sm"
+            variant={webhookId ? 'outline' : 'default'}
+            disabled={!boardId || webhookRegistering}
+            onClick={async () => {
+              setWebhookRegistering(true);
+              try {
+                const callbackUrl = `${API}/api/store/crm-chat/webhooks/update-created`;
+                const res = await fetch(`${API}/api/store/crm-chat/admin/config/register-webhook`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ callback_url: callbackUrl }),
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  setWebhookId(data.webhook_id);
+                  toast.success('Push notifications webhook registered!');
+                } else {
+                  const err = await res.json();
+                  toast.error(err.detail || 'Failed to register webhook');
+                }
+              } catch {
+                toast.error('Error registering webhook');
+              } finally {
+                setWebhookRegistering(false);
+              }
+            }}
+            className="text-xs gap-1"
+            data-testid="register-webhook-btn"
+          >
+            {webhookRegistering ? <Loader2 className="h-3 w-3 animate-spin" /> : <Bell className="h-3 w-3" />}
+            {webhookId ? 'Re-register Webhook' : 'Enable Push Notifications'}
+          </Button>
+          {webhookId && (
+            <Badge variant="outline" className="text-[9px] text-green-600 border-green-300">
+              Webhook active
+            </Badge>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
