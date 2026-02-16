@@ -134,3 +134,52 @@ async def get_board_columns(admin: dict = Depends(get_admin_user)):
         raise HTTPException(status_code=400, detail="CRM board not configured")
     columns = await crm_monday_adapter.client.get_board_columns(board_id)
     return {"columns": columns}
+
+
+# ============== WEBHOOK ENDPOINT ==============
+
+@router.post("/webhooks/update-created")
+async def crm_webhook_update(request: Request):
+    """Monday.com webhook: fires when an Update is created on the CRM board.
+    Creates an in-app notification for the linked client.
+    """
+    body = await request.json()
+
+    # Monday.com challenge verification
+    if "challenge" in body:
+        logger.info("CRM webhook challenge received")
+        return JSONResponse(content={"challenge": body["challenge"]})
+
+    event = body.get("event", {})
+    if not event:
+        return {"status": "no_event"}
+
+    try:
+        result = await crm_chat_service.process_webhook_update(event)
+        logger.info(f"CRM webhook processed: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"CRM webhook error: {e}")
+        return {"status": "error", "detail": str(e)}
+
+
+# ============== NOTIFICATION ENDPOINTS ==============
+
+@router.get("/notifications/unread")
+async def get_unread_crm_notifications(current_user: dict = Depends(get_current_user)):
+    """Get unread CRM chat message counts for the current user"""
+    return await crm_chat_service.get_unread_counts(current_user["user_id"])
+
+
+@router.post("/{student_id}/mark-read")
+async def mark_student_chat_read(student_id: str, current_user: dict = Depends(get_current_user)):
+    """Mark all CRM messages for a student as read"""
+    await crm_chat_service.mark_read(student_id, current_user["user_id"])
+    return {"success": True}
+
+
+@router.post("/admin/{student_id}/mark-read")
+async def admin_mark_student_chat_read(student_id: str, admin: dict = Depends(get_admin_user)):
+    """Admin: mark all CRM messages for a student as read"""
+    await crm_chat_service.mark_read(student_id, "admin")
+    return {"success": True}
