@@ -570,6 +570,11 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
     case 'custom_gif':
       return gifUrl ? <img src={gifUrl} alt="status" className="w-8 h-8 object-contain" /> : <span className="text-[8px] text-muted-foreground">No GIF</span>;
     default:
+      // Check for progress-based animation types
+      if (isProgressAnimation(animation)) {
+        const parsed = parseProgressAnimation(animation);
+        if (parsed) return <ProgressIcon level={parsed.level} theme={parsed.theme} size={28} color={color} />;
+      }
       return <div className="w-3 h-3 rounded-full" style={{ background: c }} />;
   }
 }
