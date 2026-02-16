@@ -47,6 +47,7 @@ class CreateShipment(BaseModel):
     expected_date: Optional[str] = None
     items: List[StockOrderItem]
     notes: Optional[str] = None
+    catalog_type: str = "public"  # "public" or "pca"
 
 
 class CreateReturn(BaseModel):
@@ -55,12 +56,14 @@ class CreateReturn(BaseModel):
     return_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
+    catalog_type: str = "pca"  # Returns from linked orders default to PCA
 
 
 class CreateAdjustment(BaseModel):
     adjustment_reason: str
     items: List[StockOrderItem]
     notes: Optional[str] = None
+    catalog_type: str = "public"  # "public" or "pca"
 
 
 class TransitionRequest(BaseModel):
