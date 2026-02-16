@@ -167,6 +167,10 @@ export default function UnatiendaModule() {
           <PrivateCatalogTab token={token} onRefresh={fetchStats} />
         </TabsContent>
 
+        <TabsContent value="stock-orders">
+          <StockOrdersTab token={token} />
+        </TabsContent>
+
         <TabsContent value="access-requests">
           <TextbookAccessAdminTab token={token} />
         </TabsContent>
