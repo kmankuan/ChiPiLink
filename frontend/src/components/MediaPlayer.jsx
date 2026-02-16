@@ -51,20 +51,44 @@ function useImageOrientations(items) {
   return { orientations: ori, allLoaded };
 }
 
-/* In smart mode, pair consecutive portrait images into one slide */
+/* In smart mode, collect ALL portrait images and pair them, then interleave with others */
 function buildSlides(items, orientations, fitMode) {
   if (fitMode !== 'smart' || !items.length) return items.map(it => ({ kind: 'single', items: [it] }));
-  const slides = [];
-  let i = 0;
-  while (i < items.length) {
-    const item = items[i];
-    if (item.type === 'video') { slides.push({ kind: 'single', items: [item] }); i++; continue; }
-    if (orientations[item.url] === 'portrait' && i + 1 < items.length && items[i+1].type === 'image' && orientations[items[i+1].url] === 'portrait') {
-      slides.push({ kind: 'pair', items: [item, items[i+1]] }); i += 2; continue;
-    }
-    slides.push({ kind: 'single', items: [item] }); i++;
+
+  // Separate portraits from non-portraits
+  const portraits = [];
+  const others = [];
+  items.forEach(it => {
+    if (it.type === 'image' && orientations[it.url] === 'portrait') portraits.push(it);
+    else others.push(it);
+  });
+
+  // Pair all portrait images (regardless of original position)
+  const pairedSlides = [];
+  for (let i = 0; i + 1 < portraits.length; i += 2) {
+    pairedSlides.push({ kind: 'pair', items: [portraits[i], portraits[i + 1]] });
   }
-  return slides;
+  if (portraits.length % 2 === 1) {
+    pairedSlides.push({ kind: 'single', items: [portraits[portraits.length - 1]] });
+  }
+
+  // Non-portrait items as single slides
+  const otherSlides = others.map(it => ({ kind: 'single', items: [it] }));
+
+  // Interleave: distribute portrait pairs evenly among other slides
+  if (!pairedSlides.length) return otherSlides;
+  if (!otherSlides.length) return pairedSlides;
+
+  const result = [];
+  const step = Math.max(1, Math.floor(otherSlides.length / pairedSlides.length));
+  let pi = 0;
+  for (let i = 0; i < otherSlides.length; i++) {
+    result.push(otherSlides[i]);
+    if ((i + 1) % step === 0 && pi < pairedSlides.length) result.push(pairedSlides[pi++]);
+  }
+  while (pi < pairedSlides.length) result.push(pairedSlides[pi++]);
+
+  return result;
 }
 
 export default function MediaPlayer() {
