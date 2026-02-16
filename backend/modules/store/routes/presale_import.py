@@ -62,3 +62,59 @@ async def manual_link_order(
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+@router.post("/unlink")
+async def unlink_order(
+    data: dict = Body(...),
+    admin: dict = Depends(get_admin_user)
+):
+    """Unlink a previously linked order — returns it to awaiting_link"""
+    order_id = data.get("order_id")
+    if not order_id:
+        raise HTTPException(400, "order_id is required")
+    admin_user_id = admin.get("user_id", "admin")
+    try:
+        result = await presale_import_service.unlink_order(order_id, admin_user_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@router.get("/suggestions")
+async def get_suggestions(
+    status: Optional[str] = None,
+    admin: dict = Depends(get_admin_user)
+):
+    """Get link suggestions for admin review. Filter by status: pending, confirmed, rejected"""
+    suggestions = await presale_import_service.get_suggestions(status)
+    pending_count = sum(1 for s in suggestions if s.get("status") == "pending")
+    return {"suggestions": suggestions, "count": len(suggestions), "pending_count": pending_count}
+
+
+@router.post("/suggestions/{suggestion_id}/confirm")
+async def confirm_suggestion(
+    suggestion_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin confirms a link suggestion — links the order to the student"""
+    admin_user_id = admin.get("user_id", "admin")
+    try:
+        result = await presale_import_service.confirm_suggestion(suggestion_id, admin_user_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@router.post("/suggestions/{suggestion_id}/reject")
+async def reject_suggestion(
+    suggestion_id: str,
+    admin: dict = Depends(get_admin_user)
+):
+    """Admin rejects a link suggestion"""
+    admin_user_id = admin.get("user_id", "admin")
+    try:
+        result = await presale_import_service.reject_suggestion(suggestion_id, admin_user_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
