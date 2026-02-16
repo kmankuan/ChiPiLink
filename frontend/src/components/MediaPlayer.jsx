@@ -362,7 +362,7 @@ export default function MediaPlayer() {
               {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             </button>
             {isVideo && (
-              <button onClick={() => setMuted(!muted)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-mute">
+              <button onClick={() => { setMuted(!muted); setAutoMuted(false); }} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/50 transition" data-testid="media-mute">
                 {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
               </button>
             )}
