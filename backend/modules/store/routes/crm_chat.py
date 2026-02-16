@@ -2,10 +2,14 @@
 CRM Chat Routes
 Multi-topic customer chat via Monday.com Admin Customers board.
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi.responses import JSONResponse
 from core.auth import get_current_user, get_admin_user
 from ..services.crm_chat_service import crm_chat_service
 from ..integrations.monday_crm_adapter import crm_monday_adapter
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/crm-chat", tags=["Store - CRM Chat"])
 
