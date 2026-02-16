@@ -69,6 +69,7 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             }),
             "last_full_sync": config.get("last_full_sync"),
             "sync_stats": config.get("sync_stats", {}),
+            "stock_approval_column_id": config.get("stock_approval_column_id"),
         }
 
     async def save_txb_inventory_config(self, data: Dict) -> bool:
