@@ -178,10 +178,10 @@ export default function StudentsTab({ token }) {
   }, []);
 
   const toggleAll = useCallback(() => {
-    const visibleIds = pagination.currentItems.map(s => s.student_id || s.sync_id);
+    const visibleIds = paginated.map(s => s.student_id || s.sync_id);
     const allSelected = visibleIds.every(id => selectedIds.has(id));
     setSelectedIds(allSelected ? new Set() : new Set(visibleIds));
-  }, [pagination.currentItems, selectedIds]);
+  }, [paginated, selectedIds]);
 
   const lockedCount = students.filter(s => s.is_locked).length;
   const presaleCount = students.filter(s => s.presale_mode).length;
