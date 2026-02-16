@@ -374,12 +374,22 @@ export default function StudentsTab({ token }) {
                                 Approved
                               </Badge>
                             )}
-                            {isPresale && (
-                              <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                                Pre-sale
-                              </Badge>
-                            )}
                           </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <button
+                            onClick={() => handleTogglePresale(id, isPresale)}
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                              isPresale
+                                ? 'bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700'
+                                : 'bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted hover:border-border'
+                            }`}
+                            data-testid={`presale-toggle-${id}`}
+                            title={isPresale ? 'Click to disable pre-sale' : 'Click to enable pre-sale'}
+                          >
+                            <ShoppingCart className="h-3 w-3" />
+                            {isPresale ? 'On' : 'Off'}
+                          </button>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
