@@ -216,15 +216,13 @@ class PreSaleImportService:
         logger.info(f"Created pre-sale order {order_id} for {parsed['student_name']} (grade {parsed['grade']})")
         return order
 
-    async def try_auto_link(self, student_id: str, student_name: str, grade: str, user_id: str) -> Optional[Dict]:
-        """Try to auto-link a pre-sale order when a student is registered/linked.
-        Called from the student linking flow.
+    async def suggest_link(self, student_id: str, student_name: str, grade: str, user_id: str) -> Optional[Dict]:
+        """Create a link SUGGESTION when a student is registered/linked.
+        Does NOT auto-link. Admin must confirm.
         """
-        # Build name variants for matching
         name_lower = student_name.strip().lower()
         name_parts = name_lower.split()
 
-        # Search for awaiting_link orders matching student name + grade
         candidates = await db.store_textbook_orders.find(
             {
                 "status": "awaiting_link",
@@ -240,29 +238,130 @@ class PreSaleImportService:
         for order in candidates:
             order_name = (order.get("student_name") or "").strip().lower()
             score = self._name_match_score(name_lower, name_parts, order_name)
-            if score > best_score and score >= 0.7:  # 70% threshold
+            if score > best_score and score >= 0.6:  # Lower threshold for suggestions
                 best_score = score
                 best_match = order
 
         if best_match:
             order_id = best_match["order_id"]
             now = datetime.now(timezone.utc).isoformat()
-            await db.store_textbook_orders.update_one(
-                {"order_id": order_id},
-                {"$set": {
-                    "user_id": user_id,
-                    "student_id": student_id,
-                    "status": "submitted",
-                    "link_status": "linked",
-                    "linked_at": now,
-                    "linked_method": "auto",
-                    "updated_at": now,
-                }}
-            )
-            logger.info(f"Auto-linked order {order_id} to student {student_id} (score: {best_score:.2f})")
-            return {"order_id": order_id, "score": best_score, "student_name": best_match.get("student_name")}
+            suggestion = {
+                "suggestion_id": f"sug_{uuid.uuid4().hex[:10]}",
+                "order_id": order_id,
+                "student_id": student_id,
+                "student_name": student_name,
+                "user_id": user_id,
+                "order_student_name": best_match.get("student_name"),
+                "grade": grade,
+                "match_score": round(best_score, 2),
+                "status": "pending",  # pending, confirmed, rejected
+                "created_at": now,
+            }
+            await db.presale_link_suggestions.insert_one(suggestion)
+            suggestion.pop("_id", None)
+            logger.info(f"Created link suggestion for order {order_id} -> student {student_id} (score: {best_score:.2f})")
+            return suggestion
 
         return None
+
+    async def get_suggestions(self, status_filter: str = None) -> List[Dict]:
+        """Get all pending link suggestions for admin review"""
+        query = {}
+        if status_filter:
+            query["status"] = status_filter
+        suggestions = await db.presale_link_suggestions.find(query, {"_id": 0}).sort("created_at", -1).to_list(200)
+        # Enrich with order details
+        for s in suggestions:
+            order = await db.store_textbook_orders.find_one(
+                {"order_id": s.get("order_id")},
+                {"_id": 0, "student_name": 1, "parent_name": 1, "grade": 1, "total_amount": 1, "items": 1, "link_status": 1}
+            )
+            if order:
+                s["order_details"] = order
+        return suggestions
+
+    async def confirm_suggestion(self, suggestion_id: str, admin_user_id: str) -> Dict:
+        """Admin confirms a link suggestion — actually links the order"""
+        suggestion = await db.presale_link_suggestions.find_one(
+            {"suggestion_id": suggestion_id}, {"_id": 0}
+        )
+        if not suggestion:
+            raise ValueError("Suggestion not found")
+        if suggestion.get("status") != "pending":
+            raise ValueError(f"Suggestion already {suggestion.get('status')}")
+
+        order_id = suggestion["order_id"]
+        order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+        if not order:
+            raise ValueError("Order not found")
+        if order.get("link_status") == "linked":
+            raise ValueError("Order already linked to another student")
+
+        now = datetime.now(timezone.utc).isoformat()
+        # Link the order
+        await db.store_textbook_orders.update_one(
+            {"order_id": order_id},
+            {"$set": {
+                "user_id": suggestion.get("user_id"),
+                "student_id": suggestion["student_id"],
+                "status": "submitted",
+                "link_status": "linked",
+                "linked_at": now,
+                "linked_method": "suggestion_confirmed",
+                "linked_by_admin": admin_user_id,
+                "updated_at": now,
+            }}
+        )
+        # Update suggestion status
+        await db.presale_link_suggestions.update_one(
+            {"suggestion_id": suggestion_id},
+            {"$set": {"status": "confirmed", "confirmed_at": now, "confirmed_by": admin_user_id}}
+        )
+        logger.info(f"Admin {admin_user_id} confirmed link suggestion {suggestion_id} for order {order_id}")
+        return {"suggestion_id": suggestion_id, "order_id": order_id, "linked": True}
+
+    async def reject_suggestion(self, suggestion_id: str, admin_user_id: str) -> Dict:
+        """Admin rejects a link suggestion"""
+        suggestion = await db.presale_link_suggestions.find_one(
+            {"suggestion_id": suggestion_id}, {"_id": 0}
+        )
+        if not suggestion:
+            raise ValueError("Suggestion not found")
+
+        now = datetime.now(timezone.utc).isoformat()
+        await db.presale_link_suggestions.update_one(
+            {"suggestion_id": suggestion_id},
+            {"$set": {"status": "rejected", "rejected_at": now, "rejected_by": admin_user_id}}
+        )
+        logger.info(f"Admin {admin_user_id} rejected link suggestion {suggestion_id}")
+        return {"suggestion_id": suggestion_id, "rejected": True}
+
+    async def unlink_order(self, order_id: str, admin_user_id: str) -> Dict:
+        """Admin unlinks a previously linked order — returns it to awaiting_link"""
+        order = await db.store_textbook_orders.find_one({"order_id": order_id}, {"_id": 0})
+        if not order:
+            raise ValueError("Order not found")
+        if order.get("link_status") != "linked":
+            raise ValueError("Order is not linked")
+
+        now = datetime.now(timezone.utc).isoformat()
+        await db.store_textbook_orders.update_one(
+            {"order_id": order_id},
+            {"$set": {
+                "user_id": None,
+                "student_id": None,
+                "status": "awaiting_link",
+                "link_status": "unlinked",
+                "unlinked_at": now,
+                "unlinked_by": admin_user_id,
+                "linked_at": None,
+                "linked_method": None,
+                "linked_by_admin": None,
+                "updated_at": now,
+            }}
+        )
+        logger.info(f"Admin {admin_user_id} unlinked order {order_id}")
+        return {"order_id": order_id, "unlinked": True}
 
     async def manual_link(self, order_id: str, student_id: str, user_id: str, admin_user_id: str) -> Dict:
         """Admin manually links a pre-sale order to a student"""
