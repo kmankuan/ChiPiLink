@@ -579,6 +579,171 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
   }
 }
 
+/* ═══ Progress Icons Gallery — visual browser for all themes/levels ═══ */
+function ProgressIconsGallery() {
+  const [expanded, setExpanded] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('journey');
+  const [lottieTestUrl, setLottieTestUrl] = useState('');
+
+  const themeEntries = Object.entries(PROGRESS_THEMES);
+
+  return (
+    <div className="rounded-2xl border border-border/50 bg-card p-4 space-y-3" data-testid="progress-icons-gallery">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2 text-left w-full"
+      >
+        <Sparkles className="h-4 w-4 text-amber-500" />
+        <div className="flex-1">
+          <h3 className="text-sm font-bold tracking-tight">Progress Icon Sets</h3>
+          <p className="text-[10px] text-muted-foreground">
+            {themeEntries.length} themes with {PROGRESS_LEVELS.length} levels each — Chinese-inspired & artistic progression indicators
+          </p>
+        </div>
+        {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+      </button>
+
+      {expanded && (
+        <div className="space-y-4">
+          {/* How to use */}
+          <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-300" data-testid="progress-howto">
+            <ArrowRight className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+            <p className="text-[10px] leading-relaxed">
+              <strong>How to use:</strong> These icons are available as animation types in the <strong>Status Animation</strong> dropdown of each navigation icon. Look for entries like <em>"Seedling (Chinese Journey)"</em> or <em>"Temple (Chinese Architecture)"</em>. They also work as custom status animations.
+            </p>
+          </div>
+
+          {/* Theme selector tabs */}
+          <div className="flex flex-wrap gap-2" data-testid="theme-tabs">
+            {themeEntries.map(([key, theme]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedTheme(key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  selectedTheme === key
+                    ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-300 dark:bg-amber-900/40 dark:text-amber-200'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                }`}
+                data-testid={`theme-tab-${key}`}
+              >
+                {theme.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Selected theme detail */}
+          {selectedTheme && PROGRESS_THEMES[selectedTheme] && (
+            <div className="rounded-xl border border-border/30 bg-muted/20 p-4 space-y-3" data-testid={`theme-detail-${selectedTheme}`}>
+              <div>
+                <h4 className="text-xs font-bold tracking-tight">{PROGRESS_THEMES[selectedTheme].name}</h4>
+                <p className="text-[10px] text-muted-foreground">{PROGRESS_THEMES[selectedTheme].description}</p>
+              </div>
+
+              {/* All levels in a row */}
+              <div className="flex items-end gap-4 overflow-x-auto pb-2">
+                {PROGRESS_LEVELS.map(level => {
+                  const levelInfo = PROGRESS_THEMES[selectedTheme].levels[level.key];
+                  const animType = getProgressAnimationType(level.key, selectedTheme);
+                  return (
+                    <div key={level.key} className="flex flex-col items-center gap-2 min-w-[64px]" data-testid={`progress-level-${selectedTheme}-${level.key}`}>
+                      <div
+                        className="w-14 h-14 rounded-xl flex items-center justify-center border border-border/30 transition-shadow hover:shadow-md"
+                        style={{ background: `${levelInfo?.color || '#666'}12` }}
+                        title={`Animation ID: ${animType}`}
+                      >
+                        <ProgressIcon level={level.key} theme={selectedTheme} size={36} />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] font-bold block" style={{ color: levelInfo?.color }}>{levelInfo?.label}</span>
+                        <span className="text-[8px] text-muted-foreground block">{level.range}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Size variants */}
+              <div className="pt-2 border-t border-border/20">
+                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Size variants</span>
+                <div className="flex items-end gap-4 mt-2">
+                  {[16, 24, 32, 48].map(s => (
+                    <div key={s} className="flex flex-col items-center gap-1">
+                      <ProgressIcon level="advancing" theme={selectedTheme} size={s} />
+                      <span className="text-[8px] text-muted-foreground">{s}px</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* All themes compact overview */}
+          <div className="rounded-xl border border-border/30 bg-muted/10 p-3 space-y-3">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">All Themes Overview</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {themeEntries.map(([key, theme]) => (
+                <div key={key} className="flex items-center gap-3 p-2 rounded-lg bg-card border border-border/20" data-testid={`theme-overview-${key}`}>
+                  <div className="flex gap-1.5">
+                    {PROGRESS_LEVELS.map(l => (
+                      <div key={l.key} className="w-7 h-7 rounded-md flex items-center justify-center bg-muted/30">
+                        <ProgressIcon level={l.key} theme={key} size={20} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold block truncate">{theme.name}</span>
+                    <span className="text-[8px] text-muted-foreground block truncate">{theme.description}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Lottie section */}
+          <div className="rounded-xl border border-border/30 bg-muted/10 p-3 space-y-3">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Lottie Animations</span>
+            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/30 dark:border-blue-800 dark:text-blue-300">
+              <ExternalLink className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <div className="text-[10px] leading-relaxed space-y-1">
+                <p>Browse free Lottie animations from these sources:</p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <a href="https://lottiefiles.com/featured" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 transition-colors dark:bg-blue-900 dark:text-blue-200">
+                    LottieFiles.com <ExternalLink className="h-2.5 w-2.5" />
+                  </a>
+                  <a href="https://creattie.com/lottie-animations" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold hover:bg-purple-200 transition-colors dark:bg-purple-900 dark:text-purple-200">
+                    Creattie.com <ExternalLink className="h-2.5 w-2.5" />
+                  </a>
+                </div>
+                <p className="mt-1">Copy the <strong>Lottie JSON URL</strong> and paste it in the <strong>"Lottie JSON URL"</strong> field when you select "Lottie Animation (URL)" as the animation type.</p>
+              </div>
+            </div>
+            {/* Lottie tester */}
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <Label className="text-[9px] text-muted-foreground">Test a Lottie URL</Label>
+                <Input
+                  value={lottieTestUrl}
+                  onChange={(e) => setLottieTestUrl(e.target.value)}
+                  placeholder="https://assets.lottiefiles.com/... .json"
+                  className="h-7 text-xs"
+                  data-testid="lottie-test-url"
+                />
+              </div>
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center border border-border/30" data-testid="lottie-test-preview">
+                {lottieTestUrl ? (
+                  <LottieProgressIcon url={lottieTestUrl} size={36} />
+                ) : (
+                  <span className="text-[8px] text-muted-foreground">Preview</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LayoutPreviewModule() {
   const [iconConfig, setIconConfig] = useState(null);
   const [activeLayout, setActiveLayout] = useState(null);
