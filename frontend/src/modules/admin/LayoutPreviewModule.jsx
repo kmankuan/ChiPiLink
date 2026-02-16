@@ -1220,7 +1220,12 @@ export default function LayoutPreviewModule() {
       </div>
 
       {/* ═══ Progress Icons Gallery ═══ */}
-      <ProgressIconsGallery />
+      <ProgressIconsGallery
+        activeLayout={activeLayout}
+        iconConfig={iconConfig}
+        setIconConfig={setIconConfig}
+        saveIcons={saveIcons}
+      />
     </div>
   );
 }
