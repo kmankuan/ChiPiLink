@@ -256,10 +256,11 @@ export default function MediaPlayer() {
   const videoRefCallback = useCallback((node) => {
     videoRef.current = node;
     if (node) {
-      node.setAttribute('muted', '');
-      node.muted = true;
+      node.muted = muted;
+      if (muted) node.setAttribute('muted', '');
+      else node.removeAttribute('muted');
     }
-  }, []);
+  }, [muted]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -268,7 +269,7 @@ export default function MediaPlayer() {
       else videoRef.current.removeAttribute('muted');
     }
   }, [muted]);
-  useEffect(() => { setVideoError(false); }, [current]);
+  useEffect(() => { setVideoError(false); setAutoMuted(false); }, [current]);
 
   /* Parallax */
   useEffect(() => {
