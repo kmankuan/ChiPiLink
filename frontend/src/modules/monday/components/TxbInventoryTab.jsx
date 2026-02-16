@@ -70,6 +70,7 @@ export default function TxbInventoryTab() {
     create_item_webhook_config: {},
     last_full_sync: null,
     sync_stats: {},
+    stock_approval_column_id: null,
   });
 
   const fetchConfig = useCallback(async () => {
