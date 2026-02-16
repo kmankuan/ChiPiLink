@@ -287,15 +287,28 @@ class CrmChatService:
         return {"conversations": conversations, "total": len(conversations)}
 
     async def admin_get_topics(self, student_id: str) -> Dict:
-        """Admin: get all topics for a student (no ownership check)"""
+        """Admin: get all topics for a student (no ownership check). Tries auto-link if not linked."""
         link = await self._get_link(student_id)
+        student = await db.store_students.find_one(
+            {"student_id": student_id}, {"_id": 0, "user_id": 1, "full_name": 1}
+        )
+        if not student:
+            raise ValueError("Student not found")
+
         if not link:
-            # Try to find and link
-            student = await db.store_students.find_one(
-                {"student_id": student_id}, {"_id": 0, "user_id": 1, "full_name": 1}
-            )
-            if not student:
-                raise ValueError("Student not found")
+            # Try auto-link via parent user email
+            user_id = student.get("user_id")
+            if user_id:
+                user = await db.auth_users.find_one({"user_id": user_id}, {"_id": 0, "email": 1})
+                if user and user.get("email"):
+                    item = await crm_monday_adapter.find_item_by_email(user["email"])
+                    if item:
+                        item_id = str(item.get("id"))
+                        await self._save_link(student_id, item_id, user["email"])
+                        link = {"monday_item_id": item_id}
+                        logger.info(f"Admin auto-linked student {student_id} to CRM item {item_id}")
+
+        if not link:
             return {
                 "topics": [],
                 "monday_linked": False,
@@ -305,15 +318,11 @@ class CrmChatService:
         item_id = link["monday_item_id"]
         topics = await crm_monday_adapter.get_topics(item_id)
 
-        student = await db.store_students.find_one(
-            {"student_id": student_id}, {"_id": 0, "full_name": 1}
-        )
-
         return {
             "topics": topics,
             "monday_linked": True,
             "monday_item_id": item_id,
-            "student_name": student.get("full_name", "") if student else "",
+            "student_name": student.get("full_name", ""),
         }
 
     async def admin_reply_to_topic(self, student_id: str, update_id: str, admin_id: str, message: str) -> Dict:
