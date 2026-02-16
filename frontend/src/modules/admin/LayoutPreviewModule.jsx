@@ -1048,6 +1048,9 @@ export default function LayoutPreviewModule() {
           </div>
         )}
       </div>
+
+      {/* ═══ Progress Icons Gallery ═══ */}
+      <ProgressIconsGallery />
     </div>
   );
 }
