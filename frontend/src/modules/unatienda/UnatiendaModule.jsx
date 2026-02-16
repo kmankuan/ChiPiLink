@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Store, ClipboardList, Package, FileText, Calendar, Warehouse, Truck, Settings, Database } from 'lucide-react';
+import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Store, ClipboardList, Package, FileText, Calendar, Warehouse, Truck, Settings, Database, MessageCircle } from 'lucide-react';
 
 import PublicCatalogTab from './tabs/PublicCatalogTab';
 import PrivateCatalogTab from './tabs/PrivateCatalogTab';
@@ -14,6 +14,7 @@ import OrderFormConfigTab from './tabs/OrderFormConfigTab';
 import SchoolYearTab from './tabs/SchoolYearTab';
 import StockOrdersTab from './tabs/StockOrdersTab';
 import PreSaleImportTab from './tabs/PreSaleImportTab';
+import MessagesTab from './tabs/MessagesTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
