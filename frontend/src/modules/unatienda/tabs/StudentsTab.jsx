@@ -164,7 +164,7 @@ export default function StudentsTab({ token }) {
   }, [filteredStudents, sortConfig]);
 
   // Pagination
-  const pagination = usePagination(sortedStudents, 25);
+  const { page, pageSize, totalPages, paginated, setPage, setPageSize, canPrev, canNext, totalItems } = usePagination(sortedStudents, 25);
 
   const handleSort = useCallback((key) => {
     setSortConfig(prev => ({
