@@ -1,54 +1,42 @@
 /**
  * Students Management Tab (Admin)
- * View all linked students, lock/unlock profiles, manage enrollments
+ * Compact table with sorting, pagination, inline pre-sale toggle
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
-  Users,
-  Search,
-  Loader2,
-  RefreshCw,
-  Lock,
-  Unlock,
-  GraduationCap,
-  Eye,
-  Shield,
-  ShoppingCart
+  Users, Search, Loader2, RefreshCw, Lock, Unlock, GraduationCap,
+  Eye, ShoppingCart, ArrowUpDown, ArrowUp, ArrowDown, Plus
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { usePagination } from '@/hooks/usePagination';
+import { TablePagination } from '@/components/shared/TablePagination';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function StudentsTab({ token }) {
-  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionStudent, setActionStudent] = useState(null);
-  const [actionType, setActionType] = useState(null); // 'lock' | 'unlock'
+  const [actionType, setActionType] = useState(null);
   const [unlockReason, setUnlockReason] = useState('');
   const [processing, setProcessing] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: 'full_name', direction: 'asc' });
 
   useEffect(() => { fetchStudents(); }, []);
 
@@ -62,7 +50,6 @@ export default function StudentsTab({ token }) {
         const data = await res.json();
         setStudents(data.students || data || []);
       } else {
-        // Fallback to synced students
         const res2 = await fetch(`${API}/api/store/students/synced`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -86,70 +73,38 @@ export default function StudentsTab({ token }) {
     const endpoint = actionType === 'lock'
       ? `${API}/api/store/school-year/students/${studentId}/lock`
       : `${API}/api/store/school-year/students/${studentId}/unlock`;
-
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         ...(actionType === 'unlock' && unlockReason ? { body: JSON.stringify({ reason: unlockReason }) } : {})
       });
-
       if (res.ok) {
-        toast.success(actionType === 'lock' ? 'Student profile locked' : 'Student profile unlocked');
+        toast.success(actionType === 'lock' ? 'Profile locked' : 'Profile unlocked');
         fetchStudents();
       } else {
         const err = await res.json();
         toast.error(err.detail || 'Error updating student');
       }
-    } catch (error) {
-      toast.error('Error updating student');
-    } finally {
-      setProcessing(false);
-      setActionStudent(null);
-      setActionType(null);
-      setUnlockReason('');
-    }
+    } catch { toast.error('Error updating student'); }
+    finally { setProcessing(false); setActionStudent(null); setActionType(null); setUnlockReason(''); }
   };
 
-  const openAction = (student, type) => {
-    setActionStudent(student);
-    setActionType(type);
-    setUnlockReason('');
+  const handleTogglePresale = async (studentId, currentMode) => {
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/students/bulk-presale`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_ids: [studentId], presale_mode: !currentMode })
+      });
+      if (res.ok) {
+        setStudents(prev => prev.map(s =>
+          (s.student_id || s.sync_id) === studentId ? { ...s, presale_mode: !currentMode } : s
+        ));
+        toast.success(`Pre-sale ${!currentMode ? 'enabled' : 'disabled'}`);
+      } else { toast.error('Failed to toggle pre-sale'); }
+    } catch { toast.error('Error toggling pre-sale'); }
   };
-
-  const filteredStudents = students.filter(s => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      s.full_name?.toLowerCase().includes(term) ||
-      s.student_number?.toLowerCase().includes(term) ||
-      s.student_id?.toLowerCase().includes(term)
-    );
-  });
-
-  const lockedCount = students.filter(s => s.is_locked).length;
-  const presaleCount = students.filter(s => s.presale_mode).length;
-
-  const toggleSelect = useCallback((id) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }, []);
-
-  const toggleAll = useCallback(() => {
-    const visibleIds = filteredStudents.map(s => s.student_id || s.sync_id);
-    const allSelected = visibleIds.every(id => selectedIds.has(id));
-    if (allSelected) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(visibleIds));
-    }
-  }, [filteredStudents, selectedIds]);
 
   const handleBulkPresale = async (enable) => {
     if (selectedIds.size === 0) return;
@@ -165,262 +120,230 @@ export default function StudentsTab({ token }) {
         toast.success(`Pre-sale ${enable ? 'enabled' : 'disabled'} for ${data.modified} students`);
         setSelectedIds(new Set());
         fetchStudents();
-      } else {
-        toast.error('Failed to update pre-sale mode');
-      }
+      } else { toast.error('Failed to update pre-sale mode'); }
     } catch { toast.error('Error updating pre-sale mode'); }
     finally { setBulkProcessing(false); }
   };
 
-  const handleTogglePresale = async (studentId, currentMode) => {
-    try {
-      const res = await fetch(`${API}/api/store/textbook-access/admin/students/bulk-presale`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ student_ids: [studentId], presale_mode: !currentMode })
-      });
-      if (res.ok) {
-        setStudents(prev => prev.map(s =>
-          (s.student_id || s.sync_id) === studentId ? { ...s, presale_mode: !currentMode } : s
-        ));
-        toast.success(`Pre-sale ${!currentMode ? 'enabled' : 'disabled'}`);
-      } else {
-        toast.error('Failed to toggle pre-sale');
+  // Filtering
+  const filteredStudents = useMemo(() => {
+    if (!searchTerm) return students;
+    const term = searchTerm.toLowerCase();
+    return students.filter(s =>
+      s.full_name?.toLowerCase().includes(term) ||
+      s.student_number?.toLowerCase().includes(term) ||
+      s.student_id?.toLowerCase().includes(term)
+    );
+  }, [students, searchTerm]);
+
+  // Sorting
+  const sortedStudents = useMemo(() => {
+    const sorted = [...filteredStudents];
+    const { key, direction } = sortConfig;
+    sorted.sort((a, b) => {
+      let va, vb;
+      switch (key) {
+        case 'full_name': va = a.full_name || ''; vb = b.full_name || ''; break;
+        case 'grade': {
+          const ea = (a.enrollments || []).sort((x, y) => (y.year || 0) - (x.year || 0))[0];
+          const eb = (b.enrollments || []).sort((x, y) => (y.year || 0) - (x.year || 0))[0];
+          va = parseInt(ea?.grade) || 0; vb = parseInt(eb?.grade) || 0;
+          break;
+        }
+        case 'school': va = a.school_name || ''; vb = b.school_name || ''; break;
+        case 'locked': va = a.is_locked ? 1 : 0; vb = b.is_locked ? 1 : 0; break;
+        case 'presale': va = a.presale_mode ? 1 : 0; vb = b.presale_mode ? 1 : 0; break;
+        default: va = ''; vb = '';
       }
-    } catch { toast.error('Error toggling pre-sale'); }
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+      if (va < vb) return direction === 'asc' ? -1 : 1;
+      if (va > vb) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [filteredStudents, sortConfig]);
+
+  // Pagination
+  const pagination = usePagination(sortedStudents, 25);
+
+  const handleSort = useCallback((key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  }, []);
+
+  const toggleSelect = useCallback((id) => {
+    setSelectedIds(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    const visibleIds = pagination.currentItems.map(s => s.student_id || s.sync_id);
+    const allSelected = visibleIds.every(id => selectedIds.has(id));
+    setSelectedIds(allSelected ? new Set() : new Set(visibleIds));
+  }, [pagination.currentItems, selectedIds]);
+
+  const lockedCount = students.filter(s => s.is_locked).length;
+  const presaleCount = students.filter(s => s.presale_mode).length;
+  const gradeCount = [...new Set(students.flatMap(s => (s.enrollments || []).map(e => e.grade)).filter(Boolean))].length;
+
+  const SortHeader = ({ label, sortKey, className = '' }) => {
+    const isActive = sortConfig.key === sortKey;
+    return (
+      <button onClick={() => handleSort(sortKey)} className={`flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider hover:text-foreground transition-colors ${className}`}>
+        {label}
+        {isActive ? (sortConfig.direction === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-2.5 w-2.5 opacity-30" />}
+      </button>
+    );
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
   return (
-    <div className="space-y-6" data-testid="students-tab">
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="text-2xl font-bold">{students.length}</p>
-                <p className="text-xs text-muted-foreground">Total Students</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Lock className="h-5 w-5 text-amber-600" />
-              <div>
-                <p className="text-2xl font-bold">{lockedCount}</p>
-                <p className="text-xs text-muted-foreground">Locked Profiles</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <ShoppingCart className="h-5 w-5 text-orange-600" />
-              <div>
-                <p className="text-2xl font-bold">{presaleCount}</p>
-                <p className="text-xs text-muted-foreground">Pre-sale Active</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <GraduationCap className="h-5 w-5 text-green-600" />
-              <div>
-                <p className="text-2xl font-bold">
-                  {[...new Set(students.flatMap(s => (s.enrollments || []).map(e => e.grade)).filter(Boolean))].length}
-                </p>
-                <p className="text-xs text-muted-foreground">Active Grades</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-3" data-testid="students-tab">
+      {/* Compact inline stats */}
+      <div className="flex items-center gap-2 flex-wrap" data-testid="student-stats">
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-blue-50 dark:bg-blue-950/40 text-blue-600 text-xs font-medium">
+          <Users className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{students.length}</span> students
+        </span>
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-xs font-medium">
+          <Lock className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{lockedCount}</span> locked
+        </span>
+        <span className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${presaleCount > 0 ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/40 text-orange-600' : 'border-border/50 bg-muted/50 text-muted-foreground'}`}>
+          <ShoppingCart className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{presaleCount}</span> pre-sale
+        </span>
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 text-xs font-medium">
+          <GraduationCap className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{gradeCount}</span> grades
+        </span>
       </div>
 
-      {/* Search + Refresh + Bulk Actions */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <CardTitle className="text-base">Student Profiles</CardTitle>
-                <CardDescription>Manage student profiles, lock/unlock editing access</CardDescription>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {selectedIds.size > 0 && (
-                <>
-                  <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
-                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
-                    className="gap-1.5 text-xs border-orange-300 text-orange-700 hover:bg-orange-50" data-testid="bulk-presale-on">
-                    <ShoppingCart className="h-3.5 w-3.5" /> Enable Pre-sale
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
-                    className="gap-1.5 text-xs" data-testid="bulk-presale-off">
-                    Disable Pre-sale
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="text-xs">
-                    Clear
-                  </Button>
-                </>
-              )}
-              <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-2 shrink-0">
-                <RefreshCw className="h-4 w-4" />
-                <span className="hidden sm:inline">Refresh</span>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input placeholder="Search by name or student ID..." value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="student-search" />
+        </div>
+        <div className="flex items-center gap-1.5">
+          {selectedIds.size > 0 && (
+            <>
+              <span className="text-[11px] text-muted-foreground font-medium">{selectedIds.size} sel.</span>
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
+                className="gap-1 h-7 text-[11px] border-orange-300 text-orange-700 hover:bg-orange-50" data-testid="bulk-presale-on">
+                <ShoppingCart className="h-3 w-3" /> Pre-sale On
               </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name or student ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-              data-testid="student-search"
-            />
-          </div>
-        </CardContent>
-      </Card>
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
+                className="gap-1 h-7 text-[11px]" data-testid="bulk-presale-off">
+                Pre-sale Off
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px]">Clear</Button>
+            </>
+          )}
+          <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-1 h-7 text-xs">
+            <RefreshCw className="h-3 w-3" /> Refresh
+          </Button>
+        </div>
+      </div>
 
-      {/* Student List */}
-      {filteredStudents.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-            <p className="text-muted-foreground">No students found</p>
-          </CardContent>
-        </Card>
+      {/* Row count */}
+      <div className="text-[11px] text-muted-foreground">
+        Showing {pagination.currentItems.length} of {sortedStudents.length} students
+        {searchTerm && ` (filtered from ${students.length})`}
+      </div>
+
+      {/* Table */}
+      {sortedStudents.length === 0 ? (
+        <Card><CardContent className="py-10 text-center">
+          <Users className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+          <p className="text-sm text-muted-foreground">No students found</p>
+        </CardContent></Card>
       ) : (
-        <Card>
-          <CardContent className="p-0">
-            <ScrollArea className="max-h-[500px]">
+        <>
+          <div className="rounded-lg border overflow-hidden">
+            <ScrollArea className="max-h-[520px]">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40px]">
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="w-8 px-2">
                       <Checkbox
-                        checked={filteredStudents.length > 0 && filteredStudents.every(s => selectedIds.has(s.student_id || s.sync_id))}
-                        onCheckedChange={toggleAll}
-                        data-testid="select-all-students"
-                      />
+                        checked={pagination.currentItems.length > 0 && pagination.currentItems.every(s => selectedIds.has(s.student_id || s.sync_id))}
+                        onCheckedChange={toggleAll} data-testid="select-all-students" />
                     </TableHead>
-                    <TableHead>Student</TableHead>
-                    <TableHead className="hidden sm:table-cell">Grade</TableHead>
-                    <TableHead className="hidden md:table-cell">School</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-center">Pre-sale</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
+                    <TableHead className="px-2 w-16"><SortHeader label="Grade" sortKey="grade" /></TableHead>
+                    <TableHead className="px-2 hidden md:table-cell"><SortHeader label="School" sortKey="school" /></TableHead>
+                    <TableHead className="px-2 w-24"><SortHeader label="Status" sortKey="locked" /></TableHead>
+                    <TableHead className="px-2 w-20 text-center"><SortHeader label="Pre-sale" sortKey="presale" className="justify-center" /></TableHead>
+                    <TableHead className="px-2 w-16 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredStudents.map((student) => {
+                  {pagination.currentItems.map((student) => {
                     const id = student.student_id || student.sync_id;
-                    const latestEnrollment = (student.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
+                    const enrollment = (student.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
                     const isLocked = student.is_locked === true;
                     const isPresale = student.presale_mode === true;
                     const isSelected = selectedIds.has(id);
 
                     return (
-                      <TableRow key={id} className={isSelected ? 'bg-primary/5' : ''} data-testid={`student-row-${id}`}>
-                        <TableCell className="w-[40px]">
+                      <TableRow key={id} className={`h-10 ${isSelected ? 'bg-primary/5' : ''}`} data-testid={`student-row-${id}`}>
+                        <TableCell className="px-2 py-1">
                           <Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(id)} data-testid={`select-student-${id}`} />
                         </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-sm">{student.full_name}</p>
-                            <p className="text-xs text-muted-foreground">{student.student_number || id}</p>
-                          </div>
+                        <TableCell className="px-2 py-1">
+                          <span className="text-xs font-medium leading-tight block">{student.full_name}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight block">{student.student_number || id}</span>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge variant="secondary" className="text-xs">
-                            {latestEnrollment?.grade || '-'}
-                          </Badge>
+                        <TableCell className="px-2 py-1 text-center">
+                          <span className="text-xs font-medium">{enrollment?.grade || '-'}</span>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <span className="text-xs text-muted-foreground truncate max-w-[120px] block">
-                            {student.school_name || '-'}
-                          </span>
+                        <TableCell className="px-2 py-1 hidden md:table-cell">
+                          <span className="text-[11px] text-muted-foreground truncate max-w-[140px] block">{student.school_name || '-'}</span>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1.5">
+                        <TableCell className="px-2 py-1">
+                          <div className="flex items-center gap-1">
                             {isLocked ? (
-                              <Badge variant="destructive" className="gap-1 text-xs">
-                                <Lock className="h-3 w-3" /> Locked
-                              </Badge>
+                              <Badge variant="destructive" className="gap-0.5 text-[10px] px-1.5 py-0 h-5"><Lock className="h-2.5 w-2.5" /> Locked</Badge>
                             ) : (
-                              <Badge variant="outline" className="gap-1 text-xs">
-                                <Unlock className="h-3 w-3" /> Editable
-                              </Badge>
+                              <Badge variant="outline" className="gap-0.5 text-[10px] px-1.5 py-0 h-5"><Unlock className="h-2.5 w-2.5" /> Editable</Badge>
                             )}
-                            {latestEnrollment?.status === 'approved' && (
-                              <Badge className="bg-green-100 text-green-700 border-green-200 text-xs hidden sm:inline-flex">
-                                Approved
-                              </Badge>
+                            {enrollment?.status === 'approved' && (
+                              <Badge className="bg-green-100 text-green-700 border-green-200 text-[10px] px-1.5 py-0 h-5 hidden sm:inline-flex">Approved</Badge>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="px-2 py-1 text-center">
                           <button
                             onClick={() => handleTogglePresale(id, isPresale)}
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                            className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all cursor-pointer ${
                               isPresale
-                                ? 'bg-orange-100 text-orange-700 border border-orange-300 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700'
-                                : 'bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted hover:border-border'
+                                ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-300 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400'
+                                : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
                             }`}
                             data-testid={`presale-toggle-${id}`}
-                            title={isPresale ? 'Click to disable pre-sale' : 'Click to enable pre-sale'}
+                            title={isPresale ? 'Disable pre-sale' : 'Enable pre-sale'}
                           >
-                            <ShoppingCart className="h-3 w-3" />
+                            <ShoppingCart className="h-2.5 w-2.5" />
                             {isPresale ? 'On' : 'Off'}
                           </button>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedStudent(student)}
-                              className="h-7 px-2"
-                              data-testid={`view-student-${id}`}
-                            >
-                              <Eye className="h-3.5 w-3.5" />
+                        <TableCell className="px-2 py-1 text-right">
+                          <div className="flex items-center justify-end gap-0.5">
+                            <Button variant="ghost" size="sm" onClick={() => setSelectedStudent(student)}
+                              className="h-6 w-6 p-0" data-testid={`view-student-${id}`}>
+                              <Eye className="h-3 w-3" />
                             </Button>
                             {isLocked ? (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openAction(student, 'unlock')}
-                                className="h-7 px-2 text-amber-600 hover:text-amber-700"
-                                data-testid={`unlock-student-${id}`}
-                              >
-                                <Unlock className="h-3.5 w-3.5" />
+                              <Button variant="ghost" size="sm" onClick={() => { setActionStudent(student); setActionType('unlock'); setUnlockReason(''); }}
+                                className="h-6 w-6 p-0 text-amber-600 hover:text-amber-700" data-testid={`unlock-student-${id}`}>
+                                <Unlock className="h-3 w-3" />
                               </Button>
                             ) : (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => openAction(student, 'lock')}
-                                className="h-7 px-2 text-red-600 hover:text-red-700"
-                                data-testid={`lock-student-${id}`}
-                              >
-                                <Lock className="h-3.5 w-3.5" />
+                              <Button variant="ghost" size="sm" onClick={() => { setActionStudent(student); setActionType('lock'); }}
+                                className="h-6 w-6 p-0 text-red-600 hover:text-red-700" data-testid={`lock-student-${id}`}>
+                                <Lock className="h-3 w-3" />
                               </Button>
                             )}
                           </div>
@@ -431,89 +354,80 @@ export default function StudentsTab({ token }) {
                 </TableBody>
               </Table>
             </ScrollArea>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Pagination */}
+          <TablePagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={sortedStudents.length}
+            onPageChange={pagination.goToPage}
+            onPageSizeChange={pagination.setPageSize}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+          />
+        </>
       )}
 
-      {/* Lock/Unlock Confirmation Dialog */}
+      {/* Lock/Unlock Dialog */}
       <Dialog open={!!actionStudent} onOpenChange={() => { setActionStudent(null); setActionType(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>
-              {actionType === 'lock' ? 'Lock Student Profile' : 'Unlock Student Profile'}
-            </DialogTitle>
+            <DialogTitle>{actionType === 'lock' ? 'Lock Student Profile' : 'Unlock Student Profile'}</DialogTitle>
             <DialogDescription>
               {actionType === 'lock'
-                ? `Lock "${actionStudent?.full_name}"'s profile to prevent editing by the parent/user.`
-                : `Unlock "${actionStudent?.full_name}"'s profile to allow editing again.`
-              }
+                ? `Lock "${actionStudent?.full_name}"'s profile to prevent editing.`
+                : `Unlock "${actionStudent?.full_name}"'s profile to allow editing.`}
             </DialogDescription>
           </DialogHeader>
           {actionType === 'unlock' && (
             <div className="space-y-2">
-              <Label>Reason for unlocking (optional)</Label>
-              <Textarea
-                value={unlockReason}
-                onChange={(e) => setUnlockReason(e.target.value)}
-                placeholder="e.g., Parent needs to update student info"
-                rows={2}
-              />
+              <Label>Reason (optional)</Label>
+              <Textarea value={unlockReason} onChange={(e) => setUnlockReason(e.target.value)}
+                placeholder="e.g., Parent needs to update info" rows={2} />
             </div>
           )}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setActionStudent(null)}>Cancel</Button>
-            <Button
-              onClick={handleLockUnlock}
-              disabled={processing}
-              variant={actionType === 'lock' ? 'destructive' : 'default'}
-              className="gap-2"
-            >
+            <Button onClick={handleLockUnlock} disabled={processing}
+              variant={actionType === 'lock' ? 'destructive' : 'default'} className="gap-2">
               {processing ? <Loader2 className="h-4 w-4 animate-spin" /> :
-                actionType === 'lock' ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />
-              }
-              {actionType === 'lock' ? 'Lock Profile' : 'Unlock Profile'}
+                actionType === 'lock' ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+              {actionType === 'lock' ? 'Lock' : 'Unlock'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Student Detail Dialog */}
+      {/* Detail Dialog */}
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              {selectedStudent?.full_name}
+              <GraduationCap className="h-5 w-5" /> {selectedStudent?.full_name}
             </DialogTitle>
           </DialogHeader>
           {selectedStudent && (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">Student ID</p>
-                  <p className="font-mono text-xs">{selectedStudent.student_id || selectedStudent.sync_id}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Student Number</p>
-                  <p>{selectedStudent.student_number || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">School</p>
-                  <p>{selectedStudent.school_name || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Relation</p>
-                  <p className="capitalize">{selectedStudent.relation_type || '-'}</p>
-                </div>
+                <div><p className="text-xs text-muted-foreground">Student ID</p><p className="font-mono text-xs">{selectedStudent.student_id || selectedStudent.sync_id}</p></div>
+                <div><p className="text-xs text-muted-foreground">Student Number</p><p>{selectedStudent.student_number || '-'}</p></div>
+                <div><p className="text-xs text-muted-foreground">School</p><p>{selectedStudent.school_name || '-'}</p></div>
+                <div><p className="text-xs text-muted-foreground">Relation</p><p className="capitalize">{selectedStudent.relation_type || '-'}</p></div>
                 <div>
                   <p className="text-xs text-muted-foreground">Profile Status</p>
                   <Badge variant={selectedStudent.is_locked ? 'destructive' : 'outline'} className="text-xs">
                     {selectedStudent.is_locked ? 'Locked' : 'Editable'}
                   </Badge>
                 </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Pre-sale</p>
+                  <Badge className={`text-xs ${selectedStudent.presale_mode ? 'bg-orange-100 text-orange-700' : ''}`} variant={selectedStudent.presale_mode ? 'default' : 'outline'}>
+                    {selectedStudent.presale_mode ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
               </div>
-
-              {/* Enrollments */}
               <div>
                 <p className="text-xs text-muted-foreground mb-2">Enrollments</p>
                 <div className="space-y-2">
@@ -523,10 +437,8 @@ export default function StudentsTab({ token }) {
                         <Badge variant="secondary" className="text-xs">{e.year}</Badge>
                         <span className="text-sm">Grade {e.grade || '?'}</span>
                       </div>
-                      <Badge
-                        variant={e.status === 'approved' ? 'default' : 'outline'}
-                        className={`text-xs ${e.status === 'approved' ? 'bg-green-100 text-green-700' : e.status === 'pending' ? 'bg-amber-100 text-amber-700' : ''}`}
-                      >
+                      <Badge variant={e.status === 'approved' ? 'default' : 'outline'}
+                        className={`text-xs ${e.status === 'approved' ? 'bg-green-100 text-green-700' : e.status === 'pending' ? 'bg-amber-100 text-amber-700' : ''}`}>
                         {e.status || 'pending'}
                       </Badge>
                     </div>
