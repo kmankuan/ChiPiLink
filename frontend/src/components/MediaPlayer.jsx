@@ -260,6 +260,7 @@ export default function MediaPlayer() {
               ref={videoRef}
               key={first.url}
               src={first.url}
+              autoPlay
               muted
               playsInline
               preload="auto"
