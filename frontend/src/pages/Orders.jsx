@@ -34,6 +34,7 @@ export default function Orders() {
   const [activeTab, setActiveTab] = useState('textbooks');
   const [expandedOrders, setExpandedOrders] = useState({});
   const [chatOrder, setChatOrder] = useState(null);
+  const [crmChatStudent, setCrmChatStudent] = useState(null);
 
   const toggleOrderExpansion = (orderId) => {
     setExpandedOrders(prev => ({
