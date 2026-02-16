@@ -116,7 +116,7 @@ export default function UnatiendaModule() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-9 mb-6">
+        <TabsList className="grid w-full grid-cols-10 mb-6">
           <TabsTrigger value="public-catalog" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className="hidden md:inline">Public</span>
@@ -124,6 +124,10 @@ export default function UnatiendaModule() {
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <Warehouse className="h-4 w-4" />
             <span className="hidden md:inline">Inventory</span>
+          </TabsTrigger>
+          <TabsTrigger value="stock-orders" className="flex items-center gap-2" data-testid="stock-orders-tab-trigger">
+            <Truck className="h-4 w-4" />
+            <span className="hidden md:inline">Workflows</span>
           </TabsTrigger>
           <TabsTrigger value="access-requests" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
