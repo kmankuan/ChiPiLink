@@ -172,6 +172,24 @@ export default function StudentsTab({ token }) {
     finally { setBulkProcessing(false); }
   };
 
+  const handleTogglePresale = async (studentId, currentMode) => {
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/students/bulk-presale`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_ids: [studentId], presale_mode: !currentMode })
+      });
+      if (res.ok) {
+        setStudents(prev => prev.map(s =>
+          (s.student_id || s.sync_id) === studentId ? { ...s, presale_mode: !currentMode } : s
+        ));
+        toast.success(`Pre-sale ${!currentMode ? 'enabled' : 'disabled'}`);
+      } else {
+        toast.error('Failed to toggle pre-sale');
+      }
+    } catch { toast.error('Error toggling pre-sale'); }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
