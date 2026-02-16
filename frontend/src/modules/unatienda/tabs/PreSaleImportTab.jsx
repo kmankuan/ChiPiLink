@@ -470,8 +470,17 @@ export default function PreSaleImportTab({ token: propToken }) {
                             <Button variant="ghost" size="sm"
                               onClick={() => { setLinkDialog(order); setLinkSearchTerm(''); }}
                               className="h-6 w-6 p-0 text-orange-600 hover:text-orange-700"
-                              data-testid={`link-presale-${order.order_id}`}>
+                              title="Manual link" data-testid={`link-presale-${order.order_id}`}>
                               <Link2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                          {order.link_status === 'linked' && (
+                            <Button variant="ghost" size="sm"
+                              onClick={() => handleUnlink(order.order_id)}
+                              disabled={unlinking === order.order_id}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                              title="Unlink order" data-testid={`unlink-presale-${order.order_id}`}>
+                              {unlinking === order.order_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Unlink className="h-3 w-3" />}
                             </Button>
                           )}
                         </div>
