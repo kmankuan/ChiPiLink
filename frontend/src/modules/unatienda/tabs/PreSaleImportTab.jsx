@@ -376,7 +376,7 @@ export default function PreSaleImportTab({ token: propToken }) {
                   <li>Click <strong>"Preview Import"</strong> to see what will be imported</li>
                   <li>Click <strong>"Import"</strong> to bring the orders into the app</li>
                   <li>Orders will have status <strong>"Awaiting Link"</strong> until the parent registers and links their student</li>
-                  <li>When a student is linked, orders are <strong>auto-matched</strong> by name + grade</li>
+                  <li>When a student is linked, the system creates a <strong>link suggestion</strong> for admin to confirm or reject</li>
                 </ol>
               </div>
             </div>
