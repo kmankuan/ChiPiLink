@@ -336,12 +336,20 @@ export default function Orders() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setCrmChatStudent({ id: order.student_id, name: order.student_name })}
-                        className="gap-1.5 text-xs"
+                        onClick={() => {
+                          setCrmChatStudent({ id: order.student_id, name: order.student_name });
+                          markStudentRead(order.student_id);
+                        }}
+                        className="gap-1.5 text-xs relative"
                         data-testid={`crm-chat-btn-${order.order_id}`}
                       >
                         <Headphones className="h-3.5 w-3.5" />
                         {t('orders.support', 'Support')}
+                        {(crmPerStudent[order.student_id]?.count || 0) > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white px-1 animate-pulse">
+                            {crmPerStudent[order.student_id].count}
+                          </span>
+                        )}
                       </Button>
                       <Button
                         variant="outline"
