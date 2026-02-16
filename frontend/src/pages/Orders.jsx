@@ -329,8 +329,18 @@ export default function Orders() {
                       </p>
                     )}
                     
-                    {/* Chat button */}
-                    <div className="flex justify-end mt-3">
+                    {/* Chat buttons */}
+                    <div className="flex justify-end mt-3 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCrmChatStudent({ id: order.student_id, name: order.student_name })}
+                        className="gap-1.5 text-xs"
+                        data-testid={`crm-chat-btn-${order.order_id}`}
+                      >
+                        <Headphones className="h-3.5 w-3.5" />
+                        {t('orders.support', 'Support')}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
