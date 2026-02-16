@@ -592,8 +592,8 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {/* Autoplay toggle */}
-          {posts.length > 1 && (
+          {/* Autoplay toggle - hidden by default, admin-configurable */}
+          {show_autoplay_btn && posts.length > 1 && (
             <button
               onClick={toggleAutoplay}
               className="flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold transition-colors"
@@ -611,14 +611,33 @@ function HorizontalFeedContainer({ container, onOpenGallery }) {
               )}
             </button>
           )}
-          <button
-            onClick={() => navigate(cta_link)}
-            className="text-[10px] font-bold flex items-center gap-0.5 transition-all hover:gap-1.5"
-            style={{ color: accent_color }}
-            data-testid="telegram-see-all"
-          >
-            {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
-          </button>
+          {/* Admin-configurable link buttons */}
+          {header_links.length > 0 && header_links.map((link, idx) => {
+            const isExternal = link.url?.startsWith('http');
+            return (
+              <button
+                key={idx}
+                onClick={() => isExternal ? window.open(link.url, '_blank') : navigate(link.url)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold transition-all hover:opacity-80"
+                style={{ background: `${accent_color}10`, color: accent_color }}
+                data-testid={`header-link-${idx}`}
+              >
+                {isExternal ? <ExternalLink className="h-2.5 w-2.5" /> : <Link2 className="h-2.5 w-2.5" />}
+                {link.label}
+              </button>
+            );
+          })}
+          {/* See all - hidden by default, admin-configurable */}
+          {show_see_all_btn && (
+            <button
+              onClick={() => navigate(cta_link)}
+              className="text-[10px] font-bold flex items-center gap-0.5 transition-all hover:gap-1.5"
+              style={{ color: accent_color }}
+              data-testid="telegram-see-all"
+            >
+              {t('telegramFeed.seeAll', 'See all')} <ChevronRight className="h-3 w-3" />
+            </button>
+          )}
         </div>
       </div>
 
