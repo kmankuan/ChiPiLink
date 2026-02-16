@@ -856,6 +856,11 @@ export default function StockOrdersTab({ token }) {
                         {catBadge.label}
                       </Badge>
                     )}
+                    {order.source === 'monday_sync' && (
+                      <Badge variant="outline" className="text-[9px] bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300 border-sky-200 gap-0.5" data-testid={`monday-badge-${order.order_id}`}>
+                        <Zap className="h-2.5 w-2.5" /> Monday.com
+                      </Badge>
+                    )}
                     {order.supplier && <span className="text-[10px] text-muted-foreground truncate">{order.supplier}</span>}
                     {order.customer_name && <span className="text-[10px] text-muted-foreground truncate">{order.customer_name}</span>}
                     {order.linked_order_id && <span className="text-[10px] text-muted-foreground">linked: {order.linked_order_id}</span>}
