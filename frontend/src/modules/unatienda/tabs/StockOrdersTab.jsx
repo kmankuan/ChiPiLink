@@ -1,6 +1,6 @@
 /**
- * StockOrdersTab — Workflow-based stock management
- * With catalog type separation: Public Store vs PCA Textbooks
+ * StockOrdersTab — Stock Movements management
+ * With catalog type separation: Public Store vs School Textbooks
  * 3 workflows: Shipment (restock), Return (linked to orders), Adjustment (corrections)
  */
 import { useState, useEffect, useCallback } from 'react';
@@ -25,12 +25,12 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const CATALOG_TABS = [
   { key: 'all', label: 'All', icon: Layers, color: 'bg-slate-600' },
-  { key: 'pca', label: 'PCA Textbooks', icon: BookOpen, color: 'bg-purple-600' },
+  { key: 'pca', label: 'School Textbooks', icon: BookOpen, color: 'bg-purple-600' },
   { key: 'public', label: 'Public Store', icon: Store, color: 'bg-emerald-600' },
 ];
 
 const CATALOG_BADGE = {
-  pca: { label: 'PCA', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
+  pca: { label: 'Textbooks', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
   public: { label: 'Public', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200' },
 };
 
@@ -118,7 +118,7 @@ function CatalogTypeSelector({ value, onChange }) {
           }`}
         >
           <BookOpen className="h-4 w-4" />
-          PCA Textbooks
+          School Textbooks
         </button>
       </div>
     </div>
@@ -164,7 +164,7 @@ function ProductPicker({ items, setItems, token, catalogType }) {
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
         <Input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder={catalogType === 'pca' ? 'Search PCA textbooks...' : catalogType === 'public' ? 'Search public products...' : 'Search products...'}
+          placeholder={catalogType === 'pca' ? 'Search school textbooks...' : catalogType === 'public' ? 'Search public products...' : 'Search products...'}
           className="pl-8 h-9 text-xs" data-testid="product-search-input" />
         {searching && <Loader2 className="absolute right-2.5 top-2.5 h-3.5 w-3.5 animate-spin" />}
       </div>
@@ -314,12 +314,12 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><RotateCcw className="h-5 w-5 text-amber-600" /> New Return</DialogTitle>
-          <DialogDescription>Register a customer return linked to an existing textbook order. Returns are automatically categorized as PCA Textbooks.</DialogDescription>
+          <DialogDescription>Register a customer return linked to an existing textbook order. Returns are automatically categorized as School Textbooks.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800">
             <BookOpen className="h-4 w-4 text-purple-600" />
-            <span className="text-xs font-medium text-purple-700 dark:text-purple-300">PCA Textbooks Inventory</span>
+            <span className="text-xs font-medium text-purple-700 dark:text-purple-300">School Textbooks Inventory</span>
           </div>
           <div>
             <Label className="text-xs">Link to Order *</Label>
@@ -676,8 +676,8 @@ export default function StockOrdersTab({ token }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold">Stock Workflows</h2>
-          <p className="text-xs text-muted-foreground">Manage shipments, returns, and adjustments with tracked processes</p>
+          <h2 className="text-lg font-bold">Stock Movements</h2>
+          <p className="text-xs text-muted-foreground">Manage shipments, returns, and stock adjustments</p>
         </div>
         <div className="flex gap-2">
           <Button size="sm" onClick={() => setShowShipment(true)} className="gap-1 text-xs" data-testid="new-shipment-btn">
@@ -755,8 +755,8 @@ export default function StockOrdersTab({ token }) {
       {orders.length === 0 ? (
         <div className="text-center py-12 text-sm text-muted-foreground" data-testid="empty-orders">
           {catalogFilter !== 'all'
-            ? `No ${catalogFilter === 'pca' ? 'PCA Textbooks' : 'Public Store'} workflow orders yet.`
-            : 'No stock orders yet. Create a shipment, return, or adjustment to get started.'}
+            ? `No ${catalogFilter === 'pca' ? 'School Textbooks' : 'Public Store'} stock movements yet.`
+            : 'No stock movements yet. Create a shipment, return, or adjustment to get started.'}
         </div>
       ) : (
         <div className="space-y-2">
