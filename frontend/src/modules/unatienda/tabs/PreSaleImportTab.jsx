@@ -80,6 +80,72 @@ export default function PreSaleImportTab({ token: propToken }) {
     } catch { /* silent */ }
   };
 
+  const fetchSuggestions = async () => {
+    try {
+      const res = await fetch(`${API}/api/store/presale-import/suggestions?status=pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestions(data.suggestions || []);
+      }
+    } catch { /* silent */ }
+  };
+
+  const handleConfirmSuggestion = async (suggestionId) => {
+    setConfirmingId(suggestionId);
+    try {
+      const res = await fetch(`${API}/api/store/presale-import/suggestions/${suggestionId}/confirm`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('Link confirmed');
+        fetchOrders();
+        fetchSuggestions();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Failed to confirm');
+      }
+    } catch { toast.error('Error confirming'); }
+    finally { setConfirmingId(null); }
+  };
+
+  const handleRejectSuggestion = async (suggestionId) => {
+    setConfirmingId(suggestionId);
+    try {
+      const res = await fetch(`${API}/api/store/presale-import/suggestions/${suggestionId}/reject`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('Suggestion rejected');
+        fetchSuggestions();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Failed to reject');
+      }
+    } catch { toast.error('Error rejecting'); }
+    finally { setConfirmingId(null); }
+  };
+
+  const handleUnlink = async (orderId) => {
+    setUnlinking(orderId);
+    try {
+      const res = await fetch(`${API}/api/store/presale-import/unlink`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId })
+      });
+      if (res.ok) {
+        toast.success('Order unlinked');
+        fetchOrders();
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || 'Failed to unlink');
+      }
+    } catch { toast.error('Error unlinking'); }
+    finally { setUnlinking(null); }
+  };
+
   const handlePreview = async () => {
     setPreviewing(true);
     try {
