@@ -580,11 +580,13 @@ class TxbInventoryAdapter(BaseMondayAdapter):
 
     async def handle_stock_webhook(self, event: dict) -> Dict:
         """Process Monday.com webhook for column value changes on the TXB board.
-        Updates local inventory when stock is changed on Monday.com."""
+        Creates a Stock Adjustment order instead of directly updating inventory.
+        The adjustment must be approved (via app or Monday.com) before stock changes."""
         config = await self.get_txb_inventory_config()
         board_id = config.get("board_id")
         col_map = config.get("column_mapping", {})
         stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+        approval_col = config.get("stock_approval_column_id")
 
         if not board_id or not stock_col:
             return {"processed": False, "reason": "Not configured"}
@@ -594,6 +596,10 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         column_id = event.get("columnId", "")
         column_value = event.get("value", {})
 
+        # If this is the approval column change, handle separately
+        if approval_col and column_id == approval_col:
+            return await self.handle_stock_approval_webhook(event)
+
         # Only process changes to the stock column
         if column_id != stock_col:
             return {"processed": False, "reason": f"Column {column_id} is not stock column"}
@@ -601,7 +607,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         # Parse new stock value
         new_stock = 0
         if isinstance(column_value, dict):
-            # Number column value format
             raw = column_value.get("value") or column_value.get("text", "0")
             try:
                 new_stock = int(float(str(raw)))
@@ -622,7 +627,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         )
 
         if not product:
-            # Fallback: search by looking up the item code from Monday.com
             code_col = col_map.get("code")
             if code_col:
                 try:
@@ -637,7 +641,6 @@ class TxbInventoryAdapter(BaseMondayAdapter):
                             {"_id": 0, "book_id": 1, "name": 1, "inventory_quantity": 1}
                         )
                         if product:
-                            # Link for future lookups
                             await db.store_products.update_one(
                                 {"book_id": product["book_id"]},
                                 {"$set": {"monday_item_id": pulse_id}}
@@ -654,42 +657,176 @@ class TxbInventoryAdapter(BaseMondayAdapter):
         if old_stock == new_stock:
             return {"processed": True, "no_change": True, "book_id": book_id}
 
-        # Update stock in the app
-        await db.store_products.update_one(
-            {"book_id": book_id},
-            {"$set": {
-                "inventory_quantity": new_stock,
-                "updated_at": datetime.now(timezone.utc).isoformat(),
-            }}
-        )
-
-        # Log the movement
+        # Create a Stock Adjustment order instead of directly updating inventory
         import uuid
-        movement = {
-            "movement_id": str(uuid.uuid4())[:12],
-            "book_id": book_id,
-            "product_name": product.get("name", "Unknown"),
-            "type": "addition" if new_stock > old_stock else "removal",
-            "quantity_change": new_stock - old_stock,
-            "old_quantity": old_stock,
-            "new_quantity": new_stock,
-            "reason": "monday_webhook",
-            "notes": f"Stock updated via Monday.com (item {pulse_id})",
-            "admin_id": "monday_webhook",
-            "admin_name": "Monday.com",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
-        await db.inventory_movements.insert_one(movement)
+        qty_change = new_stock - old_stock
+        order_id = f"so_{uuid.uuid4().hex[:10]}"
+        now = datetime.now(timezone.utc).isoformat()
 
-        logger.info(f"Stock webhook: {book_id} '{product.get('name')}' {old_stock} → {new_stock}")
+        adjustment_order = {
+            "order_id": order_id,
+            "type": "adjustment",
+            "status": "requested",
+            "catalog_type": "pca",
+            "adjustment_reason": "Monday.com stock change",
+            "source": "monday_sync",
+            "monday_item_id": pulse_id,
+            "monday_old_stock": old_stock,
+            "monday_new_stock": new_stock,
+            "items": [{
+                "book_id": book_id,
+                "product_name": product.get("name", "Unknown"),
+                "expected_qty": qty_change,
+                "received_qty": None,
+                "condition": None,
+            }],
+            "notes": f"Auto-generated from Monday.com. Stock: {old_stock} → {new_stock} (diff: {'+' if qty_change > 0 else ''}{qty_change})",
+            "created_by": "monday_webhook",
+            "created_by_name": "Monday.com",
+            "created_at": now,
+            "updated_at": now,
+            "status_history": [{"status": "requested", "timestamp": now, "by": "Monday.com"}],
+        }
+
+        await db.stock_orders.insert_one(adjustment_order)
+        adjustment_order.pop("_id", None)
+
+        # Set Monday.com "Stock Approval" column to "Pending"
+        if approval_col:
+            try:
+                await self.client.update_column_values(
+                    board_id, pulse_id,
+                    {approval_col: {"label": "Pending"}},
+                    create_labels_if_missing=True
+                )
+            except Exception as e:
+                logger.warning(f"Failed to set Stock Approval to Pending: {e}")
+
+        logger.info(f"Stock webhook: Created adjustment {order_id} for {book_id} '{product.get('name')}' ({old_stock} → {new_stock})")
 
         return {
             "processed": True,
+            "action": "adjustment_created",
+            "order_id": order_id,
             "book_id": book_id,
             "product_name": product.get("name"),
             "old_stock": old_stock,
-            "new_stock": new_stock,
+            "requested_new_stock": new_stock,
         }
+
+    # ──────────── Webhook: Monday.com → App (Stock Approval changes) ────────────
+
+    async def handle_stock_approval_webhook(self, event: dict) -> Dict:
+        """Process when 'Stock Approval' column changes on Monday.com.
+        Approved → apply the adjustment and update inventory.
+        Rejected → cancel the adjustment and revert Monday.com stock."""
+        pulse_id = str(event.get("pulseId", ""))
+        column_value = event.get("value", {})
+
+        # Parse status label
+        label = ""
+        if isinstance(column_value, dict):
+            label_data = column_value.get("label", {})
+            if isinstance(label_data, dict):
+                label = label_data.get("text", "")
+            elif isinstance(label_data, str):
+                label = label_data
+            if not label:
+                index = column_value.get("index")
+                index_map = {0: "Pending", 1: "Approved", 2: "Rejected"}
+                label = index_map.get(index, "")
+        elif isinstance(column_value, str):
+            label = column_value
+
+        label_lower = label.lower().strip()
+
+        if label_lower not in ("approved", "rejected"):
+            return {"processed": False, "reason": f"Status '{label}' not actionable"}
+
+        # Find the pending adjustment for this Monday.com item
+        adjustment = await db.stock_orders.find_one(
+            {
+                "source": "monday_sync",
+                "monday_item_id": pulse_id,
+                "type": "adjustment",
+                "status": "requested",
+            },
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+
+        if not adjustment:
+            return {"processed": False, "reason": f"No pending adjustment for Monday item {pulse_id}"}
+
+        order_id = adjustment["order_id"]
+        now = datetime.now(timezone.utc).isoformat()
+
+        if label_lower == "approved":
+            # Apply the stock adjustment
+            for item in adjustment.get("items", []):
+                book_id = item["book_id"]
+                qty_change = item.get("expected_qty", 0)
+
+                product = await db.store_products.find_one({"book_id": book_id}, {"_id": 0, "inventory_quantity": 1})
+                if product:
+                    old_qty = product.get("inventory_quantity", 0)
+                    new_qty = old_qty + qty_change
+                    await db.store_products.update_one(
+                        {"book_id": book_id},
+                        {"$set": {"inventory_quantity": new_qty, "updated_at": now}}
+                    )
+
+                    import uuid
+                    movement = {
+                        "movement_id": str(uuid.uuid4())[:12],
+                        "book_id": book_id,
+                        "product_name": item.get("product_name", "Unknown"),
+                        "type": "addition" if qty_change > 0 else "removal",
+                        "quantity_change": qty_change,
+                        "old_quantity": old_qty,
+                        "new_quantity": new_qty,
+                        "reason": "monday_stock_approval",
+                        "notes": f"Approved via Monday.com (order {order_id})",
+                        "admin_id": "monday_webhook",
+                        "admin_name": "Monday.com",
+                        "timestamp": now,
+                    }
+                    await db.inventory_movements.insert_one(movement)
+
+            await db.stock_orders.update_one(
+                {"order_id": order_id},
+                {"$set": {"status": "applied", "updated_at": now},
+                 "$push": {"status_history": {"status": "applied", "timestamp": now, "by": "Monday.com (Approved)"}}}
+            )
+            logger.info(f"Stock Approval: Applied adjustment {order_id} via Monday.com")
+            return {"processed": True, "action": "applied", "order_id": order_id}
+
+        elif label_lower == "rejected":
+            await db.stock_orders.update_one(
+                {"order_id": order_id},
+                {"$set": {"status": "cancelled", "updated_at": now},
+                 "$push": {"status_history": {"status": "cancelled", "timestamp": now, "by": "Monday.com (Rejected)"}}}
+            )
+
+            # Revert Monday.com stock column to original value
+            config = await self.get_txb_inventory_config()
+            board_id = config.get("board_id")
+            col_map = config.get("column_mapping", {})
+            stock_col = col_map.get("stock_quantity") or col_map.get("stock")
+
+            if board_id and stock_col:
+                old_stock = adjustment.get("monday_old_stock")
+                if old_stock is not None:
+                    try:
+                        await self.client.update_column_values(
+                            board_id, pulse_id, {stock_col: str(old_stock)}
+                        )
+                        logger.info(f"Reverted Monday.com stock to {old_stock} for item {pulse_id}")
+                    except Exception as e:
+                        logger.warning(f"Failed to revert Monday.com stock: {e}")
+
+            logger.info(f"Stock Approval: Rejected adjustment {order_id} via Monday.com")
+            return {"processed": True, "action": "rejected", "order_id": order_id}
 
     # ──────────── Webhook: Monday.com → App (new item created) ────────────
 
