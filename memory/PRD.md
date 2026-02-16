@@ -44,6 +44,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
   - Students admin tab (chat icon per student)
   - Messages admin tab (centralized inbox)
   - Client Orders page (Support button)
+- **Push Notifications** via Monday.com webhooks
+  - Webhook endpoint receives update events from CRM board
+  - Creates in-app notifications for linked client users
+  - Unread badge counts on Support buttons and admin inbox
+  - One-click webhook registration from admin config panel
+  - Mark-as-read functionality for both clients and admin
 
 ## Key Data Models
 - `crm_student_links` - Maps student_id to monday_item_id for CRM linking
