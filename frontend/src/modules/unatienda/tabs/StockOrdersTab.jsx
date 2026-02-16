@@ -733,6 +733,72 @@ export default function StockOrdersTab({ token }) {
         })}
       </div>
 
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="summary-cards">
+        <Card>
+          <CardContent className="py-3 px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <Package className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold leading-tight">{total}</p>
+                <p className="text-[10px] text-muted-foreground">Total Orders</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="py-3 px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                <Clock className="h-4 w-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold leading-tight">{pendingCount}</p>
+                <p className="text-[10px] text-muted-foreground">Pending</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="py-3 px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              </div>
+              <div>
+                <p className="text-lg font-bold leading-tight">{completedCount}</p>
+                <p className="text-[10px] text-muted-foreground">Completed</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="py-3 px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-slate-800">
+                <Truck className="h-4 w-4 text-blue-500" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="text-center">
+                  <p className="text-sm font-bold leading-tight">{shipmentCount}</p>
+                  <p className="text-[9px] text-muted-foreground">Ship</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-bold leading-tight">{returnCount}</p>
+                  <p className="text-[9px] text-muted-foreground">Ret</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-bold leading-tight">{adjustmentCount}</p>
+                  <p className="text-[9px] text-muted-foreground">Adj</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Pending Actions Banner */}
       {pendingCount > 0 && (
         <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800">
