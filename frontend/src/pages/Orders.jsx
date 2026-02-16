@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag, ChevronDown, ChevronUp, MessageCircle, Headphones } from 'lucide-react';
 import OrderChat from '@/components/chat/OrderChat';
+import CrmChat from '@/components/chat/CrmChat';
 import { useNotifications } from '@/hooks/useNotifications';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
