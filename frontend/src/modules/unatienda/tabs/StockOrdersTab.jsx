@@ -1,5 +1,6 @@
 /**
  * StockOrdersTab — Workflow-based stock management
+ * With catalog type separation: Public Store vs PCA Textbooks
  * 3 workflows: Shipment (restock), Return (linked to orders), Adjustment (corrections)
  */
 import { useState, useEffect, useCallback } from 'react';
@@ -15,11 +16,23 @@ import {
 import { toast } from 'sonner';
 import {
   Truck, RotateCcw, Wrench, Plus, ChevronRight, Clock,
-  CheckCircle, XCircle, Package, Search, Loader2, ArrowRight, AlertTriangle
+  CheckCircle, XCircle, Package, Search, Loader2, ArrowRight,
+  AlertTriangle, Store, BookOpen, Layers
 } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const CATALOG_TABS = [
+  { key: 'all', label: 'All', icon: Layers, color: 'bg-slate-600' },
+  { key: 'pca', label: 'PCA Textbooks', icon: BookOpen, color: 'bg-purple-600' },
+  { key: 'public', label: 'Public Store', icon: Store, color: 'bg-emerald-600' },
+];
+
+const CATALOG_BADGE = {
+  pca: { label: 'PCA', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200' },
+  public: { label: 'Public', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200' },
+};
 
 const TYPE_META = {
   shipment:   { label: 'Shipment',   icon: Truck,      color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30', statuses: ['draft','confirmed','received'] },
@@ -75,8 +88,45 @@ function StepIndicator({ statuses, current }) {
   );
 }
 
+/* ============ Catalog Type Selector ============ */
+function CatalogTypeSelector({ value, onChange }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium">Inventory Type *</Label>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => onChange('public')}
+          data-testid="catalog-select-public"
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all ${
+            value === 'public'
+              ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300'
+              : 'border-muted hover:border-muted-foreground/30 text-muted-foreground'
+          }`}
+        >
+          <Store className="h-4 w-4" />
+          Public Store
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange('pca')}
+          data-testid="catalog-select-pca"
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all ${
+            value === 'pca'
+              ? 'border-purple-500 bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300'
+              : 'border-muted hover:border-muted-foreground/30 text-muted-foreground'
+          }`}
+        >
+          <BookOpen className="h-4 w-4" />
+          PCA Textbooks
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ============ Product Picker ============ */
-function ProductPicker({ items, setItems, token }) {
+function ProductPicker({ items, setItems, token, catalogType }) {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -85,14 +135,16 @@ function ProductPicker({ items, setItems, token }) {
     if (!q || q.length < 2) { setResults([]); return; }
     setSearching(true);
     try {
+      const params = { search: q, limit: 10 };
+      if (catalogType) params.catalog_type = catalogType;
       const { data } = await axios.get(`${API_URL}/api/store/inventory/products`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { search: q, limit: 10 },
+        params,
       });
       setResults(data.products || []);
     } catch { setResults([]); }
     finally { setSearching(false); }
-  }, [token]);
+  }, [token, catalogType]);
 
   useEffect(() => {
     const t = setTimeout(() => doSearch(search), 300);
@@ -111,7 +163,9 @@ function ProductPicker({ items, setItems, token }) {
       <Label className="text-xs">Add Products</Label>
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-        <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="pl-8 h-9 text-xs" data-testid="product-search-input" />
+        <Input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder={catalogType === 'pca' ? 'Search PCA textbooks...' : catalogType === 'public' ? 'Search public products...' : 'Search products...'}
+          className="pl-8 h-9 text-xs" data-testid="product-search-input" />
         {searching && <Loader2 className="absolute right-2.5 top-2.5 h-3.5 w-3.5 animate-spin" />}
       </div>
       {results.length > 0 && (
@@ -149,12 +203,15 @@ function ProductPicker({ items, setItems, token }) {
 }
 
 /* ============ Create Shipment Dialog ============ */
-function CreateShipmentDialog({ open, onClose, onCreated, token }) {
+function CreateShipmentDialog({ open, onClose, onCreated, token, defaultCatalog }) {
+  const [catalogType, setCatalogType] = useState(defaultCatalog || 'public');
   const [supplier, setSupplier] = useState('');
   const [expectedDate, setExpectedDate] = useState('');
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => { if (open) setCatalogType(defaultCatalog || 'public'); }, [open, defaultCatalog]);
 
   const handleCreate = async () => {
     if (!supplier) { toast.error('Supplier is required'); return; }
@@ -162,7 +219,7 @@ function CreateShipmentDialog({ open, onClose, onCreated, token }) {
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/shipment`, {
-        supplier, expected_date: expectedDate || null, items, notes: notes || null,
+        supplier, expected_date: expectedDate || null, items, notes: notes || null, catalog_type: catalogType,
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Shipment created');
       onCreated();
@@ -179,11 +236,12 @@ function CreateShipmentDialog({ open, onClose, onCreated, token }) {
           <DialogDescription>Register an incoming shipment. Stock updates when you mark it as received.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <CatalogTypeSelector value={catalogType} onChange={(v) => { setCatalogType(v); setItems([]); }} />
           <div className="grid grid-cols-2 gap-3">
             <div><Label className="text-xs">Supplier *</Label><Input value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="Supplier name" className="h-9 text-xs" data-testid="shipment-supplier" /></div>
             <div><Label className="text-xs">Expected Date</Label><Input type="date" value={expectedDate} onChange={e => setExpectedDate(e.target.value)} className="h-9 text-xs" data-testid="shipment-date" /></div>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} />
+          <ProductPicker items={items} setItems={setItems} token={token} catalogType={catalogType} />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Additional details..." rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
@@ -229,7 +287,6 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
     setLinkedOrder(order);
     setOrderSearch('');
     setOrderResults([]);
-    // Pre-populate items from the order
     const orderItems = (order.items || []).filter(i => i.status === 'delivered' || i.quantity_ordered > 0).map(i => ({
       book_id: i.book_id, product_name: i.book_name || i.book_code, expected_qty: i.quantity_ordered || 1, received_qty: null, condition: 'good',
     }));
@@ -243,7 +300,7 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/return`, {
         linked_order_id: linkedOrder.order_id, customer_name: linkedOrder.student_name || '',
-        return_reason: reason, items, notes: notes || null,
+        return_reason: reason, items, notes: notes || null, catalog_type: 'pca',
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Return registered');
       onCreated();
@@ -257,9 +314,13 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><RotateCcw className="h-5 w-5 text-amber-600" /> New Return</DialogTitle>
-          <DialogDescription>Register a customer return linked to an existing order.</DialogDescription>
+          <DialogDescription>Register a customer return linked to an existing textbook order. Returns are automatically categorized as PCA Textbooks.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800">
+            <BookOpen className="h-4 w-4 text-purple-600" />
+            <span className="text-xs font-medium text-purple-700 dark:text-purple-300">PCA Textbooks Inventory</span>
+          </div>
           <div>
             <Label className="text-xs">Link to Order *</Label>
             {linkedOrder ? (
@@ -326,18 +387,21 @@ function CreateReturnDialog({ open, onClose, onCreated, token }) {
 }
 
 /* ============ Create Adjustment Dialog ============ */
-function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
+function CreateAdjustmentDialog({ open, onClose, onCreated, token, defaultCatalog }) {
+  const [catalogType, setCatalogType] = useState(defaultCatalog || 'public');
   const [reason, setReason] = useState(ADJUSTMENT_REASONS[0]);
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => { if (open) setCatalogType(defaultCatalog || 'public'); }, [open, defaultCatalog]);
 
   const handleCreate = async () => {
     if (!items.length) { toast.error('Add at least one product'); return; }
     setSaving(true);
     try {
       await axios.post(`${API_URL}/api/store/stock-orders/adjustment`, {
-        adjustment_reason: reason, items, notes: notes || null,
+        adjustment_reason: reason, items, notes: notes || null, catalog_type: catalogType,
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Adjustment created');
       onCreated();
@@ -354,13 +418,14 @@ function CreateAdjustmentDialog({ open, onClose, onCreated, token }) {
           <DialogDescription>Correct stock levels. Use negative quantities to remove stock.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          <CatalogTypeSelector value={catalogType} onChange={(v) => { setCatalogType(v); setItems([]); }} />
           <div>
             <Label className="text-xs">Reason</Label>
             <select value={reason} onChange={e => setReason(e.target.value)} className="w-full h-9 px-3 text-xs border rounded-md bg-background mt-1" data-testid="adjustment-reason">
               {ADJUSTMENT_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
             </select>
           </div>
-          <ProductPicker items={items} setItems={setItems} token={token} />
+          <ProductPicker items={items} setItems={setItems} token={token} catalogType={catalogType} />
           <div><Label className="text-xs">Notes</Label><Textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} className="text-xs" /></div>
         </div>
         <DialogFooter>
@@ -385,7 +450,6 @@ function TransitionDialog({ order, open, onClose, onDone, token }) {
     if (!order) return;
     const next = NEXT_STATUS[order.type]?.[order.status];
     setTargetStatus(Array.isArray(next) ? next[0] : next);
-    // Pre-populate items for receive/inspect steps
     if ((order.type === 'shipment' && order.status === 'confirmed') ||
         (order.type === 'return' && order.status === 'registered')) {
       setItemsUpdate(order.items.map(i => ({
@@ -500,12 +564,14 @@ function TransitionDialog({ order, open, onClose, onDone, token }) {
 function OrderDetailDialog({ order, open, onClose }) {
   if (!order) return null;
   const meta = TYPE_META[order.type];
+  const catBadge = CATALOG_BADGE[order.catalog_type];
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <meta.icon className="h-5 w-5" /> {order.order_id}
+            {catBadge && <Badge variant="outline" className={`text-[9px] ml-1 ${catBadge.className}`}>{catBadge.label}</Badge>}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
@@ -513,6 +579,7 @@ function OrderDetailDialog({ order, open, onClose }) {
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div><span className="text-muted-foreground">Type:</span> <strong>{meta.label}</strong></div>
             <div><span className="text-muted-foreground">Status:</span> <Badge className={`text-[9px] ${STATUS_COLORS[order.status]}`}>{order.status}</Badge></div>
+            <div><span className="text-muted-foreground">Inventory:</span> <Badge variant="outline" className={`text-[9px] ${catBadge?.className || ''}`}>{catBadge?.label || 'Unknown'}</Badge></div>
             {order.supplier && <div><span className="text-muted-foreground">Supplier:</span> {order.supplier}</div>}
             {order.linked_order_id && <div><span className="text-muted-foreground">Order:</span> <code>{order.linked_order_id}</code></div>}
             {order.customer_name && <div><span className="text-muted-foreground">Customer:</span> {order.customer_name}</div>}
@@ -563,7 +630,9 @@ export default function StockOrdersTab({ token }) {
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [counts, setCounts] = useState({});
+  const [catalogCounts, setCatalogCounts] = useState({});
   const [loading, setLoading] = useState(true);
+  const [catalogFilter, setCatalogFilter] = useState('all'); // all | public | pca
   const [filter, setFilter] = useState('all'); // all | shipment | return | adjustment
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -580,21 +649,25 @@ export default function StockOrdersTab({ token }) {
       if (filter !== 'all') params.order_type = filter;
       if (statusFilter) params.status = statusFilter;
       if (search) params.search = search;
+      if (catalogFilter !== 'all') params.catalog_type = catalogFilter;
       const { data } = await axios.get(`${API_URL}/api/store/stock-orders`, {
         headers: { Authorization: `Bearer ${token}` }, params,
       });
       setOrders(data.orders);
       setTotal(data.total);
       setCounts(data.counts);
+      setCatalogCounts(data.catalog_counts || {});
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  }, [token, filter, statusFilter, search]);
+  }, [token, filter, statusFilter, search, catalogFilter]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   const pendingCount = orders.filter(o =>
     !['received', 'approved', 'rejected', 'applied'].includes(o.status)
   ).length;
+
+  const defaultCatalog = catalogFilter !== 'all' ? catalogFilter : 'public';
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
@@ -619,6 +692,39 @@ export default function StockOrdersTab({ token }) {
         </div>
       </div>
 
+      {/* Catalog Type Filter Tabs */}
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 w-fit" data-testid="catalog-filter-tabs">
+        {CATALOG_TABS.map(tab => {
+          const Icon = tab.icon;
+          const isActive = catalogFilter === tab.key;
+          const count = tab.key === 'all'
+            ? (catalogCounts.pca || 0) + (catalogCounts.public || 0) + (catalogCounts.unknown || 0)
+            : (catalogCounts[tab.key] || 0);
+          return (
+            <button
+              key={tab.key}
+              onClick={() => { setCatalogFilter(tab.key); setFilter('all'); setStatusFilter(''); }}
+              data-testid={`catalog-filter-${tab.key}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                isActive
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {tab.label}
+              {count > 0 && (
+                <span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                  isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                }`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Pending Actions Banner */}
       {pendingCount > 0 && (
         <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800">
@@ -629,7 +735,7 @@ export default function StockOrdersTab({ token }) {
         </Card>
       )}
 
-      {/* Filters */}
+      {/* Type + Search Filters */}
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="flex gap-1">
           {['all', 'shipment', 'return', 'adjustment'].map(f => (
@@ -647,8 +753,10 @@ export default function StockOrdersTab({ token }) {
 
       {/* Orders List */}
       {orders.length === 0 ? (
-        <div className="text-center py-12 text-sm text-muted-foreground">
-          No stock orders yet. Create a shipment, return, or adjustment to get started.
+        <div className="text-center py-12 text-sm text-muted-foreground" data-testid="empty-orders">
+          {catalogFilter !== 'all'
+            ? `No ${catalogFilter === 'pca' ? 'PCA Textbooks' : 'Public Store'} workflow orders yet.`
+            : 'No stock orders yet. Create a shipment, return, or adjustment to get started.'}
         </div>
       ) : (
         <div className="space-y-2">
@@ -657,6 +765,7 @@ export default function StockOrdersTab({ token }) {
             const Icon = meta.icon;
             const next = NEXT_STATUS[order.type]?.[order.status];
             const isFinal = !next;
+            const catBadge = CATALOG_BADGE[order.catalog_type];
 
             return (
               <div key={order.order_id} className="flex items-center gap-3 p-3 rounded-xl border hover:bg-muted/30 transition cursor-pointer"
@@ -665,9 +774,14 @@ export default function StockOrdersTab({ token }) {
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-mono font-bold">{order.order_id}</span>
                     <Badge className={`text-[9px] ${STATUS_COLORS[order.status]}`}>{order.status}</Badge>
+                    {catBadge && (
+                      <Badge variant="outline" className={`text-[9px] ${catBadge.className}`} data-testid={`catalog-badge-${order.order_id}`}>
+                        {catBadge.label}
+                      </Badge>
+                    )}
                     {order.supplier && <span className="text-[10px] text-muted-foreground truncate">{order.supplier}</span>}
                     {order.customer_name && <span className="text-[10px] text-muted-foreground truncate">{order.customer_name}</span>}
                     {order.linked_order_id && <span className="text-[10px] text-muted-foreground">linked: {order.linked_order_id}</span>}
@@ -690,9 +804,9 @@ export default function StockOrdersTab({ token }) {
       )}
 
       {/* Dialogs */}
-      <CreateShipmentDialog open={showShipment} onClose={() => setShowShipment(false)} onCreated={fetchOrders} token={token} />
+      <CreateShipmentDialog open={showShipment} onClose={() => setShowShipment(false)} onCreated={fetchOrders} token={token} defaultCatalog={defaultCatalog} />
       <CreateReturnDialog open={showReturn} onClose={() => setShowReturn(false)} onCreated={fetchOrders} token={token} />
-      <CreateAdjustmentDialog open={showAdjustment} onClose={() => setShowAdjustment(false)} onCreated={fetchOrders} token={token} />
+      <CreateAdjustmentDialog open={showAdjustment} onClose={() => setShowAdjustment(false)} onCreated={fetchOrders} token={token} defaultCatalog={defaultCatalog} />
       <TransitionDialog order={transitionOrder} open={!!transitionOrder} onClose={() => setTransitionOrder(null)} onDone={fetchOrders} token={token} />
       <OrderDetailDialog order={detailOrder} open={!!detailOrder} onClose={() => setDetailOrder(null)} />
     </div>
