@@ -5,6 +5,14 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Media Player Mute Configuration (Feb 16, 2026) - COMPLETE
+- **Default with sound**: Videos now play with sound by default (unmuted). If browser blocks unmuted autoplay, automatically falls back to muted playback
+- **Admin setting**: New "Video Default Muted" toggle in admin panel (Content > Banners y Medios > Media Player tab)
+- **User control**: Mute/unmute button on video slides allows users to toggle audio
+- Backend: Added `video_default_muted` field to `DEFAULT_PLAYER_CONFIG`
+- Frontend: Updated `MediaPlayer.jsx` with try-with-sound-then-fallback-to-muted logic
+- Admin UI: Added checkbox in `ShowcaseAdminModule.jsx`
+
 ### Media Player Video Autoplay & Portrait Pairing Fix (Feb 16, 2026) - COMPLETE
 - **Video Autoplay Fix**: Added `autoPlay` HTML attribute, ref callback to ensure `muted` DOM attribute is set (React JSX `muted` prop only sets JS property), retry useEffect at 50ms/300ms after slide change
 - **Portrait Pairing Fix**: Rewrote `buildSlides()` to collect ALL portrait images regardless of position in source array and pair them together. Old logic only paired consecutive portraits. New logic separates portraits from non-portraits, pairs all portraits, then interleaves evenly among other slides
