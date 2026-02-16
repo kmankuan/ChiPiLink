@@ -315,6 +315,49 @@ export default function PreSaleImportTab({ token: propToken }) {
         </div>
       </div>
 
+      {/* Pending Suggestions */}
+      {suggestions.length > 0 && (
+        <div className="rounded-lg border border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-800 p-3 space-y-2" data-testid="link-suggestions">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-orange-600" />
+            <span className="text-xs font-bold text-orange-800 dark:text-orange-300">{suggestions.length} Link Suggestion{suggestions.length > 1 ? 's' : ''} — Review Required</span>
+          </div>
+          <div className="space-y-1.5">
+            {suggestions.map(s => (
+              <div key={s.suggestion_id} className="flex items-center gap-3 p-2 rounded-md bg-white dark:bg-card border border-orange-100 dark:border-orange-800/50" data-testid={`suggestion-${s.suggestion_id}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-medium">Order: <strong>{s.order_student_name}</strong></span>
+                    <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs font-medium">Student: <strong>{s.student_name}</strong></span>
+                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">Grade {s.grade}</Badge>
+                    <Badge className={`text-[9px] px-1.5 py-0 h-4 ${s.match_score >= 0.9 ? 'bg-green-100 text-green-700' : s.match_score >= 0.7 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                      {Math.round(s.match_score * 100)}% match
+                    </Badge>
+                  </div>
+                  {s.order_details && (
+                    <span className="text-[10px] text-muted-foreground">{s.order_details.items?.length || 0} items — ${(s.order_details.total_amount || 0).toFixed(2)}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button size="sm" onClick={() => handleConfirmSuggestion(s.suggestion_id)}
+                    disabled={confirmingId === s.suggestion_id}
+                    className="h-6 text-[10px] gap-0.5 bg-green-600 hover:bg-green-700" data-testid={`confirm-${s.suggestion_id}`}>
+                    {confirmingId === s.suggestion_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3" />}
+                    Confirm
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleRejectSuggestion(s.suggestion_id)}
+                    disabled={confirmingId === s.suggestion_id}
+                    className="h-6 text-[10px] gap-0.5 border-red-300 text-red-600 hover:bg-red-50" data-testid={`reject-${s.suggestion_id}`}>
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* How it works */}
       {orders.length === 0 && (
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
