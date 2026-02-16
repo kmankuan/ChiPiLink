@@ -13,6 +13,7 @@ import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab
 import OrderFormConfigTab from './tabs/OrderFormConfigTab';
 import SchoolYearTab from './tabs/SchoolYearTab';
 import StockOrdersTab from './tabs/StockOrdersTab';
+import PreSaleImportTab from './tabs/PreSaleImportTab';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
