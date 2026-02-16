@@ -216,6 +216,8 @@ function CrmConfigPanel({ token }) {
   const [boardId, setBoardId] = useState('');
   const [emailCol, setEmailCol] = useState('');
   const [saving, setSaving] = useState(false);
+  const [webhookRegistering, setWebhookRegistering] = useState(false);
+  const [webhookId, setWebhookId] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -228,6 +230,7 @@ function CrmConfigPanel({ token }) {
           setConfig(data);
           setBoardId(data.board_id || '');
           setEmailCol(data.email_column_id || '');
+          setWebhookId(data.webhook_id || '');
         }
         // Try to load columns if board is configured
         const colRes = await fetch(`${API}/api/store/crm-chat/admin/config/board-columns`, {
