@@ -350,16 +350,21 @@ function IconRow({ item, index, onUpdate, onRemove, statusOptions }) {
           </div>
           <div>
             <Label className="text-[9px] text-muted-foreground">Status Animation</Label>
-            <select
-              value={item.status_animation || currentStatus?.animation || 'none'}
-              onChange={(e) => onUpdate(index, { ...item, status_animation: e.target.value })}
-              className="h-7 w-full px-2 text-xs border rounded-md bg-background"
-              data-testid={`icon-anim-${item.key}`}
-            >
-              {ANIMATION_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <div className="flex items-center gap-1">
+              <select
+                value={item.status_animation || currentStatus?.animation || 'none'}
+                onChange={(e) => onUpdate(index, { ...item, status_animation: e.target.value })}
+                className="h-7 flex-1 px-2 text-xs border rounded-md bg-background"
+                data-testid={`icon-anim-${item.key}`}
+              >
+                {ANIMATION_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <div className="shrink-0 w-8 h-8 rounded-lg bg-muted/40 flex items-center justify-center overflow-hidden" title="Animation preview">
+                <StatusAnimationPreview animation={item.status_animation || currentStatus?.animation || 'none'} color={item.status_color || currentStatus?.color} gifUrl={item.status_gif_url} />
+              </div>
+            </div>
           </div>
           {(item.status_animation === 'custom_gif' || item.status_animation === 'lottie_url' || currentStatus?.animation === 'custom_gif' || currentStatus?.animation === 'lottie_url') && (
             <div>
