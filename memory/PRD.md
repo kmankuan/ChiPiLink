@@ -44,6 +44,19 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - **Landing page integration**: `MosaicCommunityLanding.jsx` StatusAnimation renders progress icons via `isProgressAnimation()` adapter
 - Files: `ProgressIcons.jsx`, `LayoutPreviewModule.jsx`, `MosaicCommunityLanding.jsx`
 
+### Pre-Sale Import from Monday.com (Feb 16, 2026) - COMPLETE
+- **Backend**: 4 API endpoints (`/api/store/presale-import/` — preview, execute, orders, link)
+  - Imports orders from Monday.com Textbook Orders board using sync trigger column (`color_mm0mnmrs`)
+  - Creates `awaiting_link` orders with student name, grade, book items (matched to inventory)
+  - Auto-links orders when student is registered (fuzzy name + grade matching in `textbook_access.py`)
+  - Admin can manually link unmatched orders to students
+- **Frontend**: New "Pre-Sale Import" tab in Unatienda ORDERS group
+  - Preview Import → shows what will be imported from Monday.com
+  - Compact stats, status filters (All/Unlinked/Linked), search, sorting, pagination
+  - Order detail dialog with book match status; manual link dialog with student search
+- **Monday.com columns**: `text_mm026sg3` (Estudiante), `color_mm02xhw1` (Grado), `color_mm0mnmrs` (sync trigger)
+- Files: `presale_import_service.py`, `presale_import.py` (routes), `PreSaleImportTab.jsx`, `textbook_access.py` (auto-link hook)
+
 ### Status Packs — One-Click Themed Icon Assignment (Feb 16, 2026) - COMPLETE
 - **5 themed packs**: Chinese New Year, Construction Progress, Nature Journey, Celestial Night, Calligraphy Master
 - Each pack auto-assigns progress animations to all navigation icons of the active layout with one click
