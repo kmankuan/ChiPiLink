@@ -280,7 +280,7 @@ export default function StudentsTab({ token }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pagination.currentItems.map((student) => {
+                  {paginated.map((student) => {
                     const id = student.student_id || student.sync_id;
                     const enrollment = (student.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
                     const isLocked = student.is_locked === true;
