@@ -132,8 +132,10 @@ export default function MediaPlayer() {
   const disableSwipe  = config?.disable_swipe === true;
   const fitMode       = config?.fit_mode || 'cover';
 
-  const orientations = useImageOrientations(fitMode === 'smart' ? items : []);
-  const slides = useMemo(() => buildSlides(items, orientations, fitMode), [items, orientations, fitMode]);
+  const orientations_data = useImageOrientations(fitMode === 'smart' ? items : []);
+  const orientations = orientations_data.orientations;
+  const orientationsReady = fitMode !== 'smart' || orientations_data.allLoaded;
+  const slides = useMemo(() => orientationsReady ? buildSlides(items, orientations, fitMode) : items.map(it => ({ kind: 'single', items: [it] })), [items, orientations, fitMode, orientationsReady]);
 
   const effectiveDotStyle = useMemo(() => {
     if (!showDots || dotStyle === 'none') return 'none';
