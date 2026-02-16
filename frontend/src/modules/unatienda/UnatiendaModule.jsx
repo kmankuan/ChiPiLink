@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Settings, Link2, Database, CreditCard, Store, ClipboardList, Package, FileText, Calendar, Warehouse, Truck } from 'lucide-react';
+import { Loader2, ShoppingBag, BookOpen, Users, ShoppingCart, Store, ClipboardList, Package, FileText, Calendar, Warehouse, Truck, Settings, Database } from 'lucide-react';
 
-// Import sub-modules
 import PublicCatalogTab from './tabs/PublicCatalogTab';
 import PrivateCatalogTab from './tabs/PrivateCatalogTab';
 import StudentsTab from './tabs/StudentsTab';
@@ -17,30 +13,74 @@ import TextbookOrdersAdminTab from '@/modules/admin/store/TextbookOrdersAdminTab
 import OrderFormConfigTab from './tabs/OrderFormConfigTab';
 import SchoolYearTab from './tabs/SchoolYearTab';
 import StockOrdersTab from './tabs/StockOrdersTab';
-import { useTranslation } from 'react-i18next';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
+/* Tab groups — logical sections */
+const TAB_GROUPS = [
+  {
+    label: 'Catalog',
+    tabs: [
+      { id: 'inventory', label: 'Inventory', icon: Warehouse },
+      { id: 'public-catalog', label: 'Public Store', icon: Store },
+      { id: 'stock-orders', label: 'Stock Mov.', icon: Truck, testId: 'stock-orders-tab-trigger' },
+    ],
+  },
+  {
+    label: 'Orders',
+    tabs: [
+      { id: 'textbook-orders', label: 'Textbook Orders', icon: Package },
+      { id: 'access-requests', label: 'Access Requests', icon: ClipboardList },
+    ],
+  },
+  {
+    label: 'School',
+    tabs: [
+      { id: 'students', label: 'Students', icon: Users },
+      { id: 'school-year', label: 'School Year', icon: Calendar },
+    ],
+  },
+  {
+    label: 'Settings',
+    tabs: [
+      { id: 'form-config', label: 'Order Form', icon: FileText },
+      { id: 'configuration', label: 'Config', icon: Settings },
+      { id: 'demo', label: 'Demo Data', icon: Database },
+    ],
+  },
+];
+
+function NavTab({ id, label, icon: Icon, isActive, onClick, testId }) {
+  return (
+    <button
+      onClick={() => onClick(id)}
+      data-testid={testId || `tab-${id}`}
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+        isActive
+          ? 'bg-primary text-primary-foreground shadow-sm'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
+  );
+}
+
 export default function UnatiendaModule() {
-  const { t } = useTranslation();
   const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('inventory');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchStats(); }, []);
 
   const fetchStats = async () => {
     try {
       const response = await fetch(`${API}/api/admin/unatienda/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
+      if (response.ok) setStats(await response.json());
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -56,149 +96,67 @@ export default function UnatiendaModule() {
     );
   }
 
+  const statItems = [
+    { icon: Store, value: stats?.public_products || 0, label: 'Public', color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/40' },
+    { icon: BookOpen, value: stats?.private_products || 0, label: 'Textbooks', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/40' },
+    { icon: Users, value: stats?.students || 0, label: 'Students', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40' },
+    { icon: ShoppingCart, value: stats?.orders_pending || 0, label: 'Pending', color: 'text-orange-600 bg-orange-50 dark:bg-orange-950/40', alert: (stats?.orders_pending || 0) > 0 },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <ShoppingBag className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats?.public_products || 0}</p>
-                <p className="text-xs text-muted-foreground">Public Products</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                <BookOpen className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats?.private_products || 0}</p>
-                <p className="text-xs text-muted-foreground">School Textbooks</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
-                <Users className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats?.students || 0}</p>
-                <p className="text-xs text-muted-foreground">PCA Students</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
-                <ShoppingCart className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats?.orders_pending || 0}</p>
-                <p className="text-xs text-muted-foreground">Pending Orders</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-4" data-testid="unatienda-module">
+      {/* ── Compact header: stats as inline badges ── */}
+      <div className="flex items-center gap-3 flex-wrap" data-testid="unatienda-stats">
+        {statItems.map(s => (
+          <div
+            key={s.label}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${s.alert ? 'border-orange-300 dark:border-orange-700' : 'border-border/50'} ${s.color}`}
+          >
+            <s.icon className="h-4 w-4" />
+            <span className="text-lg font-bold leading-none">{s.value}</span>
+            <span className="text-[10px] font-medium opacity-70 leading-none">{s.label}</span>
+          </div>
+        ))}
       </div>
 
-      {/* Main Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-10 mb-6">
-          <TabsTrigger value="public-catalog" className="flex items-center gap-2">
-            <Store className="h-4 w-4" />
-            <span className="hidden md:inline">Public</span>
-          </TabsTrigger>
-          <TabsTrigger value="inventory" className="flex items-center gap-2">
-            <Warehouse className="h-4 w-4" />
-            <span className="hidden md:inline">Inventory</span>
-          </TabsTrigger>
-          <TabsTrigger value="stock-orders" className="flex items-center gap-2" data-testid="stock-orders-tab-trigger">
-            <Truck className="h-4 w-4" />
-            <span className="hidden md:inline">Stock Mov.</span>
-          </TabsTrigger>
-          <TabsTrigger value="access-requests" className="flex items-center gap-2">
-            <ClipboardList className="h-4 w-4" />
-            <span className="hidden md:inline">Requests</span>
-          </TabsTrigger>
-          <TabsTrigger value="textbook-orders" className="flex items-center gap-2">
-            <Package className="h-4 w-4" />
-            <span className="hidden md:inline">Txt Orders</span>
-          </TabsTrigger>
-          <TabsTrigger value="form-config" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            <span className="hidden md:inline">Form</span>
-          </TabsTrigger>
-          <TabsTrigger value="students" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden md:inline">Students</span>
-          </TabsTrigger>
-          <TabsTrigger value="configuration" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <span className="hidden md:inline">Config</span>
-          </TabsTrigger>
-          <TabsTrigger value="demo" className="flex items-center gap-2">
-            <Database className="h-4 w-4" />
-            <span className="hidden md:inline">Demo</span>
-          </TabsTrigger>
-          <TabsTrigger value="school-year" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span className="hidden md:inline">School Year</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* ── Grouped tab navigation ── */}
+      <nav className="flex items-center gap-1 flex-wrap border-b pb-2" data-testid="unatienda-nav">
+        {TAB_GROUPS.map((group, gi) => (
+          <div key={group.label} className="flex items-center">
+            {gi > 0 && <div className="w-px h-5 bg-border mx-2 shrink-0" />}
+            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mr-1.5 hidden lg:inline">
+              {group.label}
+            </span>
+            <div className="flex items-center gap-0.5">
+              {group.tabs.map(tab => (
+                <NavTab
+                  key={tab.id}
+                  id={tab.id}
+                  label={tab.label}
+                  icon={tab.icon}
+                  isActive={activeTab === tab.id}
+                  onClick={setActiveTab}
+                  testId={tab.testId}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
 
-        <TabsContent value="public-catalog">
-          <PublicCatalogTab token={token} onRefresh={fetchStats} />
-        </TabsContent>
-
-        <TabsContent value="inventory">
-          <PrivateCatalogTab token={token} onRefresh={fetchStats} />
-        </TabsContent>
-
-        <TabsContent value="stock-orders">
-          <StockOrdersTab token={token} />
-        </TabsContent>
-
-        <TabsContent value="access-requests">
-          <TextbookAccessAdminTab token={token} />
-        </TabsContent>
-
-        <TabsContent value="textbook-orders">
-          <TextbookOrdersAdminTab />
-        </TabsContent>
-
-        <TabsContent value="form-config">
-          <OrderFormConfigTab />
-        </TabsContent>
-
-        <TabsContent value="students">
-          <StudentsTab token={token} />
-        </TabsContent>
-
-        <TabsContent value="configuration">
-          <ConfigurationTab token={token} />
-        </TabsContent>
-
-        <TabsContent value="demo">
-          <DemoDataTab token={token} onRefresh={fetchStats} />
-        </TabsContent>
-
-        <TabsContent value="school-year">
-          <SchoolYearTab token={token} />
-        </TabsContent>
-      </Tabs>
+      {/* ── Tab content ── */}
+      <div data-testid="unatienda-content">
+        {activeTab === 'inventory' && <PrivateCatalogTab token={token} onRefresh={fetchStats} />}
+        {activeTab === 'public-catalog' && <PublicCatalogTab token={token} onRefresh={fetchStats} />}
+        {activeTab === 'stock-orders' && <StockOrdersTab token={token} />}
+        {activeTab === 'textbook-orders' && <TextbookOrdersAdminTab />}
+        {activeTab === 'access-requests' && <TextbookAccessAdminTab token={token} />}
+        {activeTab === 'students' && <StudentsTab token={token} />}
+        {activeTab === 'school-year' && <SchoolYearTab token={token} />}
+        {activeTab === 'form-config' && <OrderFormConfigTab />}
+        {activeTab === 'configuration' && <ConfigurationTab token={token} />}
+        {activeTab === 'demo' && <DemoDataTab token={token} onRefresh={fetchStats} />}
+      </div>
     </div>
   );
 }
