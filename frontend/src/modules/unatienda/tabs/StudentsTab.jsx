@@ -459,6 +459,17 @@ export default function StudentsTab({ token }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* CRM Chat */}
+      {chatStudent && (
+        <CrmChat
+          studentId={chatStudent.student_id || chatStudent.sync_id}
+          studentName={chatStudent.full_name}
+          isOpen={!!chatStudent}
+          onClose={() => setChatStudent(null)}
+          isAdmin={true}
+        />
+      )}
     </div>
   );
 }
