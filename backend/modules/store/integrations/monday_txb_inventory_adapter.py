@@ -519,6 +519,63 @@ class TxbInventoryAdapter(BaseMondayAdapter):
             logger.error(f"Stock sync to Monday failed for {book_id}: {e}")
             return {"synced": False, "reason": str(e)}
 
+    # ──────────── Setup: Create "Stock Approval" column on Monday.com ────────────
+
+    async def setup_stock_approval_column(self) -> Dict:
+        """Create a 'Stock Approval' status column on the TXB inventory board.
+        Returns the column_id for the new column."""
+        config = await self.get_txb_inventory_config()
+        board_id = config.get("board_id")
+        if not board_id:
+            return {"error": "Board not configured"}
+
+        # Check if column already exists
+        existing_cols = await self.client.get_board_columns(board_id)
+        for col in existing_cols:
+            if col.get("title") == "Stock Approval" and col.get("type") == "status":
+                col_id = col["id"]
+                # Save to config
+                config["stock_approval_column_id"] = col_id
+                await self.save_txb_inventory_config(config)
+                return {"column_id": col_id, "status": "already_exists"}
+
+        # Create status column with labels
+        try:
+            labels_json = json.dumps({
+                "labels": {"0": "Pending", "1": "Approved", "2": "Rejected"},
+                "done_colors": [1],
+                "labels_colors": {
+                    "0": {"color": "#fdab3d", "border": "#e99729", "var_name": "orange"},
+                    "1": {"color": "#00c875", "border": "#00b461", "var_name": "green-shadow"},
+                    "2": {"color": "#e2445c", "border": "#ce3048", "var_name": "red-shadow"}
+                }
+            })
+
+            query = f'''mutation {{
+                create_column (
+                    board_id: {board_id},
+                    title: "Stock Approval",
+                    column_type: status,
+                    defaults: {json.dumps(labels_json)}
+                ) {{ id title }}
+            }}'''
+
+            data = await self.client.execute(query)
+            col_id = data.get("create_column", {}).get("id")
+            if not col_id:
+                return {"error": "Failed to create column", "data": data}
+
+            # Save to config
+            config["stock_approval_column_id"] = col_id
+            await self.save_txb_inventory_config(config)
+
+            logger.info(f"Created 'Stock Approval' column: {col_id}")
+            return {"column_id": col_id, "status": "created"}
+
+        except Exception as e:
+            logger.error(f"Failed to create Stock Approval column: {e}")
+            return {"error": str(e)}
+
     # ──────────── Webhook: Monday.com → App (stock changes) ────────────
 
     async def handle_stock_webhook(self, event: dict) -> Dict:
