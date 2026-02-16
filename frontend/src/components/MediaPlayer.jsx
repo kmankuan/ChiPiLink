@@ -130,6 +130,7 @@ export default function MediaPlayer() {
   const showDots      = config?.show_dots !== false;
   const dotStyle      = config?.dot_style || 'auto';
   const videoAutoplay = config?.video_autoplay !== false;
+  const videoDefaultMuted = config?.video_default_muted === true;
   const videoMaxMs    = config?.video_max_duration_ms || 30000;
   const disableSwipe  = config?.disable_swipe === true;
   const fitMode       = config?.fit_mode || 'cover';
