@@ -268,7 +268,7 @@ export default function StudentsTab({ token }) {
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
                     <TableHead className="w-8 px-2">
                       <Checkbox
-                        checked={pagination.currentItems.length > 0 && pagination.currentItems.every(s => selectedIds.has(s.student_id || s.sync_id))}
+                        checked={paginated.length > 0 && paginated.every(s => selectedIds.has(s.student_id || s.sync_id))}
                         onCheckedChange={toggleAll} data-testid="select-all-students" />
                     </TableHead>
                     <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
