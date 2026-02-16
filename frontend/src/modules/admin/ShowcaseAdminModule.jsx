@@ -1017,6 +1017,16 @@ export default function ShowcaseAdminModule() {
                 />
                 Video Autoplay
               </label>
+              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mediaConfig?.video_default_muted === true}
+                  onChange={e => setMediaConfig({ ...mediaConfig, video_default_muted: e.target.checked })}
+                  className="rounded"
+                  data-testid="video-default-muted-checkbox"
+                />
+                Video Default Muted
+              </label>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <label className="flex items-center gap-1.5 text-xs cursor-pointer">
