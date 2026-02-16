@@ -1,0 +1,150 @@
+<analysis>**original_problem_statement:**
+The user's initial request was to redesign the Stock Workflows UI. This evolved into several sequential tasks:
+1.  Redesign the Stock Workflows UI to separate Public Store and PCA Textbooks inventory.
+2.  Rename UI elements: Workflows to Stock Movements and PCA Textbooks to School Textbooks.
+3.  Enhance the Community Feed on the landing page by making the Auto and See all buttons configurable from the admin panel.
+4.  Refactor the Monday.com integration to decouple direct stock updates. Instead of modifying inventory directly, changes on Monday.com now create Stock Adjustment movements in the app, which await approval via a new Stock Approval status column on the Monday.com board.
+5.  The current and most recent request is to create a new, globally available system of progress-based status icons with multiple styles (including Chinese themes and Lottie animations) to indicate different stages like Starting, middle phase, and Advanced.
+
+**User's preferred language**: English
+
+**what currently exists?**
+- A full-stack application with a React frontend and a FastAPI backend.
+- A Stock Movements feature (formerly Stock Workflows) that now has a clear UI distinction between School Textbooks and Public Store inventory, complete with filter tabs, summary cards, and category badges.
+- The ChiPi Community feed on the landing page, where display buttons are now controlled by an admin configuration.
+- A decoupled Monday.com integration that generates pending Stock Adjustment movements instead of directly altering inventory levels. This workflow is triggered and confirmed using status columns on the Monday.com board.
+- An existing system for displaying custom statuses and icons, which is now being extended. The new  component has been created to house the new icon sets.
+
+**Last working item**:
+-   **Last item agent was working:** The agent was in the process of building a new, reusable progress icon system as a core application resource. This involved creating CSS-based Chinese-themed icon sets (Chinese Journey and Chinese Architecture) and a Lottie-based set. The agent created the  file, added CSS animations to , and began integrating these into the landing page () and the admin panel ().
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** Frontend testing agent to verify the new icons are selectable in the admin panel and render correctly. A screenshot test of the landing page is also necessary to visually confirm the animations and styles.
+-   **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+None. The current work is a feature implementation.
+
+**In progress Task List**:
+-   **Task 1: Complete the Progress-Based Status Icon System (P0)**
+    -   **Description:** Finalize the implementation of the new global progress icon system. This includes ensuring all three requested icon sets (two CSS-based, one Lottie-based) are fully functional.
+    -   **Where to resume:** The core files , , , and  have been created or modified but are not yet complete. The next steps are to finish the integration, ensuring the new icons can be selected in the admin panel and render correctly on the frontend as custom statuses.
+    -   **What will be achieved with this?** A centralized, reusable icon system that provides visually rich, progress-based status indicators with multiple thematic styles, enhancing the application's UI.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on something:** No.
+
+**Upcoming and Future Tasks**
+-   **Upcoming Tasks:**
+    -   **(P1)** Make the new progress icon system a truly global resource by fully abstracting it from landing page-specific components and creating a clear API for other modules to consume it.
+    -   **(P2)** Implement a Stop button for the full sync operation, making it a cancellable background task.
+    -   **(P3)** Build an on-demand landing page redesign tool in the admin panel.
+-   **Future Tasks:**
+    -   **(P4)** Extend the Monday.com synchronization to the general product inventory.
+
+**Completed work in this session**
+-   **Feature - Redesigned Stock Management UI (DONE):**
+    -   Redesigned the Stock Workflows tab, renaming it to Stock Movements.
+    -   Implemented UI separation for School Textbooks and Public Store using tabs, badges, and filters.
+    -   Added dynamic summary cards that update based on selected filters.
+-   **Feature - Configurable Community Feed Buttons (DONE):**
+    -   Removed hardcoded Auto and See all buttons from the landing page's community feed.
+    -   Added toggles and a link editor in the admin panel to control button visibility and add custom links.
+-   **Feature - Decoupled Monday.com Stock Sync (DONE):**
+    -   Refactored the integration to prevent direct inventory updates from Monday.com.
+    -   Stock changes on Monday.com now create Pending Stock Adjustment movements within the app.
+    -   Implemented a Stock Approval status column on Monday.com boards to approve these movements and finalize stock updates.
+
+**Earlier issues found/mentioned but not fixed**
+None.
+
+**Known issue recurrence from previous fork**
+None.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Decoupled Integration Workflow:** The Monday.com integration was refactored to use the internal Stock Movements system instead of directly modifying the database, creating a more robust and traceable workflow.
+-   **Dynamic Admin Configuration:** More UI elements (like the community feed buttons) are now controlled via the admin panel, allowing for greater flexibility without code changes.
+-   **Reusable Core Components:** The new  is being built as a shared, reusable component intended for application-wide use.
+-   **State-Driven UI:** Components like the summary cards in the Stock Movements tab dynamically update based on the selected filters, reading from the frontend's state.
+
+**key DB schema**
+-   **:** Modified to include  and  (to tag orders originating from integrations like Monday.com).
+-   **:** The  config was updated to include boolean flags for button visibility and a  list.
+-   **:** Updated with  to manage the new approval workflow.
+-   **:** The data structure used to store and manage custom status definitions, which will include the new progress icon sets.
+
+**changes in tech stack**
+None.
+
+**All files of reference**
+-   **High Priority for Next Task:**
+    -    (New component, needs completion)
+    -    (Needs to correctly render the new progress component)
+    -    (Needs UI for selecting the new progress icon sets)
+    -    (Contains new CSS keyframe animations for the icons)
+-   **Recently Completed/Modified:**
+    -   
+    -   
+    -   
+    -   
+
+**key api endpoints**
+-   **Modified:**
+    -   : Now filters by .
+    -   : Now saves .
+    -   : Creates a pending Stock Adjustment movement.
+    -   : Saves new button visibility and link configurations.
+-   **New:**
+    -   : Sets up the approval column on a Monday.com board.
+    -   : Handles approval events from Monday.com to confirm stock movements.
+
+**Critical Info for New Agent**
+-   Your primary task is to complete the implementation of the new progress-based status icon system. The foundation has been laid, but the pieces need to be connected and finalized.
+-   Focus on making  a robust, reusable component, as the user wants this to be a global core stock resource.
+-   The user has specifically requested three styles: two CSS-animated sets with Chinese themes (Journey and Architecture) and a third set using Lottie animations. All three must be implemented.
+-   After completing the implementation, test thoroughly by selecting the new icons in the admin panel and verifying they render correctly on the landing page.
+
+**documents and test reports created in this job**
+-   /app/test_reports/iteration_9.json
+-   /app/test_reports/iteration_10.json
+-   /app/test_reports/iteration_11.json
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** Requested a new system for progress-based status icons (Starting, middle, Advanced) with Chinese design elements, Lottie support, and one other alternative, to be used globally.
+2.  **Agent:** Proposed a plan to implement the new icon system as a core shared resource.
+3.  **User:** Inquired about the current Monday.com stock synchronization workflow.
+4.  **Agent:** Explained the existing direct-update mechanism and its potential issues.
+5.  **User:** Agreed to block the direct sync and asked if stock movements could be initiated from Monday.com.
+6.  **Agent:** Outlined two potential solutions: a manual Apply button within the app, or a fully automated workflow using a status column on the Monday.com board.
+7.  **User:** Asked if the approval button could also be on Monday.com.
+8.  **Agent:** Clarified how a status column on Monday.com would function as the approval trigger.
+9.  **User:** Agreed to proceed with the full integration using a Stock Approval status column.
+10. **User:** Requested the removal of the Auto and See all buttons from the ChiPi Community section on the landing page.
+
+**Project Health Check:**
+-   **Broken:** No broken features.
+-   **Mocked:** No mocked components.
+
+**3rd Party Integrations**
+-   Monday.com API v2
+-   Google Photos, Gmail (IMAP)
+-   Telegram Bot API
+-   OpenAI GPT-4o, Anthropic Claude Sonnet 4.5, OpenAI Image Generation
+-   Lottie (via  library)
+-   LottieFiles (as a source for animations)
+
+**Testing status**
+-   **Testing agent used after significant changes:** YES
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None
+-   **Known regressions:** None
+
+**Credentials to test flow:**
+-   **Email:** 
+-   **Password:** 
+
+**What agent forgot to execute**
+The agent is currently mid-task. The implementation of the progress-based status icon system is in progress and has not yet been completed or tested. All prior tasks from the session were finished successfully.</analysis>
