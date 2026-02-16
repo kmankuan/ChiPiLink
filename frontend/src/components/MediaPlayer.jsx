@@ -210,14 +210,24 @@ export default function MediaPlayer() {
     }, 2000);
   }, [slides.length]);
 
-  /* Called when video data is ready — triggers play with muted=true for autoplay policy */
+  /* Called when video data is ready — tries to play with current mute setting, falls back to muted if browser blocks */
   const handleVideoReady = useCallback(() => {
     const v = videoRef.current;
     if (!v || !playing || !videoAutoplay) return;
-    v.muted = true;
+    v.muted = muted;
     const p = v.play();
-    if (p?.catch) p.catch(() => { if (v) { v.muted = true; v.play().catch(() => setVideoError(true)); } });
-  }, [playing, videoAutoplay]);
+    if (p?.catch) p.catch(() => {
+      // Browser blocked unmuted autoplay — fall back to muted
+      if (v && !v.muted) {
+        v.muted = true;
+        setMuted(true);
+        setAutoMuted(true);
+        v.play().catch(() => setVideoError(true));
+      } else {
+        setVideoError(true);
+      }
+    });
+  }, [playing, videoAutoplay, muted]);
 
   /* Robust autoplay: when current slide changes to a video, attempt play after a tick */
   useEffect(() => {
@@ -225,15 +235,22 @@ export default function MediaPlayer() {
     const tryPlay = () => {
       const v = videoRef.current;
       if (!v) return;
-      v.muted = true;
+      v.muted = muted;
       const p = v.play();
-      if (p?.catch) p.catch(() => {});
+      if (p?.catch) p.catch(() => {
+        // Fall back to muted if unmuted play fails
+        if (v && !v.muted) {
+          v.muted = true;
+          setMuted(true);
+          setAutoMuted(true);
+          v.play().catch(() => {});
+        }
+      });
     };
-    // Try immediately, then again after short delays to handle mount timing
     const t1 = setTimeout(tryPlay, 50);
     const t2 = setTimeout(tryPlay, 300);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [current, isVideo, videoAutoplay, playing]);
+  }, [current, isVideo, videoAutoplay, playing, muted]);
 
   /* Ensure muted attribute is set on the DOM element (React JSX 'muted' only sets the property, not the attribute) */
   const videoRefCallback = useCallback((node) => {
