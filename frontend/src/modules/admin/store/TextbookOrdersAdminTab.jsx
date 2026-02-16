@@ -727,6 +727,17 @@ export default function TextbookOrdersAdminTab() {
         confirmLabel="Archive"
         loading={bulkLoading}
       />
+
+      {/* CRM Chat */}
+      {chatStudent && (
+        <CrmChat
+          studentId={chatStudent.id}
+          studentName={chatStudent.name}
+          isOpen={!!chatStudent}
+          onClose={() => setChatStudent(null)}
+          isAdmin={true}
+        />
+      )}
     </div>
   );
 }
