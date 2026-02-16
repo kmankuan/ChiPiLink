@@ -360,6 +360,8 @@ function ContainerEditor({ container, onSave, onDelete, onDuplicate, isNew }) {
             {[
               { key: 'show_post_count', label: 'Show Post Count' },
               { key: 'show_media_count', label: 'Show Media Count' },
+              { key: 'show_autoplay_btn', label: 'Show Autoplay Button' },
+              { key: 'show_see_all_btn', label: 'Show "See All" Button' },
               { key: 'is_active', label: 'Active (visible on landing)' },
             ].map(({ key, label }) => (
               <div key={key} className="flex items-center justify-between">
