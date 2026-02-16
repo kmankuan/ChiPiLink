@@ -586,6 +586,8 @@ function OrderDetailDialog({ order, open, onClose }) {
             {order.customer_name && <div><span className="text-muted-foreground">Customer:</span> {order.customer_name}</div>}
             {order.return_reason && <div><span className="text-muted-foreground">Reason:</span> {order.return_reason}</div>}
             {order.adjustment_reason && <div><span className="text-muted-foreground">Reason:</span> {order.adjustment_reason}</div>}
+            {order.source === 'monday_sync' && <div><span className="text-muted-foreground">Source:</span> Monday.com (auto)</div>}
+            {order.monday_old_stock != null && <div><span className="text-muted-foreground">Stock change:</span> {order.monday_old_stock} → {order.monday_new_stock}</div>}
             <div><span className="text-muted-foreground">Created:</span> {new Date(order.created_at).toLocaleString()}</div>
             <div><span className="text-muted-foreground">By:</span> {order.created_by_name}</div>
           </div>
