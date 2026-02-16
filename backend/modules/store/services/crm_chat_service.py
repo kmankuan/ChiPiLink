@@ -394,5 +394,97 @@ class CrmChatService:
 
         return {"success": True, "topic_id": update_id, "message": msg_doc}
 
+    # ---------- Webhook processing ----------
+
+    async def process_webhook_update(self, event: Dict) -> Dict:
+        """Process a Monday.com webhook event when an Update is created on the CRM board.
+        Creates a notification for the linked client user.
+        """
+        item_id = str(event.get("pulseId") or event.get("itemId") or "")
+        update_body = event.get("body") or event.get("textBody") or ""
+        update_id = str(event.get("updateId") or "")
+        creator_name = event.get("userName") or "Staff"
+
+        if not item_id:
+            return {"status": "skipped", "reason": "no item_id"}
+
+        # Find which student is linked to this CRM item
+        link = await db[LINK_COLLECTION].find_one(
+            {"monday_item_id": item_id}, {"_id": 0}
+        )
+        if not link:
+            return {"status": "skipped", "reason": "no student linked to this item"}
+
+        student_id = link["student_id"]
+
+        # Find the student's parent user
+        student = await db.store_students.find_one(
+            {"student_id": student_id}, {"_id": 0, "user_id": 1, "full_name": 1}
+        )
+        if not student:
+            return {"status": "skipped", "reason": "student not found"}
+
+        user_id = student.get("user_id")
+        student_name = student.get("full_name", "")
+
+        # Create a notification record
+        notification = {
+            "notification_id": f"crm_notif_{uuid.uuid4().hex[:12]}",
+            "type": "crm_chat_message",
+            "student_id": student_id,
+            "student_name": student_name,
+            "user_id": user_id,
+            "monday_item_id": item_id,
+            "update_id": update_id,
+            "message_preview": update_body[:120] if update_body else "",
+            "author_name": creator_name,
+            "is_staff": True,
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.crm_chat_notifications.insert_one(notification)
+        del notification["_id"]
+
+        logger.info(f"CRM notification created for user {user_id} (student {student_name})")
+        return {"status": "notified", "student_id": student_id, "user_id": user_id}
+
+    # ---------- Notifications & unread counts ----------
+
+    async def get_unread_counts(self, user_id: str) -> Dict:
+        """Get unread CRM chat notification counts for a user"""
+        pipeline = [
+            {"$match": {"user_id": user_id, "read": False, "type": "crm_chat_message"}},
+            {"$group": {"_id": "$student_id", "count": {"$sum": 1}, "student_name": {"$first": "$student_name"}}},
+        ]
+        cursor = db.crm_chat_notifications.aggregate(pipeline)
+        results = await cursor.to_list(100)
+
+        per_student = {}
+        total = 0
+        for r in results:
+            per_student[r["_id"]] = {
+                "count": r["count"],
+                "student_name": r.get("student_name", ""),
+            }
+            total += r["count"]
+
+        return {"total_unread": total, "per_student": per_student}
+
+    async def mark_read(self, student_id: str, reader_id: str) -> None:
+        """Mark all CRM notifications for a student as read"""
+        query = {"student_id": student_id, "read": False}
+        if reader_id == "admin":
+            pass  # Admin marks all as read
+        else:
+            query["user_id"] = reader_id
+
+        await db.crm_chat_notifications.update_many(query, {"$set": {"read": True}})
+
+        # Also update read_by in local messages
+        await db[LOCAL_MESSAGES_COLLECTION].update_many(
+            {"student_id": student_id, "read_by": {"$not": {"$elemMatch": {"$eq": reader_id}}}},
+            {"$addToSet": {"read_by": reader_id}},
+        )
+
 
 crm_chat_service = CrmChatService()
