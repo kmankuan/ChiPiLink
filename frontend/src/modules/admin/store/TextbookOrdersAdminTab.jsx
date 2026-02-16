@@ -49,7 +49,8 @@ import {
   Eye,
   Users,
   BarChart3,
-  Archive
+  Archive,
+  MessageCircle
 } from 'lucide-react';
 import { useTableSelection } from '@/hooks/useTableSelection';
 import { usePagination } from '@/hooks/usePagination';
@@ -57,6 +58,7 @@ import { BulkActionBar } from '@/components/shared/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { TablePagination } from '@/components/shared/TablePagination';
 import { useTranslation } from 'react-i18next';
+import CrmChat from '@/components/chat/CrmChat';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
