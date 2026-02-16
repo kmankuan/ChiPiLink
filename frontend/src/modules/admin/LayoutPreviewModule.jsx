@@ -584,13 +584,93 @@ function StatusAnimationPreview({ animation, color, gifUrl }) {
   }
 }
 
+/* ═══ Status Packs — predefined themed icon sets for one-click application ═══ */
+const STATUS_PACKS = [
+  {
+    id: 'chinese_new_year',
+    name: 'Chinese New Year',
+    description: 'Festive red & gold — lanterns, dragons, fireworks',
+    theme: 'journey',
+    levels: ['starting', 'developing', 'advancing', 'mastering', 'complete'],
+    accent: '#dc2626',
+  },
+  {
+    id: 'construction',
+    name: 'Construction Progress',
+    description: 'Building from foundation to golden palace',
+    theme: 'architecture',
+    levels: ['starting', 'developing', 'advancing', 'mastering', 'complete'],
+    accent: '#d97706',
+  },
+  {
+    id: 'nature_journey',
+    name: 'Nature Journey',
+    description: 'Growth path from seedling to phoenix',
+    theme: 'journey',
+    levels: ['starting', 'developing', 'advancing', 'mastering', 'complete'],
+    accent: '#16a34a',
+  },
+  {
+    id: 'celestial_night',
+    name: 'Celestial Night',
+    description: 'Sky journey from new moon to golden sun',
+    theme: 'celestial',
+    levels: ['starting', 'developing', 'advancing', 'mastering', 'complete'],
+    accent: '#7c3aed',
+  },
+  {
+    id: 'calligraphy_master',
+    name: 'Calligraphy Master',
+    description: 'Ink mastery from first stroke to masterpiece',
+    theme: 'calligraphy',
+    levels: ['starting', 'developing', 'advancing', 'mastering', 'complete'],
+    accent: '#1e293b',
+  },
+];
+
 /* ═══ Progress Icons Gallery — visual browser for all themes/levels ═══ */
-function ProgressIconsGallery() {
+function ProgressIconsGallery({ activeLayout, iconConfig, setIconConfig, saveIcons }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('journey');
   const [lottieTestUrl, setLottieTestUrl] = useState('');
+  const [applyingPack, setApplyingPack] = useState(null);
 
   const themeEntries = Object.entries(PROGRESS_THEMES);
+
+  const activeIcons = activeLayout ? (iconConfig?.[activeLayout] || []) : [];
+  const activeLayoutName = LAYOUT_META[activeLayout]?.name || activeLayout;
+
+  const handleApplyPack = async (pack) => {
+    if (!activeLayout || activeIcons.length === 0) {
+      toast.error('No active layout or no icons configured. Add icons to your layout first.');
+      return;
+    }
+    setApplyingPack(pack.id);
+    try {
+      const updatedIcons = activeIcons.map((icon, idx) => {
+        const levelIdx = idx % pack.levels.length;
+        const level = pack.levels[levelIdx];
+        const animType = getProgressAnimationType(level, pack.theme);
+        return { ...icon, status_animation: animType };
+      });
+      setIconConfig(prev => ({ ...prev, [activeLayout]: updatedIcons }));
+      // Auto-save
+      const res = await fetch(`${API_URL}/api/admin/ticker/layout-icons/${activeLayout}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ icons: updatedIcons })
+      });
+      if (res.ok) {
+        toast.success(`"${pack.name}" applied to ${activeLayoutName} (${updatedIcons.length} icons)`);
+      } else {
+        toast.error('Pack applied locally but failed to save');
+      }
+    } catch {
+      toast.error('Error applying pack');
+    } finally {
+      setApplyingPack(null);
+    }
+  };
 
   return (
     <div className="rounded-2xl border border-border/50 bg-card p-4 space-y-3" data-testid="progress-icons-gallery">
