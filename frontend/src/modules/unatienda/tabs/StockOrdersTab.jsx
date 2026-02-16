@@ -572,6 +572,7 @@ function OrderDetailDialog({ order, open, onClose }) {
           <DialogTitle className="flex items-center gap-2">
             <meta.icon className="h-5 w-5" /> {order.order_id}
             {catBadge && <Badge variant="outline" className={`text-[9px] ml-1 ${catBadge.className}`}>{catBadge.label}</Badge>}
+            {order.source === 'monday_sync' && <Badge variant="outline" className="text-[9px] ml-1 bg-sky-100 text-sky-700 border-sky-200 gap-0.5"><Zap className="h-2.5 w-2.5" /> Monday.com</Badge>}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
