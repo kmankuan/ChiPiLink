@@ -272,7 +272,7 @@ export default function MediaPlayer() {
         {isVideo ? (
           <>
             <video
-              ref={videoRef}
+              ref={videoRefCallback}
               key={first.url}
               src={first.url}
               autoPlay
