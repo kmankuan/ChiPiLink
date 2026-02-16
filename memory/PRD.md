@@ -44,6 +44,18 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - **Landing page integration**: `MosaicCommunityLanding.jsx` StatusAnimation renders progress icons via `isProgressAnimation()` adapter
 - Files: `ProgressIcons.jsx`, `LayoutPreviewModule.jsx`, `MosaicCommunityLanding.jsx`
 
+### Status Packs — One-Click Themed Icon Assignment (Feb 16, 2026) - COMPLETE
+- **5 themed packs**: Chinese New Year, Construction Progress, Nature Journey, Celestial Night, Calligraphy Master
+- Each pack auto-assigns progress animations to all navigation icons of the active layout with one click
+- Shows preview strip of 5 themed icons + "Apply to [Layout Name]" button
+- Auto-saves to backend on apply (PUT /api/admin/ticker/layout-icons/{layoutId})
+- Files: `LayoutPreviewModule.jsx` (STATUS_PACKS array, handleApplyPack function)
+
+### Students Table Enhancement (Feb 16, 2026) - COMPLETE
+- Compact table with sortable columns, pagination (25/page), inline pre-sale toggle
+- 4 large stat cards → inline badges
+- Files: `StudentsTab.jsx`
+
 ### Unatienda Admin UI Reorganization (Feb 16, 2026) - COMPLETE
 - **Grouped navigation**: 10 flat tabs reorganized into 4 logical groups (Catalog, Orders, School, Settings) with visual dividers
 - **Compact stats**: Module-level 4 large stat cards → 4 inline badges; Inventory tab 6 stat cards → inline badge row
