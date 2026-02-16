@@ -387,16 +387,27 @@ export default function TextbookOrdersAdminTab() {
                           </Select>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedOrder(order);
-                              setShowOrderDialog(true);
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-0.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setChatStudent({ id: order.student_id, name: order.student_name })}
+                              title="Messages"
+                              data-testid={`admin-chat-order-${order.order_id}`}
+                            >
+                              <MessageCircle className="h-4 w-4 text-purple-600" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setShowOrderDialog(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
