@@ -521,7 +521,10 @@ export default function Orders() {
         studentId={crmChatStudent?.id}
         studentName={crmChatStudent?.name}
         isOpen={!!crmChatStudent}
-        onClose={() => setCrmChatStudent(null)}
+        onClose={() => {
+          setCrmChatStudent(null);
+          refreshCrmUnread();
+        }}
       />
     </div>
   );
