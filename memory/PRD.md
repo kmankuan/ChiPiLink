@@ -5,53 +5,58 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Monday.com Stock Approval Integration (Feb 16, 2026) - COMPLETE
+- **Stock changes routed through Stock Movements**: Monday.com stock changes no longer directly update inventory. Instead, they create pending Stock Adjustment orders
+- **"Stock Approval" column on Monday.com**: Created a status column (Pending/Approved/Rejected) on the TXB Inventory board (column_id: color_mm0mtf8f)
+- **Bidirectional approval**: Admin can approve/reject from the app (Stock Movements tab) OR directly from Monday.com by changing the Stock Approval column
+  - Approved → inventory updates, movement logged
+  - Rejected → stock reverts on Monday.com, adjustment cancelled
+- **New products start at 0 stock**: Products created from Monday.com don't get stock synced — stock must go through Stock Movements
+- **Admin setup UI**: "Stock Approval Control" card in TXB Inventory settings (Integrations) with one-click column creation
+- **Monday.com badge**: Orders from Monday.com show a blue "Monday.com" badge with Zap icon in Stock Movements tab and detail dialog
+- Files: `monday_txb_inventory_adapter.py`, `monday_sync.py`, `StockOrdersTab.jsx`, `TxbInventoryTab.jsx`
+
 ### Community Feed: Hide Auto/See All + Admin Link Buttons (Feb 16, 2026) - COMPLETE
-- **Hidden by default**: "Auto" (autoplay toggle) and "See all" buttons now hidden by default on ChiPi Community feed
-- **Admin-configurable**: New toggles `show_autoplay_btn` and `show_see_all_btn` in Telegram admin (Integrations > Telegram > container settings > Toggles)
-- **Header Link Buttons**: New admin section to add/remove custom link buttons (label + URL pairs) that appear in the feed header. Supports both external URLs (opens new tab) and internal app paths
-- Files: `TelegramFeedCard.jsx` (HorizontalFeedContainer + VerticalFeedContainer), `TelegramAdminModule.jsx`
+- Hidden "Auto" and "See all" buttons by default (admin-configurable)
+- Admin-configurable header link buttons (label + URL pairs)
 
 ### Stock Movements: Naming Update & Summary Cards (Feb 16, 2026) - COMPLETE
-- **Renamed** "Workflows" → "Stock Mov." / "Stock Movements", "PCA Textbooks" → "School Textbooks" across entire app
-- **Summary cards**: Dynamic stats (Total, Pending, Completed, type breakdown) that update per catalog filter
+- Renamed "Workflows" → "Stock Movements", "PCA Textbooks" → "School Textbooks"
+- Dynamic summary cards (Total, Pending, Completed, type breakdown)
 
 ### Stock Movements: Catalog Type Separation (Feb 16, 2026) - COMPLETE
-- Catalog filter tabs (All / School Textbooks / Public Store), explicit catalog selection in create dialogs
-- Scoped product search, visual badges, backend `catalog_type` field + filtering
+- Catalog filter tabs (All / School Textbooks / Public Store)
+- Explicit catalog selection, scoped product search, visual badges
 
 ### Stock Movements System (Feb 16, 2026) - COMPLETE
-- 3 workflow types: Shipment, Customer Return, Stock Adjustment with state machine transitions
+- 3 workflow types: Shipment, Customer Return, Stock Adjustment
 
 ### Media Player Features (Feb 15-16, 2026) - COMPLETE
-- Video autoplay with unmute/mute fallback, smart portrait image pairing, admin muted config
-
-### Other Completed Features
-- Animation Types & Lottie, Custom Icon Statuses, Horizontal Telegram Feed
-- Module Icon Status Indicators, Privacy Settings, Monday.com Widget
-- Media Gallery Player, PinPanClub Ranking Fix, Banner/Feed UI Fixes
+### Other Completed Features (Feb 15, 2026) - COMPLETE
 
 ## Prioritized Backlog
 
 ### P1: Implement "Stop" Button for Full Sync
 - Refactor full_sync into cancellable background task
-- Add stop button in UI
 
 ### P2: On-Demand Landing Page Redesign Tool
-- Admin panel tool for layout/component customization
 
 ### P3: General Inventory Monday.com Sync
-- Extend Monday.com sync to general (non-textbook) inventory
 
-## Architecture
+## Key Architecture Notes
+
+### Stock Flow
+- Monday.com stock change → Webhook → Create Stock Adjustment (Pending) → Set "Stock Approval" to Pending
+- Admin approves (app or Monday.com) → Inventory updated → Movement logged
+- Admin rejects (app or Monday.com) → Monday.com stock reverted → Adjustment cancelled
 
 ### Key DB Collections
-- `store_products` with `is_private_catalog: bool` for catalog type
-- `stock_orders` with `catalog_type: "public"|"pca"`
-- `telegram_feed_containers` with `show_autoplay_btn`, `show_see_all_btn`, `header_links[]`
+- `stock_orders` with `source: "monday_sync"`, `monday_item_id`, `monday_old_stock`, `monday_new_stock`
+- `monday_integration_config` with `stock_approval_column_id` in TXB inventory config
+- `store_products` with `is_private_catalog: bool`
 
 ### Key Files
-- `frontend/src/components/TelegramFeedCard.jsx` - Community feed with configurable buttons
-- `frontend/src/modules/admin/TelegramAdminModule.jsx` - Feed container admin config
-- `frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` - Stock Movements
-- `backend/modules/store/routes/stock_orders.py` - Stock Orders API
-- `backend/modules/store/routes/inventory.py` - Product inventory API
+- `backend/modules/store/integrations/monday_txb_inventory_adapter.py` - Core adapter with stock approval logic
+- `backend/modules/store/routes/monday_sync.py` - API endpoints including setup-stock-approval
+- `frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` - Stock Movements UI
+- `frontend/src/modules/monday/components/TxbInventoryTab.jsx` - TXB Inventory admin with Stock Approval card
