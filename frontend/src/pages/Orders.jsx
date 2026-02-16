@@ -505,6 +505,14 @@ export default function Orders() {
         }}
         lang={i18n?.language || 'es'}
       />
+
+      {/* CRM Chat */}
+      <CrmChat
+        studentId={crmChatStudent?.id}
+        studentName={crmChatStudent?.name}
+        isOpen={!!crmChatStudent}
+        onClose={() => setCrmChatStudent(null)}
+      />
     </div>
   );
 }
