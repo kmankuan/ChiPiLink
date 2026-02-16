@@ -223,7 +223,22 @@ export default function MediaPlayer() {
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [current, isVideo, videoAutoplay, playing]);
 
-  useEffect(() => { if (videoRef.current) videoRef.current.muted = muted; }, [muted]);
+  /* Ensure muted attribute is set on the DOM element (React JSX 'muted' only sets the property, not the attribute) */
+  const videoRefCallback = useCallback((node) => {
+    videoRef.current = node;
+    if (node) {
+      node.setAttribute('muted', '');
+      node.muted = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = muted;
+      if (muted) videoRef.current.setAttribute('muted', '');
+      else videoRef.current.removeAttribute('muted');
+    }
+  }, [muted]);
   useEffect(() => { setVideoError(false); }, [current]);
 
   /* Parallax */
