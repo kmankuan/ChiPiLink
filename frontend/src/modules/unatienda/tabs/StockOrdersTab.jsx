@@ -667,6 +667,14 @@ export default function StockOrdersTab({ token }) {
     !['received', 'approved', 'rejected', 'applied'].includes(o.status)
   ).length;
 
+  const completedCount = orders.filter(o =>
+    ['received', 'approved', 'applied'].includes(o.status)
+  ).length;
+
+  const shipmentCount = orders.filter(o => o.type === 'shipment').length;
+  const returnCount = orders.filter(o => o.type === 'return').length;
+  const adjustmentCount = orders.filter(o => o.type === 'adjustment').length;
+
   const defaultCatalog = catalogFilter !== 'all' ? catalogFilter : 'public';
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
