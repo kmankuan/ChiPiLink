@@ -577,6 +577,63 @@ export default function TxbInventoryTab() {
         </CardContent>
       </Card>
 
+      {/* Stock Approval Column */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CheckCircle className="h-4 w-4" />
+            Stock Approval Control
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Stock changes from Monday.com are now routed through Stock Movements for approval.
+            When stock is changed on the board, a pending adjustment is created. Approve or reject directly from Monday.com or the admin panel.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-lg p-3 flex items-center justify-between" style={{
+            background: config.stock_approval_column_id ? '#ecfdf5' : '#f0f4f8',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}>
+            <div className="flex items-center gap-2">
+              {config.stock_approval_column_id ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-slate-500" />
+              )}
+              <div>
+                <p className="text-xs font-medium" style={{ color: config.stock_approval_column_id ? '#065f46' : '#334155' }}>
+                  {config.stock_approval_column_id ? 'Stock Approval Column Active' : 'Stock Approval Not Configured'}
+                </p>
+                <p className="text-[10px]" style={{ color: config.stock_approval_column_id ? '#047857' : '#64748b' }}>
+                  {config.stock_approval_column_id
+                    ? `Column ID: ${config.stock_approval_column_id} — Statuses: Pending / Approved / Rejected`
+                    : 'Create a "Stock Approval" status column on Monday.com to enable approval workflow'}
+                </p>
+              </div>
+            </div>
+            {!config.stock_approval_column_id && (
+              <Button
+                size="sm"
+                onClick={handleSetupStockApproval}
+                disabled={settingUpApproval || !config.enabled || !config.board_id}
+                className="text-xs gap-1"
+                data-testid="setup-stock-approval-btn"
+              >
+                {settingUpApproval ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3" />}
+                Create Column
+              </Button>
+            )}
+          </div>
+          <div className="text-[10px] text-muted-foreground space-y-1">
+            <p><strong>How it works:</strong></p>
+            <p>1. Someone changes stock on Monday.com → A Stock Adjustment is created (status: Pending)</p>
+            <p>2. "Stock Approval" column on Monday.com is set to "Pending"</p>
+            <p>3. Set to "Approved" → inventory updates. Set to "Rejected" → stock reverts.</p>
+            <p>You can also approve/reject from the Stock Movements tab in the admin panel.</p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Item Column Mapping */}
       <Card>
         <CardHeader className="pb-3">
