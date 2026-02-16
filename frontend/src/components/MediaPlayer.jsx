@@ -136,6 +136,15 @@ export default function MediaPlayer() {
   const fitMode       = config?.fit_mode || 'cover';
 
   const orientations_data = useImageOrientations(fitMode === 'smart' ? items : []);
+
+  /* Set initial muted state from config */
+  useEffect(() => {
+    if (config) {
+      setMuted(videoDefaultMuted);
+      setAutoMuted(false);
+    }
+  }, [config, videoDefaultMuted]);
+
   const orientations = orientations_data.orientations;
   const orientationsReady = fitMode !== 'smart' || orientations_data.allLoaded;
   const slides = useMemo(() => orientationsReady ? buildSlides(items, orientations, fitMode) : items.map(it => ({ kind: 'single', items: [it] })), [items, orientations, fitMode, orientationsReady]);
