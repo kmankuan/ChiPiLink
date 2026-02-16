@@ -358,14 +358,14 @@ export default function StudentsTab({ token }) {
 
           {/* Pagination */}
           <TablePagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.pageSize}
+            page={page}
+            totalPages={totalPages}
+            pageSize={pageSize}
             totalItems={sortedStudents.length}
-            onPageChange={pagination.goToPage}
-            onPageSizeChange={pagination.setPageSize}
-            startIndex={pagination.startIndex}
-            endIndex={pagination.endIndex}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+            canPrev={canPrev}
+            canNext={canNext}
           />
         </>
       )}
