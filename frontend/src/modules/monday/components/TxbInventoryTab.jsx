@@ -37,7 +37,7 @@ const COLUMN_FIELDS = [
   { key: 'publisher', label: 'Publisher', description: 'Text column for publisher name' },
   { key: 'subject', label: 'Subject', description: 'Text column for subject/materia' },
   { key: 'unit_price', label: 'Unit Price', description: 'Number column for price' },
-  { key: 'stock_quantity', label: 'Stock Quantity', description: 'Number column for current stock (enables bidirectional sync)', required: true },
+  { key: 'stock_quantity', label: 'Stock Quantity', description: 'Number column for current stock. Changes create pending approvals instead of direct updates.', required: true },
   { key: 'status', label: 'Status', description: 'Status column (auto-set: In Stock / Low Stock / Out of Stock)' },
 ];
 
