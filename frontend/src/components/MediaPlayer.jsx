@@ -207,6 +207,22 @@ export default function MediaPlayer() {
     if (p?.catch) p.catch(() => { if (v) { v.muted = true; v.play().catch(() => setVideoError(true)); } });
   }, [playing, videoAutoplay]);
 
+  /* Robust autoplay: when current slide changes to a video, attempt play after a tick */
+  useEffect(() => {
+    if (!isVideo || !videoAutoplay || !playing) return;
+    const tryPlay = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      v.muted = true;
+      const p = v.play();
+      if (p?.catch) p.catch(() => {});
+    };
+    // Try immediately, then again after short delays to handle mount timing
+    const t1 = setTimeout(tryPlay, 50);
+    const t2 = setTimeout(tryPlay, 300);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [current, isVideo, videoAutoplay, playing]);
+
   useEffect(() => { if (videoRef.current) videoRef.current.muted = muted; }, [muted]);
   useEffect(() => { setVideoError(false); }, [current]);
 
