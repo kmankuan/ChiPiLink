@@ -35,17 +35,20 @@ function shuffleArray(arr) {
 /* Detect portrait/landscape for each image URL */
 function useImageOrientations(items) {
   const [ori, setOri] = useState({});
+  const imageUrls = useMemo(() => (items || []).filter(it => it.type === 'image').map(it => it.url), [items]);
+  const allLoaded = imageUrls.length > 0 && imageUrls.every(u => ori[u] !== undefined);
+
   useEffect(() => {
-    if (!items?.length) return;
-    items.filter(it => it.type === 'image').forEach(it => {
-      if (ori[it.url] !== undefined) return;
+    if (!imageUrls.length) return;
+    imageUrls.forEach(url => {
+      if (ori[url] !== undefined) return;
       const img = new window.Image();
-      img.onload = () => setOri(p => ({ ...p, [it.url]: img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape' }));
-      img.onerror = () => setOri(p => ({ ...p, [it.url]: 'landscape' }));
-      img.src = it.url;
+      img.onload = () => setOri(p => ({ ...p, [url]: img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape' }));
+      img.onerror = () => setOri(p => ({ ...p, [url]: 'landscape' }));
+      img.src = url;
     });
-  }, [items]);
-  return ori;
+  }, [imageUrls]);
+  return { orientations: ori, allLoaded };
 }
 
 /* In smart mode, pair consecutive portrait images into one slide */
