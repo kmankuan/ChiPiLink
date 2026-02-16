@@ -954,7 +954,7 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
             <div className="flex rounded-md border overflow-hidden" data-testid="catalog-type-filter">
               {[
                 { value: 'all', label: 'All' },
-                { value: 'pca', label: 'PCA Textbooks' },
+                { value: 'pca', label: 'School Textbooks' },
                 { value: 'public', label: 'Public Store' },
                 { value: 'archived', label: 'Archived' },
               ].map(opt => (

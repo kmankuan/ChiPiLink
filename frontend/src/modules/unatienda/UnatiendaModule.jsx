@@ -81,7 +81,7 @@ export default function UnatiendaModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.private_products || 0}</p>
-                <p className="text-xs text-muted-foreground">Private Catalog PCA</p>
+                <p className="text-xs text-muted-foreground">School Textbooks</p>
               </div>
             </div>
           </CardContent>
@@ -127,7 +127,7 @@ export default function UnatiendaModule() {
           </TabsTrigger>
           <TabsTrigger value="stock-orders" className="flex items-center gap-2" data-testid="stock-orders-tab-trigger">
             <Truck className="h-4 w-4" />
-            <span className="hidden md:inline">Workflows</span>
+            <span className="hidden md:inline">Stock Mov.</span>
           </TabsTrigger>
           <TabsTrigger value="access-requests" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />

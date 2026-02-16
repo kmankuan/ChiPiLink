@@ -317,7 +317,7 @@ export default function LinkingPage({ embedded = false }) {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-purple-600" />
-                PCA Textbooks
+                School Textbooks
               </CardTitle>
               <CardDescription>
                 Link students to access exclusive school textbooks

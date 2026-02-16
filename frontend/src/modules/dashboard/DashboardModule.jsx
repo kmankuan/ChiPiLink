@@ -217,7 +217,7 @@ export default function DashboardModule() {
                 <p className="text-2xl font-bold">{unatiendaStats.public_products || 0}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Private Catalog PCA</p>
+                <p className="text-sm text-muted-foreground">School Textbooks</p>
                 <p className="text-2xl font-bold text-purple-600">{unatiendaStats.private_products || 0}</p>
               </div>
               <div className="space-y-1">
