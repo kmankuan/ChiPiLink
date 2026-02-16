@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
   MessageCircle, Search, Loader2, Inbox, User, Clock,
-  ChevronRight, RefreshCw, Settings
+  ChevronRight, RefreshCw, Settings, Bell
 } from 'lucide-react';
 import CrmChat from '@/components/chat/CrmChat';
 
