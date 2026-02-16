@@ -823,6 +823,58 @@ function ProgressIconsGallery({ activeLayout, iconConfig, setIconConfig, saveIco
               </div>
             </div>
           </div>
+
+          {/* ── Quick Apply Packs ── */}
+          <div className="rounded-xl border border-border/30 bg-muted/10 p-3 space-y-3" data-testid="status-packs">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick Apply Packs</span>
+            {activeLayout && activeIcons.length > 0 ? (
+              <div className="space-y-2">
+                {STATUS_PACKS.map(pack => (
+                  <div
+                    key={pack.id}
+                    className="flex items-center gap-3 p-2 rounded-lg bg-card border border-border/20 hover:border-border/50 transition-colors"
+                    data-testid={`pack-${pack.id}`}
+                  >
+                    {/* Preview strip */}
+                    <div className="flex gap-1">
+                      {pack.levels.map((level, i) => (
+                        <div key={i} className="w-7 h-7 rounded-md flex items-center justify-center bg-muted/30">
+                          <ProgressIcon level={level} theme={pack.theme} size={20} />
+                        </div>
+                      ))}
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[11px] font-bold block">{pack.name}</span>
+                      <span className="text-[9px] text-muted-foreground block truncate">{pack.description}</span>
+                    </div>
+                    {/* Apply button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[10px] gap-1 shrink-0"
+                      onClick={() => handleApplyPack(pack)}
+                      disabled={!!applyingPack}
+                      data-testid={`apply-pack-${pack.id}`}
+                    >
+                      {applyingPack === pack.id ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Check className="h-3 w-3" />
+                      )}
+                      Apply to {activeLayoutName}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-muted-foreground">
+                {!activeLayout
+                  ? 'No active layout detected. Activate a layout first.'
+                  : 'No icons configured for the active layout. Add navigation icons first using the "Icons" button above.'}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
