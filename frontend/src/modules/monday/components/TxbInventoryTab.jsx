@@ -244,6 +244,29 @@ export default function TxbInventoryTab() {
     }
   };
 
+  const handleSetupStockApproval = async () => {
+    setSettingUpApproval(true);
+    try {
+      const res = await fetch(`${API}/api/store/monday/txb-inventory/setup-stock-approval`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.status === 'already_exists'
+          ? 'Stock Approval column already exists'
+          : 'Stock Approval column created on Monday.com');
+        fetchConfig();
+      } else {
+        toast.error(data.detail || 'Failed to create column');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setSettingUpApproval(false);
+    }
+  };
+
   const handleSyncColumn = async (columnKey, label) => {
     setSyncingColumn(columnKey);
     try {
