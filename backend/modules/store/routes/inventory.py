@@ -116,49 +116,38 @@ async def get_inventory_products(
     admin: dict = Depends(get_admin_user),
 ):
     """Get products with inventory data, search, filter, sort"""
-    query = {"active": True}
+    conditions = [{"active": True}]
 
     # Filter by catalog type
     if catalog_type == "pca":
-        query["is_private_catalog"] = True
+        conditions.append({"is_private_catalog": True})
     elif catalog_type == "public":
-        query["$or"] = [
+        conditions.append({"$or": [
             {"is_private_catalog": {"$exists": False}},
             {"is_private_catalog": False},
-        ]
+        ]})
 
     if search:
-        query["$or"] = [
+        conditions.append({"$or": [
             {"name": {"$regex": search, "$options": "i"}},
             {"code": {"$regex": search, "$options": "i"}},
             {"isbn": {"$regex": search, "$options": "i"}},
-        ]
+        ]})
 
     if category:
-        query["category"] = category
+        conditions.append({"category": category})
 
     if stock_filter == "low":
-        query["inventory_quantity"] = {"$gt": 0, "$lte": 10}
+        conditions.append({"inventory_quantity": {"$gt": 0, "$lte": 10}})
     elif stock_filter == "out":
-        query["$or"] = [
+        conditions.append({"$or": [
             {"inventory_quantity": {"$lte": 0}},
             {"inventory_quantity": {"$exists": False}},
-        ]
-        # Remove conflicting $or from search
-        if search:
-            query = {"$and": [
-                {"active": True},
-                {"$or": [
-                    {"name": {"$regex": search, "$options": "i"}},
-                    {"code": {"$regex": search, "$options": "i"}},
-                ]},
-                {"$or": [
-                    {"inventory_quantity": {"$lte": 0}},
-                    {"inventory_quantity": {"$exists": False}},
-                ]}
-            ]}
+        ]})
     elif stock_filter == "in":
-        query["inventory_quantity"] = {"$gt": 10}
+        conditions.append({"inventory_quantity": {"$gt": 10}})
+
+    query = {"$and": conditions} if len(conditions) > 1 else conditions[0]
 
     sort_map = {
         "name": "name",
