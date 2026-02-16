@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useLandingImages } from '@/hooks/useLandingImages';
 import { useLayoutIcons } from '@/hooks/useLayoutIcons';
 import Lottie from 'lottie-react';
+import { ProgressIcon, isProgressAnimation, parseProgressAnimation } from '@/components/ui/ProgressIcons';
 import BannerCarousel from '@/components/BannerCarousel';
 import MediaPlayer from '@/components/MediaPlayer';
 import TelegramFeedCard from '@/components/TelegramFeedCard';
