@@ -919,109 +919,92 @@ export default function PrivateCatalogTab({ token, onRefresh }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
-                <Warehouse className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <CardTitle>Inventory</CardTitle>
-                <CardDescription>Unified product & textbook management</CardDescription>
-              </div>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')} className="gap-1.5" data-testid="view-table">
-                <BarChart3 className="h-3.5 w-3.5" /> Products
-              </Button>
-              <Button variant={viewMode === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('history')} className="gap-1.5" data-testid="view-history">
-                <History className="h-3.5 w-3.5" /> Movements
-              </Button>
-              <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> {translate('common.refresh', 'Refresh')}
-              </Button>
-              <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} />
-              <Button onClick={() => handleOpenForm()} className="gap-2"><Plus className="h-4 w-4" /> {translate('store.addBook', 'Add Product')}</Button>
-            </div>
+    <div className="space-y-4">
+      {/* Compact toolbar */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600">
+            <Warehouse className="h-4 w-4 text-white" />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {/* Catalog Type Tabs */}
-            <div className="flex rounded-md border overflow-hidden" data-testid="catalog-type-filter">
-              {[
-                { value: 'all', label: 'All' },
-                { value: 'pca', label: 'School Textbooks' },
-                { value: 'public', label: 'Public Store' },
-                { value: 'archived', label: 'Archived' },
-              ].map(opt => (
-                <button key={opt.value} onClick={() => { setCatalogType(opt.value); setSelectedIds(new Set()); }}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    catalogType === opt.value
-                      ? opt.value === 'archived' ? 'bg-amber-500 text-white' : 'bg-primary text-primary-foreground'
-                      : 'bg-background hover:bg-muted'
-                  }`}
-                  data-testid={`catalog-${opt.value}`}>
-                  {opt.value === 'archived' && <Archive className="h-3 w-3 inline mr-1" />}
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search by name, code, publisher..." value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)} className="pl-9" data-testid="pca-search" />
-              </div>
-            </div>
-            <select value={selectedGrade} onChange={(e) => setSelectedGrade(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background text-sm" data-testid="pca-filter-grade">
-              <option value="">All grades</option>
-              {filters.grades.map(g => <option key={g} value={g}>{g}</option>)}
-            </select>
-            <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background text-sm" data-testid="pca-filter-subject">
-              <option value="">All subjects</option>
-              {filters.subjects.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background text-sm" data-testid="pca-filter-status">
-              <option value="all">All status</option>
-              <option value="active">Active only</option>
-              <option value="inactive">Inactive only</option>
-            </select>
-            {(searchTerm || selectedGrade || selectedSubject || statusFilter !== 'all') && (
-              <Button variant="ghost" size="sm" className="gap-1 text-xs" data-testid="pca-clear-filters"
-                onClick={() => { setSearchTerm(''); setSelectedGrade(''); setSelectedSubject(''); setStatusFilter('all'); }}>
-                <X className="h-3.5 w-3.5" /> Clear filters
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-6">
-        <Card><CardContent className="pt-6"><div className="text-2xl font-bold">{products.length}</div><p className="text-xs text-muted-foreground">Total books</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><div className="text-2xl font-bold">{products.filter(p => p.active !== false).length}</div><p className="text-xs text-muted-foreground">Active</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><div className="text-2xl font-bold text-green-600">{totalStock}</div><p className="text-xs text-muted-foreground">Total Stock</p></CardContent></Card>
-        <Card className={lowStockCount > 0 ? 'border-amber-300' : ''}><CardContent className="pt-6"><div className="text-2xl font-bold text-amber-600">{lowStockCount}</div><p className="text-xs text-muted-foreground">Low Stock</p></CardContent></Card>
-        <Card className={outOfStockCount > 0 ? 'border-red-300' : ''}><CardContent className="pt-6"><div className="text-2xl font-bold text-red-600">{outOfStockCount}</div><p className="text-xs text-muted-foreground">Out of Stock</p></CardContent></Card>
-        <Card><CardContent className="pt-6"><div className="text-2xl font-bold">{filters.grades.length}</div><p className="text-xs text-muted-foreground">Grades</p></CardContent></Card>
+          <h3 className="text-sm font-bold tracking-tight">Inventory</h3>
+          <span className="text-[10px] text-muted-foreground hidden sm:inline">Unified product & textbook management</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          <Button variant={viewMode === 'table' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('table')} className="gap-1 h-7 text-xs" data-testid="view-table">
+            <BarChart3 className="h-3 w-3" /> Products
+          </Button>
+          <Button variant={viewMode === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('history')} className="gap-1 h-7 text-xs" data-testid="view-history">
+            <History className="h-3 w-3" /> Movements
+          </Button>
+          <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading} className="h-7 text-xs">
+            <RefreshCw className={`h-3 w-3 mr-1 ${loading ? 'animate-spin' : ''}`} /> {translate('common.refresh', 'Refresh')}
+          </Button>
+          <InventoryImport token={token} onImportComplete={() => { fetchProducts(); onRefresh?.(); }} />
+          <Button onClick={() => handleOpenForm()} size="sm" className="gap-1 h-7 text-xs"><Plus className="h-3 w-3" /> {translate('store.addBook', 'Add Product')}</Button>
+        </div>
       </div>
 
-      {/* Info Banner */}
-      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-        <CardContent className="py-3">
-          <div className="flex items-center gap-3 text-sm text-blue-700 dark:text-blue-300">
-            <AlertCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
-            <p><strong>Tip:</strong> Click cells to edit inline. Drag column headers to reorder. Use checkboxes for bulk actions. Click headers to sort.</p>
+      {/* Filters row */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex rounded-md border overflow-hidden" data-testid="catalog-type-filter">
+          {[
+            { value: 'all', label: 'All' },
+            { value: 'pca', label: 'School Textbooks' },
+            { value: 'public', label: 'Public Store' },
+            { value: 'archived', label: 'Archived' },
+          ].map(opt => (
+            <button key={opt.value} onClick={() => { setCatalogType(opt.value); setSelectedIds(new Set()); }}
+              className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                catalogType === opt.value
+                  ? opt.value === 'archived' ? 'bg-amber-500 text-white' : 'bg-primary text-primary-foreground'
+                  : 'bg-background hover:bg-muted'
+              }`}
+              data-testid={`catalog-${opt.value}`}>
+              {opt.value === 'archived' && <Archive className="h-3 w-3 inline mr-0.5" />}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1 min-w-[180px] max-w-sm">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input placeholder="Search by name, code, publisher..." value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="pca-search" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <select value={selectedGrade} onChange={(e) => setSelectedGrade(e.target.value)}
+          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-grade">
+          <option value="">All grades</option>
+          {filters.grades.map(g => <option key={g} value={g}>{g}</option>)}
+        </select>
+        <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
+          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-subject">
+          <option value="">All subjects</option>
+          {filters.subjects.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-2 py-1.5 border rounded-md bg-background text-xs h-8" data-testid="pca-filter-status">
+          <option value="all">All status</option>
+          <option value="active">Active only</option>
+          <option value="inactive">Inactive only</option>
+        </select>
+        {(searchTerm || selectedGrade || selectedSubject || statusFilter !== 'all') && (
+          <Button variant="ghost" size="sm" className="gap-1 text-[10px] h-7" data-testid="pca-clear-filters"
+            onClick={() => { setSearchTerm(''); setSelectedGrade(''); setSelectedSubject(''); setStatusFilter('all'); }}>
+            <X className="h-3 w-3" /> Clear
+          </Button>
+        )}
+      </div>
+
+      {/* Compact inline stats */}
+      <div className="flex flex-wrap gap-2 text-xs" data-testid="inventory-stats">
+        <span className="px-2 py-1 rounded bg-muted font-medium">{products.length} <span className="text-muted-foreground">total</span></span>
+        <span className="px-2 py-1 rounded bg-muted font-medium">{products.filter(p => p.active !== false).length} <span className="text-muted-foreground">active</span></span>
+        <span className="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium">{totalStock} <span className="opacity-70">stock</span></span>
+        {lowStockCount > 0 && <span className="px-2 py-1 rounded bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-bold">{lowStockCount} <span className="opacity-70">low stock</span></span>}
+        {outOfStockCount > 0 && <span className="px-2 py-1 rounded bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 font-bold">{outOfStockCount} <span className="opacity-70">out of stock</span></span>}
+        <span className="px-2 py-1 rounded bg-muted font-medium">{filters.grades.length} <span className="text-muted-foreground">grades</span></span>
+      </div>
 
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
