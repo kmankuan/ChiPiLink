@@ -18,6 +18,7 @@ const DEFAULT_CONFIG = {
   shuffle: false,
   disable_swipe: false,
   video_autoplay: true,
+  video_default_muted: false,
   video_max_duration_ms: 30000,
   fit_mode: 'smart',
   items: [],

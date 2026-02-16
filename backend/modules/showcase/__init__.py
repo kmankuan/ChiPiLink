@@ -232,6 +232,7 @@ DEFAULT_PLAYER_CONFIG = {
     "shuffle": False,
     "disable_swipe": False,
     "video_autoplay": True,
+    "video_default_muted": False,
     "video_max_duration_ms": 30000,
     "fit_mode": "smart",
     "items": [],
