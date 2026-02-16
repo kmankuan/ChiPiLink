@@ -4,6 +4,10 @@ Tests for the pre-sale import API endpoints:
 - GET /api/store/presale-import/preview
 - GET /api/store/presale-import/orders
 - POST /api/store/presale-import/execute
+- GET /api/store/presale-import/suggestions
+- POST /api/store/presale-import/suggestions/{id}/confirm
+- POST /api/store/presale-import/suggestions/{id}/reject
+- POST /api/store/presale-import/unlink
 """
 import pytest
 import requests
