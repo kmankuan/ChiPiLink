@@ -54,6 +54,7 @@ export default function TxbInventoryTab() {
   const [syncing, setSyncing] = useState(false);
   const [registeringWebhook, setRegisteringWebhook] = useState(false);
   const [registeringCreateWh, setRegisteringCreateWh] = useState(false);
+  const [settingUpApproval, setSettingUpApproval] = useState(false);
   const [syncingColumn, setSyncingColumn] = useState(null);
   const [boardColumns, setBoardColumns] = useState([]);
   const [subitemColumns, setSubitemColumns] = useState([]);
