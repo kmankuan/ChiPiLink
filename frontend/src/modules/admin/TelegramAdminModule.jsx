@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   RefreshCw, Settings, Eye, BarChart3, Loader2, CheckCircle, AlertCircle,
   Radio, Plus, Trash2, GripVertical, Copy, ChevronDown, ChevronUp,
-  Palette, Type, Layout, ToggleLeft
+  Palette, Type, Layout, ToggleLeft, Link2
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
