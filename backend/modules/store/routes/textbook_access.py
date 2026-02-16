@@ -57,6 +57,24 @@ async def create_student(
             user_id=current_user["user_id"],
             data=data
         )
+        # Auto-link pre-sale orders
+        try:
+            from ..services.presale_import_service import presale_import_service
+            student_name = f"{data.first_name} {data.last_name}".strip()
+            grade = data.initial_grade or ""
+            student_id = result.get("student_id", "")
+            if student_id and student_name:
+                linked = await presale_import_service.try_auto_link(
+                    student_id=student_id,
+                    student_name=student_name,
+                    grade=str(grade),
+                    user_id=current_user["user_id"]
+                )
+                if linked:
+                    result["presale_linked"] = linked
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Pre-sale auto-link failed (non-blocking): {e}")
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
