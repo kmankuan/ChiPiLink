@@ -30,6 +30,7 @@ from .monday_sync import router as monday_sync_router
 from .order_summary_config import router as order_summary_config_router
 from .stock_orders import router as stock_orders_router
 from .presale_import import router as presale_import_router
+from .crm_chat import router as crm_chat_router
 
 # Main module router
 router = APIRouter(prefix="/store", tags=["Store"])
@@ -54,6 +55,7 @@ router.include_router(monday_sync_router)
 router.include_router(order_summary_config_router)
 router.include_router(stock_orders_router)
 router.include_router(presale_import_router)
+router.include_router(crm_chat_router)
 
 # Re-export for compatibility
 store_refactored_router = router
