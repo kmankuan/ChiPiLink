@@ -333,6 +333,11 @@ export default function StudentsTab({ token }) {
                         </TableCell>
                         <TableCell className="px-2 py-1 text-right">
                           <div className="flex items-center justify-end gap-0.5">
+                            <Button variant="ghost" size="sm" onClick={() => setChatStudent(student)}
+                              className="h-6 w-6 p-0 text-purple-600 hover:text-purple-700" data-testid={`chat-student-${id}`}
+                              title="Open messages">
+                              <MessageCircle className="h-3 w-3" />
+                            </Button>
                             <Button variant="ghost" size="sm" onClick={() => setSelectedStudent(student)}
                               className="h-6 w-6 p-0" data-testid={`view-student-${id}`}>
                               <Eye className="h-3 w-3" />
