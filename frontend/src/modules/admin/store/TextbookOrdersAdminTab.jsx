@@ -63,6 +63,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 const ORDER_STATUSES = [
   { value: 'draft', label: 'Draft' },
   { value: 'submitted', label: 'Submitted' },
+  { value: 'awaiting_link', label: 'Awaiting Link' },
   { value: 'processing', label: 'Processing' },
   { value: 'ready', label: 'Ready' },
   { value: 'delivered', label: 'Delivered' },
@@ -72,6 +73,7 @@ const ORDER_STATUSES = [
 const STATUS_COLORS = {
   draft: 'bg-gray-100 text-gray-700',
   submitted: 'bg-blue-100 text-blue-700',
+  awaiting_link: 'bg-orange-100 text-orange-700',
   processing: 'bg-amber-100 text-amber-700',
   ready: 'bg-green-100 text-green-700',
   delivered: 'bg-emerald-100 text-emerald-700',
