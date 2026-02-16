@@ -136,6 +136,33 @@ async def get_board_columns(admin: dict = Depends(get_admin_user)):
     return {"columns": columns}
 
 
+@router.post("/admin/config/register-webhook")
+async def register_crm_webhook(body: dict, admin: dict = Depends(get_admin_user)):
+    """Register a Monday.com webhook for CRM board update notifications"""
+    config = await crm_monday_adapter.get_crm_config()
+    board_id = config.get("board_id")
+    if not board_id:
+        raise HTTPException(status_code=400, detail="CRM board not configured")
+
+    callback_url = body.get("callback_url", "").strip()
+    if not callback_url:
+        raise HTTPException(status_code=400, detail="callback_url is required")
+
+    try:
+        webhook_id = await crm_monday_adapter.client.register_webhook(
+            board_id, callback_url, event="create_update"
+        )
+        if webhook_id:
+            # Save webhook ID in config
+            config["webhook_id"] = webhook_id
+            config["webhook_url"] = callback_url
+            await crm_monday_adapter.save_crm_config(config)
+            return {"success": True, "webhook_id": webhook_id}
+        raise HTTPException(status_code=500, detail="Failed to register webhook")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ============== WEBHOOK ENDPOINT ==============
 
 @router.post("/webhooks/update-created")
