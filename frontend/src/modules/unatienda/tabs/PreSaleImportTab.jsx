@@ -45,8 +45,11 @@ export default function PreSaleImportTab({ token: propToken }) {
   const [linkDialog, setLinkDialog] = useState(null);
   const [linkSearchTerm, setLinkSearchTerm] = useState('');
   const [linking, setLinking] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [unlinking, setUnlinking] = useState(null);
 
-  useEffect(() => { fetchOrders(); fetchStudents(); }, []);
+  useEffect(() => { fetchOrders(); fetchStudents(); fetchSuggestions(); }, []);
 
   const fetchOrders = async () => {
     setLoading(true);
