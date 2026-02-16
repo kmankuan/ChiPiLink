@@ -108,6 +108,7 @@ async def get_inventory_products(
     search: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     stock_filter: Optional[str] = Query(None, description="all|low|out|in"),
+    catalog_type: Optional[str] = Query(None, description="public|pca - filter by catalog type"),
     sort_by: Optional[str] = Query("name", description="name|stock|price|updated"),
     sort_dir: Optional[str] = Query("asc"),
     skip: int = Query(0, ge=0),
@@ -116,6 +117,15 @@ async def get_inventory_products(
 ):
     """Get products with inventory data, search, filter, sort"""
     query = {"active": True}
+
+    # Filter by catalog type
+    if catalog_type == "pca":
+        query["is_private_catalog"] = True
+    elif catalog_type == "public":
+        query["$or"] = [
+            {"is_private_catalog": {"$exists": False}},
+            {"is_private_catalog": False},
+        ]
 
     if search:
         query["$or"] = [
