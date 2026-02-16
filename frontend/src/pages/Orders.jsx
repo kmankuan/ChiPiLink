@@ -18,6 +18,7 @@ import { Package, Eye, Printer, Loader2, ArrowLeft, BookOpen, ShoppingBag, Chevr
 import OrderChat from '@/components/chat/OrderChat';
 import CrmChat from '@/components/chat/CrmChat';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useCrmNotifications } from '@/hooks/useCrmNotifications';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
