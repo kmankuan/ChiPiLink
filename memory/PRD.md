@@ -5,6 +5,20 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Stock Workflows: Catalog Type Separation (Feb 16, 2026) - COMPLETE
+- **Catalog filter tabs**: "All", "PCA Textbooks", "Public Store" at the top of the Workflows view with counts
+- **Explicit catalog selection**: Shipment and Adjustment creation dialogs include a CatalogTypeSelector (Public Store / PCA Textbooks)
+- **Scoped product search**: ProductPicker filters products by `is_private_catalog` based on selected catalog type
+- **Returns default to PCA**: Return workflow shows "PCA Textbooks Inventory" indicator; always tagged as PCA since returns are from linked student orders
+- **Visual badges**: Each order row shows a PCA (purple) or Public (green) badge
+- **Order detail**: Shows catalog type in detail dialog
+- **Backend**: `catalog_type` field added to stock orders; list API supports `catalog_type` filter; `catalog_counts` aggregation in response
+- **Backend**: `GET /api/store/inventory/products` supports `catalog_type=pca|public` filter
+- **Migration**: Existing orders migrated to `pca` catalog_type
+- Frontend: `StockOrdersTab.jsx` — Full redesign with catalog separation
+- Backend: `stock_orders.py` — Updated models and list endpoint
+- Backend: `inventory.py` — Updated products endpoint with catalog filter
+
 ### Stock Workflows System (Feb 16, 2026) - COMPLETE
 - **3 workflow types**: Shipment (draft → confirmed → received), Customer Return (registered → inspected → approved|rejected), Stock Adjustment (requested → applied)
 - **Stock integrity**: Inventory only updates at terminal workflow steps — not on direct manual edits
@@ -25,32 +39,9 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 - Admin UI: Added checkbox in `ShowcaseAdminModule.jsx`
 
 ### Media Player Video Autoplay & Portrait Pairing Fix (Feb 16, 2026) - COMPLETE
-- **Video Autoplay Fix**: Added `autoPlay` HTML attribute, ref callback to ensure `muted` DOM attribute is set (React JSX `muted` prop only sets JS property), retry useEffect at 50ms/300ms after slide change
-- **Portrait Pairing Fix**: Rewrote `buildSlides()` to collect ALL portrait images regardless of position in source array and pair them together. Old logic only paired consecutive portraits. New logic separates portraits from non-portraits, pairs all portraits, then interleaves evenly among other slides
-- **Orientation Detection**: Improved `useImageOrientations` hook to track loading completion (`allLoaded`), preventing slides from being built with incomplete orientation data
-- Files: `frontend/src/components/MediaPlayer.jsx`
-
 ### Media Player Controls & Video Fix (Feb 15, 2026) - COMPLETE
-- Added admin-configurable settings: `show_dots`, `dot_style` (auto/dots/progress_bar/counter/none), `shuffle` (random order), `video_autoplay`, `video_max_duration_ms`
-- **Dot Style 'auto'**: Shows individual dots for <=10 items, switches to compact progress bar for >10 items
-- **Shuffle**: Fisher-Yates randomization on load
-- **Disable Swipe / Lock Navigation**: `disable_swipe` setting removes touch handlers, hides prev/next arrows, disables dot clicks — for random-only display mode
-- **Image Fit Mode**: `fit_mode` setting with 3 modes:
-  - `smart` (default): Detects portrait images and pairs consecutive portraits side-by-side with blurred background fill
-  - `contain`: Shows full image with blurred background behind
-  - `cover`: Crops image to fill the container (classic behavior)
-- Admin panel: New controls in Banners y Medios > Media Player tab (Fit Mode dropdown, Lock Navigation checkbox)
-- Files: `frontend/src/components/MediaPlayer.jsx`, `frontend/src/modules/admin/ShowcaseAdminModule.jsx`, `backend/modules/showcase/__init__.py`
-
 ### New Animation Types & Lottie Support (Feb 15, 2026) - COMPLETE
-- Added 3 new animation types: `coding_scene`, `building_progress`, `lottie_url`
-- Added `lottie-react` v2.4.1 dependency
-- Updated admin preview and landing page
-
 ### Custom Icon Statuses & Animations (Feb 15, 2026) - COMPLETE
-- 24 animation types total including Chinese cultural styles
-- Backend CRUD API for icon statuses
-
 ### Horizontal Telegram Feed Redesign (Feb 15, 2026) - COMPLETE
 ### Module Icon Status Indicators (Feb 15, 2026) - COMPLETE
 ### Privacy Settings Module (Feb 15, 2026) - COMPLETE
@@ -88,11 +79,15 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ### Key DB Collections
 - `app_config` with keys: `ticker_config`, `landing_images`, `layout_icons`, `icon_statuses`
+- `store_products` with `is_private_catalog: bool` for catalog type separation
+- `stock_orders` with `catalog_type: "public"|"pca"` for workflow catalog separation
 - `users`, `community_posts`, `store_textbook_orders`, `pinpanclub_matches`
 
 ### Key Files
+- `frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` - Stock Workflows with catalog separation
+- `backend/modules/store/routes/stock_orders.py` - Stock Orders API with catalog_type
+- `backend/modules/store/routes/inventory.py` - Product inventory API with catalog filter
 - `frontend/src/components/MediaPlayer.jsx` - Media player with smart layout
 - `frontend/src/modules/admin/tabs/layouts/LayoutPreviewModule.jsx` - Admin status/icon management
-- `frontend/src/pages/landing-layouts/MosaicCommunityLanding.jsx` - Landing page
 - `backend/modules/ticker/routes.py` - Ticker, icon, status API endpoints
 - `backend/modules/showcase/__init__.py` - Media player config API
