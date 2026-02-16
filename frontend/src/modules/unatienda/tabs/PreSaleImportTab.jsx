@@ -303,6 +303,11 @@ export default function PreSaleImportTab({ token: propToken }) {
           <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-green-50 dark:bg-green-950/40 text-green-600 text-xs font-medium">
             <Link2 className="h-3.5 w-3.5" /> <span className="text-base font-bold">{linkedCount}</span> linked
           </span>
+          {suggestions.length > 0 && (
+            <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-xs font-medium animate-pulse">
+              <AlertTriangle className="h-3.5 w-3.5" /> <span className="text-base font-bold">{suggestions.length}</span> to review
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <Button variant="outline" size="sm" onClick={handlePreview} disabled={previewing} className="gap-1 h-7 text-xs" data-testid="preview-import-btn">
