@@ -90,6 +90,7 @@ export default function TxbInventoryTab() {
           create_item_webhook_config: data.create_item_webhook_config || {},
           last_full_sync: data.last_full_sync || null,
           sync_stats: data.sync_stats || {},
+          stock_approval_column_id: data.stock_approval_column_id || null,
         });
       }
     } catch (e) {
