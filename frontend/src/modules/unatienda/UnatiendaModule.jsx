@@ -153,6 +153,7 @@ export default function UnatiendaModule() {
         {activeTab === 'stock-orders' && <StockOrdersTab token={token} />}
         {activeTab === 'textbook-orders' && <TextbookOrdersAdminTab />}
         {activeTab === 'access-requests' && <TextbookAccessAdminTab token={token} />}
+        {activeTab === 'presale-import' && <PreSaleImportTab token={token} />}
         {activeTab === 'students' && <StudentsTab token={token} />}
         {activeTab === 'school-year' && <SchoolYearTab token={token} />}
         {activeTab === 'form-config' && <OrderFormConfigTab />}
