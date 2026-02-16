@@ -187,6 +187,15 @@ const DEFAULT_STATUS_OPTIONS = [
   { value: 'maintenance', label: 'Maintenance', color: '#ef4444', animation: 'wrench', gif_url: '' },
 ];
 
+// Build progress animation options dynamically from themes
+const PROGRESS_ANIM_OPTIONS = Object.entries(PROGRESS_THEMES).flatMap(([themeKey, themeData]) =>
+  PROGRESS_LEVELS.map(level => ({
+    value: getProgressAnimationType(level.key, themeKey),
+    label: `${themeData.levels[level.key]?.label || level.label} (${themeData.name})`,
+    group: themeData.name,
+  }))
+);
+
 const ANIMATION_OPTIONS = [
   { value: 'none', label: 'None' },
   // Original
@@ -199,24 +208,26 @@ const ANIMATION_OPTIONS = [
   { value: 'wrench', label: 'Wrench Spin' },
   { value: 'rocket', label: 'Rocket' },
   { value: 'wave', label: 'Wave' },
-  // NEW: Chinese / Cultural
+  // Chinese / Cultural
   { value: 'lantern', label: 'Lantern (Chinese)' },
   { value: 'dragon', label: 'Dragon (Chinese)' },
   { value: 'bamboo', label: 'Bamboo Growth' },
   { value: 'temple', label: 'Temple / Pagoda' },
   { value: 'sparkle', label: 'Sparkle' },
-  // NEW: Construction
+  // Construction
   { value: 'crane', label: 'Crane' },
-  // NEW: Tech / Digital
+  // Tech / Digital
   { value: 'coding', label: 'Coding' },
   { value: 'data_sync', label: 'Data Sync' },
-  // NEW: Celebration
+  // Celebration
   { value: 'fireworks', label: 'Fireworks' },
-  // NEW: Progress
+  // Progress Bar
   { value: 'progress_bar', label: 'Progress Bar' },
-  // NEW: Scene-based
+  // Scene-based
   { value: 'coding_scene', label: 'Person Coding (Scene)' },
   { value: 'building_progress', label: 'Building Progress 0-100%' },
+  // ── Progress Icon Sets (Chinese themes & more) ──
+  ...PROGRESS_ANIM_OPTIONS,
   // Lottie
   { value: 'lottie_url', label: 'Lottie Animation (URL)' },
   // Custom
