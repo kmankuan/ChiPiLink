@@ -151,6 +151,26 @@ class MondayCoreClient:
         items = data.get("items", [])
         return items[0].get("updates", []) if items else []
 
+    async def get_item_updates_with_replies(self, item_id: str) -> list:
+        """Fetch Updates with their replies for an item (topic + thread structure)"""
+        data = await self.execute(
+            f'''query {{ items(ids: [{item_id}]) {{
+                updates {{ id body text_body creator {{ name }} created_at
+                    replies {{ id body text_body creator {{ name }} created_at }}
+                }}
+            }} }}''',
+            timeout=25.0
+        )
+        items = data.get("items", [])
+        return items[0].get("updates", []) if items else []
+
+    async def create_reply(self, item_id: str, update_id: str, body: str) -> Optional[str]:
+        """Reply to an existing Update. Returns reply update_id."""
+        escaped = body.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+        query = f'mutation {{ create_update (item_id: {item_id}, parent_id: {update_id}, body: "{escaped}") {{ id }} }}'
+        data = await self.execute(query)
+        return data.get("create_update", {}).get("id")
+
     async def get_subitems(self, item_id: str) -> list:
         """Fetch subitems for an item with their column values"""
         data = await self.execute(
