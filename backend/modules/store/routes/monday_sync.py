@@ -436,6 +436,17 @@ async def unregister_txb_create_item_webhook(admin: dict = Depends(get_admin_use
     return await txb_inventory_adapter.unregister_create_item_webhook()
 
 
+@router.post("/txb-inventory/setup-stock-approval")
+async def setup_stock_approval_column(admin: dict = Depends(get_admin_user)):
+    """Create the 'Stock Approval' status column on the TXB inventory board.
+    This column is used to approve/reject stock changes from Monday.com."""
+    from ..integrations.monday_txb_inventory_adapter import txb_inventory_adapter
+    result = await txb_inventory_adapter.setup_stock_approval_column()
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
 # ========== WEBHOOK MANAGEMENT (Admin) ==========
 
 @router.post("/webhooks/register")
