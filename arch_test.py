@@ -7,7 +7,7 @@ def test_architectural_reorganization():
     """Test the architectural reorganization - CRITICAL REVIEW REQUEST"""
     print("🏗️ Testing Architectural Reorganization (CRITICAL)...")
     
-    base_url = "https://workflow-status-4.preview.emergentagent.com"
+    base_url = "https://order-updates-2.preview.emergentagent.com"
     
     # 1. Health Check - Should return all 12 modules
     print("\n1. Testing Health Check...")
