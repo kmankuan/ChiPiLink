@@ -325,6 +325,7 @@ export default function StudentsTab({ token }) {
                     <TableHead className="hidden sm:table-cell">Grade</TableHead>
                     <TableHead className="hidden md:table-cell">School</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="text-center">Pre-sale</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
