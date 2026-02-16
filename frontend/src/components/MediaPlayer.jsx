@@ -257,14 +257,11 @@ export default function MediaPlayer() {
         {isVideo ? (
           <>
             <video
-              ref={(el) => {
-                videoRef.current = el;
-                if (el) el.muted = true; // Ensure muted attribute for autoplay policy
-              }}
+              ref={videoRef}
               key={first.url}
               src={first.url}
               autoPlay
-              muted={true}
+              muted
               playsInline
               preload="auto"
               loop={slides.length === 1}
