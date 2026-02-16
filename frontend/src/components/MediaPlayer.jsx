@@ -96,7 +96,8 @@ export default function MediaPlayer() {
   const [config, setConfig] = useState(null);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(true); // start muted, will update from config
+  const [autoMuted, setAutoMuted] = useState(false); // track if browser forced mute
   const [loaded, setLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
