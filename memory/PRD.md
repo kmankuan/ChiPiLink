@@ -5,6 +5,17 @@ Build a comprehensive admin dashboard for "Chipi Wallet" — evolved into a full
 
 ## What's Been Implemented
 
+### Stock Workflows System (Feb 16, 2026) - COMPLETE
+- **3 workflow types**: Shipment (draft → confirmed → received), Customer Return (registered → inspected → approved|rejected), Stock Adjustment (requested → applied)
+- **Stock integrity**: Inventory only updates at terminal workflow steps — not on direct manual edits
+- **Customer Returns linked to orders**: Search existing textbook orders and link returns to them
+- **Audit trail**: Full status history with timestamps and user info on each transition
+- **Step indicator UI**: Visual workflow progress bar for each order
+- **Product search**: Autocomplete search for adding products to orders with stock levels
+- Backend: `/app/backend/modules/store/routes/stock_orders.py` — CRUD + transitions + summary
+- Frontend: `/app/frontend/src/modules/unatienda/tabs/StockOrdersTab.jsx` — Full UI with dialogs
+- Admin tab: Unatienda > Workflows
+
 ### Media Player Mute Configuration (Feb 16, 2026) - COMPLETE
 - **Default with sound**: Videos now play with sound by default (unmuted). If browser blocks unmuted autoplay, automatically falls back to muted playback
 - **Admin setting**: New "Video Default Muted" toggle in admin panel (Content > Banners y Medios > Media Player tab)
