@@ -155,7 +155,6 @@ export default function UnatiendaModule() {
         {activeTab === 'public-catalog' && <PublicCatalogTab token={token} onRefresh={fetchStats} />}
         {activeTab === 'stock-orders' && <StockOrdersTab token={token} />}
         {activeTab === 'textbook-orders' && <TextbookOrdersAdminTab />}
-        {activeTab === 'access-requests' && <TextbookAccessAdminTab token={token} />}
         {activeTab === 'presale-import' && <PreSaleImportTab token={token} />}
         {activeTab === 'messages' && <MessagesTab token={token} />}
         {activeTab === 'students' && <StudentsTab token={token} />}
