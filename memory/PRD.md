@@ -89,6 +89,11 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - All config stored in `site_config` collection and served via public API
 - Login page reads siteConfig context and renders dynamically
 
+### Phase 5 - Link Student Bug Fixes (Complete - Feb 2026)
+- **Bug 1 Fix**: Fixed intermittent submission failure in Link Student form. Root cause: `data.initial_grade` (non-existent field) in backend presale suggestion, and `onBack()` in onSuccess causing premature navigation away.
+- **Bug 2 Fix**: Fixed school dropdown emptying after linking. Root cause: `onSuccess` called `onBack()` which unmounted the component, losing state. Now user stays on School Textbooks page after linking.
+- **Improvement**: Added error handling + retry button for schools fetch (was silently swallowed)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
