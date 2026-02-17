@@ -41,28 +41,36 @@ const RELATIONSHIP_OPTIONS = [
 function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [schoolsError, setSchoolsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     first_name: '', last_name: '', school_id: '', student_number: '',
     year: new Date().getFullYear(), grade: '', relation_type: '', relation_other: '',
   });
 
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        const { data } = await axios.get(`${API_URL}/api/store/textbook-access/schools`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSchools(data?.schools || []);
-      } catch { /* ignore */ }
+  const fetchSchools = useCallback(async () => {
+    setLoading(true);
+    setSchoolsError(false);
+    try {
+      const { data } = await axios.get(`${API_URL}/api/store/textbook-access/schools`);
+      setSchools(data?.schools || []);
+    } catch (err) {
+      console.error('Failed to load schools:', err);
+      setSchoolsError(true);
+      setSchools([]);
+    } finally {
       setLoading(false);
-    };
+    }
+  }, []);
+
+  useEffect(() => {
     fetchSchools();
-  }, [token]);
+  }, [fetchSchools]);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSubmit = async () => {
+    if (submitting) return;
     if (!form.first_name.trim()) { toast.error('Enter student first name'); return; }
     if (!form.last_name.trim()) { toast.error('Enter student last name'); return; }
     if (!form.school_id) { toast.error('Select a school'); return; }
@@ -84,6 +92,7 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
       toast.success('Student linked! Pending admin approval.');
       onSuccess();
     } catch (err) {
+      console.error('Student link error:', err);
       toast.error(err.response?.data?.detail || 'Failed to submit');
     } finally {
       setSubmitting(false);
@@ -91,6 +100,26 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   };
 
   if (loading) return <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+
+  if (schoolsError || schools.length === 0) {
+    return (
+      <Card className="border-primary/30 shadow-sm">
+        <CardContent className="py-6 text-center space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {lang === 'es' ? 'Error cargando escuelas.' : 'Failed to load schools.'}
+          </p>
+          <div className="flex justify-center gap-2">
+            <Button size="sm" variant="outline" onClick={fetchSchools}>
+              {lang === 'es' ? 'Reintentar' : 'Retry'}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={onCancel}>
+              {lang === 'es' ? 'Cancelar' : 'Cancel'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const texts = {
     en: { firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel' },
