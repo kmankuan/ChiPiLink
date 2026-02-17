@@ -45,7 +45,13 @@ export const schoolTxbTranslations = {
     insufficientBalance: 'Insufficient balance',
     insufficientBalanceMsg: 'Your wallet balance is insufficient. Please make a bank transfer to top up your wallet.',
     paymentSuccess: 'Payment successful! Order submitted.',
-    bankTransferInfo: 'Bank Transfer Information'
+    bankTransferInfo: 'Bank Transfer Information',
+    itemsUnavailable: 'item(s) could not be processed',
+    outOfStock: 'Out of Stock',
+    reorderApproved: 'Reorder approved - Select to order',
+    fileUploaded: 'File uploaded successfully',
+    fileUploadError: 'Error uploading file',
+    fieldRequired: 'is required'
   },
   es: {
     backToStudents: 'Volver a estudiantes',
