@@ -277,23 +277,97 @@ export default function StudentsTab({ token }) {
         </CardContent></Card>
       ) : (
         <>
-          <div className="rounded-lg border">
-            <Table className="min-w-[640px]">
-              <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="w-8 px-2">
-                    <Checkbox
-                      checked={paginated.length > 0 && paginated.every(s => selectedIds.has(s.student_id || s.sync_id))}
-                      onCheckedChange={toggleAll} data-testid="select-all-students" />
-                  </TableHead>
-                  <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
-                  <TableHead className="px-2 w-16"><SortHeader label="Grade" sortKey="grade" /></TableHead>
-                  <TableHead className="px-2 hidden md:table-cell"><SortHeader label="School" sortKey="school" /></TableHead>
-                  <TableHead className="px-2 w-24"><SortHeader label="Status" sortKey="locked" /></TableHead>
-                  <TableHead className="px-2 w-20 text-center"><SortHeader label="Pre-sale" sortKey="presale" className="justify-center" /></TableHead>
-                  <TableHead className="px-2 w-16 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+          {viewMode === 'card' ? (
+            /* ── Card View ── */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2" data-testid="student-cards">
+              {paginated.map((student) => {
+                const id = student.student_id || student.sync_id;
+                const enrollment = (student.enrollments || []).sort((a, b) => (b.year || 0) - (a.year || 0))[0];
+                const isLocked = student.is_locked === true;
+                const isPresale = student.presale_mode === true;
+                const isSelected = selectedIds.has(id);
+
+                return (
+                  <div
+                    key={id}
+                    className={`rounded-lg border p-3 transition-colors ${isSelected ? 'border-primary/50 bg-primary/5' : 'border-border/60 bg-card hover:bg-muted/30'}`}
+                    data-testid={`student-card-${id}`}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(id)} className="mt-0.5" data-testid={`select-student-${id}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold truncate">{student.full_name}</p>
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <Button variant="ghost" size="sm" onClick={() => setChatStudent(student)}
+                              className="h-6 w-6 p-0 text-purple-600 hover:text-purple-700" data-testid={`chat-student-${id}`}>
+                              <MessageCircle className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setSelectedStudent(student)}
+                              className="h-6 w-6 p-0" data-testid={`view-student-${id}`}>
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                            {isLocked ? (
+                              <Button variant="ghost" size="sm" onClick={() => { setActionStudent(student); setActionType('unlock'); setUnlockReason(''); }}
+                                className="h-6 w-6 p-0 text-amber-600" data-testid={`unlock-student-${id}`}>
+                                <Unlock className="h-3.5 w-3.5" />
+                              </Button>
+                            ) : (
+                              <Button variant="ghost" size="sm" onClick={() => { setActionStudent(student); setActionType('lock'); }}
+                                className="h-6 w-6 p-0 text-red-600" data-testid={`lock-student-${id}`}>
+                                <Lock className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground font-mono">{student.student_number || id}</p>
+                        <div className="flex items-center flex-wrap gap-1.5 mt-2">
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 gap-0.5">
+                            <GraduationCap className="h-2.5 w-2.5" /> {enrollment?.grade || '-'}
+                          </Badge>
+                          {isLocked ? (
+                            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-5 gap-0.5"><Lock className="h-2.5 w-2.5" /> Locked</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 gap-0.5 text-emerald-600 border-emerald-200"><Unlock className="h-2.5 w-2.5" /> Editable</Badge>
+                          )}
+                          <button
+                            onClick={() => handleTogglePresale(id, isPresale)}
+                            className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all cursor-pointer ${
+                              isPresale ? 'bg-orange-100 text-orange-700 ring-1 ring-orange-300' : 'bg-muted/40 text-muted-foreground hover:bg-muted'
+                            }`}
+                            data-testid={`presale-toggle-${id}`}
+                          >
+                            <ShoppingCart className="h-2.5 w-2.5" /> {isPresale ? 'On' : 'Off'}
+                          </button>
+                          {student.school_name && (
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{student.school_name}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* ── Table View ── */
+            <div className="rounded-lg border">
+              <Table className="min-w-[640px]">
+                <TableHeader>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    <TableHead className="w-8 px-2">
+                      <Checkbox
+                        checked={paginated.length > 0 && paginated.every(s => selectedIds.has(s.student_id || s.sync_id))}
+                        onCheckedChange={toggleAll} data-testid="select-all-students" />
+                    </TableHead>
+                    <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
+                    <TableHead className="px-2 w-16"><SortHeader label="Grade" sortKey="grade" /></TableHead>
+                    <TableHead className="px-2 hidden md:table-cell"><SortHeader label="School" sortKey="school" /></TableHead>
+                    <TableHead className="px-2 w-24"><SortHeader label="Status" sortKey="locked" /></TableHead>
+                    <TableHead className="px-2 w-20 text-center"><SortHeader label="Pre-sale" sortKey="presale" className="justify-center" /></TableHead>
+                    <TableHead className="px-2 w-16 text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
                 <TableBody>
                   {paginated.map((student) => {
                     const id = student.student_id || student.sync_id;
