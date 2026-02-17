@@ -12,7 +12,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Save, Loader2, Globe, Palette } from 'lucide-react';
+import { Save, Loader2, Globe, Palette, LogIn } from 'lucide-react';
 import ImageUploader from '@/components/common/ImageUploader';
 import { useTranslation } from 'react-i18next';
 
