@@ -264,23 +264,24 @@ export default function StudentsTab({ token }) {
       ) : (
         <>
           <div className="rounded-lg border overflow-hidden">
-            <ScrollArea className="max-h-[520px]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="w-8 px-2">
-                      <Checkbox
-                        checked={paginated.length > 0 && paginated.every(s => selectedIds.has(s.student_id || s.sync_id))}
-                        onCheckedChange={toggleAll} data-testid="select-all-students" />
-                    </TableHead>
-                    <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
-                    <TableHead className="px-2 w-16"><SortHeader label="Grade" sortKey="grade" /></TableHead>
-                    <TableHead className="px-2 hidden md:table-cell"><SortHeader label="School" sortKey="school" /></TableHead>
-                    <TableHead className="px-2 w-24"><SortHeader label="Status" sortKey="locked" /></TableHead>
-                    <TableHead className="px-2 w-20 text-center"><SortHeader label="Pre-sale" sortKey="presale" className="justify-center" /></TableHead>
-                    <TableHead className="px-2 w-16 text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+            <div className="overflow-x-auto">
+              <ScrollArea className="max-h-[520px]">
+                <Table className="min-w-[600px]">
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <TableHead className="w-8 px-2">
+                        <Checkbox
+                          checked={paginated.length > 0 && paginated.every(s => selectedIds.has(s.student_id || s.sync_id))}
+                          onCheckedChange={toggleAll} data-testid="select-all-students" />
+                      </TableHead>
+                      <TableHead className="px-2"><SortHeader label="Student" sortKey="full_name" /></TableHead>
+                      <TableHead className="px-2 w-16"><SortHeader label="Grade" sortKey="grade" /></TableHead>
+                      <TableHead className="px-2 hidden md:table-cell"><SortHeader label="School" sortKey="school" /></TableHead>
+                      <TableHead className="px-2 w-24"><SortHeader label="Status" sortKey="locked" /></TableHead>
+                      <TableHead className="px-2 w-20 text-center"><SortHeader label="Pre-sale" sortKey="presale" className="justify-center" /></TableHead>
+                      <TableHead className="px-2 w-16 text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {paginated.map((student) => {
                     const id = student.student_id || student.sync_id;
