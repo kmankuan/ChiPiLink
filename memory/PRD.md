@@ -99,6 +99,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **Bug 2 Fix**: Fixed school dropdown emptying after linking. Root cause: `onSuccess` called `onBack()` which unmounted the component, losing state. Now user stays on School Textbooks page after linking.
 - **Improvement**: Added error handling + retry button for schools fetch (was silently swallowed)
 
+### Phase 5b - i18n Language Consistency Fix (Complete - Feb 2026)
+- Fixed all hardcoded English strings in Link Student form (GRADE_OPTIONS, RELATIONSHIP_OPTIONS, validation toasts, success/error toasts, select placeholders, input placeholders)
+- Fixed PendingStudentCard badge ("Pending" → "Pendiente" in Spanish)
+- Fixed 2 English strings left in Spanish texts object (orderError, selectAtLeastOne)
+- Fixed hardcoded Spanish toasts in TextbookOrderView.jsx (file upload, required field validation)
+- Added missing translation keys to constants/translations.js (itemsUnavailable, outOfStock, reorderApproved, fileUploaded, fileUploadError, fieldRequired)
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
