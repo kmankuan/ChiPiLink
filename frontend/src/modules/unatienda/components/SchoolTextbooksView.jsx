@@ -171,15 +171,15 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
           <div className="space-y-1">
             <Label className="text-xs">{ft.school} *</Label>
             <select value={form.school_id} onChange={e => set('school_id', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
-              <option value="">-- Select --</option>
+              <option value="">{ft.selectPlaceholder}</option>
               {schools.map(s => <option key={s.school_id} value={s.school_id}>{s.name}</option>)}
             </select>
           </div>
           <div className="space-y-1">
             <Label className="text-xs">{ft.grade} *</Label>
             <select value={form.grade} onChange={e => set('grade', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
-              <option value="">-- Select --</option>
-              {GRADE_OPTIONS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+              <option value="">{ft.selectPlaceholder}</option>
+              {GRADE_OPTIONS.map(g => <option key={g.value} value={g.value}>{g[lang] || g.es}</option>)}
             </select>
           </div>
           <div className="space-y-1">
