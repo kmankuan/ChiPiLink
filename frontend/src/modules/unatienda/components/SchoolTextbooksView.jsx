@@ -189,8 +189,8 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
           <div className="space-y-1">
             <Label className="text-xs">{ft.relationship} *</Label>
             <select value={form.relation_type} onChange={e => set('relation_type', e.target.value)} className="w-full h-9 px-3 text-sm border rounded-md bg-background">
-              <option value="">-- Select --</option>
-              {RELATIONSHIP_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              <option value="">{ft.selectPlaceholder}</option>
+              {RELATIONSHIP_OPTIONS.map(r => <option key={r.value} value={r.value}>{r[lang] || r.es}</option>)}
             </select>
           </div>
           {form.relation_type === 'other' && (
