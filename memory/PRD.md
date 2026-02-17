@@ -122,6 +122,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Cards include: name, ID, grade badge, status badge, pre-sale toggle, school name, action buttons (chat, view, lock/unlock), checkbox
 - Table view still available via toggle for data-dense workflows
 
+### Phase 5e - Mobile Floating Action Bar (Complete - Feb 2026)
+- Added floating bottom action bar on Students tab (mobile only, sm:hidden) when cards are selected
+- Shows selected count, Pre-sale On/Off buttons, and Clear (X) button
+- Positioned above bottom navigation (bottom-16) for easy touch access
+- Access Requests tab already had mobile card view with Approve/Reject buttons
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
