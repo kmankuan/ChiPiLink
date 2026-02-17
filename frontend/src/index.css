@@ -154,6 +154,15 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Print styles for thermal receipt */
 @media print {
   @page {
