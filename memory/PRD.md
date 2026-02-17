@@ -136,13 +136,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Status filter (Pending/In Review/All) and school filter included
 - Removed separate "Access Requests" tab from UnatiendaModule nav
 
-### Phase 5g - Approve/Reject Bug Verification (Verified Working - Feb 2026)
-- User reported Approve/Reject buttons not working in merged Solicitudes section
-- Thorough testing (desktop 1920x1080 + mobile 390x844) confirmed both buttons work correctly
-- Approve: Opens dialog → Confirmar → API 200 → Toast "Solicitud aprobada" → List refreshes
-- Reject: Dropdown with 6 quick reasons → API 200 → Toast "Solicitud rechazada" → List refreshes
-- Backend endpoint: POST /api/store/textbook-access/admin/requests/{student_id}/{year}/approve
-- Testing agent verified 100% pass rate on both backend and frontend
+### Phase 5g - Approve/Reject Bug Verification + StudentsTab Rewrite (Feb 2026)
+- Verified Approve/Reject buttons work correctly (desktop + mobile) — bug not reproducible
+- Clean rewrite of StudentsTab.jsx from scratch: 946 → 772 lines (18% reduction)
+  - Shared `api()` helper eliminates all fetch boilerplate
+  - Combined state: `lockDialog` replaces `actionStudent`+`actionType`; `reqDialog`/`reqForm` replaces `reqActionDialog`/`reqActionData`
+  - `SortHeader` and `StatusBadge` extracted as pure components outside main function
+  - Stats, section toggles, view mode toggles rendered via array maps
+  - All data-testid attributes and functionality preserved
+- Testing agent verified 100% pass rate (backend + frontend, desktop + mobile)
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
