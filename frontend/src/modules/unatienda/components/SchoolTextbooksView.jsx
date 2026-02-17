@@ -518,7 +518,7 @@ export default function SchoolTextbooksView({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* Existing pending students */}
           {pendingStudents.map((s, i) => (
-            <PendingStudentCard key={s.student_id || i} student={s} />
+            <PendingStudentCard key={s.student_id || i} student={s} lang={lang} />
           ))}
 
           {/* Empty card to add a new student (always show when no validated) */}
