@@ -78,7 +78,16 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `POST /api/admin/presale-orders/{id}/reject-suggestion`
 - `POST /api/admin/presale-orders/{id}/unlink`
 
-## Prioritized Backlog
+### Phase 4 - Mobile Fix & Login Design Config (Complete - Feb 2026)
+- **Login Page Mobile Fix**: Rewrote Login.jsx as mobile-first. Image panel hidden on mobile, buttons fit viewport, proper font sizes and padding
+- **Register Page Mobile Fix**: Adjusted padding, font sizes, and layout for mobile
+- **Login Page Design Config** (admin → Config. del Sitio → Login Page Design):
+  - Layout selector: Split (image left + form right), Centered (card), Fullscreen (bg image fills screen)
+  - Background image upload with overlay color & opacity controls
+  - Custom heading text and subtitle text
+  - Logo size selector (SM, MD, LG)
+- All config stored in `site_config` collection and served via public API
+- Login page reads siteConfig context and renders dynamically
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
