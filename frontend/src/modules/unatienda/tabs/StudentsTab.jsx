@@ -359,9 +359,7 @@ export default function StudentsTab({ token }) {
                   })}
                 </TableBody>
               </Table>
-            </ScrollArea>
           </div>
-        </div>
 
           {/* Pagination */}
           <TablePagination
