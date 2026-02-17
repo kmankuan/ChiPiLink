@@ -70,6 +70,11 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - `GET/PUT /api/store/crm-chat/admin/config` - CRM board configuration
 - `GET /api/store/crm-chat/admin/config/board-columns` - Get board columns
 
+### Student Linking (Bug Fixed Feb 2026)
+- `GET /api/store/textbook-access/schools` - Public: get schools list
+- `POST /api/store/textbook-access/students` - User: link student (fixed: presale grade reference)
+- `GET /api/store/textbook-access/my-students` - User: get linked students
+
 ### Pre-Sale Import
 - `GET /api/admin/monday-import/preview-import`
 - `POST /api/admin/monday-import/trigger-import`
