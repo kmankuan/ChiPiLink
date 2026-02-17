@@ -142,7 +142,13 @@ export const schoolTxbTranslations = {
     insufficientBalance: '余额不足',
     insufficientBalanceMsg: '您的钱包余额不足。请通过银行转账充值您的钱包。',
     paymentSuccess: '支付成功！订单已提交。',
-    bankTransferInfo: '银行转账信息'
+    bankTransferInfo: '银行转账信息',
+    itemsUnavailable: '个项目无法处理',
+    outOfStock: '缺货',
+    reorderApproved: '重新订购已批准 - 选择以订购',
+    fileUploaded: '文件上传成功',
+    fileUploadError: '文件上传失败',
+    fieldRequired: '是必填项'
   }
 };
 
