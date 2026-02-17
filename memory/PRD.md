@@ -126,7 +126,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Added floating bottom action bar on Students tab (mobile only, sm:hidden) when cards are selected
 - Shows selected count, Pre-sale On/Off buttons, and Clear (X) button
 - Positioned above bottom navigation (bottom-16) for easy touch access
-- Access Requests tab already had mobile card view with Approve/Reject buttons
+
+### Phase 5f - Merged Students + Access Requests Tabs (Complete - Feb 2026)
+- Combined Students tab and Access Requests tab into a single unified tab
+- Section toggle at top: "Estudiantes (count)" | "Solicitudes (count)" with pending count badge
+- Requests section shows request cards with Approve/Reject buttons directly visible on mobile
+- Reject uses dropdown with quick reject reasons (6 presets + custom)
+- Approve opens confirmation dialog with admin notes
+- Status filter (Pending/In Review/All) and school filter included
+- Removed separate "Access Requests" tab from UnatiendaModule nav
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
