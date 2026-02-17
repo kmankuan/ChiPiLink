@@ -31,7 +31,14 @@ export default function SiteConfigModule() {
     email_contacto: '',
     telefono_contacto: '',
     direccion: '',
-    footer_texto: ''
+    footer_texto: '',
+    login_bg_image: '',
+    login_bg_overlay_color: '',
+    login_bg_overlay_opacity: 0.7,
+    login_heading: '',
+    login_subtext: '',
+    login_layout: 'split',
+    login_logo_size: 'md',
   });
 
   useEffect(() => {
