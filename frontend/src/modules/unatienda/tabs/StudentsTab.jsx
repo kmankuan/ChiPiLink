@@ -248,6 +248,18 @@ export default function StudentsTab({ token }) {
           <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-1 h-7 text-xs shrink-0">
             <RefreshCw className="h-3 w-3" /> Refresh
           </Button>
+          <div className="flex items-center border rounded-md overflow-hidden shrink-0" data-testid="view-mode-toggle">
+            <button onClick={() => setViewMode('card')}
+              className={`p-1.5 transition-colors ${viewMode === 'card' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+              title="Card view" data-testid="view-mode-card">
+              <LayoutGrid className="h-3.5 w-3.5" />
+            </button>
+            <button onClick={() => setViewMode('table')}
+              className={`p-1.5 transition-colors ${viewMode === 'table' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+              title="Table view" data-testid="view-mode-table">
+              <List className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
