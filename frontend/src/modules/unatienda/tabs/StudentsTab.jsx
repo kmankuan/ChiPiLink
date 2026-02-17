@@ -684,7 +684,7 @@ export default function StudentsTab({ token }) {
                   ['Profile Status', <Badge variant={detailStudent.is_locked ? 'destructive' : 'outline'} className="text-xs">{detailStudent.is_locked ? 'Locked' : 'Editable'}</Badge>],
                   ['Pre-sale', <Badge className={`text-xs ${detailStudent.presale_mode ? 'bg-orange-100 text-orange-700' : ''}`} variant={detailStudent.presale_mode ? 'default' : 'outline'}>{detailStudent.presale_mode ? 'Active' : 'Inactive'}</Badge>],
                 ].map(([label, val], i) => (
-                  <div key={i}><p className="text-xs text-muted-foreground">{label}</p><p>{val}</p></div>
+                  <div key={i}><p className="text-xs text-muted-foreground">{label}</p><div>{val}</div></div>
                 ))}
               </div>
               <div>
