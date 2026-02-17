@@ -464,6 +464,29 @@ export default function StudentsTab({ token }) {
         </>
       )}
 
+      {/* Mobile Floating Action Bar — shown when items selected */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-16 left-0 right-0 z-50 p-3 sm:hidden" data-testid="mobile-action-bar">
+          <div className="bg-card border border-border shadow-lg rounded-xl px-4 py-3 flex items-center justify-between gap-2 animate-in slide-in-from-bottom-4">
+            <span className="text-sm font-semibold text-primary shrink-0">{selectedIds.size} sel.</span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
+                className="h-8 text-xs border-orange-300 text-orange-700 hover:bg-orange-50 gap-1" data-testid="mobile-presale-on">
+                <ShoppingCart className="h-3 w-3" /> On
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
+                className="h-8 text-xs gap-1" data-testid="mobile-presale-off">
+                <ShoppingCart className="h-3 w-3" /> Off
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}
+                className="h-8 text-xs" data-testid="mobile-clear-selection">
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Lock/Unlock Dialog */}
       <Dialog open={!!actionStudent} onOpenChange={() => { setActionStudent(null); setActionType(null); }}>
         <DialogContent className="max-w-sm">
