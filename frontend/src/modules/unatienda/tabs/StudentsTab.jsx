@@ -1,8 +1,9 @@
 /**
  * Students Management Tab (Admin)
- * Compact table with sorting, pagination, inline pre-sale toggle
+ * Merged: Students + Access Requests in one unified view
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,17 +16,85 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import {
   Users, Search, Loader2, RefreshCw, Lock, Unlock, GraduationCap,
   Eye, ShoppingCart, ArrowUpDown, ArrowUp, ArrowDown, Plus, MessageCircle,
-  LayoutGrid, List, X
+  LayoutGrid, List, X, Check, Clock, Info, AlertCircle, CheckCircle2, XCircle,
+  HelpCircle, ChevronDown, Filter, Clipboard
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
 import CrmChat from '@/components/chat/CrmChat';
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+/* ── Request translations & constants ── */
+const QUICK_REJECT_REASONS = {
+  en: [
+    { id: 'not_enrolled', label: 'Student not enrolled', reason: 'The student is not currently enrolled in our system.' },
+    { id: 'wrong_school', label: 'Wrong school', reason: 'The student is registered at a different school.' },
+    { id: 'wrong_grade', label: 'Incorrect grade', reason: 'The grade level does not match our records.' },
+    { id: 'duplicate', label: 'Duplicate request', reason: 'A request for this student already exists.' },
+    { id: 'incomplete', label: 'Incomplete info', reason: 'The request is missing required information.' },
+    { id: 'other', label: 'Other (custom)', reason: '' }
+  ],
+  es: [
+    { id: 'not_enrolled', label: 'No esta matriculado', reason: 'El estudiante no esta matriculado actualmente en nuestro sistema.' },
+    { id: 'wrong_school', label: 'Colegio incorrecto', reason: 'El estudiante esta registrado en otro colegio.' },
+    { id: 'wrong_grade', label: 'Grado incorrecto', reason: 'El nivel de grado no coincide con nuestros registros.' },
+    { id: 'duplicate', label: 'Solicitud duplicada', reason: 'Ya existe una solicitud para este estudiante.' },
+    { id: 'incomplete', label: 'Info incompleta', reason: 'La solicitud carece de informacion requerida.' },
+    { id: 'other', label: 'Otro (personalizado)', reason: '' }
+  ]
+};
+
+const REQ_TEXTS = {
+  en: {
+    approve: 'Approve', reject: 'Reject', markInReview: 'Mark In Review', requestInfo: 'Request Info',
+    approveTitle: 'Approve Request', rejectTitle: 'Reject Request', infoTitle: 'Request Information',
+    adminNotes: 'Admin Notes (optional)', adminNotesPlaceholder: 'Internal notes (not visible to user)',
+    selectReason: 'Select a reason', customReason: 'Custom reason (optional)',
+    rejectionReasonPlaceholder: 'Explain why the request was rejected (optional)',
+    infoMessage: 'Information Required', infoMessagePlaceholder: 'What information does the user need to provide?',
+    confirm: 'Confirm', cancel: 'Cancel', noRequests: 'No requests found',
+    allSchools: 'All Schools', allYears: 'All Years',
+    statusLabels: { pending: 'Pending', in_review: 'In Review', approved: 'Approved', rejected: 'Rejected', info_required: 'Info Required' },
+    success: { approved: 'Request approved', rejected: 'Request rejected', inReview: 'Marked as in review', infoRequested: 'Information requested' },
+    school: 'School', year: 'Year', grade: 'Grade', requestedBy: 'Requested By', pending: 'Pending', inReview: 'In Review', all: 'All',
+  },
+  es: {
+    approve: 'Aprobar', reject: 'Rechazar', markInReview: 'Marcar En Revision', requestInfo: 'Pedir Info',
+    approveTitle: 'Aprobar Solicitud', rejectTitle: 'Rechazar Solicitud', infoTitle: 'Solicitar Informacion',
+    adminNotes: 'Notas Internas (opcional)', adminNotesPlaceholder: 'Notas internas (no visible para el usuario)',
+    selectReason: 'Selecciona un motivo', customReason: 'Motivo personalizado (opcional)',
+    rejectionReasonPlaceholder: 'Explica por que se rechazo (opcional)',
+    infoMessage: 'Informacion Requerida', infoMessagePlaceholder: 'Que informacion necesita proporcionar el usuario?',
+    confirm: 'Confirmar', cancel: 'Cancelar', noRequests: 'No se encontraron solicitudes',
+    allSchools: 'Todos los Colegios', allYears: 'Todos los Anos',
+    statusLabels: { pending: 'Pendiente', in_review: 'En Revision', approved: 'Aprobado', rejected: 'Rechazado', info_required: 'Info Requerida' },
+    success: { approved: 'Solicitud aprobada', rejected: 'Solicitud rechazada', inReview: 'Marcada como en revision', infoRequested: 'Informacion solicitada' },
+    school: 'Colegio', year: 'Ano', grade: 'Grado', requestedBy: 'Solicitado Por', pending: 'Pendientes', inReview: 'En Revision', all: 'Todas',
+  }
+};
+
+const StatusBadge = ({ status, rt }) => {
+  const cfg = {
+    pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+    in_review: { color: 'bg-blue-100 text-blue-800', icon: Info },
+    approved: { color: 'bg-green-100 text-green-800', icon: CheckCircle2 },
+    rejected: { color: 'bg-red-100 text-red-800', icon: XCircle },
+    info_required: { color: 'bg-orange-100 text-orange-800', icon: AlertCircle }
+  }[status] || { color: 'bg-yellow-100 text-yellow-800', icon: Clock };
+  const Icon = cfg.icon;
+  return <Badge variant="secondary" className={`${cfg.color} gap-1 text-[10px]`}><Icon className="h-3 w-3" />{rt.statusLabels[status] || status}</Badge>;
+};
 
 export default function StudentsTab({ token }) {
   const [students, setStudents] = useState([]);
