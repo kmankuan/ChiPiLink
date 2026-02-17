@@ -447,7 +447,8 @@ export default function StudentsTab({ token }) {
                   })}
                 </TableBody>
               </Table>
-          </div>
+            </div>
+          )}
 
           {/* Pagination */}
           <TablePagination
