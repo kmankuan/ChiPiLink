@@ -142,9 +142,9 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
   }
 
   const texts = {
-    en: { firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel' },
-    es: { firstName: 'Nombre', lastName: 'Apellido', school: 'Escuela', grade: 'Grado', studentNo: 'Número de Estudiante (opcional)', relationship: 'Su Relación', other: 'Especificar relación', submit: 'Vincular Estudiante', cancel: 'Cancelar' },
-    zh: { firstName: '名', lastName: '姓', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消' },
+    en: { title: 'Link Student', firstName: 'First Name', lastName: 'Last Name', school: 'School', grade: 'Grade', studentNo: 'Student Number (optional)', relationship: 'Your Relationship', other: 'Specify relationship', submit: 'Link Student', cancel: 'Cancel', selectPlaceholder: '-- Select --', firstNamePh: 'John', lastNamePh: 'Doe' },
+    es: { title: 'Vincular Estudiante', firstName: 'Nombre', lastName: 'Apellido', school: 'Escuela', grade: 'Grado', studentNo: 'Numero de Estudiante (opcional)', relationship: 'Su Relacion', other: 'Especificar relacion', submit: 'Vincular Estudiante', cancel: 'Cancelar', selectPlaceholder: '-- Seleccionar --', firstNamePh: 'Juan', lastNamePh: 'Perez' },
+    zh: { title: '关联学生', firstName: '名', lastName: '姓', school: '学校', grade: '年级', studentNo: '学号（可选）', relationship: '您的关系', other: '指定关系', submit: '关联学生', cancel: '取消', selectPlaceholder: '-- 选择 --', firstNamePh: '名', lastNamePh: '姓' },
   };
   const ft = texts[lang] || texts.es;
 
