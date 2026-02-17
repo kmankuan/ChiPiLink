@@ -891,6 +891,55 @@ export default function StudentsTab({ token }) {
           isAdmin={true}
         />
       )}
+
+      {/* ── Request Action Dialog (Approve/Reject/Info) ── */}
+      <Dialog open={!!reqActionDialog} onOpenChange={(open) => !open && setReqActionDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {reqActionDialog?.action === 'approved' ? rt.approveTitle : reqActionDialog?.action === 'rejected' ? rt.rejectTitle : reqActionDialog?.action === 'info_required' ? rt.infoTitle : rt.markInReview}
+            </DialogTitle>
+            <DialogDescription>{reqActionDialog?.request?.student_name} — {reqActionDialog?.request?.school_name}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {reqActionDialog?.action === 'rejected' && (
+              <div className="space-y-2">
+                <Label className="text-xs">{rt.selectReason}</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {quickRejectReasons.map(r => (
+                    <button key={r.id} onClick={() => handleReqReasonSelect(r.id)}
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${reqActionData.selectedReasonId === r.id ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}>
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+                <Textarea value={reqActionData.reason} onChange={e => setReqActionData(prev => ({...prev, reason: e.target.value}))}
+                  placeholder={rt.rejectionReasonPlaceholder} rows={2} className="text-xs" />
+              </div>
+            )}
+            {reqActionDialog?.action === 'info_required' && (
+              <div className="space-y-2">
+                <Label className="text-xs">{rt.infoMessage} *</Label>
+                <Textarea value={reqActionData.reason} onChange={e => setReqActionData(prev => ({...prev, reason: e.target.value}))}
+                  placeholder={rt.infoMessagePlaceholder} rows={3} className="text-xs" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label className="text-xs">{rt.adminNotes}</Label>
+              <Textarea value={reqActionData.notes} onChange={e => setReqActionData(prev => ({...prev, notes: e.target.value}))}
+                placeholder={rt.adminNotesPlaceholder} rows={2} className="text-xs" />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setReqActionDialog(null)}>{rt.cancel}</Button>
+            <Button size="sm" onClick={processReqAction} disabled={reqProcessing}
+              className={reqActionDialog?.action === 'approved' ? 'bg-green-600 hover:bg-green-700' : reqActionDialog?.action === 'rejected' ? 'bg-red-600 hover:bg-red-700' : ''}>
+              {reqProcessing ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+              {rt.confirm}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
