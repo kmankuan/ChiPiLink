@@ -773,6 +773,7 @@ export default function StudentsTab({ token }) {
           />
         </>
       )}
+      </div>)}
 
       {/* Mobile Floating Action Bar — shown when items selected */}
       {selectedIds.size > 0 && (
