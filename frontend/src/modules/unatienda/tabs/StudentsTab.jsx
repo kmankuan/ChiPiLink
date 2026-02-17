@@ -263,7 +263,7 @@ export default function StudentsTab({ token }) {
         </CardContent></Card>
       ) : (
         <>
-          <div className="rounded-lg border overflow-x-auto">
+          <div className="rounded-lg border">
             <Table className="min-w-[640px]">
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
