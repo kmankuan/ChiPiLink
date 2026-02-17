@@ -83,11 +83,19 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
 
   const handleSubmit = async () => {
     if (submitting) return;
-    if (!form.first_name.trim()) { toast.error('Enter student first name'); return; }
-    if (!form.last_name.trim()) { toast.error('Enter student last name'); return; }
-    if (!form.school_id) { toast.error('Select a school'); return; }
-    if (!form.grade) { toast.error('Select a grade'); return; }
-    if (!form.relation_type) { toast.error('Select your relationship'); return; }
+
+    const vt = {
+      en: { firstName: 'Enter student first name', lastName: 'Enter student last name', school: 'Select a school', grade: 'Select a grade', relation: 'Select your relationship', success: 'Student linked! Pending admin approval.', error: 'Failed to submit' },
+      es: { firstName: 'Ingrese el nombre del estudiante', lastName: 'Ingrese el apellido del estudiante', school: 'Seleccione una escuela', grade: 'Seleccione un grado', relation: 'Seleccione su relacion', success: 'Estudiante vinculado. Pendiente de aprobacion.', error: 'Error al enviar' },
+      zh: { firstName: '请输入学生名字', lastName: '请输入学生姓氏', school: '请选择学校', grade: '请选择年级', relation: '请选择关系', success: '学生已关联，等待管理员审批。', error: '提交失败' },
+    };
+    const v = vt[lang] || vt.es;
+
+    if (!form.first_name.trim()) { toast.error(v.firstName); return; }
+    if (!form.last_name.trim()) { toast.error(v.lastName); return; }
+    if (!form.school_id) { toast.error(v.school); return; }
+    if (!form.grade) { toast.error(v.grade); return; }
+    if (!form.relation_type) { toast.error(v.relation); return; }
 
     setSubmitting(true);
     try {
@@ -101,11 +109,11 @@ function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
         relation_type: form.relation_type,
         relation_other: form.relation_type === 'other' ? form.relation_other.trim() : null,
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Student linked! Pending admin approval.');
+      toast.success(v.success);
       onSuccess();
     } catch (err) {
       console.error('Student link error:', err);
-      toast.error(err.response?.data?.detail || 'Failed to submit');
+      toast.error(err.response?.data?.detail || v.error);
     } finally {
       setSubmitting(false);
     }
