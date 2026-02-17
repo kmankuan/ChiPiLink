@@ -40,6 +40,7 @@ export default function StudentsTab({ token }) {
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'full_name', direction: 'asc' });
   const [chatStudent, setChatStudent] = useState(null);
+  const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
 
   useEffect(() => { fetchStudents(); }, []);
 
