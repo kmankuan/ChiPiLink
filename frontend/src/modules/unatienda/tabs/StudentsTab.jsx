@@ -18,7 +18,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import {
   Users, Search, Loader2, RefreshCw, Lock, Unlock, GraduationCap,
-  Eye, ShoppingCart, ArrowUpDown, ArrowUp, ArrowDown, Plus, MessageCircle
+  Eye, ShoppingCart, ArrowUpDown, ArrowUp, ArrowDown, Plus, MessageCircle,
+  LayoutGrid, List
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
