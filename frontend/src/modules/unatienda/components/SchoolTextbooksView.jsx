@@ -228,7 +228,8 @@ function EmptyStudentCard({ onClick, lang }) {
   );
 }
 
-function PendingStudentCard({ student }) {
+function PendingStudentCard({ student, lang }) {
+  const pendingLabel = { en: 'Pending', es: 'Pendiente', zh: '待处理' };
   return (
     <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
       <CardContent className="py-4 flex items-center gap-3">
@@ -240,7 +241,7 @@ function PendingStudentCard({ student }) {
           <p className="text-xs text-muted-foreground">{student.school_name || student.escuela} • {student.grade || student.grado}</p>
         </div>
         <Badge variant="secondary" className="shrink-0 text-xs">
-          <Clock className="h-3 w-3 mr-1" /> Pending
+          <Clock className="h-3 w-3 mr-1" /> {pendingLabel[lang] || pendingLabel.es}
         </Badge>
       </CardContent>
     </Card>
