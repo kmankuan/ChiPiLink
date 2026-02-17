@@ -140,10 +140,10 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
         ...prev,
         [fieldId]: response.data.filename
       }));
-      toast.success('Archivo subido correctamente');
+      toast.success(lang === 'es' ? 'Archivo subido correctamente' : lang === 'zh' ? '文件上传成功' : 'File uploaded successfully');
     } catch (error) {
       console.error('Error uploading file:', error);
-      toast.error(error.response?.data?.detail || 'Error al subir archivo');
+      toast.error(error.response?.data?.detail || (lang === 'es' ? 'Error al subir archivo' : lang === 'zh' ? '文件上传失败' : 'Error uploading file'));
     } finally {
       setUploadingFile(null);
     }
