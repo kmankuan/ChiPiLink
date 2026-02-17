@@ -110,11 +110,11 @@ export default function UnatiendaModule() {
   return (
     <div className="space-y-4" data-testid="unatienda-module">
       {/* ── Compact header: stats as inline badges ── */}
-      <div className="flex items-center gap-3 flex-wrap" data-testid="unatienda-stats">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1" data-testid="unatienda-stats">
         {statItems.map(s => (
           <div
             key={s.label}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${s.alert ? 'border-orange-300 dark:border-orange-700' : 'border-border/50'} ${s.color}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border shrink-0 ${s.alert ? 'border-orange-300 dark:border-orange-700' : 'border-border/50'} ${s.color}`}
           >
             <s.icon className="h-4 w-4" />
             <span className="text-lg font-bold leading-none">{s.value}</span>
@@ -123,29 +123,31 @@ export default function UnatiendaModule() {
         ))}
       </div>
 
-      {/* ── Grouped tab navigation ── */}
-      <nav className="flex items-center gap-1 flex-wrap border-b pb-2" data-testid="unatienda-nav">
-        {TAB_GROUPS.map((group, gi) => (
-          <div key={group.label} className="flex items-center">
-            {gi > 0 && <div className="w-px h-5 bg-border mx-2 shrink-0" />}
-            <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mr-1.5 hidden lg:inline">
-              {group.label}
-            </span>
-            <div className="flex items-center gap-0.5">
-              {group.tabs.map(tab => (
-                <NavTab
-                  key={tab.id}
-                  id={tab.id}
-                  label={tab.label}
-                  icon={tab.icon}
-                  isActive={activeTab === tab.id}
-                  onClick={setActiveTab}
-                  testId={tab.testId}
-                />
-              ))}
+      {/* ── Grouped tab navigation — scrollable on mobile ── */}
+      <nav className="overflow-x-auto scrollbar-hide -mx-1 px-1" data-testid="unatienda-nav">
+        <div className="flex items-center gap-1 border-b pb-2 min-w-max">
+          {TAB_GROUPS.map((group, gi) => (
+            <div key={group.label} className="flex items-center">
+              {gi > 0 && <div className="w-px h-5 bg-border mx-1.5 sm:mx-2 shrink-0" />}
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mr-1.5 hidden lg:inline">
+                {group.label}
+              </span>
+              <div className="flex items-center gap-0.5">
+                {group.tabs.map(tab => (
+                  <NavTab
+                    key={tab.id}
+                    id={tab.id}
+                    label={tab.label}
+                    icon={tab.icon}
+                    isActive={activeTab === tab.id}
+                    onClick={setActiveTab}
+                    testId={tab.testId}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </nav>
 
       {/* ── Tab content ── */}
