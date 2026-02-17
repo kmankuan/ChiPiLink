@@ -97,6 +97,15 @@ const StatusBadge = ({ status, rt }) => {
 };
 
 export default function StudentsTab({ token }) {
+  const { i18n } = useTranslation();
+  const lang = i18n?.language || 'es';
+  const rt = REQ_TEXTS[lang] || REQ_TEXTS.es;
+  const quickRejectReasons = QUICK_REJECT_REASONS[lang] || QUICK_REJECT_REASONS.es;
+
+  /* ── Section toggle: 'students' or 'requests' ── */
+  const [section, setSection] = useState('students');
+
+  /* ── Students state ── */
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -109,7 +118,19 @@ export default function StudentsTab({ token }) {
   const [bulkProcessing, setBulkProcessing] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'full_name', direction: 'asc' });
   const [chatStudent, setChatStudent] = useState(null);
-  const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
+  const [viewMode, setViewMode] = useState('card');
+
+  /* ── Requests state ── */
+  const [requests, setRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [reqFilterStatus, setReqFilterStatus] = useState('pending');
+  const [reqFilterSchool, setReqFilterSchool] = useState('all');
+  const [reqFilterYear, setReqFilterYear] = useState('all');
+  const [reqSchools, setReqSchools] = useState([]);
+  const [reqActionDialog, setReqActionDialog] = useState(null);
+  const [reqActionData, setReqActionData] = useState({ notes: '', reason: '', selectedReasonId: '' });
+  const [reqProcessing, setReqProcessing] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0); // 'card' or 'table'
 
   useEffect(() => { fetchStudents(); }, []);
 
