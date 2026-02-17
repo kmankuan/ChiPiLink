@@ -396,6 +396,127 @@ export default function StudentsTab({ token }) {
 
   return (
     <div className="space-y-3" data-testid="students-tab">
+      {/* ── Section Toggle: Students | Requests ── */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1" data-testid="section-toggle">
+        <button
+          onClick={() => setSection('students')}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+            section === 'students' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+          }`}
+          data-testid="section-students"
+        >
+          <Users className="h-3.5 w-3.5" /> {lang === 'es' ? 'Estudiantes' : 'Students'}
+          <Badge variant="secondary" className="ml-0.5 text-[10px] px-1.5 py-0 h-4">{students.length}</Badge>
+        </button>
+        <button
+          onClick={() => setSection('requests')}
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+            section === 'requests' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+          }`}
+          data-testid="section-requests"
+        >
+          <Clipboard className="h-3.5 w-3.5" /> {lang === 'es' ? 'Solicitudes' : 'Requests'}
+          {pendingCount > 0 && (
+            <Badge className="ml-0.5 text-[10px] px-1.5 py-0 h-4 bg-amber-500 text-white">{pendingCount}</Badge>
+          )}
+        </button>
+      </div>
+
+      {/* ══════════ REQUESTS SECTION ══════════ */}
+      {section === 'requests' && (
+        <div className="space-y-3" data-testid="requests-section">
+          {/* Filters */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center border rounded-md overflow-hidden shrink-0">
+              {['pending', 'in_review', 'all'].map(s => (
+                <button key={s} onClick={() => setReqFilterStatus(s)}
+                  className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${reqFilterStatus === s ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}
+                  data-testid={`req-filter-${s}`}>
+                  {s === 'pending' ? rt.pending : s === 'in_review' ? rt.inReview : rt.all}
+                  {s === 'pending' && pendingCount > 0 && <span className="ml-1 text-[10px]">{pendingCount}</span>}
+                </button>
+              ))}
+            </div>
+            <Select value={reqFilterSchool} onValueChange={setReqFilterSchool}>
+              <SelectTrigger className="h-8 text-xs w-auto min-w-[140px]"><SelectValue placeholder={rt.allSchools} /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{rt.allSchools}</SelectItem>
+                {reqSchools.map(s => <SelectItem key={s.school_id} value={s.school_id}>{s.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={() => { fetchRequests(); fetchPendingCount(); }} className="gap-1 h-8 text-xs shrink-0">
+              <RefreshCw className="h-3 w-3" /> {lang === 'es' ? 'Actualizar' : 'Refresh'}
+            </Button>
+          </div>
+
+          {/* Request Cards */}
+          {requestsLoading ? (
+            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : pageRequests.length === 0 ? (
+            <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">{rt.noRequests}</CardContent></Card>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2" data-testid="request-cards">
+                {pageRequests.map((req) => (
+                  <Card key={`${req.student_id}-${req.year}`} className="border-border/60">
+                    <CardContent className="p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold truncate">{req.student_name}</p>
+                          <p className="text-[10px] text-muted-foreground">{req.school_name}</p>
+                        </div>
+                        <StatusBadge status={req.status} rt={rt} />
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span>{rt.year}: <strong>{req.year}</strong></span>
+                        <span>{rt.grade}: <strong>{req.grade}°</strong></span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {rt.requestedBy}: <span className="font-medium text-foreground">{req.requested_by_name || req.requested_by_email}</span>
+                      </div>
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-1.5 pt-1 border-t">
+                        <Button size="sm" variant="outline" onClick={() => handleReqAction(req, 'approved')} disabled={reqProcessing}
+                          className="h-7 text-xs gap-1 text-green-700 border-green-200 hover:bg-green-50 flex-1" data-testid={`approve-${req.student_id}`}>
+                          <Check className="h-3 w-3" /> {rt.approve}
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" disabled={reqProcessing}
+                              className="h-7 text-xs gap-1 text-red-700 border-red-200 hover:bg-red-50 flex-1" data-testid={`reject-${req.student_id}`}>
+                              <XCircle className="h-3 w-3" /> {rt.reject} <ChevronDown className="h-3 w-3 ml-auto" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {quickRejectReasons.map(r => (
+                              <DropdownMenuItem key={r.id} onClick={() => handleQuickReject(req, r.id)} className="text-xs cursor-pointer">
+                                {r.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        {req.status === 'pending' && (
+                          <Button size="sm" variant="ghost" onClick={() => handleReqAction(req, 'in_review')} className="h-7 w-7 p-0 text-blue-600 shrink-0">
+                            <Info className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <TablePagination
+                page={requestsPagination.page} totalPages={requestsPagination.totalPages} totalItems={requestsPagination.totalItems}
+                pageSize={requestsPagination.pageSize} onPageChange={requestsPagination.setPage} onPageSizeChange={requestsPagination.setPageSize}
+                canPrev={requestsPagination.canPrev} canNext={requestsPagination.canNext}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ══════════ STUDENTS SECTION ══════════ */}
+      {section === 'students' && (<div className="space-y-3">
       {/* Compact inline stats */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1" data-testid="student-stats">
         <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-blue-50 dark:bg-blue-950/40 text-blue-600 text-xs font-medium shrink-0">
