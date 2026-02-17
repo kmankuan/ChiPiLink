@@ -514,8 +514,6 @@ export default function SchoolTextbooksView({
             onSuccess={() => {
               setShowLinkForm(false);
               fetchAllStudents();
-              // Trigger parent refresh to check for new access
-              if (typeof onBack === 'function') onBack();
             }}
             onCancel={() => setShowLinkForm(false)}
           />
@@ -554,7 +552,6 @@ export default function SchoolTextbooksView({
           onSuccess={() => {
             setShowLinkForm(false);
             fetchAllStudents();
-            if (typeof onBack === 'function') onBack();
           }}
           onCancel={() => setShowLinkForm(false)}
         />
