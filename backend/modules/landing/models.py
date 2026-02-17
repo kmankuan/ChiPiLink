@@ -39,6 +39,14 @@ class ConfiguracionSitio(BaseModel):
     google_analytics_id: Optional[str] = None  # GA4 Measurement ID
     custom_head_scripts: Optional[str] = None  # Custom scripts for <head>
     custom_body_scripts: Optional[str] = None  # Custom scripts for <body>
+    # Login Page Design
+    login_bg_image: Optional[str] = None  # Background image URL for login
+    login_bg_overlay_color: Optional[str] = None  # Overlay color (e.g. rgba(0,0,0,0.5))
+    login_bg_overlay_opacity: Optional[float] = 0.7
+    login_heading: Optional[str] = None  # Custom heading (overrides default)
+    login_subtext: Optional[str] = None  # Custom subtitle
+    login_layout: str = "split"  # split | centered | fullscreen
+    login_logo_size: str = "md"  # sm | md | lg
 
 
 class PaginaBuilder(BaseModel):
