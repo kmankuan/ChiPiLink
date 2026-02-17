@@ -160,6 +160,105 @@ export default function StudentsTab({ token }) {
     }
   };
 
+  /* ── Requests functions ── */
+  const fetchRequests = useCallback(async () => {
+    setRequestsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (reqFilterStatus !== 'all') params.append('status', reqFilterStatus === 'pending' ? 'pending' : 'in_review');
+      if (reqFilterSchool && reqFilterSchool !== 'all') params.append('school_id', reqFilterSchool);
+      if (reqFilterYear && reqFilterYear !== 'all') params.append('year', reqFilterYear);
+      const res = await fetch(`${API}/api/store/textbook-access/admin/requests?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRequests(data.requests || []);
+      }
+    } catch { /* ignore */ } finally { setRequestsLoading(false); }
+  }, [token, reqFilterStatus, reqFilterSchool, reqFilterYear]);
+
+  const fetchPendingCount = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/requests?status=pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPendingCount((data.requests || []).length);
+      }
+    } catch { /* ignore */ }
+  }, [token]);
+
+  const fetchReqSchools = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/schools`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReqSchools(data.schools || []);
+      }
+    } catch { /* ignore */ }
+  }, [token]);
+
+  useEffect(() => { fetchPendingCount(); fetchReqSchools(); }, [fetchPendingCount, fetchReqSchools]);
+  useEffect(() => { if (section === 'requests') fetchRequests(); }, [section, fetchRequests]);
+
+  const handleReqAction = (request, action) => {
+    setReqActionDialog({ request, action });
+    setReqActionData({ notes: '', reason: '', selectedReasonId: '' });
+  };
+
+  const handleReqReasonSelect = (reasonId) => {
+    const r = quickRejectReasons.find(x => x.id === reasonId);
+    setReqActionData(prev => ({ ...prev, selectedReasonId: reasonId, reason: r?.reason || '' }));
+  };
+
+  const processReqAction = async () => {
+    if (!reqActionDialog) return;
+    const { request, action } = reqActionDialog;
+    if (action === 'info_required' && !reqActionData.reason.trim()) { toast.error(lang === 'es' ? 'Proporciona el mensaje' : 'Please provide the information message'); return; }
+    setReqProcessing(true);
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: action, admin_notes: reqActionData.notes || null, rejection_reason: action === 'rejected' ? (reqActionData.reason.trim() || null) : null })
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Action failed'); }
+      toast.success(rt.success[action === 'in_review' ? 'inReview' : action === 'info_required' ? 'infoRequested' : action] || 'Done');
+      setReqActionDialog(null);
+      fetchRequests();
+      fetchPendingCount();
+      fetchStudents();
+    } catch (err) { toast.error(err.message); } finally { setReqProcessing(false); }
+  };
+
+  const handleQuickReject = async (request, reasonId) => {
+    const reason = quickRejectReasons.find(r => r.id === reasonId);
+    if (!reason || reasonId === 'other') { handleReqAction(request, 'rejected'); return; }
+    setReqProcessing(true);
+    try {
+      const res = await fetch(`${API}/api/store/textbook-access/admin/requests/${request.student_id}/${request.year}/approve`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: 'rejected', admin_notes: null, rejection_reason: reason.reason })
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Rejection failed'); }
+      toast.success(rt.success.rejected);
+      fetchRequests();
+      fetchPendingCount();
+    } catch (err) { toast.error(err.message); } finally { setReqProcessing(false); }
+  };
+
+  const getAvailableYears = () => {
+    const years = new Set();
+    requests.forEach(r => years.add(r.year));
+    return Array.from(years).sort((a, b) => b - a);
+  };
+
+  const requestsPagination = usePagination(requests, 25);
+  const pageRequests = requestsPagination.paginated;
+
   const handleLockUnlock = async () => {
     if (!actionStudent) return;
     setProcessing(true);
