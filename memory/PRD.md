@@ -115,6 +115,13 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - AdminDashboard main content uses responsive padding (p-3 sm:p-4 lg:p-6)
 - Added .scrollbar-hide CSS utility to index.css
 
+### Phase 5d - Card View Toggle for Students (Complete - Feb 2026)
+- Added card/table view toggle (LayoutGrid / List icons) to StudentsTab toolbar
+- Card view is default - shows each student as a compact card with all info
+- Responsive grid: 1 col mobile, 2 cols sm breakpoint, 3 cols lg breakpoint
+- Cards include: name, ID, grade badge, status badge, pre-sale toggle, school name, action buttons (chat, view, lock/unlock), checkbox
+- Table view still available via toggle for data-dense workflows
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
