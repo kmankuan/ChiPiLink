@@ -61,7 +61,7 @@ async def create_student(
         try:
             from ..services.presale_import_service import presale_import_service
             student_name = f"{data.first_name} {data.last_name}".strip()
-            grade = data.initial_grade or ""
+            grade = data.grade or ""
             student_id = result.get("student_id", "")
             if student_id and student_name:
                 suggestion = await presale_import_service.suggest_link(
