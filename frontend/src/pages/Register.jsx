@@ -193,21 +193,21 @@ export default function Register() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-6 md:p-12 overflow-y-auto">
-        <div className="w-full max-w-md py-8">
+      <div className="flex-1 flex items-center justify-center px-5 py-6 sm:p-6 md:p-12 overflow-y-auto">
+        <div className="w-full max-w-sm sm:max-w-md py-4 sm:py-8">
           {/* Logo for mobile */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
+          <div className="lg:hidden flex items-center gap-3 mb-6">
             <div className="p-2 rounded-xl bg-primary text-primary-foreground">
-              <Book className="h-6 w-6" />
+              <Book className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <span className="font-serif text-2xl font-bold">{siteConfig?.site_name || 'Mi Tienda'}</span>
+            <span className="font-serif text-xl sm:text-2xl font-bold truncate">{siteConfig?.site_name || 'Mi Tienda'}</span>
           </div>
 
-          <div className="mb-8">
-            <h1 className="font-serif text-3xl font-bold mb-2">
+          <div className="mb-6">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-1.5">
               {t('auth.register')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Complete sus datos para crear una cuenta
             </p>
           </div>
