@@ -206,44 +206,44 @@ export default function StudentsTab({ token }) {
   return (
     <div className="space-y-3" data-testid="students-tab">
       {/* Compact inline stats */}
-      <div className="flex items-center gap-2 flex-wrap" data-testid="student-stats">
-        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-blue-50 dark:bg-blue-950/40 text-blue-600 text-xs font-medium">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1" data-testid="student-stats">
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-blue-50 dark:bg-blue-950/40 text-blue-600 text-xs font-medium shrink-0">
           <Users className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{students.length}</span> students
         </span>
-        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-xs font-medium">
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-amber-50 dark:bg-amber-950/40 text-amber-600 text-xs font-medium shrink-0">
           <Lock className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{lockedCount}</span> locked
         </span>
-        <span className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium ${presaleCount > 0 ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/40 text-orange-600' : 'border-border/50 bg-muted/50 text-muted-foreground'}`}>
+        <span className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium shrink-0 ${presaleCount > 0 ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/40 text-orange-600' : 'border-border/50 bg-muted/50 text-muted-foreground'}`}>
           <ShoppingCart className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{presaleCount}</span> pre-sale
         </span>
-        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 text-xs font-medium">
+        <span className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/50 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 text-xs font-medium shrink-0">
           <GraduationCap className="h-3.5 w-3.5" /> <span className="text-base font-bold leading-none">{gradeCount}</span> grades
         </span>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-3">
+        <div className="relative flex-1 min-w-0 sm:max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input placeholder="Search by name or student ID..." value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="student-search" />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
           {selectedIds.size > 0 && (
             <>
-              <span className="text-[11px] text-muted-foreground font-medium">{selectedIds.size} sel.</span>
+              <span className="text-[11px] text-muted-foreground font-medium shrink-0">{selectedIds.size} sel.</span>
               <Button variant="outline" size="sm" onClick={() => handleBulkPresale(true)} disabled={bulkProcessing}
-                className="gap-1 h-7 text-[11px] border-orange-300 text-orange-700 hover:bg-orange-50" data-testid="bulk-presale-on">
+                className="gap-1 h-7 text-[11px] border-orange-300 text-orange-700 hover:bg-orange-50 shrink-0" data-testid="bulk-presale-on">
                 <ShoppingCart className="h-3 w-3" /> Pre-sale On
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleBulkPresale(false)} disabled={bulkProcessing}
-                className="gap-1 h-7 text-[11px]" data-testid="bulk-presale-off">
+                className="gap-1 h-7 text-[11px] shrink-0" data-testid="bulk-presale-off">
                 Pre-sale Off
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px]">Clear</Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="h-7 text-[11px] shrink-0">Clear</Button>
             </>
           )}
-          <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-1 h-7 text-xs">
+          <Button variant="outline" size="sm" onClick={fetchStudents} className="gap-1 h-7 text-xs shrink-0">
             <RefreshCw className="h-3 w-3" /> Refresh
           </Button>
         </div>
