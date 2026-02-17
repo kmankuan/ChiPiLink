@@ -550,7 +550,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                   <div className="mb-6">
                     <h3 className="font-semibold mb-3 flex items-center gap-2 text-red-600 text-sm">
                       <AlertTriangle className="h-4 w-4" />
-                      {te.outOfStock || 'Out of Stock'} ({outOfStockBooks.length})
+                      {te.outOfStock} ({outOfStockBooks.length})
                     </h3>
                     <div className="space-y-2">
                       {outOfStockBooks.map(book => (
