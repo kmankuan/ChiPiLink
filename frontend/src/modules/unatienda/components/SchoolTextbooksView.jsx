@@ -25,17 +25,29 @@ import { OrderSummaryModal } from './OrderSummaryModal';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const GRADE_OPTIONS = [
-  { value: 'K3', label: 'K3' }, { value: 'K4', label: 'K4' }, { value: 'K5', label: 'K5' },
-  { value: '1', label: '1st Grade' }, { value: '2', label: '2nd Grade' }, { value: '3', label: '3rd Grade' },
-  { value: '4', label: '4th Grade' }, { value: '5', label: '5th Grade' }, { value: '6', label: '6th Grade' },
-  { value: '7', label: '7th Grade' }, { value: '8', label: '8th Grade' }, { value: '9', label: '9th Grade' },
-  { value: '10', label: '10th Grade' }, { value: '11', label: '11th Grade' }, { value: '12', label: '12th Grade' },
+  { value: 'K3', en: 'K3', es: 'K3', zh: 'K3' },
+  { value: 'K4', en: 'K4', es: 'K4', zh: 'K4' },
+  { value: 'K5', en: 'K5', es: 'K5', zh: 'K5' },
+  { value: '1', en: '1st Grade', es: '1er Grado', zh: '1年级' },
+  { value: '2', en: '2nd Grade', es: '2do Grado', zh: '2年级' },
+  { value: '3', en: '3rd Grade', es: '3er Grado', zh: '3年级' },
+  { value: '4', en: '4th Grade', es: '4to Grado', zh: '4年级' },
+  { value: '5', en: '5th Grade', es: '5to Grado', zh: '5年级' },
+  { value: '6', en: '6th Grade', es: '6to Grado', zh: '6年级' },
+  { value: '7', en: '7th Grade', es: '7mo Grado', zh: '7年级' },
+  { value: '8', en: '8th Grade', es: '8vo Grado', zh: '8年级' },
+  { value: '9', en: '9th Grade', es: '9no Grado', zh: '9年级' },
+  { value: '10', en: '10th Grade', es: '10mo Grado', zh: '10年级' },
+  { value: '11', en: '11th Grade', es: '11vo Grado', zh: '11年级' },
+  { value: '12', en: '12th Grade', es: '12vo Grado', zh: '12年级' },
 ];
 
 const RELATIONSHIP_OPTIONS = [
-  { value: 'parent', label: 'Parent' }, { value: 'guardian', label: 'Legal Guardian' },
-  { value: 'grandparent', label: 'Grandparent' }, { value: 'representative', label: 'Representative' },
-  { value: 'other', label: 'Other' },
+  { value: 'parent', en: 'Parent', es: 'Padre/Madre', zh: '父/母' },
+  { value: 'guardian', en: 'Legal Guardian', es: 'Tutor Legal', zh: '法定监护人' },
+  { value: 'grandparent', en: 'Grandparent', es: 'Abuelo/a', zh: '祖父母' },
+  { value: 'representative', en: 'Representative', es: 'Representante', zh: '代表' },
+  { value: 'other', en: 'Other', es: 'Otro', zh: '其他' },
 ];
 
 function InlineStudentForm({ token, onSuccess, onCancel, lang }) {
