@@ -264,7 +264,7 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
     // Validate required form fields
     for (const field of formFields) {
       if (field.required && !formData[field.field_id]) {
-        toast.error(`El campo "${getLocalizedText(field, 'label')}" es requerido`);
+        toast.error(lang === 'es' ? `El campo "${getLocalizedText(field, 'label')}" es requerido` : lang === 'zh' ? `"${getLocalizedText(field, 'label')}" 是必填项` : `The field "${getLocalizedText(field, 'label')}" is required`);
         return;
       }
     }
