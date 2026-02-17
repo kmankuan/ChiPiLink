@@ -94,7 +94,13 @@ export const schoolTxbTranslations = {
     insufficientBalance: 'Saldo insuficiente',
     insufficientBalanceMsg: 'Tu saldo es insuficiente. Por favor realiza una transferencia bancaria para recargar tu billetera.',
     paymentSuccess: '¡Pago exitoso! Pedido enviado.',
-    bankTransferInfo: 'Información de Transferencia Bancaria'
+    bankTransferInfo: 'Informacion de Transferencia Bancaria',
+    itemsUnavailable: 'libro(s) no disponible(s)',
+    outOfStock: 'Agotado',
+    reorderApproved: 'Re-orden aprobada - Selecciona para ordenar',
+    fileUploaded: 'Archivo subido correctamente',
+    fileUploadError: 'Error al subir archivo',
+    fieldRequired: 'es requerido'
   },
   zh: {
     backToStudents: '返回学生列表',
