@@ -245,6 +245,127 @@ export default function SiteConfigModule() {
         </CardContent>
       </Card>
 
+      {/* Login Page Design */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LogIn className="h-5 w-5" />
+            Login Page Design
+          </CardTitle>
+          <CardDescription>
+            Customize the login page appearance. Changes are applied globally.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Layout selector */}
+          <div>
+            <Label>Layout</Label>
+            <div className="grid grid-cols-3 gap-2 mt-1.5">
+              {[
+                { id: 'split', label: 'Split', desc: 'Image left, form right' },
+                { id: 'centered', label: 'Centered', desc: 'Clean card in center' },
+                { id: 'fullscreen', label: 'Fullscreen', desc: 'Background image fills screen' },
+              ].map((l) => (
+                <button
+                  key={l.id}
+                  onClick={() => setConfig({ ...config, login_layout: l.id })}
+                  className={`p-3 rounded-lg border-2 text-left transition-all ${
+                    config.login_layout === l.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-muted hover:border-muted-foreground/30'
+                  }`}
+                  data-testid={`login-layout-${l.id}`}
+                >
+                  <span className="text-xs font-semibold block">{l.label}</span>
+                  <span className="text-[10px] text-muted-foreground">{l.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Background image */}
+          <ImageUploader
+            label="Background Image"
+            value={config.login_bg_image}
+            onChange={(url) => setConfig({ ...config, login_bg_image: url })}
+            aspectRatio="16/9"
+            maxSize={5}
+          />
+
+          {/* Overlay */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Overlay Color</Label>
+              <div className="flex gap-2 mt-0.5">
+                <Input
+                  type="color"
+                  value={config.login_bg_overlay_color || config.color_primario || '#16a34a'}
+                  onChange={(e) => setConfig({ ...config, login_bg_overlay_color: e.target.value })}
+                  className="w-16 h-10 p-1"
+                />
+                <Input
+                  value={config.login_bg_overlay_color || ''}
+                  onChange={(e) => setConfig({ ...config, login_bg_overlay_color: e.target.value })}
+                  placeholder="Uses primary color"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Overlay Opacity ({Math.round((config.login_bg_overlay_opacity ?? 0.7) * 100)}%)</Label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round((config.login_bg_overlay_opacity ?? 0.7) * 100)}
+                onChange={(e) => setConfig({ ...config, login_bg_overlay_opacity: parseInt(e.target.value) / 100 })}
+                className="w-full mt-2"
+              />
+            </div>
+          </div>
+
+          {/* Text overrides */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Heading Text</Label>
+              <Input
+                value={config.login_heading || ''}
+                onChange={(e) => setConfig({ ...config, login_heading: e.target.value })}
+                placeholder="Sign In (default)"
+              />
+            </div>
+            <div>
+              <Label>Subtitle Text</Label>
+              <Input
+                value={config.login_subtext || ''}
+                onChange={(e) => setConfig({ ...config, login_subtext: e.target.value })}
+                placeholder="Sign in or register..."
+              />
+            </div>
+          </div>
+
+          {/* Logo size */}
+          <div>
+            <Label>Logo Size</Label>
+            <div className="flex gap-2 mt-1">
+              {['sm', 'md', 'lg'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setConfig({ ...config, login_logo_size: s })}
+                  className={`px-4 py-1.5 rounded-md text-xs font-medium border transition-all ${
+                    config.login_logo_size === s
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-muted text-muted-foreground hover:border-muted-foreground/30'
+                  }`}
+                  data-testid={`logo-size-${s}`}
+                >
+                  {s.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Save Button */}
       <Button onClick={saveConfig} disabled={saving} className="w-full gap-2">
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
