@@ -551,7 +551,7 @@ export default function AdminDashboard() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
-          <div className="p-4 lg:p-6 max-w-7xl mx-auto">
+          <div className="p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto overflow-x-hidden">
             {/* Page Header - Desktop only */}
             <div className="hidden lg:block mb-6">
               <div className="flex items-center justify-between">
