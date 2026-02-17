@@ -7,7 +7,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://order-updates-2.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://school-dropdown-fix.preview.emergentagent.com').rstrip('/')
 
 # Test data
 LIGA_ID = "liga_01bc717ff842"
