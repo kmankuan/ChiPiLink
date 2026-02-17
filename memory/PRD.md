@@ -106,6 +106,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Fixed hardcoded Spanish toasts in TextbookOrderView.jsx (file upload, required field validation)
 - Added missing translation keys to constants/translations.js (itemsUnavailable, outOfStock, reorderApproved, fileUploaded, fileUploadError, fieldRequired)
 
+### Phase 5c - Admin Mobile Responsiveness (Complete - Feb 2026)
+- Made UnatiendaModule tab navigation horizontally scrollable with hidden scrollbar
+- Made stats badges horizontally scrollable with shrink-0 items
+- Made StudentsTab stats, toolbar, and table responsive for mobile
+- Student table forced to min-w-[640px] enabling horizontal scroll on mobile
+- Toolbar stacks vertically on mobile (search full width, buttons below)
+- AdminDashboard main content uses responsive padding (p-3 sm:p-4 lg:p-6)
+- Added .scrollbar-hide CSS utility to index.css
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
