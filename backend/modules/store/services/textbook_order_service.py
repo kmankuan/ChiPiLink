@@ -231,6 +231,14 @@ class TextbookOrderService(BaseService):
         
         books_dict = {b["book_id"]: b for b in books}
         
+        # Check if student is in pre-sale mode
+        student_id = order.get("student_id")
+        student_doc = await db.store_students.find_one(
+            {"student_id": student_id}, {"_id": 0, "presale_mode": 1}
+        )
+        is_presale = student_doc.get("presale_mode", False) if student_doc else False
+        logger.info(f"[_refresh_order_items] Student {student_id} presale_mode={is_presale}")
+        
         existing_items = order.get("items", [])
         existing_by_id = {item["book_id"]: item for item in existing_items}
         logger.info(f"[_refresh_order_items] Existing items count: {len(existing_items)}")
@@ -250,9 +258,9 @@ class TextbookOrderService(BaseService):
                 item["book_name"] = book["name"]
                 
                 if item["status"] not in [OrderItemStatus.ORDERED.value]:
-                    if inventory <= 0:
+                    if inventory <= 0 and not is_presale:
                         item["status"] = OrderItemStatus.OUT_OF_STOCK.value
-                    elif item["status"] == OrderItemStatus.OUT_OF_STOCK.value:
+                    elif inventory > 0 or is_presale:
                         item["status"] = OrderItemStatus.AVAILABLE.value
             else:
                 # Product no longer in catalog — mark unavailable but keep the item
@@ -265,7 +273,7 @@ class TextbookOrderService(BaseService):
         for book_id, book in books_dict.items():
             if book_id not in seen_ids:
                 inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
-                status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
+                status = OrderItemStatus.AVAILABLE.value if (inventory > 0 or is_presale) else OrderItemStatus.OUT_OF_STOCK.value
                 updated_items.append({
                     "book_id": book_id,
                     "book_code": book.get("code", ""),
