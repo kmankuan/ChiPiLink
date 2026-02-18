@@ -67,9 +67,17 @@ async def execute_cleanup(request: CleanupRequest, admin: dict = Depends(get_adm
 
 @router.get("/students")
 async def list_students_for_cleanup(admin: dict = Depends(get_admin_user)):
-    """List all students with order counts — for the cleanup UI picker."""
+    """List ALL students with order counts — for the cleanup UI picker.
+    Includes students without orders (those with only enrollment requests)."""
     from core.database import db
 
+    # Get ALL students
+    all_students = await db.store_students.find(
+        {}, {"_id": 0, "student_id": 1, "full_name": 1, "is_demo": 1, "user_id": 1, "enrollments": 1}
+    ).to_list(500)
+    student_map = {s["student_id"]: s for s in all_students}
+
+    # Get order stats per student
     pipeline = [
         {"$group": {
             "_id": "$student_id",
@@ -79,26 +87,19 @@ async def list_students_for_cleanup(admin: dict = Depends(get_admin_user)):
             "last_order": {"$max": "$submitted_at"},
             "monday_items": {"$push": "$monday_item_ids"},
         }},
-        {"$sort": {"order_count": -1}},
     ]
-    order_stats = await db.store_textbook_orders.aggregate(pipeline).to_list(200)
-
-    # Get student details
-    student_ids = [s["_id"] for s in order_stats if s["_id"]]
-    students = await db.store_students.find(
-        {"student_id": {"$in": student_ids}},
-        {"_id": 0, "student_id": 1, "full_name": 1, "is_demo": 1, "user_id": 1}
-    ).to_list(200)
-    student_map = {s["student_id"]: s for s in students}
+    order_stats = await db.store_textbook_orders.aggregate(pipeline).to_list(500)
+    order_map = {s["_id"]: s for s in order_stats}
 
     # Get CRM link status
+    all_sids = [s["student_id"] for s in all_students]
     links = await db.crm_student_links.find(
-        {"student_id": {"$in": student_ids}}, {"_id": 0, "student_id": 1, "monday_item_id": 1}
+        {"student_id": {"$in": all_sids}}, {"_id": 0, "student_id": 1, "monday_item_id": 1}
     ).to_list(200)
     link_map = {l["student_id"]: l.get("monday_item_id") for l in links}
 
     # Get wallet info per user_id
-    all_user_ids = list(set(s.get("user_id") for s in students if s.get("user_id")))
+    all_user_ids = list(set(s.get("user_id") for s in all_students if s.get("user_id")))
     wallet_counts = {}
     txn_counts = {}
     for uid in all_user_ids:
@@ -109,26 +110,32 @@ async def list_students_for_cleanup(admin: dict = Depends(get_admin_user)):
         txn_counts[uid] = t1 + t2
 
     result = []
-    for stat in order_stats:
-        sid = stat["_id"]
-        s = student_map.get(sid, {})
+    for s in all_students:
+        sid = s["student_id"]
+        stat = order_map.get(sid, {})
+        enrollments = s.get("enrollments", [])
+        pending_requests = sum(1 for e in enrollments if e.get("status") in ("pending", "in_review", "info_required"))
         monday_ids = set()
         for ids_list in stat.get("monday_items", []):
             if isinstance(ids_list, list):
                 monday_ids.update(str(i) for i in ids_list if i)
         result.append({
             "student_id": sid,
-            "student_name": stat.get("student_name") or s.get("full_name", "Unknown"),
+            "student_name": s.get("full_name", "Unknown"),
             "is_demo": s.get("is_demo", False),
             "user_id": s.get("user_id", ""),
-            "order_count": stat["order_count"],
+            "order_count": stat.get("order_count", 0),
             "total_amount": stat.get("total_amount", 0),
             "last_order": stat.get("last_order"),
+            "pending_requests": pending_requests,
             "monday_item_count": len(monday_ids),
             "crm_linked": sid in link_map,
             "crm_monday_item_id": link_map.get(sid),
             "wallet_balance": wallet_counts.get(s.get("user_id")),
             "wallet_txn_count": txn_counts.get(s.get("user_id"), 0),
         })
+
+    # Sort: most orders first, then by pending requests
+    result.sort(key=lambda x: (x["order_count"] + x["pending_requests"]), reverse=True)
 
     return {"students": result}
