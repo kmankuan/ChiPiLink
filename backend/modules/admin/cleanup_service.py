@@ -1,7 +1,7 @@
 """
 Admin Data Cleanup Service
 Provides preview + execute for cleaning up test/demo data across collections.
-Supports: orders, CRM links, CRM messages, students, Monday.com items.
+Supports: orders, CRM links, CRM messages, students, wallets, users, Monday.com items.
 """
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
@@ -20,7 +20,15 @@ CLEANUP_COLLECTIONS = {
     "crm_notifications": "crm_chat_notifications",
     "students": "store_students",
     "order_messages": "order_messages",
+    "wallets": "chipi_wallets",
+    "wallet_transactions": "chipi_transactions",
+    "wallet_transactions_v2": "wallet_transactions",
+    "wallet_alerts": "alertas_wallet",
+    "users": "users",
 }
+
+# Admin user IDs that must NEVER be deleted
+PROTECTED_USER_IDS = set()
 
 
 class CleanupService:
