@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { schoolTxbTranslations } from '../constants/translations';
 import { OrderSummaryModal } from './OrderSummaryModal';
+import { ExpandableText } from '../../../components/ui/expandable-text';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -273,11 +274,6 @@ export default function SchoolTextbooksView({
   const [allStudents, setAllStudents] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
   const [summaryStudent, setSummaryStudent] = useState(null); // student object for summary modal
-  const [expandedNames, setExpandedNames] = useState(new Set());
-  
-  const toggleNameExpand = (bookId) => {
-    setExpandedNames(prev => { const n = new Set(prev); n.has(bookId) ? n.delete(bookId) : n.add(bookId); return n; });
-  };
   
   const texts = {
     en: {
@@ -702,10 +698,10 @@ export default function SchoolTextbooksView({
                               </div>
                               
                               {/* Book info */}
-                              <div className="flex-1 min-w-0" onClick={(e) => { e.stopPropagation(); toggleNameExpand(item.book_id); }}>
-                                <p className={`text-sm font-medium ${expandedNames.has(item.book_id) ? '' : 'line-clamp-2'} ${isOrdered ? 'text-muted-foreground' : ''}`}>
+                              <div className="flex-1 min-w-0">
+                                <ExpandableText className={`text-sm font-medium ${isOrdered ? 'text-muted-foreground' : ''}`}>
                                   {item.book_name}
-                                </p>
+                                </ExpandableText>
                                 <p className="text-xs text-muted-foreground truncate">{item.book_code}</p>
                               </div>
                               
