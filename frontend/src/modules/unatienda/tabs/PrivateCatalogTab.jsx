@@ -14,12 +14,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import axios from 'axios';
 import {
-  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package,
+  BookOpen, Plus, Search, Loader2, RefreshCw, Trash2, AlertCircle, Package, Store,
   Maximize2, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Edit, X,
   Minus, History, DollarSign, BarChart3, AlertTriangle, Warehouse, Archive, RotateCcw,
   GripVertical
 } from 'lucide-react';
 import InventoryImport from '../components/InventoryImport';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 
 /* ── Column definitions per catalog type ── */
 const COLUMN_DEFS = {
