@@ -519,6 +519,27 @@ class TextbookOrderService(BaseService):
         # Send notification
         await self._notify_order_submitted(order, user_name, user_email)
         
+        # Auto-link student to CRM board + create order topic for chat
+        try:
+            from ..services.crm_chat_service import crm_chat_service
+            crm_result = await crm_chat_service.link_student_on_order_submit(
+                student_id=order.get("student_id"),
+                student_name=order.get("student_name", ""),
+                user_id=user_id,
+                user_email=user_email,
+                user_name=user_name,
+                order_summary={
+                    "order_id": order_id,
+                    "grade": order.get("grade", ""),
+                    "items": new_selected_items,
+                    "total": submission_total,
+                    "is_presale": is_presale,
+                },
+            )
+            logger.info(f"[submit_order] CRM link result: {crm_result}")
+        except Exception as crm_err:
+            logger.error(f"[submit_order] CRM auto-link failed (non-blocking): {crm_err}")
+        
         order["items"] = items
         order["status"] = new_status
         order["last_submitted_at"] = now
