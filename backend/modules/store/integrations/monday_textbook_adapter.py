@@ -109,7 +109,7 @@ class TextbookMondayAdapter(BaseMondayAdapter):
                     "unit_price": item["price"],
                     "subtotal": item["price"] * item["quantity_ordered"],
                     "code": item.get("book_code", ""),
-                    "status": {"label": "Pendiente"},
+                    "status": {"label": "Recibido"},
                 }
                 for field, value in sub_fields.items():
                     col_id = subitem_mapping.get(field)
