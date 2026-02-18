@@ -31,10 +31,11 @@ class TextbookOrderRepository(BaseRepository):
         return await self.find_one({"order_id": order_id})
     
     async def get_by_student(self, student_id: str, year: int) -> Optional[Dict]:
-        """Get order for a specific student and year"""
+        """Get draft order for a specific student and year (for browsing only)"""
         return await self.find_one({
             "student_id": student_id,
-            "year": year
+            "year": year,
+            "status": "draft"
         })
     
     async def get_by_user(self, user_id: str, year: Optional[int] = None) -> List[Dict]:
