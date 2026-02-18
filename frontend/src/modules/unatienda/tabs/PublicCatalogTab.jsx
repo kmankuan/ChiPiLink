@@ -288,82 +288,51 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
     );
   }
 
+  const lowStockProducts = productos.filter(p => p.inventory_quantity < 10);
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500">
-                <Store className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <CardTitle>Public Catalog</CardTitle>
-                <CardDescription>
-                  Products visible to all users in Unatienda
-                </CardDescription>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
+    <div className="space-y-3">
+      <BoardHeader
+        title="Public Catalog"
+        icon={Store}
+        subtitle="Products visible to all users in Unatienda"
+        tabs={[
+          { value: 'productos', label: 'Products', icon: Package },
+          { value: 'categories', label: 'Categories', icon: Tags },
+          { value: 'inventario', label: 'Low Stock', icon: AlertTriangle },
+        ]}
+        activeTab={subTab}
+        onTabChange={setSubTab}
+        search={subTab === 'productos' ? searchTerm : undefined}
+        onSearchChange={subTab === 'productos' ? setSearchTerm : undefined}
+        searchPlaceholder="Search products..."
+        filters={subTab === 'productos' && categories.length > 0 ? [
+          {
+            value: filterCategoria, onChange: setFilterCategoria, placeholder: 'All categories', testId: 'pub-filter-cat',
+            options: categories.map(c => ({ value: c.category_id, label: `${c.icono} ${c.name}` })),
+          },
+        ] : []}
+        hasActiveFilters={!!(searchTerm || filterCategoria !== 'all')}
+        onClearFilters={() => { setSearchTerm(''); setFilterCategoria('all'); }}
+        stats={[
+          { label: 'products', value: productos.length, color: 'blue' },
+          { label: 'categories', value: categories.length, color: 'purple' },
+          ...(lowStockProducts.length > 0 ? [{ label: 'low stock', value: lowStockProducts.length, color: 'amber', highlight: true }] : []),
+        ]}
+        loading={loading}
+        onRefresh={fetchData}
+        actions={
+          subTab === 'productos'
+            ? <Button onClick={() => openEditDialog()} size="sm" className="gap-1 h-7 text-xs" data-testid="pub-add-product"><Plus className="h-3 w-3" /> Add Product</Button>
+            : subTab === 'categories'
+            ? <Button onClick={() => openCategoryDialog()} size="sm" className="gap-1 h-7 text-xs" data-testid="pub-add-category"><Plus className="h-3 w-3" /> New Category</Button>
+            : null
+        }
+      />
 
-      {/* Sub-tabs */}
-      <Tabs value={subTab} onValueChange={setSubTab}>
-        <TabsList>
-          <TabsTrigger value="productos" className="gap-2">
-            <Package className="h-4 w-4" />
-            Products
-          </TabsTrigger>
-          <TabsTrigger value="categories" className="gap-2">
-            <Tags className="h-4 w-4" />
-            Categories
-          </TabsTrigger>
-          <TabsTrigger value="inventario" className="gap-2">
-            <Box className="h-4 w-4" />
-            Inventory
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Products Tab */}
-        <TabsContent value="productos" className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <div className="flex gap-2 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={filterCategoria} onValueChange={setFilterCategoria}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All categories</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.category_id} value={cat.category_id}>
-                      <span className="flex items-center gap-2">
-                        <span>{cat.icono}</span> {cat.name}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={() => openEditDialog()} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Product
-            </Button>
-          </div>
+      {/* Products Tab */}
+      {subTab === 'productos' && (
+        <div className="space-y-3">
 
           {filteredProducts.length === 0 ? (
             <Card>
