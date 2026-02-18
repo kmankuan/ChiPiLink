@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import {
   Trash2, Eye, Loader2, AlertTriangle, CheckCircle2,
-  ShoppingCart, MessageSquare, Users, Link2, Package
+  ShoppingCart, MessageSquare, Users, Link2, Package, Wallet, CreditCard
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
