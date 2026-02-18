@@ -42,6 +42,11 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
   const [formData, setFormData] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadingFile, setUploadingFile] = useState(null);
+  const [expandedNames, setExpandedNames] = useState(new Set());
+  
+  const toggleNameExpand = (bookId) => {
+    setExpandedNames(prev => { const n = new Set(prev); n.has(bookId) ? n.delete(bookId) : n.add(bookId); return n; });
+  };
   
   // Wallet state
   const [walletBalance, setWalletBalance] = useState(null);
