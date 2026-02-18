@@ -44,14 +44,14 @@ class TextbookMondayAdapter(BaseMondayAdapter):
         item_name = f"{order['student_name']} - {order['grade']} - ${total:.2f} ({order_ref})"
         items_text = ", ".join([f"{i['book_name']} (x{i['quantity_ordered']})" for i in selected_items])
 
-        # Grade → Monday.com status label
+        # Grade → Monday.com status label (must match board labels exactly)
         grade = str(order["grade"])
         grade_label_map = {
-            "1": "1ro", "2": "2do", "3": "3ro", "4": "4to", "5": "5to",
-            "6": "6to", "7": "7mo", "8": "8vo", "9": "9no", "10": "10mo",
-            "11": "11vo", "12": "12vo", "K4": "K4", "K5": "K5",
+            "1": "G1", "2": "G2", "3": "G3", "4": "G4", "5": "G5",
+            "6": "G6", "7": "G7", "8": "G8", "9": "G9", "10": "G10",
+            "11": "G11", "12": "G12", "K4": "K4", "K5": "K5",
         }
-        monday_grade_label = grade_label_map.get(grade, grade)
+        monday_grade_label = grade_label_map.get(grade, f"G{grade}" if grade.isdigit() else grade)
 
         # Build column values from mapping
         column_values = {}
