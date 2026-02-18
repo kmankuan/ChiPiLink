@@ -472,10 +472,11 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               </Card>
             ))}
           </div>
-        </TabsContent>
+        </div>
+      )}
 
-        {/* Inventory Tab */}
-        <TabsContent value="inventario" className="space-y-4">
+      {/* Inventory/Low Stock Tab */}
+      {subTab === 'inventario' && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
