@@ -108,6 +108,7 @@ class CrmChatService:
             )
             order_id = order_summary.get("order_id", "")
             order_ref = order_id[-8:] if order_id else ""
+            total = order_summary.get("total", 0)
             grade = order_summary.get("grade", "")
             is_presale = order_summary.get("is_presale", False)
 
