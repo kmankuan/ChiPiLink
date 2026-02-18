@@ -273,6 +273,11 @@ export default function SchoolTextbooksView({
   const [allStudents, setAllStudents] = useState(null);
   const [walletBalance, setWalletBalance] = useState(null);
   const [summaryStudent, setSummaryStudent] = useState(null); // student object for summary modal
+  const [expandedNames, setExpandedNames] = useState(new Set());
+  
+  const toggleNameExpand = (bookId) => {
+    setExpandedNames(prev => { const n = new Set(prev); n.has(bookId) ? n.delete(bookId) : n.add(bookId); return n; });
+  };
   
   const texts = {
     en: {
