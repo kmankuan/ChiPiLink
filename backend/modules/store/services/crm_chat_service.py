@@ -59,6 +59,97 @@ class CrmChatService:
         logger.info(f"Auto-linked student {student_id} to CRM item {item_id}")
         return item_id
 
+    # ---------- Order submission: auto-link + auto-topic ----------
+
+    async def link_student_on_order_submit(
+        self,
+        student_id: str,
+        student_name: str,
+        user_id: str,
+        user_email: str,
+        user_name: str,
+        order_summary: Dict,
+    ) -> Dict:
+        """
+        Called after an order is submitted. Ensures the student is linked to the
+        CRM board and creates an order notification Update (topic) so admin and
+        parent can start a conversation.
+        Returns {"linked": bool, "topic_created": bool, "item_id": str|None}.
+        """
+        result = {"linked": False, "topic_created": False, "item_id": None}
+
+        try:
+            # 1. Resolve or create the CRM item
+            item_id = await self._resolve_monday_item(student_id, user_id)
+
+            if not item_id:
+                # No existing item — create a new one on the CRM board
+                item_id = await crm_monday_adapter.create_crm_item(
+                    student_name=student_name,
+                    parent_email=user_email,
+                    parent_name=user_name,
+                )
+                if item_id:
+                    await self._save_link(student_id, item_id, user_email)
+                    logger.info(f"Created CRM item {item_id} for student {student_id}")
+
+            if not item_id:
+                logger.warning(f"Could not link student {student_id} to CRM — board may not be configured")
+                return result
+
+            result["linked"] = True
+            result["item_id"] = item_id
+
+            # 2. Create an order notification Update (topic)
+            items_list = order_summary.get("items", [])
+            items_text = "\n".join(
+                f"  - {it.get('book_name', it.get('book_id', '?'))} (x{it.get('quantity_ordered', 1)}) — ${it.get('price', 0):.2f}"
+                for it in items_list
+            )
+            total = order_summary.get("total", 0)
+            order_id = order_summary.get("order_id", "")
+            grade = order_summary.get("grade", "")
+            is_presale = order_summary.get("is_presale", False)
+
+            body = (
+                f"[New Order Submitted]\n\n"
+                f"Student: {student_name}\n"
+                f"Grade: {grade}\n"
+                f"Order: {order_id}\n"
+                f"{'(Pre-sale)' if is_presale else ''}\n\n"
+                f"Items:\n{items_text}\n\n"
+                f"Total: ${total:.2f}\n\n"
+                f"Submitted by: {user_name} ({user_email})"
+            )
+
+            update_id = await crm_monday_adapter.create_topic(item_id, body)
+            if update_id:
+                # Store locally so it shows in the chat
+                msg_doc = {
+                    "message_id": f"crm_{uuid.uuid4().hex[:12]}",
+                    "student_id": student_id,
+                    "monday_item_id": item_id,
+                    "topic_id": update_id,
+                    "user_id": user_id,
+                    "author_name": user_name or user_email,
+                    "subject": "New Order Submitted",
+                    "message": body,
+                    "is_staff": False,
+                    "is_topic_creator": True,
+                    "is_auto_generated": True,
+                    "read_by": [user_id],
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+                await db[LOCAL_MESSAGES_COLLECTION].insert_one(msg_doc)
+                del msg_doc["_id"]
+                result["topic_created"] = True
+                logger.info(f"Auto-created order topic for student {student_id}, update_id={update_id}")
+
+        except Exception as e:
+            logger.error(f"Error in link_student_on_order_submit for {student_id}: {e}")
+
+        return result
+
     # ---------- Topics (Monday.com Updates) ----------
 
     async def get_topics(self, student_id: str, user_id: str) -> Dict:
