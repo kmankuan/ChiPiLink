@@ -182,10 +182,14 @@ class TextbookOrderService(BaseService):
         books = await self.get_books_for_grade(grade)
         logger.info(f"[get_or_create_order] Found {len(books)} books for grade {grade}")
         
+        # Check if student is in pre-sale mode (allows ordering even when stock is 0)
+        is_presale = student.get("presale_mode", False)
+        logger.info(f"[get_or_create_order] Student presale_mode={is_presale}")
+        
         items = []
         for book in books:
             inventory = book.get("inventory_quantity", 0) - book.get("reserved_quantity", 0)
-            status = OrderItemStatus.AVAILABLE.value if inventory > 0 else OrderItemStatus.OUT_OF_STOCK.value
+            status = OrderItemStatus.AVAILABLE.value if (inventory > 0 or is_presale) else OrderItemStatus.OUT_OF_STOCK.value
             
             items.append({
                 "book_id": book["book_id"],
