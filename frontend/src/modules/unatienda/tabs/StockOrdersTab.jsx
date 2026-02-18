@@ -20,6 +20,7 @@ import {
   AlertTriangle, Store, BookOpen, Layers, Zap
 } from 'lucide-react';
 import axios from 'axios';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
