@@ -180,12 +180,15 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Consolidates title, tabs, search, filters, stats, and actions into a single unified card
 - Sub-components: TabSegment (segmented pill control), StatChip (colored stat badges), FilterDropdown (compact selects)
 - Mobile responsive: filters collapse behind toggle button, tabs scroll horizontally, stats don't wrap
-- Rolled out globally across all 4 Unatienda admin tabs:
+- Rolled out globally across all 7 Unatienda admin tabs:
   - **PrivateCatalogTab** (Inventory): tabs for catalog type, search, grade/subject/status filters, stats
   - **StockOrdersTab** (Stock Mov.): tabs for catalog, type filter, stats with pending/completed counts, action buttons
   - **StudentsTab** (Students + Requests): dual BoardHeaders for Students and Requests sections, view modes, pending badge
   - **PublicCatalogTab** (Public Store): tabs for Products/Categories/Low Stock, search, category filter
-- 100% test pass rate across all rendered components
+  - **TextbookOrdersAdminTab** (Textbook Orders): tabs for Orders/Statistics/Reorders, search, status+grade filters, archive toggle
+  - **PreSaleImportTab** (Pre-Sale Import): search, status filter, stats, Preview Import action
+  - **MessagesTab** (Messages): search, stats with unread count, settings toggle
+- 100% test pass rate across all 7 tabs on desktop and mobile
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
