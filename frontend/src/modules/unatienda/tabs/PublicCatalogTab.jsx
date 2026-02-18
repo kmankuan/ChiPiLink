@@ -501,8 +501,8 @@ export default function CatalogoPublicoTab({ token, onRefresh }) {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
 
       {/* Edit Product Dialog */}
       <Dialog open={editDialog} onOpenChange={setEditDialog}>
