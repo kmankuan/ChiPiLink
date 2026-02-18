@@ -132,6 +132,13 @@ function PreviewPanel({ preview, loading }) {
           </div>
         </div>
       )}
+
+      {preview.protected_user_ids?.length > 0 && (
+        <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg text-xs text-amber-700 dark:text-amber-400">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>Admin user accounts are protected and will not be deleted ({preview.protected_user_ids.length} skipped)</span>
+        </div>
+      )}
     </div>
   );
 }
