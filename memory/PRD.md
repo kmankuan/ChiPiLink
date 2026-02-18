@@ -206,8 +206,14 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - Repository `get_by_student` now only returns draft orders (for browsing), not submitted ones
 - Frontend `TextbookOrdersAdminTab.jsx` cleaned up: removed "Last Submitted" column (replaced with "Date"), removed submission count display, removed "Submission History" from order detail dialog
 - Admin can now see multiple distinct order rows for the same student
-- Wallet payment, Monday.com sync, CRM auto-link all preserved in the new flow
-- Testing agent verified 100% pass rate (backend + frontend)
+
+### Phase 5o - Monday.com Integration Hardening (Complete - Feb 2026)
+- **Fix 1**: Monday.com item name now includes order reference: `"Student - Grade - $Total (ord_ref)"` for easy identification
+- **Fix 2**: `order_id` stored in `crm_chat_messages` collection for auto-generated topics → enables linking CRM topics back to specific orders
+- **Fix 3**: CRM topic subject changed from generic `"[New Order Submitted]"` to `"[New Order - ord_ref]"` with prominent order reference
+- **Fix 4**: CrmChat component now accepts `orderId` prop; when opened from a specific order row, highlights the relevant topic (sorted to top, purple ring, "This order" badge)
+- **Bug Fix**: Grade label mapping corrected from Spanish ordinals (`3ro`, `4to`) to board labels (`G3`, `G4`, etc.)
+- **Bug Fix**: Subitem default status corrected from `"Pendiente"` to `"Recibido"` to match Monday.com board labels
 
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
