@@ -636,6 +636,29 @@ export default function TextbookOrdersAdminTab() {
                   Monday.com Item ID: {selectedOrder.monday_item_id}
                 </p>
               )}
+
+              {/* Submissions History */}
+              {selectedOrder.submissions?.length > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Submission History ({selectedOrder.submissions.length})</p>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {selectedOrder.submissions.slice().reverse().map((sub, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 bg-muted/50 border rounded text-xs">
+                        <div>
+                          <span className="font-medium">#{selectedOrder.submissions.length - i}</span>
+                          <span className="text-muted-foreground ml-2">
+                            {sub.submitted_at ? new Date(sub.submitted_at).toLocaleString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-medium">{sub.items_count || sub.items?.length || 0} items</span>
+                          <span className="ml-2 font-bold">${(sub.total || sub.submission_total || 0).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
