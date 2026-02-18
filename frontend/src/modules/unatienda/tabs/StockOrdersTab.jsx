@@ -684,124 +684,55 @@ export default function StockOrdersTab({ token }) {
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (
-    <div className="space-y-4" data-testid="stock-orders-tab">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold">Stock Movements</h2>
-          <p className="text-xs text-muted-foreground">Manage shipments, returns, and stock adjustments</p>
-        </div>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => setShowShipment(true)} className="gap-1 text-xs" data-testid="new-shipment-btn">
-            <Truck className="h-3.5 w-3.5" /> Shipment
+    <div className="space-y-3" data-testid="stock-orders-tab">
+      <BoardHeader
+        title="Stock Movements"
+        icon={Truck}
+        subtitle="Manage shipments, returns, and stock adjustments"
+        tabs={[
+          { value: 'all', label: 'All', icon: Layers },
+          { value: 'pca', label: 'Textbooks', icon: BookOpen },
+          { value: 'public', label: 'Public', icon: Store },
+        ]}
+        activeTab={catalogFilter}
+        onTabChange={(v) => { setCatalogFilter(v); setFilter('all'); setStatusFilter(''); }}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search orders..."
+        filters={[
+          {
+            value: filter, onChange: (v) => { setFilter(v); setStatusFilter(''); }, placeholder: 'All Types', testId: 'so-type-filter',
+            options: [
+              { value: 'shipment', label: 'Shipments' },
+              { value: 'return', label: 'Returns' },
+              { value: 'adjustment', label: 'Adjustments' },
+            ],
+          },
+        ]}
+        hasActiveFilters={!!(search || filter !== 'all' || statusFilter || catalogFilter !== 'all')}
+        onClearFilters={() => { setSearch(''); setFilter('all'); setStatusFilter(''); setCatalogFilter('all'); }}
+        stats={[
+          { label: 'total', value: total, color: 'blue' },
+          ...(pendingCount > 0 ? [{ label: 'pending', value: pendingCount, color: 'amber', highlight: true }] : []),
+          { label: 'completed', value: completedCount, color: 'green' },
+          { label: 'ship', value: shipmentCount, color: 'default' },
+          { label: 'ret', value: returnCount, color: 'default' },
+          { label: 'adj', value: adjustmentCount, color: 'default' },
+        ]}
+        loading={loading}
+        onRefresh={fetchOrders}
+        actions={<>
+          <Button size="sm" onClick={() => setShowShipment(true)} className="gap-1 h-7 text-xs" data-testid="new-shipment-btn">
+            <Truck className="h-3 w-3" /> <span className="hidden sm:inline">Shipment</span>
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setShowReturn(true)} className="gap-1 text-xs" data-testid="new-return-btn">
-            <RotateCcw className="h-3.5 w-3.5" /> Return
+          <Button size="sm" variant="outline" onClick={() => setShowReturn(true)} className="gap-1 h-7 text-xs" data-testid="new-return-btn">
+            <RotateCcw className="h-3 w-3" /> <span className="hidden sm:inline">Return</span>
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setShowAdjustment(true)} className="gap-1 text-xs" data-testid="new-adjustment-btn">
-            <Wrench className="h-3.5 w-3.5" /> Adjustment
+          <Button size="sm" variant="outline" onClick={() => setShowAdjustment(true)} className="gap-1 h-7 text-xs" data-testid="new-adjustment-btn">
+            <Wrench className="h-3 w-3" /> <span className="hidden sm:inline">Adjust</span>
           </Button>
-        </div>
-      </div>
-
-      {/* Catalog Type Filter Tabs */}
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 w-fit" data-testid="catalog-filter-tabs">
-        {CATALOG_TABS.map(tab => {
-          const Icon = tab.icon;
-          const isActive = catalogFilter === tab.key;
-          const count = tab.key === 'all'
-            ? (catalogCounts.pca || 0) + (catalogCounts.public || 0) + (catalogCounts.unknown || 0)
-            : (catalogCounts[tab.key] || 0);
-          return (
-            <button
-              key={tab.key}
-              onClick={() => { setCatalogFilter(tab.key); setFilter('all'); setStatusFilter(''); }}
-              data-testid={`catalog-filter-${tab.key}`}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                isActive
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {tab.label}
-              {count > 0 && (
-                <span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                  isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                }`}>
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="summary-cards">
-        <Card>
-          <CardContent className="py-3 px-4">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <Package className="h-4 w-4 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold leading-tight">{total}</p>
-                <p className="text-[10px] text-muted-foreground">Total Orders</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-3 px-4">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30">
-                <Clock className="h-4 w-4 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold leading-tight">{pendingCount}</p>
-                <p className="text-[10px] text-muted-foreground">Pending</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-3 px-4">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold leading-tight">{completedCount}</p>
-                <p className="text-[10px] text-muted-foreground">Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-3 px-4">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-slate-800">
-                <Truck className="h-4 w-4 text-blue-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-center">
-                  <p className="text-sm font-bold leading-tight">{shipmentCount}</p>
-                  <p className="text-[9px] text-muted-foreground">Ship</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold leading-tight">{returnCount}</p>
-                  <p className="text-[9px] text-muted-foreground">Ret</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold leading-tight">{adjustmentCount}</p>
-                  <p className="text-[9px] text-muted-foreground">Adj</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        </>}
+      />
 
       {/* Pending Actions Banner */}
       {pendingCount > 0 && (
@@ -811,23 +742,7 @@ export default function StockOrdersTab({ token }) {
             <p className="text-xs font-medium text-amber-800 dark:text-amber-300">{pendingCount} order{pendingCount > 1 ? 's' : ''} pending action</p>
           </CardContent>
         </Card>
-      )}
-
-      {/* Type + Search Filters */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="flex gap-1">
-          {['all', 'shipment', 'return', 'adjustment'].map(f => (
-            <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} onClick={() => { setFilter(f); setStatusFilter(''); }}
-              className="text-xs h-7 gap-1" data-testid={`filter-${f}`}>
-              {f === 'all' ? 'All' : TYPE_META[f]?.label}
-            </Button>
-          ))}
-        </div>
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1.5 h-3.5 w-3.5 text-muted-foreground" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search orders..." className="pl-8 h-7 text-xs" />
-        </div>
-      </div>
+      )
 
       {/* Orders List */}
       {orders.length === 0 ? (
