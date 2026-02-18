@@ -390,29 +390,6 @@ export default function PreSaleImportTab({ token: propToken }) {
         </Card>
       )}
 
-      {/* Filters */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex rounded-md border overflow-hidden" data-testid="presale-status-filter">
-          {[
-            { value: 'all', label: 'All' },
-            { value: 'unlinked', label: 'Unlinked' },
-            { value: 'linked', label: 'Linked' },
-          ].map(opt => (
-            <button key={opt.value} onClick={() => setStatusFilter(opt.value)}
-              className={`px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                statusFilter === opt.value ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'
-              }`}>
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <div className="relative flex-1 min-w-[180px] max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input placeholder="Search by student, parent, or order ID..." value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)} className="pl-8 h-8 text-xs" data-testid="presale-search" />
-        </div>
-      </div>
-
       {/* Row count */}
       <div className="text-[11px] text-muted-foreground">
         Showing {paginated.length} of {sortedOrders.length} orders
