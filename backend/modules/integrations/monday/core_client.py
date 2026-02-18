@@ -253,6 +253,15 @@ class MondayCoreClient:
             return []
         return boards[0].get("items_page", {}).get("items", [])
 
+    async def delete_item(self, item_id: str) -> bool:
+        """Delete an item from any board"""
+        try:
+            await self.execute(f'mutation {{ delete_item (item_id: {item_id}) {{ id }} }}')
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete Monday.com item {item_id}: {e}")
+            return False
+
 
 
 # Singleton
