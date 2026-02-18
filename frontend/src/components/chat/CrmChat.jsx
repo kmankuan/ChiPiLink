@@ -380,7 +380,7 @@ function NewTopicForm({ studentId, token, onBack, onCreated, isAdmin }) {
   );
 }
 
-export default function CrmChat({ studentId, studentName, isOpen, onClose, isAdmin = false }) {
+export default function CrmChat({ studentId, studentName, orderId, isOpen, onClose, isAdmin = false }) {
   const { token } = useAuth();
   const [view, setView] = useState('topics'); // topics | thread | new
   const [topics, setTopics] = useState([]);
