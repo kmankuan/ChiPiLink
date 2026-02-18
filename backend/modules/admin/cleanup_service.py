@@ -154,7 +154,17 @@ class CleanupService:
     ) -> Dict:
         """Execute cleanup. Returns counts of deleted records per collection."""
         results = {}
-        all_collections = collections_to_clean or ["orders", "crm_links", "crm_messages", "crm_notifications", "students", "order_messages"]
+        all_collections = collections_to_clean or [
+            "orders", "crm_links", "crm_messages", "crm_notifications",
+            "students", "order_messages",
+            "wallets", "wallet_transactions", "wallet_alerts", "users"
+        ]
+
+        # Resolve IDs upfront
+        resolved_sids = await self._resolve_student_ids(student_ids, demo_only)
+        user_ids = await self._resolve_user_ids(resolved_sids)
+        protected = await self._get_protected_user_ids()
+        safe_user_ids = [uid for uid in user_ids if uid not in protected]
 
         # 1. Collect Monday.com item IDs before deleting orders
         monday_ids_to_delete = set()
@@ -172,7 +182,6 @@ class CleanupService:
 
             deleted_order_ids = [o["order_id"] for o in orders]
 
-            # Delete orders
             r = await db[CLEANUP_COLLECTIONS["orders"]].delete_many(order_filter)
             results["orders"] = {"deleted": r.deleted_count}
 
@@ -184,53 +193,73 @@ class CleanupService:
                 results["order_messages"] = {"deleted": r.deleted_count}
 
         # 2. CRM Links
-        if "crm_links" in all_collections:
-            resolved_sids = await self._resolve_student_ids(student_ids, demo_only)
-            if resolved_sids:
-                links = await db[CLEANUP_COLLECTIONS["crm_links"]].find(
-                    {"student_id": {"$in": resolved_sids}}, {"_id": 0, "monday_item_id": 1}
-                ).to_list(200)
-                for l in links:
-                    if l.get("monday_item_id"):
-                        monday_ids_to_delete.add(str(l["monday_item_id"]))
+        if "crm_links" in all_collections and resolved_sids:
+            links = await db[CLEANUP_COLLECTIONS["crm_links"]].find(
+                {"student_id": {"$in": resolved_sids}}, {"_id": 0, "monday_item_id": 1}
+            ).to_list(200)
+            for l in links:
+                if l.get("monday_item_id"):
+                    monday_ids_to_delete.add(str(l["monday_item_id"]))
 
-                r = await db[CLEANUP_COLLECTIONS["crm_links"]].delete_many(
-                    {"student_id": {"$in": resolved_sids}}
-                )
-                results["crm_links"] = {"deleted": r.deleted_count}
-            else:
-                results["crm_links"] = {"deleted": 0, "note": "No student_ids resolved"}
+            r = await db[CLEANUP_COLLECTIONS["crm_links"]].delete_many(
+                {"student_id": {"$in": resolved_sids}}
+            )
+            results["crm_links"] = {"deleted": r.deleted_count}
 
         # 3. CRM Messages
-        if "crm_messages" in all_collections:
-            msg_filter = self._build_student_collection_filter(student_ids, demo_only)
-            if msg_filter:
-                r = await db[CLEANUP_COLLECTIONS["crm_messages"]].delete_many(msg_filter)
-                results["crm_messages"] = {"deleted": r.deleted_count}
-            else:
-                results["crm_messages"] = {"deleted": 0}
+        if "crm_messages" in all_collections and resolved_sids:
+            r = await db[CLEANUP_COLLECTIONS["crm_messages"]].delete_many(
+                {"student_id": {"$in": resolved_sids}}
+            )
+            results["crm_messages"] = {"deleted": r.deleted_count}
 
         # 4. CRM Notifications
-        if "crm_notifications" in all_collections:
-            msg_filter = self._build_student_collection_filter(student_ids, demo_only)
-            if msg_filter:
-                r = await db[CLEANUP_COLLECTIONS["crm_notifications"]].delete_many(msg_filter)
-                results["crm_notifications"] = {"deleted": r.deleted_count}
-            else:
-                results["crm_notifications"] = {"deleted": 0}
+        if "crm_notifications" in all_collections and resolved_sids:
+            r = await db[CLEANUP_COLLECTIONS["crm_notifications"]].delete_many(
+                {"student_id": {"$in": resolved_sids}}
+            )
+            results["crm_notifications"] = {"deleted": r.deleted_count}
 
         # 5. Students
-        if "students" in all_collections:
-            resolved_sids = await self._resolve_student_ids(student_ids, demo_only)
-            if resolved_sids:
-                r = await db[CLEANUP_COLLECTIONS["students"]].delete_many(
-                    {"student_id": {"$in": resolved_sids}}
-                )
-                results["students"] = {"deleted": r.deleted_count}
-            else:
-                results["students"] = {"deleted": 0}
+        if "students" in all_collections and resolved_sids:
+            r = await db[CLEANUP_COLLECTIONS["students"]].delete_many(
+                {"student_id": {"$in": resolved_sids}}
+            )
+            results["students"] = {"deleted": r.deleted_count}
 
-        # 6. Delete Monday.com items
+        # 6. Wallets
+        if "wallets" in all_collections and safe_user_ids:
+            uid_filter = {"user_id": {"$in": safe_user_ids}}
+            r = await db[CLEANUP_COLLECTIONS["wallets"]].delete_many(uid_filter)
+            results["wallets"] = {"deleted": r.deleted_count}
+
+        # 7. Wallet Transactions (both collections)
+        if "wallet_transactions" in all_collections and safe_user_ids:
+            uid_filter = {"user_id": {"$in": safe_user_ids}}
+            r1 = await db[CLEANUP_COLLECTIONS["wallet_transactions"]].delete_many(uid_filter)
+            r2 = await db[CLEANUP_COLLECTIONS["wallet_transactions_v2"]].delete_many(uid_filter)
+            results["wallet_transactions"] = {"deleted": r1.deleted_count + r2.deleted_count}
+
+        # 8. Wallet Alerts
+        if "wallet_alerts" in all_collections and safe_user_ids:
+            r = await db[CLEANUP_COLLECTIONS["wallet_alerts"]].delete_many(
+                {"usuario_id": {"$in": safe_user_ids}}
+            )
+            results["wallet_alerts"] = {"deleted": r.deleted_count}
+
+        # 9. Users
+        if "users" in all_collections and safe_user_ids:
+            r = await db[CLEANUP_COLLECTIONS["users"]].delete_many(
+                {"user_id": {"$in": safe_user_ids}}
+            )
+            results["users"] = {"deleted": r.deleted_count}
+
+        # 10. Protected users info
+        protected_skipped = list(protected & set(user_ids))
+        if protected_skipped:
+            results["protected_users_skipped"] = protected_skipped
+
+        # 11. Delete Monday.com items
         monday_results = {"attempted": 0, "deleted": 0, "failed": 0}
         if delete_monday_items and monday_ids_to_delete:
             for mid in monday_ids_to_delete:
