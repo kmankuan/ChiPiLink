@@ -436,87 +436,65 @@ export default function TextbookAccessAdminTab({ token }) {
     return Array.from(years).sort((a, b) => b - a);
   };
 
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
+  const inReviewCount = requests.filter(r => r.status === 'in_review').length;
+
+  const hasActiveFilters = (filterSchool && filterSchool !== 'all') || (filterYear && filterYear !== 'all');
+
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h3 className="text-base sm:text-lg font-semibold">{t.title}</h3>
-          <p className="text-xs sm:text-sm text-muted-foreground">{t.subtitle}</p>
+    <div className="space-y-3" data-testid="student-requests-tab">
+      <BoardHeader
+        title={t.title}
+        icon={ClipboardList}
+        subtitle={t.subtitle}
+        tabs={[
+          { value: 'pending', label: `${t.pendingTab}${pendingCount ? ` (${pendingCount})` : ''}`, icon: Clock },
+          { value: 'in_review', label: t.inReviewTab, icon: Info },
+          { value: 'all', label: t.allTab },
+        ]}
+        activeTab={selectedTab}
+        onTabChange={setSelectedTab}
+        filters={[
+          {
+            value: filterSchool === 'all' ? '' : filterSchool,
+            onChange: (v) => setFilterSchool(v || 'all'),
+            options: schools.map(s => ({ value: s.school_id, label: s.name })),
+            placeholder: t.allSchools,
+            testId: 'requests-filter-school',
+          },
+          {
+            value: filterYear === 'all' ? '' : filterYear,
+            onChange: (v) => setFilterYear(v || 'all'),
+            options: getAvailableYears().map(y => ({ value: String(y), label: String(y) })),
+            placeholder: t.allYears,
+            testId: 'requests-filter-year',
+          },
+        ]}
+        stats={[
+          { label: t.pendingTab, value: pendingCount, color: pendingCount > 0 ? 'amber' : 'default', highlight: pendingCount > 0 },
+          { label: t.inReviewTab, value: inReviewCount, color: inReviewCount > 0 ? 'blue' : 'default' },
+          { label: t.allTab, value: requests.length, color: 'default' },
+        ]}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={() => { setFilterSchool('all'); setFilterYear('all'); }}
+        loading={loading}
+        onRefresh={fetchRequests}
+      />
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-        <Button variant="outline" size="sm" onClick={fetchRequests} className="self-start sm:self-auto">
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          {t.refresh}
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-        <div className="flex items-center gap-2 flex-1 sm:flex-none">
-          <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
-          <Select value={filterSchool} onValueChange={setFilterSchool}>
-            <SelectTrigger className="flex-1 sm:w-[200px]">
-              <SelectValue placeholder={t.filterSchool} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.allSchools}</SelectItem>
-              {schools.map((school) => (
-                <SelectItem key={school.school_id} value={school.school_id}>
-                  {school.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <Select value={filterYear} onValueChange={setFilterYear}>
-          <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder={t.filterYear} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t.allYears}</SelectItem>
-            {getAvailableYears().map((year) => (
-              <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Tabs */}
-      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList>
-          <TabsTrigger value="pending" className="gap-2">
-            <Clock className="h-4 w-4" />
-            {t.pendingTab}
-            {requests.filter(r => r.status === 'pending').length > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {requests.filter(r => r.status === 'pending').length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="in_review" className="gap-2">
-            <Info className="h-4 w-4" />
-            {t.inReviewTab}
-          </TabsTrigger>
-          <TabsTrigger value="all" className="gap-2">
-            {t.allTab}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={selectedTab} className="mt-4">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : requests.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t.noRequests}</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
+      ) : requests.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">{t.noRequests}</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
               {/* Mobile Card View */}
               <div className="block sm:hidden space-y-3">
                 {pageRequests.map((request, idx) => (
