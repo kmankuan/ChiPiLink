@@ -198,6 +198,12 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - The CRM linking is non-blocking — if Monday.com API fails, the order still succeeds
 - Files modified: `monday_crm_adapter.py` (create_crm_item), `crm_chat_service.py` (link_student_on_order_submit), `textbook_order_service.py` (calls it after submit)
 
+### Phase 5n - Order Submission Tracking in Admin (Complete - Feb 2026)
+- Added "Last Submitted" column to TextbookOrdersAdminTab orders table — shows exact date/time of latest submission
+- Added Submission History section to order detail dialog — shows all submissions with date, items count, and subtotal
+- Added "(X submissions)" badge on Items column when an order has multiple partial submissions
+- Root cause: system uses 1 order per student/year with partial submissions — admin couldn't distinguish between first and subsequent submissions. Now all submissions are tracked and visible.
+
 ### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
