@@ -476,19 +476,19 @@ export default function TextbookOrderView({ privateCatalogAccess, selectedStuden
                   {orderedBooks.map(book => (
                     <div 
                       key={book.book_id}
-                      className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
+                      className="flex items-start justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 gap-3"
                     >
-                      <div className="flex items-center gap-3">
-                        <Lock className="h-4 w-4 text-green-600" />
-                        <div>
-                          <p className="font-medium">{book.name || book.book_name}</p>
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <Lock className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                        <div className="min-w-0" onClick={() => toggleNameExpand(book.book_id)}>
+                          <p className={`font-medium ${expandedNames.has(book.book_id) ? '' : 'line-clamp-2'}`}>{book.name || book.book_name}</p>
                           <p className="text-sm text-muted-foreground">{book.subject}</p>
                           {book.reorder_pending && (
                             <p className="text-xs text-amber-600">{te.reorderPending}</p>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <span className="font-semibold text-green-700">${book.price?.toFixed(2)}</span>
                         {!book.reorder_pending && (
                           <Button
