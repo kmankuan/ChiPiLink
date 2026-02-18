@@ -154,12 +154,7 @@ Build and enhance a community/school management platform (ChiPi Link) with featu
 - **UI Fix**: Removed duplicate "Agregar estudiante" (Add Student) card from bottom of student grid in `SchoolTextbooksView.jsx` — header already has the + button
 - Testing agent verified 100% pass rate
 
-### Phase 5i - Book Name Text Wrap (Feb 2026)
-- Fixed truncated book names on mobile in both `SchoolTextbooksView.jsx` and `TextbookOrderView.jsx`
-- Names now wrap to 2 lines by default with `line-clamp-2`
-- Tap on a name to expand and see the full title (toggle behavior)
-- Changed flex alignment from `items-center` to `items-start` so multi-line text aligns with checkbox
-- Added `min-w-0` + `shrink-0` to prevent flex overflow
+### P1 - Global Progress Icon System
 Abstract the progress icon system from landing page-specific components into a truly global resource.
 
 ### P2 - Stop Button for Monday.com Sync
