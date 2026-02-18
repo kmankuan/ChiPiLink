@@ -44,6 +44,29 @@ class CrmMondayAdapter(BaseMondayAdapter):
         )
         return items[0] if items else None
 
+    async def create_crm_item(self, student_name: str, parent_email: str, parent_name: str = "") -> Optional[str]:
+        """Create a new customer item on the CRM board. Returns item_id."""
+        config = await self.get_crm_config()
+        board_id = config.get("board_id")
+        email_col = config.get("email_column_id")
+        name_col = config.get("name_column_id")
+        if not board_id or not email_col:
+            logger.warning("CRM board not configured, cannot create item")
+            return None
+
+        column_values = {email_col: {"email": parent_email, "text": parent_email}}
+        if name_col and parent_name:
+            column_values[name_col] = parent_name
+
+        item_id = await self.client.create_item(
+            board_id=board_id,
+            item_name=student_name,
+            column_values=column_values,
+        )
+        if item_id:
+            logger.info(f"Created CRM item {item_id} for {student_name} ({parent_email})")
+        return item_id
+
     async def get_topics(self, item_id: str) -> List[Dict]:
         """Get all Updates (topics) with their replies for a CRM item"""
         raw = await self.client.get_item_updates_with_replies(item_id)
