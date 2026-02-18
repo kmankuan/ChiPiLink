@@ -328,6 +328,23 @@ class CleanupService:
             return [d["student_id"] for d in docs]
         return []
 
+    async def _resolve_user_ids(self, student_ids: List[str]) -> List[str]:
+        """Get unique user_ids from a list of student_ids."""
+        if not student_ids:
+            return []
+        students = await db[CLEANUP_COLLECTIONS["students"]].find(
+            {"student_id": {"$in": student_ids}},
+            {"_id": 0, "user_id": 1}
+        ).to_list(500)
+        return list(set(s["user_id"] for s in students if s.get("user_id")))
+
+    async def _get_protected_user_ids(self) -> set:
+        """Return user_ids that must never be deleted (admins)."""
+        admins = await db.auth_users.find(
+            {"is_admin": True}, {"_id": 0, "user_id": 1}
+        ).to_list(50)
+        return set(a["user_id"] for a in admins if a.get("user_id"))
+
     def _build_student_collection_filter(self, student_ids: Optional[List[str]], demo_only: bool) -> Dict:
         """Filter for collections keyed by student_id."""
         if student_ids:
