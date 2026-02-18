@@ -184,7 +184,7 @@ export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
   // Flatten all items with translated labels for lookups
   const allNavItems = useMemo(() =>
-    navGroups.flatMap(g => g.items.map(item => ({ ...item, label: t(item.labelKey), group: g.group }))),
+    navGroups.flatMap(g => g.items.map(item => ({ ...item, label: t(item.labelKey) === item.labelKey && item.fallbackLabel ? item.fallbackLabel : t(item.labelKey), group: g.group }))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [i18n.language]
   );
