@@ -97,6 +97,17 @@ async def list_students_for_cleanup(admin: dict = Depends(get_admin_user)):
     ).to_list(200)
     link_map = {l["student_id"]: l.get("monday_item_id") for l in links}
 
+    # Get wallet info per user_id
+    all_user_ids = list(set(s.get("user_id") for s in students if s.get("user_id")))
+    wallet_counts = {}
+    txn_counts = {}
+    for uid in all_user_ids:
+        w = await db.chipi_wallets.find_one({"user_id": uid}, {"_id": 0, "balance_usd": 1})
+        t1 = await db.chipi_transactions.count_documents({"user_id": uid})
+        t2 = await db.wallet_transactions.count_documents({"user_id": uid})
+        wallet_counts[uid] = w.get("balance_usd", 0) if w else None
+        txn_counts[uid] = t1 + t2
+
     result = []
     for stat in order_stats:
         sid = stat["_id"]
