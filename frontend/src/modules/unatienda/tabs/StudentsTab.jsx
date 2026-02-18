@@ -414,28 +414,6 @@ export default function StudentsTab({ token }) {
       {/* ═══ REQUESTS SECTION ═══ */}
       {section === 'requests' && (
         <div className="space-y-3" data-testid="requests-section">
-          {/* Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center border rounded-md overflow-hidden shrink-0">
-              {['pending', 'in_review', 'all'].map(s => (
-                <button key={s} onClick={() => setReqFilter(s)} data-testid={`req-filter-${s}`}
-                  className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${reqFilter === s ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'}`}>
-                  {s === 'pending' ? t.pending : s === 'in_review' ? t.inReview : t.all}
-                  {s === 'pending' && pendingCount > 0 && <span className="ml-1 text-[10px]">{pendingCount}</span>}
-                </button>
-              ))}
-            </div>
-            <Select value={reqSchoolFilter} onValueChange={setReqSchoolFilter}>
-              <SelectTrigger className="h-8 text-xs w-auto min-w-[140px]"><SelectValue placeholder={t.allSchools} /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.allSchools}</SelectItem>
-                {reqSchools.map(s => <SelectItem key={s.school_id} value={s.school_id}>{s.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="sm" onClick={() => { fetchRequests(); fetchPendingCount(); }} className="gap-1 h-8 text-xs shrink-0">
-              <RefreshCw className="h-3 w-3" /> {t.refresh}
-            </Button>
-          </div>
 
           {/* Request Cards */}
           {requestsLoading ? (
