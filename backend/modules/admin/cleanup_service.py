@@ -47,8 +47,7 @@ class CleanupService:
         """Return counts and sample data that would be deleted."""
         result = {}
 
-        # Build a student filter
-        student_filter = self._build_student_filter(student_ids, demo_only)
+        # Build filters
         order_filter = self._build_order_filter(order_ids, student_ids, demo_only, date_before)
 
         # Orders
@@ -61,62 +60,82 @@ class CleanupService:
             monday_item_ids.extend(o.get("monday_item_ids", []))
         result["orders"] = {
             "count": len(orders),
-            "monday_items_count": len(monday_item_ids),
+            "monday_items_count": len([m for m in monday_item_ids if m]),
             "samples": orders[:10],
         }
 
+        # Resolve student IDs and user IDs
+        resolved_sids = await self._resolve_student_ids(student_ids, demo_only)
+        user_ids = await self._resolve_user_ids(resolved_sids)
+        protected = await self._get_protected_user_ids()
+        safe_user_ids = [uid for uid in user_ids if uid not in protected]
+
         # CRM Links
-        if student_ids or demo_only:
-            link_filter = {"student_id": {"$in": await self._resolve_student_ids(student_ids, demo_only)}} if student_ids or demo_only else {}
-            links = await db[CLEANUP_COLLECTIONS["crm_links"]].find(
-                link_filter, {"_id": 0}
-            ).to_list(100)
+        if resolved_sids:
+            link_filter = {"student_id": {"$in": resolved_sids}}
+            links = await db[CLEANUP_COLLECTIONS["crm_links"]].find(link_filter, {"_id": 0}).to_list(100)
             crm_monday_ids = [l.get("monday_item_id") for l in links if l.get("monday_item_id")]
-            result["crm_links"] = {
-                "count": len(links),
-                "crm_monday_items_count": len(crm_monday_ids),
-                "samples": links[:10],
-            }
+            result["crm_links"] = {"count": len(links), "crm_monday_items_count": len(crm_monday_ids)}
         else:
-            count = await db[CLEANUP_COLLECTIONS["crm_links"]].count_documents(order_filter if order_ids else {})
-            result["crm_links"] = {"count": 0, "note": "Use student_ids or demo_only to clean CRM links"}
+            result["crm_links"] = {"count": 0}
 
         # CRM Messages
-        msg_filter = self._build_student_collection_filter(student_ids, demo_only)
-        msg_count = await db[CLEANUP_COLLECTIONS["crm_messages"]].count_documents(msg_filter)
-        result["crm_messages"] = {"count": msg_count}
+        msg_filter = {"student_id": {"$in": resolved_sids}} if resolved_sids else {}
+        result["crm_messages"] = {"count": await db[CLEANUP_COLLECTIONS["crm_messages"]].count_documents(msg_filter) if msg_filter else 0}
 
         # CRM Notifications
-        notif_count = await db[CLEANUP_COLLECTIONS["crm_notifications"]].count_documents(msg_filter)
-        result["crm_notifications"] = {"count": notif_count}
+        result["crm_notifications"] = {"count": await db[CLEANUP_COLLECTIONS["crm_notifications"]].count_documents(msg_filter) if msg_filter else 0}
 
-        # Students (only if demo_only or specific IDs)
-        if student_ids or demo_only:
-            resolved = await self._resolve_student_ids(student_ids, demo_only)
+        # Students
+        if resolved_sids:
             student_docs = await db[CLEANUP_COLLECTIONS["students"]].find(
-                {"student_id": {"$in": resolved}},
+                {"student_id": {"$in": resolved_sids}},
                 {"_id": 0, "student_id": 1, "full_name": 1, "is_demo": 1, "user_id": 1}
             ).to_list(100)
             result["students"] = {"count": len(student_docs), "samples": student_docs[:10]}
         else:
-            result["students"] = {"count": 0, "note": "Use student_ids or demo_only to clean students"}
+            result["students"] = {"count": 0}
 
         # Order Messages
-        if order_ids:
-            om_count = await db[CLEANUP_COLLECTIONS["order_messages"]].count_documents(
-                {"order_id": {"$in": order_ids}}
-            )
-        elif student_ids:
-            order_id_list = [o["order_id"] for o in orders]
-            om_count = await db[CLEANUP_COLLECTIONS["order_messages"]].count_documents(
+        order_id_list = [o["order_id"] for o in orders]
+        result["order_messages"] = {
+            "count": await db[CLEANUP_COLLECTIONS["order_messages"]].count_documents(
                 {"order_id": {"$in": order_id_list}}
             ) if order_id_list else 0
-        else:
-            om_count = 0
-        result["order_messages"] = {"count": om_count}
+        }
 
-        result["monday_items_to_delete"] = len(monday_item_ids) + len(result.get("crm_links", {}).get("crm_monday_items_count", 0).__class__ == int and [])
-        result["total_monday_items"] = len(set(monday_item_ids))
+        # --- Wallets ---
+        if safe_user_ids:
+            uid_filter = {"user_id": {"$in": safe_user_ids}}
+            wallets = await db[CLEANUP_COLLECTIONS["wallets"]].find(uid_filter, {"_id": 0, "wallet_id": 1, "user_id": 1, "balance_usd": 1}).to_list(100)
+            wallet_ids = [w["wallet_id"] for w in wallets if w.get("wallet_id")]
+            txn1 = await db[CLEANUP_COLLECTIONS["wallet_transactions"]].count_documents(uid_filter)
+            txn2 = await db[CLEANUP_COLLECTIONS["wallet_transactions_v2"]].count_documents(uid_filter)
+            # Wallet alerts use usuario_id
+            alert_count = await db[CLEANUP_COLLECTIONS["wallet_alerts"]].count_documents(
+                {"usuario_id": {"$in": safe_user_ids}}
+            )
+            result["wallets"] = {"count": len(wallets), "samples": wallets[:5]}
+            result["wallet_transactions"] = {"count": txn1 + txn2}
+            result["wallet_alerts"] = {"count": alert_count}
+        else:
+            result["wallets"] = {"count": 0}
+            result["wallet_transactions"] = {"count": 0}
+            result["wallet_alerts"] = {"count": 0}
+
+        # --- Users ---
+        if safe_user_ids:
+            user_docs = await db[CLEANUP_COLLECTIONS["users"]].find(
+                {"user_id": {"$in": safe_user_ids}},
+                {"_id": 0, "user_id": 1, "email": 1, "name": 1}
+            ).to_list(100)
+            result["users"] = {"count": len(user_docs), "samples": user_docs[:10]}
+        else:
+            result["users"] = {"count": 0, "note": "Admin users are protected and won't be deleted"}
+
+        # Summary
+        result["protected_user_ids"] = list(protected & set(user_ids))
+        result["total_monday_items"] = len(set(m for m in monday_item_ids if m))
 
         return result
 
