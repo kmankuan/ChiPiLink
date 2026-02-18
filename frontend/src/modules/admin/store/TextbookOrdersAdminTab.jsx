@@ -373,7 +373,7 @@ export default function TextbookOrdersAdminTab() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setChatStudent({ id: order.student_id, name: order.student_name })}
+                              onClick={() => setChatStudent({ id: order.student_id, name: order.student_name, orderId: order.order_id })}
                               title="Messages"
                               data-testid={`admin-chat-order-${order.order_id}`}
                             >
@@ -719,6 +719,7 @@ export default function TextbookOrdersAdminTab() {
         <CrmChat
           studentId={chatStudent.id}
           studentName={chatStudent.name}
+          orderId={chatStudent.orderId}
           isOpen={!!chatStudent}
           onClose={() => setChatStudent(null)}
           isAdmin={true}
