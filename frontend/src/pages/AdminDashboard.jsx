@@ -58,7 +58,8 @@ import {
   Megaphone,
   Send,
   FileText,
-  EyeOff
+  EyeOff,
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -95,6 +96,7 @@ const DictionaryManagerModule = lazy(() => import('@/modules/admin/DictionaryMan
 const TranslationCoverageCard = lazy(() => import('@/modules/admin/TranslationCoverageCard'));
 const DemoDataModule = lazy(() => import('@/modules/admin/DemoDataModule'));
 const DatabaseMigrationModule = lazy(() => import('@/modules/admin/DatabaseMigrationModule'));
+const DataCleanupModule = lazy(() => import('@/modules/admin/DataCleanupModule'));
 const ModuleStatusModule = lazy(() => import('@/modules/admin/ModuleStatusModule'));
 
 // Loading component for Suspense
@@ -173,6 +175,7 @@ const navGroups = [
       { id: 'migration', labelKey: 'nav.migration', icon: ArrowRightLeft, permission: 'admin.site_config', adminOnly: true },
       { id: 'modules', labelKey: 'nav.moduleStatus', icon: LayoutGrid, permission: 'admin.site_config', adminOnly: true },
       { id: 'devcontrol', labelKey: 'nav.devControl', icon: Code2, permission: 'admin.site_config', adminOnly: true },
+      { id: 'cleanup', labelKey: 'nav.dataCleanup', icon: Trash2, permission: 'admin.site_config', adminOnly: true },
     ],
   },
 ];
@@ -329,6 +332,8 @@ export default function AdminDashboard() {
         return <DatabaseMigrationModule />;
       case 'modules':
         return <ModuleStatusModule />;
+      case 'cleanup':
+        return <DataCleanupModule />;
       default:
         return <DashboardModule />;
     }
