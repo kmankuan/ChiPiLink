@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { BoardHeader } from '@/components/shared/BoardHeader';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
