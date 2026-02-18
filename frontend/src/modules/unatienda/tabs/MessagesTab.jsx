@@ -63,72 +63,34 @@ export default function MessagesTab({ token }) {
   }
 
   return (
-    <div className="space-y-4" data-testid="messages-tab">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-purple-600" />
-            Messages
-            {totalUnread > 0 && (
-              <Badge className="bg-red-500 text-white text-[10px] h-5 px-1.5">{totalUnread}</Badge>
-            )}
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Customer conversations via Monday.com CRM
-          </p>
-        </div>
-        <div className="flex gap-2">
+    <div className="space-y-3" data-testid="messages-tab">
+      <BoardHeader
+        title="Messages"
+        icon={MessageCircle}
+        subtitle="Customer conversations via Monday.com CRM"
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by student or email..."
+        hasActiveFilters={!!search}
+        onClearFilters={() => setSearch('')}
+        stats={[
+          { label: 'conversations', value: conversations.length, color: 'blue' },
+          ...(totalUnread > 0 ? [{ label: 'unread', value: totalUnread, color: 'red', highlight: true }] : []),
+        ]}
+        loading={loading}
+        onRefresh={() => { setLoading(true); fetchInbox(); }}
+        actions={
           <Button
             size="sm"
-            variant="outline"
-            onClick={() => { setLoading(true); fetchInbox(); }}
-            className="gap-1 text-xs"
-            data-testid="refresh-inbox-btn"
-          >
-            <RefreshCw className="h-3.5 w-3.5" /> Refresh
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
+            variant={showConfig ? 'default' : 'ghost'}
             onClick={() => setShowConfig(!showConfig)}
-            className="gap-1 text-xs"
+            className="gap-1 h-7 text-xs"
             data-testid="messages-config-btn"
           >
-            <Settings className="h-3.5 w-3.5" />
+            <Settings className="h-3 w-3" />
           </Button>
-        </div>
-      </div>
-
-      {/* Config panel */}
-      {showConfig && <CrmConfigPanel token={token} />}
-
-      {/* Stats bar */}
-      <div className="flex items-center gap-4 text-xs">
-        <div className="flex items-center gap-1.5">
-          <Inbox className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="font-semibold">{conversations.length}</span>
-          <span className="text-muted-foreground">conversations</span>
-        </div>
-        {totalUnread > 0 && (
-          <div className="flex items-center gap-1.5">
-            <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="font-semibold text-red-600">{totalUnread}</span>
-            <span className="text-muted-foreground">unread</span>
-          </div>
-        )}
-      </div>
-
-      {/* Search */}
-      {conversations.length > 0 && (
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by student or email..."
-            className="pl-8 h-8 text-xs"
-            data-testid="inbox-search"
+        }
+      />
           />
         </div>
       )}
