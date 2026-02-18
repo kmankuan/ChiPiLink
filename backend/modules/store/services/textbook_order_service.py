@@ -515,8 +515,12 @@ class TextbookOrderService(BaseService):
             "submissions": submissions,
             "notes": notes,
             "total_amount": total_amount,
+            "user_name": user_name,
+            "user_email": user_email,
             "monday_item_ids": order.get("monday_item_ids", []) + ([monday_item_id] if monday_item_id else [])
         }
+        if form_data:
+            update_data["form_data"] = form_data
         if is_presale:
             update_data["is_presale"] = True
         await self.order_repo.update_order(order_id, update_data)
