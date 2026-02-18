@@ -341,22 +341,75 @@ export default function StudentsTab({ token }) {
   /* ──────────────────── RENDER ──────────────────── */
   return (
     <div className="space-y-3" data-testid="students-tab">
-      {/* Section Toggle */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1" data-testid="section-toggle">
-        {[
-          { id: 'students', icon: Users, label: t.students, count: students.length },
-          { id: 'requests', icon: Clipboard, label: t.requests, badge: pendingCount },
-        ].map(({ id, icon: Ic, label, count, badge }) => (
-          <button key={id} onClick={() => setSection(id)} data-testid={`section-${id}`}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all shrink-0 ${
-              section === id ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-            }`}>
-            <Ic className="h-3.5 w-3.5" /> {label}
-            {count != null && <Badge variant="secondary" className="ml-0.5 text-[10px] px-1.5 py-0 h-4">{count}</Badge>}
-            {badge > 0 && <Badge className="ml-0.5 text-[10px] px-1.5 py-0 h-4 bg-amber-500 text-white">{badge}</Badge>}
-          </button>
-        ))}
-      </div>
+      {/* Students Section Board Header */}
+      {section === 'students' && (
+        <BoardHeader
+          title={t.students}
+          icon={Users}
+          tabs={[
+            { value: 'students', label: t.students, icon: Users },
+            { value: 'requests', label: t.requests, icon: Clipboard },
+          ]}
+          activeTab={section}
+          onTabChange={setSection}
+          search={searchTerm}
+          onSearchChange={setSearchTerm}
+          searchPlaceholder="Search by name or student ID..."
+          hasActiveFilters={!!searchTerm}
+          onClearFilters={() => setSearchTerm('')}
+          stats={[
+            { label: 'students', value: students.length, color: 'blue' },
+            ...(stats.locked > 0 ? [{ label: 'locked', value: stats.locked, color: 'amber', highlight: true }] : []),
+            ...(stats.presale > 0 ? [{ label: 'pre-sale', value: stats.presale, color: 'red', highlight: true }] : []),
+            { label: 'grades', value: stats.grades, color: 'green' },
+          ]}
+          viewModes={[
+            { value: 'card', label: 'Cards', icon: LayoutGrid },
+            { value: 'table', label: 'Table', icon: List },
+          ]}
+          activeView={viewMode}
+          onViewChange={setViewMode}
+          loading={loading}
+          onRefresh={fetchStudents}
+          actions={pendingCount > 0 ? (
+            <Badge className="text-[10px] bg-amber-500 text-white cursor-pointer" onClick={() => setSection('requests')} data-testid="pending-requests-badge">
+              {pendingCount} {t.pending}
+            </Badge>
+          ) : null}
+        />
+      )}
+
+      {/* Requests Section Board Header */}
+      {section === 'requests' && (
+        <BoardHeader
+          title={t.requests}
+          icon={Clipboard}
+          tabs={[
+            { value: 'students', label: t.students, icon: Users },
+            { value: 'requests', label: t.requests, icon: Clipboard },
+          ]}
+          activeTab={section}
+          onTabChange={setSection}
+          filters={[
+            {
+              value: reqFilter, onChange: setReqFilter, placeholder: t.all, testId: 'req-status-filter',
+              options: [
+                { value: 'pending', label: t.pending },
+                { value: 'in_review', label: t.inReview },
+              ],
+            },
+            ...(reqSchools.length > 0 ? [{
+              value: reqSchoolFilter, onChange: setReqSchoolFilter, placeholder: t.allSchools, testId: 'req-school-filter',
+              options: reqSchools.map(s => ({ value: s.school_id, label: s.name })),
+            }] : []),
+          ]}
+          hasActiveFilters={reqFilter !== 'pending' || reqSchoolFilter !== 'all'}
+          onClearFilters={() => { setReqFilter('pending'); setReqSchoolFilter('all'); }}
+          stats={pendingCount > 0 ? [{ label: 'pending', value: pendingCount, color: 'amber', highlight: true }] : []}
+          loading={requestsLoading}
+          onRefresh={() => { fetchRequests(); fetchPendingCount(); }}
+        />
+      )}
 
       {/* ═══ REQUESTS SECTION ═══ */}
       {section === 'requests' && (
