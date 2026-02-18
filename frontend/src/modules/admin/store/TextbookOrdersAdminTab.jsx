@@ -351,7 +351,7 @@ export default function TextbookOrdersAdminTab() {
                           ${order.total_amount?.toFixed(2) || '0.00'}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
-                          {order.last_submitted_at ? new Date(order.last_submitted_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
+                          {order.submitted_at ? new Date(order.submitted_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : order.created_at ? new Date(order.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}
                         </TableCell>
                         <TableCell>
                           <Select
